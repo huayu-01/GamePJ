@@ -1,0 +1,46 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="抽抽抽"
+run/main_scene="res://scenes/ui/main_menu.tscn"
+config/features=PackedStringArray("4.6", "C#", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+GameManager="*res://autoload/GameManager.cs"
+NetworkManager="*res://autoload/NetworkManager.cs"
+PlayerData="*res://autoload/PlayerData.cs"
+AudioManager="*res://autoload/AudioManager.cs"
+SettingsManager="*res://autoload/SettingsManager.cs"
+
+[display]
+
+window/size/viewport_width=960
+window/size/viewport_height=1920
+window/stretch/mode="canvas_items"
+
+[dotnet]
+
+project/assembly_name="TexasHoldemGodot"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"

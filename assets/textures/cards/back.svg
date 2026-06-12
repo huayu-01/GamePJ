@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="136" viewBox="0 0 96 136">
+  <rect width="96" height="136" rx="8" fill="#1d3f78"/>
+  <rect x="6" y="6" width="84" height="124" rx="6" fill="none" stroke="#d6e4ff" stroke-width="3"/>
+  <path d="M24 24h48v88H24z" fill="#254f95"/>
+  <text x="48" y="74" text-anchor="middle" font-family="Arial" font-size="18" fill="#ffffff">TH</text>
+</svg>
