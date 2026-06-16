@@ -6,12 +6,9 @@ public partial class MainMenu : Control
     [Export] public bool ShowTestModeButton { get; set; }
 
     private LineEdit? _joinAddressInput;
+    private ColorRect? _joinOverlay;
     private Panel? _joinPanel;
     private OptionButton? _seatCountOption;
-    private SpinBox? _smallBlindSpin;
-    private SpinBox? _minBuyInSpin;
-    private SpinBox? _maxBuyInSpin;
-    private SpinBox? _tableCapSpin;
 
     public override void _Ready()
     {
@@ -26,18 +23,24 @@ public partial class MainMenu : Control
         background.SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(background);
 
-        var root = new HBoxContainer { Name = "MainLayout" };
-        root.SetAnchorsPreset(LayoutPreset.FullRect);
-        root.OffsetLeft = 56;
-        root.OffsetTop = 56;
-        root.OffsetRight = -56;
-        root.OffsetBottom = -56;
-        root.AddThemeConstantOverride("separation", 24);
-        AddChild(root);
+        var center = new CenterContainer { Name = "MainCenter" };
+        center.SetAnchorsPreset(LayoutPreset.FullRect);
+        center.OffsetLeft = 48;
+        center.OffsetTop = 48;
+        center.OffsetRight = -48;
+        center.OffsetBottom = -48;
+        AddChild(center);
+
+        var root = new VBoxContainer { Name = "MainLayout" };
+        root.Alignment = BoxContainer.AlignmentMode.Center;
+        root.CustomMinimumSize = new Vector2(440, 0);
+        root.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+        root.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        root.AddThemeConstantOverride("separation", 18);
+        center.AddChild(root);
 
         var menuPanel = FlatUi.Panel("MenuPanel");
-        menuPanel.CustomMinimumSize = new Vector2(420, 520);
-        menuPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        menuPanel.CustomMinimumSize = new Vector2(440, 520);
         root.AddChild(menuPanel);
 
         var menu = new VBoxContainer { Name = "Menu" };
@@ -62,13 +65,8 @@ public partial class MainMenu : Control
         roomRow.AddChild(_seatCountOption);
         menu.AddChild(roomRow);
 
-        menu.AddChild(BuildSpinRow("低注/小盲", out _smallBlindSpin, 1, 10000, GameManager.Instance?.SmallBlindAmount ?? Constants.SmallBlind, 1));
-        menu.AddChild(BuildSpinRow("最低带入", out _minBuyInSpin, 1, 100000, GameManager.Instance?.MinBuyIn ?? Constants.MinBuyIn, 1));
-        menu.AddChild(BuildSpinRow("最高带入", out _maxBuyInSpin, 1, 100000, GameManager.Instance?.MaxBuyIn ?? Constants.MaxBuyIn, 1));
-        menu.AddChild(BuildSpinRow("后手上限", out _tableCapSpin, 1, 200000, GameManager.Instance?.TableChipLimit ?? Constants.TableChipLimit, 1));
-
         AddMenuButton(menu, "创建房间", OnCreateRoomPressed, FlatUi.AccentMuted);
-        AddMenuButton(menu, "加入房间", ToggleJoinPanel);
+        AddMenuButton(menu, "加入房间", ShowJoinPanel);
         AddMenuButton(menu, "设置", () => GetTree().ChangeSceneToFile(Constants.SettingsScene));
 
         var testButton = AddMenuButton(menu, "测试模式", OnTestModePressed);
@@ -78,10 +76,26 @@ public partial class MainMenu : Control
         menu.AddChild(spacer);
         AddMenuButton(menu, "退出游戏", () => GetTree().Quit(), FlatUi.Danger);
 
+        _joinOverlay = new ColorRect
+        {
+            Name = "JoinOverlay",
+            Color = new Color(0, 0, 0, 0.52f),
+            Visible = false
+        };
+        _joinOverlay.SetAnchorsPreset(LayoutPreset.FullRect);
+        AddChild(_joinOverlay);
+
+        var joinCenter = new CenterContainer();
+        joinCenter.SetAnchorsPreset(LayoutPreset.FullRect);
+        joinCenter.OffsetLeft = 24;
+        joinCenter.OffsetTop = 24;
+        joinCenter.OffsetRight = -24;
+        joinCenter.OffsetBottom = -24;
+        _joinOverlay.AddChild(joinCenter);
+
         _joinPanel = FlatUi.Panel("JoinPanel");
-        _joinPanel.CustomMinimumSize = new Vector2(380, 520);
-        _joinPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        root.AddChild(_joinPanel);
+        _joinPanel.CustomMinimumSize = new Vector2(420, 420);
+        joinCenter.AddChild(_joinPanel);
 
         BuildJoinPanel();
     }
@@ -93,24 +107,6 @@ public partial class MainMenu : Control
         button.Pressed += action;
         parent.AddChild(button);
         return button;
-    }
-
-    private HBoxContainer BuildSpinRow(string label, out SpinBox spin, int min, int max, int value, int step)
-    {
-        var row = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
-        var text = FlatUi.MutedLabel(label);
-        text.CustomMinimumSize = new Vector2(108, 34);
-        row.AddChild(text);
-        spin = new SpinBox
-        {
-            MinValue = min,
-            MaxValue = max,
-            Value = value,
-            Step = step,
-            CustomMinimumSize = new Vector2(140, 36)
-        };
-        row.AddChild(spin);
-        return row;
     }
 
     private void BuildJoinPanel()
@@ -129,23 +125,35 @@ public partial class MainMenu : Control
         box.AddThemeConstantOverride("separation", 12);
         _joinPanel.AddChild(box);
 
-        box.AddChild(FlatUi.Label("加入房间", 28));
-        box.AddChild(FlatUi.MutedLabel("输入 Host 的局域网 IP。这里不是弹窗，不会遮挡主菜单。"));
+        var header = new HBoxContainer();
+        header.AddChild(FlatUi.Label("加入房间", 28));
+        var headerSpacer = new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        header.AddChild(headerSpacer);
+        var close = FlatUi.Button("关闭");
+        close.CustomMinimumSize = new Vector2(72, 36);
+        close.Pressed += HideJoinPanel;
+        header.AddChild(close);
+        box.AddChild(header);
+
+        var hint = FlatUi.MutedLabel("输入 Host 的局域网 IP，连接后进入房间。");
+        hint.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        box.AddChild(hint);
 
         _joinAddressInput = new LineEdit
         {
             PlaceholderText = "例如 192.168.1.100",
             Text = "127.0.0.1",
-            CustomMinimumSize = new Vector2(280, 40)
+            CustomMinimumSize = new Vector2(280, 44)
         };
         box.AddChild(_joinAddressInput);
 
         var connect = FlatUi.Button("连接", FlatUi.AccentMuted);
+        connect.CustomMinimumSize = new Vector2(280, 46);
         connect.Pressed += ConnectToAddress;
         box.AddChild(connect);
 
-        var cancel = FlatUi.Button("清空输入");
-        cancel.Pressed += () =>
+        var clear = FlatUi.Button("清空输入");
+        clear.Pressed += () =>
         {
             if (_joinAddressInput != null)
             {
@@ -153,23 +161,36 @@ public partial class MainMenu : Control
                 _joinAddressInput.GrabFocus();
             }
         };
-        box.AddChild(cancel);
+        box.AddChild(clear);
 
-        var hint = FlatUi.MutedLabel("如果只是想测试，可以进入牌桌后在工具面板加入 AI。");
-        hint.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        box.AddChild(hint);
+        var footer = FlatUi.MutedLabel("如果只是想测试，可以创建房间后在牌桌内追加 AI。");
+        footer.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        box.AddChild(footer);
     }
 
     private void OnCreateRoomPressed()
     {
-        ApplyRoomRules();
         NetworkManager.Instance?.CreateRoom(Constants.DefaultPort, GetSelectedSeatCount());
         GetTree().ChangeSceneToFile(Constants.LobbyScene);
     }
 
-    private void ToggleJoinPanel()
+    private void ShowJoinPanel()
     {
+        if (_joinOverlay != null)
+        {
+            _joinOverlay.Visible = true;
+            _joinOverlay.MoveToFront();
+        }
+
         _joinAddressInput?.GrabFocus();
+    }
+
+    private void HideJoinPanel()
+    {
+        if (_joinOverlay != null)
+        {
+            _joinOverlay.Visible = false;
+        }
     }
 
     private void ConnectToAddress()
@@ -187,7 +208,6 @@ public partial class MainMenu : Control
 
     private void OnTestModePressed()
     {
-        ApplyRoomRules();
         NetworkManager.Instance?.CreateRoom(Constants.DefaultPort, GetSelectedSeatCount());
         var room = NetworkManager.Instance?.RoomCode ?? "";
         var ip = NetworkManager.Instance?.GetLocalIP() ?? "";
@@ -207,12 +227,4 @@ public partial class MainMenu : Control
         return selectedId == 12 ? 12 : 9;
     }
 
-    private void ApplyRoomRules()
-    {
-        var smallBlind = (int)(_smallBlindSpin?.Value ?? Constants.SmallBlind);
-        var minBuyIn = (int)(_minBuyInSpin?.Value ?? Constants.MinBuyIn);
-        var maxBuyIn = (int)(_maxBuyInSpin?.Value ?? Constants.MaxBuyIn);
-        var tableCap = (int)(_tableCapSpin?.Value ?? Constants.TableChipLimit);
-        GameManager.Instance?.ConfigureRoomRules(smallBlind, minBuyIn, maxBuyIn, tableCap);
-    }
 }

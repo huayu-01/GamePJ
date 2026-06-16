@@ -16,14 +16,19 @@ public partial class GameTable : Control
     private Label? _potLabel;
     private Label? _stateLabel;
     private Label? _turnPromptLabel;
+    private ProgressBar? _turnTimerBar;
+    private Label? _turnTimerLabel;
     private Label? _currentBetLabel;
     private BettingPanel? _bettingPanel;
+    private ColorRect? _drawerDismissLayer;
+    private Panel? _leftDrawerPanel;
     private Panel? _sidePanel;
     private Control? _settlementLayer;
     private Texture2D? _settlementChipTexture;
     private Panel? _bustedPanel;
     private Label? _bustedLabel;
     private Button? _rebuyButton;
+    private Button? _chatToggle;
     private Button? _sideToggle;
     private Button? _restartButton;
     private Button? _leaveButton;
@@ -32,7 +37,9 @@ public partial class GameTable : Control
     private SpinBox? _aiCount;
     private SpinBox? _chipLimitSpin;
     private bool _sideCollapsed = true;
+    private bool _chatCollapsed = true;
     private bool _syncingSitOutToggle;
+    private bool _revealWindowOpen;
 
     public override void _Ready()
     {
@@ -54,6 +61,11 @@ public partial class GameTable : Control
             ApplyResponsiveLayout();
             LayoutPlayerHuds();
         }
+    }
+
+    public override void _Process(double delta)
+    {
+        UpdateTurnTimerVisual();
     }
 
     private void BuildUi()
@@ -94,7 +106,11 @@ public partial class GameTable : Control
         _stateLabel.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
         top.AddChild(_stateLabel);
 
-        _sideToggle = FlatUi.Button("收起侧栏");
+        _chatToggle = FlatUi.Button("聊天");
+        _chatToggle.Pressed += ToggleChatPanel;
+        top.AddChild(_chatToggle);
+
+        _sideToggle = FlatUi.Button("记录");
         _sideToggle.Pressed += ToggleSidePanel;
         top.AddChild(_sideToggle);
 
@@ -144,6 +160,20 @@ public partial class GameTable : Control
         _turnPromptLabel.AddThemeColorOverride("font_color", FlatUi.Accent);
         centerBox.AddChild(_turnPromptLabel);
 
+        _turnTimerBar = new ProgressBar
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Value = 0,
+            ShowPercentage = false,
+            CustomMinimumSize = new Vector2(0, 10)
+        };
+        centerBox.AddChild(_turnTimerBar);
+
+        _turnTimerLabel = FlatUi.MutedLabel("", 13);
+        _turnTimerLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        centerBox.AddChild(_turnTimerLabel);
+
         var potRow = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         var chip = new TextureRect
         {
@@ -167,12 +197,54 @@ public partial class GameTable : Control
 
     private void BuildSidePanel()
     {
+        BuildDrawerDismissLayer();
+        BuildChatDrawer();
+        BuildHistoryDrawer();
+    }
+
+    private void BuildDrawerDismissLayer()
+    {
+        _drawerDismissLayer = new ColorRect
+        {
+            Name = "DrawerDismissLayer",
+            Color = new Color(0, 0, 0, 0.08f),
+            Visible = false,
+            MouseFilter = MouseFilterEnum.Stop
+        };
+        _drawerDismissLayer.SetAnchorsPreset(LayoutPreset.FullRect);
+        _drawerDismissLayer.GuiInput += input =>
+        {
+            if (input is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
+            {
+                CloseDrawers();
+            }
+        };
+        AddToStage(_drawerDismissLayer);
+    }
+
+    private void BuildChatDrawer()
+    {
+        _leftDrawerPanel = FlatUi.Panel("ChatDrawer");
+        _leftDrawerPanel.SetAnchorsPreset(LayoutPreset.FullRect);
+        AddToStage(_leftDrawerPanel);
+
+        var box = new VBoxContainer();
+        box.SetAnchorsPreset(LayoutPreset.FullRect);
+        box.OffsetLeft = 12;
+        box.OffsetTop = 10;
+        box.OffsetRight = -12;
+        box.OffsetBottom = -10;
+        _leftDrawerPanel.AddChild(box);
+
+        var chat = new ChatPanel();
+        chat.SizeFlagsVertical = SizeFlags.ExpandFill;
+        box.AddChild(chat);
+    }
+
+    private void BuildHistoryDrawer()
+    {
         _sidePanel = FlatUi.Panel("SidePanel");
         _sidePanel.SetAnchorsPreset(LayoutPreset.FullRect);
-        _sidePanel.OffsetLeft = -360;
-        _sidePanel.OffsetTop = 78;
-        _sidePanel.OffsetRight = -24;
-        _sidePanel.OffsetBottom = -190;
         AddToStage(_sidePanel);
 
         var box = new VBoxContainer();
@@ -184,7 +256,7 @@ public partial class GameTable : Control
         box.AddThemeConstantOverride("separation", 10);
         _sidePanel.AddChild(box);
 
-        box.AddChild(FlatUi.Label("对局工具", 20));
+        box.AddChild(FlatUi.Label("对局记录", 20));
 
         var debug = FlatUi.Panel("DebugPanel");
         debug.CustomMinimumSize = new Vector2(0, 122);
@@ -227,9 +299,9 @@ public partial class GameTable : Control
         limitRow.AddChild(applyLimit);
         debugBox.AddChild(limitRow);
 
-        var chat = new ChatPanel();
-        chat.SizeFlagsVertical = SizeFlags.ExpandFill;
-        box.AddChild(chat);
+        var history = new HandHistoryPanel();
+        history.SizeFlagsVertical = SizeFlags.ExpandFill;
+        box.AddChild(history);
     }
 
     private void BuildBettingPanel()
@@ -320,6 +392,7 @@ public partial class GameTable : Control
 
             ConfigureHudForSlot(hud, visualSlot, seatCount);
             hud.SetEmptySeat(GetRealSeatForVisualSlot(visualSlot, localSeat) + 1);
+            hud.SetRevealActions(false, false, null, null);
         }
 
         foreach (var player in manager.Players)
@@ -332,8 +405,16 @@ public partial class GameTable : Control
 
             var hud = _seatHuds[visualSlot];
             var reveal = player.Id == localId || manager.LastShownHands.ContainsKey(player.Id);
+            var revealFirst = manager.IsHoleCardRevealed(player.Id, 0);
+            var revealSecond = manager.IsHoleCardRevealed(player.Id, 1);
             ConfigureHudForSlot(hud, visualSlot, seatCount);
-            hud.SetPlayer(player, reveal);
+            hud.SetPlayer(player, reveal, revealFirst, revealSecond);
+            var canRevealButtons = _revealWindowOpen && player.Id == localId && !manager.LastShownHands.ContainsKey(player.Id);
+            hud.SetRevealActions(
+                canRevealButtons && player.HoleCards[0] != null && !revealFirst,
+                canRevealButtons && player.HoleCards[1] != null && !revealSecond,
+                player.HoleCards[0],
+                player.HoleCards[1]);
             hud.SetBlindRole(manager.GetBlindRole(player.Id));
             hud.SetTurnActive(player.Id == currentId);
             hud.SetWinnerState(manager.LastWinners.Contains(player.Id), manager.LastWinnings.GetValueOrDefault(player.Id, 0));
@@ -518,6 +599,51 @@ public partial class GameTable : Control
         }
     }
 
+    private void UpdateTurnTimerVisual()
+    {
+        if (_turnTimerBar == null || _turnTimerLabel == null)
+        {
+            return;
+        }
+
+        var manager = GameManager.Instance;
+        var limit = manager?.CurrentTurnTimeLimitSeconds ?? 0;
+        var currentId = manager?.CurrentBettingRound?.GetCurrentPlayerId() ?? -1;
+        if (manager == null || limit <= 0 || currentId <= 0 || manager.CurrentTurnStartedMsec <= 0)
+        {
+            _turnTimerBar.Visible = false;
+            _turnTimerLabel.Visible = false;
+            return;
+        }
+
+        var elapsed = (Time.GetTicksMsec() - manager.CurrentTurnStartedMsec) / 1000.0;
+        var remaining = Mathf.Clamp((float)(limit - elapsed), 0f, limit);
+        var progress = limit <= 0 ? 0f : remaining / limit;
+        _turnTimerBar.Visible = true;
+        _turnTimerLabel.Visible = true;
+        _turnTimerBar.Value = progress;
+        var fill = new StyleBoxFlat
+        {
+            BgColor = progress < 0.25f ? FlatUi.Danger : new Color(1.0f, 0.82f, 0.32f),
+            CornerRadiusTopLeft = 5,
+            CornerRadiusTopRight = 5,
+            CornerRadiusBottomLeft = 5,
+            CornerRadiusBottomRight = 5
+        };
+        var background = new StyleBoxFlat
+        {
+            BgColor = new Color(0.05f, 0.08f, 0.07f, 0.92f),
+            CornerRadiusTopLeft = 5,
+            CornerRadiusTopRight = 5,
+            CornerRadiusBottomLeft = 5,
+            CornerRadiusBottomRight = 5
+        };
+        _turnTimerBar.AddThemeStyleboxOverride("fill", fill);
+        _turnTimerBar.AddThemeStyleboxOverride("background", background);
+        _turnTimerLabel.Text = $"{Mathf.CeilToInt(remaining)}s";
+    }
+
+
     private void UpdateBettingPanel()
     {
         var manager = GameManager.Instance;
@@ -549,20 +675,82 @@ public partial class GameTable : Control
 
     private void ToggleSidePanel()
     {
-        _sideCollapsed = !_sideCollapsed;
+        var willOpen = _sideCollapsed;
+        _sideCollapsed = !willOpen;
+        if (willOpen)
+        {
+            _chatCollapsed = true;
+        }
+
         if (_sidePanel != null)
         {
             _sidePanel.Visible = !_sideCollapsed;
         }
 
+        if (_leftDrawerPanel != null)
+        {
+            _leftDrawerPanel.Visible = !_chatCollapsed;
+        }
+
         if (_sideToggle != null)
         {
-            _sideToggle.Text = _sideCollapsed ? "展开侧栏" : "收起侧栏";
+            _sideToggle.Text = _sideCollapsed ? "记录" : "收起";
         }
 
         if (_bettingPanel != null)
         {
-            _bettingPanel.OffsetRight = _sideCollapsed ? -24 : -384;
+            _bettingPanel.OffsetRight = -24;
+        }
+
+        ApplyResponsiveLayout();
+        LayoutPlayerHuds();
+    }
+
+    private void ToggleChatPanel()
+    {
+        var willOpen = _chatCollapsed;
+        _chatCollapsed = !willOpen;
+        if (willOpen)
+        {
+            _sideCollapsed = true;
+        }
+
+        if (_sidePanel != null)
+        {
+            _sidePanel.Visible = !_sideCollapsed;
+        }
+
+        if (_leftDrawerPanel != null)
+        {
+            _leftDrawerPanel.Visible = !_chatCollapsed;
+        }
+
+        if (_chatToggle != null)
+        {
+            _chatToggle.Text = _chatCollapsed ? "聊天" : "收起";
+        }
+
+        ApplyResponsiveLayout();
+        LayoutPlayerHuds();
+    }
+
+    private void CloseDrawers()
+    {
+        _sideCollapsed = true;
+        _chatCollapsed = true;
+        if (_sidePanel != null)
+        {
+            _sidePanel.Visible = false;
+        }
+
+        if (_leftDrawerPanel != null)
+        {
+            _leftDrawerPanel.Visible = false;
+        }
+
+        if (_drawerDismissLayer != null)
+        {
+            _drawerDismissLayer.Visible = false;
         }
 
         ApplyResponsiveLayout();
@@ -634,8 +822,22 @@ public partial class GameTable : Control
     private async void OnGameEnded()
     {
         Refresh();
+        await RunRevealWindow();
         await PlaySettlementSequence();
         GameManager.Instance?.CompleteSettlementAnimation();
+        Refresh();
+    }
+
+    private async Task RunRevealWindow()
+    {
+        _revealWindowOpen = true;
+        Refresh();
+        for (var remaining = 5; remaining > 0; remaining--)
+        {
+            await ToSignal(GetTree().CreateTimer(1.0), SceneTreeTimer.SignalName.Timeout);
+        }
+
+        _revealWindowOpen = false;
         Refresh();
     }
 
@@ -766,20 +968,57 @@ public partial class GameTable : Control
 
         _communityCards?.SetCardSize(new Vector2(Mathf.Clamp(size.X * 0.086f, 42f, 86f), Mathf.Clamp(size.X * 0.086f, 42f, 86f) * 1.43f));
 
+        if (_drawerDismissLayer != null)
+        {
+            _drawerDismissLayer.Visible = !_sideCollapsed || !_chatCollapsed;
+            _drawerDismissLayer.OffsetLeft = 0;
+            _drawerDismissLayer.OffsetTop = 0;
+            _drawerDismissLayer.OffsetRight = 0;
+            _drawerDismissLayer.OffsetBottom = 0;
+            if (_drawerDismissLayer.Visible)
+            {
+                _drawerDismissLayer.MoveToFront();
+            }
+        }
+
         if (_sidePanel != null)
         {
             _sidePanel.Visible = !_sideCollapsed;
-            _sidePanel.OffsetLeft = margin;
+            var drawerWidth = Mathf.Clamp(size.X * 0.70f, 360f, size.X - margin * 2f);
+            _sidePanel.OffsetLeft = size.X - drawerWidth - margin;
             _sidePanel.OffsetTop = topHeight + margin;
-            _sidePanel.OffsetRight = -(size.X - Mathf.Clamp(size.X * 0.58f, 260f, 520f));
-            _sidePanel.OffsetBottom = -(size.Y * 0.38f);
-            _sidePanel.MoveToFront();
+            _sidePanel.OffsetRight = -margin;
+            _sidePanel.OffsetBottom = -margin;
+            if (!_sideCollapsed)
+            {
+                _sidePanel.MoveToFront();
+            }
+        }
+
+        if (_leftDrawerPanel != null)
+        {
+            _leftDrawerPanel.Visible = !_chatCollapsed;
+            var drawerWidth = Mathf.Clamp(size.X * 0.70f, 360f, size.X - margin * 2f);
+            _leftDrawerPanel.OffsetLeft = margin;
+            _leftDrawerPanel.OffsetTop = topHeight + margin;
+            _leftDrawerPanel.OffsetRight = -(size.X - drawerWidth - margin);
+            _leftDrawerPanel.OffsetBottom = -margin;
+            if (!_chatCollapsed)
+            {
+                _leftDrawerPanel.MoveToFront();
+            }
         }
 
         if (_sideToggle != null)
         {
-            _sideToggle.Text = _sideCollapsed ? "工具" : "收起";
+            _sideToggle.Text = _sideCollapsed ? "记录" : "收起";
             _sideToggle.CustomMinimumSize = new Vector2(58, 36);
+        }
+
+        if (_chatToggle != null)
+        {
+            _chatToggle.Text = _chatCollapsed ? "聊天" : "收起";
+            _chatToggle.CustomMinimumSize = new Vector2(58, 36);
         }
 
         if (_aiCount != null)

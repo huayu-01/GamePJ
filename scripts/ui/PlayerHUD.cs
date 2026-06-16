@@ -11,6 +11,10 @@ public partial class PlayerHUD : Control
     private Label? _blindLabel;
     private Panel? _panel;
     private Control? _cardsLayer;
+    private HBoxContainer? _revealActions;
+    private Button? _revealFirstButton;
+    private Button? _revealSecondButton;
+    private Button? _revealBothButton;
     private CardDisplay? _card1;
     private CardDisplay? _card2;
 
@@ -18,6 +22,8 @@ public partial class PlayerHUD : Control
     private string _lastCard1Key = "";
     private string _lastCard2Key = "";
     private bool _lastRevealCards;
+    private bool _lastCard1FaceUp;
+    private bool _lastCard2FaceUp;
     private bool _lastTurnActive;
     private bool _lastWinner;
     private bool _lastFolded;
@@ -93,7 +99,7 @@ public partial class PlayerHUD : Control
         LayoutContents();
     }
 
-    public void SetPlayer(Player player, bool revealCards)
+    public void SetPlayer(Player player, bool revealCards, bool revealFirstCard = false, bool revealSecondCard = false)
     {
         if (_nameLabel == null)
         {
@@ -117,6 +123,8 @@ public partial class PlayerHUD : Control
         var rank = GameManager.Instance?.GetVisibleHandRank(player.Id);
         _handLabel!.Text = rank.HasValue && revealCards ? rank.Value.Category.ToDisplayName() : "";
 
+        var showFirstCard = revealCards || revealFirstCard;
+        var showSecondCard = revealCards || revealSecondCard;
         var card1Key = player.HoleCards[0]?.ShortName ?? "";
         var card2Key = player.HoleCards[1]?.ShortName ?? "";
         if (player.IsSittingOut)
@@ -125,45 +133,38 @@ public partial class PlayerHUD : Control
             _card2!.SetCard(null, false);
             SetFoldedVisual(true);
         }
-        else if (player.IsFolded)
-        {
-            _card1!.SetBack();
-            _card2!.SetBack();
-            SetFoldedVisual(true);
-        }
-        else if (revealCards)
-        {
-            SetFoldedVisual(false);
-            if (!_lastRevealCards || _lastCard1Key != card1Key)
-            {
-                _card1!.FlipTo(player.HoleCards[0]);
-            }
-            else
-            {
-                _card1!.SetCard(player.HoleCards[0]);
-            }
-
-            if (!_lastRevealCards || _lastCard2Key != card2Key)
-            {
-                _card2!.FlipTo(player.HoleCards[1]);
-            }
-            else
-            {
-                _card2!.SetCard(player.HoleCards[1]);
-            }
-        }
         else
         {
-            _card1!.SetBack();
-            _card2!.SetBack();
-            SetFoldedVisual(false);
+            SetCardVisibility(_card1!, player.HoleCards[0], showFirstCard, _lastCard1FaceUp, _lastCard1Key != card1Key);
+            SetCardVisibility(_card2!, player.HoleCards[1], showSecondCard, _lastCard2FaceUp, _lastCard2Key != card2Key);
+            SetFoldedVisual(player.IsFolded && !showFirstCard && !showSecondCard);
         }
 
         _lastCard1Key = card1Key;
         _lastCard2Key = card2Key;
-        _lastRevealCards = revealCards;
+        _lastRevealCards = showFirstCard && showSecondCard;
+        _lastCard1FaceUp = showFirstCard;
+        _lastCard2FaceUp = showSecondCard;
         _lastFolded = player.IsFolded || player.IsSittingOut;
         LayoutContents();
+    }
+
+    private static void SetCardVisibility(CardDisplay display, Card? card, bool faceUp, bool wasFaceUp, bool cardChanged)
+    {
+        if (!faceUp)
+        {
+            display.SetBack();
+            return;
+        }
+
+        if (!wasFaceUp || cardChanged)
+        {
+            display.FlipTo(card);
+        }
+        else
+        {
+            display.SetCard(card);
+        }
     }
 
     public void SetBlindRole(string role)
@@ -263,7 +264,79 @@ public partial class PlayerHUD : Control
         _card2 = new CardDisplay { CustomMinimumSize = new Vector2(58, 83) };
         _cardsLayer.AddChild(_card1);
         _cardsLayer.AddChild(_card2);
+
+        _revealActions = new HBoxContainer
+        {
+            Name = "RevealActions",
+            Alignment = BoxContainer.AlignmentMode.Center,
+            Visible = false
+        };
+        _revealActions.AddThemeConstantOverride("separation", 6);
+        AddChild(_revealActions);
+        _revealFirstButton = CreateRevealButton(() => RevealCard(0));
+        _revealSecondButton = CreateRevealButton(() => RevealCard(1));
+        _revealBothButton = CreateRevealButton(RevealBothCards);
+        _revealActions.AddChild(_revealFirstButton);
+        _revealActions.AddChild(_revealSecondButton);
+        _revealActions.AddChild(_revealBothButton);
         LayoutContents();
+    }
+
+    public void SetRevealActions(bool canRevealFirst, bool canRevealSecond, Card? firstCard, Card? secondCard)
+    {
+        if (_revealActions == null)
+        {
+            BuildUi();
+        }
+
+        var canRevealBoth = canRevealFirst && canRevealSecond;
+        ConfigureRevealButton(_revealFirstButton, canRevealFirst, firstCard, null);
+        ConfigureRevealButton(_revealSecondButton, canRevealSecond, secondCard, null);
+        ConfigureRevealButton(_revealBothButton, canRevealBoth, firstCard, secondCard);
+        _revealActions!.Visible = canRevealFirst || canRevealSecond || canRevealBoth;
+        LayoutContents();
+    }
+
+    private static Button CreateRevealButton(System.Action action)
+    {
+        var button = FlatUi.Button("亮", FlatUi.SurfaceAlt);
+        button.CustomMinimumSize = new Vector2(128, 46);
+        button.Pressed += action;
+        button.ExpandIcon = true;
+        button.IconAlignment = HorizontalAlignment.Right;
+        return button;
+    }
+
+    private static void ConfigureRevealButton(Button? button, bool visible, Card? firstCard, Card? secondCard)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        button.Visible = visible;
+        button.Disabled = !visible;
+        button.Text = "亮";
+        button.Icon = visible ? CardIconCache.GetCombinedIcon(firstCard, secondCard) : null;
+        button.TooltipText = visible
+            ? $"亮牌 {(firstCard != null ? firstCard.ShortName : "")}{(secondCard != null ? " " + secondCard.ShortName : "")}".Trim()
+            : "";
+    }
+
+    private void RevealCard(int cardIndex)
+    {
+        if (!_isLocal || _lastPlayerId <= 0)
+        {
+            return;
+        }
+
+        GameManager.Instance?.RevealHoleCard(_lastPlayerId, cardIndex);
+    }
+
+    private void RevealBothCards()
+    {
+        RevealCard(0);
+        RevealCard(1);
     }
 
     private Label CreateCenteredLabel(string text, int fontSize, bool muted = false)
@@ -309,9 +382,26 @@ public partial class PlayerHUD : Control
         }
 
         var bottomY = cardsY + _cardSize.Y + (_isLocal ? 4f : 2f);
-        PositionLabel(_betLabel, 0, bottomY, width, lineHeight);
-        PositionLabel(_handLabel, 0, bottomY + lineHeight * 0.86f, width, lineHeight);
-        PositionLabel(_statusLabel, 0, bottomY + lineHeight * 1.72f, width, lineHeight);
+        var revealHeight = _revealActions?.Visible == true ? Mathf.Clamp(_cardSize.X * 0.30f, 46f, 62f) : 0f;
+        if (_revealActions != null)
+        {
+            _revealActions.Position = new Vector2(0, bottomY);
+            _revealActions.Size = new Vector2(width, revealHeight);
+            foreach (var child in _revealActions.GetChildren())
+            {
+                if (child is Button button)
+                {
+                    var buttonWidth = Mathf.Clamp(_cardSize.X * 0.62f, 104f, 148f);
+                    button.CustomMinimumSize = new Vector2(buttonWidth, Mathf.Max(40f, revealHeight - 2f));
+                    button.AddThemeFontSizeOverride("font_size", Mathf.RoundToInt(Mathf.Clamp(_cardSize.X * 0.15f, 16f, 23f)));
+                }
+            }
+        }
+
+        var textY = bottomY + revealHeight;
+        PositionLabel(_betLabel, 0, textY, width, lineHeight);
+        PositionLabel(_handLabel, 0, textY + lineHeight * 0.86f, width, lineHeight);
+        PositionLabel(_statusLabel, 0, textY + lineHeight * 1.72f, width, lineHeight);
     }
 
     private static void PositionLabel(Label? label, float x, float y, float width, float height)

@@ -1,4 +1,4 @@
-public static class Constants
+﻿public static class Constants
 {
     public const int DefaultPort = 7000;
     public const int MaxPlayers = 12;
@@ -8,6 +8,7 @@ public static class Constants
     public const int MinBuyIn = 50;
     public const int MaxBuyIn = 200;
     public const int TableChipLimit = 1000;
+    public const int ThinkingTimeSeconds = 30;
     public const string MainMenuScene = "res://scenes/ui/main_menu.tscn";
     public const string LobbyScene = "res://scenes/ui/lobby.tscn";
     public const string GameTableScene = "res://scenes/ui/game_table.tscn";

@@ -12,7 +12,7 @@ public partial class TestAll : Node
         var totalFail = hand.Fail + betting.Fail + pot.Fail + flow.Fail;
 
         GD.Print("\n========== ALL TESTS ==========");
-        GD.Print($"PASS: {totalPass}/47, FAIL: {totalFail}/47");
+        GD.Print($"PASS: {totalPass}/51, FAIL: {totalFail}/51");
         GD.Print(totalFail == 0 ? "ALL LOGIC TESTS PASSED!" : "LOGIC TESTS FAILED");
         GetTree().Quit(totalFail == 0 ? 0 : 1);
     }

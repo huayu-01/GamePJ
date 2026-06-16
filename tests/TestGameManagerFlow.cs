@@ -24,13 +24,14 @@ public partial class TestGameManagerFlow : Node
         manager.ConfigureAiPlayers(true, 11);
         Check(manager.Players.Count == Constants.MaxPlayers, "TwelveSeatLimit", ref pass, ref fail);
 
-        manager.ConfigureRoomRules(1, 50, 200, 1000);
+        manager.ConfigureRoomRules(1, 50, 200, 1000, 9);
         Check(
             manager.SmallBlindAmount == 1 &&
             manager.BigBlindAmount == 2 &&
             manager.MinBuyIn == 50 &&
             manager.MaxBuyIn == 200 &&
-            manager.TableChipLimit == 1000,
+            manager.TableChipLimit == 1000 &&
+            manager.ThinkingTimeSeconds == 9,
             "RoomRulesConfigurable",
             ref pass,
             ref fail);
@@ -244,12 +245,50 @@ public partial class TestGameManagerFlow : Node
         manager.Players.First(player => player.Id == 2).IsFolded = true;
         manager.Players.First(player => player.Id == 3).IsFolded = true;
         manager.StartBettingRound(GameState.Flop);
+        manager.WaitForSettlementAnimation = true;
+        var standingHistoryStart = manager.HandHistory.Count;
         manager.EndBettingRound();
+        manager.EndBettingRound();
+        manager.CheckBettingRoundProgress();
         Check(
             !manager.LastHandWentToShowdown &&
             manager.LastWinners.SequenceEqual(new[] { 1 }) &&
             manager.GetVisibleHandRank(1) == null,
             "LastStandingDoesNotExposeHandRank",
+            ref pass,
+            ref fail);
+
+        var standingHistory = manager.HandHistory.Skip(standingHistoryStart).Where(line => line.Contains("收")).ToList();
+        Check(standingHistory.Count == 1, "ResolvedHandDoesNotDuplicateSettlementHistory", ref pass, ref fail);
+        manager.WaitForSettlementAnimation = false;
+        manager.CompleteSettlementAnimation();
+
+        manager.LeaveTable();
+        manager.Players.Clear();
+        manager.AiPlayerIds.Clear();
+        manager.TableSeatCount = 2;
+        manager.Players.Add(new Player { Id = 1, Name = "P1", Chips = Constants.StartingChips, Position = 0 });
+        manager.Players.Add(new Player { Id = 2, Name = "P2", Chips = Constants.StartingChips, Position = 1 });
+        var historyStart = manager.HandHistory.Count;
+        manager.StartGame();
+        var privateCard = manager.Players.First(player => player.Id == 1).HoleCards[0]?.ShortName ?? "";
+        var newHistory = manager.HandHistory.Skip(historyStart).ToList();
+        Check(!string.IsNullOrEmpty(privateCard) && newHistory.All(line => !line.Contains(privateCard)), "HistoryHidesPrivateHoleCards", ref pass, ref fail);
+
+        var revealResult = manager.RevealHoleCard(1, 0);
+        Check(
+            revealResult &&
+            manager.IsHoleCardRevealed(1, 0) &&
+            manager.HandHistory.Last().Contains(privateCard),
+            "RevealHoleCardAddsPublicHistory",
+            ref pass,
+            ref fail);
+
+        var revealIcon = CardIconCache.GetIcon(new Card { Suit = Suit.Diamonds, Rank = Rank.Seven });
+        Check(
+            revealIcon != null &&
+            Godot.FileAccess.FileExists(ProjectSettings.GlobalizePath("res://assets/textures/card_icons/cardDiamonds7_icon.png")),
+            "CardIconCacheGeneratesRevealIcons",
             ref pass,
             ref fail);
 

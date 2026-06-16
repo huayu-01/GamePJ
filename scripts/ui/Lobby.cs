@@ -9,6 +9,7 @@ public partial class Lobby : Control
     private SpinBox? _minBuyInSpin;
     private SpinBox? _maxBuyInSpin;
     private SpinBox? _chipLimitSpin;
+    private SpinBox? _thinkingTimeSpin;
 
     public override void _Ready()
     {
@@ -29,40 +30,46 @@ public partial class Lobby : Control
         background.SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(background);
 
-        var topBar = new HBoxContainer { Name = "TopBar" };
-        topBar.SetAnchorsPreset(LayoutPreset.TopWide);
-        topBar.OffsetLeft = 32;
-        topBar.OffsetTop = 20;
-        topBar.OffsetRight = -32;
-        topBar.OffsetBottom = 68;
-        AddChild(topBar);
-        var title = FlatUi.Label("房间", 28);
-        title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        topBar.AddChild(title);
-        var exitTop = FlatUi.Button("退出房间", FlatUi.Danger);
-        exitTop.Pressed += LeaveLobby;
-        topBar.AddChild(exitTop);
+        var center = new CenterContainer { Name = "LobbyCenter" };
+        center.SetAnchorsPreset(LayoutPreset.FullRect);
+        center.OffsetLeft = 28;
+        center.OffsetTop = 28;
+        center.OffsetRight = -28;
+        center.OffsetBottom = -28;
+        AddChild(center);
 
-        var root = new HBoxContainer { Name = "LobbyRoot" };
-        root.SetAnchorsPreset(LayoutPreset.FullRect);
-        root.OffsetLeft = 32;
-        root.OffsetTop = 86;
-        root.OffsetRight = -32;
-        root.OffsetBottom = -32;
-        root.AddThemeConstantOverride("separation", 18);
-        AddChild(root);
+        var frame = FlatUi.Panel("LobbyFrame");
+        frame.CustomMinimumSize = new Vector2(620, 860);
+        frame.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+        frame.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        center.AddChild(frame);
 
-        var leftPanel = FlatUi.Panel("HostPanelFrame");
-        leftPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        root.AddChild(leftPanel);
-        var left = new VBoxContainer { Name = "HostPanel" };
-        left.SetAnchorsPreset(LayoutPreset.FullRect);
-        left.OffsetLeft = 18;
-        left.OffsetTop = 16;
-        left.OffsetRight = -18;
-        left.OffsetBottom = -16;
+        var scroll = new ScrollContainer();
+        scroll.SetAnchorsPreset(LayoutPreset.FullRect);
+        scroll.OffsetLeft = 18;
+        scroll.OffsetTop = 16;
+        scroll.OffsetRight = -18;
+        scroll.OffsetBottom = -16;
+        scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+        frame.AddChild(scroll);
+
+        var left = new VBoxContainer { Name = "LobbyContent" };
+        left.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         left.AddThemeConstantOverride("separation", 12);
-        leftPanel.AddChild(left);
+        scroll.AddChild(left);
+
+        var header = new HBoxContainer();
+        header.AddThemeConstantOverride("separation", 10);
+        left.AddChild(header);
+
+        var title = FlatUi.Label("房间", 30);
+        title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        header.AddChild(title);
+
+        var exitTop = FlatUi.Button("退出房间", FlatUi.Danger);
+        exitTop.CustomMinimumSize = new Vector2(104, 40);
+        exitTop.Pressed += LeaveLobby;
+        header.AddChild(exitTop);
 
         _roomLabel = new Label { Name = "RoomLabel", Text = "房间号: ------" };
         _roomLabel.AddThemeColorOverride("font_color", FlatUi.Text);
@@ -77,41 +84,48 @@ public partial class Lobby : Control
             ExpandMode = TextureRect.ExpandModeEnum.FitWidthProportional,
             StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
         };
-        left.AddChild(_qrTexture);
+        var qrCenter = new CenterContainer();
+        qrCenter.AddChild(_qrTexture);
+        left.AddChild(qrCenter);
 
         var copy = FlatUi.Button("复制房间号");
         copy.Pressed += () => DisplayServer.ClipboardSet(NetworkManager.Instance?.RoomCode ?? "");
         left.AddChild(copy);
 
+        left.AddChild(BuildSectionLabel("房间设置"));
         left.AddChild(BuildSpinRow("低注/小盲", out _smallBlindSpin, 1, 10000, GameManager.Instance?.SmallBlindAmount ?? Constants.SmallBlind, 1));
         left.AddChild(BuildSpinRow("最低带入", out _minBuyInSpin, 1, 100000, GameManager.Instance?.MinBuyIn ?? Constants.MinBuyIn, 1));
         left.AddChild(BuildSpinRow("最高带入", out _maxBuyInSpin, 1, 100000, GameManager.Instance?.MaxBuyIn ?? Constants.MaxBuyIn, 1));
         left.AddChild(BuildSpinRow("后手上限", out _chipLimitSpin, 1, 200000, GameManager.Instance?.TableChipLimit ?? Constants.TableChipLimit, 1));
+        left.AddChild(BuildSpinRow("思考时间", out _thinkingTimeSpin, 0, 300, GameManager.Instance?.ThinkingTimeSeconds ?? Constants.ThinkingTimeSeconds, 1));
+
+        left.AddChild(BuildSectionLabel("玩家列表"));
+        var playersPanel = FlatUi.Panel("PlayersPanelFrame");
+        playersPanel.CustomMinimumSize = new Vector2(0, 132);
+        left.AddChild(playersPanel);
+        _playersList = new VBoxContainer { Name = "PlayersList" };
+        _playersList.SetAnchorsPreset(LayoutPreset.FullRect);
+        _playersList.OffsetLeft = 12;
+        _playersList.OffsetTop = 10;
+        _playersList.OffsetRight = -12;
+        _playersList.OffsetBottom = -10;
+        playersPanel.AddChild(_playersList);
 
         var start = FlatUi.Button("开始游戏", FlatUi.AccentMuted);
+        start.CustomMinimumSize = new Vector2(0, 46);
         start.Pressed += OnStartPressed;
         left.AddChild(start);
 
         var back = FlatUi.Button("返回主菜单");
         back.Pressed += LeaveLobby;
         left.AddChild(back);
+    }
 
-        var rightPanel = FlatUi.Panel("PlayersPanelFrame");
-        rightPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        root.AddChild(rightPanel);
-        var right = new VBoxContainer { Name = "PlayersPanel" };
-        right.SetAnchorsPreset(LayoutPreset.FullRect);
-        right.OffsetLeft = 18;
-        right.OffsetTop = 16;
-        right.OffsetRight = -18;
-        right.OffsetBottom = -16;
-        rightPanel.AddChild(right);
-
-        var playerTitle = FlatUi.Label("玩家列表", 28);
-        right.AddChild(playerTitle);
-
-        _playersList = new VBoxContainer { Name = "PlayersList" };
-        right.AddChild(_playersList);
+    private static Label BuildSectionLabel(string text)
+    {
+        var label = FlatUi.Label(text, 18);
+        label.AddThemeColorOverride("font_color", new Color(0.72f, 0.86f, 1.0f));
+        return label;
     }
 
     private void Refresh()
@@ -158,7 +172,8 @@ public partial class Lobby : Control
             (int)(_smallBlindSpin?.Value ?? Constants.SmallBlind),
             (int)(_minBuyInSpin?.Value ?? Constants.MinBuyIn),
             (int)(_maxBuyInSpin?.Value ?? Constants.MaxBuyIn),
-            (int)(_chipLimitSpin?.Value ?? Constants.TableChipLimit));
+            (int)(_chipLimitSpin?.Value ?? Constants.TableChipLimit),
+            (int)(_thinkingTimeSpin?.Value ?? Constants.ThinkingTimeSeconds));
         GameManager.Instance?.StartGame();
         NetworkManager.Instance?.StartNetworkGame();
         GetTree().ChangeSceneToFile(Constants.GameTableScene);

@@ -13,6 +13,7 @@ public partial class GameManager : Node
     [Signal] public delegate void GameEndedEventHandler(Godot.Collections.Array<int> winners, Godot.Collections.Dictionary winnings);
     [Signal] public delegate void PlayerFoldedEventHandler(int playerId);
     [Signal] public delegate void PlayerAllInEventHandler(int playerId);
+    [Signal] public delegate void HandHistoryUpdatedEventHandler();
 
     [Export] public int SmallBlindAmount { get; set; } = Constants.SmallBlind;
     [Export] public int BigBlindAmount { get; set; } = Constants.BigBlind;
@@ -20,6 +21,7 @@ public partial class GameManager : Node
     [Export] public int MinBuyIn { get; set; } = Constants.MinBuyIn;
     [Export] public int MaxBuyIn { get; set; } = Constants.MaxBuyIn;
     [Export] public int TableChipLimit { get; set; } = Constants.TableChipLimit;
+    [Export] public int ThinkingTimeSeconds { get; set; } = Constants.ThinkingTimeSeconds;
     [Export] public bool AutoContinueHands { get; set; } = true;
     [Export] public int TableSeatCount { get; set; } = 9;
     [Export] public bool WaitForSettlementAnimation { get; set; }
@@ -37,8 +39,13 @@ public partial class GameManager : Node
     public List<int> LastWinners { get; } = new();
     public List<PotAward> LastPotAwards { get; } = new();
     public bool LastHandWentToShowdown { get; private set; }
+    public IReadOnlyList<string> HandHistory => _handHistory;
+    public ulong CurrentTurnStartedMsec { get; private set; }
+    public int CurrentTurnTimeLimitSeconds { get; private set; }
 
+    private readonly List<string> _handHistory = new();
     private readonly Dictionary<int, int> _handContributions = new();
+    private readonly Dictionary<int, HashSet<int>> _revealedHoleCards = new();
     private readonly HashSet<int> _currentHandPlayerIds = new();
     private readonly RandomNumberGenerator _rng = new();
     private bool _processingAiTurns;
@@ -46,6 +53,9 @@ public partial class GameManager : Node
     private bool _autoContinueScheduled;
     private bool _roundProgressCheckQueued;
     private bool _settlementPending;
+    private bool _handResolved;
+    private int _handNumber;
+    private int _turnTimerToken;
 
     public override void _Ready()
     {
@@ -184,7 +194,9 @@ public partial class GameManager : Node
         PotManager.Reset();
         _handContributions.Clear();
         LastPotAwards.Clear();
+        _revealedHoleCards.Clear();
         _settlementPending = false;
+        _handResolved = false;
         EmitSignal(SignalName.StateChanged, (int)CurrentState);
     }
 
@@ -216,17 +228,21 @@ public partial class GameManager : Node
             _currentHandPlayerIds.Add(player.Id);
         }
 
+        _handNumber++;
         Deck = new Deck();
         Deck.Shuffle();
         CommunityCards.Clear();
         PotManager.Reset();
         _handContributions.Clear();
+        _revealedHoleCards.Clear();
         LastShownHands.Clear();
         LastWinnings.Clear();
         LastWinners.Clear();
         LastPotAwards.Clear();
         LastHandWentToShowdown = false;
         _settlementPending = false;
+        _handResolved = false;
+        AppendHistory($"--- 第 {_handNumber} 手 ---");
 
         foreach (var player in Players)
         {
@@ -257,8 +273,10 @@ public partial class GameManager : Node
             return;
         }
 
-        PostBlind(handPlayers[0], SmallBlindAmount);
-        PostBlind(handPlayers[1 % handPlayers.Count], BigBlindAmount);
+        var smallBlind = PostBlind(handPlayers[0], SmallBlindAmount);
+        AppendHistory($"{handPlayers[0].Name} 下小盲 {smallBlind}");
+        var bigBlind = PostBlind(handPlayers[1 % handPlayers.Count], BigBlindAmount);
+        AppendHistory($"{handPlayers[1 % handPlayers.Count].Name} 下大盲 {bigBlind}");
     }
 
     public void DealHoleCards()
@@ -278,6 +296,7 @@ public partial class GameManager : Node
             dealt.Add($"P{player.Id}: dealt");
         }
 
+        AppendHistory($"向 {handPlayers.Count} 名玩家发手牌");
         EmitSignal(SignalName.CardsDealt, dealt, 0);
     }
 
@@ -315,7 +334,7 @@ public partial class GameManager : Node
 
     public void ProcessPlayerAction(int playerId, PlayerAction action, int amount)
     {
-        if (CurrentBettingRound == null)
+        if (CurrentBettingRound == null || _handResolved)
         {
             return;
         }
@@ -332,6 +351,7 @@ public partial class GameManager : Node
             return;
         }
 
+        _turnTimerToken++;
         var beforeBet = CurrentBettingRound.PlayerBets.GetValueOrDefault(playerId, 0);
         var processed = CurrentBettingRound.ProcessAction(playerId, action, amount);
         if (!processed)
@@ -362,6 +382,7 @@ public partial class GameManager : Node
         }
 
         NetworkManager.Instance?.BroadcastAction(playerId, action, amount);
+        AppendHistory(FormatActionHistory(player, action, added, afterBet));
 
         if (CurrentBettingRound.IsRoundComplete())
         {
@@ -389,7 +410,7 @@ public partial class GameManager : Node
 
     public void EndBettingRound()
     {
-        if (CurrentBettingRound == null)
+        if (CurrentBettingRound == null || _handResolved)
         {
             return;
         }
@@ -456,12 +477,31 @@ public partial class GameManager : Node
             4 => 2,
             _ => 3
         };
+        AppendHistory($"{DealTypeName(dealType)}: {FormatCommunityHistory(dealt.Count)}");
         EmitSignal(SignalName.CardsDealt, dealt, dealType);
         AudioManager.Instance?.PlaySFX(AudioManager.Instance.DealSound);
     }
 
+    private string FormatCommunityHistory(int newCardCount)
+    {
+        var splitIndex = System.Math.Max(0, CommunityCards.Count - newCardCount);
+        var previous = CommunityCards.Take(splitIndex).Select(card => card.ShortName);
+        var newest = CommunityCards.Skip(splitIndex).Select(card => card.ShortName);
+        return splitIndex == 0
+            ? string.Join(" ", newest)
+            : $"{string.Join(" ", previous)} | {string.Join(" ", newest)}";
+    }
+
     public void StartShowdown()
     {
+        if (_handResolved)
+        {
+            return;
+        }
+
+        _handResolved = true;
+        _turnTimerToken++;
+        CurrentBettingRound = null;
         CurrentState = GameState.Showdown;
         LastHandWentToShowdown = true;
         EmitSignal(SignalName.StateChanged, (int)CurrentState);
@@ -501,6 +541,12 @@ public partial class GameManager : Node
             LastShownHands[player.Id] = HandEvaluator.EvaluateHand(player.HoleCards, CommunityCards.ToArray());
         }
 
+        foreach (var player in activePlayers.OrderBy(player => player.Position))
+        {
+            var rank = LastShownHands[player.Id].Category.ToDisplayName();
+            AppendHistory($"摊牌 {player.Name}: {player.HoleCards.JoinCards()} ({rank})");
+        }
+
         var winningsDict = new Godot.Collections.Dictionary();
         foreach (var pair in LastWinnings)
         {
@@ -508,6 +554,7 @@ public partial class GameManager : Node
         }
 
         MarkSettlementPendingIfNeeded();
+        AppendSettlementHistory();
         EmitSignal(SignalName.GameEnded, winnerIds, winningsDict);
         AudioManager.Instance?.PlaySFX(AudioManager.Instance.WinSound);
         CompleteSettlementAfterOptionalAnimation();
@@ -516,6 +563,7 @@ public partial class GameManager : Node
     public void EndHand()
     {
         _settlementPending = false;
+        _handResolved = false;
         LockBustedPlayers();
         AutoRebuyAiPlayers();
         DealerPosition = GetNextActiveSeatIndex(DealerPosition);
@@ -598,13 +646,14 @@ public partial class GameManager : Node
         };
     }
 
-    private void PostBlind(Player player, int amount)
+    private int PostBlind(Player player, int amount)
     {
         var posted = System.Math.Min(player.Chips, amount);
         player.Chips -= posted;
         player.CurrentBet += posted;
         player.IsAllIn = player.Chips == 0;
         _handContributions[player.Id] = _handContributions.GetValueOrDefault(player.Id, 0) + posted;
+        return posted;
     }
 
     private List<int> BuildActionOrder(GameState state)
@@ -648,6 +697,7 @@ public partial class GameManager : Node
         }
 
         EmitSignal(SignalName.PlayerActionRequired, playerId, GetValidActions(playerId).ToGodotArray());
+        StartTurnTimer(playerId);
         QueueSitOutTurnProcessing();
     }
 
@@ -694,8 +744,66 @@ public partial class GameManager : Node
         EmitSignal(SignalName.PotUpdated, PotManager.MainPot, sidePots);
     }
 
+    private void AppendHistory(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        _handHistory.Add(message);
+        if (_handHistory.Count > 500)
+        {
+            _handHistory.RemoveRange(0, _handHistory.Count - 500);
+        }
+
+        EmitSignal(SignalName.HandHistoryUpdated);
+    }
+
+    private static string FormatActionHistory(Player player, PlayerAction action, int added, int totalBet)
+    {
+        return action switch
+        {
+            PlayerAction.Fold => $"{player.Name} 弃牌",
+            PlayerAction.Check => $"{player.Name} 过牌",
+            PlayerAction.Call => $"{player.Name} 跟注 (-{added})",
+            PlayerAction.Bet => $"{player.Name} 下注 (-{added}) 到 {totalBet}",
+            PlayerAction.Raise => $"{player.Name} 加注 (-{added}) 到 {totalBet}",
+            PlayerAction.AllIn => $"{player.Name} 全下 (-{added}) 到 {totalBet}",
+            _ => $"{player.Name} {action.ToDisplayName()}"
+        };
+    }
+
+    private static string DealTypeName(int dealType)
+    {
+        return dealType switch
+        {
+            1 => "翻牌",
+            2 => "转牌",
+            3 => "河牌",
+            _ => "公共牌"
+        };
+    }
+
+    private void AppendSettlementHistory()
+    {
+        foreach (var pair in LastWinnings.OrderBy(pair => Players.FirstOrDefault(player => player.Id == pair.Key)?.Position ?? int.MaxValue))
+        {
+            var player = Players.FirstOrDefault(item => item.Id == pair.Key);
+            AppendHistory($"{player?.Name ?? $"P{pair.Key}"} 收池 (+{pair.Value})");
+        }
+    }
+
     private void AwardLastStanding()
     {
+        if (_handResolved)
+        {
+            return;
+        }
+
+        _handResolved = true;
+        _turnTimerToken++;
+        CurrentBettingRound = null;
         var winner = GetHandPlayers().First(player => !player.IsFolded);
         LastHandWentToShowdown = false;
         LastShownHands.Clear();
@@ -727,6 +835,7 @@ public partial class GameManager : Node
         }
         var winners = new Godot.Collections.Array<int> { winner.Id };
         var winnings = new Godot.Collections.Dictionary { [winner.Id] = total };
+        AppendHistory($"其他玩家弃牌，{winner.Name} 收下底池 {total}");
         MarkSettlementPendingIfNeeded();
         EmitSignal(SignalName.GameEnded, winners, winnings);
         CompleteSettlementAfterOptionalAnimation();
@@ -819,6 +928,39 @@ public partial class GameManager : Node
         NetworkManager.Instance?.BroadcastGameState(CreateStateDTO().ToDictionary());
     }
 
+    private async void StartTurnTimer(int playerId)
+    {
+        if (ThinkingTimeSeconds <= 0)
+        {
+            CurrentTurnStartedMsec = 0;
+            CurrentTurnTimeLimitSeconds = 0;
+            EmitSignal(SignalName.StateChanged, (int)CurrentState);
+            return;
+        }
+
+        var token = ++_turnTimerToken;
+        CurrentTurnStartedMsec = Time.GetTicksMsec();
+        CurrentTurnTimeLimitSeconds = ThinkingTimeSeconds;
+        EmitSignal(SignalName.StateChanged, (int)CurrentState);
+        await ToSignal(GetTree().CreateTimer(ThinkingTimeSeconds), SceneTreeTimer.SignalName.Timeout);
+        if (CurrentBettingRound == null || token != _turnTimerToken || CurrentBettingRound.GetCurrentPlayerId() != playerId)
+        {
+            return;
+        }
+
+        var player = Players.FirstOrDefault(item => item.Id == playerId);
+        if (player == null || player.IsFolded || player.IsAllIn || player.IsSittingOut)
+        {
+            return;
+        }
+
+        var action = CurrentBettingRound.IsValidAction(playerId, PlayerAction.Check, 0)
+            ? PlayerAction.Check
+            : PlayerAction.Fold;
+        AppendHistory($"{player.Name} 超时，自动{action.ToDisplayName()}");
+        ProcessPlayerAction(playerId, action, 0);
+    }
+
     public HandRank? GetVisibleHandRank(int playerId)
     {
         if (LastShownHands.TryGetValue(playerId, out var lastRank))
@@ -840,6 +982,50 @@ public partial class GameManager : Node
         return HandEvaluator.EvaluateHand(player.HoleCards, CommunityCards.ToArray());
     }
 
+    public bool RevealHoleCard(int playerId, int cardIndex)
+    {
+        if (cardIndex is < 0 or > 1 || !_currentHandPlayerIds.Contains(playerId))
+        {
+            return false;
+        }
+
+        var player = Players.FirstOrDefault(item => item.Id == playerId);
+        var card = player?.HoleCards[cardIndex];
+        if (player == null || card == null || LastShownHands.ContainsKey(playerId))
+        {
+            return false;
+        }
+
+        if (!_revealedHoleCards.TryGetValue(playerId, out var revealed))
+        {
+            revealed = new HashSet<int>();
+            _revealedHoleCards[playerId] = revealed;
+        }
+
+        if (!revealed.Add(cardIndex))
+        {
+            return false;
+        }
+
+        AppendHistory($"{player.Name} 亮牌: {FormatRevealedHoleCards(player, revealed)}");
+        EmitSignal(SignalName.StateChanged, (int)CurrentState);
+        return true;
+    }
+
+    private static string FormatRevealedHoleCards(Player player, HashSet<int> revealed)
+    {
+        return string.Join(" ", Enumerable.Range(0, 2).Select(index =>
+        {
+            var card = player.HoleCards[index];
+            return revealed.Contains(index) && card != null ? card.ShortName : "BACK";
+        }));
+    }
+
+    public bool IsHoleCardRevealed(int playerId, int cardIndex)
+    {
+        return _revealedHoleCards.TryGetValue(playerId, out var revealed) && revealed.Contains(cardIndex);
+    }
+
     public void SetTableChipLimit(int limit)
     {
         TableChipLimit = System.Math.Max(MaxBuyIn, limit);
@@ -849,13 +1035,14 @@ public partial class GameManager : Node
         }
     }
 
-    public void ConfigureRoomRules(int smallBlind, int minBuyIn, int maxBuyIn, int tableChipLimit)
+    public void ConfigureRoomRules(int smallBlind, int minBuyIn, int maxBuyIn, int tableChipLimit, int thinkingTimeSeconds = Constants.ThinkingTimeSeconds)
     {
         SmallBlindAmount = System.Math.Max(1, smallBlind);
         BigBlindAmount = SmallBlindAmount * 2;
         MinBuyIn = System.Math.Max(1, minBuyIn);
         MaxBuyIn = System.Math.Max(MinBuyIn, maxBuyIn);
         TableChipLimit = System.Math.Max(MaxBuyIn, tableChipLimit);
+        ThinkingTimeSeconds = System.Math.Max(0, thinkingTimeSeconds);
 
         foreach (var player in Players)
         {

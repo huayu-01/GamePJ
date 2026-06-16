@@ -142,7 +142,8 @@ public partial class NetworkManager : Node
             ["big_blind"] = GameManager.Instance?.BigBlindAmount ?? Constants.BigBlind,
             ["min_buy_in"] = GameManager.Instance?.MinBuyIn ?? Constants.MinBuyIn,
             ["max_buy_in"] = GameManager.Instance?.MaxBuyIn ?? Constants.MaxBuyIn,
-            ["table_chip_limit"] = GameManager.Instance?.TableChipLimit ?? Constants.TableChipLimit
+            ["table_chip_limit"] = GameManager.Instance?.TableChipLimit ?? Constants.TableChipLimit,
+            ["thinking_time_seconds"] = GameManager.Instance?.ThinkingTimeSeconds ?? Constants.ThinkingTimeSeconds
         };
 
         return Json.Stringify(payload);
