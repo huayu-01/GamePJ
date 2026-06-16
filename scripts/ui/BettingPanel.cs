@@ -29,6 +29,7 @@ public partial class BettingPanel : Panel
     private bool _canCheck;
     private bool _interactive;
     private bool _canBetOrRaiseByRule = true;
+    private bool _callButtonActsAsRaise;
 
     public override void _Ready()
     {
@@ -113,8 +114,13 @@ public partial class BettingPanel : Panel
 
         if (_callButton != null)
         {
-            _callButton.Text = _callAmount > 0 ? $"跟注 {_callAmount}" : "跟注";
-            _callButton.Disabled = !canCall;
+            _callButtonActsAsRaise = !canCall && canRaise;
+            _callButton.Text = canCall
+                ? $"跟注 {_callAmount}"
+                : _callButtonActsAsRaise
+                    ? $"{(_currentBet == 0 ? "下注" : "加注")} {GetMinimumBetOrRaiseTotal()}"
+                    : "跟注";
+            _callButton.Disabled = !canCall && !_callButtonActsAsRaise;
         }
 
         if (_raiseButton != null)
@@ -161,7 +167,7 @@ public partial class BettingPanel : Panel
         _threeQuarterButton = AddButton("3/4", () => SubmitPotFraction(0.75f));
         _allInButton = AddButton("全下", () => Submit(PlayerAction.AllIn, _chips), FlatUi.Danger);
         _foldOrCheckButton = AddButton("过牌", SubmitFoldOrCheck);
-        _callButton = AddButton("跟注", () => Submit(PlayerAction.Call, _callAmount));
+        _callButton = AddButton("跟注", SubmitCallOrRaise);
 
         _quickButtons.Add(_halfButton);
         _quickButtons.Add(_quarterButton);
@@ -210,6 +216,17 @@ public partial class BettingPanel : Panel
     private void SubmitFoldOrCheck()
     {
         Submit(_canCheck ? PlayerAction.Check : PlayerAction.Fold, 0);
+    }
+
+    private void SubmitCallOrRaise()
+    {
+        if (_callButtonActsAsRaise)
+        {
+            Submit(_currentBet == 0 ? PlayerAction.Bet : PlayerAction.Raise, GetMinimumBetOrRaiseTotal());
+            return;
+        }
+
+        Submit(PlayerAction.Call, _callAmount);
     }
 
     private void ToggleRaiseControls()

@@ -2,6 +2,8 @@ using Godot;
 
 public partial class ChatPanel : Panel
 {
+    [Signal] public delegate void ChatMessageSentEventHandler(int playerId, string message);
+
     private TextEdit? _history;
     private LineEdit? _input;
     private VBoxContainer? _body;
@@ -18,6 +20,7 @@ public partial class ChatPanel : Panel
     {
         var playerName = GameManager.Instance?.Players.Find(player => player.Id == playerId)?.Name ?? $"玩家{playerId}";
         AppendMessage($"[{playerName}]: {message}");
+        EmitSignal(SignalName.ChatMessageSent, playerId, message);
     }
 
     private void BuildUi()
@@ -111,6 +114,12 @@ public partial class ChatPanel : Panel
     private void Send(string message)
     {
         var playerId = PlayerData.Instance?.LocalPlayerId ?? 1;
+        if (Multiplayer.MultiplayerPeer == null)
+        {
+            SendChatMessage(playerId, message);
+            return;
+        }
+
         Rpc(MethodName.SendChatMessage, playerId, message);
     }
 

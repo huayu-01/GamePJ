@@ -15,6 +15,8 @@ public partial class PlayerHUD : Control
     private Button? _revealFirstButton;
     private Button? _revealSecondButton;
     private Button? _revealBothButton;
+    private Panel? _bubblePanel;
+    private Label? _bubbleLabel;
     private CardDisplay? _card1;
     private CardDisplay? _card2;
 
@@ -29,6 +31,7 @@ public partial class PlayerHUD : Control
     private bool _lastFolded;
     private bool _isLocal;
     private bool _isEmptySeat;
+    private int _bubbleVersion;
     private Vector2 _cardSize = new(72, 103);
 
     public int PlayerId => _lastPlayerId;
@@ -88,6 +91,10 @@ public partial class PlayerHUD : Control
         _statusLabel!.Text = "";
         _handLabel!.Text = "";
         _blindLabel!.Visible = false;
+        if (_bubblePanel != null)
+        {
+            _bubblePanel.Visible = false;
+        }
         _card1!.SetCard(null, false);
         _card2!.SetCard(null, false);
         if (_cardsLayer != null)
@@ -121,7 +128,7 @@ public partial class PlayerHUD : Control
         _betLabel!.Text = player.CurrentBet > 0 ? $"下注: {player.CurrentBet}" : "";
         _statusLabel!.Text = GetStatusText(player);
         var rank = GameManager.Instance?.GetVisibleHandRank(player.Id);
-        _handLabel!.Text = rank.HasValue && revealCards ? rank.Value.Category.ToDisplayName() : "";
+        _handLabel!.Text = rank.HasValue && revealCards ? rank.Value.ToDetailedDisplayName() : "";
 
         var showFirstCard = revealCards || revealFirstCard;
         var showSecondCard = revealCards || revealSecondCard;
@@ -147,6 +154,45 @@ public partial class PlayerHUD : Control
         _lastCard2FaceUp = showSecondCard;
         _lastFolded = player.IsFolded || player.IsSittingOut;
         LayoutContents();
+    }
+
+    public async void ShowActionBubble(string text)
+    {
+        if (_bubblePanel == null || _bubbleLabel == null)
+        {
+            BuildUi();
+        }
+
+        if (_bubblePanel == null || _bubbleLabel == null || _isEmptySeat || string.IsNullOrWhiteSpace(text))
+        {
+            return;
+        }
+
+        var version = ++_bubbleVersion;
+        _bubbleLabel.Text = text;
+        _bubblePanel.Visible = true;
+        _bubblePanel.Modulate = Colors.White;
+        _bubblePanel.Scale = Vector2.One;
+        _bubblePanel.MoveToFront();
+        LayoutContents();
+
+        var tween = CreateTween();
+        tween.TweenProperty(_bubblePanel, "scale", new Vector2(1.06f, 1.06f), 0.12).SetTrans(Tween.TransitionType.Back);
+        tween.TweenProperty(_bubblePanel, "scale", Vector2.One, 0.16).SetTrans(Tween.TransitionType.Bounce);
+        await ToSignal(GetTree().CreateTimer(1.25), SceneTreeTimer.SignalName.Timeout);
+        if (_bubblePanel == null || _bubbleVersion != version)
+        {
+            return;
+        }
+
+        var fade = CreateTween();
+        fade.TweenProperty(_bubblePanel, "modulate:a", 0.0f, 0.22);
+        await ToSignal(fade, Tween.SignalName.Finished);
+        if (_bubblePanel != null && _bubbleVersion == version)
+        {
+            _bubblePanel.Visible = false;
+            _bubblePanel.Modulate = Colors.White;
+        }
     }
 
     private static void SetCardVisibility(CardDisplay display, Card? card, bool faceUp, bool wasFaceUp, bool cardChanged)
@@ -242,6 +288,11 @@ public partial class PlayerHUD : Control
 
     private void BuildUi()
     {
+        if (_nameLabel != null)
+        {
+            return;
+        }
+
         CustomMinimumSize = new Vector2(220, 190);
         _panel = FlatUi.Panel("HudPanel");
         _panel.AddThemeStyleboxOverride("panel", new StyleBoxEmpty());
@@ -279,6 +330,18 @@ public partial class PlayerHUD : Control
         _revealActions.AddChild(_revealFirstButton);
         _revealActions.AddChild(_revealSecondButton);
         _revealActions.AddChild(_revealBothButton);
+
+        _bubblePanel = FlatUi.Panel("ActionBubble");
+        _bubblePanel.Visible = false;
+        var bubbleStyle = FlatUi.PanelStyle(new Color(0.96f, 0.98f, 0.98f, 0.96f), 10);
+        bubbleStyle.BorderColor = new Color(0.12f, 0.18f, 0.16f, 0.18f);
+        _bubblePanel.AddThemeStyleboxOverride("panel", bubbleStyle);
+        AddChild(_bubblePanel);
+
+        _bubbleLabel = FlatUi.Label("", 14, HorizontalAlignment.Center);
+        _bubbleLabel.SetAnchorsPreset(LayoutPreset.FullRect);
+        _bubbleLabel.AddThemeColorOverride("font_color", new Color(0.12f, 0.18f, 0.16f));
+        _bubblePanel.AddChild(_bubbleLabel);
         LayoutContents();
     }
 
@@ -402,6 +465,21 @@ public partial class PlayerHUD : Control
         PositionLabel(_betLabel, 0, textY, width, lineHeight);
         PositionLabel(_handLabel, 0, textY + lineHeight * 0.86f, width, lineHeight);
         PositionLabel(_statusLabel, 0, textY + lineHeight * 1.72f, width, lineHeight);
+
+        if (_bubblePanel != null)
+        {
+            var bubbleWidth = _isLocal ? Mathf.Clamp(_cardSize.X * 0.92f, 118f, 168f) : Mathf.Clamp(_cardSize.X * 1.10f, 92f, 132f);
+            var bubbleHeight = _isLocal ? Mathf.Clamp(_cardSize.X * 0.34f, 42f, 56f) : Mathf.Clamp(_cardSize.X * 0.40f, 36f, 48f);
+            var bubbleX = cardsX + cardsWidth + Mathf.Clamp(_cardSize.X * 0.08f, 6f, 14f);
+            var bubbleY = cardsY + Mathf.Clamp(_cardSize.Y * 0.16f, 10f, 22f);
+            _bubblePanel.Position = new Vector2(bubbleX, bubbleY);
+            _bubblePanel.Size = new Vector2(bubbleWidth, bubbleHeight);
+            _bubblePanel.CustomMinimumSize = _bubblePanel.Size;
+            if (_bubbleLabel != null)
+            {
+                _bubbleLabel.AddThemeFontSizeOverride("font_size", Mathf.RoundToInt(Mathf.Clamp(_cardSize.X * 0.18f, 14f, 22f)));
+            }
+        }
     }
 
     private static void PositionLabel(Label? label, float x, float y, float width, float height)

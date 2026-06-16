@@ -14,6 +14,7 @@ public partial class GameManager : Node
     [Signal] public delegate void PlayerFoldedEventHandler(int playerId);
     [Signal] public delegate void PlayerAllInEventHandler(int playerId);
     [Signal] public delegate void HandHistoryUpdatedEventHandler();
+    [Signal] public delegate void PlayerActedEventHandler(int playerId, string bubbleText);
 
     [Export] public int SmallBlindAmount { get; set; } = Constants.SmallBlind;
     [Export] public int BigBlindAmount { get; set; } = Constants.BigBlind;
@@ -320,6 +321,13 @@ public partial class GameManager : Node
 
         CurrentBettingRound.CurrentPlayerIndex = 0;
         EmitSignal(SignalName.StateChanged, (int)state);
+        if (ShouldForceShowdownBecauseNoContestableAction())
+        {
+            DealUntilRiver();
+            StartShowdown();
+            return;
+        }
+
         if (CurrentBettingRound.GetCurrentPlayerId() < 0 || CurrentBettingRound.IsRoundComplete())
         {
             BroadcastState();
@@ -383,6 +391,7 @@ public partial class GameManager : Node
 
         NetworkManager.Instance?.BroadcastAction(playerId, action, amount);
         AppendHistory(FormatActionHistory(player, action, added, afterBet));
+        EmitSignal(SignalName.PlayerActed, playerId, FormatActionBubbleText(action, added));
 
         if (CurrentBettingRound.IsRoundComplete())
         {
@@ -436,6 +445,13 @@ public partial class GameManager : Node
             return;
         }
 
+        if (ShouldForceShowdownBecauseNoContestableAction())
+        {
+            DealUntilRiver();
+            StartShowdown();
+            return;
+        }
+
         switch (CurrentState)
         {
             case GameState.PreFlop:
@@ -454,6 +470,23 @@ public partial class GameManager : Node
                 StartShowdown();
                 break;
         }
+    }
+
+    private bool ShouldForceShowdownBecauseNoContestableAction()
+    {
+        var activePlayers = GetHandPlayers().Where(player => !player.IsFolded).ToArray();
+        if (activePlayers.Length <= 1)
+        {
+            return false;
+        }
+
+        var playersWithChips = activePlayers.Where(player => !player.IsAllIn && player.Chips > 0).ToArray();
+        if (playersWithChips.Length > 1)
+        {
+            return false;
+        }
+
+        return CurrentBettingRound == null || playersWithChips.All(player => CurrentBettingRound.PlayerBets.GetValueOrDefault(player.Id, 0) >= CurrentBettingRound.CurrentBet);
     }
 
     public void DealCommunityCards(int count)
@@ -543,7 +576,7 @@ public partial class GameManager : Node
 
         foreach (var player in activePlayers.OrderBy(player => player.Position))
         {
-            var rank = LastShownHands[player.Id].Category.ToDisplayName();
+            var rank = LastShownHands[player.Id].ToDetailedDisplayName();
             AppendHistory($"摊牌 {player.Name}: {player.HoleCards.JoinCards()} ({rank})");
         }
 
@@ -771,6 +804,20 @@ public partial class GameManager : Node
             PlayerAction.Raise => $"{player.Name} 加注 (-{added}) 到 {totalBet}",
             PlayerAction.AllIn => $"{player.Name} 全下 (-{added}) 到 {totalBet}",
             _ => $"{player.Name} {action.ToDisplayName()}"
+        };
+    }
+
+    private static string FormatActionBubbleText(PlayerAction action, int added)
+    {
+        return action switch
+        {
+            PlayerAction.Fold => "弃牌",
+            PlayerAction.Check => "过牌",
+            PlayerAction.Call => $"跟注{added}",
+            PlayerAction.Bet => $"下注{added}",
+            PlayerAction.Raise => $"加注{added}",
+            PlayerAction.AllIn => $"全下{added}",
+            _ => action.ToDisplayName()
         };
     }
 

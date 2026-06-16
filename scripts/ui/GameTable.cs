@@ -18,12 +18,20 @@ public partial class GameTable : Control
     private Label? _turnPromptLabel;
     private ProgressBar? _turnTimerBar;
     private Label? _turnTimerLabel;
+    private StyleBoxFlat? _turnTimerFillStyle;
+    private StyleBoxFlat? _turnTimerBackgroundStyle;
     private Label? _currentBetLabel;
     private BettingPanel? _bettingPanel;
     private ColorRect? _drawerDismissLayer;
     private Panel? _leftDrawerPanel;
     private Panel? _sidePanel;
+    private HandHistoryPanel? _handHistoryPanel;
+    private ChatPanel? _chatPanel;
+    private Panel? _hostRebuyPanel;
+    private VBoxContainer? _hostRebuyList;
+    private SpinBox? _hostRebuyAmountSpin;
     private Control? _settlementLayer;
+    private Control? _bubbleLayer;
     private Texture2D? _settlementChipTexture;
     private Panel? _bustedPanel;
     private Label? _bustedLabel;
@@ -36,10 +44,13 @@ public partial class GameTable : Control
     private CheckButton? _aiToggle;
     private SpinBox? _aiCount;
     private SpinBox? _chipLimitSpin;
+    private readonly Dictionary<int, string> _pendingActionBubbles = new();
     private bool _sideCollapsed = true;
     private bool _chatCollapsed = true;
     private bool _syncingSitOutToggle;
     private bool _revealWindowOpen;
+    private int _lastStatePromptPlayerId = int.MinValue;
+    private bool _lastTimerDanger;
 
     public override void _Ready()
     {
@@ -83,6 +94,7 @@ public partial class GameTable : Control
         BuildTableArea();
         BuildSidePanel();
         BuildBettingPanel();
+        BuildBubbleLayer();
         BuildSettlementLayer();
         BuildBustedPanel();
         ApplyResponsiveLayout();
@@ -169,6 +181,24 @@ public partial class GameTable : Control
             CustomMinimumSize = new Vector2(0, 10)
         };
         centerBox.AddChild(_turnTimerBar);
+        _turnTimerFillStyle = new StyleBoxFlat
+        {
+            BgColor = new Color(1.0f, 0.82f, 0.32f),
+            CornerRadiusTopLeft = 5,
+            CornerRadiusTopRight = 5,
+            CornerRadiusBottomLeft = 5,
+            CornerRadiusBottomRight = 5
+        };
+        _turnTimerBackgroundStyle = new StyleBoxFlat
+        {
+            BgColor = new Color(0.05f, 0.08f, 0.07f, 0.92f),
+            CornerRadiusTopLeft = 5,
+            CornerRadiusTopRight = 5,
+            CornerRadiusBottomLeft = 5,
+            CornerRadiusBottomRight = 5
+        };
+        _turnTimerBar.AddThemeStyleboxOverride("fill", _turnTimerFillStyle);
+        _turnTimerBar.AddThemeStyleboxOverride("background", _turnTimerBackgroundStyle);
 
         _turnTimerLabel = FlatUi.MutedLabel("", 13);
         _turnTimerLabel.HorizontalAlignment = HorizontalAlignment.Center;
@@ -236,9 +266,10 @@ public partial class GameTable : Control
         box.OffsetBottom = -10;
         _leftDrawerPanel.AddChild(box);
 
-        var chat = new ChatPanel();
-        chat.SizeFlagsVertical = SizeFlags.ExpandFill;
-        box.AddChild(chat);
+        _chatPanel = new ChatPanel();
+        _chatPanel.SizeFlagsVertical = SizeFlags.ExpandFill;
+        _chatPanel.ChatMessageSent += OnChatMessageSent;
+        box.AddChild(_chatPanel);
     }
 
     private void BuildHistoryDrawer()
@@ -259,7 +290,7 @@ public partial class GameTable : Control
         box.AddChild(FlatUi.Label("对局记录", 20));
 
         var debug = FlatUi.Panel("DebugPanel");
-        debug.CustomMinimumSize = new Vector2(0, 122);
+        debug.CustomMinimumSize = new Vector2(0, 212);
         box.AddChild(debug);
         var debugBox = new VBoxContainer();
         debugBox.SetAnchorsPreset(LayoutPreset.FullRect);
@@ -299,9 +330,40 @@ public partial class GameTable : Control
         limitRow.AddChild(applyLimit);
         debugBox.AddChild(limitRow);
 
-        var history = new HandHistoryPanel();
-        history.SizeFlagsVertical = SizeFlags.ExpandFill;
-        box.AddChild(history);
+        _hostRebuyPanel = FlatUi.Panel("HostRebuyPanel");
+        _hostRebuyPanel.CustomMinimumSize = new Vector2(0, 120);
+        debugBox.AddChild(_hostRebuyPanel);
+
+        var rebuyBox = new VBoxContainer();
+        rebuyBox.SetAnchorsPreset(LayoutPreset.FullRect);
+        rebuyBox.OffsetLeft = 10;
+        rebuyBox.OffsetTop = 8;
+        rebuyBox.OffsetRight = -10;
+        rebuyBox.OffsetBottom = -8;
+        rebuyBox.AddThemeConstantOverride("separation", 6);
+        _hostRebuyPanel.AddChild(rebuyBox);
+        rebuyBox.AddChild(FlatUi.Label("房主补码", 16));
+
+        var rebuyAmountRow = new HBoxContainer();
+        rebuyAmountRow.AddChild(FlatUi.MutedLabel("补码额"));
+        _hostRebuyAmountSpin = new SpinBox
+        {
+            MinValue = 1,
+            MaxValue = 100000,
+            Value = GameManager.Instance?.MaxBuyIn ?? Constants.MaxBuyIn,
+            Step = 1,
+            CustomMinimumSize = new Vector2(120, 34)
+        };
+        rebuyAmountRow.AddChild(_hostRebuyAmountSpin);
+        rebuyBox.AddChild(rebuyAmountRow);
+
+        _hostRebuyList = new VBoxContainer();
+        _hostRebuyList.AddThemeConstantOverride("separation", 4);
+        rebuyBox.AddChild(_hostRebuyList);
+
+        _handHistoryPanel = new HandHistoryPanel();
+        _handHistoryPanel.SizeFlagsVertical = SizeFlags.ExpandFill;
+        box.AddChild(_handHistoryPanel);
     }
 
     private void BuildBettingPanel()
@@ -322,6 +384,13 @@ public partial class GameTable : Control
         _settlementLayer.SetAnchorsPreset(LayoutPreset.FullRect);
         _settlementChipTexture = LoadTexture("res://assets/textures/chips/chipRedWhite.png");
         AddToStage(_settlementLayer);
+    }
+
+    private void BuildBubbleLayer()
+    {
+        _bubbleLayer = new Control { Name = "BubbleLayer", MouseFilter = MouseFilterEnum.Ignore };
+        _bubbleLayer.SetAnchorsPreset(LayoutPreset.FullRect);
+        AddToStage(_bubbleLayer);
     }
 
     private void BuildBustedPanel()
@@ -366,6 +435,7 @@ public partial class GameTable : Control
         manager.CardsDealt += (_, _) => Refresh();
         manager.PotUpdated += (_, _) => Refresh();
         manager.GameEnded += (_, _) => OnGameEnded();
+        manager.PlayerActed += OnPlayerActed;
     }
 
     private void Refresh()
@@ -425,7 +495,9 @@ public partial class GameTable : Control
         UpdateStateLabel();
         UpdateBettingPanel();
         UpdateBustedPanel();
+        RefreshHostRebuyPanel();
         LayoutPlayerHuds();
+        PlayPendingActionBubbles();
     }
 
     private void EnsureSeatHuds()
@@ -590,13 +662,15 @@ public partial class GameTable : Control
             var localId = PlayerData.Instance?.LocalPlayerId ?? 1;
             _turnPromptLabel.Text = currentId == localId ? "轮到你行动" : currentId > 0 ? $"等待 {currentName}" : manager.CurrentState.ToDisplayName();
             _turnPromptLabel.AddThemeColorOverride("font_color", currentId == localId ? new Color(1.0f, 0.82f, 0.32f) : FlatUi.Accent);
-            if (currentId == localId)
+            if (currentId == localId && currentId != _lastStatePromptPlayerId)
             {
                 var tween = CreateTween();
                 tween.TweenProperty(_turnPromptLabel, "scale", new Vector2(1.08f, 1.08f), 0.18);
                 tween.TweenProperty(_turnPromptLabel, "scale", Vector2.One, 0.18);
             }
         }
+
+        _lastStatePromptPlayerId = currentId;
     }
 
     private void UpdateTurnTimerVisual()
@@ -622,24 +696,13 @@ public partial class GameTable : Control
         _turnTimerBar.Visible = true;
         _turnTimerLabel.Visible = true;
         _turnTimerBar.Value = progress;
-        var fill = new StyleBoxFlat
+        var danger = progress < 0.25f;
+        if (_turnTimerFillStyle != null && danger != _lastTimerDanger)
         {
-            BgColor = progress < 0.25f ? FlatUi.Danger : new Color(1.0f, 0.82f, 0.32f),
-            CornerRadiusTopLeft = 5,
-            CornerRadiusTopRight = 5,
-            CornerRadiusBottomLeft = 5,
-            CornerRadiusBottomRight = 5
-        };
-        var background = new StyleBoxFlat
-        {
-            BgColor = new Color(0.05f, 0.08f, 0.07f, 0.92f),
-            CornerRadiusTopLeft = 5,
-            CornerRadiusTopRight = 5,
-            CornerRadiusBottomLeft = 5,
-            CornerRadiusBottomRight = 5
-        };
-        _turnTimerBar.AddThemeStyleboxOverride("fill", fill);
-        _turnTimerBar.AddThemeStyleboxOverride("background", background);
+            _turnTimerFillStyle.BgColor = danger ? FlatUi.Danger : new Color(1.0f, 0.82f, 0.32f);
+            _turnTimerBar.QueueRedraw();
+            _lastTimerDanger = danger;
+        }
         _turnTimerLabel.Text = $"{Mathf.CeilToInt(remaining)}s";
     }
 
@@ -695,6 +758,11 @@ public partial class GameTable : Control
         if (_sideToggle != null)
         {
             _sideToggle.Text = _sideCollapsed ? "记录" : "收起";
+        }
+
+        if (!_sideCollapsed)
+        {
+            _handHistoryPanel?.JumpToLatestPage();
         }
 
         if (_bettingPanel != null)
@@ -771,6 +839,149 @@ public partial class GameTable : Control
             GameManager.Instance?.StartGame();
         }
         Refresh();
+    }
+
+    private void RefreshHostRebuyPanel()
+    {
+        if (_hostRebuyPanel == null || _hostRebuyList == null)
+        {
+            return;
+        }
+
+        var isHost = NetworkManager.Instance?.IsHost == true;
+        _hostRebuyPanel.Visible = isHost;
+        if (!isHost)
+        {
+            return;
+        }
+
+        foreach (var child in _hostRebuyList.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        var manager = GameManager.Instance;
+        if (manager == null)
+        {
+            return;
+        }
+
+        if (_hostRebuyAmountSpin != null)
+        {
+            _hostRebuyAmountSpin.MinValue = manager.MinBuyIn;
+            _hostRebuyAmountSpin.MaxValue = manager.MaxBuyIn;
+            _hostRebuyAmountSpin.Value = Mathf.Clamp((float)_hostRebuyAmountSpin.Value, manager.MinBuyIn, manager.MaxBuyIn);
+        }
+
+        foreach (var player in manager.Players.OrderBy(player => player.Position))
+        {
+            var row = new HBoxContainer();
+            row.AddThemeConstantOverride("separation", 6);
+            var text = FlatUi.MutedLabel($"{player.Name} · 筹码 {player.Chips}");
+            text.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            row.AddChild(text);
+
+            var button = FlatUi.Button("补码");
+            button.CustomMinimumSize = new Vector2(72, 32);
+            var playerId = player.Id;
+            button.Pressed += () => RebuyTargetPlayer(playerId);
+            row.AddChild(button);
+            _hostRebuyList.AddChild(row);
+        }
+    }
+
+    private void RebuyTargetPlayer(int playerId)
+    {
+        var amount = (int)(_hostRebuyAmountSpin?.Value ?? (GameManager.Instance?.MaxBuyIn ?? Constants.MaxBuyIn));
+        GameManager.Instance?.RebuyPlayer(playerId, amount);
+        Refresh();
+    }
+
+    private void OnPlayerActed(int playerId, string bubbleText)
+    {
+        QueuePlayerBubble(playerId, bubbleText);
+    }
+
+    private void OnChatMessageSent(int playerId, string message)
+    {
+        QueuePlayerBubble(playerId, message);
+    }
+
+    private void QueuePlayerBubble(int playerId, string bubbleText)
+    {
+        if (playerId <= 0 || string.IsNullOrWhiteSpace(bubbleText))
+        {
+            return;
+        }
+
+        _pendingActionBubbles[playerId] = bubbleText.Trim();
+        CallDeferred(nameof(PlayPendingActionBubbles));
+    }
+
+    private void PlayPendingActionBubbles()
+    {
+        if (_pendingActionBubbles.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var pair in _pendingActionBubbles.ToArray())
+        {
+            var hud = _seatHuds.FirstOrDefault(item => item.PlayerId == pair.Key);
+            if (hud == null)
+            {
+                continue;
+            }
+
+            ShowTableBubble(hud, pair.Value);
+            _pendingActionBubbles.Remove(pair.Key);
+        }
+    }
+
+    private async void ShowTableBubble(PlayerHUD hud, string text)
+    {
+        if (_bubbleLayer == null || _stage == null || string.IsNullOrWhiteSpace(text))
+        {
+            hud.ShowActionBubble(text);
+            return;
+        }
+
+        var panel = FlatUi.Panel("TableBubble");
+        panel.MouseFilter = MouseFilterEnum.Ignore;
+        var bubbleStyle = FlatUi.PanelStyle(new Color(0.96f, 0.98f, 0.98f, 0.97f), 10);
+        bubbleStyle.BorderColor = new Color(0.12f, 0.18f, 0.16f, 0.26f);
+        panel.AddThemeStyleboxOverride("panel", bubbleStyle);
+
+        var label = FlatUi.Label(text.Trim(), 15, HorizontalAlignment.Center);
+        label.SetAnchorsPreset(LayoutPreset.FullRect);
+        label.AddThemeColorOverride("font_color", new Color(0.10f, 0.15f, 0.13f));
+        label.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
+        panel.AddChild(label);
+
+        var stageSize = GetStageSize();
+        var bubbleWidth = Mathf.Clamp(stageSize.X * 0.18f, 92f, 176f);
+        var bubbleHeight = Mathf.Clamp(stageSize.X * 0.052f, 38f, 56f);
+        panel.Size = new Vector2(bubbleWidth, bubbleHeight);
+        panel.CustomMinimumSize = panel.Size;
+
+        var hudGlobal = hud.GetGlobalRect();
+        var stageGlobal = _stage.GetGlobalRect().Position;
+        var rawPosition = hudGlobal.Position - stageGlobal + new Vector2(hud.Size.X * 0.70f, hud.Size.Y * 0.40f);
+        panel.Position = new Vector2(
+            Mathf.Clamp(rawPosition.X, 8f, Mathf.Max(8f, stageSize.X - bubbleWidth - 8f)),
+            Mathf.Clamp(rawPosition.Y, 8f, Mathf.Max(8f, stageSize.Y - bubbleHeight - 8f)));
+        panel.Modulate = new Color(1f, 1f, 1f, 0f);
+        panel.Scale = new Vector2(0.92f, 0.92f);
+        _bubbleLayer.AddChild(panel);
+        _bubbleLayer.MoveToFront();
+
+        var tween = CreateTween();
+        tween.TweenProperty(panel, "modulate:a", 1.0f, 0.08);
+        tween.Parallel().TweenProperty(panel, "scale", Vector2.One, 0.16).SetTrans(Tween.TransitionType.Back);
+        tween.TweenInterval(1.15);
+        tween.TweenProperty(panel, "modulate:a", 0.0f, 0.22);
+        await ToSignal(tween, Tween.SignalName.Finished);
+        panel.QueueFree();
     }
 
     private void ApplyChipLimit()
@@ -1075,6 +1286,18 @@ public partial class GameTable : Control
             _bettingPanel.MoveToFront();
         }
 
+        if (_bubbleLayer != null)
+        {
+            _bubbleLayer.SetAnchorsPreset(LayoutPreset.FullRect);
+            _bubbleLayer.OffsetLeft = 0;
+            _bubbleLayer.OffsetTop = 0;
+            _bubbleLayer.OffsetRight = 0;
+            _bubbleLayer.OffsetBottom = 0;
+            _bubbleLayer.MoveToFront();
+        }
+
+        BringOpenDrawersToFront();
+
         if (_bustedPanel != null)
         {
             var panelWidth = Mathf.Clamp(size.X * 0.76f, 320f, 720f);
@@ -1091,6 +1314,26 @@ public partial class GameTable : Control
             _settlementLayer.OffsetTop = 0;
             _settlementLayer.OffsetRight = 0;
             _settlementLayer.OffsetBottom = 0;
+        }
+
+        BringOpenDrawersToFront();
+    }
+
+    private void BringOpenDrawersToFront()
+    {
+        if (_drawerDismissLayer?.Visible == true)
+        {
+            _drawerDismissLayer.MoveToFront();
+        }
+
+        if (_sidePanel?.Visible == true)
+        {
+            _sidePanel.MoveToFront();
+        }
+
+        if (_leftDrawerPanel?.Visible == true)
+        {
+            _leftDrawerPanel.MoveToFront();
         }
     }
 

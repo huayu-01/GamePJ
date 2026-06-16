@@ -162,6 +162,56 @@ public partial class TestGameManagerFlow : Node
         manager.LeaveTable();
         manager.Players.Clear();
         manager.AiPlayerIds.Clear();
+        manager.TableSeatCount = 3;
+        for (var seat = 0; seat < 3; seat++)
+        {
+            manager.Players.Add(new Player { Id = seat + 1, Name = $"P{seat + 1}", Chips = Constants.StartingChips, Position = seat });
+        }
+
+        manager.StartGame();
+        manager.WaitForSettlementAnimation = true;
+        var p1 = manager.Players.First(player => player.Id == 1);
+        var p2 = manager.Players.First(player => player.Id == 2);
+        var p3 = manager.Players.First(player => player.Id == 3);
+        p1.Chips = 0;
+        p2.Chips = 0;
+        p3.Chips = 300;
+        p1.IsAllIn = true;
+        p2.IsAllIn = true;
+        p3.IsAllIn = false;
+        p1.IsFolded = false;
+        p2.IsFolded = false;
+        p3.IsFolded = false;
+        manager.StartBettingRound(GameState.Flop);
+        if (manager.CurrentBettingRound != null)
+        {
+            manager.CurrentBettingRound.CurrentBet = 120;
+            manager.CurrentBettingRound.PlayerBets[p1.Id] = 120;
+            manager.CurrentBettingRound.PlayerBets[p2.Id] = 120;
+            manager.CurrentBettingRound.PlayerBets[p3.Id] = 120;
+            manager.CurrentBettingRound.PlayerChips[p1.Id] = 0;
+            manager.CurrentBettingRound.PlayerChips[p2.Id] = 0;
+            manager.CurrentBettingRound.PlayerChips[p3.Id] = 300;
+            manager.CurrentBettingRound.AllInPlayers.Add(p1.Id);
+            manager.CurrentBettingRound.AllInPlayers.Add(p2.Id);
+            manager.CurrentBettingRound.PlayersToAct.Clear();
+            manager.CurrentBettingRound.CurrentPlayerIndex = -1;
+        }
+
+        manager.EndBettingRound();
+        Check(
+            manager.CurrentState == GameState.Showdown &&
+            manager.CurrentBettingRound == null &&
+            manager.CommunityCards.Count == 5,
+            "OnlyOneDeepStackSkipsDeadBettingStreets",
+            ref pass,
+            ref fail);
+        manager.WaitForSettlementAnimation = false;
+        manager.CompleteSettlementAnimation();
+
+        manager.LeaveTable();
+        manager.Players.Clear();
+        manager.AiPlayerIds.Clear();
         manager.TableSeatCount = 6;
         manager.Players.Add(new Player { Id = 1, Name = "P1", Chips = 0, Position = 0 });
         for (var seat = 1; seat < 6; seat++)

@@ -5,8 +5,18 @@ using System.Text.RegularExpressions;
 
 public partial class HandHistoryPanel : Panel
 {
+    private const int HandsPerPage = 4;
+
     private VBoxContainer? _list;
     private ScrollContainer? _scroll;
+    private Label? _pageLabel;
+    private Button? _prevPageButton;
+    private Button? _nextPageButton;
+
+    private readonly List<HistoryEntry> _parsedEntries = new();
+    private readonly List<(int Start, int End)> _pageRanges = new();
+    private int _parsedMessageCount;
+    private int _currentPageIndex = -1;
 
     private static readonly Color CheckColor = new(0.48f, 0.72f, 0.92f);
     private static readonly Color CallColor = new(0.94f, 0.78f, 0.34f);
@@ -20,6 +30,11 @@ public partial class HandHistoryPanel : Panel
         BuildUi();
         WireSignals();
         RefreshHistory();
+    }
+
+    public void JumpToLatestPage()
+    {
+        RefreshHistory(forceLatestPage: true);
     }
 
     private void BuildUi()
@@ -36,7 +51,27 @@ public partial class HandHistoryPanel : Panel
         root.AddThemeConstantOverride("separation", 8);
         AddChild(root);
 
-        root.AddChild(FlatUi.Label("对局记录", 22));
+        var header = new HBoxContainer();
+        header.AddThemeConstantOverride("separation", 8);
+        root.AddChild(header);
+
+        var title = FlatUi.Label("对局记录", 22);
+        title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        header.AddChild(title);
+
+        _prevPageButton = FlatUi.Button("上一页");
+        _prevPageButton.CustomMinimumSize = new Vector2(82, 36);
+        _prevPageButton.Pressed += () => ChangePage(-1);
+        header.AddChild(_prevPageButton);
+
+        _pageLabel = FlatUi.MutedLabel("第 1 / 1 页", 14);
+        _pageLabel.VerticalAlignment = VerticalAlignment.Center;
+        header.AddChild(_pageLabel);
+
+        _nextPageButton = FlatUi.Button("下一页");
+        _nextPageButton.CustomMinimumSize = new Vector2(82, 36);
+        _nextPageButton.Pressed += () => ChangePage(1);
+        header.AddChild(_nextPageButton);
 
         _scroll = new ScrollContainer
         {
@@ -65,6 +100,90 @@ public partial class HandHistoryPanel : Panel
 
     private void RefreshHistory()
     {
+        RefreshHistory(false);
+    }
+
+    private void RefreshHistory(bool forceLatestPage)
+    {
+        if (_list == null)
+        {
+            return;
+        }
+
+        EnsureParsedHistory();
+        RebuildPageRanges();
+
+        if (_pageRanges.Count == 0)
+        {
+            _currentPageIndex = -1;
+            RenderCurrentPage();
+            return;
+        }
+
+        var latestIndex = _pageRanges.Count - 1;
+        if (forceLatestPage || _currentPageIndex < 0 || _currentPageIndex > latestIndex)
+        {
+            _currentPageIndex = latestIndex;
+        }
+
+        RenderCurrentPage();
+    }
+
+    private void EnsureParsedHistory()
+    {
+        var history = GameManager.Instance?.HandHistory ?? System.Array.Empty<string>();
+        if (history.Count < _parsedMessageCount)
+        {
+            _parsedEntries.Clear();
+            _parsedMessageCount = 0;
+        }
+
+        for (var i = _parsedMessageCount; i < history.Count; i++)
+        {
+            _parsedEntries.Add(ParseEntry(history[i]));
+        }
+
+        _parsedMessageCount = history.Count;
+    }
+
+    private void RebuildPageRanges()
+    {
+        _pageRanges.Clear();
+        if (_parsedEntries.Count == 0)
+        {
+            return;
+        }
+
+        var handStarts = _parsedEntries
+            .Select((entry, index) => (entry, index))
+            .Where(item => item.entry.Kind == EntryKind.Section)
+            .Select(item => item.index)
+            .ToList();
+
+        if (handStarts.Count == 0)
+        {
+            _pageRanges.Add((0, _parsedEntries.Count - 1));
+            return;
+        }
+
+        var handBlocks = new List<(int Start, int End)>();
+        for (var i = 0; i < handStarts.Count; i++)
+        {
+            var start = handStarts[i];
+            var end = i + 1 < handStarts.Count ? handStarts[i + 1] - 1 : _parsedEntries.Count - 1;
+            handBlocks.Add((start, end));
+        }
+
+        for (var i = 0; i < handBlocks.Count; i += HandsPerPage)
+        {
+            var pageStart = handBlocks[i].Start;
+            var pageEnd = handBlocks[Mathf.Min(i + HandsPerPage - 1, handBlocks.Count - 1)].End;
+            _pageRanges.Add((pageStart, pageEnd));
+        }
+    }
+
+    private void RenderCurrentPage()
+    {
         if (_list == null)
         {
             return;
@@ -75,13 +194,51 @@ public partial class HandHistoryPanel : Panel
             child.QueueFree();
         }
 
-        var history = GameManager.Instance?.HandHistory ?? System.Array.Empty<string>();
-        foreach (var message in history)
+        if (_currentPageIndex < 0 || _currentPageIndex >= _pageRanges.Count)
         {
-            _list.AddChild(BuildEntry(ParseEntry(message)));
+            UpdatePager();
+            return;
         }
 
+        var range = _pageRanges[_currentPageIndex];
+        for (var i = range.Start; i <= range.End; i++)
+        {
+            _list.AddChild(BuildEntry(_parsedEntries[i]));
+        }
+
+        UpdatePager();
         CallDeferred(nameof(ScrollToBottom));
+    }
+
+    private void ChangePage(int delta)
+    {
+        if (_pageRanges.Count == 0)
+        {
+            return;
+        }
+
+        _currentPageIndex = Mathf.Clamp(_currentPageIndex + delta, 0, _pageRanges.Count - 1);
+        RenderCurrentPage();
+    }
+
+    private void UpdatePager()
+    {
+        var pageCount = Mathf.Max(1, _pageRanges.Count);
+        var current = _currentPageIndex < 0 ? 1 : _currentPageIndex + 1;
+        if (_pageLabel != null)
+        {
+            _pageLabel.Text = $"第 {current} / {pageCount} 页";
+        }
+
+        if (_prevPageButton != null)
+        {
+            _prevPageButton.Disabled = _currentPageIndex <= 0;
+        }
+
+        if (_nextPageButton != null)
+        {
+            _nextPageButton.Disabled = _currentPageIndex < 0 || _currentPageIndex >= pageCount - 1;
+        }
     }
 
     private void ScrollToBottom()
@@ -96,13 +253,56 @@ public partial class HandHistoryPanel : Panel
 
     private Control BuildEntry(HistoryEntry entry)
     {
-        if (entry.IsSection)
+        return entry.Kind switch
         {
-            var section = FlatUi.Label(entry.Action, 15, HorizontalAlignment.Center);
-            section.AddThemeColorOverride("font_color", DealColor);
-            return section;
+            EntryKind.Section => BuildSectionEntry(entry),
+            EntryKind.Street => BuildStreetEntry(entry),
+            _ => BuildPlayerEntry(entry)
+        };
+    }
+
+    private static Control BuildSectionEntry(HistoryEntry entry)
+    {
+        var section = FlatUi.Label(entry.Action, 16, HorizontalAlignment.Center);
+        section.AddThemeColorOverride("font_color", DealColor);
+        return section;
+    }
+
+    private Control BuildStreetEntry(HistoryEntry entry)
+    {
+        var panel = FlatUi.Panel("StreetHistoryEntry");
+        panel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        panel.CustomMinimumSize = new Vector2(0, 88);
+        panel.AddThemeStyleboxOverride("panel", FlatUi.PanelStyle(new Color(0.085f, 0.105f, 0.11f, 0.96f), 8));
+
+        var root = new HBoxContainer();
+        root.SetAnchorsPreset(LayoutPreset.FullRect);
+        root.OffsetLeft = 12;
+        root.OffsetTop = 8;
+        root.OffsetRight = -12;
+        root.OffsetBottom = -8;
+        root.AddThemeConstantOverride("separation", 12);
+        root.Alignment = BoxContainer.AlignmentMode.Center;
+        panel.AddChild(root);
+
+        var stageLabel = FlatUi.Label(entry.Action, 22);
+        stageLabel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        stageLabel.AddThemeColorOverride("font_color", DealColor);
+        root.AddChild(stageLabel);
+
+        var cardRow = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.End };
+        cardRow.AddThemeConstantOverride("separation", 5);
+        foreach (var card in entry.Cards.Select((card, index) => (card, index)))
+        {
+            cardRow.AddChild(BuildMiniCard(card.card, card.index >= entry.HighlightCardStart, true));
         }
 
+        root.AddChild(cardRow);
+        return panel;
+    }
+
+    private Control BuildPlayerEntry(HistoryEntry entry)
+    {
         var panel = FlatUi.Panel("HistoryEntry");
         panel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         panel.CustomMinimumSize = new Vector2(0, entry.Cards.Count > 0 ? 88 : 76);
@@ -140,9 +340,9 @@ public partial class HandHistoryPanel : Panel
                 SizeFlagsHorizontal = SizeFlags.ShrinkEnd
             };
             cardRow.AddThemeConstantOverride("separation", 4);
-            for (var i = 0; i < entry.Cards.Count; i++)
+            foreach (var card in entry.Cards.Select((card, index) => (card, index)))
             {
-                cardRow.AddChild(BuildMiniCard(entry.Cards[i], i >= entry.HighlightCardStart));
+                cardRow.AddChild(BuildMiniCard(card.card, card.index >= entry.HighlightCardStart, false));
             }
 
             root.AddChild(cardRow);
@@ -186,10 +386,10 @@ public partial class HandHistoryPanel : Panel
         return playerName.Trim()[0].ToString();
     }
 
-    private static Control BuildMiniCard(Card? card, bool highlighted)
+    private static Control BuildMiniCard(Card? card, bool highlighted, bool large)
     {
         var display = new CardDisplay();
-        display.SetDisplaySize(new Vector2(42, 60));
+        display.SetDisplaySize(large ? new Vector2(50, 72) : new Vector2(42, 60));
         if (card == null)
         {
             display.SetBack();
@@ -206,7 +406,7 @@ public partial class HandHistoryPanel : Panel
 
         var frame = new Panel
         {
-            CustomMinimumSize = new Vector2(50, 68)
+            CustomMinimumSize = large ? new Vector2(58, 80) : new Vector2(50, 68)
         };
         var style = FlatUi.PanelStyle(new Color(1.0f, 0.82f, 0.18f, 0.12f), 4);
         style.BorderColor = new Color(1.0f, 0.82f, 0.18f, 0.92f);
@@ -216,10 +416,21 @@ public partial class HandHistoryPanel : Panel
         style.BorderWidthBottom = 2;
         frame.AddThemeStyleboxOverride("panel", style);
         display.SetAnchorsPreset(LayoutPreset.Center);
-        display.OffsetLeft = -21;
-        display.OffsetTop = -30;
-        display.OffsetRight = 21;
-        display.OffsetBottom = 30;
+        if (large)
+        {
+            display.OffsetLeft = -25;
+            display.OffsetTop = -36;
+            display.OffsetRight = 25;
+            display.OffsetBottom = 36;
+        }
+        else
+        {
+            display.OffsetLeft = -21;
+            display.OffsetTop = -30;
+            display.OffsetRight = 21;
+            display.OffsetBottom = 30;
+        }
+
         frame.AddChild(display);
         return frame;
     }
@@ -233,7 +444,7 @@ public partial class HandHistoryPanel : Panel
 
         if (message.StartsWith("---"))
         {
-            return new HistoryEntry("", message.Trim('-').Trim(), DealColor) { IsSection = true };
+            return new HistoryEntry("", message.Trim('-').Trim(), DealColor) { Kind = EntryKind.Section };
         }
 
         var deal = Regex.Match(message, @"^(翻牌|转牌|河牌):\s*(?<cards>.+)$");
@@ -242,6 +453,7 @@ public partial class HandHistoryPanel : Panel
             var cardText = deal.Groups["cards"].Value;
             return new HistoryEntry("", deal.Groups[1].Value, DealColor)
             {
+                Kind = EntryKind.Street,
                 Cards = ParseCards(cardText),
                 HighlightCardStart = GetHighlightCardStart(cardText)
             };
@@ -439,6 +651,13 @@ public partial class HandHistoryPanel : Panel
         return rankText is "A" or "K" or "Q" or "J" or "10" or "9" or "8" or "7" or "6" or "5" or "4" or "3" or "2";
     }
 
+    private enum EntryKind
+    {
+        Player,
+        Street,
+        Section
+    }
+
     private sealed class HistoryEntry
     {
         public HistoryEntry(string playerName, string action, Color actionColor)
@@ -451,9 +670,9 @@ public partial class HandHistoryPanel : Panel
         public string PlayerName { get; }
         public string Action { get; }
         public Color ActionColor { get; }
+        public EntryKind Kind { get; init; } = EntryKind.Player;
         public string AmountText { get; init; } = "";
         public bool AmountPositive { get; init; }
-        public bool IsSection { get; init; }
         public int HighlightCardStart { get; init; } = int.MaxValue;
         public List<Card?> Cards { get; init; } = new();
     }

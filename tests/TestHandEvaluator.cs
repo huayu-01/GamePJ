@@ -7,7 +7,7 @@ public partial class TestHandEvaluator : Node
     {
         var (pass, fail) = Run();
         GD.Print("\n========== TEST RESULT ==========");
-        GD.Print($"PASS: {pass}/12, FAIL: {fail}/12");
+        GD.Print($"PASS: {pass}/17, FAIL: {fail}/17");
         GD.Print(fail == 0 ? "ALL TESTS PASSED!" : "SOME TESTS FAILED - FIX BEFORE PROCEEDING");
     }
 
@@ -77,6 +77,11 @@ public partial class TestHandEvaluator : Node
             new[] { C(Suit.Hearts, Rank.Ace), C(Suit.Spades, Rank.Two) },
             new[] { C(Suit.Diamonds, Rank.Three), C(Suit.Clubs, Rank.Four), C(Suit.Hearts, Rank.Five), C(Suit.Spades, Rank.Seven), C(Suit.Diamonds, Rank.Eight) });
         Check(result12.Category == HandCategory.Straight && result12.Kickers[0] == 5, "StraightAceLow", ref pass, ref fail);
+        Check(result4.ToDetailedDisplayName() == "QJ葫芦", "FullHouseDetailedName", ref pass, ref fail);
+        Check(result5.ToDetailedDisplayName() == "A同花", "FlushDetailedName", ref pass, ref fail);
+        Check(result6.ToDetailedDisplayName() == "顺子9", "StraightDetailedName", ref pass, ref fail);
+        Check(result8.ToDetailedDisplayName() == "AK两对", "TwoPairDetailedName", ref pass, ref fail);
+        Check(result9.ToDetailedDisplayName() == "A对子", "OnePairDetailedName", ref pass, ref fail);
 
         return (pass, fail);
     }
