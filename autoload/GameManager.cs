@@ -299,6 +299,10 @@ public partial class GameManager : Node
 
         AppendHistory($"向 {handPlayers.Count} 名玩家发手牌");
         EmitSignal(SignalName.CardsDealt, dealt, 0);
+        foreach (var player in handPlayers)
+        {
+            NetworkManager.Instance?.SendPrivateHoleCards(player.Id, player.HoleCards);
+        }
     }
 
     public void StartBettingRound(GameState state)
@@ -677,6 +681,96 @@ public partial class GameManager : Node
             DealerPosition = DealerPosition,
             TableSeatCount = TableSeatCount
         };
+    }
+
+    public void ApplyNetworkState(Godot.Collections.Dictionary state)
+    {
+        var dto = GameStateDTO.FromDictionary(state);
+        CurrentState = dto.CurrentState;
+        TableSeatCount = Mathf.Clamp(dto.TableSeatCount, 2, Constants.MaxPlayers);
+        DealerPosition = dto.DealerPosition;
+
+        var existingHoleCards = Players.ToDictionary(
+            player => player.Id,
+            player => new[] { player.HoleCards[0], player.HoleCards[1] });
+        Players.Clear();
+        foreach (var dtoPlayer in dto.Players.OrderBy(player => player.Position))
+        {
+            var player = new Player
+            {
+                Id = dtoPlayer.Id,
+                Name = dtoPlayer.Name,
+                Chips = dtoPlayer.Chips,
+                CurrentBet = dtoPlayer.CurrentBet,
+                IsFolded = dtoPlayer.IsFolded,
+                IsAllIn = dtoPlayer.IsAllIn,
+                Position = dtoPlayer.Position
+            };
+
+            if (existingHoleCards.TryGetValue(player.Id, out var cards))
+            {
+                player.HoleCards[0] = cards[0];
+                player.HoleCards[1] = cards[1];
+            }
+
+            Players.Add(player);
+        }
+
+        CommunityCards.Clear();
+        CommunityCards.AddRange(dto.CommunityCards.Select(card => card.ToCard()));
+        PotManager.LoadSnapshot(dto.MainPot, dto.SidePots.Select(sidePot => new SidePot
+        {
+            Amount = sidePot.Amount,
+            EligiblePlayers = sidePot.EligiblePlayers.ToList()
+        }));
+
+        CurrentBettingRound = dto.CurrentPlayerId > 0
+            ? new BettingRound
+            {
+                CurrentBet = dto.CurrentBet,
+                MinRaise = BigBlindAmount,
+                LastRaiseAmount = BigBlindAmount,
+                WagerUnit = SmallBlindAmount,
+                PlayerBets = Players.ToDictionary(player => player.Id, player => player.CurrentBet),
+                PlayerChips = Players.ToDictionary(player => player.Id, player => player.Chips),
+                PlayersToAct = new List<int> { dto.CurrentPlayerId },
+                SeatOrder = Players.OrderBy(player => player.Position).Select(player => player.Id).ToList()
+            }
+            : null;
+
+        if (CurrentBettingRound != null)
+        {
+            foreach (var player in Players)
+            {
+                if (player.IsFolded)
+                {
+                    CurrentBettingRound.FoldedPlayers.Add(player.Id);
+                }
+
+                if (player.IsAllIn)
+                {
+                    CurrentBettingRound.AllInPlayers.Add(player.Id);
+                }
+            }
+        }
+
+        EmitSignal(SignalName.StateChanged, (int)CurrentState);
+    }
+
+    public void ApplyPrivateHoleCards(int playerId, Godot.Collections.Array<Godot.Collections.Dictionary> cards)
+    {
+        var player = Players.FirstOrDefault(item => item.Id == playerId);
+        if (player == null)
+        {
+            return;
+        }
+
+        for (var i = 0; i < System.Math.Min(2, cards.Count); i++)
+        {
+            player.HoleCards[i] = CardDTO.FromDictionary(cards[i]).ToCard();
+        }
+
+        EmitSignal(SignalName.StateChanged, (int)CurrentState);
     }
 
     private int PostBlind(Player player, int amount)

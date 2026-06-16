@@ -6,6 +6,9 @@ public partial class MainMenu : Control
     [Export] public bool ShowTestModeButton { get; set; }
 
     private LineEdit? _joinAddressInput;
+    private LineEdit? _joinPortInput;
+    private TextEdit? _joinInviteInput;
+    private Label? _joinStatusLabel;
     private ColorRect? _joinOverlay;
     private Panel? _joinPanel;
     private OptionButton? _seatCountOption;
@@ -13,6 +16,11 @@ public partial class MainMenu : Control
     public override void _Ready()
     {
         BuildUi();
+        if (NetworkManager.Instance != null)
+        {
+            NetworkManager.Instance.JoinSucceeded += OnJoinSucceeded;
+            NetworkManager.Instance.JoinFailed += OnJoinFailed;
+        }
     }
 
     private void BuildUi()
@@ -94,7 +102,7 @@ public partial class MainMenu : Control
         _joinOverlay.AddChild(joinCenter);
 
         _joinPanel = FlatUi.Panel("JoinPanel");
-        _joinPanel.CustomMinimumSize = new Vector2(420, 420);
+        _joinPanel.CustomMinimumSize = new Vector2(460, 560);
         joinCenter.AddChild(_joinPanel);
 
         BuildJoinPanel();
@@ -135,17 +143,37 @@ public partial class MainMenu : Control
         header.AddChild(close);
         box.AddChild(header);
 
-        var hint = FlatUi.MutedLabel("输入 Host 的局域网 IP，连接后进入房间。");
+        var hint = FlatUi.MutedLabel("可粘贴 Host 复制的邀请信息，也可直接输入 IP:端口。跨网络时填写公网 IP 和已开放端口。");
         hint.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         box.AddChild(hint);
 
+        _joinInviteInput = new TextEdit
+        {
+            PlaceholderText = "粘贴邀请信息，例如 {\"ip\":\"192.168.1.100\",\"port\":7000,...}",
+            CustomMinimumSize = new Vector2(0, 96),
+            WrapMode = TextEdit.LineWrappingMode.Boundary
+        };
+        box.AddChild(_joinInviteInput);
+
         _joinAddressInput = new LineEdit
         {
-            PlaceholderText = "例如 192.168.1.100",
+            PlaceholderText = "IP 或 IP:端口，例如 192.168.1.100:7000",
             Text = "127.0.0.1",
             CustomMinimumSize = new Vector2(280, 44)
         };
         box.AddChild(_joinAddressInput);
+
+        _joinPortInput = new LineEdit
+        {
+            PlaceholderText = "端口",
+            Text = Constants.DefaultPort.ToString(),
+            CustomMinimumSize = new Vector2(280, 44)
+        };
+        box.AddChild(_joinPortInput);
+
+        _joinStatusLabel = FlatUi.MutedLabel("");
+        _joinStatusLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        box.AddChild(_joinStatusLabel);
 
         var connect = FlatUi.Button("连接", FlatUi.AccentMuted);
         connect.CustomMinimumSize = new Vector2(280, 46);
@@ -158,12 +186,23 @@ public partial class MainMenu : Control
             if (_joinAddressInput != null)
             {
                 _joinAddressInput.Text = "";
-                _joinAddressInput.GrabFocus();
             }
+
+            if (_joinInviteInput != null)
+            {
+                _joinInviteInput.Text = "";
+            }
+
+            if (_joinPortInput != null)
+            {
+                _joinPortInput.Text = Constants.DefaultPort.ToString();
+            }
+
+            _joinAddressInput?.GrabFocus();
         };
         box.AddChild(clear);
 
-        var footer = FlatUi.MutedLabel("如果只是想测试，可以创建房间后在牌桌内追加 AI。");
+        var footer = FlatUi.MutedLabel("同 Wi-Fi 推荐使用局域网 IP；不同网络需要 Host 开放 UDP 端口，或后续接入中继/房间服务器。");
         footer.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         box.AddChild(footer);
     }
@@ -182,6 +221,11 @@ public partial class MainMenu : Control
             _joinOverlay.MoveToFront();
         }
 
+        if (_joinStatusLabel != null)
+        {
+            _joinStatusLabel.Text = "";
+        }
+
         _joinAddressInput?.GrabFocus();
     }
 
@@ -195,15 +239,89 @@ public partial class MainMenu : Control
 
     private void ConnectToAddress()
     {
-        var address = _joinAddressInput?.Text.Trim();
+        var address = "";
+        var port = Constants.DefaultPort;
+        if (!TryParseJoinTarget(out address, out port, out var error))
+        {
+            SetJoinStatus(error, true);
+            return;
+        }
+
         if (string.IsNullOrEmpty(address))
         {
             _joinAddressInput?.GrabFocus();
             return;
         }
 
-        NetworkManager.Instance?.JoinRoom(address);
+        SetJoinStatus($"正在连接 {address}:{port} ...", false);
+        NetworkManager.Instance?.JoinRoom(address, port);
+    }
+
+    private bool TryParseJoinTarget(out string address, out int port, out string error)
+    {
+        address = "";
+        port = Constants.DefaultPort;
+        error = "";
+
+        var invite = _joinInviteInput?.Text.Trim() ?? "";
+        if (!string.IsNullOrEmpty(invite))
+        {
+            var parsed = Json.ParseString(invite);
+            if (parsed.VariantType == Variant.Type.Dictionary)
+            {
+                var dict = parsed.AsGodotDictionary();
+                address = dict.GetValueOrDefault("ip", "").AsString().Trim();
+                port = dict.GetValueOrDefault("port", Constants.DefaultPort).AsInt32();
+                if (!string.IsNullOrEmpty(address) && port > 0)
+                {
+                    return true;
+                }
+            }
+        }
+
+        address = _joinAddressInput?.Text.Trim() ?? "";
+        if (string.IsNullOrEmpty(address))
+        {
+            error = "请输入 Host IP 或粘贴邀请信息。";
+            return false;
+        }
+
+        var match = Regex.Match(address, @"^(.+):(\d+)$");
+        if (match.Success)
+        {
+            address = match.Groups[1].Value.Trim();
+            port = int.Parse(match.Groups[2].Value);
+            return true;
+        }
+
+        if (!int.TryParse(_joinPortInput?.Text.Trim(), out port))
+        {
+            port = Constants.DefaultPort;
+        }
+
+        return true;
+    }
+
+    private void OnJoinSucceeded()
+    {
+        SetJoinStatus("连接成功，正在进入房间...", false);
         GetTree().ChangeSceneToFile(Constants.LobbyScene);
+    }
+
+    private void OnJoinFailed(string reason)
+    {
+        SetJoinStatus($"连接失败：{reason}", true);
+    }
+
+    private void SetJoinStatus(string text, bool danger)
+    {
+        if (_joinStatusLabel == null)
+        {
+            return;
+        }
+
+        _joinStatusLabel.Text = text;
+        _joinStatusLabel.AddThemeColorOverride("font_color", danger ? FlatUi.Danger : FlatUi.MutedText);
     }
 
     private void OnTestModePressed()

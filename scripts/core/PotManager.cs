@@ -27,6 +27,13 @@ public class PotManager
         SidePots.Clear();
     }
 
+    public void LoadSnapshot(int mainPot, IEnumerable<SidePot> sidePots)
+    {
+        MainPot = System.Math.Max(0, mainPot);
+        SidePots.Clear();
+        SidePots.AddRange(sidePots);
+    }
+
     public void CollectBets(Dictionary<int, int> playerBets)
     {
         Reset();

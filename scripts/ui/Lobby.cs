@@ -19,6 +19,7 @@ public partial class Lobby : Control
         {
             NetworkManager.Instance.PlayerConnected += (_, _) => Refresh();
             NetworkManager.Instance.PlayerDisconnected += _ => Refresh();
+            NetworkManager.Instance.GameStarted += OnGameStarted;
         }
     }
 
@@ -75,7 +76,7 @@ public partial class Lobby : Control
         _roomLabel.AddThemeColorOverride("font_color", FlatUi.Text);
         _roomLabel.AddThemeFontSizeOverride("font_size", 32);
         left.AddChild(_roomLabel);
-        left.AddChild(FlatUi.MutedLabel("同一局域网玩家可用 IP 加入；二维码用于核对房间信息。"));
+        left.AddChild(FlatUi.MutedLabel("同一局域网玩家可粘贴邀请信息加入；跨网络需要 Host 开放 UDP 端口。"));
 
         _qrTexture = new TextureRect
         {
@@ -88,8 +89,8 @@ public partial class Lobby : Control
         qrCenter.AddChild(_qrTexture);
         left.AddChild(qrCenter);
 
-        var copy = FlatUi.Button("复制房间号");
-        copy.Pressed += () => DisplayServer.ClipboardSet(NetworkManager.Instance?.RoomCode ?? "");
+        var copy = FlatUi.Button("复制邀请信息");
+        copy.Pressed += () => DisplayServer.ClipboardSet(NetworkManager.Instance?.GetRoomPayload() ?? "");
         left.AddChild(copy);
 
         left.AddChild(BuildSectionLabel("房间设置"));
@@ -133,7 +134,7 @@ public partial class Lobby : Control
         var network = NetworkManager.Instance;
         var manager = GameManager.Instance;
         _roomLabel!.Text = network?.IsHost == true
-            ? $"房间号: {network.RoomCode}  ·  {network.RoomMaxPlayers}人局  ·  {manager?.SmallBlindAmount}/{manager?.BigBlindAmount}"
+            ? $"房间号: {network.RoomCode}  ·  {network.GetLocalIP()}:{Constants.DefaultPort}  ·  {network.RoomMaxPlayers}人局"
             : "等待 Host 开始游戏...";
 
         if (_qrTexture != null && network?.IsHost == true)
@@ -176,6 +177,16 @@ public partial class Lobby : Control
             (int)(_thinkingTimeSpin?.Value ?? Constants.ThinkingTimeSeconds));
         GameManager.Instance?.StartGame();
         NetworkManager.Instance?.StartNetworkGame();
+        GetTree().ChangeSceneToFile(Constants.GameTableScene);
+    }
+
+    private void OnGameStarted()
+    {
+        if (NetworkManager.Instance?.IsHost == true)
+        {
+            return;
+        }
+
         GetTree().ChangeSceneToFile(Constants.GameTableScene);
     }
 

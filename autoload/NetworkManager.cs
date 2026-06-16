@@ -19,6 +19,7 @@ public partial class NetworkManager : Node
     [Signal] public delegate void PlayerConnectedEventHandler(int id, string name);
     [Signal] public delegate void PlayerDisconnectedEventHandler(int id);
     [Signal] public delegate void RoomCreatedEventHandler(string roomCode);
+    [Signal] public delegate void JoinSucceededEventHandler();
     [Signal] public delegate void JoinFailedEventHandler(string reason);
     [Signal] public delegate void GameStartedEventHandler();
     [Signal] public delegate void GameStateReceivedEventHandler(Godot.Collections.Dictionary state);
@@ -191,6 +192,31 @@ public partial class NetworkManager : Node
         EmitSignal(SignalName.GameStarted);
     }
 
+    public void SendPrivateHoleCards(int playerId, Card?[] holeCards)
+    {
+        if (!IsHost)
+        {
+            return;
+        }
+
+        var cards = new Godot.Collections.Array<Godot.Collections.Dictionary>();
+        foreach (var card in holeCards)
+        {
+            if (card != null)
+            {
+                cards.Add(CardDTO.FromCard(card).ToDictionary());
+            }
+        }
+
+        if (playerId == 1)
+        {
+            GameManager.Instance?.ApplyPrivateHoleCards(playerId, cards);
+            return;
+        }
+
+        RpcId(playerId, MethodName.SyncPrivateHoleCards, playerId, cards);
+    }
+
     public void LeaveRoom()
     {
         DisconnectSignals();
@@ -216,7 +242,19 @@ public partial class NetworkManager : Node
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void SyncGameState(Godot.Collections.Dictionary state)
     {
+        if (IsHost)
+        {
+            return;
+        }
+
+        GameManager.Instance?.ApplyNetworkState(state);
         EmitSignal(SignalName.GameStateReceived, state);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SyncPrivateHoleCards(int playerId, Godot.Collections.Array<Godot.Collections.Dictionary> cards)
+    {
+        GameManager.Instance?.ApplyPrivateHoleCards(playerId, cards);
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -229,6 +267,31 @@ public partial class NetworkManager : Node
     public void NotifyGameStarted()
     {
         EmitSignal(SignalName.GameStarted);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void RegisterPlayer(string playerName)
+    {
+        if (!IsHost)
+        {
+            return;
+        }
+
+        var playerId = (int)Multiplayer.GetRemoteSenderId();
+        if (playerId <= 1)
+        {
+            return;
+        }
+
+        if (!Players.TryGetValue(playerId, out var info))
+        {
+            info = new PlayerInfo { Id = playerId, SeatIndex = FindFirstFreeSeat() };
+            Players[playerId] = info;
+        }
+
+        info.Name = string.IsNullOrWhiteSpace(playerName) ? $"玩家{playerId}" : playerName.Trim();
+        GameManager.Instance?.SyncPlayersFromNetwork();
+        EmitSignal(SignalName.PlayerConnected, playerId, info.Name);
     }
 
     private void OnPeerConnected(long id)
@@ -252,6 +315,8 @@ public partial class NetworkManager : Node
         IsConnected = true;
         LocalPlayerId = (int)Multiplayer.GetUniqueId();
         Players[LocalPlayerId] = new PlayerInfo { Id = LocalPlayerId, Name = PlayerData.Instance?.PlayerName ?? $"玩家{LocalPlayerId}", SeatIndex = 0 };
+        RpcId(1, MethodName.RegisterPlayer, PlayerData.Instance?.PlayerName ?? $"玩家{LocalPlayerId}");
+        EmitSignal(SignalName.JoinSucceeded);
         Logger.Info("Connection successful");
     }
 

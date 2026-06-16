@@ -16,6 +16,11 @@ public class CardDTO
         return new CardDTO { Suit = (int)card.Suit, Rank = (int)card.Rank };
     }
 
+    public Card ToCard()
+    {
+        return new Card { Suit = (Suit)Suit, Rank = (Rank)Rank };
+    }
+
     public static CardDTO FromDictionary(Godot.Collections.Dictionary dict)
     {
         return new CardDTO
@@ -94,6 +99,21 @@ public class SidePotDTO
 
         return new Godot.Collections.Dictionary { ["amount"] = Amount, ["eligible_players"] = players };
     }
+
+    public static SidePotDTO FromDictionary(Godot.Collections.Dictionary dict)
+    {
+        var dto = new SidePotDTO
+        {
+            Amount = dict.GetValueOrDefault("amount", 0).AsInt32()
+        };
+
+        foreach (var item in dict.GetValueOrDefault("eligible_players", new Godot.Collections.Array()).AsGodotArray())
+        {
+            dto.EligiblePlayers.Add(item.AsInt32());
+        }
+
+        return dto;
+    }
 }
 
 public class GameStateDTO
@@ -153,6 +173,30 @@ public class GameStateDTO
             DealerPosition = dict.GetValueOrDefault("dealer_position", 0).AsInt32(),
             TableSeatCount = dict.GetValueOrDefault("table_seat_count", 9).AsInt32()
         };
+
+        foreach (var item in dict.GetValueOrDefault("players", new Godot.Collections.Array()).AsGodotArray())
+        {
+            if (item.VariantType == Variant.Type.Dictionary)
+            {
+                dto.Players.Add(PlayerDTO.FromDictionary(item.AsGodotDictionary()));
+            }
+        }
+
+        foreach (var item in dict.GetValueOrDefault("community_cards", new Godot.Collections.Array()).AsGodotArray())
+        {
+            if (item.VariantType == Variant.Type.Dictionary)
+            {
+                dto.CommunityCards.Add(CardDTO.FromDictionary(item.AsGodotDictionary()));
+            }
+        }
+
+        foreach (var item in dict.GetValueOrDefault("side_pots", new Godot.Collections.Array()).AsGodotArray())
+        {
+            if (item.VariantType == Variant.Type.Dictionary)
+            {
+                dto.SidePots.Add(SidePotDTO.FromDictionary(item.AsGodotDictionary()));
+            }
+        }
 
         return dto;
     }
