@@ -2,5 +2,7 @@
 .godot/
 build/
 /android/
+/tools/android-sdk/
+/tools/android-avd/
 test_outputs/
 *.old

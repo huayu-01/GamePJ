@@ -28,6 +28,7 @@ SettingsManager="*res://autoload/SettingsManager.cs"
 window/size/viewport_width=960
 window/size/viewport_height=1920
 window/stretch/mode="canvas_items"
+window/handheld/orientation=1
 
 [dotnet]
 
@@ -44,4 +45,5 @@ enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
