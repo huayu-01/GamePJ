@@ -4,7 +4,6 @@ public partial class Lobby : Control
 {
     private VBoxContainer? _playersList;
     private Label? _roomLabel;
-    private TextureRect? _qrTexture;
     private SpinBox? _smallBlindSpin;
     private SpinBox? _minBuyInSpin;
     private SpinBox? _maxBuyInSpin;
@@ -78,17 +77,6 @@ public partial class Lobby : Control
         left.AddChild(_roomLabel);
         left.AddChild(FlatUi.MutedLabel("同一局域网玩家可粘贴邀请信息加入；跨网络需要 Host 开放 UDP 端口。"));
 
-        _qrTexture = new TextureRect
-        {
-            Name = "QRCode",
-            CustomMinimumSize = new Vector2(256, 256),
-            ExpandMode = TextureRect.ExpandModeEnum.FitWidthProportional,
-            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
-        };
-        var qrCenter = new CenterContainer();
-        qrCenter.AddChild(_qrTexture);
-        left.AddChild(qrCenter);
-
         var copy = FlatUi.Button("复制邀请信息");
         copy.Pressed += () => DisplayServer.ClipboardSet(NetworkManager.Instance?.GetRoomPayload() ?? "");
         left.AddChild(copy);
@@ -136,12 +124,6 @@ public partial class Lobby : Control
         _roomLabel!.Text = network?.IsHost == true
             ? $"房间号: {network.RoomCode}  ·  {network.GetLocalIP()}:{Constants.DefaultPort}  ·  {network.RoomMaxPlayers}人局"
             : "等待 Host 开始游戏...";
-
-        if (_qrTexture != null && network?.IsHost == true)
-        {
-            var generator = new QRCodeGenerator();
-            _qrTexture.Texture = generator.GenerateQRCode(network.GetRoomPayload());
-        }
 
         if (_playersList == null)
         {
