@@ -1,14 +1,10 @@
 <Project Sdk="Godot.NET.Sdk/4.6.3">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>TexasHoldemGodot</AssemblyName>
     <RootNamespace></RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="ZXing.Net" Version="0.16.9" />
-  </ItemGroup>
 </Project>
