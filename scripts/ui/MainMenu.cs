@@ -19,12 +19,16 @@ public partial class MainMenu : Control
     private Label? _updateStatusLabel;
     private Button? _downloadUpdateButton;
     private Panel? _addressKeypadPanel;
+    private CenterContainer? _mainCenter;
+    private Panel? _menuPanel;
+    private CenterContainer? _joinCenter;
     private LineEdit? _keypadTarget;
     private Label? _keypadTargetLabel;
     private Button? _keypadDotButton;
     private Button? _keypadColonButton;
     private string _availableApkUrl = "";
     private readonly Dictionary<string, Button> _discoveredRoomButtons = new();
+    private Vector2 _lastResponsiveViewport = new(-1, -1);
 
     public override void _Ready()
     {
@@ -54,6 +58,14 @@ public partial class MainMenu : Control
         }
     }
 
+    public override void _Notification(int what)
+    {
+        if (what == NotificationResized)
+        {
+            ApplyResponsiveLayout();
+        }
+    }
+
     public override void _ExitTree()
     {
         if (NetworkManager.Instance != null)
@@ -80,6 +92,7 @@ public partial class MainMenu : Control
         AddChild(background);
 
         var center = new CenterContainer { Name = "MainCenter" };
+        _mainCenter = center;
         center.SetAnchorsPreset(LayoutPreset.FullRect);
         center.OffsetLeft = 48;
         center.OffsetTop = 48;
@@ -96,6 +109,7 @@ public partial class MainMenu : Control
         center.AddChild(root);
 
         var menuPanel = FlatUi.Panel("MenuPanel");
+        _menuPanel = menuPanel;
         menuPanel.CustomMinimumSize = new Vector2(440, 520);
         root.AddChild(menuPanel);
 
@@ -158,6 +172,7 @@ public partial class MainMenu : Control
         AddChild(_joinOverlay);
 
         var joinCenter = new CenterContainer();
+        _joinCenter = joinCenter;
         joinCenter.SetAnchorsPreset(LayoutPreset.FullRect);
         joinCenter.OffsetLeft = 24;
         joinCenter.OffsetTop = 24;
@@ -171,6 +186,53 @@ public partial class MainMenu : Control
 
         BuildJoinPanel();
         BuildAddressKeypad();
+        ApplyResponsiveLayout();
+    }
+
+    private void ApplyResponsiveLayout()
+    {
+        var viewport = GetViewportRect().Size;
+        if (viewport.X <= 0 || viewport.Y <= 0 || _menuPanel == null || viewport.IsEqualApprox(_lastResponsiveViewport))
+        {
+            return;
+        }
+        _lastResponsiveViewport = viewport;
+
+        var safe = ResponsiveUi.GetSafeMargins(this);
+        var margin = ResponsiveUi.MarginFor(viewport);
+        if (_mainCenter != null)
+        {
+            ResponsiveUi.ApplySafeCenter(_mainCenter, this, margin);
+        }
+
+        if (_menuPanel != null)
+        {
+            var preferredHeight = OS.GetName() == "Android" ? 620f : 710f;
+            _menuPanel.CustomMinimumSize = ResponsiveUi.FitPanel(viewport, safe, 440f, preferredHeight, margin);
+        }
+
+        if (_joinCenter != null)
+        {
+            ResponsiveUi.ApplySafeCenter(_joinCenter, this, margin);
+        }
+
+        if (_joinPanel != null)
+        {
+            _joinPanel.CustomMinimumSize = ResponsiveUi.FitPanel(viewport, safe, 520f, 860f, margin);
+        }
+
+        if (_addressKeypadPanel != null)
+        {
+            var keypadMargin = margin + Mathf.Max(safe.Left, safe.Right);
+            var keypadWidth = Mathf.Min(520f, Mathf.Max(300f, viewport.X - keypadMargin * 2f));
+            var keypadHeight = Mathf.Clamp(viewport.Y * 0.23f, 380f, 460f);
+            _addressKeypadPanel.OffsetLeft = -keypadWidth / 2f;
+            _addressKeypadPanel.OffsetRight = keypadWidth / 2f;
+            _addressKeypadPanel.OffsetTop = -(keypadHeight + safe.Bottom + margin);
+            _addressKeypadPanel.OffsetBottom = -(safe.Bottom + margin);
+        }
+
+        ResponsiveUi.EnsureTouchTargets(this);
     }
 
     private Button AddMenuButton(VBoxContainer parent, string text, System.Action action, Color? color = null)
@@ -189,14 +251,18 @@ public partial class MainMenu : Control
             return;
         }
 
-        var box = new VBoxContainer();
-        box.SetAnchorsPreset(LayoutPreset.FullRect);
-        box.OffsetLeft = 24;
-        box.OffsetTop = 24;
-        box.OffsetRight = -24;
-        box.OffsetBottom = -24;
+        var scroll = new ScrollContainer();
+        scroll.SetAnchorsPreset(LayoutPreset.FullRect);
+        scroll.OffsetLeft = 24;
+        scroll.OffsetTop = 24;
+        scroll.OffsetRight = -24;
+        scroll.OffsetBottom = -24;
+        scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+        _joinPanel.AddChild(scroll);
+
+        var box = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         box.AddThemeConstantOverride("separation", 12);
-        _joinPanel.AddChild(box);
+        scroll.AddChild(box);
 
         var header = new HBoxContainer();
         header.AddChild(FlatUi.Label("加入房间", 28));

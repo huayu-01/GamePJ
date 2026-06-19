@@ -58,7 +58,7 @@ public static class FlatUi
         button.AddThemeColorOverride("font_color", Text);
         button.AddThemeColorOverride("font_disabled_color", MutedText);
         button.FocusMode = Control.FocusModeEnum.None;
-        button.CustomMinimumSize = new Vector2(96, 38);
+        button.CustomMinimumSize = new Vector2(96, 56);
     }
 
     public static Label Label(string text, int fontSize = 16, HorizontalAlignment alignment = HorizontalAlignment.Left)

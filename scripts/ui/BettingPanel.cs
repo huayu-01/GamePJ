@@ -45,25 +45,25 @@ public partial class BettingPanel : Panel
     {
         var width = panelSize.X > 0 ? panelSize.X : Mathf.Clamp(stageWidth * 0.94f, 360f, 920f);
         var height = panelSize.Y > 0 ? panelSize.Y : Mathf.Clamp(stageWidth * 0.48f, 240f, 520f);
-        var smallWidth = Mathf.Clamp(stageWidth * 0.135f, 76f, 142f);
+        var gap = Mathf.Clamp(stageWidth * 0.016f, 6f, 16f);
+        var smallWidth = Mathf.Clamp((width - gap * 6f) / 5f, 64f, 142f);
         var smallHeight = Mathf.Clamp(stageWidth * 0.064f, 42f, 72f);
-        var largeWidth = Mathf.Clamp(stageWidth * 0.25f, 132f, 248f);
+        var largeWidth = Mathf.Clamp(Mathf.Min(stageWidth * 0.25f, (width - gap * 3f) / 2f), 120f, 248f);
         var largeHeight = Mathf.Clamp(stageWidth * 0.14f, 86f, 164f);
         var fontSize = Mathf.RoundToInt(Mathf.Clamp(stageWidth * 0.034f, 18f, 32f));
-        var gap = Mathf.Clamp(stageWidth * 0.016f, 6f, 16f);
         var centerX = width / 2f;
         var arcTop = Mathf.Clamp(height * 0.10f, 18f, 54f);
-        var arcLow = arcTop + smallHeight + Mathf.Clamp(stageWidth * 0.035f, 18f, 42f);
-        var innerOffset = smallWidth * 1.16f + gap;
-        var outerOffset = smallWidth * 1.30f + gap * 2f;
+        var arcDrop = Mathf.Clamp(stageWidth * 0.040f, 20f, 44f);
+        var buttonStep = (width - gap * 2f - smallWidth) / 4f;
+        var quickY = new[] { arcTop + arcDrop, arcTop + arcDrop * 0.45f, arcTop, arcTop + arcDrop * 0.45f, arcTop + arcDrop };
+        var quickButtons = new[] { _halfButton, _quarterButton, _raiseButton, _threeQuarterButton, _allInButton };
+        for (var index = 0; index < quickButtons.Length; index++)
+        {
+            PositionButton(quickButtons[index], gap + buttonStep * index, quickY[index], smallWidth, smallHeight, fontSize);
+        }
 
-        PositionButton(_raiseButton, centerX - smallWidth / 2f, arcTop, smallWidth, smallHeight, fontSize);
-        PositionButton(_quarterButton, centerX - innerOffset - smallWidth / 2f, arcTop + smallHeight * 0.42f, smallWidth, smallHeight, fontSize);
-        PositionButton(_threeQuarterButton, centerX + innerOffset - smallWidth / 2f, arcTop + smallHeight * 0.42f, smallWidth, smallHeight, fontSize);
-        PositionButton(_halfButton, centerX - outerOffset - smallWidth / 2f, arcLow, smallWidth, smallHeight, fontSize);
-        PositionButton(_allInButton, centerX + outerOffset - smallWidth / 2f, arcLow, smallWidth, smallHeight, fontSize);
-
-        var bottomY = Mathf.Clamp(height * 0.58f, arcLow + smallHeight + 18f, height - largeHeight - 8f);
+        var quickBottom = arcTop + arcDrop + smallHeight;
+        var bottomY = Mathf.Max(quickBottom + gap, height - largeHeight - gap);
         PositionButton(_foldOrCheckButton, gap, bottomY, largeWidth, largeHeight, fontSize + 1);
         PositionButton(_callButton, width - largeWidth - gap, bottomY, largeWidth, largeHeight, fontSize + 1);
 
@@ -77,7 +77,7 @@ public partial class BettingPanel : Panel
         if (_raiseContainer != null)
         {
             var raiseWidth = Mathf.Clamp(stageWidth * 0.28f, 140f, 260f);
-            _raiseContainer.Position = new Vector2((width - raiseWidth) / 2f, arcTop + smallHeight + 8f);
+            _raiseContainer.Position = new Vector2((width - raiseWidth) / 2f, quickBottom + gap);
             _raiseContainer.Size = new Vector2(raiseWidth, Mathf.Clamp(stageWidth * 0.16f, 86f, 150f));
         }
     }

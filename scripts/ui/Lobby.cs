@@ -11,6 +11,9 @@ public partial class Lobby : Control
     private SpinBox? _thinkingTimeSpin;
     private Button? _copyButton;
     private Button? _startButton;
+    private CenterContainer? _center;
+    private Panel? _frame;
+    private Vector2 _lastResponsiveViewport = new(-1, -1);
 
     public override void _Ready()
     {
@@ -18,9 +21,27 @@ public partial class Lobby : Control
         Refresh();
         if (NetworkManager.Instance != null)
         {
-            NetworkManager.Instance.PlayerConnected += (_, _) => Refresh();
-            NetworkManager.Instance.PlayerDisconnected += _ => Refresh();
+            NetworkManager.Instance.PlayerConnected += OnPlayerConnected;
+            NetworkManager.Instance.PlayerDisconnected += OnPlayerDisconnected;
             NetworkManager.Instance.GameStarted += OnGameStarted;
+        }
+    }
+
+    public override void _ExitTree()
+    {
+        if (NetworkManager.Instance != null)
+        {
+            NetworkManager.Instance.PlayerConnected -= OnPlayerConnected;
+            NetworkManager.Instance.PlayerDisconnected -= OnPlayerDisconnected;
+            NetworkManager.Instance.GameStarted -= OnGameStarted;
+        }
+    }
+
+    public override void _Notification(int what)
+    {
+        if (what == NotificationResized)
+        {
+            ApplyResponsiveLayout();
         }
     }
 
@@ -33,6 +54,7 @@ public partial class Lobby : Control
         AddChild(background);
 
         var center = new CenterContainer { Name = "LobbyCenter" };
+        _center = center;
         center.SetAnchorsPreset(LayoutPreset.FullRect);
         center.OffsetLeft = 28;
         center.OffsetTop = 28;
@@ -41,6 +63,7 @@ public partial class Lobby : Control
         AddChild(center);
 
         var frame = FlatUi.Panel("LobbyFrame");
+        _frame = frame;
         frame.CustomMinimumSize = new Vector2(620, 860);
         frame.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
         frame.SizeFlagsVertical = SizeFlags.ShrinkCenter;
@@ -73,7 +96,12 @@ public partial class Lobby : Control
         exitTop.Pressed += LeaveLobby;
         header.AddChild(exitTop);
 
-        _roomLabel = new Label { Name = "RoomLabel", Text = "房间号: ------" };
+        _roomLabel = new Label
+        {
+            Name = "RoomLabel",
+            Text = "房间号: ------",
+            AutowrapMode = TextServer.AutowrapMode.WordSmart
+        };
         _roomLabel.AddThemeColorOverride("font_color", FlatUi.Text);
         _roomLabel.AddThemeFontSizeOverride("font_size", 32);
         left.AddChild(_roomLabel);
@@ -110,6 +138,32 @@ public partial class Lobby : Control
         var back = FlatUi.Button("返回主菜单");
         back.Pressed += LeaveLobby;
         left.AddChild(back);
+        ApplyResponsiveLayout();
+    }
+
+    private void ApplyResponsiveLayout()
+    {
+        var viewport = GetViewportRect().Size;
+        if (viewport.X <= 0 || viewport.Y <= 0 || _frame == null || viewport.IsEqualApprox(_lastResponsiveViewport))
+        {
+            return;
+        }
+        _lastResponsiveViewport = viewport;
+
+        var safe = ResponsiveUi.GetSafeMargins(this);
+        var margin = ResponsiveUi.MarginFor(viewport);
+        if (_center != null)
+        {
+            ResponsiveUi.ApplySafeCenter(_center, this, margin);
+        }
+
+        if (_frame != null)
+        {
+            _frame.CustomMinimumSize = ResponsiveUi.FitPanel(viewport, safe, 660f, 920f, margin);
+        }
+
+        _roomLabel?.AddThemeFontSizeOverride("font_size", Mathf.RoundToInt(Mathf.Clamp(viewport.X * 0.036f, 24f, 34f)));
+        ResponsiveUi.EnsureTouchTargets(this);
     }
 
     private static Label BuildSectionLabel(string text)
@@ -136,6 +190,9 @@ public partial class Lobby : Control
         if (_startButton != null)
         {
             _startButton.Visible = isHost;
+            var canStart = (network?.Players.Count ?? 0) >= 2;
+            _startButton.Disabled = !canStart;
+            _startButton.Text = canStart ? "开始游戏" : "等待至少 2 名玩家";
         }
 
         foreach (var spin in new[] { _smallBlindSpin, _minBuyInSpin, _maxBuyInSpin, _chipLimitSpin, _thinkingTimeSpin })
@@ -176,6 +233,12 @@ public partial class Lobby : Control
             return;
         }
 
+        if (NetworkManager.Instance.Players.Count < 2)
+        {
+            Refresh();
+            return;
+        }
+
         GameManager.Instance?.SyncPlayersFromNetwork();
         GameManager.Instance?.ConfigureRoomRules(
             (int)(_smallBlindSpin?.Value ?? Constants.SmallBlind),
@@ -196,6 +259,16 @@ public partial class Lobby : Control
         }
 
         GetTree().ChangeSceneToFile(Constants.GameTableScene);
+    }
+
+    private void OnPlayerConnected(int id, string playerName)
+    {
+        Refresh();
+    }
+
+    private void OnPlayerDisconnected(int id)
+    {
+        Refresh();
     }
 
     private void LeaveLobby()

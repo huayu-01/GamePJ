@@ -7,6 +7,9 @@ public partial class SettingsMenu : Control
     private HSlider? _bgm;
     private CheckButton? _animations;
     private LineEdit? _nameInput;
+    private CenterContainer? _center;
+    private Panel? _panel;
+    private Vector2 _lastResponsiveViewport = new(-1, -1);
 
     public override void _Ready()
     {
@@ -14,15 +17,30 @@ public partial class SettingsMenu : Control
         LoadValues();
     }
 
+    public override void _Notification(int what)
+    {
+        if (what == NotificationResized)
+        {
+            ApplyResponsiveLayout();
+        }
+    }
+
     private void BuildUi()
     {
         SetAnchorsPreset(LayoutPreset.FullRect);
 
+        var background = new ColorRect { Color = FlatUi.Background };
+        background.SetAnchorsPreset(LayoutPreset.FullRect);
+        AddChild(background);
+
         var center = new CenterContainer();
+        _center = center;
         center.SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(center);
 
-        var panel = new Panel { CustomMinimumSize = new Vector2(420, 420) };
+        var panel = FlatUi.Panel("SettingsPanel");
+        _panel = panel;
+        panel.CustomMinimumSize = new Vector2(420, 480);
         center.AddChild(panel);
 
         var root = new VBoxContainer();
@@ -46,13 +64,37 @@ public partial class SettingsMenu : Control
         _nameInput = new LineEdit { PlaceholderText = "玩家名称" };
         root.AddChild(_nameInput);
 
-        var save = new Button { Text = "保存" };
+        var save = FlatUi.Button("保存", FlatUi.AccentMuted);
         save.Pressed += SaveValues;
         root.AddChild(save);
 
-        var back = new Button { Text = "返回" };
+        var back = FlatUi.Button("返回");
         back.Pressed += () => GetTree().ChangeSceneToFile(Constants.MainMenuScene);
         root.AddChild(back);
+        ApplyResponsiveLayout();
+    }
+
+    private void ApplyResponsiveLayout()
+    {
+        var viewport = GetViewportRect().Size;
+        if (viewport.X <= 0 || viewport.Y <= 0 || _panel == null || viewport.IsEqualApprox(_lastResponsiveViewport))
+        {
+            return;
+        }
+        _lastResponsiveViewport = viewport;
+
+        var safe = ResponsiveUi.GetSafeMargins(this);
+        var margin = ResponsiveUi.MarginFor(viewport);
+        if (_center != null)
+        {
+            ResponsiveUi.ApplySafeCenter(_center, this, margin);
+        }
+
+        if (_panel != null)
+        {
+            _panel.CustomMinimumSize = ResponsiveUi.FitPanel(viewport, safe, 460f, 640f, margin);
+        }
+        ResponsiveUi.EnsureTouchTargets(this);
     }
 
     private HSlider AddSlider(VBoxContainer root, string label)

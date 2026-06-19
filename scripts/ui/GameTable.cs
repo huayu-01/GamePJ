@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 public partial class GameTable : Control
 {
-    private const float StageAspect = 1f / 2f;
-
     private readonly List<PlayerHUD> _seatHuds = new();
     private Control? _stage;
     private HBoxContainer? _topBar;
@@ -568,11 +566,12 @@ public partial class GameTable : Control
     private List<Vector2> GetSeatPositions()
     {
         var stageSize = GetStageSize();
+        var safe = ResponsiveUi.GetSafeMargins(this);
         var result = new List<Vector2>();
         var seatCount = GetSeatCount();
         for (var visualSlot = 0; visualSlot < seatCount; visualSlot++)
         {
-            result.Add(GetSeatCenter(visualSlot, seatCount, stageSize));
+            result.Add(GetSeatCenter(visualSlot, seatCount, stageSize, safe));
         }
 
         return result;
@@ -607,7 +606,7 @@ public partial class GameTable : Control
         return Mathf.Clamp(GameManager.Instance?.TableSeatCount ?? Constants.MaxPlayers, 2, Constants.MaxPlayers);
     }
 
-    private static Vector2 GetSeatCenter(int visualSlot, int seatCount, Vector2 stageSize)
+    private static Vector2 GetSeatCenter(int visualSlot, int seatCount, Vector2 stageSize, UiSafeMargins safe)
     {
         var twelveSeats = visualSlot switch
         {
@@ -641,7 +640,11 @@ public partial class GameTable : Control
         };
 
         var normalized = seatCount <= 9 ? nineSeats : twelveSeats;
-        return new Vector2(stageSize.X * normalized.X, stageSize.Y * normalized.Y);
+        var usableWidth = Mathf.Max(1f, stageSize.X - safe.Left - safe.Right);
+        var usableHeight = Mathf.Max(1f, stageSize.Y - safe.Top - safe.Bottom);
+        return new Vector2(
+            safe.Left + usableWidth * normalized.X,
+            safe.Top + usableHeight * normalized.Y);
     }
 
     private void UpdatePotLabel()
@@ -1198,8 +1201,9 @@ public partial class GameTable : Control
     {
         UpdateStageRect();
         var size = GetStageSize();
+        var safe = ResponsiveUi.GetSafeMargins(this);
         var margin = Mathf.Clamp(size.X * 0.025f, 8f, 24f);
-        var topHeight = Mathf.Clamp(size.Y * 0.035f, 52f, 82f);
+        var topHeight = Mathf.Clamp(size.X * 0.072f, 58f, 78f);
         var localHudHeight = Mathf.Clamp(size.X * 0.52f, 310f, 590f);
         var centerWidth = Mathf.Clamp(size.X * 0.58f, 260f, 560f);
         var centerHeight = Mathf.Clamp(size.Y * 0.090f, 132f, 210f);
@@ -1223,10 +1227,10 @@ public partial class GameTable : Control
         {
             _sidePanel.Visible = !_sideCollapsed;
             var drawerWidth = Mathf.Clamp(size.X * 0.70f, 360f, size.X - margin * 2f);
-            _sidePanel.OffsetLeft = size.X - drawerWidth - margin;
-            _sidePanel.OffsetTop = topHeight + margin;
-            _sidePanel.OffsetRight = -margin;
-            _sidePanel.OffsetBottom = -margin;
+            _sidePanel.OffsetLeft = size.X - safe.Right - drawerWidth - margin;
+            _sidePanel.OffsetTop = safe.Top + topHeight + margin * 2f;
+            _sidePanel.OffsetRight = -(safe.Right + margin);
+            _sidePanel.OffsetBottom = -(safe.Bottom + margin);
             if (!_sideCollapsed)
             {
                 _sidePanel.MoveToFront();
@@ -1237,10 +1241,10 @@ public partial class GameTable : Control
         {
             _leftDrawerPanel.Visible = !_chatCollapsed;
             var drawerWidth = Mathf.Clamp(size.X * 0.70f, 360f, size.X - margin * 2f);
-            _leftDrawerPanel.OffsetLeft = margin;
-            _leftDrawerPanel.OffsetTop = topHeight + margin;
-            _leftDrawerPanel.OffsetRight = -(size.X - drawerWidth - margin);
-            _leftDrawerPanel.OffsetBottom = -margin;
+            _leftDrawerPanel.OffsetLeft = safe.Left + margin;
+            _leftDrawerPanel.OffsetTop = safe.Top + topHeight + margin * 2f;
+            _leftDrawerPanel.OffsetRight = -(size.X - safe.Left - drawerWidth - margin);
+            _leftDrawerPanel.OffsetBottom = -(safe.Bottom + margin);
             if (!_chatCollapsed)
             {
                 _leftDrawerPanel.MoveToFront();
@@ -1250,13 +1254,13 @@ public partial class GameTable : Control
         if (_sideToggle != null)
         {
             _sideToggle.Text = _sideCollapsed ? "记录" : "收起";
-            _sideToggle.CustomMinimumSize = new Vector2(58, 36);
+            _sideToggle.CustomMinimumSize = new Vector2(64, 48);
         }
 
         if (_chatToggle != null)
         {
             _chatToggle.Text = _chatCollapsed ? "聊天" : "收起";
-            _chatToggle.CustomMinimumSize = new Vector2(58, 36);
+            _chatToggle.CustomMinimumSize = new Vector2(64, 48);
         }
 
         if (_aiCount != null)
@@ -1268,7 +1272,7 @@ public partial class GameTable : Control
         if (_restartButton != null)
         {
             _restartButton.Text = "新局";
-            _restartButton.CustomMinimumSize = new Vector2(58, 36);
+            _restartButton.CustomMinimumSize = new Vector2(64, 48);
         }
 
         if (_sitOutToggle != null)
@@ -1277,20 +1281,20 @@ public partial class GameTable : Control
             _syncingSitOutToggle = true;
             _sitOutToggle.ButtonPressed = GameManager.Instance?.Players.Find(player => player.Id == localId)?.WantsSitOutNextHand == true;
             _syncingSitOutToggle = false;
-            _sitOutToggle.CustomMinimumSize = new Vector2(72, 36);
+            _sitOutToggle.CustomMinimumSize = new Vector2(76, 48);
         }
 
         if (_leaveButton != null)
         {
-            _leaveButton.CustomMinimumSize = new Vector2(58, 36);
+            _leaveButton.CustomMinimumSize = new Vector2(64, 48);
         }
 
         if (_topBar != null)
         {
-            _topBar.OffsetLeft = margin;
-            _topBar.OffsetTop = margin;
-            _topBar.OffsetRight = -margin;
-            _topBar.OffsetBottom = margin + topHeight;
+            _topBar.OffsetLeft = safe.Left + margin;
+            _topBar.OffsetTop = safe.Top + margin;
+            _topBar.OffsetRight = -(safe.Right + margin);
+            _topBar.OffsetBottom = safe.Top + margin + topHeight;
             _topBar.AddThemeConstantOverride("separation", Mathf.RoundToInt(Mathf.Clamp(size.X * 0.012f, 4f, 10f)));
         }
 
@@ -1305,11 +1309,13 @@ public partial class GameTable : Control
         if (_bettingPanel != null)
         {
             var actionTop = size.Y - localHudHeight - Mathf.Clamp(size.Y * 0.075f, 86f, 150f);
-            _bettingPanel.OffsetLeft = margin;
-            _bettingPanel.OffsetRight = -margin;
+            _bettingPanel.OffsetLeft = safe.Left + margin;
+            _bettingPanel.OffsetRight = -(safe.Right + margin);
             _bettingPanel.OffsetTop = Mathf.Clamp(actionTop, size.Y * 0.50f, size.Y * 0.64f);
-            _bettingPanel.OffsetBottom = -margin;
-            _bettingPanel.ConfigureForStage(size.X, new Vector2(size.X - margin * 2f, size.Y - _bettingPanel.OffsetTop - margin));
+            _bettingPanel.OffsetBottom = -(safe.Bottom + margin);
+            _bettingPanel.ConfigureForStage(size.X, new Vector2(
+                size.X - safe.Left - safe.Right - margin * 2f,
+                size.Y - _bettingPanel.OffsetTop - safe.Bottom - margin));
             _bettingPanel.MoveToFront();
         }
 
@@ -1329,7 +1335,7 @@ public partial class GameTable : Control
         {
             var panelWidth = Mathf.Clamp(size.X * 0.76f, 320f, 720f);
             var panelHeight = Mathf.Clamp(size.X * 0.07f, 54f, 78f);
-            _bustedPanel.Position = new Vector2((size.X - panelWidth) / 2f, size.Y * 0.72f);
+            _bustedPanel.Position = new Vector2((size.X - panelWidth) / 2f, Mathf.Min(size.Y * 0.72f, size.Y - safe.Bottom - panelHeight - margin));
             _bustedPanel.Size = new Vector2(panelWidth, panelHeight);
             _bustedPanel.MoveToFront();
         }
@@ -1344,6 +1350,7 @@ public partial class GameTable : Control
         }
 
         BringOpenDrawersToFront();
+        ResponsiveUi.EnsureTouchTargets(this);
     }
 
     private void BringOpenDrawersToFront()
@@ -1428,17 +1435,9 @@ public partial class GameTable : Control
         }
 
         var viewport = GetViewportRect().Size;
-        var stageWidth = viewport.X;
-        var stageHeight = stageWidth / StageAspect;
-        if (stageHeight > viewport.Y)
-        {
-            stageHeight = viewport.Y;
-            stageWidth = stageHeight * StageAspect;
-        }
-
         _stage.SetAnchorsPreset(LayoutPreset.TopLeft);
-        _stage.Position = new Vector2((viewport.X - stageWidth) / 2f, (viewport.Y - stageHeight) / 2f);
-        _stage.Size = new Vector2(stageWidth, stageHeight);
+        _stage.Position = Vector2.Zero;
+        _stage.Size = viewport;
         _stage.ClipContents = true;
     }
 
