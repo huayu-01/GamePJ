@@ -127,6 +127,14 @@ public class GameStateDTO
     public int CurrentPlayerId { get; set; }
     public int DealerPosition { get; set; }
     public int TableSeatCount { get; set; } = 9;
+    public int SmallBlindAmount { get; set; } = Constants.SmallBlind;
+    public int BigBlindAmount { get; set; } = Constants.BigBlind;
+    public int MinBuyIn { get; set; } = Constants.MinBuyIn;
+    public int MaxBuyIn { get; set; } = Constants.MaxBuyIn;
+    public int TableChipLimit { get; set; } = Constants.TableChipLimit;
+    public int ThinkingTimeSeconds { get; set; } = Constants.ThinkingTimeSeconds;
+    public int TurnTimeRemainingSeconds { get; set; }
+    public int HandNumber { get; set; }
 
     public Godot.Collections.Dictionary ToDictionary()
     {
@@ -158,7 +166,15 @@ public class GameStateDTO
             ["current_bet"] = CurrentBet,
             ["current_player_id"] = CurrentPlayerId,
             ["dealer_position"] = DealerPosition,
-            ["table_seat_count"] = TableSeatCount
+            ["table_seat_count"] = TableSeatCount,
+            ["small_blind_amount"] = SmallBlindAmount,
+            ["big_blind_amount"] = BigBlindAmount,
+            ["min_buy_in"] = MinBuyIn,
+            ["max_buy_in"] = MaxBuyIn,
+            ["table_chip_limit"] = TableChipLimit,
+            ["thinking_time_seconds"] = ThinkingTimeSeconds,
+            ["turn_time_remaining_seconds"] = TurnTimeRemainingSeconds,
+            ["hand_number"] = HandNumber
         };
     }
 
@@ -171,7 +187,15 @@ public class GameStateDTO
             CurrentBet = dict.GetValueOrDefault("current_bet", 0).AsInt32(),
             CurrentPlayerId = dict.GetValueOrDefault("current_player_id", -1).AsInt32(),
             DealerPosition = dict.GetValueOrDefault("dealer_position", 0).AsInt32(),
-            TableSeatCount = dict.GetValueOrDefault("table_seat_count", 9).AsInt32()
+            TableSeatCount = dict.GetValueOrDefault("table_seat_count", 9).AsInt32(),
+            SmallBlindAmount = dict.GetValueOrDefault("small_blind_amount", Constants.SmallBlind).AsInt32(),
+            BigBlindAmount = dict.GetValueOrDefault("big_blind_amount", Constants.BigBlind).AsInt32(),
+            MinBuyIn = dict.GetValueOrDefault("min_buy_in", Constants.MinBuyIn).AsInt32(),
+            MaxBuyIn = dict.GetValueOrDefault("max_buy_in", Constants.MaxBuyIn).AsInt32(),
+            TableChipLimit = dict.GetValueOrDefault("table_chip_limit", Constants.TableChipLimit).AsInt32(),
+            ThinkingTimeSeconds = dict.GetValueOrDefault("thinking_time_seconds", Constants.ThinkingTimeSeconds).AsInt32(),
+            TurnTimeRemainingSeconds = dict.GetValueOrDefault("turn_time_remaining_seconds", 0).AsInt32(),
+            HandNumber = dict.GetValueOrDefault("hand_number", 0).AsInt32()
         };
 
         foreach (var item in dict.GetValueOrDefault("players", new Godot.Collections.Array()).AsGodotArray())

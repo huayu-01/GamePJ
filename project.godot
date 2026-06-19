@@ -11,12 +11,14 @@ config_version=5
 [application]
 
 config/name="抽抽抽"
+config/version="0.2.0-test"
 run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
+UpdateManager="*res://autoload/UpdateManager.cs"
 GameManager="*res://autoload/GameManager.cs"
 NetworkManager="*res://autoload/NetworkManager.cs"
 PlayerData="*res://autoload/PlayerData.cs"
@@ -37,6 +39,10 @@ project/assembly_name="TexasHoldemGodot"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+
+[game]
+
+update/manifest_url=""
 
 [physics]
 

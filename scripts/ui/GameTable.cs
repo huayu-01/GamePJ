@@ -49,8 +49,10 @@ public partial class GameTable : Control
     private bool _chatCollapsed = true;
     private bool _syncingSitOutToggle;
     private bool _revealWindowOpen;
+    private bool _settlementPresentationActive;
     private int _lastStatePromptPlayerId = int.MinValue;
     private bool _lastTimerDanger;
+    private static bool GmToolsEnabled => OS.GetName() != "Android";
 
     public override void _Ready()
     {
@@ -126,9 +128,12 @@ public partial class GameTable : Control
         _sideToggle.Pressed += ToggleSidePanel;
         top.AddChild(_sideToggle);
 
-        _restartButton = FlatUi.Button("新一局");
-        _restartButton.Pressed += () => GameManager.Instance?.StartGame();
-        top.AddChild(_restartButton);
+        if (GmToolsEnabled)
+        {
+            _restartButton = FlatUi.Button("新一局");
+            _restartButton.Pressed += () => GameManager.Instance?.StartGame();
+            top.AddChild(_restartButton);
+        }
 
         _sitOutToggle = new CheckButton { Text = "暂离" };
         _sitOutToggle.AddThemeColorOverride("font_color", FlatUi.Text);
@@ -289,6 +294,8 @@ public partial class GameTable : Control
 
         box.AddChild(FlatUi.Label("对局记录", 20));
 
+        if (GmToolsEnabled)
+        {
         var debug = FlatUi.Panel("DebugPanel");
         debug.CustomMinimumSize = new Vector2(0, 212);
         box.AddChild(debug);
@@ -360,6 +367,7 @@ public partial class GameTable : Control
         _hostRebuyList = new VBoxContainer();
         _hostRebuyList.AddThemeConstantOverride("separation", 4);
         rebuyBox.AddChild(_hostRebuyList);
+        }
 
         _handHistoryPanel = new HandHistoryPanel();
         _handHistoryPanel.SizeFlagsVertical = SizeFlags.ExpandFill;
@@ -488,6 +496,11 @@ public partial class GameTable : Control
             hud.SetBlindRole(manager.GetBlindRole(player.Id));
             hud.SetTurnActive(player.Id == currentId);
             hud.SetWinnerState(manager.LastWinners.Contains(player.Id), manager.LastWinnings.GetValueOrDefault(player.Id, 0));
+            var fullHandPublic = manager.LastShownHands.ContainsKey(player.Id);
+            hud.SetSettlementCardPresentation(
+                _settlementPresentationActive && player.Id == localId,
+                fullHandPublic || revealFirst,
+                fullHandPublic || revealSecond);
         }
 
         _communityCards?.SetCards(manager.CommunityCards);
@@ -656,7 +669,7 @@ public partial class GameTable : Control
 
         var currentId = manager.CurrentBettingRound?.GetCurrentPlayerId() ?? -1;
         var currentName = currentId > 0 ? manager.Players.Find(player => player.Id == currentId)?.Name ?? currentId.ToString() : "-";
-        _stateLabel.Text = $"{manager.CurrentState.ToDisplayName()}  ·  当前行动: {currentName}";
+        _stateLabel.Text = manager.CurrentState.ToDisplayName();
         if (_turnPromptLabel != null)
         {
             var localId = PlayerData.Instance?.LocalPlayerId ?? 1;
@@ -687,14 +700,21 @@ public partial class GameTable : Control
         {
             _turnTimerBar.Visible = false;
             _turnTimerLabel.Visible = false;
+            foreach (var hud in _seatHuds)
+            {
+                hud.SetTurnProgress(false, 0f, 0);
+            }
             return;
         }
 
         var elapsed = (Time.GetTicksMsec() - manager.CurrentTurnStartedMsec) / 1000.0;
         var remaining = Mathf.Clamp((float)(limit - elapsed), 0f, limit);
-        var progress = limit <= 0 ? 0f : remaining / limit;
-        _turnTimerBar.Visible = true;
-        _turnTimerLabel.Visible = true;
+        var totalThinkingTime = manager.ThinkingTimeSeconds > 0 ? manager.ThinkingTimeSeconds : limit;
+        var progress = totalThinkingTime <= 0 ? 0f : remaining / totalThinkingTime;
+        var localId = PlayerData.Instance?.LocalPlayerId ?? 1;
+        var localTurn = currentId == localId;
+        _turnTimerBar.Visible = localTurn;
+        _turnTimerLabel.Visible = localTurn;
         _turnTimerBar.Value = progress;
         var danger = progress < 0.25f;
         if (_turnTimerFillStyle != null && danger != _lastTimerDanger)
@@ -704,6 +724,11 @@ public partial class GameTable : Control
             _lastTimerDanger = danger;
         }
         _turnTimerLabel.Text = $"{Mathf.CeilToInt(remaining)}s";
+        var remainingSeconds = Mathf.CeilToInt(remaining);
+        foreach (var hud in _seatHuds)
+        {
+            hud.SetTurnProgress(hud.PlayerId == currentId, progress, remainingSeconds);
+        }
     }
 
 
@@ -1032,10 +1057,12 @@ public partial class GameTable : Control
 
     private async void OnGameEnded()
     {
+        _settlementPresentationActive = true;
         Refresh();
         await RunRevealWindow();
         await PlaySettlementSequence();
         GameManager.Instance?.CompleteSettlementAnimation();
+        _settlementPresentationActive = false;
         Refresh();
     }
 

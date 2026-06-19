@@ -17,6 +17,8 @@ public partial class PlayerHUD : Control
     private Button? _revealBothButton;
     private Panel? _bubblePanel;
     private Label? _bubbleLabel;
+    private ProgressBar? _turnProgressBar;
+    private StyleBoxFlat? _turnProgressFillStyle;
     private CardDisplay? _card1;
     private CardDisplay? _card2;
 
@@ -95,6 +97,10 @@ public partial class PlayerHUD : Control
         {
             _bubblePanel.Visible = false;
         }
+        if (_turnProgressBar != null)
+        {
+            _turnProgressBar.Visible = false;
+        }
         _card1!.SetCard(null, false);
         _card2!.SetCard(null, false);
         if (_cardsLayer != null)
@@ -104,6 +110,60 @@ public partial class PlayerHUD : Control
         Modulate = new Color(1, 1, 1, 0.34f);
         MouseFilter = MouseFilterEnum.Ignore;
         LayoutContents();
+    }
+
+    public void SetSettlementCardPresentation(bool active, bool firstCardPublic, bool secondCardPublic)
+    {
+        if (!_isLocal || _card1 == null || _card2 == null)
+        {
+            return;
+        }
+
+        if (!active)
+        {
+            if (!_lastFolded)
+            {
+                _card1.Modulate = Colors.White;
+                _card2.Modulate = Colors.White;
+            }
+            return;
+        }
+
+        _card1.Modulate = new Color(1f, 1f, 1f, firstCardPublic ? 1f : 0.38f);
+        _card2.Modulate = new Color(1f, 1f, 1f, secondCardPublic ? 1f : 0.38f);
+    }
+
+    public void SetTurnProgress(bool active, float progress, int remainingSeconds)
+    {
+        if (_turnProgressBar == null)
+        {
+            BuildUi();
+        }
+
+        if (_turnProgressBar == null)
+        {
+            return;
+        }
+
+        var visible = active && !_isLocal && !_isEmptySeat;
+        _turnProgressBar.Visible = visible;
+        if (!visible)
+        {
+            return;
+        }
+
+        var normalized = Mathf.Clamp(progress, 0f, 1f);
+        _turnProgressBar.Value = normalized;
+        _turnProgressBar.TooltipText = $"剩余 {remainingSeconds}s";
+        if (_turnProgressFillStyle != null)
+        {
+            _turnProgressFillStyle.BgColor = normalized < 0.25f
+                ? FlatUi.Danger
+                : normalized < 0.5f
+                    ? new Color(1.0f, 0.72f, 0.22f)
+                    : new Color(0.22f, 0.82f, 0.58f);
+            _turnProgressBar.QueueRedraw();
+        }
     }
 
     public void SetPlayer(Player player, bool revealCards, bool revealFirstCard = false, bool revealSecondCard = false)
@@ -316,6 +376,34 @@ public partial class PlayerHUD : Control
         _cardsLayer.AddChild(_card1);
         _cardsLayer.AddChild(_card2);
 
+        _turnProgressBar = new ProgressBar
+        {
+            Name = "SeatTurnProgress",
+            MinValue = 0,
+            MaxValue = 1,
+            ShowPercentage = false,
+            MouseFilter = MouseFilterEnum.Ignore,
+            Visible = false
+        };
+        _turnProgressFillStyle = new StyleBoxFlat
+        {
+            BgColor = new Color(0.22f, 0.82f, 0.58f),
+            CornerRadiusTopLeft = 4,
+            CornerRadiusTopRight = 4,
+            CornerRadiusBottomLeft = 4,
+            CornerRadiusBottomRight = 4
+        };
+        _turnProgressBar.AddThemeStyleboxOverride("fill", _turnProgressFillStyle);
+        _turnProgressBar.AddThemeStyleboxOverride("background", new StyleBoxFlat
+        {
+            BgColor = new Color(0.04f, 0.07f, 0.06f, 0.88f),
+            CornerRadiusTopLeft = 4,
+            CornerRadiusTopRight = 4,
+            CornerRadiusBottomLeft = 4,
+            CornerRadiusBottomRight = 4
+        });
+        AddChild(_turnProgressBar);
+
         _revealActions = new HBoxContainer
         {
             Name = "RevealActions",
@@ -393,7 +481,7 @@ public partial class PlayerHUD : Control
             return;
         }
 
-        GameManager.Instance?.RevealHoleCard(_lastPlayerId, cardIndex);
+        NetworkManager.Instance?.RequestHoleCardReveal(_lastPlayerId, cardIndex);
     }
 
     private void RevealBothCards()
@@ -445,6 +533,12 @@ public partial class PlayerHUD : Control
         }
 
         var bottomY = cardsY + _cardSize.Y + (_isLocal ? 4f : 2f);
+        if (_turnProgressBar != null)
+        {
+            var timerHeight = Mathf.Clamp(_cardSize.X * 0.075f, 6f, 10f);
+            _turnProgressBar.Position = new Vector2(cardsX, cardsY + _cardSize.Y - timerHeight);
+            _turnProgressBar.Size = new Vector2(cardsWidth, timerHeight);
+        }
         var revealHeight = _revealActions?.Visible == true ? Mathf.Clamp(_cardSize.X * 0.30f, 46f, 62f) : 0f;
         if (_revealActions != null)
         {

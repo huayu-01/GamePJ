@@ -25,7 +25,7 @@ public partial class GameManager : Node
     [Export] public int ThinkingTimeSeconds { get; set; } = Constants.ThinkingTimeSeconds;
     [Export] public bool AutoContinueHands { get; set; } = true;
     [Export] public int TableSeatCount { get; set; } = 9;
-    [Export] public bool WaitForSettlementAnimation { get; set; }
+    [Export] public bool WaitForSettlementAnimation { get; set; } = true;
 
     public GameState CurrentState { get; private set; } = GameState.Menu;
     public List<Player> Players { get; } = new();
@@ -590,6 +590,8 @@ public partial class GameManager : Node
             winningsDict[pair.Key] = pair.Value;
         }
 
+        BroadcastState();
+        NetworkManager.Instance?.BroadcastHandResult(activePlayers, winnerIds, winningsDict, LastPotAwards, true);
         MarkSettlementPendingIfNeeded();
         AppendSettlementHistory();
         EmitSignal(SignalName.GameEnded, winnerIds, winningsDict);
@@ -665,6 +667,13 @@ public partial class GameManager : Node
 
     public GameStateDTO CreateStateDTO()
     {
+        var turnTimeRemaining = 0;
+        if (CurrentTurnStartedMsec > 0 && CurrentTurnTimeLimitSeconds > 0)
+        {
+            var elapsedSeconds = (Time.GetTicksMsec() - CurrentTurnStartedMsec) / 1000.0;
+            turnTimeRemaining = Mathf.Max(0, Mathf.CeilToInt(CurrentTurnTimeLimitSeconds - elapsedSeconds));
+        }
+
         return new GameStateDTO
         {
             CurrentState = CurrentState,
@@ -679,20 +688,54 @@ public partial class GameManager : Node
             CurrentBet = CurrentBettingRound?.CurrentBet ?? 0,
             CurrentPlayerId = CurrentBettingRound?.GetCurrentPlayerId() ?? -1,
             DealerPosition = DealerPosition,
-            TableSeatCount = TableSeatCount
+            TableSeatCount = TableSeatCount,
+            SmallBlindAmount = SmallBlindAmount,
+            BigBlindAmount = BigBlindAmount,
+            MinBuyIn = MinBuyIn,
+            MaxBuyIn = MaxBuyIn,
+            TableChipLimit = TableChipLimit,
+            ThinkingTimeSeconds = ThinkingTimeSeconds,
+            TurnTimeRemainingSeconds = turnTimeRemaining,
+            HandNumber = _handNumber
         };
     }
 
     public void ApplyNetworkState(Godot.Collections.Dictionary state)
     {
         var dto = GameStateDTO.FromDictionary(state);
+        var isNewHand = dto.HandNumber > 0 && dto.HandNumber != _handNumber;
+        _handNumber = dto.HandNumber;
         CurrentState = dto.CurrentState;
         TableSeatCount = Mathf.Clamp(dto.TableSeatCount, 2, Constants.MaxPlayers);
         DealerPosition = dto.DealerPosition;
+        SmallBlindAmount = System.Math.Max(1, dto.SmallBlindAmount);
+        BigBlindAmount = System.Math.Max(SmallBlindAmount * 2, dto.BigBlindAmount);
+        MinBuyIn = System.Math.Max(1, dto.MinBuyIn);
+        MaxBuyIn = System.Math.Max(MinBuyIn, dto.MaxBuyIn);
+        TableChipLimit = System.Math.Max(MaxBuyIn, dto.TableChipLimit);
+        ThinkingTimeSeconds = System.Math.Max(0, dto.ThinkingTimeSeconds);
+        CurrentTurnTimeLimitSeconds = System.Math.Max(0, dto.TurnTimeRemainingSeconds);
+        CurrentTurnStartedMsec = CurrentTurnTimeLimitSeconds > 0 ? Time.GetTicksMsec() : 0;
 
         var existingHoleCards = Players.ToDictionary(
             player => player.Id,
             player => new[] { player.HoleCards[0], player.HoleCards[1] });
+        if (isNewHand)
+        {
+            var localId = PlayerData.Instance?.LocalPlayerId ?? 1;
+            foreach (var playerId in existingHoleCards.Keys.Where(id => id != localId).ToArray())
+            {
+                existingHoleCards[playerId] = new Card[2];
+            }
+
+            _revealedHoleCards.Clear();
+            LastShownHands.Clear();
+            LastWinnings.Clear();
+            LastWinners.Clear();
+            LastPotAwards.Clear();
+            LastHandWentToShowdown = false;
+        }
+
         Players.Clear();
         foreach (var dtoPlayer in dto.Players.OrderBy(player => player.Position))
         {
@@ -755,6 +798,90 @@ public partial class GameManager : Node
         }
 
         EmitSignal(SignalName.StateChanged, (int)CurrentState);
+    }
+
+    public void ApplyPublicHoleCard(int playerId, int cardIndex, Godot.Collections.Dictionary cardData)
+    {
+        if (cardIndex is < 0 or > 1)
+        {
+            return;
+        }
+
+        var player = Players.FirstOrDefault(item => item.Id == playerId);
+        if (player == null)
+        {
+            return;
+        }
+
+        player.HoleCards[cardIndex] = CardDTO.FromDictionary(cardData).ToCard();
+        if (!_revealedHoleCards.TryGetValue(playerId, out var revealed))
+        {
+            revealed = new HashSet<int>();
+            _revealedHoleCards[playerId] = revealed;
+        }
+
+        revealed.Add(cardIndex);
+        EmitSignal(SignalName.StateChanged, (int)CurrentState);
+    }
+
+    public void ApplyNetworkHandResult(
+        Godot.Collections.Array<Godot.Collections.Dictionary> revealedHands,
+        Godot.Collections.Array<int> winners,
+        Godot.Collections.Dictionary winnings,
+        Godot.Collections.Array<Godot.Collections.Dictionary> potAwards,
+        bool wentToShowdown)
+    {
+        LastHandWentToShowdown = wentToShowdown;
+        LastShownHands.Clear();
+        foreach (var hand in revealedHands)
+        {
+            var playerId = hand.GetValueOrDefault("player_id", 0).AsInt32();
+            var player = Players.FirstOrDefault(item => item.Id == playerId);
+            if (player == null)
+            {
+                continue;
+            }
+
+            var cards = hand.GetValueOrDefault("cards", new Godot.Collections.Array()).AsGodotArray<Godot.Collections.Dictionary>();
+            for (var index = 0; index < System.Math.Min(2, cards.Count); index++)
+            {
+                player.HoleCards[index] = CardDTO.FromDictionary(cards[index]).ToCard();
+            }
+
+            if (player.HoleCards.All(card => card != null) && CommunityCards.Count >= 3)
+            {
+                LastShownHands[playerId] = HandEvaluator.EvaluateHand(player.HoleCards, CommunityCards.ToArray());
+            }
+        }
+
+        LastWinners.Clear();
+        LastWinners.AddRange(winners);
+        LastWinnings.Clear();
+        foreach (var key in winnings.Keys)
+        {
+            LastWinnings[key.AsInt32()] = winnings[key].AsInt32();
+        }
+
+        LastPotAwards.Clear();
+        foreach (var data in potAwards)
+        {
+            var award = new PotAward
+            {
+                PotIndex = data.GetValueOrDefault("pot_index", 0).AsInt32(),
+                Amount = data.GetValueOrDefault("amount", 0).AsInt32()
+            };
+            award.EligiblePlayers.AddRange(data.GetValueOrDefault("eligible_players", new Godot.Collections.Array()).AsGodotArray<int>());
+            award.Winners.AddRange(data.GetValueOrDefault("winners", new Godot.Collections.Array()).AsGodotArray<int>());
+            var shares = data.GetValueOrDefault("shares", new Godot.Collections.Dictionary()).AsGodotDictionary();
+            foreach (var key in shares.Keys)
+            {
+                award.Shares[key.AsInt32()] = shares[key].AsInt32();
+            }
+            LastPotAwards.Add(award);
+        }
+
+        EmitSignal(SignalName.StateChanged, (int)CurrentState);
+        EmitSignal(SignalName.GameEnded, winners, winnings);
     }
 
     public void ApplyPrivateHoleCards(int playerId, Godot.Collections.Array<Godot.Collections.Dictionary> cards)
@@ -977,6 +1104,8 @@ public partial class GameManager : Node
         var winners = new Godot.Collections.Array<int> { winner.Id };
         var winnings = new Godot.Collections.Dictionary { [winner.Id] = total };
         AppendHistory($"其他玩家弃牌，{winner.Name} 收下底池 {total}");
+        BroadcastState();
+        NetworkManager.Instance?.BroadcastHandResult(System.Array.Empty<Player>(), winners, winnings, LastPotAwards, false);
         MarkSettlementPendingIfNeeded();
         EmitSignal(SignalName.GameEnded, winners, winnings);
         CompleteSettlementAfterOptionalAnimation();

@@ -1,0 +1,21 @@
+{
+  "manifest_version": 1,
+  "latest_app_version": "0.2.0-test",
+  "minimum_app_version": "0.2.0-test",
+  "protocol_version": 2,
+  "apk_url": "https://example.com/GamePJ-test.apk",
+  "config": {
+    "announcement": "",
+    "maintenance": false
+  },
+  "packs": [
+    {
+      "id": "base-art",
+      "version": "1.0.0",
+      "url": "https://example.com/packs/base-art.pck",
+      "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "size": 0,
+      "enabled": false
+    }
+  ]
+}

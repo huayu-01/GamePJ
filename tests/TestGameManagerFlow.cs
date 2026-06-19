@@ -14,6 +14,8 @@ public partial class TestGameManagerFlow : Node
             return (pass, fail);
         }
 
+        Check(manager.WaitForSettlementAnimation, "SettlementWaitsByDefault", ref pass, ref fail);
+        manager.WaitForSettlementAnimation = false;
         manager.AutoContinueHands = false;
         manager.Players.Clear();
         manager.AiPlayerIds.Clear();
@@ -95,6 +97,96 @@ public partial class TestGameManagerFlow : Node
             ref pass,
             ref fail);
 
+        manager.ConfigureRoomRules(3, 60, 240, 1200, 17);
+        var rulesState = manager.CreateStateDTO().ToDictionary();
+        var parsedRules = GameStateDTO.FromDictionary(rulesState);
+        Check(
+            parsedRules.SmallBlindAmount == 3 &&
+            parsedRules.BigBlindAmount == 6 &&
+            parsedRules.MinBuyIn == 60 &&
+            parsedRules.MaxBuyIn == 240 &&
+            parsedRules.TableChipLimit == 1200 &&
+            parsedRules.ThinkingTimeSeconds == 17,
+            "NetworkStateCarriesRoomRules",
+            ref pass,
+            ref fail);
+
+        Check(
+            LanDiscoveryProtocol.IsQuery(LanDiscoveryProtocol.CreateQuery()),
+            "LanDiscoveryRecognizesQuery",
+            ref pass,
+            ref fail);
+        var discoveryResponse = LanDiscoveryProtocol.CreateResponse(7000, "123456", 3, 9);
+        Check(
+            LanDiscoveryProtocol.TryParseResponse(discoveryResponse, "192.168.1.20", out var discoveredRoom) &&
+            discoveredRoom.Address == "192.168.1.20" &&
+            discoveredRoom.Port == 7000 &&
+            discoveredRoom.RoomCode == "123456" &&
+            discoveredRoom.PlayerCount == 3 &&
+            discoveredRoom.MaxPlayers == 9 &&
+            discoveredRoom.ProtocolVersion == Constants.NetworkProtocolVersion &&
+            discoveredRoom.AppVersion == Constants.AppVersion,
+            "LanDiscoveryParsesRoomResponse",
+            ref pass,
+            ref fail);
+
+        Check(
+            UpdatePolicy.CompareVersions("0.2.0-test", "0.1.9") > 0 &&
+            UpdatePolicy.CompareVersions("1.0", "1.0.0") == 0 &&
+            UpdatePolicy.CompareVersions("1.0.1", "1.0.2") < 0,
+            "UpdateVersionOrdering",
+            ref pass,
+            ref fail);
+        Check(
+            UpdatePolicy.IsPackIdSafe("base-art_2") &&
+            !UpdatePolicy.IsPackIdSafe("../base") &&
+            !UpdatePolicy.IsPackIdSafe("bad/name"),
+            "UpdatePackIdValidation",
+            ref pass,
+            ref fail);
+        Check(
+            UpdatePolicy.ComputeSha256(System.Text.Encoding.UTF8.GetBytes("abc")) ==
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+            "UpdateSha256Validation",
+            ref pass,
+            ref fail);
+
+        var publicCards = new Godot.Collections.Array<Godot.Collections.Dictionary>
+        {
+            CardDTO.FromCard(new Card { Suit = Suit.Spades, Rank = Rank.Ace }).ToDictionary(),
+            CardDTO.FromCard(new Card { Suit = Suit.Hearts, Rank = Rank.King }).ToDictionary()
+        };
+        manager.Players.First(player => player.Id == 2).HoleCards = new Card[2];
+        manager.ApplyNetworkHandResult(
+            new Godot.Collections.Array<Godot.Collections.Dictionary>
+            {
+                new() { ["player_id"] = 2, ["cards"] = publicCards }
+            },
+            new Godot.Collections.Array<int> { 2 },
+            new Godot.Collections.Dictionary { [2] = 40 },
+            new Godot.Collections.Array<Godot.Collections.Dictionary>(),
+            true);
+        Check(
+            manager.Players.First(player => player.Id == 2).HoleCards.All(card => card != null) &&
+            manager.LastShownHands.ContainsKey(2) &&
+            manager.LastWinners.SequenceEqual(new[] { 2 }) &&
+            manager.LastWinnings.GetValueOrDefault(2) == 40,
+            "NetworkHandResultRevealsShowdownCards",
+            ref pass,
+            ref fail);
+
+        var nextHandState = manager.CreateStateDTO().ToDictionary();
+        nextHandState["hand_number"] = nextHandState.GetValueOrDefault("hand_number", 0).AsInt32() + 1;
+        nextHandState["current_state"] = (int)GameState.PreFlop;
+        manager.ApplyNetworkState(nextHandState);
+        Check(
+            manager.Players.First(player => player.Id == 2).HoleCards.All(card => card == null) &&
+            !manager.LastShownHands.ContainsKey(2) &&
+            manager.LastWinners.Count == 0,
+            "NewNetworkHandClearsOpponentShowdownCards",
+            ref pass,
+            ref fail);
+
         manager.LeaveTable();
         manager.Players.Clear();
         manager.AiPlayerIds.Clear();
@@ -115,6 +207,24 @@ public partial class TestGameManagerFlow : Node
             "PreFlopSkipsBrokeSeatAfterBigBlind",
             ref pass,
             ref fail);
+
+        manager.LeaveTable();
+        manager.Players.Clear();
+        manager.AiPlayerIds.Clear();
+        manager.TableSeatCount = 2;
+        manager.WaitForSettlementAnimation = false;
+        typeof(GameManager)
+            .GetProperty(nameof(GameManager.DealerPosition), BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            ?.SetValue(manager, 0);
+        manager.Players.Add(new Player { Id = 1, Name = "P1", Chips = Constants.StartingChips, Position = 0 });
+        manager.Players.Add(new Player { Id = 2, Name = "P2", Chips = Constants.StartingChips, Position = 1 });
+        manager.StartGame();
+        var firstSmallBlind = manager.Players.First(player => manager.GetBlindRole(player.Id) == "小盲").Id;
+        var foldingPlayer = manager.CurrentBettingRound?.GetCurrentPlayerId() ?? -1;
+        manager.ProcessPlayerAction(foldingPlayer, PlayerAction.Fold, 0);
+        manager.StartGame();
+        var secondSmallBlind = manager.Players.First(player => manager.GetBlindRole(player.Id) == "小盲").Id;
+        Check(firstSmallBlind != secondSmallBlind, "HeadsUpDealerRotatesBlinds", ref pass, ref fail);
 
         manager.LeaveTable();
         manager.Players.Clear();

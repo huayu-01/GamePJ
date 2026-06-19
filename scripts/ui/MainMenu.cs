@@ -1,4 +1,5 @@
 using Godot;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 public partial class MainMenu : Control
@@ -12,6 +13,12 @@ public partial class MainMenu : Control
     private ColorRect? _joinOverlay;
     private Panel? _joinPanel;
     private OptionButton? _seatCountOption;
+    private VBoxContainer? _discoveredRoomsList;
+    private Label? _discoveryStatusLabel;
+    private Label? _updateStatusLabel;
+    private Button? _downloadUpdateButton;
+    private string _availableApkUrl = "";
+    private readonly Dictionary<string, Button> _discoveredRoomButtons = new();
 
     public override void _Ready()
     {
@@ -20,6 +27,41 @@ public partial class MainMenu : Control
         {
             NetworkManager.Instance.JoinSucceeded += OnJoinSucceeded;
             NetworkManager.Instance.JoinFailed += OnJoinFailed;
+            NetworkManager.Instance.LanRoomDiscovered += OnLanRoomDiscovered;
+            NetworkManager.Instance.LanDiscoveryFinished += OnLanDiscoveryFinished;
+        }
+        if (UpdateManager.Instance != null)
+        {
+            UpdateManager.Instance.StatusChanged += OnUpdateStatusChanged;
+            UpdateManager.Instance.AppUpdateAvailable += OnAppUpdateAvailable;
+            OnUpdateStatusChanged(UpdateManager.Instance.StatusText, UpdateManager.Instance.StatusIsDanger);
+            var manifest = UpdateManager.Instance.LastManifest;
+            if (manifest != null &&
+                (UpdatePolicy.CompareVersions(Constants.AppVersion, manifest.LatestAppVersion) < 0 ||
+                 UpdatePolicy.CompareVersions(Constants.AppVersion, manifest.MinimumAppVersion) < 0 ||
+                 manifest.ProtocolVersion != Constants.NetworkProtocolVersion))
+            {
+                var required = UpdatePolicy.CompareVersions(Constants.AppVersion, manifest.MinimumAppVersion) < 0 ||
+                               manifest.ProtocolVersion != Constants.NetworkProtocolVersion;
+                OnAppUpdateAvailable(manifest.LatestAppVersion, manifest.ApkUrl, required);
+            }
+        }
+    }
+
+    public override void _ExitTree()
+    {
+        if (NetworkManager.Instance != null)
+        {
+            NetworkManager.Instance.JoinSucceeded -= OnJoinSucceeded;
+            NetworkManager.Instance.JoinFailed -= OnJoinFailed;
+            NetworkManager.Instance.LanRoomDiscovered -= OnLanRoomDiscovered;
+            NetworkManager.Instance.LanDiscoveryFinished -= OnLanDiscoveryFinished;
+            NetworkManager.Instance.StopLanRoomScan();
+        }
+        if (UpdateManager.Instance != null)
+        {
+            UpdateManager.Instance.StatusChanged -= OnUpdateStatusChanged;
+            UpdateManager.Instance.AppUpdateAvailable -= OnAppUpdateAvailable;
         }
     }
 
@@ -62,7 +104,10 @@ public partial class MainMenu : Control
 
         var title = FlatUi.Label("Texas Hold'em", 48, HorizontalAlignment.Center);
         menu.AddChild(title);
-        menu.AddChild(FlatUi.MutedLabel("创建房间、加入局域网对局，或直接用 AI 进行本地测试。"));
+        var isAndroid = OS.GetName() == "Android";
+        menu.AddChild(FlatUi.MutedLabel(isAndroid
+            ? "创建房间，或自动发现并加入同一网络内的牌局。"
+            : "创建房间、加入局域网对局，或直接用 AI 进行本地测试。"));
 
         var roomRow = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         roomRow.AddChild(FlatUi.MutedLabel("房间人数"));
@@ -77,8 +122,21 @@ public partial class MainMenu : Control
         AddMenuButton(menu, "加入房间", ShowJoinPanel);
         AddMenuButton(menu, "设置", () => GetTree().ChangeSceneToFile(Constants.SettingsScene));
 
-        var testButton = AddMenuButton(menu, "测试模式", OnTestModePressed);
-        testButton.Visible = ShowTestModeButton;
+        if (!isAndroid)
+        {
+            var testButton = AddMenuButton(menu, "测试模式", OnTestModePressed);
+            testButton.Visible = ShowTestModeButton;
+        }
+
+        _updateStatusLabel = FlatUi.MutedLabel($"版本 {Constants.AppVersion}");
+        _updateStatusLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        _updateStatusLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        menu.AddChild(_updateStatusLabel);
+
+        _downloadUpdateButton = FlatUi.Button("获取新版本", FlatUi.AccentMuted);
+        _downloadUpdateButton.Visible = false;
+        _downloadUpdateButton.Pressed += OpenAvailableUpdate;
+        menu.AddChild(_downloadUpdateButton);
 
         var spacer = new Control { SizeFlagsVertical = SizeFlags.ExpandFill };
         menu.AddChild(spacer);
@@ -102,7 +160,7 @@ public partial class MainMenu : Control
         _joinOverlay.AddChild(joinCenter);
 
         _joinPanel = FlatUi.Panel("JoinPanel");
-        _joinPanel.CustomMinimumSize = new Vector2(460, 560);
+        _joinPanel.CustomMinimumSize = new Vector2(500, 760);
         joinCenter.AddChild(_joinPanel);
 
         BuildJoinPanel();
@@ -146,6 +204,31 @@ public partial class MainMenu : Control
         var hint = FlatUi.MutedLabel("可粘贴 Host 复制的邀请信息，也可直接输入 IP:端口。跨网络时填写公网 IP 和已开放端口。");
         hint.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         box.AddChild(hint);
+
+        var discoveryHeader = new HBoxContainer();
+        discoveryHeader.AddChild(FlatUi.Label("同一网络房间", 19));
+        var discoverySpacer = new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        discoveryHeader.AddChild(discoverySpacer);
+        var refreshDiscovery = FlatUi.Button("重新搜索");
+        refreshDiscovery.CustomMinimumSize = new Vector2(96, 36);
+        refreshDiscovery.Pressed += StartLanDiscovery;
+        discoveryHeader.AddChild(refreshDiscovery);
+        box.AddChild(discoveryHeader);
+
+        _discoveryStatusLabel = FlatUi.MutedLabel("打开页面后自动搜索");
+        box.AddChild(_discoveryStatusLabel);
+
+        var discoveredPanel = FlatUi.Panel("DiscoveredRooms");
+        discoveredPanel.CustomMinimumSize = new Vector2(0, 154);
+        box.AddChild(discoveredPanel);
+        _discoveredRoomsList = new VBoxContainer();
+        _discoveredRoomsList.SetAnchorsPreset(LayoutPreset.FullRect);
+        _discoveredRoomsList.OffsetLeft = 10;
+        _discoveredRoomsList.OffsetTop = 8;
+        _discoveredRoomsList.OffsetRight = -10;
+        _discoveredRoomsList.OffsetBottom = -8;
+        _discoveredRoomsList.AddThemeConstantOverride("separation", 6);
+        discoveredPanel.AddChild(_discoveredRoomsList);
 
         _joinInviteInput = new TextEdit
         {
@@ -226,11 +309,12 @@ public partial class MainMenu : Control
             _joinStatusLabel.Text = "";
         }
 
-        _joinAddressInput?.GrabFocus();
+        StartLanDiscovery();
     }
 
     private void HideJoinPanel()
     {
+        NetworkManager.Instance?.StopLanRoomScan();
         if (_joinOverlay != null)
         {
             _joinOverlay.Visible = false;
@@ -304,6 +388,7 @@ public partial class MainMenu : Control
 
     private void OnJoinSucceeded()
     {
+        NetworkManager.Instance?.StopLanRoomScan();
         SetJoinStatus("连接成功，正在进入房间...", false);
         GetTree().ChangeSceneToFile(Constants.LobbyScene);
     }
@@ -324,6 +409,91 @@ public partial class MainMenu : Control
         _joinStatusLabel.AddThemeColorOverride("font_color", danger ? FlatUi.Danger : FlatUi.MutedText);
     }
 
+    private void StartLanDiscovery()
+    {
+        ClearDiscoveredRooms();
+        if (_discoveryStatusLabel != null)
+        {
+            _discoveryStatusLabel.Text = "正在自动搜索局域网房间...";
+            _discoveryStatusLabel.AddThemeColorOverride("font_color", FlatUi.Accent);
+        }
+        NetworkManager.Instance?.DiscoverLanRooms();
+    }
+
+    private void ClearDiscoveredRooms()
+    {
+        _discoveredRoomButtons.Clear();
+        if (_discoveredRoomsList == null)
+        {
+            return;
+        }
+
+        foreach (var child in _discoveredRoomsList.GetChildren())
+        {
+            child.QueueFree();
+        }
+    }
+
+    private void OnLanRoomDiscovered(string address, int port, string roomCode, int playerCount, int maxPlayers)
+    {
+        if (_discoveredRoomsList == null)
+        {
+            return;
+        }
+
+        var key = $"{address}:{port}";
+        if (_discoveredRoomButtons.ContainsKey(key))
+        {
+            return;
+        }
+
+        var isFull = playerCount >= maxPlayers;
+        var button = FlatUi.Button($"房间 {roomCode}    {playerCount}/{maxPlayers}    {address}:{port}", isFull ? FlatUi.SurfaceAlt : FlatUi.AccentMuted);
+        button.CustomMinimumSize = new Vector2(0, 44);
+        button.Disabled = isFull;
+        button.TooltipText = isFull ? "房间已满" : "点击直接加入";
+        button.Pressed += () => ConnectToDiscoveredRoom(address, port);
+        _discoveredRoomButtons[key] = button;
+        _discoveredRoomsList.AddChild(button);
+        if (_discoveryStatusLabel != null)
+        {
+            _discoveryStatusLabel.Text = $"已发现 {_discoveredRoomButtons.Count} 个房间";
+            _discoveryStatusLabel.AddThemeColorOverride("font_color", FlatUi.Accent);
+        }
+    }
+
+    private void OnLanDiscoveryFinished()
+    {
+        if (_discoveryStatusLabel == null)
+        {
+            return;
+        }
+
+        _discoveryStatusLabel.Text = _discoveredRoomButtons.Count > 0
+            ? $"已发现 {_discoveredRoomButtons.Count} 个房间"
+            : "未发现房间，可重新搜索或手动输入 IP";
+        _discoveryStatusLabel.AddThemeColorOverride("font_color", FlatUi.MutedText);
+    }
+
+    private void ConnectToDiscoveredRoom(string address, int port)
+    {
+        if (_joinAddressInput != null)
+        {
+            _joinAddressInput.Text = address;
+        }
+        if (_joinPortInput != null)
+        {
+            _joinPortInput.Text = port.ToString();
+        }
+        if (_joinInviteInput != null)
+        {
+            _joinInviteInput.Text = "";
+        }
+
+        SetJoinStatus($"正在连接 {address}:{port} ...", false);
+        NetworkManager.Instance?.JoinRoom(address, port);
+    }
+
     private void OnTestModePressed()
     {
         NetworkManager.Instance?.CreateRoom(Constants.DefaultPort, GetSelectedSeatCount());
@@ -332,6 +502,35 @@ public partial class MainMenu : Control
         var ok = Regex.IsMatch(room, "^\\d{6}$") && !string.IsNullOrWhiteSpace(ip);
         GD.Print(ok ? "Connection successful" : "Connection test failed");
         GD.Print($"RoomCode={room}, LocalIP={ip}");
+    }
+
+    private void OnUpdateStatusChanged(string status, bool danger)
+    {
+        if (_updateStatusLabel == null)
+        {
+            return;
+        }
+
+        _updateStatusLabel.Text = status;
+        _updateStatusLabel.AddThemeColorOverride("font_color", danger ? FlatUi.Danger : FlatUi.MutedText);
+    }
+
+    private void OnAppUpdateAvailable(string version, string apkUrl, bool required)
+    {
+        _availableApkUrl = apkUrl;
+        if (_downloadUpdateButton != null)
+        {
+            _downloadUpdateButton.Text = required ? $"必须更新至 {version}" : $"下载 {version}";
+            _downloadUpdateButton.Visible = !string.IsNullOrWhiteSpace(apkUrl);
+        }
+    }
+
+    private void OpenAvailableUpdate()
+    {
+        if (!string.IsNullOrWhiteSpace(_availableApkUrl))
+        {
+            OS.ShellOpen(_availableApkUrl);
+        }
     }
 
     private int GetSelectedSeatCount()

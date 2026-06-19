@@ -9,6 +9,8 @@ public partial class Lobby : Control
     private SpinBox? _maxBuyInSpin;
     private SpinBox? _chipLimitSpin;
     private SpinBox? _thinkingTimeSpin;
+    private Button? _copyButton;
+    private Button? _startButton;
 
     public override void _Ready()
     {
@@ -77,9 +79,9 @@ public partial class Lobby : Control
         left.AddChild(_roomLabel);
         left.AddChild(FlatUi.MutedLabel("同一局域网玩家可粘贴邀请信息加入；跨网络需要 Host 开放 UDP 端口。"));
 
-        var copy = FlatUi.Button("复制邀请信息");
-        copy.Pressed += () => DisplayServer.ClipboardSet(NetworkManager.Instance?.GetRoomPayload() ?? "");
-        left.AddChild(copy);
+        _copyButton = FlatUi.Button("复制邀请信息");
+        _copyButton.Pressed += () => DisplayServer.ClipboardSet(NetworkManager.Instance?.GetRoomPayload() ?? "");
+        left.AddChild(_copyButton);
 
         left.AddChild(BuildSectionLabel("房间设置"));
         left.AddChild(BuildSpinRow("低注/小盲", out _smallBlindSpin, 1, 10000, GameManager.Instance?.SmallBlindAmount ?? Constants.SmallBlind, 1));
@@ -100,10 +102,10 @@ public partial class Lobby : Control
         _playersList.OffsetBottom = -10;
         playersPanel.AddChild(_playersList);
 
-        var start = FlatUi.Button("开始游戏", FlatUi.AccentMuted);
-        start.CustomMinimumSize = new Vector2(0, 46);
-        start.Pressed += OnStartPressed;
-        left.AddChild(start);
+        _startButton = FlatUi.Button("开始游戏", FlatUi.AccentMuted);
+        _startButton.CustomMinimumSize = new Vector2(0, 46);
+        _startButton.Pressed += OnStartPressed;
+        left.AddChild(_startButton);
 
         var back = FlatUi.Button("返回主菜单");
         back.Pressed += LeaveLobby;
@@ -124,6 +126,25 @@ public partial class Lobby : Control
         _roomLabel!.Text = network?.IsHost == true
             ? $"房间号: {network.RoomCode}  ·  {network.GetLocalIP()}:{Constants.DefaultPort}  ·  {network.RoomMaxPlayers}人局"
             : "等待 Host 开始游戏...";
+
+        var isHost = network?.IsHost == true;
+        if (_copyButton != null)
+        {
+            _copyButton.Visible = isHost;
+        }
+
+        if (_startButton != null)
+        {
+            _startButton.Visible = isHost;
+        }
+
+        foreach (var spin in new[] { _smallBlindSpin, _minBuyInSpin, _maxBuyInSpin, _chipLimitSpin, _thinkingTimeSpin })
+        {
+            if (spin != null)
+            {
+                spin.Editable = isHost;
+            }
+        }
 
         if (_playersList == null)
         {
@@ -150,6 +171,11 @@ public partial class Lobby : Control
 
     private void OnStartPressed()
     {
+        if (NetworkManager.Instance?.IsHost != true)
+        {
+            return;
+        }
+
         GameManager.Instance?.SyncPlayersFromNetwork();
         GameManager.Instance?.ConfigureRoomRules(
             (int)(_smallBlindSpin?.Value ?? Constants.SmallBlind),
