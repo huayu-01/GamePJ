@@ -645,7 +645,9 @@ public partial class MainMenu : Control
 
     private void OnJoinFailed(string reason)
     {
-        SetJoinStatus($"连接失败：{reason}", true);
+        SetJoinStatus(
+            $"连接失败：{reason}。请确认双方位于可互访的同一局域网，Host 的 UDP {Constants.DefaultPort} 未被防火墙拦截；模拟器创建的房间不能直接被手机访问。",
+            true);
     }
 
     private void SetJoinStatus(string text, bool danger)
@@ -721,7 +723,7 @@ public partial class MainMenu : Control
 
         _discoveryStatusLabel.Text = _discoveredRoomButtons.Count > 0
             ? $"已发现 {_discoveredRoomButtons.Count} 个房间"
-            : "未发现房间，可重新搜索或手动输入 IP";
+            : "未发现房间。请检查访客 Wi-Fi/AP 隔离；模拟器 Host 无法被手机直接发现。";
         _discoveryStatusLabel.AddThemeColorOverride("font_color", FlatUi.MutedText);
     }
 

@@ -4,6 +4,7 @@ public partial class Lobby : Control
 {
     private VBoxContainer? _playersList;
     private Label? _roomLabel;
+    private Label? _networkHintLabel;
     private SpinBox? _smallBlindSpin;
     private SpinBox? _minBuyInSpin;
     private SpinBox? _maxBuyInSpin;
@@ -105,6 +106,10 @@ public partial class Lobby : Control
         _roomLabel.AddThemeColorOverride("font_color", FlatUi.Text);
         _roomLabel.AddThemeFontSizeOverride("font_size", 32);
         left.AddChild(_roomLabel);
+        _networkHintLabel = FlatUi.MutedLabel("");
+        _networkHintLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _networkHintLabel.AddThemeColorOverride("font_color", new Color(1.0f, 0.74f, 0.32f));
+        left.AddChild(_networkHintLabel);
         left.AddChild(FlatUi.MutedLabel("同一局域网玩家可粘贴邀请信息加入；跨网络需要 Host 开放 UDP 端口。"));
 
         _copyButton = FlatUi.Button("复制邀请信息");
@@ -180,6 +185,15 @@ public partial class Lobby : Control
         _roomLabel!.Text = network?.IsHost == true
             ? $"房间号: {network.RoomCode}  ·  {network.GetLocalIP()}:{Constants.DefaultPort}  ·  {network.RoomMaxPlayers}人局"
             : "等待 Host 开始游戏...";
+
+        if (_networkHintLabel != null)
+        {
+            var isEmulatorHost = network?.IsHost == true && OS.GetName() == "Android" && network.GetLocalIP().StartsWith("10.0.2.");
+            _networkHintLabel.Visible = isEmulatorHost;
+            _networkHintLabel.Text = isEmulatorHost
+                ? "模拟器为私有 NAT 地址：手机无法反向直连，请改用实体设备或由电脑创建房间。"
+                : "";
+        }
 
         var isHost = network?.IsHost == true;
         if (_copyButton != null)

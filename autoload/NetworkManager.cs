@@ -722,7 +722,13 @@ public partial class NetworkManager : Node
 
     private static IEnumerable<IPEndPoint> GetDiscoveryEndpoints()
     {
-        var addresses = new HashSet<string> { IPAddress.Broadcast.ToString(), IPAddress.Loopback.ToString() };
+        var addresses = new HashSet<string>
+        {
+            IPAddress.Broadcast.ToString(),
+            IPAddress.Loopback.ToString(),
+            // Android Emulator 访问宿主机的固定别名。
+            "10.0.2.2"
+        };
         try
         {
             foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces())
@@ -747,6 +753,16 @@ public partial class NetworkManager : Node
                         broadcast[index] = (byte)(ip[index] | ~mask[index]);
                     }
                     addresses.Add(new IPAddress(broadcast).ToString());
+
+                    // 部分 Android 设备和无线路由器会过滤广播包，补充常见 /24
+                    // 局域网的单播探测。实际掩码广播仍由上面的地址负责。
+                    if (IsPrivateAddress(unicast.Address))
+                    {
+                        for (var host = 1; host < 255; host++)
+                        {
+                            addresses.Add($"{ip[0]}.{ip[1]}.{ip[2]}.{host}");
+                        }
+                    }
                 }
             }
         }
@@ -755,6 +771,15 @@ public partial class NetworkManager : Node
         }
 
         return addresses.Select(address => new IPEndPoint(IPAddress.Parse(address), LanDiscoveryProtocol.DiscoveryPort));
+    }
+
+    private static bool IsPrivateAddress(IPAddress address)
+    {
+        var bytes = address.GetAddressBytes();
+        return bytes.Length == 4 &&
+               (bytes[0] == 10 ||
+                (bytes[0] == 172 && bytes[1] is >= 16 and <= 31) ||
+                (bytes[0] == 192 && bytes[1] == 168));
     }
 
     private void OnConnectionFailed()
