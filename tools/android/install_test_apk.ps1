@@ -19,7 +19,13 @@ if (-not $currentMapping) {
 }
 
 $adb = Join-Path $mappedRoot "tools\android-sdk\platform-tools\adb.exe"
-$apk = Join-Path $mappedRoot "build\android\GamePJ-test.apk"
+$presetPath = Join-Path $projectRoot "export_presets.cfg"
+$versionMatch = Select-String -Path $presetPath -Pattern '^version/name="([^"]+)"$' | Select-Object -First 1
+if (-not $versionMatch) {
+    throw "Android version/name was not found in export_presets.cfg."
+}
+$versionName = $versionMatch.Matches[0].Groups[1].Value
+$apk = Join-Path $mappedRoot "build\android\GamePJ-$versionName.apk"
 
 if (-not (Test-Path $adb)) {
     throw "adb was not found: $adb"
@@ -46,4 +52,4 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 & $adb shell monkey -p com.huayu.gamepj -c android.intent.category.LAUNCHER 1 | Out-Null
-Write-Host "GamePJ test APK was installed and launched."
+Write-Host "GamePJ $versionName APK was installed and launched."

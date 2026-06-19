@@ -16,6 +16,14 @@ powershell -ExecutionPolicy Bypass -File tools/android/start_emulator.ps1 -WipeD
 
 ## 安装测试 APK
 
+先按 `version/name` 自动导出带版本号的 APK：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/android/export_versioned_apk.ps1
+```
+
+输出文件格式为 `build/android/GamePJ-<版本号>.apk`。随后安装：
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools/android/install_test_apk.ps1
 ```

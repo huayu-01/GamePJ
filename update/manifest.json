@@ -3,7 +3,7 @@
   "latest_app_version": "0.2.1-test",
   "minimum_app_version": "0.2.1-test",
   "protocol_version": 2,
-  "apk_url": "https://media.githubusercontent.com/media/huayu-01/GamePJ/main/build/android/GamePJ-test.apk",
+  "apk_url": "https://media.githubusercontent.com/media/huayu-01/GamePJ/main/build/android/GamePJ-0.2.1-test.apk",
   "config": {
     "announcement": "",
     "maintenance": false

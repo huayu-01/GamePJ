@@ -2,7 +2,7 @@
 
 Godot 4.6 C# Texas Hold'em prototype.
 
-Android 测试包：`build/android/GamePJ-test.apk`（Git LFS，版本 `0.2.1-test`）。
+Android 测试包：`build/android/GamePJ-0.2.1-test.apk`（Git LFS）。
 
 ## 文档
 
