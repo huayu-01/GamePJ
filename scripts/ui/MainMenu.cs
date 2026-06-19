@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 public partial class MainMenu : Control
@@ -17,6 +18,11 @@ public partial class MainMenu : Control
     private Label? _discoveryStatusLabel;
     private Label? _updateStatusLabel;
     private Button? _downloadUpdateButton;
+    private Panel? _addressKeypadPanel;
+    private LineEdit? _keypadTarget;
+    private Label? _keypadTargetLabel;
+    private Button? _keypadDotButton;
+    private Button? _keypadColonButton;
     private string _availableApkUrl = "";
     private readonly Dictionary<string, Button> _discoveredRoomButtons = new();
 
@@ -160,10 +166,11 @@ public partial class MainMenu : Control
         _joinOverlay.AddChild(joinCenter);
 
         _joinPanel = FlatUi.Panel("JoinPanel");
-        _joinPanel.CustomMinimumSize = new Vector2(500, 760);
+        _joinPanel.CustomMinimumSize = new Vector2(500, 800);
         joinCenter.AddChild(_joinPanel);
 
         BuildJoinPanel();
+        BuildAddressKeypad();
     }
 
     private Button AddMenuButton(VBoxContainer parent, string text, System.Action action, Color? color = null)
@@ -240,18 +247,26 @@ public partial class MainMenu : Control
 
         _joinAddressInput = new LineEdit
         {
+            Name = "JoinAddressInput",
             PlaceholderText = "IP 或 IP:端口，例如 192.168.1.100:7000",
             Text = "127.0.0.1",
-            CustomMinimumSize = new Vector2(280, 44)
+            CustomMinimumSize = new Vector2(280, 44),
+            MaxLength = 64,
+            VirtualKeyboardEnabled = false
         };
+        _joinAddressInput.FocusEntered += () => ShowAddressKeypad(_joinAddressInput, "地址");
         box.AddChild(_joinAddressInput);
 
         _joinPortInput = new LineEdit
         {
+            Name = "JoinPortInput",
             PlaceholderText = "端口",
             Text = Constants.DefaultPort.ToString(),
-            CustomMinimumSize = new Vector2(280, 44)
+            CustomMinimumSize = new Vector2(280, 44),
+            MaxLength = 5,
+            VirtualKeyboardEnabled = false
         };
+        _joinPortInput.FocusEntered += () => ShowAddressKeypad(_joinPortInput, "端口");
         box.AddChild(_joinPortInput);
 
         _joinStatusLabel = FlatUi.MutedLabel("");
@@ -290,6 +305,174 @@ public partial class MainMenu : Control
         box.AddChild(footer);
     }
 
+    private void BuildAddressKeypad()
+    {
+        if (_joinOverlay == null)
+        {
+            return;
+        }
+
+        _addressKeypadPanel = FlatUi.Panel("AddressKeypad");
+        _addressKeypadPanel.AnchorLeft = 0.5f;
+        _addressKeypadPanel.AnchorTop = 1f;
+        _addressKeypadPanel.AnchorRight = 0.5f;
+        _addressKeypadPanel.AnchorBottom = 1f;
+        _addressKeypadPanel.OffsetLeft = -246;
+        _addressKeypadPanel.OffsetTop = -326;
+        _addressKeypadPanel.OffsetRight = 246;
+        _addressKeypadPanel.OffsetBottom = -20;
+        _addressKeypadPanel.Visible = false;
+        _addressKeypadPanel.ZIndex = 50;
+        _joinOverlay.AddChild(_addressKeypadPanel);
+
+        var box = new VBoxContainer();
+        box.SetAnchorsPreset(LayoutPreset.FullRect);
+        box.OffsetLeft = 12;
+        box.OffsetTop = 10;
+        box.OffsetRight = -12;
+        box.OffsetBottom = -10;
+        box.AddThemeConstantOverride("separation", 8);
+        _addressKeypadPanel.AddChild(box);
+
+        var header = new HBoxContainer();
+        _keypadTargetLabel = FlatUi.Label("输入地址", 18);
+        header.AddChild(_keypadTargetLabel);
+        var spacer = new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        header.AddChild(spacer);
+        var close = FlatUi.Button("关闭");
+        close.CustomMinimumSize = new Vector2(72, 34);
+        close.Pressed += HideAddressKeypad;
+        header.AddChild(close);
+        box.AddChild(header);
+
+        var grid = new GridContainer { Columns = 4 };
+        grid.AddThemeConstantOverride("h_separation", 8);
+        grid.AddThemeConstantOverride("v_separation", 8);
+        grid.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        box.AddChild(grid);
+
+        AddKeypadButton(grid, "1", () => AppendKeypadText("1"));
+        AddKeypadButton(grid, "2", () => AppendKeypadText("2"));
+        AddKeypadButton(grid, "3", () => AppendKeypadText("3"));
+        AddKeypadButton(grid, "←", BackspaceKeypad);
+        AddKeypadButton(grid, "4", () => AppendKeypadText("4"));
+        AddKeypadButton(grid, "5", () => AppendKeypadText("5"));
+        AddKeypadButton(grid, "6", () => AppendKeypadText("6"));
+        _keypadDotButton = AddKeypadButton(grid, ".", () => AppendKeypadText("."));
+        AddKeypadButton(grid, "7", () => AppendKeypadText("7"));
+        AddKeypadButton(grid, "8", () => AppendKeypadText("8"));
+        AddKeypadButton(grid, "9", () => AppendKeypadText("9"));
+        _keypadColonButton = AddKeypadButton(grid, ":", () => AppendKeypadText(":"));
+        AddKeypadButton(grid, "清空", ClearKeypadTarget, FlatUi.SurfaceAlt);
+        AddKeypadButton(grid, "0", () => AppendKeypadText("0"));
+        AddKeypadButton(grid, "收起", HideAddressKeypad, FlatUi.SurfaceAlt);
+        AddKeypadButton(grid, "连接", () =>
+        {
+            HideAddressKeypad();
+            ConnectToAddress();
+        }, FlatUi.AccentMuted);
+    }
+
+    private static Button AddKeypadButton(GridContainer grid, string text, System.Action action, Color? color = null)
+    {
+        var button = FlatUi.Button(text, color);
+        button.CustomMinimumSize = new Vector2(104, 54);
+        button.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        button.AddThemeFontSizeOverride("font_size", 20);
+        button.Pressed += action;
+        grid.AddChild(button);
+        return button;
+    }
+
+    private void ShowAddressKeypad(LineEdit target, string targetName)
+    {
+        _keypadTarget = target;
+        if (_keypadTargetLabel != null)
+        {
+            _keypadTargetLabel.Text = $"输入{targetName}";
+        }
+        var addressTarget = ReferenceEquals(target, _joinAddressInput);
+        if (_keypadDotButton != null)
+        {
+            _keypadDotButton.Disabled = !addressTarget;
+        }
+        if (_keypadColonButton != null)
+        {
+            _keypadColonButton.Disabled = !addressTarget;
+        }
+        if (_addressKeypadPanel != null)
+        {
+            _addressKeypadPanel.Visible = true;
+            _addressKeypadPanel.MoveToFront();
+        }
+    }
+
+    private void HideAddressKeypad()
+    {
+        if (_addressKeypadPanel != null)
+        {
+            _addressKeypadPanel.Visible = false;
+        }
+        _keypadTarget?.ReleaseFocus();
+    }
+
+    private void AppendKeypadText(string value)
+    {
+        var target = _keypadTarget ?? _joinAddressInput;
+        if (target == null)
+        {
+            return;
+        }
+
+        if (ReferenceEquals(target, _joinPortInput) && !char.IsAsciiDigit(value[0]))
+        {
+            return;
+        }
+
+        if (ReferenceEquals(target, _joinAddressInput))
+        {
+            if (value == "." && (target.Text.Count(character => character == '.') >= 3 || target.Text.Contains(':')))
+            {
+                return;
+            }
+            if (value == ":" && target.Text.Contains(':'))
+            {
+                return;
+            }
+        }
+
+        var caret = Mathf.Clamp(target.CaretColumn, 0, target.Text.Length);
+        target.Text = target.Text.Insert(caret, value);
+        target.CaretColumn = caret + value.Length;
+    }
+
+    private void BackspaceKeypad()
+    {
+        var target = _keypadTarget ?? _joinAddressInput;
+        if (target == null || target.Text.Length == 0)
+        {
+            return;
+        }
+
+        var caret = Mathf.Clamp(target.CaretColumn, 0, target.Text.Length);
+        if (caret <= 0)
+        {
+            return;
+        }
+        target.Text = target.Text.Remove(caret - 1, 1);
+        target.CaretColumn = caret - 1;
+    }
+
+    private void ClearKeypadTarget()
+    {
+        var target = _keypadTarget ?? _joinAddressInput;
+        if (target != null)
+        {
+            target.Text = "";
+            target.CaretColumn = 0;
+        }
+    }
+
     private void OnCreateRoomPressed()
     {
         NetworkManager.Instance?.CreateRoom(Constants.DefaultPort, GetSelectedSeatCount());
@@ -315,6 +498,7 @@ public partial class MainMenu : Control
     private void HideJoinPanel()
     {
         NetworkManager.Instance?.StopLanRoomScan();
+        HideAddressKeypad();
         if (_joinOverlay != null)
         {
             _joinOverlay.Visible = false;

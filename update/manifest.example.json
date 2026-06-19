@@ -1,7 +1,7 @@
 {
   "manifest_version": 1,
-  "latest_app_version": "0.2.0-test",
-  "minimum_app_version": "0.2.0-test",
+  "latest_app_version": "0.2.1-test",
+  "minimum_app_version": "0.2.1-test",
   "protocol_version": 2,
   "apk_url": "https://example.com/GamePJ-test.apk",
   "config": {
