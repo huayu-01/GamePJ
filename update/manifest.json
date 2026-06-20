@@ -1,9 +1,21 @@
 {
   "manifest_version": 1,
-  "latest_app_version": "0.2.4-test",
+  "latest_app_version": "0.2.5-test",
   "minimum_app_version": "0.2.1-test",
   "protocol_version": 2,
-  "apk_url": "https://media.githubusercontent.com/media/huayu-01/GamePJ/main/build/android/GamePJ-0.2.4-test.apk",
+  "apk_url": "",
+  "artifacts": {
+    "Android": {
+      "url": "https://media.githubusercontent.com/media/huayu-01/GamePJ/main/build/android/GamePJ-0.2.5-test.apk",
+      "sha256": "47aee6819f4f9d3eea0b96d88c2a72a9a861592932a82114d4e8c09360ba2ba2",
+      "size": 104176553
+    },
+    "Windows": {
+      "url": "https://media.githubusercontent.com/media/huayu-01/GamePJ/main/build/windows/GamePJ-0.2.5-test.zip",
+      "sha256": "a9963682deae27593e4cef185be6358da3134051ba55dda31dba328f6a637d1f",
+      "size": 35122273
+    }
+  },
   "config": {
     "announcement": "",
     "maintenance": false

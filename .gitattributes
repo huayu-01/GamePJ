@@ -2,3 +2,4 @@
 * text=auto eol=lf
 
 build/android/*.apk filter=lfs diff=lfs merge=lfs -text
+build/windows/*.zip filter=lfs diff=lfs merge=lfs -text

@@ -14,7 +14,7 @@ public partial class UpdateManager : Node
     public static UpdateManager? Instance { get; private set; }
 
     [Signal] public delegate void StatusChangedEventHandler(string status, bool danger);
-    [Signal] public delegate void AppUpdateAvailableEventHandler(string version, string apkUrl, bool required);
+    [Signal] public delegate void AppUpdateAvailableEventHandler(string version, string packageUrl, bool required);
 
     private const string UpdateRoot = "user://updates";
     private const string PackRoot = "user://updates/packs";
@@ -100,9 +100,9 @@ public partial class UpdateManager : Node
         EmitSignal(SignalName.StatusChanged, status, danger);
     }
 
-    public void PublishAppUpdate(string version, string apkUrl, bool required)
+    public void PublishAppUpdate(string version, string packageUrl, bool required)
     {
-        EmitSignal(SignalName.AppUpdateAvailable, version, apkUrl, required);
+        EmitSignal(SignalName.AppUpdateAvailable, version, packageUrl, required);
     }
 
     private async Task CheckForUpdatesAsync(string manifestUrl, CancellationTokenSource owner)
@@ -122,9 +122,10 @@ public partial class UpdateManager : Node
             var required = UpdatePolicy.CompareVersions(Constants.AppVersion, manifest.MinimumAppVersion) < 0 ||
                            manifest.ProtocolVersion != Constants.NetworkProtocolVersion;
             var available = UpdatePolicy.CompareVersions(Constants.AppVersion, manifest.LatestAppVersion) < 0;
+            var packageUrl = UpdatePolicy.ResolveArtifactUrl(manifest, OS.GetName());
             if (available || required)
             {
-                CallDeferred(nameof(PublishAppUpdate), manifest.LatestAppVersion, manifest.ApkUrl, required);
+                CallDeferred(nameof(PublishAppUpdate), manifest.LatestAppVersion, packageUrl, required);
             }
 
             var changedPacks = 0;
@@ -143,7 +144,9 @@ public partial class UpdateManager : Node
             }
             else if (available)
             {
-                QueueStatus($"发现客户端新版本 {manifest.LatestAppVersion}", false);
+                QueueStatus(string.IsNullOrWhiteSpace(packageUrl)
+                    ? $"发现新版本 {manifest.LatestAppVersion}，当前平台安装包暂未发布"
+                    : $"发现客户端新版本 {manifest.LatestAppVersion}", false);
             }
             else if (changedPacks > 0)
             {

@@ -170,6 +170,29 @@ public partial class TestGameManagerFlow : Node
             "UpdateSha256Validation",
             ref pass,
             ref fail);
+        var platformManifest = new UpdateManifest
+        {
+            ApkUrl = "https://example.com/legacy.apk",
+            Artifacts = new Dictionary<string, AppArtifactManifest>
+            {
+                ["Android"] = new() { Url = "https://example.com/current.apk" },
+                ["Windows"] = new() { Url = "https://example.com/current.zip" }
+            }
+        };
+        Check(
+            UpdatePolicy.ResolveArtifactUrl(platformManifest, "Android") == "https://example.com/current.apk" &&
+            UpdatePolicy.ResolveArtifactUrl(platformManifest, "Windows") == "https://example.com/current.zip" &&
+            UpdatePolicy.ResolveArtifactUrl(platformManifest, "iOS") == "",
+            "UpdateArtifactMatchesPlatform",
+            ref pass,
+            ref fail);
+        var legacyManifest = new UpdateManifest { ApkUrl = "https://example.com/legacy.apk" };
+        Check(
+            UpdatePolicy.ResolveArtifactUrl(legacyManifest, "Android") == "https://example.com/legacy.apk" &&
+            UpdatePolicy.ResolveArtifactUrl(legacyManifest, "Windows") == "",
+            "LegacyApkIsAndroidOnly",
+            ref pass,
+            ref fail);
 
         var publicCards = new Godot.Collections.Array<Godot.Collections.Dictionary>
         {

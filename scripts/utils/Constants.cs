@@ -1,6 +1,6 @@
 ﻿public static class Constants
 {
-    public const string AppVersion = "0.2.4-test";
+    public const string AppVersion = "0.2.5-test";
     public const int NetworkProtocolVersion = 2;
     public const int DefaultPort = 7000;
     public const int MaxPlayers = 12;

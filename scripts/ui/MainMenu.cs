@@ -30,7 +30,7 @@ public partial class MainMenu : Control
     private Label? _keypadTargetLabel;
     private Button? _keypadDotButton;
     private Button? _keypadColonButton;
-    private string _availableApkUrl = "";
+    private string _availablePackageUrl = "";
     private readonly Dictionary<string, Button> _discoveredRoomButtons = new();
     private Vector2 _lastResponsiveViewport = new(-1, -1);
 
@@ -62,7 +62,10 @@ public partial class MainMenu : Control
             {
                 var required = UpdatePolicy.CompareVersions(Constants.AppVersion, manifest.MinimumAppVersion) < 0 ||
                                manifest.ProtocolVersion != Constants.NetworkProtocolVersion;
-                OnAppUpdateAvailable(manifest.LatestAppVersion, manifest.ApkUrl, required);
+                OnAppUpdateAvailable(
+                    manifest.LatestAppVersion,
+                    UpdatePolicy.ResolveArtifactUrl(manifest, OS.GetName()),
+                    required);
             }
         }
     }
@@ -856,21 +859,21 @@ public partial class MainMenu : Control
         _updateStatusLabel.AddThemeColorOverride("font_color", danger ? FlatUi.Danger : FlatUi.MutedText);
     }
 
-    private void OnAppUpdateAvailable(string version, string apkUrl, bool required)
+    private void OnAppUpdateAvailable(string version, string packageUrl, bool required)
     {
-        _availableApkUrl = apkUrl;
+        _availablePackageUrl = packageUrl;
         if (_downloadUpdateButton != null)
         {
             _downloadUpdateButton.Text = required ? $"必须更新至 {version}" : $"下载 {version}";
-            _downloadUpdateButton.Visible = !string.IsNullOrWhiteSpace(apkUrl);
+            _downloadUpdateButton.Visible = !string.IsNullOrWhiteSpace(packageUrl);
         }
     }
 
     private void OpenAvailableUpdate()
     {
-        if (!string.IsNullOrWhiteSpace(_availableApkUrl))
+        if (!string.IsNullOrWhiteSpace(_availablePackageUrl))
         {
-            OS.ShellOpen(_availableApkUrl);
+            OS.ShellOpen(_availablePackageUrl);
         }
     }
 

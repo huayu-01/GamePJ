@@ -22,11 +22,26 @@ public sealed class UpdateManifest
     [JsonPropertyName("apk_url")]
     public string ApkUrl { get; set; } = "";
 
+    [JsonPropertyName("artifacts")]
+    public Dictionary<string, AppArtifactManifest> Artifacts { get; set; } = new();
+
     [JsonPropertyName("config")]
     public Dictionary<string, JsonElement> Config { get; set; } = new();
 
     [JsonPropertyName("packs")]
     public List<ResourcePackManifest> Packs { get; set; } = new();
+}
+
+public sealed class AppArtifactManifest
+{
+    [JsonPropertyName("url")]
+    public string Url { get; set; } = "";
+
+    [JsonPropertyName("sha256")]
+    public string Sha256 { get; set; } = "";
+
+    [JsonPropertyName("size")]
+    public long Size { get; set; }
 }
 
 public sealed class ResourcePackManifest
@@ -52,6 +67,21 @@ public sealed class ResourcePackManifest
 
 public static class UpdatePolicy
 {
+    public static string ResolveArtifactUrl(UpdateManifest manifest, string platform)
+    {
+        var artifact = (manifest.Artifacts ?? new Dictionary<string, AppArtifactManifest>()).FirstOrDefault(pair =>
+            string.Equals(pair.Key, platform, StringComparison.OrdinalIgnoreCase)).Value;
+        if (artifact != null && !string.IsNullOrWhiteSpace(artifact.Url))
+        {
+            return artifact.Url.Trim();
+        }
+
+        // 兼容旧清单，但旧 APK 地址绝不能泄漏给桌面端或其他平台。
+        return string.Equals(platform, "Android", StringComparison.OrdinalIgnoreCase)
+            ? manifest.ApkUrl?.Trim() ?? ""
+            : "";
+    }
+
     public static int CompareVersions(string left, string right)
     {
         var leftParts = ParseVersion(left);

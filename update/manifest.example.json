@@ -1,9 +1,21 @@
 {
   "manifest_version": 1,
-  "latest_app_version": "0.2.4-test",
+  "latest_app_version": "0.2.5-test",
   "minimum_app_version": "0.2.1-test",
   "protocol_version": 2,
-  "apk_url": "https://example.com/GamePJ-0.2.4-test.apk",
+  "apk_url": "",
+  "artifacts": {
+    "Android": {
+      "url": "https://example.com/GamePJ-0.2.5-test.apk",
+      "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "size": 0
+    },
+    "Windows": {
+      "url": "https://example.com/GamePJ-0.2.5-test.zip",
+      "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "size": 0
+    }
+  },
   "config": {
     "announcement": "",
     "maintenance": false
