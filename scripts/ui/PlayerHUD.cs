@@ -182,7 +182,7 @@ public partial class PlayerHUD : Control
         }
         MouseFilter = MouseFilterEnum.Stop;
         _lastPlayerId = player.Id;
-        _nameLabel!.Text = player.Name;
+        _nameLabel!.Text = _isLocal ? "" : player.Name;
         _chipsLabel!.Text = $"筹码: {player.Chips}";
         _accountLabel!.Text = "";
         _betLabel!.Text = player.CurrentBet > 0 ? $"下注: {player.CurrentBet}" : "";
@@ -517,9 +517,20 @@ public partial class PlayerHUD : Control
         var cardsX = (width - cardsWidth) / 2f;
 
         PositionLabel(_blindLabel, 0, 0, width, blindHeight);
-        PositionLabel(_nameLabel, 0, blindHeight, width, lineHeight);
-        PositionLabel(_chipsLabel, 0, blindHeight + lineHeight * 0.95f, width, lineHeight);
-        PositionLabel(_accountLabel, 0, blindHeight + lineHeight * 1.85f, width, accountHeight);
+        if (_isLocal)
+        {
+            // 本地玩家不重复显示名称；下注占用原顶部操作提示区域。
+            PositionLabel(_nameLabel, 0, 0, width, 0);
+            PositionLabel(_chipsLabel, 0, 0, width, 0);
+            PositionLabel(_betLabel, 0, blindHeight + lineHeight * 0.95f, width, lineHeight);
+            PositionLabel(_accountLabel, 0, blindHeight + lineHeight * 1.85f, width, accountHeight);
+        }
+        else
+        {
+            PositionLabel(_nameLabel, 0, blindHeight, width, lineHeight);
+            PositionLabel(_chipsLabel, 0, blindHeight + lineHeight * 0.95f, width, lineHeight);
+            PositionLabel(_accountLabel, 0, blindHeight + lineHeight * 1.85f, width, accountHeight);
+        }
 
         _cardsLayer.Position = new Vector2(cardsX, cardsY);
         _cardsLayer.Size = new Vector2(cardsWidth, _cardSize.Y);
@@ -556,7 +567,14 @@ public partial class PlayerHUD : Control
         }
 
         var textY = bottomY + revealHeight;
-        PositionLabel(_betLabel, 0, textY, width, lineHeight);
+        if (_isLocal)
+        {
+            PositionLabel(_chipsLabel, 0, textY, width, lineHeight);
+        }
+        else
+        {
+            PositionLabel(_betLabel, 0, textY, width, lineHeight);
+        }
         PositionLabel(_handLabel, 0, textY + lineHeight * 0.86f, width, lineHeight);
         PositionLabel(_statusLabel, 0, textY + lineHeight * 1.72f, width, lineHeight);
 

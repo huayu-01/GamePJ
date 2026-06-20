@@ -2,9 +2,6 @@ using Godot;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,24 +23,26 @@ public partial class NetworkManager : Node
     [Signal] public delegate void JoinFailedEventHandler(string reason);
     [Signal] public delegate void GameStartedEventHandler();
     [Signal] public delegate void GameStateReceivedEventHandler(Godot.Collections.Dictionary state);
-    [Signal] public delegate void LanRoomDiscoveredEventHandler(string address, int port, string roomCode, int playerCount, int maxPlayers);
-    [Signal] public delegate void LanDiscoveryFinishedEventHandler();
+    [Signal] public delegate void ChatMessageReceivedEventHandler(int playerId, string message);
+    [Signal] public delegate void RoomDiscoveredEventHandler(string address, int port, string roomCode, int playerCount, int maxPlayers);
+    [Signal] public delegate void RoomDiscoveryFinishedEventHandler(string message);
 
     [Export] public bool IsHost { get; set; }
     [Export] public new bool IsConnected { get; set; }
     [Export] public string RoomCode { get; set; } = "";
     [Export] public int LocalPlayerId { get; set; } = 1;
     [Export] public int RoomMaxPlayers { get; set; } = 9;
+    [Export] public NetworkSessionMode SessionMode { get; set; } = NetworkSessionMode.EntertainmentP2P;
+    [Export] public int SessionPort { get; set; } = Constants.DefaultPort;
 
     public Dictionary<int, PlayerInfo> Players { get; } = new();
     private bool hostSignalsConnected;
     private bool clientSignalsConnected;
-    private readonly ConcurrentQueue<LanRoomInfo> _discoveredRooms = new();
-    private CancellationTokenSource? _discoveryHostCancellation;
-    private CancellationTokenSource? _discoveryScanCancellation;
+    private readonly ConcurrentQueue<DiscoveredRoomInfo> _discoveredRooms = new();
+    private IRoomDirectoryProvider _roomDirectoryProvider = new UnconfiguredRoomDirectoryProvider();
+    private CancellationTokenSource? _roomDiscoveryCancellation;
     private int _discoveryFinishedPending;
-    private int _advertisedGamePort = Constants.DefaultPort;
-    private int _advertisedPlayerCount;
+    private string _discoveryFinishedMessage = "";
 
     public override void _Ready()
     {
@@ -56,7 +55,7 @@ public partial class NetworkManager : Node
         while (_discoveredRooms.TryDequeue(out var room))
         {
             EmitSignal(
-                SignalName.LanRoomDiscovered,
+                SignalName.RoomDiscovered,
                 room.Address,
                 room.Port,
                 room.RoomCode,
@@ -66,14 +65,13 @@ public partial class NetworkManager : Node
 
         if (Interlocked.Exchange(ref _discoveryFinishedPending, 0) == 1)
         {
-            EmitSignal(SignalName.LanDiscoveryFinished);
+            EmitSignal(SignalName.RoomDiscoveryFinished, _discoveryFinishedMessage);
         }
     }
 
     public override void _ExitTree()
     {
-        StopLanDiscoveryHost();
-        StopLanRoomScan();
+        StopRoomDiscovery();
         DisconnectSignals();
         if (Instance == this)
         {
@@ -83,9 +81,15 @@ public partial class NetworkManager : Node
 
     public void CreateRoom(int port = Constants.DefaultPort, int maxPlayers = 9)
     {
-        StopLanDiscoveryHost();
-        StopLanRoomScan();
+        CreateEntertainmentRoom(port, maxPlayers);
+    }
+
+    public void CreateEntertainmentRoom(int port = Constants.DefaultPort, int maxPlayers = 9)
+    {
+        StopRoomDiscovery();
         DisconnectSignals();
+        SessionMode = NetworkSessionMode.EntertainmentP2P;
+        SessionPort = port;
         RoomMaxPlayers = Mathf.Clamp(maxPlayers, 2, Constants.MaxPlayers);
         var peer = new ENetMultiplayerPeer();
         var error = peer.CreateServer(port, RoomMaxPlayers);
@@ -110,20 +114,17 @@ public partial class NetworkManager : Node
         RoomCode = GenerateRoomCode();
         Players.Clear();
         Players[1] = new PlayerInfo { Id = 1, Name = PlayerData.Instance?.PlayerName ?? "Host", SeatIndex = 0 };
-        _advertisedGamePort = port;
-        _advertisedPlayerCount = Players.Count;
-        StartLanDiscoveryHost();
-
         EmitSignal(SignalName.RoomCreated, RoomCode);
         EmitSignal(SignalName.PlayerConnected, 1, Players[1].Name);
-        Logger.Info($"Room created: {RoomCode}, {GetLocalIP()}:{port}");
+        Logger.Info($"Room created: {RoomCode}, port {port}");
     }
 
     public void JoinRoom(string address, int port = Constants.DefaultPort)
     {
-        StopLanRoomScan();
-        StopLanDiscoveryHost();
+        StopRoomDiscovery();
         DisconnectSignals();
+        SessionMode = NetworkSessionMode.EntertainmentP2P;
+        SessionPort = port;
         var peer = new ENetMultiplayerPeer();
         var error = peer.CreateClient(address, port);
         if (error != Error.Ok)
@@ -141,30 +142,9 @@ public partial class NetworkManager : Node
         IsConnected = false;
     }
 
-    public string GetLocalIP()
+    public string GetEntertainmentInvitePayload()
     {
-        var fallback = "127.0.0.1";
-        var candidates = new List<string>();
-        foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces())
-        {
-            if (networkInterface.OperationalStatus != OperationalStatus.Up ||
-                networkInterface.NetworkInterfaceType == NetworkInterfaceType.Loopback)
-            {
-                continue;
-            }
-
-            foreach (var address in networkInterface.GetIPProperties().UnicastAddresses)
-            {
-                if (address.Address.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    candidates.Add(address.Address.ToString());
-                }
-            }
-        }
-
-        return candidates.FirstOrDefault(ip => ip.StartsWith("192.168.") || ip.StartsWith("10.")) ??
-               candidates.FirstOrDefault() ??
-               fallback;
+        return P2PSession.CreateInvitePayload(RoomCode, SessionPort, RoomMaxPlayers);
     }
 
     public string GenerateRoomCode()
@@ -174,42 +154,26 @@ public partial class NetworkManager : Node
         return rng.RandiRange(100000, 999999).ToString();
     }
 
-    public string GetRoomPayload(int port = Constants.DefaultPort)
+    public void ConfigureRoomDirectoryProvider(IRoomDirectoryProvider provider)
     {
-        var payload = new Godot.Collections.Dictionary
-        {
-            ["v"] = Constants.NetworkProtocolVersion,
-            ["app_version"] = Constants.AppVersion,
-            ["ip"] = GetLocalIP(),
-            ["port"] = port,
-            ["room"] = RoomCode,
-            ["max_players"] = RoomMaxPlayers,
-            ["small_blind"] = GameManager.Instance?.SmallBlindAmount ?? Constants.SmallBlind,
-            ["big_blind"] = GameManager.Instance?.BigBlindAmount ?? Constants.BigBlind,
-            ["min_buy_in"] = GameManager.Instance?.MinBuyIn ?? Constants.MinBuyIn,
-            ["max_buy_in"] = GameManager.Instance?.MaxBuyIn ?? Constants.MaxBuyIn,
-            ["table_chip_limit"] = GameManager.Instance?.TableChipLimit ?? Constants.TableChipLimit,
-            ["thinking_time_seconds"] = GameManager.Instance?.ThinkingTimeSeconds ?? Constants.ThinkingTimeSeconds
-        };
-
-        return Json.Stringify(payload);
+        _roomDirectoryProvider = provider ?? new UnconfiguredRoomDirectoryProvider();
     }
 
-    public void DiscoverLanRooms()
+    public void DiscoverRooms()
     {
-        StopLanRoomScan();
+        StopRoomDiscovery();
         while (_discoveredRooms.TryDequeue(out _))
         {
         }
 
         Interlocked.Exchange(ref _discoveryFinishedPending, 0);
-        _discoveryScanCancellation = new CancellationTokenSource();
-        _ = DiscoverLanRoomsAsync(_discoveryScanCancellation.Token);
+        _roomDiscoveryCancellation = new CancellationTokenSource();
+        _ = DiscoverRoomsAsync(_roomDiscoveryCancellation.Token);
     }
 
-    public void StopLanRoomScan()
+    public void StopRoomDiscovery()
     {
-        var cancellation = Interlocked.Exchange(ref _discoveryScanCancellation, null);
+        var cancellation = Interlocked.Exchange(ref _roomDiscoveryCancellation, null);
         if (cancellation == null)
         {
             return;
@@ -248,6 +212,39 @@ public partial class NetworkManager : Node
         }
 
         Rpc(MethodName.SyncPlayerAction, playerId, (int)action, amount);
+    }
+
+    public void SendChatMessage(int playerId, string message)
+    {
+        var normalized = NormalizeChatMessage(message);
+        if (playerId <= 0 || string.IsNullOrEmpty(normalized))
+        {
+            return;
+        }
+
+        if (Multiplayer.MultiplayerPeer == null || !IsConnected)
+        {
+            EmitSignal(SignalName.ChatMessageReceived, playerId, normalized);
+            return;
+        }
+
+        if (IsHost)
+        {
+            BroadcastChatMessage(playerId, normalized);
+            return;
+        }
+
+        RpcId(1, MethodName.SubmitChatMessage, playerId, normalized);
+    }
+
+    public void BroadcastHistoryEntry(string message)
+    {
+        if (!IsHost || !IsConnected || string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        Rpc(MethodName.SyncHistoryEntry, message);
     }
 
     public void RequestHoleCardReveal(int playerId, int cardIndex)
@@ -346,14 +343,15 @@ public partial class NetworkManager : Node
 
     public void LeaveRoom()
     {
-        StopLanDiscoveryHost();
-        StopLanRoomScan();
+        StopRoomDiscovery();
         DisconnectSignals();
         Multiplayer.MultiplayerPeer?.Close();
         Multiplayer.MultiplayerPeer = null;
         IsHost = false;
         IsConnected = false;
         RoomCode = "";
+        SessionMode = NetworkSessionMode.EntertainmentP2P;
+        SessionPort = Constants.DefaultPort;
         Players.Clear();
         LocalPlayerId = 1;
         if (PlayerData.Instance != null)
@@ -378,6 +376,28 @@ public partial class NetworkManager : Node
         }
 
         GameManager.Instance?.ProcessRemoteAction(playerId, action, amount);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SubmitChatMessage(int playerId, string message)
+    {
+        if (!IsHost)
+        {
+            return;
+        }
+
+        var senderId = (int)Multiplayer.GetRemoteSenderId();
+        if (senderId > 1 && senderId != playerId)
+        {
+            Logger.Warn($"Rejected chat for P{playerId} from peer {senderId}.");
+            return;
+        }
+
+        var normalized = NormalizeChatMessage(message);
+        if (!string.IsNullOrEmpty(normalized))
+        {
+            BroadcastChatMessage(playerId, normalized);
+        }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -437,6 +457,18 @@ public partial class NetworkManager : Node
     public void SyncPlayerAction(int playerId, int action, int amount)
     {
         Logger.Info($"Action synced: P{playerId} {(PlayerAction)action} {amount}");
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SyncChatMessage(int playerId, string message)
+    {
+        EmitSignal(SignalName.ChatMessageReceived, playerId, message);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SyncHistoryEntry(string message)
+    {
+        GameManager.Instance?.ApplyNetworkHistoryEntry(message);
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -505,7 +537,6 @@ public partial class NetworkManager : Node
         }
 
         info.Name = string.IsNullOrWhiteSpace(playerName) ? $"玩家{playerId}" : playerName.Trim();
-        _advertisedPlayerCount = Players.Count;
         GameManager.Instance?.SyncPlayersFromNetwork();
         EmitSignal(SignalName.PlayerConnected, playerId, info.Name);
         BroadcastLobbyPlayers();
@@ -520,8 +551,8 @@ public partial class NetworkManager : Node
     private void OnPeerDisconnected(long id)
     {
         var playerId = (int)id;
+        GameManager.Instance?.HandlePlayerDisconnected(playerId);
         Players.Remove(playerId);
-        _advertisedPlayerCount = Players.Count;
         GameManager.Instance?.SyncPlayersFromNetwork();
         EmitSignal(SignalName.PlayerDisconnected, playerId);
         BroadcastLobbyPlayers();
@@ -573,6 +604,18 @@ public partial class NetworkManager : Node
         return Mathf.Clamp(Players.Count, 0, RoomMaxPlayers - 1);
     }
 
+    private void BroadcastChatMessage(int playerId, string message)
+    {
+        EmitSignal(SignalName.ChatMessageReceived, playerId, message);
+        Rpc(MethodName.SyncChatMessage, playerId, message);
+    }
+
+    private static string NormalizeChatMessage(string message)
+    {
+        var normalized = (message ?? "").Replace('\r', ' ').Replace('\n', ' ').Trim();
+        return normalized.Length <= 80 ? normalized : normalized[..80];
+    }
+
     private void BroadcastLobbyPlayers()
     {
         if (!IsHost || !IsConnected)
@@ -609,107 +652,34 @@ public partial class NetworkManager : Node
         }
     }
 
-    private void StartLanDiscoveryHost()
+    private async Task DiscoverRoomsAsync(CancellationToken cancellationToken)
     {
-        _discoveryHostCancellation = new CancellationTokenSource();
-        _ = RunLanDiscoveryHostAsync(_discoveryHostCancellation.Token);
-    }
+        try
+        {
+            var rooms = await _roomDirectoryProvider.SearchAsync(cancellationToken);
+            foreach (var room in rooms)
+            {
+                if (room.ProtocolVersion != Constants.NetworkProtocolVersion)
+                {
+                    Logger.Info($"Ignored incompatible room {room.RoomCode}: protocol {room.ProtocolVersion}.");
+                    continue;
+                }
 
-    private void StopLanDiscoveryHost()
-    {
-        var cancellation = Interlocked.Exchange(ref _discoveryHostCancellation, null);
-        if (cancellation == null)
+                _discoveredRooms.Enqueue(room);
+            }
+
+            _discoveryFinishedMessage = _roomDirectoryProvider.IsConfigured
+                ? "搜索完成"
+                : _roomDirectoryProvider.UnavailableReason;
+        }
+        catch (OperationCanceledException)
         {
             return;
         }
-
-        cancellation.Cancel();
-        cancellation.Dispose();
-    }
-
-    private async Task RunLanDiscoveryHostAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            using var udp = new UdpClient(AddressFamily.InterNetwork);
-            udp.ExclusiveAddressUse = false;
-            udp.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            udp.Client.Bind(new IPEndPoint(IPAddress.Any, LanDiscoveryProtocol.DiscoveryPort));
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                var request = await udp.ReceiveAsync(cancellationToken);
-                if (!LanDiscoveryProtocol.IsQuery(request.Buffer))
-                {
-                    continue;
-                }
-
-                var response = LanDiscoveryProtocol.CreateResponse(
-                    _advertisedGamePort,
-                    RoomCode,
-                    _advertisedPlayerCount,
-                    RoomMaxPlayers);
-                await udp.SendAsync(response, response.Length, request.RemoteEndPoint);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-        }
         catch (Exception exception)
         {
-            Logger.Warn($"LAN discovery host stopped: {exception.Message}");
-        }
-    }
-
-    private async Task DiscoverLanRoomsAsync(CancellationToken cancellationToken)
-    {
-        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        timeout.CancelAfter(TimeSpan.FromSeconds(3));
-        try
-        {
-            using var udp = new UdpClient(AddressFamily.InterNetwork) { EnableBroadcast = true };
-            udp.Client.Bind(new IPEndPoint(IPAddress.Any, 0));
-            var query = LanDiscoveryProtocol.CreateQuery();
-            foreach (var endpoint in GetDiscoveryEndpoints())
-            {
-                try
-                {
-                    await udp.SendAsync(query, query.Length, endpoint);
-                }
-                catch (SocketException)
-                {
-                    // 某些虚拟网卡不允许广播，继续尝试其他可用网卡。
-                }
-            }
-
-            var seen = new HashSet<string>();
-            while (!timeout.IsCancellationRequested)
-            {
-                var response = await udp.ReceiveAsync(timeout.Token);
-                var address = response.RemoteEndPoint.Address.ToString();
-                if (!LanDiscoveryProtocol.TryParseResponse(response.Buffer, address, out var room))
-                {
-                    continue;
-                }
-
-                if (room.ProtocolVersion != Constants.NetworkProtocolVersion)
-                {
-                    Logger.Info($"Ignored incompatible LAN room {room.RoomCode}: protocol {room.ProtocolVersion}.");
-                    continue;
-                }
-
-                var key = $"{room.Address}:{room.Port}";
-                if (seen.Add(key))
-                {
-                    _discoveredRooms.Enqueue(room);
-                }
-            }
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        catch (Exception exception)
-        {
-            Logger.Warn($"LAN discovery scan stopped: {exception.Message}");
+            _discoveryFinishedMessage = $"房间目录连接失败：{exception.Message}";
+            Logger.Warn(_discoveryFinishedMessage);
         }
         finally
         {
@@ -718,68 +688,6 @@ public partial class NetworkManager : Node
                 Interlocked.Exchange(ref _discoveryFinishedPending, 1);
             }
         }
-    }
-
-    private static IEnumerable<IPEndPoint> GetDiscoveryEndpoints()
-    {
-        var addresses = new HashSet<string>
-        {
-            IPAddress.Broadcast.ToString(),
-            IPAddress.Loopback.ToString(),
-            // Android Emulator 访问宿主机的固定别名。
-            "10.0.2.2"
-        };
-        try
-        {
-            foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces())
-            {
-                if (networkInterface.OperationalStatus != OperationalStatus.Up)
-                {
-                    continue;
-                }
-
-                foreach (var unicast in networkInterface.GetIPProperties().UnicastAddresses)
-                {
-                    if (unicast.Address.AddressFamily != AddressFamily.InterNetwork || unicast.IPv4Mask == null)
-                    {
-                        continue;
-                    }
-
-                    var ip = unicast.Address.GetAddressBytes();
-                    var mask = unicast.IPv4Mask.GetAddressBytes();
-                    var broadcast = new byte[4];
-                    for (var index = 0; index < broadcast.Length; index++)
-                    {
-                        broadcast[index] = (byte)(ip[index] | ~mask[index]);
-                    }
-                    addresses.Add(new IPAddress(broadcast).ToString());
-
-                    // 部分 Android 设备和无线路由器会过滤广播包，补充常见 /24
-                    // 局域网的单播探测。实际掩码广播仍由上面的地址负责。
-                    if (IsPrivateAddress(unicast.Address))
-                    {
-                        for (var host = 1; host < 255; host++)
-                        {
-                            addresses.Add($"{ip[0]}.{ip[1]}.{ip[2]}.{host}");
-                        }
-                    }
-                }
-            }
-        }
-        catch (NetworkInformationException)
-        {
-        }
-
-        return addresses.Select(address => new IPEndPoint(IPAddress.Parse(address), LanDiscoveryProtocol.DiscoveryPort));
-    }
-
-    private static bool IsPrivateAddress(IPAddress address)
-    {
-        var bytes = address.GetAddressBytes();
-        return bytes.Length == 4 &&
-               (bytes[0] == 10 ||
-                (bytes[0] == 172 && bytes[1] is >= 16 and <= 31) ||
-                (bytes[0] == 192 && bytes[1] == 168));
     }
 
     private void OnConnectionFailed()

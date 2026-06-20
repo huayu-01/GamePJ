@@ -10,9 +10,10 @@ public partial class TestAll : Node
         var flow = TestGameManagerFlow.Run();
         var totalPass = hand.Pass + betting.Pass + pot.Pass + flow.Pass;
         var totalFail = hand.Fail + betting.Fail + pot.Fail + flow.Fail;
+        var total = totalPass + totalFail;
 
         GD.Print("\n========== ALL TESTS ==========");
-        GD.Print($"PASS: {totalPass}/67, FAIL: {totalFail}/67");
+        GD.Print($"PASS: {totalPass}/{total}, FAIL: {totalFail}/{total}");
         GD.Print(totalFail == 0 ? "ALL LOGIC TESTS PASSED!" : "LOGIC TESTS FAILED");
         GetTree().Quit(totalFail == 0 ? 0 : 1);
     }

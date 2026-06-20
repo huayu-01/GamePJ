@@ -83,6 +83,19 @@ public class BettingRound
         return true;
     }
 
+    public bool ForceFold(int playerId)
+    {
+        if (!PlayerBets.ContainsKey(playerId) || FoldedPlayers.Contains(playerId))
+        {
+            return false;
+        }
+
+        FoldedPlayers.Add(playerId);
+        PlayersToAct.Remove(playerId);
+        CurrentPlayerIndex = PlayersToAct.Count > 0 ? 0 : -1;
+        return true;
+    }
+
     public bool IsValidAction(int playerId, PlayerAction action, int amount)
     {
         EnsurePlayer(playerId);

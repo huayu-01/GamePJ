@@ -7,7 +7,7 @@ public partial class TestBettingRound : Node
     {
         var (pass, fail) = Run();
         GD.Print("\n========== BETTING TEST RESULT ==========");
-        GD.Print($"PASS: {pass}/13, FAIL: {fail}/13");
+        GD.Print($"PASS: {pass}/14, FAIL: {fail}/14");
     }
 
     public static (int Pass, int Fail) Run()
@@ -106,6 +106,20 @@ public partial class TestBettingRound : Node
             !round12.IsValidAction(1, PlayerAction.Raise, 300) &&
             round12.IsValidAction(1, PlayerAction.Raise, 310),
             "CumulativeShortAllInsReopenRaiseAtFullIncrement",
+            ref pass,
+            ref fail);
+
+        var round13 = new BettingRound { CurrentBet = 20, MinRaise = 20 };
+        round13.PlayersToAct = new List<int> { 1, 2, 3 };
+        round13.SeatOrder = new List<int> { 1, 2, 3 };
+        round13.PlayerBets = new Dictionary<int, int> { [1] = 20, [2] = 0, [3] = 20 };
+        round13.PlayerChips = new Dictionary<int, int> { [1] = 100, [2] = 100, [3] = 100 };
+        Check(
+            round13.ForceFold(2) &&
+            round13.FoldedPlayers.Contains(2) &&
+            !round13.PlayersToAct.Contains(2) &&
+            round13.GetCurrentPlayerId() == 1,
+            "DisconnectedPlayerForceFoldsWithoutBlockingTurn",
             ref pass,
             ref fail);
 

@@ -1,31 +1,17 @@
-# 项目本地 Android Emulator
+# Android APK 构建
 
-Android SDK、Emulator、API 35/36 系统镜像和虚拟设备数据安装在本项目目录中，但因体积较大被 `.gitignore` 排除，不会提交到 Git。
+项目不再内置 Android Emulator、系统镜像或虚拟设备数据。此目录仅保留 APK 导出工具。
 
-## 启动
-
-```powershell
-powershell -ExecutionPolicy Bypass -File tools/android/start_emulator.ps1
-```
-
-如需清除模拟器数据并冷启动：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File tools/android/start_emulator.ps1 -WipeData
-```
-
-## 安装测试 APK
-
-先按 `version/name` 自动导出带版本号的 APK：
+导出带版本号的 APK：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools/android/export_versioned_apk.ps1
 ```
 
-输出文件格式为 `build/android/GamePJ-<版本号>.apk`。随后安装：
+输出文件格式：
 
-```powershell
-powershell -ExecutionPolicy Bypass -File tools/android/install_test_apk.ps1
+```text
+build/android/GamePJ-<版本号>.apk
 ```
 
-脚本会使用 `R:` 作为临时英文路径映射，以规避 Android Emulator 对中文路径支持不完整的问题。项目文件仍实际保存在原目录中。
+使用实体 Android 设备测试时，可在手机中直接打开 APK 安装，或使用保留的 `tools/android-sdk/platform-tools/adb.exe` 手动安装。

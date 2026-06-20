@@ -112,7 +112,10 @@ public partial class GameManager : Node
 
         TableSeatCount = Mathf.Clamp(NetworkManager.Instance.RoomMaxPlayers, 2, Constants.MaxPlayers);
         var networkIds = NetworkManager.Instance.Players.Keys.ToHashSet();
-        Players.RemoveAll(player => !AiPlayerIds.Contains(player.Id) && !networkIds.Contains(player.Id));
+        Players.RemoveAll(player =>
+            !AiPlayerIds.Contains(player.Id) &&
+            !networkIds.Contains(player.Id) &&
+            !_currentHandPlayerIds.Contains(player.Id));
 
         foreach (var info in NetworkManager.Instance.Players.Values.OrderBy(player => player.SeatIndex))
         {
@@ -199,6 +202,46 @@ public partial class GameManager : Node
         _settlementPending = false;
         _handResolved = false;
         EmitSignal(SignalName.StateChanged, (int)CurrentState);
+    }
+
+    public void HandlePlayerDisconnected(int playerId)
+    {
+        var player = Players.FirstOrDefault(item => item.Id == playerId);
+        if (player == null)
+        {
+            return;
+        }
+
+        player.WantsSitOutNextHand = true;
+        if (!_currentHandPlayerIds.Contains(playerId) || CurrentBettingRound == null || _handResolved)
+        {
+            return;
+        }
+
+        if (!CurrentBettingRound.ForceFold(playerId))
+        {
+            return;
+        }
+
+        _turnTimerToken++;
+        player.IsFolded = true;
+        AppendHistory($"{player.Name} 离线，自动弃牌");
+        EmitSignal(SignalName.PlayerFolded, playerId);
+        EmitSignal(SignalName.PlayerActed, playerId, "离线弃牌");
+        NetworkManager.Instance?.BroadcastAction(playerId, PlayerAction.Fold, 0);
+
+        if (CurrentBettingRound.IsRoundComplete())
+        {
+            EndBettingRound();
+        }
+        else
+        {
+            NotifyCurrentPlayer();
+        }
+
+        BroadcastState();
+        QueueSitOutTurnProcessing();
+        QueueAiTurnProcessing();
     }
 
     public void StartGame()
@@ -590,10 +633,10 @@ public partial class GameManager : Node
             winningsDict[pair.Key] = pair.Value;
         }
 
+        AppendSettlementHistory();
         BroadcastState();
         NetworkManager.Instance?.BroadcastHandResult(activePlayers, winnerIds, winningsDict, LastPotAwards, true);
         MarkSettlementPendingIfNeeded();
-        AppendSettlementHistory();
         EmitSignal(SignalName.GameEnded, winnerIds, winningsDict);
         AudioManager.Instance?.PlaySFX(AudioManager.Instance.WinSound);
         CompleteSettlementAfterOptionalAnimation();
@@ -607,12 +650,24 @@ public partial class GameManager : Node
         AutoRebuyAiPlayers();
         DealerPosition = GetNextActiveSeatIndex(DealerPosition);
         _currentHandPlayerIds.Clear();
+        RemoveDepartedNetworkPlayers();
         ReleaseNextHandWaiters();
         CurrentBettingRound = null;
         CurrentState = GetNextHandEligiblePlayers().Count <= 1 ? GameState.GameOver : GameState.Lobby;
         EmitSignal(SignalName.StateChanged, (int)CurrentState);
         BroadcastState();
         ScheduleAutoContinue();
+    }
+
+    private void RemoveDepartedNetworkPlayers()
+    {
+        if (NetworkManager.Instance?.IsConnected != true)
+        {
+            return;
+        }
+
+        var connectedIds = NetworkManager.Instance.Players.Keys.ToHashSet();
+        Players.RemoveAll(player => !AiPlayerIds.Contains(player.Id) && !connectedIds.Contains(player.Id));
     }
 
     public void CompleteSettlementAnimation()
@@ -999,6 +1054,23 @@ public partial class GameManager : Node
     }
 
     private void AppendHistory(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        _handHistory.Add(message);
+        if (_handHistory.Count > 500)
+        {
+            _handHistory.RemoveRange(0, _handHistory.Count - 500);
+        }
+
+        EmitSignal(SignalName.HandHistoryUpdated);
+        NetworkManager.Instance?.BroadcastHistoryEntry(message);
+    }
+
+    public void ApplyNetworkHistoryEntry(string message)
     {
         if (string.IsNullOrWhiteSpace(message))
         {

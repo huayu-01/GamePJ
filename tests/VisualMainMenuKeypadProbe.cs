@@ -21,7 +21,7 @@ public partial class VisualMainMenuKeypadProbe : MainMenu
         var keypad = (Panel)FindChild("AddressKeypad", true, false);
         var keypadButtons = keypad.FindChildren("*", "Button", true, false).OfType<Button>().ToList();
         keypadButtons.First(button => button.Text == "清空").EmitSignal(Button.SignalName.Pressed);
-        foreach (var character in "192.168.1.20:7000")
+        foreach (var character in "203.0.113.20:7000")
         {
             keypadButtons.First(button => button.Text == character.ToString()).EmitSignal(Button.SignalName.Pressed);
         }
@@ -42,7 +42,7 @@ public partial class VisualMainMenuKeypadProbe : MainMenu
 
         await ToSignal(GetTree().CreateTimer(0.25), SceneTreeTimer.SignalName.Timeout);
         GD.Print($"KEYPAD_PROBE address={address.Text} port={port.Text} visible={keypad.Visible}");
-        if (address.Text != "192.168.1.20:7000" || port.Text != "8080" ||
+        if (address.Text != "203.0.113.20:7000" || port.Text != "8080" ||
             !dotDisabled || !colonDisabled || !keypad.Visible)
         {
             GetTree().Quit(1);

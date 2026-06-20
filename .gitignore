@@ -6,3 +6,5 @@ build/
 /tools/android-avd/
 test_outputs/
 *.old
+.tmp_*/
+NuGet/

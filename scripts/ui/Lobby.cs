@@ -4,16 +4,15 @@ public partial class Lobby : Control
 {
     private VBoxContainer? _playersList;
     private Label? _roomLabel;
-    private Label? _networkHintLabel;
     private SpinBox? _smallBlindSpin;
     private SpinBox? _minBuyInSpin;
     private SpinBox? _maxBuyInSpin;
     private SpinBox? _chipLimitSpin;
     private SpinBox? _thinkingTimeSpin;
-    private Button? _copyButton;
     private Button? _startButton;
-    private CenterContainer? _center;
     private Panel? _frame;
+    private MarginContainer? _safeArea;
+    private Label? _modeLabel;
     private Vector2 _lastResponsiveViewport = new(-1, -1);
 
     public override void _Ready()
@@ -54,30 +53,20 @@ public partial class Lobby : Control
         background.SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(background);
 
-        var center = new CenterContainer { Name = "LobbyCenter" };
-        _center = center;
-        center.SetAnchorsPreset(LayoutPreset.FullRect);
-        center.OffsetLeft = 28;
-        center.OffsetTop = 28;
-        center.OffsetRight = -28;
-        center.OffsetBottom = -28;
-        AddChild(center);
-
         var frame = FlatUi.Panel("LobbyFrame");
         _frame = frame;
-        frame.CustomMinimumSize = new Vector2(620, 860);
-        frame.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-        frame.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-        center.AddChild(frame);
+        frame.SetAnchorsPreset(LayoutPreset.FullRect);
+        AddChild(frame);
+
+        _safeArea = new MarginContainer { Name = "LobbySafeArea" };
+        _safeArea.SetAnchorsPreset(LayoutPreset.FullRect);
+        frame.AddChild(_safeArea);
 
         var scroll = new ScrollContainer();
-        scroll.SetAnchorsPreset(LayoutPreset.FullRect);
-        scroll.OffsetLeft = 18;
-        scroll.OffsetTop = 16;
-        scroll.OffsetRight = -18;
-        scroll.OffsetBottom = -16;
+        scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
         scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
-        frame.AddChild(scroll);
+        _safeArea.AddChild(scroll);
 
         var left = new VBoxContainer { Name = "LobbyContent" };
         left.SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -106,15 +95,12 @@ public partial class Lobby : Control
         _roomLabel.AddThemeColorOverride("font_color", FlatUi.Text);
         _roomLabel.AddThemeFontSizeOverride("font_size", 32);
         left.AddChild(_roomLabel);
-        _networkHintLabel = FlatUi.MutedLabel("");
-        _networkHintLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        _networkHintLabel.AddThemeColorOverride("font_color", new Color(1.0f, 0.74f, 0.32f));
-        left.AddChild(_networkHintLabel);
-        left.AddChild(FlatUi.MutedLabel("同一局域网玩家可粘贴邀请信息加入；跨网络需要 Host 开放 UDP 端口。"));
-
-        _copyButton = FlatUi.Button("复制邀请信息");
-        _copyButton.Pressed += () => DisplayServer.ClipboardSet(NetworkManager.Instance?.GetRoomPayload() ?? "");
-        left.AddChild(_copyButton);
+        _modeLabel = FlatUi.Label("娱乐模式 P2P", 20);
+        _modeLabel.AddThemeColorOverride("font_color", FlatUi.Accent);
+        left.AddChild(_modeLabel);
+        var connectionHint = FlatUi.MutedLabel("房主设备负责牌局运算。其他玩家输入房主可达地址与监听端口加入；房主退出时牌局结束。");
+        connectionHint.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        left.AddChild(connectionHint);
 
         left.AddChild(BuildSectionLabel("房间设置"));
         left.AddChild(BuildSpinRow("低注/小盲", out _smallBlindSpin, 1, 10000, GameManager.Instance?.SmallBlindAmount ?? Constants.SmallBlind, 1));
@@ -157,14 +143,12 @@ public partial class Lobby : Control
 
         var safe = ResponsiveUi.GetSafeMargins(this);
         var margin = ResponsiveUi.MarginFor(viewport);
-        if (_center != null)
+        if (_safeArea != null)
         {
-            ResponsiveUi.ApplySafeCenter(_center, this, margin);
-        }
-
-        if (_frame != null)
-        {
-            _frame.CustomMinimumSize = ResponsiveUi.FitPanel(viewport, safe, 660f, 920f, margin);
+            _safeArea.AddThemeConstantOverride("margin_left", Mathf.RoundToInt(safe.Left + margin));
+            _safeArea.AddThemeConstantOverride("margin_top", Mathf.RoundToInt(safe.Top + margin));
+            _safeArea.AddThemeConstantOverride("margin_right", Mathf.RoundToInt(safe.Right + margin));
+            _safeArea.AddThemeConstantOverride("margin_bottom", Mathf.RoundToInt(safe.Bottom + margin));
         }
 
         _roomLabel?.AddThemeFontSizeOverride("font_size", Mathf.RoundToInt(Mathf.Clamp(viewport.X * 0.036f, 24f, 34f)));
@@ -183,24 +167,17 @@ public partial class Lobby : Control
         var network = NetworkManager.Instance;
         var manager = GameManager.Instance;
         _roomLabel!.Text = network?.IsHost == true
-            ? $"房间号: {network.RoomCode}  ·  {network.GetLocalIP()}:{Constants.DefaultPort}  ·  {network.RoomMaxPlayers}人局"
+            ? $"房间号 {network.RoomCode}  ·  {network.RoomMaxPlayers} 人桌"
             : "等待 Host 开始游戏...";
 
-        if (_networkHintLabel != null)
+        if (_modeLabel != null)
         {
-            var isEmulatorHost = network?.IsHost == true && OS.GetName() == "Android" && network.GetLocalIP().StartsWith("10.0.2.");
-            _networkHintLabel.Visible = isEmulatorHost;
-            _networkHintLabel.Text = isEmulatorHost
-                ? "模拟器为私有 NAT 地址：手机无法反向直连，请改用实体设备或由电脑创建房间。"
-                : "";
+            _modeLabel.Text = network == null
+                ? "娱乐模式 P2P"
+                : $"{P2PSession.DisplayName(network.SessionMode)}  ·  端口 {network.SessionPort}";
         }
 
         var isHost = network?.IsHost == true;
-        if (_copyButton != null)
-        {
-            _copyButton.Visible = isHost;
-        }
-
         if (_startButton != null)
         {
             _startButton.Visible = isHost;
@@ -304,6 +281,7 @@ public partial class Lobby : Control
             MaxValue = max,
             Value = value,
             Step = step,
+            UpdateOnTextChanged = true,
             CustomMinimumSize = new Vector2(120, 36)
         };
         row.AddChild(spin);

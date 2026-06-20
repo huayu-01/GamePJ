@@ -13,14 +13,18 @@ public partial class ChatPanel : Panel
     public override void _Ready()
     {
         BuildUi();
+        if (NetworkManager.Instance != null)
+        {
+            NetworkManager.Instance.ChatMessageReceived += ReceiveChatMessage;
+        }
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void SendChatMessage(int playerId, string message)
+    public override void _ExitTree()
     {
-        var playerName = GameManager.Instance?.Players.Find(player => player.Id == playerId)?.Name ?? $"玩家{playerId}";
-        AppendMessage($"[{playerName}]: {message}");
-        EmitSignal(SignalName.ChatMessageSent, playerId, message);
+        if (NetworkManager.Instance != null)
+        {
+            NetworkManager.Instance.ChatMessageReceived -= ReceiveChatMessage;
+        }
     }
 
     private void BuildUi()
@@ -114,13 +118,20 @@ public partial class ChatPanel : Panel
     private void Send(string message)
     {
         var playerId = PlayerData.Instance?.LocalPlayerId ?? 1;
-        if (Multiplayer.MultiplayerPeer == null)
+        if (NetworkManager.Instance != null)
         {
-            SendChatMessage(playerId, message);
+            NetworkManager.Instance.SendChatMessage(playerId, message);
             return;
         }
 
-        Rpc(MethodName.SendChatMessage, playerId, message);
+        ReceiveChatMessage(playerId, message);
+    }
+
+    private void ReceiveChatMessage(int playerId, string message)
+    {
+        var playerName = GameManager.Instance?.Players.Find(player => player.Id == playerId)?.Name ?? $"玩家{playerId}";
+        AppendMessage($"[{playerName}]: {message}");
+        EmitSignal(SignalName.ChatMessageSent, playerId, message);
     }
 
     private void AppendMessage(string message)

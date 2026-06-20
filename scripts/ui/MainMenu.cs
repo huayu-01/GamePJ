@@ -12,16 +12,20 @@ public partial class MainMenu : Control
     private TextEdit? _joinInviteInput;
     private Label? _joinStatusLabel;
     private ColorRect? _joinOverlay;
+    private ColorRect? _createOverlay;
     private Panel? _joinPanel;
+    private Panel? _createPanel;
     private OptionButton? _seatCountOption;
+    private OptionButton? _networkModeOption;
     private VBoxContainer? _discoveredRoomsList;
     private Label? _discoveryStatusLabel;
     private Label? _updateStatusLabel;
     private Button? _downloadUpdateButton;
     private Panel? _addressKeypadPanel;
-    private CenterContainer? _mainCenter;
+    private MarginContainer? _mainSafeArea;
+    private MarginContainer? _createSafeArea;
+    private MarginContainer? _joinSafeArea;
     private Panel? _menuPanel;
-    private CenterContainer? _joinCenter;
     private LineEdit? _keypadTarget;
     private Label? _keypadTargetLabel;
     private Button? _keypadDotButton;
@@ -33,12 +37,17 @@ public partial class MainMenu : Control
     public override void _Ready()
     {
         BuildUi();
+        if (P2PDebugProbe.TryStart(this))
+        {
+            return;
+        }
+
         if (NetworkManager.Instance != null)
         {
             NetworkManager.Instance.JoinSucceeded += OnJoinSucceeded;
             NetworkManager.Instance.JoinFailed += OnJoinFailed;
-            NetworkManager.Instance.LanRoomDiscovered += OnLanRoomDiscovered;
-            NetworkManager.Instance.LanDiscoveryFinished += OnLanDiscoveryFinished;
+            NetworkManager.Instance.RoomDiscovered += OnRoomDiscovered;
+            NetworkManager.Instance.RoomDiscoveryFinished += OnRoomDiscoveryFinished;
         }
         if (UpdateManager.Instance != null)
         {
@@ -72,9 +81,9 @@ public partial class MainMenu : Control
         {
             NetworkManager.Instance.JoinSucceeded -= OnJoinSucceeded;
             NetworkManager.Instance.JoinFailed -= OnJoinFailed;
-            NetworkManager.Instance.LanRoomDiscovered -= OnLanRoomDiscovered;
-            NetworkManager.Instance.LanDiscoveryFinished -= OnLanDiscoveryFinished;
-            NetworkManager.Instance.StopLanRoomScan();
+            NetworkManager.Instance.RoomDiscovered -= OnRoomDiscovered;
+            NetworkManager.Instance.RoomDiscoveryFinished -= OnRoomDiscoveryFinished;
+            NetworkManager.Instance.StopRoomDiscovery();
         }
         if (UpdateManager.Instance != null)
         {
@@ -91,54 +100,46 @@ public partial class MainMenu : Control
         background.SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(background);
 
-        var center = new CenterContainer { Name = "MainCenter" };
-        _mainCenter = center;
-        center.SetAnchorsPreset(LayoutPreset.FullRect);
-        center.OffsetLeft = 48;
-        center.OffsetTop = 48;
-        center.OffsetRight = -48;
-        center.OffsetBottom = -48;
-        AddChild(center);
-
-        var root = new VBoxContainer { Name = "MainLayout" };
-        root.Alignment = BoxContainer.AlignmentMode.Center;
-        root.CustomMinimumSize = new Vector2(440, 0);
-        root.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-        root.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-        root.AddThemeConstantOverride("separation", 18);
-        center.AddChild(root);
-
         var menuPanel = FlatUi.Panel("MenuPanel");
         _menuPanel = menuPanel;
-        menuPanel.CustomMinimumSize = new Vector2(440, 520);
-        root.AddChild(menuPanel);
+        menuPanel.SetAnchorsPreset(LayoutPreset.FullRect);
+        AddChild(menuPanel);
+
+        _mainSafeArea = new MarginContainer { Name = "MainSafeArea" };
+        _mainSafeArea.SetAnchorsPreset(LayoutPreset.FullRect);
+        menuPanel.AddChild(_mainSafeArea);
 
         var menu = new VBoxContainer { Name = "Menu" };
-        menu.SetAnchorsPreset(LayoutPreset.FullRect);
-        menu.OffsetLeft = 28;
-        menu.OffsetTop = 28;
-        menu.OffsetRight = -28;
-        menu.OffsetBottom = -28;
-        menu.AddThemeConstantOverride("separation", 14);
-        menuPanel.AddChild(menu);
+        menu.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        menu.SizeFlagsVertical = SizeFlags.ExpandFill;
+        menu.AddThemeConstantOverride("separation", 18);
+        _mainSafeArea.AddChild(menu);
 
-        var title = FlatUi.Label("Texas Hold'em", 48, HorizontalAlignment.Center);
+        var cardMark = new TextureRect
+        {
+            Texture = GD.Load<Texture2D>("res://assets/textures/cards/cardBack_blue2.png"),
+            CustomMinimumSize = new Vector2(116, 160),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        menu.AddChild(cardMark);
+
+        var title = FlatUi.Label("抽抽抽", 56, HorizontalAlignment.Center);
         menu.AddChild(title);
+        var subtitle = FlatUi.Label("Texas Hold'em", 24, HorizontalAlignment.Center);
+        subtitle.AddThemeColorOverride("font_color", FlatUi.MutedText);
+        menu.AddChild(subtitle);
         var isAndroid = OS.GetName() == "Android";
-        menu.AddChild(FlatUi.MutedLabel(isAndroid
-            ? "创建房间，或自动发现并加入同一网络内的牌局。"
-            : "创建房间、加入局域网对局，或直接用 AI 进行本地测试。"));
+        var summary = FlatUi.MutedLabel(isAndroid
+            ? "娱乐模式 P2P · 创建或加入好友牌局"
+            : "娱乐模式 P2P · 创建、加入或使用 AI 测试牌局");
+        summary.HorizontalAlignment = HorizontalAlignment.Center;
+        menu.AddChild(summary);
 
-        var roomRow = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
-        roomRow.AddChild(FlatUi.MutedLabel("房间人数"));
-        _seatCountOption = new OptionButton { CustomMinimumSize = new Vector2(120, 40) };
-        _seatCountOption.AddItem("9人局", 9);
-        _seatCountOption.AddItem("12人局", 12);
-        _seatCountOption.Selected = 0;
-        roomRow.AddChild(_seatCountOption);
-        menu.AddChild(roomRow);
+        menu.AddChild(new Control { CustomMinimumSize = new Vector2(0, 24), SizeFlagsVertical = SizeFlags.ExpandFill });
 
-        AddMenuButton(menu, "创建房间", OnCreateRoomPressed, FlatUi.AccentMuted);
+        AddMenuButton(menu, "创建房间", ShowCreatePanel, FlatUi.AccentMuted);
         AddMenuButton(menu, "加入房间", ShowJoinPanel);
         AddMenuButton(menu, "设置", () => GetTree().ChangeSceneToFile(Constants.SettingsScene));
 
@@ -162,27 +163,40 @@ public partial class MainMenu : Control
         menu.AddChild(spacer);
         AddMenuButton(menu, "退出游戏", () => GetTree().Quit(), FlatUi.Danger);
 
+        _createOverlay = new ColorRect
+        {
+            Name = "CreateOverlay",
+            Color = FlatUi.Background,
+            Visible = false
+        };
+        _createOverlay.SetAnchorsPreset(LayoutPreset.FullRect);
+        _createOverlay.ZIndex = 20;
+        AddChild(_createOverlay);
+
+        _createPanel = FlatUi.Panel("CreatePanel");
+        _createPanel.SetAnchorsPreset(LayoutPreset.FullRect);
+        _createOverlay.AddChild(_createPanel);
+        _createSafeArea = new MarginContainer { Name = "CreateSafeArea" };
+        _createSafeArea.SetAnchorsPreset(LayoutPreset.FullRect);
+        _createPanel.AddChild(_createSafeArea);
+        BuildCreatePanel();
+
         _joinOverlay = new ColorRect
         {
             Name = "JoinOverlay",
-            Color = new Color(0, 0, 0, 0.52f),
+            Color = FlatUi.Background,
             Visible = false
         };
         _joinOverlay.SetAnchorsPreset(LayoutPreset.FullRect);
+        _joinOverlay.ZIndex = 20;
         AddChild(_joinOverlay);
 
-        var joinCenter = new CenterContainer();
-        _joinCenter = joinCenter;
-        joinCenter.SetAnchorsPreset(LayoutPreset.FullRect);
-        joinCenter.OffsetLeft = 24;
-        joinCenter.OffsetTop = 24;
-        joinCenter.OffsetRight = -24;
-        joinCenter.OffsetBottom = -24;
-        _joinOverlay.AddChild(joinCenter);
-
         _joinPanel = FlatUi.Panel("JoinPanel");
-        _joinPanel.CustomMinimumSize = new Vector2(500, 800);
-        joinCenter.AddChild(_joinPanel);
+        _joinPanel.SetAnchorsPreset(LayoutPreset.FullRect);
+        _joinOverlay.AddChild(_joinPanel);
+        _joinSafeArea = new MarginContainer { Name = "JoinSafeArea" };
+        _joinSafeArea.SetAnchorsPreset(LayoutPreset.FullRect);
+        _joinPanel.AddChild(_joinSafeArea);
 
         BuildJoinPanel();
         BuildAddressKeypad();
@@ -198,31 +212,14 @@ public partial class MainMenu : Control
         }
         _lastResponsiveViewport = viewport;
 
-        var safe = ResponsiveUi.GetSafeMargins(this);
         var margin = ResponsiveUi.MarginFor(viewport);
-        if (_mainCenter != null)
-        {
-            ResponsiveUi.ApplySafeCenter(_mainCenter, this, margin);
-        }
-
-        if (_menuPanel != null)
-        {
-            var preferredHeight = OS.GetName() == "Android" ? 620f : 710f;
-            _menuPanel.CustomMinimumSize = ResponsiveUi.FitPanel(viewport, safe, 440f, preferredHeight, margin);
-        }
-
-        if (_joinCenter != null)
-        {
-            ResponsiveUi.ApplySafeCenter(_joinCenter, this, margin);
-        }
-
-        if (_joinPanel != null)
-        {
-            _joinPanel.CustomMinimumSize = ResponsiveUi.FitPanel(viewport, safe, 520f, 860f, margin);
-        }
+        ApplySafeMargins(_mainSafeArea, margin);
+        ApplySafeMargins(_createSafeArea, margin);
+        ApplySafeMargins(_joinSafeArea, margin);
 
         if (_addressKeypadPanel != null)
         {
+            var safe = ResponsiveUi.GetSafeMargins(this);
             var keypadMargin = margin + Mathf.Max(safe.Left, safe.Right);
             var keypadWidth = Mathf.Min(520f, Mathf.Max(300f, viewport.X - keypadMargin * 2f));
             var keypadHeight = Mathf.Clamp(viewport.Y * 0.23f, 380f, 460f);
@@ -235,13 +232,90 @@ public partial class MainMenu : Control
         ResponsiveUi.EnsureTouchTargets(this);
     }
 
+    private void ApplySafeMargins(MarginContainer? container, float margin)
+    {
+        if (container == null)
+        {
+            return;
+        }
+
+        var safe = ResponsiveUi.GetSafeMargins(this);
+        container.AddThemeConstantOverride("margin_left", Mathf.RoundToInt(safe.Left + margin));
+        container.AddThemeConstantOverride("margin_top", Mathf.RoundToInt(safe.Top + margin));
+        container.AddThemeConstantOverride("margin_right", Mathf.RoundToInt(safe.Right + margin));
+        container.AddThemeConstantOverride("margin_bottom", Mathf.RoundToInt(safe.Bottom + margin));
+    }
+
     private Button AddMenuButton(VBoxContainer parent, string text, System.Action action, Color? color = null)
     {
         var button = FlatUi.Button(text, color);
-        button.CustomMinimumSize = new Vector2(280, 44);
+        button.CustomMinimumSize = new Vector2(0, 64);
+        button.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        button.AddThemeFontSizeOverride("font_size", 22);
         button.Pressed += action;
         parent.AddChild(button);
         return button;
+    }
+
+    private void BuildCreatePanel()
+    {
+        if (_createSafeArea == null)
+        {
+            return;
+        }
+
+        var box = new VBoxContainer
+        {
+            Name = "CreateContent",
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
+        };
+        box.AddThemeConstantOverride("separation", 22);
+        _createSafeArea.AddChild(box);
+
+        var header = new HBoxContainer();
+        var back = FlatUi.Button("返回");
+        back.CustomMinimumSize = new Vector2(96, 52);
+        back.Pressed += HideCreatePanel;
+        header.AddChild(back);
+        var title = FlatUi.Label("创建房间", 36, HorizontalAlignment.Center);
+        title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        header.AddChild(title);
+        var headerBalance = new Control { CustomMinimumSize = new Vector2(96, 0) };
+        header.AddChild(headerBalance);
+        box.AddChild(header);
+
+        box.AddChild(new Control { CustomMinimumSize = new Vector2(0, 28) });
+        box.AddChild(FlatUi.Label("连接模式", 22));
+        _networkModeOption = new OptionButton { CustomMinimumSize = new Vector2(0, 62) };
+        _networkModeOption.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _networkModeOption.AddItem("娱乐模式 P2P", (int)NetworkSessionMode.EntertainmentP2P);
+        _networkModeOption.AddItem("公网权威服务器（后续开放）", (int)NetworkSessionMode.DedicatedServer);
+        _networkModeOption.SetItemDisabled(1, true);
+        box.AddChild(_networkModeOption);
+
+        var modeNote = FlatUi.MutedLabel("由创建者设备主持牌局，其他玩家直接连接。适合好友娱乐；房主退出时牌局会结束。");
+        modeNote.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        box.AddChild(modeNote);
+
+        box.AddChild(FlatUi.Label("座位数量", 22));
+        _seatCountOption = new OptionButton { CustomMinimumSize = new Vector2(0, 62) };
+        _seatCountOption.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _seatCountOption.AddItem("9 人桌", 9);
+        _seatCountOption.AddItem("12 人桌", 12);
+        _seatCountOption.Selected = 0;
+        box.AddChild(_seatCountOption);
+
+        var ruleNote = FlatUi.MutedLabel("盲注、带入、后手上限和思考时间将在进入房间后由房主设置。");
+        ruleNote.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        box.AddChild(ruleNote);
+
+        box.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill });
+        var create = FlatUi.Button("创建娱乐房间", FlatUi.AccentMuted);
+        create.CustomMinimumSize = new Vector2(0, 72);
+        create.AddThemeFontSizeOverride("font_size", 24);
+        create.Pressed += OnCreateRoomPressed;
+        box.AddChild(create);
     }
 
     private void BuildJoinPanel()
@@ -252,13 +326,10 @@ public partial class MainMenu : Control
         }
 
         var scroll = new ScrollContainer();
-        scroll.SetAnchorsPreset(LayoutPreset.FullRect);
-        scroll.OffsetLeft = 24;
-        scroll.OffsetTop = 24;
-        scroll.OffsetRight = -24;
-        scroll.OffsetBottom = -24;
+        scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
         scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
-        _joinPanel.AddChild(scroll);
+        _joinSafeArea?.AddChild(scroll);
 
         var box = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         box.AddThemeConstantOverride("separation", 12);
@@ -274,17 +345,17 @@ public partial class MainMenu : Control
         header.AddChild(close);
         box.AddChild(header);
 
-        var hint = FlatUi.MutedLabel("可粘贴 Host 复制的邀请信息，也可直接输入 IP:端口。跨网络时填写公网 IP 和已开放端口。");
+        var hint = FlatUi.MutedLabel("娱乐模式 P2P：输入房主提供的可达地址。公网自动搜房将在协调服务接入后启用。");
         hint.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         box.AddChild(hint);
 
         var discoveryHeader = new HBoxContainer();
-        discoveryHeader.AddChild(FlatUi.Label("同一网络房间", 19));
+        discoveryHeader.AddChild(FlatUi.Label("自动搜索房间", 22));
         var discoverySpacer = new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         discoveryHeader.AddChild(discoverySpacer);
         var refreshDiscovery = FlatUi.Button("重新搜索");
         refreshDiscovery.CustomMinimumSize = new Vector2(96, 36);
-        refreshDiscovery.Pressed += StartLanDiscovery;
+        refreshDiscovery.Pressed += StartRoomDiscovery;
         discoveryHeader.AddChild(refreshDiscovery);
         box.AddChild(discoveryHeader);
 
@@ -292,7 +363,7 @@ public partial class MainMenu : Control
         box.AddChild(_discoveryStatusLabel);
 
         var discoveredPanel = FlatUi.Panel("DiscoveredRooms");
-        discoveredPanel.CustomMinimumSize = new Vector2(0, 154);
+        discoveredPanel.CustomMinimumSize = new Vector2(0, 240);
         box.AddChild(discoveredPanel);
         _discoveredRoomsList = new VBoxContainer();
         _discoveredRoomsList.SetAnchorsPreset(LayoutPreset.FullRect);
@@ -305,8 +376,8 @@ public partial class MainMenu : Control
 
         _joinInviteInput = new TextEdit
         {
-            PlaceholderText = "粘贴邀请信息，例如 {\"ip\":\"192.168.1.100\",\"port\":7000,...}",
-            CustomMinimumSize = new Vector2(0, 96),
+            PlaceholderText = "粘贴娱乐房间信息",
+            CustomMinimumSize = new Vector2(0, 112),
             WrapMode = TextEdit.LineWrappingMode.Boundary
         };
         box.AddChild(_joinInviteInput);
@@ -314,8 +385,8 @@ public partial class MainMenu : Control
         _joinAddressInput = new LineEdit
         {
             Name = "JoinAddressInput",
-            PlaceholderText = "IP 或 IP:端口，例如 192.168.1.100:7000",
-            Text = "127.0.0.1",
+            PlaceholderText = "房主地址或 IP:端口",
+            Text = "",
             CustomMinimumSize = new Vector2(280, 44),
             MaxLength = 64,
             VirtualKeyboardEnabled = false
@@ -366,7 +437,7 @@ public partial class MainMenu : Control
         };
         box.AddChild(clear);
 
-        var footer = FlatUi.MutedLabel("同 Wi-Fi 推荐使用局域网 IP；不同网络需要 Host 开放 UDP 端口，或后续接入中继/房间服务器。");
+        var footer = FlatUi.MutedLabel("本机多客户端测试使用 127.0.0.1；跨网络连接需要后续的公网信令与中继服务。");
         footer.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         box.AddChild(footer);
     }
@@ -541,12 +612,31 @@ public partial class MainMenu : Control
 
     private void OnCreateRoomPressed()
     {
-        NetworkManager.Instance?.CreateRoom(Constants.DefaultPort, GetSelectedSeatCount());
+        NetworkManager.Instance?.CreateEntertainmentRoom(Constants.DefaultPort, GetSelectedSeatCount());
         GetTree().ChangeSceneToFile(Constants.LobbyScene);
+    }
+
+    private void ShowCreatePanel()
+    {
+        HideAddressKeypad();
+        if (_createOverlay != null)
+        {
+            _createOverlay.Visible = true;
+            _createOverlay.MoveToFront();
+        }
+    }
+
+    private void HideCreatePanel()
+    {
+        if (_createOverlay != null)
+        {
+            _createOverlay.Visible = false;
+        }
     }
 
     private void ShowJoinPanel()
     {
+        HideCreatePanel();
         if (_joinOverlay != null)
         {
             _joinOverlay.Visible = true;
@@ -558,12 +648,12 @@ public partial class MainMenu : Control
             _joinStatusLabel.Text = "";
         }
 
-        StartLanDiscovery();
+        StartRoomDiscovery();
     }
 
     private void HideJoinPanel()
     {
-        NetworkManager.Instance?.StopLanRoomScan();
+        NetworkManager.Instance?.StopRoomDiscovery();
         HideAddressKeypad();
         if (_joinOverlay != null)
         {
@@ -638,7 +728,7 @@ public partial class MainMenu : Control
 
     private void OnJoinSucceeded()
     {
-        NetworkManager.Instance?.StopLanRoomScan();
+        NetworkManager.Instance?.StopRoomDiscovery();
         SetJoinStatus("连接成功，正在进入房间...", false);
         GetTree().ChangeSceneToFile(Constants.LobbyScene);
     }
@@ -646,7 +736,7 @@ public partial class MainMenu : Control
     private void OnJoinFailed(string reason)
     {
         SetJoinStatus(
-            $"连接失败：{reason}。请确认双方位于可互访的同一局域网，Host 的 UDP {Constants.DefaultPort} 未被防火墙拦截；模拟器创建的房间不能直接被手机访问。",
+            $"连接失败：{reason}。请确认公网服务器在线、地址和端口正确，并且客户端版本兼容。",
             true);
     }
 
@@ -661,15 +751,15 @@ public partial class MainMenu : Control
         _joinStatusLabel.AddThemeColorOverride("font_color", danger ? FlatUi.Danger : FlatUi.MutedText);
     }
 
-    private void StartLanDiscovery()
+    private void StartRoomDiscovery()
     {
         ClearDiscoveredRooms();
         if (_discoveryStatusLabel != null)
         {
-            _discoveryStatusLabel.Text = "正在自动搜索局域网房间...";
+            _discoveryStatusLabel.Text = "正在搜索公网房间...";
             _discoveryStatusLabel.AddThemeColorOverride("font_color", FlatUi.Accent);
         }
-        NetworkManager.Instance?.DiscoverLanRooms();
+        NetworkManager.Instance?.DiscoverRooms();
     }
 
     private void ClearDiscoveredRooms()
@@ -686,7 +776,7 @@ public partial class MainMenu : Control
         }
     }
 
-    private void OnLanRoomDiscovered(string address, int port, string roomCode, int playerCount, int maxPlayers)
+    private void OnRoomDiscovered(string address, int port, string roomCode, int playerCount, int maxPlayers)
     {
         if (_discoveredRoomsList == null)
         {
@@ -714,7 +804,7 @@ public partial class MainMenu : Control
         }
     }
 
-    private void OnLanDiscoveryFinished()
+    private void OnRoomDiscoveryFinished(string message)
     {
         if (_discoveryStatusLabel == null)
         {
@@ -723,7 +813,7 @@ public partial class MainMenu : Control
 
         _discoveryStatusLabel.Text = _discoveredRoomButtons.Count > 0
             ? $"已发现 {_discoveredRoomButtons.Count} 个房间"
-            : "未发现房间。请检查访客 Wi-Fi/AP 隔离；模拟器 Host 无法被手机直接发现。";
+            : message;
         _discoveryStatusLabel.AddThemeColorOverride("font_color", FlatUi.MutedText);
     }
 
@@ -750,10 +840,9 @@ public partial class MainMenu : Control
     {
         NetworkManager.Instance?.CreateRoom(Constants.DefaultPort, GetSelectedSeatCount());
         var room = NetworkManager.Instance?.RoomCode ?? "";
-        var ip = NetworkManager.Instance?.GetLocalIP() ?? "";
-        var ok = Regex.IsMatch(room, "^\\d{6}$") && !string.IsNullOrWhiteSpace(ip);
+        var ok = Regex.IsMatch(room, "^\\d{6}$");
         GD.Print(ok ? "Connection successful" : "Connection test failed");
-        GD.Print($"RoomCode={room}, LocalIP={ip}");
+        GD.Print($"RoomCode={room}");
     }
 
     private void OnUpdateStatusChanged(string status, bool danger)

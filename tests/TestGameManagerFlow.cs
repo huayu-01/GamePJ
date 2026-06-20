@@ -111,22 +111,42 @@ public partial class TestGameManagerFlow : Node
             ref pass,
             ref fail);
 
+        var synchronizedHistoryStart = manager.HandHistory.Count;
+        manager.ApplyNetworkHistoryEntry("同步记录测试");
         Check(
-            LanDiscoveryProtocol.IsQuery(LanDiscoveryProtocol.CreateQuery()),
-            "LanDiscoveryRecognizesQuery",
+            manager.HandHistory.Count == synchronizedHistoryStart + 1 &&
+            manager.HandHistory.Last() == "同步记录测试",
+            "NetworkHistoryEntryApplied",
             ref pass,
             ref fail);
-        var discoveryResponse = LanDiscoveryProtocol.CreateResponse(7000, "123456", 3, 9);
+
+        var network = NetworkManager.Instance;
+        var receivedChatPlayer = -1;
+        var receivedChatMessage = "";
+        void OnChatMessageReceived(int playerId, string message)
+        {
+            receivedChatPlayer = playerId;
+            receivedChatMessage = message;
+        }
+
+        if (network != null)
+        {
+            network.ChatMessageReceived += OnChatMessageReceived;
+            network.SendChatMessage(7, "  客户端聊天测试  ");
+            network.ChatMessageReceived -= OnChatMessageReceived;
+        }
         Check(
-            LanDiscoveryProtocol.TryParseResponse(discoveryResponse, "192.168.1.20", out var discoveredRoom) &&
-            discoveredRoom.Address == "192.168.1.20" &&
-            discoveredRoom.Port == 7000 &&
-            discoveredRoom.RoomCode == "123456" &&
-            discoveredRoom.PlayerCount == 3 &&
-            discoveredRoom.MaxPlayers == 9 &&
-            discoveredRoom.ProtocolVersion == Constants.NetworkProtocolVersion &&
-            discoveredRoom.AppVersion == Constants.AppVersion,
-            "LanDiscoveryParsesRoomResponse",
+            network != null && receivedChatPlayer == 7 && receivedChatMessage == "客户端聊天测试",
+            "OfflineChatUsesSharedNetworkChannel",
+            ref pass,
+            ref fail);
+
+        var roomDirectory = new UnconfiguredRoomDirectoryProvider();
+        Check(
+            !roomDirectory.IsConfigured &&
+            !string.IsNullOrWhiteSpace(roomDirectory.UnavailableReason) &&
+            roomDirectory.SearchAsync(default).GetAwaiter().GetResult().Count == 0,
+            "RoomDirectoryInterfaceAvailableWithoutLanScan",
             ref pass,
             ref fail);
 

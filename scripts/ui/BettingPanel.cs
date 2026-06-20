@@ -52,7 +52,8 @@ public partial class BettingPanel : Panel
         var largeHeight = Mathf.Clamp(stageWidth * 0.14f, 86f, 164f);
         var fontSize = Mathf.RoundToInt(Mathf.Clamp(stageWidth * 0.034f, 18f, 32f));
         var centerX = width / 2f;
-        var arcTop = Mathf.Clamp(height * 0.10f, 18f, 54f);
+        // 快捷加注按钮下移到本地玩家原名称区域，给下注文本留出独立空间。
+        var arcTop = Mathf.Clamp(height * 0.29f, 92f, 160f);
         var arcDrop = Mathf.Clamp(stageWidth * 0.040f, 20f, 44f);
         var buttonStep = (width - gap * 2f - smallWidth) / 4f;
         var quickY = new[] { arcTop + arcDrop, arcTop + arcDrop * 0.45f, arcTop, arcTop + arcDrop * 0.45f, arcTop + arcDrop };

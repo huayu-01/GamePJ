@@ -39,9 +39,6 @@ public partial class GameTable : Control
     private Button? _restartButton;
     private Button? _leaveButton;
     private CheckButton? _sitOutToggle;
-    private CheckButton? _aiToggle;
-    private SpinBox? _aiCount;
-    private SpinBox? _chipLimitSpin;
     private readonly Dictionary<int, string> _pendingActionBubbles = new();
     private bool _sideCollapsed = true;
     private bool _chatCollapsed = true;
@@ -294,50 +291,9 @@ public partial class GameTable : Control
 
         if (GmToolsEnabled)
         {
-        var debug = FlatUi.Panel("DebugPanel");
-        debug.CustomMinimumSize = new Vector2(0, 212);
-        box.AddChild(debug);
-        var debugBox = new VBoxContainer();
-        debugBox.SetAnchorsPreset(LayoutPreset.FullRect);
-        debugBox.OffsetLeft = 10;
-        debugBox.OffsetTop = 8;
-        debugBox.OffsetRight = -10;
-        debugBox.OffsetBottom = -8;
-        debug.AddChild(debugBox);
-
-        _aiToggle = new CheckButton { Text = "启用 AI 追加" };
-        _aiToggle.AddThemeColorOverride("font_color", FlatUi.Text);
-        _aiToggle.ButtonPressed = true;
-        debugBox.AddChild(_aiToggle);
-
-        var row = new HBoxContainer();
-        row.AddChild(FlatUi.MutedLabel("AI 数量"));
-        _aiCount = new SpinBox { MinValue = 1, MaxValue = Constants.MaxPlayers - 1, Value = 1, Step = 1, CustomMinimumSize = new Vector2(92, 34) };
-        row.AddChild(_aiCount);
-        var apply = FlatUi.Button("添加");
-        apply.Pressed += ApplyAiSettings;
-        row.AddChild(apply);
-        debugBox.AddChild(row);
-
-        var limitRow = new HBoxContainer();
-        limitRow.AddChild(FlatUi.MutedLabel("桌面上限"));
-        _chipLimitSpin = new SpinBox
-        {
-            MinValue = 1,
-            MaxValue = 100000,
-            Value = GameManager.Instance?.TableChipLimit ?? Constants.TableChipLimit,
-            Step = 1,
-            CustomMinimumSize = new Vector2(110, 34)
-        };
-        limitRow.AddChild(_chipLimitSpin);
-        var applyLimit = FlatUi.Button("设置");
-        applyLimit.Pressed += ApplyChipLimit;
-        limitRow.AddChild(applyLimit);
-        debugBox.AddChild(limitRow);
-
         _hostRebuyPanel = FlatUi.Panel("HostRebuyPanel");
         _hostRebuyPanel.CustomMinimumSize = new Vector2(0, 120);
-        debugBox.AddChild(_hostRebuyPanel);
+        box.AddChild(_hostRebuyPanel);
 
         var rebuyBox = new VBoxContainer();
         rebuyBox.SetAnchorsPreset(LayoutPreset.FullRect);
@@ -611,31 +567,31 @@ public partial class GameTable : Control
         var twelveSeats = visualSlot switch
         {
             0 => new Vector2(0.50f, 0.835f),
-            1 => new Vector2(0.12f, 0.735f),
-            2 => new Vector2(0.12f, 0.570f),
-            3 => new Vector2(0.12f, 0.405f),
-            4 => new Vector2(0.12f, 0.240f),
-            5 => new Vector2(0.28f, 0.125f),
+            1 => new Vector2(0.12f, 0.690f),
+            2 => new Vector2(0.12f, 0.550f),
+            3 => new Vector2(0.12f, 0.410f),
+            4 => new Vector2(0.12f, 0.270f),
+            5 => new Vector2(0.31f, 0.135f),
             6 => new Vector2(0.50f, 0.105f),
-            7 => new Vector2(0.72f, 0.125f),
-            8 => new Vector2(0.88f, 0.240f),
-            9 => new Vector2(0.88f, 0.405f),
-            10 => new Vector2(0.88f, 0.570f),
-            11 => new Vector2(0.88f, 0.735f),
+            7 => new Vector2(0.69f, 0.135f),
+            8 => new Vector2(0.88f, 0.270f),
+            9 => new Vector2(0.88f, 0.410f),
+            10 => new Vector2(0.88f, 0.550f),
+            11 => new Vector2(0.88f, 0.690f),
             _ => new Vector2(0.50f, 0.50f)
         };
 
         var nineSeats = visualSlot switch
         {
             0 => new Vector2(0.50f, 0.835f),
-            1 => new Vector2(0.12f, 0.695f),
+            1 => new Vector2(0.12f, 0.650f),
             2 => new Vector2(0.12f, 0.500f),
-            3 => new Vector2(0.12f, 0.305f),
-            4 => new Vector2(0.38f, 0.145f),
-            5 => new Vector2(0.62f, 0.145f),
-            6 => new Vector2(0.88f, 0.305f),
+            3 => new Vector2(0.12f, 0.350f),
+            4 => new Vector2(0.40f, 0.145f),
+            5 => new Vector2(0.60f, 0.145f),
+            6 => new Vector2(0.88f, 0.350f),
             7 => new Vector2(0.88f, 0.500f),
-            8 => new Vector2(0.88f, 0.695f),
+            8 => new Vector2(0.88f, 0.650f),
             _ => twelveSeats
         };
 
@@ -853,22 +809,6 @@ public partial class GameTable : Control
         LayoutPlayerHuds();
     }
 
-    private void ApplyAiSettings()
-    {
-        if (_aiToggle?.ButtonPressed != true)
-        {
-            return;
-        }
-
-        GameManager.Instance?.AddAiPlayers((int)(_aiCount?.Value ?? 1));
-
-        if (GameManager.Instance?.CurrentState is GameState.Menu or GameState.Lobby or GameState.GameOver)
-        {
-            GameManager.Instance?.StartGame();
-        }
-        Refresh();
-    }
-
     private void RefreshHostRebuyPanel()
     {
         if (_hostRebuyPanel == null || _hostRebuyList == null)
@@ -1012,13 +952,6 @@ public partial class GameTable : Control
         panel.QueueFree();
     }
 
-    private void ApplyChipLimit()
-    {
-        var limit = (int)(_chipLimitSpin?.Value ?? Constants.TableChipLimit);
-        GameManager.Instance?.SetTableChipLimit(limit);
-        Refresh();
-    }
-
     private void ToggleSitOut()
     {
         if (_syncingSitOutToggle)
@@ -1042,7 +975,7 @@ public partial class GameTable : Control
     {
         GameManager.Instance?.LeaveTable();
         NetworkManager.Instance?.LeaveRoom();
-        GetTree().ChangeSceneToFile(Constants.LobbyScene);
+        GetTree().ChangeSceneToFile(Constants.MainMenuScene);
     }
 
     private void OnActionSubmitted(int action, int amount)
@@ -1261,12 +1194,6 @@ public partial class GameTable : Control
         {
             _chatToggle.Text = _chatCollapsed ? "聊天" : "收起";
             _chatToggle.CustomMinimumSize = new Vector2(64, 48);
-        }
-
-        if (_aiCount != null)
-        {
-            var realPlayers = GameManager.Instance?.Players.Count(player => GameManager.Instance.IsAiPlayer(player.Id) == false) ?? 1;
-            _aiCount.MaxValue = Mathf.Max(1, GetSeatCount() - realPlayers);
         }
 
         if (_restartButton != null)
