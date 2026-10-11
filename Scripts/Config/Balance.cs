@@ -15,6 +15,9 @@ public partial class Balance : Node
 
 	private static readonly BalanceConfig Fallback = new();
 
+	/// <summary>"敌人倍率来源"只写一次日志（见 <see cref="LogEnemyScalesOnce"/>）。</summary>
+	private static bool _enemyScaleLogged;
+
 	public BalanceConfig Config { get; private set; } = new();
 
 	/// <summary>
@@ -70,6 +73,27 @@ public partial class Balance : Node
 		// 增幅项要编译成运行期目录（表优先、代码内置兜底），编译结果与来源写在日志里。
 		ActRoguelike.Rewards.RewardTable.Build(Config.Upgrades);
 
+		// 关卡行里的敌人白名单按**敌人表的行 Id** 匹配：未知 Id 在这里一次性报出来，
+		// 不让它变成"这一关静默少了几种敌人"（旧实现按中文显示名匹配，改文案就静默失效）。
+		foreach (StageDefinition stage in Config.Stages)
+		{
+			if (stage == null)
+			{
+				continue;
+			}
+
+			foreach (string id in stage.AllowedEnemyIds)
+			{
+				if (ConfigRows.ById<EnemyConfig>(id) != null)
+				{
+					continue;
+				}
+
+				GD.PushWarning($"[Balance] 关卡 {stage.Id} 的 AllowedEnemyIds 里有未知敌人 Id「{id}」（敌人表里没有这一行）。");
+				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 关卡 {stage.Id} 允许列表里的「{id}」在敌人表里找不到，这一条不会生效。");
+			}
+		}
+
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
 			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
@@ -78,19 +102,27 @@ public partial class Balance : Node
 	/// <summary>
 	/// 给生成出来的敌人/Boss 套用全局倍率（生成后立刻调用，会回满生命）。
 	/// 倍率**优先读敌人表的全局行**（`Config/Tables/Enemies/enemy_global.tres`），
-	/// 读不到才用 <see cref="BalanceConfig"/> 上的旧字段 —— 这是"读不到表就用自身默认值"的落地。
+	/// 读不到才用 <see cref="BalanceConfig"/> 上的同名回退值 —— 这是"读不到表就用自身默认值"的落地。
+	///
+	/// ⚠️ 回退值只有一个来源（<see cref="BalanceConfig"/> 的 <c>[Export]</c> 初值），且它与表里的值**一致**：
+	/// 旧版本这里是 1f / 0.8f，而表里是 0.75 / 0.3，于是"表读不到"会让敌人伤害静默 ×2.67（没有任何日志）。
+	/// 现在两处对齐 + <see cref="LogEnemyScalesOnce"/> 留痕。
 	/// </summary>
 	public static void ScaleEnemy(Unit unit, Node source, bool isBoss)
 	{
 		BalanceConfig config = Settings;
 		EnemyConfig? row = ConfigRows.ById<EnemyConfig>("enemy_global");
-		float health = isBoss
-			? config.BossHealthMultiplier
-			: row?.HealthMultiplier ?? config.EnemyHealthMultiplier;
-		float damage = isBoss
-			? config.BossDamageMultiplier
-			: row?.DamageMultiplier ?? config.EnemyDamageMultiplier;
+
+		float enemyHealth = row?.HealthMultiplier ?? config.EnemyHealthMultiplier;
+		float enemyDamage = row?.DamageMultiplier ?? config.EnemyDamageMultiplier;
+		float bossHealth = config.BossHealthMultiplier;
+		float bossDamage = config.BossDamageMultiplier;
 		float speed = row?.MoveSpeedMultiplier ?? config.EnemyMoveSpeedMultiplier;
+
+		LogEnemyScalesOnce(row, enemyHealth, enemyDamage, bossHealth, bossDamage, speed);
+
+		float health = isBoss ? bossHealth : enemyHealth;
+		float damage = isBoss ? bossDamage : enemyDamage;
 
 		unit.Stats.AddModifier(new StatModifier { Stat = "MaxHealthMultiplier", Operation = ModifierOperation.Multiply, Value = health, Source = source });
 		unit.Stats.AddModifier(new StatModifier { Stat = "DamageMultiplier", Operation = ModifierOperation.Multiply, Value = damage, Source = source });
@@ -101,5 +133,19 @@ public partial class Balance : Node
 
 		unit.RefreshStats();
 		unit.FillVitals();
+	}
+
+	/// <summary>本局第一次套用敌人倍率时把"来源 + 实际数值"写进日志（回退路径必须留痕，只写一次）。</summary>
+	private static void LogEnemyScalesOnce(EnemyConfig? row, float enemyHealth, float enemyDamage, float bossHealth, float bossDamage, float speed)
+	{
+		if (_enemyScaleLogged)
+		{
+			return;
+		}
+
+		_enemyScaleLogged = true;
+		ActRoguelike.Core.GameLog.Write(
+			"Config",
+			$"敌人倍率：普通 生命×{enemyHealth:0.##} 伤害×{enemyDamage:0.##} 移速×{speed:0.##} / Boss 生命×{bossHealth:0.##} 伤害×{bossDamage:0.##}（来源：{(row != null ? "表 enemy_global" : "代码默认值 BalanceConfig（表读不到）")}）");
 	}
 }

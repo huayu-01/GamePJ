@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "enemy_charger"
+Slot = 6
+DisplayName = "冲锋兵"
+ScenePath = "res://Scenes/Enemies/Charger.tscn"
+Tags = PackedStringArray("Melee", "Bruiser", "Charger")
+MaxHealth = 90.0
+MaxArmor = 30.0
+ArmorDamageReduction = 0.3
+KnockbackResistance = 0.0
+MoveSpeed = 3.2
+AttackDamage = 18.0
+AttackInterval = 2.6
+AttackRange = 14.0
+AttackKnockback = 8.0
+Cost = 3
+Weight = 1.6
+MinElapsedSeconds = 0.0
+EliteChance = 0.25
+Note = "冲锋：AttackRange 走 ChargeAttackAbility.MaxDistance（14）。精英率 0.25。"

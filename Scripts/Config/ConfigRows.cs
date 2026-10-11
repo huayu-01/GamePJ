@@ -18,6 +18,7 @@ public static class ConfigRows
 {
 	private static readonly Dictionary<string, Dictionary<string, ConfigRow>> ByIdMap = new();
 	private static readonly Dictionary<string, Dictionary<int, ConfigRow>> BySlotMap = new();
+	private static readonly Dictionary<string, List<ConfigRow>> RowsMap = new();
 	private static readonly Dictionary<string, string> KindMap = new();
 
 	private static string KeyOf<T>() => typeof(T).Name;
@@ -31,6 +32,7 @@ public static class ConfigRows
 		string key = KeyOf<T>();
 		var ids = new Dictionary<string, ConfigRow>();
 		var slots = new Dictionary<int, ConfigRow>();
+		var all = new List<ConfigRow>();
 
 		if (rows != null)
 		{
@@ -40,6 +42,8 @@ public static class ConfigRows
 				{
 					continue;
 				}
+
+				all.Add(row);
 
 				if (string.IsNullOrEmpty(row.Id))
 				{
@@ -63,6 +67,7 @@ public static class ConfigRows
 
 		ByIdMap[key] = ids;
 		BySlotMap[key] = slots;
+		RowsMap[key] = all;
 	}
 
 	/// <summary>按 Id 取行。读不到 → null（调用方回退到自身默认值）。</summary>
@@ -91,6 +96,30 @@ public static class ConfigRows
 			&& slots.TryGetValue(slot, out ConfigRow? row)
 			? (T)row
 			: null;
+	}
+
+	/// <summary>
+	/// 按**预制体路径**找行（靠行里的 <c>ScenePath</c> 属性，走引擎自带的 <c>Get</c>，不需要类型特判）。
+	/// 用在"场景里的生成项 ↔ 表里的行"这种配对上：敌人表 / 首领表 / 召唤物表都是这么配对的，
+	/// 所以改文案、改显示名都不会再把配对搞丢。
+	/// </summary>
+	public static T? ByScenePath<T>(string? scenePath) where T : ConfigRow
+	{
+		if (string.IsNullOrEmpty(scenePath) || !RowsMap.TryGetValue(KeyOf<T>(), out List<ConfigRow>? rows))
+		{
+			return null;
+		}
+
+		foreach (ConfigRow row in rows)
+		{
+			Variant path = row.Get("ScenePath");
+			if ((path.VariantType is Variant.Type.String or Variant.Type.StringName) && path.AsString() == scenePath)
+			{
+				return (T)row;
+			}
+		}
+
+		return null;
 	}
 
 	/// <summary>本表当前索引到多少行（自测/日志用）。</summary>

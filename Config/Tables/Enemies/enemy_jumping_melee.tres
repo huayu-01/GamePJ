@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "enemy_jumping_melee"
+Slot = 4
+DisplayName = "跳跃近战"
+ScenePath = "res://Scenes/Enemies/JumpingMelee.tscn"
+Tags = PackedStringArray("Melee", "Diver")
+MaxHealth = 50.0
+MaxArmor = 0.0
+ArmorDamageReduction = 0.3
+KnockbackResistance = 0.0
+MoveSpeed = 3.6
+AttackDamage = 14.0
+AttackInterval = 2.2
+AttackRange = 0.0
+AttackKnockback = 4.0
+Cost = 2
+Weight = 2.0
+MinElapsedSeconds = 0.0
+EliteChance = 0.0
+Note = "跳劈：AttackRange=0（LeapAttackAbility 没有射程属性，跳跃距离在技能行的 JumpVelocity/HorizontalSpeed/ApproachMaxRange 上）。"

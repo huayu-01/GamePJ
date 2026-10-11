@@ -79,6 +79,15 @@ public partial class Unit : CharacterBody3D
 		_baseMaxShield = MaxShield;
 	}
 
+	/// <summary>
+	/// StatSheet 的基础值必须在**任何** <see cref="RefreshStats"/> 之前就位：<c>Get()</c> 对没有基础值的键返回 0，
+	/// 所以"进树前先套用配置表的值"（生成敌人时 `row.ApplyTo(unit)` → `AddChild`）会把生命算成
+	/// <c>max(1, 生命 × 0) = 1</c>，而 `_EnterTree` 又把这个 1 捕获成基础值 —— 一路静默错到底
+	/// （配置表阶段 3 实测踩到：Chaser 生命 45 变成 1）。
+	/// 放在构造函数里最省事；`_Ready` 里那次保留（`SetBase` 只改基础值、不动修正器，重复调用是幂等的）。
+	/// </summary>
+	public Unit() => SeedStats();
+
 	public override void _Ready()
 	{
 		SeedStats();

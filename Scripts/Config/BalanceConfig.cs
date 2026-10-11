@@ -42,8 +42,16 @@ public enum PlayerCharacterKind
 public partial class BalanceConfig : Resource
 {
 	[ExportGroup("敌人 · 全局倍率")]
-	[Export] public float EnemyHealthMultiplier { get; set; } = 1f;
-	[Export] public float EnemyDamageMultiplier { get; set; } = 0.8f;
+	/// <summary>
+	/// 所有普通敌人的生命倍率（回退值）。⚠️ **必须与 `Config/Tables/Enemies/enemy_global.tres` 的值一致** ——
+	/// 优先来源是那一行；这里只是"表读不到"时的兜底。两个值不一样就会出现**没有日志的静默换挡**
+	/// （旧代码这里是 1f / 0.8f，表一丢敌人伤害直接 ×2.67，见 config-tables-inventory.md §5-④）。
+	/// </summary>
+	[Export] public float EnemyHealthMultiplier { get; set; } = 0.75f;
+
+	/// <summary>所有普通敌人的伤害倍率（难度总开关；回退值，语义见上一条）。</summary>
+	[Export] public float EnemyDamageMultiplier { get; set; } = 0.3f;
+
 	[Export] public float EnemyMoveSpeedMultiplier { get; set; } = 1f;
 	[Export] public float EliteChanceMultiplier { get; set; } = 1f;
 

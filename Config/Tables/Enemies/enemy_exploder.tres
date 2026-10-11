@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "enemy_exploder"
+Slot = 3
+DisplayName = "自爆"
+ScenePath = "res://Scenes/Enemies/Exploder.tscn"
+Tags = PackedStringArray("Suicide", "AreaDenial", "Chaser")
+MaxHealth = 25.0
+MaxArmor = 0.0
+ArmorDamageReduction = 0.3
+KnockbackResistance = 0.0
+MoveSpeed = 5.5
+AttackDamage = 22.0
+AttackInterval = 30.0
+AttackRange = 2.4
+AttackKnockback = 5.0
+Cost = 1
+Weight = 1.5
+MinElapsedSeconds = 0.0
+EliteChance = 0.0
+Note = "自爆：范围伤害 22、TriggerRadius 2.4、KillSelf=true（技能行里）。AttackInterval=30 等于"一场只炸一次"。"

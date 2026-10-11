@@ -181,6 +181,25 @@ public partial class EncounterController : Node3D
 	public int WaveIndex => _waveIndex;
 
 	/// <summary>
+	/// 诊断用：本关通过白名单筛选后实际可生成的敌人（写的是**敌人表的行 Id**）。
+	/// 这条字符串就是"白名单按 Id 匹配、不再按中文显示名匹配"的证据。
+	/// </summary>
+	public string AllowedEntrySummary
+	{
+		get
+		{
+			var parts = new System.Collections.Generic.List<string>();
+			foreach (EnemySpawnEntry entry in _entries)
+			{
+				EnemyConfig? row = EnemyRow(entry);
+				parts.Add($"{row?.Id ?? entry.DisplayName}(成本{entry.Cost})");
+			}
+
+			return parts.Count == 0 ? "无" : string.Join(", ", parts);
+		}
+	}
+
+	/// <summary>
 	/// 彻底停止生成（开 Boss 门 / Boss 阵亡时调用）：冻结波次与预算，并标记本场结束。
 	/// 只翻 <see cref="IsRunning"/> 不够——波次系统会在清场后又开新波，所以这里直接把 IsCompleted 立起来。
 	/// </summary>
@@ -411,6 +430,12 @@ public partial class EncounterController : Node3D
 		_spendable -= entry.Cost;
 
 		var enemy = entry.Scene.Instantiate<Unit>();
+
+		// 单位表（`Config/Tables/Enemies/enemy_*.tres`）：生命/护甲/移速/攻击/持有技能/类标签。
+		// ⚠️ 顺序必须是 实例化 → ApplyTo → AddChild：`Unit._EnterTree` 在 AddChild 时捕获基础值，
+		// 晚套用会让"回满生命"算错（见 config-tables-inventory.md #10）。
+		EnemyRow(entry)?.ApplyTo(enemy);
+
 		AddChild(enemy);
 		enemy.GlobalPosition = SpawnPlanner.FindSpawnPoint(_player?.GlobalPosition ?? GlobalPosition, MinSpawnDistance, SpawnRadius);
 
@@ -575,7 +600,11 @@ public partial class EncounterController : Node3D
 		_waveEntries.Clear();
 	}
 
-	/// <summary>按 Stage 配置重建可生成列表（生成项的 Enabled 由 AllowedEnemies 决定）。</summary>
+	/// <summary>
+	/// 按 Stage 配置重建可生成列表。生成项的刷怪参数（成本/权重/解锁时间/精英概率）与开关**都来自敌人表**：
+	/// 生成项与行按**预制体路径**配对（改中文显示名不再影响任何逻辑），白名单按行的 <c>Id</c> 匹配。
+	/// 读不到行时（敌人表空 / Balance.tres 未加载）保留场景里的值、且不做白名单过滤（回退路径必须还能玩）。
+	/// </summary>
 	public void ApplyEntryFilter(StageDefinition definition)
 	{
 		_entries.Clear();
@@ -586,13 +615,27 @@ public partial class EncounterController : Node3D
 				continue;
 			}
 
-			entry.Enabled = definition.Allows(entry.DisplayName);
+			EnemyConfig? row = EnemyRow(entry);
+			if (row != null)
+			{
+				entry.DisplayName = row.DisplayName;
+				entry.Cost = Mathf.Max(1, row.Cost);
+				entry.Weight = row.Weight;
+				entry.MinElapsedSeconds = row.MinElapsedSeconds;
+				entry.EliteChance = row.EliteChance;
+			}
+
+			entry.Enabled = definition.AllowsEnemy(row?.Id);
 			if (entry.Enabled)
 			{
 				_entries.Add(entry);
 			}
 		}
 	}
+
+	/// <summary>生成项 → 敌人表的行（按预制体路径配对；读不到 → null，调用方回退到场景里的值）。</summary>
+	private static EnemyConfig? EnemyRow(EnemySpawnEntry entry)
+		=> entry.Scene == null ? null : ConfigRows.ByScenePath<EnemyConfig>(entry.Scene.ResourcePath);
 
 	/// <summary>立即结算本节点：停止生成并清空场上敌人（阶段流程结束节点时使用）。</summary>
 	public void ForceComplete()
@@ -682,6 +725,8 @@ public partial class EncounterController : Node3D
 		for (int i = 0; i < BossGuardCount && BossGuardScene != null; i++)
 		{
 			var guard = BossGuardScene.Instantiate<Unit>();
+			// 护卫也走单位表（`enemy_skill_elite` 那一行）：与生成项一样，先套用再 AddChild。
+			ConfigRows.ByScenePath<EnemyConfig>(BossGuardScene.ResourcePath)?.ApplyTo(guard);
 			parent.AddChild(guard);
 			float angle = Mathf.Pi * (i + 1) / (BossGuardCount + 1);
 			guard.GlobalPosition = Boss.GlobalPosition + new Vector3(Mathf.Cos(angle) * 6f, 0.6f, Mathf.Sin(angle) * 6f);

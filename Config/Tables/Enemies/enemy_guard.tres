@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "enemy_guard"
+Slot = 8
+DisplayName = "守卫"
+ScenePath = "res://Scenes/Enemies/Guard.tscn"
+Tags = PackedStringArray("Melee", "Guard", "Tank")
+MaxHealth = 130.0
+MaxArmor = 60.0
+ArmorDamageReduction = 0.35
+KnockbackResistance = 0.85
+MoveSpeed = 2.6
+AttackDamage = 14.0
+AttackInterval = 1.6
+AttackRange = 2.4
+AttackKnockback = 3.0
+Cost = 3
+Weight = 1.2
+MinElapsedSeconds = 0.0
+EliteChance = 0.2
+Note = "重甲：护甲 60 + 护甲减伤 0.35 + 击退抗性 0.85，还带正面格挡（Block 节点，不在表里）。精英率 0.2。"

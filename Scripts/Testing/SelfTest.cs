@@ -99,7 +99,7 @@ public partial class SelfTest : Node
 				GameLog.Write("SelfTest", $"波数映射：进化={StageController.WavesFor(RewardNodeKind.Evolution)}（期望3） 异化={StageController.WavesFor(RewardNodeKind.Mutation)}（期望3） 强化={StageController.WavesFor(RewardNodeKind.Enhancement)}（期望2） 商店={StageController.WavesFor(RewardNodeKind.Shop)}（期望2） 材料={StageController.WavesFor(RewardNodeKind.Resource)}（期望1） 恢复={StageController.WavesFor(RewardNodeKind.Heal)}（期望1） 特殊={StageController.WavesFor(RewardNodeKind.Special)}（期望1）");
 				ReportNodes(stage);
 				ReportSpacing(stage);
-				ReportTables();
+				ReportTables(stage);
 				stage?.AddPressureForNode(RewardNodeKind.Evolution);
 				stage?.AddPressureForNode(RewardNodeKind.Mutation);
 				GameLog.Write("SelfTest", $"Pressure 测试（进化 150×1.25 + 异化 150×1.5）：{stage?.DebugState}");
@@ -511,7 +511,7 @@ public partial class SelfTest : Node
 	/// 与分表前 `Balance.tres` 的记录逐条对照（见 docs/config.md 的实测表）。
 	/// 玩家/武器数值来自 `Config/Tables/Characters` 与 `Config/Tables/Weapons`。
 	/// </summary>
-	private void ReportTables()
+	private void ReportTables(StageController? stage)
 	{
 		var player = PlayerLocator.Player;
 		ActRoguelike.Weapons.Weapon? weapon = player == null ? null : NodeSearch.FindInSubtree<ActRoguelike.Weapons.Weapon>(player);
@@ -561,6 +561,17 @@ public partial class SelfTest : Node
 		string poolSize = poolIds.Length == 0 ? "空" : $"{poolIds.Split(',').Length} 条";
 		GameLog.Write("SelfTest",
 			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望 19 = 10/4/5） 用了表={(RewardCatalog.All.Length == 19 && RewardCatalog.All[0].Id == "upg_dmg_up")} 当前池子={poolSize}（枪手期望 18 条）");
+
+		// 敌人表（阶段 3）：行数 + 白名单按 Id 匹配的结果 + 一行逐项数值。
+		ActRoguelike.Config.EnemyConfig? global = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.EnemyConfig>("enemy_global");
+		ActRoguelike.Config.EnemyConfig? chaser = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.EnemyConfig>("enemy_chaser");
+		EncounterController? encounter = stage?.CurrentNode;
+		GameLog.Write("SelfTest",
+			$"配置表比对·敌人表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()} 行（期望 10 = 1 全局 + 9 敌种） 全局行 生命×{global?.HealthMultiplier:0.##}/伤害×{global?.DamageMultiplier:0.##}（期望 0.75/0.3） 本关白名单 [{string.Join(",", stage?.Definition?.AllowedEnemyIds ?? System.Array.Empty<string>())}]（期望按 Id） 实际可生成 [{encounter?.AllowedEntrySummary}]");
+		GameLog.Write("SelfTest",
+			chaser == null
+				? "配置表比对·敌人行：读不到 enemy_chaser（应回退到场景值）"
+				: $"配置表比对·敌人行 enemy_chaser：生命 {chaser.MaxHealth:0}（期望 60） 移速 {chaser.MoveSpeed:0.##}（期望 4.2） 攻击 {chaser.AttackDamage:0}（期望 12） 间隔 {chaser.AttackInterval:0.##}（期望 1.3） 射程 {chaser.AttackRange:0.##}（期望 2.3） 击退 {chaser.AttackKnockback:0.##}（期望 3） 标签 [{string.Join(",", chaser.Tags)}] 成本 {chaser.Cost}/权重 {chaser.Weight:0.##}");
 	}
 
 	private static void ReportCombat(StageController? stage)
@@ -588,6 +599,35 @@ public partial class SelfTest : Node
 		GameLog.Write("SelfTest", $"诊断：EntryCount={encounter.EntryCount} Started={encounter.Started} WaveMode={encounter.WaveModeOn} IsRunning={encounter.IsRunning} IsCompleted={encounter.IsCompleted} WaveIndex={encounter.WaveIndex} WaveRemaining={encounter.WaveRemaining} 预算={encounter.RemainingBudget}");
 		GameLog.Write("SelfTest", $"战斗检查：本场 WaveCount={encounter.WaveCount}，场上存活 {enemies.Count} 只");
 		GameLog.Write("SelfTest", $"敌种：{(enemies.Count == 0 ? "-" : string.Join(", ", enemies))}");
+
+		// 单位表（阶段 3）实测：生成后的**实际值**（表值 + 全局倍率），证明行真的套到了单位身上。
+		Unit? sample = null;
+		foreach (Node node in encounter.GetTree().GetNodesInGroup("enemy_units"))
+		{
+			if (node is Unit unit && !unit.IsDead)
+			{
+				sample = unit;
+				break;
+			}
+		}
+
+		if (sample != null)
+		{
+			var abilities = new List<ActRoguelike.Abilities.Ability>();
+			NodeSearch.CollectInSubtree(sample, abilities);
+			ActRoguelike.Abilities.Ability? attacker = null;
+			foreach (ActRoguelike.Abilities.Ability ability in abilities)
+			{
+				if (NodeSearch.FindInSubtree<AttackHitbox>(ability) != null)
+				{
+					attacker = ability;
+					break;
+				}
+			}
+
+			AttackHitbox? hit = attacker == null ? null : NodeSearch.FindInSubtree<AttackHitbox>(attacker);
+			GameLog.Write("SelfTest", $"单位表实测（{sample.Name}）：生命 {sample.MaxHealth:0} 移速 {sample.MoveSpeed:0.##} 伤害 {hit?.Damage:0} 间隔 {attacker?.Cooldown:0.##} 击退 {hit?.Knockback:0.##} 标签 [{string.Join(",", sample.Tags)}] 技能 {abilities.Count} 个");
+		}
 	}
 
 	/// <summary>当前角色（供验证读取）。</summary>

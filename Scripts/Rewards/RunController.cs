@@ -323,7 +323,7 @@ public partial class RunController : Node
 		var summary = new System.Text.StringBuilder();
 		foreach (StageDefinition row in stages)
 		{
-			summary.Append($" | {row.Id} {row.DisplayName} 允许敌人[{row.AllowedEnemies.Length}] 敌伤×{row.EnemyDamageMultiplier:0.##} Boss伤×{row.BossDamageMultiplier:0.##} Boss词条{row.BossPerkCount}");
+			summary.Append($" | {row.Id} {row.DisplayName} 允许敌人[{row.AllowedEnemyIds.Length}] 敌伤×{row.EnemyDamageMultiplier:0.##} Boss伤×{row.BossDamageMultiplier:0.##} Boss词条{row.BossPerkCount}");
 		}
 
 		ActRoguelike.Core.GameLog.Write("Flow", $"关卡表：{stages.Count} 关（来源：表{(missing > 0 ? $"，缺 {missing} 行→该关用默认值" : string.Empty)}）{summary}");
@@ -448,6 +448,11 @@ public partial class RunController : Node
 	/// <summary>
 	/// 角色表的能力开关矩阵。读不到角色行时回退到分表前那段硬编码规则
 	/// （`melee.Enabled = heavy`、`summon/control.Enabled = summoner`），保证行为逐位一致。
+	///
+	/// ⚠️ 这里按**脚本类名**匹配（不是 <c>Ability.AbilityId</c>）：技能表落地后 <c>AbilityId</c> 会被
+	/// 写成技能行的 Id（`skl_melee` 这种），而名单里写的是类名（`MeleeAttackAbility`）。
+	/// 类名在"表在"与"表不在"两种情况下都成立（`Ability.EnsureInitialized` 用类名兜底），
+	/// 所以按类名匹配既与改动前逐位一致，又不会在回退路径上让近战/召唤角色丢掉技能。
 	/// </summary>
 	private void ApplyAbilityMatrix(CharacterConfig? character, bool heavy, bool summoner)
 	{
@@ -456,11 +461,7 @@ public partial class RunController : Node
 
 		foreach (Ability ability in abilities)
 		{
-			string id = ability.AbilityId;
-			if (string.IsNullOrEmpty(id))
-			{
-				id = ability.GetType().Name;
-			}
+			string id = ability.GetType().Name;
 
 			if (character == null)
 			{

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "enemy_ranged"
+Slot = 5
+DisplayName = "远程"
+ScenePath = "res://Scenes/Enemies/RangedEnemy.tscn"
+Tags = PackedStringArray("Ranged", "Harasser")
+MaxHealth = 45.0
+MaxArmor = 0.0
+ArmorDamageReduction = 0.3
+KnockbackResistance = 0.0
+MoveSpeed = 3.4
+AttackDamage = 8.0
+AttackInterval = 1.8
+AttackRange = 18.0
+AttackKnockback = 1.2
+Cost = 2
+Weight = 1.6
+MinElapsedSeconds = 8.0
+EliteChance = 0.0
+Note = "远程：主攻击没有命中体，伤害/击退写在武器组件上。AttackRange 走 ProjectileAttackAbility.MaxRange。开场 8 秒后才出现。"

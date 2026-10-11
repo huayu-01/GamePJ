@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "enemy_skill_elite"
+Slot = 9
+DisplayName = "技能精英"
+ScenePath = "res://Scenes/Enemies/SkillElite.tscn"
+Tags = PackedStringArray("Elite", "Support", "Melee")
+MaxHealth = 200.0
+MaxArmor = 90.0
+ArmorDamageReduction = 0.35
+KnockbackResistance = 0.9
+MoveSpeed = 2.9
+AttackDamage = 12.0
+AttackInterval = 1.6
+AttackRange = 2.5
+AttackKnockback = 3.0
+Cost = 0
+Weight = 0.0
+MinElapsedSeconds = 0.0
+EliteChance = 0.0
+Note = "Boss 护卫（Main.tscn 的 BossGuardScene，不走生成项，所以 Cost/Weight 留 0）：近战 + 增益光环 + 控制。"

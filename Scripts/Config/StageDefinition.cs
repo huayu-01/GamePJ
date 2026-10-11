@@ -27,8 +27,14 @@ public partial class StageDefinition : Resource
 	/// <summary>精英出现概率的额外缩放（加在各生成项自己的 EliteChance 上）。</summary>
 	[Export] public float EliteChanceScale { get; set; }
 
-	/// <summary>本关允许生成的敌人（按生成项的 DisplayName 匹配；留空 = 不限制）。</summary>
-	[Export] public string[] AllowedEnemies { get; set; } = System.Array.Empty<string>();
+	/// <summary>
+	/// 本关允许生成的敌人（写敌人表的行 Id，如 <c>enemy_chaser</c>；留空 = 不限制）。
+	///
+	/// ⚠️ 这里以前按**中文显示名**匹配（`"基础近战"` 这种），改一个文案就静默放行/屏蔽敌人 ——
+	/// 现在按敌人表的稳定键 <see cref="ConfigRow.Id"/> 匹配，显示名只用于界面与日志。
+	/// 未知 Id 会在开局由 <see cref="Balance"/> 校验并写警告（不再静默失效）。
+	/// </summary>
+	[Export] public string[] AllowedEnemyIds { get; set; } = System.Array.Empty<string>();
 
 	[ExportGroup("节点与挑战")]
 	[Export] public int RewardNodeCount { get; set; } = 3;
@@ -41,9 +47,6 @@ public partial class StageDefinition : Resource
 
 	/// <summary>Boss 词条数量（策划文档 §12 Boss 构筑）。</summary>
 	[Export] public int BossPerkCount { get; set; } = 2;
-
-	/// <summary>最终 Boss（打完即通关）。</summary>
-	[Export] public bool IsFinalBoss { get; set; }
 
 	/// <summary>
 	/// Boss Pressure 的 Stage 倍率表（关卡核心文档 §7.4：Stage 倍率使用固定表、不随机生成；
@@ -91,6 +94,18 @@ public partial class StageDefinition : Resource
 	/// </summary>
 	[Export] public string[] PressureUpgradeTags { get; set; } = System.Array.Empty<string>();
 
-	public bool Allows(string displayName)
-		=> AllowedEnemies.Length == 0 || System.Array.IndexOf(AllowedEnemies, displayName) >= 0;
+	/// <summary>
+	/// 本关允不允许某个敌人生成。按敌人表的行 Id 匹配（见 <see cref="AllowedEnemyIds"/>）。
+	/// <paramref name="enemyId"/> 为空 = 敌人表整个读不到 —— 这时**不筛**（放全部敌人），
+	/// 因为"整张表回退"的语义是不限制难度，而不是把本关变成空场（回退路径必须还能玩）。
+	/// </summary>
+	public bool AllowsEnemy(string? enemyId)
+	{
+		if (AllowedEnemyIds.Length == 0 || string.IsNullOrEmpty(enemyId))
+		{
+			return true;
+		}
+
+		return System.Array.IndexOf(AllowedEnemyIds, enemyId) >= 0;
+	}
 }

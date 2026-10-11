@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "enemy_chaser"
+Slot = 1
+DisplayName = "基础近战"
+ScenePath = "res://Scenes/Enemies/Chaser.tscn"
+Tags = PackedStringArray("Melee", "Chaser")
+MaxHealth = 60.0
+MaxArmor = 0.0
+ArmorDamageReduction = 0.3
+KnockbackResistance = 0.0
+MoveSpeed = 4.2
+AttackDamage = 12.0
+AttackInterval = 1.3
+AttackRange = 2.3
+AttackKnockback = 3.0
+Cost = 2
+Weight = 3.0
+MinElapsedSeconds = 0.0
+EliteChance = 0.0
+Note = "近战杂兵：直接扑上来砍。数值来自 Chaser.tscn + Main.tscn/SpawnChaser。"

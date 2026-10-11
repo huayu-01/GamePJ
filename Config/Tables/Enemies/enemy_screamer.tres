@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "enemy_screamer"
+Slot = 7
+DisplayName = "尖啸者"
+ScenePath = "res://Scenes/Enemies/Screamer.tscn"
+Tags = PackedStringArray("Controller", "AreaDenial")
+MaxHealth = 70.0
+MaxArmor = 0.0
+ArmorDamageReduction = 0.3
+KnockbackResistance = 0.0
+MoveSpeed = 3.0
+AttackDamage = 6.0
+AttackInterval = 4.0
+AttackRange = 7.0
+AttackKnockback = 6.0
+Cost = 2
+Weight = 1.2
+MinElapsedSeconds = 0.0
+EliteChance = 0.0
+Note = "范围减速：AttackRange 走 AreaAttackAbility.TriggerRadius（7），命中挂 Slow（在技能行里）。"
