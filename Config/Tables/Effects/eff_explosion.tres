@@ -5,8 +5,6 @@
 [resource]
 script = ExtResource("1_6hhuv")
 Kind = 6
-Value = 0.6
-Radius = 3.5
 Id = "Explosion"
 Slot = 11
 DisplayName = "爆炸"

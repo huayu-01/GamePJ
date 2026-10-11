@@ -150,9 +150,6 @@ public partial class BalanceConfig : Resource
 	/// <summary>血条相对单位原点的垂直偏移（现在沿 -Up 使用，即放在脚下）。</summary>
 	[Export] public float EnemyHealthBarTopOffset { get; set; } = 0.25f;
 
-	/// <summary>「白板首领副本」的血量倍率（相对普通首领，关卡核心文档 L231/L315）。</summary>
-	[Export(PropertyHint.Range, "0.05,1,0.05")] public float EliteBossHealthScale { get; set; } = 0.35f;
-
 	/// <summary>节点之间的最小间距（关卡核心文档 L106）。</summary>
 	[Export] public float MinNodeSpacing { get; set; } = 8f;
 
@@ -182,5 +179,4 @@ public partial class BalanceConfig : Resource
 
 	/// <summary>与首领的距离小于它时，屏幕上方显示完整血条；否则只显示首领头像。</summary>
 	[Export] public float BossBarFullRange { get; set; } = 22f;
-	[Export] public float BossHealthBarScale { get; set; } = 4f;
 }

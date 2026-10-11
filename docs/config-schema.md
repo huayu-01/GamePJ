@@ -5,14 +5,18 @@
 > 相关：[todo-handoff.md](todo-handoff.md)（约定与统一入口）、[architecture.md](architecture.md)（分层与踩过的坑）、[controller-flow.md](controller-flow.md)（流程）、[assets.md](assets.md)（目录与命名规范）、[config.md](config.md)（当前数值入口）
 >
 > ⚠ **本文以设计为主。** 文中的 C# 代码全部按 Godot 4.7.2 实际 API 写成，关键签名已用 `GodotSharp 4.7.2` 反射核对（见 §7）。
-> **例外（已落地）**：**阶段 0 / 1 / 2** 已按本文实施并实测。
+> **例外（已落地）**：**阶段 0 / 1 / 2 / 3** 已按本文实施并实测。
 > - 阶段 0/1：`Scripts/Config/{ConfigTable,ParamEntry,ConfigText,WeightedPick}.cs`、`Config/Tables/Stages/stg_*.tres`、`RunController.DefaultStages()` 已删除。
 > - **阶段 2（2026-10）**：`Balance` 拆成 **8 张表**（武器 / 角色 / 敌人 / **效果** / 节点 / 增幅项 / 局外成长 / 关卡），
 >   新增行类 `ConfigRow`(基类) / `WeaponConfig` / `CharacterConfig` / `EnemyConfig` / **`EffectConfig`** /
 >   `NodeConfig` / `RewardConfig` / `MetaUpgradeConfig` / `StatOverride` + 索引器 `ConfigRows` +
 >   增幅项处理器注册表 `RewardEffectRegistry` / `RewardTable`。
 >   进度、实测证据与逐项比对见 **§5 阶段 2**；YARD 真机冒烟结论见 **§7.2 末尾**。
-> 其余设计（技能表 T2 / 首领增强表 T9 的节点驱动 / 敌人按敌种行）仍是设计。
+> - **阶段 3（2026-10，本文的 T2 / T5 / T9 / #24 落地）**：新增**单位表基类 `UnitConfig`** 与
+>   **技能表 `AbilityConfig`**，共 **12 张表**（新增 `Enemies` 按敌种 9 行 / `Bosses` 1 行 / `Summons` 1 行 /
+>   `Skills` 25 行 / `Pressure` 3 行）；`EnemyConfig` / `BossConfig` / `SummonConfig` / `CharacterConfig`
+>   全部改为 `: UnitConfig`；白名单从"按中文显示名"改成"按敌人表 Id"。
+>   进度、实测与回退验证见 **§5 阶段 3**。
 >
 > 🔗 **与 [config-tooling.md](config-tooling.md) 的分工**：那份文档回答"**用什么工具**批量编辑这些表"，结论是装 `Edit Resources as Table` 插件、**把文件夹当表、一行一个 `.tres` 文件**。
 > **这个形态是本文表格设计的硬约束** —— 本文的行布局（§2.3）与文件粒度取舍（§6.2）已经按它对齐：**每一行 = 独立的 `.tres` 文件，一个文件夹 = 一张表**。
@@ -25,7 +29,7 @@
 |---|---|
 | 盘出多少可配置项 | **632 处磁盘配置实例**（`Scenes/**.tscn` 里 513 处脚本属性赋值 + `Config/Balance.tres` 里 119 处）+ **305 个 C# 可导出属性槽**（分布在 49 个文件） |
 | 多少当前硬编码 | 全项目 **214 处**十进制字面量；剔除测试代码（48）、纯表现/UI 布局（61）、clamp/epsilon/形状数学后，**约 65 处是"可调玩法数值"**（A 类 40 + B 类 25）。其中 **40 处集中在 7 个文件**：**30 处在 6 个纯"目录式"文件**里（`RewardCatalog` 11 / `StatusEffect` 6 / `BossPerk` 4 / `MetaProgress` 4 / `RunSettlement` 3 / `SpawnPlanner` 2），另 10 处在 ~~`RunController.DefaultStages()`~~ —— 这 40 处就是"应该整表外置"的候选。✅ 其中 `RunController` 那 10 处已随阶段 1 删除 |
-| 拆几张表 | **11 张**（T1–T11）：武器 / 技能 / 增幅项 / 角色 / 敌人 / 关卡 / 节点 / 状态 / **首领增强（含词条）** / 局外成长（见 §3）。✅ **已落地 8 张**（阶段 1+2）；⏸ 剩技能表（T2）、敌人按敌种行（T5 扩展）、首领增强表（T9） |
+| 拆几张表 | **11 张**（T1–T11）：武器 / 技能 / 增幅项 / 角色 / 敌人 / 关卡 / 节点 / 状态 / **首领增强（含词条）** / 局外成长（见 §3）。✅ **已落地 12 个表目录**（阶段 1+2+3）：`Weapons` / `Characters` / `Enemies` / `Bosses` / `Summons` / `Skills` / `Pressure` / `Effects` / `Nodes` / `Upgrades` / `Meta` / `Stages`；⏸ 只剩 **Pressure 转换池的接线**（表已就位、抽取点未接线，见 §5 阶段 3） |
 | 第一阶段做哪张 | **关卡表（T6）**。理由见 §5 的「阶段 1」小节：类已经存在（`StageDefinition` 15 个字段）、改动只有 2 个调用点、有现成自测可逐项比对、而且顺手消掉一个**已经漂移的真 bug**。✅ **阶段 0 与阶段 1 已完成（2026-10）**，进度与实测证据见 §5；两条新挖出来的坑见 §5 阶段 1 与 §7.2 |
 | 行怎么放 | **一行 = 一个 `.tres` 文件，一个文件夹 = 一张表**（[config-tooling.md](config-tooling.md) 推荐的 `Edit Resources as Table` 插件按文件夹分组，这是硬约束）。`Balance.tres` 持有 `[Export] XxxConfig[]` 数组显式引用这些行 —— **不扫目录**，导出后也不会掉文件 |
 | 最需要拍板的 | **效果怎么表达**（`ApplyHandler` 字符串 + C# 处理器注册表，还是允许内嵌脚本）—— 这一条决定整套体系是"可校验的数据"还是"换皮代码"（见 §6.1）。另有两条与你的两个场景直接相关：**武器→升级池的关联方向**（§6.9）与**场景 A 的范围**（§6.10） |
@@ -193,6 +197,14 @@
 **C 类 —— 不该外置（保留）**：`Combat/CombatTypes.cs:25-28,58`（碰撞层位、`MaxDepth`）、`Weapons/Weapon.cs:89,91,170,232`（clamp 保护）、`Combat/AttackHitbox.cs:70-73,95`（形状数学）、`Interaction/Interactable.cs:16-27`（节点名常量）、`Scripts/Testing/SelfTest.cs`（48 处，测试代码）。
 
 ### 1.4 盘点发现的 7 个既有问题（都是"分表"会顺手修掉的）
+
+> ✅ **2026-10 状态**：① 已修（阶段 1）；② 未修（波次规模两份，`SpawnPlanner` 的 const 与 `EncounterController` 的导出值）；
+> ③ 未修（`Pistol.tscn` 的数值仍是回退基线，表是权威）；④ 已修（阶段 2：节点表替掉了重复 switch）；
+> ⑤ 部分修（`RewardConfig.Weight` 19 条仍全是 1.0 —— 故意不改分布；`PoolTags` / `ConflictsWith` 仍是死字段，属 §4.5.6 的收尾决定）；
+> ⑥ 未做（`ApplicableWeapons` 反向指，§6.9 待拍板）；⑦ 未做（节点驱动见 §5 阶段 3 的第 3 步）。
+> **阶段 3 新修掉的问题**（本文档 §1.4 之外、由 [config-tables-inventory.md](config-tables-inventory.md) §5 盘出来的）
+> 见 §5 阶段 3 的"顺手修掉的既有问题"表：2 个 Balance 死字段 · `IsFinalBoss` · 效果表 4 列镜像 ·
+> `SpawnDisplayName` · 敌人倍率静默换挡 · `BarEnemy` 居中。
 
 **① 关卡数值有两个真源，而且已经漂移。** ✅ **已修（2026-10，配置表阶段 1：删掉 `DefaultStages()` + 拆表，见 §5）**
 `Config/Balance.tres:6-58` 与 `RunController.cs:286-325` 的 `DefaultStages()` 是同一份数据的两个副本：
@@ -2082,23 +2094,85 @@ public static string DescribePools()
 **验证**：见阶段 2 的比对表（手枪 11 项逐项一致、玩家 4 项一致、`PoolPreview` 18 条不变）。
 ❗ **未做**：三把武器各自开一局验证狙击/步枪的暴击/弹速（分表前它们**共用** `Pistol*` 的值，现在各自有独立字段，默认值仍写成 0.15/2/90/55/3 所以**行为不变**；要按武器区分得改行文件）。
 
+### 阶段 3：统一单位表 + 技能表（T2 + T5 + T9 的一部分 + #24）✅ **已完成（2026-10）**
+
+> 用户要求的结构：「敌人和首领单位都享有一个**单位表**，定义了它们**都通用的属性参数**，
+> 比如攻击/生命/移速/持有技能/行为&类」+「首领行为表本质也是一些技能」。
+
+**新增行类**（`Scripts/Config/`）：
+
+| 类 | 继承 | 自己声明的列 | 目录 / 行数 |
+|---|---|---|---|
+| `UnitConfig` | `ConfigRow`（抽象，不导出） | 生命（生命/护甲/护盾/护甲减伤/额外减伤/击退抗性）· 攻击四项（`AttackDamage` / `AttackInterval` / `AttackRange` / `AttackKnockback`）· 移速 · 行为&类（`Tags`）· **持有技能 `Skills : AbilityConfig[]`**（资源引用）· 表现（`ModelPath` / `IconPath` / `ModelScale`） | —（基类） |
+| `EnemyConfig` | `UnitConfig` | 全局倍率行（`IsGlobal` + 4 个倍率）· 刷怪（`ScenePath` / `Cost` / `Weight` / `MinElapsedSeconds` / `EliteChance`） | `Enemies/` **10** |
+| `BossConfig` | `UnitConfig` | `ScenePath` · `EliteCopyHealthScale` | `Bosses/` **1** |
+| `SummonConfig` | `UnitConfig` | `ScenePath` · `LifetimeSeconds` | `Summons/` **1** |
+| `CharacterConfig` | `UnitConfig` | 武器开关 / 默认武器 / 能力开关矩阵 | `Characters/` **3** |
+| `AbilityConfig` | `ConfigRow` | 寻址（`NodeName` / `ClassHint` / `InputAction`）· 通用项（`Aim` / `Cooldown` / `Windup` / `Recover` / `Enabled` / `Approach*`）· `Params`（子类专属）· `AttackParams`（命中体/武器组件）· `ApplyHandler` + `Weight`（**首领行为词条**用） | `Skills/` **25** |
+| `PressureModConfig` | `ConfigRow` | `Weight` · `Modifiers : StatOverride[]`（**只允许数值操作**） | `Pressure/` **3** |
+
+**三条关键设计（都是为了避免两个真源）**：
+
+1. **攻击四项属于单位行，`AbilityConfig.Cooldown <= 0` = 不覆盖**：套用顺序是"先技能行、后单位行"，
+   所以主攻击的伤害/间隔/范围/击退只有一个权威（单位行）。范围按能力子类依次试
+   `AttackRange` → `TriggerRadius` → `MaxRange` → `MaxDistance`（用 `GodotObject.Get` 判存在）。
+2. **`AttackParams` 与 `Params` 分开**：前者套到**这个技能的命中体**（没有命中体就退到它的武器组件，
+   远程兵走这条），后者套到**能力节点自己**。命中体的 `Damage`/`Knockback` 对主攻击由单位行统一给。
+3. **白名单按 `Id` 匹配**：`StageDefinition.AllowedEnemies`（中文显示名）→ **`AllowedEnemyIds`**；
+   生成项与行的配对改用**预制体路径**（`ConfigRows.ByScenePath<T>()`）。未知 Id 由 `Balance.BuildTableIndex`
+   在开局一次性校验并写警告 —— 这正是 §1.4-F4 与 §5 阶段 4 里"最容易出错的一步"的落地。
+
+**首领强化的两套来源（关卡核心文档 §7.1）**：行为/技能型 = 技能表里 `ApplyHandler` 非空的 4 行
+（`bhv_awakened` / `bhv_summoner` / `bhv_screaming` / `bhv_charging`，由 `BossPerkCatalog` 的处理器注册表编译）；
+数值型 = `Pressure/` 的 3 行（`pmod_berserk` / `pmod_fortress` / `pmod_swift`）。
+两张表**分别编译、各自独立回退**（一侧读不到不会让另一侧变空），`All` = 数值型在前 + 行为型在后
+（与分表前的 7 条顺序一致 → 开场抽取的随机序列不变）；新增 `PressureOnly` / `BehaviorOnly`
+让两套来源可独立追踪。**没有**为 Pressure 加"可被玩家增幅修改"的接口（§7.2 明令禁止）。
+
+**顺手修掉的既有问题**（详见 [config-tables-inventory.md](config-tables-inventory.md) §5）：
+
+| 问题 | 处理 |
+|---|---|
+| `BalanceConfig.EliteBossHealthScale`（0 消费者） | 搬进 `BossConfig.EliteCopyHealthScale`（行优先、场景导出值兜底）后删除 |
+| `BalanceConfig.BossHealthBarScale`（0 消费者） | 删除（血条尺寸由 `BarBoss.tscn` 决定） |
+| `StageDefinition.IsFinalBoss`（0 消费者） | 删除字段 + 3 行关卡里的赋值 |
+| `EffectConfig.Value` / `Value2` / `Radius` / `TickSeconds`（0 消费者，是 `Params` 的镜像） | 4 列删除；删完只剩注释的 `eff_knockback.tres` 整行删除（9 行） |
+| `EnemyConfig.SpawnDisplayName`（为对接显示名匹配而加） | 删除（身份键改为 `Id`） |
+| **静默换挡**：`Balance.cs` 的 `row?.HealthMultiplier ?? config.EnemyHealthMultiplier`（表 0.75/0.3 vs C# 1f/0.8f） | 两处对齐 + 新增"敌人倍率来源"日志 |
+| `BarEnemy.tscn` 的 `Content` 没以 Root 原点居中 | 改成 `(-33,-4.5)~(33,4.5)`（尺寸不变），`WorldDraw` 的警告消失 |
+
+**另一条实测踩到的坑（写进 `Unit` 的注释了）**：进树前套用配置表的值时，
+`Unit.RefreshStats()` 会在 `StatSheet` 基础值还没就位（`_Ready` 才 `SeedStats`）时把生命算成
+`max(1, 生命 × 0) = 1`，而 `_EnterTree` 又把这个 1 捕获成基础值 —— 一路静默错到底
+（实测 Chaser 生命 45 → 1）。修法：`SeedStats()` 提到构造函数里。
+
+**验证**（实测日志与回退验证的逐项比对见 [config.md](config.md) 的「配置表阶段 3 实测」一节）：
+`build.ps1 --no-incremental` **0 warning / 0 error**；自测里 `技能表实测（玩家）：滑铲 冷却 1.2 位移 6
+AbilityId skl_dash ｜ 近战 伤害 32 间隔 0.75 射程 2.4 击退 5 命中标签 [Melee,Heavy]`、
+`单位表实测（FastMelee）：生命 26 …（技能行 Id skl_enemy_fast_melee_melee）`；
+把 5 个新数组清空后仍能跑完自测、日志显示"来源：代码兜底 / 场景导出值"且敌人倍率**不再换挡**。
+
 ### 阶段 4：技能表 + 敌人表 + 节点表（T2 + T5 + T7）
 
 - ✅ **节点表（T7）已在阶段 2 做完**：`Config/Tables/Nodes/node_*.tres` 9 行，替掉 `RewardService` 两个 switch + `NodePlacement`/`StageController` 的重复实现。
   ⏸ **未做**：`SpawnsEncounter` / `MaterialPath` / `IconPath` 三个字段已就位但**还没接进 `RewardNode`**（当前它们仍读各自场景里的值）。
-- ⏸ **敌人表（T5）只落了全局那一行**（`enemy_global`）：四个全局倍率仍由 `BalanceConfig` 提供、表行优先覆盖（`enemy_global.HealthMultiplier` 等已接进 `Balance.ScaleEnemy` 与 `EliteChanceMultiplier`）。
-  **按敌种的行、`ScenePath` / `Weight` / `MinElapsedSeconds` / `EliteChance` 字段已就位但没接线** —— 生成项仍在 `Scenes/Main.tscn` 上。
-  下一步要连带把 `StageDefinition.Allows()` 从显示名匹配改成 `Id` 匹配（`AllowedEnemyIds`），**这一步最容易出错，务必先加自测把"本关允许的敌人"打出来**。
-- ⏸ **技能表（T2）完全没做**：`Player.tscn:64-140` 的 40 处赋值要逐项搬进 `Params`，而且 `Set()` 的键名必须与 `Ability` 子类的属性名完全一致。
+- ✅ **敌人表（T5）已在阶段 3 做完**：`Enemies/` 10 行（1 全局 + 9 敌种），生成项按**预制体路径**配对、
+  白名单按 `AllowedEnemyIds` 匹配（`StageDefinition.AllowsEnemy`），生成时"先 ApplyTo 再 AddChild"。
+- ✅ **技能表（T2）已在阶段 3 做完**：`Skills/` 25 行（5 玩家 + 16 单位 + 4 首领行为词条），
+  通用项 + `Params` + `AttackParams` 三类参数；`AbilityId` 会被写成技能行 Id（矩阵改成按类名匹配，见阶段 3）。
 
 ### 阶段 5：首领增强表 + 局外成长表（T9 + T10）+ 删旧代码
 
 - ✅ **局外成长表（T10）已在阶段 2 做完**：`Config/Tables/Meta/meta_*.tres` 5 行，`MetaProgress` 的 5 个系数与价格公式都改成查表（存档键 `SaveKey` 保留 `health_level` 等原键名，**存档兼容**）。
   ⏸ `RunSettlement.cs` 的 3 个 `const`（10 / 3 / 50 碎片）**仍没外置**（建议直接搬进 `BalanceConfig`，不是"按类型的行"）。
-- ⏸ **首领增强表（T9）完全没做**，顺序仍然是设计文档写的那样：
-  1. 先把 `BossPerkCatalog` 的 7 条搬进 `Config/Tables/BossMods/boss_*.tres`（`Source = OpeningPerk`），`EncounterController.cs:671-677` 改走 `WeightedPick`。**行为必须与今天一致**。
-  2. 抽 `WeightedPick`（已就位）—— **换的时候把 rng 当参数传**，否则随机序列会变、自测基线会漂。
-  3. 最后才加"节点驱动"：`NodeConfig.BossPressurePoints` / `BossModifierRolls` / `BossModifierTags` 三个字段**已经就位**（`node_*.tres` 里默认为 0/0/空 = 不生效），接线点是 `StageController` 的累加与 `EncounterController.BossModifierRolls`。
+- ⏸ **首领增强表（T9）已在阶段 3 做了一半**，剩"节点驱动"这最后一步：
+  1. ✅ 7 条词条已搬进表（4 条行为型 → `Skills/bhv_*.tres`，3 条数值型 → `Pressure/pmod_*.tres`），
+     `EncounterController` 走 `BossPerkCatalog.Roll`（内部仍是 `WeightedPick`，rng 照旧是本目录的静态 Rng）。
+     **行为必须与今天一致**（顺序 + 权重一致，所以随机序列没变）。
+  2. ✅ `WeightedPick` 已就位并使用中。
+  3. ⏸ **最后才加"节点驱动"**：`NodeConfig.BossPressurePoints` / `BossModifierRolls` / `BossModifierTags`
+     三个字段**已经就位**（`node_*.tres` 里默认为 0/0/空 = 不生效），接线点是 `StageController` 的累加与
+     `EncounterController.BossModifierRolls`。接线时按 `BossPerkCatalog.PressureOnly` / `BehaviorOnly` 分开抽。
 - ✅ **`_fallback` 旧目录没删**（`RewardCatalog.Fallback` / `StatusPresets.Fallback`）—— 按设计这是回退路径，不是技术债。
 - ⏸ 收尾决定 §4.5.6：`PoolTags` 改成 `UpgradePoolId` 用起来、还是删掉。
 
@@ -2331,9 +2405,10 @@ public WeaponFieldMask Overrides { get; set; } = WeaponFieldMask.All;
 | 它是什么 | 说明 |
 |---|---|
 | ✅ **仍是全项目数值的唯一入口** | 业务代码继续写 `Balance.Settings.Xxx`（[todo-handoff.md](todo-handoff.md) 的"统一入口"约定**没变**）。`Balance` 从"唯一数值**文件**"变成"唯一数值**门面**"（§2.1 就是这么设计的） |
-| ✅ **同时是 8 张表的索引持有者** | 7 个新 `[Export] XxxConfig[]` 数组 + 既有的 `Stages`，元素全部是独立 `ExtResource` |
-| ⏸ **没有**把索引分散到各系统 | **理由**：① 分散会造出 8 个"谁持有哪张表"的新约定，[architecture.md](architecture.md):134「加新全局入口前先问：能不能传参」的精神是**少入口**；② `ConfigRows` 是一个静态索引器，谁来 `Rebuild` 都一样，而现在只有 `Balance._Ready` 一处；③ **回退语义要求能一眼看出"整份配置有没有加载上"** —— `Balance.FileLoaded` 已经是那个开关，分散后它会失去意义 |
-| 顺序依赖 | `Balance._Ready` → `CallDeferred(BuildTableIndex)`（**必须 defer**，见 §5 阶段 2 的坑 1）→ `ConfigRows.Rebuild(...)` ×7 + `SetKind` ×9 + `RewardTable.Build` |
+| ✅ **同时是 12 张表的索引持有者** | 11 个 `[Export] XxxConfig[]` 数组 + 既有的 `Stages`，元素全部是独立 `ExtResource`：<br>`Stages` / `Weapons` / `Characters` / `Enemies` / **`Bosses`** / **`Summons`** / **`Skills`** / **`PressureMods`** / `Effects` / `Nodes` / `Upgrades` / `MetaUpgrades`（阶段 3 新增的 4 个加粗） |
+| ⏸ **没有**把索引分散到各系统 | **理由**：① 分散会造出 12 个"谁持有哪张表"的新约定，[architecture.md](architecture.md):134「加新全局入口前先问：能不能传参」的精神是**少入口**；② `ConfigRows` 是一个静态索引器，谁来 `Rebuild` 都一样，而现在只有 `Balance._Ready` 一处；③ **回退语义要能一眼看出"整份配置有没有加载上"** —— `Balance.FileLoaded` 已经是那个开关，分散后它会失去意义 |
+| 顺序依赖 | `Balance._Ready` → `CallDeferred(BuildTableIndex)`（**必须 defer**，见 §5 阶段 2 的坑 1）→ `ConfigRows.Rebuild(...)` ×11 + `SetKind` ×9 + `RewardTable.Build` + `BossPerkCatalog.Build(Config.Skills, Config.PressureMods)` + 关卡白名单校验（未知 Id 写警告） |
+| `BalanceConfig` 的标量字段 | **28 个**（阶段 2 之后 30 个，阶段 3 删掉两个死字段 `EliteBossHealthScale` / `BossHealthBarScale`） |
 
 ### 8.2 读表 / 回退的固定写法（新代码照抄）
 
@@ -2347,6 +2422,25 @@ GD.PushWarning($"[Config] 武器表里没有 {kind} 的行，保留武器组件�
 // 按 Id / 按枚举（节点表用 ByKind）
 NodeConfig? node = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
 MetaUpgradeConfig? meta = ConfigRows.ById<MetaUpgradeConfig>("meta_health");
+
+// 按"预制体路径"配对（阶段 3：敌人 / 首领 / 召唤物的生成项 ↔ 表行）
+EnemyConfig? enemy = ConfigRows.ByScenePath<EnemyConfig>(entry.Scene.ResourcePath);
+
+// ⚠️ 单位表套用的时机：必须在 Unit._EnterTree 之前（Unit 在 _EnterTree 捕获基础值）
+var unit = scene.Instantiate<Unit>();
+row?.ApplyTo(unit);        // ← 先套用（生命/攻击/技能/标签/表现）
+AddChild(unit);            // ← 再进树（触发 _EnterTree → _Ready → 回满生命）
+```
+
+**单位表的继承关系**（新表照这个模式加）：
+
+```
+ConfigRow（Id / Slot / DisplayName / DescriptionTemplate / Note / Params / ApplyTo）
+  └─ UnitConfig（生命 · 攻击四项 · 移速 · Tags · Skills · 表现）
+       ├─ EnemyConfig（+ 全局倍率行 + 刷怪五列）
+       ├─ BossConfig（+ ScenePath + EliteCopyHealthScale）
+       ├─ SummonConfig（+ ScenePath + LifetimeSeconds）
+       └─ CharacterConfig（+ 武器开关 / 能力开关矩阵）
 ```
 
 ### 8.3 ⚠️ 操作纪律（这一条必须遵守，否则"整份 Balance.tres 静默回退"）

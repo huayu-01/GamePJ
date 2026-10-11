@@ -64,26 +64,11 @@ public partial class EffectConfig : ConfigRow
 	[Export(PropertyHint.File, "*.png,*.svg")] public string IconPath { get; set; } = string.Empty;
 
 	[ExportGroup("通用数值（按 Kind 选用，用不到的就留默认值）")]
-	/// <summary>主数值：击退倍率 / 每秒伤害 / 减速后移速倍率 / 削伤倍率 / 吸血比例 …（含义由 <see cref="Kind"/> 决定）。</summary>
-	[Export] public float Value { get; set; }
-
-	/// <summary>状态类效果的默认持续时间（秒；0 = 由施加方决定）。</summary>
+	/// <summary>
+	/// 状态类效果的默认持续时间（秒；0 = 由施加方决定，例如命中体的 <c>StatusDuration</c>）。
+	/// ⚠️ 这是**第二优先**：调用方给了时长就用调用方的（`ToStatus(duration)` 的规则）。
+	/// </summary>
 	[Export] public float Duration { get; set; }
-
-	/// <summary>持续伤害的跳伤害间隔（秒）。</summary>
-	[Export] public float TickSeconds { get; set; } = 0.5f;
-
-	/// <summary>次要数值：攻速倍率（眩晕/增益）/ 爆炸伤害比例 / 召唤上限 …。</summary>
-	[Export] public float Value2 { get; set; }
-
-	/// <summary>作用半径（爆炸类）。</summary>
-	[Export] public float Radius { get; set; }
-
-	/// <summary>按命中挂状态时挂哪个状态 Id（对应 <c>Config/Tables/Effects/</c> 里的状态行）。</summary>
-	[Export] public string StatusId { get; set; } = string.Empty;
-
-	/// <summary>召唤类效果召唤什么（场景路径）。</summary>
-	[Export(PropertyHint.File, "*.tscn")] public string SummonScenePath { get; set; } = string.Empty;
 
 	[ExportGroup("状态修正（状态类效果用；取代 StatusEffect.cs 里硬编码的 Modifiers）")]
 	/// <summary>挂上之后持续生效的属性修正。空 = 不改属性（纯持续伤害就是这种）。</summary>

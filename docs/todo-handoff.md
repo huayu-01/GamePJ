@@ -104,13 +104,22 @@ Scripts/
 > 进度 / 实测证据 / 逐项比对 / 两条新坑见 [config-schema.md](config-schema.md) §5 阶段 2 与 §8；调参入口见 [config.md](config.md)。
 >
 > **留给下一轮的三件事**（按建议顺序）：
-> 1. **技能表（T2）**：`Player.tscn` 的 40 处技能赋值搬进 `Config/Tables/Skills/`（`Params` 键名必须与 `Ability` 子类属性名一致）。
-> 2. **敌人按敌种成行**：`EnemyConfig` 的 `ScenePath`/`Weight`/`MinElapsedSeconds`/`EliteChance` 已就位但没接线，
->    还要把 `StageDefinition.Allows()` 从显示名匹配改成 `Id` 匹配（**最容易出错的一步**）。
-> 3. **首领增强表（T9）**：7 条词条搬表 + `WeightedPick` 接上 + 最后才做"节点驱动"
->    （`NodeConfig.BossPressurePoints`/`BossModifierRolls`/`BossModifierTags` 三个字段已就位、当前默认 0 = 不生效）。
+> 1. **AI 行为表（盘点 #15，优先级高）**：10 个敌种的 AI 参数（`Brain.SearchRange` / 各 Behavior 的
+>    `Priority`·`StopDistance`·`PreferredDistance`… / 4 处硬编码避障启发式）现在仍**每个场景各配一份**；
+>    技能表已经落地，`UseAbilityBehavior.ApproachMin/Max` 也已进表，接 AI 表的时机成熟了。
+> 2. **首领增强的"节点驱动"**（T9 最后一步）：`NodeConfig.BossPressurePoints` / `BossModifierRolls` /
+>    `BossModifierTags` 三个字段已就位（默认 0 = 不生效），接线点在 `StageController` 的累加与
+>    `EncounterController.BossModifierRolls`。抽的时候按 `BossPerkCatalog.PressureOnly` / `BehaviorOnly`
+>    分开抽（两张表已经分开，见阶段 3）。
 >    ⚠️ 关卡核心文档 §7.1 的硬约束：**Boss Pressure（数值强化）与 Boss Build（行为/技能）必须分离**，
 >    且**不要为 Pressure 设计"可被玩家增幅修改"的接口**。
+> 3. **收尾决定**：`RewardConfig.PoolTags` / `ConflictsWith` 两个死字段（接上或删掉）、
+>    `WeaponConfig.ApplicableWeapons` 反向指（武器↔升级池关联）、`Pistol.tscn` 的数值（回退基线）。
+>
+> ✅ **阶段 3 已完成（2026-10）**：统一单位表（`UnitConfig` 基类 + 敌人 10 行 / 首领 1 行 / 召唤物 1 行 +
+> 角色表改继承）· 技能表 25 行（含 4 条首领行为词条）· 首领数值强化池 3 行 · 白名单改成按 Id ·
+> 6 处死字段清理 · 敌人倍率静默换挡修复 · `BarEnemy` 居中修复。
+> 详见 [config.md](config.md) 的「配置表阶段 3 实测」与 [config-schema.md](config-schema.md) §5 阶段 3。
 
 ### 任务 A：血条改事件驱动（用户明确要求）✅ 已完成（2026-10）
 

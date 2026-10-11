@@ -5,7 +5,6 @@
 [resource]
 script = ExtResource("1_0phsp")
 Kind = 7
-Value = 0.12
 Id = "Lifesteal"
 Slot = 12
 DisplayName = "吸血"

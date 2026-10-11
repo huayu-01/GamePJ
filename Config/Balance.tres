@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BalanceConfig" load_steps=94 format=3]
+[gd_resource type="Resource" script_class="BalanceConfig" load_steps=93 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/BalanceConfig.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -16,7 +16,6 @@
 [ext_resource type="Resource" path="res://Config/Tables/Effects/eff_burn.tres" id="14_eff_burn"]
 [ext_resource type="Resource" path="res://Config/Tables/Effects/eff_empowered.tres" id="15_eff_empowered"]
 [ext_resource type="Resource" path="res://Config/Tables/Effects/eff_stun.tres" id="16_eff_stun"]
-[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_knockback.tres" id="17_eff_knockback"]
 [ext_resource type="Resource" path="res://Config/Tables/Effects/eff_explosion.tres" id="18_eff_explosion"]
 [ext_resource type="Resource" path="res://Config/Tables/Effects/eff_lifesteal.tres" id="19_eff_lifesteal"]
 [ext_resource type="Resource" path="res://Config/Tables/Effects/eff_summon_on_kill.tres" id="20_eff_summon_on_kill"]
@@ -111,7 +110,7 @@ Stages = [ExtResource("2_stg_outer"), ExtResource("3_stg_inner"), ExtResource("4
 Weapons = [ExtResource("5_wpn_pistol"), ExtResource("6_wpn_sniper"), ExtResource("7_wpn_rifle")]
 Characters = [ExtResource("8_chr_gunner"), ExtResource("9_chr_heavy"), ExtResource("10_chr_summoner")]
 Enemies = [ExtResource("11_enemy_global"), ExtResource("55_enemy_chaser"), ExtResource("56_enemy_fast_melee"), ExtResource("57_enemy_exploder"), ExtResource("58_enemy_jumping_melee"), ExtResource("59_enemy_ranged"), ExtResource("60_enemy_charger"), ExtResource("61_enemy_screamer"), ExtResource("62_enemy_guard"), ExtResource("63_enemy_skill_elite")]
-Effects = [ExtResource("12_eff_slow"), ExtResource("13_eff_weaken"), ExtResource("14_eff_burn"), ExtResource("15_eff_empowered"), ExtResource("16_eff_stun"), ExtResource("17_eff_knockback"), ExtResource("18_eff_explosion"), ExtResource("19_eff_lifesteal"), ExtResource("20_eff_summon_on_kill"), ExtResource("21_eff_chain_lightning")]
+Effects = [ExtResource("12_eff_slow"), ExtResource("13_eff_weaken"), ExtResource("14_eff_burn"), ExtResource("15_eff_empowered"), ExtResource("16_eff_stun"), ExtResource("18_eff_explosion"), ExtResource("19_eff_lifesteal"), ExtResource("20_eff_summon_on_kill"), ExtResource("21_eff_chain_lightning")]
 Nodes = [ExtResource("22_node_weapon"), ExtResource("23_node_enhance"), ExtResource("24_node_evolution"), ExtResource("25_node_mutation"), ExtResource("26_node_resource"), ExtResource("27_node_heal"), ExtResource("28_node_special"), ExtResource("29_node_shop"), ExtResource("30_node_portal")]
 Upgrades = [ExtResource("36_upg_dmg_up"), ExtResource("37_upg_rate_up"), ExtResource("38_upg_boots"), ExtResource("39_upg_vitality"), ExtResource("40_upg_scope"), ExtResource("41_upg_lethal"), ExtResource("42_upg_fast_reload"), ExtResource("43_upg_ext_mag"), ExtResource("44_upg_stance"), ExtResource("45_upg_pierce_round"), ExtResource("46_evo_twin"), ExtResource("47_evo_ap"), ExtResource("48_evo_ricochet"), ExtResource("49_evo_blast"), ExtResource("50_mut_chain"), ExtResource("51_mut_lifesteal"), ExtResource("52_mut_burn"), ExtResource("53_mut_summon"), ExtResource("54_mut_supply")]
 MetaUpgrades = [ExtResource("31_meta_health"), ExtResource("32_meta_damage"), ExtResource("33_meta_speed"), ExtResource("34_meta_crit"), ExtResource("35_meta_reload")]
@@ -128,7 +127,6 @@ BossBarFullRange = 22.0
 KillPlaneY = -8.0
 NodeHealRatio = 0.3
 MinNodeSpacing = 8.0
-EliteBossHealthScale = 0.35
 PressurePerHighValueNode = 150
 PressureEvolutionBonus = 1.25
 PressureMutationBonus = 1.5
@@ -139,4 +137,3 @@ Skills = [ExtResource("64_skl_dash"), ExtResource("65_skl_burst"), ExtResource("
 PressureMods = [ExtResource("89_pmod_berserk"), ExtResource("90_pmod_fortress"), ExtResource("91_pmod_swift")]
 Bosses = [ExtResource("92_boss_final")]
 Summons = [ExtResource("93_summon_drone")]
-BossHealthBarScale = 4.0

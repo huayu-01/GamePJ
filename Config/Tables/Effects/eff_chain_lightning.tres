@@ -4,10 +4,6 @@
 
 [resource]
 script = ExtResource("1_akbno")
-Value = 14.0
-TickSeconds = 0.12
-Value2 = 7.0
-Radius = 7.0
 Id = "ChainLightning"
 Slot = 14
 DisplayName = "连锁闪电"

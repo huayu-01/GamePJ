@@ -16,9 +16,7 @@ Value = 0.5
 [resource]
 script = ExtResource("2_t7tgq")
 Kind = 5
-Value = 0.12
 Duration = 1.0
-Value2 = 0.5
 Modifiers = [SubResource("Resource_m3xer"), SubResource("Resource_t7tgq")]
 Id = "Stun"
 Slot = 5

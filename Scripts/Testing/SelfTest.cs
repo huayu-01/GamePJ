@@ -527,7 +527,7 @@ public partial class SelfTest : Node
 				: $"配置表比对·武器：伤害 {weapon.Damage:0}（期望 24） 间隔 {weapon.FireInterval:0.##}（期望 0.26） 弹匣 {weapon.EffectiveMagazineSize}（期望 12） 装填 {weapon.ReloadTime:0.##}（期望 0.7） 散布 {weapon.SpreadDegrees:0.##}（期望 0.5） 击退 {weapon.Knockback:0.##}（期望 2.5） 暴击 {weapon.CritChance:0.##}（期望 0.15） 弹速 {weapon.ProjectileSpeed:0}（期望 90） 预瞄FOV {weapon.AimFov:0}（期望 55） 穿透 {weapon.BasePierce}（期望 0） 连发 {weapon.Automatic}（期望 False）");
 
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}（期望 3/3/10/1/1/25/3/10/9/5）");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}（期望 3/3/10/1/1/25/3/9/9/5）");
 
 		GameLog.Write("SelfTest",
 			$"配置表比对·节点表：进化层 {NodePlacement.LayerOf(RewardNodeKind.Evolution)}/波 {NodePlacement.WavesFor(RewardNodeKind.Evolution)}（期望 2/3） 强化层 {NodePlacement.LayerOf(RewardNodeKind.Enhancement)}/波 {NodePlacement.WavesFor(RewardNodeKind.Enhancement)}（期望 1/2） 恢复层 {NodePlacement.LayerOf(RewardNodeKind.Heal)}/波 {NodePlacement.WavesFor(RewardNodeKind.Heal)}（期望 0/1） 商店价目 {RewardService.ShopCost(0)}/{RewardService.ShopCost(1)}/{RewardService.ShopCost(2)}（期望 5/12/18） 标题 {RewardService.TitleFor(RewardNodeKind.Mutation)}（期望 异化池）");
@@ -641,7 +641,7 @@ public partial class SelfTest : Node
 			}
 
 			AttackHitbox? hit = attacker == null ? null : NodeSearch.FindInSubtree<AttackHitbox>(attacker);
-			GameLog.Write("SelfTest", $"单位表实测（{sample.Name}）：生命 {sample.MaxHealth:0} 移速 {sample.MoveSpeed:0.##} 伤害 {hit?.Damage:0} 间隔 {attacker?.Cooldown:0.##} 击退 {hit?.Knockback:0.##} 标签 [{string.Join(",", sample.Tags)}] 技能 {abilities.Count} 个");
+			GameLog.Write("SelfTest", $"单位表实测（{sample.Name}）：生命 {sample.MaxHealth:0} 移速 {sample.MoveSpeed:0.##} 伤害 {hit?.Damage:0} 间隔 {attacker?.Cooldown:0.##} 击退 {hit?.Knockback:0.##} 标签 [{string.Join(",", sample.Tags)}] 技能 {abilities.Count} 个 技能行 Id {attacker?.AbilityId}（非类名 = 技能行真的套上了）");
 		}
 	}
 

@@ -5,7 +5,6 @@
 [resource]
 script = ExtResource("1_l008i")
 Kind = 1
-Value = 6.0
 Duration = 3.0
 DamagePerSecond = 6.0
 Id = "Burn"
