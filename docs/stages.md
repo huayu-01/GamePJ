@@ -44,10 +44,16 @@ Boss 战内的压力仍按时间继续升级。
 
 ## Stage 序列与 Final Boss
 
-一个 Stage 场景被复用于所有关卡，差异全部来自 Config/StageDefinition.cs 的数据（策划文档 §6.2：Stage 之间靠敌人强度与进度区分）：
+一个 Stage 场景被复用于所有关卡，差异全部来自**关卡表**的数据（策划文档 §6.2：Stage 之间靠敌人强度与进度区分）。
+
+> **关卡表的位置**（配置表体系阶段 1，见 [config-schema.md](config-schema.md) §3 T6 / §5）：
+> **一行 = 一个 `.tres` 文件**，放在 `Config/Tables/Stages/`：`stg_outer.tres` / `stg_inner.tres` / `stg_core.tres`；
+> 关卡顺序与索引仍是 `Config/Balance.tres` 上**已有的** `[Export] StageDefinition[] Stages` 数组（元素指向上面三个文件）。
+> 改某一关的数值 → 打开那一行的 `.tres`（或整张表一起看）；**不要**再往 `Balance.tres` 里塞内嵌 `sub_resource`。
 
 | 字段 | 含义 |
 |---|---|
+| `Id` | 关卡稳定键（`stg_outer` / `stg_inner` / `stg_core`），与行文件名同语义名；日志用它证明"这一关读的是哪一行" |
 | `DisplayName` | 关卡名，显示在 HUD |
 | `CombatBudget` / `MaxConcurrent` / `SpawnInterval` | 本关战斗的 Spawn Budget 与节奏 |
 | `EnemyHealthMultiplier` / `EnemyDamageMultiplier` | 本关敌人额外缩放（在全局平衡倍率之上再乘） |
@@ -55,9 +61,21 @@ Boss 战内的压力仍按时间继续升级。
 | `AllowedEnemies` | 本关允许生成的敌人（按生成项 DisplayName 匹配；留空 = 不限制） |
 | `RewardNodeCount` / `FreeChallengeQuota` | 本关布置几个节点、免费挑战几次 |
 | `BossGuardCount` / `BossHealthMultiplier` / `BossDamageMultiplier` | Boss 护卫数与 Boss 缩放 |
+| `BossPerkCount` | Boss 词条数量（Boss **Build**，即行为/技能） |
 | `IsFinalBoss` | 最终 Boss（打完即通关） |
+| `PressureGrowthMultiplier` / `PressureThreshold` | Boss **Pressure**（数值强化）的本关增长倍率与转换阈值（关卡核心文档 §7.2/§7.3） |
+| `PressurePerNodeNormal` / `PressurePerNodeHighValue` | 普通 / 高价值挑战完成后增加的基础 Pressure（§7.4） |
+| `PressureEvolutionBonus` / `PressureMutationBonus` | 进化 / 异化挑战的额外比例（§7.4） |
+| `PressureUpgradeTags` | 本关 Pressure 转换后允许进入的**数值型**强化候选标签（§7.4；留空 = 不限制）。⚠️ 数值强化池本身尚未实现（§7.5），当前只写进日志 |
 
-序列写在 `Balance.tres` 的 `Stages` 数组里（`Config/Balance.tres`），配置为空时使用代码内置的三关兜底。
+> **Pressure 字段的取值规则**：行里填了就用行里的；留 0（= 未设置）就用 `Balance.tres` 上的全局默认值
+> （`PressurePerHighValueNode` 150 / `PressureEvolutionBonus` 1.25 / `PressureMutationBonus` 1.5 / `PressurePerPoint` 100）。
+> 当前三行**都没填**，所以 Pressure 与分表之前逐位一致。
+> ⚠️ 关卡核心文档 §7.1 的硬约束：Pressure 只管**数值型**强化，行为/技能型走 Boss Build（`BossPerkCatalog`），两者不得合成一个池。
+
+序列写在 `Balance.tres` 的 `Stages` 数组里（`Config/Balance.tres`），指向 `Config/Tables/Stages/stg_*.tres`。
+**读不到 / 数组为空时回退到 `StageDefinition` 自身的 `[Export]` 默认值**（一关，`Stage 1`）；
+代码里**不再有**"内置三关兜底"（`RunController.DefaultStages()` 已在配置表阶段 1 删除 —— 它和 `Balance.tres` 漂移过 5 处）。走表还是走默认值，开局日志里有一行明确写出。
 
 **切关流程**：Boss 阵亡 → 还有下一关就 `ApplyStage`（节点重新随机布置、挑战计数清零、门复位、场上清空、玩家回出生点并回满、构筑与生命保留）并弹「本关完成」提示；最后一关的 Boss 阵亡 → 通关结算。
 
@@ -191,7 +209,7 @@ Stage 1 · 外围   剩余节点 5   隔离次数 2   用时 2s   敌人 0
 
 ### 节点数量与保底
 
-> 数值以 `Config/Balance.tres` 为准（**2026-01 复核**）：Stage 1/2/3 的 `RewardNodeCount` = **3 / 4 / 4**，`FreeChallengeQuota` = **2 / 2 / 1**。
+> 数值以 `Config/Tables/Stages/*.tres` 为准（**2026-10 复核**，配置表阶段 1 之后）：Stage 1/2/3 的 `RewardNodeCount` = **3 / 4 / 4**，`FreeChallengeQuota` = **2 / 2 / 1**（分表时逐字段照抄，数值未变）。
 > `StageController.ActiveNodeCount` 会被 `StageDefinition.RewardNodeCount` 覆盖（`StageController.ApplyStage()` 里赋值），Inspector 上的默认值不生效。
 
 - 场景 `Scenes/Levels/TestArena.tscn` 里手工摆了 10 个 `RewardNode` 实例，`PlaceNodes()` 按 `ActiveNodeCount` 洗牌启用其中若干个

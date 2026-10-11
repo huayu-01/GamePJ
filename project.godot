@@ -21,8 +21,8 @@ MCPRuntimeProbe="*uid://bsg12huaf1u5i"
 Balance="*res://Scripts/Config/Balance.cs"
 UiRouter="*res://Scripts/UI/UiRouter.cs"
 GameLog="*res://Scripts/Core/GameLog.cs"
-UiService="*res://Scripts/UI/UiService.cs"
 SelfTest="*res://Scripts/Testing/SelfTest.cs"
+UiService="*res://Scripts/UI/UiService.cs"
 
 [display]
 
@@ -37,7 +37,7 @@ project/assembly_name="ActRoguelike"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg", "res://addons/yard/plugin.cfg")
 
 [input]
 
@@ -114,8 +114,6 @@ interact={
 [physics]
 
 3d/physics_engine="Jolt Physics"
-; 物理插值：物理固定 60Hz、渲染 120fps+ 时，角色的**渲染变换**按渲染帧插值，
-; 否则角色每 2~3 个渲染帧才移动一次（实测 50.2% 的帧位移为 0），看起来就是"缓动 + 残影"。
 common/physics_interpolation=true
 
 [rendering]

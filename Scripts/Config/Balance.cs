@@ -17,6 +17,12 @@ public partial class Balance : Node
 
 	public BalanceConfig Config { get; private set; } = new();
 
+	/// <summary>
+	/// <see cref="ConfigPath"/> 是否真的加载成功。供日志区分「表已加载」与「整份配置回退到代码默认值」——
+	/// 两者在玩法上差别很大（例如 Stages 为空、玩家生命 160 vs 250），必须能一眼看出来。
+	/// </summary>
+	public bool FileLoaded { get; private set; }
+
 	public static BalanceConfig Settings => Instance?.Config ?? Fallback;
 
 	public override void _Ready()
@@ -25,6 +31,7 @@ public partial class Balance : Node
 		if (ResourceLoader.Exists(ConfigPath) && GD.Load<BalanceConfig>(ConfigPath) is { } loaded)
 		{
 			Config = loaded;
+			FileLoaded = true;
 		}
 		else
 		{

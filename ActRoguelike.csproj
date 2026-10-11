@@ -4,5 +4,14 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>ActRoguelike</RootNamespace>
     <Nullable>enable</Nullable>
+    <!-- YARD 插件的 C# 包装类在 Nullable=enable 下报 CS8618（上游问题，改上游文件会被升级覆盖）。
+         我们自己的代码仍受 Nullable=enable 检查，只是不再把这一条当噪声。 -->
+    <NoWarn>$(NoWarn);CS8618</NoWarn>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- 上游 YARD 插件的 C# 包装类在 Nullable=enable 下报 CS8618（Registry.cs:50 _registry 未初始化）。
+         只对该文件关闭 nullable 检查：不改上游文件（升级会被覆盖）、不全局压制警告。 -->
+
+  </ItemGroup>
+
 </Project>

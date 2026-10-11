@@ -100,6 +100,12 @@ public partial class StageController : Node3D
 		ActiveNodeCount = definition.RewardNodeCount;
 		FreeChallengeQuota = definition.FreeChallengeQuota;
 
+		// 证明"这一关用的是表里的哪一行、哪套 Pressure 规则"（配置表回退纪律：回退/来源要留痕）。
+		string tags = definition.PressureUpgradeTags.Length == 0
+			? "不限制"
+			: string.Join(",", definition.PressureUpgradeTags);
+		ActRoguelike.Core.GameLog.Write("Node", $"Stage 表行：{definition.Id}（{definition.DisplayName}）Boss Pressure 规则：增长倍率 {definition.PressureGrowthMultiplier:0.##} / 阈值 {(definition.PressureThreshold > 0 ? definition.PressureThreshold : ActRoguelike.Config.Balance.Settings.PressurePerPoint)} / 数值强化候选 [{tags}]");
+
 		if (_encounter != null)
 		{
 			_encounter.TotalBudget = definition.CombatBudget;
@@ -328,12 +334,27 @@ public partial class StageController : Node3D
 	}
 
 	/// <summary>
-	/// 挑战完成后按节点价值累积 Pressure（关卡核心文档 L352/L370）：
-	/// 高价值（进化/异化）每次 +150；每满 100 转成 1 点首领压力，**余数清零**。
+	/// 挑战完成后按节点价值累积 Pressure（关卡核心文档 §7.2/§7.3/§7.4）：
+	///   高价值（进化/异化）基础点数 × 本关增长倍率 × 挑战类型额外比例；普通挑战只有基础点数（默认 0）。
+	///   组合顺序固定为「基础 → ×本关倍率 → ×类型比例」（§7.2 要求组合规则明确）。
+	/// 每满「Pressure 阈值」转成 1 点首领压力，**余数清零、不结转**（§7.3 第 5 条）；
+	/// 一次结算跨过多个阈值时按整除一次拿到多级（§7.3 第 6 条：不能只转一次就丢掉多余的）。
+	///
+	/// 数值来源（关卡核心文档 §7.4 的 Stage 倍率表）：先读当前 Stage 行
+	/// （<c>Config/Tables/Stages/stg_*.tres</c>），行里留 0 = 未设置 → 回退到 Balance 的全局默认值。
+	/// ⚠️ 这里只处理**数值型**首领强化所需的 Pressure；行为/技能型词条走 BossPerkCatalog，
+	/// 关卡核心文档 §7.1 要求两者分离、不得合并成一个池。
 	/// </summary>
 	public void AddPressureForNode(RewardNodeKind kind)
 	{
-		if (LayerOf(kind) < 2)
+		ActRoguelike.Config.BalanceConfig config = ActRoguelike.Config.Balance.Settings;
+		StageDefinition? stage = Definition;
+
+		// 基础点数：高价值（层 2）用「高价值挑战基础 Pressure」，普通挑战用「普通挑战基础 Pressure」。
+		float basePoints = LayerOf(kind) >= 2
+			? Positive(stage?.PressurePerNodeHighValue, config.PressurePerHighValueNode)
+			: Mathf.Max(0f, stage?.PressurePerNodeNormal ?? 0f);
+		if (basePoints <= 0f)
 		{
 			return;
 		}
@@ -341,12 +362,13 @@ public partial class StageController : Node3D
 		// 关卡核心文档 L356：进化/异化奖励对 Pressure 增加值有额外比例。
 		float scale = kind switch
 		{
-			RewardNodeKind.Evolution => ActRoguelike.Config.Balance.Settings.PressureEvolutionBonus,
-			RewardNodeKind.Mutation => ActRoguelike.Config.Balance.Settings.PressureMutationBonus,
+			RewardNodeKind.Evolution => Positive(stage?.PressureEvolutionBonus, config.PressureEvolutionBonus),
+			RewardNodeKind.Mutation => Positive(stage?.PressureMutationBonus, config.PressureMutationBonus),
 			_ => 1f,
 		};
-		float perNode = ActRoguelike.Config.Balance.Settings.PressurePerHighValueNode * scale;
-		float perPoint = Mathf.Max(1f, ActRoguelike.Config.Balance.Settings.PressurePerPoint);
+		float growth = stage is { PressureGrowthMultiplier: > 0f } row ? row.PressureGrowthMultiplier : 1f;
+		float perNode = basePoints * growth * scale;
+		float perPoint = Mathf.Max(1f, Positive(stage?.PressureThreshold, config.PressurePerPoint));
 		_pressureBank += perNode;
 		int gained = (int)(_pressureBank / perPoint);
 		if (gained > 0)
@@ -355,8 +377,12 @@ public partial class StageController : Node3D
 			_pressureBank = 0f;
 		}
 
-		ActRoguelike.Core.GameLog.Write("Node", $"Pressure 累积：+{perNode:0} → 余数 {_pressureBank:0} / 本关首领额外压力 {_bossPressureBonus}");
+		ActRoguelike.Core.GameLog.Write("Node", $"Pressure 累积：+{perNode:0.#}（基础 {basePoints:0.#} × 本关倍率 {growth:0.##} × 类型比例 {scale:0.##}）阈值 {perPoint:0} → 余数 {_pressureBank:0.#} / 本关首领额外压力 {_bossPressureBonus}");
 	}
+
+	/// <summary>行里填了就用行里的，否则用全局默认值（0 / 负数 = 未设置）。</summary>
+	private static float Positive(float? rowValue, float globalValue)
+		=> rowValue is > 0f ? rowValue.Value : globalValue;
 
 	/// <summary>仅供自测：按类型触发一次节点交互（走正常 RequestRewardNode 路径）。</summary>
 	public bool DebugTriggerNode(RewardNodeKind kind)

@@ -80,32 +80,9 @@ public sealed partial class RewardPool : RefCounted
 			}
 		}
 
-		var picked = new List<RewardDefinition>();
-		for (int i = 0; i < count && available.Count > 0; i++)
-		{
-			float total = 0f;
-			foreach (RewardDefinition definition in available)
-			{
-				total += Mathf.Max(0.01f, definition.Weight);
-			}
-
-			float roll = _rng.RandfRange(0f, total);
-			int index = available.Count - 1;
-			for (int j = 0; j < available.Count; j++)
-			{
-				roll -= Mathf.Max(0.01f, available[j].Weight);
-				if (roll <= 0f)
-				{
-					index = j;
-					break;
-				}
-			}
-
-			picked.Add(available[index]);
-			available.RemoveAt(index);
-		}
-
-		return picked;
+		// 加权抽样走公共工具（Config/WeightedPick.cs）。⚠️ 必须把本池自己的 _rng 传进去：
+		// 抽公共工具之前这里是内联的同一段算法，换成共用一把 RNG 会让随机序列变、自测基线漂。
+		return ActRoguelike.Config.WeightedPick.Pick(available, definition => definition.Weight, count, _rng);
 	}
 	/// <summary>互斥判定（双向）：弹射与穿透这类不合理的组合不会同时出现。</summary>
 	private bool IsExcluded(RunBuild build, RewardDefinition candidate)

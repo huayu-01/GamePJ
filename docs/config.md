@@ -243,10 +243,17 @@
 
 ## Pressure 结算（关卡核心文档 L352/L370）
 
+> **2026-10 更新（配置表阶段 1）**：Pressure 的**基础点数 / 阈值 / 增长倍率 / 额外比例**现在优先读**当前 Stage 行**
+> （`Config/Tables/Stages/stg_*.tres` 的 `PressureGrowthMultiplier` / `PressureThreshold` /
+> `PressurePerNodeNormal` / `PressurePerNodeHighValue` / `PressureEvolutionBonus` / `PressureMutationBonus`）。
+> **行里留 0（= 未设置）就回退到下表的全局默认值** —— 当前三行都没填，所以行为与分表前完全一致。
+> 组合顺序固定为：`基础点数 × 本关增长倍率 × 挑战类型额外比例`。
+> ⚠️ 硬约束：这里只管**数值型**强化（Boss Pressure）；行为/技能型走 `BossPerkCatalog`（Boss Build），两者不得合成一个池（关卡核心文档 §7.1）。
+
 | 参数 | 含义 |
 |---|---|
-| `PressurePerHighValueNode` | 完成一次**高价值**节点（进化/异化）挑战增加的 Pressure 点数（150） |
-| `PressurePerPoint` | 每满多少点转成 1 点首领压力（100） |
+| `PressurePerHighValueNode` | 完成一次**高价值**节点（进化/异化）挑战增加的 Pressure 点数（150）—— 行里没填时的全局默认值 |
+| `PressurePerPoint` | 每满多少点转成 1 点首领压力（100）—— 行里没填时的全局默认值 |
 
 规则：**挑战完成后**才累积（不是随时间涨）；只有高价值节点计数；每满 100 转 1 点，**余数清零**（不满 100 的部分丢弃）。
 
@@ -315,13 +322,13 @@ Encounter 清场完成：共生成 4，用时 3s      ← 首领死后才结算
 
 | 参数 | 含义 |
 |---|---|
-| `PressureEvolutionBonus` | 进化奖励的 Pressure 比例（1.25 = +25%） |
-| `PressureMutationBonus` | 异化奖励的 Pressure 比例（1.5 = +50%） |
+| `PressureEvolutionBonus` | 进化奖励的 Pressure 比例（1.25 = +25%）—— 行里没填时的全局默认值 |
+| `PressureMutationBonus` | 异化奖励的 Pressure 比例（1.5 = +50%）—— 行里没填时的全局默认值 |
 
-`AddPressureForNode()` 按奖励类型乘比例后再走「每 100 转 1 点、余数清零」。实测：
+`AddPressureForNode()` 按奖励类型乘比例后再走「每 100 转 1 点、余数清零」。实测（**2026-10 复核，日志格式改成 `+187.5` 保留一位小数**，数值与分表前逐位一致）：
 
 ```
-进化 150×1.25 = 187.5 → +188 → 转 1 点（余数清零）
-异化 150×1.50 = 225   → +225 → 转 2 点（累计 3 点）
+进化 150×1.25 = 187.5 → +187.5 → 转 1 点（余数清零）
+异化 150×1.50 = 225   → +225   → 转 2 点（累计 3 点）
 再加一次中价值（强化）→ 压力仍为 3（只有高价值计数）
 ```

@@ -177,7 +177,7 @@ public partial class RunController : Node
 		{
 			_boot = 1;
 			ApplyBalance();
-			_stages = Balance.Settings.Stages.Length > 0 ? Balance.Settings.Stages : DefaultStages();
+			_stages = ResolveStages();
 			_startScreen = UiService.Instance?.Screen<StartScreen>();
 			_baseScreen = UiService.Instance?.Screen<BaseScreen>();
 			MetaProgress.Load();
@@ -282,47 +282,61 @@ public partial class RunController : Node
 		BeginRunWithCharacter(character, _weaponKind);
 	}
 
-	/// <summary>配置里没写关卡序列时的兜底（三关：外围 / 内环 / 最终 Boss）。</summary>
-	private static StageDefinition[] DefaultStages() => new[]
+	/// <summary>
+	/// 关卡序列的来源（设计文档 config-schema.md §4.2 / §5 阶段 1）：
+	/// **只有一个真源** —— <see cref="ActRoguelike.Config.BalanceConfig.Stages"/>（`Config/Balance.tres`
+	/// 上的数组，元素指向 `Config/Tables/Stages/stg_*.tres`）。
+	/// 读不到 / 空表 → 回退到 <see cref="StageDefinition"/> 自身的 `[Export]` 默认值，
+	/// **不再有第二份兜底表**（原来的 `DefaultStages()` 与 `Balance.tres` 已经漂移了 5 处，
+	/// 最严重的是 Stage2 的 AllowedEnemies 走兜底会变成"不限制"）。
+	/// ⚠️ 实测：删/改一个被引用的行文件 → Godot 会**整份** `Balance.tres` 加载失败，
+	/// 所以走的是"0 关 → 单关默认值"这条粗回退（其他数值也一起回退）。别再删行文件，见 docs/config-schema.md §5。
+	/// 回退留痕：日志里能直接看到这一局走的是"表"还是"默认值"。
+	/// </summary>
+	private static StageDefinition[] ResolveStages()
 	{
-		new StageDefinition
+		StageDefinition[] table = ActRoguelike.Config.Balance.Settings.Stages;
+		if (table is not { Length: > 0 })
 		{
-			DisplayName = "Stage 1 · 外围",
-			CombatBudget = 10f,
-			MaxConcurrent = 3,
-			SpawnInterval = 2f,
-			RewardNodeCount = 3,
-			FreeChallengeQuota = 2,
-			AllowedEnemies = new[] { "基础近战", "快速近战", "自爆" },
-		},
-		new StageDefinition
+			// 连"整张表"都读不到时，把全局数值的来源也打出来：这样一眼能区分
+			// 「只是关卡表为空」和「连 Balance.tres 都没加载上（所有数值都回退了）」。
+			string source = ActRoguelike.Config.Balance.Instance?.FileLoaded == true ? "Balance.tres 已加载" : "Balance.tres 未加载（全部数值回退到代码默认值）";
+			ActRoguelike.Core.GameLog.Write("Flow", $"关卡表：0 关（来源：默认值）—— Balance 的 Stages 为空或未找到，使用 StageDefinition 自身的默认值。（{source}，玩家生命 {ActRoguelike.Config.Balance.Settings.PlayerMaxHealth:0}）");
+			GD.PushWarning("[Config] 关卡表为空，使用 StageDefinition 自身默认值。");
+			return new[] { new StageDefinition() };
+		}
+
+		var stages = new List<StageDefinition>(table.Length);
+		int missing = 0;
+		foreach (StageDefinition? row in table)
 		{
-			DisplayName = "Stage 2 · 内环",
-			CombatBudget = 16f,
-			MaxConcurrent = 4,
-			SpawnInterval = 1.8f,
-			EnemyHealthMultiplier = 1.15f,
-			EliteChanceScale = 0.15f,
-			RewardNodeCount = 4,
-			BossHealthMultiplier = 1.4f,
-		},
-		new StageDefinition
+			// ⚠️ 实测（2026-10）：行文件被删/改名时，**在游戏里根本走不到这里** —— 缺依赖会让
+			// `GD.Load<BalanceConfig>` 整份失败（于是走上面"0 关"那条分支，所有数值一起回退到代码默认值，
+			// 实测玩家生命 250→160）。这个空档分支只在"数组里真的出现空元素"时兜底，纯粹是防 NullReference。
+			if (row == null)
+			{
+				missing++;
+				stages.Add(new StageDefinition());
+				continue;
+			}
+
+			stages.Add(row);
+		}
+
+		var summary = new System.Text.StringBuilder();
+		foreach (StageDefinition row in stages)
 		{
-			DisplayName = "Stage 3 · 核心（最终 Boss）",
-			CombatBudget = 22f,
-			MaxConcurrent = 5,
-			SpawnInterval = 1.6f,
-			EnemyHealthMultiplier = 1.3f,
-			EnemyDamageMultiplier = 1.2f,
-			EliteChanceScale = 0.25f,
-			RewardNodeCount = 4,
-			FreeChallengeQuota = 1,
-			BossGuardCount = 3,
-			BossHealthMultiplier = 2.2f,
-			BossDamageMultiplier = 1.25f,
-			IsFinalBoss = true,
-		},
-	};
+			summary.Append($" | {row.Id} {row.DisplayName} 允许敌人[{row.AllowedEnemies.Length}] 敌伤×{row.EnemyDamageMultiplier:0.##} Boss伤×{row.BossDamageMultiplier:0.##} Boss词条{row.BossPerkCount}");
+		}
+
+		ActRoguelike.Core.GameLog.Write("Flow", $"关卡表：{stages.Count} 关（来源：表{(missing > 0 ? $"，缺 {missing} 行→该关用默认值" : string.Empty)}）{summary}");
+		if (missing > 0)
+		{
+			GD.PushWarning($"[Config] 关卡表有 {missing} 行读不到（文件被删/改名？），这些关使用 StageDefinition 自身默认值。");
+		}
+
+		return stages.ToArray();
+	}
 
 	private void EndRun(bool victory)
 	{
@@ -426,7 +440,7 @@ public partial class RunController : Node
 
 		if (_stages.Length == 0)
 		{
-			_stages = Balance.Settings.Stages.Length > 0 ? Balance.Settings.Stages : DefaultStages();
+			_stages = ResolveStages();
 		}
 
 		ApplyStage(0);

@@ -28,6 +28,14 @@ public sealed class BossPerkContext
 /// Boss 词条目录。加内容只加一行定义；效果走 StatSheet 的 Modifier 或直接改 Boss 的组件参数，
 /// 不往 Boss 脚本里加分支（策划文档 §12：Boss Build 与 Boss Pressure、Boss Skill 分离）。
 /// </summary>
+/// <remarks>
+/// ⚠️ <b>关卡核心文档 §7.1 的硬约束</b>：这里是 <b>Boss Build</b>（首领实际获得的战斗行为/技能）。
+/// <b>Boss Pressure</b>（数值型强化，按 Pressure 阈值转换）是**另一套**来源，两套可以在最终 Boss
+/// 初始化时共同生效，但**不允许合并成一个无法区分来源的强化池**。
+/// 即：数值型强化的候选/权重不得写进本目录，行为型词条也不得混进 Pressure 强化池。
+/// （当前本目录确实同时含数值词条（狂暴/铁壁/疾行/提前觉醒）与行为词条（召唤师/尖啸/冲锋），
+/// 把它们按来源拆开是设计文档 §5 阶段 5 / T9 的工作，本阶段不动。）
+/// </remarks>
 public static class BossPerkCatalog
 {
 	public static readonly BossPerk[] All =
@@ -121,34 +129,9 @@ public static class BossPerkCatalog
 	/// <summary>随机抽 count 个不重复词条（加权）。</summary>
 	public static List<BossPerk> Roll(int count)
 	{
-		var available = new List<BossPerk>(All);
-		var picked = new List<BossPerk>();
-
-		for (int i = 0; i < count && available.Count > 0; i++)
-		{
-			float total = 0f;
-			foreach (BossPerk perk in available)
-			{
-				total += Mathf.Max(0.01f, perk.Weight);
-			}
-
-			float roll = Rng.RandfRange(0f, total);
-			int index = available.Count - 1;
-			for (int j = 0; j < available.Count; j++)
-			{
-				roll -= Mathf.Max(0.01f, available[j].Weight);
-				if (roll <= 0f)
-				{
-					index = j;
-					break;
-				}
-			}
-
-			picked.Add(available[index]);
-			available.RemoveAt(index);
-		}
-
-		return picked;
+		// 加权抽样走公共工具（Config/WeightedPick.cs）。⚠️ 本目录自己的静态 Rng 必须传进去：
+		// 它与 RewardPool 的实例 RNG 不是同一把，共用一把会让随机序列变、自测基线漂。
+		return ActRoguelike.Config.WeightedPick.Pick(All, perk => perk.Weight, count, Rng);
 	}
 
 	private static void Mod(BossPerkContext context, string stat, ModifierOperation operation, float value)

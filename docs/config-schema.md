@@ -4,7 +4,9 @@
 > 本文回答三件事：**① 现在有哪些可配置项、哪些是硬编码；② 按类型怎么分表（类 / 字段 / `[Export]` / 目录）；③ 怎么分阶段搬过去而不炸。**
 > 相关：[todo-handoff.md](todo-handoff.md)（约定与统一入口）、[architecture.md](architecture.md)（分层与踩过的坑）、[controller-flow.md](controller-flow.md)（流程）、[assets.md](assets.md)（目录与命名规范）、[config.md](config.md)（当前数值入口）
 >
-> ⚠ **本文只是设计。没有改任何 `.cs` / `.tres` / `.tscn`。** 文中的 C# 代码全部按 Godot 4.7.2 实际 API 写成，关键签名已用 `GodotSharp 4.7.2` 反射核对（见 §7）。
+> ⚠ **本文以设计为主。** 文中的 C# 代码全部按 Godot 4.7.2 实际 API 写成，关键签名已用 `GodotSharp 4.7.2` 反射核对（见 §7）。
+> **例外（已落地）**：**阶段 0 与阶段 1** 已经按本文实施并实测（`Scripts/Config/ConfigTable.cs` / `ParamEntry.cs` / `ConfigText.cs` / `WeightedPick.cs`、`Config/Tables/Stages/stg_*.tres`、`RunController.DefaultStages()` 已删除）——
+> 进度、实测证据与两条新发现的坑见 **§5 阶段 0/1** 与 **§7.2**。其余 8 张表仍是设计。
 >
 > 🔗 **与 [config-tooling.md](config-tooling.md) 的分工**：那份文档回答"**用什么工具**批量编辑这些表"，结论是装 `Edit Resources as Table` 插件、**把文件夹当表、一行一个 `.tres` 文件**。
 > **这个形态是本文表格设计的硬约束** —— 本文的行布局（§2.3）与文件粒度取舍（§6.2）已经按它对齐：**每一行 = 独立的 `.tres` 文件，一个文件夹 = 一张表**。
@@ -16,9 +18,9 @@
 | 问题 | 结论 |
 |---|---|
 | 盘出多少可配置项 | **632 处磁盘配置实例**（`Scenes/**.tscn` 里 513 处脚本属性赋值 + `Config/Balance.tres` 里 119 处）+ **305 个 C# 可导出属性槽**（分布在 49 个文件） |
-| 多少当前硬编码 | 全项目 **214 处**十进制字面量；剔除测试代码（48）、纯表现/UI 布局（61）、clamp/epsilon/形状数学后，**约 65 处是"可调玩法数值"**（A 类 40 + B 类 25）。其中 **40 处集中在 7 个文件**：**30 处在 6 个纯"目录式"文件**里（`RewardCatalog` 11 / `StatusEffect` 6 / `BossPerk` 4 / `MetaProgress` 4 / `RunSettlement` 3 / `SpawnPlanner` 2），另 10 处在 `RunController.DefaultStages()` —— 这 40 处就是"应该整表外置"的候选 |
+| 多少当前硬编码 | 全项目 **214 处**十进制字面量；剔除测试代码（48）、纯表现/UI 布局（61）、clamp/epsilon/形状数学后，**约 65 处是"可调玩法数值"**（A 类 40 + B 类 25）。其中 **40 处集中在 7 个文件**：**30 处在 6 个纯"目录式"文件**里（`RewardCatalog` 11 / `StatusEffect` 6 / `BossPerk` 4 / `MetaProgress` 4 / `RunSettlement` 3 / `SpawnPlanner` 2），另 10 处在 ~~`RunController.DefaultStages()`~~ —— 这 40 处就是"应该整表外置"的候选。✅ 其中 `RunController` 那 10 处已随阶段 1 删除 |
 | 拆几张表 | **11 张**（T1–T11）：武器 / 技能 / 增幅项 / 角色 / 敌人 / 关卡 / 节点 / 状态 / **首领增强（含词条）** / 局外成长（见 §3） |
-| 第一阶段做哪张 | **关卡表（T6）**。理由见 §5 的「阶段 1」小节：类已经存在（`StageDefinition` 15 个字段）、改动只有 2 个调用点、有现成自测可逐项比对、而且顺手消掉一个**已经漂移的真 bug** |
+| 第一阶段做哪张 | **关卡表（T6）**。理由见 §5 的「阶段 1」小节：类已经存在（`StageDefinition` 15 个字段）、改动只有 2 个调用点、有现成自测可逐项比对、而且顺手消掉一个**已经漂移的真 bug**。✅ **阶段 0 与阶段 1 已完成（2026-10）**，进度与实测证据见 §5；两条新挖出来的坑见 §5 阶段 1 与 §7.2 |
 | 行怎么放 | **一行 = 一个 `.tres` 文件，一个文件夹 = 一张表**（[config-tooling.md](config-tooling.md) 推荐的 `Edit Resources as Table` 插件按文件夹分组，这是硬约束）。`Balance.tres` 持有 `[Export] XxxConfig[]` 数组显式引用这些行 —— **不扫目录**，导出后也不会掉文件 |
 | 最需要拍板的 | **效果怎么表达**（`ApplyHandler` 字符串 + C# 处理器注册表，还是允许内嵌脚本）—— 这一条决定整套体系是"可校验的数据"还是"换皮代码"（见 §6.1）。另有两条与你的两个场景直接相关：**武器→升级池的关联方向**（§6.9）与**场景 A 的范围**（§6.10） |
 
@@ -134,7 +136,7 @@
 | # | 现有配置项 | 当前存放位置 | 是否硬编码 | 建议归属哪张表 |
 |---|---|---|---|---|
 | G1 | 3 关 × 15 字段 | `Balance.tres:6-58`（`[sub_resource]`） | 否（但内嵌在 Balance 里） | **关卡表** `Config/Tables/Stages/stg_*.tres`（每关一个文件） |
-| G2 | 关卡兜底序列（3 关） | `RunController.cs:286-325` `DefaultStages()` | **是**，且**已与 `Balance.tres` 漂移**（见 §1.4-①） | 删除；改用 `new StageDefinition()` 的 `[Export]` 默认值 |
+| G2 | 关卡兜底序列（3 关） | ~~`RunController.cs:286-325` `DefaultStages()`~~ **已删除（2026-10）** | **是**，且**已与 `Balance.tres` 漂移**（见 §1.4-①） | ✅ 已删除；改用 `new StageDefinition()` 的 `[Export]` 默认值 |
 | G3 | 遭遇参数 20 项（`TotalBudget`/`BudgetRegen`/`BudgetCap`/`MaxConcurrent`/`SpawnInterval`/`SpawnRadius`/`MinSpawnDistance`/波次…） | `EncounterController.cs:21-63` + `Main.tscn:63-145` | 否 | 关卡表按关覆盖（`StageController.cs:105-119` 已经在做这件事） |
 | G4 | 波次规模 4–15 | `SpawnPlanner.cs:17-18`（`const`）**与** `EncounterController.cs:56-57`（`[Export]`）**两份** | **是**（第一份） | 关卡表（删掉 const 那份） |
 | G5 | 节点价值层 / 波数 | `NodePlacement.cs:18-26` **与** `StageController.cs:653-661`（**两处实现同一逻辑**） | **是** | **节点表** `Layer` / `WaveCount` |
@@ -176,7 +178,7 @@
 | `Run/MetaProgress.cs` | 4 | L29,31,34,37（+ L27 `*10f`、L47 `10*(level+1)`） | 局外成长表 |
 | `Rewards/RunSettlement.cs` | 3 | L10 `10`、L13 `3`、L16 `50` | 局外成长表 |
 | `Encounter/SpawnPlanner.cs` | 2 | L17 `4`、L18 `15` | 关卡表 |
-| `Rewards/RunController.cs` | 10 | `DefaultStages()` L303,304,305,307,314,315,316,317,321,322（整段 L286-325 共 ≈30 个值） | 删除（改用 `StageDefinition` 默认值） |
+| `Rewards/RunController.cs` | 10 | ~~`DefaultStages()` L303,304,305,307,314,315,316,317,321,322（整段 L286-325 共 ≈30 个值）~~ | ✅ **已删除（2026-10）**（改用 `StageDefinition` 默认值） |
 
 **B 类 —— 流程/几何启发式（25 处，可外置但不是必须）**
 
@@ -186,7 +188,7 @@
 
 ### 1.4 盘点发现的 7 个既有问题（都是"分表"会顺手修掉的）
 
-**① 关卡数值有两个真源，而且已经漂移。**
+**① 关卡数值有两个真源，而且已经漂移。** ✅ **已修（2026-10，配置表阶段 1：删掉 `DefaultStages()` + 拆表，见 §5）**
 `Config/Balance.tres:6-58` 与 `RunController.cs:286-325` 的 `DefaultStages()` 是同一份数据的两个副本：
 
 | 字段 | `Balance.tres` | `DefaultStages()` | 结果 |
@@ -199,6 +201,7 @@
 | Stage3 `BossGuardCount` | `3`（L54） | `3` | 一致（对照项） |
 
 `RunController.cs:429` 是 `Balance.Settings.Stages.Length > 0 ? Balance.Settings.Stages : DefaultStages()` —— 一旦有人把 `Balance.tres` 的 `Stages` 清空（`BalanceConfig.cs:111` 的默认值就是空数组），游戏会**静默**换上一套不同的关卡数值。分表（T6）会删掉这个兜底函数，改为"缺文件 → 用 `StageDefinition` 自身默认值"，这正是用户要的回退语义。
+✅ **已按此落地（2026-10）**：`DefaultStages()` 删除、3 关独立成 `Config/Tables/Stages/stg_*.tres`、清空数组时实测走"默认值"分支（见 §5 阶段 1）。
 
 **② 波次规模有两个来源。** `SpawnPlanner.cs:17-18` 的 `MinWaveSize = 4 / MaxWaveSize = 15` 与 `EncounterController.cs:56-57` 的 `[Export] WaveMinEnemies = 4 / WaveMaxEnemies = 15` 是同一个数字写了两遍（前者作为 `RollWaveSize` 的默认参数）。
 
@@ -1137,29 +1140,42 @@ public bool Allows(string displayName)
 ### T6 关卡表 —— `StageDefinition : Resource`（**类已存在**，一行一个文件）
 
 **目录**：`Config/Tables/Stages/stg_*.tres`（一行一个文件）；索引用 `Balance.tres` 上**已有的** `[Export] StageDefinition[] Stages`（形态不变，只是每一关独立成文件）
-**替换**：`Balance.tres:6-58` 的 3 个内嵌子资源 + `RunController.cs:286-325` 的 `DefaultStages()`
+**替换**：`Balance.tres` 里 3 个内嵌子资源 + `RunController.DefaultStages()` —— ✅ **两步都已落地（2026-10，见 §5 阶段 1 的实测证据）**
 
-`StageDefinition` 已经是一个 `[GlobalClass] partial class : Resource`（`StageDefinition.cs:9-11`），**15 个字段一个都不用改**，只需：
+`StageDefinition` 已经是一个 `[GlobalClass] partial class : Resource`，老的 15 个字段**一个都没改**，落地时做了 4 件事：
 
-1. 从 `Balance.tres` 的 `[sub_resource]`（`Balance.tres:6-58`）变成**每关一个独立文件** `Config/Tables/Stages/stg_outer.tres` / `stg_inner.tres` / `stg_core.tres` —— 这样 `Config/Tables/Stages/` 在表插件里就是一张干净的"关卡表"（一行一关），策划也能单独打开一关改。
-2. `Balance.tres:114` 的 `Stages` 数组从 `SubResource` 改成 `ExtResource`（指向上面 3 个文件）。**`BalanceConfig.Stages` 这个字段本身不动**（`BalanceConfig.cs:111` 仍是 `[Export] StageDefinition[] Stages`），所以 `StageController` / `RunController` 读 `Balance.Settings.Stages` 的代码一行都不改。
-3. **删掉 `RunController.DefaultStages()`**（L286-325）。回退路径改为：
+1. ✅ 从 `Balance.tres` 的 `[sub_resource]` 变成**每关一个独立文件** `Config/Tables/Stages/stg_outer.tres` / `stg_inner.tres` / `stg_core.tres` —— `Config/Tables/Stages/` 现在就是一张干净的"关卡表"（一行一关），策划可以单独打开一关改。
+2. ✅ `Balance.tres` 的 `Stages` 数组从 `SubResource` 改成 `ExtResource`（指向上面 3 个文件）。**`BalanceConfig.Stages` 字段本身没动**（仍是 `[Export] StageDefinition[] Stages`），所以 `StageController` 读 `Balance.Settings.Stages` 的代码一行都没改。
+3. ✅ **删掉了 `RunController.DefaultStages()`**。回退路径落成了 `RunController.ResolveStages()`：
    ```csharp
-   // RunController.cs:180 与 :429 两处
-   _stages = Balance.Settings.Stages is { Length: > 0 } table
-       ? table
-       : new[] { new StageDefinition() };   // 缺表 → 用 StageDefinition 自身的 [Export] 默认值
+   // 两个调用点都走它（原来 :180 与 :429 各写了一遍三元表达式）
+   _stages = ResolveStages();
+   // 表为空 → new[] { new StageDefinition() } + GD.PushWarning + 一条 GameLog
    ```
-   并在缺表时 `GameLog.Write("Flow", ...)` 一条警告。这样"读不到就用自身默认值"是真的只有**一个**真源（`StageDefinition.cs` 上的 `[Export]` 初值）。
-4. **迁移期建议保留内嵌形态**：这一步是唯一"要把 `SubResource` 改成 `ExtResource`"的地方（§7.2 的未验证项 ⭐），而 `Stages` 是既有功能。所以**先只做第 3 步（删 `DefaultStages()`）**、把 `SubResource` 改 `ExtResource` 挪到最后 —— 或者干脆把 T6 放在 T1/T3 之后做，等阶段 0 的探针已经证明 `ExtResource` 数组可用。见 §5 阶段 1 的说明。
+   缺表时日志会写 `关卡表：0 关（来源：默认值）…（Balance.tres 已加载/未加载，玩家生命 N）`，所以"读不到就用自身默认值"只有**一个**真源（`StageDefinition` 上的 `[Export]` 初值）。
+4. ✅ **`SubResource` → `ExtResource` 这一步已经做了**（原计划要等探针）。§7.2 已实测通过，且顺手挖出两条新坑（缺行文件会整份 `Balance.tres` 失败；Inspector 拖拽填不了 C# 资源数组），操作纪律见 §5 阶段 1。
 
-新增可选字段（向后兼容，老 `.tres` 缺字段会自动用默认值）：
+新增字段（向后兼容，老 `.tres` 缺字段会自动用默认值）—— **本次已落地**：
 
-| 字段 | 类型 | 默认值 | 用途 |
-|---|---|---|---|
-| `Id` | `string` | `"stage_1"` | 稳定键（`RunSetup` / 存档 / 分支用） |
-| `AllowedEnemyIds` | `string[]` | `[]` | 取代 `AllowedEnemies` 的显示名匹配（见 F4） |
-| `Params` | `ParamEntry[]` | `[]` | 以后的新关卡参数 |
+| 字段 | 类型 | 默认值 | 用途 | 状态 |
+|---|---|---|---|---|
+| `Id` | `string` | `"stage_1"` | 稳定键（`RunSetup` / 存档 / 分支用） | ✅ 已加；三行分别是 `stg_outer` / `stg_inner` / `stg_core`（与文件名同语义名），开局日志会打出来 |
+| `PressureGrowthMultiplier` | `float` | `1f` | Pressure 增长倍率（关卡核心文档 §7.2） | ✅ 已加并接进 `StageController.AddPressureForNode` |
+| `PressureThreshold` | `int` | `0`（= 未设置） | Pressure 阈值（§7.3）；`<= 0` → 用 `Balance.PressurePerPoint` | ✅ 同上 |
+| `PressurePerNodeNormal` | `float` | `0f` | 普通挑战基础 Pressure（§7.4）；`<= 0` = 不加（= 分表前的行为） | ✅ 同上 |
+| `PressurePerNodeHighValue` | `float` | `0f`（= 未设置） | 高价值挑战基础 Pressure（§7.4）；`<= 0` → 用 `Balance.PressurePerHighValueNode` | ✅ 同上 |
+| `PressureEvolutionBonus` / `PressureMutationBonus` | `float` | `0f`（= 未设置） | 进化/异化额外比例（§7.2/§7.4）；`<= 0` → 用 `Balance` 上的同名全局值 | ✅ 同上 |
+| `PressureUpgradeTags` | `string[]` | `[]` | **数值型**强化池的适用规则（§7.4）；留空 = 不限制 | ⚠️ 字段已就位，**但 §7.5 的数值强化池还没实现**，所以当前唯一消费者是开局日志（改它不影响玩法数值）。⚠️ 见下方硬约束 |
+| `AllowedEnemyIds` | `string[]` | `[]` | 取代 `AllowedEnemies` 的显示名匹配（见 F4） | ⏸ **本次没加**：它的消费者是敌人表（T5，阶段 4）。现在加就是空字段，违反"不留不生效的配置"（§1.4-⑤） |
+| `Params` | `ParamEntry[]` | `[]` | 以后的新关卡参数 | ⏸ **本次没加**：同上，等第一个真实参数出现再加（一行的事） |
+
+> ⚠️ **Pressure 两条硬约束（关卡核心文档 §7.1 / §7.5，实现时必须守）**：
+> ① **Boss Pressure（数值强化）与 Boss Build（行为/技能）必须分离**，不得合并成一个"来源不明的池" ——
+> 所以 `PressureUpgradeTags` 只描述数值型强化，`BossPerkCatalog`（狂暴/召唤师/尖啸…）保持独立；
+> ② **不要为 Pressure 设计"可被玩家增幅修改"的扩展接口**（文档明确禁止，除非以后重新决定这项设计）—— 本次没有加任何这类钩子。
+>
+> **Pressure 数值的取值规则**（只有一条，避免两个真源）：行里填了用行里的；留 0 用 `Balance` 的全局默认值。
+> 三行当前**都没填**，因此 Pressure 行为与分表前**逐位一致**（自测实测 `+187.5 → 1` / `+225 → 3`，与改动前相同）。
 
 ### T7 节点表 —— `NodeConfig : Resource`（一行一个文件）
 
@@ -1873,40 +1889,62 @@ public static string DescribePools()
 
 **总原则**：一张表一次；每阶段结束时**编译 0 warning / 0 error + 跑一次自测 + 逐项比对日志**；迁移期**保留代码里的旧目录作为兜底**（`RewardTable.Instance == null` 时用 `_fallback`），下个阶段再删。这样任何一步出问题都能立刻回退到"旧目录 + 表未生效"的安全状态。
 
-### 阶段 0：铺地基（不改任何现有行为）
+### 阶段 0：铺地基（不改任何现有行为）✅ **已完成（2026-10）**
 
-| 做什么 | 新增文件 |
-|---|---|
-| 加 `ConfigTable`（§4.1）、`ParamEntry`（§4.3）、`ConfigText`（§4.4） | `Scripts/Config/ConfigTable.cs`、`ParamEntry.cs`、`ConfigText.cs` |
-| `BalanceConfig` 加 4 行 `[Export] ...Table?` 字段（全部默认 `null`） | 改 `BalanceConfig.cs` |
-| 写一个 5 行的实验 `.tres`，确认 `[Export] Variant` 与 `ParamEntry[]` 在 4.7 编辑器里能编辑、能存盘（§7 的未验证项） | `Config/_probe.tres`（验证完删掉） |
+| 做什么 | 新增文件 | 状态 |
+|---|---|---|
+| 加 `ConfigTable`（§4.1）、`ParamEntry`（§4.3）、`ConfigText`（§4.4） | `Scripts/Config/ConfigTable.cs`、`ParamEntry.cs`、`ConfigText.cs` | ✅ 已落地（含 `IConfigRow`） |
+| 抽公共 `WeightedPick`（§3 T9），**rng 由调用方传入** | `Scripts/Config/WeightedPick.cs` | ✅ 已落地，并**已接上两处调用方**（`RewardPool.Roll` 传自己的实例 RNG、`BossPerkCatalog.Roll` 传自己的静态 RNG）—— 自测压力/Pressure 基线逐位不变 |
+| `BalanceConfig` 加 4 行 `[Export] ...Table?` 字段（全部默认 `null`） | 改 `BalanceConfig.cs` | ⏸ **未做**：目前只有关卡表一张，它的索引是**已有的** `Stages` 数组，加空字段等于死配置。等 T1/T3 落地时再加 |
+| 写一个 5 行的实验 `.tres`，确认 `[Export] Variant` 与 `ParamEntry[]` 在 4.7 编辑器里能编辑、能存盘 | `Config/_probe.tres`（验证完删掉） | ✅ 探针已做并删除，结论写进 **§7.2**：`ExtResource` 数组**已验证可用**；另外补充了一条设计文档里没写的工作流坑（Inspector 拖拽填充 C# 资源数组无效） |
 
-**验证**：`& 'F:\Godot项目\项目a\build.ps1' -v minimal` → 0 warning / 0 error。跑一次自测确认行为完全没变。
+**验证**（实测，2026-10）：
+
+- `& 'F:\Godot项目\项目a\build.ps1' -v minimal` → **0 error**；本项目自己改动的文件 **0 warning**（唯一的 warning 来自无关的第三方插件 `addons/yard/Registry.cs`）。
+- 自测（`selftest.flag` + gdmcp CLI）：行为与改动前逐项一致 —— `节点布置：启用 10 个（高 2 / 中 5 / 低 3）`、`节点间距：最小 9.74`、`Pressure 累积：+187.5 → 1 / +225 → 3`、`端到端：按 F 之后 奖励界面打开 = True`。
 
 **收益**：这一步之后，"读表 + 回退"就是一个 3 行的固定写法了。
 
-### 阶段 1：关卡表（T6）—— **建议先做这张**
+### 阶段 1：关卡表（T6）—— **建议先做这张** ✅ **已完成（2026-10）**
 
 | 为什么是它 | 依据 |
 |---|---|
-| 类**已经存在**，15 个字段一个都不用改 | `StageDefinition.cs:9-44` 已经是 `[GlobalClass] partial class : Resource` |
-| 改动点只有 **2 处** | `RunController.cs:180` 与 `:429` 的 `Balance.Settings.Stages.Length > 0 ? ... : DefaultStages()` |
-| **顺手修掉一个真 bug** | `DefaultStages()`（`RunController.cs:286-325`）与 `Balance.tres:6-58` 已经漂移（§1.4-① 的 5 行对照表） |
-| 有**现成的自动验证** | 自测日志里有 `第 N 波开始`、`Encounter 清场完成`、`端到端：按 F 之后 奖励界面打开 = True`、`=== 自测结束 ===`（[assets.md](assets.md) §6.2）；关卡数值可逐项比对 [config.md](config.md):282-285 的实测值（"启用 10 个（高 2 / 中 5 / 低 3）"、"节点间距最小 9.74，阈值 8"） |
-| 不碰任何业务逻辑 | 只改"关卡数据从哪来"，`StageController` / `EncounterController` 完全不动 |
-| **不依赖 §7.2 那条未验证的 `ExtResource` 数组写法** | 阶段 1 只做下面第 1–4 步（`SubResource` 保持内嵌），把"每关一个文件"留到阶段 0 探针通过之后再顺手改 —— 这样**第一阶段零未知风险** |
+| 类**已经存在**，15 个字段一个都不用改 | `StageDefinition.cs` 已经是 `[GlobalClass] partial class : Resource`（本次只**新增**了 §7.4 的 Pressure 字段，老字段一字未动） |
+| 改动点只有 **2 处** | `RunController.cs` 的 `_stages = ResolveStages()`（原来两处 `Balance.Settings.Stages.Length > 0 ? ... : DefaultStages()`） |
+| **顺手修掉一个真 bug** | ✅ `DefaultStages()` 已删除，§1.4-① 的 5 处漂移随之消失（实测日志：`stg_inner … 敌伤×1.1 Boss伤×1.1 允许敌人[6]`） |
+| 有**现成的自动验证** | ✅ 自测日志新增 `关卡表：N 关（来源：表/默认值）| <每关摘要>` 与 `Stage 表行：<Id>…Pressure 规则…` |
+| 不碰任何业务逻辑 | ✅ `StageController` / `EncounterController` 的流程未改，只把 Pressure 的取值从"只读 Balance"改成"行优先、留 0 回退 Balance" |
+| **不依赖 §7.2 那条未验证的 `ExtResource` 数组写法** | ✅ 已实测通过（见 §7.2），所以第 5 步"每关一个文件"**已经做了** |
 
-**步骤**（先做 1–4，"每关一个文件"留到探针之后）：
-1. `BalanceConfig` 加一个 `[Export] StageDefinition[]? StagesResolved`（默认空）—— 或者更省事：**直接删掉 `DefaultStages()`**，让 `Balance.tres:114` 继续提供数据（它现在已经是对的），只在它为空时回退。
-2. 改 `RunController.cs:180,429` 的表达式：读不到/为空就用 `new[] { new StageDefinition() }`。
-3. **删掉 `RunController.DefaultStages()`（L286-325）** 与它的 XML 注释。
-4. 日志加一行：`GameLog.Write("Flow", $"关卡表：{_stages.Length} 关（来源：{(从表 ? "表" : "默认值")}）")`。
-5. *（阶段 0 探针通过后）* 把 `Balance.tres:6-58` 的 3 个 `[sub_resource]` 抽成 `Config/Tables/Stages/stg_outer.tres` / `stg_inner.tres` / `stg_core.tres`，`Stages` 数组改成 `ExtResource` 引用。**在编辑器里操作**（拖 3 个文件进数组），别手写。
+**实际落地**（比原计划的 1–4 步多做了第 5 步）：
 
-**验证**：
-- 编译 0/0。
-- 自测，比对 §1.4-① 表格里的 5 个字段（尤其 Stage2 的 `EnemyDamageMultiplier` 与 `BossDamageMultiplier` —— 走 `Balance.tres` 应该是 `1.1` / `1.1`，走默认值才是 `1.0` / `1.0`；新加的日志行能直接证明走的是哪条路）。
-- **删掉 `DefaultStages()` 之前先故意清空 `Balance.tres` 的 `Stages` 数组跑一次**，记录"旧兜底"的行为；删掉之后再清空跑一次，确认新回退路径的行为与日志符合预期（这是"读不到则使用自身默认值"的**主动验证**，必做）。
+1. `Config/Tables/Stages/` 下新建 `stg_outer.tres` / `stg_inner.tres` / `stg_core.tres`（**一行一关**，字段值逐条照抄 `Balance.tres` 原来的 3 个 `sub_resource`）。
+2. `Balance.tres` 里 3 个 `[sub_resource]` 删除，改成 4 个 `[ext_resource]`（BalanceConfig 脚本 + 3 个行文件），`Stages = [ExtResource(...), ...]`。
+   **写法取自引擎自己的输出**（探针里让 Godot 的 `ResourceSaver` 写过一遍再照抄），不是手抄文档示例。
+3. `RunController.DefaultStages()` 删除，改为 `ResolveStages()`：表为空 → `new[] { new StageDefinition() }` + 一条 `GD.PushWarning` + 一条 GameLog（把"Balance.tres 是否加载成功"也打出来）。
+4. 日志：开局一行 `关卡表：3 关（来源：表）| stg_outer Stage 1 · 外围 允许敌人[3] 敌伤×1 …`。
+5. `StageDefinition` 补 §7.4 的 Pressure 字段（`Id` + 6 个数值 + `PressureUpgradeTags`），`StageController.AddPressureForNode` 改为读行、留 0 回退 Balance。
+
+**验证（实测证据）**：
+
+| 场景 | 结果 |
+|---|---|
+| 正常（表在） | `关卡表：3 关（来源：表）`，Stage2 的 5 个漂移字段全部正确；自测全程通过；Pressure 与改动前**逐位一致**（+187.5 → 1、+225 → 3） |
+| **主动回退验证：把 `Stages` 清空**（`Stages = []`） | 日志 `关卡表：0 关（来源：默认值）…`；游戏正常跑完自测；Pressure 仍与改动前一致（证明"留 0 → 用 Balance 全局默认值"这条回退真的生效） |
+| **主动回退验证：把 `stg_inner.tres` 改名** | 日志 `关卡表：0 关（来源：默认值）…（Balance.tres 未加载（全部数值回退到代码默认值），玩家生命 160）`；游戏仍能跑完自测 |
+
+> ⚠️ **最后一行是本阶段挖出来的新风险，比设计文档的假设更严重**：只要 `Balance.tres` 引用的**任何一个行文件**缺失/改名，
+> Godot 的资源加载会**整份 `Balance.tres` 失败**（不是只丢那一行），于是**所有**数值静默回到代码默认值
+> （实测玩家生命 250 → 160）。回退是"安全的"（只有 warning、能正常玩、日志留痕），但比"只影响缺的那一行"粗得多。
+> **操作纪律**：不要删/改被 `Balance.tres` 引用的行文件；确实要下线一行，就把 `[ext_resource]` 与数组里的那一项**一起**删。
+> 若以后要让"缺一行"只影响那一行，唯一干净的做法是把索引从"资源引用数组"换成**路径字符串数组** + `ConfigTable.TryLoad` 逐行加载
+> —— 代价是 §6.2 里放弃的那两条（编辑器里看不到引用、导出可能漏文件）。**这条需要拍板，本次没有改**。
+
+> ⚠️ **第二条工作流坑（设计文档原先假设它可以，实测不行）**：在编辑器 Inspector 里把若干 `.tres` **拖进** C# 的
+> `[Export] StageDefinition[]` 数组槽，**不会写进去**（`Object::set` / `UndoRedo.add_do_property` 对"已落盘的资源"整条赋值静默失效，
+> 属性保持原值）。探针里 5 种写法全部复现。**可行且已验证的写法是直接把数组写成文本**：
+> `Stages = [ExtResource("2_stg_outer"), …]` + 顶部 `[ext_resource type="Resource" path="…" id="…"]`（只写 `path=`，不写 `uid=`，符合本项目约定）。
+> 这也说明：**将来接表插件时，往数组里加引用这一步不能靠 Inspector 拖拽**。
 
 ### 阶段 2：增幅项表（T3）—— 用户最想要的
 
@@ -2119,17 +2157,22 @@ public WeaponFieldMask Overrides { get; set; } = WeaponFieldMask.All;
 | `Godot.GlobalClassAttribute` | 存在 | 所有表/行类 |
 | 项目内已验证的导出形态 | `BalanceConfig.Stages` 是 `StageDefinition[]`，`Balance.tres:114` 存成 `Array[Resource]([SubResource("Stage_1"), ...])`；`119 = 74 + 3×15` 数字完全对齐 | **§4.3 主方案的全部依据**（`ParamEntry[]` 与 `StageDefinition[]` 同构） |
 
-### 7.2 未验证（**请在阶段 0 用探针 `.tres` 确认，不要直接批量写表**）
+### 7.2 未验证项 → **实测结论（2026-10，阶段 0/1 的探针）**
 
-| 项 | 不确定的是什么 | 怎么验证 | 万一不行的退路 |
-|---|---|---|---|
-| ⭐ **数组元素指向独立 `ExtResource`** | `Balance.tres` 上的 `Weapons = Array[Resource]([ExtResource("11_pistol"), …])`（**一行一个文件**的关键前提）。项目现有的 `Balance.tres:114` 用的是 `SubResource`（内嵌），**`ExtResource` 形态我没有实测** | 阶段 0：先建 2 个行 `.tres` 文件，在编辑器里往 `Balance.tres` 的数组里拖进去、保存，然后打开 `Balance.tres` 文本看它写成什么 | ① 让编辑器自己写（本来就不该手抄示例）；② 退到 `SubResource` 内嵌（此时 [config-tooling.md](config-tooling.md) 的插件只能靠"把数组列单独打开成另一张表"来编辑，见 §6.2） |
-| `[Export] public Variant Value` | Godot 4.7 的 C# 源生成器是否为 `Variant` 产出可用的 `PropertyInfo`、Inspector 里是否渲染成一个通用值槽 | 写一个 5 行的 `ProbeRow : Resource`（含 `[Export] Variant Value`）+ 一个 `Config/_probe.tres`，在编辑器里打开看能不能编辑、存盘后能不能读回 | 用 §4.3 的保底方案（`Kind` + `Number` + `Text` 三字段），`ParamEntry` 的访问器签名不变 |
-| `[Export] Godot.Collections.Dictionary<string, Variant>` | 同上（泛型字典的编辑器呈现） | 同上，加一个字典字段 | 不用它（本设计已经不用字典） |
-| `[Export] ParamEntry[]`（自定义 `Resource` 数组） | 理论上没问题（与 `Stages` 同构），但没有第二个人验证过数组元素的 `[GlobalClass]` 类型是否被正确识别 | 探针里放一个 `ParamEntry[]` 字段 | 改成 `Godot.Collections.Array<ParamEntry>` |
-| `[Export(PropertyHint.Flags, "...")]` + `[Flags] enum` | §6.5 的字段级覆盖开关要用它 | 阶段 0 一并试 | 阶段 1-4 本来就不做这个（§6.5） |
-| `Ability.AimSource` 这类**嵌套在别的类里的枚举**作为表字段 | `[Export] public Ability.AimSource Aim` 在 `Resource` 上是否可导出 | 探针里加一个字段 | 表里存 `int`，`ApplyTo` 里 `(Ability.AimSource)value` |
-| `Edit Resources as Table` 插件本身在 4.7.2 上能不能用 | 插件官方只标到 Godot 4.0，**未显式声明 4.7**；issue #113 有"新项目里表是空白、重开一次项目就好"的记录 | [config-tooling.md](config-tooling.md) §五"第 2 步"已经给了 5 项冒烟测试，照做 | ① 重开项目再试；② 退到 CSV Data Importer + 生成脚本；③ 回到本文的 `SubResource` 内嵌形态（插件用不了也不影响游戏读表） |
+> 探针怎么做的：`Config/_probe/` 下建 2 个独立行 `.tres` + 1 个持有 `StageDefinition[]` 的 `.tres`，
+> 在**运行中的 Godot 4.7.2 编辑器**里（gdmcp `execute_editor_script`）加载/保存/回读，
+> 探针文件验证完已删除。**索引那一行是照引擎自己的输出写的**（先让 `ResourceSaver` 写一遍 `probe_ext_resaved.tres`，再照抄语法）。
 
-> 前 6 项的共同点是**只影响"表字段怎么声明"**，第 7 项影响**编辑体验**（不影响运行时读表）。所以阶段 0 一次探针就能全部排掉，之后 9 张表的写法就是确定的。
-> **注意最后一项的地位**：本设计的**运行时读取路径完全不依赖那个插件** —— 插件只是让"批量改表"更舒服。所以插件在 4.7.2 上坏了，最多退回到"用 Inspector 按文件改"或"用文本编辑器改 `.tres`"，**不影响分表方案落地**。
+| 项 | 结论 | 证据 |
+|---|---|---|
+| ⭐ **数组元素指向独立 `ExtResource`** | ✅ **可以用** —— "一行一个 `.tres` + 索引数组"这套地基成立 | 手写 `Stages = Array[Resource]([ExtResource("2_a"), ExtResource("3_b")])` → 编辑器加载得 **2 个** 元素、类型是 `StageDefinition`、`resource_path` 指向各自文件；引擎自己重存一遍写成 `Stages = [ExtResource("1_lx87h"), ExtResource("2_jdwmd")]`（**4.7 的规范写法是裸 `[...]`**，不再包 `Array[Resource](…)`），说明**存、读、回存三个方向都通** |
+| 数组元素的**行文件缺失**时 | ⚠️ **比预想严重**：编辑器侧那一项变成"没有脚本的占位 `Resource`"；而**游戏侧整份宿主资源加载失败**（实测：改名 `stg_inner.tres` → 游戏里 `Balance.tres` 未加载、玩家生命 250→160、关卡表回退成单关默认） | 见 §5 阶段 1 的验证表与操作纪律 |
+| **往 C# 资源数组里赋值**（Inspector 拖拽 / `Object::set` / `UndoRedo.add_do_property`） | ❌ **对"已落盘的资源"静默失效**（属性保持原值，无报错）：`[rs.new()]` 能写进去（1 个），`[ResourceLoader.load(...)]`、`[duplicate()]`、`[Balance.tres 自己的子资源]` 全部写不进去（0 个） | 5 种写法逐个复现。结论：**索引数组只能靠写文本**（或 C# 代码赋值）。这条直接影响 §6.2 "加一行 → 拖进数组"的日常动作 |
+| `[Export] public Variant Value` | ✅ C# 侧可导出（`ParamEntry.Value` 编译通过） | `ParamEntry.cs` 已落地并在构建中验证；编辑器里的**可视化编辑**尚未冒烟（无消费者，等 T3 真正用起来时按 §5 阶段 2 验证） |
+| `[Export] ParamEntry[]`（自定义 `Resource` 数组） | ✅ 与 `Stages` 同构，可用 | 同"数组元素指向独立 `ExtResource`"一条 |
+| `[Export(PropertyHint.Flags, "...")]` + `[Flags] enum` | ⏸ 未试 | 阶段 1–4 本来就不做字段级覆盖（§6.5） |
+| `Ability.AimSource` 这类**嵌套在别的类里的枚举**作为表字段 | ⏸ 未试 | 等 T2 技能表时再验 |
+| `Edit Resources as Table` 插件在 4.7.2 上能不能用 | ⏸ 本次**没测**（项目里没装；`addons/` 下只有 `godot_mcp`） | 注意新增的前提：它靠 Inspector/`ResourceSaver` 保存，若它用"拖拽填数组"的方式加索引，会撞上前一条的坑 |
+
+> **注意最后一项的地位**：本设计的**运行时读取路径完全不依赖那个插件** —— 插件只是让"批量改表"更舒服。
+> 所以插件在 4.7.2 上坏了，最多退回到"用 Inspector 按文件改"或"用文本编辑器改 `.tres`"，**不影响分表方案落地**。
