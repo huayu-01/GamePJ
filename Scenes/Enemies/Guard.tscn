@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
 [ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://Scripts/Abilities/MeleeAttackAbility.cs" id="8_melee"]
 [ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="9_hitbox"]
 [ext_resource type="PackedScene" path="res://Assets/Models/enemies/mesh_enemy_guard.glb" id="10_model"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.6
@@ -83,3 +84,5 @@ shape = SubResource("BoxShape3D_attack")
 
 [node name="Presentation" type="Node" parent="."]
 script = ExtResource("3_presentation")
+[node name="Animator" type="Node" parent="."]
+script = ExtResource("90_anim")

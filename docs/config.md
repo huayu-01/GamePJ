@@ -59,10 +59,13 @@
 - 两种改法都行：Godot 编辑器里双击 `.tres` 用 Inspector 改（有中文分组），或直接用文本编辑器改。
 - 字段的中文注释在对应的行类里：`Scripts/Config/{UnitConfig,EnemyConfig,BossConfig,SummonConfig,AbilityConfig,AiProfileConfig,PressureModConfig,CharacterConfig,WeaponConfig,EffectConfig,NodeConfig,RewardConfig,MetaUpgradeConfig,StageDefinition}.cs`。
 - **单位表是继承关系**：`EnemyConfig` / `BossConfig` / `SummonConfig` / `CharacterConfig` 都继承 `UnitConfig`，
-  所以"生命 / 攻击四项 / 移速 / 持有技能 / 标签 / **AI 档案** / 表现"这七组列在所有单位表里长得一样，只有各自的私有列不同。
+  所以"生命 / 攻击四项 / 移速 / 持有技能 / 标签 / **AI 档案** / 表现 / **动画**"这八组列在所有单位表里长得一样，只有各自的私有列不同。
   **攻击四项是整个单位表通用的一组**（伤害/间隔/范围/击退，套到该单位的**主攻击**上）：
   `AttackDamage` / `AttackInterval`（→ 能力 `Cooldown`）/ `AttackRange`（按能力子类依次试
   `AttackRange`→`TriggerRadius`→`MaxRange`→`MaxDistance`）/ `AttackKnockback`。**留 0 = 不覆盖**。
+- **动画那一组是 6 列**（本轮新增，套到 `UnitAnimator` 上）：`AnimIdle` / `AnimWalk` / `AnimRun` / `AnimDeath`
+  （动画名，**留空 = 不覆盖**）+ `AnimWalkMinSpeed` / `AnimRunMinSpeed`（走/跑的速度阈值，**留 0 = 不覆盖**）。
+  **一行都不填也能动** —— 走组件默认值（`idle` / `walk` / `sprint` / `die`，阈值 0.15 / 4）。
 
 > ⚠️ **操作纪律（血泪教训）**：不要单独删/改 `Balance.tres` 引用到的行文件。
 > 只要引用的**任何一个**行文件缺失/改名，Godot 会**整份 `Balance.tres` 加载失败**（不是只丢那一行），
@@ -185,7 +188,7 @@
 
 | 表 | 行 | 关键内容 |
 |---|---|---|
-| `Config/Tables/Bosses/boss_final.tres` | 1 | 生命 900 / 护甲 200 / 移速 3.6 / 攻击 24·1.8·3.4·6 / 标签 Boss,Melee；**持有技能 4 行**（`skl_boss_melee` / `skl_boss_scream` / `skl_boss_charge` / `skl_boss_summon`）；`EliteCopyHealthScale = 0.35`（白板首领副本的血量倍率） |
+| `Config/Tables/Bosses/boss_final.tres` | 1 | 生命 900 / **护甲 0**（用户要求「去掉首领的甲」；护甲字段仍留在 `Unit` / `UnitConfig` 基类上，只是首领没有任何获取手段 —— 见文末「首领去甲 + 单位动画实测」）/ 移速 3.6 / 攻击 24·1.8·3.4·6 / 标签 Boss,Melee；**持有技能 4 行**（`skl_boss_melee` / `skl_boss_scream` / `skl_boss_charge` / `skl_boss_summon`）；`EliteCopyHealthScale = 0.35`（白板首领副本的血量倍率） |
 | `Config/Tables/Summons/summon_drone.tres` | 1 | 生命 40 / 移速 6.0 / 攻击 6·0.9·1.8·1.5 / 标签 Summon / `LifetimeSeconds = 25` |
 | `Config/Tables/Skills/skl_*.tres` | 21 | 技能：`NodeName`（目标能力节点）+ 通用项（Aim/Cooldown/Windup/Recover/Enabled/Approach*）+ `Params`（子类专属，Key = 属性名）+ `AttackParams`（命中体/武器组件） |
 | `Config/Tables/Skills/bhv_*.tres` | 4 | **首领行为技能**（Boss Build）：`ApplyHandler` 非空的技能行，由 `BossPerkCatalog` 编译成运行期条目。**界面上叫「技能」**（用户拍板：行为型的那些本来就是技能，不是"词条"） |
@@ -1521,11 +1524,138 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 
 ### 四、这一轮**没有**做的事（留给下一轮决定）
 
-- ⚠️ **首领本体的护甲没动**：`Config/Tables/Bosses/boss_final.tres` 与 `Scenes/Enemies/Boss.tscn` 仍是
-  **200 基甲**。用户原话是"护甲就只给精英怪使用，首领不需要"，但**这次下线的是 Pressure 池里那条护甲词条**
-  （题面明确的范围）；"要不要把首领的 200 基甲也拿掉"是**数值决策**（会影响护甲优先/破甲的整条链路），
-  没有顺手动。要动的话改一处即可：`boss_final.tres` 的 `Armor`（行优先、场景兜底）。
+- ✅ **首领本体的护甲已在本轮去掉（用户明确要求「去掉首领的甲」）** —— 上一轮记的"没动"这一条**已作废**：
+  `boss_final.tres` 的 `MaxArmor` 现在是 **0**、`Boss.tscn` 那份同值导出也一并归零（表是权威、场景是回退，两处必须同值）。
+  **护甲字段一个都没删**（`Unit.MaxArmor/Armor/ArmorDamageReduction` + `UnitConfig.MaxArmor/ArmorDamageReduction`
+  全部原样保留）—— 用户澄清："护甲是**所有单位**都能有的通用属性，只是首领**默认没有获取手段**"。
+  完整判据、伤害管线怎么走、以及"还有谁能给首领加甲"的 grep 结论见文末「首领去甲 + 单位动画实测」。
 - ⚠️ **Pressure 的强度需要重新平衡**：池子从 8 条变 7 条，单条概率整体上扬（20% → 23.1% 等），
   且阶段 7 已知的"每抽期望强度只有拆分前的 58.9%"这条结论**不受影响**（它由"一抽只买一个参数"决定）。
 - `StageController` 里那两条日志的措辞没有跟着改（边界约束，见 §二末尾）。
+
+## 首领去甲 + 单位动画实测（2026-10）
+
+> 本轮两件事：① 用户要求「**去掉首领的甲**」；② 用户要求「**单位动画系统**」（原话："都要做但是可以按你理解来决定
+> 哪些要先做，反正就是起码位置都先占了有个好的示范例子方便后续增量的维护"）。
+> 边界：C# 只改 `Scripts/Combat/UnitAnimator.cs`（新建）/ `UnitPresentation.cs` / `Scripts/Config/UnitConfig.cs`；
+> 数据只改 `Config/Tables/**` + `Scenes/Player/Player.tscn` + `Scenes/Enemies/*.tscn`。
+> **没有碰** `Scenes/UI/**`、`Assets/UI/**`、`Assets/Audio/**`、`Assets/Fonts/**`、`Scenes/Levels/TestArena.tscn`。
+
+### 一、首领去甲：权威在哪、改了什么
+
+| 问题 | 结论 |
+|---|---|
+| **权威在哪** | **`Config/Tables/Bosses/boss_final.tres` 的 `MaxArmor`**。生成路径 `EncounterController.SpawnBossNow()` 是 `Instantiate → BossRow(BossScene)?.ApplyTo(Boss) → AddChild`（`EncounterController.cs:708-712`），`UnitConfig.ApplyTo` 里 `unit.ApplyBaseStats(...)` 会把 `_baseMaxArmor` 与 `MaxArmor` 一起写成行里的值，而 `Unit._EnterTree` 在 `AddChild` 时才捕获基础值 → **行覆盖场景**。白板首领副本（`SpawnEliteBossNow`）走同一条路（`:670-672`）。 |
+| **场景那一份** | `Scenes/Enemies/Boss.tscn` 的 `MaxArmor = 200.0` 是**回退值**（表读不到时才生效）。两处不同值 = 项目反复警告的"**静默换挡**"，所以本轮**两处一起归零**：行里写 `MaxArmor = 0.0`（与 `enemy_chaser.tres` 等 0 甲行的写法一致），场景里**删掉那一行**（0 甲的敌人场景都不写它）。 |
+| **字段有没有被删/摘掉** | **完全没有**。`Unit.MaxArmor` / `Unit.Armor` / `Unit.ArmorDamageReduction` / `UnitConfig.MaxArmor` / `UnitConfig.ArmorDamageReduction` / `MaxArmorMultiplier` / `MaxArmorAdd` / `ArmorBroke` 事件 / `DamageResult.ArmorLost` / HUD 的"甲 N" / `BossPreviewScreen` 的护甲一栏 —— **一个都没动**（用户澄清：护甲是所有单位通用的属性）。 |
+| **还有谁能给首领加甲？** | 全项目 grep（`MaxArmorAdd` / `MaxArmorMultiplier` / `ArmorAdd` / `MaxArmor`、`Scripts/**` + `Config/**` + `Scenes/**`）只有**一个**生产者：`Scripts/Combat/EliteModifier.cs:12,35`（`ArmorAdd = 120` → `MaxArmorAdd`）。它**只挂在普通敌人身上**：`EncounterController.cs:454-457`（`SpawnEnemy` 里按 `eliteChance` 添加）与 `Scenes/Enemies/SkillElite.tscn` 里手挂的那一个（该场景写 `ArmorAdd = 0.0`）。首领那条路（`SpawnBossNow` / `SpawnEliteBossNow`）**不加** `EliteModifier`。另外查过三个"看起来会加甲"的地方，结论都是**不加**：`BossPressure`（只加 `DamageMultiplier` / `AttackSpeedMultiplier` / `MoveSpeedMultiplier`）、`Balance.ScaleEnemy`（生命/伤害/移速）、Pressure 池 7 行（`DamageMultiplier` / `AttackSpeedMultiplier` / `MaxHealthMultiplier` / `MoveSpeedMultiplier` + 3 条技能参数）。**结论：首领现在没有任何获取护甲的途径。** |
+| **精英的甲** | **保留不动**（`EliteModifier.ArmorAdd = 120`）—— 它是精英怪的获取手段，与首领无关。 |
+
+**去掉之后伤害管线怎么走**（`Unit.ReceiveHit`，战斗规则说明 §12 的顺序一个字没改）：
+
+```
+命中 → OnHit（HitReceived + GameplayEventKind.Hit）→ IsInvulnerable? 停
+     → Block（Boss 没有 Block 组件 → 系数 1）
+     → DR：CombinedDamageReduction() = 1-(1-护甲减伤)(1-额外减伤)
+          ⚠️ 护甲减伤那一项是 `Armor > 0f ? ArmorDamageReduction : 0f` → 甲为 0 时**自动**取 0，
+             所以 Boss.tscn 里那句 `ArmorDamageReduction = 0.3` 变成惰性值（不必删，也不会偷偷减伤）
+     → Armor 阶段：`Armor > 0f` 为假 → **整段跳过**（不再吸收伤害，也不再发 `ArmorBroke` 事件）
+     → Shield 阶段：Boss 护盾 0 → 跳过
+     → HP
+```
+
+数值影响（**这是有意的数值变化，不是回归**）：首领从"先吃 200 点护甲吸收 + 全程 30% 减免"变成
+**全额吃伤害**。以玩家手枪 24 伤害为例：改前每发先扣甲、血只掉在甲耗尽后；改后每发直接进血。
+**没有做任何补偿性调参**（例如调 `BossHealthMultiplier` 或 `boss_final` 的 `MaxHealth`）—— 那是数值决策，留给下一轮。
+
+**实测证据**：
+- `build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**。
+- 自测运行日志里，探针把行套到 Boss 上之后打印 `→ Boss 生命 900 护甲 0 ...`（改前是 `护甲 200`）；
+  同一次运行 `ERROR/WARNING` 命中 **0** 条。
+- 归零的是**数据**，所以"回退路径"这次是**同值**的：表读不到时场景也是 0 → 不存在"表没了首领又长回 200 甲"的静默换挡。
+
+### 二、单位动画：`UnitAnimator` 的接入契约（后续加敌人照这个抄）
+
+**新增文件**：`Scripts/Combat/UnitAnimator.cs`（约 300 行，一个 `Node` 组件）。
+
+| 问题 | 答案 |
+|---|---|
+| **它做什么** | 按**移动速度**在 `idle` / `walk` / 跑 之间切；死亡时播一次倒地动画（`LOOP_NONE`，停在最后一帧，撑到 `UnitPresentation.DeathLinger` 到期）。速度读 `Unit.Velocity` 的平面分量，每物理帧比一次阈值。 |
+| **循环** | 必须由代码设：`.glb` 导入的 32 段**全是 `LOOP_NONE`**，所以场景里那句 `autoplay="idle"` 只是摆了个**静止姿势**。`Bind()` 里把 idle/walk/跑 三段设成 `Linear`、`die` 保持 `None`。 |
+| **新敌人要做什么** | **什么都不用做**。只要场景里 `Model` 子树里有 `AnimationPlayer`（`.glb` 实例根下 `index="1"` 那个），动画就自动生效：`UnitPresentation._Ready` 会调 `UnitAnimator.Ensure(unit)`，**没挂就补一个**。 |
+| **新敌人可选做什么** | ① 想改名字/阈值：在 `Config/Tables/Enemies/enemy_xxx.tres` 的新「表现 · 动画」6 列里填（**空 / 0 = 不覆盖**）；② 想在编辑器里直接改：给场景挂一个 `Animator` 子节点（本轮 11 个单位场景都显式挂了，右侧 Inspector 有中文分组）。 |
+| **不用做什么** | 不用写任何 C#、不用改 10 个敌人场景的其它地方、不用在生成路径（`EncounterController` / `SummonAbility`）里加一行。 |
+| **读不到表会怎样** | 走组件自身的 `[Export]` 默认值：`idle` / `walk` / `sprint` / `die`，阈值 **0.15 / 4**。名字解析顺序 = 精确匹配 → **忽略大小写**（新素材写 `Idle`/`Run` 也能直接用）→ 退回上一档（跑→走→待机），退回时写一条警告（**每种单位只提醒一次**，不刷屏）。 |
+| **没有 AnimationPlayer 的单位** | 静默不参与（木桩、无人机…），零每帧开销，不报错。 |
+| **日志** | 每种场景各一行：`单位动画：Chaser 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值 或 表 enemy_chaser）`；每次**切换**再一行（每种单位每种切换只记一次，不会刷屏）。 |
+| **"跑"是哪个动画** | Kenney Mini Characters 的 32 段里**没有 `run`**，跑就是 **`sprint`**（列名仍叫 `AnimRun`，语义是"跑"）。 |
+
+**参数进了哪张表**：`Scripts/Config/UnitConfig.cs` 新增一组 `[ExportGroup("表现 · 动画（按移速在 idle/walk/跑 之间切；空 = 不覆盖，用 UnitAnimator 的默认值）")]`
+—— 6 列，**只加列**（没有改任何已有字段的名字/类型/默认值）：`AnimIdle` / `AnimWalk` / `AnimRun` / `AnimDeath`
+（字符串，空 = 不覆盖）+ `AnimWalkMinSpeed` / `AnimRunMinSpeed`（float，0 = 不覆盖）。
+套用点在 `UnitConfig.ApplyTo` 末尾（新增的 `ApplyAnimationTo(unit)`）：
+**一行都不填 → 连组件都不建**，完全交给 `UnitPresentation` 的自动补挂 + 组件默认值。
+
+> ⚠️ **一个已知的"半生效"边界（写清楚，不留陷阱）**：**玩家那 3 行（`chr_*.tres`）的动画列当前不生效** ——
+> `RunController.ApplyBalance` 与"攻击组"那处一样，只调 `ApplySkillsTo` / `ApplyAttackTo`，**不调** `ApplyTo`
+> （`RunController.cs:111-117`）。玩家的动画参数在 `Scenes/Player/Player.tscn` 的 `Animator` 节点上
+> （同一套组件、同一套默认值，所以行为与"填了默认值"逐位一致）。
+> **要让它也生效 = 一处一行的改动**：在 `RunController.ApplyBalance` 的 `character != null` 分支里加
+> `character.ApplyAnimationTo(_player);`。本轮边界不含 `RunController.cs`，所以没动。
+
+### 三、实测证据
+
+**编译**：每一步都跑 `& build.ps1 --no-incremental -v minimal` → 全程 **0 warning / 0 error**。
+
+**单位绑定 + 速度切换**（`run_20261012_010245.log`，`Scenes/Enemies/_AnimShowcase.tscn` 展示场景：
+
+```
+01:02:45 [Combat] 单位动画：FastMelee 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+01:02:45 [Combat] 单位动画：Chaser 共 32 段 · … 阈值 0.15/4（来源：组件默认值）
+01:02:45 [Combat] 单位动画：Guard 共 32 段 · … 阈值 0.15/4（来源：组件默认值）
+01:02:45 [Combat] 单位动画：Screamer 共 32 段 · … 阈值 0.15/4（来源：组件默认值）
+01:02:45 [Combat] 单位动画切换：FastMelee idle → walk（当前速度 1，阈值 0.15/4）
+01:02:45 [Combat] 单位动画切换：Chaser idle → walk（当前速度 1，阈值 0.15/4）
+01:02:45 [Combat] 单位动画切换：Guard idle → walk（当前速度 1，阈值 0.15/4）
+01:02:45 [Combat] 单位动画切换：Screamer idle → walk（当前速度 1，阈值 0.15/4）
+01:02:45 [Combat] 单位动画切换：FastMelee walk → sprint（当前速度 4，阈值 0.15/4）
+01:02:45 [Combat] 单位动画切换：Chaser walk → sprint（当前速度 4，阈值 0.15/4）
+01:02:48 [Combat] 单位动画切换：FastMelee sprint → walk（当前速度 3.5，阈值 0.15/4）
+01:02:48 [Combat] 单位动画切换：Chaser sprint → walk（当前速度 3.2，阈值 0.15/4）
+01:02:48 [Combat] 单位动画切换：FastMelee walk → idle（当前速度 0，阈值 0.15/4）
+01:02:49 [Combat] 单位动画切换：Guard walk → idle（当前速度 0，阈值 0.15/4）
+```
+
+读法：**4 个单位在同一帧越过 4.0 → 4 个 `walk → sprint`**（`FastMelee` 6.5、`Chaser` 4.2 都 ≥ 4；
+`Guard` 2.6、`Screamer` 3.0 一直 `walk`）；减速回到 3.5 / 3.2 时**又切回 `walk`**（证明是真按速度算的，不是一次性状态）。
+
+**死亡**（同一批自测日志）：`Chaser idle → die`、`Boss idle → die`、`Exploder idle → die`、
+`@CharacterBody3D@5 idle → die`（首领召唤出来的小怪也自动有动画 = 自动补挂这条路真的走到了）。
+
+**表里的列真的是旋钮**（一次临时实验，做完已还原 —— 与阶段 4 的"两次临时实验"同一套做法）：
+
+| 步骤 | 做法 | 实测 |
+|---|---|---|
+| 正向 | 给 `enemy_chaser.tres` 临时填 `AnimRunMinSpeed = 1.0` | `单位动画：Chaser … 阈值 0.15/1（来源：表 enemy_chaser）`；同一帧其它单位仍是 `阈值 0.15/4（来源：组件默认值）` → **逐行生效**；行为也变了：`Chaser idle → sprint（当前速度 1，阈值 0.15/1）`（默认阈值 4 时这一步只会是 `→ walk`） |
+| 还原 | 删掉那一列 | 又变回 `Chaser … 阈值 0.15/4（来源：组件默认值）`（`run_20261012_010000.log` 里 9 个单位全是这一条） |
+
+**截图**（`Scenes/Enemies/_AnimShowcase.tscn` = 本轮新增的展示台：一块地面 + 固定侧视相机 + 4 个单位 + 一个
+玩家阵营的木桩目标，单位会自己走过去；留着给以后换模型/调动画当对照台）：
+[anim_01_walk_showcase.png](screenshots/anim_01_walk_showcase.png) —— `Screamer` 迈步中（一条腿在前、一条在后，
+不是旧的"站姿定格"）；[anim_02_walk_showcase_next.png](screenshots/anim_02_walk_showcase_next.png) —— 0.4 秒后的
+同一批单位，腿部姿势已经换了一档（**两帧不同 = 动画真的在播**，而不是停在 `autoplay="idle"` 的那一帧）。
+
+**自测**：`selftest.flag` + `run_project` / 直接跑 `Main.tscn` 各跑过整轮，日志里有
+`=== 自测开始 ===` … `=== 自测结束 ===`、`Encounter 清场完成`、`端到端：按 F 之后 奖励界面打开 = True`，
+`ERROR/WARNING` **0 条**；`selftest.flag` 跑完即删（`Test-Path` 复查 False）。
+
+### 四、这一轮**没有**做的事（留给下一轮）
+
+- ⚠️ **玩家那 3 行的动画列不生效**（原因与一行修法见上面 §二末尾那个引用块）—— 需要改 `RunController.cs`。
+- ⚠️ **掉落 / 跳跃 / 攻击动画没接**：`.glb` 里现成还有 `jump` / `fall` / `attack-melee-right` 等 28 段。
+  接入点已经占好（`UnitAnimator` 是唯一改动画的地方），但要新增"空中/出招"两个状态机分支 + 各自的列。
+- ⚠️ **动画播放速率没有跟随移速**（`SpeedScale` 固定 1）：7 m/s 的玩家用 `sprint` 仍然会有一点点滑步。
+  要调就在 `UnitAnimator` 里加一处 `SpeedScale = clamp(speed / 参考速度)`；本轮没有可靠数据定"参考速度"，所以故意留空。
+- ⚠️ **首领去甲之后没有补偿调参**：首领的有效血量明显下降（少 200 点吸收 + 少 30% 减免），要不要上调
+  `MaxHealth` 或 `BossHealthMultiplier` 是数值决策。
 

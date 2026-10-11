@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
 [ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" path="res://Scripts/Weapons/Weapon.cs" id="9_weapon"]
 [ext_resource type="PackedScene" path="res://Scenes/Combat/Bullet.tscn" id="10_bullet"]
 [ext_resource type="PackedScene" path="res://Assets/Models/enemies/mesh_enemy_ranged.glb" id="11_model"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.45
@@ -86,3 +87,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
 
 [node name="Presentation" type="Node" parent="."]
 script = ExtResource("3_presentation")
+[node name="Animator" type="Node" parent="."]
+script = ExtResource("90_anim")

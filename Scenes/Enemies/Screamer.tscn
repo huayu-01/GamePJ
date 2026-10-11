@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
 [ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://Scripts/Abilities/AreaAttackAbility.cs" id="7_scream"]
 [ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="8_hitbox"]
 [ext_resource type="PackedScene" path="res://Assets/Models/enemies/mesh_enemy_screamer.glb" id="9_model"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.5
@@ -79,3 +80,5 @@ shape = SubResource("SphereShape3D_scream")
 
 [node name="Presentation" type="Node" parent="."]
 script = ExtResource("3_presentation")
+[node name="Animator" type="Node" parent="."]
+script = ExtResource("90_anim")

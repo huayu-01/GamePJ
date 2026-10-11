@@ -168,9 +168,19 @@ Scripts/
 > 索引行 `Pressure 7`、池明细 7 条无护甲、概率 23.1/23.1/15.4/15.4/7.7×3；探针的合成 `StageIds` 判定仍生效。
 > 详见 [config.md](config.md) 的「用户三项修正实测」与 [boss.md](boss.md) 的「Boss 构筑（技能 + 词条）」。
 >
-> **⚠️ 留给下一轮的两个决定**：① 首领**本体的 200 基甲**没动（题面只要求下线 Pressure 池里那条护甲词条）——
-> 要不要连基甲一起去掉是数值决策；② `Scripts/Run/StageController.cs` 里两条日志仍写着"Boss Build **行为词条**"
+> **⚠️ 留给下一轮的两个决定**：① ~~首领**本体的 200 基甲**没动~~ → ✅ **已去掉（2026-10 再一轮，用户明确要求「去掉首领的甲」）**：
+> `boss_final.tres` 的 `MaxArmor = 0` + `Boss.tscn` 那份同值导出删掉；**护甲字段全部保留在基类上**
+> （用户澄清：护甲是所有单位通用的属性，首领只是"没有获取手段"）。判据/管线走向见
+> [config.md](config.md) 的「首领去甲 + 单位动画实测」§一。**遗留**：首领有效血量因此明显下降，
+> 要不要补偿调参（`MaxHealth` 或 `BossHealthMultiplier`）是数值决策；
+> ② `Scripts/Run/StageController.cs` 里两条日志仍写着"Boss Build **行为词条**"
 > （受"只改数据不改算法"的边界约束没动，建议单独一次只改字符串的提交）。
+>
+> ✅ **同轮还做完了**：**单位动画系统**（`Scripts/Combat/UnitAnimator.cs`）—— 玩家 + 10 敌人 + 首领
+> 按移速在 `idle`/`walk`/跑 之间切、死亡播 `die`；参数是 `UnitConfig` 新增的「表现 · 动画」6 列
+> （**空 / 0 = 不覆盖**），新敌人不挂节点、不写代码、不填表也能动（`UnitPresentation._Ready` 会 `Ensure()` 补挂）。
+> **边界**：`RunController.ApplyBalance` 不调 `ApplyTo`，所以**玩家那 3 行（`chr_*.tres`）的动画列当前不生效**
+> —— 一行修法（`character.ApplyAnimationTo(_player);`）与证据见 [art-integration-log.md](art-integration-log.md) §11。
 
 ### 任务 E：Pressure 词条"一参数一栏"（3→8 条）+ 技能参数入池 + 限定词刷新判定 ✅ 已完成（2026-10）
 

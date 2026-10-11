@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
 [ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
@@ -16,6 +16,7 @@
 [ext_resource type="Script" path="res://Scripts/Boss/BossPressure.cs" id="14_pressure"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/Chaser.tscn" id="15_add"]
 [ext_resource type="PackedScene" path="res://Assets/Models/enemies/mesh_enemy_boss.glb" id="16_model"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 1.0
@@ -31,7 +32,6 @@ radius = 7.5
 script = ExtResource("1_unit")
 Faction = 1
 MaxHealth = 900.0
-MaxArmor = 200.0
 ArmorDamageReduction = 0.3
 KnockbackResistance = 1.0
 MoveSpeed = 3.6
@@ -180,3 +180,5 @@ AddScene = ExtResource("15_add")
 [node name="Presentation" type="Node" parent="."]
 script = ExtResource("3_presentation")
 DeathLinger = 2.5
+[node name="Animator" type="Node" parent="."]
+script = ExtResource("90_anim")

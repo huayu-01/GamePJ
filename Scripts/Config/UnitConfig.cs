@@ -110,6 +110,43 @@ public abstract partial class UnitConfig : ConfigRow
 	/// <summary>整体缩放（含碰撞体，与 <see cref="EliteModifier"/> 的 ModelScale 同一套做法）。1 = 不缩放。</summary>
 	[Export(PropertyHint.Range, "0.1,5,0.05")] public float ModelScale { get; set; } = 1f;
 
+	[ExportGroup("表现 · 动画（按移速在 idle/walk/跑 之间切；空 = 不覆盖，用 UnitAnimator 的默认值）")]
+	/// <summary>
+	/// 待机动画名（速度低于 <see cref="AnimWalkMinSpeed"/> 时播）。
+	/// <b>空 = 不覆盖</b>：用 <see cref="UnitAnimator.AnimIdle"/> 的默认值（`idle`）。
+	/// </summary>
+	[Export] public string AnimIdle { get; set; } = string.Empty;
+
+	/// <summary>
+	/// 移动动画名（速度在 <see cref="AnimWalkMinSpeed"/> 与 <see cref="AnimRunMinSpeed"/> 之间时播）。
+	/// <b>空 = 不覆盖</b>：用 <see cref="UnitAnimator.AnimWalk"/> 的默认值（`walk`）。
+	/// </summary>
+	[Export] public string AnimWalk { get; set; } = string.Empty;
+
+	/// <summary>
+	/// 奔跑动画名（速度不低于 <see cref="AnimRunMinSpeed"/> 时播）。
+	/// <b>空 = 不覆盖</b>：用 <see cref="UnitAnimator.AnimRun"/> 的默认值（`sprint` —— Kenney Mini Characters
+	/// 的 32 段里"跑"就叫 `sprint`，没有 `run`）。
+	/// </summary>
+	[Export] public string AnimRun { get; set; } = string.Empty;
+
+	/// <summary>
+	/// 死亡动画名（播一遍停在倒地帧，撑到 <see cref="UnitPresentation.DeathLinger"/> 到期）。
+	/// <b>空 = 不覆盖</b>：用 <see cref="UnitAnimator.AnimDeath"/> 的默认值（`die`）。
+	/// </summary>
+	[Export] public string AnimDeath { get; set; } = string.Empty;
+
+	/// <summary>
+	/// 「开始移动」的速度阈值（m/s）。<b>0 = 不覆盖</b>（用 <see cref="UnitAnimator.WalkMinSpeed"/> 的默认值 0.15）。
+	/// </summary>
+	[Export] public float AnimWalkMinSpeed { get; set; }
+
+	/// <summary>
+	/// 「开始奔跑」的速度阈值（m/s）。<b>0 = 不覆盖</b>（用 <see cref="UnitAnimator.RunMinSpeed"/> 的默认值 4 ——
+	/// 单位表里的移速大多是 2.6~3.6（走）与 4.2~7（跑），所以一列都不填也能得到"慢的走、快的跑"）。
+	/// </summary>
+	[Export] public float AnimRunMinSpeed { get; set; }
+
 	/// <summary>作用距离的候选属性名，按能力子类依次尝试（见 <see cref="AttackRange"/>）。</summary>
 	private static readonly string[] RangeProperties = { "AttackRange", "TriggerRadius", "MaxRange", "MaxDistance" };
 
@@ -137,6 +174,29 @@ public abstract partial class UnitConfig : ConfigRow
 		ApplySkillsTo(unit);
 		ApplyAiProfileTo(unit);
 		ApplyModel(unit);
+		ApplyAnimationTo(unit);
+	}
+
+	/// <summary>
+	/// 表现 · 动画 → 单位的 <see cref="UnitAnimator"/>（场景里没挂就补一个，见 <see cref="UnitAnimator.Ensure"/>）。
+	/// 只写**填过的**列（空字符串 / 0 = 不覆盖），所以一行都不填时什么都不做 —— 单位用组件自身的默认值，
+	/// "新敌人不加任何配置也能动"这条就成立。
+	///
+	/// ⚠️ <b>玩家（角色表 `chr_*.tres`）不走这条路径</b>：<c>RunController.ApplyBalance</c> 与"攻击组"那处一样，
+	/// 只调 <see cref="ApplySkillsTo"/> / <see cref="ApplyAttackTo"/>，不调 <see cref="ApplyTo"/>。
+	/// 所以玩家那 3 行的动画列**当前不生效**，玩家的动画参数在 `Scenes/Player/Player.tscn` 的 `Animator` 节点上
+	/// （同一套组件、同一套默认值）；要让角色行也生效，在 `RunController.ApplyBalance` 里加一行
+	/// `character.ApplyAnimationTo(_player);` 即可（本轮边界内不能改那个文件）。
+	/// </summary>
+	public void ApplyAnimationTo(Unit unit)
+	{
+		if (string.IsNullOrEmpty(AnimIdle) && string.IsNullOrEmpty(AnimWalk) && string.IsNullOrEmpty(AnimRun)
+			&& string.IsNullOrEmpty(AnimDeath) && AnimWalkMinSpeed <= 0f && AnimRunMinSpeed <= 0f)
+		{
+			return;
+		}
+
+		UnitAnimator.Ensure(unit).ApplyRow(this);
 	}
 
 	/// <summary>

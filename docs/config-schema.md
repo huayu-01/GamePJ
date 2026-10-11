@@ -2195,7 +2195,7 @@ public static string DescribePools()
 
 | 类 | 继承 | 自己声明的列 | 目录 / 行数 |
 |---|---|---|---|
-| `UnitConfig` | `ConfigRow`（抽象，不导出） | 生命（生命/护甲/护盾/护甲减伤/额外减伤/击退抗性）· 攻击四项（`AttackDamage` / `AttackInterval` / `AttackRange` / `AttackKnockback`）· 移速 · 行为&类（`Tags`）· **持有技能 `Skills : AbilityConfig[]`**（资源引用）· 表现（`ModelPath` / `ModelScale`） | —（基类） |
+| `UnitConfig` | `ConfigRow`（抽象，不导出） | 生命（生命/护甲/护盾/护甲减伤/额外减伤/击退抗性）· 攻击四项（`AttackDamage` / `AttackInterval` / `AttackRange` / `AttackKnockback`）· 移速 · 行为&类（`Tags`）· **持有技能 `Skills : AbilityConfig[]`**（资源引用）· **AI 档案 `AiProfile`**（资源引用）· 表现（`ModelPath` / `ModelScale`）· **动画 6 列**（`AnimIdle` / `AnimWalk` / `AnimRun` / `AnimDeath` + `AnimWalkMinSpeed` / `AnimRunMinSpeed`；**空 / 0 = 不覆盖** → `UnitAnimator`） | —（基类） |
 | `EnemyConfig` | `UnitConfig` | 全局倍率行（`IsGlobal` + 4 个倍率）· 刷怪（`ScenePath` / `Cost` / `Weight` / `MinElapsedSeconds` / `EliteChance`） | `Enemies/` **10** |
 | `BossConfig` | `UnitConfig` | `ScenePath` · `EliteCopyHealthScale` | `Bosses/` **1** |
 | `SummonConfig` | `UnitConfig` | `ScenePath` · `LifetimeSeconds` | `Summons/` **1** |
@@ -2208,6 +2208,9 @@ public static string DescribePools()
 > `AbilityConfig.InputAction`（按键由 `PlayerAbilityInput` 按能力类硬编码 + `project.godot [input]` 决定，
 > 改键是「设置表」那件事）、`CharacterConfig.DefaultWeaponId`（阶段 2 起就没人读，开局武器由 `StartScreen` 决定）。
 > `ModelPath` / `ModelScale` 保留了，因为它们在 `UnitConfig.ApplyModel` 里有真实代码路径（当前所有行留空 = 用场景模型）。
+> **动画那 6 列**（2026-10 新增）与它们同一套纪律：`ApplyAnimationTo(unit)` 只写**填过的**列，一行都不填就什么都不做
+> （单位用 `UnitAnimator` 自身的 `[Export]` 默认值），所以新敌人不填这几列也能动。细节见
+> [config.md](config.md) 的「首领去甲 + 单位动画实测」。
 
 **三条关键设计（都是为了避免两个真源）**：
 

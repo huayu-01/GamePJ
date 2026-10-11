@@ -6,6 +6,7 @@ namespace ActRoguelike.Combat;
 /// <summary>
 /// 受击表现：只监听 Unit 的 Gameplay 事件，不参与任何战斗结算（执行文档 §5.4）。
 /// 命中闪色、护甲/护盾破碎提示、死亡后延迟销毁。
+/// 另外保证单位身上有 <see cref="UnitAnimator"/>（动画切换本身在那个组件里，本文件只负责"它在位"）。
 /// </summary>
 public partial class UnitPresentation : Node
 {
@@ -35,6 +36,10 @@ public partial class UnitPresentation : Node
 		};
 
 		CollectMeshes(_unit);
+
+		// 动画组件：场景里挂了就用那个，**没挂就补一个** —— 这样"新增一个敌人"不需要手动挂节点，
+		// 只要有 `Model/…/AnimationPlayer` 就自动按移速切 idle/walk/跑（读不到配置表也成立）。
+		UnitAnimator.Ensure(_unit);
 	}
 
 	public override void _ExitTree()

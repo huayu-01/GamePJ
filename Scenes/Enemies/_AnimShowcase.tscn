@@ -1,0 +1,122 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/FastMelee.tscn" id="2_fast"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Chaser.tscn" id="3_chaser"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Guard.tscn" id="4_guard"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Screamer.tscn" id="5_screamer"]
+
+[sub_resource type="Environment" id="Environment_anim"]
+background_mode = 1
+background_color = Color(0.09, 0.11, 0.16, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.75, 0.78, 0.85, 1)
+ambient_light_energy = 0.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.26, 0.31, 0.27, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+material = SubResource("StandardMaterial3D_ground")
+size = Vector3(60, 1, 30)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(60, 1, 30)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_target"]
+radius = 0.5
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_target"]
+albedo_color = Color(0.85, 0.78, 0.35, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_target"]
+material = SubResource("StandardMaterial3D_target")
+radius = 0.5
+height = 1.8
+
+[node name="AnimShowcase" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_anim")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 8, 0)
+shadow_enabled = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+mesh = SubResource("BoxMesh_ground")
+
+[node name="GroundBody" type="StaticBody3D" parent="."]
+
+[node name="Shape" type="CollisionShape3D" parent="GroundBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1.6, 20)
+fov = 32.0
+current = true
+
+[node name="Target" type="CharacterBody3D" parent="."]
+script = ExtResource("1_unit")
+Faction = 0
+MaxHealth = 100000.0
+MoveSpeed = 0.0
+Tags = PackedStringArray("Target")
+
+[node name="Body" type="CollisionShape3D" parent="Target"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_target")
+
+[node name="Model" type="MeshInstance3D" parent="Target"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_target")
+
+[node name="Label" type="Label3D" parent="Target"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+billboard = 1
+no_depth_test = true
+pixel_size = 0.005
+text = "目标"
+
+[node name="FastMelee" parent="." instance=ExtResource("2_fast")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 0)
+
+[node name="Label" type="Label3D" parent="FastMelee"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+billboard = 1
+no_depth_test = true
+pixel_size = 0.005
+text = "FastMelee 6.5 跑"
+
+[node name="Chaser" parent="." instance=ExtResource("3_chaser")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 0)
+
+[node name="Label" type="Label3D" parent="Chaser"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+billboard = 1
+no_depth_test = true
+pixel_size = 0.005
+text = "Chaser 4.2 跑"
+
+[node name="Guard" parent="." instance=ExtResource("4_guard")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
+
+[node name="Label" type="Label3D" parent="Guard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+billboard = 1
+no_depth_test = true
+pixel_size = 0.005
+text = "Guard 2.6 走"
+
+[node name="Screamer" parent="." instance=ExtResource("5_screamer")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+
+[node name="Label" type="Label3D" parent="Screamer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+billboard = 1
+no_depth_test = true
+pixel_size = 0.005
+text = "Screamer 3.0 走"

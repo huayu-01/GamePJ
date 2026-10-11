@@ -356,8 +356,9 @@ RampBase  | vis_center=(-8.0,  1.2, -5.0) col_center=(-8.0,  1.2, -5.0) corner_d
 1. **9 个敌人 + Boss + 木桩**：与玩家同一套包换色/缩放。⚠️ 记得
    [art-sources.md](art-sources.md) §4.3 那条：`EliteModifier` 的精英染色**只看直接子节点**，
    `.glb` 挂深了精英怪不会变紫 —— 把 `.glb` 实例直接挂成单位的直接子节点、或放在 `Model` 这一层。
-2. **给玩家加 walk/sprint 动画**：`.glb` 里现成有 `walk` / `sprint` / `jump` / `fall` / `die`，
-   缺的只是一个按 `CharacterMovement` 速度切片的 `UnitAnimator`（新代码，本次没做）。
+2. **给玩家加 walk/sprint 动画**：✅ **已在「第四轮」做完**（见文末 §11）—— `.glb` 里现成的 `walk` / `sprint` /
+   `die` 现在由 `Scripts/Combat/UnitAnimator.cs` 按移速切换，10 个敌人 + 首领与玩家共用同一个组件。
+   仍**没做**的是 `jump` / `fall` / `attack-*`（§11.3）。
 3. **子弹拖尾的截图**（§6.5），顺手决定要不要把拖尾改成"弹丸销毁后仍存活一小会儿"
    （现在拖尾是弹丸的子节点，命中即整个消失）。
 4. **命中火花（Binbun Hit FX）/ 爆炸（Explosion FX）** —— 包已经下好了，在 `F:\Godot项目\_art_staging\`。
@@ -702,3 +703,89 @@ if (GD.Load<PackedScene>("res://Assets/Effects/fx_combat_hit.tscn") is { } hitFx
   → `ERROR: Parameter "t" is null` + `NullReferenceException` **每帧刷一次**（实测一次运行刷了 3.8 万条、
   stderr 长到 **142 MB**）。**跑自测请用 windowed**，或者让那个截图步骤在 `DisplayServer.get_name() == "headless"` 时跳过。
 
+---
+
+# 第四轮：单位动画（`UnitAnimator`）真的接线了（2026-10）
+
+> **本轮范围**：`Scripts/Combat/UnitAnimator.cs`（新建）、`Scripts/Combat/UnitPresentation.cs`、
+> `Scripts/Config/UnitConfig.cs`（只加列）、`Scenes/Player/Player.tscn`、`Scenes/Enemies/*.tscn`、本文档 + `docs/config.md`。
+> **没有动** `Assets/**`（`.glb` 一个字节没改）、`Scenes/UI/**`、`Scenes/Levels/TestArena.tscn`。
+> 上一轮（§8 下一步第 2 条）留的"给玩家加 walk/sprint 动画"这一项**本轮做完了**，而且敌人与玩家共用同一个组件。
+
+## 11.0 30 秒结论
+
+| 问题 | 答案 |
+|---|---|
+| 谁在动？ | **玩家 + 10 个敌人 + 首领**（`Model` 子树里有 `AnimationPlayer` 的单位全都会动；木桩/无人机这类没有动画的单位静默跳过）。 |
+| 怎么切的？ | 一个组件 `Scripts/Combat/UnitAnimator.cs` 按**移动速度**切 `idle` / `walk` / `sprint`，死亡切 `die`。 |
+| 位置占在哪？ | 每个单位场景里一个 `Animator` 子节点（`[node name="Animator" type="Node" parent="."]`），**但漏挂也不会坏** —— `UnitPresentation._Ready` 会 `Ensure()` 补一个。 |
+| 参数可配吗？ | 可配。`UnitConfig` 新增 6 列（4 个动画名 + 2 个速度阈值，**空 / 0 = 不覆盖**），落在单位表的「表现 · 动画」组里；一行都不填 = 组件默认值（`idle`/`walk`/`sprint`/`die`，阈值 0.15 / 4）。 |
+| 循环从哪来？ | **代码里设的**。`.glb` 导入的 32 段全是 `LOOP_NONE`（§6.3 记过：`autoplay="idle"` 只是"播一遍停在最后一帧"）→ `Bind()` 把 idle/walk/跑 设成 `Linear`、`die` 保持 `None`。 |
+| 有没有破坏既有表现？ | **没有**。受击闪色（`UnitPresentation`，递归收集 mesh + `MaterialOverride`）与精英染色（`EliteModifier.TintRecursive`）走的是材质，动画走的是 `AnimationPlayer` 的骨骼轨道，互不干扰；两处代码本轮都只动了"多一行 Ensure / 注释"。 |
+| 证据 | 日志（绑定行 + 每次切换行，含速度）+ 两张截图（同一批单位间隔 0.4 秒、腿部姿势不同）+ 一次"表列真的是旋钮"的临时实验。 |
+
+## 11.1 改了哪些文件
+
+| 文件 | 改了什么 |
+|---|---|
+| `Scripts/Combat/UnitAnimator.cs` | **新增**（约 300 行）：按速度切动画、死亡动画、约定位查找 `Model/**/AnimationPlayer`、循环模式修正、名字解析与回退、`Ensure(unit)` 自动补挂、每种场景各一行日志 + 每次切换一行日志。 |
+| `Scripts/Combat/UnitPresentation.cs` | `_Ready` 里多一行 `UnitAnimator.Ensure(_unit);`（新敌人不挂节点也能动）+ 类注释补一句。 |
+| `Scripts/Config/UnitConfig.cs` | **只加列**：`[ExportGroup("表现 · 动画…")]` 下 6 个新字段 + `ApplyAnimationTo(Unit)`（`ApplyTo` 末尾调用）。既有字段的名字/类型/默认值一个没动。 |
+| `Scenes/Player/Player.tscn` + `Scenes/Enemies/{Chaser,Charger,Exploder,FastMelee,Guard,JumpingMelee,RangedEnemy,Screamer,SkillElite,Boss}.tscn` | 各加一个 `Animator` 子节点（`ext_resource` 指向 `UnitAnimator.cs`，`load_steps` 相应 +1，11/11 逐个复核过）。 |
+| `Scenes/Enemies/_AnimShowcase.tscn` | **新增的展示台**（对照 `_ArtShowcase.tscn` 的定位）：一块地面 + 固定侧视相机 + 4 个单位 + 一个玩家阵营的木桩目标 → 单位自己走过去，用来拍"走/跑"的截图。 |
+
+> ⚠️ 11 个场景的 `AnimationPlayer` 那条 `autoplay = "idle"` **原样保留** —— 它现在是"动画组件没接上时的兜底姿势"，
+> 不去动它更安全（本轮没有删任何一行既有属性）。
+
+## 11.2 实测证据
+
+**编译**：`& build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（改一步跑一次，全程 0/0）。
+
+**绑定 + 按速度切换**（`run_20261012_010245.log`，展示场景；同一批单位、同一帧的数据）：
+
+```
+[Combat] 单位动画：FastMelee 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[Combat] 单位动画：Chaser / Guard / Screamer …（同上，各自一行）
+[Combat] 单位动画切换：FastMelee idle → walk（当前速度 1，阈值 0.15/4）
+[Combat] 单位动画切换：Chaser   idle → walk（当前速度 1，阈值 0.15/4）
+[Combat] 单位动画切换：Guard    idle → walk（当前速度 1，阈值 0.15/4）
+[Combat] 单位动画切换：Screamer idle → walk（当前速度 1，阈值 0.15/4）
+[Combat] 单位动画切换：FastMelee walk → sprint（当前速度 4，阈值 0.15/4）
+[Combat] 单位动画切换：Chaser   walk → sprint（当前速度 4，阈值 0.15/4）
+[Combat] 单位动画切换：FastMelee sprint → walk（当前速度 3.5，阈值 0.15/4）   ← 到达后减速，退回走
+[Combat] 单位动画切换：Chaser   sprint → walk（当前速度 3.2，阈值 0.15/4）
+[Combat] 单位动画切换：FastMelee walk → idle（当前速度 0，阈值 0.15/4）
+```
+
+**死亡动画**（自测整轮里抓到的三种）：`Chaser idle → die`、`Boss idle → die`、`Exploder idle → die`，
+以及首领召唤出来的小怪 `@CharacterBody3D@5 idle → die`（**自动补挂那条路真的走到了** —— 那个单位是运行期
+`Instantiate` 出来的，没有任何人给它挂节点）。
+
+**表里的列真的是旋钮**（一次临时实验，做完已还原）：给 `enemy_chaser.tres` 临时填 `AnimRunMinSpeed = 1.0` →
+日志变成 `单位动画：Chaser … 阈值 0.15/1（来源：表 enemy_chaser）`，并且 `Chaser idle → sprint（当前速度 1）`
+（默认阈值 4 时这一步只会是 `→ walk`）；同一帧其它单位仍是 `阈值 0.15/4（来源：组件默认值）`。
+删掉那一列后立刻回到 `0.15/4（来源：组件默认值）`。
+
+**截图**（对照台 `Scenes/Enemies/_AnimShowcase.tscn`，4 个单位 + 固定侧视相机）：
+
+| 图 | 看到什么 |
+|---|---|
+| [anim_01_walk_showcase.png](screenshots/anim_01_walk_showcase.png) | `Screamer`（紫衣）**迈步中**：一条腿在前、一条在后，影子也跟着分开 —— 与"`autoplay="idle"` 停在最后一帧"的旧状态明显不同。 |
+| [anim_02_walk_showcase_next.png](screenshots/anim_02_walk_showcase_next.png) | **0.4 秒后**的同一批单位：腿部姿势换了一档 ⇒ **动画真的在播**（不是定格）。 |
+
+> 截图方式（本机 gdmcp runtime 桥与别的代理抢 session，所以走这条路）：直接
+> `Godot_v4.7.2-stable_mono_win64.exe --path F:\Godot项目\项目a --resolution 1920x1080 --position 0,0 res://Scenes/Enemies/_AnimShowcase.tscn`，
+> 用 `user32!SetWindowPos` 把窗口钉在 (0,0) 置顶，再用 `System.Drawing` 的 `CopyFromScreen` 连拍。
+
+**自测**：整轮自测（`selftest.flag`）跑完，日志里 `=== 自测开始 ===` … `=== 自测结束 ===`、
+`Encounter 清场完成`、`端到端：按 F 之后 奖励界面打开 = True` 全在，`ERROR/WARNING` **0 条**；
+`selftest.flag` 跑完即删（复查 `Test-Path` = False）。
+
+## 11.3 留给下一轮
+
+1. **玩家角色行（`chr_*.tres`）的动画列当前不生效**：`RunController.ApplyBalance` 不调 `UnitConfig.ApplyTo`，
+   所以玩家读的是 `Player.tscn` 上 `Animator` 节点的默认值。**一行修法**：在它的 `character != null` 分支里加
+   `character.ApplyAnimationTo(_player);`（本轮边界不含 `RunController.cs`）。细节见 `docs/config.md`。
+2. **`jump` / `fall` / `attack-*` 还没接**：32 段里还剩 28 段没用。接入点只有一处（`UnitAnimator`），
+   加两个状态分支 + 两列即可。
+3. **播放速率没跟随移速**（`SpeedScale` 固定 1）：要更贴地就加 `SpeedScale = clamp(speed / 参考速度)`。

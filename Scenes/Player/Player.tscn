@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Player/PlayerController.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://Scenes/Camera/CameraRig.tscn" id="2_rig"]
@@ -18,6 +18,7 @@
 [ext_resource type="Script" path="res://Scripts/Abilities/BurstFireAbility.cs" id="8_burst"]
 [ext_resource type="Script" path="res://Scripts/Player/PlayerAbilityInput.cs" id="9_ability_input"]
 [ext_resource type="PackedScene" path="res://Assets/Models/player/mesh_player_body.glb" id="18_playerbody"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -140,3 +141,5 @@ AttackTags = PackedStringArray("Control", "AoE")
 shape = SubResource("SphereShape3D_control")
 [node name="ChallengerMark" type="Node3D" parent="."]
 script = ExtResource("17_mark")
+[node name="Animator" type="Node" parent="."]
+script = ExtResource("90_anim")
