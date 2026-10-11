@@ -7,7 +7,10 @@
 
 ## 一、30 秒现状
 
-- **项目目前零美术资源**：没有贴图、没有字体、没有 3D 模型、没有 Theme、没有粒子、没有动画（`AnimationPlayer`/`Skeleton3D` 全项目 0 命中）。所有可见物都是**程序化基础网格**（`BoxMesh` / `CapsuleMesh` / `CylinderMesh` / `SphereMesh`）+ 纯色材质。
+- **项目已经不是零美术资源了**（本文写于"零资源"时期，现状见文末的**更新记录**，冲突时以更新记录为准）：
+  天空盒 ✅、竞技场 10 个 GLB ✅、玩家 + 10 个敌人模型 ✅、枪口火光 / 命中 / 爆炸特效 ✅、
+  **UI 主题 + 贴图 + 准星 + 中文字体（系统字体占位）✅**、**界面说明见 [ui.md](ui.md)**。
+  仍然程序化的：基地 4 个交互台、木桩、无人机、手枪、子弹/爆炸网格的部分材质。
 - **规范已立**：资源目录 `Assets/`，命名 `<类别>_<分组>_<变体>`。
 - **已有样板**：交互物（奖励节点、Boss 门）与特效（子弹、爆炸）这 4 个已经**从场景内联改成独立资源文件**，照它们的做法抄就行。
 - **转换进度**：4 个场景已外置，**还剩 19 个**内联（9 个敌人 + Base / TestArena / Player / Drone / Training×3 / Pistol）。
@@ -88,10 +91,14 @@ Assets/
 
 ### 4. 换 UI 素材
 
+> ✅ **这一节已经在 2026-10「第五轮」落地了：完整操作说明搬到了 [ui.md](ui.md)（新建，UI 外观的唯一入口）**。
+> 下面这些是**仍然成立**的约束，细节（主题怎么组织、怎么加新样式、字体怎么换、准星怎么换）看 ui.md。
+
 `Scenes/UI/` 下每个界面。**⚠️ 换之前先看这几条**：
 
 | 坑 | 说明 |
 |---|---|
+| **主题是唯一的样式入口** | `Assets/UI/Themes/ui_theme.tres` 管字体 / 字号 / 颜色 / 面板 / 按钮；挂在各界面根 `Control` 的 `theme` 上。**换皮只改主题，不碰场景** |
 | 一批控件是**按名字取的** | 改名必须先改代码（见下面第五节） |
 | 血条的**填充条 / 残影条 / 文字**按名字取 | 见下面的预制体说明；改 `Fill` / `DelayBar` / `Label` 这三个名字要同步 `PlayerHud.cs` / `WorldOverlay.cs` 里的常量 |
 | 血条配色仍由**代码**按血量写（绿 → 黄 → 红） | 美术在预制体里设的颜色会被覆盖；要换配色改 `HealthColor()`（`PlayerHud.cs`、`WorldOverlay.cs` 各一份） |
@@ -148,6 +155,7 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
 | `Hud/BossPanel`、`Panel/{Icon,NameLabel,Bar,StateLabel}` | `PlayerHud`（`BuildBossPanel`，`BossPanel` 是代码挂上去时的名字） | `BarBoss.tscn` |
 | `Bars/*/Content/Fill|DelayBar|Label` | `WorldOverlay`（每个敌人血条实例） | `BarEnemy.tscn` |
 | `Model` / `Body` | **无引用，可自由改名** | 所有单位 |
+| ~~`CrosshairH` / `CrosshairV` / `CrosshairDot`~~ | **已删除**（第四轮换成 `Hud.tscn` 的 `Root/Crosshair` 贴图准星）；这三个名字**本来就没有任何代码引用** | HUD |
 
 完整清单（15 组共 26 个节点名）见 [visual-inventory.md](visual-inventory.md) 第 8 节。
 
@@ -166,8 +174,9 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
 | 视觉由**代码生成**的还剩 5 处 | `ChallengerMark` 的三角环（`ArrayMesh`）、受击闪色、精英染色、伤害跳字、"用尽变暗" —— 换这些要改 C#。**三条血条已是预制体**（见第三节第 4 条） |
 | 血条配色仍是代码写死 | 绿→黄→红在 `HealthColor()` 里；要按美术主题色走需要改成读预制体颜色 |
 | 血条的动画还没做 | 预制体上有空的 `AnimationPlayer` 与"数值更新 / 表现更新"两个方法（`SetRatio` / `AdvanceDelay`），插入动画的接口已留好 |
-| 奖励节点按类型上色 | 现存可玩性问题，见第三节第 5 条 |
-| 粒子 / 动画 / 骨骼 | 全空白，从零加 |
+| 奖励节点按类型上色 | 现存可玩性问题，见第三节第 5 条（**已做**，见文末更新记录） |
+| 粒子 / 动画 / 骨骼 | 枪口火光、命中、爆炸粒子已接；模型动画已由 `UnitAnimator` 接管（见 [art-integration-log.md](art-integration-log.md) 后续轮次） |
+| **UI 只剩"铺满"的体力活** | 主题 + 贴图 + 字体 + 准星已就位（**见 [ui.md](ui.md)**）；剩下的是把 7 个弹窗逐个精修、血条换贴图、中文自带字体（发行前必做） |
 
 ---
 
@@ -200,3 +209,30 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
 **同步需要知道的其它变化**：`Interactable` 新增 `Vanished` 状态与 `Appear()`/`Disappear()`；`StageController` 的兜底落点从 `_playerRef`（原来永远是 null）改成了 `PlayerLocator.Player`。
 
 **仍然待办**：19 个场景内联资源、7 处代码生成的视觉、9 敌+Boss 换模型、UI/音效接入、补拍子弹拖尾。
+
+---
+
+## 更新记录（2026-10 · 第五轮：UI 素材 + 主题 + 字体 + 准星 + glow）
+
+> 本轮的**完整说明见 [ui.md](ui.md)**；逐项证据与截图见 [art-integration-log.md](art-integration-log.md) 的「第五轮」。
+
+1. **UI 不再是"纯色 `ColorRect` + 默认字体"**：
+   - 新增 `Assets/UI/`（`Textures/` + `Themes/` + `Fonts/` + `Licenses/`），素材来自 **Kenney UI Pack - Sci-Fi 2.0 / Crosshair Pack 1.1 / Fonts**（全部 **CC0**，包内许可原文已照抄进 `Assets/UI/Licenses/`）。（第五轮）
+   - **主题** `Assets/UI/Themes/ui_theme.tres` 统管字体 / 字号 / 颜色 / 面板 / 按钮，挂在 **8 个界面场景的根 `Control`** 上；
+     三个**类型变体**（`UiTitle` / `UiPrimaryButton` / `UiCaption`）让"标题带 / 主按钮 / 说明文字"一行搞定。
+2. **中文字体（重要，发行前必做）**：`default_font` 是一个 **`SystemFont`**，按优先级从系统取
+   「微软雅黑 UI → 微软雅黑 → Noto Sans SC → 思源黑体 …」。**实测中文 / `◆` / `◇` / 数字全部有字形**。
+   ⚠️ 这是**开发期占位**：玩家机器上不一定有这些字体 → **发行前要换成一个自带的开源中文字体**
+   （Noto Sans SC 17 MB / 得意黑 ~2.7 MB / 裁字后 1~2 MB，许可与步骤见 [ui.md](ui.md) §4）。
+   英文/数字另配了 `font_ui_kenney_future.ttf`（Kenney Fonts, CC0），用在 HUD 的 `HP 120/120`。
+3. **准星**：`Hud.tscn` 的 3 个 `ColorRect`（`CrosshairH`/`CrosshairV`/`CrosshairDot`，无代码引用）**已删除**，
+   换成 `Root/Crosshair`（`TextureRect` + Kenney 描边准星 56×56）。
+4. **玩家血条**：`BarPlayer.tscn` 的 `BarBg` 换成带端帽的九宫格边框贴图、`Fill`/`DelayBar` 从
+   **`res://icon.svg`（Godot 图标平铺！）** 换成 Kenney 血条填充条 —— 配色仍由代码按血量写（绿→黄→红）。
+   **`BarEnemy` / `BarBoss` 未动**（结构与 `BarPlayer` 一致，照抄即可）。
+5. **竞技场开了 glow**（`TestArena.tscn` 的 `WorldEnvironment`，只动 `Environment` 这一块）：
+   上一轮记录的"爆炸偏暗、以烟为主"就是因为这里没开 glow。**阈值取 2.0**（不是常见的 0.9~1.2），
+   因为这张场地的地板本来就接近纯白，阈值低了会整块地板一起 bloom（实测过曝）。
+   爆炸火球从"一块平黄"变成"白热核心 + 橙色外焰 + 光晕"，枪口火光带上暖色光晕，**空场亮度基本不变**。
+6. **验证工具**：新增 `Scenes/UI/_UiShowcase.tscn` + `_ui_shot.gd`（一次运行拍完 7 个界面 + HUD + glow 前后），
+   用法与两个坑（**别最小化窗口**、它拍的是真的 `TestArena.tscn` 环境）见 [ui.md](ui.md) §8。

@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://Scripts/UI/PlayerHud.cs" id="1_hud"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/Bars/BarPlayer.tscn" id="2_bar"]
+[ext_resource type="Theme" path="res://Assets/UI/Themes/ui_theme.tres" id="3_theme"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Textures/tex_ui_crosshair_default.png" id="4_crosshair"]
+[ext_resource type="FontFile" path="res://Assets/UI/Fonts/font_ui_kenney_future.ttf" id="5_hud_digits"]
 
 [node name="Hud" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -13,58 +16,35 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme = ExtResource("3_theme")
 
 [node name="Health" type="Label" parent="Root"]
 offset_left = 24.0
 offset_top = 16.0
 offset_right = 520.0
 offset_bottom = 52.0
-theme_override_font_sizes/font_size = 26
+theme_override_fonts/font = ExtResource("5_hud_digits")
+theme_override_font_sizes/font_size = 24
 text = "HP"
 
 [node name="PlayerBar" parent="Root" instance=ExtResource("2_bar")]
 
-[node name="CrosshairH" type="ColorRect" parent="Root"]
+[node name="Crosshair" type="TextureRect" parent="Root"]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -9.0
-offset_top = -1.0
-offset_right = 9.0
-offset_bottom = 1.0
+offset_left = -28.0
+offset_top = -28.0
+offset_right = 28.0
+offset_bottom = 28.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(1, 1, 1, 0.9)
-
-[node name="CrosshairV" type="ColorRect" parent="Root"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -1.0
-offset_top = -9.0
-offset_right = 1.0
-offset_bottom = 9.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(1, 1, 1, 0.9)
-
-[node name="CrosshairDot" type="ColorRect" parent="Root"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -1.5
-offset_top = -1.5
-offset_right = 1.5
-offset_bottom = 1.5
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(1, 0.85, 0.3, 1)
+texture = ExtResource("4_crosshair")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(1, 1, 1, 0.9)
 
 [node name="Status" type="Label" parent="Root"]
 anchor_left = 0.5

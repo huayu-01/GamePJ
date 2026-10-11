@@ -789,3 +789,186 @@ if (GD.Load<PackedScene>("res://Assets/Effects/fx_combat_hit.tscn") is { } hitFx
 2. **`jump` / `fall` / `attack-*` 还没接**：32 段里还剩 28 段没用。接入点只有一处（`UnitAnimator`），
    加两个状态分支 + 两列即可。
 3. **播放速率没跟随移速**（`SpeedScale` 固定 1）：要更贴地就加 `SpeedScale = clamp(speed / 参考速度)`。
+
+---
+
+# 第五轮：UI 素材 + 主题 + 字体 + 准星 + 竞技场 glow（2026-10）
+
+> **本轮范围**：`Scenes/UI/**`、`Assets/UI/**`（新建）、`Scenes/Levels/TestArena.tscn`（**只动 `WorldEnvironment` 的 `Environment`**）、`docs/ui.md`（新建）。
+> **没有动** `Scripts/**`（一个字节都没改）、`Config/**`、`Scenes/Enemies/**`、`Scenes/Player/**`、`Assets/Audio/**`、`Assets/Fonts/**`。
+> **界面逻辑一行没改**：`OverlayScreen` 的分层（`Hud`/`Panel`/`Modal`）、`UiRouter`、各 `*Screen.cs` 全部原样；只改外观。
+> **完整操作说明见 [ui.md](ui.md)** —— 本节只记"改了什么 + 证据"。
+
+## 12.0 30 秒结论
+
+| 问题 | 答案 |
+|---|---|
+| UI 用了哪个包？ | **Kenney UI Pack - Sci-Fi 2.0**（切角面板 + 蓝色标题带 + 血条，CC0）+ **Kenney Crosshair Pack 1.1**（准星，CC0）+ **Kenney Fonts**（HUD 数字，CC0）。三个包的 `License.txt` 都是 **CC0**，已照抄进 `Assets/UI/Licenses/`。 |
+| 主题怎么组织的？ | `Assets/UI/Themes/ui_theme.tres` **一个文件**统管字体 / 字号 / 颜色 / 面板 / 按钮 / 焦点框；挂在 **8 个界面场景的根 `Control`**（7 弹窗 + `Hud`）。另加 3 个**类型变体**（`UiTitle` / `UiPrimaryButton` / `UiCaption`），场景里一行 `theme_type_variation = &"UiTitle"` 就能用。 |
+| 后续加界面要做什么？ | ① 贴图放 `Assets/UI/Textures/`；② 新样式就在主题里加一个变体；③ 节点上写一行 `theme_type_variation`。**零 C#**。四种常见动作见 [ui.md](ui.md) §3。 |
+| 中文字体？ | **能显示**，而且是**显式**的：`default_font` = `SystemFont`，按优先级取「微软雅黑 UI → 微软雅黑 → Noto Sans SC → 思源黑体…」。实测 `中/文/·/…/◆/◇/A/7` 全部 `has_char=true`，实解析到 **Microsoft YaHei**。⚠️ **系统字体只是开发期占位，发行前必须换自带字体**（候选 + 许可 + 体积见 §12.4）。 |
+| 准星接在哪？ | `Assets/UI/Textures/tex_ui_crosshair_default.png`（Kenney 200 个里挑的第 112 号描边版）→ `Hud.tscn` 的 **`Root/Crosshair`**（`TextureRect`，屏幕中心 56×56）。**原 3 个 `ColorRect` 已删**（无代码引用）。 |
+| glow？ | `TestArena.tscn` 的 `WorldEnvironment` 开了：**`glow_hdr_threshold = 2.0`** / `glow_intensity = 0.5` / `glow_bloom = 0` / `glow_blend_mode = 1`(Screen) / 只开 4-6 档。**为什么阈值不是常见的 0.9** 见 §12.5。 |
+
+## 12.1 素材落盘（`Assets/UI/`，全部 CC0）
+
+| 文件 | 来源（包内路径） | 尺寸 | 用在哪 |
+|---|---|---|---|
+| `Textures/tex_ui_panel_frame.png` | UI Pack `PNG/Extra/Double/panel_glass_notches.png` | 128² | 大面板底（九宫格 34px 切角） |
+| `Textures/tex_ui_panel_frame_small.png` | 同上 `Extra/Default/` | 64² | 焦点框（九宫格 17px） |
+| `Textures/tex_ui_panel_glass.png` / `_small` | `Extra/{Double,Default}/panel_glass.png` | 128²/64² | 备选圆角面板（本轮未接线） |
+| `Textures/tex_ui_panel_glass_small.png` | 同 `_small` | 64² | **所有普通按钮**的底（靠 `modulate_color` 区分 normal/hover/pressed/disabled） |
+| `Textures/tex_ui_header_band.png` | `PNG/Blue/Default/button_square_header_large_rectangle.png` | 192×64 | 标题带 / 主按钮（用 `region_rect` 裁顶部 33px 蓝带） |
+| `Textures/tex_ui_bar_frame.png` | `PNG/Blue/Default/bar_square_large.png` | 192×48 | 分隔条 / **玩家血条边框** |
+| `Textures/tex_ui_bar_fill.png` | `PNG/Blue/Default/bar_square_large_m.png` | 24² | **血条填充**（平铺，跟着代码染色） |
+| `Textures/tex_ui_crosshair_default.png` | Crosshair Pack `PNG/Outline (2×)/crosshair-112.png` | 148² | 准星 |
+| `Fonts/font_ui_kenney_future.ttf` | Kenney Fonts `Fonts/Kenney Future.ttf` | 34 KB | HUD 数字（`HP 120/120`） |
+| `Licenses/license_kenney_*.txt` | 三个包的 `License.txt` | — | CC0 原文（举证用） |
+
+> **两处目录偏离（照实记录）**：① UI 贴图放 `Assets/UI/Textures/` 而不是 `Assets/Textures/`
+> （"改界面只看一个目录"）；② 字体放 `Assets/UI/Fonts/` 而不是 `Assets/Fonts/`（后者本轮划给了别的代理），
+> 以后要统一，**只改主题里一行引用**。
+> **命名**：贴图 `tex_ui_*.png`（照 [assets.md](assets.md) §2）；字体是新类别，用了 `font_ui_*.ttf`（建议给 assets.md 补一行）。
+
+## 12.2 改了哪些文件（逐项）
+
+**新建**
+
+| 文件 | 内容 |
+|---|---|
+| `Assets/UI/Themes/ui_theme.tres` | 主题：`SystemFont`（中文）+ 13 个 `StyleBoxTexture` + 3 个类型变体 |
+| `Assets/UI/**`（贴图/字体/许可，见 §12.1） | — |
+| `Scenes/UI/_UiShowcase.tscn` + `_ui_shot.gd` | 拍摄台（见 §12.6） |
+| `docs/ui.md` | UI 外观的唯一入口文档 |
+
+**改（全部只动外观）**
+
+| 文件 | 改了什么 |
+|---|---|
+| `Scenes/UI/{Base,BossPreview,Choose,Help,Loading,Reward,Start}Screen.tscn` | 各加 1 行 `ext_resource(Theme)` + 根 `Control` 上 1 行 `theme = ...`；`load_steps` 同步 +1。带标题的 5 个界面把 `Title` 的 `theme_override_font_sizes/font_size = 30~34` 换成 `theme_type_variation = &"UiTitle"`，`Hint` 换成 `&"UiCaption"` |
+| `Scenes/UI/BaseScreen.tscn`（**完整示范**） | 另加一个 `Divider`（`NinePatchRect` + `tex_ui_bar_frame.png`），`Start` 按钮换成 `&"UiPrimaryButton"`（蓝色实心） |
+| `Scenes/UI/Hud.tscn` | 加主题；**删 3 个 `ColorRect` 准星 → 1 个 `Root/Crosshair`（贴图）**；`Health` 标签加 `theme_override_fonts/font`（Kenney Future） |
+| `Scenes/UI/Bars/BarPlayer.tscn` | `BarBg`：`ColorRect` → `NinePatchRect` + 血条边框贴图（**名字保持 `BarBg`**，代码找的是 `Bg`）；`Fill`/`DelayBar` 贴图：`res://icon.svg`（**平铺的 Godot 图标**）→ `tex_ui_bar_fill.png` |
+| `Scenes/Levels/TestArena.tscn` | **只加 glow 那一段**（`Environment` 的 11 行），其它节点一个字节没动 |
+
+**没碰**：`Scripts/**`（0 改动）、`Config/**`、`Scenes/Enemies/**`、`Scenes/Player/**`、`Assets/Audio/**`、`Assets/Fonts/**`、
+`OverlayScreen.ScreenLayer`、任何节点名（除删掉的那 3 个无引用的准星 `ColorRect`）。
+
+## 12.3 界面截图（7 弹窗 + HUD）
+
+| 图 | 看什么 |
+|---|---|
+| [ui_01_basescreen.png](screenshots/ui_01_basescreen.png) | **完整示范**：切角面板 + 蓝色标题带（`UiTitle`）+ 青色分隔条 + 5 个贴图按钮 + 蓝色主按钮（`UiPrimaryButton`）+ 灰色说明文字（`UiCaption`），中文正文正常 |
+| [ui_02_helpscreen.png](screenshots/ui_02_helpscreen.png) | 同一套主题下的**长中文正文**（30+ 行），换行 / 对齐 / 描边都正常 —— 这张同时是"中文字体可用"的证据 |
+| [ui_03_startscreen.png](screenshots/ui_03_startscreen.png) | 武器选择：标题带 + 2 张卡片按钮 |
+| [ui_04_rewardscreen.png](screenshots/ui_04_rewardscreen.png) | 三选一奖励：标题带 + 3 张卡片按钮 + 说明文字 |
+| [ui_05_choosescreen.png](screenshots/ui_05_choosescreen.png) | 池子选择（中文长卡片文案不溢出） |
+| [ui_06_bosspreview.png](screenshots/ui_06_bosspreview.png) | 首领状况面板（多行正文 + `◆`/`◇` 两个符号有字形） |
+| [ui_07_loadingscreen.png](screenshots/ui_07_loadingscreen.png) | 加载界面（标题 + 说明两行） |
+| [ui_08_hud_ingame.png](screenshots/ui_08_hud_ingame.png) | **HUD 实机**（拍摄台挂**真的** `Player.tscn` + `Hud.tscn`）：左上 `HP 120/120` 用 **Kenney Future**、**绿色血条 + 九宫格金属边框**、屏幕中心 **Kenney 准星**、右下 `8 / 8` 弹药 |
+| [ui_09_hud_crosshair.png](screenshots/ui_09_hud_crosshair.png) | 同一次运行的下一帧（相机/玩家位置略有变化，用于核对准星是贴在屏幕中心的） |
+
+> ⚠️ 卡片按钮的文字是拍摄台**手动填的样本文案**（真实文案由 C# 运行时写入）。
+> 因为拍摄台**不调各界面的 `Open()`**（那要真实数据、还会触发分层暂停），只把根 `Control` 点亮 ——
+> **拍的是外观，一行界面逻辑都没走**。
+
+## 12.4 字体：结论（含"为什么没自带"）
+
+- **能显示中文**：`SystemFont.font_names` 按优先级列了 8 个候选 + `sans-serif`，`allow_system_fallback = true`。
+  探针实测（`--headless --script`）：`has_char` 对 `中` `文` `·` `…` `◆` `◇` `A` `7` **全部 true**，
+  `get_font_name()` = **Microsoft YaHei**；本机 `OS.get_system_fonts()` = **115** 个，其中
+  `Microsoft YaHei UI` / `Microsoft YaHei` / `SimHei` / `DengXian` / `SimSun` 都在。
+- **英文/数字另配**：Kenney Future（CC0）用在 HUD 的 `Health` 标签。
+- ⚠️ **`SystemFont` 是开发期占位**（玩家机器上不一定有雅黑）→ **发行前换成自带字体**。
+- **本轮没有下载任何中文字体**（任务约束"不要下大文件"）。**实测体积**（读 GitHub API，不是估的）：
+
+  | 候选 | 许可（项目声明） | 单字重体积 |
+  |---|---|---|
+  | **Noto Sans SC** | SIL OFL 1.1（`ofl/notosanssc/OFL.txt`） | `NotoSansSC[wght].ttf` = **17,772,300 B ≈ 17.0 MB** |
+  | **霞鹜文楷 LXGW WenKai** | SIL OFL 1.1 | `LXGWWenKai-Regular.ttf` = **25,575,676 B ≈ 24.4 MB** |
+  | **得意黑 Smiley Sans** | SIL OFL 1.1 | 发布包 5,781,344 B≈5.5 MB（含 2 字重）→ 单字重 ≈ **2.7 MB** |
+  | 微软雅黑 / 黑体 / 宋体 | **专有，不可再分发** | 只能像现在这样"按名字引用"，**不能入库** |
+
+  > 诚实交代：**我没有逐字读完许可原文**（抓 `LICENSE`/`OFL.txt` 原文时网络超时），
+  > 上面"许可"一列来自各自仓库/发布页的声明与目录结构（`ofl/` + `OFL.txt`）。真要发行**请自己再确认一次**。
+- **换法 3 步**（+ 强烈建议 `pyftsubset` 裁剪到 1~2 MB，Godot 原生支持 `.woff2`）见 [ui.md](ui.md) §4.3。
+
+## 12.5 glow：参数与"为什么阈值 2.0"
+
+- **改**：`Scenes/Levels/TestArena.tscn` 的 `Environment`（只这一段）：
+  `glow_enabled=true` / `glow_normalized=true` / `glow_intensity=0.5` / `glow_strength=1.0` /
+  `glow_bloom=0.0` / `glow_blend_mode=1`(Screen) / **`glow_hdr_threshold=2.0`** / `glow_hdr_scale=2.0` /
+  `glow_hdr_luminance_cap=12.0` / `glow_levels/4,5,6 = 0.8,0.6,0.4`（1/2/3/7 = 0）。
+- **为什么不是常见的 0.9~1.2**：这张竞技场的地面（Space Station Kit 地板 + `ambient_light_energy=0.55` + filmic）
+  **本来就接近纯白**。实测 4 档参数（同一机位、同一帧数、同一发爆炸）：
+
+  | 档 | 阈值 / 强度 / bloom / blend | 空场 | 爆炸 |
+  |---|---|---|---|
+  | `z_off` | 关 | 基线 | 火球是一块**平黄**、火星是**平线** |
+  | `a` | 0.9 / 0.9 / 0.15 / Additive | **整屏泛白、天空褪成淡紫** = 过曝 | 火球爆成白团，画面糊 |
+  | `b` | 1.4 / 0.6 / 0.05 / Screen | 天空仍明显变亮 | 火球有光晕，但整体仍偏亮 |
+  | **`c`（采用）** | **2.0 / 0.5 / 0 / Screen** | **与基线基本一致**（只有天空亮一点点） | **白热核心 + 橙色外焰 + 光晕**，火星带光带 |
+  | `d` | 3.0 / 0.5 / 0 / Screen | 与基线几乎相同 | 只对最亮的火星有一点点作用（太弱） |
+
+- **证据**：4 档合成图 [ui_glow_trials_arena.png](screenshots/ui_glow_trials_arena.png) /
+  [ui_glow_trials_explosion.png](screenshots/ui_glow_trials_explosion.png) /
+  [ui_glow_trials_muzzle.png](screenshots/ui_glow_trials_muzzle.png)；
+  **定稿前后对比（用文件里那组参数，不在运行时注入）**：
+  [ui_glow_00_before_after.png](screenshots/ui_glow_00_before_after.png)
+  （每行左 ON / 右 OFF：爆炸 t0、枪口火光 t0、空场），单张为 `ui_glow_01..06`。
+- **结论**：**爆炸与枪口火光明显变亮**（火球有白热核心与外焰、枪口从"小白点"变成"带暖色光晕的亮点"），
+  **空场几乎不变**（地板没被吃进 bloom）。唯一副作用：**天空比原来略亮一点**（星云亮部在阈值附近）。
+- 想要更强：把 `glow_hdr_threshold` 降到 1.4（天空会明显泛白）；**更彻底的办法是先把地板材质压暗**（它接近纯白才是瓶颈）。
+
+## 12.6 验证证据（本轮实际跑过的）
+
+| 项 | 命令 / 方式 | 结果 |
+|---|---|---|
+| 编译 | `build.ps1 --no-incremental -v minimal` | **0 warning / 0 error**（本轮没改 C#，只是复核） |
+| 资源导入 | `Godot.exe --headless --path <项目> --import` | 新 PNG / TTF 全部生成 `.import`，无报错 |
+| 主题 / 字体探针 | `Godot.exe --headless --path <项目> --script res://_ui_probe.gd`（临时脚本，跑完已删） | 主题加载 ✓；`default_font` 解析到 Microsoft YaHei ✓；7 个字形 `has_char` 全 true ✓；`UiTitle/UiPrimaryButton/UiCaption` 的 `base_type` 与 `StyleBoxTexture.region_rect=(6,0,180,33)` 回读正确 ✓ |
+| 界面 / HUD / glow 截图 | `Godot.exe --path <项目> res://Scenes/UI/_UiShowcase.tscn [-- ui\|glow\|final\|hud]` | 7 个界面 + 2 张 HUD + 6 张定稿 glow + 4 档试拍，全部 `1920×1080 err=0` |
+| 游戏内自测 | `selftest.flag` + 直接跑 `res://Scenes/Main.tscn` | ✅ `Encounter 清场完成：共生成 4，用时 3s` / `端到端：按 F 之后 奖励界面打开 = True Paused = True` / `=== 自测结束 ===`；进程 **25 s 自动退出，exit code 0** |
+| 日志 | 最新 `run_*.log` 匹配 `ERROR\|Exception` | **0 命中**；stderr 只剩 2 条**既有** WARNING（`MapManager 导航网格为空`、navmesh `cell_height` 不一致） |
+| `selftest.flag` | `Remove-Item` + `Test-Path` | ✅ 已删除（复查 False） |
+| 未动的目录 | `Scripts/**`（0 改动）、`Config/**`、`Scenes/Enemies/**`、`Scenes/Player/**`、`Assets/Audio/**`、`Assets/Fonts/**` | 一个文件都没碰 |
+
+**拍摄台用法**（留在仓库里，以后换 UI 素材直接复用）：
+
+```powershell
+$godot='F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64.exe'
+& $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_UiShowcase.tscn'              # 全部
+& $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_UiShowcase.tscn' -- ui        # 只拍 7 个界面
+& $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_UiShowcase.tscn' -- hud       # 只拍 HUD 实机
+& $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_UiShowcase.tscn' -- glow      # glow 4 档试拍
+& $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_UiShowcase.tscn' -- final     # glow 定稿 ON/OFF 对比
+```
+
+> **两个坑（都实测踩到）**：
+> ① 拍摄台**直接实例化 `TestArena.tscn`** → 拍到的 glow 永远是"游戏里真正那个环境"，
+> 不会出现"展示场景自己开了 glow、游戏里没开"的假证据；
+> ② **不要把 Godot 窗口最小化 / 完全遮挡**：不渲染时 `RenderingServer.frame_post_draw` 永不触发，
+> 拍摄脚本会**永久卡死**（我用 `Start-Process -WindowStyle Minimized` 卡了 100 秒以上才定位到）。
+> 另外：本机的 **gdmcp runtime 桥与其它代理抢 session**（`run_project` 报 *no debugger session became active*），
+> 所以本轮**没用 gdmcp 截图**，全部走"自己存 viewport PNG"这条路 —— 与上一轮 `_art_shot.gd` 的做法一致。
+
+## 12.7 本轮明确"试过但没采用"的
+
+| 试过的 | 结果 | 为什么放弃 |
+|---|---|---|
+| glow 阈值 0.9（网上常见值） | 整屏泛白、天空褪成淡紫 | **过曝**，与"更亮而不是过曝"的目标相反（合成图里 `a_thr090_i090` 就是这一档） |
+| `glow_bloom = 0.15` | 给全屏加了一层白雾 | 这张场地地板接近纯白，基础 bloom 只会让画面发灰 |
+| `glow_blend_mode = 0`（Additive，Godot 默认） | 亮部更容易顶到死白 | 换 Screen（1）后高光仍有层次 |
+| 把血条 `Fill` 换成"带端帽的完整血条图" | 没采用 | 代码会把 `Fill.Size.X` 按血量比例改小 → 端帽会被**横向压扁**；改用**中间段平铺**（`tex_ui_bar_fill.png` + `stretch_mode=1`）才对 |
+| 给全部 7 个弹窗逐个"精修" | 没做 | 任务明确"**不求做满，但每个位置都要占住、且有一个做得好的示范**" —— 主题已让 7 个界面统一换皮，示范做了 `BaseScreen`（完整）+ `HelpScreen`（长文本），剩下的是体力活 |
+
+## 12.8 给后续的交接（下一步按性价比）
+
+1. **中文自带字体**（发行前必做）：Noto Sans SC（17 MB）或得意黑（2.7 MB）或裁字到 1~2 MB，换主题里一行。见 [ui.md](ui.md) §4.3。
+2. **`BarEnemy.tscn` / `BarBoss.tscn` 换贴图**（照 `BarPlayer.tscn` 抄）；`BarBoss` 的 `Icon` 现在还是 Godot 图标占位。
+3. **加"危险/警示"色变体**（红）：主题里加 `UiDangerButton` 即可，界面里一行引用。
+4. **面板装饰件**：Kenney 包里还有 `panel_glass_tab`（标题凸舌）/ `panel_glass_screws`（螺丝）/ 单角切角件，
+   可以叠在面板上把"科技感"再做足一点。
+5. **UI 音效**：`Assets/Audio/` 里已有别人放的 `ui_click.ogg` / `ui_open.ogg`（Kenney Interface Sounds, CC0）→
+   挂到主题的 `Button` 音效或 `UiRouter` 上（要碰 `Scripts/`）。
+6. **准星随散布/瞄准变化**：要写 C#（改 `Crosshair` 的 `scale`/`modulate`）。

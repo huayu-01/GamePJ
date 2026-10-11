@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scenes/UI/_ui_shot.gd" id="1_shot"]
+[ext_resource type="PackedScene" path="res://Scenes/Levels/TestArena.tscn" id="2_arena"]
+
+[node name="UiShowcase" type="Node3D"]
+script = ExtResource("1_shot")
+
+[node name="Arena" parent="." instance=ExtResource("2_arena")]
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 18)
+fov = 70.0
+current = true
+
+[node name="Screens" type="Node" parent="."]

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://Scripts/UI/RewardScreen.cs" id="1_screen"]
+[ext_resource type="Theme" path="res://Assets/UI/Themes/ui_theme.tres" id="2_theme"]
 
 [node name="RewardScreen" type="CanvasLayer"]
 layer = 10
@@ -13,6 +14,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
+theme = ExtResource("2_theme")
 
 [node name="Dim" type="ColorRect" parent="Root"]
 anchors_preset = 15
@@ -38,7 +40,7 @@ grow_vertical = 2
 theme_override_constants/separation = 14
 
 [node name="Title" type="Label" parent="Root/Panel/VBox"]
-theme_override_font_sizes/font_size = 30
+theme_type_variation = &"UiTitle"
 text = "选择奖励"
 horizontal_alignment = 1
 
@@ -50,6 +52,6 @@ visible = false
 custom_minimum_size = Vector2(600, 78)
 
 [node name="Hint" type="Label" parent="Root/Panel/VBox"]
-theme_override_font_sizes/font_size = 18
+theme_type_variation = &"UiCaption"
 text = "按 1 / 2 / 3 或点击选择"
 horizontal_alignment = 1
