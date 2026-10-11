@@ -1,0 +1,145 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://Scenes/Enemies/_art_shot.gd" id="1_shot"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Chaser.tscn" id="2_chaser"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Charger.tscn" id="3_charger"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Exploder.tscn" id="4_exploder"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/FastMelee.tscn" id="5_fastmelee"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Guard.tscn" id="6_guard"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/JumpingMelee.tscn" id="7_jumping"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/RangedEnemy.tscn" id="8_ranged"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Screamer.tscn" id="9_screamer"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/SkillElite.tscn" id="10_elite"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Boss.tscn" id="11_boss"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.26, 0.31, 0.27, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+material = SubResource("StandardMaterial3D_ground")
+size = Vector3(46, 1, 30)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(46, 1, 30)
+
+[sub_resource type="Environment" id="Environment_showcase"]
+background_mode = 1
+background_color = Color(0.09, 0.11, 0.16, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.75, 0.78, 0.85, 1)
+ambient_light_energy = 0.6
+
+[node name="ArtShowcase" type="Node3D"]
+script = ExtResource("1_shot")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_showcase")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 8, 0)
+shadow_enabled = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+mesh = SubResource("BoxMesh_ground")
+
+[node name="GroundBody" type="StaticBody3D" parent="."]
+
+[node name="Shape" type="CollisionShape3D" parent="GroundBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 11)
+fov = 55.0
+current = true
+
+[node name="Chaser" parent="." instance=ExtResource("2_chaser")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+
+[node name="ChaserLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.7, 0)
+billboard = 1
+pixel_size = 0.005
+text = "Chaser"
+
+[node name="Charger" parent="." instance=ExtResource("3_charger")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+
+[node name="ChargerLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.7, 0)
+billboard = 1
+pixel_size = 0.005
+text = "Charger"
+
+[node name="Exploder" parent="." instance=ExtResource("4_exploder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="ExploderLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+billboard = 1
+pixel_size = 0.005
+text = "Exploder"
+
+[node name="FastMelee" parent="." instance=ExtResource("5_fastmelee")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+
+[node name="FastMeleeLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.7, 0)
+billboard = 1
+pixel_size = 0.005
+text = "FastMelee"
+
+[node name="Guard" parent="." instance=ExtResource("6_guard")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+
+[node name="GuardLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.7, 0)
+billboard = 1
+pixel_size = 0.005
+text = "Guard"
+
+[node name="JumpingMelee" parent="." instance=ExtResource("7_jumping")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -5)
+
+[node name="JumpingMeleeLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.7, -5)
+billboard = 1
+pixel_size = 0.005
+text = "JumpingMelee"
+
+[node name="RangedEnemy" parent="." instance=ExtResource("8_ranged")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -5)
+
+[node name="RangedEnemyLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.7, -5)
+billboard = 1
+pixel_size = 0.005
+text = "RangedEnemy"
+
+[node name="Screamer" parent="." instance=ExtResource("9_screamer")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+
+[node name="ScreamerLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -5)
+billboard = 1
+pixel_size = 0.005
+text = "Screamer"
+
+[node name="SkillElite" parent="." instance=ExtResource("10_elite")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -5)
+
+[node name="SkillEliteLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.7, -5)
+billboard = 1
+pixel_size = 0.005
+text = "SkillElite"
+
+[node name="Boss" parent="." instance=ExtResource("11_boss")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, -5)
+
+[node name="BossLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 3.4, -5)
+billboard = 1
+pixel_size = 0.005
+text = "Boss"

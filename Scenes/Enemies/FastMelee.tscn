@@ -8,16 +8,9 @@
 [ext_resource type="Script" path="res://Scripts/AI/Behaviors/ChaseBehavior.cs" id="6_chase"]
 [ext_resource type="Script" path="res://Scripts/Abilities/MeleeAttackAbility.cs" id="7_melee"]
 [ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="8_hitbox"]
+[ext_resource type="PackedScene" path="res://Assets/Models/enemies/mesh_enemy_fast_melee.glb" id="9_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
-radius = 0.4
-height = 1.6
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
-albedo_color = Color(0.95, 0.45, 0.2, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
-material = SubResource("StandardMaterial3D_body")
 radius = 0.4
 height = 1.6
 
@@ -35,9 +28,11 @@ Tags = PackedStringArray("Melee", "Fast", "Chaser")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_body")
 
-[node name="Model" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
-mesh = SubResource("CapsuleMesh_body")
+[node name="Model" parent="." instance=ExtResource("9_model")]
+transform = Transform3D(-2.23308, 0, 0, 0, 2.23308, 0, 0, 0, -2.23308, 0, 0, 0)
+
+[node name="AnimationPlayer" parent="Model" index="1"]
+autoplay = "idle"
 
 [node name="Movement" type="Node" parent="."]
 script = ExtResource("2_movement")

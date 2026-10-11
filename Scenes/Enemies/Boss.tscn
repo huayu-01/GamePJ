@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
 [ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
@@ -15,16 +15,9 @@
 [ext_resource type="Script" path="res://Scripts/Boss/BossPhaseController.cs" id="13_phases"]
 [ext_resource type="Script" path="res://Scripts/Boss/BossPressure.cs" id="14_pressure"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/Chaser.tscn" id="15_add"]
+[ext_resource type="PackedScene" path="res://Assets/Models/enemies/mesh_enemy_boss.glb" id="16_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
-radius = 1.0
-height = 2.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
-albedo_color = Color(0.55, 0.12, 0.28, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
-material = SubResource("StandardMaterial3D_body")
 radius = 1.0
 height = 2.8
 
@@ -48,9 +41,11 @@ Tags = PackedStringArray("Boss", "Melee")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
 shape = SubResource("CapsuleShape3D_body")
 
-[node name="Model" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
-mesh = SubResource("CapsuleMesh_body")
+[node name="Model" parent="." instance=ExtResource("16_model")]
+transform = Transform3D(-3.61057, 0, 0, 0, 3.61057, 0, 0, 0, -3.61057, 0, 0, 0)
+
+[node name="AnimationPlayer" parent="Model" index="1"]
+autoplay = "idle"
 
 [node name="Movement" type="Node" parent="."]
 script = ExtResource("2_movement")

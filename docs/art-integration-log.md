@@ -367,3 +367,257 @@ RampBase  | vis_center=(-8.0,  1.2, -5.0) col_center=(-8.0,  1.2, -5.0) corner_d
 6. **Modular SciFi MegaKit**（46 MB，CC0）如果要用来做"更写实的科幻关"，
    注意它的 glTF 是**外部 PBR 三件套**（BaseColor / Normal / ORM，单个模块 ~10 MB），
    且 `images[].uri` 只写裸文件名（`T_Trim_01_Normal.png`），**必须把 `Textures/*.png` 复制到 `.gltf` 旁边**才认得。
+
+---
+
+# 第二轮：9 敌 + Boss 换模型 + Binbun 命中/爆炸特效（2026-10）
+
+> **本轮范围**：`Scenes/Enemies/**`、`Scenes/Combat/Explosion.tscn`、`Assets/**`、`docs/art-*.md`。
+> **没有改任何 `Scripts/**`、`Config/**`**（边界要求；确实需要的一处改动见 §9.5「必须改代码的地方」）。
+> 素材全部来自上一轮已下载的 CC0 包（**没有新下载任何东西**）。
+
+## 9.0 30 秒结论
+
+| 问题 | 答案 |
+|---|---|
+| 换了几个模型？ | **10 个**（9 敌 + Boss），全部换完并逐个验证。 |
+| 用了哪个包？ | **Kenney Mini Characters**（CC0，与玩家同一个包）。`character-male-a` 已被玩家占用，敌人用其余 11 个角色里的 10 个。 |
+| 实测轴心 | **脚底**：10 个 `.glb` 的 `min.y = 0.0000`（与玩家一致）→ **`Model.transform.y = 0`**。 |
+| 实测朝向 | **正面朝 +Z**（与玩家一致）→ **绕 Y 转 180°**：`Transform3D(-s,0,0, 0,s,0, 0,0,-s, 0,0,0)`。**双向截图验证**（`art_10/11` 看到正脸 → `art_20/21/22` 看到后脑勺）。 |
+| 缩放怎么定的？ | `s = 碰撞胶囊高度 / 模型原生高度`，**让视觉与碰撞同高同底**。逐单位数值见 §9.2。 |
+| 自带动画？ | **每个 32 段**，零 C#：给实例化子节点加 `[node name="AnimationPlayer" parent="Model" index="1"] autoplay = "idle"`。 |
+| 特效接了几个？ | **爆炸 ✅ 接进 `Explosion.tscn`**；**命中 ✅ 资源已就位并验证渲染**（真正挂到"打中的那一刻"需要 1 行 C#，见 §9.5）。 |
+| 玩法有没有被碰？ | **没有**。`Explosion.tscn` 的 `SphereShape3D radius=1`、`Explosion.Lifetime=0.12`、所有 `Body` 胶囊、`Bullet` 速度全部一个字节没动。 |
+
+## 9.1 素材落盘（新增）
+
+```
+Assets/Models/enemies/            11 文件  2.7 MB  (10 个 mesh_enemy_*.glb + colormap.png)
+Assets/Effects/fx_combat_explosion.tscn     24 KB  (Binbun ExplosionFX「地面爆炸」预设，已改路径)
+Assets/Effects/fx_combat_hit.tscn           12 KB  (Binbun HitFX vfx_hit_02，已改路径)
+Assets/Effects/fx_detach_lifetime.gd         1 KB  (自写：一次性特效的独立生命周期壳)
+Assets/Effects/binbun/**                    18 文件 (2 个包用到的 shader / gd / license，路径全部改写成 res://Assets/...)
+Assets/Effects/binbun/*/license.txt                 (CC0 原文，照抄进仓库)
+```
+
+- 命名照 [assets.md](assets.md) §2：`mesh_enemy_<变体>.glb`（类别 `mesh_` / 分组 `enemy`）。
+- **一个目录装 10 个 `.glb` 是因为 Kenney 的 glb 不内嵌贴图**：它的 `images[].uri` 是相对路径 `Textures/colormap.png`，
+  而 Mini Characters 的 12 个角色**共用同一张 8706 B 的 colormap**（已核对 hash 与玩家那份一致），所以共用一份即可。
+- 厂商文件放 `Assets/Effects/binbun/` 是延续上一轮 `Assets/Effects/muzzle/` 的做法（见 §5.2 的偏离说明）；
+  `ext_resource` 上的 `uid=` 已按 §5 规矩 4 去掉，`res://assets/BinbunVFX_Vol2/` 全部改写成 `res://Assets/Effects/binbun/`。
+
+## 9.2 实测值总表（轴心 / 朝向 / 缩放）
+
+测量方法：编辑器脚本 `ResourceLoader.load(..., CACHE_MODE_IGNORE)` → `instantiate()` → 遍历子树里的 `MeshInstance3D`，
+用**手动父链相乘**（`c.transform * c.get_aabb()` 只对直接子节点成立，深一层的网格会算错）求出相对单位根节点的 AABB。
+
+| 场景 | 模型文件（源角色） | 模型原生高 | 胶囊高 | **缩放 s** | **Model.y** | Basis |
+|---|---|---|---|---|---|---|
+| Chaser | `mesh_enemy_chaser.glb`（male-b） | 0.6613 | 1.8 | **2.72191** | **0** | `(-s,0,0, 0,s,0, 0,0,-s)` |
+| Charger | `mesh_enemy_charger.glb`（male-c） | 0.7928 | 2.0 | **2.52270** | **0** | 同上 |
+| Exploder | `mesh_enemy_exploder.glb`（male-d） | 0.7218 | 1.5 | **2.07814** | **0** | 同上 |
+| FastMelee | `mesh_enemy_fast_melee.glb`（female-e） | 0.7165 | 1.6 | **2.23308** | **0** | 同上 |
+| Guard | `mesh_enemy_guard.glb`（male-e） | 0.6760 | 2.1 | **3.10651** | **0** | 同上 |
+| JumpingMelee | `mesh_enemy_jumping_melee.glb`（female-f） | 0.6713 | 1.8 | **2.68137** | **0** | 同上 |
+| RangedEnemy | `mesh_enemy_ranged.glb`（male-f） | 0.6713 | 1.8 | **2.68137** | **0** | 同上 |
+| Screamer | `mesh_enemy_screamer.glb`（female-a） | 0.7755 | 2.0 | **2.57898** | **0** | 同上 |
+| SkillElite | `mesh_enemy_skill_elite.glb`（female-b） | 0.7234 | 2.1 | **2.90296** | **0** | 同上 |
+| Boss | `mesh_enemy_boss.glb`（female-c） | 0.7755 | 2.8 | **3.61057** | **0** | 同上 |
+
+**逐单位回读证据**（脚本输出，10/10 全部命中）：
+
+```
+Chaser       Model=Node3D meshes=2 vis_min_y=0.0 vis_max_y=1.8001 vis_H=1.8001 capsule_h=1.8  y=0.9  autoplay=idle anims=32 has_idle=true
+Charger      ... vis_min_y=0.0 vis_max_y=2.0    vis_H=2.0    capsule_h=2.0  ...
+Exploder     ... vis_min_y=0.0 vis_max_y=1.4999 vis_H=1.4999 capsule_h=1.5  ...
+FastMelee    ... vis_min_y=0.0 vis_max_y=1.5999 vis_H=1.5999 capsule_h=1.6  ...
+Guard        ... vis_min_y=0.0 vis_max_y=2.0999 vis_H=2.0999 capsule_h=2.1  ...
+JumpingMelee ... vis_min_y=0.0 vis_max_y=1.8001 vis_H=1.8001 capsule_h=1.8  ...
+RangedEnemy  ... vis_min_y=0.0 vis_max_y=1.8001 vis_H=1.8001 capsule_h=1.8  ...
+Screamer     ... vis_min_y=0.0 vis_max_y=2.0001 vis_H=2.0001 capsule_h=2.0  ...
+SkillElite   ... vis_min_y=0.0 vis_max_y=2.0999 vis_H=2.0999 capsule_h=2.1  ...
+Boss         ... vis_min_y=0.0 vis_max_y=2.8001 vis_H=2.8001 capsule_h=2.8  ...
+```
+
+→ **`vis_min_y` 全 0**（脚底正好在单位原点=地面）、**`vis_max_y` 与胶囊高度在 0.0001 内相等**（视觉与碰撞同高同底）。
+**所有 `Body` / `CapsuleShape3D` / 命中盒一个字节没改。**
+
+### 9.2.1 方向：双向截图验证（这是"逐包实测"，不是照抄规范）
+
+| 步骤 | 截图 | 看到了什么 |
+|---|---|---|
+| ① 不转（identity basis） | [art_10_models_raw_front.png](screenshots/art_10_models_raw_front.png)、[art_11_models_raw_front_right.png](screenshots/art_11_models_raw_front_right.png) | 相机在 +Z 朝 -Z 看，**10 个角色全部把正脸对着镜头** → 模型正面朝 **+Z**，与 Godot 前方（-Z）相反 |
+| ② 绕 Y 转 180°（x/z 轴取负） | [art_20_enemies_all.png](screenshots/art_20_enemies_all.png)、[art_21_enemies_left.png](screenshots/art_21_enemies_left.png)、[art_22_enemies_right.png](screenshots/art_22_enemies_right.png) | **全是后脑勺**、看不到脸 → 与单位前方一致 ✅ |
+
+> **判据仍是 `det > 0`**：x、z 轴同时取负 = 绕 Y 转 π（不是镜像）。写成 scale 负值会让法线/背面剔除出错。
+
+### 9.2.2 玩家 vs 敌人 的模型分配（同一包里挑不重样的角色）
+
+玩家 = `character-male-a`（上一轮）。敌人按"体型/气质"分配：
+Chaser=male-b（橙红大胡子）、Charger=male-c（蓝制服壮汉）、Exploder=male-d（黑西装）、
+FastMelee=female-e（白衣轻装）、Guard=male-e（白+橙）、JumpingMelee=female-f（深发蓝衣）、
+RangedEnemy=male-f（棕发）、Screamer=female-a（黑发紫衣）、SkillElite=female-b（金发黄衣）、Boss=female-c（蓝衣灰发，放大 3.61 倍）。
+
+## 9.3 每个场景具体改了什么
+
+以 `Chaser.tscn` 为例（其余 9 个完全同构）：
+
+1. `[gd_scene load_steps=11]` → **按 `ext_resource + sub_resource + 1` 重算**（顺手修掉了原来不准的 load_steps）。
+2. 新增 `[ext_resource type="PackedScene" path="res://Assets/Models/enemies/mesh_enemy_chaser.glb" id="9_model"]`
+   —— 位置在**所有 `[sub_resource]` 之前**（.tscn 格式硬要求）。
+3. **删掉已经没人引用的** `StandardMaterial3D_body` 与 `CapsuleMesh_body` 两个 `sub_resource`（网格换掉了，纯色材质不再需要）。
+4. `Model` 节点：`MeshInstance3D + CapsuleMesh` → **`.glb` 的实例根节点**
+   ```
+   [node name="Model" parent="." instance=ExtResource("9_model")]
+   transform = Transform3D(-2.72191, 0, 0, 0, 2.72191, 0, 0, 0, -2.72191, 0, 0, 0)
+   ```
+   ⚠️ **给实例根节点写 transform 是"覆盖"**：缩放、180°、位移必须**一次性写全**（上一轮踩过）。
+5. 紧跟一条属性覆盖（**零 C# 让模型动起来**）：
+   ```
+   [node name="AnimationPlayer" parent="Model" index="1"]
+   autoplay = "idle"
+   ```
+   ⚠️ `index` 是**兄弟序号**（glb 根下 `character-xxx` = 0、`AnimationPlayer` = 1），写错**静默不生效**。
+
+## 9.4 特效接入
+
+### 9.4.1 爆炸（Binbun Explosion FX → `Scenes/Combat/Explosion.tscn`）
+
+**红线条目全部遵守**：
+
+| 项 | 处理 |
+|---|---|
+| `SphereShape3D radius = 1` | **原样未动**（`[sub_resource]` 一行没改） |
+| `Detonate()` 靠 `Scale = radius` | **未动**（`Explosion.cs` 没碰） |
+| `Explosion.Lifetime = 0.12s` | **未动**。它是**玩法窗口**（`AttackHitbox._PhysicsProcess` 在这 0.12s 内持续判定命中），不是美术参数 |
+
+新增结构：
+
+```
+Explosion (Area3D, Explosion.cs)
+├── Shape  (CollisionShape3D + SphereShape3D radius=1)   ← 红线，未动
+├── Mesh   (MeshInstance3D, 原来的半透明球)               ← 保留：它就是"半径=判定半径"的那次闪光
+└── FX     (Node3D, fx_detach_lifetime.gd, fx_scale=2.5)  ← 新增
+    └── Vfx (Binbun fx_combat_explosion.tscn, emission=8, light_energy=8)
+```
+
+**为什么需要 `fx_detach_lifetime.gd`（自写，21 行）**：爆炸节点只活 0.12 s，而 Binbun 的 `main` 动画有 2.6 s
+——做成普通子节点会在第 0.12 s 被连根 `QueueFree`，只剩一帧闪光。
+这个壳在**出生当帧**（`call_deferred`，此时宿主已经摆好位置/缩放）把自己 `reparent()` 到场景根并**显式搬运世界变换**，
+于是宿主被删掉时特效不受影响，播完再自毁。**零 C# 改动、零玩法参数改动。**
+
+> ⚠️ **踩到的坑（值得记）**：`Node.reparent(new_parent, true)`（keep_global_transform）在本项目
+> （`physics_interpolation = true`）下**实测会把缩放丢掉** —— 三档缩放 1× / 3× / 6× 渲染出来一模一样。
+> 修法：自己存 `global_transform` → `reparent(root, false)` → `global_transform = gt` → 再乘美术倍率。
+
+**实测结论（诚实记录，不算"完美"）**：
+
+- Binbun 的爆炸粒子**尺寸不跟随节点缩放**（`GPUParticles3D` 的 shader 直接写 `POSITION`，绕过 `MODEL_MATRIX`），
+  这与素材页评论区的抱怨（"why cant this be scaled at all"）一致。
+- 本项目的 `${TestArena}` `Environment` **没有开 glow**（只有 `background_mode=2` / `ambient_light_energy=0.55` / `tonemap_mode=2`），
+  Binbun 这套特效是按 HDR/glow 环境调的 → 在这里表现为**短暂的橙色火球 + 灰烟 + 一记橙色灯光闪**，比作者 demo 里暗。
+- **所以本轮的做法是"叠加"而不是"替换"**：原来的半透明球（0.12 s、半径正好等于判定半径）留着当核心闪光，
+  Binbun 爆炸提供粒子、烟、碎片与光照。想要更炸裂，需要在 `TestArena.tscn` 的 Environment 里打开 glow
+  —— 那个文件不在本轮允许改的范围内。
+
+### 9.4.2 命中（Binbun Hit FX → `Assets/Effects/fx_combat_hit.tscn`）
+
+- `Assets/Effects/fx_combat_hit.tscn` = Binbun `vfx_hit_02`（**白色的四角星火花 + 橙色辐射条纹 + 地面光斑**），
+  根节点设成 `one_shot = true, autoplay = true` —— **实例化即播**，调用方只要 `Instantiate + AddChild + 设 GlobalPosition`。
+- **零代码的挂接点不存在**：命中发生在 `Scripts/Combat/Projectile.cs`（子弹）/ `UnitPresentation`（受击闪色）里，
+  而这两个文件不在本轮允许改的范围内 → **只做到"资源就位 + 渲染已验证"**，接线见 §9.5。
+- 证据：[art_33_hit_t0.png](screenshots/art_33_hit_t0.png)（火花本体）、[art_34_hit_t1.png](screenshots/art_34_hit_t1.png)（余晖）。
+
+> **避开了 `fx_weapon_muzzle.tscn` 那个已知坑**：那个坑来自 `AnimationPlayer` 里一条
+> `Glow:material_override:shader_parameter/...` 轨道（运行时把 `material_override` 弄成 null）。
+> 本轮的命中特效**只有 `Glow:scale` 轨道**，且**所有材质都是场景内的 `sub_resource`（不是共享 `.tres`）**
+> → 既不会互相影响，也不会有那条轨道。爆炸同理。
+
+## 9.5 ⚠️ 必须改代码的地方（本轮没有动 `Scripts/`，交接给下一轮）
+
+### (1) `EliteModifier` 的精英染色**对蒙皮模型失效**（重要）
+
+`Scripts/Combat/EliteModifier.cs:55-61` 是**只看直接子节点**的：
+
+```csharp
+foreach (Node child in unit.GetChildren())
+    if (child is MeshInstance3D mesh) mesh.MaterialOverride = material;
+```
+
+换模型前，`Model` 本身就是 `MeshInstance3D`（胶囊）→ 染色生效。
+换模型后，`Model` 是 **`.glb` 的实例根节点（`Node3D`）**，真正的网格在 `Model/character-xxx/Skeleton3D/...` 下
+→ **直接子节点里一个 `MeshInstance3D` 都没有**，染色**静默失效**（不报错）。
+
+**实测证据**（脚本回读 10/10）：`direct_mesh_child=false`。
+副作用范围：
+- `SkillElite.tscn` 里那个手挂的 `Elite` 节点 → 不再变紫（**但 `unit.Scale = 1.2` 仍然生效，精英还是大一圈**）。
+- `EncounterController.cs:448` 运行时 `enemy.AddChild(new EliteModifier())` 随机点名的精英 → 同样只有放大、没有变紫。
+
+**建议改法（1 行，改 `Scripts/Combat/` 不在本轮边界内）**：把上面那段换成递归（照抄
+`UnitPresentation` 的收集方式），或额外接受 `Node3D` 并向下找网格。`UnitPresentation` 的**受击闪色是递归的，不受影响**。
+
+### (2) 命中特效接线
+
+`Scripts/Combat/Projectile.cs` 命中那一支（或 `UnitPresentation.Flash()`）加 3 行即可：
+
+```csharp
+if (GD.Load<PackedScene>("res://Assets/Effects/fx_combat_hit.tscn") is { } hitFx
+    && hitFx.Instantiate<Node3D>() is { } fx)
+{
+    GetTree().CurrentScene.AddChild(fx);
+    fx.GlobalPosition = hitPosition;     // 命中点
+}
+```
+（`fx_combat_hit.tscn` 已经 `autoplay = true`，**不需要再调 `play()`**。）
+
+### (3) 精英/高个模型的其它已知假设（本轮核对结果：**不需要改**）
+
+- `CameraRig.TargetOffset.y = 1.5` 是**玩家**的胸口高；玩家模型没换 → 不用动。
+- `RangedEnemy` / `TrainingShooter` 的 `Muzzle` 是空 `Marker3D`，模型换了但枪口点没动 → 子弹仍从模型前方射出，**无需改**。
+- 伤害跳字高度 `WorldOverlay.cs:73` 的固定 `+1.5` 与小怪身高不匹配是**既有现象**（Boss 3.6 米更高）→ 未动。
+
+## 9.6 验证证据
+
+| 项 | 命令/方式 | 结果 |
+|---|---|---|
+| 编译 | `build.ps1 --no-incremental -v minimal` | **0 warning / 0 error** |
+| 游戏内自测 | `selftest.flag` + 手动跑 `res://Scenes/Main.tscn` | ✅ `Encounter 清场完成：共生成 4，用时 3s` / `端到端：按 F 之后 奖励界面打开 = True` / `=== 自测结束 ===`；stderr 里**只有 1 条** NavigationMesh cell height 警告（既有问题），**没有 ERROR/Exception** |
+| `selftest.flag` | `Remove-Item` + `Test-Path` | ✅ **已删除**（复查 False） |
+| 资源级 | 编辑器脚本逐个 `instantiate` 量 AABB / 读 `AnimationPlayer` | **10/10**：脚在 y=0、视觉高 == 胶囊高、`autoplay=idle`、`anims=32`、`has_idle=true` |
+| 视觉 | 自建展示场景 `Scenes/Enemies/_ArtShowcase.tscn` + `_art_shot.gd`（自己存 viewport PNG，不依赖 gdmcp 运行时桥） | `art_20`~`art_23`（10 个单位）、`art_30`~`art_34`（爆炸/命中特效） |
+
+### 9.6.1 新增的两个"验证工具"（留在仓库里，以后换美术直接用）
+
+| 文件 | 用途 |
+|---|---|
+| `Scenes/Enemies/_ArtShowcase.tscn` | 把 10 个敌人预制体**按真实场景**排成两排放在一块带碰撞的地面上（含太阳阴影、Label3D 名牌）。**这就是"换完模型长什么样"的对照台。** |
+| `Scenes/Enemies/_art_shot.gd` | 挂在展示场景根上：等若干帧 → 移动相机 → `get_viewport().get_texture().get_image().save_png()` → 退出。**一次运行拍 9 张图**，完全不依赖 gdmcp 运行时桥（本机 gdmcp 的 debugger session 起不来时也能拍）。 |
+
+跑法（**不用编辑器、不用 MCP**）：
+
+```powershell
+& 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64.exe' `
+  --path 'F:\Godot项目\项目a' 'res://Scenes/Enemies/_ArtShowcase.tscn'
+```
+
+## 9.7 本轮明确"试过但没采用"的
+
+| 试过的 | 结果 | 为什么放弃 |
+|---|---|---|
+| **Quaternius Modular SciFi MegaKit 的 3 只外星怪**（`Alien_Scolitex` / `Alien_Cyclop` / `Alien_Oculichrysalis`，CC0，自带 1 段 idle）当 Boss | 导入成功、能量 AABB，但**轴心不在脚底**（`Alien_Scolitex` 的 `min.y = -1.0817`，AABB 高 3.36 / 宽 3.43 / 深 3.23），且**风格与 chibi 角色冲突** | 换成"和玩家同一个包、轴心在脚底、32 段动画"的 `character-female-c` 放大 3.61 倍。外星怪的两个结论留在 [art-sources.md](art-sources.md) 的"逐包实测"补记里，见 §9.8 |
+| Binbun **地面爆炸**换成**空中爆炸/蘑菇云**预设 | 没试（时间） | 三个预设共用同一套 shader 家族，烟的问题一样；下次要更好效果优先开 glow 而不是换预设 |
+| 给爆炸加 `ParticleProcessMaterial.scale_min/max` 倍率 | 没试（时间） | 粒子尺寸由 shader 的 `POSITION` 决定，改 material scale 未必有效；**更靠谱的下一步是在 `TestArena.tscn` 的 Environment 开 glow** |
+
+## 9.8 给 [art-sources.md](art-sources.md) 的"逐包实测"补记（本轮新增的事实）
+
+> art-sources.md §4.1 / §7 当时写的是"**任何包的轴心都没验证过**"。本轮把能测的都测了，补两条：
+
+1. **Kenney Mini Characters（12 个角色）**：`min.y = 0.0000`（**轴心在脚底**），`max.y` 在 0.6613 ~ 0.7928 之间
+   → **`Model.y = 0`**，缩放按需。**正面朝 +Z**（截图双向验证）。
+2. **Quaternius Modular SciFi MegaKit 的 Alien_*（glTF，外部 `.bin`）**：**轴心不在脚底**，
+   `Alien_Scolitex` 的本地 AABB 是 `min(-1.7162, -1.0817, -0.7662) → max(1.7162, 2.2806, 2.4603)`（高 3.3622 米），
+   要在脚底对齐得写 `Model.y = +1.0817 × s`。**逐包实测这句话对 Quaternius 是成立的、对 Kenney 不成立。**
+   另外它的 `.gltf` 里 `buffers[0].uri` 写的是**原始文件名**（`Alien_Scolitex.bin`）——
+   **改文件名导入必失败**（`.import` 会停在 `valid=false`，`ResourceLoader.load` 返回 null），
+   要么别改名，要么同步改 JSON 里的 `uri`。
+

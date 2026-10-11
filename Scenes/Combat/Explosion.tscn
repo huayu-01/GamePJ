@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/Explosion.cs" id="1_explosion"]
 [ext_resource type="Mesh" path="res://Assets/Models/mesh_combat_explosion.tres" id="2_mesh"]
+[ext_resource type="PackedScene" path="res://Assets/Effects/fx_combat_explosion.tscn" id="3_vfx"]
+[ext_resource type="Script" path="res://Assets/Effects/fx_detach_lifetime.gd" id="4_life"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_blast"]
 radius = 1.0
@@ -16,3 +18,11 @@ shape = SubResource("SphereShape3D_blast")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
 mesh = ExtResource("2_mesh")
+
+[node name="FX" type="Node3D" parent="."]
+script = ExtResource("4_life")
+fx_scale = 2.5
+
+[node name="Vfx" parent="FX" instance=ExtResource("3_vfx")]
+emission = 8.0
+light_energy = 8.0

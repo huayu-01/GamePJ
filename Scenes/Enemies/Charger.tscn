@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
 [ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
@@ -8,16 +8,9 @@
 [ext_resource type="Script" path="res://Scripts/AI/Behaviors/ChaseBehavior.cs" id="6_chase"]
 [ext_resource type="Script" path="res://Scripts/Abilities/ChargeAttackAbility.cs" id="7_charge"]
 [ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="8_hitbox"]
+[ext_resource type="PackedScene" path="res://Assets/Models/enemies/mesh_enemy_charger.glb" id="9_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
-radius = 0.55
-height = 2.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
-albedo_color = Color(0.6, 0.15, 0.15, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
-material = SubResource("StandardMaterial3D_body")
 radius = 0.55
 height = 2.0
 
@@ -36,9 +29,11 @@ Tags = PackedStringArray("Melee", "Bruiser", "Charger")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_body")
 
-[node name="Model" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = SubResource("CapsuleMesh_body")
+[node name="Model" parent="." instance=ExtResource("9_model")]
+transform = Transform3D(-2.5227, 0, 0, 0, 2.5227, 0, 0, 0, -2.5227, 0, 0, 0)
+
+[node name="AnimationPlayer" parent="Model" index="1"]
+autoplay = "idle"
 
 [node name="Movement" type="Node" parent="."]
 script = ExtResource("2_movement")

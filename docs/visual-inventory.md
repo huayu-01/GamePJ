@@ -1,5 +1,10 @@
 # 视觉元素清单（美术替换用）
 
+> **⚠️ 更新（第二轮 · 2026-10）**：**§3 单位**（9 敌 + Boss 换 Kenney 模型）、**§5 特效**（爆炸接 Binbun、命中火花就位）、
+> **§8.5 精英染色**三条已按实际情况改写。**§1「项目视觉现状」第 1/3 条已过期**
+> （天空盒 / 玩家模型 / 竞技场 / 枪口火光 / 子弹拖尾 / 敌人模型 / 爆炸 / 命中火花都已接入）——
+> 以 [art-integration-log.md](art-integration-log.md)（尤其 §9）为准，本文档其余章节是**第一轮扫描时的快照**。
+
 > **用途**：美术要换掉某个东西时，一眼看出「它在哪、现在长什么样、换起来有多难、会不会踩代码的坑」。
 > **来源**：只读扫描 `Scenes/**/*.tscn`（**34 个场景**）+ `Scripts/**/*.cs`（**85 个脚本**）+ `Config/Balance.tres`。
 > **本次没有修改任何 `.cs` / `.tscn`**；本文档是唯一产物。
@@ -100,32 +105,43 @@
 
 ## 3. 单位
 
-> 每个单位都是 `CharacterBody3D`，结构固定：`Body`(CollisionShape3D) + `Model`(MeshInstance3D) + `Movement` + `Brain` + `Presentation`。
-> **`Model` 的 `transform.y` = 胶囊高度的一半**（= 胶囊中心），**而单位的原点在脚底**（胶囊底面正好在 local y=0）。
-> 换模型时这个轴心差是第一个坑，见 §8.2。
+> **⚠️ 本节已于「第二轮」更新（2026-10）**：**9 个敌人 + Boss 的 `Model` 已全部换成真模型**
+> （Kenney Mini Characters，CC0，与玩家同包）。下表「当前实现」列是**替换后**的真实值；
+> 轴心/朝向/缩放的实测过程与证据见 [art-integration-log.md](art-integration-log.md) §9。
+> 玩家、Drone、3 个木桩仍是胶囊（不在本轮范围）。
 
-| 类别 | 对象 | 所在场景 | 视觉节点路径 | 当前实现（mesh 半径/高 + 材质色） | 建议替换成 | 难度 |
+> 每个单位都是 `CharacterBody3D`，结构固定：`Body`(CollisionShape3D) + `Model`(glb 实例) + `Movement` + `Brain` + `Presentation`。
+> **`Model` 现在是 `.glb` 的场景实例根节点（`Node3D`）**，`transform` 里一次性写全
+> 「缩放 s + 绕 Y 180° + 位移」：`Transform3D(-s,0,0, 0,s,0, 0,0,-s, 0,0,0)`。
+> **`y` 分量是 0**（模型的轴心实测在脚底），`s = 胶囊高度 / 模型原生高度` → 视觉与碰撞同高同底。
+> 每个 `Model` 下都有一条 `AnimationPlayer` 属性覆盖（`index="1"`、`autoplay="idle"`，零 C#）。
+
+| 类别 | 对象 | 所在场景 | 视觉节点路径 | 当前实现（模型 / 原生高 / 缩放） | 建议替换成 | 难度 |
 |---|---|---|---|---|---|---|
-| 单位 | 玩家 | `Scenes/Player/Player.tscn:51-53` | `Model` | `CapsuleMesh` r0.4 h1.8，y=0.9；albedo `(0.35,0.62,0.95)` | 玩家角色模型（必须有朝 -Z 的正脸） | 容易 |
-| 单位 | Chaser 基础近战 | `Scenes/Enemies/Chaser.tscn:38-40` | `Model` | `CapsuleMesh` r0.45 h1.8，y=0.9；albedo `(0.85,0.25,0.25)` | 小怪模型（红） | 容易 |
-| 单位 | Charger 冲锋兵 | `Scenes/Enemies/Charger.tscn:39-41` | `Model` | r0.55 h2.0，y=1.0；albedo `(0.6,0.15,0.15)` | 壮硕冲锋怪（暗红） | 容易 |
-| 单位 | Exploder 自爆 | `Scenes/Enemies/Exploder.tscn:38-40` | `Model` | r0.4 h1.5，y=0.75；albedo `(0.85,0.85,0.2)` | 膨胀的自爆怪（黄） | 容易 |
-| 单位 | FastMelee 快速近战 | `Scenes/Enemies/FastMelee.tscn:38-40` | `Model` | r0.4 h1.6，y=0.8；albedo `(0.95,0.45,0.2)` | 轻捷小怪（橙） | 容易 |
-| 单位 | Guard 守卫 | `Scenes/Enemies/Guard.tscn:42-44` | `Model` | r0.6 h2.1，y=1.05；albedo `(0.55,0.6,0.68)` | 重甲守卫（带盾更好） | 容易 |
-| 单位 | JumpingMelee 跳跃近战 | `Scenes/Enemies/JumpingMelee.tscn:38-40` | `Model` | r0.45 h1.8，y=0.9；albedo `(0.7,0.35,0.85)` | 扑击怪（紫） | 容易 |
-| 单位 | RangedEnemy 远程 | `Scenes/Enemies/RangedEnemy.tscn:37-39` | `Model` | r0.45 h1.8，y=0.9；albedo `(0.85,0.5,0.2)` | 远程怪（棕橙）；它没有可见的枪，只有 `Muzzle` 空节点 | 容易 |
-| 单位 | Screamer 尖啸者 | `Scenes/Enemies/Screamer.tscn:38-40` | `Model` | r0.5 h2.0，y=1.0；albedo `(0.25,0.8,0.75)` | 尖叫怪（青绿），建议配"张嘴"造型 | 容易 |
-| 单位 | SkillElite 精英 | `Scenes/Enemies/SkillElite.tscn:50-52` | `Model` | r0.6 h2.1，y=1.05；albedo `(0.6,0.5,0.85)`。**另外** `Elite` 节点会把整个单位 `Scale=1.2` 并覆盖成紫 `(0.75,0.4,0.95)`（`SkillElite.tscn:112-121`） | 精英模型；注意它会被代码二次染色 | 容易 |
-| 单位 | Boss | `Scenes/Enemies/Boss.tscn:51-53` | `Model` | `CapsuleMesh` r1.0 h2.8，y=1.4；albedo `(0.55,0.12,0.28)` | Boss 模型（最高优先级建模对象） | 容易 |
-| 单位 | Drone 召唤物 | `Scenes/Summons/Drone.tscn:42-44` | `Model` | r0.3 h1.0，y=0.55；albedo `(0.35,0.95,0.85)` + emission `(0.2,0.7,0.6)` ×0.5 | 浮空无人机模型（要能悬空，它在 0.55 高度） | 容易 |
-| 单位 | 训练木桩·纯木桩 | `Scenes/Training/TrainingDummy.tscn:33-35` | `Model` | r0.6 h2.2，y=1.1；albedo `(0.62,0.45,0.26)` | 木桩模型 | 容易 |
-| 单位 | 训练木桩·打击木桩 | `Scenes/Training/TrainingAttacker.tscn:38-40` | `Model` | r0.45 h1.8，y=0.9；albedo `(0.78,0.55,0.3)` | 同上 | 容易 |
-| 单位 | 训练木桩·远程木桩 | `Scenes/Training/TrainingShooter.tscn:36-38` | `Model` | r0.45 h1.8，y=0.9；albedo `(0.75,0.7,0.35)` | 同上 | 容易 |
+| 单位 | 玩家 | `Scenes/Player/Player.tscn:44-48` | `Model` | **已换**：`mesh_player_body.glb`（male-a），H=0.6713，s=2.6814，y=0 | 已有模型 | 容易 |
+| 单位 | Chaser 基础近战 | `Scenes/Enemies/Chaser.tscn` | `Model` | **已换**：`mesh_enemy_chaser.glb`（male-b，橙红大胡子），H=0.6613，**s=2.72191** | 已有模型 | 容易 |
+| 单位 | Charger 冲锋兵 | `Scenes/Enemies/Charger.tscn` | `Model` | **已换**：`mesh_enemy_charger.glb`（male-c，蓝制服壮汉），H=0.7928，**s=2.52270** | 已有模型 | 容易 |
+| 单位 | Exploder 自爆 | `Scenes/Enemies/Exploder.tscn` | `Model` | **已换**：`mesh_enemy_exploder.glb`（male-d，黑西装），H=0.7218，**s=2.07814** | 已有模型 | 容易 |
+| 单位 | FastMelee 快速近战 | `Scenes/Enemies/FastMelee.tscn` | `Model` | **已换**：`mesh_enemy_fast_melee.glb`（female-e，白衣），H=0.7165，**s=2.23308** | 已有模型 | 容易 |
+| 单位 | Guard 守卫 | `Scenes/Enemies/Guard.tscn` | `Model` | **已换**：`mesh_enemy_guard.glb`（male-e，白+橙），H=0.6760，**s=3.10651** | 已有模型 | 容易 |
+| 单位 | JumpingMelee 跳跃近战 | `Scenes/Enemies/JumpingMelee.tscn` | `Model` | **已换**：`mesh_enemy_jumping_melee.glb`（female-f，深发蓝衣），H=0.6713，**s=2.68137** | 已有模型 | 容易 |
+| 单位 | RangedEnemy 远程 | `Scenes/Enemies/RangedEnemy.tscn` | `Model` | **已换**：`mesh_enemy_ranged.glb`（male-f，棕发），H=0.6713，**s=2.68137**；它的 `Muzzle` 仍是空 `Marker3D`，**位置未动** | 已有模型 | 容易 |
+| 单位 | Screamer 尖啸者 | `Scenes/Enemies/Screamer.tscn` | `Model` | **已换**：`mesh_enemy_screamer.glb`（female-a，黑发紫衣），H=0.7755，**s=2.57898** | 已有模型 | 容易 |
+| 单位 | SkillElite 精英 | `Scenes/Enemies/SkillElite.tscn` | `Model` | **已换**：`mesh_enemy_skill_elite.glb`（female-b，金发黄衣），H=0.7234，**s=2.90296**。⚠️ `Elite` 节点的**染色已失效**（见 §8.5），`Scale=1.2` 仍生效 | 已有模型 | 容易 |
+| 单位 | Boss | `Scenes/Enemies/Boss.tscn` | `Model` | **已换**：`mesh_enemy_boss.glb`（female-c，蓝衣灰发），H=0.7755，**s=3.61057**（2.8 m 的巨人） | 已有模型 | 容易 |
+| 单位 | Drone 召唤物 | `Scenes/Summons/Drone.tscn:42-44` | `Model` | `CapsuleMesh` r0.3 h1.0，y=0.55；albedo `(0.35,0.95,0.85)` + emission `(0.2,0.7,0.6)` ×0.5 | 浮空无人机模型（要能悬空，它在 0.55 高度） | 容易 |
+| 单位 | 训练木桩·纯木桩 | `Scenes/Training/TrainingDummy.tscn:33-35` | `Model` | `CapsuleMesh` r0.6 h2.2，y=1.1；albedo `(0.62,0.45,0.26)` | 木桩模型 | 容易 |
+| 单位 | 训练木桩·打击木桩 | `Scenes/Training/TrainingAttacker.tscn:38-40` | `Model` | `CapsuleMesh` r0.45 h1.8，y=0.9；albedo `(0.78,0.55,0.3)` | 同上 | 容易 |
+| 单位 | 训练木桩·远程木桩 | `Scenes/Training/TrainingShooter.tscn:36-38` | `Model` | `CapsuleMesh` r0.45 h1.8，y=0.9；albedo `(0.75,0.7,0.35)` | 同上 | 容易 |
 | 单位 | 木桩名牌·纯木桩 | `Scenes/Training/TrainingDummy.tscn:37-43` | `Label`（`Label3D`，billboard，y=2.6） | `font_size=64`、`outline_size=12`、`no_depth_test=true`、文本"纯木桩" | 可保留；换成图标贴图 | 容易 |
 | 单位 | 木桩名牌·打击木桩 | `Scenes/Training/TrainingAttacker.tscn:42-48` | `Label`（同上，y=2.3） | 同上，文本"打击木桩" | 同上 | 容易 |
 | 单位 | 木桩名牌·远程木桩 | `Scenes/Training/TrainingShooter.tscn:40-46` | `Label`（同上，y=2.3） | 同上，文本"远程木桩" | 同上 | 容易 |
 
-**注意**：所有单位的碰撞胶囊 `Body` 与 `Model` 同高同 y（如 `Chaser.tscn:34-40`），**换模型不要动 `Body`**，视觉可以高于碰撞（碰撞只影响手感）。
+**注意**：所有单位的碰撞胶囊 `Body` 与 `Model` 同高同底（`Body.y = 胶囊高/2`、`Model.y = 0`），
+**换模型不要动 `Body`**；本轮 10 个单位的 `vis_max_y` 与 `capsule_h` 误差 ≤ 0.0001 m（实测见 §9.2）。
+
+**验证工具**：`Scenes/Enemies/_ArtShowcase.tscn` + `_art_shot.gd` —— 把 10 个敌人预制体按真实场景排成两排，
+一次运行自动拍 9 张 PNG 到 `docs/screenshots/`。跑法见 [art-integration-log.md](art-integration-log.md) §9.6.1。
 
 ---
 
@@ -151,13 +167,14 @@
 | 类别 | 对象 | 所在场景 / 代码 | 视觉节点路径 | 当前实现（具体值） | 建议替换成 | 难度 |
 |---|---|---|---|---|---|---|
 | 特效 | 子弹 | `Scenes/Combat/Bullet.tscn:20-21` | `Mesh` | `BoxMesh` 0.07×0.07×0.45；albedo `(1,0.82,0.3)` + emission `(1,0.65,0.15)` ×**4.0**（`:5-13`） | 曳光弹：`MeshInstance3D` + `Trail`/`GPUParticles3D`（当前完全没有尾迹）；或换成细长发光体 | 中等 |
-| 特效 | 爆炸 | `Scenes/Combat/Explosion.tscn:26-27` | `Mesh` | `SphereMesh` r1.0 h2.0；**半透明无光照**：albedo `(1,0.6,0.2,0.5)`、`transparency=1`、`shading_mode=0`（`:8-16`） | 一次性的粒子爆发 / 序列帧；注意它靠 `Scale = radius` 放大（`Scripts/Combat/Explosion.cs:25`），所以**模型基准半径必须是 1、轴心在球心** | 中等 |
+| 特效 | 爆炸 | `Scenes/Combat/Explosion.tscn` | `Mesh`（保留）+ **`FX/Vfx`（第二轮新增）** | **已接入 Binbun Explosion FX（CC0）**：`FX`(`fx_detach_lifetime.gd`, `fx_scale=2.5`) → `Vfx`(`res://Assets/Effects/fx_combat_explosion.tscn`, `emission=8`)。原来的半透明球 `Mesh` **保留**（0.12 s 的核心闪光，半径正好等于判定半径）。⚠️ **`Shape` 的 `SphereShape3D radius=1` 与 `Explosion.Lifetime=0.12` 都是玩法，原样未动** | 想更亮需要在 `TestArena.tscn` 的 Environment 开 glow（不在本轮范围） | 中等 |
 | 特效 | 挑战者地面三角环 | **无场景**，`Scripts/Combat/ChallengerMark.cs` | 代码 `AddChild` 的 MeshInstance3D，`Name = "Mark"`（`:36`） | 代码用 `SurfaceTool` 生成 `ArrayMesh`：6 个三角形绕半径 1.15 排成环（`:55-77`）；代码建材质 unshaded + alpha，albedo `(1,0.75,0.25)`、emission `(1,0.6,0.15)`（`:40-47`）；出现/消失补间 + 自转 + 呼吸（`:79-128`） | **保留程序化**（要贴图就换成贴图环/Decal）；换成美术模型需改 C# | 较难 |
 | 特效 | 受击闪色 | `Scripts/Combat/UnitPresentation.cs` | 无场景节点，运行时 `MaterialOverride` | 代码建材质 albedo/emission = `FlashColor` `(1,0.55,0.45)` ×1.6，持续 `FlashDuration=0.09s`（`:12-13`、`:29-35`）；**递归收集单位子树里所有 MeshInstance3D**（`:70-81`） | 想换成受击特效/贴图闪白：改 C# 或给单位加 `GPUParticles3D` 子节点（会被一起染色，注意） | 较难 |
 | 特效 | 精英染色 / 放大 | `Scripts/Combat/EliteModifier.cs` | 无场景节点，运行时 `MaterialOverride` + `unit.Scale` | `ModelScale` 默认 1.35（精英场景写 1.2）→ **整个单位（含碰撞体）等比放大**（`:42-45`）；`Tint` 默认 `(0.85,0.3,0.9)`（场景写 `(0.75,0.4,0.95)`）盖在**直接子节点**的 mesh 上（`:47-61`） | 精英外观建议做成独立材质/附加装饰；注意它**不递归**，挂在更深层的 mesh 不会被染色 | 较难 |
 | 特效 | 交互物"已用"变暗 | `Scripts/Interaction/Interactable.cs:103-114` | 运行时替换 `Mesh` 的 surface 0 材质 | 复制原材质 → albedo `(0.22,0.22,0.25)`、关 emission | 若新模型有多个 surface 或不是 `StandardMaterial3D`，这段会**静默失效**（见 §8.5） | 较难 |
-| （缺口） | 粒子系统 | — | — | **无**（全项目 grep 0 命中，见 §1.3） | 枪口火光、命中火花、落地尘土、召唤光圈全部需要**从零新增** | — |
-| （缺口） | 骨骼动画 / AnimationPlayer / Shader | — | — | **无**（0 命中） | 上带动画的模型需要新增 `AnimationPlayer`/`AnimationTree` + 在 C# 里驱动（目前没有任何动画代码） | — |
+| （缺口） | 命中火花 | **第二轮已就位**（尚未挂到命中事件上） | `Assets/Effects/fx_combat_hit.tscn` | **Binbun Hit FX（CC0）** `vfx_hit_02`：白色四角星 + 橙色辐射条纹 + 地面光斑，`one_shot=true / autoplay=true`。证据 `docs/screenshots/art_33_hit_t0.png`。⚠️ 真正"打中的那一刻"要 `Projectile.cs` / `UnitPresentation.cs` 加 3 行（本轮边界外，见 [art-integration-log.md](art-integration-log.md) §9.5） | 接线即可 | — |
+| （缺口） | 粒子系统 | — | — | **已不再是 0**：枪口火光（上一轮）、子弹拖尾（上一轮）、爆炸、命中火花（第二轮）都有 `GPUParticles3D` 了；仍缺**落地尘土 / 召唤光圈 / 升级特效** | 继续从 `_art_staging` 里的 Kenney Particle Pack / Brackeys VFX Bundle 搭 | — |
+| （缺口） | 骨骼动画 / AnimationPlayer | — | — | **已不再是 0**：玩家的 `.glb` 上一轮起就在用；**9 敌 + Boss 本轮全部接上 `autoplay="idle"`**（每个 32 段动画，零 C#）。仍**没有**按速度切 walk/run 的状态机、没有死亡动画 | 想要"跑起来"要新增 `UnitAnimator`（新代码） | — |
 
 ---
 
@@ -319,6 +336,13 @@
 1. **`Mesh` 不是单 surface 或不叫 `Mesh`** → 交互物"用掉变暗"完全没反应（`Interactable.cs:105` 的 `GetActiveMaterial(0) is not StandardMaterial3D` 直接 `return`）。
 2. **`Mesh` 的材质不是 `StandardMaterial3D`**（比如你自己换成 `ShaderMaterial`）→ 同上，变暗失效。
 3. **单位的 mesh 挂在更深层的节点下** → `UnitPresentation` 的受击闪色**会**生效（它是递归的，`UnitPresentation.cs:70-81`），但 `EliteModifier` 的精英染色**不会**（它只看直接子节点，`EliteModifier.cs:55-61`）→ 精英看起来"没被染色"，而且**手里的枪/挂件会跟着闪色但不会被染精英色**（因为枪是 `WeaponMount/Pistol/Body` 这个三级子节点，会被 `UnitPresentation` 扫到）。
+
+> **⚠️ 第二轮实测：这条坑在第 1 条上"踩实了"**。9 敌 + Boss 的 `Model` 换成 `.glb` 实例后，
+> 它是 **`Node3D`**（子树里才是 `character-xxx/Skeleton3D/.../MeshInstance3D`），
+> 所以 `unit.GetChildren()` 里**一个 `MeshInstance3D` 都没有** → `EliteModifier` 的染色**静默失效**。
+> 脚本回读 10/10 全部 `direct_mesh_child = false`。
+> **仍然生效的只有 `unit.Scale`（精英还是大 20~35%）**。
+> 修法见 [art-integration-log.md](art-integration-log.md) §9.5（1 行：把那段改成递归），**本轮没改 `Scripts/`**。
 
 ### 8.6 其它
 
