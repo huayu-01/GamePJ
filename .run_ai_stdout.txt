@@ -1,0 +1,1 @@
+gdmcp: API request failed: TOOL_EXECUTION_FAILED: Play was requested but no debugger session became active within the timeout. The scene likely failed to load — check ProjectSettings application/run/main_scene.

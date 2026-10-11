@@ -52,12 +52,24 @@ public partial class EliteModifier : Node
 			EmissionEnergyMultiplier = 0.35f,
 		};
 
-		foreach (Node child in unit.GetChildren())
+		TintRecursive(unit, material);
+	}
+
+	/// <summary>
+	/// 递归给所有网格上色。
+	/// 换用 .glb 模型后，网格藏在 Model/&lt;角色&gt;/Skeleton3D/... 下面，
+	/// 只遍历直接子节点会一个网格都找不到 —— 精英怪不再变紫，而且**不报错**（静默失效）。
+	/// </summary>
+	private static void TintRecursive(Node node, Material material)
+	{
+		foreach (Node child in node.GetChildren())
 		{
 			if (child is MeshInstance3D mesh)
 			{
 				mesh.MaterialOverride = material;
 			}
+
+			TintRecursive(child, material);
 		}
 	}
 }
