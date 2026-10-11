@@ -1,0 +1,54 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/BossPreviewScreen.cs" id="1_preview"]
+
+[node name="BossPreviewScreen" type="CanvasLayer"]
+layer = 8
+script = ExtResource("1_preview")
+ScreenLayer = 1
+CloseOnCancel = true
+ToggleKey = 66
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dim" type="ColorRect" parent="Root"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.75)
+
+[node name="Panel" type="PanelContainer" parent="Root"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -460.0
+offset_top = -330.0
+offset_right = 460.0
+offset_bottom = 330.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root/Panel"]
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Root/Panel/VBox"]
+theme_override_font_sizes/font_size = 30
+text = "首领状况"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="Root/Panel/VBox"]
+theme_override_font_sizes/font_size = 19
+text = ""
+vertical_alignment = 1
+autowrap_mode = 2

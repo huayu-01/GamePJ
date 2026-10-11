@@ -100,11 +100,7 @@ public partial class SelfTest : Node
 				ReportNodes(stage);
 				ReportSpacing(stage);
 				ReportTables(stage);
-				stage?.AddPressureForNode(RewardNodeKind.Evolution);
-				stage?.AddPressureForNode(RewardNodeKind.Mutation);
-				GameLog.Write("SelfTest", $"Pressure 测试（进化 150×1.25 + 异化 150×1.5）：{stage?.DebugState}");
-				stage?.AddPressureForNode(RewardNodeKind.Enhancement);
-				GameLog.Write("SelfTest", $"Pressure 测试（再加一次中价值，应不变）：{stage?.DebugState}");
+				ReportPressureGate(stage);
 				Next();
 				break;
 
@@ -527,7 +523,7 @@ public partial class SelfTest : Node
 				: $"配置表比对·武器：伤害 {weapon.Damage:0}（期望 24） 间隔 {weapon.FireInterval:0.##}（期望 0.26） 弹匣 {weapon.EffectiveMagazineSize}（期望 12） 装填 {weapon.ReloadTime:0.##}（期望 0.7） 散布 {weapon.SpreadDegrees:0.##}（期望 0.5） 击退 {weapon.Knockback:0.##}（期望 2.5） 暴击 {weapon.CritChance:0.##}（期望 0.15） 弹速 {weapon.ProjectileSpeed:0}（期望 90） 预瞄FOV {weapon.AimFov:0}（期望 55） 穿透 {weapon.BasePierce}（期望 0） 连发 {weapon.Automatic}（期望 False）");
 
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}（期望 3/3/10/1/1/25/3/9/9/5/3/11）");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}（期望 3/3/10/1/1/25/8/9/9/5/3/11）");
 
 		GameLog.Write("SelfTest",
 			$"配置表比对·节点表：进化层 {NodePlacement.LayerOf(RewardNodeKind.Evolution)}/波 {NodePlacement.WavesFor(RewardNodeKind.Evolution)}（期望 2/3） 强化层 {NodePlacement.LayerOf(RewardNodeKind.Enhancement)}/波 {NodePlacement.WavesFor(RewardNodeKind.Enhancement)}（期望 1/2） 恢复层 {NodePlacement.LayerOf(RewardNodeKind.Heal)}/波 {NodePlacement.WavesFor(RewardNodeKind.Heal)}（期望 0/1） 商店价目 {RewardService.ShopCost(0)}/{RewardService.ShopCost(1)}/{RewardService.ShopCost(2)}（期望 5/12/18） 标题 {RewardService.TitleFor(RewardNodeKind.Mutation)}（期望 异化池）");
@@ -635,7 +631,7 @@ public partial class SelfTest : Node
 		// 技能表（阶段 3）：行数 + 首领强化的两套来源必须能分开。
 		ActRoguelike.Config.AbilityConfig? dashRow = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AbilityConfig>("skl_dash");
 		GameLog.Write("SelfTest",
-			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 25 = 5 玩家 + 16 单位 + 4 首领行为） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型 {ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型 {ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 3）");
+			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 25 = 5 玩家 + 16 单位 + 4 首领行为） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型 {ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型 {ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 8 = 5 数值型参数栏 + 3 技能参数栏）");
 
 		// AI 行为表（阶段 5）：行数 + "敌人行 → 档案"的关联 + **真的写进去了**的硬证据。
 		ActRoguelike.Config.AiProfileConfig? chaserAi = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AiProfileConfig>("ai_chaser");
@@ -674,6 +670,10 @@ public partial class SelfTest : Node
 			GameLog.Write("SelfTest",
 				$"技能表实测（玩家）：滑铲 冷却 {dash?.Cooldown:0.##}（期望 1.2） 位移 {(dash == null ? 0f : dash.Get("Distance").AsSingle()):0.##}（期望 6） AbilityId {dash?.AbilityId}（期望 skl_dash） ｜ 近战 伤害 {meleeHit?.Damage:0}（期望 32，来自角色行攻击组） 间隔 {melee?.Cooldown:0.##}（期望 0.75，证明技能行的 0 = 不覆盖） 射程 {(melee == null ? 0f : melee.Get("AttackRange").AsSingle()):0.##}（期望 2.4） 击退 {meleeHit?.Knockback:0.##}（期望 5） 命中标签 [{string.Join(",", meleeHit?.AttackTags ?? System.Array.Empty<string>())}]（期望 Melee,Heavy）");
 		}
+
+		// Pressure 词条池（3 条拆成 5 条 + 技能参数入池）与**限定词的刷新判定**取证。
+		// 全部逻辑放在 `Scripts/Boss/BossPerkProbe.cs`（跟着 SelfTest 走，但别把这里撑长）。
+		ActRoguelike.Boss.BossPerkProbe.Report(stage);
 	}
 
 	private static void ReportCombat(StageController? stage)
@@ -746,6 +746,46 @@ public partial class SelfTest : Node
 				GameLog.Write("SelfTest", $"AI 档案实测（场上 {sample.Name}）：SearchRange {liveBrain.SearchRange:0.##} 目标刷新 {liveBrain.TargetRefreshInterval:0.##} 行为 [{string.Join(" ", slots)}]");
 			}
 		}
+	}
+
+	/// <summary>
+	/// Pressure 段：**先验 §8.2 的免费挑战闸门，再验 §7.2–§7.5 的数值链路**。
+	///
+	/// 为什么这么改：闸门接上之后，"挑战数 0"就是免费挑战（额度内），结算**必须**一点都不累积 ——
+	/// 所以原来那两行直接调 `AddPressureForNode` 的硬指标 `+187.5 / +225` **会变成 0**（预期内的变化）。
+	/// 要让自测仍然能验证 Pressure 机制，就先走一遍真实记账把免费额度用掉
+	/// （<see cref="StageController.DebugExhaustFreeQuota"/>，与 StartEncounter 同一套账：额度随挑战数扣），
+	/// 之后再用**同一个公开入口** <see cref="StageController.AddPressureForNode"/> 结算 —— 闸门本身一行都没放宽。
+	/// </summary>
+	private void ReportPressureGate(StageController? stage)
+	{
+		if (stage == null)
+		{
+			GameLog.Write("SelfTest", "Pressure 检查失败：找不到 Stage");
+			return;
+		}
+
+		// ① 闸门关着（这次结算算免费挑战）：Pressure 一点都不能累积。
+		GameLog.Write("SelfTest", $"§8.2 免费挑战闸门（当前 {stage.DebugState}）：先按「免费挑战」结算一次进化节点");
+		stage.AddPressureForNode(RewardNodeKind.Evolution);
+		GameLog.Write("SelfTest", $"§8.2 免费挑战闸门（额度内不加 Pressure）：{stage.DebugState}（期望 challenges=0 freeQuota={stage.FreeChallengeQuota} free=True pressure=0 pmods=0 bank=0）");
+
+		// ② 把免费额度用掉（走真实记账），闸门打开后再结算 —— 数值必须与接闸门之前逐位一致。
+		int left = stage.DebugExhaustFreeQuota();
+		GameLog.Write("SelfTest", $"§8.2 消耗免费额度后：{stage.DebugState}（期望 challenges={stage.FreeChallengeQuota + 1} freeQuota={left} free=False）");
+		stage.AddPressureForNode(RewardNodeKind.Evolution);
+		stage.AddPressureForNode(RewardNodeKind.Mutation);
+		GameLog.Write("SelfTest", $"Pressure 测试（进化 150×1.25 + 异化 150×1.5）：{stage.DebugState}（期望 pressure=3 pmods=3 bank=0）");
+		stage.AddPressureForNode(RewardNodeKind.Enhancement);
+		GameLog.Write("SelfTest", $"Pressure 测试（再加一次中价值，应不变）：{stage.DebugState}（期望 pressure=3 pmods=3）");
+
+		// ③ 面板文案：自测不用开界面就能断言"当前首领状况"里真的有 Pressure 与词条（用户需求 3）。
+		GameLog.Write("SelfTest", $"首领状况面板（{BossPreviewScreen.Describe(stage, stage.CurrentNode).Replace("\n", " ／ ")}");
+
+		// ④ 血条栏那一行词条（用户需求 2）：行为型 + 数值型合并显示、同名折叠成 ×N。
+		//    这里场上还没有 Boss，所以行为型为空、只有本关抽到的数值型 —— 折叠规则照常生效。
+		int total = BossPerkText.Total(null, stage.PressurePerks);
+		GameLog.Write("SelfTest", $"词条显示（血条栏一行，上限 5：同名折叠成 ×N、超出折叠成 …+N）：{BossPerkText.FormatLine(null, stage.PressurePerks, 5)}（本关抽到 {total} 条，期望总数 {total} = 显示条数之和）");
 	}
 
 	/// <summary>当前角色（供验证读取）。</summary>

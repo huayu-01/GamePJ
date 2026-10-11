@@ -87,6 +87,8 @@ Scripts/
 - `ConfigRows.ById<T>()` / `BySlot<T>()` / `ByKind<T,TKind>()` —— 读配置表的唯一入口（读不到 → `null` → 调用方回退到自身 `[Export]` 默认值）
 
 **UI 框架现状**：`OverlayScreen` 已支持分层（`UiLayer.Hud/Panel/Modal`，决定是否暂停）、防误触、开合动画（`FadeSeconds` / `OpenScaleFrom`）。
+界面清单与所属层见 [config.md](config.md) 的「界面与弹窗」；**新增界面请走 `UiService` + `UiRouter`，不要自己 new / 找节点路径**
+（例：首领状况预览 = `BossPreviewScreen` + `UiService.OpenBossPreview()`，快捷键 B，分层 `Panel`）。
 
 **详细流程**见 [controller-flow.md](controller-flow.md)，架构与坑见 [architecture.md](architecture.md)。
 
@@ -123,7 +125,7 @@ Scripts/
 >    见 [config.md](config.md) 的「配置表阶段 6 实测」与 [boss.md](boss.md)。
 >    ⚠️ 关卡核心文档 §7.1 的硬约束仍然成立：**Boss Pressure（数值强化）与 Boss Build（行为/技能）必须分离**，
 >    且**不要为 Pressure 设计"可被玩家增幅修改"的接口**（本轮没有加）。
->    ⏸ **仍未做（第八章范围）**：§8.2 的"免费挑战不加 Pressure"闸门。
+>    ✅ **§8.2 的「免费挑战不加 Pressure」闸门已接（2026-10）** —— 见下面「任务 D」。
 > 3. **收尾决定**：`RewardConfig.PoolTags` / `ConflictsWith` 两个死字段（接上或删掉）、
 >    `WeaponConfig.ApplicableWeapons` 反向指（武器↔升级池关联）、`Pistol.tscn` 的数值（回退基线）。
 >    → ✅ **`PoolTags` / `ConflictsWith` 已在阶段 4 处理**（前者删除、后者接上）；
@@ -136,8 +138,31 @@ Scripts/
 > 6 处死字段清理 · 敌人倍率静默换挡修复 · `BarEnemy` 居中修复。
 > 详见 [config.md](config.md) 的「配置表阶段 3 实测」与 [config-schema.md](config-schema.md) §5 阶段 3。
 
-### 任务 A：血条改事件驱动（用户明确要求）✅ 已完成（2026-10）
+### 任务 D：§8.2 免费挑战闸门 + HUD 词条 + 首领状况预览面板 ✅ 已完成（2026-10）
 
+> **做了什么**（三件事，用户一次提的）：
+> 1. **§8.2「免费挑战不加 Pressure」闸门接上了**：`StageController.AddPressureForNode` 第一件事读
+>    `CurrentChallengeFree`（= 挑战数 ≤ 本关免费额度，额度在 `StartEncounter` 里随挑战数扣，§8.2 第 1–2 步），
+>    免费挑战直接返回 —— **不累积 Pressure、也不抽数值强化**（连节点行的"额外抽几次"一起拦）。
+>    ⚠️ 顺手修了一个**真 bug**：`StageController._currentNodeKind` 从来没被赋值过，
+>    所以**正常游玩时 Pressure 一次都不会累积**（只有自测直接调 `AddPressureForNode` 才有数字）。
+>    现在 `StartEncounter` 里写 `_currentNodeKind = node?.Kind`（证据 = 自测端到端那行的 `node=Enhancement`）。
+> 2. **HUD 血条栏显示词条名（两套来源都显示）**：新增 `Scripts/UI/BossPerkText.cs` 统一文案，
+>    `◆` = 行为型（`EncounterController.BossPerks`）、`◇` = 数值型（`StageController.PressurePerks`）；
+>    同名折叠成 `名字×N`、超过上限折叠成 `…+N`（血条栏 5 个 / 顶部状态行 4 个）。
+>    节点在 `Scenes/UI/Bars/BarBoss.tscn` 的 `Panel/PerkLabel`。
+> 3. **首领状况预览面板**（快捷键 **B**）：`BossPreviewScreen` + `Scenes/UI/BossPreviewScreen.tscn`，
+>    走 `OverlayScreen`（分层 `Panel`）/ `UiService.OpenBossPreview()` / `UiRouter`，**没有绕过任何一层**。
+>    内容 = 免费额度与闸门状态 / Pressure 阈值·跨阈值次数·余数·转换池候选与权重 / 两类词条逐条（带说明）/ 首领当前数值。
+>    正文由静态只读的 `Describe(stage, encounter)` 生成，自测不开界面就能断言。
+> 4. **自测**：`SelfTest.ReportPressureGate()` 替换了原来直接调两次 `AddPressureForNode` 的写法 ——
+>    先验"免费挑战 = 0"（新增硬指标），再用 `DebugExhaustFreeQuota()` 把额度用掉，之后 `+187.5 / +225` 逐位不变。
+>    细节见 [config.md](config.md) 的「免费挑战额度（§8.2）」。
+>
+> **还没做**：预览面板只有快捷键（用户拍板先这样，后期与词典图鉴合并）；交互时不会自动弹面板，
+> 只在 HUD 的交互提示里加了 `[B 首领状况]`。
+
+### 任务 A：血条改事件驱动（用户明确要求）✅ 已完成（2026-10）
 > 实现：`Scripts/UI/WorldOverlay.cs`。已订阅 `GameplayEventBus.Raised`（`_Ready` += / `_ExitTree` -= 成对），
 > `Damaged` → O(1) 登记并建血条，`Died` → 移除，`_Process` 只更新已登记血条、不再遍历单位组。
 > 实测数据见 [config.md](config.md) 的「血条事件驱动」验证条目。

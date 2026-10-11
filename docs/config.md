@@ -36,7 +36,7 @@
 | **首领**：生命/护甲/移速/攻击四项/持有技能/白板副本血量 | `Config/Tables/Bosses/boss_final.tres` | 一个首领 | 1 |
 | **召唤物**：数值 + 存活时间 | `Config/Tables/Summons/summon_drone.tres` | 一个召唤物 | 1 |
 | **技能**：冷却/前摇/后摇/朝向/开关/接近区间 + 子类专属参数 + 命中体参数 | `Config/Tables/Skills/skl_*.tres` | 一个技能 | **25**（5 玩家 + 16 单位 + 4 首领行为词条） |
-| **首领数值强化池（Pressure）**：权重 / **候选标签** / 改哪些属性 | `Config/Tables/Pressure/pmod_*.tres` | 一条数值强化 | 3 |
+| **首领数值强化池（Pressure）**：权重 / **候选标签** / 改哪些属性 / **技能参数** / **限定词**（只对哪个 Boss、哪几关） | `Config/Tables/Pressure/pmod_*.tres` | 一条数值强化 = **一个参数栏** | **8**（5 数值型参数栏 + 3 技能参数栏） |
 | 玩家基础数值与攻击组 | `Config/Tables/Characters/chr_*.tres` | 一个角色 | 3 |
 | 武器数值（伤害/射速/弹匣/装填/散布/**击退**/暴击/弹速/**升级池**） | `Config/Tables/Weapons/wpn_*.tres` | 一把武器 | 3 |
 | **升级池**（"某把武器的升级池"这个粒度；武器表正向指过来） | `Config/Tables/UpgradePools/pool_*.tres` | 一个池 | 3 |
@@ -61,6 +61,58 @@
 > 于是**所有**数值静默回到代码默认值（实测：玩家生命 250 → 140、武器变成 22/0.32/8/1.15）。
 > 要下线一行，就把 `Balance.tres` 里的数组项与顶部对应的 `[ext_resource]` 一起删。
 > 详见 [config-schema.md](config-schema.md) §8.3。
+
+## 参数中文说明（表里每个参数项怎么看懂）
+
+**需求**：表里每个参数项都要有中文说明，显示在**右侧 Inspector（检查面板）**上或**悬停**时，**且不改变原变量名/参数名**。
+
+### 30 秒结论：**Godot 4.7 的 C# 导出没有 tooltip 机制，悬停显示做不到**
+
+先调研再动手，结论是**做不到"Inspector 悬停弹出中文说明"**。三条独立证据（都在本机 4.7.2 上验过）：
+
+| # | 证据 | 说明 |
+|---|---|---|
+| ① | **本地反射 `GodotSharp.dll`（程序集版本 `4.7.2.0`）**：`Godot.ExportAttribute` 的**全部**成员只有构造函数 `ExportAttribute(PropertyHint hint, string hintString)` + 属性 `Hint` / `HintString` | **没有任何** tooltip / description / doc 参数。`ExportGroupAttribute(string name, string prefix)`、`ExportSubgroupAttribute`、`ExportCategoryAttribute(string name)` 同样只有一个字符串 —— 那个字符串**就是**分组标题，所以它能显示中文 |
+| ② | **引擎源码 `editor/inspector/editor_inspector.cpp`（`_update_property_tooltip` 的构建处）**：<br>`// Build the doc hint, to use as tooltip.`<br>`Vector<DocData::ClassDoc> docs = scr->get_documentation();`<br>`doc_tooltip_text = "property\|" + classname + "\|" + propname;` | 悬停提示的文本是一个**文档符号**（`property\|类名\|属性名`），由 `EditorHelpBitTooltip` 去**文档数据库**里查（引擎类 XML 文档 + 脚本文档）。它**完全不读 `hint_string`**，也不读任何 C# 特性 |
+| ③ | **`modules/mono/csharp_script.h:301-307`**：`get_doc_class_name()` 与 `get_documentation()` 是**空的 `// TODO`**（`return StringName();` / 返回空 `Vector`）；而 `modules/gdscript/gdscript.h:288` 的 GDScript 版本 `return docs;` 是**真的**从 `##` 注释解析出来的 | **C# 的 XML 文档注释永远进不了编辑器**（既不是 Help、也不是 Inspector tooltip）。侧证：本地反射整个 `GodotSharp` API，唯一带 "Documentation" 的成员是 `ScriptExtension._GetDocumentation` / `ScriptLanguageExtension._SupportsDocumentation`（GDExtension 扩展点），`Godot.Script` 自己**没有任何** `GetDocumentation` |
+
+补充两条**实测**：
+
+- **`PropertyHint` 里没有能显示说明文字的取值**（本地 4.7.2 全量 46 个：`None`/`Range`/`Enum`/…/`MultilineText`(18)/`PlaceholderText`(20)/`ToolButton`(39)/`FilePath`(44)/`Max`(45)）——
+  没有"只读说明行"这种 hint。
+- **GDScript 侧也一样没有**：本机跑 `Godot_v4.7.2-stable_mono_win64.exe --headless --check-only --script`，
+  `@export_tooltip("…")` 直接 **`Parse Error: Unrecognized annotation: "@export_tooltip"`**（同一套壳里只有 `@export` 的对照文件 exit=0，证明测试本身有效）。
+  （2020 年那个 PR #41033 "export variable tooltips" 并没有进入 4.x 的 `@export` 语法。）
+
+> ⚠️ 所以：**不要**去硬造一个"悬停 tooltip"（比如写 `EditorInspectorPlugin` 去给每个属性挂 `TooltipText`）。
+> 那需要自己解析 C# 源码里的 `/// <summary>`，是把注释变成第二套真源，得不偿失。
+
+### 实际采用的方案：`[ExportGroup("中文分组 · 一句话说明")]` + 每个字段的中文 XML 注释
+
+两条路一起走，**都不改变量名/参数名**：
+
+1. **`[ExportGroup("中文")]` —— Inspector 里真的能看到中文**（这就是"在右边的检查面板上显示"）。
+   分组的字符串是**唯一**能被 C# 特性送进 Inspector 的可见文本，所以每个字段都必须落在某个中文标题下面
+   （**没有落在任何 `[ExportGroup]` 里的字段会挤进上一个分组的标题下**，那是错的 —— 本轮顺手修了
+   `BalanceConfig` 里 `MinNodeSpacing`/`PressurePerPoint`/`KillPlaneY` 等挤在「表现 · 血条」下的问题）。
+2. **每个字段一句中文 `/// <summary>`** —— IDE（Rider / VS / VS Code）里鼠标停上去就能看，
+   读代码时就在手边；虽然 Godot Inspector 不显示它（证据 ③），但它对人是有效的"悬停说明"。
+
+> **覆盖范围**：`Scripts/Config/` 下 **18 个**会被人编辑的配置/资源类全部覆盖 ——
+> `ConfigRow`（基类，覆盖 Id/Slot/DisplayName/DescriptionTemplate/Note/Params）/ `UnitConfig` /
+> `EnemyConfig` / `BossConfig` / `SummonConfig` / `CharacterConfig` / `WeaponConfig` / `AbilityConfig` /
+> `AiProfileConfig` / `EffectConfig` / `NodeConfig` / `RewardConfig` / `PressureModConfig` (注释) /
+> `MetaUpgradeConfig` / `StageDefinition` / `UpgradePoolConfig` / `ParamEntry` / `StatOverride` /
+> `BalanceConfig`（全局字段）。**共 34 个中文 `ExportGroup`、200+ 个字段的中文说明**。
+>
+> **红线遵守**：本次只加/改 `[ExportGroup]` 特性行与 `/// <summary>` 注释行 ——
+> 用 `git diff -U0` 核对过，`Scripts/Config/**` 里**没有一行 `[Export]` 属性签名被改动**
+> （字段名 / 类型 / 默认值一个都没动），也没有动 `Config/Tables/**` 的任何数据。
+> 唯一的字段"搬动"是 `BalanceConfig.BossBarFullRange` 从文件末尾移到「表现 · 血条」组里（名字/类型/默认值不变），
+> 因为它原来挂在错误的组标题下面。
+
+顺带说明**两列本来就有、可以直接写中文**的地方：`ConfigRow.Note` / `DescriptionTemplate`
+（都是 `PropertyHint.MultilineText`，一行一条中文备注；`DescriptionTemplate` 还支持 `{字段名}` 占位符，见 `ConfigText`）。
 
 ## 各表参数（当前取值）
 
@@ -111,19 +163,20 @@
 | `Config/Tables/Summons/summon_drone.tres` | 1 | 生命 40 / 移速 6.0 / 攻击 6·0.9·1.8·1.5 / 标签 Summon / `LifetimeSeconds = 25` |
 | `Config/Tables/Skills/skl_*.tres` | 21 | 技能：`NodeName`（目标能力节点）+ 通用项（Aim/Cooldown/Windup/Recover/Enabled/Approach*）+ `Params`（子类专属，Key = 属性名）+ `AttackParams`（命中体/武器组件） |
 | `Config/Tables/Skills/bhv_*.tres` | 4 | **首领行为词条**（Boss Build）：`ApplyHandler` 非空的技能行，由 `BossPerkCatalog` 编译成运行期词条 |
-| `Config/Tables/Pressure/pmod_*.tres` | 3 | **首领数值强化池**（Pressure）：狂暴(3/Offense) / 铁壁(2/Defense) / 疾行(2/Mobility)，内容是 `StatOverride` 数值操作；括号里是 **`Weight` / `Tags`** |
+| `Config/Tables/Pressure/pmod_*.tres` | **8** | **首领数值强化池**（Pressure）：**一栏一个参数** —— 狂暴·伤害(3/Offense) / 狂暴·攻速(3/Offense) / 铁壁·生命(2/Defense) / 铁壁·护甲(2/Defense，限定第 2·3 关) / 疾行(2/Mobility) / 尖啸回响(1/Offense,Skill) / 冲锋冲击(1/Offense,Skill) / 召唤急速(1/Defense,Skill)。前 5 条是 `StatOverride` 单位属性，后 3 条是**技能参数**（`AbilityScales` / `AttackScales`，见下）。括号里是 **`Weight` / `Tags`** |
 
 **⚠️ 首领强化的两套来源必须能分开（关卡核心文档 §7.1）**：
-行为/技能型在**技能表**里（`ApplyHandler` 非空的那 4 行），数值型在 **Pressure 表**里（3 行）。
+行为/技能型在**技能表**里（`ApplyHandler` 非空的那 4 行），数值型在 **Pressure 表**里（8 行）。
 两张表分别编译、各自独立回退（一侧读不到不会让另一侧变空），开局日志会分开打条数：
-`首领强化来源：数值型 Pressure 3 条（来源：表 Pressure）/ 行为型 Boss Build 4 条（来源：表 Skills）`。
+`首领强化来源：数值型 Pressure 8 条（来源：表 Pressure）/ 行为型 Boss Build 4 条（来源：表 Skills）`。
 
 **配置表阶段 6 起，两个抽取点也彻底分开了**（这是 §7.1/§7.5 的硬要求）：
 
 | 抽取点 | 候选 | 谁触发 | 代码入口 |
 |---|---|---|---|
 | **Boss 开场词条**（Boss Build） | **只有行为型 4 条** | Boss 出生时，词条数 = `StageDefinition.BossPerkCount` | `BossPerkCatalog.Roll(count)` |
-| **Pressure 转换**（§7.5 数值池） | **只有数值型 3 条**（按 `Tags` 过滤 + 按 `Weight` 加权） | 每跨过一次 Pressure 阈值**立即**抽一次 | `BossPerkCatalog.RollPressure(tags)` |
+| **Pressure 转换**（§7.5 数值池） | **只有数值型 8 条**（按 `Tags` 过滤 + 按 `Weight` 加权） | 每跨过一次 Pressure 阈值**立即**抽一次（**抽签**不判限定词） | `BossPerkCatalog.RollPressure(tags)` |
+| **限定词判定**（阶段 7） | 上面抽到的那一条 | **Boss 出生时**（两条路都要经过 `perk.Apply`） | `BossPerkCatalog.ApplyWithRefresh` |
 
 ⚠️ 两套来源因此在代码里可以**独立配置、独立追踪、独立结算**（§7.5 最后一句）。
 **没有**为 Pressure 设计"可被玩家增幅修改"的接口（§7.2 明令禁止）。
@@ -593,6 +646,7 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 | 战术滑铲 | **Q** | `dash` |
 | 火力倾泻 | E | `burst` |
 | 帮助界面 | H | `HelpScreen.ToggleKey`（导出属性，非 InputMap） |
+| **首领状况预览** | **B** | `BossPreviewScreen.ToggleKey`（导出属性，非 InputMap） |
 | 菜单 / 关闭顶层界面 | Esc | `UiRouter`（`ui_cancel` 动作）；有弹窗就关掉最顶层那个，没有弹窗就打开菜单 |
 | 装填 | 无按键 | 被动：武器表的 `AutoReloadDelay` 秒没开火或打空弹匣自动装填 |
 | 三选一奖励 | 无按键 | 节点清空后自动弹出 |
@@ -626,6 +680,22 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 
 - `OverlayScreen`（基类）：`OpenGuardSeconds`(默认 0.3s) 打开后禁输入防误触；`OpeningDuration` 供以后加缓动 —— 保护期取两者较大值，**加缓动不用改逻辑**。`CloseOnCancel` 控制 Esc 能否关闭（奖励 / 结算界面设为 false，避免流程卡住）。
 - `UiRouter`（autoload）：维护界面栈，栈空 → 恢复游戏并捕获鼠标；栈非空 → 暂停并放开鼠标。Esc 先尝试关闭最顶层可关闭界面，没有界面时调用 `OpenMenu`（当前指向帮助界面，等真正的菜单）。
+- **界面清单与所属层**（层决定是否暂停）：
+
+| 界面 | 层 | 打开方式 |
+|---|---|---|
+| `Hud` / `WorldOverlay` | 常驻（不是 OverlayScreen） | 场景里常驻 |
+| `HelpScreen` | `Panel` | H（`ToggleKey`）或没有弹窗时按 Esc |
+| `BossPreviewScreen`（首领状况预览，2026-10） | **`Panel`** | **B**（`ToggleKey`）/ `UiService.OpenBossPreview()` |
+| `BaseScreen` / `StartScreen` | `Panel` | 基地交互台 / 出征 |
+| `RewardScreen` / `ChooseScreen` | `Modal` | 节点奖励、商店（必须选择） |
+
+> **为什么首领状况预览用 `Panel` 层**：它是"停下来看一眼资料"的信息面板，与帮助界面同类 ——
+> 打开即暂停并放开鼠标，读的时候不该被打死；`Hud` 层留给**常驻**元素（常驻 = 不暂停、不拦输入），
+> `Modal` 层留给必须做出选择的界面。想改成"边打边看"，只把 `Scenes/UI/BossPreviewScreen.tscn` 的
+> `ScreenLayer` 改成 `Hud` 即可（代码不用动）。
+> 面板正文由 `BossPreviewScreen.Describe(stage, encounter)` 生成（**静态 + 只读入参**，所以自测不开界面也能断言内容）；
+> 界面由 `UiService.OpenBossPreview()` 打开，**没有绕过 UiService / UiRouter**。
 
 ## 开局配置与武器池
 
@@ -661,14 +731,22 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 | 普通怪物血条 | 放在**脚下**（沿 -Up 偏移），满血不显示 | `EnemyHealthBarTopOffset = 0.25`（现在按脚下偏移使用） |
 | 触发方式 | **事件驱动**：订阅 `GameplayEventBus.Raised`，收到 `Damaged` 才 O(1) 登记该单位并建血条，`Died` 立即移除；**不再每帧遍历** `enemy_units` / `boss_units` 组 | — |
 | 首领血条 | **不再画头顶血条**，改为屏幕**上方**的主血条面板（`WorldOverlay` 按 `HasTag("Boss")` 跳过） | — |
-| 近距离 | 与首领距离 ≤ `BossBarFullRange` 时展开完整血条（名称 + 血量 + 关卡） | `BossBarFullRange = 22` |
+| 近距离 | 与首领距离 ≤ `BossBarFullRange` 时展开完整血条（名称 + 血量 + 关卡 **+ 词条行**） | `BossBarFullRange = 22` |
 | 远距离 | 只保留首领头像色块 | 同上 |
+| **首领词条行**（2026-10 用户需求） | 血条栏与顶部状态行都列出本关词条：`◆` = 行为型（Boss Build，来自 `EncounterController.BossPerks`）、`◇` = 数值型（Pressure，来自 `StageController.PressurePerks`）；同名词条折叠成 `名字×N`，超过上限折叠成 `…+N`（血条栏 5 个 / 状态行 4 个） | 文案统一在 `Scripts/UI/BossPerkText.cs`；节点在 `Scenes/UI/Bars/BarBoss.tscn` 的 `Panel/PerkLabel` |
 
-代码位置：`Scripts/UI/WorldOverlay.cs`（怪物血条）、`Scripts/UI/PlayerHud.cs`（首领面板，含验证用只读属性 `BossBarExpanded` / `BossDistance`）。
+代码位置：`Scripts/UI/WorldOverlay.cs`（怪物血条）、`Scripts/UI/PlayerHud.cs`（首领面板，含验证用只读属性 `BossBarExpanded` / `BossDistance`）、`Scripts/UI/BossPerkText.cs`（词条文案）。
 
 **验证状态**：
 - 首领面板：**已通过** —— 无首领时 `BossBarExpanded=False`；首领出场近距离（20.7 米）`True`、面板与名称条都可见；走远到 48.5 米（>22）自动收起为 `False`、只留头像；再靠近又展开为 `True` ✓
   （踩过的坑：`UpdateBossPanel()` 一开始被插在 `PlayerHud._Process` 的**某一个状态分支末尾**，Boss 战走的是另一个分支，所以从不执行；移到所有分支之前才生效。）
+- 🔧 **2026-10 顺带修好一处"面板其实根本没显示"**：`Scenes/UI/Bars/BarBoss.tscn` 里的 `Panel` 节点
+  自**首个提交**起就写着 `visible = false`，而代码只切根节点（`BarBoss`）的可见性 ——
+  于是头像 / 名字 / 血条**从来没有真正画出来过**，只有 `BossBarExpanded` / `BossDistance` 两个只读属性在动。
+  现在 `BuildBossPanel()` 明确把 `Panel` 打开，并把整块面板从 `y=14` 下移到 `y=64`（原先与顶部状态文字叠在同一处），
+  同时**面板展开（近距离）时顶部状态行不再重复列词条** —— 词条由血条栏那一条负责，避免同一串词条出现两次。
+  实测截图：[boss_bar_perks.png](screenshots/boss_bar_perks.png)（血条栏显示 `词条 4 ◆尖啸强化 ◇狂暴·攻速×2 ◇铁壁·生命`）
+  与 [boss_preview_panel.png](screenshots/boss_preview_panel.png)（B 键的首领状况面板）。
 - 怪物血条改到脚下：代码已改（`WorldOverlay` 用 `- Vector3.Up * offset`），**仍缺视觉确认**，建议你游玩时看一眼。
 - 血条事件驱动：**机制已通过**（2026-10 自测实测日志）——满血敌人不建血条（`满血HP=60 血条数=0`）；扣 5 点（60 → 55）后 `Damaged` 事件立刻建出血条（`登记 Chaser HP=55/60 现有血条=1`），此后逐帧采样 121 帧期间**只登记一次、没有重复建条、单位存活且 HP 实时为 55**；致死 `Died` 事件立刻移除（`移除 ... 剩余血条=0`）。首领按 `HasTag("Boss")` 跳过（`跳过 Boss ... 候选=False`）。
   注意：若一次伤害直接致死，`Damaged` 与 `Died` 在同一调用栈内先后触发，血条会「建好又立刻拆掉」——本作实测几乎每次伤害都是即死，所以用 0.5 秒级轮询 `Bars` 子节点数常常看到 0，这是正确行为，不是丢事件。
@@ -712,6 +790,9 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 **计算规则（全项目只有这一处定义，在 `StageController.AddPressureForNode`）**：
 
 ```
+§8.2 闸门：这次挑战是「免费挑战」吗？（挑战序号 ≤ 本关免费额度）
+        是 → 直接返回：不增加 Pressure、也不抽数值强化（连节点行的"额外抽几次"也拦）
+        否 ↓
 基础点数 = 节点行 BossPressurePoints        （挑战类型最具体，§7.2）
          → 关卡行按价值层的 HighValue / Normal（§7.4 的两个"基础 Pressure"，留 0 = 不表态）
          → Balance.PressurePerHighValueNode（150，全局默认值）
@@ -757,9 +838,72 @@ Boss 出生：套用本关 Pressure 数值强化 3 条 [铁壁、疾行、疾行
   **对玩法数值可见的变化**：以前打 2 个高价值节点白送 3 级压力曲线，现在换成 3 条随机数值强化。
   两者强度量级接近（3 级压力 ≈ +24% 伤害/+18% 攻速/+15% 移速；3 条强化看抽到什么），但**仍需一轮平衡测试**。
 
-> ⚠️ **已记录的边界（属第八章，本轮未做）**：§8.2 要求"若没有免费额度，挑战完成后才增加 Pressure"，
-> 即免费挑战不该加 Pressure。当前 `AddPressureForNode` 里**没有**这个免费额度闸门（§7 正文没提它），
-> 所以免费挑战也会累积。要接的话就在 `AddPressureForNode` 开头判断这次挑战是不是免费的。
+> ✅ **闸门已接（2026-10，第八章 §8.2）**：`AddPressureForNode` 的第一件事就是判断"这次挑战是不是免费挑战"，
+> 是则直接返回（不累积 Pressure、不抽数值强化）。详见下面「免费挑战额度（§8.2）」一节。
+
+## 免费挑战额度（§8.2「免费挑战不加 Pressure」，2026-10）
+
+**文档要求（关卡核心文档 §8.2）的结算顺序**，以及它落到哪一行代码：
+
+| §8.2 步骤 | 落在哪 |
+|---|---|
+| 1. 检查当前免费挑战额度 | `StageController.FreeQuotaLeft`（= 额度 − 已挑战数） |
+| 2. 若有额度，则扣除 1 次免费额度 | `StartEncounter()` 里 `ChallengesUsed++` —— **额度与挑战数是同一份记账**（不刷怪的节点不进这里，也就不扣额度，§8.1） |
+| 3. 启动 Encounter | `_encounter.Start()` |
+| 4. Encounter 完成后，依据这次是否免费决定加不加 Pressure | `AddPressureForNode()` 第一行读 `StageController.CurrentChallengeFree` |
+| 5. 没有免费额度 → 挑战完成后增加对应类型的 Pressure | 同一个方法往下走 §7.2–§7.5 的完整计算 |
+| （§8.2 末）挑战未正常完成时不发放结算 | Pressure 只在 `IsCleared` 之后结算；开了 Boss 门会冻结普通 Encounter，不会补发 |
+
+```csharp
+/// §8.2 闸门：第 N 次挑战是否免费 = N ≤ 本关额度（额度在 StartEncounter 里扣）
+public bool CurrentChallengeFree => ChallengesUsed <= FreeChallengeQuota;
+
+public void AddPressureForNode(RewardNodeKind kind)
+{
+    if (CurrentChallengeFree) { /* 写日志，return：不累积、不抽数值强化 */ }
+    ... // §7.2–§7.5
+}
+```
+
+**两处必须一起看的地方**：
+
+1. 闸门拦的是**整段 Pressure 结算** —— 包括节点行配的 `BossModifierRolls`「额外抽几次」。
+   理由：那也属于"挑战完成时增加 Pressure"的结算（§7.3/§7.5），免费挑战按 §8.2 不该有任何 Pressure 产出。
+2. `StageController._currentNodeKind` **以前从来没被赋值**（字段存在、结算分支在用它，但 `StartEncounter` 忘了写），
+   所以**正常游玩时 Pressure 一次都不会累积**，只有自测直接调 `AddPressureForNode` 才有数字。
+   本轮把它接上了：`StartEncounter` 里 `_currentNodeKind = node?.Kind`。
+   证据 = 自测端到端那行的 `node=Enhancement`。
+
+### 自测改了哪一段、为什么、新期望值
+
+**改的是 `SelfTest.ReportPressureGate()`（原来是 `case 1` 里直接调两次 `AddPressureForNode`）**。
+
+⚠️ **旧硬指标 `Pressure 累积：+187.5 / +225` 直接跑会变成 0** —— 那时自测的 `challenges=0`，
+按 §8.2 就是**免费挑战**，闸门**正确地**把 Pressure 全拦了。**这是预期内的变化，不是回归**；
+为了让自测仍然能验证 Pressure 机制，改成"**先把免费额度真的用掉，再走同一个公开结算入口**"，
+**闸门本身一行都没放宽**：
+
+```
+① 闸门关着（额度内）：
+   Pressure 累积：跳过（§8.2 免费挑战）—— 挑战数 0 ≤ 本关免费额度 1（剩余 1）→ 本次不增加 Pressure、也不抽取数值强化
+   状态：challenges=0 freeQuota=1 free=True pressure=0 pmods=0 bank=0        ← 新增的硬指标（期望就是 0）
+② 用掉额度（DebugExhaustFreeQuota，与 StartEncounter 同一套账）：
+   状态：challenges=2 freeQuota=0 free=False
+③ 再结算（闸门打开）：
+   Pressure 累积：+187.5（…× 1.25）阈值 100 → 本次跨阈值 1 次 → 本关累计 1 次 / 余数 0 / 立即抽取 [狂暴]
+   Pressure 累积：+225（…× 1.5） 阈值 100 → 本次跨阈值 2 次 → 本关累计 3 次 / 余数 0 / 立即抽取 [狂暴、狂暴]
+   状态：pressure=3 pmods=3 bank=0                                            ← 与接闸门之前**逐位一致**
+④ 词条显示（血条栏那一行，同名折叠）：
+   ◇狂暴×3（本关抽到 3 条）
+```
+
+- **`+187.5` / `+225` 的数字没变**：闸门打开后走的还是原来那条路（三层取值 → 倍率 → 逐次跨阈值）。
+- **新增的硬指标是 ①**：免费挑战必须让 `pressure`/`pmods`/`bank` 三项**全为 0**，且日志里出现"跳过（§8.2 免费挑战）"。
+- `DebugExhaustFreeQuota()` 是**显式的测试入口**（只在 Debug 自测里调用，不参与玩法逻辑）：
+  它按真实记账把 `ChallengesUsed` 顶到 `额度 + 1`，所以"下一次结算按超出额度处理"。
+  之所以不用"直接调用一个绕过闸门的结算"：那样只能证明数值链没坏，证明不了闸门会开。
+- 自测其余部分只多了一位数：端到端那行 `challenges` 从 1 → 5（多出的是本次消耗的额度与两场调试战斗），
+  其余 `配置表比对·*` 行**逐字未变**。
 
 ## 节点生成约束（关卡核心文档 L105-107）
 
@@ -925,3 +1069,245 @@ W2/W3 只改了 `.tres` 的 `Weight` 列（没重新编译）就换了分布 →
 实测对照：改前打 2 个高价值节点 → 初始压力 **5**（2 来自超额 + 3 来自节点）；改后 → **2**，
 但那 3 次转换换成了 **3 条数值强化**（例如 `[铁壁、疾行、疾行]` → 生命 1260 / 护甲 350 / 移速 ×1.914）。
 强度量级接近，但**属于新曲线，需要一轮平衡测试**。
+
+## 配置表阶段 7 实测（2026-10：Pressure 词条拆成"一参数一栏" + 技能参数入池 + 限定词刷新判定）
+
+**需求原话**：「词条我这里只看到了 3 条，`Pressure/` 里的，不过这三条应该**拆成 5 条**的，
+**每个参数单独占一个词条栏**。如果可以的话**把一些技能的参数也加入词条里**
+（尽管每个 boss 可能都不同，**限定词记得做好刷新判定**）」
+
+**编译**：`& build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（改一步跑一次，全程 0/0）。
+
+### 一、3 条 → 8 条（5 条数值型参数栏 + 3 条技能参数栏）
+
+| 新行 Id | 显示名 | 内容（与拆分前**逐位一致**） | 权重 | 单条概率 | 母行 / 来源 |
+|---|---|---|---|---|---|
+| `pmod_berserk_dmg` | 狂暴·伤害 | `DamageMultiplier` ×1.25 | **3** | 20.0% | ← `pmod_berserk`（拆） |
+| `pmod_berserk_speed` | 狂暴·攻速 | `AttackSpeedMultiplier` ×1.2 | **3** | 20.0% | ← `pmod_berserk`（拆） |
+| `pmod_fortress_hp` | 铁壁·生命 | `MaxHealthMultiplier` ×1.4 | **2** | 13.3% | ← `pmod_fortress`（拆） |
+| `pmod_fortress_armor` | 铁壁·护甲 | `MaxArmorAdd` +150（Add） | **2** | 13.3% | ← `pmod_fortress`（拆）+ **限定关卡** |
+| `pmod_swift` | 疾行 | `MoveSpeedMultiplier` ×1.35 | **2** | 13.3% | 本来就是单参数，**文件名不变** |
+| `pmod_scream_echo` | 尖啸回响 | `AbilityScream.Cooldown` ×0.8 | **1** | 6.7% | 🆕 **技能参数** |
+| `pmod_charge_impact` | 冲锋冲击 | `AbilityCharge` 命中体 `Damage` ×1.25 | **1** | 6.7% | 🆕 **技能参数** |
+| `pmod_summon_haste` | 召唤急速 | `AbilitySummon.Cooldown` ×0.75 | **1** | 6.7% | 🆕 **技能参数** |
+
+`pmod_berserk.tres` / `pmod_fortress.tres` **两个行文件已删**（数组项与 `[ext_resource]` 一起删，符合操作纪律）。
+
+#### 1.1 权重怎么分（分配依据：三条规则）
+
+| 规则 | 做法 | 为什么 |
+|---|---|---|
+| ① **继承母行权重，不均分** | 母行 3 → 两个子栏各 **3**；母行 2 → 两个子栏各 **2** | "母行权重" 表达的是"这一路（攻击向/防御向）该占多少概率质量"。均分（1.5/1.5）会把攻击向从"最重"打成"最轻"；继承则保住原设计意图（老注释写着"权重 3 = 攻击向略高"）。副作用还很好解释：**每一个老参数的概率都恰好变成原来的 7/15 = 46.7%**（分母从 7 变 15），谁也没被单独放大 |
+| ② **技能型每条只给 1** | 3 条技能词条合计 3/15 = **20%**，5 条数值型占 **80%** | §7.5 要求 Pressure 池"**优先**定位为数值型强化，例如生命值、伤害、攻击速度或技能冷却"；而且技能参数词条只改**一个技能的某一个参数**，尖啸/冲锋/召唤还都要到阶段 2/3（或被 Boss Build 词条提前解锁）才真的会放 —— 有效强度低于名义强度，所以给最小权重 |
+| ③ **单条数值一个都没动** | 1.25 / 1.2 / 1.4 / +150 / 1.35 与原文件**逐字相同**，技能参数取自 `skl_boss_*.tres` 的现值 | 本轮是**结构**改动（一栏一个参数），不该顺手改手感；数值一变，"抽到 N 次 = ×M" 的对照就要重新算 |
+
+改前 / 改后的概率对照（**每个老参数都是 46.7%**，不是有人被针对）：
+
+| 参数 | 改前（母行概率） | 改后（本栏概率） | 比值 |
+|---|---|---|---|
+| 伤害 | 42.9%（狂暴：一抽**同时**给伤害+攻速） | 20.0% | 0.467 |
+| 攻速 | 42.9%（同上，同一次抽） | 20.0% | 0.467 |
+| 生命 | 28.6%（铁壁：一抽同时给生命+护甲） | 13.3% | 0.467 |
+| 护甲 | 28.6%（同上，同一次抽） | 13.3%（第 1 关还会被限定词挡掉 → 见第三节） | 0.467 |
+| 移速 | 28.6%（疾行） | 13.3% | 0.467 |
+| 尖啸回响 / 冲锋冲击 / 召唤急速 | —（不存在） | 各 6.7% | 新增 |
+
+#### 1.2 "整体强度不失控"——算一遍（以及为什么会**变弱**）
+
+口径：每抽的期望强度 = Σ 概率 × 效果强度，效果强度取 `ln(倍率)`（乘区天然可加）；
+护甲是加法，按首领基线 900 血折算（+150 ≈ +16.7% → `ln1.1667 = 0.154`）。
+
+| 参数 | 改前每抽期望 | 改后每抽期望 |
+|---|---|---|
+| 伤害 | 0.4286 × 0.2231 = **0.0956** | 0.20 × 0.2231 = **0.0446** |
+| 攻速 | 0.4286 × 0.1823 = **0.0781** | 0.20 × 0.1823 = **0.0365** |
+| 生命 | 0.2857 × 0.3365 = **0.0961** | 0.1333 × 0.3365 = **0.0449** |
+| 护甲 | 0.2857 × 0.1542 = **0.0440** | 0.1333 × 0.1542 = **0.0206** |
+| 移速 | 0.2857 × 0.3001 = **0.0857** | 0.1333 × 0.3001 = **0.0400** |
+| 技能 3 条 | — | (1/15)×(0.2231+0.2231+0.2877) = **0.0489** |
+| **合计** | **0.3996** | **0.2354（= 原来的 58.9%）** |
+
+**结论（重要，属于"需要平衡测试"的可见变化）**：
+拆成"一抽只买一个参数"之后，每抽的期望强度**必然下降**（-41%），这是拆分的**定义**决定的，不是权重没调好：
+**理论上界** = 最强的那一条（铁壁·生命 `ln1.4 = 0.3365`）**仍然小于**原来的 0.3996 ——
+所以**无论怎么分配权重都不可能补回原来的总量**（只有把权重全压在一条上才会接近，那显然更糟）。
+要补，只有两个旋钮：① 提高单条数值（`Modifiers` 的 `Value`）；② 降低转换阈值（§7.3 的 100 点 / 关卡行 `PressureThreshold`）。
+**故意没有**用"悄悄加强单条数值"来掩盖这一点 —— 那会让"抽到 N 次 = ×M"的对照全部失效。
+
+> 反过来看，**不会失控变强**是确定的：没有任何一条效果被放大，每条参数的出现概率都 ≤ 原来的 42.9%。
+
+#### 1.3 "抽到 3 次狂暴 = 伤害 ×1.95" 的叠加语义还在吗
+
+| | 改前 | 改后 |
+|---|---|---|
+| 3 次狂暴 | 伤害 ×1.25³ = **1.953** **且** 攻速 ×1.2³ = 1.728（一抽买两个乘区） | 3 次"狂暴·**伤害**" = ×1.25³ = **1.953（逐位相同）**；攻速要另外抽"狂暴·攻速" |
+| 凑出 ×1.95 伤害需要几次 | 期望 2.33 次（1 ÷ 42.9%） | 期望 5 次（1 ÷ 20%） |
+| P(连中 3 次) | (3/7)³ = 7.9% | (3/15)³ = **0.8%** |
+
+**所以**：叠乘本身**没变**（效果值没动，抽两次就是乘两次；技能参数也是倍率，`7 → 5.6 → 4.48` 同样是叠乘，不是覆盖），
+变的是"一抽买几个参数"和"凑齐要几抽"。这是用户要的语义（**每个参数单独占一个词条栏**）。
+
+### 二、技能参数怎么进词条的（§7.5 依据 + 三个新列）
+
+**放哪张表**：进 **`Pressure/`（数值型）**，不进 `Skills/bhv_*`（行为型）。
+依据是关卡核心文档 §7.5 原文：「建议优先将 Pressure 强化定位为**数值型**强化，例如生命值、伤害、攻击速度或**技能冷却**等参数。
+首领**新增技能行为**则由 Boss Skill Elite 系统负责。」——**技能冷却/伤害是数值**，**技能开不开是行为**，两者分属 §7.1 的两套来源。
+
+`PressureModConfig` 新增三列（都是给人编辑的扁平列）：
+
+| 列 | 作用 | 例子 |
+|---|---|---|
+| `AbilityNode` | 要改的**技能节点名**（首领的子节点） | `AbilityScream` |
+| `AbilityScales` | 作用在**能力节点**上的参数倍率：`Key` = 属性名，`Value` = **相对当前值的倍率** | `Cooldown ×0.8` |
+| `AttackScales` | 作用在这个技能**命中体**上的参数倍率 | `Damage ×1.25`（冲锋） |
+
+三点设计取舍：
+
+1. **倍率语义（不是绝对赋值）**：`Value` 是"乘在当前值上"。绝对赋值会让**同一条抽到两次时第二次白抽**
+   （7 → 5.6 → 5.6），而倍率是 7 → 5.6 → 4.48 —— 与"词条可重复抽中"的既有语义一致。
+2. **`AbilityNode` 同时是一条限定词**：填了它就等于声明"这个首领必须真的有这个技能节点"（见第三节）。
+3. **§7.1 的边界由代码兜着**：数值行想在技能上写 `Enabled` / `ApplyHandler` / `NodeName`（= 行为型开关），
+   `BossPerkCatalog.ScaleProperty` 会**写警告并跳过**，不会让数值池偷偷变成行为池。
+
+### 三、限定词与"刷新判定"
+
+#### 3.1 三个维度（都在 `Config/Tables/Pressure/` 的词条行上）
+
+| 列 | 语义 | 例子 |
+|---|---|---|
+| `BossIds` | 只对哪些**首领**生效：写单位行 Id（也接受场景路径兜底） | `["boss_final"]` |
+| `StageIds` | 只对哪几关生效：写关卡行 Id（也接受关号 `"2"`） | `["stg_inner","stg_core"]` |
+| `AbilityNode` 非空 | 这个首领必须**真的有**这个技能节点（技能参数词条的隐含限定） | `AbilityScream` |
+
+首领身份取**单位行 Id**（`ConfigRows.ByScenePath<BossConfig>` 查表），读不到才退到场景路径 ——
+**不用中文显示名**（改文案不该改变词条的适用性，与敌人白名单改按 Id 是同一条纪律）。
+
+#### 3.2 判定做在哪：**Boss 出生时**（这是本次的关键）
+
+```
+抽签（挑战完成、跨过阈值就抽）          出生（Boss 真的被生成）
+StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
+  BossPerkCatalog.RollPressure(tags)      EncounterController：BossPerkCatalog.Roll() → perk.Apply(ctx)
+  只按 Tags 预筛候选，不判限定词            StageController.ApplyPendingPressurePerks()（BossSpawned 信号）
+  抽到的 BossPerk 排队                      → perk.Apply(ctx)  ← **限定词在这里判**
+```
+
+`BossPerk` 因此被拆成"效果本体 `Effect`" + "入口 `Apply`"：`Apply` = 先判限定词、再决定生效还是换抽。
+**两个调用点的签名与接线一行都没改**（`StageController` / `EncounterController` 依旧写 `perk.Apply(context)`；
+这两个文件本轮**没碰**），所以"刷新判定"落在正确的位置 —— 也不需要把关卡逻辑渗进遭遇层。
+
+**为什么不在抽签时判**：抽签发生在"一次挑战完成"时，那时**首领还不存在**（这一关可能根本不打首领），
+拿不到"这个 Boss 有没有这个技能"这个事实。所以抽签只筛 `Tags`（节点行/关卡行给的那层候选），
+限定词一律留到出生时判 —— 这正是用户说的"不能因为是同一局就复用上次的结果"。
+
+#### 3.3 判不成立怎么办：**换抽**（不让这一抽白费）
+
+`ApplyWithRefresh` 的规则（循环上界 = 候选池大小，每次换抽都排除一个 Id，不会死循环）：
+
+1. 成立 → `Effect` 生效，写一行日志：`词条限定词（Boss 出生时判定）：<id>「<名>」限定 […] → 成立 → 已生效（Boss <身份> · 关卡 <关>）`。
+2. 不成立 → 写一行日志说明**哪一条限定词不成立、当时的 Boss/关卡是什么**，然后从**同一组标签**的池里
+   换抽另一条（排除已经判过的 Id）并**重新判定**。
+3. 全部判过仍无适用者 → 只写日志，**不静默变强**（不会临时造一条效果出来）。
+
+⚠️ **一个刻意的设计**：换抽后 `BossPerk.Name` 会被改写成 `原词条→实际生效的词条`。
+这样 `StageController` / `EncounterController` 里那两条**既有日志**（它们先 `Apply`、后取 `Name`）
+说的仍然是真正生效的那一条（HUD 的词条名同理）。实测日志里就能看到 `铁壁·护甲→狂暴·伤害`。
+
+### 四、实测证据
+
+#### 4.1 真实出生实测（`user://logs/run_20261011_233032.log`，一整局自测里的真 Boss 出生）
+
+```
+[Node] Pressure 累积：+225（基础 150（来源：节点表 node_mutation）× 本关倍率 1 × 类型比例 1.5）
+       阈值 100 → 本次跨阈值 2 次 → 本关累计 3 次 / 余数 0 / 立即抽取 [铁壁·护甲、尖啸回响]      ← 抽签（第 1 关也抽得到护甲）
+[Config] 词条限定词（Boss 出生时判定）：pmod_fortress_armor「铁壁·护甲」限定 [关卡 [stg_inner,stg_core]]
+       → **不成立**（限定关卡 [stg_inner,stg_core]，而这一关是「stg_outer（第 1 关）」· Boss boss_final）
+       → 换抽另一条（每次出生都重新判，不复用抽签时的结论）                                    ← 出生时才判 + 换抽
+[Config] Pressure 技能参数：pmod_scream_echo「尖啸回响」→ 技能 AbilityScream.Cooldown 7 → 5.6（×0.8）  ← 技能参数真的落到技能上
+[Node] Boss 出生：套用本关 Pressure 数值强化 3 条 [狂暴·攻速、铁壁·护甲→狂暴·伤害、尖啸回响]（阈值转换 3 次，来源：表 Pressure）
+       → Boss 生命 900 护甲 200 伤害×1.485 攻速×1.488 移速×1.2
+```
+
+数字对得上：**护甲停在 200**（不是 +150 的 350）证明护甲那一栏**真的没生效**；
+伤害 ×1.485 = 0.9（Boss 全局）× 1.25（换抽到的"狂暴·伤害"）× 1.32（压力 4 级）证明**换抽到的效果真的落了地**。
+另一次真实出生（`run_20261011_233231.log`）同样出现 `铁壁·护甲→狂暴·攻速`，护甲仍是 200。
+`run_20261011_233129.log` 里则是 `[尖啸回响、狂暴·伤害、狂暴·攻速]` 三条全中（尖啸冷却 7 → 5.6）。
+
+#### 4.2 自测探针（`Scripts/Boss/BossPerkProbe.cs`，挂在 `SelfTest.ReportTables` 末尾）
+
+```
+[SelfTest] Pressure 词条池：8 条（期望 8 = 5 数值型参数栏 + 3 技能参数栏）｜ 带限定词的 4 条（期望 4）
+           明细：[… pmod_fortress_armor「铁壁·护甲」权重 2 限定 [关卡 [stg_inner,stg_core]] ·
+                 pmod_scream_echo「尖啸回响」权重 1 限定 [首领 [boss_final] · 技能节点 AbilityScream] · …]
+[SelfTest] Pressure 词条池·出率（权重真进分母）：候选 8 条 [pmod_berserk_dmg 权重 3 → 20% · pmod_berserk_speed 权重 3 → 20%
+           · pmod_fortress_hp 权重 2 → 13.3% · pmod_fortress_armor 权重 2 → 13.3% · pmod_swift 权重 2 → 13.3%
+           · pmod_scream_echo 权重 1 → 6.7% · pmod_charge_impact 权重 1 → 6.7% · pmod_summon_haste 权重 1 → 6.7%]
+[SelfTest] 技能参数词条实测（pmod_scream_echo → AbilityScream.Cooldown）：7（技能行 skl_boss_scream）→ 抽 1 次 5.6 → 抽 2 次 4.48
+[SelfTest] 技能参数词条实测（pmod_charge_impact → AbilityCharge 命中体.Damage）：20 → 25
+[SelfTest] 限定词刷新判定·基准：当前 Boss 身份「boss_final」（期望 boss_final = 单位行 Id）· 当前关卡「stg_outer（第 1 关）」
+[SelfTest] 限定词刷新判定·同一条词条两次判定：Boss.tscn → 成立 ｜ 换成 Chaser.tscn（身份「res://Scenes/Enemies/Chaser.tscn」）
+           → 不成立（限定首领 [boss_final]，而这次出生的是「…Chaser.tscn」）        ← 同一个词条对象、同一帧，两次判定结果不同 = 没缓存
+[SelfTest] 限定词刷新判定·换抽实测（抽签副本 pmod_scream_echo，限定词不成立）：名字被改写为「尖啸回响→狂暴·伤害」
+           ｜ 该单位身上发生的变化：[伤害×1 → 伤害×1.25]                              ← 换抽真的换了效果，不是硬套
+[SelfTest] 限定词刷新判定·关卡限定（pmod_fortress_armor，限定 [stg_inner,stg_core]）：当前第 1 关 → 不成立 ｜ 把当前关卡换成 stg_core 再判 → 成立
+           ｜ 成立那次真的落地：护甲 200 → 350                                        ← 同一帧两次判定，结果随条件变化
+[SelfTest] 限定词刷新判定·端到端 3 次「抽签 → 出生套用」：铁壁·生命[生命 900 → 1260] ｜ 狂暴·攻速[攻速×1 → ×1.2] ｜ 狂暴·伤害[伤害×1 → ×1.25]
+```
+
+> 探针里的 `PerkQualifier.DebugStageIdOverride` 是**自测专用**开关（`#if DEBUG`，Release 里这个属性不存在），
+> 只用来说明"同一帧换个关卡条件 → 判定结果就变"；跑到最后会复位，正式代码从不设置它。
+
+#### 4.3 多次开局 / 多次出生：结果确实随限定条件变化（12 局真实出生的汇总）
+
+| 日志 | 真实出生时套用的 3 条 | 其中被判不成立并换抽的 |
+|---|---|---|
+| `run_…_233019.log` | 疾行、冲锋冲击、狂暴·攻速 | — |
+| `run_…_233031.log` | 尖啸回响、铁壁·生命、尖啸回响 | — |
+| `run_…_233032.log` | 狂暴·攻速、**铁壁·护甲→狂暴·伤害**、尖啸回响 | 1（第 1 关 → 护甲被挡） |
+| `run_…_233129.log` | 尖啸回响、狂暴·伤害、狂暴·攻速 | — |
+| `run_…_233150.log` | 冲锋冲击、狂暴·攻速、召唤急速 | — |
+| `run_…_233223.log` | 尖啸回响、召唤急速、狂暴·伤害 | — |
+| `run_…_233231.log` | 疾行、铁壁·生命、**铁壁·护甲→狂暴·攻速** | 1（同上） |
+| `run_…_233239.log` | 狂暴·伤害、狂暴·攻速、狂暴·伤害 | — |
+
+每一局的抽取名单都不同（RNG 是随机的），但**判定每一次出生都重新跑了一遍** ——
+抽到护甲那两次都在第 1 关被判不成立并换抽，护甲值始终停在 200（见 4.1）。
+
+### 五、自测硬指标：哪些**没漂**、哪些**应该变**
+
+| 日志行 | 改前 | 改后 | 说明 |
+|---|---|---|---|
+| `Pressure 累积：+187.5 … 本次跨阈值 **1** 次 / 本关累计 **1** 次 / 余数 0` | 1 / 1 / 0 | **1 / 1 / 0** | 只由「基础点数 × 本关倍率 × 类型比例」与阈值（100）决定，**与池子有几条、权重怎么分完全无关** → 不漂 |
+| `Pressure 累积：+225 … 本次跨阈值 **2** 次 / 本关累计 **3** 次 / 余数 0` | 2 / 3 / 0 | **2 / 3 / 0** | 同上 → 不漂 |
+| `Boss 出生：套用本关 Pressure 数值强化 **3** 条 […]` | 3 条 | **3 条** | 条数 = 跨阈值次数，与池大小无关 → 不漂 |
+| `配置表比对·技能表：**25** 行 ｜ Boss Build 行为型 **4** 条` | 25 / 4 | **25 / 4** | 本轮**没往技能表加行**（技能参数词条在 `Pressure/`），所以这两个数一个都没动 |
+| `配置表比对·索引：… 技能 25/**Pressure 3**/…（期望 …25/**3**/…）` | 3 | **8**（期望串同步改成 8） | 这是本次任务的**目的**：池子从 3 条变 8 条。**前 11 个数字一个都没动**，只动了第 7 位 |
+| `首领强化来源：数值型 Pressure **3** 条` | 3 | **8** | 同上 |
+| `立即抽取 [疾行]` / `[疾行、狂暴]` | 老名字 | **`[尖啸回响]` / `[狂暴·伤害、狂暴·攻速]`**（每局随机不同） | 名字**应该**变（3 条池 → 8 条池）；括号里的这份名单就是"抽到了哪一栏" |
+| 其余 `配置表比对·*`（玩家 / 武器 / 节点 / 效果 / 增幅项 / 升级池 / 敌人表 / 敌人行 / AI 档案） | — | **逐位相同** | 与本次改动无关 |
+
+### 六、回退路径主动验证（把 `PressureMods` 索引数组清空，跑一整轮自测）
+
+| 观察点 | 实测 |
+|---|---|
+| 日志留痕 | `配置表：… 技能 25 / **Pressure 0** / …（Balance.tres 已加载）` + `首领强化来源：数值型 Pressure **8 条（来源：代码兜底）** / 行为型 Boss Build 4 条（来源：表 Skills）` |
+| **兜底与表同结构** | 池明细与表在时**逐字相同**（同样 8 条 Id / 权重 3·3·2·2·2·1·1·1 / 4 条限定词 / 同样的概率 20/20/13.3/13.3/13.3/6.7/6.7/6.7）—— 兜底**不再**退回"伤害+攻速挤在一栏"的旧形态（那会是一次静默换挡） |
+| 技能参数仍然生效 | `AbilityScream.Cooldown 7 → 5.6 → 4.48`、`AbilityCharge 命中体 Damage 20 → 25`；真实出生 `[狂暴·攻速、铁壁·生命、狂暴·攻速]` → `Boss 生命 1260` |
+| 限定词与换抽仍然生效 | 探针：Chaser 判定不成立 → 换抽；`铁壁·护甲→铁壁·生命`（成立那次真的落地：生命 900 → 1260）；端到端 3 抽 `疾行 ｜ 尖啸回响 ｜ 铁壁·护甲→铁壁·生命` |
+| 硬指标 | `+187.5 → 1 次 / +225 → 2 次 → 累计 3 次` **与表在时逐字相同** |
+| 只有 warning、没有 error | 与 Pressure 相关的 warning / error **0 条**，自测走到 `=== 自测结束 ===` |
+| ⚠️ 已知不准确的一行（**本轮没改，StageController 不在本轮边界内**） | 清空索引时 `StageController` 那条日志仍写 `（阈值转换 3 次，**来源：表 Pressure**）` —— 这个字符串是硬编码的；真实来源以 `BossPerkCatalog` 打的那一行为准（这一行在回退时写的是"代码兜底"） |
+
+**清空"索引数组"不会让词条消失**（第三/四/五次踩到同一类坑）：行引用写在 `Balance.tres` 的
+`[ext_resource]` 上，数组只是"建索引 + 报数"用的。要真正回退到"这批词条不存在"，
+得连 `[ext_resource]` 与行文件一起删。
+
+### 七、顺带说明：为什么技能参数词条**没有**放进 `Skills/`
+
+- §7.1 要求两套来源**可分离**；技能**参数**（冷却/伤害）属数值型，放进 `Skills/` 会让
+  `ConfigRows.Count<AbilityConfig>()`（自测的 `25 行`）与 `BossPerkCatalog.BehaviorOnly`（自测的 `4 条`）
+  两个既有回归指标**同时漂**，也模糊了"行为 vs 数值"的界线。
+- 想让**行为型**词条也带限定词（比如"某个行为词条只对某关生效"）需要给 `AbilityConfig` 加列 ——
+  本轮没做（`Scripts/Config/` 的其它行类同时有别的改动在进行）。行为型词条天然的自我限定是
+  "它引用的能力节点找不到就写警告跳过"（`EnableAbility` 处理器）。
+

@@ -67,10 +67,17 @@ public partial class EncounterController : Node3D
 	private int _waveRemaining;
 	private int _waveIndex;
 
-	/// <summary>本次 Boss 抽到的词条名，供 HUD 显示。</summary>
-	public IReadOnlyList<string> BossPerkNames => _bossPerkNames;
+	/// <summary>
+	/// 本次 Boss 抽到的**行为型**（Boss Build）词条，供 HUD 与首领预览面板显示。
+	///
+	/// ⚠️ 只含行为型 —— 数值型（Pressure）由 <c>StageController.PressurePerks</c> 单独持有，
+	/// 两套来源必须能区分，不许合并（关卡核心文档 §7.1）。
+	/// 这里给的是词条对象（含 <c>Name</c> / <c>Description</c>），不是光秃秃的名字 ——
+	/// HUD 与预览面板要显示的是同两份数据。
+	/// </summary>
+	public IReadOnlyList<BossPerk> BossPerks => _bossPerks;
 
-	private readonly List<string> _bossPerkNames = new();
+	private readonly List<BossPerk> _bossPerks = new();
 
 	[Signal]
 	public delegate void BossSpawnedEventHandler();
@@ -727,11 +734,11 @@ public partial class EncounterController : Node3D
 		}
 
 		// Boss 构筑：随机词条（策划文档 §12）。压力与技能的词条要在 Pressure 初始化之后套用。
-		_bossPerkNames.Clear();
+		_bossPerks.Clear();
 		foreach (BossPerk perk in BossPerkCatalog.Roll(BossPerkCount))
 		{
 			perk.Apply(new BossPerkContext { Boss = Boss, Source = this, Pressure = pressure });
-			_bossPerkNames.Add(perk.Name);
+			_bossPerks.Add(perk);
 		}
 
 		for (int i = 0; i < BossGuardCount && BossGuardScene != null; i++)

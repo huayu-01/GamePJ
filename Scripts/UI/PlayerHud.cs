@@ -6,6 +6,7 @@ using ActRoguelike.Rewards;
 using ActRoguelike.Run;
 using ActRoguelike.Weapons;
 using ActRoguelike.Core;
+using System.Collections.Generic;
 using Godot;
 
 namespace ActRoguelike.UI;
@@ -22,6 +23,15 @@ public partial class PlayerHud : CanvasLayer
 	/// <summary>延迟条跟随速度（比例/秒）。</summary>
 	private const float DelayFollowSpeed = 0.6f;
 
+	/// <summary>血条栏上最多显示几个**不同**词条（超出的折叠成 "…+N"）—— 词条多了不能把血条挤爆。</summary>
+	private const int BossBarPerkLimit = 5;
+
+	/// <summary>顶部那一行状态文字更窄，词条上限再收一档。</summary>
+	private const int BossStatusPerkLimit = 4;
+
+	/// <summary>交互提示里顺带写出的「首领状况」快捷键（取自预览面板的默认键，避免两处漂移）。</summary>
+	private static readonly string BossPreviewHint = $"[{OS.GetKeycodeString(BossPreviewScreen.DefaultToggleKey)} 首领状况]";
+
 	private Label _health = null!;
 	private Label _ammo = null!;
 	private Label _status = null!;
@@ -35,6 +45,9 @@ public partial class PlayerHud : CanvasLayer
 	private ProgressBar _bossBar = null!;
 	private Label _bossName = null!;
 	private Label _bossState = null!;
+
+	/// <summary>血条栏上的词条行（行为型 ◆ + 数值型 ◇，见 <see cref="BossPerkText"/>）。</summary>
+	private Label _bossPerks = null!;
 	private Label _build = null!;
 	private HealthBarWidget _healthBar = null!;
 	private Unit? _player;
@@ -81,6 +94,12 @@ public partial class PlayerHud : CanvasLayer
 			return;
 		}
 
+		// 关卡 / 遭遇 / 一局的引用先解析：首领血条栏（含词条）与下面几行都要用它们。
+		_encounter ??= GetTree().GetFirstNodeInGroup("encounters") as EncounterController;
+		_run ??= GetTree().GetFirstNodeInGroup("run_controller") as RunController;
+		_stage ??= GetTree().GetFirstNodeInGroup("stage") as StageController;
+		_encounter = _stage?.CurrentNode ?? _encounter;
+
 		// 首领血条面板：放在所有分支之前，保证任何状态下都会更新。
 		if (_bossPanel == null)
 		{
@@ -113,14 +132,12 @@ public partial class PlayerHud : CanvasLayer
 			_ammo.Text = _weapon.IsReloading ? "装填中…" : $"{_weapon.Ammo} / {_weapon.EffectiveMagazineSize}";
 		}
 
-		_encounter ??= GetTree().GetFirstNodeInGroup("encounters") as EncounterController;
-		_run ??= GetTree().GetFirstNodeInGroup("run_controller") as RunController;
-		_stage ??= GetTree().GetFirstNodeInGroup("stage") as StageController;
-		_encounter = _stage?.CurrentNode ?? _encounter;
-
 		string prompt = PlayerInteractInput.Prompt;
 		string build = _run?.Build.Describe() ?? string.Empty;
-		_build.Text = prompt.Length > 0 ? $"{prompt}\n{build}" : build;
+
+		// 站在可交互物旁边（= "交互时"）顺带提示首领状况面板的快捷键。
+		string interactHint = prompt.Length > 0 ? $"   {BossPreviewHint}" : string.Empty;
+		_build.Text = prompt.Length > 0 ? $"{prompt}{interactHint}\n{build}" : build;
 
 		if (_player.IsDead)
 		{
@@ -130,9 +147,10 @@ public partial class PlayerHud : CanvasLayer
 		{
 			var phases = boss.GetNodeOrNull<BossPhaseController>("Phases");
 			var pressure = boss.GetNodeOrNull<BossPressure>("Pressure");
-			string perks = _encounter.BossPerkNames.Count > 0
-				? "   [" + string.Join("·", _encounter.BossPerkNames) + "]"
-				: string.Empty;
+
+			// 近距离（血条面板展开）时词条由**面板那一条**负责显示，这里不再重复 —— 否则同一串词条出现两次。
+			string perkLine = BossBarExpanded ? string.Empty : PerkLine(BossStatusPerkLimit);
+			string perks = perkLine.Length > 0 ? $"   {perkLine}" : string.Empty;
 			_status.Text = $"BOSS {boss.Health:0}/{boss.MaxHealth:0}   阶段 {(phases?.Phase ?? 0) + 1}   压力 {pressure?.Level ?? 0}{perks}";
 		}
 		else if (_encounter == null)
@@ -186,6 +204,12 @@ public partial class PlayerHud : CanvasLayer
 		_bossBar = RequireChild<ProgressBar>(panel, "Panel/Bar");
 		_bossName = RequireChild<Label>(panel, "Panel/NameLabel");
 		_bossState = RequireChild<Label>(panel, "Panel/StateLabel");
+		_bossPerks = RequireChild<Label>(panel, "Panel/PerkLabel");
+
+		// ⚠️ 预制体里的 `Panel` 自带 `visible = false`（自首个提交起），而代码只切根节点的可见性 ——
+		// 于是头像/名字/血条/词条**从来没有显示过**（只有 BossBarExpanded / BossDistance 两个只读属性在动）。
+		// 这里明确打开它：开合由根节点（_bossPanel.Visible）负责，内部 Panel 常显。
+		RequireChild<Control>(panel, "Panel").Visible = true;
 
 		_bossPanel = panel;
 		AddChild(_bossPanel);
@@ -237,5 +261,24 @@ public partial class PlayerHud : CanvasLayer
 		_bossBar.Value = boss.MaxHealth > 0f ? boss.Health / boss.MaxHealth : 0f;
 		_bossName.Text = $"{boss.Name}   {boss.Health:0} / {boss.MaxHealth:0}";
 		_bossState.Text = $"{_stage?.Definition?.DisplayName}   距离 {distance:0}";
+
+		// 词条行：行为型（Boss Build）+ 数值型（Pressure）都要显示，并带标记区分来源（§7.1）。
+		string perkLine = PerkLine(BossBarPerkLimit);
+		_bossPerks.Text = perkLine;
+		_bossPerks.Visible = perkLine.Length > 0;
+	}
+
+	/// <summary>
+	/// 本关首领词条的一行文案 —— **两套来源都显示**（用户要求"在血条栏上显示词条名"）：
+	/// 行为型来自这一场遭遇（<see cref="EncounterController.BossPerks"/>，Boss 出生时抽的 Boss Build 词条），
+	/// 数值型来自关卡（<see cref="StageController.PressurePerks"/>，Pressure 阈值转换抽到的数值强化）。
+	/// 标记与折叠规则在 <see cref="BossPerkText"/> 里（HUD 与预览面板共用一份）。
+	/// </summary>
+	private string PerkLine(int limit)
+	{
+		IReadOnlyList<BossPerk>? behavior = _encounter?.BossPerks;
+		IReadOnlyList<BossPerk>? numbers = _stage?.PressurePerks;
+		string list = BossPerkText.FormatLine(behavior, numbers, limit);
+		return list.Length == 0 ? string.Empty : $"词条 {BossPerkText.Total(behavior, numbers)} {list}";
 	}
 }

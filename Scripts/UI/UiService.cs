@@ -119,6 +119,23 @@ public partial class UiService : Node
 		return true;
 	}
 
+	/// <summary>
+	/// 打开**首领状况预览**（本关攒了多少 Pressure、抽到了哪些词条、首领当前数值）。
+	/// 快捷键由界面自己处理（<see cref="BossPreviewScreen.ToggleKey"/>，默认 B），
+	/// 这里保留语义化入口给以后"交互时自动弹一次"或图鉴复用。
+	/// </summary>
+	public bool OpenBossPreview()
+	{
+		if (Screen<BossPreviewScreen>() is not { } screen)
+		{
+			return false;
+		}
+
+		screen.CloseOnCancel = true;
+		screen.Open();
+		return true;
+	}
+
 	/// <summary>打开三选一奖励（关卡节点用）。</summary>
 	public bool OpenRewards(IReadOnlyList<RewardDefinition> options, string title)
 	{

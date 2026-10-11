@@ -73,6 +73,36 @@ public partial class StageController : Node3D
 
 	public int FreeQuotaLeft => Mathf.Max(0, FreeChallengeQuota - ChallengesUsed);
 
+	/// <summary>
+	/// **§8.2 的免费挑战闸门**：这一次结算对应的挑战是不是「免费挑战」（在本关免费额度之内）。
+	///
+	/// 额度在 <see cref="StartEncounter"/> 里随 <see cref="ChallengesUsed"/> 一起扣（§8.2 第 1–2 步：
+	/// 「检查当前免费挑战额度」→「若有额度，则扣除 1 次」→「启动 Encounter」），所以第 N 次挑战是否免费
+	/// 就是 <c>N ≤ 本关额度</c>。不刷怪的节点不进 <see cref="StartEncounter"/>，也就不会消耗额度（§8.1）。
+	///
+	/// ⚠️ 挑战数没到额度时一律判为免费 —— 包括"直接调用结算、根本没有开挑战"的情形（例如自测）。
+	/// 这正是 §8.2 第 5 条的反面：「若没有免费额度，则挑战完成后增加对应类型的 Pressure」。
+	/// </summary>
+	public bool CurrentChallengeFree => ChallengesUsed <= FreeChallengeQuota;
+
+	/// <summary>本关跨过 Pressure 阈值的次数（每一次都会立即抽一条数值型强化，§7.3）。</summary>
+	public int PressureRolls => _pressureRolls;
+
+	/// <summary>还没凑够一个阈值的余数（每次结算完清零、不结转，§7.3 第 5 条）。</summary>
+	public float PressureBank => _pressureBank;
+
+	/// <summary>本关的 Pressure 阈值（§7.3；关卡行留 0 → Balance 的全局默认值）。</summary>
+	public float PressureThresholdNow => ResolveThreshold(Definition, Balance.Settings);
+
+	/// <summary>
+	/// 本关由 Pressure 转换（+ 节点行额外次数）抽到的**数值型**强化，按抽取顺序（含重复）。
+	/// Boss 出生（<c>BossSpawned</c>）时这些就会被套到它身上，所以它同时是"HUD / 预览面板要显示什么"的真源。
+	/// </summary>
+	public IReadOnlyList<BossPerk> PressurePerks => _pendingPressurePerks;
+
+	/// <summary>上面那批数值强化是否已经套到 Boss 身上（Boss 出生之后为 true）。</summary>
+	public bool PressurePerksApplied => _pressureApplied;
+
 	// 兼容旧 HUD/流程代码的最小壳。
 	public int CurrentIndex => BossOpened ? 1 : 0;
 	public int NodeCount => _nodes.Count;
@@ -97,6 +127,9 @@ public partial class StageController : Node3D
 	/// 挑战发生时 Boss 还不存在，所以在它出生时才套（见 <see cref="ApplyPendingPressurePerks"/>）。
 	/// </summary>
 	private readonly List<BossPerk> _pendingPressurePerks = new();
+
+	/// <summary>上面那批数值强化是否已经套到 Boss 身上（BossSpawned 触发后为 true）。</summary>
+	private bool _pressureApplied;
 
 	private bool _rewardPending;
 
@@ -153,6 +186,7 @@ public partial class StageController : Node3D
 		_pressureBank = 0f;
 		_pressureRolls = 0;
 		_pendingPressurePerks.Clear();
+		_pressureApplied = false;
 
 		// 免费挑战额度：初始 1 次、每关 +1、上限 2（关卡核心文档 L405-416）。
 		// 注意只统计"会刷怪的节点"，StartEncounter 才会让 ChallengesUsed 递增。
@@ -349,6 +383,11 @@ public partial class StageController : Node3D
 
 		ChallengesUsed++;
 		_encounterRunning = true;
+
+		// 记下"这次挑战是哪种奖励节点"：清场后由它决定 Pressure 的基础点数 / 额外比例 / 候选标签（§7.2）。
+		// ⚠️ 曾经漏了这一行：字段存在于 _PhysicsProcess 的结算分支里，却从来没人赋值，
+		// 于是**正常游玩时 Pressure 一次都不会累积**（只有自测直接调 AddPressureForNode 才有数字）。
+		_currentNodeKind = node?.Kind;
 		ActRoguelike.Core.GameLog.Write("Spawn", $"第 {ChallengesUsed} 场 Encounter 开始（节点触发的战斗）");
 		// 每一场新 Encounter 都要复位上一场的状态（IsCompleted / 波次 / 预算），
 		// 否则第二次交互时 EncounterController 会以为自己已经打完、直接不刷怪。
@@ -385,13 +424,26 @@ public partial class StageController : Node3D
 	/// 套到它身上 —— 挑战发生时 Boss 还不存在。行为/技能型走 <see cref="BossPerkCatalog.Roll"/>，
 	/// 两套来源各有各的抽取点，不得合并成一个池（§7.1）。
 	///
-	/// ⚠️ 已知边界（本轮**未**实现，属第八章而非第七章）：§8.2 要求"只有**不**属于免费挑战的挑战完成时才加
-	/// Pressure"，这里的免费额度闸门（<c>FreeQuotaLeft</c>）还没有接进来，所以免费挑战也会累积 Pressure。
-	/// 见 docs/config.md「Pressure 结算」一节的记录。
+	/// <b>§8.2 免费挑战额度（第八章，本轮新接）</b>：**额度之内的挑战完成后不加 Pressure**。
+	/// 结算顺序按文档：额度在 <see cref="StartEncounter"/> 里检查并扣除（§8.2 第 1–2 步），
+	/// Pressure 在挑战**正常完成**时才增加（第 4–5 步，所以挑战没打完就不会加）；
+	/// 这里的闸门读 <see cref="CurrentChallengeFree"/>：免费挑战直接返回、一点 Pressure 都不累积
+	/// （含节点行配的 <c>BossModifierRolls</c> 额外抽取 —— 那也属于 Pressure 结算）。
+	/// 见 docs/config.md「免费挑战额度（§8.2）」一节。
 	/// </summary>
 	/// <param name="kind">这次完成的是哪种奖励节点（决定基础点数、额外比例与候选标签）。</param>
 	public void AddPressureForNode(RewardNodeKind kind)
 	{
+		// §8.2 闸门：免费挑战（在本关免费额度之内的那几次）完成后**不**增加 Pressure。
+		// 额度已在 StartEncounter 里扣过，所以这里只看"这次挑战的序号是否还在额度内"。
+		if (CurrentChallengeFree)
+		{
+			ActRoguelike.Core.GameLog.Write(
+				"Node",
+				$"Pressure 累积：跳过（§8.2 免费挑战）—— 挑战数 {ChallengesUsed} ≤ 本关免费额度 {FreeChallengeQuota}（剩余 {FreeQuotaLeft}）→ 本次不增加 Pressure、也不抽取数值强化");
+			return;
+		}
+
 		BalanceConfig config = Balance.Settings;
 		StageDefinition? stage = Definition;
 		NodeConfig? nodeRow = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
@@ -530,6 +582,9 @@ public partial class StageController : Node3D
 			return;
 		}
 
+		// 到这里（BossSpawned）这批数值强化就算"落地"了：HUD 与预览面板据此区分"已套用 / 待首领降临"。
+		_pressureApplied = true;
+
 		if (_pendingPressurePerks.Count == 0)
 		{
 			ActRoguelike.Core.GameLog.Write("Node", $"Boss 出生：本关 Pressure 数值强化 0 条（阈值转换 {_pressureRolls} 次）→ {Vitals(boss)} —— 与 Boss Build 行为词条分开结算（关卡核心文档 §7.1）");
@@ -612,9 +667,24 @@ public partial class StageController : Node3D
 	/// <summary>
 	/// 仅供自测：关键状态快照。`all` = Interactable.All 里还剩几个可交互物（用掉的会退出这张表）。
 	/// `pressure` = 本关跨过 Pressure 阈值的次数（每次转换都会立即抽一条数值强化）；
-	/// `pmods` = 已经抽到、还没套到 Boss 身上的数值强化条数（含节点行额外次数）。
+	/// `pmods` = 已经抽到的数值强化条数（含节点行额外次数；Boss 出生后即为已套用）；
+	/// `free` = §8.2 的闸门当前是开还是关（true = 这次结算算免费挑战 → 不加 Pressure）。
 	/// </summary>
-	public string DebugState => $"pending={_rewardPending} running={_encounterRunning} waves={_encounter?.WaveCount} waveIndex={_encounter?.WaveIndex} remaining={_encounter?.WaveRemaining} alive={_encounter?.AliveCount} spawned={_encounter?.TotalSpawned} encRunning={_encounter?.IsRunning} encDone={_encounter?.IsCompleted} challenges={ChallengesUsed} freeQuota={FreeQuotaLeft} boss={BossOpened} pressure={_pressureRolls} pmods={_pendingPressurePerks.Count} bank={_pressureBank:0} victory={IsVictory} all={Interactable.All.Count}";
+	public string DebugState => $"pending={_rewardPending} running={_encounterRunning} waves={_encounter?.WaveCount} waveIndex={_encounter?.WaveIndex} remaining={_encounter?.WaveRemaining} alive={_encounter?.AliveCount} spawned={_encounter?.TotalSpawned} encRunning={_encounter?.IsRunning} encDone={_encounter?.IsCompleted} challenges={ChallengesUsed} freeQuota={FreeQuotaLeft} free={CurrentChallengeFree} node={_currentNodeKind?.ToString() ?? "-"} boss={BossOpened} pressure={_pressureRolls} pmods={_pendingPressurePerks.Count} bank={_pressureBank:0} victory={IsVictory} all={Interactable.All.Count}";
+
+	/// <summary>
+	/// **仅供自测**：把本关的免费挑战额度记账到用完（<c>ChallengesUsed = 额度 + 1</c>），
+	/// 于是下一次结算按「超出免费额度」处理（§8.2 第 5 条）。不启动战斗、不生成敌人、不改任何数值。
+	///
+	/// 存在的理由：自测直接调 <see cref="AddPressureForNode"/>，那时挑战数还是 0 → 判定为**免费挑战**
+	/// → 闸门会（正确地）把 Pressure 全部拦掉。要验证 §7.2–§7.5 的数值链路，必须先把额度真的用掉，
+	/// 而不是把闸门关掉。返回剩余额度（期望 0）。
+	/// </summary>
+	public int DebugExhaustFreeQuota()
+	{
+		ChallengesUsed = Mathf.Max(ChallengesUsed, FreeChallengeQuota + 1);
+		return FreeQuotaLeft;
+	}
 
 	/// <summary>仅供自测：直接开一场普通战斗（无 MCP 时用命令行验证波次）。</summary>
 	public void DebugStartCombat(int waves = 0)
