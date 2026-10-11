@@ -21,6 +21,7 @@ MCPRuntimeProbe="*uid://bsg12huaf1u5i"
 Balance="*res://Scripts/Config/Balance.cs"
 UiRouter="*res://Scripts/UI/UiRouter.cs"
 GameLog="*res://Scripts/Core/GameLog.cs"
+AudioManager="*res://Scripts/Audio/AudioManager.cs"
 SelfTest="*res://Scripts/Testing/SelfTest.cs"
 UiService="*res://Scripts/UI/UiService.cs"
 

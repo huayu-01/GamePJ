@@ -1,4 +1,5 @@
 using System;
+using ActRoguelike.Audio;
 using Godot;
 
 namespace ActRoguelike.Combat;
@@ -158,6 +159,9 @@ public partial class AttackHitbox : Area3D
 
 			// 击中特效（Binbun Hit FX）：**打在哪就炸在哪**（用户要求：「实际应该在命中的位置发生特效」）。
 			HitEffect.Spawn(this, hitPoint);
+
+			// 命中音效：与命中特效**同一个位置、同一个判定**，按 id 播（表里说了算）。
+			AudioManager.PlaySfx(AudioIds.CombatHit);
 
 			HitLanded?.Invoke(target);
 		}

@@ -1,4 +1,5 @@
 using System;
+using ActRoguelike.Audio;
 using Godot;
 
 namespace ActRoguelike.UI;
@@ -79,6 +80,9 @@ public abstract partial class OverlayScreen : CanvasLayer
 
 		// 先登记再播动画，保证暂停/鼠标模式立刻生效。
 		UiRouter.Instance?.Push(this);
+
+		// 界面打开音效：六个弹窗共用这一处，按 id 播（表里说了算）。按钮点击音在 AudioManager 里自动挂。
+		AudioManager.PlayUi(AudioIds.UiOpen);
 		PlayFade(open: true, onDone: null);
 	}
 

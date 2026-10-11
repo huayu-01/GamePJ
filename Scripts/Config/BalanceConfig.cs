@@ -168,6 +168,15 @@ public partial class BalanceConfig : Resource
 	/// <summary>局外成长表（`Config/Tables/Meta/meta_*.tres`）。空 = 用 <c>MetaProgress</c> 里的代码内置系数。</summary>
 	[Export] public MetaUpgradeConfig[] MetaUpgrades { get; set; } = System.Array.Empty<MetaUpgradeConfig>();
 
+	[ExportGroup("表索引 · 音效")]
+	/// <summary>
+	/// 音效表（`Config/Tables/Audio/audio_*.tres`）：**一行一条音效** = id + 资源引用 + 音量/音高随机范围 + 总线。
+	/// 由 autoload <c>AudioManager</c> 读取（它自己 <c>ConfigRows.Rebuild</c> + 写"配置表：音效 N"日志，
+	/// 与其它表挂在 <c>Balance.BuildTableIndex</c> 里是同一条纪律）。
+	/// 空 = 没有任何音效可播 → 所有 <c>PlaySfx</c>/<c>PlayUi</c> 都静默跳过并写一次 warning（玩法不受影响）。
+	/// </summary>
+	[Export] public AudioConfig[] Audio { get; set; } = System.Array.Empty<AudioConfig>();
+
 	[ExportGroup("成长（三选一给几个）")]
 	/// <summary>奖励界面给几个选项（默认 3）。</summary>
 	[Export] public int RewardChoiceCount { get; set; } = 3;

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BalanceConfig" load_steps=113 format=3]
+[gd_resource type="Resource" script_class="BalanceConfig" load_steps=116 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/BalanceConfig.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -110,6 +110,11 @@
 [ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_scream_echo.tres" id="112_pmod_scream_echo"]
 [ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_charge_impact.tres" id="113_pmod_charge_impact"]
 [ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_summon_haste.tres" id="114_pmod_summon_haste"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_sfx_weapon_fire.tres" id="115_audio_sfx_weapon_fire"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_sfx_combat_hit.tres" id="116_audio_sfx_combat_hit"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_sfx_enemy_die.tres" id="117_audio_sfx_enemy_die"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_click.tres" id="118_audio_ui_click"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_open.tres" id="119_audio_ui_open"]
 
 [resource]
 script = ExtResource("1_balance")
@@ -133,6 +138,7 @@ Nodes = [ExtResource("22_node_weapon"), ExtResource("23_node_enhance"), ExtResou
 Upgrades = [ExtResource("36_upg_dmg_up"), ExtResource("37_upg_rate_up"), ExtResource("38_upg_boots"), ExtResource("39_upg_vitality"), ExtResource("40_upg_scope"), ExtResource("41_upg_lethal"), ExtResource("42_upg_fast_reload"), ExtResource("43_upg_ext_mag"), ExtResource("44_upg_stance"), ExtResource("45_upg_pierce_round"), ExtResource("46_evo_twin"), ExtResource("47_evo_ap"), ExtResource("48_evo_ricochet"), ExtResource("49_evo_blast"), ExtResource("50_mut_chain"), ExtResource("51_mut_lifesteal"), ExtResource("52_mut_burn"), ExtResource("53_mut_summon"), ExtResource("54_mut_supply")]
 UpgradePools = [ExtResource("94_pool_pistol"), ExtResource("95_pool_sniper"), ExtResource("96_pool_rifle")]
 MetaUpgrades = [ExtResource("31_meta_health"), ExtResource("32_meta_damage"), ExtResource("33_meta_speed"), ExtResource("34_meta_crit"), ExtResource("35_meta_reload")]
+Audio = [ExtResource("115_audio_sfx_weapon_fire"), ExtResource("116_audio_sfx_combat_hit"), ExtResource("117_audio_sfx_enemy_die"), ExtResource("118_audio_ui_click"), ExtResource("119_audio_ui_open")]
 RewardChoiceCount = 3
 ShowDamageNumbers = true
 DamageNumberLifetime = 0.8

@@ -1,0 +1,25 @@
+音频素材来源与许可（本目录只放"已经被音效表用到的"文件）
+================================================================
+
+全部来自 Kenney（https://kenney.nl），许可一律 CC0 1.0（公共领域）：
+  无需署名、可商用、无额外义务。
+
+原始压缩包在项目外 F:\Godot项目\_art_staging\（未入库，见 .gitignore 的 _art_staging/）。
+
+文件对照（仓库文件 ← 包内路径）
+----------------------------------------------------------------
+Assets/Audio/sfx/sfx_weapon_fire.ogg  ← kenney_sci-fi-sounds.zip    Audio/laserSmall_000.ogg
+Assets/Audio/sfx/sfx_combat_hit.ogg   ← kenney_impact-sounds.zip    Audio/impactGeneric_light_000.ogg
+Assets/Audio/sfx/sfx_enemy_die.ogg    ← kenney_impact-sounds.zip    Audio/impactPunch_heavy_000.ogg
+Assets/Audio/ui/ui_click.ogg          ← kenney_interface-sounds.zip Audio/click_002.ogg
+Assets/Audio/ui/ui_open.ogg           ← kenney_interface-sounds.zip Audio/open_001.ogg
+
+素材包页面
+----------------------------------------------------------------
+Kenney · Sci-fi Sounds      https://kenney.nl/assets/sci-fi-sounds       （70 个文件）
+Kenney · Impact Sounds      https://kenney.nl/assets/impact-sounds       （130 个文件）
+Kenney · Interface Sounds   https://kenney.nl/assets/interface-sounds    （100 个文件）
+
+想加新音效怎么办：从这三个包（或任何 CC0 音效包）里再拷一个 .ogg 进来，
+按 <类别>_<分组>_<变体> 命名（sfx_* / ui_*），然后在 Config/Tables/Audio/ 加一行。
+详见 docs/audio.md。

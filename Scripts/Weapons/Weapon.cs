@@ -1,4 +1,5 @@
 using System;
+using ActRoguelike.Audio;
 using ActRoguelike.Combat;
 using Godot;
 
@@ -224,6 +225,7 @@ public partial class Weapon : Node3D
 		_sinceLastFire = 0f;
 		AmmoChanged?.Invoke(Ammo);
 		_muzzleVfx?.Call("play");
+		AudioManager.PlaySfx(AudioIds.WeaponFire); // 开火音效：按 id 播，文件/音量/总线在音效表里（调用方不知道路径）
 		Fired?.Invoke();
 
 		if (Ammo <= 0)

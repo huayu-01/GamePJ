@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AudioConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AudioConfig.cs" id="1_audio_cfg"]
+[ext_resource type="AudioStream" path="res://Assets/Audio/ui/ui_open.ogg" id="2_stream"]
+
+[resource]
+script = ExtResource("1_audio_cfg")
+Stream = ExtResource("2_stream")
+Bus = 1
+VolumeDb = -8.0
+VolumeRandomDb = 0.0
+PitchScale = 1.0
+PitchRandom = 0.0
+Id = "ui_open"
+DisplayName = "界面打开"
+Note = "触发点：OverlayScreen.BeginOpen（六个弹窗共用一处）。故意不做随机：同一个界面的开合声每次一样才不会烦。素材：Kenney Interface Sounds / open_001.ogg（CC0）。"

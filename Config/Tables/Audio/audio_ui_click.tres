@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AudioConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AudioConfig.cs" id="1_audio_cfg"]
+[ext_resource type="AudioStream" path="res://Assets/Audio/ui/ui_click.ogg" id="2_stream"]
+
+[resource]
+script = ExtResource("1_audio_cfg")
+Stream = ExtResource("2_stream")
+Bus = 1
+VolumeDb = -6.0
+VolumeRandomDb = 1.0
+PitchScale = 1.0
+PitchRandom = 0.03
+Id = "ui_click"
+DisplayName = "按钮点击"
+Note = "触发点：AudioManager 运行期自动挂到所有 BaseButton.Pressed 上（零场景改动；新加界面/按钮自动有声）。素材：Kenney Interface Sounds / click_002.ogg（CC0）。"

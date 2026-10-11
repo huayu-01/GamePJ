@@ -1,0 +1,31 @@
+namespace ActRoguelike.Audio;
+
+/// <summary>
+/// 代码里会用到的那几个**音效 id**（值必须与 `Config/Tables/Audio/audio_*.tres` 的 `Id` 一致，
+/// 也与 `.ogg` 的文件名一致）。
+///
+/// <para>为什么要有这个常量类，而不是在调用点写字符串字面量：调用点散在 `Weapon` / `Projectile` /
+/// `AttackHitbox` / `OverlayScreen` 里，拼错一个字符的后果是**静默没声音**（不报错）。
+/// 集中在这里之后，"代码引用了哪些 id" 一次 grep 就能看全。</para>
+///
+/// <para>⚠️ 它**不是**第二份真源：真源永远是音效表。id 写错 / 表里没有那一行时，
+/// <see cref="AudioManager"/> 会写一条 warning（只警告一次）并静默跳过 —— 不会崩、也不会以为接好了。</para>
+/// </summary>
+public static class AudioIds
+{
+	/// <summary>枪械开火（触发点：<c>Weapon.TryFire</c>）。</summary>
+	public const string WeaponFire = "sfx_weapon_fire";
+
+	/// <summary>命中 / 击中（触发点：<c>Projectile.ResolveImpact</c> 与 <c>AttackHitbox._PhysicsProcess</c>，
+	/// 与命中特效同一个位置）。</summary>
+	public const string CombatHit = "sfx_combat_hit";
+
+	/// <summary>敌人死亡（触发点：<c>GameplayEventBus</c> 的 <c>Died</c> 事件）。</summary>
+	public const string EnemyDie = "sfx_enemy_die";
+
+	/// <summary>按钮点击（触发点：<c>AudioManager</c> 自动挂到所有 <c>BaseButton.Pressed</c> 上，零场景改动）。</summary>
+	public const string UiClick = "ui_click";
+
+	/// <summary>界面打开（触发点：<c>OverlayScreen.BeginOpen</c>，所有弹窗共用一处）。</summary>
+	public const string UiOpen = "ui_open";
+}
