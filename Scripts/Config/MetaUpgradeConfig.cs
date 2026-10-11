@@ -13,6 +13,7 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class MetaUpgradeConfig : ConfigRow
 {
+	[ExportGroup("存档与效果（每级加什么）")]
 	/// <summary>
 	/// 存档键名。⚠️ **不能用 <see cref="ConfigRow.Id"/> 当存档键** —— `MetaProgress` 用
 	/// `user://meta.cfg` 的 <c>&lt;id&gt;_level</c> 存 int 等级，改了键名老玩家进度会归零。
@@ -23,12 +24,14 @@ public partial class MetaUpgradeConfig : ConfigRow
 	/// <summary>套用的属性键（与 <c>StatSheet</c> 一致）。只有 <see cref="Operation"/> = Add 时按"每级加固定值"处理。</summary>
 	[Export] public string Stat { get; set; } = string.Empty;
 
+	/// <summary>运算方式（<c>Add</c> 加法 / <c>Multiply</c> 乘法；<c>Multiply</c> 时 <see cref="PerLevel"/> 是每级的倍率增量）。</summary>
 	[Export] public ModifierOperation Operation { get; set; } = ModifierOperation.Add;
 
-	/// <summary>每升一级的效果量。</summary>
+	/// <summary>每升一级的效果量（例：最大生命 +10 / 伤害 +5%）。</summary>
 	[Export] public float PerLevel { get; set; }
 
-	/// <summary>1 级的价格。</summary>
+	[ExportGroup("价格与上限（碎片）")]
+	/// <summary>1 级的价格（碎片）。</summary>
 	[Export] public int BaseCost { get; set; } = 10;
 
 	/// <summary>每级的涨价幅度（当前实现是线性的：<c>BaseCost + CostGrowth × level</c>）。</summary>

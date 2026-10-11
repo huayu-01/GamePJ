@@ -16,7 +16,7 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class CharacterConfig : UnitConfig
 {
-	[ExportGroup("武器")]
+	[ExportGroup("武器（这个角色拿不拿枪）")]
 	/// <summary>这个角色能不能用枪（近战重装 = false，左键改由近战能力接管）。</summary>
 	[Export] public bool WeaponEnabled { get; set; } = true;
 

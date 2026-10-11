@@ -21,6 +21,7 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class BossConfig : UnitConfig
 {
+	[ExportGroup("首领（预制体 + 白板副本血量）")]
 	/// <summary>首领预制体路径（与 `Main.tscn` 的 BossScene / EliteBossScene 按路径配对）。</summary>
 	[Export(PropertyHint.File, "*.tscn")] public string ScenePath { get; set; } = "res://Scenes/Enemies/Boss.tscn";
 

@@ -15,6 +15,7 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class WeaponConfig : ConfigRow
 {
+	[ExportGroup("身份 · 预制体与标签")]
 	/// <summary>武器预制体。当前三把武器共用一个预制体，只换数值（不重建节点，避免弄丢输入组件）。</summary>
 	[Export(PropertyHint.File, "*.tscn")] public string ScenePath { get; set; } = "res://Scenes/Weapons/Pistol.tscn";
 
@@ -40,7 +41,7 @@ public partial class WeaponConfig : ConfigRow
 	/// </summary>
 	[Export] public UpgradePoolConfig? Pool { get; set; }
 
-	[ExportGroup("数值")]
+	[ExportGroup("数值（伤害 / 射速 / 弹匣 / 散布 / 暴击 / 弹速 …）")]
 	/// <summary>单发伤害。</summary>
 	[Export] public float Damage { get; set; } = 24f;
 
@@ -56,8 +57,10 @@ public partial class WeaponConfig : ConfigRow
 	/// <summary>被动装填：这么久没开火且弹匣不满就自动装填。</summary>
 	[Export] public float AutoReloadDelay { get; set; } = 3f;
 
+	/// <summary>基础散布（度）。腰射时的弹道随机偏移范围。</summary>
 	[Export(PropertyHint.Range, "0,15,0.1")] public float SpreadDegrees { get; set; } = 0.5f;
 
+	/// <summary>预瞄（ADS）时散布的缩放（0.35 = 瞄准后散布只剩 35%）。</summary>
 	[Export(PropertyHint.Range, "0,1,0.05")] public float AimSpreadScale { get; set; } = 0.35f;
 
 	/// <summary>一次击发多颗弹丸时，每颗之间的横向散开角度。</summary>
@@ -72,8 +75,10 @@ public partial class WeaponConfig : ConfigRow
 	/// <summary>击退力（<b>效果数值</b>：命中时传给攻击实例，见 <c>Config/Tables/Effects/</c> 的击退行）。</summary>
 	[Export] public float Knockback { get; set; } = 2.5f;
 
+	/// <summary>暴击率（0–1；0.15 = 15%）。</summary>
 	[Export(PropertyHint.Range, "0,1,0.01")] public float CritChance { get; set; } = 0.15f;
 
+	/// <summary>暴击伤害倍率（2 = 双倍伤害）。</summary>
 	[Export] public float CritMultiplier { get; set; } = 2f;
 
 	/// <summary>弹速（只写进投射物发射时的初速）。</summary>

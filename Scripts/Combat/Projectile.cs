@@ -102,6 +102,10 @@ public partial class Projectile : Node3D
 			{
 				_hitTargets.Add(target.GetInstanceId());
 				target.ReceiveHit(_attack.RollHit(target, _velocity.Normalized(), position));
+
+				// 命中特效（Binbun Hit FX）：用**射线命中点**，子弹打在身上哪就炸在哪。
+				// 开关 / 生命周期 / 预制体路径都在 `Config/Balance.tres` 的「表现 · 命中特效」组里（不写死）。
+				HitEffect.Spawn(this, position);
 			}
 
 			if (_pierceLeft > 0)

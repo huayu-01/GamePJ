@@ -1,4 +1,5 @@
 using System;
+using ActRoguelike.Config;
 using Godot;
 
 namespace ActRoguelike.Combat;
@@ -151,6 +152,12 @@ public partial class AttackHitbox : Area3D
 			Vector3 direction = target.GlobalPosition - GlobalPosition;
 			direction.Y = 0f;
 			target.ReceiveHit(_attack.RollHit(target, direction.Normalized(), target.GlobalPosition));
+
+			// 击中特效（Binbun Hit FX）：命中体判定的是"重叠"、手上没有表面命中点，
+			// 而单位原点在**脚底** —— 直接用目标原点会把火花打在地上，所以抬到胸口高度。
+			// 抬升量读 `Balance.tres` 的「表现 · 命中特效 · 高度偏移」，不写死在这里。
+			HitEffect.Spawn(this, target.GlobalPosition + (Vector3.Up * Balance.Settings.HitEffectHeightOffset));
+
 			HitLanded?.Invoke(target);
 		}
 	}

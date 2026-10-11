@@ -12,13 +12,14 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class ParamEntry : Resource
 {
-	/// <summary>参数名。与组件 [Export] 属性名一致时可以被 Set() 直接套用。</summary>
+	[ExportGroup("键值对（一条 = 覆盖目标组件上的一个同名 [Export] 属性）")]
+	/// <summary>参数名。与组件 [Export] 属性名一致时可以被 Set() 直接套用（写错会打警告并跳过，不会静默失效）。</summary>
 	[Export] public string Key { get; set; } = string.Empty;
 
-	/// <summary>值。用 Variant 才能既放数字又放字符串/资源路径。</summary>
+	/// <summary>值。用 Variant 才能既放数字又放字符串/资源路径（数字 1.15 / 文本 "Burn" / 路径 "res://…"）。</summary>
 	[Export] public Variant Value { get; set; } = 0f;
 
-	/// <summary>这一条是干什么的（给策划看，也可用于 {Key} 文本模板）。</summary>
+	/// <summary>这一条是干什么的（给策划看，也可用于 {Key} 文本模板）。只给人看，代码不读。</summary>
 	[Export] public string Note { get; set; } = string.Empty;
 
 	public float AsFloat(float fallback = 0f)

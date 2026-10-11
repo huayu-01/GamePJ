@@ -46,60 +46,73 @@ public partial class AiProfileConfig : ConfigRow
 	/// <summary>重新选目标的间隔（秒），写进 <c>EnemyBrain.TargetRefreshInterval</c>。</summary>
 	[Export] public float TargetRefreshInterval { get; set; }
 
-	[ExportGroup("行为 · 近战攻击（节点名 Attack；0 = 不覆盖）")]
+	[ExportGroup("行为 · 近战攻击（节点名 Attack；0 = 整个槽位不生效）")]
+	/// <summary>近战攻击行为的优先级（越大越先决策）。0 = 这个槽位在本档案里"不管"。</summary>
 	[Export] public int AttackPriority { get; set; }
 
-	[ExportGroup("行为 · 追击（节点名 Chase）")]
+	[ExportGroup("行为 · 追击（节点名 Chase；Priority 0 = 整个槽位不生效）")]
+	/// <summary>追击行为的优先级。0 = 整个槽位不生效（下面两个参数一起跳过）。</summary>
 	[Export] public int ChasePriority { get; set; }
 
 	/// <summary>追到多近就停下（交给攻击行为）。</summary>
 	[Export] public float ChaseStopDistance { get; set; }
 
-	/// <summary>追击速度倍率（乘单位的 MoveSpeed）。</summary>
+	/// <summary>追击速度倍率（乘单位的 MoveSpeed；1 = 原速）。</summary>
 	[Export] public float ChaseSpeedScale { get; set; }
 
-	[ExportGroup("行为 · 远程攻击（节点名 Shoot；0 = 不覆盖）")]
+	[ExportGroup("行为 · 远程攻击（节点名 Shoot；0 = 整个槽位不生效）")]
+	/// <summary>远程射击行为的优先级。0 = 这个槽位在本档案里"不管"。</summary>
 	[Export] public int ShootPriority { get; set; }
 
-	[ExportGroup("行为 · 保持距离（节点名 KeepDistance）")]
+	[ExportGroup("行为 · 保持距离（节点名 KeepDistance；Priority 0 = 整个槽位不生效）")]
+	/// <summary>保持距离行为的优先级。0 = 整个槽位不生效（下面五个参数一起跳过）。</summary>
 	[Export] public int KeepDistancePriority { get; set; }
 
-	/// <summary>舒适圈半径。</summary>
+	/// <summary>舒适圈半径（离目标多远最舒服）。</summary>
 	[Export] public float KeepDistancePreferredDistance { get; set; }
 
-	/// <summary>舒适圈的容差（在这个宽度里站定）。</summary>
+	/// <summary>舒适圈的容差（在这个宽度里站定、不再调整位置）。</summary>
 	[Export] public float KeepDistanceTolerance { get; set; }
 
+	/// <summary>调整位置时的速度倍率（乘单位的 MoveSpeed）。</summary>
 	[Export] public float KeepDistanceSpeedScale { get; set; }
 
 	/// <summary>是否绕圈（bool 列在槽位生效时照写，见类注释）。</summary>
 	[Export] public bool KeepDistanceStrafe { get; set; }
 
+	/// <summary>绕圈速度的相对大小（仅在 <see cref="KeepDistanceStrafe"/> = true 时有意义）。</summary>
 	[Export] public float KeepDistanceStrafeScale { get; set; }
 
-	[ExportGroup("行为 · 撤退（节点名 Retreat）")]
+	[ExportGroup("行为 · 撤退（节点名 Retreat；Priority 0 = 整个槽位不生效）")]
+	/// <summary>撤退行为的优先级。0 = 整个槽位不生效（下面三个参数一起跳过）。</summary>
 	[Export] public int RetreatPriority { get; set; }
 
 	/// <summary>血量低于它就开始撤退。<b>&lt; 0 = 不覆盖</b>；填 0 = 永不撤退（所以这里不能用"0 = 不覆盖"）。</summary>
 	[Export(PropertyHint.Range, "-1,1,0.05")] public float RetreatHealthThreshold { get; set; } = -1f;
 
+	/// <summary>撤退时的速度倍率（1.1 = 比正常快 10%）。</summary>
 	[Export] public float RetreatSpeedScale { get; set; }
 
 	/// <summary>撤到多远之外就停下。</summary>
 	[Export] public float RetreatKeepDistance { get; set; }
 
-	[ExportGroup("行为 · 通用技能槽（节点名 Explode / Leap / Scream / Charge / Summon / Buff；0 = 不覆盖）")]
-	/// <summary>自爆兵的 Explode、跳兵的 Leap、尖啸者的 Scream、冲锋兵的 Charge、首领的 Summon / Buff。</summary>
+	[ExportGroup("行为 · 通用技能槽（节点名 Explode / Leap / Scream / Charge / Summon / Buff；0 = 整个槽位不生效）")]
+	/// <summary>自爆兵的 Explode 槽位优先级。0 = 本档案不管它。</summary>
 	[Export] public int ExplodePriority { get; set; }
 
+	/// <summary>跳兵的 Leap 槽位优先级。0 = 本档案不管它。</summary>
 	[Export] public int LeapPriority { get; set; }
 
+	/// <summary>尖啸者的 Scream 槽位优先级。0 = 本档案不管它。</summary>
 	[Export] public int ScreamPriority { get; set; }
 
+	/// <summary>冲锋兵的 Charge 槽位优先级。0 = 本档案不管它。</summary>
 	[Export] public int ChargePriority { get; set; }
 
+	/// <summary>首领的 Summon 槽位优先级。0 = 本档案不管它。</summary>
 	[Export] public int SummonPriority { get; set; }
 
+	/// <summary>首领的 Buff 槽位优先级。0 = 本档案不管它。</summary>
 	[Export] public int BuffPriority { get; set; }
 
 	/// <summary>

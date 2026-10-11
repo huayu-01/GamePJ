@@ -30,11 +30,14 @@ namespace ActRoguelike.Config;
 /// </summary>
 public abstract partial class UnitConfig : ConfigRow
 {
-	[ExportGroup("生命")]
+	[ExportGroup("生命（血量 / 护甲 / 护盾 / 减伤 / 击退抗性）")]
+	/// <summary>最大生命。进场景树之前套用（"先 ApplyTo、再 AddChild"）。</summary>
 	[Export] public float MaxHealth { get; set; } = 100f;
 
+	/// <summary>最大护甲（先扣护甲再扣血；护甲大于 0 时按 <see cref="ArmorDamageReduction"/> 减伤）。</summary>
 	[Export] public float MaxArmor { get; set; }
 
+	/// <summary>最大护盾（在护甲之前被消耗，不吃护甲减伤）。</summary>
 	[Export] public float MaxShield { get; set; }
 
 	/// <summary>护甲大于 0 时提供的伤害减免。</summary>
@@ -46,7 +49,7 @@ public abstract partial class UnitConfig : ConfigRow
 	/// <summary>击退抗性，0 = 全额吃击退，1 = 完全免疫。</summary>
 	[Export(PropertyHint.Range, "0,1,0.05")] public float KnockbackResistance { get; set; }
 
-	[ExportGroup("移速")]
+	[ExportGroup("移速（基础移动速度；增益走 StatSheet 的 MoveSpeedMultiplier）")]
 	/// <summary>基础移动速度（增益通过 StatSheet 的 MoveSpeedMultiplier 放大）。</summary>
 	[Export] public float MoveSpeed { get; set; } = 4f;
 
@@ -66,7 +69,7 @@ public abstract partial class UnitConfig : ConfigRow
 	/// <summary>主攻击的击退（写进命中体的 <c>Knockback</c>）。0 = 不覆盖。</summary>
 	[Export] public float AttackKnockback { get; set; }
 
-	[ExportGroup("行为 & 类")]
+	[ExportGroup("行为 & 类（敌种类标签 Tags：Melee / Tank / Boss / Summon …，供按类筛选）")]
 	/// <summary>
 	/// 敌种类标签（<c>Melee</c> / <c>Tank</c> / <c>Boss</c> / <c>Summon</c> …），套到 <see cref="Unit.Tags"/>。
 	/// 用途是按类筛选（例如"这一关只放近战类"），**不是**拿来当身份键 —— 身份键是 <see cref="ConfigRow.Id"/>。
@@ -97,7 +100,7 @@ public abstract partial class UnitConfig : ConfigRow
 	/// </summary>
 	[Export] public AiProfileConfig? AiProfile { get; set; }
 
-	[ExportGroup("表现")]
+	[ExportGroup("表现（模型 / 图标 / 缩放）")]
 	/// <summary>替换占位模型用的预制体（空 = 用场景里自带的占位模型）。</summary>
 	[Export(PropertyHint.File, "*.glb,*.gltf,*.tscn")] public string ModelPath { get; set; } = string.Empty;
 

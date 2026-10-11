@@ -13,11 +13,14 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class StatOverride : Resource
 {
-	/// <summary>属性键，与 <c>StatSheet</c> 的键名一致（<c>MoveSpeedMultiplier</c> / <c>DamagePerSecondAdd</c> …）。</summary>
+	[ExportGroup("一条属性修正（改哪个属性 / 怎么算 / 多少）")]
+	/// <summary>属性键，与 <c>StatSheet</c> 的键名一致（<c>MoveSpeedMultiplier</c> / <c>DamagePerSecondAdd</c> / <c>MaxHealthMultiplier</c> …）。</summary>
 	[Export] public string Stat { get; set; } = string.Empty;
 
+	/// <summary>运算方式：<c>Add</c> 加法 / <c>Multiply</c> 乘法（倍率，1.15 = +15%）/ <c>Override</c> 直接覆盖。</summary>
 	[Export] public ModifierOperation Operation { get; set; } = ModifierOperation.Multiply;
 
+	/// <summary>数值（含义随 <see cref="Operation"/> 变：加法是增量，乘法是倍率）。</summary>
 	[Export] public float Value { get; set; } = 1f;
 
 	public StatModifier ToRuntime()

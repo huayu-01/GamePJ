@@ -15,10 +15,11 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class SummonConfig : UnitConfig
 {
+	[ExportGroup("召唤物（预制体 + 存活时间）")]
 	/// <summary>召唤物预制体路径（与各技能行的 <c>SummonScene</c> 按路径配对）。</summary>
 	[Export(PropertyHint.File, "*.tscn")] public string ScenePath { get; set; } = "res://Scenes/Summons/Drone.tscn";
 
-	/// <summary>存活时间（秒；0 = 永不消失）。写进召唤物的 <c>Lifetime</c> 节点。</summary>
+	/// <summary>存活时间（秒；0 = 永不消失）。写进召唤物的 <c>Lifetime</c> 节点。当前无人机 = 25 秒。</summary>
 	[Export] public float LifetimeSeconds { get; set; } = 25f;
 
 	/// <summary>套用通用单位参数后再处理召唤物私有项（存活时间）。</summary>

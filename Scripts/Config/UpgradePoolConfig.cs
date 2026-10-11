@@ -22,6 +22,10 @@ namespace ActRoguelike.Config;
 /// （改名/删文件时 Godot 会把引用置 null，能检测），而不是拼字符串（拼错会静默失效）。
 /// 池行本身**只承载身份**（<see cref="ConfigRow.Id"/> / `DisplayName` / `Note`），
 /// **不重复列一遍武器或选项** —— 成员关系只有一个真源，写在选项行上（避免 §1.4-① 那种双真源漂移）。
+///
+/// 📖 <b>这个类没有自己的参数</b>：它的全部可见字段都继承自 <see cref="ConfigRow"/>
+/// （Id / Slot / DisplayName / DescriptionTemplate / Note / Params），在 Inspector 里落在「身份与文案」
+/// 与「额外键值对」两个中文分组下。要看"每个参数是干什么的"，读 <see cref="ConfigRow"/> 的注释。
 /// </summary>
 [Tool]
 [GlobalClass]

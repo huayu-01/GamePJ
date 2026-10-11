@@ -556,7 +556,7 @@ foreach (Node child in unit.GetChildren())
 **建议改法（1 行，改 `Scripts/Combat/` 不在本轮边界内）**：把上面那段换成递归（照抄
 `UnitPresentation` 的收集方式），或额外接受 `Node3D` 并向下找网格。`UnitPresentation` 的**受击闪色是递归的，不受影响**。
 
-### (2) 命中特效接线
+### (2) 命中特效接线 —— ✅ **已在「第三轮」做完，见文末 §10**（这里保留原始交接文字）
 
 `Scripts/Combat/Projectile.cs` 命中那一支（或 `UnitPresentation.Flash()`）加 3 行即可：
 
@@ -620,4 +620,85 @@ if (GD.Load<PackedScene>("res://Assets/Effects/fx_combat_hit.tscn") is { } hitFx
    另外它的 `.gltf` 里 `buffers[0].uri` 写的是**原始文件名**（`Alien_Scolitex.bin`）——
    **改文件名导入必失败**（`.import` 会停在 `valid=false`，`ResourceLoader.load` 返回 null），
    要么别改名，要么同步改 JSON 里的 `uri`。
+
+---
+
+# 第三轮：命中 / 击中特效**真的接线了**（2026-10）
+
+> **本轮范围**：`Scripts/Combat/{HitEffect.cs(新),Projectile.cs,AttackHitbox.cs}`、`Scripts/Config/BalanceConfig.cs`、
+> `Config/Balance.tres`、`docs/config.md`、`docs/art-integration-log.md`。
+> **没有动** `Explosion.tscn` 的 `SphereShape3D radius=1` 与 `Explosion.Lifetime=0.12`（红线），
+> **没有动** `Assets/Effects/fx_combat_hit.tscn` 一个字节（美术资源保持原样）。
+
+## 10.0 30 秒结论
+
+| 问题 | 答案 |
+|---|---|
+| 上一轮留下的"§9.5 (2) 命中特效接线"做完了吗？ | ✅ **做完了**，而且**两条命中路径都接了**。 |
+| 为什么是"两条"？ | grep `ReceiveHit` 全项目只有**两个**会造成伤害的命中入口：<br>① **投射物命中** `Projectile.ResolveImpact`（子弹/箭矢/气刃，手上有**精确射线命中点**）<br>② **命中体击中** `AttackHitbox._PhysicsProcess`（近战挥砍 / AOE / 冲锋 / **爆炸**——`Explosion` 继承它）<br>（`RewardCatalog` 的连锁闪电也走 `ReceiveHit`，但它是奖励效果不是"命中"，没接。） |
+| 接线代码在哪？ | 两个调用点各 **1 行** + 一个新文件 `Scripts/Combat/HitEffect.cs`（出生逻辑只有一处）。 |
+| 参数写死了吗？ | **没有**。开关 / 预制体路径 / 寿命 / 高度偏移四个都进了 `Config/Balance.tres` 的「表现 · 命中特效」组（见 [config.md](config.md)）。 |
+| 截图 | [fx_hit_01_bullet_projectile.png](screenshots/fx_hit_01_bullet_projectile.png)（子弹命中敌人胸口）、[fx_hit_02_enemy_melee_hitbox.png](screenshots/fx_hit_02_enemy_melee_hitbox.png)（敌人近战砍中玩家） |
+
+## 10.1 ⚠️ 上一轮那句"加 3 行就行"**不够** —— 会漏节点（本轮实测）
+
+上一轮交接写的接法是 `Instantiate + AddChild + GlobalPosition` 三行。照做能出效果，但会**泄漏**：
+
+1. **`fx_combat_hit.tscn` 自己不会销毁。** 根节点的 `one_shot = true` 只表示"动画不循环"——
+   `VFXControllerBB.play()` 播完只 `finished.emit()`，**没有任何 `queue_free()`**。
+   打一梭子（步枪 8 发/秒）就会在场景树里留下十几个常驻节点，一直留到本局结束。
+2. **`fx_detach_lifetime.gd` 那个现成的壳在这里用不了**：它的 `_detach()` 开头有一句
+   `if holder == null or root == null or holder == root: return` —— 它设计上是"**从一个会死的宿主里脱身**"，
+   而命中特效**正是**直接挂在场景根（`CurrentScene`）下的，会**提前 return、根本不走自毁那条路**。
+
+**本轮做法**：寿命由配置值 `HitEffectLifetime`（默认 1.8s）接管，用 `SceneTreeTimer` 定时 `QueueFree`
+（`HitEffect.Spawn` 里）。于是同时拿到三件事：不泄漏、寿命可调、**不需要新场景文件、不需要 reparent**。
+
+## 10.2 顺带避开的两个已知坑
+
+| 坑（上一轮实测的） | 本轮怎么绕开的 |
+|---|---|
+| `reparent(..., true)` 在 `physics_interpolation = true` 下**会丢缩放** | **全程没有 reparent**：特效出生时就 `AddChild` 到最终父节点，再写一次 `GlobalPosition` |
+| Binbun 的粒子**尺寸不跟随节点缩放**（shader 里直接写 `POSITION`） | 所以**没有**开"特效缩放"配置列 —— 那会是一列改了没用的死配置；要改尺寸就改 `fx_combat_hit.tscn` 的材质/网格 |
+| 命中体那一路**没有表面命中点**（判定的是"重叠"），而单位原点在**脚底** | 用 `GlobalPosition + Up × HitEffectHeightOffset`（配置项，默认 1.0 = 1.8m 单位的胸口）；投射物那一路直接用射线命中点 |
+| `fx_weapon_muzzle.tscn` 那条 `alpha_multiplier` 轨道（运行期把 `material_override` 弄成 null，会刷警告） | **与命中特效无关**：`fx_combat_hit.tscn` 里 `alpha_multiplier` 出现 **0 次**（`Select-String` 实测），本轮也没有往枪口那套里加东西 |
+
+## 10.3 实测证据（可复现，不用编辑器、不用 MCP）
+
+**功能**：一个一次性探针场景（跑完即删）真的走那两条路径，并数场景根下的特效节点：
+
+```
+[FxProbe] 开局：FX 数 = 0（期望 0）
+[FxProbe] ① Pistol.TryFire -> true（期望 true）
+[FxProbe] ① 子弹命中后 FX 数 = 1（期望 >= 1）        ← Projectile.ResolveImpact 那条路
+[FxProbe] ③ 2.4s 后 FX 数 = 0（期望 0：配置寿命到了就自毁，不泄漏）
+[FxProbe] ② 敌人砍中玩家后 FX 数 = 1（期望 >= 1）    ← AttackHitbox._PhysicsProcess 那条路（敌人 AI 真的砍玩家）
+[FxProbe] 结论：①=1 ②=1 ③=1
+```
+
+跑法（与 `Scenes/Enemies/_art_shot.gd` 同一套路：自己造场景 + 自己存 PNG，不依赖 gdmcp 运行时桥）：
+
+```powershell
+& 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64.exe' `
+  --path 'F:\Godot项目\项目a' --windowed --resolution 1600x900 'res://_fx_probe.tscn'
+```
+
+**视觉**：`fx_hit_01_bullet_projectile.png` 是子弹打在 Chaser **胸口**上的一团白色四角星火花（地面有光斑）；
+`fx_hit_02_enemy_melee_hitbox.png` 是敌人近战砍中玩家时、在**两人之间的胸口高度**爆出的火花
+（证明"高度偏移"真的生效 —— 直接用单位原点会打在地上）。
+
+> ⚠️ 记一条工具现状（本轮踩的）：**本机 gdmcp 的 runtime 桥起不来**
+> （`get_runtime_screenshot` 返回 `{"status":"no_active_sessions"}`，`get_debugger_sessions` 里
+> 唯一那个 session 是 `debuggable: false`），所以运行时读数/截图都得靠"游戏自己存 PNG"这条路。
+
+## 10.4 全流程回归
+
+- 编译：`& build.ps1 --no-incremental -v minimal` → **0 警告 / 0 错误**。
+- 自测：`Main.tscn -- --selftest`（**windowed**，见下面的坑）→ `=== 自测开始 ===` … `Encounter 清场完成` /
+  `白板首领降临（血量倍率 0.35（来源：表 boss_final））` / `端到端：按 F 之后 奖励界面打开 = True` /
+  `=== 自测结束 ===`，stderr 里 **0 个 SCRIPT ERROR、0 个 Exception**（只有既有那条 NavigationMesh cell height 警告）。
+- ⚠️ **顺带发现的别人家的坑（不是本轮的改动，记在这里免得下次再查一遍）**：
+  `--headless` 跑自测时，`SelfTest.Shot()` 每帧调 `Texture2D.GetImage()`，而 headless 用的是 dummy 渲染器
+  → `ERROR: Parameter "t" is null` + `NullReferenceException` **每帧刷一次**（实测一次运行刷了 3.8 万条、
+  stderr 长到 **142 MB**）。**跑自测请用 windowed**，或者让那个截图步骤在 `DisplayServer.get_name() == "headless"` 时跳过。
 

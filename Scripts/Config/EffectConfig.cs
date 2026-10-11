@@ -58,10 +58,11 @@ public enum EffectKind
 [GlobalClass]
 public partial class EffectConfig : ConfigRow
 {
-	/// <summary>这是哪一类效果。</summary>
+	[ExportGroup("身份（这一类效果 + 图标）")]
+	/// <summary>这是哪一类效果 —— 决定这一行的数值怎么被使用（见 <see cref="EffectKind"/> 每个取值的中文说明）。</summary>
 	[Export] public EffectKind Kind { get; set; } = EffectKind.Other;
 
-	/// <summary>图标（界面/Debug 用）。</summary>
+	/// <summary>图标（界面/Debug 用；空 = 无图标）。</summary>
 	[Export(PropertyHint.File, "*.png,*.svg")] public string IconPath { get; set; } = string.Empty;
 
 	[ExportGroup("通用数值（按 Kind 选用，用不到的就留默认值）")]
@@ -72,10 +73,10 @@ public partial class EffectConfig : ConfigRow
 	[Export] public float Duration { get; set; }
 
 	[ExportGroup("状态修正（状态类效果用；取代 StatusEffect.cs 里硬编码的 Modifiers）")]
-	/// <summary>挂上之后持续生效的属性修正。空 = 不改属性（纯持续伤害就是这种）。</summary>
+	/// <summary>挂上之后持续生效的属性修正（例：<c>MoveSpeedMultiplier × 0.55</c> = 减速）。空 = 不改属性（纯持续伤害就是这种）。</summary>
 	[Export] public StatOverride[] Modifiers { get; set; } = System.Array.Empty<StatOverride>();
 
-	/// <summary>每秒伤害（0 = 没有持续伤害）。等价于原来 <c>StatusEffect.DamagePerSecond</c>。</summary>
+	/// <summary>每秒伤害（0 = 没有持续伤害）。等价于原来 <c>StatusEffect.DamagePerSecond</c>；燃烧当前 = 6 伤害/秒。</summary>
 	[Export] public float DamagePerSecond { get; set; }
 
 	/// <summary>本行是不是一条"可被挂到单位身上的状态"（有 Modifiers 或 DamagePerSecond 就是）。</summary>

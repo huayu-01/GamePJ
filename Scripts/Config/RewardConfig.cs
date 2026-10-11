@@ -16,13 +16,14 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class RewardConfig : ConfigRow
 {
+	[ExportGroup("身份与出率（强化 / 进化 / 异化；能叠几层；抽中概率）")]
 	/// <summary>强化 / 进化 / 异化（对应 <c>Rewards.RewardKind</c>）。</summary>
 	[Export] public Rewards.RewardKind RewardKind { get; set; } = Rewards.RewardKind.Enhancement;
 
-	/// <summary>最多叠几层（0 = 不限）。</summary>
+	/// <summary>最多叠几层（0 = 不限；1 = 只能拿一次）。</summary>
 	[Export] public int MaxStacks { get; set; } = 1;
 
-	/// <summary>抽中概率（与 <c>BossPerk</c> 共用 <see cref="WeightedPick"/>）。</summary>
+	/// <summary>抽中概率（与 <c>BossPerk</c> 共用 <see cref="WeightedPick"/>；当前 19 条都是 1.0 = 等概率）。</summary>
 	[Export] public float Weight { get; set; } = 1f;
 
 	[ExportGroup("效果")]

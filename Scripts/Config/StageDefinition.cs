@@ -10,19 +10,30 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class StageDefinition : Resource
 {
+	[ExportGroup("身份")]
 	/// <summary>
 	/// Stage 的稳定键（关卡核心文档 §7.4「Stage 标识」）。存档 / 分支 / 别的表引用都用它，
 	/// 定好不再改；与行文件名（<c>Config/Tables/Stages/stg_*.tres</c>）取同一个语义名便于人肉对照。
 	/// </summary>
 	[Export] public string Id { get; set; } = "stage_1";
 
+	/// <summary>界面显示名（只影响界面与日志，不要拿它当身份键）。</summary>
 	[Export] public string DisplayName { get; set; } = "Stage 1";
 
-	[ExportGroup("战斗")]
+	[ExportGroup("战斗（预算 / 并发 / 生成间隔 / 本关敌人倍率 / 白名单）")]
+	/// <summary>本关的生成预算（决定这一关总共出多少怪；全局还有 <c>NodeBudgetMultiplier</c> 再乘一次）。</summary>
 	[Export] public float CombatBudget { get; set; } = 10f;
+
+	/// <summary>同时在场的最多敌人数。</summary>
 	[Export] public int MaxConcurrent { get; set; } = 3;
+
+	/// <summary>生成间隔（秒；全局还有 <c>SpawnIntervalMultiplier</c> 再乘一次）。</summary>
 	[Export] public float SpawnInterval { get; set; } = 2f;
+
+	/// <summary>本关敌人生命倍率（与敌人表的全局倍率相乘）。</summary>
 	[Export] public float EnemyHealthMultiplier { get; set; } = 1f;
+
+	/// <summary>本关敌人伤害倍率（与敌人表的全局倍率相乘）。</summary>
 	[Export] public float EnemyDamageMultiplier { get; set; } = 1f;
 
 	/// <summary>精英出现概率的额外缩放（加在各生成项自己的 EliteChance 上）。</summary>
@@ -37,16 +48,24 @@ public partial class StageDefinition : Resource
 	/// </summary>
 	[Export] public string[] AllowedEnemyIds { get; set; } = System.Array.Empty<string>();
 
-	[ExportGroup("节点与挑战")]
+	[ExportGroup("节点与挑战（本关放几个奖励节点 / 免费挑战额度）")]
+	/// <summary>本关放几个奖励节点（价值层配比由 `NodePlacement` 决定）。</summary>
 	[Export] public int RewardNodeCount { get; set; } = 3;
+
+	/// <summary>本关开局的免费挑战额度（额度内挑战节点不加 Pressure）。</summary>
 	[Export] public int FreeChallengeQuota { get; set; } = 2;
 
-	[ExportGroup("Boss")]
+	[ExportGroup("Boss（护卫数量 / 倍率 / 开场词条数）")]
+	/// <summary>Boss 出生时带的护卫数量。</summary>
 	[Export] public int BossGuardCount { get; set; } = 2;
+
+	/// <summary>本关 Boss 的生命倍率（与全局 <c>BossHealthMultiplier</c> 相乘）。</summary>
 	[Export] public float BossHealthMultiplier { get; set; } = 1f;
+
+	/// <summary>本关 Boss 的伤害倍率（与全局 <c>BossDamageMultiplier</c> 相乘）。</summary>
 	[Export] public float BossDamageMultiplier { get; set; } = 1f;
 
-	/// <summary>Boss 词条数量（策划文档 §12 Boss 构筑）。</summary>
+	/// <summary>Boss 词条数量（策划文档 §12 Boss 构筑；只抽**行为型**，见 §7.1）。</summary>
 	[Export] public int BossPerkCount { get; set; } = 2;
 
 	/// <summary>
@@ -63,7 +82,7 @@ public partial class StageDefinition : Resource
 	/// ⚠️ 这些字段**只描述数值型强化**（Boss Pressure）。行为/技能型强化属 Boss Build
 	/// （<see cref="ActRoguelike.Boss.BossPerkCatalog"/>），关卡核心文档 §7.1 明令两者不得合并成一个池。
 	/// </summary>
-	[ExportGroup("Boss Pressure（关卡核心文档 §7.4）")]
+	[ExportGroup("Boss Pressure（关卡核心文档 §7.4：只描述**数值型**强化，行为型属 Boss Build）")]
 	/// <summary>Pressure 增长倍率（§7.2「不同 Stage 使用固定的 Stage 倍率表进行调整，倍率必须可配置」）。&lt;= 0 → 按 1 处理（等于分表之前的乘数）。</summary>
 	[Export] public float PressureGrowthMultiplier { get; set; } = 1f;
 

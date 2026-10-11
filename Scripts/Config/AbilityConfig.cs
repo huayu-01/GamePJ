@@ -45,8 +45,10 @@ public partial class AbilityConfig : ConfigRow
 	/// <summary>冷却（秒）。<b>&lt;= 0 = 不覆盖</b> —— 单位的"主攻击"由单位行的 <see cref="UnitConfig.AttackInterval"/> 说了算。</summary>
 	[Export] public float Cooldown { get; set; }
 
+	/// <summary>前摇（秒）：按下到判定生效之间的准备时间（这期间不产生命中）。</summary>
 	[Export] public float Windup { get; set; } = 0.3f;
 
+	/// <summary>后摇（秒）：判定结束到能再次行动之间的硬直。</summary>
 	[Export] public float Recover { get; set; } = 0.3f;
 
 	/// <summary>未解锁的能力不参与行为决策（Boss 分阶段解锁技能用）。</summary>
@@ -55,6 +57,7 @@ public partial class AbilityConfig : ConfigRow
 	/// <summary>行为提示：目标进入这个距离区间时适合触发本能力。<b>&lt; 0 = 不覆盖</b>（保留场景里的值）。</summary>
 	[Export] public float ApproachMinRange { get; set; } = -1f;
 
+	/// <summary>接近区间的上界（与 <see cref="ApproachMinRange"/> 组成"舒适圈"；&lt; 0 = 不覆盖）。</summary>
 	[Export] public float ApproachMaxRange { get; set; } = -1f;
 
 	[ExportGroup("命中体参数（这个技能的命中体属性：Damage/Knockback/StatusId/AttackTags…）")]

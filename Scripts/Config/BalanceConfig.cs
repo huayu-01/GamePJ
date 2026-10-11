@@ -53,18 +53,33 @@ public partial class BalanceConfig : Resource
 	/// <summary>所有普通敌人的伤害倍率（难度总开关；回退值，语义见上一条）。</summary>
 	[Export] public float EnemyDamageMultiplier { get; set; } = 0.3f;
 
+	/// <summary>所有普通敌人的移速倍率（难度总开关之一；回退值，语义见上一条）。</summary>
 	[Export] public float EnemyMoveSpeedMultiplier { get; set; } = 1f;
+
+	/// <summary>精英出现概率倍率（1 = 按各节点的配置，0 = 不出精英）。</summary>
 	[Export] public float EliteChanceMultiplier { get; set; } = 1f;
 
 	[ExportGroup("节奏 · Stage")]
+	/// <summary>节点总预算倍率（越大敌人越多、节点越久）。</summary>
 	[Export] public float NodeBudgetMultiplier { get; set; } = 1f;
+
+	/// <summary>生成间隔倍率（越大出怪越慢）。</summary>
 	[Export] public float SpawnIntervalMultiplier { get; set; } = 1f;
 
-	[ExportGroup("Boss")]
+	[ExportGroup("Boss（倍率与压力曲线）")]
+	/// <summary>Boss 生命倍率。</summary>
 	[Export] public float BossHealthMultiplier { get; set; } = 1f;
+
+	/// <summary>Boss 伤害倍率。</summary>
 	[Export] public float BossDamageMultiplier { get; set; } = 0.9f;
+
+	/// <summary>压力升级间隔（秒）：每隔这么久 Boss 的压力等级 +1。</summary>
 	[Export] public float BossPressureInterval { get; set; } = 12f;
+
+	/// <summary>每级压力增加的伤害比例（0.08 = 每级 +8%）。</summary>
 	[Export] public float BossPressureDamagePerLevel { get; set; } = 0.08f;
+
+	/// <summary>每级压力增加的攻速比例（0.06 = 每级 +6%）。</summary>
 	[Export] public float BossPressureAttackSpeedPerLevel { get; set; } = 0.06f;
 
 	[ExportGroup("关卡序列")]
@@ -153,22 +168,66 @@ public partial class BalanceConfig : Resource
 	/// <summary>局外成长表（`Config/Tables/Meta/meta_*.tres`）。空 = 用 <c>MetaProgress</c> 里的代码内置系数。</summary>
 	[Export] public MetaUpgradeConfig[] MetaUpgrades { get; set; } = System.Array.Empty<MetaUpgradeConfig>();
 
-	[ExportGroup("成长")]
+	[ExportGroup("成长（三选一给几个）")]
+	/// <summary>奖励界面给几个选项（默认 3）。</summary>
 	[Export] public int RewardChoiceCount { get; set; } = 3;
 
 	[ExportGroup("表现 · 伤害跳字")]
+	/// <summary>是否显示伤害数字（关掉则完全不建跳字节点）。</summary>
 	[Export] public bool ShowDamageNumbers { get; set; } = true;
+
+	/// <summary>跳字存活时间（秒）。</summary>
 	[Export] public float DamageNumberLifetime { get; set; } = 0.8f;
+
+	/// <summary>跳字上飘距离（像素）。</summary>
 	[Export] public float DamageNumberRise { get; set; } = 70f;
+
+	/// <summary>跳字字号（像素）。</summary>
 	[Export] public int DamageNumberFontSize { get; set; } = 24;
 
-	[ExportGroup("表现 · 血条")]
+	[ExportGroup("表现 · 血条（世界头顶血条 + 首领血条）")]
+	/// <summary>是否显示敌人头顶血条（满血的杂兵不显示，Boss 常显）。</summary>
 	[Export] public bool ShowEnemyHealthBars { get; set; } = true;
+
+	/// <summary>世界血条宽度（像素）。</summary>
 	[Export] public float EnemyHealthBarWidth { get; set; } = 64f;
+
+	/// <summary>世界血条高度（像素）。</summary>
 	[Export] public float EnemyHealthBarHeight { get; set; } = 7f;
+
 	/// <summary>血条相对单位原点的垂直偏移（现在沿 -Up 使用，即放在脚下）。</summary>
 	[Export] public float EnemyHealthBarTopOffset { get; set; } = 0.25f;
 
+	/// <summary>与首领的距离小于它时，屏幕上方显示完整血条；否则只显示首领头像。</summary>
+	[Export] public float BossBarFullRange { get; set; } = 22f;
+
+	[ExportGroup("表现 · 命中特效（两条命中路径共用：子弹命中 + 近战/范围/爆炸击中）")]
+	/// <summary>
+	/// 命中 / 击中时是否播放命中特效（Binbun Hit FX）。**一个开关管两条路径**：
+	/// ① <c>Projectile.ResolveImpact</c>（投射物命中，用射线命中点）；
+	/// ② <c>AttackHitbox._PhysicsProcess</c>（近战 / AOE / 冲锋 / 爆炸的命中体击中，用目标胸口高度）。
+	/// 出生逻辑只有一处：<see cref="ActRoguelike.Combat.HitEffect.Spawn"/>。
+	/// </summary>
+	[Export] public bool ShowHitEffects { get; set; } = true;
+
+	/// <summary>命中特效的预制体（空 = 用代码里的 <c>res://Assets/Effects/fx_combat_hit.tscn</c>）。</summary>
+	[Export(PropertyHint.File, "*.tscn")] public string HitEffectScenePath { get; set; } = "res://Assets/Effects/fx_combat_hit.tscn";
+
+	/// <summary>
+	/// 命中特效在场景里存活多久（秒）之后自毁。
+	/// ⚠️ **必须给够**：Binbun 这份特效**自己不会销毁**，<c>one_shot</c> 只表示动画不循环；
+	/// 给短了会把特效切在半空中，给 0 会让节点永久留在场景里（每命中一次留一个）。
+	/// 素材 <c>main</c> 动画是 1.6s，所以默认 1.8s（含 0.2s 尾巴）。
+	/// </summary>
+	[Export] public float HitEffectLifetime { get; set; } = 1.8f;
+
+	/// <summary>
+	/// 命中体（近战 / AOE / 爆炸）那一路的**竖直抬升**：单位原点在脚底，火花打在脚底很怪。
+	/// 投射物那一路不用它（射线命中点本来就在身体上）。1.0 ≈ 1.8m 身高单位的胸口。
+	/// </summary>
+	[Export] public float HitEffectHeightOffset { get; set; } = 1f;
+
+	[ExportGroup("节点 / 关卡约束")]
 	/// <summary>节点之间的最小间距（关卡核心文档 L106）。</summary>
 	[Export] public float MinNodeSpacing { get; set; } = 8f;
 
@@ -195,7 +254,4 @@ public partial class BalanceConfig : Resource
 
 	/// <summary>地图下方的区域杀高度：玩家 Y 低于它直接被击杀（用户需求）。</summary>
 	[Export] public float KillPlaneY { get; set; } = -8f;
-
-	/// <summary>与首领的距离小于它时，屏幕上方显示完整血条；否则只显示首领头像。</summary>
-	[Export] public float BossBarFullRange { get; set; } = 22f;
 }

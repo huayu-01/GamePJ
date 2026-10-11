@@ -98,18 +98,36 @@
 2. **每个字段一句中文 `/// <summary>`** —— IDE（Rider / VS / VS Code）里鼠标停上去就能看，
    读代码时就在手边；虽然 Godot Inspector 不显示它（证据 ③），但它对人是有效的"悬停说明"。
 
-> **覆盖范围**：`Scripts/Config/` 下 **18 个**会被人编辑的配置/资源类全部覆盖 ——
-> `ConfigRow`（基类，覆盖 Id/Slot/DisplayName/DescriptionTemplate/Note/Params）/ `UnitConfig` /
-> `EnemyConfig` / `BossConfig` / `SummonConfig` / `CharacterConfig` / `WeaponConfig` / `AbilityConfig` /
-> `AiProfileConfig` / `EffectConfig` / `NodeConfig` / `RewardConfig` / `PressureModConfig` (注释) /
-> `MetaUpgradeConfig` / `StageDefinition` / `UpgradePoolConfig` / `ParamEntry` / `StatOverride` /
-> `BalanceConfig`（全局字段）。**共 34 个中文 `ExportGroup`、200+ 个字段的中文说明**。
+> **覆盖范围（用脚本数出来的实数，不是估的）**：`Scripts/Config/` 下 **18 个**会被人编辑的配置/资源类全部覆盖 ——
+> `ConfigRow`（基类，它的两个分组会出现在**每一张表**的行文件上）/ `UnitConfig` / `EnemyConfig` / `BossConfig` /
+> `SummonConfig` / `CharacterConfig` / `WeaponConfig` / `AbilityConfig` / `AiProfileConfig` / `EffectConfig` /
+> `NodeConfig` / `RewardConfig` / `MetaUpgradeConfig` / `StageDefinition` / `UpgradePoolConfig` / `ParamEntry` /
+> `StatOverride` / `BalanceConfig`（全局字段）。并行代理同期把 `PressureModConfig` 改成了同一套写法（风格一致）。
+>
+> | 指标 | 数量 |
+> |---|---|
+> | `[ExportGroup("中文…")]` | **75 个**（`BalanceConfig` 22 个、`ConfigRow` 基类 2 个） |
+> | `[Export]` 参数项 | **218 个** |
+> | 其中带紧邻中文 `/// <summary>` 的 | **218 个（100%）** |
+>
+> **逐类的真实分组**（headless 探针读 `get_property_list()` 打的，就是 Inspector 消费的那份元数据；
+> 括号里是不含 Godot 自带的那个类名分组）：
+> `Balance.tres` 22 组 · `enemy_chaser.tres` 11 组 · `chr_gunner.tres` 11 组 · `boss_final.tres` 10 组 ·
+> `summon_drone.tres` 10 组 · `ai_chaser.tres` 9 组 · `node_shop.tres` 7 组 · `skl_dash.tres` 6 组 ·
+> `eff_burn.tres` 5 组 · `wpn_pistol.tres` 5 组 · `upg_dmg_up.tres` 5 组 · `stg_outer.tres` 5 组 ·
+> `meta_health.tres` 4 组 · `pool_pistol.tres` 2 组。
 >
 > **红线遵守**：本次只加/改 `[ExportGroup]` 特性行与 `/// <summary>` 注释行 ——
 > 用 `git diff -U0` 核对过，`Scripts/Config/**` 里**没有一行 `[Export]` 属性签名被改动**
 > （字段名 / 类型 / 默认值一个都没动），也没有动 `Config/Tables/**` 的任何数据。
 > 唯一的字段"搬动"是 `BalanceConfig.BossBarFullRange` 从文件末尾移到「表现 · 血条」组里（名字/类型/默认值不变），
-> 因为它原来挂在错误的组标题下面。
+> 因为它原来挂在错误的组标题下面；同时给 `MinNodeSpacing` / `PressurePerPoint` / `KillPlaneY` 等十个
+> "关卡约束"字段补了它们自己的「节点 / 关卡约束」标题（原来它们挤在「表现 · 血条」底下，标题是错的）。
+>
+> 截图：[config_zh_inspector_groups.png](screenshots/config_zh_inspector_groups.png) —— 编辑器右侧
+> Inspector 打开一个行文件时的分组标题。其中 `ConfigRow` 那一节的「身份与文案（所有表通用）」与
+> 「额外键值对（逃生口：没有独立列的参数走这里）」就是本方案为**基类**加的两个分组，
+> **每一张表的每一行都会有它们**。
 
 顺带说明**两列本来就有、可以直接写中文**的地方：`ConfigRow.Note` / `DescriptionTemplate`
 （都是 `PropertyHint.MultilineText`，一行一条中文备注；`DescriptionTemplate` 还支持 `{字段名}` 占位符，见 `ConfigText`）。
@@ -359,6 +377,18 @@
 > 🔧 **阶段 3 顺带修的**：`Scenes/UI/Bars/BarEnemy.tscn` 的 `Content` 原来摆在 `(-1,-1)`、尺寸 66×9，
 > 即**没有以 Root 原点为中心** —— `WorldOverlay.CreateBar` 每次建血条都会推一条警告「血条位置会偏」。
 > 现在改成 `(-33,-4.5)~(33,4.5)`（尺寸不变、中心落在 Root 原点），警告消失。
+
+### 表现 · 命中特效（2026-10 新增：命中 / 击中特效接线）
+| 参数 | 含义 |
+|---|---|
+| `ShowHitEffects` | 命中 / 击中时是否播放命中特效（**一个开关管两条路径**：投射物命中 + 命中体击中） |
+| `HitEffectScenePath` | 命中特效预制体（默认 `res://Assets/Effects/fx_combat_hit.tscn` = Binbun Hit FX，CC0） |
+| `HitEffectLifetime` | 特效存活多少秒之后自毁（默认 **1.8** = 素材 `main` 动画 1.6s + 0.2s 尾巴）。⚠️ 给 0 = 每次命中都在场景里留一个常驻节点 |
+| `HitEffectHeightOffset` | **命中体那一跳**的竖直抬升（单位原点在脚底，1.0 ≈ 1.8m 单位的胸口）；投射物那一路不用它（射线命中点本来就在身上） |
+
+> 出生逻辑只有一处：`Scripts/Combat/HitEffect.cs`（`Projectile.ResolveImpact` 与
+> `AttackHitbox._PhysicsProcess` 各调一行）。为什么必须由 C# 管寿命、以及两条路径的截图证据，
+> 见 [art-integration-log.md](art-integration-log.md) 的「第三轮」。
 
 ## 当前取值（2026-10 原型）
 
