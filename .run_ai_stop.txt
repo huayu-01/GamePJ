@@ -1,1 +1,0 @@
-gdmcp: Godot service is unreachable: error sending request for url (http://127.0.0.1:9080/cli/v1/tools/stop_project/execute)
