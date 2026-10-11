@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="AbilityConfig" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://ci0vw0tqdduu4"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="a_skl_enemy_guard_melee_0"]
 script = ExtResource("2_param")
@@ -10,13 +10,11 @@ Value = PackedStringArray("Melee")
 
 [resource]
 script = ExtResource("1_row")
-Id = "skl_enemy_guard_melee"
-DisplayName = "重锤"
 NodeName = "AbilityMelee"
 ClassHint = "MeleeAttackAbility"
-Aim = 0
 Windup = 0.5
 Recover = 0.4
-Enabled = true
 AttackParams = [SubResource("a_skl_enemy_guard_melee_0")]
+Id = "skl_enemy_guard_melee"
+DisplayName = "重锤"
 Note = "守卫：厚甲 + 正面格挡（Block 节点不在表里）。"

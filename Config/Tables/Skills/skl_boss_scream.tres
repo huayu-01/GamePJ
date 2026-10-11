@@ -1,19 +1,7 @@
-[gd_resource type="Resource" script_class="AbilityConfig" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://btqo0p3kyk273"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
-
-[sub_resource type="Resource" id="p_skl_boss_scream_0"]
-script = ExtResource("2_param")
-Key = "ActiveTime"
-Value = 0.2
-Note = "命中体激活时长"
-
-[sub_resource type="Resource" id="p_skl_boss_scream_1"]
-script = ExtResource("2_param")
-Key = "TriggerRadius"
-Value = 8.0
-Note = "触发半径"
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="a_skl_boss_scream_0"]
 script = ExtResource("2_param")
@@ -44,19 +32,30 @@ script = ExtResource("2_param")
 Key = "AttackTags"
 Value = PackedStringArray("AoE", "Scream")
 
+[sub_resource type="Resource" id="p_skl_boss_scream_0"]
+script = ExtResource("2_param")
+Key = "ActiveTime"
+Value = 0.2
+Note = "命中体激活时长"
+
+[sub_resource type="Resource" id="p_skl_boss_scream_1"]
+script = ExtResource("2_param")
+Key = "TriggerRadius"
+Value = 8.0
+Note = "触发半径"
+
 [resource]
 script = ExtResource("1_row")
-Id = "skl_boss_scream"
-DisplayName = "尖啸"
 NodeName = "AbilityScream"
 ClassHint = "AreaAttackAbility"
-Aim = 0
 Cooldown = 7.0
 Windup = 0.7
 Recover = 0.9
 Enabled = false
 ApproachMinRange = 0.0
 ApproachMaxRange = 8.0
-Params = [SubResource("p_skl_boss_scream_0"), SubResource("p_skl_boss_scream_1")]
 AttackParams = [SubResource("a_skl_boss_scream_0"), SubResource("a_skl_boss_scream_1"), SubResource("a_skl_boss_scream_2"), SubResource("a_skl_boss_scream_3"), SubResource("a_skl_boss_scream_4")]
+Id = "skl_boss_scream"
+DisplayName = "尖啸"
 Note = "Boss 阶段 2 解锁（Phases.Phase2Abilities），也可以被「尖啸强化」词条开场解锁。"
+Params = [SubResource("p_skl_boss_scream_0"), SubResource("p_skl_boss_scream_1")]

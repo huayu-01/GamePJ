@@ -1,7 +1,12 @@
-[gd_resource type="Resource" script_class="AbilityConfig" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://bw3wv237fbpfj"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="a_skl_enemy_exploder_blow_0"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("AoE", "Explosion")
 
 [sub_resource type="Resource" id="p_skl_enemy_exploder_blow_0"]
 script = ExtResource("2_param")
@@ -15,23 +20,16 @@ Key = "KillSelf"
 Value = true
 Note = "炸完自毁"
 
-[sub_resource type="Resource" id="a_skl_enemy_exploder_blow_0"]
-script = ExtResource("2_param")
-Key = "AttackTags"
-Value = PackedStringArray("AoE", "Explosion")
-
 [resource]
 script = ExtResource("1_row")
-Id = "skl_enemy_exploder_blow"
-DisplayName = "自爆"
 NodeName = "AbilityExplode"
 ClassHint = "AreaAttackAbility"
-Aim = 0
 Windup = 0.35
 Recover = 0.1
-Enabled = true
 ApproachMinRange = 0.0
 ApproachMaxRange = 2.4
-Params = [SubResource("p_skl_enemy_exploder_blow_0"), SubResource("p_skl_enemy_exploder_blow_1")]
 AttackParams = [SubResource("a_skl_enemy_exploder_blow_0")]
+Id = "skl_enemy_exploder_blow"
+DisplayName = "自爆"
 Note = "自爆兵：TriggerRadius 2.4 由单位行的攻击范围给（AttackRange → TriggerRadius）。"
+Params = [SubResource("p_skl_enemy_exploder_blow_0"), SubResource("p_skl_enemy_exploder_blow_1")]

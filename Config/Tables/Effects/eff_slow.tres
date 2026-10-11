@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="EffectConfig" format=3]
+[gd_resource type="Resource" script_class="EffectConfig" format=3 uid="uid://xfh6yc0i1ktw"]
 
-[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_vtuu6"]
-[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="2_bxpiw"]
+[ext_resource type="Script" uid="uid://da28h1nkpc5p6" path="res://Scripts/Config/StatOverride.cs" id="1_vtuu6"]
+[ext_resource type="Script" uid="uid://dyiou3pe6um14" path="res://Scripts/Config/EffectConfig.cs" id="2_bxpiw"]
 
 [sub_resource type="Resource" id="Resource_vtuu6"]
 script = ExtResource("1_vtuu6")

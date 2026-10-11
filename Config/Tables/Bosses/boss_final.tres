@@ -1,27 +1,24 @@
-[gd_resource type="Resource" script_class="BossConfig" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="BossConfig" format=3 uid="uid://2uev58gbl7gf"]
 
-[ext_resource type="Script" path="res://Scripts/Config/BossConfig.cs" id="1_row"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_melee.tres" id="2_skl"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_scream.tres" id="3_skl"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_charge.tres" id="4_skl"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_summon.tres" id="5_skl"]
+[ext_resource type="Script" uid="uid://sougiic4ymdq" path="res://Scripts/Config/BossConfig.cs" id="1_row"]
+[ext_resource type="Resource" uid="uid://d0k1gyfj2jvsv" path="res://Config/Tables/Skills/skl_boss_melee.tres" id="2_skl"]
+[ext_resource type="Resource" uid="uid://btqo0p3kyk273" path="res://Config/Tables/Skills/skl_boss_scream.tres" id="3_skl"]
+[ext_resource type="Resource" uid="uid://c45gkacxawtjx" path="res://Config/Tables/Skills/skl_boss_charge.tres" id="4_skl"]
+[ext_resource type="Resource" uid="uid://c32p5u4t5yw34" path="res://Config/Tables/Skills/skl_boss_summon.tres" id="5_skl"]
 
 [resource]
 script = ExtResource("1_row")
-Id = "boss_final"
-Slot = 1
-DisplayName = "最终首领"
-ScenePath = "res://Scenes/Enemies/Boss.tscn"
-Tags = PackedStringArray("Boss", "Melee")
 MaxHealth = 900.0
 MaxArmor = 200.0
-ArmorDamageReduction = 0.3
 KnockbackResistance = 1.0
 MoveSpeed = 3.6
 AttackDamage = 24.0
 AttackInterval = 1.8
 AttackRange = 3.4
 AttackKnockback = 6.0
-EliteCopyHealthScale = 0.35
+Tags = PackedStringArray("Boss", "Melee")
 Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("4_skl"), ExtResource("5_skl")]
+Id = "boss_final"
+Slot = 1
+DisplayName = "最终首领"
 Note = "数值逐条抄自 Boss.tscn 的 Unit / AbilityMelee / 命中体。EliteCopyHealthScale = 白板首领副本的血量倍率（取代 Balance.tres 里那份没有消费者的 EliteBossHealthScale）。Boss 的冲锋/尖啸/召唤的冷却与专属参数在对应的技能行里。"

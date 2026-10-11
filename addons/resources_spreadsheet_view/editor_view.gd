@@ -293,7 +293,14 @@ func insert_row_sorted(res : Resource, loaded_rows : Array, sort_by : StringName
 
 	var sort_value = res[sort_by]
 	for i in loaded_rows.size():
-		if sort_reverse == compare_values(sort_value, loaded_rows[i][sort_by]):
+		# [项目补丁] loaded_rows 里可能是 Array[Object] 之类的非 Resource 元素，
+		# 直接 [sort_by] 下标访问会报 invalid access。改用 get() 并判空。
+		if loaded_rows[i] == null:
+			continue
+		var row_value = loaded_rows[i].get(sort_by)
+		if row_value == null:
+			continue
+		if sort_reverse == compare_values(sort_value, row_value):
 			loaded_rows.insert(i, res)
 			return
 	

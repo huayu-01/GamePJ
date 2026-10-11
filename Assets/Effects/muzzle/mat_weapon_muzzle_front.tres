@@ -1,7 +1,7 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://dws4vfcxkfdr7"]
 
-[ext_resource type="Shader" path="res://Assets/Effects/muzzle/base.gdshader" id="1_4qkgx"]
-[ext_resource type="Texture2D" path="res://Assets/Textures/tex_weapon_muzzle_front.png" id="2_mvd0f"]
+[ext_resource type="Shader" uid="uid://bem2b1hnv1myn" path="res://Assets/Effects/muzzle/base.gdshader" id="1_4qkgx"]
+[ext_resource type="Texture2D" uid="uid://dd3bwlc7nenaf" path="res://Assets/Textures/tex_weapon_muzzle_front.png" id="2_mvd0f"]
 
 [sub_resource type="Gradient" id="Gradient_gue1d"]
 

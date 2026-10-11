@@ -1,19 +1,7 @@
-[gd_resource type="Resource" script_class="AbilityConfig" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://bcjvlrjrjx72h"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
-
-[sub_resource type="Resource" id="p_skl_enemy_elite_control_0"]
-script = ExtResource("2_param")
-Key = "ActiveTime"
-Value = 0.15
-Note = "命中体激活时长"
-
-[sub_resource type="Resource" id="p_skl_enemy_elite_control_1"]
-script = ExtResource("2_param")
-Key = "TriggerRadius"
-Value = 6.0
-Note = "触发半径"
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="a_skl_enemy_elite_control_0"]
 script = ExtResource("2_param")
@@ -44,19 +32,30 @@ script = ExtResource("2_param")
 Key = "AttackTags"
 Value = PackedStringArray("Control", "AoE")
 
+[sub_resource type="Resource" id="p_skl_enemy_elite_control_0"]
+script = ExtResource("2_param")
+Key = "ActiveTime"
+Value = 0.15
+Note = "命中体激活时长"
+
+[sub_resource type="Resource" id="p_skl_enemy_elite_control_1"]
+script = ExtResource("2_param")
+Key = "TriggerRadius"
+Value = 6.0
+Note = "触发半径"
+
 [resource]
 script = ExtResource("1_row")
-Id = "skl_enemy_elite_control"
-DisplayName = "精英控制"
 NodeName = "AbilityControl"
 ClassHint = "AreaAttackAbility"
-Aim = 0
 Cooldown = 9.0
 Windup = 0.4
 Recover = 0.5
 Enabled = false
 ApproachMinRange = 0.0
 ApproachMaxRange = 6.0
-Params = [SubResource("p_skl_enemy_elite_control_0"), SubResource("p_skl_enemy_elite_control_1")]
 AttackParams = [SubResource("a_skl_enemy_elite_control_0"), SubResource("a_skl_enemy_elite_control_1"), SubResource("a_skl_enemy_elite_control_2"), SubResource("a_skl_enemy_elite_control_3"), SubResource("a_skl_enemy_elite_control_4")]
+Id = "skl_enemy_elite_control"
+DisplayName = "精英控制"
 Note = "技能精英：默认关闭，由 EliteSkillRandomizer 随机开启（Skills = AbilityBuff / AbilityControl）。"
+Params = [SubResource("p_skl_enemy_elite_control_0"), SubResource("p_skl_enemy_elite_control_1")]

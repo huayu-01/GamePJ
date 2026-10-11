@@ -1,27 +1,24 @@
-[gd_resource type="Resource" script_class="EnemyConfig" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyConfig" format=3 uid="uid://nbd077p8klot"]
 
-[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_charger_charge.tres" id="2_skl"]
+[ext_resource type="Script" uid="uid://10b6kkpgdrrb" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+[ext_resource type="Resource" uid="uid://b2kms403206aq" path="res://Config/Tables/Skills/skl_enemy_charger_charge.tres" id="2_skl"]
 
 [resource]
 script = ExtResource("1_row")
-Id = "enemy_charger"
-Slot = 6
-DisplayName = "冲锋兵"
 ScenePath = "res://Scenes/Enemies/Charger.tscn"
-Tags = PackedStringArray("Melee", "Bruiser", "Charger")
+Cost = 3
+Weight = 1.6
+EliteChance = 0.25
 MaxHealth = 90.0
 MaxArmor = 30.0
-ArmorDamageReduction = 0.3
-KnockbackResistance = 0.0
 MoveSpeed = 3.2
 AttackDamage = 18.0
 AttackInterval = 2.6
 AttackRange = 14.0
-AttackKnockback = 8.0
-Cost = 3
-Weight = 1.6
-MinElapsedSeconds = 0.0
-EliteChance = 0.25
+AttackKnockback = 9.0
+Tags = PackedStringArray("Melee", "Bruiser", "Charger")
 Skills = [ExtResource("2_skl")]
+Id = "enemy_charger"
+Slot = 6
+DisplayName = "冲锋兵"
 Note = "冲锋：AttackRange 走 ChargeAttackAbility.MaxDistance（14）。精英率 0.25。"

@@ -1,20 +1,8 @@
-[gd_resource type="Resource" script_class="AbilityConfig" load_steps=14 format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://dgd4hjq2t30ht"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 [ext_resource type="PackedScene" path="res://Scenes/Combat/Bullet.tscn" id="3_scene"]
-
-[sub_resource type="Resource" id="p_skl_enemy_ranged_shot_0"]
-script = ExtResource("2_param")
-Key = "MinRange"
-Value = 3.0
-Note = "最近开火距离"
-
-[sub_resource type="Resource" id="p_skl_enemy_ranged_shot_1"]
-script = ExtResource("2_param")
-Key = "AimHeight"
-Value = 0.9
-Note = "瞄准抬高"
 
 [sub_resource type="Resource" id="a_skl_enemy_ranged_shot_0"]
 script = ExtResource("2_param")
@@ -55,7 +43,6 @@ Note = "散布"
 [sub_resource type="Resource" id="a_skl_enemy_ranged_shot_6"]
 script = ExtResource("2_param")
 Key = "CritChance"
-Value = 0.0
 Note = "暴击率"
 
 [sub_resource type="Resource" id="a_skl_enemy_ranged_shot_7"]
@@ -64,16 +51,26 @@ Key = "ProjectileScene"
 Value = ExtResource("3_scene")
 Note = "弹丸预制体"
 
+[sub_resource type="Resource" id="p_skl_enemy_ranged_shot_0"]
+script = ExtResource("2_param")
+Key = "MinRange"
+Value = 3.0
+Note = "最近开火距离"
+
+[sub_resource type="Resource" id="p_skl_enemy_ranged_shot_1"]
+script = ExtResource("2_param")
+Key = "AimHeight"
+Value = 0.9
+Note = "瞄准抬高"
+
 [resource]
 script = ExtResource("1_row")
-Id = "skl_enemy_ranged_shot"
-DisplayName = "远程射击"
 NodeName = "AbilityRanged"
 ClassHint = "ProjectileAttackAbility"
-Aim = 0
 Windup = 0.45
 Recover = 0.35
-Enabled = true
-Params = [SubResource("p_skl_enemy_ranged_shot_0"), SubResource("p_skl_enemy_ranged_shot_1")]
 AttackParams = [SubResource("a_skl_enemy_ranged_shot_0"), SubResource("a_skl_enemy_ranged_shot_1"), SubResource("a_skl_enemy_ranged_shot_2"), SubResource("a_skl_enemy_ranged_shot_3"), SubResource("a_skl_enemy_ranged_shot_4"), SubResource("a_skl_enemy_ranged_shot_5"), SubResource("a_skl_enemy_ranged_shot_6"), SubResource("a_skl_enemy_ranged_shot_7")]
+Id = "skl_enemy_ranged_shot"
+DisplayName = "远程射击"
 Note = "远程兵：主攻击没有命中体，伤害 8 / 击退 1.2 由单位行写进武器组件；MaxRange 18 由单位行的攻击范围给。"
+Params = [SubResource("p_skl_enemy_ranged_shot_0"), SubResource("p_skl_enemy_ranged_shot_1")]

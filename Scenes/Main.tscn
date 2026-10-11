@@ -1,99 +1,96 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene format=3 uid="uid://3p1b3w788w57"]
 
-[ext_resource type="PackedScene" path="res://Scenes/Levels/TestArena.tscn" id="1_arena"]
+[ext_resource type="PackedScene" uid="uid://c8vnyi8h6o2u8" path="res://Scenes/Levels/TestArena.tscn" id="1_arena"]
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/WorldOverlay.tscn" id="4_overlay"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/HelpScreen.tscn" id="5_help"]
-[ext_resource type="Script" path="res://Scripts/Run/StageController.cs" id="6_stage"]
-[ext_resource type="Script" path="res://Scripts/Encounter/EncounterController.cs" id="7_encounter"]
-[ext_resource type="Script" path="res://Scripts/Encounter/EnemySpawnEntry.cs" id="8_entry"]
-[ext_resource type="Script" path="res://Scripts/Rewards/RunController.cs" id="9_run"]
+[ext_resource type="Script" uid="uid://d4auf6aghoerc" path="res://Scripts/Run/StageController.cs" id="6_stage"]
+[ext_resource type="Script" uid="uid://b83orxiwjo5mp" path="res://Scripts/Encounter/EncounterController.cs" id="7_encounter"]
+[ext_resource type="Script" uid="uid://ca3lp2kx1pfwd" path="res://Scripts/Encounter/EnemySpawnEntry.cs" id="8_entry"]
+[ext_resource type="Script" uid="uid://dxxlf6yglfyct" path="res://Scripts/Rewards/RunController.cs" id="9_run"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/RewardScreen.tscn" id="10_rewards"]
-[ext_resource type="PackedScene" path="res://Scenes/UI/StartScreen.tscn" id="23_start"]
-[ext_resource type="PackedScene" path="res://Scenes/UI/BaseScreen.tscn" id="24_base"]
-[ext_resource type="PackedScene" path="res://Scenes/UI/ChooseScreen.tscn" id="25_choose"]
-[ext_resource type="Script" path="res://Scripts/World/MapManager.cs" id="26_map"]
 [ext_resource type="PackedScene" path="res://Scenes/Interactables/RewardNode.tscn" id="11_node"]
 [ext_resource type="PackedScene" path="res://Scenes/Interactables/BossDoor.tscn" id="12_door"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/Chaser.tscn" id="13_chaser"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/FastMelee.tscn" id="14_fast"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/Exploder.tscn" id="15_exploder"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/RangedEnemy.tscn" id="16_ranged"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Boss.tscn" id="17_boss"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/SkillElite.tscn" id="18_elite"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/JumpingMelee.tscn" id="19_jump"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/Charger.tscn" id="20_charger"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/Screamer.tscn" id="21_screamer"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/Guard.tscn" id="22_guard"]
-[ext_resource type="PackedScene" path="res://Scenes/Enemies/Boss.tscn" id="17_boss"]
-[ext_resource type="PackedScene" path="res://Scenes/Enemies/SkillElite.tscn" id="18_elite"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/StartScreen.tscn" id="23_start"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/BaseScreen.tscn" id="24_base"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/ChooseScreen.tscn" id="25_choose"]
+[ext_resource type="Script" uid="uid://3wj8m1he6twb" path="res://Scripts/World/MapManager.cs" id="26_map"]
 
-[node name="Main" type="Node3D"]
+[node name="Main" type="Node3D" unique_id=218913370]
 
-[node name="MapManager" type="Node3D" parent="."]
+[node name="MapManager" type="Node3D" parent="." unique_id=1573953529]
 script = ExtResource("26_map")
 
-[node name="TestArena" parent="." instance=ExtResource("1_arena")]
+[node name="TestArena" parent="." unique_id=1880896571 instance=ExtResource("1_arena")]
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=941442993 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
-[node name="Hud" parent="." instance=ExtResource("3_hud")]
+[node name="Hud" parent="." unique_id=290143423 instance=ExtResource("3_hud")]
 
-[node name="WorldOverlay" parent="." instance=ExtResource("4_overlay")]
+[node name="WorldOverlay" parent="." unique_id=1100632517 instance=ExtResource("4_overlay")]
 
-[node name="HelpScreen" parent="." instance=ExtResource("5_help")]
+[node name="HelpScreen" parent="." unique_id=2044361750 instance=ExtResource("5_help")]
 
-[node name="RunController" type="Node" parent="."]
+[node name="RunController" type="Node" parent="." unique_id=983817383]
 script = ExtResource("9_run")
 
-[node name="RewardScreen" parent="RunController" instance=ExtResource("10_rewards")]
+[node name="RewardScreen" parent="RunController" unique_id=1082604421 instance=ExtResource("10_rewards")]
 
-[node name="BaseScreen" parent="RunController" instance=ExtResource("24_base")]
+[node name="BaseScreen" parent="RunController" unique_id=508025901 instance=ExtResource("24_base")]
 
-[node name="ChooseScreen" parent="RunController" instance=ExtResource("25_choose")]
+[node name="ChooseScreen" parent="RunController" unique_id=1880528248 instance=ExtResource("25_choose")]
 
-[node name="StartScreen" parent="RunController" instance=ExtResource("23_start")]
+[node name="StartScreen" parent="RunController" unique_id=2063483899 instance=ExtResource("23_start")]
 
-[node name="Stage" type="Node3D" parent="."]
+[node name="Stage" type="Node3D" parent="." unique_id=387874497]
 script = ExtResource("6_stage")
 ActiveNodeCount = 6
-FreeChallengeQuota = 1
 PortalScene = ExtResource("11_node")
+FreeChallengeQuota = 1
 
-[node name="Combat" type="Node3D" parent="Stage"]
+[node name="Combat" type="Node3D" parent="Stage" unique_id=272288677]
 script = ExtResource("7_encounter")
-EliteBossScene = ExtResource("17_boss")
-AutoStart = false
 TotalBudget = 10.0
 BudgetRegenPerSecond = 1.4
 BudgetCap = 4.0
 MaxConcurrent = 3
 SpawnInterval = 2.0
-SpawnRadius = 22.0
 MinSpawnDistance = 12.0
+AutoStart = false
+EliteBossScene = ExtResource("17_boss")
 
-[node name="SpawnChaser" type="Node" parent="Stage/Combat"]
+[node name="SpawnChaser" type="Node" parent="Stage/Combat" unique_id=2058816736]
 script = ExtResource("8_entry")
 Scene = ExtResource("13_chaser")
 DisplayName = "基础近战"
 Cost = 2
 Weight = 3.0
 
-[node name="SpawnFast" type="Node" parent="Stage/Combat"]
+[node name="SpawnFast" type="Node" parent="Stage/Combat" unique_id=204041777]
 script = ExtResource("8_entry")
 Scene = ExtResource("14_fast")
 DisplayName = "快速近战"
-Cost = 1
 Weight = 2.5
 
-[node name="SpawnExploder" type="Node" parent="Stage/Combat"]
+[node name="SpawnExploder" type="Node" parent="Stage/Combat" unique_id=1965107860]
 script = ExtResource("8_entry")
 Scene = ExtResource("15_exploder")
 DisplayName = "自爆"
-Cost = 1
 Weight = 1.5
 
-[node name="SpawnRanged" type="Node" parent="Stage/Combat"]
+[node name="SpawnRanged" type="Node" parent="Stage/Combat" unique_id=1629649838]
 script = ExtResource("8_entry")
 Scene = ExtResource("16_ranged")
 DisplayName = "远程"
@@ -101,14 +98,14 @@ Cost = 2
 Weight = 1.6
 MinElapsedSeconds = 8.0
 
-[node name="SpawnJump" type="Node" parent="Stage/Combat"]
+[node name="SpawnJump" type="Node" parent="Stage/Combat" unique_id=852051866]
 script = ExtResource("8_entry")
 Scene = ExtResource("19_jump")
 DisplayName = "跳跃近战"
 Cost = 2
 Weight = 2.0
 
-[node name="SpawnCharger" type="Node" parent="Stage/Combat"]
+[node name="SpawnCharger" type="Node" parent="Stage/Combat" unique_id=113674998]
 script = ExtResource("8_entry")
 Scene = ExtResource("20_charger")
 DisplayName = "冲锋兵"
@@ -116,83 +113,74 @@ Cost = 3
 Weight = 1.6
 EliteChance = 0.25
 
-[node name="SpawnScreamer" type="Node" parent="Stage/Combat"]
+[node name="SpawnScreamer" type="Node" parent="Stage/Combat" unique_id=862992924]
 script = ExtResource("8_entry")
 Scene = ExtResource("21_screamer")
 DisplayName = "尖啸者"
 Cost = 2
 Weight = 1.2
 
-[node name="SpawnGuard" type="Node" parent="Stage/Combat"]
+[node name="SpawnGuard" type="Node" parent="Stage/Combat" unique_id=317314589]
 script = ExtResource("8_entry")
 Scene = ExtResource("22_guard")
 DisplayName = "守卫"
 Cost = 3
 Weight = 1.2
 EliteChance = 0.2
-[node name="BossFight" type="Node3D" parent="Stage"]
+
+[node name="BossFight" type="Node3D" parent="Stage" unique_id=823637009]
 script = ExtResource("7_encounter")
-AutoStart = false
 TotalBudget = 0.0
 BudgetRegenPerSecond = 0.0
 BudgetCap = 0.0
 MaxConcurrent = 4
 SpawnInterval = 1.0
+AutoStart = false
 BossScene = ExtResource("17_boss")
 BossGuardScene = ExtResource("18_elite")
-BossGuardCount = 2
 BossSpawnDelay = 1.5
-BossSpawnDistance = 16.0
 
-[node name="NodeEnhance3" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeEnhance3" parent="Stage" unique_id=1296581663 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -10)
-Prompt = "强化池"
-Kind = 1
 
-[node name="NodeEnhance" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeEnhance" parent="Stage" unique_id=93880591 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -10)
-Prompt = "强化池"
-Kind = 1
 
-[node name="NodeEvolution" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeEvolution" parent="Stage" unique_id=1839181062 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -10)
-Prompt = "进化池"
 Kind = 2
+Prompt = "进化池"
 
-[node name="NodeMutation" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeMutation" parent="Stage" unique_id=1187080180 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 10)
-Prompt = "异化池"
 Kind = 3
+Prompt = "异化池"
 
-[node name="NodeShop" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeShop" parent="Stage" unique_id=1011276467 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 0)
-Prompt = "补给站（花碎片）"
 Kind = 7
+Prompt = "补给站（花碎片）"
 
-[node name="NodeResource" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeResource" parent="Stage" unique_id=1009939510 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 10)
-Prompt = "材料"
 Kind = 4
+Prompt = "材料"
 
-[node name="NodeEnhance2" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeEnhance2" parent="Stage" unique_id=673119209 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
-Prompt = "强化池"
-Kind = 1
 
-[node name="NodeEnhance4" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeEnhance4" parent="Stage" unique_id=140037047 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 0)
-Prompt = "强化池"
-Kind = 1
 
-[node name="NodeHeal" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeHeal" parent="Stage" unique_id=32264995 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
-Prompt = "恢复状态"
 Kind = 5
+Prompt = "恢复状态"
 
-[node name="NodeSpecial" parent="Stage" instance=ExtResource("11_node")]
+[node name="NodeSpecial" parent="Stage" unique_id=1120117016 instance=ExtResource("11_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -10)
-Prompt = "特殊奖励"
 Kind = 6
+Prompt = "特殊奖励"
 
-[node name="Door" parent="Stage" instance=ExtResource("12_door")]
+[node name="Door" parent="Stage" unique_id=1913413718 instance=ExtResource("12_door")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)

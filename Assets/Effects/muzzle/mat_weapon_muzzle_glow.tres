@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://dtcnjkjbdkbbn"]
 
-[ext_resource type="Shader" path="res://Assets/Effects/muzzle/glow.gdshader" id="1_l23xq"]
+[ext_resource type="Shader" uid="uid://bb0wy5msch4ry" path="res://Assets/Effects/muzzle/glow.gdshader" id="1_l23xq"]
 
 [sub_resource type="Gradient" id="Gradient_1o27r"]
 
