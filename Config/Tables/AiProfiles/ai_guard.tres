@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_guard"
+DisplayName = "守卫"
+SearchRange = 30.0
+AttackPriority = 100
+ChasePriority = 10
+ChaseStopDistance = 2.0
+Note = "AI 档案 · 守卫（Guard.tscn）。索敌最短（30）+ StopDistance 最远（2.0）：血厚走得慢，站在自己的攻击距离上等玩家上门（射程见技能行 skl_enemy_guard_melee 的 AttackRange 2.4）。"

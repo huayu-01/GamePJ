@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BalanceConfig" load_steps=96 format=3]
+[gd_resource type="Resource" script_class="BalanceConfig" load_steps=107 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/BalanceConfig.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -95,6 +95,17 @@
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_pistol.tres" id="94_pool_pistol"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_sniper.tres" id="95_pool_sniper"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_rifle.tres" id="96_pool_rifle"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_chaser.tres" id="97_ai_chaser"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_fast_melee.tres" id="98_ai_fast_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_exploder.tres" id="99_ai_exploder"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_jumping_melee.tres" id="100_ai_jumping_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_ranged.tres" id="101_ai_ranged"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_charger.tres" id="102_ai_charger"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_screamer.tres" id="103_ai_screamer"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_guard.tres" id="104_ai_guard"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_skill_elite.tres" id="105_ai_skill_elite"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_boss.tres" id="106_ai_boss"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_drone.tres" id="107_ai_drone"]
 
 [resource]
 script = ExtResource("1_balance")
@@ -141,3 +152,4 @@ Skills = [ExtResource("64_skl_dash"), ExtResource("65_skl_burst"), ExtResource("
 PressureMods = [ExtResource("89_pmod_berserk"), ExtResource("90_pmod_fortress"), ExtResource("91_pmod_swift")]
 Bosses = [ExtResource("92_boss_final")]
 Summons = [ExtResource("93_summon_drone")]
+AiProfiles = [ExtResource("97_ai_chaser"), ExtResource("98_ai_fast_melee"), ExtResource("99_ai_exploder"), ExtResource("100_ai_jumping_melee"), ExtResource("101_ai_ranged"), ExtResource("102_ai_charger"), ExtResource("103_ai_screamer"), ExtResource("104_ai_guard"), ExtResource("105_ai_skill_elite"), ExtResource("106_ai_boss"), ExtResource("107_ai_drone")]

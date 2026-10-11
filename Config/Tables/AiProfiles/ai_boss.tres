@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_boss"
+DisplayName = "最终首领"
+SearchRange = 60.0
+ScreamPriority = 120
+ChargePriority = 110
+AttackPriority = 100
+SummonPriority = 60
+ChasePriority = 10
+ChaseStopDistance = 2.4
+Note = "AI 档案 · 最终首领（Boss.tscn）。唯一一个 Brain 下面有 3 个通用技能槽的敌种（Scream / Charge / Summon），也是「按节点名开列」而不是「按行为类开列」的理由 —— 按类开列这三个槽会撞成一列。三个槽各自的 AbilityNodeName 是身份、留在场景里。"

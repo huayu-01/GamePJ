@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_jumping_melee"
+DisplayName = "跳跃近战"
+SearchRange = 40.0
+ChasePriority = 10
+ChaseStopDistance = 1.6
+LeapPriority = 100
+Note = "AI 档案 · 跳跃近战（JumpingMelee.tscn）。Leap 是通用技能槽（UseAbilityBehavior），跳跃速度/滞空在技能行 skl_enemy_jumping_leap 的 Params 里。"

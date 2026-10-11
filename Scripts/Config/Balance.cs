@@ -61,6 +61,7 @@ public partial class Balance : Node
 		ConfigRows.Rebuild(Config.Enemies);
 		ConfigRows.Rebuild(Config.Bosses);
 		ConfigRows.Rebuild(Config.Summons);
+		ConfigRows.Rebuild(Config.AiProfiles);
 		ConfigRows.Rebuild(Config.Skills);
 		ConfigRows.Rebuild(Config.PressureMods);
 		ConfigRows.Rebuild(Config.Effects);
@@ -80,6 +81,9 @@ public partial class Balance : Node
 
 		// 武器 → 升级池 → 选项 的三层关联（配置表阶段 4）：读不到表 / 武器行没填 Pool 也在这里留痕。
 		ReportUpgradePools();
+
+		// 单位行 → AI 档案（配置表阶段 5）：读不到表 / 单位行没挂档案也在这里留痕。
+		ReportAiProfiles();
 
 		// 首领强化：数值型（Pressure 表）与行为型（技能表里 ApplyHandler 非空的行）分别编译，
 		// 两者必须能按来源分开（关卡核心文档 §7.1）。
@@ -108,7 +112,7 @@ public partial class Balance : Node
 
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
-			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
+			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()} / AI 档案 {ConfigRows.Count<AiProfileConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
 	}
 
 	/// <summary>
@@ -157,6 +161,68 @@ public partial class Balance : Node
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
 			$"升级池：{poolCount} 个（来源：{(poolCount > 0 ? "表 UpgradePools" : "代码默认值（表读不到）")}）—— 武器指向 [{byWeapon}]；选项行里指定了池的 {assignedOptions} 条，其余走「标签匹配 → 通用」两层");
+	}
+
+	/// <summary>
+	/// 把"单位行 → AI 档案"的关联写进日志（配置表阶段 5 的"顺藤摸瓜"入口）。
+	///
+	/// **回退路径在这里一眼能看出来**：AI 档案表读不到、或单位行没挂 <see cref="UnitConfig.AiProfile"/> 时，
+	/// 档案数为 0、每个单位都显示"（未填）"，此时各单位保留**场景里**的 AI 参数，玩法数值不变。
+	/// 与 <see cref="ReportUpgradePools"/> 同一条纪律：引用还在、索引里查不到也要报出来。
+	/// </summary>
+	private void ReportAiProfiles()
+	{
+		var links = new System.Text.StringBuilder();
+		int unlinked = 0;
+		CollectAiLinks(Config.Enemies, links, ref unlinked);
+		CollectAiLinks(Config.Bosses, links, ref unlinked);
+		CollectAiLinks(Config.Summons, links, ref unlinked);
+
+		int profileCount = ConfigRows.Count<AiProfileConfig>();
+		ActRoguelike.Core.GameLog.Write(
+			"Config",
+			$"AI 档案：{profileCount} 个（来源：{(profileCount > 0 ? "表 AiProfiles" : "代码默认值（表读不到）")}）—— 单位指向 [{links}]；有预制体但没挂档案的 {unlinked} 个");
+	}
+
+	/// <summary>
+	/// 把一个单位表里的"行 → AI 档案"关系追加到日志串上。
+	/// 只统计**真的会生成**的行：<c>ScenePath</c> 属性不存在（角色表）或留空（<c>enemy_global</c> 全局倍率行）就跳过。
+	/// </summary>
+	private static void CollectAiLinks<T>(T[] rows, System.Text.StringBuilder links, ref int unlinked) where T : UnitConfig
+	{
+		foreach (T row in rows)
+		{
+			if (row == null)
+			{
+				continue;
+			}
+
+			Variant scenePath = row.Get("ScenePath");
+			if (scenePath.VariantType is not (Variant.Type.String or Variant.Type.StringName) || string.IsNullOrEmpty(scenePath.AsString()))
+			{
+				continue;
+			}
+
+			if (row.AiProfile == null)
+			{
+				unlinked++;
+				continue;
+			}
+
+			if (links.Length > 0)
+			{
+				links.Append('、');
+			}
+
+			links.Append($"{row.Id}→{row.AiProfile.Id}");
+
+			// 行文件被引用 ≠ 被索引（与升级池那次同一个坑）。
+			if (ConfigRows.ById<AiProfileConfig>(row.AiProfile.Id) == null)
+			{
+				GD.PushWarning($"[Balance] 单位行 {row.Id} 的 AiProfile 指向「{row.AiProfile.Id}」，但这个档案不在 Balance.tres 的 AiProfiles 索引里。");
+				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 单位行 {row.Id} 指向的 AI 档案「{row.AiProfile.Id}」不在 AiProfiles 索引里（引用还在，索引里查不到）。");
+			}
+		}
 	}
 
 	/// <summary>

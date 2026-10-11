@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_drone"
+DisplayName = "无人机（召唤物）"
+SearchRange = 22.0
+TargetRefreshInterval = 0.3
+AttackPriority = 100
+ChasePriority = 10
+ChaseStopDistance = 1.6
+Note = "AI 档案 · 无人机（Drone.tscn，角色 3 的召唤物）。唯一填了 TargetRefreshInterval 的单位（0.3 秒——比默认 0.4 更勤地换目标，因为无人机只活 25 秒）。"

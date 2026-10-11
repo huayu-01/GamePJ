@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_screamer"
+DisplayName = "尖啸者"
+SearchRange = 30.0
+ScreamPriority = 100
+KeepDistancePriority = 20
+KeepDistancePreferredDistance = 6.0
+KeepDistanceTolerance = 1.5
+Note = "AI 档案 · 尖啸者（Screamer.tscn）。索敌 30（比近战短）+ 舒适圈 6 米：够近才尖叫，然后退回 6 米外。没有 Chase 行为，所以「不走过去」是拓扑决定的，不靠 Priority。"

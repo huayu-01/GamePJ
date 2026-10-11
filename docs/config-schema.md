@@ -18,11 +18,16 @@
 >   全部改为 `: UnitConfig`；白名单从"按中文显示名"改成"按敌人表 Id"。
 >   进度、实测与回退验证见 **§5 阶段 3**。
 > - **阶段 4（2026-10，用户点名要的"武器 → 升级池 → 选项"三层关联）**：新增**升级池表
->   `UpgradePoolConfig`**（`Config/Tables/UpgradePools/`，3 行 = 一共 **13 张表**），
+>   `UpgradePoolConfig`**（`Config/Tables/UpgradePools/`，3 行），
 >   `WeaponConfig.Pool`（**正向指**）+ `RewardConfig.Pool`（**一个选项占一行 + 一个引用列**）；
 >   **三级回退**落在 `RewardDefinition.AllowsWeapon`；顺手**删掉死字段 `PoolTags`、接上 `ConflictsWith`**。
 >   ⚠️ 这一轮**推翻了本文 §4.5.2 / §6.9 的"反向指"推荐** —— 用户拍板要正向指，理由与落地形态见
 >   **§4.5.0** 与 **§5 阶段 4**。
+> - **阶段 5（2026-10，盘点 #15「AI 行为表」）**：新增**AI 行为表 `AiProfileConfig`**
+>   （`Config/Tables/AiProfiles/`，11 行 = 一行一个 AI 档案，一共 **14 张表**），
+>   `UnitConfig.AiProfile`（**资源引用**，不是字符串 id）+ `AiProfileConfig.ApplyTo` 套到
+>   `EnemyBrain` 与各 `Behavior` 节点。盘出 **25 个 AI 参数**（原先散在 10 个敌人场景的 53 处赋值里）。
+>   套用挂在 `UnitConfig.ApplyTo` 上，**没有碰 `EncounterController`**。进度、实测与两次回退验证见 **§5 阶段 5**。
 > - **阶段 6（2026-10，本文 T7 的后半 + T9 的最后一步）**：**Pressure 转换池接线**。
 >   `PressureModConfig` 多一列 `Tags`、`Weight` 真的按权重抽；`NodeConfig` 的三个空壳字段
 >   （`BossPressurePoints` / `BossModifierRolls` / `BossModifierTags`）全部接进
@@ -41,7 +46,7 @@
 |---|---|
 | 盘出多少可配置项 | **632 处磁盘配置实例**（`Scenes/**.tscn` 里 513 处脚本属性赋值 + `Config/Balance.tres` 里 119 处）+ **305 个 C# 可导出属性槽**（分布在 49 个文件） |
 | 多少当前硬编码 | 全项目 **214 处**十进制字面量；剔除测试代码（48）、纯表现/UI 布局（61）、clamp/epsilon/形状数学后，**约 65 处是"可调玩法数值"**（A 类 40 + B 类 25）。其中 **40 处集中在 7 个文件**：**30 处在 6 个纯"目录式"文件**里（`RewardCatalog` 11 / `StatusEffect` 6 / `BossPerk` 4 / `MetaProgress` 4 / `RunSettlement` 3 / `SpawnPlanner` 2），另 10 处在 ~~`RunController.DefaultStages()`~~ —— 这 40 处就是"应该整表外置"的候选。✅ 其中 `RunController` 那 10 处已随阶段 1 删除 |
-| 拆几张表 | **11 张**（T1–T11）：武器 / 技能 / 增幅项 / 角色 / 敌人 / 关卡 / 节点 / 状态 / **首领增强（含词条）** / 局外成长（见 §3）。✅ **已落地 13 个表目录**（阶段 1+2+3+4）：`Weapons` / `Characters` / `Enemies` / `Bosses` / `Summons` / `Skills` / `Pressure` / **`UpgradePools`** / `Effects` / `Nodes` / `Upgrades` / `Meta` / `Stages`；✅ **Pressure 转换池已在阶段 6 接线**（表与抽取点都到位，见 §5 阶段 6） |
+| 拆几张表 | **11 张**（T1–T11）：武器 / 技能 / 增幅项 / 角色 / 敌人 / 关卡 / 节点 / 状态 / **首领增强（含词条）** / 局外成长（见 §3）。✅ **已落地 14 个表目录**（阶段 1+2+3+4+5）：`Weapons` / `Characters` / `Enemies` / `Bosses` / `Summons` / **`AiProfiles`** / `Skills` / `Pressure` / **`UpgradePools`** / `Effects` / `Nodes` / `Upgrades` / `Meta` / `Stages`；✅ **Pressure 转换池已在阶段 6 接线**（表与抽取点都到位，见 §5 阶段 6） |
 | 第一阶段做哪张 | **关卡表（T6）**。理由见 §5 的「阶段 1」小节：类已经存在（`StageDefinition` 15 个字段）、改动只有 2 个调用点、有现成自测可逐项比对、而且顺手消掉一个**已经漂移的真 bug**。✅ **阶段 0 与阶段 1 已完成（2026-10）**，进度与实测证据见 §5；两条新挖出来的坑见 §5 阶段 1 与 §7.2 |
 | 行怎么放 | **一行 = 一个 `.tres` 文件，一个文件夹 = 一张表**（[config-tooling.md](config-tooling.md) 推荐的 `Edit Resources as Table` 插件按文件夹分组，这是硬约束）。`Balance.tres` 持有 `[Export] XxxConfig[]` 数组显式引用这些行 —— **不扫目录**，导出后也不会掉文件 |
 | 最需要拍板的 | **效果怎么表达**（`ApplyHandler` 字符串 + C# 处理器注册表，还是允许内嵌脚本）—— 这一条决定整套体系是"可校验的数据"还是"换皮代码"（见 §6.1）。另有两条与你的两个场景直接相关：**武器→升级池的关联方向**（§6.9）与**场景 A 的范围**（§6.10） |
@@ -2265,6 +2270,47 @@ AbilityId skl_dash ｜ 近战 伤害 32 间隔 0.75 射程 2.4 击退 5 命中�
 > `WeaponConfig.ApplicableWeapons` 这个字段**全项目从未存在过**（只在文档里），所以没有代码要删。
 > §6.9 的取舍点因此有结论了（见该节）。
 
+### 阶段 5：AI 行为表（盘点 #15）✅ **已完成（2026-10）**
+
+> **做了什么**（详细实测 / 两次回退验证 / 逐行 diff 见 [config.md](config.md) 的「配置表阶段 5 实测」）：
+>
+> | 变化 | 文件 |
+> |---|---|
+> | 新行类 **`AiProfileConfig : ConfigRow`**（`[Tool]` + `[GlobalClass]`）：Brain 2 列 + **21 个行为槽列**（按节点名）+ `ConfigRow.Params` 逃生口 | `Scripts/Config/AiProfileConfig.cs` |
+> | 新表 **`Config/Tables/AiProfiles/ai_*.tres`**（**11 行** = 一行一个 AI 档案：9 敌种 + 首领 + 无人机） | 新目录 |
+> | 新列 **`UnitConfig.AiProfile`**（**资源引用** `AiProfileConfig?`，不是字符串 id）+ 一行调用 `ApplyAiProfileTo(unit)` | `Scripts/Config/UnitConfig.cs` |
+> | 索引数组 `BalanceConfig.AiProfiles` + `ConfigRows.Rebuild` + **`ReportAiProfiles()` 日志留痕**（单位行→档案 + "有预制体但没挂档案的 N 个" + "引用还在索引里查不到"的警告） | `BalanceConfig.cs` / `Balance.cs` |
+> | 11 个单位行填引用：9 个 `enemy_*.tres` + `boss_final.tres` + `summon_drone.tres` | 11 个行文件 |
+> | 自测新增 `配置表比对·AI 档案表` + **"伪造 -1 再 ApplyTo"探针** + 场上敌人的实测行，索引行末尾加 `/AI 档案 11` | `SelfTest.cs` |
+> | 顺手修：`enemy_exploder.tres` 的 `Note` 里 4 个 ASCII 引号（`"…"` 会让 Godot 的 VariantParser 在该行报错 → 改成 `「」`） | 1 个行文件 |
+>
+> **盘到的参数（以代码为准）**：**25 个** —— `EnemyBrain` 2 · `Behavior` 基类 3（`Priority`/`MinRange`/`MaxRange`）
+> · `Chase` 2 · `KeepDistance` 5 · `Retreat` 3 · `UseAbility` 1 · `Reposition` 5（**0 场景使用**）
+> · `AvoidObstacles` 4 处硬编码启发式（**没有进表**，它们是"AI 手感"保护值，见 §1.3 B 类）。
+> 场景侧赋值：敌人 10 个场景 **53 处** + 无人机 5 处 + 训练场 4 处 = **62 处**。
+>
+> **三个设计取舍**（都写进了类注释）：
+> 1. **扁平列而不是 `Array[行为]`** —— 一列 = 一个标量属性才拿得到编辑器的排序/批量改；
+>    数组列既拿不到这些，阶段 4 还实测过 `Array[Object]` 的插件报错。这与 §4.3「一个选项占一栏」是同一条理由。
+> 2. **按节点名开列而不是按行为类** —— Boss 的 `Brain` 下有 **3 个** `UseAbilityBehavior`
+>    （`Scream` P120 / `Charge` P110 / `Summon` P60），按类开列会撞成一列。
+> 3. **`AiProfileId`（阶段 3 预留名）→ `AiProfile`（资源引用）** —— 与 `UnitConfig.Skills` /
+>    `WeaponConfig.Pool` 同一套写法；行文件被删/改名时 Godot 把引用置 null（可判定、可警告），
+>    而字符串 id 拼错只会静默失效（§1.2 里那 11 处字符串外键的老问题）。`Edit Resources as Table`
+>    里同样是资源列（与阶段 4 实测的 `Pool(type=24, hint=17)` 同类）。
+>
+> **两条语义约定**（沿用既有纪律）：**数值列 0 = 不覆盖**（`RetreatHealthThreshold` 用 `-1`，因为 0 = 永不撤退有意义）；
+> **`Priority <= 0` = 整个槽位不生效**。**边界**：档案只调数值，**不增删行为节点**（拓扑在场景里）；
+> `AbilityNodeName`（身份）与 `MinRange`/`MaxRange` 走 `Params` 逃生口（键 = `节点名.属性名`）。
+>
+> **验收（实测）**：`build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**；
+> 自测走到 `=== 自测结束 ===`，索引 `…/升级池 3/AI 档案 11（期望 …/11）`，
+> 探针 `SearchRange 40 / Chase.Priority 10 / StopDistance 1.6 / Attack.Priority 100`（篡改后又被写回 = 真套上了）；
+> 与基线日志逐行 diff，**所有既有 `配置表比对·*` 行逐位相同**（索引行只在末尾追加）。
+> 两次回退验证：清 `AiProfiles` 索引 → `0 个（来源：代码默认值（表读不到））` + 11 条 warning、**玩法不变**；
+> 清单位行的 `AiProfile` → 探针**保留伪造的 -1**（= 真的什么都没写，走组件/场景默认值）。
+> ⚠️ 清索引数组**不会**让单位丢掉档案（引用在行文件里）—— 与阶段 3/4 那条边界**同一个坑，第三次遇到**。
+
 ### 阶段 6：首领增强的"节点驱动抽奖"（T7 的后半 + T9 的最后一步）✅ **已完成（2026-10）**
 
 > **做了什么**（详细实测 / 回退验证 / 逐条解释见 [config.md](config.md) 的「配置表阶段 6 实测」）：
@@ -2576,10 +2622,10 @@ public WeaponFieldMask Overrides { get; set; } = WeaponFieldMask.All;
 | 它是什么 | 说明 |
 |---|---|
 | ✅ **仍是全项目数值的唯一入口** | 业务代码继续写 `Balance.Settings.Xxx`（[todo-handoff.md](todo-handoff.md) 的"统一入口"约定**没变**）。`Balance` 从"唯一数值**文件**"变成"唯一数值**门面**"（§2.1 就是这么设计的） |
-| ✅ **同时是 13 张表的索引持有者** | 12 个 `[Export] XxxConfig[]` 数组 + 既有的 `Stages`，元素全部是独立 `ExtResource`：<br>`Stages` / `Weapons` / `Characters` / `Enemies` / **`Bosses`** / **`Summons`** / **`Skills`** / **`PressureMods`** / `Effects` / `Nodes` / `Upgrades` / **`UpgradePools`** / `MetaUpgrades`（阶段 3 新增的 4 个、阶段 4 新增的 1 个加粗） |
+| ✅ **同时是 14 张表的索引持有者** | 13 个 `[Export] XxxConfig[]` 数组 + 既有的 `Stages`，元素全部是独立 `ExtResource`：<br>`Stages` / `Weapons` / `Characters` / `Enemies` / **`Bosses`** / **`Summons`** / **`AiProfiles`** / **`Skills`** / **`PressureMods`** / `Effects` / `Nodes` / `Upgrades` / **`UpgradePools`** / `MetaUpgrades`（阶段 3 新增的 4 个、阶段 4 新增的 1 个、**阶段 5 新增的 1 个**加粗） |
 | ⏸ **没有**把索引分散到各系统 | **理由**：① 分散会造出 12 个"谁持有哪张表"的新约定，[architecture.md](architecture.md):134「加新全局入口前先问：能不能传参」的精神是**少入口**；② `ConfigRows` 是一个静态索引器，谁来 `Rebuild` 都一样，而现在只有 `Balance._Ready` 一处；③ **回退语义要能一眼看出"整份配置有没有加载上"** —— `Balance.FileLoaded` 已经是那个开关，分散后它会失去意义 |
-| 顺序依赖 | `Balance._Ready` → `CallDeferred(BuildTableIndex)`（**必须 defer**，见 §5 阶段 2 的坑 1）→ `ConfigRows.Rebuild(...)` ×12 + `SetKind` ×9 + `RewardTable.Build` + **`ReportUpgradePools()`（阶段 4：武器→池→选项的留痕）** + `BossPerkCatalog.Build(Config.Skills, Config.PressureMods)` + 关卡白名单校验（未知 Id 写警告） |
-| `BalanceConfig` 的标量字段 | **30 个**（标量；另有 **13 个表索引数组**。阶段 3 删掉两个死字段 `EliteBossHealthScale` / `BossHealthBarScale`） |
+| 顺序依赖 | `Balance._Ready` → `CallDeferred(BuildTableIndex)`（**必须 defer**，见 §5 阶段 2 的坑 1）→ `ConfigRows.Rebuild(...)` ×13 + `SetKind` ×9 + `RewardTable.Build` + **`ReportUpgradePools()`（阶段 4：武器→池→选项的留痕）** + **`ReportAiProfiles()`（阶段 5：单位行→AI 档案的留痕）** + `BossPerkCatalog.Build(Config.Skills, Config.PressureMods)` + 关卡白名单校验（未知 Id 写警告） |
+| `BalanceConfig` 的标量字段 | **30 个**（标量；另有 **14 个表索引数组**。阶段 3 删掉两个死字段 `EliteBossHealthScale` / `BossHealthBarScale`） |
 
 ### 8.2 读表 / 回退的固定写法（新代码照抄）
 

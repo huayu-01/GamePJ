@@ -527,7 +527,7 @@ public partial class SelfTest : Node
 				: $"配置表比对·武器：伤害 {weapon.Damage:0}（期望 24） 间隔 {weapon.FireInterval:0.##}（期望 0.26） 弹匣 {weapon.EffectiveMagazineSize}（期望 12） 装填 {weapon.ReloadTime:0.##}（期望 0.7） 散布 {weapon.SpreadDegrees:0.##}（期望 0.5） 击退 {weapon.Knockback:0.##}（期望 2.5） 暴击 {weapon.CritChance:0.##}（期望 0.15） 弹速 {weapon.ProjectileSpeed:0}（期望 90） 预瞄FOV {weapon.AimFov:0}（期望 55） 穿透 {weapon.BasePierce}（期望 0） 连发 {weapon.Automatic}（期望 False）");
 
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}（期望 3/3/10/1/1/25/3/9/9/5/3）");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}（期望 3/3/10/1/1/25/3/9/9/5/3/11）");
 
 		GameLog.Write("SelfTest",
 			$"配置表比对·节点表：进化层 {NodePlacement.LayerOf(RewardNodeKind.Evolution)}/波 {NodePlacement.WavesFor(RewardNodeKind.Evolution)}（期望 2/3） 强化层 {NodePlacement.LayerOf(RewardNodeKind.Enhancement)}/波 {NodePlacement.WavesFor(RewardNodeKind.Enhancement)}（期望 1/2） 恢复层 {NodePlacement.LayerOf(RewardNodeKind.Heal)}/波 {NodePlacement.WavesFor(RewardNodeKind.Heal)}（期望 0/1） 商店价目 {RewardService.ShopCost(0)}/{RewardService.ShopCost(1)}/{RewardService.ShopCost(2)}（期望 5/12/18） 标题 {RewardService.TitleFor(RewardNodeKind.Mutation)}（期望 异化池）");
@@ -637,6 +637,34 @@ public partial class SelfTest : Node
 		GameLog.Write("SelfTest",
 			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 25 = 5 玩家 + 16 单位 + 4 首领行为） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型 {ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型 {ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 3）");
 
+		// AI 行为表（阶段 5）：行数 + "敌人行 → 档案"的关联 + **真的写进去了**的硬证据。
+		ActRoguelike.Config.AiProfileConfig? chaserAi = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AiProfileConfig>("ai_chaser");
+		GameLog.Write("SelfTest",
+			$"配置表比对·AI 档案表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()} 行（期望 11 = 9 敌种 + 首领 + 召唤物） 敌人行 enemy_chaser 挂的档案「{chaser?.AiProfile?.Id}」（期望 ai_chaser） 档案行 SearchRange {chaserAi?.SearchRange:0.##}（期望 40）");
+		if (chaser != null && GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn") is { } chaserScene)
+		{
+			// 探针：先把预制体上的 AI 值改成 -1（伪造"错的值"）再 ApplyTo ——
+			// 值回到档案里的数才能证明档案**确实写进了** Brain / 行为节点，而不是"碰巧与场景相等"。
+			var probe = chaserScene.Instantiate<Unit>();
+			ActRoguelike.AI.EnemyBrain? probeBrain = NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(probe);
+			ActRoguelike.AI.Behavior? probeChase = probeBrain?.GetNodeOrNull<ActRoguelike.AI.Behavior>("Chase");
+			ActRoguelike.AI.Behavior? probeAttack = probeBrain?.GetNodeOrNull<ActRoguelike.AI.Behavior>("Attack");
+			if (probeBrain != null)
+			{
+				probeBrain.SearchRange = -1f;
+			}
+
+			if (probeChase != null)
+			{
+				probeChase.Priority = -1;
+			}
+
+			chaser.ApplyTo(probe);
+			GameLog.Write("SelfTest",
+				$"AI 档案实测（Chaser 预制体：先把 SearchRange/Chase.Priority 伪造为 -1，再 ApplyTo，与生成路径同序）：SearchRange {probeBrain?.SearchRange:0.##}（期望 40） Chase.Priority {probeChase?.Priority}（期望 10） Chase.StopDistance {(probeChase == null ? 0f : probeChase.Get("StopDistance").AsSingle()):0.##}（期望 1.6） Attack.Priority {probeAttack?.Priority}（期望 100）");
+			probe.Free();
+		}
+
 		// 玩家侧实测：技能行 + 角色行攻击组是否真的套上了（这条是"技能表接线"的硬证据）。
 		if (player != null)
 		{
@@ -701,6 +729,22 @@ public partial class SelfTest : Node
 
 			AttackHitbox? hit = attacker == null ? null : NodeSearch.FindInSubtree<AttackHitbox>(attacker);
 			GameLog.Write("SelfTest", $"单位表实测（{sample.Name}）：生命 {sample.MaxHealth:0} 移速 {sample.MoveSpeed:0.##} 伤害 {hit?.Damage:0} 间隔 {attacker?.Cooldown:0.##} 击退 {hit?.Knockback:0.##} 标签 [{string.Join(",", sample.Tags)}] 技能 {abilities.Count} 个 技能行 Id {attacker?.AbilityId}（非类名 = 技能行真的套上了）");
+
+			// AI 行为表（阶段 5）实测：同一个**真的生成出来的**敌人，读回它的 Brain 与行为节点 ——
+			// 证明生成路径（EncounterController.Spawn → UnitConfig.ApplyTo → ApplyAiProfileTo）也走了档案。
+			if (NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(sample) is { } liveBrain)
+			{
+				var slots = new List<string>();
+				foreach (Node child in liveBrain.GetChildren())
+				{
+					if (child is ActRoguelike.AI.Behavior live)
+					{
+						slots.Add($"{live.Name}=P{live.Priority}");
+					}
+				}
+
+				GameLog.Write("SelfTest", $"AI 档案实测（场上 {sample.Name}）：SearchRange {liveBrain.SearchRange:0.##} 目标刷新 {liveBrain.TargetRefreshInterval:0.##} 行为 [{string.Join(" ", slots)}]");
+			}
 		}
 	}
 

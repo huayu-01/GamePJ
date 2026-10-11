@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_chaser"
+DisplayName = "基础近战"
+SearchRange = 40.0
+AttackPriority = 100
+ChasePriority = 10
+ChaseStopDistance = 1.6
+Note = "AI 档案 · 基础近战（Scenes/Enemies/Chaser.tscn）。数值逐条抄自场景 Brain 子树：SearchRange 40 / Attack P100 / Chase P10（StopDistance 1.6）。Attack 是近战攻击行为，射程由技能行 skl_enemy_chaser_melee 的 AttackRange 决定。"

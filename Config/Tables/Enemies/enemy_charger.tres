@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://10b6kkpgdrrb" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
 [ext_resource type="Resource" uid="uid://b2kms403206aq" path="res://Config/Tables/Skills/skl_enemy_charger_charge.tres" id="2_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_charger.tres" id="3_ai"]
 
 [resource]
 script = ExtResource("1_row")
@@ -18,6 +19,7 @@ AttackRange = 14.0
 AttackKnockback = 9.0
 Tags = PackedStringArray("Melee", "Bruiser", "Charger")
 Skills = [ExtResource("2_skl")]
+AiProfile = ExtResource("3_ai")
 Id = "enemy_charger"
 Slot = 6
 DisplayName = "冲锋兵"

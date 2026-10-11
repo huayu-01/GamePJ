@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_exploder"
+DisplayName = "自爆"
+SearchRange = 40.0
+ChasePriority = 10
+ChaseStopDistance = 1.0
+ExplodePriority = 100
+Note = "AI 档案 · 自爆兵（Exploder.tscn）。Explode 是通用技能槽（UseAbilityBehavior），触发距离在技能行 skl_enemy_exploder_blow 的 ApproachMaxRange / TriggerRadius 上。StopDistance 1.0 = 贴到最近再爆。"

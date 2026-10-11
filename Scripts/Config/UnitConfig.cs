@@ -15,6 +15,7 @@ namespace ActRoguelike.Config;
 /// <item><b>移速</b>。</item>
 /// <item><b>行为 &amp; 类</b>：敌种类标签（供按类筛选；取代"按显示名匹配"）。</item>
 /// <item><b>持有技能</b>：指向技能表（`Config/Tables/Skills/`）的**资源引用**，不是字符串 id。</item>
+/// <item><b>AI</b>：指向 **AI 行为表**（`Config/Tables/AiProfiles/`）的**资源引用**（配置表阶段 5）。</item>
 /// <item><b>表现</b>：模型 / 图标 / 缩放。</item>
 /// </list>
 ///
@@ -79,6 +80,23 @@ public abstract partial class UnitConfig : ConfigRow
 	/// </summary>
 	[Export] public AbilityConfig[] Skills { get; set; } = System.Array.Empty<AbilityConfig>();
 
+	[ExportGroup("AI（指向 Config/Tables/AiProfiles/ 的行；资源引用不是字符串）")]
+	/// <summary>
+	/// 这个单位的 **AI 档案**（`Config/Tables/AiProfiles/ai_*.tres`，一行一个档案）——
+	/// 索敌半径 / 目标刷新间隔 / 每个行为节点的优先级与参数。
+	///
+	/// <b>留空 = 保留场景里的 AI 参数</b>（Brain 与各 Behavior 自身的 `[Export]` 默认值），
+	/// 与其余各列"表是权威、场景是回退"完全同一条纪律。
+	///
+	/// 用**资源引用**而不是字符串 id（阶段 3 当时预留的名字是 `AiProfileId`）：与
+	/// <see cref="Skills"/> 同一套写法 —— 行文件被删/改名时 Godot 把引用置 null（能检测、会警告），
+	/// 而不是留下一个拼错却静默失效的字符串；编辑器里也是类型过滤后的资源选择器。
+	///
+	/// ⚠️ 套用发生在 <see cref="ApplyTo"/> 里、也就是"实例化 → ApplyTo → AddChild"的第二步：
+	/// `EnemyBrain._Ready` 会按 `Priority` 给行为列表排序，所以必须早于进树。
+	/// </summary>
+	[Export] public AiProfileConfig? AiProfile { get; set; }
+
 	[ExportGroup("表现")]
 	/// <summary>替换占位模型用的预制体（空 = 用场景里自带的占位模型）。</summary>
 	[Export(PropertyHint.File, "*.glb,*.gltf,*.tscn")] public string ModelPath { get; set; } = string.Empty;
@@ -114,8 +132,16 @@ public abstract partial class UnitConfig : ConfigRow
 
 		ApplyAttackTo(unit);
 		ApplySkillsTo(unit);
+		ApplyAiProfileTo(unit);
 		ApplyModel(unit);
 	}
+
+	/// <summary>
+	/// AI 档案 → 单位的 <c>EnemyBrain</c> 与它下面的行为节点（<see cref="AiProfileConfig.ApplyTo"/>）。
+	/// <see cref="AiProfile"/> 留空 / 读不到档案时**什么都不做** —— Brain 与各 Behavior 保留场景里的值。
+	/// 没有 Brain 的单位（玩家、没有 AI 的召唤物）调用它也是空操作。
+	/// </summary>
+	public void ApplyAiProfileTo(Unit unit) => AiProfile?.ApplyTo(unit);
 
 	/// <summary>
 	/// 攻击组 → 单位的**主攻击**：子树里第一个"带命中体、或带武器组件"的能力。

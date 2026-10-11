@@ -104,9 +104,13 @@ Scripts/
 > 进度 / 实测证据 / 逐项比对 / 两条新坑见 [config-schema.md](config-schema.md) §5 阶段 2 与 §8；调参入口见 [config.md](config.md)。
 >
 > **留给下一轮的三件事**（按建议顺序）：
-> 1. **AI 行为表（盘点 #15，优先级高）**：10 个敌种的 AI 参数（`Brain.SearchRange` / 各 Behavior 的
->    `Priority`·`StopDistance`·`PreferredDistance`… / 4 处硬编码避障启发式）现在仍**每个场景各配一份**；
->    技能表已经落地，`UseAbilityBehavior.ApproachMin/Max` 也已进表，接 AI 表的时机成熟了。
+> 1. ✅ **AI 行为表（盘点 #15）已做完（2026-10 配置表阶段 5）**：新增 `Config/Tables/AiProfiles/ai_*.tres`
+>    **11 行**（一行一个 AI 档案 = 一个单位的整套 AI 参数），行类 `AiProfileConfig`；`UnitConfig` 多一列
+>    **`AiProfile`（资源引用）**，套用挂在 `UnitConfig.ApplyTo` 上（**没有碰 `EncounterController`**）。
+>    盘到 **25 个 AI 参数**（原先散在 10 个敌人场景的 **53 处**赋值里）。
+>    ⚠️ 4 处硬编码避障启发式（`Behavior.AvoidObstacles` 的 2.4 / 0.6 / 1.2s / 0.35）**没有进表**（属"AI 手感"保护值）；
+>    ⚠️ 档案只调数值，**不增删行为节点**（拓扑仍在场景里）。
+>    见 [config.md](config.md) 的「配置表阶段 5 实测」与 [config-schema.md](config-schema.md) §5 阶段 5。
 > 2. ✅ **首领增强的"节点驱动"（T9 最后一步）已做完（2026-10 配置表阶段 6）**：
 >    `NodeConfig.BossPressurePoints` / `BossModifierRolls` / `BossModifierTags` 三个字段
 >    **已全部接进** `StageController.AddPressureForNode`（不是 `EncounterController.BossModifierRolls` ——

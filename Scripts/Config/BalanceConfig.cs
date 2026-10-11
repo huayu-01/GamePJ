@@ -108,6 +108,15 @@ public partial class BalanceConfig : Resource
 	/// <summary>召唤物表（`Config/Tables/Summons/summon_*.tres`）。空 = 用 Drone.tscn 场景里的值。</summary>
 	[Export] public SummonConfig[] Summons { get; set; } = System.Array.Empty<SummonConfig>();
 
+	[ExportGroup("表索引 · AI 行为")]
+	/// <summary>
+	/// AI 行为表（`Config/Tables/AiProfiles/ai_*.tres`）：**一行一个 AI 档案**
+	/// （9 个敌种 + 首领 + 召唤物各一行）—— 索敌半径 / 目标刷新间隔 / 每个行为节点的优先级与参数。
+	/// 单位表用 <see cref="UnitConfig.AiProfile"/> 以**资源引用**指过来（不是字符串 id）。
+	/// 空 = 各单位保留场景里的 AI 参数（与分表前逐位一致）。
+	/// </summary>
+	[Export] public AiProfileConfig[] AiProfiles { get; set; } = System.Array.Empty<AiProfileConfig>();
+
 	[ExportGroup("表索引 · 技能")]
 	/// <summary>
 	/// 技能表（`Config/Tables/Skills/skl_*.tres`）。单位表用 `Skills` 以资源引用指过来；

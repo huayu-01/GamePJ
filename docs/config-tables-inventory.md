@@ -9,7 +9,18 @@
 >
 > ---
 >
-> ## ⚠️ 2026-10 更新：配置表阶段 3 / 4 / 6 已落地，本文多条结论已过时
+> ## ⚠️ 2026-10 更新：配置表阶段 3 / 4 / 5 / 6 已落地，本文多条结论已过时
+>
+> **阶段 5（AI 行为表 = 本文 #15，§2.7）**：✅ **已做**。新增 `Config/Tables/AiProfiles/ai_*.tres`
+> **11 行**（一行一个 AI 档案 = 一个单位的整套 AI 参数：9 敌种 + 首领 + 无人机），行类 `AiProfileConfig`；
+> `UnitConfig` 新增一列 **`AiProfile`（资源引用）** + 在 `ApplyTo` 里一行调用（**没有碰 `EncounterController`**）。
+> **盘到 25 个 AI 参数**（原先散在 10 个敌人场景的 **53 处**赋值里）。
+> ⚠️ 本文 §2.7 建议的"`Behaviors: ParamEntry[]` 数组"**没有被采纳** —— 改成了**扁平静态列**
+> （列名 = 节点名 + 参数名），理由与阶段 4 的"一个选项占一栏"完全相同：**一列 = 一个标量属性**才拿得到
+> 编辑器的排序/批量改；而且 Boss 的 `Brain` 下有 3 个 `UseAbilityBehavior`，按行为类开列会撞成一列。
+> 4 处硬编码避障启发式（§2.7 末尾）**没有进表**（属于"AI 手感"保护值）。
+> 实测与两次回退验证见 [config.md](config.md) 的「配置表阶段 5 实测」、
+> 设计记录见 [config-schema.md](config-schema.md) §5 阶段 5。
 >
 > **阶段 6（首领增强的"节点驱动抽奖"）**：`NodeConfig` 的三个空壳字段与 `StageDefinition.PressureUpgradeTags`
 > **全部接进玩法**；`PressureModConfig` 新增 `Tags` 列、`Weight` 真的加权；**两个抽取点拆开**
@@ -31,7 +42,7 @@
 > | §5-④ 敌人全局倍率**静默换挡**（0.75→1f / 0.3→0.8f 且无日志） | ✅ **已修**：`BalanceConfig` 的回退值对齐到 0.75 / 0.3，并新增"敌人倍率来源"日志 |
 > | §5-② 死字段：`BalanceConfig.BossHealthBarScale` / `EliteBossHealthScale` / `StageDefinition.IsFinalBoss` / `EffectConfig.Value·Value2·Radius·TickSeconds` | ✅ **全部处理**：前两个删掉（`EliteBossHealthScale` 的职责搬进 `BossConfig.EliteCopyHealthScale`）、`IsFinalBoss` 删掉、效果表 4 列删掉（删完只剩注释的 `eff_knockback` 整行删除） |
 > | §5-② `EnemyConfig.SpawnDisplayName` | ✅ 已删（身份键改成 `Id`） |
-> | 「单位/敌种/AI」相关的其余条目（#13 首领阶段 / #14 精英表 / #15 AI 行为表 / #16 刷怪生成项表 / #17 波次 / #18 投射物 / #20 角色↔技能矩阵 / #23 命中体 / #25 移动手感 …） | ⏸ **仍未做**，本文结论继续有效（其中 #15 AI 行为表仍是"优先级高"的那张） |
+> | 「单位/敌种/AI」相关的其余条目（#13 首领阶段 / #14 精英表 / **#15 AI 行为表 ✅阶段5** / #16 刷怪生成项表 / #17 波次 / #18 投射物 / #20 角色↔技能矩阵 / #23 命中体 / #25 移动手感 …） | ⏸ **仍未做**（**#15 已在阶段 5 做完**，见文首更新节），其余本文结论继续有效 |
 >
 > 阶段 3 的完整证据（实测日志、逐项比对、回退验证）见 [config.md](config.md) 的「配置表阶段 3 实测」
 > 与 [config-schema.md](config-schema.md) §5 阶段 3。
@@ -63,10 +74,10 @@
 | 问题 | 结论 |
 |---|---|
 | 一共列出多少张表 | **47 张** |
-| 已落地 | **8 张**（⚠️ 阶段 3 之后是 **12 张**，**阶段 4 之后是 13 张** —— 新增 `UpgradePools/pool_*.tres` 3 行，见 §2.19 与文首的更新节） |
+| 已落地 | **8 张**（⚠️ 阶段 3 之后是 **12 张**，阶段 4 之后是 **13 张**，**阶段 5 之后是 14 张** —— 新增 `UpgradePools/pool_*.tres` 3 行与 `AiProfiles/ai_*.tres` 11 行，见 §2.19 / §2.7 与文首的更新节） |
 | 设计里有但没做 | ~~**3 张**（技能表 T2 / 敌人按敌种表 T5 扩展 / 首领增强表 T9）~~ → ✅ **全部做完**：T2 与 T5 在阶段 3、T9（含"节点驱动"）在阶段 6 |
-| **本文新发现** | **36 张**（`config-schema.md` 未列为独立表的）—— ⚠️ 其中 **#28 武器↔升级池已在阶段 4 落地**（形态与本文建议不同，见 §2.19） |
-| 最该先做的三张 | ① **敌人按敌种表** ② **技能/能力表** ③ **AI 行为表** —— 理由见 §4 |
+| **本文新发现** | **36 张**（`config-schema.md` 未列为独立表的）—— ⚠️ 其中 **#28 武器↔升级池已在阶段 4 落地**（形态与本文建议不同，见 §2.19）、**#15 AI 行为表已在阶段 5 落地**（形态同样与本文建议不同，见 §2.7） |
+| 最该先做的三张 | ① **敌人按敌种表** ② **技能/能力表** ③ **AI 行为表** —— ✅ **三张全部做完**（① ② 在阶段 3、③ 在阶段 5） |
 | 盘点发现的主要问题 | 见 §5：**6 处死字段**（2 个 Balance 字段 ✅阶段3 + `IsFinalBoss` + 效果表 4 列）、**1 处双真源静默换挡**（敌人全局倍率 ✅阶段3）、**3 处加权抽取退化**（`RewardConfig.Weight` / `BossPerk.Weight` / `ConflictsWith` ✅阶段4接上其一）、**3 处数值只靠 C# 默认值撑着**（`Pistol.tscn` / `PlayerInputConfig` / `EnemyConfig.MoveSpeedMultiplier`）、**1 处疑似未生效的列**（`Weapon.ProjectileSpeed`）、**11 处该改成资源引用的字符串外键**。🆕 阶段 4 另**删除**了 `PoolTags` 这处死字段（原表里没单列，混在 `RewardDefinition` 那一行里） |
 
 **「已落地 8 张」的现状**（`Config/Tables/` 下 53 个行文件，索引全挂在 `Config/Balance.tres` 的 `[Export] XxxConfig[]` 数组上）：
@@ -110,7 +121,7 @@
 | 12 | `BossPerkConfig` | 首领**行为/技能型**构筑词条（Boss Build） | 🔴新发现 | `BossPerk.cs:41-125` 硬编码 7 条 | 7 | `BossPerkCatalog.Roll`（:130）、`EncounterController.cs:676` | **高** |
 | 13 | `BossPhaseConfig` | 首领阶段阈值 / 各阶段数值与解锁技能 | 🔴新发现 | `BossPhaseController.cs:13-20` 默认值 + `Scenes/Enemies/Boss.tscn:167-171` | 6 | `BossPhaseController.EnterPhase`（:59-92） | 中 |
 | 14 | `EliteConfig` | 精英修正（普通敌人精英化） | 🔴新发现 | `EliteModifier.cs:11-19` 默认值；`SkillElite.tscn:114-120` 全是 1.0（等于没配） | 7 | `EncounterController.cs:423` `new EliteModifier()` | 中 |
-| 15 | `EnemyAiConfig` | AI 决策参数（追击距离/攻击间隔/撤退阈值…） | 🔴新发现 | `AI/Behavior.cs:12-18` + 7 个 Behavior 的 `[Export]` + `EnemyBrain.cs:14-15`；**每个 `.tscn` 各配一份** | 3 公共 + 各 1–5 | `EnemyBrain._PhysicsProcess`（:65-85） | **高** |
+| 15 | `AiProfileConfig` | AI 决策参数（索敌半径/行为优先级/追击距离/舒适圈/撤退阈值…） | ✅**已落地（2026-10 阶段 5）** | `Config/Tables/AiProfiles/ai_*.tres`（**11 行** = 一行一个 AI 档案）；`UnitConfig.AiProfile`（资源引用）指过来 | 2 自有列 + **21 个行为槽列** + 6 继承列 | `AiProfileConfig.ApplyTo` → `EnemyBrain` + `Behavior`（由 `UnitConfig.ApplyTo` 调用） | ✅ 已完成 |
 | 16 | `SpawnEntryConfig` | 每种敌人的刷怪成本 / 权重 / 解锁时间门 | 🔴新发现 | `Scenes/Main.tscn:75-132`（8 条 `EnemySpawnEntry`） | 7 | `EncounterController.PickEntry`（:296）/ `PickWaveEntry`（:379）/ `Spawn`（:403） | **高** |
 | 17 | `WaveConfig` | 每波规模 / 类型数 / 波数 / 节奏 | 🔴新发现 | `EncounterController.cs:56-63` 默认值 + `Main.tscn:67-73`、`Scenes/Main.tscn:139-140`；`SpawnPlanner.cs:17-18` **const 重复一份** | 6 | `EncounterController.BeginWave`（:335-390） | 中 |
 | 18 | `ProjectileConfig` | 投射物/弹道参数 | 🔴新发现 | `Scenes/Combat/Bullet.tscn:10-11`、`Scripts/Combat/Projectile.cs:13-23` | 6 | `Projectile._PhysicsProcess`（:46-85） | 中 |
@@ -217,7 +228,7 @@
 |---|---|---|
 | `ScenePath` | `string` | 敌人预制体（现在写死在 `Main.tscn` 的生成项上） |
 | `SpawnEntryId` | `string` | 与 #16 `SpawnEntryConfig` 对接（取代 `DisplayName` 字符串匹配） |
-| `AiConfigId` | `string` | 与 #15 `EnemyAiConfig` 对接 |
+| `AiConfigId` | `string` | 与 #15 `EnemyAiConfig` 对接 —— ⚠️ **实际落地成了资源引用**：`UnitConfig.AiProfile`（`AiProfileConfig?`），**不是字符串 id**（阶段 5） |
 
 **⚠️ 这里有一处必须一起修的**：`StageDefinition.AllowedEnemies` 按**显示名**匹配
 （`StageDefinition.cs:31,94-95` → `EncounterController.ApplyEntryFilter` :589）。
@@ -314,7 +325,26 @@
 的（等于关掉），说明「按敌种/按档次配多套精英」是真实需求。**建议成表**（7 字段），
 并允许 `SpawnEntryConfig` 指一个 `EliteConfigId`。**优先级：中**。
 
-### 2.7 【#15】**新发现** AI 行为表 —— `EnemyAiConfig`
+### 2.7 【#15】**新发现** AI 行为表 —— ✅ **已落地（2026-10 配置表阶段 5），行类叫 `AiProfileConfig`**
+
+> **本节结论已落地，形态与下面的"落地建议"不同，保留原文作历史依据。**
+>
+> | 项 | 实际实现 |
+> |---|---|
+> | 表目录 / 行数 | `Config/Tables/AiProfiles/ai_*.tres` —— **11 行**（9 敌种 + 首领 `ai_boss` + 召唤物 `ai_drone`），一行一个 AI 档案 |
+> | 行类 | `Scripts/Config/AiProfileConfig.cs`（`[Tool]` + `[GlobalClass]`，继承 `ConfigRow`） |
+> | 关联方式 | `UnitConfig.AiProfile`（**资源引用**，阶段 3 预留的名字 `AiProfileId` 改成了资源引用 —— 与 `Skills` 同一套） |
+> | 套用点 | `UnitConfig.ApplyTo` 里一行 `ApplyAiProfileTo(unit)` → `AiProfileConfig.ApplyTo` 找 `EnemyBrain` 并写 Brain + 各 `Behavior`。**没有碰 `EncounterController`** |
+> | 字段形态 | **扁平静态列**（列名 = `节点名 + 参数名`，如 `ChaseStopDistance`），**不是**本文建议的 `Behaviors: ParamEntry[]` 数组。理由：① 一列 = 一个标量属性才拿得到编辑器的排序/批量改，数组列拿不到（阶段 4 还实测过 `Array[Object]` 的插件报错）；② Boss 的 `Brain` 下有 **3 个** `UseAbilityBehavior`，按行为类开列会撞成一列 |
+> | 逃生口 | 基类的 `Params`，键 = `节点名.属性名`（`MinRange` / `MaxRange` / `AbilityNodeName` 没有独立列，走这里） |
+> | 4 处硬编码避障启发式 | ⏸ **没有进表**（探针 2.4 / 抬高 0.6 / 翻转 1.2s / 前向权重 0.35）—— 它们是"AI 手感"保护值，与 §1.3 的 B 类同性质 |
+> | 盘到的参数 | **25 个**；场景侧赋值：敌人 10 个场景 **53 处** + 无人机 5 处 + 训练场 4 处 = **62 处** |
+> | 语义 | **数值列 0 = 不覆盖**（`RetreatHealthThreshold` 用 `-1`）；**`Priority <= 0` = 整个槽位不生效**；**不增删行为节点**（拓扑仍在场景里） |
+>
+> 实测（含"伪造 -1 再 ApplyTo"的硬证据探针）与两次回退验证见
+> [config.md](config.md) 的「配置表阶段 5 实测」；设计记录见 [config-schema.md](config-schema.md) §5 阶段 5。
+>
+> **⚠️ 原文（当时的盘点与建议）保留如下**：
 
 **为什么是表**：AI 参数现在**每个敌人场景各配一份**，而它们描述的是「这个敌种怎么打」——
 正是「每行一份」的形状。10 个场景里的 AI 参数：
@@ -797,7 +827,10 @@ var scene = GD.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn");
 **唯一硬前置**：`AbilityId` 现在**全空**（靠 `Ability.cs:113-116` 用类名兜底），
 而 `CharacterConfig.EnabledAbilityIds` 用的就是类名。做表时要么补 `AbilityId`，要么接受「用类名寻址」。
 
-### 🥉 第三：AI 行为表（#15）
+### 🥉 第三：AI 行为表（#15）—— ✅ **已完成（2026-10 配置表阶段 5）**
+
+> **三张"最该先做"的表全部做完了**（① 敌人按敌种表 + ② 技能表在阶段 3，③ 本表在阶段 5）。
+> 实际落地形态（**扁平静态列**而不是 `Behaviors` 数组）、盘到的 25 个参数、实测与两次回退验证见 §2.7 的更新块。
 
 **理由**：
 1. **参数密度最高**：10 个敌种 × 每个 8–15 个 AI/能力参数（见 §2.7 的表），
@@ -936,7 +969,7 @@ Balance.cs:92   row?.DamageMultiplier ?? config.EnemyDamageMultiplier
 
 | 建议 | 张数 | 表 |
 |---|---|---|
-| **高**（该先做） | 6 | #9 技能表 · #10 敌人按敌种表 · #11 首领数值强化表 · #12 首领行为词条表 · #15 AI 行为表 · #16 刷怪生成项表 |
+| **高**（该先做） | 6 | **✅ #9 技能表（阶段 3）· #10 敌人按敌种表（阶段 3）· #11 首领数值强化表（阶段 3+6）· #12 首领行为词条表（阶段 3）· #15 AI 行为表（阶段 5）** · ⏸ #16 刷怪生成项表 |
 | 中 | 14 | #13 · #14 · #17 · #18 · #19 · #20 · #23 · #25 · #27 · #28 · #29 · #31 · #33 · #37 |
 | 低 | 7 | #30 · #32 · #34 · #38 · #39 · #36（或并入 #31） · #40（或做成「设置」而非表） |
 | **并入别处**（不新建表） | 6 | #21 → #2 · #22 → #16 · #24 → #10 · #26 → 应删除 · #28 → #6 加一列 · #29 → #6 + Balance |

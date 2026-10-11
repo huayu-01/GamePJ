@@ -1,6 +1,6 @@
 # 数值配置（调参唯一入口）
 
-**所有可调数值拆成 13 张表，全部挂在 [`Config/Balance.tres`](../Config/Balance.tres) 上；运行期由 autoload `Balance` 读取并建索引。**
+**所有可调数值拆成 14 张表，全部挂在 [`Config/Balance.tres`](../Config/Balance.tres) 上；运行期由 autoload `Balance` 读取并建索引。**
 
 > **2026-10 配置表阶段 2（重要变化）**：`Balance` 从"唯一数值**文件**"变成"唯一数值**门面 + 表索引**"。
 > 业务代码**仍然写 `Balance.Settings.Xxx`**（这条约定没变），但数值的实际家在 `Config/Tables/<分组>/` 里，
@@ -20,12 +20,19 @@
 > （`BossPressurePoints` / `BossModifierRolls` / `BossModifierTags`）全部接进 `StageController.AddPressureForNode`；
 > **两个抽取点彻底分开** —— Boss 开场词条只抽行为型（Boss Build），Pressure 转换只抽数值型（§7.5）。
 > 细节、实测与"随机序列为什么可以漂"见文末「配置表阶段 6」一节。
+>
+> **2026-10 配置表阶段 5（AI 行为表）**：新增第 14 张表 **AI 行为档案**
+> （`Config/Tables/AiProfiles/ai_*.tres`，**一行一个 AI 档案** = 一个单位的整套 AI 参数）；
+> 单位表（`UnitConfig`）多一列 **`AiProfile`**（**资源引用**，指向档案行）。
+> 以前"让所有敌人更激进"要开 10 个场景改 30 处，现在在 `AiProfiles/` 这一张表里按列排序/批量改即可。
+> 细节、实测与两次回退验证见文末「配置表阶段 5」一节。
 
 ## 调参去哪张表
 
 | 要调什么 | 打开哪个目录 | 一行是什么 | 行数 |
 |---|---|---|---|
 | **敌人（按敌种）**：生命/护甲/移速/攻击四项/标签/持有技能/刷怪成本与权重 | `Config/Tables/Enemies/enemy_*.tres` | 一个敌种 | **10**（1 行全局倍率 + 9 个敌种） |
+| **AI 行为（按敌种/首领/召唤物）**：索敌半径、目标刷新间隔、每个行为节点的**优先级与参数**（追击距离 / 舒适圈 / 撤退阈值 / 技能槽开关） | `Config/Tables/AiProfiles/ai_*.tres` | 一个单位的整套 AI 参数 | **11**（9 敌种 + 首领 + 无人机） |
 | **首领**：生命/护甲/移速/攻击四项/持有技能/白板副本血量 | `Config/Tables/Bosses/boss_final.tres` | 一个首领 | 1 |
 | **召唤物**：数值 + 存活时间 | `Config/Tables/Summons/summon_drone.tres` | 一个召唤物 | 1 |
 | **技能**：冷却/前摇/后摇/朝向/开关/接近区间 + 子类专属参数 + 命中体参数 | `Config/Tables/Skills/skl_*.tres` | 一个技能 | **25**（5 玩家 + 16 单位 + 4 首领行为词条） |
@@ -42,9 +49,9 @@
 
 - **改完要重新运行游戏才生效**（数值在开局一次性应用，不热重载）。
 - 两种改法都行：Godot 编辑器里双击 `.tres` 用 Inspector 改（有中文分组），或直接用文本编辑器改。
-- 字段的中文注释在对应的行类里：`Scripts/Config/{UnitConfig,EnemyConfig,BossConfig,SummonConfig,AbilityConfig,PressureModConfig,CharacterConfig,WeaponConfig,EffectConfig,NodeConfig,RewardConfig,MetaUpgradeConfig,StageDefinition}.cs`。
+- 字段的中文注释在对应的行类里：`Scripts/Config/{UnitConfig,EnemyConfig,BossConfig,SummonConfig,AbilityConfig,AiProfileConfig,PressureModConfig,CharacterConfig,WeaponConfig,EffectConfig,NodeConfig,RewardConfig,MetaUpgradeConfig,StageDefinition}.cs`。
 - **单位表是继承关系**：`EnemyConfig` / `BossConfig` / `SummonConfig` / `CharacterConfig` 都继承 `UnitConfig`，
-  所以"生命 / 攻击四项 / 移速 / 持有技能 / 标签 / 表现"这六组列在所有单位表里长得一样，只有各自的私有列不同。
+  所以"生命 / 攻击四项 / 移速 / 持有技能 / 标签 / **AI 档案** / 表现"这七组列在所有单位表里长得一样，只有各自的私有列不同。
   **攻击四项是整个单位表通用的一组**（伤害/间隔/范围/击退，套到该单位的**主攻击**上）：
   `AttackDamage` / `AttackInterval`（→ 能力 `Cooldown`）/ `AttackRange`（按能力子类依次试
   `AttackRange`→`TriggerRadius`→`MaxRange`→`MaxDistance`）/ `AttackKnockback`。**留 0 = 不覆盖**。
@@ -472,6 +479,109 @@ RewardConfig（Config/Tables/Upgrades/*.tres，19 行：一行一个选项）
 > `editor_view.gd:296 … Invalid access … on base object of type 'Array[Object]'`（`insert_row_sorted` 对"数组列"取值那一段），
 > 属于上一轮已记录的那批插件脆弱点（commit `7972a4f` 修过 5 类，未含这一处）；
 > **不影响表格的渲染与编辑** —— 复测连续两次 `display_folder` 后 `rows` 仍是 19 / 3 且元素全是 `Resource`。
+
+## 配置表阶段 5 实测（2026-10：AI 行为表）
+
+**为什么是这张表**：AI 参数**密度最高、而且完全不可批量调** —— 它们原先**每个单位场景各配一份**
+（`Brain` 子树 + 各 `Behavior` 的 `[Export]`），10 个敌人场景里写着 **53 处**（Boss 一个就 10 处），
+想"让所有敌人更激进"得开 10 个场景改 30 处。
+
+### 盘点到的东西（**以代码里实际存在的为准**，不是文档举例）
+
+| 来源 | 参数（默认值） | 敌人场景里配了几处 |
+|---|---|---|
+| `EnemyBrain` | `SearchRange`(40) / `TargetRefreshInterval`(0.4) | 10 / 0（只有无人机配 0.3） |
+| `Behavior`（基类） | `Priority`(0) / `MinRange`(0) / `MaxRange`(0) | **25** / 0 / 0 |
+| `ChaseBehavior` | `StopDistance`(1.5) / `SpeedScale`(1) | 8 / 0 |
+| `KeepDistanceBehavior` | `PreferredDistance`(8) / `Tolerance`(1.5) / `SpeedScale`(1) / `Strafe`(false) / `StrafeScale`(0.6) | 2 / 2 / 0 / 0 / 0 |
+| `RetreatBehavior` | `HealthThreshold`(0.3) / `SpeedScale`(1.1) / `KeepDistance`(12) | 1 / 0 / 1 |
+| `UseAbilityBehavior` | `AbilityNodeName`("") | 4（`AbilityScream`/`AbilityCharge`/`AbilitySummon`/`AbilityBuff`） |
+| `MeleeAttackBehavior` / `RangedAttackBehavior` | **无自有参数**（射程由能力/技能行给） | — |
+| `RepositionBehavior` | `MinDistance` / `MaxDistance` / `ArriveTolerance` / `RestartDelay` / `SpeedScale` | **0 —— 全项目没有任何场景用它** |
+| `Behavior.AvoidObstacles`（硬编码） | 探针 2.4 / 射线抬高 0.6 / 侧移翻转 1.2s / 前向权重 0.35 | 硬编码在 `Behavior.cs:70-96` |
+
+合计 **25 个可配 AI 参数**（不含 4 处硬编码避障启发式）+ 62 处场景赋值
+（敌人 53 / 召唤物 5 / 训练场 4）。
+
+### 表结构：一行一个 AI 档案，**扁平静态列**
+
+```
+Config/Tables/AiProfiles/ai_*.tres（11 行 = 一行一个 AI 档案）
+ai_chaser ai_fast_melee ai_exploder ai_jumping_melee ai_ranged
+ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
+```
+
+| 组 | 列 |
+|---|---|
+| 决策 · Brain | `SearchRange` / `TargetRefreshInterval`（0 = 不覆盖） |
+| 行为槽（**按节点名开列**） | `AttackPriority`、`ChasePriority`+`ChaseStopDistance`+`ChaseSpeedScale`、`ShootPriority`、`KeepDistancePriority`+`PreferredDistance`+`Tolerance`+`SpeedScale`+`Strafe`+`StrafeScale`、`RetreatPriority`+`HealthThreshold`+`SpeedScale`+`KeepDistance`、`Explode`/`Leap`/`Scream`/`Charge`/`Summon`/`Buff` 各一列 `XxxPriority` |
+| 逃生口 | 基类的 `Params`，键 = `节点名.属性名`（例：`Chase.MaxRange = 8`） |
+
+三处**刻意的设计选择**：
+
+| 选择 | 理由 |
+|---|---|
+| **扁平列**（`ChaseStopDistance`）而不是 `Array[行为]` | 一列 = 一个标量属性才拿得到编辑器的排序/批量改；数组列在表插件里拿不到这些，而且阶段 4 实测过 `Array[Object]` 那条插件报错 |
+| **按节点名开列**而不是按行为类 | Boss 的 `Brain` 下有 **3 个** `UseAbilityBehavior`（Scream P120 / Charge P110 / Summon P60）—— 按类开列这三个会撞成一列 |
+| **不放 `AbilityNodeName` 列** | 它是**身份**不是数值（哪个节点放哪个技能），场景里已经写死；抄一份进表就是第二个真源（项目文档反复点名的坑）。要改它走 `Params`（`Summon.AbilityNodeName = "AbilitySummon"`） |
+| **不增删行为节点** | 档案只调数值，"谁有 Chase / 谁有 Retreat"这个**拓扑仍在场景里** —— 与 `Main.tscn` 的 `SpawnXxx` 提供预制体与位置、敌人表覆盖成本与权重是同一条分工 |
+
+两条语义约定（都与既有表一致）：**数值列 0 = 不覆盖**（`RetreatHealthThreshold` 用 -1，因为 0 = 永不撤退是有意义的），
+**`Priority <= 0` = 整个槽位不生效**（该节点在本档案里"不管"，它下面的参数一起跳过）。
+
+### `UnitConfig` 怎么关联档案：**资源引用**（不是字符串 Id）
+
+```csharp
+// Scripts/Config/UnitConfig.cs
+[Export] public AiProfileConfig? AiProfile { get; set; }   // 单位行 → 档案行
+```
+
+阶段 3 预留的位置叫 `AiProfileId`，落地时**改成了资源引用、属性名 `AiProfile`**，理由：
+
+| 资源引用（采用） | 字符串 Id（未采用） |
+|---|---|
+| 与 `UnitConfig.Skills` / `WeaponConfig.Pool` 同一套写法 | 又要多一种关联方式 |
+| 行文件被删/改名 → Godot 把引用**置 null**（`row.AiProfile == null` 立刻可判定 + 可警告） | 拼错一个字符就**静默失效**（`docs` 里 11 处字符串外键那条老问题） |
+| Inspector 里是**类型过滤后的资源选择器**；`Edit Resources as Table` 里也是资源列（与阶段 4 实测的 `Pool(type=24, hint=17)` 同一种列） | 手打字符串 |
+| `AiProfileConfig.Id` 仍然存在，用于日志/自测（`AI 档案：… 单位指向 [enemy_chaser→ai_chaser、…]`） | — |
+
+**套用点只有一个，而且没有碰 `EncounterController`**：`UnitConfig.ApplyTo()` 里加了一行
+`ApplyAiProfileTo(unit)` —— 生成路径本来就是"实例化 → `ApplyTo` → `AddChild`"，
+而 `EnemyBrain._Ready`（按 `Priority` 排序行为列表）在 `AddChild` 才跑，所以时机天然正确。
+`ApplyTo` 是敌人 / 首领 / 白板首领副本 / Boss 护卫 / 召唤物的**唯一入口**，所以一处改动全覆盖。
+玩家侧走 `RunController.ApplyBalance`（不经过 `ApplyTo`），而玩家没有 `EnemyBrain`，本来也不该有档案。
+
+### 自测实测（`selftest.flag` + gdmcp）
+
+```
+[Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 3 / 效果 9 / 节点 9 / 局外成长 5 / AI 档案 11（Balance.tres 已加载）
+[SelfTest] 配置表比对·索引：武器 3/角色 3/敌人 10/首领 1/召唤物 1/技能 25/Pressure 3/效果 9/节点 9/局外 5/升级池 3/AI 档案 11（期望 3/3/10/1/1/25/3/9/9/5/3/11）
+[SelfTest] 配置表比对·AI 档案表：11 行（期望 11 = 9 敌种 + 首领 + 召唤物） 敌人行 enemy_chaser 挂的档案「ai_chaser」（期望 ai_chaser） 档案行 SearchRange 40（期望 40）
+[SelfTest] AI 档案实测（Chaser 预制体：先把 SearchRange/Chase.Priority 伪造为 -1，再 ApplyTo，与生成路径同序）：SearchRange 40（期望 40） Chase.Priority 10（期望 10） Chase.StopDistance 1.6（期望 1.6） Attack.Priority 100（期望 100）
+[SelfTest] AI 档案实测（场上 Chaser）：SearchRange 40 目标刷新 0.4 行为 [Attack=P100 Chase=P10]
+```
+
+**"真的写进去了"这条硬证据怎么来的**：因为档案里的数值**逐条抄自场景**（这是零行为变化的前提），
+单看数值相等**证明不了**是谁写的 —— 所以自测里的探针**先把预制体上的 `SearchRange` / `Chase.Priority`
+伪造成 `-1`，再调 `ApplyTo`**：值回到 40 / 10 / 1.6 / 100，只可能是档案写进去的。
+
+**改前 / 改后逐行 diff**：拿基线日志（`selftest.flag` 全流程、含 `=== 自测结束 ===`）与改后对比，
+**所有既有的 `配置表比对·*` 行逐位相同**（玩家 / 武器 / 节点表 / 效果表 / 增幅项 / 升级池 / 敌人表 /
+敌人行 / 技能表 / 技能表实测 / 节点布置 / 节点间距 / 单位表实测），索引行只在**末尾**追加了 `/AI 档案 11`
+（前 11 个数字一个都没动），新增的只有上面 6 行。
+
+### 回退路径主动验证（两轮，各跑一整轮自测）
+
+| 清空什么 | 日志留痕 | AI 实际行为 |
+|---|---|---|
+| **`Balance.tres` 的 `AiProfiles` 索引数组**（模拟"档案表读不到"） | `AI 档案：0 个（来源：代码默认值（表读不到））`、`配置表：… AI 档案 0 …`、**11 条** `⚠ 单位行 X 指向的 AI 档案「ai_x」不在 AiProfiles 索引里（引用还在，索引里查不到）`、自测那一行变成 `0 行（期望 11）` | **一点没变**（探针仍是 40/10/1.6/100、场上敌人仍是 `SearchRange 40 [Attack=P100 Chase=P10]`） |
+| **敌人行 `enemy_chaser.tres` 的 `AiProfile` 字段**（模拟"这个单位没挂档案"） | `单位指向` 列表里少了 `enemy_chaser→ai_chaser`、`有预制体但没挂档案的 1 个`、`敌人行 enemy_chaser 挂的档案「」（期望 ai_chaser）` | **组件默认值生效**：探针**保留我们伪造的 `SearchRange -1` / `Chase.Priority -1`**（`ApplyTo` 里整段跳过），`StopDistance 1.6` / `Attack.Priority 100` 也原样留在场景值上 |
+
+> ⚠️ **第一轮又验证了阶段 3/4 那条边界（同一类坑，第三次了）**：清空 `AiProfiles` **索引数组**
+> 不会让单位丢掉档案 —— 引用写在**单位行文件**里（`enemy_*.tres` / `boss_final.tres` / `summon_drone.tres`
+> 的 `[ext_resource]`），数组只是"给 `ConfigRows` 建索引、给日志报数"用的。
+> 要真正回退到"各单位没有 AI 档案"，得清**单位行**那一侧的字段（上表第二行）。
 
 ## 按键映射（当前）
 

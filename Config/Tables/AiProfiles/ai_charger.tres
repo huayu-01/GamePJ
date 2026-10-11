@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_charger"
+DisplayName = "冲锋兵"
+SearchRange = 45.0
+ChasePriority = 10
+ChaseStopDistance = 1.9
+ChargePriority = 100
+Note = "AI 档案 · 冲锋兵（Charger.tscn）。索敌 45（比普通近战远，先看到就先冲）。Charge 是通用技能槽（UseAbilityBehavior），冲锋速度/距离在技能行 skl_enemy_charger_charge 的 Params 里。"

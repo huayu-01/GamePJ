@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_fast_melee"
+DisplayName = "快速近战"
+SearchRange = 40.0
+AttackPriority = 100
+ChasePriority = 10
+ChaseStopDistance = 1.5
+Note = "AI 档案 · 快速近战（FastMelee.tscn）。与基础近战只差 StopDistance（1.5 vs 1.6）—— 拉开这张表就是为了让「某个敌种更贴脸」这种差异一列可见。"

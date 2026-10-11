@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AiProfileConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AiProfileConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "ai_ranged"
+DisplayName = "远程"
+SearchRange = 32.0
+ShootPriority = 100
+RetreatPriority = 90
+RetreatHealthThreshold = 0.3
+RetreatKeepDistance = 14.0
+KeepDistancePriority = 20
+KeepDistancePreferredDistance = 9.0
+KeepDistanceTolerance = 2.0
+Note = "AI 档案 · 远程兵（RangedEnemy.tscn）。唯一带「撤退 + 舒适圈」的敌种：血量 ≤30% 时 Retreat 接管（P90 > KeepDistance P20），撤到 14 米外停下。射程在技能行 skl_enemy_ranged_shot（MinRange 3 / MaxRange 18）。"
