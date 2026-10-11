@@ -11,6 +11,7 @@ namespace ActRoguelike.Config;
 /// <see cref="ApplyTo"/> 逐字段套到 <see cref="Weapon"/> 组件上；表读不到时由运行期回退到
 /// <see cref="Weapon"/> 自身的 <c>[Export]</c> 默认值（"读不到则使用自身的默认值"）。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class WeaponConfig : ConfigRow
 {

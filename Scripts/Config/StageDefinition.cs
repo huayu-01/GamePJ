@@ -6,6 +6,7 @@ namespace ActRoguelike.Config;
 /// 一个 Stage 的配置（策划文档 §6.2：Stage 之间靠敌人强度与进度区分）。
 /// 每一关复用同一个 Stage 场景，只有这里的数值不同，代码不认具体关卡。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class StageDefinition : Resource
 {

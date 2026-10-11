@@ -9,6 +9,7 @@ namespace ActRoguelike.Config;
 /// **不是 Resource，存不进 `.tres`**。所以配置行里用这个 Resource 表达同一条数据，
 /// 运行期再由 <see cref="ToRuntime"/> 转成引擎侧使用的 <see cref="StatModifier"/>。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class StatOverride : Resource
 {

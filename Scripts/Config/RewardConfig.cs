@@ -12,6 +12,7 @@ namespace ActRoguelike.Config;
 /// C# 处理器注册表（<c>RewardEffectRegistry</c>）表达 —— 表仍是**可校验的数据**，
 /// 读表时就能把"handler 未注册"抓出来并警告。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class RewardConfig : ConfigRow
 {

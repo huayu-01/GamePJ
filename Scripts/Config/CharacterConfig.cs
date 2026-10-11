@@ -12,6 +12,7 @@ namespace ActRoguelike.Config;
 /// 取代 `RunController.ApplyBalance` 里那串 <c>heavy ? A : summoner ? B : C</c> 三元链与
 /// 硬编码的能力开关矩阵（原 `Balance.tres` 的 <c>Player*</c> / <c>Heavy*</c> / <c>Summoner*</c> 已搬到这里）。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class CharacterConfig : UnitConfig
 {

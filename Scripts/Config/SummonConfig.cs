@@ -11,6 +11,7 @@ namespace ActRoguelike.Config;
 /// <see cref="UnitConfig"/>（Drone 的 `Tags = ["Summon"]` 决定它进 summon_units 组、
 /// 不被敌人当成目标）。这里只加召唤物私有的一列：存活时间。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class SummonConfig : UnitConfig
 {

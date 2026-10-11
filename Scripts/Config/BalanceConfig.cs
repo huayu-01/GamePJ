@@ -38,6 +38,7 @@ public enum PlayerCharacterKind
 ///
 /// 代码里不要写死数值 —— 需要新的可调项就在对应的表行类上加一个 `[Export]`，然后在套用它的地方读表。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class BalanceConfig : Resource
 {

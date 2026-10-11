@@ -17,6 +17,7 @@ namespace ActRoguelike.Config;
 /// <item>它的**数值型强化**（Pressure）→ `Config/Tables/Pressure/`，与本表无关。</item>
 /// </list>
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class BossConfig : UnitConfig
 {

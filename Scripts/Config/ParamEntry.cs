@@ -8,6 +8,7 @@ namespace ActRoguelike.Config;
 /// 为什么用 <see cref="Variant"/> 而不是 float：键值对要能同时表达数字（1.15）、
 /// 字符串（"Burn" / "res://Scenes/Summons/Drone.tscn"）与布尔，用 float 就得为字符串另开一张表。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class ParamEntry : Resource
 {

@@ -54,6 +54,7 @@ public enum EffectKind
 /// 状态行（<see cref="EffectKind.DamageOverTime"/> / <see cref="EffectKind.Slow"/> …）描述的是
 /// "挂上去之后持续改什么"。两者共用本表，靠 <see cref="Kind"/> 区分，避免出现两张同构的表。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class EffectConfig : ConfigRow
 {

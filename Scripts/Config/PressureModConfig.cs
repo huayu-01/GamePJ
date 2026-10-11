@@ -20,6 +20,7 @@ namespace ActRoguelike.Config;
 ///
 /// ⚠️ 也**没有**为 Pressure 设计"可被玩家增幅修改"的接口（§7.2 明令禁止）。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class PressureModConfig : ConfigRow
 {

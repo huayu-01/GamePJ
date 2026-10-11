@@ -20,6 +20,7 @@ namespace ActRoguelike.Config;
 ///
 /// 数值权威：**这一行**。行读不到时调用方什么都不做，能力保留场景里的值。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class AbilityConfig : ConfigRow
 {

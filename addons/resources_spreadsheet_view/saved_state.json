@@ -1,0 +1,19 @@
+{
+  "column_properties": {
+    "res://Config/": {
+      "metadata/_custom_type_script": {
+        "visibility": 0
+      },
+      "resource_local_to_scene": {
+        "visibility": 0
+      },
+      "resource_name": {
+        "visibility": 0
+      }
+    }
+  },
+  "recent_paths": [
+    "res://Config/"
+  ],
+  "table_functions": {}
+}

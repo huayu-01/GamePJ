@@ -9,6 +9,7 @@ namespace ActRoguelike.Config;
 ///
 /// 取代 `MetaProgress.cs` 里 5 个硬编码系数（10 / 0.05 / 0.03 / 0.03 / 0.06）与价格公式 <c>10*(level+1)</c>。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class MetaUpgradeConfig : ConfigRow
 {

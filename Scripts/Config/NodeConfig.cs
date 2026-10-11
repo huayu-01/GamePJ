@@ -11,6 +11,7 @@ namespace ActRoguelike.Config;
 /// 它一处替掉三处硬编码：`RewardService.TitleFor` / <c>FilterFor</c> 两个 switch、
 /// `NodePlacement.LayerOf` 与 `StageController.WavesFor`（同一段逻辑写了两遍）、以及商店三项报价。
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class NodeConfig : ConfigRow
 {

@@ -17,6 +17,7 @@ namespace ActRoguelike.Config;
 ///   不再按中文显示名匹配</b>（改文案不再会静默放行/屏蔽敌人）。</item>
 /// </list>
 /// </summary>
+[Tool]
 [GlobalClass]
 public partial class EnemyConfig : UnitConfig
 {
