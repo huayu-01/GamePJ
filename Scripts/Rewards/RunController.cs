@@ -114,6 +114,8 @@ public partial class RunController : Node
 			// 主攻击的这四个数以**单位行**为准，所以角色行写在技能行之后 —— 只留一个真源。
 			character.ApplySkillsTo(_player);
 			character.ApplyAttackTo(_player);
+			// 角色的「表现 · 动画」6 列也要应用 —— 否则表里填了动画名/阈值对玩家无效（死配置）。
+			character.ApplyAnimationTo(_player);
 		}
 
 		if (_stage == null)
