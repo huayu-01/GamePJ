@@ -86,12 +86,15 @@ public partial class StageDefinition : Resource
 	[Export] public float PressureMutationBonus { get; set; }
 
 	/// <summary>
-	/// 本关 Pressure 转换后允许进入的**数值型**强化候选标签（§7.4「强化池权重或适用规则」；留空 = 不限制）。
-	/// ⚠️ 只描述数值型强化（生命/伤害/攻速/冷却这类，§7.5），**绝不包含行为或技能型词条** ——
+	/// 本关 Pressure 转换后允许进入的**数值型**强化候选标签（§7.4「强化池权重或适用规则」）。
+	///
+	/// 取值优先级（只有一个真源）：节点行的 <see cref="NodeConfig.BossModifierTags"/>（挑战类型更具体）
+	/// → 本字段（关卡级兜底）→ 两层都留空 = **不限制**（Pressure 表里每一行都是候选）。
+	/// 命中规则 = 候选行 <c>PressureModConfig.Tags</c> 与本值**有交集**。
+	///
+	/// ⚠️ 只描述数值型强化（生命/伤害/攻速/移速这类，§7.5），**绝不包含行为或技能型词条** ——
 	/// 那是 Boss Build 的职责，两者必须能独立配置、独立追踪、独立结算（§7.1）。
-	/// ⚠️ 诚实交代：§7.5 的数值强化池本身**尚未实现**（候选与权重仍待平衡测试），
-	/// 所以本阶段这个字段的唯一消费者是开局的关卡日志（用它证明"这一关用的是哪套规则"）。
-	/// 在池实现之前，改它不会改变任何玩法数值。
+	/// 消费者是 <c>StageController.PickTags</c>（配置表阶段 6 起真的生效；在此之前它只进日志）。
 	/// </summary>
 	[Export] public string[] PressureUpgradeTags { get; set; } = System.Array.Empty<string>();
 

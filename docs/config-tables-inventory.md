@@ -9,7 +9,13 @@
 >
 > ---
 >
-> ## ⚠️ 2026-10 更新：配置表阶段 3 已落地，本文多条结论已过时
+> ## ⚠️ 2026-10 更新：配置表阶段 3 / 4 / 6 已落地，本文多条结论已过时
+>
+> **阶段 6（首领增强的"节点驱动抽奖"）**：`NodeConfig` 的三个空壳字段与 `StageDefinition.PressureUpgradeTags`
+> **全部接进玩法**；`PressureModConfig` 新增 `Tags` 列、`Weight` 真的加权；**两个抽取点拆开**
+> （Boss 开场词条只抽行为型 = Boss Build，Pressure 转换只抽数值型 = §7.5）。
+> 对应本文的 **#11**（§2.3 / §5-② 的那几行）与 §4 的"最该先做的三张"。
+> 实测见 [config.md](config.md) 的「配置表阶段 6 实测」、设计记录见 [config-schema.md](config-schema.md) §5 阶段 6。
 >
 > 阶段 3（统一单位表 + 技能表）做完之后，下面这些盘点结论**已经处理**，读本文时请对照本节：
 >
@@ -18,7 +24,7 @@
 > | #9 技能/能力表（⏳ 未做，优先级高） | ✅ **已做**：`Config/Tables/Skills/` **25 行**（5 玩家 + 16 单位 + 4 首领行为词条），`AbilityConfig` 含通用项 + `Params` + `AttackParams`；由 `UnitConfig.Skills`（**资源引用**）指向 |
 > | #10 敌人按敌种表（⏳ 未做，优先级高） | ✅ **已做**：`Config/Tables/Enemies/` 10 行（1 全局 + 9 敌种），`EnemyConfig : UnitConfig`，生成时"先 ApplyTo 再 AddChild" |
 > | #12 首领行为/技能表（🔴 新发现） | ✅ **已做**：4 条行为型词条并入**技能表**（`bhv_awakened` / `bhv_summoner` / `bhv_screaming` / `bhv_charging`，`ApplyHandler` 非空），`BossPerkCatalog` 改成表驱动 + 处理器注册表 |
-> | #11 首领增强表（数值型 Pressure，⏳ 未做） | 🟡 **表已就位**：`Config/Tables/Pressure/` 3 行（`pmod_berserk` / `pmod_fortress` / `pmod_swift`）；**抽取点仍与行为型合并**（顺序与分表前一致 = 玩法没变），`BossPerkCatalog.PressureOnly` / `BehaviorOnly` 已让两套来源可独立追踪 |
+> | #11 首领增强表（数值型 Pressure，⏳ 未做） | ✅ **阶段 6 已做完**：`Config/Tables/Pressure/` 3 行（`pmod_berserk` / `pmod_fortress` / `pmod_swift`），`Weight` 真的加权、新增 `Tags` 列；**抽取点已与行为型拆开**（Boss 开场词条只抽行为型，Pressure 转换只抽数值型）；`NodeConfig` 的三个字段全部接进 `StageController.AddPressureForNode` |
 > | #24 单位本体表（建议并入 #10） | ✅ **已做**：抽成 **`UnitConfig` 基类**（生命 / 攻击四项 / 移速 / Tags / 持有技能 / 表现），`EnemyConfig` / `BossConfig` / `SummonConfig` / `CharacterConfig` 全部继承它 |
 > | #19 召唤物表（🔴 优先级中） | ✅ **已做**：`Config/Tables/Summons/summon_drone.tres`（含 `LifetimeSeconds = 25`） |
 > | §2.2 的 `AllowedEnemies` 按中文显示名匹配（"这里必须一起修"） | ✅ **已修**：改成 `StageDefinition.AllowedEnemyIds`（按敌人表 Id），生成项与行按**预制体路径**配对；未知 Id 开局写警告 |
@@ -58,7 +64,7 @@
 |---|---|
 | 一共列出多少张表 | **47 张** |
 | 已落地 | **8 张**（⚠️ 阶段 3 之后是 **12 张**，**阶段 4 之后是 13 张** —— 新增 `UpgradePools/pool_*.tres` 3 行，见 §2.19 与文首的更新节） |
-| 设计里有但没做 | **3 张**（技能表 T2 / 敌人按敌种表 T5 扩展 / 首领增强表 T9）—— ⚠️ T2 与 T5 已在阶段 3 做完；T9 的"节点驱动"仍未做 |
+| 设计里有但没做 | ~~**3 张**（技能表 T2 / 敌人按敌种表 T5 扩展 / 首领增强表 T9）~~ → ✅ **全部做完**：T2 与 T5 在阶段 3、T9（含"节点驱动"）在阶段 6 |
 | **本文新发现** | **36 张**（`config-schema.md` 未列为独立表的）—— ⚠️ 其中 **#28 武器↔升级池已在阶段 4 落地**（形态与本文建议不同，见 §2.19） |
 | 最该先做的三张 | ① **敌人按敌种表** ② **技能/能力表** ③ **AI 行为表** —— 理由见 §4 |
 | 盘点发现的主要问题 | 见 §5：**6 处死字段**（2 个 Balance 字段 ✅阶段3 + `IsFinalBoss` + 效果表 4 列）、**1 处双真源静默换挡**（敌人全局倍率 ✅阶段3）、**3 处加权抽取退化**（`RewardConfig.Weight` / `BossPerk.Weight` / `ConflictsWith` ✅阶段4接上其一）、**3 处数值只靠 C# 默认值撑着**（`Pistol.tscn` / `PlayerInputConfig` / `EnemyConfig.MoveSpeedMultiplier`）、**1 处疑似未生效的列**（`Weapon.ProjectileSpeed`）、**11 处该改成资源引用的字符串外键**。🆕 阶段 4 另**删除**了 `PoolTags` 这处死字段（原表里没单列，混在 `RewardDefinition` 那一行里） |
@@ -94,13 +100,13 @@
 | 2 | `CharacterConfig` | 角色数值与开关矩阵 | ✅已落地 | `Config/Tables/Characters/chr_*.tres`（3 行） | 10(+6) | `RunController.ApplyBalance`（:85-119） | — |
 | 3 | `EnemyConfig` | 敌人（当前只有全局倍率一行） | ✅已落地（仅全局行） | `Config/Tables/Enemies/enemy_global.tres` | 10(+6) | `Balance.ScaleEnemy`（`Balance.cs:86-93`）、`EncounterController.cs:418` | — |
 | 4 | `EffectConfig` | 效果与状态参数 | ✅已落地（**但 4 列无消费者**，见 §5-②） | `Config/Tables/Effects/eff_*.tres`（10 行） | 11(+6)（其中 `Value/Value2/Radius/TickSeconds` 死） | `StatusPresets.Create`（`StatusEffect.cs:43`）、`buff`/`burn` 等 | — |
-| 5 | `NodeConfig` | 节点类型、分层、波数、商店价目 | ✅已落地 | `Config/Tables/Nodes/node_*.tres`（9 行） | 15(+6)（其中 `BossPressurePoints/BossModifierRolls/BossModifierTags` 是空壳） | `RewardService`（:21,33,53）、`NodePlacement`（:22,39） | — |
+| 5 | `NodeConfig` | 节点类型、分层、波数、商店价目、**Boss Pressure 三列** | ✅已落地 | `Config/Tables/Nodes/node_*.tres`（9 行） | 15(+6)（`BossPressurePoints/BossModifierRolls/BossModifierTags` **阶段 6 已全部接进玩法**） | `RewardService`（:21,33,53）、`NodePlacement`（:22,39）、**`StageController.AddPressureForNode`** | — |
 | 6 | `RewardConfig` | 增幅项（强化/进化/异化） | ✅已落地 | `Config/Tables/Upgrades/*.tres`（19 行） | 11(+6)（`Weight` 仍无实际效果；`PoolTags` **阶段 4 已删**；`Pool` / `ConflictsWith` **阶段 4 新增**） | `RewardTable.Build` → `RewardPool.Roll` | — |
 | 7 | `MetaUpgradeConfig` | 局外成长条目 | ✅已落地 | `Config/Tables/Meta/meta_*.tres`（5 行） | 7(+6) | `MetaProgress`（:33,37） | — |
 | 8 | `StageDefinition` | 关卡（含 Pressure 规则） | ✅已落地 | `Config/Tables/Stages/stg_*.tres`（3 行） | 23（**不含**基类公共列）（其中 `IsFinalBoss` 是死字段） | `RunController.ResolveStages`、`StageController.ApplyStage` | — |
 | 9 | `AbilityConfig`（T2） | 技能/能力的通用参数与专属参数 | ⏳设计里有但没做 | `Scenes/Player/Player.tscn:64-140`（**40 处**） + 9 个子类各自的 `[Export]` | ~50 | `Ability` 及 9 个子类、`PlayerAbilityInput`、`EnemyBrain` | **高** |
 | 10 | `EnemyUnitConfig`（T5 扩展） | **按敌种的敌人本体数值** | ⏳设计里有但没做 | `Scenes/Enemies/*.tscn` 的 `Unit` 节点（10 个场景） | 6 公共 + 各 0–3 | `EncounterController.Spawn`（:413-439） | **高** |
-| 11 | `BossModifierConfig`（T9/T11） | 首领**数值型**强化池（Pressure） | ⏳设计里有但没做 | **不存在**；`NodeConfig.BossPressurePoints/BossModifierRolls/BossModifierTags`（:55-61）是**空壳**（9 行 `.tres` 全没写、0 处读取） | 6+ | 无（`EncounterController` 上**没有** `BossModifierRolls` 字段，已确认） | **高** |
+| 11 | `PressureModConfig`（T9/T11） | 首领**数值型**强化池（Pressure，§7.5） | ✅**阶段 6 已落地** | `Config/Tables/Pressure/` **3 行**（`pmod_*`，含 `Weight` / `Tags` / `Modifiers`） | 4(+6) | `BossPerkCatalog.RollPressure`（由 `StageController.AddPressureForNode` 在**跨阈值时**调用） | — |
 | 12 | `BossPerkConfig` | 首领**行为/技能型**构筑词条（Boss Build） | 🔴新发现 | `BossPerk.cs:41-125` 硬编码 7 条 | 7 | `BossPerkCatalog.Roll`（:130）、`EncounterController.cs:676` | **高** |
 | 13 | `BossPhaseConfig` | 首领阶段阈值 / 各阶段数值与解锁技能 | 🔴新发现 | `BossPhaseController.cs:13-20` 默认值 + `Scenes/Enemies/Boss.tscn:167-171` | 6 | `BossPhaseController.EnterPhase`（:59-92） | 中 |
 | 14 | `EliteConfig` | 精英修正（普通敌人精英化） | 🔴新发现 | `EliteModifier.cs:11-19` 默认值；`SkillElite.tscn:114-120` 全是 1.0（等于没配） | 7 | `EncounterController.cs:423` `new EliteModifier()` | 中 |
@@ -222,35 +228,45 @@
 **边界建议**：`Unit.MaxHealth/MaxArmor/MoveSpeed/Tags` 这类「一行一份」的搬进表；
 `CollisionShape3D` 尺寸、网格、材质**不要搬**（属美术，见 §3-⑤）。
 
-### 2.3 【#11 · T9/T11】首领增强表（数值型）—— `BossModifierConfig`
+### 2.3 【#11 · T9/T11】首领增强表（数值型）—— `BossModifierConfig` ✅ **阶段 6 已落地为 `PressureModConfig`**
 
-**⚠️ 与「首领行为表」（#12）必须分离**：`BossPerk.cs:32-37` 的注释把这条写成硬约束
+**⚠️ 与「首领行为表」（#12）必须分离**：`BossPerk.cs` 的注释把这条写成硬约束
 （《关卡核心文档》§7.1）：**数值型强化（Pressure）不允许与行为/技能型词条合并成一个无法区分来源的池**。
 
-**当前状态：这张表根本不存在。** 已有的三个「壳」是空字段：
+> ✅ **2026-10 阶段 6 已全部落地**（本节以下是当时的盘点原文，保留作为"为什么这么设计"的依据）：
+> 表名定为 **`PressureModConfig`**（`Config/Tables/Pressure/pmod_*.tres`，3 行），字段为
+> `Id` / `DisplayName` / `DescriptionTemplate` / **`Weight`** / **`Tags`** / `Modifiers : StatOverride[]` / `Note`。
+> 与本节建议字段清单的差异：**没有** `TargetStat` / `Operation` / `Value` / `MaxLevel` / `Source` ——
+> 因为一行要改多项（狂暴同时改伤害与攻速），标量字段表达不了，改用**与增幅项表共用的 `StatOverride[]`**
+> （`{Stat, Operation, Value}`，已在 `upg_evo_blast` 上验证过）；`MaxLevel` 与 `Source` 当时没有消费者，
+> 按"不留不生效的列"纪律**没加**（多次抽到同一条会叠加，这是 §7.3"每次转换各抽一次"的自然结果）。
+> 三个「壳」也全部接上了（见下表的"阶段 6"列），`StageDefinition.PressureUpgradeTags` 同理。
 
-| 壳 | 位置 | 消费者 |
-|---|---|---|
-| `NodeConfig.BossPressurePoints` | `NodeConfig.cs:55` | **无**（`StageController.AddPressureForNode` :348-381 读的是 `StageDefinition` + `Balance`，不读节点表） |
-| `NodeConfig.BossModifierRolls` | `NodeConfig.cs:58` | **无** |
-| `NodeConfig.BossModifierTags` | `NodeConfig.cs:61` | 只在日志里打印（`StageController.cs:104-107`） |
-| `StageDefinition.PressureUpgradeTags` | `StageDefinition.cs:92` | 同上，**只进日志**（源码注释自己承认：「在池实现之前，改它不会改变任何玩法数值」，:88-90） |
+**原盘点（改前状态）：这张表根本不存在。** 已有的三个「壳」是空字段：
 
-**建议字段清单**
+| 壳 | 位置 | 改前的消费者 | **阶段 6 之后** |
+|---|---|---|---|
+| `NodeConfig.BossPressurePoints` | `NodeConfig.cs:55` | **无**（`StageController.AddPressureForNode` 读的是 `StageDefinition` + `Balance`） | `StageController.ResolveBasePressure`（三层取值的第一层）；`node_evolution` / `node_mutation` 填 150 |
+| `NodeConfig.BossModifierRolls` | `NodeConfig.cs:58` | **无** | `AddPressureForNode` 的「额外 N 次」段（与阈值无关） |
+| `NodeConfig.BossModifierTags` | `NodeConfig.cs:61` | 只在日志里打印 | `StageController.PickTags` → `BossPerkCatalog.FilterPressure`（**真的过滤候选**） |
+| `StageDefinition.PressureUpgradeTags` | `StageDefinition.cs:92` | 只进日志 | 同上的第二层（节点行留空时才用它） |
+
+**当时的建议字段清单**（对照上面 ✅ 框里的实际落地）：
 
 | 字段 | 类型 | 用途 |
 |---|---|---|
-| `Id` | `string` | 行键（`bmp_hp` / `bmp_dmg` / `bmp_aspd` …） |
-| `TargetStat` | `string` | 目标属性键（`MaxHealthMultiplier` / `DamageMultiplier` / `AttackSpeedMultiplier` / `MoveSpeedMultiplier`） |
-| `Operation` | `ModifierOperation` | `Multiply` / `Add`（§7.5 只允许数值操作） |
-| `Value` | `float` | 每级强化量 |
-| `MaxLevel` | `int` | 该条最多叠几级（0 = 不限） |
-| `Weight` | `float` | 抽中权重（接 `WeightedPick`，`Config/WeightedPick.cs` 已落地） |
-| `Tags` | `string[]` | 与 `StageDefinition.PressureUpgradeTags` 对接 |
-| `Source` | `enum` | `Pressure`（预留：将来若要加 `StartPerk` 来源也能区分） |
+| `Id` | `string` | 行键（`bmp_hp` / `bmp_dmg` / `bmp_aspd` …）→ 实际用 `pmod_berserk` / `pmod_fortress` / `pmod_swift` |
+| `TargetStat` | `string` | 目标属性键 → 实际并入 `Modifiers` 的 `StatOverride.Stat` |
+| `Operation` | `ModifierOperation` | `Multiply` / `Add` → 实际并入 `StatOverride.Operation` |
+| `Value` | `float` | 每级强化量 → 实际并入 `StatOverride.Value` |
+| `MaxLevel` | `int` | 该条最多叠几级（0 = 不限）→ **没加**（无消费者） |
+| `Weight` | `float` | 抽中权重（接 `WeightedPick`）→ ✅ 落地，现有 3/2/2 |
+| `Tags` | `string[]` | 与 `StageDefinition.PressureUpgradeTags` 对接 → ✅ 落地（`Offense` / `Defense` / `Mobility`） |
+| `Source` | `enum` | `Pressure` → **没加**（两套来源已经靠"两张表 + 两个抽取点"分开，不需要行内枚举） |
 
 **落地顺序建议**：先做「数值池」（本表）→ 再把 `NodeConfig.BossPressurePoints` / `BossModifierRolls`
 接进 `StageController.AddPressureForNode` → 最后才放宽 `PressureUpgradeTags` 的语义。
+✅ **两步都在阶段 6 一起做完了**（顺序与建议一致：先让池能抽，再接节点驱动）。
 
 ### 2.4 【#12】**新发现** 首领行为/技能表（Boss Build）—— `BossPerkConfig`
 
@@ -793,10 +809,11 @@ var scene = GD.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn");
 **⚠️ 与 #11（首领增强表）的取舍**：用户特别强调了《关卡核心文档》第七章的
 「Pressure（数值强化）与 Boss Build（行为/技能）必须分离」。
 本文把它拆成 **#11 数值池** + **#12 行为表** 两张表。
-但**两张表现在都还不存在**（#11 是完全空壳，#12 是 C# 数组），
+✅ **两张表现在都落地了**（阶段 3 建表、阶段 6 把抽取点拆开并接上节点驱动）：
+#11 = `Pressure/pmod_*.tres`（3 行）、#12 = `Skills/bhv_*.tres`（4 行），
 且 #12 的 7 条词条里有 **3 条是数值型**（狂暴/铁壁/疾行）、**4 条是行为型**（提前觉醒/召唤师/尖啸/冲锋）
-—— **恰好需要按「来源」拆到两张表**。
-**建议：这两张表与 #15 分开排期**（它们服务 Boss，不服务小怪）。
+—— **就是按「来源」拆到两张表的**。
+**原建议：这两张表与 #15 分开排期**（它们服务 Boss，不服务小怪）。
 
 ---
 
@@ -839,9 +856,9 @@ var scene = GD.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn");
 | `RewardConfig.Weight` | `RewardConfig.cs:25` | **19 行 `.tres` 全没写** | `RewardPool.Roll`（:85，读了但恒为 1f） | 加权抽取退化成等概率（老问题 #5，**分表后未修，阶段 4 也没动** —— 改它会变抽样分布） |
 | `RewardDefinition.ConflictsWith` | `RewardDefinition.cs:44` | ~~**从未被赋值**~~ → ✅ **阶段 4 起由 `RewardConfig.ConflictsWith` 填** | `RewardPool.cs:68-75` | ✅ **已接上**（老问题 #5 的一半）。默认空 = 行为不变；语义是**单向**：已拥有列表里任一 Id → 本项不进池 |
 | `RewardDefinition.PoolTags` | ~~`RewardDefinition.cs:38`~~ | ~~`RewardCatalog.cs:98,113,126` + 19 行 `.tres` 的 `PoolTags`~~ | **从无** | 🗑 **阶段 4 已删除**（连同 19 行 `.tres` 里的那一行、`RewardCatalog` 三个工厂的 `tag` 参数与 15 个调用点）。语义由 `RewardConfig.Pool`（专属池）+ `RequiredWeaponTags`（标签层）取代 |
-| `BossPerk.Weight` | `BossPerk.cs:15` | 7 条全默认 `1f` | `BossPerk.cs:134` | 同上，等概率 |
-| `NodeConfig.BossPressurePoints` / `BossModifierRolls` / `BossModifierTags` | `NodeConfig.cs:55,58,61` | **9 行 `.tres` 全没写** | **0 处** | 空壳（源码注释也承认「本阶段只落数据，尚未接进玩法」，:53） |
-| `StageDefinition.PressureUpgradeTags` | `StageDefinition.cs:92` | **3 行都没写** | 只在日志（`StageController.cs:104-107`） | 空壳（注释自认「在池实现之前，改它不会改变任何玩法数值」，:88-90） |
+| `BossPerk.Weight` | `BossPerk.cs:16` | 行为型 4 条仍全默认 `1f`（数值型 3 条**阶段 6 起是 3/2/2**） | `BossPerkCatalog.Roll`（行为型，等概率）/ `RollPressure`（数值型，**真加权**） | 行为型仍是等概率（4 条等分）；**数值型的加权已经在阶段 6 接上**，有 3 万次实测（3/2/2 → 42.0/29.0/28.9%） |
+| `NodeConfig.BossPressurePoints` / `BossModifierRolls` / `BossModifierTags` | `NodeConfig.cs:55,58,61` | `node_evolution` / `node_mutation` 填了 `BossPressurePoints = 150`；另两列仍全空 | ✅ **阶段 6 起三处都有消费者**：`StageController.ResolveBasePressure` / 「额外 N 次」段 / `PickTags` | ✅ **空壳已消除**。回退路径：三个字段都留空时明确走「关卡行 → Balance 全局默认值」，且写了日志 |
+| `StageDefinition.PressureUpgradeTags` | `StageDefinition.cs:92` | **3 行都没写** | ✅ **阶段 6 起是 `StageController.PickTags` 的第二层**（节点行留空时才用它） | ✅ **空壳已消除**（留空 = 不限制，是合法状态不是错误） |
 | **`StageDefinition.IsFinalBoss`** | `StageDefinition.cs:46` | **3 行全写了**（`stg_outer/inner`=`false`、`stg_core`=`true`） | **全项目 0 处**（`grep IsFinalBoss` 只命中定义行本身） | 🔴 **确认是死字段**。3 个 `.tres` 都认真填了它，但没有任何代码读。**建议删掉字段 + 删 3 行赋值**，或接进「打完最终 Boss 的胜利文案」（`RunController.cs:350` 现在写死「通关！三关全部清理」） |
 | `EnemyConfig.MoveSpeedMultiplier` | `EnemyConfig.cs:25` | `enemy_global.tres` **没写** | `Balance.cs:93,99` | **实际值是 C# 默认 `1f`**，表里那行没显式给出来（可读性差）；`enemy_global.tres` 只显式给了 `HealthMultiplier` / `DamageMultiplier` |
 | **`EffectConfig.Value` / `Value2` / `Radius` / `TickSeconds`** | `EffectConfig.cs:68-80` | 各行都填了（`eff_chain_lightning` 的 `Value=14/TickSeconds=0.12/Value2=7/Radius=7`、`eff_explosion` 的 `Value=0.6/Radius=3.5` 等） | **全项目 0 处读取**（`grep` 只命中 `EffectConfig.cs` 自己的声明与注释） | 🔴 **确认这 4 列没有消费者** —— `StatusPresets.Create` 只走 `Modifiers` 与 `DamagePerSecond`（`StatusEffect.cs:43-47` → `EffectConfig.ToStatus` :102-117）。这些值目前只是**「把 `RewardConfig.HandlerParams` 里的数抄一份供人看」的镜像**（各行 `Note` 自己承认：「数值来自异化『连锁闪电』（Damage 14 / Range 7 / Jumps 3 / Cooldown 0.12）」，`eff_chain_lightning.tres`）。**真正生效的仍是 `mut_chain.tres` 的 `HandlerParams`** —— 两处改一处不改就会出现「表里的数」与「实际打的伤害」不一致。**建议：要么接上（`RewardEffectRegistry` 改成读效果表），要么删掉这 4 列** |
@@ -938,7 +955,7 @@ Balance.cs:92   row?.DamageMultiplier ?? config.EnemyDamageMultiplier
 | 在 `Balance.tres` / Balance 的展示字段（**建议保留现状**） | 3 | #41 伤害跳字 · #42 血条 · #43 HUD 文案（#47 日志开关属软件参数，不是 Balance） |
 | **只存在于 `.tscn` 脚本属性** | **10** | #9 · #10 · #13 · #14 · #15 · #16 · #17 · #18 · #19 · #25 |
 | **只存在于 C# 字面量 / `[Export]` 默认值** | **14** | #12 · #23 · #24 · #26 · #27 · #30 · #31 · #32 · #33 · #34 · #36 · #38 · #39 · #47 |
-| 不存在（表里的空壳字段，数据尚无家） | 1 | #11 |
+| 不存在（表里的空壳字段，数据尚无家） | ~~1~~ → **0** | ✅ #11 **阶段 6 已落地**（`Pressure/pmod_*.tres` 3 行），空壳字段全部接上 |
 | 不存在（关联关系无载体） | 1 | #20 角色↔技能矩阵（现在是 `CharacterConfig` 的字符串数组） |
 | 不存在（无法新建，应并入已有表） | 2 | #21 职业参数（已在角色表） · #29 奖励池过滤（`RewardChoiceCount` 已在 Balance） |
 | 不存在（应改设计而非建表） | 3 | #22（并入 #16） · #28（并入 #6） · #37（`Prompt` 与节点表 `Title` 重复，应删除） |

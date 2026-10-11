@@ -107,12 +107,19 @@ Scripts/
 > 1. **AI 行为表（盘点 #15，优先级高）**：10 个敌种的 AI 参数（`Brain.SearchRange` / 各 Behavior 的
 >    `Priority`·`StopDistance`·`PreferredDistance`… / 4 处硬编码避障启发式）现在仍**每个场景各配一份**；
 >    技能表已经落地，`UseAbilityBehavior.ApproachMin/Max` 也已进表，接 AI 表的时机成熟了。
-> 2. **首领增强的"节点驱动"**（T9 最后一步）：`NodeConfig.BossPressurePoints` / `BossModifierRolls` /
->    `BossModifierTags` 三个字段已就位（默认 0 = 不生效），接线点在 `StageController` 的累加与
->    `EncounterController.BossModifierRolls`。抽的时候按 `BossPerkCatalog.PressureOnly` / `BehaviorOnly`
->    分开抽（两张表已经分开，见阶段 3）。
->    ⚠️ 关卡核心文档 §7.1 的硬约束：**Boss Pressure（数值强化）与 Boss Build（行为/技能）必须分离**，
->    且**不要为 Pressure 设计"可被玩家增幅修改"的接口**。
+> 2. ✅ **首领增强的"节点驱动"（T9 最后一步）已做完（2026-10 配置表阶段 6）**：
+>    `NodeConfig.BossPressurePoints` / `BossModifierRolls` / `BossModifierTags` 三个字段
+>    **已全部接进** `StageController.AddPressureForNode`（不是 `EncounterController.BossModifierRolls` ——
+>    改成 `StageController` 排队 + `BossSpawned` 信号在 Boss 出生时套用，避免把关卡逻辑渗进遭遇层）。
+>    §7.5 的 Pressure 转换池真的接线了：`PressureModConfig` 新增 `Tags`、`Weight` 真的加权；
+>    **两个抽取点拆开**（Boss 开场词条 `Roll()` 只抽行为型，Pressure 转换 `RollPressure()` 只抽数值型）。
+>    ⚠️ 因此**开场词条的结果会变**（候选 7 → 4，§7.1 要求的分离）；自测的 `+187.5 → 1` / `+225 → 3` **没漂**。
+>    ⚠️ 两处需要平衡测试 / 后续处理：① `BossInitialPressure` 不再叠加节点累积 Pressure 折算出的压力等级
+>    （那是 §7.5 的替身）；② HUD 的 `[词条]` 一栏只显示行为型，不显示 Pressure 数值强化。
+>    见 [config.md](config.md) 的「配置表阶段 6 实测」与 [boss.md](boss.md)。
+>    ⚠️ 关卡核心文档 §7.1 的硬约束仍然成立：**Boss Pressure（数值强化）与 Boss Build（行为/技能）必须分离**，
+>    且**不要为 Pressure 设计"可被玩家增幅修改"的接口**（本轮没有加）。
+>    ⏸ **仍未做（第八章范围）**：§8.2 的"免费挑战不加 Pressure"闸门。
 > 3. **收尾决定**：`RewardConfig.PoolTags` / `ConflictsWith` 两个死字段（接上或删掉）、
 >    `WeaponConfig.ApplicableWeapons` 反向指（武器↔升级池关联）、`Pistol.tscn` 的数值（回退基线）。
 >    → ✅ **`PoolTags` / `ConflictsWith` 已在阶段 4 处理**（前者删除、后者接上）；

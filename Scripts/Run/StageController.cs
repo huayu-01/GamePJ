@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ActRoguelike.Boss;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
 using ActRoguelike.Encounter;
@@ -84,8 +85,19 @@ public partial class StageController : Node3D
 	private bool _bossFight;
 	private bool _bossCleared;
 	private RewardNodeKind? _currentNodeKind;
+
+	/// <summary>Pressure 的"银行"：还没凑够一个阈值的余数。凑够一个阈值就清零（§7.3 第 5 条：不结转）。</summary>
 	private float _pressureBank;
-	private int _bossPressureBonus;
+
+	/// <summary>本关已跨过阈值的次数（= 由 Pressure 转换触发的数值强化次数）。与 §8 的免费额度溢出是两码事。</summary>
+	private int _pressureRolls;
+
+	/// <summary>
+	/// 本关由 Pressure 转换（+ 节点行额外次数）抽到、但**还没套用**的数值强化 ——
+	/// 挑战发生时 Boss 还不存在，所以在它出生时才套（见 <see cref="ApplyPendingPressurePerks"/>）。
+	/// </summary>
+	private readonly List<BossPerk> _pendingPressurePerks = new();
+
 	private bool _rewardPending;
 
 	/// <summary>当前关卡的配置与序号（1 起）。</summary>
@@ -105,6 +117,7 @@ public partial class StageController : Node3D
 			? "不限制"
 			: string.Join(",", definition.PressureUpgradeTags);
 		ActRoguelike.Core.GameLog.Write("Node", $"Stage 表行：{definition.Id}（{definition.DisplayName}）Boss Pressure 规则：增长倍率 {definition.PressureGrowthMultiplier:0.##} / 阈值 {(definition.PressureThreshold > 0 ? definition.PressureThreshold : ActRoguelike.Config.Balance.Settings.PressurePerPoint)} / 数值强化候选 [{tags}]");
+		ActRoguelike.Core.GameLog.Write("Node", $"Pressure 节点驱动：{DescribeNodePressureRules()}");
 
 		if (_encounter != null)
 		{
@@ -138,7 +151,8 @@ public partial class StageController : Node3D
 		_bossCleared = false;
 		_currentNodeKind = null;
 		_pressureBank = 0f;
-		_bossPressureBonus = 0;
+		_pressureRolls = 0;
+		_pendingPressurePerks.Clear();
 
 		// 免费挑战额度：初始 1 次、每关 +1、上限 2（关卡核心文档 L405-416）。
 		// 注意只统计"会刷怪的节点"，StartEncounter 才会让 ChallengesUsed 递增。
@@ -203,6 +217,15 @@ public partial class StageController : Node3D
 		Instance = this;
 		AddToGroup("stage");
 		CollectChildren();
+
+		// 关卡核心文档 §7.5：Pressure 转换出的**数值强化**在 Boss 出生时才套得上（挑战发生时它还不存在）。
+		// 用 EncounterController 的 BossSpawned 信号挂钩，而不是让 EncounterController 认识 Pressure ——
+		// "一关怎么攒 Pressure"不该渗进"一场遭遇"那一层。成对退订见 _ExitTree。
+		if (_bossEncounter != null)
+		{
+			_bossEncounter.BossSpawned += ApplyPendingPressurePerks;
+		}
+
 		PlaceNodes();
 
 		// 关卡核心文档 L87-93：每个 Stage 固定 10 个节点 —— 高价值 2 / 中价值 5 / 低价值 3。
@@ -211,6 +234,12 @@ public partial class StageController : Node3D
 
 	public override void _ExitTree()
 	{
+		// 订阅必须成对（项目纪律）：信号发在已释放的 StageController 上会直接报错。
+		if (_bossEncounter != null)
+		{
+			_bossEncounter.BossSpawned -= ApplyPendingPressurePerks;
+		}
+
 		if (Instance == this)
 		{
 			Instance = null;
@@ -334,50 +363,230 @@ public partial class StageController : Node3D
 	}
 
 	/// <summary>
-	/// 挑战完成后按节点价值累积 Pressure（关卡核心文档 §7.2/§7.3/§7.4）：
-	///   高价值（进化/异化）基础点数 × 本关增长倍率 × 挑战类型额外比例；普通挑战只有基础点数（默认 0）。
-	///   组合顺序固定为「基础 → ×本关倍率 → ×类型比例」（§7.2 要求组合规则明确）。
-	/// 每满「Pressure 阈值」转成 1 点首领压力，**余数清零、不结转**（§7.3 第 5 条）；
-	/// 一次结算跨过多个阈值时按整除一次拿到多级（§7.3 第 6 条：不能只转一次就丢掉多余的）。
+	/// 挑战完成后按节点/关卡配置累积 Pressure 并**立即抽取**数值强化（关卡核心文档 §7.2–§7.5）。
 	///
-	/// 数值来源（关卡核心文档 §7.4 的 Stage 倍率表）：先读当前 Stage 行
-	/// （<c>Config/Tables/Stages/stg_*.tres</c>），行里留 0 = 未设置 → 回退到 Balance 的全局默认值。
-	/// ⚠️ 这里只处理**数值型**首领强化所需的 Pressure；行为/技能型词条走 BossPerkCatalog，
-	/// 关卡核心文档 §7.1 要求两者分离、不得合并成一个池。
+	/// <b>§7.2「不同挑战类型具有各自的 Pressure 增加值」</b> → 基础点数按这个顺序取（只有一个真源）：
+	/// ① <see cref="NodeConfig.BossPressurePoints"/>（节点表那一行 = 挑战类型，最具体）；
+	/// ② Stage 行按价值层的 <see cref="StageDefinition.PressurePerNodeHighValue"/> /
+	///    <see cref="StageDefinition.PressurePerNodeNormal"/>（§7.4 的两个"基础 Pressure"字段）；
+	/// ③ <see cref="BalanceConfig.PressurePerHighValueNode"/>（全局默认值 150）。
+	///
+	/// <b>组合顺序（§7.2「组合顺序应通过明确的计算配置定义」—— 全项目只有这一处定义）</b>：
+	/// <c>本次点数 = 基础点数 × 本关增长倍率 × 挑战类型额外比例</c>。
+	/// 倍率来自 Stage 行（§7.4：固定倍率表、不随机生成），额外比例来自
+	/// <see cref="StageDefinition.PressureEvolutionBonus"/> / <see cref="StageDefinition.PressureMutationBonus"/>。
+	///
+	/// <b>§7.3 转换阈值</b>：入账后**逐次**检查阈值 —— 每满一次就**立即**抽一次随机强化（§7.3 第 3 条），
+	/// 所以一次结算跨过多个阈值就是多次抽取（§7.3 第 6 条明令不能"只调用一次转换函数"）；
+	/// 转换完不足阈值的余数清零、不结转（§7.3 第 5 条）。
+	///
+	/// <b>§7.5</b>：抽取走 <see cref="BossPerkCatalog.RollPressure"/>（只出**数值型** + 按 Weight 真加权 +
+	/// 按标签过滤候选）。抽到的词条先**排队**，Boss 出生时才由 <see cref="ApplyPendingPressurePerks"/>
+	/// 套到它身上 —— 挑战发生时 Boss 还不存在。行为/技能型走 <see cref="BossPerkCatalog.Roll"/>，
+	/// 两套来源各有各的抽取点，不得合并成一个池（§7.1）。
+	///
+	/// ⚠️ 已知边界（本轮**未**实现，属第八章而非第七章）：§8.2 要求"只有**不**属于免费挑战的挑战完成时才加
+	/// Pressure"，这里的免费额度闸门（<c>FreeQuotaLeft</c>）还没有接进来，所以免费挑战也会累积 Pressure。
+	/// 见 docs/config.md「Pressure 结算」一节的记录。
 	/// </summary>
+	/// <param name="kind">这次完成的是哪种奖励节点（决定基础点数、额外比例与候选标签）。</param>
 	public void AddPressureForNode(RewardNodeKind kind)
 	{
-		ActRoguelike.Config.BalanceConfig config = ActRoguelike.Config.Balance.Settings;
+		BalanceConfig config = Balance.Settings;
 		StageDefinition? stage = Definition;
+		NodeConfig? nodeRow = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
 
-		// 基础点数：高价值（层 2）用「高价值挑战基础 Pressure」，普通挑战用「普通挑战基础 Pressure」。
-		float basePoints = LayerOf(kind) >= 2
-			? Positive(stage?.PressurePerNodeHighValue, config.PressurePerHighValueNode)
-			: Mathf.Max(0f, stage?.PressurePerNodeNormal ?? 0f);
-		if (basePoints <= 0f)
-		{
-			return;
-		}
+		// ① 基础点数（§7.2：不同挑战类型各自的增加值）。
+		(float basePoints, string source) = ResolveBasePressure(kind, nodeRow, stage, config);
 
-		// 关卡核心文档 L356：进化/异化奖励对 Pressure 增加值有额外比例。
+		// ② 组合顺序：基础 × 本关倍率 × 类型比例。
+		float growth = stage is { PressureGrowthMultiplier: > 0f } row ? row.PressureGrowthMultiplier : 1f;
 		float scale = kind switch
 		{
 			RewardNodeKind.Evolution => Positive(stage?.PressureEvolutionBonus, config.PressureEvolutionBonus),
 			RewardNodeKind.Mutation => Positive(stage?.PressureMutationBonus, config.PressureMutationBonus),
 			_ => 1f,
 		};
-		float growth = stage is { PressureGrowthMultiplier: > 0f } row ? row.PressureGrowthMultiplier : 1f;
 		float perNode = basePoints * growth * scale;
-		float perPoint = Mathf.Max(1f, Positive(stage?.PressureThreshold, config.PressurePerPoint));
-		_pressureBank += perNode;
-		int gained = (int)(_pressureBank / perPoint);
-		if (gained > 0)
+		float perPoint = ResolveThreshold(stage, config);
+
+		// ③ §7.3：入账后**逐次**跨阈值 —— 每满一次就地抽一次，不能只转一次就丢掉多余的强化机会。
+		int crossed = 0;
+		var picked = new List<string>();
+		if (perNode > 0f)
 		{
-			_bossPressureBonus += gained;
-			_pressureBank = 0f;
+			_pressureBank += perNode;
+			while (_pressureBank >= perPoint)
+			{
+				_pressureBank -= perPoint;
+				crossed++;
+				AppendPick(BossPerkCatalog.RollPressure(PickTags(nodeRow)), picked);
+			}
+
+			// §7.3 第 5 条：转换后不足阈值的余数**清除、不结转**。
+			if (crossed > 0)
+			{
+				_pressureBank = 0f;
+			}
+
+			_pressureRolls += crossed;
 		}
 
-		ActRoguelike.Core.GameLog.Write("Node", $"Pressure 累积：+{perNode:0.#}（基础 {basePoints:0.#} × 本关倍率 {growth:0.##} × 类型比例 {scale:0.##}）阈值 {perPoint:0} → 余数 {_pressureBank:0.#} / 本关首领额外压力 {_bossPressureBonus}");
+		// ④ 节点表再加几次（§3 T11 的"抽几次"：与阈值无关，配置了就抽）。
+		int extra = Mathf.Max(0, nodeRow?.BossModifierRolls ?? 0);
+		for (int i = 0; i < extra; i++)
+		{
+			AppendPick(BossPerkCatalog.RollPressure(PickTags(nodeRow)), picked);
+		}
+
+		if (crossed == 0 && extra == 0 && perNode <= 0f)
+		{
+			return; // 这个节点本来就不加压力（与分表前的静默一致，不写日志）。
+		}
+
+		string extraText = extra > 0 ? $" + 节点行额外 {extra} 次" : string.Empty;
+		string pickText = picked.Count == 0 ? "（池空，未兑现）" : string.Join("、", picked);
+		ActRoguelike.Core.GameLog.Write(
+			"Node",
+			$"Pressure 累积：+{perNode:0.#}（基础 {basePoints:0.#}（来源：{source}）× 本关倍率 {growth:0.##} × 类型比例 {scale:0.##}）阈值 {perPoint:0} → 本次跨阈值 {crossed} 次{extraText} → 本关累计 {_pressureRolls} 次 / 余数 {_pressureBank:0.#} / 立即抽取 [{pickText}]");
+	}
+
+	/// <summary>把一次抽取结果登记进队列（池空时只警告，不静默变强）。</summary>
+	private void AppendPick(BossPerk? perk, List<string> names)
+	{
+		if (perk == null)
+		{
+			GD.PushWarning("[StageController] Pressure 转换池是空的（候选 0 条），这次强化没有兑现。");
+			return;
+		}
+
+		_pendingPressurePerks.Add(perk);
+		names.Add(perk.Name);
+	}
+
+	/// <summary>
+	/// 本次抽取允许的**数值型**候选标签（§7.4「强化池权重或适用规则」）：
+	/// 节点行的 <see cref="NodeConfig.BossModifierTags"/> 优先（节点更具体）→ 关卡行的
+	/// <see cref="StageDefinition.PressureUpgradeTags"/> → 两层都留空 = 不限制（本表全部行都是候选）。
+	/// </summary>
+	private string[] PickTags(NodeConfig? nodeRow)
+	{
+		if (nodeRow is { BossModifierTags.Length: > 0 })
+		{
+			return nodeRow.BossModifierTags;
+		}
+
+		return Definition is { PressureUpgradeTags.Length: > 0 } stage
+			? stage.PressureUpgradeTags
+			: System.Array.Empty<string>();
+	}
+
+	/// <summary>
+	/// 基础 Pressure 的三层取值（§7.2 + §7.4）。节点行填了就用节点行（"挑战类型"最具体），
+	/// 否则按价值层用 Stage 行的两个基础值，最后才用 Balance 的全局默认值。
+	/// 返回的第二个值是**来源说明**，只用于日志留痕（回退纪律：来源必须能一眼看出来）。
+	/// </summary>
+	private static (float Points, string Source) ResolveBasePressure(
+		RewardNodeKind kind,
+		NodeConfig? nodeRow,
+		StageDefinition? stage,
+		BalanceConfig config)
+	{
+		if (nodeRow is { BossPressurePoints: > 0f } row)
+		{
+			return (row.BossPressurePoints, $"节点表 {row.Id}");
+		}
+
+		if (LayerOf(kind) >= 2)
+		{
+			return stage is { PressurePerNodeHighValue: > 0f } high
+				? (high.PressurePerNodeHighValue, $"关卡表 {high.Id}")
+				: (config.PressurePerHighValueNode, "Balance 全局默认值");
+		}
+
+		return stage is { PressurePerNodeNormal: > 0f } normal
+			? (normal.PressurePerNodeNormal, $"关卡表 {normal.Id}")
+			: (0f, "未配置（= 这个价值层不加 Pressure）");
+	}
+
+	/// <summary>本关的 Pressure 阈值（§7.3）：行里填了用行里的，留 0 → 用 Balance 的全局默认值。</summary>
+	private static float ResolveThreshold(StageDefinition? stage, BalanceConfig config)
+		=> Mathf.Max(1f, Positive(stage?.PressureThreshold, config.PressurePerPoint));
+
+	/// <summary>
+	/// Boss 出生 → 把本关攒下的 Pressure **数值强化**套到它身上。
+	///
+	/// 关卡核心文档 §7.1：两套来源可以在最终 Boss 初始化时**共同生效**，但不能合并成一个无法区分来源的池。
+	/// 所以这里只套 Pressure 那一侧（数值型），Boss Build 的行为词条由 <c>EncounterController</c>
+	/// 走 <see cref="BossPerkCatalog.Roll"/> 单独抽、单独套；日志里两条线分别留痕。
+	///
+	/// 用 <c>BossSpawned</c> 信号挂钩，而不是让 EncounterController 认识 Pressure ——
+	/// 关卡的累积规则不渗进"一场遭遇"那一层。
+	/// </summary>
+	private void ApplyPendingPressurePerks()
+	{
+		if (_bossEncounter?.Boss is not { } boss)
+		{
+			return;
+		}
+
+		if (_pendingPressurePerks.Count == 0)
+		{
+			ActRoguelike.Core.GameLog.Write("Node", $"Boss 出生：本关 Pressure 数值强化 0 条（阈值转换 {_pressureRolls} 次）→ {Vitals(boss)} —— 与 Boss Build 行为词条分开结算（关卡核心文档 §7.1）");
+			return;
+		}
+
+		BossPressure? pressure = boss.GetNodeOrNull<BossPressure>("Pressure");
+		var names = new List<string>();
+		foreach (BossPerk perk in _pendingPressurePerks)
+		{
+			perk.Apply(new BossPerkContext { Boss = boss, Source = this, Pressure = pressure });
+			names.Add(perk.Name);
+		}
+
+		// 顺带把套用后的血量/护甲/乘区打出来 —— 这是"数值真的落到 Boss 身上"的直接证据
+		// （只写"抽到了什么"证明不了生效）。
+		ActRoguelike.Core.GameLog.Write(
+			"Node",
+			$"Boss 出生：套用本关 Pressure 数值强化 {names.Count} 条 [{string.Join("、", names)}]（阈值转换 {_pressureRolls} 次，来源：表 Pressure）→ {Vitals(boss)} —— 与 Boss Build 行为词条分开结算（关卡核心文档 §7.1）");
+	}
+
+	/// <summary>Boss 当前的有效数值（Pressure 套用前后的证据用）。</summary>
+	private static string Vitals(Unit boss)
+		=> $"Boss 生命 {boss.MaxHealth:0.#} 护甲 {boss.Armor:0.#} 伤害×{boss.Stats.Get("DamageMultiplier"):0.###} 攻速×{boss.Stats.Get("AttackSpeedMultiplier"):0.###} 移速×{boss.Stats.Get("MoveSpeedMultiplier"):0.###}";
+
+	/// <summary>
+	/// 节点表里配了 Boss Pressure 的行（§7.2「不同挑战类型具有各自的 Pressure 增加值」）。
+	/// 这是**确定性**的一行日志，可以当回归指标逐字比对；同时也是回退留痕：
+	/// 一行都没配时明确写出"全部走「关卡行 → Balance 全局默认值」回退"。
+	/// </summary>
+	private static string DescribeNodePressureRules()
+	{
+		List<string> ids = ConfigRows.Ids<NodeConfig>();
+		ids.Sort(StringComparer.Ordinal);
+
+		var configured = new List<string>();
+		int total = 0;
+		foreach (string id in ids)
+		{
+			if (ConfigRows.ById<NodeConfig>(id) is not { } row)
+			{
+				continue;
+			}
+
+			total++;
+			if (row.BossPressurePoints <= 0f && row.BossModifierRolls <= 0 && row.BossModifierTags.Length == 0)
+			{
+				continue;
+			}
+
+			string rowTags = row.BossModifierTags.Length == 0 ? "不限制" : string.Join(",", row.BossModifierTags);
+			configured.Add($"{row.Id} 基础 {row.BossPressurePoints:0.#} / 额外抽 {row.BossModifierRolls} 次 / 标签 [{rowTags}]");
+		}
+
+		return configured.Count == 0
+			? $"节点表 {total} 行都没配 → 全部走「关卡行 → Balance 全局默认值」回退"
+			: $"节点表 {total} 行里 {configured.Count} 行配了 → {string.Join(" · ", configured)}";
 	}
 
 	/// <summary>行里填了就用行里的，否则用全局默认值（0 / 负数 = 未设置）。</summary>
@@ -400,8 +609,12 @@ public partial class StageController : Node3D
 		return false;
 	}
 
-	/// <summary>仅供自测：关键状态快照。`all` = Interactable.All 里还剩几个可交互物（用掉的会退出这张表）。</summary>
-	public string DebugState => $"pending={_rewardPending} running={_encounterRunning} waves={_encounter?.WaveCount} waveIndex={_encounter?.WaveIndex} remaining={_encounter?.WaveRemaining} alive={_encounter?.AliveCount} spawned={_encounter?.TotalSpawned} encRunning={_encounter?.IsRunning} encDone={_encounter?.IsCompleted} challenges={ChallengesUsed} freeQuota={FreeQuotaLeft} boss={BossOpened} pressure={_bossPressureBonus} bank={_pressureBank:0} victory={IsVictory} all={Interactable.All.Count}";
+	/// <summary>
+	/// 仅供自测：关键状态快照。`all` = Interactable.All 里还剩几个可交互物（用掉的会退出这张表）。
+	/// `pressure` = 本关跨过 Pressure 阈值的次数（每次转换都会立即抽一条数值强化）；
+	/// `pmods` = 已经抽到、还没套到 Boss 身上的数值强化条数（含节点行额外次数）。
+	/// </summary>
+	public string DebugState => $"pending={_rewardPending} running={_encounterRunning} waves={_encounter?.WaveCount} waveIndex={_encounter?.WaveIndex} remaining={_encounter?.WaveRemaining} alive={_encounter?.AliveCount} spawned={_encounter?.TotalSpawned} encRunning={_encounter?.IsRunning} encDone={_encounter?.IsCompleted} challenges={ChallengesUsed} freeQuota={FreeQuotaLeft} boss={BossOpened} pressure={_pressureRolls} pmods={_pendingPressurePerks.Count} bank={_pressureBank:0} victory={IsVictory} all={Interactable.All.Count}";
 
 	/// <summary>仅供自测：直接开一场普通战斗（无 MCP 时用命令行验证波次）。</summary>
 	public void DebugStartCombat(int waves = 0)
@@ -429,7 +642,12 @@ public partial class StageController : Node3D
 		// 否则清场后波次系统还会继续刷怪。
 		_encounterRunning = false;
 		_encounter?.StopSpawning();
-		_bossEncounter.BossInitialPressure = Mathf.Max(0, ChallengesUsed - FreeChallengeQuota) + _bossPressureBonus;
+
+		// 初始压力只由"超出免费挑战额度"这一项决定（关卡核心文档 §8.1/§8.2）。
+		// ⚠️ 配置表阶段 6 之前这里还有一个 `+ _bossPressureBonus`（节点累积的 Pressure 被折算成压力等级）——
+		// 那是 §7.5 转换池没落地时的**替身**。现在转换的结果是"从数值池里抽一条强化并套到 Boss 身上"
+		// （§7.3 第 3 条），所以那一段被移除，不能两头都算。
+		_bossEncounter.BossInitialPressure = Mathf.Max(0, ChallengesUsed - FreeChallengeQuota);
 		_bossEncounter.SpawnBossNow();
 		return true;
 	}

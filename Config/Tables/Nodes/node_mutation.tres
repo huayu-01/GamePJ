@@ -12,3 +12,4 @@ WaveCount = 3
 Id = "node_mutation"
 Slot = 4
 DisplayName = "异化池"
+BossPressurePoints = 150.0
