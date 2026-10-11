@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WeaponConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "wpn_sniper"
+Slot = 2
+DisplayName = "激光狙击枪"
+DescriptionTemplate = "高伤单发、可穿透 {BasePierce} 个目标（{Damage:0} 伤害 / {MagazineSize} 发弹匣）"
+ScenePath = "res://Scenes/Weapons/Pistol.tscn"
+AttackTags = PackedStringArray("Projectile", "Gun", "Physical")
+Damage = 60.0
+FireInterval = 0.95
+MagazineSize = 5
+ReloadTime = 1.4
+AutoReloadDelay = 3.0
+SpreadDegrees = 0.2
+AimSpreadScale = 0.35
+MultiShotSpreadDegrees = 1.2
+ProjectilesPerShot = 1
+BasePierce = 2
+Knockback = 4.0
+CritChance = 0.15
+CritMultiplier = 2.0
+ProjectileSpeed = 90.0
+MaxLifetime = 2.2
+AimFov = 55.0
+Automatic = false

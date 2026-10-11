@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/CharacterConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "chr_summoner"
+Slot = 3
+DisplayName = "召唤控制"
+DescriptionTemplate = "{MaxHealth:0} 生命 / {MaxArmor:0} 护甲"
+MaxHealth = 210.0
+MaxArmor = 60.0
+MaxShield = 0.0
+MoveSpeed = 6.8
+DamageReduction = 0.0
+WeaponEnabled = true
+DefaultWeaponId = "wpn_pistol"
+EnabledAbilityIds = PackedStringArray("SummonAbility", "AreaAttackAbility")
+DisabledAbilityIds = PackedStringArray("MeleeAttackAbility")
+MeleeDamage = 32.0

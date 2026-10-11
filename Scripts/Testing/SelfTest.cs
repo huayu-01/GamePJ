@@ -99,6 +99,7 @@ public partial class SelfTest : Node
 				GameLog.Write("SelfTest", $"波数映射：进化={StageController.WavesFor(RewardNodeKind.Evolution)}（期望3） 异化={StageController.WavesFor(RewardNodeKind.Mutation)}（期望3） 强化={StageController.WavesFor(RewardNodeKind.Enhancement)}（期望2） 商店={StageController.WavesFor(RewardNodeKind.Shop)}（期望2） 材料={StageController.WavesFor(RewardNodeKind.Resource)}（期望1） 恢复={StageController.WavesFor(RewardNodeKind.Heal)}（期望1） 特殊={StageController.WavesFor(RewardNodeKind.Special)}（期望1）");
 				ReportNodes(stage);
 				ReportSpacing(stage);
+				ReportTables();
 				stage?.AddPressureForNode(RewardNodeKind.Evolution);
 				stage?.AddPressureForNode(RewardNodeKind.Mutation);
 				GameLog.Write("SelfTest", $"Pressure 测试（进化 150×1.25 + 异化 150×1.5）：{stage?.DebugState}");
@@ -503,6 +504,63 @@ public partial class SelfTest : Node
 		}
 
 		GameLog.Write("SelfTest", $"节点间距：最小 {min:0.##}（{pair}），阈值 {ActRoguelike.Config.Balance.Settings.MinNodeSpacing:0.#}");
+	}
+
+	/// <summary>
+	/// 配置表阶段 2 的**逐项比对**：把分表后的实际数值打出来，
+	/// 与分表前 `Balance.tres` 的记录逐条对照（见 docs/config.md 的实测表）。
+	/// 玩家/武器数值来自 `Config/Tables/Characters` 与 `Config/Tables/Weapons`。
+	/// </summary>
+	private void ReportTables()
+	{
+		var player = PlayerLocator.Player;
+		ActRoguelike.Weapons.Weapon? weapon = player == null ? null : NodeSearch.FindInSubtree<ActRoguelike.Weapons.Weapon>(player);
+
+		GameLog.Write("SelfTest",
+			player == null
+				? "配置表比对：找不到玩家"
+				: $"配置表比对·玩家：生命 {player.MaxHealth:0}（期望 250 + 元进度加成 {MetaProgress.BonusMaxHealth:0}） 护甲 {player.MaxArmor:0}（期望 40） 移速 {player.MoveSpeed:0.##}（期望 7） 减伤 {player.DamageReduction:0.##}（期望 0）");
+
+		GameLog.Write("SelfTest",
+			weapon == null
+				? "配置表比对：找不到武器"
+				: $"配置表比对·武器：伤害 {weapon.Damage:0}（期望 24） 间隔 {weapon.FireInterval:0.##}（期望 0.26） 弹匣 {weapon.EffectiveMagazineSize}（期望 12） 装填 {weapon.ReloadTime:0.##}（期望 0.7） 散布 {weapon.SpreadDegrees:0.##}（期望 0.5） 击退 {weapon.Knockback:0.##}（期望 2.5） 暴击 {weapon.CritChance:0.##}（期望 0.15） 弹速 {weapon.ProjectileSpeed:0}（期望 90） 预瞄FOV {weapon.AimFov:0}（期望 55） 穿透 {weapon.BasePierce}（期望 0） 连发 {weapon.Automatic}（期望 False）");
+
+		GameLog.Write("SelfTest",
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}（期望 3/3/1/10/9/5）");
+
+		GameLog.Write("SelfTest",
+			$"配置表比对·节点表：进化层 {NodePlacement.LayerOf(RewardNodeKind.Evolution)}/波 {NodePlacement.WavesFor(RewardNodeKind.Evolution)}（期望 2/3） 强化层 {NodePlacement.LayerOf(RewardNodeKind.Enhancement)}/波 {NodePlacement.WavesFor(RewardNodeKind.Enhancement)}（期望 1/2） 恢复层 {NodePlacement.LayerOf(RewardNodeKind.Heal)}/波 {NodePlacement.WavesFor(RewardNodeKind.Heal)}（期望 0/1） 商店价目 {RewardService.ShopCost(0)}/{RewardService.ShopCost(1)}/{RewardService.ShopCost(2)}（期望 5/12/18） 标题 {RewardService.TitleFor(RewardNodeKind.Mutation)}（期望 异化池）");
+
+		ActRoguelike.Combat.StatusEffect? burn = ActRoguelike.Combat.StatusPresets.Create("Burn", 3f);
+		ActRoguelike.Combat.StatusEffect? slow = ActRoguelike.Combat.StatusPresets.Create("Slow", 3f);
+		GameLog.Write("SelfTest",
+			$"配置表比对·效果表：燃烧 {burn?.DamagePerSecond:0} dps（期望 6） 减速修正 [{string.Join(",", System.Array.ConvertAll(slow?.Modifiers ?? System.Array.Empty<ActRoguelike.Combat.StatModifier>(), m => $"{m.Stat}={m.Value}"))}]（期望 MoveSpeedMultiplier=0.55）");
+
+		// 增幅项目录来源 + 池子规模：`docs/rewards.md` 记录的硬指标是"枪手 18 / 召唤 19"。
+		int enhancement = 0;
+		int evolution = 0;
+		int mutation = 0;
+		foreach (RewardDefinition definition in RewardCatalog.All)
+		{
+			switch (definition.Kind)
+			{
+				case RewardKind.Enhancement:
+					enhancement++;
+					break;
+				case RewardKind.Evolution:
+					evolution++;
+					break;
+				default:
+					mutation++;
+					break;
+			}
+		}
+
+		string poolIds = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController")?.PoolPreview ?? string.Empty;
+		string poolSize = poolIds.Length == 0 ? "空" : $"{poolIds.Split(',').Length} 条";
+		GameLog.Write("SelfTest",
+			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望 19 = 10/4/5） 用了表={(RewardCatalog.All.Length == 19 && RewardCatalog.All[0].Id == "upg_dmg_up")} 当前池子={poolSize}（枪手期望 18 条）");
 	}
 
 	private static void ReportCombat(StageController? stage)

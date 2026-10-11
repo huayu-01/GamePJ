@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_38156"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_n2cea"]
+
+[sub_resource type="Resource" id="Resource_rt6es"]
+script = ExtResource("1_38156")
+Stat = "PierceAdd"
+Operation = 0
+
+[resource]
+script = ExtResource("2_n2cea")
+MaxStacks = 2
+Excludes = PackedStringArray("evo_ricochet")
+PoolTags = PackedStringArray("Projectile")
+Modifiers = [SubResource("Resource_rt6es")]
+Id = "upg_pierce_round"
+DisplayName = "贯穿弹头"
+DescriptionTemplate = "子弹可多穿透 1 个目标"

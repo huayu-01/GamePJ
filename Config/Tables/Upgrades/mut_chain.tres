@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_wrbbe"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_w66ww"]
+
+[sub_resource type="Resource" id="Resource_t3jhm"]
+script = ExtResource("1_wrbbe")
+Key = "Cooldown"
+Value = 0.12
+Note = "触发冷却"
+
+[sub_resource type="Resource" id="Resource_me0ce"]
+script = ExtResource("1_wrbbe")
+Key = "Damage"
+Value = 14.0
+Note = "每跳伤害"
+
+[sub_resource type="Resource" id="Resource_pn2yf"]
+script = ExtResource("1_wrbbe")
+Key = "Range"
+Value = 7.0
+Note = "跳转范围"
+
+[sub_resource type="Resource" id="Resource_0xw2v"]
+script = ExtResource("1_wrbbe")
+Key = "Jumps"
+Value = 3.0
+Note = "最多跳几次"
+
+[resource]
+script = ExtResource("2_w66ww")
+RewardKind = 2
+ApplyHandler = "ChainLightning"
+HandlerParams = [SubResource("Resource_t3jhm"), SubResource("Resource_me0ce"), SubResource("Resource_pn2yf"), SubResource("Resource_0xw2v")]
+PoolTags = PackedStringArray("Mutation", "KillTrigger")
+Id = "mut_chain"
+DisplayName = "连锁闪电"
+DescriptionTemplate = "击杀敌人时对附近敌人放电"

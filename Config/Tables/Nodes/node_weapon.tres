@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="NodeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/NodeConfig.cs" id="1_j8jua"]
+
+[resource]
+script = ExtResource("1_j8jua")
+Kind = 0
+Title = "武器池"
+RewardKind = 1
+Id = "node_weapon"
+Slot = 1
+DisplayName = "武器池"

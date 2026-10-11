@@ -1,62 +1,64 @@
 # 数值配置（调参唯一入口）
 
-**所有可调数值都在一个文件里：[`Config/Balance.tres`](../Config/Balance.tres)**
+**所有可调数值拆成 8 张表，全部挂在 [`Config/Balance.tres`](../Config/Balance.tres) 上；运行期由 autoload `Balance` 读取并建索引。**
 
-- 游戏里运行时由 autoload `Balance` 读取，`RunController` 在**开局那一帧**套用到玩家、武器与节点节奏；生成的每个敌人/Boss 也会立刻套用全局倍率。
+> **2026-10 配置表阶段 2（重要变化）**：`Balance` 从"唯一数值**文件**"变成"唯一数值**门面 + 表索引**"。
+> 业务代码**仍然写 `Balance.Settings.Xxx`**（这条约定没变），但数值的实际家在 `Config/Tables/<分组>/` 里，
+> **一行一个 `.tres` 文件**。字段定义见 `Scripts/Config/*.cs`，缺字段/缺表都会回退到代码默认值。
+
+## 调参去哪张表
+
+| 要调什么 | 打开哪个目录 | 一行是什么 | 行数 |
+|---|---|---|---|
+| 玩家基础数值 | `Config/Tables/Characters/chr_*.tres` | 一个角色 | 3 |
+| 武器数值（伤害/射速/弹匣/装填/散布/**击退**/暴击/弹速） | `Config/Tables/Weapons/wpn_*.tres` | 一把武器 | 3 |
+| **效果参数（燃烧 dps / 减速 / 眩晕 / 击退倍率 / 爆炸 / 吸血 / 召唤上限 / 连锁闪电）** | `Config/Tables/Effects/eff_*.tres` | 一个效果 | 10 |
+| 奖励节点（标题 / 层 / 波数 / 商店价目） | `Config/Tables/Nodes/node_*.tres` | 一种节点 | 9 |
+| 增幅项（19 条强化·进化·异化） | `Config/Tables/Upgrades/*.tres` | 一条增幅 | 19 |
+| 关卡（预算 / 波次 / 敌人白名单 / Boss 词条数 / Pressure 规则） | `Config/Tables/Stages/stg_*.tres` | 一关 | 3 |
+| 敌人全局倍率 | `Config/Tables/Enemies/enemy_global.tres` | 一行 | 1 |
+| 局外成长（碎片价格 / 每级效果） | `Config/Tables/Meta/meta_*.tres` | 一项 | 5 |
+| **全局开关**（敌人/Boss 倍率、节奏、Boss 压力曲线、伤害跳字、血条、节点间距、区域杀高度） | **`Config/Balance.tres`**（还在原地） | — | 30 个字段 |
+
 - **改完要重新运行游戏才生效**（数值在开局一次性应用，不热重载）。
-- 两种改法都行：Godot 编辑器里双击 `Config/Balance.tres` 用 Inspector 改（有中文分组），或直接用文本编辑器改 `.tres`。
-- 字段定义在 [`Scripts/Config/BalanceConfig.cs`](../Scripts/Config/BalanceConfig.cs)，加了中文注释；缺字段会回退到代码默认值。
+- 两种改法都行：Godot 编辑器里双击 `.tres` 用 Inspector 改（有中文分组），或直接用文本编辑器改。
+- 字段的中文注释在对应的行类里：`Scripts/Config/{CharacterConfig,WeaponConfig,EffectConfig,NodeConfig,RewardConfig,MetaUpgradeConfig,StageDefinition}.cs`。
 
-## 参数分组
+> ⚠️ **操作纪律（血泪教训）**：不要单独删/改 `Balance.tres` 引用到的行文件。
+> 只要引用的**任何一个**行文件缺失/改名，Godot 会**整份 `Balance.tres` 加载失败**（不是只丢那一行），
+> 于是**所有**数值静默回到代码默认值（实测：玩家生命 250 → 140、武器变成 22/0.32/8/1.15）。
+> 要下线一行，就把 `Balance.tres` 里的数组项与顶部对应的 `[ext_resource]` 一起删。
+> 详见 [config-schema.md](config-schema.md) §8.3。
 
-### 玩家
-| 参数 | 含义 |
-|---|---|
-| `PlayerMaxHealth` / `PlayerMaxArmor` / `PlayerMaxShield` | 玩家最大生命 / 护甲 / 护盾 |
-| `PlayerMoveSpeed` | 玩家基础移速 |
-| `PlayerDamageReduction` | 护甲之外的额外减伤（0~0.9） |
+## 各表参数（当前取值）
 
-### 角色 · 近战重装（角色 2）
-| 参数 | 含义 |
-|---|---|
-| `HeavyMaxHealth` / `HeavyArmor` | 最大生命 380 / 护甲 140 |
-| `HeavyMoveSpeed` | 移速 6.2（枪手是 7.0） |
-| `HeavyDamageReduction` | 护甲之外的额外减伤 12% |
-| `HeavyMeleeDamage` | 左键近战重击伤害 32（范围/冷却在 `Player.tscn` 的 `AbilityMelee` 上） |
+### 角色表 `Config/Tables/Characters/`（3 行）
 
+| 行 | 生命 | 护甲 | 移速 | 减伤 | 武器 | 能力开关 | 近战伤害 |
+|---|---|---|---|---|---|---|---|
+| `chr_gunner`（槽 1） | 250 | 40 | 7.0 | 0 | ✅ | 关 Melee/Summon/Control | — |
+| `chr_heavy`（槽 2） | 380 | 140 | 6.2 | 12% | ❌ | 开 Melee，关 Summon/Control | 32 |
+| `chr_summoner`（槽 3） | 210 | 60 | 6.8 | 0 | ✅ | 开 Summon/Control，关 Melee | — |
+
+`EnabledAbilityIds` / `DisabledAbilityIds` 里写的是**能力脚本类名**（`MeleeAttackAbility` 等）——
+因为 `Ability.cs` 在 `AbilityId` 为空时会自动填 `GetType().Name`，所以不用去改场景。
 近战角色会**关闭枪械**（`Weapon.Enabled = false`），左键改由近战能力接管（`PlayerWeaponInput` 里分流）；
 近战需要一个「范围内的目标」才会出招，够不着就不挥空。
 
-### 角色 · 召唤控制（角色 3）
-| 参数 | 含义 |
-|---|---|
-| `SummonerMaxHealth` / `SummonerArmor` / `SummonerMoveSpeed` | 210 生命 / 60 护甲 / 6.8 移速 |
-| （召唤本身） | 冷却 5 秒、一次 1 架、上限 3 架 —— 写在 `Player.tscn` 的 `AbilitySummon` 上 |
+### 武器表 `Config/Tables/Weapons/`（3 行）
 
-⚠ **未实跑验证**：角色 3 的属性、界面、构建都已通过，但「按 G 召唤出无人机」这一步在本轮没能确认（MCP 对该节点的属性读取与 `TryActivate` 调用持续返回失败，输入注入也没观察到召唤物）。下一轮需要换一种验证方式（例如让 HUD 显示召唤物数量再肉眼/截图确认，或加一个累计召唤计数器）。
+| 行 | 伤害 | 间隔 | 弹匣 | 装填 | 散布 | **击退** | 穿透 | 连发 |
+|---|---|---|---|---|---|---|---|---|
+| `wpn_pistol`（槽 1） | 24 | 0.26 | 12 | 0.7 | 0.5 | **2.5** | 0 | ❌ |
+| `wpn_sniper`（槽 2） | 60 | 0.95 | 5 | 1.4 | 0.2 | **4.0** | 2 | ❌ |
+| `wpn_rifle`（槽 3） | 13 | 0.12 | 30 | 1.2 | 1.6 | **1.2** | 0 | ✅ |
 
-### 武器 · 手枪
-| 参数 | 含义 |
-|---|---|
-| `PistolDamage` | 单发伤害 |
-| `PistolFireInterval` | 射击间隔（秒），越小射速越快 |
-| `PistolMagazineSize` | 弹匣容量 |
-| `PistolReloadTime` | **装填时间（秒）** —— 觉得换弹慢就调这个 |
-| `PistolSpreadDegrees` | 腰射散布角度 |
-| `PistolKnockback` | 击退力 |
-| `PistolCritChance` / `PistolCritMultiplier` | 暴击率 / 暴击倍率 |
-| `PistolProjectileSpeed` | 弹速 |
-| `PistolAimFov` | 瞄准时的 FOV |
+三把武器**共用同一个 `Pistol.tscn` 节点**，只换数值（`RunController.EquipWeapon` → `WeaponConfig.ApplyTo`），
+所以不会重建节点、不会弄丢挂在武器下的输入组件。
 
-### 武器 · 激光狙击枪（第二把武器，策划文档 §8.1：角色 1 的武器是手枪/步枪/激光狙击枪/弓箭，没有霰弹枪）
-| 参数 | 含义 |
-|---|---|
-| `ShotgunDamage` | 单发弹丸伤害（一次击发多颗） |
-| ``SniperPierce`` | **基础穿透数量**（2 个目标） |
-| `ShotgunFireInterval` / `ShotgunMagazineSize` / `ShotgunReloadTime` | 射击间隔 / 弹匣 / 装填 |
-| `ShotgunSpreadDegrees` / `ShotgunKnockback` | 散布 / 击退 |
-
-两把武器共用同一个 Weapon 节点，只换数值（`RunController.EquipWeapon`），所以不会重建节点、不会弄丢挂在武器下的输入组件。
+> ℹ️ 分表前狙击/步枪的暴击率、暴击倍率、弹速、预瞄 FOV、被动装填延迟**全部借用 `Pistol*` 的值**；
+> 分表后它们各自有独立字段，当前**默认值仍与手枪相同**（0.15 / 2.0 / 90 / 55 / 3），所以行为没变。
+> 要按武器区分，改行文件即可。
 
 ### 火力倾泻（角色 1 技能，按武器分两种模式）
 
@@ -65,33 +67,82 @@
 | 手枪 / 激光狙击枪（非连发） | 无视当前弹药，**直接打出一整个弹匣**（1/12 也能打满 12 发），随后自动装填 |
 | 步枪（连发） | **持续 2.5 秒自动连射且不消耗子弹**（弹匣 0/N 也能用），到时停止 |
 
-判定依据是 `Weapon.Automatic`，以后新增连发武器会自动走第二种。
-### 武器 · 步枪（第三把武器）
-| 参数 | 含义 |
-|---|---|
-| `RifleDamage` / `RifleFireInterval` | 单发伤害 / 射击间隔（0.12 秒 ≈ 8 发每秒） |
-| `RifleMagazineSize` / `RifleReloadTime` | 弹匣 30 / 装填 |
-| `RifleSpreadDegrees` / `RifleKnockback` | 散布 / 击退 |
-| `RifleAutomatic` | 按住左键持续开火（唯一连发武器） |
+判定依据是武器表的 `Automatic`，以后新增连发武器会自动走第二种。
 
-三把武器共用同一个 Weapon 节点，只换数值（`RunController.EquipWeapon`）。
+### ⭐ 效果表 `Config/Tables/Effects/`（10 行）—— 用户点名要的"效果参数"
 
-### 节点 · 商店（花局外碎片买局内收益）
-| 参数 | 含义 |
-|---|---|
-| `ShopHealCost` | 恢复全部生命与护甲的碎片价格（5） |
-| `ShopRewardCost` | 随机一件强化奖励（12） |
-| `ShopWeaponCost` | 更换武器（18） |
+| 行 Id | 类型 | 数值 | 原来在哪 |
+|---|---|---|---|
+| `Slow` | 减速 | 移速 ×0.55 | `StatusEffect.cs` switch（硬编码） |
+| `Weaken` | 虚弱 | 伤害 ×0.75 | 同上 |
+| **`Burn`** | 持续伤害 | **6 伤害/秒** | 同上（用户点名的"燃烧值"） |
+| `Empowered` | 增益 | 攻速 ×1.3 + 伤害 ×1.15 | 同上 |
+| `Stun` | 眩晕 | 移速 ×0.12 + 攻速 ×0.5 | 同上 |
+| **`Knockback`** | 击退 | 全局倍率 1.0（= 原样）+ 抗性上限 1.0 | **原来没有**（新增，待接线） |
+| `Explosion` | 爆炸 | 半径 3.5 + 伤害比例 0.6 | `RewardCatalog` 闭包 |
+| `Lifesteal` | 吸血 | 比例 0.12 | 同上 |
+| `SummonOnKill` | 击杀召唤 | 上限 2 + 召唤 `Drone.tscn` | 同上 |
+| `ChainLightning` | 连锁闪电 | 14 伤害 / 7 范围 / 3 跳 / 0.12 冷却 | 同上 |
 
+> ⚠️ **"击退值"有两层，别找错地方**：
+> ① **每个单位实际给多少击退** 在**武器表**的 `Knockback`（手枪 2.5 / 狙击 4 / 步枪 1.2）与敌人命中体的 `AttackHitbox.Knockback` 上；
+> ② **效果表**的 `eff_knockback` 放的是**全局倍率**与**击退抗性上限**。
+> 这个 `Value` 目前**还没接进** `Unit.ReceiveHit`（接线点：`Unit.cs` 里 `float scale = Stats.Get("KnockbackMultiplier");` 那一行），
+> 所以它现在是"已就位、待接线"的参数 —— 改它暂时不会影响玩法。
+
+### 节点表 `Config/Tables/Nodes/`（9 行）
+
+| 行 | 节点类型 | 层 | 波数 | 奖励过滤 | 界面标题 |
+|---|---|---|---|---|---|
+| `node_weapon` | Weapon | 1 | 2 | 进化 | 武器池 |
+| `node_enhance` | Enhancement | 1 | 2 | 强化 | 强化池 |
+| `node_evolution` | Evolution | 2 | 3 | 进化 | 进化池 |
+| `node_mutation` | Mutation | 2 | 3 | 异化 | 异化池 |
+| `node_resource` | Resource | 0 | 1 | 不过滤 | 局外资源 |
+| `node_heal` | Heal | 0 | 1 | 不过滤 | 恢复状态 |
+| `node_special` | Special | 0 | 1 | 不过滤 | 特殊奖励 |
+| `node_shop` | Shop | 1 | 2 | 不过滤 | 补给站 |
+| `node_portal` | Portal | 0 | 1 | 不过滤 | 降临节点（不触发战斗） |
+
+`node_shop` 还带三项价目：**恢复 5 / 强化 12 / 进化 18 碎片**（花局外碎片买局内收益）。
 碎片不足时不会扣款、也不会产生收益，但**依然会触发本场 Encounter**（节点 = 一次收益 + 一次挑战）。
 
-### 敌人 · 全局倍率（改一处影响所有敌人）
+### 增幅项表 `Config/Tables/Upgrades/`（19 行）
+
+10 条强化 + 4 条进化 + 5 条异化，数值与分表前**逐条一致**。
+每条行的 `ApplyHandler` 决定用哪个 C# 处理器（`Scripts/Rewards/RewardEffectRegistry.cs`）：
+
+| handler | 条数 | 说明 |
+|---|---|---|
+| `StatSet` | 14 | 纯数据：改 `StatSheet` 的某项（数值在 `Modifiers` 里） |
+| `ChainLightning` / `Lifesteal` / `BurnOnHit` / `SummonOnKill` / `AmmoOnKill` | 各 1 | 需要一行 C#（加新机制仍要写一行代码，见 [config-schema.md](config-schema.md) §6.1） |
+
+> ⚠️ `Weight` 目前 19 条**都写成 1.0** → 加权抽取仍退化成等概率（与分表前一致，**故意不改**，改了抽样分布会变）。
+> 现在**改得动了**：想调某条的出率就改它的 `Weight` 一行。
+
+### 局外成长表 `Config/Tables/Meta/`（5 行）
+
+| 行 | 存档键 | 每级效果 | 价格 |
+|---|---|---|---|
+| `meta_health` | `health_level` | 最大生命 +10 | 10 × (等级+1) |
+| `meta_damage` | `damage_level` | 伤害 +5% | 同上 |
+| `meta_speed` | `speed_level` | 移速 +3% | 同上 |
+| `meta_crit` | `crit_level` | 暴击率 +3% | 同上 |
+| `meta_reload` | `reload_level` | 装填速度 +6% | 同上 |
+
+> ⚠️ **存档兼容红线**：存档键名（`SaveKey`）必须保持 `health_level` 等原值，改了老玩家进度会归零。
+
+## 还留在 `Balance.tres` 的全局字段
+
+### 敌人 · 全局倍率（`Config/Tables/Enemies/enemy_global.tres` 是**优先来源**，这里是回退值）
 | 参数 | 含义 |
 |---|---|
-| `EnemyHealthMultiplier` | 所有普通敌人生命倍率 |
-| `EnemyDamageMultiplier` | **所有普通敌人伤害倍率（难度总开关）** |
+| `EnemyHealthMultiplier` | 所有普通敌人生命倍率（当前 0.75） |
+| `EnemyDamageMultiplier` | **所有普通敌人伤害倍率（难度总开关）**（当前 0.3） |
 | `EnemyMoveSpeedMultiplier` | 所有普通敌人移速倍率 |
 | `EliteChanceMultiplier` | 精英出现概率倍率（1 = 按各节点的配置，0 = 不出精英） |
+
+> 敌人表的 `enemy_global` 行里同名四个值是**优先来源**，读不到才用上面这四个。
 
 ### 节奏 · Stage
 | 参数 | 含义 |
@@ -108,8 +159,9 @@
 | `BossPressureAttackSpeedPerLevel` | 每级压力增加的攻速比例 |
 
 ### 成长
-| `RewardChoiceCount` | 三选一给几个选项（默认 3） |
+| 参数 | 含义 |
 |---|---|
+| `RewardChoiceCount` | 三选一给几个选项（默认 3） |
 
 ### 表现 · 伤害跳字
 | 参数 | 含义 |
@@ -123,18 +175,37 @@
 | `ShowEnemyHealthBars` | 是否显示敌人头顶血条（满血的杂兵不显示，Boss 常显） |
 | `EnemyHealthBarWidth` / `EnemyHealthBarHeight` | 血条尺寸 |
 | `EnemyHealthBarTopOffset` | 血条相对单位原点的抬升高度 |
-| `BossHealthBarScale` | Boss 血条的放大倍数 |
+| `BossHealthBarScale` / `BossBarFullRange` | Boss 血条的放大倍数 / 展开完整血条的距离阈值 |
 
-## 当前取值（2026-01 原型）
+## 当前取值（2026-10 原型）
 
 玩家 250 血 / 40 甲 / 7 移速；手枪 24 伤害、0.26 秒间隔、12 发弹匣、**0.7 秒装填**；
 普通敌人 **生命 ×0.75、伤害 ×0.3**；节点预算 ×1；Boss 生命 ×1、伤害 ×0.9。
 
 调难度建议：
 - 整体太难 → 先调 `EnemyDamageMultiplier`（0.3 → 0.2）
-- 打起来太肉 → 调 `EnemyHealthMultiplier` 或 `PistolDamage`
+- 打起来太肉 → 调 `EnemyHealthMultiplier` 或 `Config/Tables/Weapons/wpn_pistol.tres` 的 `Damage`
 - 一波接一波太密 → 调 `SpawnIntervalMultiplier`（1 → 1.5）
 - 关卡太长/太短 → 调 `NodeBudgetMultiplier`
+- 某个节点给的奖励太强 → 改 `Config/Tables/Upgrades/` 里对应那一行的 `Modifiers`
+
+## 分表实测（2026-10，阶段 2）
+
+自测（`selftest.flag` + gdmcp CLI）里新增了一组**逐项比对**日志，改完表可以照着核对：
+
+```
+[Config] 配置表：武器 3 / 角色 3 / 敌人 1 / 效果 10 / 节点 9 / 局外成长 5（Balance.tres 已加载）
+[Config] 增幅项表：19 条（来源：表）—— 强化 10 / 进化 4 / 异化 5。
+[SelfTest] 配置表比对·玩家：生命 270（期望 250 + 元进度加成 20） 护甲 40 移速 7 减伤 0
+[SelfTest] 配置表比对·武器：伤害 24 间隔 0.26 弹匣 12 装填 0.7 散布 0.5 击退 2.5 暴击 0.15 弹速 90 FOV 55 穿透 0 连发 False
+[SelfTest] 配置表比对·节点表：进化层 2/波 3 · 强化层 1/波 2 · 恢复层 0/波 1 · 商店价目 5/12/18 · 标题 异化池
+[SelfTest] 配置表比对·效果表：燃烧 6 dps 减速修正 [MoveSpeedMultiplier=0.55]
+[SelfTest] 配置表比对·增幅项：共 19 条（强化 10 / 进化 4 / 异化 5） 用了表=True 当前池子=18 条（枪手期望 18 条）
+```
+
+**回退路径**（把 8 个数组全清空再跑）：日志里会写"来源：代码默认值"，
+玩家变成 `Unit` 场景默认 140（+ 元进度 20 = 160）、武器变成 `Weapon.cs` 默认 22/0.32/8/1.15/75，
+而节点/效果/局外/增幅**与表在时逐位一致**（因为 C# 兜底就是分表前那份实现），自测全程通过、端到端按 F 仍能打开奖励界面。
 
 ## 按键映射（当前）
 
@@ -147,7 +218,7 @@
 | 火力倾泻 | E | `burst` |
 | 帮助界面 | H | `HelpScreen.ToggleKey`（导出属性，非 InputMap） |
 | 菜单 / 关闭顶层界面 | Esc | `UiRouter`（`ui_cancel` 动作）；有弹窗就关掉最顶层那个，没有弹窗就打开菜单 |
-| 装填 | 无按键 | 被动：`PistolAutoReloadDelay` 秒没开火或打空弹匣自动装填 |
+| 装填 | 无按键 | 被动：武器表的 `AutoReloadDelay` 秒没开火或打空弹匣自动装填 |
 | 三选一奖励 | 无按键 | 节点清空后自动弹出 |
 
 > **Esc 语义（已按需求实现）**：只用于「打开菜单 / 关闭当前弹层」，**不再切换鼠标捕获** —— 鼠标由 `UiRouter` 按「有没有弹窗」自动 Captured / Visible。
@@ -182,27 +253,34 @@
 
 ## 开局配置与武器池
 
-- 开局先弹 **Configure 画面**（`Scenes/UI/StartScreen.tscn`）：按 1 选手枪 / 按 2 选霰弹枪 → 进入 Stage 1（主循环的 Configure 步）。
-- **武器池节点**：互动后弹出**三选一**（手枪 / 霰弹枪 / 步枪），选定即换装并触发本场 Encounter。用的是通用选择界面 ``ChooseScreen``（给定标题 + 选项文本 + 回调下标），以后商店/事件节点可直接复用。
+- 开局先弹 **Configure 画面**（`Scenes/UI/StartScreen.tscn`）：按 1 选手枪 / 按 2 选狙击枪 / 按 3 选步枪 → 进入 Stage 1。
+  卡片文案来自武器表的 `DescriptionTemplate`（支持 `{Damage:0}` 这类占位符）。
+- **武器池节点**：互动后弹出**三选一**，选定即触发本场 Encounter。用的是通用选择界面 `ChooseScreen`，以后商店/事件节点可直接复用。
 
 ## 节点自身的数值
 
 每个节点的预算、并发上限、生成间隔写在 `Scenes/Main.tscn` 的 `Stage/Node1`、`Node2`、`Node3Boss` 上（Inspector 里可直接改）。
 每个节点的敌人种类与权重写在该节点下的 `SpawnXxx` 子节点上（`Scene` / `Cost` / `Weight` / `MinElapsedSeconds` / `EliteChance`）。
+**节点的"类型 → 层 / 波数 / 标题 / 奖励过滤"在 `Config/Tables/Nodes/node_*.tres` 里**（不在场景里）。
 
 > **成本与预算的整除关系**：节点结束时余额若低于任何可用敌人的成本，会被当作「已花完」直接结算（不会卡住）。所以节点预算最好是成本的整数倍，否则最后会有一点余额被浪费。
 
 ## 代码里不写死数值
 
-新增可调项时：在 `BalanceConfig` 里加一个 `[Export]` → 在 `Balance.tres` 里给出默认值 → 在套用它的地方读 `Balance.Settings`。
-`EncounterController` 生成敌人后调用 `Balance.ScaleEnemy(unit, this, isBoss)` 套用倍率，`RunController.ApplyBalance()` 套用玩家/武器/节点数值。
+新增可调项时：
+1. 属于某张表的一行 → 在对应行类上加 `[Export]`，在建一个 `.tres` 行文件，再加进 `Balance.tres` 的索引数组；
+2. 是跨表全局开关 → 在 `BalanceConfig` 里加一个 `[Export]` → 在 `Balance.tres` 里给出默认值；
+3. 套用它的地方读 `Balance.Settings` 或 `ConfigRows.ById<T>(...)`。
+
+`EncounterController` 生成敌人后调用 `Balance.ScaleEnemy(unit, this, isBoss)` 套用倍率（优先读 `enemy_global` 行），
+`RunController.ApplyBalance()` 套用角色/武器数值（读角色表与武器表）。
 
 ## 血条（用户需求，2026-01）
 
 | 项目 | 规则 | 配置 |
 |---|---|---|
 | 普通怪物血条 | 放在**脚下**（沿 -Up 偏移），满血不显示 | `EnemyHealthBarTopOffset = 0.25`（现在按脚下偏移使用） |
-| 触发方式 | **事件驱动**：订阅 `GameplayEventBus.Raised`，收到 `Damaged` 才 O(1) 登记该单位并建血条，`Died` 立即移除；**不再每帧遍历 `enemy_units` / `boss_units` 组** | — |
+| 触发方式 | **事件驱动**：订阅 `GameplayEventBus.Raised`，收到 `Damaged` 才 O(1) 登记该单位并建血条，`Died` 立即移除；**不再每帧遍历** `enemy_units` / `boss_units` 组 | — |
 | 首领血条 | **不再画头顶血条**，改为屏幕**上方**的主血条面板（`WorldOverlay` 按 `HasTag("Boss")` 跳过） | — |
 | 近距离 | 与首领距离 ≤ `BossBarFullRange` 时展开完整血条（名称 + 血量 + 关卡） | `BossBarFullRange = 22` |
 | 远距离 | 只保留首领头像色块 | 同上 |
@@ -233,8 +311,8 @@
 [Node] 节点避障：NodeWeapon   从 (9, 0, -7)  → (9, 0.25, -7)
 [Node] 节点避障：NodeEnhance  从 (-9, 0, -5) → (-9.95, 1.86, -0.19)   ← 它在斜坡上，贴的是坡顶
 [Node] 节点避障：NodeEvolution 从 (7, 0, 10) → (7, 0.25, 10)
-[Node] 节点避障：NodeMutation  从 (-8, 0, 9) → (-8, 0.25, 9)
-[Node] 节点避障：NodeShop      从 (0, 0, 13) → (0, 0.25, 13)
+[Node] 节点避障：NodeMutation 从 (-8, 0, 9) → (-8, 0.25, 9)
+[Node] 节点避障：NodeShop     从 (0, 0, 13) → (0, 0.25, 13)
 ```
 
 区域杀实测：把玩家 Y 设为 -20 → 生命 260 → **0**、`IsDead = true`，日志记「玩家掉出地图 → 击杀」。
@@ -243,7 +321,7 @@
 
 ## Pressure 结算（关卡核心文档 L352/L370）
 
-> **2026-10 更新（配置表阶段 1）**：Pressure 的**基础点数 / 阈值 / 增长倍率 / 额外比例**现在优先读**当前 Stage 行**
+> **2026-10 更新（配置表阶段 1 + 2）**：Pressure 的**基础点数 / 阈值 / 增长倍率 / 额外比例**现在优先读**当前 Stage 行**
 > （`Config/Tables/Stages/stg_*.tres` 的 `PressureGrowthMultiplier` / `PressureThreshold` /
 > `PressurePerNodeNormal` / `PressurePerNodeHighValue` / `PressureEvolutionBonus` / `PressureMutationBonus`）。
 > **行里留 0（= 未设置）就回退到下表的全局默认值** —— 当前三行都没填，所以行为与分表前完全一致。
@@ -265,12 +343,12 @@ _bossEncounter.BossInitialPressure = Mathf.Max(0, ChallengesUsed - FreeChallenge
 
 即「超额挑战次数」+「节点累积压力」共同决定 Boss 初始压力。
 
-实测（自测直接调 `AddPressureForNode`）：
+实测（自测直接调 `AddPressureForNode`，2026-10 复核）：
 
 ```
-Pressure 累积：+150 → 余数 0 / 本关首领额外压力 1
-Pressure 累积：+150 → 余数 0 / 本关首领额外压力 2
-再加一次中价值（强化）→ 压力仍为 2（高价值才计数 ✓）
+Pressure 累积：+187.5（基础 150 × 本关倍率 1 × 类型比例 1.25）阈值 100 → 余数 0 / 本关首领额外压力 1
+Pressure 累积：+225（基础 150 × 本关倍率 1 × 类型比例 1.5）阈值 100 → 余数 0 / 本关首领额外压力 3
+再加一次中价值（强化）→ 压力仍为 3（只有高价值计数 ✓）
 ```
 
 注：两次 150 得到 2 点而不是 3 点，是因为文档要求「余数清零」——每次转换后不足 100 的 50 点被丢弃，实现与文档一致。
@@ -325,10 +403,4 @@ Encounter 清场完成：共生成 4，用时 3s      ← 首领死后才结算
 | `PressureEvolutionBonus` | 进化奖励的 Pressure 比例（1.25 = +25%）—— 行里没填时的全局默认值 |
 | `PressureMutationBonus` | 异化奖励的 Pressure 比例（1.5 = +50%）—— 行里没填时的全局默认值 |
 
-`AddPressureForNode()` 按奖励类型乘比例后再走「每 100 转 1 点、余数清零」。实测（**2026-10 复核，日志格式改成 `+187.5` 保留一位小数**，数值与分表前逐位一致）：
-
-```
-进化 150×1.25 = 187.5 → +187.5 → 转 1 点（余数清零）
-异化 150×1.50 = 225   → +225   → 转 2 点（累计 3 点）
-再加一次中价值（强化）→ 压力仍为 3（只有高价值计数）
-```
+`AddPressureForNode()` 按奖励类型乘比例后再走「每 100 转 1 点、余数清零」。

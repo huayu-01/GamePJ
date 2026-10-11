@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WeaponConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "wpn_pistol"
+Slot = 1
+DisplayName = "手枪"
+DescriptionTemplate = "单发高伤、精准，适合中远距离点射（{Damage:0} 伤害 / {MagazineSize} 发弹匣）"
+ScenePath = "res://Scenes/Weapons/Pistol.tscn"
+AttackTags = PackedStringArray("Projectile", "Gun", "Physical")
+Damage = 24.0
+FireInterval = 0.26
+MagazineSize = 12
+ReloadTime = 0.7
+AutoReloadDelay = 3.0
+SpreadDegrees = 0.5
+AimSpreadScale = 0.35
+MultiShotSpreadDegrees = 1.2
+ProjectilesPerShot = 1
+BasePierce = 0
+Knockback = 2.5
+CritChance = 0.15
+CritMultiplier = 2.0
+ProjectileSpeed = 90.0
+MaxLifetime = 2.2
+AimFov = 55.0
+Automatic = false

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="NodeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/NodeConfig.cs" id="1_qss0j"]
+
+[resource]
+script = ExtResource("1_qss0j")
+Kind = 2
+Title = "进化池"
+RewardKind = 1
+Layer = 2
+WaveCount = 3
+Id = "node_evolution"
+Slot = 3
+DisplayName = "进化池"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_xy3b7"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_1j762"]
+
+[sub_resource type="Resource" id="Resource_h42hj"]
+script = ExtResource("1_xy3b7")
+Stat = "MaxHealthAdd"
+Operation = 0
+Value = 25.0
+
+[resource]
+script = ExtResource("2_1j762")
+MaxStacks = 3
+PoolTags = PackedStringArray("Health")
+Modifiers = [SubResource("Resource_h42hj")]
+Id = "upg_vitality"
+DisplayName = "强化肌体"
+DescriptionTemplate = "最大生命 +25"

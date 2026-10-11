@@ -81,12 +81,14 @@ public partial class RunController : Node
 		bool heavy = _character == PlayerCharacterKind.Heavy;
 		bool summoner = _character == PlayerCharacterKind.Summoner;
 
-		float maxHealth = heavy ? config.HeavyMaxHealth : summoner ? config.SummonerMaxHealth : config.PlayerMaxHealth;
-		float armor = heavy ? config.HeavyArmor : summoner ? config.SummonerArmor : config.PlayerMaxArmor;
-		float moveSpeed = heavy ? config.HeavyMoveSpeed : summoner ? config.SummonerMoveSpeed : config.PlayerMoveSpeed;
-		float reduction = heavy ? config.HeavyDamageReduction : config.PlayerDamageReduction;
+		// 角色数值来自角色表（`Config/Tables/Characters/chr_*.tres`）；读不到行就用玩家场景里的原始数值。
+		CharacterConfig? character = CharacterRow(_character);
+		float maxHealth = character?.MaxHealth ?? _player!.MaxHealth;
+		float armor = character?.MaxArmor ?? _player!.MaxArmor;
+		float moveSpeed = character?.MoveSpeed ?? _player!.MoveSpeed;
+		float reduction = character?.DamageReduction ?? _player!.DamageReduction;
 
-		_player!.ApplyBaseStats(maxHealth + MetaProgress.BonusMaxHealth, armor, config.PlayerMaxShield, moveSpeed);
+		_player!.ApplyBaseStats(maxHealth + MetaProgress.BonusMaxHealth, armor, character?.MaxShield ?? _player.MaxShield, moveSpeed);
 		_player.Stats.AddModifier(new StatModifier { Stat = "DamageMultiplier", Operation = ModifierOperation.Multiply, Value = MetaProgress.BonusDamageMultiplier, Source = this });
 		_player.Stats.AddModifier(new StatModifier { Stat = "MoveSpeedMultiplier", Operation = ModifierOperation.Multiply, Value = MetaProgress.BonusMoveSpeedMultiplier, Source = this });
 		_player.Stats.AddModifier(new StatModifier { Stat = "CritChanceAdd", Operation = ModifierOperation.Add, Value = MetaProgress.BonusCritChance, Source = this });
@@ -98,27 +100,22 @@ public partial class RunController : Node
 		{
 			EquipWeapon(_weaponKind);
 			// 近战角色收起枪械：左键改由近战能力接管（PlayerWeaponInput 里分流）。
-			_weapon.Enabled = !heavy;
+			// 开关矩阵也来自角色表（读不到行时回退到原来的 `!heavy` 规则）。
+			_weapon.Enabled = character?.WeaponEnabled ?? !heavy;
 		}
 
-		if (NodeSearch.FindInSubtree<MeleeAttackAbility>(_player) is { } melee)
+		// 角色表的能力开关矩阵：取代原来三段硬编码的 `melee.Enabled = heavy` / `summon/control.Enabled = summoner`。
+		// 读不到角色行时回退到与分表前逐位一致的那套规则。
+		ApplyAbilityMatrix(character, heavy, summoner);
+
+		if (NodeSearch.FindInSubtree<MeleeAttackAbility>(_player) is { } melee
+			&& melee.GetNodeOrNull<AttackHitbox>("Attack") is { } hit)
 		{
-			melee.Enabled = heavy;
-			if (melee.GetNodeOrNull<AttackHitbox>("Attack") is { } hit)
+			// 近战伤害来自角色行；读不到行就保留命中体在场景里的原值。
+			if (character != null)
 			{
-				hit.Damage = config.HeavyMeleeDamage;
+				hit.Damage = character.MeleeDamage;
 			}
-		}
-
-		// 角色 3：开放主动召唤（G 键）与范围定身（V 键），其余角色保持关闭。
-		if (NodeSearch.FindInSubtree<SummonAbility>(_player) is { } summon)
-		{
-			summon.Enabled = summoner;
-		}
-
-		if (NodeSearch.FindInSubtree<AreaAttackAbility>(_player) is { } control)
-		{
-			control.Enabled = summoner;
 		}
 
 		if (_stage == null)
@@ -250,9 +247,9 @@ public partial class RunController : Node
 	{
 		var options = new List<string>
 		{
-			$"远程枪手 — 三把枪、灵活走位（{Balance.Settings.PlayerMaxHealth:0} 生命 / {Balance.Settings.PlayerMaxArmor:0} 护甲）",
-			$"近战重装 — 高血高甲，左键近战重击（{Balance.Settings.HeavyMaxHealth:0} 生命 / {Balance.Settings.HeavyArmor:0} 护甲 / 减伤 {Balance.Settings.HeavyDamageReduction * 100f:0}%）",
-			$"召唤控制 — G 键召唤无人机（最多 3 架），{Balance.Settings.SummonerMaxHealth:0} 生命 / {Balance.Settings.SummonerArmor:0} 护甲",
+			CharacterCardText(PlayerCharacterKind.Gunner, "远程枪手 — 三把枪、灵活走位"),
+			CharacterCardText(PlayerCharacterKind.Heavy, "近战重装 — 高血高甲，左键近战重击"),
+			CharacterCardText(PlayerCharacterKind.Summoner, "召唤控制 — G 键召唤无人机（最多 3 架）"),
 		};
 
 		if (OpenChoice("选择角色", options, ChooseCharacter))
@@ -301,7 +298,7 @@ public partial class RunController : Node
 			// 连"整张表"都读不到时，把全局数值的来源也打出来：这样一眼能区分
 			// 「只是关卡表为空」和「连 Balance.tres 都没加载上（所有数值都回退了）」。
 			string source = ActRoguelike.Config.Balance.Instance?.FileLoaded == true ? "Balance.tres 已加载" : "Balance.tres 未加载（全部数值回退到代码默认值）";
-			ActRoguelike.Core.GameLog.Write("Flow", $"关卡表：0 关（来源：默认值）—— Balance 的 Stages 为空或未找到，使用 StageDefinition 自身的默认值。（{source}，玩家生命 {ActRoguelike.Config.Balance.Settings.PlayerMaxHealth:0}）");
+			ActRoguelike.Core.GameLog.Write("Flow", $"关卡表：0 关（来源：默认值）—— Balance 的 Stages 为空或未找到，使用 StageDefinition 自身的默认值。（{source}）");
 			GD.PushWarning("[Config] 关卡表为空，使用 StageDefinition 自身默认值。");
 			return new[] { new StageDefinition() };
 		}
@@ -394,10 +391,8 @@ public partial class RunController : Node
 		return true;
 	}
 
-	/// <summary>
-	/// 换装：两把武器共用同一个 Weapon 节点，只换数值（配置集中在 BalanceConfig）。
-	/// 这样不用重建节点，也就不会把挂在武器下的输入组件一起弄丢。
-	/// </summary>
+	/// <summary>换装：三把武器共用一个 Weapon 节点，只换数值（数值权威在 `Config/Tables/Weapons/wpn_*.tres`）。
+	/// 这样不用重建节点，也就不会把挂在武器下的输入组件一起弄丢。</summary>
 	public void EquipWeapon(WeaponPresetKind kind)
 	{
 		_weaponKind = kind;
@@ -406,25 +401,88 @@ public partial class RunController : Node
 			return;
 		}
 
-		BalanceConfig config = Balance.Settings;
-		bool sniper = kind == WeaponPresetKind.Sniper;
-		bool rifle = kind == WeaponPresetKind.Rifle;
+		WeaponConfig? row = WeaponRow(kind);
+		if (row != null)
+		{
+			// 表是权威：一行 `.tres` 描述整把武器（含击退、暴击、弹速、装填延迟）。读不到行时才走下面的回退。
+			row.ApplyTo(_weapon);
+			return;
+		}
 
-		_weapon.Damage = rifle ? config.RifleDamage : sniper ? config.SniperDamage : config.PistolDamage;
-		_weapon.FireInterval = rifle ? config.RifleFireInterval : sniper ? config.SniperFireInterval : config.PistolFireInterval;
-		_weapon.MagazineSize = rifle ? config.RifleMagazineSize : sniper ? config.SniperMagazineSize : config.PistolMagazineSize;
-		_weapon.ReloadTime = rifle ? config.RifleReloadTime : sniper ? config.SniperReloadTime : config.PistolReloadTime;
-		_weapon.SpreadDegrees = rifle ? config.RifleSpreadDegrees : sniper ? config.SniperSpreadDegrees : config.PistolSpreadDegrees;
-		_weapon.Knockback = rifle ? config.RifleKnockback : sniper ? config.SniperKnockback : config.PistolKnockback;
-		_weapon.ProjectilesPerShot = 1;
-		_weapon.BasePierce = sniper ? config.SniperPierce : 0;
-		_weapon.Automatic = rifle && config.RifleAutomatic;
-		_weapon.CritChance = config.PistolCritChance;
-		_weapon.CritMultiplier = config.PistolCritMultiplier;
-		_weapon.ProjectileSpeed = config.PistolProjectileSpeed;
-		_weapon.AimFov = config.PistolAimFov;
-		_weapon.AutoReloadDelay = config.PistolAutoReloadDelay;
+		// 回退（表为空 / 整份 Balance.tres 未加载）：保留"什么都没做"的语义 ——
+		// 武器组件自己的 [Export] 默认值就是这一把枪的数值。
+		GD.PushWarning($"[Config] 武器表里没有 {kind}（Slot {(int)kind + 1}）的行，保留武器组件自身的默认值。");
 		_weapon.RefillMagazine();
+	}
+
+	/// <summary>按 <see cref="WeaponPresetKind"/> 取武器表的行（Slot 从 1 开始，与枚举顺序一致）。</summary>
+	public static WeaponConfig? WeaponRow(WeaponPresetKind kind)
+		=> ConfigRows.BySlot<WeaponConfig>((int)kind + 1);
+
+	/// <summary>按 <see cref="PlayerCharacterKind"/> 取角色表的行（Slot 从 1 开始，与枚举顺序一致）。</summary>
+	public static CharacterConfig? CharacterRow(PlayerCharacterKind kind)
+		=> ConfigRows.BySlot<CharacterConfig>((int)kind + 1);
+
+	/// <summary>
+	/// 角色选择界面的卡片文案。数值来自角色表（`DescriptionTemplate` 支持 <c>{字段名}</c> 占位符）；
+	/// 读不到角色行时退回原来的硬编码写法（用 BalanceConfig 上的旧字段），保证界面不会空掉。
+	/// </summary>
+	private static string CharacterCardText(PlayerCharacterKind kind, string title)
+	{
+		CharacterConfig? row = CharacterRow(kind);
+		if (row != null)
+		{
+			string detail = ConfigText.Format(
+				string.IsNullOrEmpty(row.DescriptionTemplate)
+					? "（{MaxHealth:0} 生命 / {MaxArmor:0} 护甲 / 减伤 {DamageReduction}）"
+					: row.DescriptionTemplate,
+				row,
+				row.Params);
+			return $"{title}（{detail}）";
+		}
+
+		// 整张角色表都读不到：只留标题（这时玩家用的是场景里的原始数值，编不出具体数字）。
+		return title;
+	}
+
+	/// <summary>
+	/// 角色表的能力开关矩阵。读不到角色行时回退到分表前那段硬编码规则
+	/// （`melee.Enabled = heavy`、`summon/control.Enabled = summoner`），保证行为逐位一致。
+	/// </summary>
+	private void ApplyAbilityMatrix(CharacterConfig? character, bool heavy, bool summoner)
+	{
+		var abilities = new System.Collections.Generic.List<Ability>();
+		NodeSearch.CollectInSubtree(_player!, abilities);
+
+		foreach (Ability ability in abilities)
+		{
+			string id = ability.AbilityId;
+			if (string.IsNullOrEmpty(id))
+			{
+				id = ability.GetType().Name;
+			}
+
+			if (character == null)
+			{
+				// 回退：与分表前的规则一模一样。
+				ability.Enabled = id switch
+				{
+					nameof(MeleeAttackAbility) => heavy,
+					nameof(SummonAbility) or nameof(AreaAttackAbility) => summoner,
+					_ => ability.Enabled,
+				};
+				continue;
+			}
+
+			if (System.Array.IndexOf(character.EnabledAbilityIds, id) >= 0)
+			{
+				ability.Enabled = true;
+			}
+			else if (System.Array.IndexOf(character.DisabledAbilityIds, id) >= 0)
+			{
+				ability.Enabled = false;
+			}
+		}
 	}
 
 	/// <summary>开局配置完成（选好武器）→ 进入第一关。</summary>
@@ -547,25 +605,22 @@ public partial class RunController : Node
 		// 无论买不买都会触发本场 Encounter（节点 = 一次收益 + 一次挑战）。
 		if (kind == RewardNodeKind.Shop)
 		{
-			BalanceConfig shop = Balance.Settings;
-			var offers = new List<string>
-			{
-				$"恢复全部生命与护甲（{shop.ShopHealCost} 碎片）",
-				$"随机一件强化奖励（{shop.ShopRewardCost} 碎片）",
-				$"随机一件进化（改攻击方式）（{shop.ShopWeaponCost} 碎片）",
-			};
+			// 价目来自节点表的 node_shop 行（`Config/Tables/Nodes/node_shop.tres`）。
+			int healCost = RewardService.ShopCost(0);
+			int rewardCost = RewardService.ShopCost(1);
+			int weaponCost = RewardService.ShopCost(2);
 
-			return OpenChoice($"补给站 · 当前碎片 {MetaProgress.Shards}", offers, index =>
+			return OpenChoice(RewardService.ShopTitle(MetaProgress.Shards), RewardService.ShopOffers(MetaProgress.Shards), index =>
 			{
-				if (index == 0 && MetaProgress.TrySpend(shop.ShopHealCost))
+				if (index == 0 && MetaProgress.TrySpend(healCost))
 				{
 					_player?.FillVitals();
 				}
-				else if (index == 1 && MetaProgress.TrySpend(shop.ShopRewardCost))
+				else if (index == 1 && MetaProgress.TrySpend(rewardCost))
 				{
 					OfferRewards();
 				}
-				else if (index == 2 && MetaProgress.TrySpend(shop.ShopWeaponCost))
+				else if (index == 2 && MetaProgress.TrySpend(weaponCost))
 				{
 					if (!OpenRewardForNode(RewardNodeKind.Evolution, onChosen))
 					{

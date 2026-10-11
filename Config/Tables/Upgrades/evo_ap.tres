@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_bylgh"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_qtqa3"]
+
+[sub_resource type="Resource" id="Resource_gsqvh"]
+script = ExtResource("1_bylgh")
+Stat = "PierceAdd"
+Operation = 0
+Value = 2.0
+
+[resource]
+script = ExtResource("2_qtqa3")
+RewardKind = 1
+RequiredWeaponTags = PackedStringArray("Gun")
+Excludes = PackedStringArray("evo_ricochet")
+PoolTags = PackedStringArray("Evolution", "Gun")
+Modifiers = [SubResource("Resource_gsqvh")]
+Id = "evo_ap"
+DisplayName = "穿甲弹"
+DescriptionTemplate = "子弹额外穿透 2 个目标"

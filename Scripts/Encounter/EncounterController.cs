@@ -414,7 +414,10 @@ public partial class EncounterController : Node3D
 		AddChild(enemy);
 		enemy.GlobalPosition = SpawnPlanner.FindSpawnPoint(_player?.GlobalPosition ?? GlobalPosition, MinSpawnDistance, SpawnRadius);
 
-		float eliteChance = (entry.EliteChance + EliteChanceScale) * Balance.Settings.EliteChanceMultiplier;
+		// 精英概率倍率优先读敌人表的全局行（`Config/Tables/Enemies/enemy_global.tres`），读不到才用 Balance 的旧字段。
+		float eliteScale = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.EnemyConfig>("enemy_global")?.EliteChanceMultiplier
+			?? Balance.Settings.EliteChanceMultiplier;
+		float eliteChance = (entry.EliteChance + EliteChanceScale) * eliteScale;
 		if (eliteChance > 0f && GD.Randf() < eliteChance)
 		{
 			enemy.AddChild(new EliteModifier());

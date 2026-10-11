@@ -49,9 +49,12 @@ Get-Content $f.FullName | Where-Object { $_ -match '波开始|清场完成|端�
 
 ### 3. 其它约定
 
-- 数值一律放 `Config/Balance.tres` + `BalanceConfig.cs`，不要硬编码在逻辑里。
+- 数值一律放 `Config/Tables/<分组>/*.tres`（一行一个文件，索引挂在 `Config/Balance.tres` 的 `[Export] XxxConfig[]` 数组上）或 `Balance.tres` 的全局字段里，**不要硬编码在逻辑里**。见 [config.md](config.md) 的"调参去哪张表"。
+- **表是权威、代码是回退**：读不到表就用组件/行类自身的 `[Export]` 默认值（`Balance.FileLoaded` + 每个系统的"来源：表/默认值"日志能证明走的是哪条路）。
+- ⚠️ **不要单独删/改 `Balance.tres` 引用到的行文件** —— 一个行文件缺失会让**整份** `Balance.tres` 加载失败、所有数值静默回退。要下线一行，把数组项与对应的 `[ext_resource]` 一起删。
 - 玩家可见文案改动 → 同步更新 `docs/`。
-- 日志用 `ActRoguelike.Core.GameLog.Write("分类", "消息")`（分类：Flow / Node / Reward / Spawn / Combat / Map）。
+- 日志用 `ActRoguelike.Core.GameLog.Write("分类", "消息")`（分类：Flow / Node / Reward / Spawn / Combat / Map / **Config**）。
+  ⚠️ **`Balance` 的 `_Ready` 里不能直接写日志** —— `GameLog` 的 autoload 排在它之后，写进去会被静默丢掉。`Balance` 用 `CallDeferred` 绕过这一点。
 - 运行时读数用 CLI 的 `await_runtime_condition`（**不是** `evaluate_debug_expression`，后者只在断点暂停时可用）：
   ```powershell
   $a = @{ expression = 'get_node("/root/Main/Stage").DebugState'; timeout_ms = 1500 } | ConvertTo-Json -Compress
@@ -80,7 +83,8 @@ Scripts/
 - `MapManager.Instance` —— 导航烘焙 + 刷怪点/降临点/节点落点
 - `UiService.Instance` —— 开界面（`OpenUpgrades/OpenLoadout/OpenHelp/OpenRewards/OpenChoose/OpenMessage`）
 - `UiRouter` —— 界面栈 / Esc / 暂停策略
-- `Balance.Settings` —— 所有数值
+- `Balance.Settings` —— 所有数值（**唯一数值门面**；实际数值在 `Config/Tables/<分组>/` 的分表里，见 [config.md](config.md)）
+- `ConfigRows.ById<T>()` / `BySlot<T>()` / `ByKind<T,TKind>()` —— 读配置表的唯一入口（读不到 → `null` → 调用方回退到自身 `[Export]` 默认值）
 
 **UI 框架现状**：`OverlayScreen` 已支持分层（`UiLayer.Hud/Panel/Modal`，决定是否暂停）、防误触、开合动画（`FadeSeconds` / `OpenScaleFrom`）。
 
@@ -89,6 +93,24 @@ Scripts/
 ---
 
 ## 三、待办任务（本次交接的重点）
+
+### 任务 0：配置表体系阶段 2 —— Balance 拆成 8 张表 ✅ 已完成（2026-10）
+
+> **做了什么**：`BalanceConfig` 从 74 字段降到 30 个全局字段；新增 8 张表（武器 3 / 角色 3 / 敌人 1 /
+> **效果 10** / 节点 9 / 增幅项 19 / 局外成长 5 / 关卡 3，共 **53 个行文件**），全部"一行一个 `.tres`"，
+> 索引挂在 `Balance.tres` 的 `[Export] XxxConfig[]` 数组上。
+> **没有做逐行回退**（保持资源引用数组）—— 但**不要单独删/改行文件**，见下面那条纪律。
+> `Balance.Settings.Xxx` **仍然可用**（渐进迁移，没有大爆炸式重构）。
+> 进度 / 实测证据 / 逐项比对 / 两条新坑见 [config-schema.md](config-schema.md) §5 阶段 2 与 §8；调参入口见 [config.md](config.md)。
+>
+> **留给下一轮的三件事**（按建议顺序）：
+> 1. **技能表（T2）**：`Player.tscn` 的 40 处技能赋值搬进 `Config/Tables/Skills/`（`Params` 键名必须与 `Ability` 子类属性名一致）。
+> 2. **敌人按敌种成行**：`EnemyConfig` 的 `ScenePath`/`Weight`/`MinElapsedSeconds`/`EliteChance` 已就位但没接线，
+>    还要把 `StageDefinition.Allows()` 从显示名匹配改成 `Id` 匹配（**最容易出错的一步**）。
+> 3. **首领增强表（T9）**：7 条词条搬表 + `WeightedPick` 接上 + 最后才做"节点驱动"
+>    （`NodeConfig.BossPressurePoints`/`BossModifierRolls`/`BossModifierTags` 三个字段已就位、当前默认 0 = 不生效）。
+>    ⚠️ 关卡核心文档 §7.1 的硬约束：**Boss Pressure（数值强化）与 Boss Build（行为/技能）必须分离**，
+>    且**不要为 Pressure 设计"可被玩家增幅修改"的接口**。
 
 ### 任务 A：血条改事件驱动（用户明确要求）✅ 已完成（2026-10）
 

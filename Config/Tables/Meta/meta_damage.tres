@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="MetaUpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/MetaUpgradeConfig.cs" id="1_vl1a6"]
+
+[resource]
+script = ExtResource("1_vl1a6")
+SaveKey = "damage_level"
+Stat = "DamageMultiplier"
+Operation = 1
+PerLevel = 0.05
+Id = "meta_damage"
+Slot = 2
+DisplayName = "增伤训练"
+DescriptionTemplate = "伤害 +{PerLevel}"

@@ -1,5 +1,6 @@
 using System;
 using ActRoguelike.Config;
+using ActRoguelike.Rewards;
 using Godot;
 
 namespace ActRoguelike.UI;
@@ -40,14 +41,35 @@ public partial class StartScreen : OverlayScreen
 		}
 
 		_onChosen = onChosen;
-		BalanceConfig config = Balance.Settings;
 
 		ClearCards();
-		CreateCard(0, $"[1] 手枪\n单发高伤、精准，适合中远距离点射（{config.PistolDamage:0} 伤害 / {config.PistolMagazineSize} 发弹匣）");
-		CreateCard(1, $"[2] 激光狙击枪\n高伤单发、可穿透 {config.SniperPierce} 个目标（{config.SniperDamage:0} 伤害 / {config.SniperMagazineSize} 发弹匣）");
-		CreateCard(2, $"[3] 步枪\n按住左键连发，续航最好（{config.RifleDamage:0} 伤害 / {config.RifleFireInterval:0.00} 秒间隔 / {config.RifleMagazineSize} 发弹匣）");
+		CreateCard(0, WeaponCardText(WeaponPresetKind.Pistol, "[1] 手枪\n单发高伤、精准，适合中远距离点射"));
+		CreateCard(1, WeaponCardText(WeaponPresetKind.Sniper, "[2] 激光狙击枪\n高伤单发"));
+		CreateCard(2, WeaponCardText(WeaponPresetKind.Rifle, "[3] 步枪\n按住左键连发，续航最好"));
 
 		BeginOpen();
+	}
+
+	/// <summary>
+	/// 武器卡片文案。数值来自武器表（`Config/Tables/Weapons/wpn_*.tres` 的 <c>DescriptionTemplate</c>
+	/// 支持 <c>{字段名}</c> 占位符）；整张表读不到时只留标题 —— 这时武器组件用的是自身默认值，
+	/// 编不出具体数字（这比编错数字好）。
+	/// </summary>
+	private static string WeaponCardText(WeaponPresetKind kind, string title)
+	{
+		WeaponConfig? row = RunController.WeaponRow(kind);
+		if (row == null)
+		{
+			return title;
+		}
+
+		string detail = ConfigText.Format(
+			string.IsNullOrEmpty(row.DescriptionTemplate)
+				? "{Damage:0} 伤害 / {MagazineSize} 发弹匣"
+				: row.DescriptionTemplate,
+			row,
+			row.Params);
+		return $"{title}（{detail}）";
 	}
 
 	public override void Close()

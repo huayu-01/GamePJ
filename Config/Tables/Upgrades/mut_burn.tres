@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_tijco"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_v0qkm"]
+
+[sub_resource type="Resource" id="Resource_ia8jy"]
+script = ExtResource("1_tijco")
+Key = "Duration"
+Value = 3.0
+Note = "燃烧时长"
+
+[sub_resource type="Resource" id="Resource_hun7c"]
+script = ExtResource("1_tijco")
+Key = "StatusId"
+Value = "Burn"
+Note = "挂哪个状态（效果表的行 Id）"
+
+[resource]
+script = ExtResource("2_v0qkm")
+RewardKind = 2
+ApplyHandler = "BurnOnHit"
+HandlerParams = [SubResource("Resource_ia8jy"), SubResource("Resource_hun7c")]
+PoolTags = PackedStringArray("Mutation", "Damage")
+Id = "mut_burn"
+DisplayName = "灼烧弹"
+DescriptionTemplate = "命中使目标燃烧 3 秒"

@@ -1,3 +1,4 @@
+using ActRoguelike.Config;
 using Godot;
 
 namespace ActRoguelike.Run;
@@ -23,28 +24,37 @@ public static class MetaProgress
 	public static int DamageLevel => _damageLevel;
 	public static int SpeedLevel => _speedLevel;
 
-	/// <summary>永久强化的效果（下局开局应用）。</summary>
-	public static float BonusMaxHealth => _healthLevel * 10f;
+	/// <summary>
+	/// 永久强化的效果（下局开局应用）。**系数优先读局外成长表**
+	/// （`Config/Tables/Meta/meta_*.tres`），读不到才用下面这些代码内置值 ——
+	/// 值逐条对应：血量 10 / 伤害 0.05 / 移速 0.03 / 暴击 0.03 / 装填 0.06。
+	/// </summary>
+	public static float PerLevel(string id, float fallback)
+		=> ConfigRows.ById<MetaUpgradeConfig>(id)?.PerLevel ?? fallback;
 
-	public static float BonusDamageMultiplier => 1f + (_damageLevel * 0.05f);
+	/// <summary>查表 + 兜底的价格。表里的默认就是 `BaseCost=10 / CostGrowth=10`，与原来的 `10 * (level + 1)` 等值。</summary>
+	private static int CostOf(string id, int level)
+		=> ConfigRows.ById<MetaUpgradeConfig>(id)?.CostOf(level) ?? (10 * (level + 1));
 
-	public static float BonusMoveSpeedMultiplier => 1f + (_speedLevel * 0.03f);
+	public static float BonusMaxHealth => _healthLevel * PerLevel("meta_health", 10f);
+
+	public static float BonusDamageMultiplier => 1f + (_damageLevel * PerLevel("meta_damage", 0.05f));
+
+	public static float BonusMoveSpeedMultiplier => 1f + (_speedLevel * PerLevel("meta_speed", 0.03f));
 
 	/// <summary>暴击率 +3%/级。</summary>
-	public static float BonusCritChance => _critLevel * 0.03f;
+	public static float BonusCritChance => _critLevel * PerLevel("meta_crit", 0.03f);
 
 	/// <summary>装弹速度 +6%/级。</summary>
-	public static float BonusReloadSpeed => 1f + (_reloadLevel * 0.06f);
+	public static float BonusReloadSpeed => 1f + (_reloadLevel * PerLevel("meta_reload", 0.06f));
 
-	public static int HealthCost => CostOf(_healthLevel);
-	public static int DamageCost => CostOf(_damageLevel);
-	public static int SpeedCost => CostOf(_speedLevel);
-	public static int CritCost => CostOf(_critLevel);
-	public static int ReloadCost => CostOf(_reloadLevel);
+	public static int HealthCost => CostOf("meta_health", _healthLevel);
+	public static int DamageCost => CostOf("meta_damage", _damageLevel);
+	public static int SpeedCost => CostOf("meta_speed", _speedLevel);
+	public static int CritCost => CostOf("meta_crit", _critLevel);
+	public static int ReloadCost => CostOf("meta_reload", _reloadLevel);
 	public static int CritLevel => _critLevel;
 	public static int ReloadLevel => _reloadLevel;
-
-	private static int CostOf(int level) => 10 * (level + 1);
 
 	public static void Load()
 	{
@@ -93,15 +103,15 @@ public static class MetaProgress
 		Save();
 	}
 
-	public static bool BuyHealth() => Buy(ref _healthLevel);
+	public static bool BuyHealth() => Buy("meta_health", ref _healthLevel);
 
-	public static bool BuyDamage() => Buy(ref _damageLevel);
+	public static bool BuyDamage() => Buy("meta_damage", ref _damageLevel);
 
-	public static bool BuySpeed() => Buy(ref _speedLevel);
+	public static bool BuySpeed() => Buy("meta_speed", ref _speedLevel);
 
-	public static bool BuyCrit() => Buy(ref _critLevel);
+	public static bool BuyCrit() => Buy("meta_crit", ref _critLevel);
 
-	public static bool BuyReload() => Buy(ref _reloadLevel);
+	public static bool BuyReload() => Buy("meta_reload", ref _reloadLevel);
 
 	/// <summary>花掉碎片（商店节点用）。碎片不足返回 false 且不扣。</summary>
 	public static bool TrySpend(int cost)
@@ -117,10 +127,10 @@ public static class MetaProgress
 		return true;
 	}
 
-	private static bool Buy(ref int level)
+	private static bool Buy(string id, ref int level)
 	{
 		Load();
-		int cost = CostOf(level);
+		int cost = CostOf(id, level);
 		if (_shards < cost)
 		{
 			return false;

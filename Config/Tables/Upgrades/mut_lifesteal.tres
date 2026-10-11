@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_crcjn"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_xsrpr"]
+
+[sub_resource type="Resource" id="Resource_s10vj"]
+script = ExtResource("1_crcjn")
+Key = "Ratio"
+Value = 0.12
+Note = "回血比例"
+
+[resource]
+script = ExtResource("2_xsrpr")
+RewardKind = 2
+ApplyHandler = "Lifesteal"
+HandlerParams = [SubResource("Resource_s10vj")]
+PoolTags = PackedStringArray("Mutation", "Healing")
+Id = "mut_lifesteal"
+DisplayName = "吸血"
+DescriptionTemplate = "造成伤害的 12% 回复为生命"

@@ -24,71 +24,23 @@ public enum PlayerCharacterKind
 }
 
 /// <summary>
-/// 全局平衡配置（唯一数值入口）。
-/// 改 `res://Config/Balance.tres` 即可调整全局强度：玩家、武器、敌人倍率、节奏、Boss、HUD 表现。
-/// 代码里不要写死数值 —— 需要新的可调项就在这里加一个 [Export]，然后在套用它的地方读 Balance.Settings。
+/// 全局平衡配置（数值唯一入口 <see cref="Balance"/> 的持有者 + **分表索引**）。
+///
+/// **2026-10 配置表阶段 2 之后，这里只保留两类字段：**
+/// ① **跨表生效的全局开关**（敌人/Boss 全局倍率、节奏倍率、Boss 压力曲线、表现与 HUD、节点/关卡约束）——
+///    它们是"难度总开关"，不属于任何单张表；
+/// ② **各分表的索引数组**（<c>Weapons</c> / <c>Characters</c> / <c>Enemies</c> / <c>Effects</c> /
+///    <c>Nodes</c> / <c>Upgrades</c> / <c>MetaUpgrades</c> / <c>Stages</c>）。
+///
+/// 已经搬进表的数值（玩家/角色/武器/商店价目等）**不再在这里留一份** —— 留两份必然漂移
+/// （上一轮的关卡表就是这么坏的，见 docs/config-schema.md §1.4-①）。
+/// 真正的数值在 `Config/Tables/&lt;分组&gt;/*.tres`，一行一个文件。
+///
+/// 代码里不要写死数值 —— 需要新的可调项就在对应的表行类上加一个 `[Export]`，然后在套用它的地方读表。
 /// </summary>
 [GlobalClass]
 public partial class BalanceConfig : Resource
 {
-	[ExportGroup("玩家")]
-	[Export] public float PlayerMaxHealth { get; set; } = 160f;
-	[Export] public float PlayerMaxArmor { get; set; } = 40f;
-	[Export] public float PlayerMaxShield { get; set; }
-	[Export] public float PlayerMoveSpeed { get; set; } = 7f;
-	[Export(PropertyHint.Range, "0,0.9,0.01")] public float PlayerDamageReduction { get; set; }
-
-	[ExportGroup("角色 · 近战重装（角色 2）")]
-	[Export] public float HeavyMaxHealth { get; set; } = 380f;
-	[Export] public float HeavyArmor { get; set; } = 140f;
-	[Export] public float HeavyMoveSpeed { get; set; } = 6.2f;
-	[Export(PropertyHint.Range, "0,0.9,0.01")] public float HeavyDamageReduction { get; set; } = 0.12f;
-
-	/// <summary>近战重击的伤害（左键触发，范围与冷却在 Player.tscn 的 AbilityMelee 上）。</summary>
-	[Export] public float HeavyMeleeDamage { get; set; } = 32f;
-
-	[ExportGroup("角色 · 召唤控制（角色 3）")]
-	[Export] public float SummonerMaxHealth { get; set; } = 210f;
-	[Export] public float SummonerArmor { get; set; } = 60f;
-	[Export] public float SummonerMoveSpeed { get; set; } = 6.8f;
-
-	[ExportGroup("武器 · 手枪")]
-	[Export] public float PistolDamage { get; set; } = 24f;
-	[Export] public float PistolFireInterval { get; set; } = 0.26f;
-	[Export] public int PistolMagazineSize { get; set; } = 12;
-	[Export] public float PistolReloadTime { get; set; } = 0.7f;
-
-	/// <summary>被动装填：这么久没开火且弹匣不满就自动装填。</summary>
-	[Export] public float PistolAutoReloadDelay { get; set; } = 3f;
-	[Export(PropertyHint.Range, "0,15,0.1")] public float PistolSpreadDegrees { get; set; } = 0.5f;
-	[Export] public float PistolKnockback { get; set; } = 2.5f;
-	[Export(PropertyHint.Range, "0,1,0.01")] public float PistolCritChance { get; set; } = 0.15f;
-	[Export] public float PistolCritMultiplier { get; set; } = 2f;
-	[Export] public float PistolProjectileSpeed { get; set; } = 90f;
-	[Export] public float PistolAimFov { get; set; } = 55f;
-
-	[ExportGroup("武器 · 激光狙击枪")]
-	[Export] public float SniperDamage { get; set; } = 60f;
-	[Export] public float SniperFireInterval { get; set; } = 0.95f;
-	[Export] public int SniperMagazineSize { get; set; } = 5;
-	[Export] public float SniperReloadTime { get; set; } = 1.4f;
-	[Export(PropertyHint.Range, "0,15,0.1")] public float SniperSpreadDegrees { get; set; } = 0.2f;
-	[Export] public float SniperKnockback { get; set; } = 4f;
-
-	/// <summary>激光狙击枪的基础穿透数量（策划文档 §8.1 的「激光狙击枪」）。</summary>
-	[Export] public int SniperPierce { get; set; } = 2;
-
-	[ExportGroup("武器 · 步枪")]
-	[Export] public float RifleDamage { get; set; } = 13f;
-	[Export] public float RifleFireInterval { get; set; } = 0.12f;
-	[Export] public int RifleMagazineSize { get; set; } = 30;
-	[Export] public float RifleReloadTime { get; set; } = 1.2f;
-	[Export(PropertyHint.Range, "0,15,0.1")] public float RifleSpreadDegrees { get; set; } = 1.6f;
-	[Export] public float RifleKnockback { get; set; } = 1.2f;
-
-	/// <summary>按住左键持续开火。</summary>
-	[Export] public bool RifleAutomatic { get; set; } = true;
-
 	[ExportGroup("敌人 · 全局倍率")]
 	[Export] public float EnemyHealthMultiplier { get; set; } = 1f;
 	[Export] public float EnemyDamageMultiplier { get; set; } = 0.8f;
@@ -110,13 +62,53 @@ public partial class BalanceConfig : Resource
 	/// <summary>本局的 Stage 顺序；留空时使用代码内置的三关默认序列。</summary>
 	[Export] public StageDefinition[] Stages { get; set; } = System.Array.Empty<StageDefinition>();
 
+	// ─────────────────────────────────────────────────────────────────────────
+	// 分表索引（配置表阶段 2，设计文档 config-schema.md §2.3 / §3）
+	//
+	// 每一张表在磁盘上是 `Config/Tables/<分组>/` 下一堆"一行一个文件"的 `.tres`，
+	// 这里只放**索引数组**：元素指向那些行文件的独立 `ExtResource`。
+	// 为什么是显式数组而不是扫目录：① 只被目录扫描引用的资源在导出时可能掉出打包范围；
+	// ② 扫目录会让"Balance 是唯一数值入口"这条约定失效（见 docs/todo-handoff.md）。
+	//
+	// ⚠️ 操作纪律（上一轮实测的坑，见 config-schema.md §5 阶段 1）：
+	// **不要单独删/改被引用到的行文件** —— 只要 Balance.tres 引用的任何一个行文件缺失/改名，
+	// Godot 会**整份 Balance.tres 加载失败**（不是只丢那一行），于是所有数值静默回到代码默认值。
+	// 要下线一行，就把这里的数组项与顶部对应的 `[ext_resource]` **一起**删掉。
+	//
+	// 回退语义：数组为空 / 整份 Balance.tres 没加载 → 各系统读不到行 → 使用**自身** `[Export]` 默认值，
+	// 并且每个系统都会写一条带"来源：表 / 代码默认值"的日志留痕。
+	// ─────────────────────────────────────────────────────────────────────────
+
+	[ExportGroup("表索引 · 武器")]
+	/// <summary>武器表（`Config/Tables/Weapons/wpn_*.tres`）。空 = 用 <c>Weapon</c> 组件自身的默认值。</summary>
+	[Export] public WeaponConfig[] Weapons { get; set; } = System.Array.Empty<WeaponConfig>();
+
+	[ExportGroup("表索引 · 角色")]
+	/// <summary>角色表（`Config/Tables/Characters/chr_*.tres`）。空 = 用玩家场景里的原始数值。</summary>
+	[Export] public CharacterConfig[] Characters { get; set; } = System.Array.Empty<CharacterConfig>();
+
+	[ExportGroup("表索引 · 敌人")]
+	/// <summary>敌人表（`Config/Tables/Enemies/enemy_*.tres`）。当前只有一行全局倍率。</summary>
+	[Export] public EnemyConfig[] Enemies { get; set; } = System.Array.Empty<EnemyConfig>();
+
+	[ExportGroup("表索引 · 效果（击退 / 燃烧 / 减速 / 眩晕 / 爆炸 / 吸血 / 召唤）")]
+	/// <summary>效果参数表（`Config/Tables/Effects/eff_*.tres`）。空 = 用 <c>StatusPresets.Fallback</c> 的代码内置值。</summary>
+	[Export] public EffectConfig[] Effects { get; set; } = System.Array.Empty<EffectConfig>();
+
+	[ExportGroup("表索引 · 节点")]
+	/// <summary>节点表（`Config/Tables/Nodes/node_*.tres`）。空 = 用 <c>RewardService</c> / <c>NodePlacement</c> 里的原 switch。</summary>
+	[Export] public NodeConfig[] Nodes { get; set; } = System.Array.Empty<NodeConfig>();
+
+	[ExportGroup("表索引 · 增幅项")]
+	/// <summary>增幅项表（`Config/Tables/Upgrades/upg_*.tres`）。空 = 用 <c>RewardCatalog.Fallback</c>。</summary>
+	[Export] public RewardConfig[] Upgrades { get; set; } = System.Array.Empty<RewardConfig>();
+
+	[ExportGroup("表索引 · 局外成长")]
+	/// <summary>局外成长表（`Config/Tables/Meta/meta_*.tres`）。空 = 用 <c>MetaProgress</c> 里的代码内置系数。</summary>
+	[Export] public MetaUpgradeConfig[] MetaUpgrades { get; set; } = System.Array.Empty<MetaUpgradeConfig>();
+
 	[ExportGroup("成长")]
 	[Export] public int RewardChoiceCount { get; set; } = 3;
-
-	[ExportGroup("节点 · 商店（花局外碎片）")]
-	[Export] public int ShopHealCost { get; set; } = 5;
-	[Export] public int ShopRewardCost { get; set; } = 12;
-	[Export] public int ShopWeaponCost { get; set; } = 18;
 
 	[ExportGroup("表现 · 伤害跳字")]
 	[Export] public bool ShowDamageNumbers { get; set; } = true;

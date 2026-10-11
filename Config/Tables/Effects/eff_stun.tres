@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EffectConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_m3xer"]
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="2_t7tgq"]
+
+[sub_resource type="Resource" id="Resource_m3xer"]
+script = ExtResource("1_m3xer")
+Stat = "MoveSpeedMultiplier"
+Value = 0.12
+
+[sub_resource type="Resource" id="Resource_t7tgq"]
+script = ExtResource("1_m3xer")
+Stat = "AttackSpeedMultiplier"
+Value = 0.5
+
+[resource]
+script = ExtResource("2_t7tgq")
+Kind = 5
+Value = 0.12
+Duration = 1.0
+Value2 = 0.5
+Modifiers = [SubResource("Resource_m3xer"), SubResource("Resource_t7tgq")]
+Id = "Stun"
+Slot = 5
+DisplayName = "眩晕"

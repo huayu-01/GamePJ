@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WeaponConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "wpn_rifle"
+Slot = 3
+DisplayName = "步枪"
+DescriptionTemplate = "按住左键连发，续航最好（{Damage:0} 伤害 / {FireInterval:0.00} 秒间隔 / {MagazineSize} 发弹匣）"
+ScenePath = "res://Scenes/Weapons/Pistol.tscn"
+AttackTags = PackedStringArray("Projectile", "Gun", "Physical")
+Damage = 13.0
+FireInterval = 0.12
+MagazineSize = 30
+ReloadTime = 1.2
+AutoReloadDelay = 3.0
+SpreadDegrees = 1.6
+AimSpreadScale = 0.35
+MultiShotSpreadDegrees = 1.2
+ProjectilesPerShot = 1
+BasePierce = 0
+Knockback = 1.2
+CritChance = 0.15
+CritMultiplier = 2.0
+ProjectileSpeed = 90.0
+MaxLifetime = 2.2
+AimFov = 55.0
+Automatic = true

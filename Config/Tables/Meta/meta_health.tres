@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MetaUpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/MetaUpgradeConfig.cs" id="1_e0ph0"]
+
+[resource]
+script = ExtResource("1_e0ph0")
+SaveKey = "health_level"
+Stat = "MaxHealthAdd"
+PerLevel = 10.0
+Id = "meta_health"
+Slot = 1
+DisplayName = "强化肌体"
+DescriptionTemplate = "最大生命 +{PerLevel:0}"

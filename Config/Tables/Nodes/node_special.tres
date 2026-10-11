@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="NodeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/NodeConfig.cs" id="1_pe6ah"]
+
+[resource]
+script = ExtResource("1_pe6ah")
+Kind = 6
+Title = "特殊奖励"
+AnyRewardKind = true
+Layer = 0
+WaveCount = 1
+Id = "node_special"
+Slot = 7
+DisplayName = "特殊奖励"

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="MetaUpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/MetaUpgradeConfig.cs" id="1_8c27w"]
+
+[resource]
+script = ExtResource("1_8c27w")
+SaveKey = "speed_level"
+Stat = "MoveSpeedMultiplier"
+Operation = 1
+PerLevel = 0.03
+Id = "meta_speed"
+Slot = 3
+DisplayName = "轻装步法"
+DescriptionTemplate = "移速 +{PerLevel}"

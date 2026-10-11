@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="NodeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/NodeConfig.cs" id="1_ujb58"]
+
+[resource]
+script = ExtResource("1_ujb58")
+Kind = 5
+Title = "恢复状态"
+AnyRewardKind = true
+Layer = 0
+WaveCount = 1
+Id = "node_heal"
+Slot = 6
+DisplayName = "恢复状态"

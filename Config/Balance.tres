@@ -1,50 +1,62 @@
-[gd_resource type="Resource" script_class="BalanceConfig" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="BalanceConfig" load_steps=55 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/BalanceConfig.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_inner.tres" id="3_stg_inner"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_core.tres" id="4_stg_core"]
+[ext_resource type="Resource" path="res://Config/Tables/Weapons/wpn_pistol.tres" id="5_wpn_pistol"]
+[ext_resource type="Resource" path="res://Config/Tables/Weapons/wpn_sniper.tres" id="6_wpn_sniper"]
+[ext_resource type="Resource" path="res://Config/Tables/Weapons/wpn_rifle.tres" id="7_wpn_rifle"]
+[ext_resource type="Resource" path="res://Config/Tables/Characters/chr_gunner.tres" id="8_chr_gunner"]
+[ext_resource type="Resource" path="res://Config/Tables/Characters/chr_heavy.tres" id="9_chr_heavy"]
+[ext_resource type="Resource" path="res://Config/Tables/Characters/chr_summoner.tres" id="10_chr_summoner"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_global.tres" id="11_enemy_global"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_slow.tres" id="12_eff_slow"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_weaken.tres" id="13_eff_weaken"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_burn.tres" id="14_eff_burn"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_empowered.tres" id="15_eff_empowered"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_stun.tres" id="16_eff_stun"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_knockback.tres" id="17_eff_knockback"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_explosion.tres" id="18_eff_explosion"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_lifesteal.tres" id="19_eff_lifesteal"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_summon_on_kill.tres" id="20_eff_summon_on_kill"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/eff_chain_lightning.tres" id="21_eff_chain_lightning"]
+[ext_resource type="Resource" path="res://Config/Tables/Nodes/node_weapon.tres" id="22_node_weapon"]
+[ext_resource type="Resource" path="res://Config/Tables/Nodes/node_enhance.tres" id="23_node_enhance"]
+[ext_resource type="Resource" path="res://Config/Tables/Nodes/node_evolution.tres" id="24_node_evolution"]
+[ext_resource type="Resource" path="res://Config/Tables/Nodes/node_mutation.tres" id="25_node_mutation"]
+[ext_resource type="Resource" path="res://Config/Tables/Nodes/node_resource.tres" id="26_node_resource"]
+[ext_resource type="Resource" path="res://Config/Tables/Nodes/node_heal.tres" id="27_node_heal"]
+[ext_resource type="Resource" path="res://Config/Tables/Nodes/node_special.tres" id="28_node_special"]
+[ext_resource type="Resource" path="res://Config/Tables/Nodes/node_shop.tres" id="29_node_shop"]
+[ext_resource type="Resource" path="res://Config/Tables/Nodes/node_portal.tres" id="30_node_portal"]
+[ext_resource type="Resource" path="res://Config/Tables/Meta/meta_health.tres" id="31_meta_health"]
+[ext_resource type="Resource" path="res://Config/Tables/Meta/meta_damage.tres" id="32_meta_damage"]
+[ext_resource type="Resource" path="res://Config/Tables/Meta/meta_speed.tres" id="33_meta_speed"]
+[ext_resource type="Resource" path="res://Config/Tables/Meta/meta_crit.tres" id="34_meta_crit"]
+[ext_resource type="Resource" path="res://Config/Tables/Meta/meta_reload.tres" id="35_meta_reload"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_dmg_up.tres" id="36_upg_dmg_up"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_rate_up.tres" id="37_upg_rate_up"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_boots.tres" id="38_upg_boots"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_vitality.tres" id="39_upg_vitality"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_scope.tres" id="40_upg_scope"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_lethal.tres" id="41_upg_lethal"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_fast_reload.tres" id="42_upg_fast_reload"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_ext_mag.tres" id="43_upg_ext_mag"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_stance.tres" id="44_upg_stance"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_pierce_round.tres" id="45_upg_pierce_round"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/evo_twin.tres" id="46_evo_twin"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/evo_ap.tres" id="47_evo_ap"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/evo_ricochet.tres" id="48_evo_ricochet"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/evo_blast.tres" id="49_evo_blast"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_chain.tres" id="50_mut_chain"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_lifesteal.tres" id="51_mut_lifesteal"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_burn.tres" id="52_mut_burn"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_summon.tres" id="53_mut_summon"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_supply.tres" id="54_mut_supply"]
 
 [resource]
 script = ExtResource("1_balance")
-PlayerMaxHealth = 250.0
-PlayerMaxArmor = 40.0
-PlayerMaxShield = 0.0
-PlayerMoveSpeed = 7.0
-PlayerDamageReduction = 0.0
-HeavyMaxHealth = 380.0
-HeavyArmor = 140.0
-HeavyMoveSpeed = 6.2
-HeavyDamageReduction = 0.12
-HeavyMeleeDamage = 32.0
-SummonerMaxHealth = 210.0
-SummonerArmor = 60.0
-SummonerMoveSpeed = 6.8
-PistolDamage = 24.0
-PistolFireInterval = 0.26
-PistolMagazineSize = 12
-PistolReloadTime = 0.7
-PistolAutoReloadDelay = 3.0
-PistolSpreadDegrees = 0.5
-PistolKnockback = 2.5
-PistolCritChance = 0.15
-PistolCritMultiplier = 2.0
-PistolProjectileSpeed = 90.0
-PistolAimFov = 55.0
-SniperDamage = 60.0
-SniperFireInterval = 0.95
-SniperMagazineSize = 5
-SniperReloadTime = 1.4
-SniperSpreadDegrees = 0.2
-SniperKnockback = 4.0
-SniperPierce = 2
-RifleDamage = 13.0
-RifleFireInterval = 0.12
-RifleMagazineSize = 30
-RifleReloadTime = 1.2
-RifleSpreadDegrees = 1.6
-RifleKnockback = 1.2
-RifleAutomatic = true
 EnemyHealthMultiplier = 0.75
 EnemyDamageMultiplier = 0.3
 EnemyMoveSpeedMultiplier = 1.0
@@ -56,11 +68,15 @@ BossDamageMultiplier = 0.9
 BossPressureInterval = 12.0
 BossPressureDamagePerLevel = 0.08
 BossPressureAttackSpeedPerLevel = 0.06
-RewardChoiceCount = 3
-ShopHealCost = 5
-ShopRewardCost = 12
-ShopWeaponCost = 18
 Stages = [ExtResource("2_stg_outer"), ExtResource("3_stg_inner"), ExtResource("4_stg_core")]
+Weapons = [ExtResource("5_wpn_pistol"), ExtResource("6_wpn_sniper"), ExtResource("7_wpn_rifle")]
+Characters = [ExtResource("8_chr_gunner"), ExtResource("9_chr_heavy"), ExtResource("10_chr_summoner")]
+Enemies = [ExtResource("11_enemy_global")]
+Effects = [ExtResource("12_eff_slow"), ExtResource("13_eff_weaken"), ExtResource("14_eff_burn"), ExtResource("15_eff_empowered"), ExtResource("16_eff_stun"), ExtResource("17_eff_knockback"), ExtResource("18_eff_explosion"), ExtResource("19_eff_lifesteal"), ExtResource("20_eff_summon_on_kill"), ExtResource("21_eff_chain_lightning")]
+Nodes = [ExtResource("22_node_weapon"), ExtResource("23_node_enhance"), ExtResource("24_node_evolution"), ExtResource("25_node_mutation"), ExtResource("26_node_resource"), ExtResource("27_node_heal"), ExtResource("28_node_special"), ExtResource("29_node_shop"), ExtResource("30_node_portal")]
+Upgrades = [ExtResource("36_upg_dmg_up"), ExtResource("37_upg_rate_up"), ExtResource("38_upg_boots"), ExtResource("39_upg_vitality"), ExtResource("40_upg_scope"), ExtResource("41_upg_lethal"), ExtResource("42_upg_fast_reload"), ExtResource("43_upg_ext_mag"), ExtResource("44_upg_stance"), ExtResource("45_upg_pierce_round"), ExtResource("46_evo_twin"), ExtResource("47_evo_ap"), ExtResource("48_evo_ricochet"), ExtResource("49_evo_blast"), ExtResource("50_mut_chain"), ExtResource("51_mut_lifesteal"), ExtResource("52_mut_burn"), ExtResource("53_mut_summon"), ExtResource("54_mut_supply")]
+MetaUpgrades = [ExtResource("31_meta_health"), ExtResource("32_meta_damage"), ExtResource("33_meta_speed"), ExtResource("34_meta_crit"), ExtResource("35_meta_reload")]
+RewardChoiceCount = 3
 ShowDamageNumbers = true
 DamageNumberLifetime = 0.8
 DamageNumberRise = 70.0

@@ -5,8 +5,14 @@
 > 相关：[todo-handoff.md](todo-handoff.md)（约定与统一入口）、[architecture.md](architecture.md)（分层与踩过的坑）、[controller-flow.md](controller-flow.md)（流程）、[assets.md](assets.md)（目录与命名规范）、[config.md](config.md)（当前数值入口）
 >
 > ⚠ **本文以设计为主。** 文中的 C# 代码全部按 Godot 4.7.2 实际 API 写成，关键签名已用 `GodotSharp 4.7.2` 反射核对（见 §7）。
-> **例外（已落地）**：**阶段 0 与阶段 1** 已经按本文实施并实测（`Scripts/Config/ConfigTable.cs` / `ParamEntry.cs` / `ConfigText.cs` / `WeightedPick.cs`、`Config/Tables/Stages/stg_*.tres`、`RunController.DefaultStages()` 已删除）——
-> 进度、实测证据与两条新发现的坑见 **§5 阶段 0/1** 与 **§7.2**。其余 8 张表仍是设计。
+> **例外（已落地）**：**阶段 0 / 1 / 2** 已按本文实施并实测。
+> - 阶段 0/1：`Scripts/Config/{ConfigTable,ParamEntry,ConfigText,WeightedPick}.cs`、`Config/Tables/Stages/stg_*.tres`、`RunController.DefaultStages()` 已删除。
+> - **阶段 2（2026-10）**：`Balance` 拆成 **8 张表**（武器 / 角色 / 敌人 / **效果** / 节点 / 增幅项 / 局外成长 / 关卡），
+>   新增行类 `ConfigRow`(基类) / `WeaponConfig` / `CharacterConfig` / `EnemyConfig` / **`EffectConfig`** /
+>   `NodeConfig` / `RewardConfig` / `MetaUpgradeConfig` / `StatOverride` + 索引器 `ConfigRows` +
+>   增幅项处理器注册表 `RewardEffectRegistry` / `RewardTable`。
+>   进度、实测证据与逐项比对见 **§5 阶段 2**；YARD 真机冒烟结论见 **§7.2 末尾**。
+> 其余设计（技能表 T2 / 首领增强表 T9 的节点驱动 / 敌人按敌种行）仍是设计。
 >
 > 🔗 **与 [config-tooling.md](config-tooling.md) 的分工**：那份文档回答"**用什么工具**批量编辑这些表"，结论是装 `Edit Resources as Table` 插件、**把文件夹当表、一行一个 `.tres` 文件**。
 > **这个形态是本文表格设计的硬约束** —— 本文的行布局（§2.3）与文件粒度取舍（§6.2）已经按它对齐：**每一行 = 独立的 `.tres` 文件，一个文件夹 = 一张表**。
@@ -1946,56 +1952,159 @@ public static string DescribePools()
 > `Stages = [ExtResource("2_stg_outer"), …]` + 顶部 `[ext_resource type="Resource" path="…" id="…"]`（只写 `path=`，不写 `uid=`，符合本项目约定）。
 > 这也说明：**将来接表插件时，往数组里加引用这一步不能靠 Inspector 拖拽**。
 
-### 阶段 2：增幅项表（T3）—— 用户最想要的
+### 阶段 2：**Balance 拆表**（T1 + T3 + T4 + T5 + T7 + T8改 + T10）✅ **已完成（2026-10）**
 
-1. 建 `Config/Tables/Upgrades/upg_*.tres`（一行一个文件），**先只搬 14 条**（10 强化 + 3 单属性进化 + `upg_evo_blast` 走 `StatSet`），并在 `Balance.tres` 上加 `[Export] RewardConfig[] Upgrades` 数组把它们引用起来。
-2. 写 `RewardConfig` + `ParamEntry` + `RewardEffectRegistry` + `RewardTable`（§3 T3 的代码）。
-3. `RewardCatalog.All` 改成"表优先，`_fallback` 兜底"，`_fallback` 就是现在这份 C# 数组（**先别删**）。
-4. 5 条异化**这一步先不搬**（它们需要 5 个 handler，风险大收益小，放阶段 5）。
+> **这一步的实际范围比设计文档原计划大**：用户原话是「Balance 里面的东西应该也是分出去成多个不同表」，
+> 所以本轮**没有**按"一张表一次"的顺序慢慢来，而是把 `BalanceConfig` 里**所有能成行的字段**一次拆完
+> （8 张表 + 42 个行文件），并顺手把用户点名的**效果参数表**做出来。技能表（T2）与首领增强表的
+> "节点驱动"仍留给后续阶段 —— 它们不是 `Balance` 里的字段，不拆不影响这一轮的完整性。
 
-**验证**（有现成的硬指标）：
-- 编译 0/0 + 自测通过。
-- 用 `RunController.PoolPreview` 比对池子总数：[rewards.md](rewards.md):79-86 已记录"枪手 18 / 召唤 19"——搬表后必须**仍然**是 18/19。
-- 逐项比对 [rewards.md](rewards.md):49-50 的实测值：增伤弹头 ×3 → `DamageMultiplier = 1.5209`；扩容弹匣 → 弹匣 8→11；双管齐下 → `ProjectileCountAdd = 1`；爆裂弹头 → `ExplosionRadiusAdd = 3.5`。
-- 顺手验证 `Weight` 真的接上了：把某条改成 `Weight = 100`，跑 `Roll` 三次确认它必出（现在这个字段是死的，这是**新增能力**不是回归）。
-- **场景 B 的关联这一步先不动**：`ApplicableWeapons` 字段加上（默认空数组）、`AllowsWeapon` 改成 §4.5.4 的三级回退，但**19 条行一个都不填 `ApplicableWeapons`** → 行为必须与今天**逐位一致**（①不触发，全走②③）。这条"空字段等价于旧行为"就是这一步的验收。
-- 跑 §4.5.5 的 `DescribePools()` 只读输出，确认"每把枪 = 专属 0 / 类别 4 / 通用 15"（与今天的三把枪共用池一致）。**再加一条**：把某条进化临时填上 `ApplicableWeapons = [wpn_sniper]`，确认 `PoolPreview` 在步枪局里少了它 —— 这是"关联真的生效"的证据。
+#### 拆表总览（74 字段 → 8 张表 + 保留 30 个全局字段）
 
-### 阶段 3：武器表 + 角色表（T1 + T4）
+| 表 | 行类 | 目录 | 行数 | 取代了 `BalanceConfig` 的哪些字段 |
+|---|---|---|---|---|
+| 武器表 | `WeaponConfig` | `Config/Tables/Weapons/` | **3** | `Pistol*` 11 + `Sniper*` 7 + `Rifle*` 7 = **25 个字段**（含 `RifleAutomatic`） |
+| 角色表 | `CharacterConfig` | `Config/Tables/Characters/` | **3** | `Player*` 5 + `Heavy*` 5（含 `HeavyMeleeDamage`）+ `Summoner*` 3 = **13 个字段** |
+| 敌人表 | `EnemyConfig` | `Config/Tables/Enemies/` | **1**（`enemy_global`） | 表的**索引**已就位；四个全局倍率字段**仍保留在 Balance** 当回退（它们是"难度总开关"，跨表生效） |
+| **效果表** | **`EffectConfig`** | `Config/Tables/Effects/` | **10** | `StatusEffect.cs` 的 6 处硬编码 + `RewardCatalog` 里的效果常量（见下） |
+| 节点表 | `NodeConfig` | `Config/Tables/Nodes/` | **9** | `ShopHealCost` / `ShopRewardCost` / `ShopWeaponCost` 3 个字段 + 3 处 switch |
+| 增幅项表 | `RewardConfig` | `Config/Tables/Upgrades/` | **19** | 无（`RewardCatalog.All` 本来就是 C# 数组，现在变成"表优先 + C# 兜底"） |
+| 局外成长表 | `MetaUpgradeConfig` | `Config/Tables/Meta/` | **5** | `MetaProgress` 的 5 个系数 + 价格公式（`Balance` 里本来没有，属顺手外置） |
+| 关卡表 | `StageDefinition` | `Config/Tables/Stages/` | **3** | ✅ 阶段 1 已做 |
 
-1. 建 `Config/Tables/Weapons/wpn_*.tres`（3 行）与 `Config/Tables/Characters/chr_*.tres`（3 行），并在 `Balance.tres` 上加 `Weapons` / `Characters` 两个数组引用它们。
-2. 删 `RunController.EquipWeapon` 的三元链（L396-412）与 `ApplyBalance` 的 if/else 链（L81-87），改查表。
-3. `RunSetup.Weapon/Character`（`RunSetup.cs:13-16`）改存 `Id` 字符串；`WeaponPresetKind` 保留为快捷键壳（或删，见拍板点 §6.4）。
-4. 决定 `Scenes/Weapons/Pistol.tscn:16-25` 的去留（拍板点 §6.3）—— 建议**清空为组件默认值**，让表成为唯一权威。
-5. `WeaponConfig.ApplyTo` 里写 `weapon.ConfigId = Id`（§4.5.4 的第 ① 步）—— **场景 B 的最后一环，做完这一步"按武器筛升级池"就整条通了**。
+**保留下来的 `BalanceConfig` 字段（30 个）** —— 都是"跨表生效的全局开关"或"表现层"，不成行：
+敌人/Boss 全局倍率（6）· 节奏倍率（2）· Boss 压力曲线（3）· 节点/关卡约束（`MinNodeSpacing` / `KillPlaneY` /
+`NodeHealRatio` / `EliteBossHealthScale` / `FreeChallengeBaseQuota` / `FreeChallengeMaxQuota` / 4 个 Pressure 结算值）·
+成长（`RewardChoiceCount`）· 表现·伤害跳字（4）· 表现·血条（4 + `BossBarFullRange` / `BossHealthBarScale`）。
 
-**验证**：
-- 编译 0/0 + 自测通过（`SelfTest.cs:88-89` 用 `WeaponPresetKind.Pistol` 开局，要确认壳映射没坏）。
-- `StartScreen.cs:46-48` 的三张卡片文案现在会从表的 `DescriptionTemplate` 来 —— **目视比对**数值与旧文案一致（手枪 24 伤害 / 12 发弹匣，狙击穿透 2，步枪 13 伤害 / 0.12 间隔 / 30 发）。
-- 三个角色各开一局：近战角色枪械 `Enabled = false`、召唤角色 G 键能召唤（[config.md](config.md):36 记录这个验证曾经卡住过，这次用 HUD 观察）。
-- **场景 B 端到端**：中途换武器是禁止的（[rewards.md](rewards.md):120），所以只验证"开局选手枪 / 狙击 / 步枪各一局 → `DescribePools()` 与 `PoolPreview` 三局各不相同"（先把某两条进化分别挂到不同武器上再测）。
+#### ⭐ 效果表（T8 的落地形态）—— 用户点名的那张
+
+用户原话：「**甚至一些效果，比如击退值、燃烧值这些也是需要配置参数的**」。
+盘点后发现"效果参数"原先散在**三处**，本轮全部收进 `Config/Tables/Effects/eff_*.tres`（10 行）：
+
+| 行 Id | Kind | 原来在哪（硬编码处） | 关键数值 |
+|---|---|---|---|
+| `Slow` | `Slow` | `StatusEffect.cs:43` | `MoveSpeedMultiplier × 0.55` |
+| `Weaken` | `Weaken` | `StatusEffect.cs:52` | `DamageMultiplier × 0.75` |
+| **`Burn`** | `DamageOverTime` | `StatusEffect.cs:59` | **`DamagePerSecond = 6`**（用户点名的"燃烧值"） |
+| `Empowered` | `Empower` | `StatusEffect.cs:67-68` | `AttackSpeed × 1.3` + `Damage × 1.15` |
+| `Stun` | `Stun` | `StatusEffect.cs:77-78` | `MoveSpeed × 0.12` + `AttackSpeed × 0.5` |
+| **`Knockback`** | `Knockback` | **无**（原来没有全局击退参数） | `Value = 1.0` 全局缩放 + `Value2 = 1.0` 抗性上限（用户点名的"击退值"） |
+| `Explosion` | `Explosion` | `RewardCatalog.cs:49-50` | `Radius 3.5` + 伤害比例 `0.6` |
+| `Lifesteal` | `Lifesteal` | `RewardCatalog.cs:67` | `Ratio 0.12` |
+| `SummonOnKill` | `SummonOnKill` | `RewardCatalog.cs:79` | `MaxSummons 2` |
+| `ChainLightning` | `Other` | `RewardCatalog.cs:58-62` | `Damage 14` / `Range 7` / `Jumps 3` / `Cooldown 0.12` |
+
+**两条诚实交代**：
+1. **击退值有两个层次**，别找错地方：① **每个单位实际给多少击退** 在**武器表**的 `Knockback`
+   （`WeaponConfig.Knockback`：手枪 2.5 / 狙击 4 / 步枪 1.2）与**命中体** `AttackHitbox.Knockback` 上；
+   ② **效果表**的 `eff_knockback` 放的是**全局倍率**（`Value = 1.0` = 原样）与抗性上限。
+   本轮**没有**把 `Value` 接进 `Unit.ReceiveHit`（那会改玩法数值），所以它当前是"已就位、待接线"的参数。
+   接线点只有一处：`Unit.cs:278` 的 `float scale = Stats.Get("KnockbackMultiplier");`。
+2. **`StatusEffect` 类没改形态**，只是数据来源从 switch 换成查表 —— `StatusPresets.Create(id, duration)`
+   现在是"先查效果表、读不到才走 `Fallback` 的 switch"，所以老行为逐位保留（自测实测：燃烧 6 dps / 减速 0.55）。
+
+#### 增幅项表（T3）：`ApplyHandler` + 处理器注册表
+
+按 §6.1 的**方案 A** 落地：14/19 条纯数据（`StatSet` 处理器 + `Modifiers` 里的 `StatOverride`），
+5 条异化各一个 handler（`ChainLightning` / `Lifesteal` / `BurnOnHit` / `SummonOnKill` / `AmmoOnKill`）。
+`RewardEffectRegistry.Compile(row)` 在**读表时**就把"handler 未注册"抓出来并警告，不会静默变成"没有效果的奖励"。
+
+`RewardCatalog.All` 从 `static readonly` 改成 **`static … { get; private set; }` + 表优先**：
+- 表在 → `All` = 编译出来的 19 条（`Balance._Ready` 里 `RewardTable.Build(Config.Upgrades)` 设置）
+- 表空 / 未加载 → `All` = `RewardCatalog.Fallback`（就是原来那个 C# 数组，**保留**，没有删）
+- **`RewardPool` / `RunBuild` / `RunController` 的消费代码一行都没改** —— 这正是 §2.2 那层"磁盘行 → 运行期视图"的价值。
+
+> ⚠️ **`Weight` 仍是 1f**：19 条行的 `Weight` 都写成 `1.0`，所以加权抽取仍然退化成等概率（与分表前一致）。
+> 这是**故意的**：改它会改抽样分布、自测基线会漂（§1.4-⑤ 的问题仍在，但至少现在**改得动了** —— 改一行 `.tres` 即可）。
+
+#### 节点表（T7）：一处替掉三个 switch + 一处重复实现
+
+`RewardService.FilterFor` / `TitleFor` / 商店价目、`NodePlacement.LayerOf` / `WavesFor`、
+`StageController.LayerOf`（原来与 `NodePlacement` **各写了一份**）现在全部"优先读 `node_*.tres`、读不到才回退原 switch"。
+`StageController.WavesFor` 直接转调 `NodePlacement.WavesFor`，重复实现消失。
+
+#### ⚠️ 阶段 2 挖出来的两条新坑
+
+**(1) `Balance` 的 autoload 排在 `GameLog` 之前 → `_Ready` 里写的日志被静默丢掉。**
+`project.godot` 的 `[autoload]` 顺序是 `MCPRuntimeProbe → Balance → UiRouter → GameLog → SelfTest → UiService`。
+首轮实测：日志里**一行 `[Config]` 都没有**，但表其实已经读进来了。
+**修法**：`Balance._Ready` 把建索引推迟一帧（`CallDeferred(nameof(BuildTableIndex))`），
+这时所有 autoload 都已就绪、主场景还没加载，日志能落地且不影响任何读取者。
+
+**(2) 编辑器有资源缓存：手写 `Balance.tres` 后，`ResourceLoader.load` 会**静默返回旧版本**。**
+现象：改完 `Balance.tres` 的数组引用后立刻读，`Stages=3` 而 `Weapons=0`（明明文本写对了）。
+**修法**：`EditorInterface.get_resource_filesystem().update_file(path)` + `CACHE_MODE_REPLACE`，
+或干脆在编辑器里重开一次。**这只影响编辑器内验证，不影响游戏启动**（游戏是冷启动读盘）。
+
+#### 阶段 2 的验证（实测证据）
+
+**编译**：`& build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（每改一步都跑，全程 0/0）。
+
+**自测（`selftest.flag` + gdmcp）逐项比对 —— 数值未变**：
+
+| 项 | 实测 | 期望（分表前） |
+|---|---|---|
+| 配置表索引 | 武器 3 / 角色 3 / 敌人 1 / 效果 10 / 节点 9 / 局外 5 | 3/3/1/10/9/5 |
+| 增幅项目录 | 19 条（强化 10 / 进化 4 / 异化 5），**用了表=True** | 19 = 10/4/5 |
+| **池子规模** | **枪手 18 条** | **18**（[rewards.md](rewards.md) 的硬指标） |
+| 玩家 | 生命 270（= 250 + 元进度 20）护甲 40 移速 7 减伤 0 | 250/40/7/0 |
+| 武器（手枪） | 伤害 24 / 0.26 / 弹匣 12 / 装填 0.7 / 散布 0.5 / **击退 2.5** / 暴击 0.15 / 弹速 90 / FOV 55 / 穿透 0 / 非连发 | 全部一致 |
+| 节点表 | 进化层 2/波 3 · 强化层 1/波 2 · 恢复层 0/波 1 · 商店价目 5/12/18 · 标题"异化池" | 全部一致 |
+| 效果表 | 燃烧 6 dps · 减速 `MoveSpeedMultiplier=0.55` | 6 / 0.55 |
+| 波数映射 | 进化3 异化3 强化2 商店2 材料1 恢复1 特殊1 | 一致 |
+| 节点布置 / 间距 | 启用 10 个（高 2 / 中 5 / 低 3）· 最小 9.74 | 一致 |
+| Pressure | `+187.5 → 1` / `+225 → 3` | 逐位一致 |
+| 端到端 | 按 F 之后奖励界面打开 = True | 一致 |
+
+**回退路径（每阶段必做一次）**：把 `Stages` / `Weapons` / `Characters` / `Enemies` / `Effects` / `Nodes` /
+`Upgrades` / `MetaUpgrades` **八个数组全部清空**再跑 ——
+
+| 观察点 | 实测 |
+|---|---|
+| 日志留痕 | `配置表：武器 0 / 角色 0 / 敌人 0 / 效果 0 / 节点 0 / 局外成长 0（Balance.tres 已加载）`、`增幅项表：0 条（来源：代码默认值）…使用 RewardCatalog.Fallback 的 19 条`、`关卡表：0 关（来源：默认值）` |
+| 武器回退 | 伤害 **22** / 间隔 0.32 / 弹匣 8 / 装填 1.15 / 散布 0.6 / 弹速 75 ← **`Weapon.cs` 组件自身的 `[Export]` 默认值**（不是旧 Balance 值） |
+| 玩家回退 | 生命 140（`Unit.cs` 场景默认）+ 元进度 20 = 160 ← **玩家场景自身的值** |
+| 节点/效果/局外/增幅回退 | 波数映射、商店价目 5/12/18、标题、燃烧 6 dps、减速 0.55、池子 18 条 —— **与表在时逐位一致**（因为 C# 兜底就是分表前的那份实现） |
+| 玩法可用性 | 自测全程通过、端到端按 F 仍打开奖励界面 |
+
+> 结论：**"读不到表就用自身默认值"这条语义真的生效**，而且每一处都在日志里留了痕。
+
+### 阶段 3：武器表 + 角色表（T1 + T4）✅ **已完成（2026-10，随阶段 2 一起做）**
+
+1. ✅ 建 `Config/Tables/Weapons/wpn_*.tres`（3 行）与 `Config/Tables/Characters/chr_*.tres`（3 行），并在 `Balance.tres` 上加 `Weapons` / `Characters` 两个数组引用它们。
+2. ✅ 删掉 `RunController.EquipWeapon` 的三元链（原 L396-412，改成 `WeaponConfig.ApplyTo`)与 `ApplyBalance` 的 if/else 链（改成 `ConfigRows.BySlot<CharacterConfig>`）；`BalanceConfig` 里那 **25 + 13 = 38 个字段已删除**。
+3. ⏸ `RunSetup.Weapon/Character`（`RunSetup.cs:13-16`）**仍存枚举**；`WeaponPresetKind` / `PlayerCharacterKind` 保留为"槽位壳"（`Slot = (int)kind + 1`）。**没改** —— 改它会牵动 `StartScreen` / `UiService` / `SelfTest` 多处，收益（少两个枚举）不值这个风险（§6.4）。
+4. ⏸ `Scenes/Weapons/Pistol.tscn:16-25` 的去留（§6.3）**没动**：它现在的值是 22/0.32/8/1.15/75…，与武器表**不再冲突**（表是权威、每局开局覆盖），
+   但它仍是"打开预制体看到 22、实际打 24"的困惑源。**建议下一步把它清空为 `Weapon.cs` 的默认值**。
+5. ✅ `WeaponConfig` 里已预留跨武器字段（`AttackTags` / `ScenePath` / `ModelPath` / `IconPath`），**但"武器→升级池"的关联方向（§4.5.2 `ApplicableWeapons`）这一步没做** —— 场景 B 仍待拍板。
+
+**验证**：见阶段 2 的比对表（手枪 11 项逐项一致、玩家 4 项一致、`PoolPreview` 18 条不变）。
+❗ **未做**：三把武器各自开一局验证狙击/步枪的暴击/弹速（分表前它们**共用** `Pistol*` 的值，现在各自有独立字段，默认值仍写成 0.15/2/90/55/3 所以**行为不变**；要按武器区分得改行文件）。
 
 ### 阶段 4：技能表 + 敌人表 + 节点表（T2 + T5 + T7）
 
-- **节点表（T7）优先于技能表**：它替掉的是 3 个 `switch`（`RewardService.cs:16-38` + `NodePlacement.cs:18-26` + `StageController.cs:653-661`），风险低、收益直接。
-- **敌人表（T5）要连带改 `StageDefinition.Allows()`**（`StageDefinition.cs:42-43`）从显示名匹配改成 `Id` 匹配 —— 这一步会动 `Balance.tres:15,33` 的 `AllowedEnemies` 字符串，**是最容易出错的一步**，务必先写一条自测把它打出来（现在 `SelfTest.cs:99` 已经在打波数映射，可以顺手加一行打"本关允许的敌人"）。
-- 技能表（T2）最后做：`Player.tscn:64-140` 的 40 处赋值（该场景脚本属性赋值共 45 处）要逐项搬进 `Params`，而且 `Set()` 的键名必须与 `Ability` 子类的属性名完全一致（拼错会被 §3 T2 的 `Nil` 判定抓到并警告，但仍要逐条核对）。
+- ✅ **节点表（T7）已在阶段 2 做完**：`Config/Tables/Nodes/node_*.tres` 9 行，替掉 `RewardService` 两个 switch + `NodePlacement`/`StageController` 的重复实现。
+  ⏸ **未做**：`SpawnsEncounter` / `MaterialPath` / `IconPath` 三个字段已就位但**还没接进 `RewardNode`**（当前它们仍读各自场景里的值）。
+- ⏸ **敌人表（T5）只落了全局那一行**（`enemy_global`）：四个全局倍率仍由 `BalanceConfig` 提供、表行优先覆盖（`enemy_global.HealthMultiplier` 等已接进 `Balance.ScaleEnemy` 与 `EliteChanceMultiplier`）。
+  **按敌种的行、`ScenePath` / `Weight` / `MinElapsedSeconds` / `EliteChance` 字段已就位但没接线** —— 生成项仍在 `Scenes/Main.tscn` 上。
+  下一步要连带把 `StageDefinition.Allows()` 从显示名匹配改成 `Id` 匹配（`AllowedEnemyIds`），**这一步最容易出错，务必先加自测把"本关允许的敌人"打出来**。
+- ⏸ **技能表（T2）完全没做**：`Player.tscn:64-140` 的 40 处赋值要逐项搬进 `Params`，而且 `Set()` 的键名必须与 `Ability` 子类的属性名完全一致。
 
-### 阶段 5：状态表 + 首领增强表 + 局外成长表（T8 + T9 + T10）+ 删旧代码
+### 阶段 5：首领增强表 + 局外成长表（T9 + T10）+ 删旧代码
 
-- 到这一步再把阶段 2 保留的 5 条异化搬进表。
-- **首领增强表（T9）到这里才做**，而且**顺序很重要**：
-  1. 先把 `BossPerkCatalog` 的 7 条搬进 `Config/Tables/BossMods/boss_*.tres`（保留 `Source = OpeningPerk`），`EncounterController.cs:671-677` 改走 `WeightedPick`。**行为必须与今天一致**（7 条全 `Weight = 1f` → 等概率，抽 `StageDefinition.BossPerkCount` 个）。
-  2. 抽 `WeightedPick`（§3 T9 的代码），顺手把 `RewardPool.Roll` 也换过去 —— **换的时候把 rng 当参数传**，否则随机序列会变、自测基线会漂。
-  3. 最后才加"节点驱动"：`NodeConfig.BossPressurePoints` / `BossModifierRolls` / `BossModifierTags` + `StageController` 的累加 + `EncounterController.BossModifierRolls`。**这一步是新增功能（场景 A 的解），不是迁移**，所以放在最后、单独验收。
-- **删掉所有 `_fallback` 旧目录**（`RewardCatalog` 的 C# 数组、`StatusPresets` 的 `switch`、`BossPerkCatalog.All`）。
-- ⚠️ 局外成长表（T10）**必须处理存档兼容**（`MetaProgress.cs:63-68` 的 `meta.cfg` 键名），做法见 §3 T10。
-- 收尾决定 §4.5.6：`PoolTags` 改成 `UpgradePoolId` 用起来、还是删掉。
-- 更新 `docs/`：[config.md](config.md)（改成"分表现状 + 每张表在哪"）、[rewards.md](rewards.md)（补 §4.5 的三级回退 + `ApplicableWeapons` 用法）、[boss.md](boss.md)（补 T9 的抽奖与增强链路）、[todo-handoff.md](todo-handoff.md)（`Balance.Settings` 那行改成"`Balance` 是唯一数值**门面**，分表在 `Config/Tables/<分组>/`"）、把 §2.3 的命名约定并入 [assets.md](assets.md)。
+- ✅ **局外成长表（T10）已在阶段 2 做完**：`Config/Tables/Meta/meta_*.tres` 5 行，`MetaProgress` 的 5 个系数与价格公式都改成查表（存档键 `SaveKey` 保留 `health_level` 等原键名，**存档兼容**）。
+  ⏸ `RunSettlement.cs` 的 3 个 `const`（10 / 3 / 50 碎片）**仍没外置**（建议直接搬进 `BalanceConfig`，不是"按类型的行"）。
+- ⏸ **首领增强表（T9）完全没做**，顺序仍然是设计文档写的那样：
+  1. 先把 `BossPerkCatalog` 的 7 条搬进 `Config/Tables/BossMods/boss_*.tres`（`Source = OpeningPerk`），`EncounterController.cs:671-677` 改走 `WeightedPick`。**行为必须与今天一致**。
+  2. 抽 `WeightedPick`（已就位）—— **换的时候把 rng 当参数传**，否则随机序列会变、自测基线会漂。
+  3. 最后才加"节点驱动"：`NodeConfig.BossPressurePoints` / `BossModifierRolls` / `BossModifierTags` 三个字段**已经就位**（`node_*.tres` 里默认为 0/0/空 = 不生效），接线点是 `StageController` 的累加与 `EncounterController.BossModifierRolls`。
+- ✅ **`_fallback` 旧目录没删**（`RewardCatalog.Fallback` / `StatusPresets.Fallback`）—— 按设计这是回退路径，不是技术债。
+- ⏸ 收尾决定 §4.5.6：`PoolTags` 改成 `UpgradePoolId` 用起来、还是删掉。
 
 **场景 A 的验收**（做完第 3 步之后）：
-- 改 `node_evolution.tres` 的 `BossModifierRolls` 从 `0` → `3`，跑一局确认 Boss 身上的词条数变了、HUD 上的 `_bossPerkNames` 变长（`PlayerHud.cs:133-134` 已经在显示）。
-- 把 `boss_berserk.tres` 的 `Weight` 改成 `100`，确认它几乎必出（在此之前"权重"是没有作用的）。
+- 改 `Config/Tables/Nodes/node_evolution.tres` 的 `BossModifierRolls` 从 `0` → `3`，跑一局确认 Boss 身上的词条数变了、HUD 上的 `_bossPerkNames` 变长。
+- 把 `boss_berserk.tres` 的 `Weight` 改成 `100`，确认它几乎必出。
 - 清空 `BossModifiers` 数组跑一次，确认回退到代码内置目录且只打一条 warning。
 
 ### 每阶段的统一验证清单
@@ -2175,4 +2284,88 @@ public WeaponFieldMask Overrides { get; set; } = WeaponFieldMask.All;
 | `Edit Resources as Table` 插件在 4.7.2 上能不能用 | ⏸ 本次**没测**（项目里没装；`addons/` 下只有 `godot_mcp`） | 注意新增的前提：它靠 Inspector/`ResourceSaver` 保存，若它用"拖拽填数组"的方式加索引，会撞上前一条的坑 |
 
 > **注意最后一项的地位**：本设计的**运行时读取路径完全不依赖那个插件** —— 插件只是让"批量改表"更舒服。
+
+### 7.3 ⭐ YARD 真机冒烟结论（2026-10，阶段 2）→ ✅ **出下拉，可以用**
+
+调研文档 [config-tooling-yard.md](config-tooling-yard.md) §1.3 明确声明过它**唯一没验证**的一步是
+"生出来的 `PropertyInfo(hint=1024)` 在 Inspector 里**真的会长出下拉框**"（当时本机没装编辑器，只到了"代码生成层实测 + 引擎层强推断"）。
+**本次在真机上跑完了这一步，结论是 ✅。**
+
+**探针怎么做**（用完已删干净）：
+
+| 步骤 | 做法 |
+|---|---|
+| 1. 建临时注册表 | `Config/Registries/_yard_probe.tres`（用 YARD 自己的 `RegistryIO.create_registry_file()` 生成，再手工塞 1 个条目 `yard_probe_registry`） |
+| 2. 建临时 C# 行类 | `Scripts/Config/YardProbe.cs`，4 个字段：两个 `[Export(YardRegistryHint, "res://Config/Registries/_yard_probe.tres")]`（`StringName` + `string`）、一个同写法的 `Godot.Collections.Array<StringName>`、一个普通 `[Export] StringName` 当对照 |
+| 3. 建临时行资源 | `Config/Tables/_Probe/row_yard_probe.tres` |
+| 4. 编译 | `build.ps1 --no-incremental` → **0 warning / 0 error**（`(PropertyHint)1024` 能编译） |
+| 5. 看真机 | 编辑器（gdmcp `execute_editor_script` + 截屏）里 `EditorInterface.edit_resource(...)` 打开这一行，遍历 `EditorInterface.get_inspector()` 的控件树 |
+
+**证据（三层，逐层变硬）**：
+
+| 层 | 结论 | 证据原文 |
+|---|---|---|
+| ① C# 侧 hint 元数据 | ✅ 1024 完整保留 | `ProbeId type=21 hint=1024 hint_string='res://Config/Registries/_yard_probe.tres' usage=4102`（21 = `TYPE_STRING_NAME`）<br>`ProbeIdString type=4 hint=1024 …`（4 = `TYPE_STRING`）<br>对照 `PlainId type=21 hint=0 hint_string=''`（普通文本框） |
+| ② 数组列 | ❌ 被源码生成器覆盖（**与调研预测一致**） | `ProbeIds type=28 hint=23 hint_string='21/0:'`（23 = `TypeString`，1024 被丢掉） |
+| ③ **真机 Inspector 控件** | ✅ **`OptionButton` 真的出现了** | 控件树（真实节点路径）：<br>`…/@EditorInspector@7861/…/@EditorProperty@61301` = `ProbeId` → 其子节点 `@OptionButton@61300`，**`OPTIONS=["yard_probe_registry"] selected=-1 visible=true`**<br>`…/@EditorProperty@61315` = `ProbeIdString` → `@OptionButton@61314`，**同样的 OPTIONS**<br>对照：`ProbeId` 的 `ProbeIds` 是 `EditorPropertyArray`（无按钮）、`PlainId` 是 `EditorPropertyText` |
+| ④ 肉眼 | ✅ 点开下拉能看到条目 | `docs/screenshots/yard_probe_inspector.png`（点 `Probe Id` 右侧箭头后弹出 `yard_probe_registry` 那一项） |
+
+**所以三种结论里属于哪一种：✅ 出下拉。** 之前唯一"没在真机点过"的那一步现在补上了，而且三层证据方向一致。
+
+**顺带实测到的两条（对以后写字段有直接影响）**：
+
+1. **同一个 hint 写法在 `StringName` 与 `string` 上都出下拉**（`type=21` 与 `type=4` 都拿到了 `hint=1024`）。
+2. **`Array[StringName]` / `Array[string]` 出不来**（`hint=23`，YARD 的 `_parse_property` 第一句 `if hint != 1024: return false` 就返回了）
+   → **一条跨表引用 = 一个标量 `StringName` 字段**，这是 C# 侧唯一可用的形态（想放多个就多写几个标量字段）。
+3. **YARD 注册表 `.tres` 由引擎写入时会带 `uid=` 与 `uid://` 脚本引用**，与项目"`ext_resource` 只写 `path=`"的既有约定（[assets.md](assets.md) §5）冲突。
+   本轮探针里已实测 `ResourceSaver.save()` 会写进 `[gd_resource … uid="uid://…"]` 与 `[ext_resource … uid="uid://…" path=…]`。
+   **结论：如果以后真要用 YARD 注册表，它属于"引擎生成的派生清单"，建议单独放 `Config/Registries/`，不要和 `Config/Tables/` 的行混在一起**（YARD 自己的 Reindex 也会重写它）。
 > 所以插件在 4.7.2 上坏了，最多退回到"用 Inspector 按文件改"或"用文本编辑器改 `.tres`"，**不影响分表方案落地**。
+
+---
+
+## 8. 阶段 2 之后的现状速查（给下一个接手的人）
+
+### 8.1 `Balance` 的最终形态 = **唯一的数值门面 + 唯一的表索引持有者**
+
+| 它是什么 | 说明 |
+|---|---|
+| ✅ **仍是全项目数值的唯一入口** | 业务代码继续写 `Balance.Settings.Xxx`（[todo-handoff.md](todo-handoff.md) 的"统一入口"约定**没变**）。`Balance` 从"唯一数值**文件**"变成"唯一数值**门面**"（§2.1 就是这么设计的） |
+| ✅ **同时是 8 张表的索引持有者** | 7 个新 `[Export] XxxConfig[]` 数组 + 既有的 `Stages`，元素全部是独立 `ExtResource` |
+| ⏸ **没有**把索引分散到各系统 | **理由**：① 分散会造出 8 个"谁持有哪张表"的新约定，[architecture.md](architecture.md):134「加新全局入口前先问：能不能传参」的精神是**少入口**；② `ConfigRows` 是一个静态索引器，谁来 `Rebuild` 都一样，而现在只有 `Balance._Ready` 一处；③ **回退语义要求能一眼看出"整份配置有没有加载上"** —— `Balance.FileLoaded` 已经是那个开关，分散后它会失去意义 |
+| 顺序依赖 | `Balance._Ready` → `CallDeferred(BuildTableIndex)`（**必须 defer**，见 §5 阶段 2 的坑 1）→ `ConfigRows.Rebuild(...)` ×7 + `SetKind` ×9 + `RewardTable.Build` |
+
+### 8.2 读表 / 回退的固定写法（新代码照抄）
+
+```csharp
+// 1) 按 Slot 取（"武器1 / 武器2 / 角色1"这种表现层顺序）
+WeaponConfig? row = ConfigRows.BySlot<WeaponConfig>((int)kind + 1);
+if (row != null) { row.ApplyTo(_weapon); return; }   // 表在 → 表是权威
+// 2) 表不在 → 什么都不做，目标保留自身 [Export] 默认值（+ 一条 warning / GameLog）
+GD.PushWarning($"[Config] 武器表里没有 {kind} 的行，保留武器组件自身的默认值。");
+
+// 按 Id / 按枚举（节点表用 ByKind）
+NodeConfig? node = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
+MetaUpgradeConfig? meta = ConfigRows.ById<MetaUpgradeConfig>("meta_health");
+```
+
+### 8.3 ⚠️ 操作纪律（这一条必须遵守，否则"整份 Balance.tres 静默回退"）
+
+**不要单独删/改 `Balance.tres` 引用到的行文件。**
+只要 `Balance.tres` 引用的**任何一个**行文件缺失 / 改名，Godot 会**整份 `Balance.tres` 加载失败**（不是只丢那一行），
+于是**所有**数值静默回到代码默认值（实测过：玩家生命 250 → 140、武器变成 `Weapon.cs` 的 22/0.32/8/1.15）。
+回退是"安全的"（只有 warning、能正常玩、日志留痕），但比"只影响缺的那一行"粗得多。
+
+**要下线一行**：把 `Balance.tres` 里的数组项与顶部对应的 `[ext_resource]` **一起**删掉，再删文件。
+**要重命名一行**：先改 `[ext_resource]` 的 `path=`，再 `git mv` 文件（中间不要留空窗）。
+
+### 8.4 手写 `.tres` 的格式规矩（本轮又一次踩到）
+
+- `[ext_resource]` / `[sub_resource]` **必须在 `[resource]` 之前**；`load_steps = ext + sub + 1`。
+- `ext_resource` **只写 `path=`，不写 `uid=`**（项目既有约定）。
+  ⚠️ 但**引擎自己保存时会写 uid**：用 `ResourceSaver.save()` 生成过一遍之后，`[gd_resource … uid=…]` 与 `[ext_resource … uid=… path=…]` 都会出现。
+  本轮的做法是**让引擎生成（保证数组/子资源写法规范）→ 再用脚本把两处 `uid=` 正则剥掉**。
+- UTF-8 无 BOM + **LF**。
+- **别手抄文档里的示例**：先让引擎 `ResourceSaver.save()` 写一遍，再照抄它的输出语法（阶段 1 就是这么做的）。
+- ⚠️ **编辑器有资源缓存**：改完 `Balance.tres` 后立刻用 `ResourceLoader.load` 读会拿到**旧版本**（表现为"某个数组是 0"）。
+  修法：`EditorInterface.get_resource_filesystem().update_file(path)` + `CACHE_MODE_REPLACE`。**游戏冷启动不受影响**。

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/CharacterConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "chr_gunner"
+Slot = 1
+DisplayName = "远程枪手"
+DescriptionTemplate = "{MaxHealth:0} 生命 / {MaxArmor:0} 护甲"
+MaxHealth = 250.0
+MaxArmor = 40.0
+MaxShield = 0.0
+MoveSpeed = 7.0
+DamageReduction = 0.0
+WeaponEnabled = true
+DefaultWeaponId = "wpn_pistol"
+EnabledAbilityIds = PackedStringArray()
+DisabledAbilityIds = PackedStringArray("MeleeAttackAbility", "SummonAbility", "AreaAttackAbility")
+MeleeDamage = 32.0

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_r7l6n"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_b2c0n"]
+
+[sub_resource type="Resource" id="Resource_4jrjf"]
+script = ExtResource("1_r7l6n")
+Stat = "CritMultiplierAdd"
+Operation = 0
+Value = 0.35
+
+[resource]
+script = ExtResource("2_b2c0n")
+MaxStacks = 2
+PoolTags = PackedStringArray("Crit")
+Modifiers = [SubResource("Resource_4jrjf")]
+Id = "upg_lethal"
+DisplayName = "致命打击"
+DescriptionTemplate = "暴击伤害 +35%"

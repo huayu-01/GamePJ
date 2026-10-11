@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EffectConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="1_dkvh8"]
+
+[resource]
+script = ExtResource("1_dkvh8")
+Kind = 9
+Value = 2.0
+SummonScenePath = "res://Scenes/Summons/Drone.tscn"
+Id = "SummonOnKill"
+Slot = 13
+DisplayName = "亡者随从"
+Note = "数值来自异化「亡者随从」（RewardCatalog.cs 原来的 MaxSummons = 2）。"

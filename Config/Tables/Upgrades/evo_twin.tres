@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_2p60k"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_asao6"]
+
+[sub_resource type="Resource" id="Resource_2a7s5"]
+script = ExtResource("1_2p60k")
+Stat = "ProjectileCountAdd"
+Operation = 0
+
+[resource]
+script = ExtResource("2_asao6")
+RewardKind = 1
+RequiredWeaponTags = PackedStringArray("Gun")
+PoolTags = PackedStringArray("Evolution", "Gun")
+Modifiers = [SubResource("Resource_2a7s5")]
+Id = "evo_twin"
+DisplayName = "双管齐下"
+DescriptionTemplate = "每次射击额外发射一发子弹"

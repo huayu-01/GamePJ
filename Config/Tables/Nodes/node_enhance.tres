@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="NodeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/NodeConfig.cs" id="1_p6q05"]
+
+[resource]
+script = ExtResource("1_p6q05")
+Title = "强化池"
+Id = "node_enhance"
+Slot = 2
+DisplayName = "强化池"

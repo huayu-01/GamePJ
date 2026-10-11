@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="NodeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/NodeConfig.cs" id="1_uwaq0"]
+
+[resource]
+script = ExtResource("1_uwaq0")
+Kind = 4
+Title = "局外资源"
+AnyRewardKind = true
+Layer = 0
+WaveCount = 1
+Id = "node_resource"
+Slot = 5
+DisplayName = "局外资源"

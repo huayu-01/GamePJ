@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_1r4at"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_yv3rr"]
+
+[sub_resource type="Resource" id="Resource_ee4e5"]
+script = ExtResource("1_1r4at")
+Stat = "MoveSpeedMultiplier"
+Value = 1.1
+
+[resource]
+script = ExtResource("2_yv3rr")
+MaxStacks = 3
+PoolTags = PackedStringArray("Movement")
+Modifiers = [SubResource("Resource_ee4e5")]
+Id = "upg_boots"
+DisplayName = "战术靴"
+DescriptionTemplate = "移动速度 +10%"

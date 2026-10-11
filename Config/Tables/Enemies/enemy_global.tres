@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_j8a3y"]
+
+[resource]
+script = ExtResource("1_j8a3y")
+IsGlobal = true
+HealthMultiplier = 0.75
+DamageMultiplier = 0.3
+Id = "enemy_global"
+Slot = 1
+DisplayName = "敌人 · 全局倍率"
+Note = "数值逐条抄自 Balance.tres 的 EnemyHealthMultiplier / EnemyDamageMultiplier / EnemyMoveSpeedMultiplier / EliteChanceMultiplier。"

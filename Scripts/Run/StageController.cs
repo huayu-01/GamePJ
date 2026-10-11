@@ -675,14 +675,11 @@ public partial class StageController : Node3D
 		}
 	}
 
-	/// <summary>某价值层的节点会开几波（关卡核心文档 L225-227：高价值 3 / 中价值 2 / 低价值 1）。</summary>
-	public static int WavesFor(RewardNodeKind kind) => LayerOf(kind) switch { 2 => 3, 1 => 2, _ => 1 };
+	/// <summary>某价值层的节点会开几波（关卡核心文档 L225-227：高价值 3 / 中价值 2 / 低价值 1）。
+	/// 与 <see cref="NodePlacement.WavesFor"/> 是同一份实现（都读节点表），这里保留只是为了不破坏既有调用点。</summary>
+	public static int WavesFor(RewardNodeKind kind) => NodePlacement.WavesFor(kind);
 
 	/// <summary>节点价值层：2 高（进化/异化）、1 中（强化/随机奖励/商店）、0 低（局外资源/回复/特殊）。</summary>
-	private static int LayerOf(RewardNodeKind kind) => kind switch
-	{
-		RewardNodeKind.Evolution or RewardNodeKind.Mutation => 2,
-		RewardNodeKind.Enhancement or RewardNodeKind.Shop => 1,
-		_ => 0,
-	};
+	/// <summary>节点价值层。配置表阶段 2 起统一走节点表（原来这里与 `NodePlacement` 各写了一份重复实现）。</summary>
+	private static int LayerOf(RewardNodeKind kind) => NodePlacement.LayerOf(kind);
 }

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_2qct0"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_g13eg"]
+
+[sub_resource type="Resource" id="Resource_83gsn"]
+script = ExtResource("1_2qct0")
+Stat = "ReloadSpeedMultiplier"
+Value = 1.25
+
+[resource]
+script = ExtResource("2_g13eg")
+MaxStacks = 2
+PoolTags = PackedStringArray("Reload")
+Modifiers = [SubResource("Resource_83gsn")]
+Id = "upg_fast_reload"
+DisplayName = "快速装填"
+DescriptionTemplate = "装填速度 +25%"

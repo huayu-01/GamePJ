@@ -14,16 +14,36 @@ public static class NodePlacement
 {
 	/// <summary>
 	/// 节点价值层：2 高（进化/异化）、1 中（强化/商店）、0 低（局外资源/回复/特殊）。
+	/// 层与波数**优先读节点表**（`Config/Tables/Nodes/node_*.tres` 的 `Layer` / `WaveCount`），
+	/// 读不到行时回退到下面这份 switch（= 分表前的规则，数值逐条一致）。
 	/// </summary>
-	public static int LayerOf(RewardNodeKind kind) => kind switch
+	public static int LayerOf(RewardNodeKind kind)
 	{
-		RewardNodeKind.Evolution or RewardNodeKind.Mutation => 2,
-		RewardNodeKind.Enhancement or RewardNodeKind.Shop => 1,
-		_ => 0,
-	};
+		NodeConfig? row = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
+		if (row != null)
+		{
+			return row.Layer;
+		}
+
+		return kind switch
+		{
+			RewardNodeKind.Evolution or RewardNodeKind.Mutation => 2,
+			RewardNodeKind.Enhancement or RewardNodeKind.Shop => 1,
+			_ => 0,
+		};
+	}
 
 	/// <summary>某个价值层的节点会开几波（关卡核心文档 §波数：高 3 / 中 2 / 低 1）。</summary>
-	public static int WavesFor(RewardNodeKind kind) => LayerOf(kind) switch { 2 => 3, 1 => 2, _ => 1 };
+	public static int WavesFor(RewardNodeKind kind)
+	{
+		NodeConfig? row = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
+		if (row != null)
+		{
+			return row.WaveCount;
+		}
+
+		return LayerOf(kind) switch { 2 => 3, 1 => 2, _ => 1 };
+	}
 
 	/// <summary>
 	/// 把节点放到最近的可站立位置（不与障碍物重叠）。

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MetaUpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/MetaUpgradeConfig.cs" id="1_7qqoa"]
+
+[resource]
+script = ExtResource("1_7qqoa")
+SaveKey = "crit_level"
+Stat = "CritChanceAdd"
+PerLevel = 0.03
+Id = "meta_crit"
+Slot = 4
+DisplayName = "瞄准训练"
+DescriptionTemplate = "暴击率 +{PerLevel}"

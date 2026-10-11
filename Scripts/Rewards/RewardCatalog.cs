@@ -13,7 +13,12 @@ namespace ActRoguelike.Rewards;
 /// </summary>
 public static class RewardCatalog
 {
-	public static readonly RewardDefinition[] All =
+	/// <summary>
+	/// 代码内置目录 —— **兜底**。表（`Config/Tables/Upgrades/upg_*.tres` + `Balance.tres` 的
+	/// <c>Upgrades</c> 数组）读得到就用表；读不到才用这里的 C# 数组。
+	/// 这是"读不到表就用自身默认值"这条回退语义在增幅项上的落地。
+	/// </summary>
+	public static readonly RewardDefinition[] Fallback =
 	{
 		// ───────── 强化（改参数，可叠层） ─────────
 		Enhance("dmg_up", "增伤弹头", "伤害 +15%", 3, "Damage",
@@ -84,6 +89,17 @@ public static class RewardCatalog
 			c.Player.AddChild(new AmmoOnKillRule { RewardId = "mut_supply" });
 		}),
 	};
+
+	/// <summary>
+	/// 本局实际使用的增幅项目录：**表优先**，表为空 / 未加载 → 回退到 <see cref="Fallback"/>。
+	/// 由 <c>Balance</c> 在 <c>_Ready</c> 里读表并编译好（见 <c>RewardTable.Build</c>），
+	/// 所以调用方（`RewardPool` / `RunController`）一行都不用改。
+	/// </summary>
+	public static RewardDefinition[] All { get; private set; } = Fallback;
+
+	/// <summary>换成本局目录（<c>Balance</c> 读表后调用；传 null 等于回到兜底目录）。</summary>
+	public static void UseTable(RewardDefinition[]? rows)
+		=> All = rows is { Length: > 0 } ? rows : Fallback;
 
 	public static RewardDefinition? Find(string id) => Array.Find(All, d => d.Id == id);
 
@@ -244,6 +260,9 @@ public partial class BurnOnHitRule : TriggerRule
 {
 	public float Duration { get; set; } = 3f;
 
+	/// <summary>挂哪个状态（对应 `Config/Tables/Effects/` 里的状态行 Id）。</summary>
+	public string StatusId { get; set; } = "Burn";
+
 	private Unit? _owner;
 
 	public override void _Ready()
@@ -260,7 +279,7 @@ public partial class BurnOnHitRule : TriggerRule
 
 	public override void Execute(GameplayEvent gameplayEvent)
 	{
-		if (StatusPresets.Create("Burn", Duration) is { } burn)
+		if (StatusPresets.Create(StatusId, Duration) is { } burn)
 		{
 			gameplayEvent.Target?.ApplyStatus(burn);
 		}
