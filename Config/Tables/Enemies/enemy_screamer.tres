@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_screamer_scream.tres" id="2_skl"]
 
 [resource]
 script = ExtResource("1_row")
@@ -22,4 +23,5 @@ Cost = 2
 Weight = 1.2
 MinElapsedSeconds = 0.0
 EliteChance = 0.0
+Skills = [ExtResource("2_skl")]
 Note = "范围减速：AttackRange 走 AreaAttackAbility.TriggerRadius（7），命中挂 Slow（在技能行里）。"

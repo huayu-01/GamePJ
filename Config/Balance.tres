@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BalanceConfig" load_steps=64 format=3]
+[gd_resource type="Resource" script_class="BalanceConfig" load_steps=94 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/BalanceConfig.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -63,6 +63,36 @@
 [ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_screamer.tres" id="61_enemy_screamer"]
 [ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_guard.tres" id="62_enemy_guard"]
 [ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_skill_elite.tres" id="63_enemy_skill_elite"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_dash.tres" id="64_skl_dash"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_burst.tres" id="65_skl_burst"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_melee.tres" id="66_skl_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_summon.tres" id="67_skl_summon"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_control.tres" id="68_skl_control"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_chaser_melee.tres" id="69_skl_enemy_chaser_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_fast_melee_melee.tres" id="70_skl_enemy_fast_melee_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_exploder_blow.tres" id="71_skl_enemy_exploder_blow"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_jumping_leap.tres" id="72_skl_enemy_jumping_leap"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_ranged_shot.tres" id="73_skl_enemy_ranged_shot"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_charger_charge.tres" id="74_skl_enemy_charger_charge"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_screamer_scream.tres" id="75_skl_enemy_screamer_scream"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_guard_melee.tres" id="76_skl_enemy_guard_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_elite_melee.tres" id="77_skl_enemy_elite_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_elite_buff.tres" id="78_skl_enemy_elite_buff"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_elite_control.tres" id="79_skl_enemy_elite_control"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_melee.tres" id="80_skl_boss_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_scream.tres" id="81_skl_boss_scream"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_charge.tres" id="82_skl_boss_charge"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_summon.tres" id="83_skl_boss_summon"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_drone_melee.tres" id="84_skl_drone_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/bhv_awakened.tres" id="85_bhv_awakened"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/bhv_summoner.tres" id="86_bhv_summoner"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/bhv_screaming.tres" id="87_bhv_screaming"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/bhv_charging.tres" id="88_bhv_charging"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_berserk.tres" id="89_pmod_berserk"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_fortress.tres" id="90_pmod_fortress"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_swift.tres" id="91_pmod_swift"]
+[ext_resource type="Resource" path="res://Config/Tables/Bosses/boss_final.tres" id="92_boss_final"]
+[ext_resource type="Resource" path="res://Config/Tables/Summons/summon_drone.tres" id="93_summon_drone"]
 
 [resource]
 script = ExtResource("1_balance")
@@ -105,4 +135,8 @@ PressureMutationBonus = 1.5
 PressurePerPoint = 100
 FreeChallengeBaseQuota = 1
 FreeChallengeMaxQuota = 2
+Skills = [ExtResource("64_skl_dash"), ExtResource("65_skl_burst"), ExtResource("66_skl_melee"), ExtResource("67_skl_summon"), ExtResource("68_skl_control"), ExtResource("69_skl_enemy_chaser_melee"), ExtResource("70_skl_enemy_fast_melee_melee"), ExtResource("71_skl_enemy_exploder_blow"), ExtResource("72_skl_enemy_jumping_leap"), ExtResource("73_skl_enemy_ranged_shot"), ExtResource("74_skl_enemy_charger_charge"), ExtResource("75_skl_enemy_screamer_scream"), ExtResource("76_skl_enemy_guard_melee"), ExtResource("77_skl_enemy_elite_melee"), ExtResource("78_skl_enemy_elite_buff"), ExtResource("79_skl_enemy_elite_control"), ExtResource("80_skl_boss_melee"), ExtResource("81_skl_boss_scream"), ExtResource("82_skl_boss_charge"), ExtResource("83_skl_boss_summon"), ExtResource("84_skl_drone_melee"), ExtResource("85_bhv_awakened"), ExtResource("86_bhv_summoner"), ExtResource("87_bhv_screaming"), ExtResource("88_bhv_charging")]
+PressureMods = [ExtResource("89_pmod_berserk"), ExtResource("90_pmod_fortress"), ExtResource("91_pmod_swift")]
+Bosses = [ExtResource("92_boss_final")]
+Summons = [ExtResource("93_summon_drone")]
 BossHealthBarScale = 4.0

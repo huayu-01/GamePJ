@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_skl_enemy_jumping_leap_0"]
+script = ExtResource("2_param")
+Key = "JumpVelocity"
+Value = 9.0
+Note = "起跳竖直速度"
+
+[sub_resource type="Resource" id="p_skl_enemy_jumping_leap_1"]
+script = ExtResource("2_param")
+Key = "HorizontalSpeed"
+Value = 8.5
+Note = "水平速度"
+
+[sub_resource type="Resource" id="p_skl_enemy_jumping_leap_2"]
+script = ExtResource("2_param")
+Key = "ActiveTime"
+Value = 0.22
+Note = "命中体激活时长"
+
+[sub_resource type="Resource" id="a_skl_enemy_jumping_leap_0"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Melee")
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_enemy_jumping_leap"
+DisplayName = "跳劈"
+NodeName = "AbilityLeap"
+ClassHint = "LeapAttackAbility"
+Aim = 0
+Windup = 0.15
+Recover = 0.5
+Enabled = true
+ApproachMinRange = 3.5
+ApproachMaxRange = 9.0
+Params = [SubResource("p_skl_enemy_jumping_leap_0"), SubResource("p_skl_enemy_jumping_leap_1"), SubResource("p_skl_enemy_jumping_leap_2")]
+AttackParams = [SubResource("a_skl_enemy_jumping_leap_0")]
+Note = "跳跃近战：没有"射程"属性，接近区间写在 ApproachMin/Max。"

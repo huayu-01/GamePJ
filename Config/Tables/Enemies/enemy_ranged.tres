@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_ranged_shot.tres" id="2_skl"]
 
 [resource]
 script = ExtResource("1_row")
@@ -22,4 +23,5 @@ Cost = 2
 Weight = 1.6
 MinElapsedSeconds = 8.0
 EliteChance = 0.0
+Skills = [ExtResource("2_skl")]
 Note = "远程：主攻击没有命中体，伤害/击退写在武器组件上。AttackRange 走 ProjectileAttackAbility.MaxRange。开场 8 秒后才出现。"

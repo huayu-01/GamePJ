@@ -1,6 +1,11 @@
-[gd_resource type="Resource" script_class="CharacterConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CharacterConfig" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/CharacterConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_dash.tres" id="2_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_burst.tres" id="3_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_melee.tres" id="4_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_summon.tres" id="5_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_control.tres" id="6_skl"]
 
 [resource]
 script = ExtResource("1_row")
@@ -17,4 +22,9 @@ WeaponEnabled = true
 DefaultWeaponId = "wpn_pistol"
 EnabledAbilityIds = PackedStringArray("SummonAbility", "AreaAttackAbility")
 DisabledAbilityIds = PackedStringArray("MeleeAttackAbility")
-MeleeDamage = 32.0
+AttackDamage = 32.0
+AttackInterval = 0.75
+AttackRange = 2.4
+AttackKnockback = 5.0
+Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("4_skl"), ExtResource("5_skl"), ExtResource("6_skl")]
+Note = "角色 3：召唤与控制。"

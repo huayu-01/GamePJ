@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_skl_burst_0"]
+script = ExtResource("2_param")
+Key = "BurstInterval"
+Value = 0.06
+Note = "连发间隔"
+
+[sub_resource type="Resource" id="p_skl_burst_1"]
+script = ExtResource("2_param")
+Key = "Duration"
+Value = 2.5
+Note = "持续时间"
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_burst"
+DisplayName = "火力倾泻"
+NodeName = "AbilityBurst"
+ClassHint = "BurstFireAbility"
+InputAction = "burst"
+Aim = 2
+Cooldown = 10.0
+Windup = 0.0
+Recover = 0.1
+Enabled = true
+Params = [SubResource("p_skl_burst_0"), SubResource("p_skl_burst_1")]
+Note = "玩家技能 2（E）：朝准星倾泻。Windup=0 是原值（本来就没有前摇）。"

@@ -108,14 +108,12 @@ public partial class RunController : Node
 		// 读不到角色行时回退到与分表前逐位一致的那套规则。
 		ApplyAbilityMatrix(character, heavy, summoner);
 
-		if (NodeSearch.FindInSubtree<MeleeAttackAbility>(_player) is { } melee
-			&& melee.GetNodeOrNull<AttackHitbox>("Attack") is { } hit)
+		if (character != null)
 		{
-			// 近战伤害来自角色行；读不到行就保留命中体在场景里的原值。
-			if (character != null)
-			{
-				hit.Damage = character.MeleeDamage;
-			}
+			// ⚠️ 顺序：先技能表（前摇/后摇/朝向/命中体细节/子类参数），再单位的攻击组（伤害/间隔/范围/击退）。
+			// 主攻击的这四个数以**单位行**为准，所以角色行写在技能行之后 —— 只留一个真源。
+			character.ApplySkillsTo(_player);
+			character.ApplyAttackTo(_player);
 		}
 
 		if (_stage == null)

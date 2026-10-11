@@ -96,8 +96,27 @@ public partial class BalanceConfig : Resource
 	[Export] public CharacterConfig[] Characters { get; set; } = System.Array.Empty<CharacterConfig>();
 
 	[ExportGroup("表索引 · 敌人")]
-	/// <summary>敌人表（`Config/Tables/Enemies/enemy_*.tres`）。当前只有一行全局倍率。</summary>
+	/// <summary>敌人表（`Config/Tables/Enemies/enemy_*.tres`）：1 行全局倍率 + 每个敌种一行。</summary>
 	[Export] public EnemyConfig[] Enemies { get; set; } = System.Array.Empty<EnemyConfig>();
+
+	[ExportGroup("表索引 · 首领")]
+	/// <summary>首领表（`Config/Tables/Bosses/boss_*.tres`）。空 = 用 Boss.tscn 场景里的值。</summary>
+	[Export] public BossConfig[] Bosses { get; set; } = System.Array.Empty<BossConfig>();
+
+	[ExportGroup("表索引 · 召唤物")]
+	/// <summary>召唤物表（`Config/Tables/Summons/summon_*.tres`）。空 = 用 Drone.tscn 场景里的值。</summary>
+	[Export] public SummonConfig[] Summons { get; set; } = System.Array.Empty<SummonConfig>();
+
+	[ExportGroup("表索引 · 技能")]
+	/// <summary>
+	/// 技能表（`Config/Tables/Skills/skl_*.tres`）。单位表用 `Skills` 以资源引用指过来；
+	/// 里面 <c>ApplyHandler</c> 非空的那几行是**首领行为词条**（Boss Build）。
+	/// </summary>
+	[Export] public AbilityConfig[] Skills { get; set; } = System.Array.Empty<AbilityConfig>();
+
+	[ExportGroup("表索引 · Pressure 数值强化池")]
+	/// <summary>首领**数值型**强化池（`Config/Tables/Pressure/pmod_*.tres`）。行为型在技能表里，两者不得合并（§7.1）。</summary>
+	[Export] public PressureModConfig[] PressureMods { get; set; } = System.Array.Empty<PressureModConfig>();
 
 	[ExportGroup("表索引 · 效果（击退 / 燃烧 / 减速 / 眩晕 / 爆炸 / 吸血 / 召唤）")]
 	/// <summary>效果参数表（`Config/Tables/Effects/eff_*.tres`）。空 = 用 <c>StatusPresets.Fallback</c> 的代码内置值。</summary>

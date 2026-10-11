@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_skl_enemy_charger_charge_0"]
+script = ExtResource("2_param")
+Key = "ChargeSpeed"
+Value = 16.0
+Note = "冲锋速度"
+
+[sub_resource type="Resource" id="a_skl_enemy_charger_charge_0"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Melee", "Charge")
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_enemy_charger_charge"
+DisplayName = "冲锋"
+NodeName = "AbilityCharge"
+ClassHint = "ChargeAttackAbility"
+Aim = 0
+Windup = 0.7
+Recover = 0.6
+Enabled = true
+ApproachMinRange = 4.5
+ApproachMaxRange = 14.0
+Params = [SubResource("p_skl_enemy_charger_charge_0")]
+AttackParams = [SubResource("a_skl_enemy_charger_charge_0")]
+Note = "冲锋兵：MaxDistance 14 由单位行的攻击范围给。"

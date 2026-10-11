@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_skl_dash_0"]
+script = ExtResource("2_param")
+Key = "Distance"
+Value = 6.0
+Note = "位移距离（米）"
+
+[sub_resource type="Resource" id="p_skl_dash_1"]
+script = ExtResource("2_param")
+Key = "Duration"
+Value = 0.22
+Note = "位移过程时长"
+
+[sub_resource type="Resource" id="p_skl_dash_2"]
+script = ExtResource("2_param")
+Key = "InvulnerableTime"
+Value = 0.18
+Note = "位移中的无敌时间"
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_dash"
+DisplayName = "滑铲"
+NodeName = "AbilityDash"
+ClassHint = "DashAbility"
+InputAction = "dash"
+Aim = 0
+Cooldown = 1.2
+Windup = 0.3
+Recover = 0.3
+Enabled = true
+Params = [SubResource("p_skl_dash_0"), SubResource("p_skl_dash_1"), SubResource("p_skl_dash_2")]
+Note = "玩家技能 1（Q）：朝准星滑铲。伤害/间隔/范围/击退不在这一行 —— 由单位行（角色行）的攻击组说了算。"

@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_fast_melee_melee.tres" id="2_skl"]
 
 [resource]
 script = ExtResource("1_row")
@@ -22,4 +23,5 @@ Cost = 1
 Weight = 2.5
 MinElapsedSeconds = 0.0
 EliteChance = 0.0
+Skills = [ExtResource("2_skl")]
 Note = "脆而快：伤害低但间隔最短。数值来自 FastMelee.tscn + Main.tscn/SpawnFast。"

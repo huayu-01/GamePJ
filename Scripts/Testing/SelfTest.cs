@@ -527,7 +527,7 @@ public partial class SelfTest : Node
 				: $"配置表比对·武器：伤害 {weapon.Damage:0}（期望 24） 间隔 {weapon.FireInterval:0.##}（期望 0.26） 弹匣 {weapon.EffectiveMagazineSize}（期望 12） 装填 {weapon.ReloadTime:0.##}（期望 0.7） 散布 {weapon.SpreadDegrees:0.##}（期望 0.5） 击退 {weapon.Knockback:0.##}（期望 2.5） 暴击 {weapon.CritChance:0.##}（期望 0.15） 弹速 {weapon.ProjectileSpeed:0}（期望 90） 预瞄FOV {weapon.AimFov:0}（期望 55） 穿透 {weapon.BasePierce}（期望 0） 连发 {weapon.Automatic}（期望 False）");
 
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}（期望 3/3/1/10/9/5）");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}（期望 3/3/10/1/1/25/3/10/9/5）");
 
 		GameLog.Write("SelfTest",
 			$"配置表比对·节点表：进化层 {NodePlacement.LayerOf(RewardNodeKind.Evolution)}/波 {NodePlacement.WavesFor(RewardNodeKind.Evolution)}（期望 2/3） 强化层 {NodePlacement.LayerOf(RewardNodeKind.Enhancement)}/波 {NodePlacement.WavesFor(RewardNodeKind.Enhancement)}（期望 1/2） 恢复层 {NodePlacement.LayerOf(RewardNodeKind.Heal)}/波 {NodePlacement.WavesFor(RewardNodeKind.Heal)}（期望 0/1） 商店价目 {RewardService.ShopCost(0)}/{RewardService.ShopCost(1)}/{RewardService.ShopCost(2)}（期望 5/12/18） 标题 {RewardService.TitleFor(RewardNodeKind.Mutation)}（期望 异化池）");
@@ -571,7 +571,22 @@ public partial class SelfTest : Node
 		GameLog.Write("SelfTest",
 			chaser == null
 				? "配置表比对·敌人行：读不到 enemy_chaser（应回退到场景值）"
-				: $"配置表比对·敌人行 enemy_chaser：生命 {chaser.MaxHealth:0}（期望 60） 移速 {chaser.MoveSpeed:0.##}（期望 4.2） 攻击 {chaser.AttackDamage:0}（期望 12） 间隔 {chaser.AttackInterval:0.##}（期望 1.3） 射程 {chaser.AttackRange:0.##}（期望 2.3） 击退 {chaser.AttackKnockback:0.##}（期望 3） 标签 [{string.Join(",", chaser.Tags)}] 成本 {chaser.Cost}/权重 {chaser.Weight:0.##}");
+				: $"配置表比对·敌人行 enemy_chaser：生命 {chaser.MaxHealth:0}（期望 60） 移速 {chaser.MoveSpeed:0.##}（期望 4.2） 攻击 {chaser.AttackDamage:0}（期望 12） 间隔 {chaser.AttackInterval:0.##}（期望 1.3） 射程 {chaser.AttackRange:0.##}（期望 2.3） 击退 {chaser.AttackKnockback:0.##}（期望 3） 标签 [{string.Join(",", chaser.Tags)}] 成本 {chaser.Cost}/权重 {chaser.Weight:0.##} 持有技能 [{string.Join(",", System.Array.ConvertAll(chaser.Skills, s => s?.Id ?? "null"))}]");
+
+		// 技能表（阶段 3）：行数 + 首领强化的两套来源必须能分开。
+		ActRoguelike.Config.AbilityConfig? dashRow = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AbilityConfig>("skl_dash");
+		GameLog.Write("SelfTest",
+			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 25 = 5 玩家 + 16 单位 + 4 首领行为） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型 {ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型 {ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 3）");
+
+		// 玩家侧实测：技能行 + 角色行攻击组是否真的套上了（这条是"技能表接线"的硬证据）。
+		if (player != null)
+		{
+			ActRoguelike.Abilities.Ability? dash = player.GetNodeOrNull<ActRoguelike.Abilities.Ability>("AbilityDash");
+			ActRoguelike.Abilities.Ability? melee = player.GetNodeOrNull<ActRoguelike.Abilities.Ability>("AbilityMelee");
+			AttackHitbox? meleeHit = melee == null ? null : NodeSearch.FindInSubtree<AttackHitbox>(melee);
+			GameLog.Write("SelfTest",
+				$"技能表实测（玩家）：滑铲 冷却 {dash?.Cooldown:0.##}（期望 1.2） 位移 {(dash == null ? 0f : dash.Get("Distance").AsSingle()):0.##}（期望 6） AbilityId {dash?.AbilityId}（期望 skl_dash） ｜ 近战 伤害 {meleeHit?.Damage:0}（期望 32，来自角色行攻击组） 间隔 {melee?.Cooldown:0.##}（期望 0.75，证明技能行的 0 = 不覆盖） 射程 {(melee == null ? 0f : melee.Get("AttackRange").AsSingle()):0.##}（期望 2.4） 击退 {meleeHit?.Knockback:0.##}（期望 5） 命中标签 [{string.Join(",", meleeHit?.AttackTags ?? System.Array.Empty<string>())}]（期望 Melee,Heavy）");
+		}
 	}
 
 	private static void ReportCombat(StageController? stage)

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="SummonConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/SummonConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_drone_melee.tres" id="2_skl"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "summon_drone"
+Slot = 1
+DisplayName = "无人机"
+ScenePath = "res://Scenes/Summons/Drone.tscn"
+Tags = PackedStringArray("Summon")
+MaxHealth = 40.0
+MaxArmor = 0.0
+ArmorDamageReduction = 0.3
+KnockbackResistance = 0.0
+MoveSpeed = 6.0
+AttackDamage = 6.0
+AttackInterval = 0.9
+AttackRange = 1.8
+AttackKnockback = 1.5
+LifetimeSeconds = 25.0
+Skills = [ExtResource("2_skl")]
+Note = "数值逐条抄自 Drone.tscn（含 Lifetime 节点的 25 秒）。Tags 里的 Summon 决定它进 summon_units 组、不被敌人当成目标。"

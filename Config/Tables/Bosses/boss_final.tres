@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BossConfig" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/BossConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_melee.tres" id="2_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_scream.tres" id="3_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_charge.tres" id="4_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_boss_summon.tres" id="5_skl"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "boss_final"
+Slot = 1
+DisplayName = "最终首领"
+ScenePath = "res://Scenes/Enemies/Boss.tscn"
+Tags = PackedStringArray("Boss", "Melee")
+MaxHealth = 900.0
+MaxArmor = 200.0
+ArmorDamageReduction = 0.3
+KnockbackResistance = 1.0
+MoveSpeed = 3.6
+AttackDamage = 24.0
+AttackInterval = 1.8
+AttackRange = 3.4
+AttackKnockback = 6.0
+EliteCopyHealthScale = 0.35
+Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("4_skl"), ExtResource("5_skl")]
+Note = "数值逐条抄自 Boss.tscn 的 Unit / AbilityMelee / 命中体。EliteCopyHealthScale = 白板首领副本的血量倍率（取代 Balance.tres 里那份没有消费者的 EliteBossHealthScale）。Boss 的冲锋/尖啸/召唤的冷却与专属参数在对应的技能行里。"

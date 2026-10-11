@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="a_skl_boss_melee_0"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Melee", "Heavy")
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_boss_melee"
+DisplayName = "首领挥击"
+NodeName = "AbilityMelee"
+ClassHint = "MeleeAttackAbility"
+Aim = 0
+Windup = 0.55
+Recover = 0.5
+Enabled = true
+AttackParams = [SubResource("a_skl_boss_melee_0")]
+Note = "Boss 主攻击：伤害 24 / 间隔 1.8 / 射程 3.4 / 击退 6 在 boss_final 行。"

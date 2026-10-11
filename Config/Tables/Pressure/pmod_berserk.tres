@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="PressureModConfig" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/PressureModConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="2_stat"]
+
+[sub_resource type="Resource" id="m_pmod_berserk_0"]
+script = ExtResource("2_stat")
+Stat = "DamageMultiplier"
+Operation = 1
+Value = 1.25
+
+[sub_resource type="Resource" id="m_pmod_berserk_1"]
+script = ExtResource("2_stat")
+Stat = "AttackSpeedMultiplier"
+Operation = 1
+Value = 1.2
+
+[resource]
+script = ExtResource("1_row")
+Id = "pmod_berserk"
+DisplayName = "狂暴"
+DescriptionTemplate = "伤害 +25%，攻速 +20%"
+Weight = 1.0
+Modifiers = [SubResource("m_pmod_berserk_0"), SubResource("m_pmod_berserk_1")]
+Note = "数值型强化（Boss Pressure 池）：只改乘区，不挂任何行为/技能 —— 与 Boss Build 严格分离（关卡核心文档 §7.1）。"

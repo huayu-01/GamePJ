@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_enemy_guard_melee.tres" id="2_skl"]
 
 [resource]
 script = ExtResource("1_row")
@@ -22,4 +23,5 @@ Cost = 3
 Weight = 1.2
 MinElapsedSeconds = 0.0
 EliteChance = 0.2
+Skills = [ExtResource("2_skl")]
 Note = "重甲：护甲 60 + 护甲减伤 0.35 + 击退抗性 0.85，还带正面格挡（Block 节点，不在表里）。精英率 0.2。"

@@ -59,6 +59,10 @@ public partial class Balance : Node
 		ConfigRows.Rebuild(Config.Weapons);
 		ConfigRows.Rebuild(Config.Characters);
 		ConfigRows.Rebuild(Config.Enemies);
+		ConfigRows.Rebuild(Config.Bosses);
+		ConfigRows.Rebuild(Config.Summons);
+		ConfigRows.Rebuild(Config.Skills);
+		ConfigRows.Rebuild(Config.PressureMods);
 		ConfigRows.Rebuild(Config.Effects);
 		ConfigRows.Rebuild(Config.Nodes);
 		ConfigRows.Rebuild(Config.Upgrades);
@@ -72,6 +76,10 @@ public partial class Balance : Node
 
 		// 增幅项要编译成运行期目录（表优先、代码内置兜底），编译结果与来源写在日志里。
 		ActRoguelike.Rewards.RewardTable.Build(Config.Upgrades);
+
+		// 首领强化：数值型（Pressure 表）与行为型（技能表里 ApplyHandler 非空的行）分别编译，
+		// 两者必须能按来源分开（关卡核心文档 §7.1）。
+		ActRoguelike.Boss.BossPerkCatalog.Build(Config.Skills, Config.PressureMods);
 
 		// 关卡行里的敌人白名单按**敌人表的行 Id** 匹配：未知 Id 在这里一次性报出来，
 		// 不让它变成"这一关静默少了几种敌人"（旧实现按中文显示名匹配，改文案就静默失效）。
@@ -96,7 +104,7 @@ public partial class Balance : Node
 
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
-			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
+			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
 	}
 
 	/// <summary>

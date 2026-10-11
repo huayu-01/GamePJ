@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PressureModConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/PressureModConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="2_stat"]
+
+[sub_resource type="Resource" id="m_pmod_swift_0"]
+script = ExtResource("2_stat")
+Stat = "MoveSpeedMultiplier"
+Operation = 1
+Value = 1.35
+
+[resource]
+script = ExtResource("1_row")
+Id = "pmod_swift"
+DisplayName = "疾行"
+DescriptionTemplate = "移速 +35%"
+Weight = 1.0
+Modifiers = [SubResource("m_pmod_swift_0")]
+Note = "数值型强化（Boss Pressure 池）。"

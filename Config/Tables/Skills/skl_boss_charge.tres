@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_skl_boss_charge_0"]
+script = ExtResource("2_param")
+Key = "ChargeSpeed"
+Value = 18.0
+Note = "冲锋速度"
+
+[sub_resource type="Resource" id="p_skl_boss_charge_1"]
+script = ExtResource("2_param")
+Key = "MaxDistance"
+Value = 18.0
+Note = "最远冲锋距离"
+
+[sub_resource type="Resource" id="a_skl_boss_charge_0"]
+script = ExtResource("2_param")
+Key = "Damage"
+Value = 20.0
+Note = "伤害"
+
+[sub_resource type="Resource" id="a_skl_boss_charge_1"]
+script = ExtResource("2_param")
+Key = "Knockback"
+Value = 10.0
+Note = "击退"
+
+[sub_resource type="Resource" id="a_skl_boss_charge_2"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Melee", "Charge")
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_boss_charge"
+DisplayName = "首领冲锋"
+NodeName = "AbilityCharge"
+ClassHint = "ChargeAttackAbility"
+Aim = 0
+Cooldown = 7.0
+Windup = 0.6
+Recover = 0.7
+Enabled = false
+ApproachMinRange = 5.0
+ApproachMaxRange = 16.0
+Params = [SubResource("p_skl_boss_charge_0"), SubResource("p_skl_boss_charge_1")]
+AttackParams = [SubResource("a_skl_boss_charge_0"), SubResource("a_skl_boss_charge_1"), SubResource("a_skl_boss_charge_2")]
+Note = "Boss 阶段 2 解锁，也可以被「冲锋强化」词条开场解锁。"

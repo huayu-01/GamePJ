@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_skl_enemy_elite_buff_0"]
+script = ExtResource("2_param")
+Key = "Radius"
+Value = 11.0
+Note = "光环半径"
+
+[sub_resource type="Resource" id="p_skl_enemy_elite_buff_1"]
+script = ExtResource("2_param")
+Key = "BuffDuration"
+Value = 5.0
+Note = "增益时长"
+
+[sub_resource type="Resource" id="p_skl_enemy_elite_buff_2"]
+script = ExtResource("2_param")
+Key = "StatusId"
+Value = "Empowered"
+Note = "挂的状态"
+
+[sub_resource type="Resource" id="p_skl_enemy_elite_buff_3"]
+script = ExtResource("2_param")
+Key = "IncludeSelf"
+Value = true
+Note = "是否包括自己"
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_enemy_elite_buff"
+DisplayName = "增益光环"
+NodeName = "AbilityBuff"
+ClassHint = "BuffAlliesAbility"
+Aim = 0
+Cooldown = 5.5
+Windup = 0.4
+Recover = 0.3
+Enabled = true
+Params = [SubResource("p_skl_enemy_elite_buff_0"), SubResource("p_skl_enemy_elite_buff_1"), SubResource("p_skl_enemy_elite_buff_2"), SubResource("p_skl_enemy_elite_buff_3")]
+Note = "技能精英：给半径内友军挂 Empowered。"

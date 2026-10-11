@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="a_skl_drone_melee_0"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Melee")
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_drone_melee"
+DisplayName = "无人机点射"
+NodeName = "AbilityMelee"
+ClassHint = "MeleeAttackAbility"
+Aim = 0
+Windup = 0.15
+Recover = 0.2
+Enabled = true
+AttackParams = [SubResource("a_skl_drone_melee_0")]
+Note = "无人机：伤害 6 / 间隔 0.9 / 射程 1.8 / 击退 1.5 在 drone 行。"

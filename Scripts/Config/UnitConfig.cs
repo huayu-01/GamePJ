@@ -112,16 +112,17 @@ public abstract partial class UnitConfig : ConfigRow
 			unit.Tags = Tags;
 		}
 
-		ApplyAttack(unit);
-		ApplySkills(unit);
+		ApplyAttackTo(unit);
+		ApplySkillsTo(unit);
 		ApplyModel(unit);
 	}
 
 	/// <summary>
 	/// 攻击组 → 单位的**主攻击**：子树里第一个"带命中体、或带武器组件"的能力。
 	/// 每个字段单独判 0（0 = 不覆盖），所以"只调间隔不调伤害"不会把伤害写成 0。
+	/// 玩家侧由 <c>RunController.ApplyBalance</c> 直接调用（角色行的攻击组就是近战重击的四个数）。
 	/// </summary>
-	private void ApplyAttack(Unit unit)
+	public void ApplyAttackTo(Unit unit)
 	{
 		if (AttackDamage <= 0f && AttackInterval <= 0f && AttackRange <= 0f && AttackKnockback <= 0f)
 		{
@@ -175,8 +176,9 @@ public abstract partial class UnitConfig : ConfigRow
 	/// <summary>
 	/// 持有技能 → 按 <see cref="AbilityConfig.NodeName"/> 在单位子树里找到对应能力并套用参数。
 	/// 行读不到 / 节点找不到时**跳过那一行**，能力保留场景里的值。
+	/// 玩家侧由 <c>RunController.ApplyBalance</c> 调用（角色行的"持有技能"指向技能表）。
 	/// </summary>
-	private void ApplySkills(Unit unit)
+	public void ApplySkillsTo(Unit unit)
 	{
 		foreach (AbilityConfig skill in Skills)
 		{

@@ -1,4 +1,5 @@
 using ActRoguelike.Abilities;
+using ActRoguelike.Combat;
 using Godot;
 
 namespace ActRoguelike.Config;
@@ -53,6 +54,16 @@ public partial class AbilityConfig : ConfigRow
 	[Export] public float ApproachMinRange { get; set; } = -1f;
 
 	[Export] public float ApproachMaxRange { get; set; } = -1f;
+
+	[ExportGroup("命中体参数（这个技能的命中体属性：Damage/Knockback/StatusId/AttackTags…）")]
+	/// <summary>
+	/// 套到**这个技能自己的命中体**上（<c>AttackHitbox</c>；没有命中体时退到武器组件，远程兵走这条）。
+	/// 与 <see cref="ConfigRow.Params"/> 分开，是因为它们作用在两个不同的对象上：
+	/// 能力节点（<c>Cooldown</c>/<c>TriggerRadius</c>…）与它下面的命中体（<c>Damage</c>/<c>StatusId</c>…）。
+	/// 这里**逐条照写**（不像单位的攻击组那样用 0 当"不覆盖"）：列出来的就是权威值。
+	/// 主攻击的伤害/击退由单位行的攻击组统一给（避免两个真源），这里填的是剩下的那些。
+	/// </summary>
+	[Export] public ParamEntry[] AttackParams { get; set; } = System.Array.Empty<ParamEntry>();
 
 	[ExportGroup("首领行为词条（Boss Build；这两列只有词条行用）")]
 	/// <summary>
@@ -118,6 +129,41 @@ public partial class AbilityConfig : ConfigRow
 			}
 
 			ability.Set(entry.Key, entry.Value);
+		}
+
+		ApplyAttackParams(ability);
+	}
+
+	/// <summary>命中体参数 → 这个技能的命中体（没有命中体时退到武器组件）。</summary>
+	private void ApplyAttackParams(Ability ability)
+	{
+		if (AttackParams.Length == 0)
+		{
+			return;
+		}
+
+		Node? strike = (Node?)NodeSearch.FindInSubtree<AttackHitbox>(ability)
+			?? NodeSearch.FindInSubtree<Weapons.Weapon>(ability);
+		if (strike == null)
+		{
+			GD.PushWarning($"[AbilityConfig] {Id} 填了命中体参数，但 {ability.Name} 下面既没有命中体也没有武器组件，已跳过。");
+			return;
+		}
+
+		foreach (ParamEntry entry in AttackParams)
+		{
+			if (string.IsNullOrEmpty(entry.Key))
+			{
+				continue;
+			}
+
+			if (strike.Get(entry.Key).VariantType == Variant.Type.Nil)
+			{
+				GD.PushWarning($"[AbilityConfig] {Id} 的命中体参数 {entry.Key} 在 {strike.GetType().Name} 上不存在，已跳过。");
+				continue;
+			}
+
+			strike.Set(entry.Key, entry.Value);
 		}
 	}
 

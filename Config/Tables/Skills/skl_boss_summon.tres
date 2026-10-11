@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Chaser.tscn" id="3_scene"]
+
+[sub_resource type="Resource" id="p_skl_boss_summon_0"]
+script = ExtResource("2_param")
+Key = "Count"
+Value = 3
+Note = "一次召唤几个"
+
+[sub_resource type="Resource" id="p_skl_boss_summon_1"]
+script = ExtResource("2_param")
+Key = "Radius"
+Value = 6.0
+Note = "召唤落点半径"
+
+[sub_resource type="Resource" id="p_skl_boss_summon_2"]
+script = ExtResource("2_param")
+Key = "SummonScene"
+Value = ExtResource("3_scene")
+Note = "召唤物预制体"
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_boss_summon"
+DisplayName = "召唤增援"
+NodeName = "AbilitySummon"
+ClassHint = "SummonAbility"
+Aim = 0
+Cooldown = 14.0
+Windup = 0.6
+Recover = 0.4
+Enabled = false
+Params = [SubResource("p_skl_boss_summon_0"), SubResource("p_skl_boss_summon_1"), SubResource("p_skl_boss_summon_2")]
+Note = "Boss 阶段 3 解锁；MaxAlive 留空 = 不限（与玩家的 3 架不同）。"

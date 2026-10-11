@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="a_skl_melee_0"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Melee", "Heavy")
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_melee"
+DisplayName = "近战重击"
+NodeName = "AbilityMelee"
+ClassHint = "MeleeAttackAbility"
+Aim = 0
+Windup = 0.18
+Recover = 0.25
+Enabled = false
+AttackParams = [SubResource("a_skl_melee_0")]
+Note = "玩家近战（近战重装专用）：Cooldown 留空 = 不覆盖，伤害/间隔/范围/击退在角色行的攻击组里。"

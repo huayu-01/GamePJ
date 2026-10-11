@@ -55,6 +55,11 @@ public partial class SummonAbility : Ability
 		for (int i = 0; i < Count; i++)
 		{
 			var summoned = SummonScene.Instantiate<Unit>();
+
+			// 召唤物表（`Config/Tables/Summons/summon_*.tres`）：生命/移速/攻击/持有技能/存活时间。
+			// 与敌人一样，必须在 `Unit._EnterTree` 之前套用（AddChild 触发 _EnterTree 捕获基础值）。
+			ActRoguelike.Config.ConfigRows.ByScenePath<ActRoguelike.Config.SummonConfig>(SummonScene.ResourcePath)?.ApplyTo(summoned);
+
 			parent.AddChild(summoned);
 			float angle = Mathf.Tau * i / Mathf.Max(1, Count);
 			summoned.GlobalPosition = OwnerUnit.GlobalPosition + new Vector3(Mathf.Cos(angle) * Radius, 0.6f, Mathf.Sin(angle) * Radius);

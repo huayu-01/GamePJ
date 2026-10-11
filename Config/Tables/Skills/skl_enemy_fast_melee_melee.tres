@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="a_skl_enemy_fast_melee_melee_0"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Melee")
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_enemy_fast_melee_melee"
+DisplayName = "快速挥砍"
+NodeName = "AbilityMelee"
+ClassHint = "MeleeAttackAbility"
+Aim = 0
+Windup = 0.22
+Recover = 0.2
+Enabled = true
+AttackParams = [SubResource("a_skl_enemy_fast_melee_melee_0")]
+Note = "快速近战：前摇/后摇最短。"

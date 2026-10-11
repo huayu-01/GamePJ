@@ -660,13 +660,18 @@ public partial class EncounterController : Node3D
 		}
 
 		_eliteBoss = EliteBossScene.Instantiate<Unit>();
+		BossRow(EliteBossScene)?.ApplyTo(_eliteBoss);
 		AddChild(_eliteBoss);
 		_eliteBoss.GlobalPosition = SpawnPlanner.FindSpawnPoint(_player?.GlobalPosition ?? GlobalPosition, MinSpawnDistance, SpawnRadius);
+
+		// 血量倍率优先读首领行（`Config/Tables/Bosses/boss_*.tres` 的 EliteCopyHealthScale），
+		// 读不到才用场景导出值 —— 以前 `Balance.tres` 里有一份**没有消费者**的同名副本，改了不起作用。
+		float eliteScale = BossRow(EliteBossScene)?.EliteCopyHealthScale ?? EliteBossHealthScale;
 		_eliteBoss.Stats.AddModifier(new StatModifier
 		{
 			Stat = "MaxHealthMultiplier",
 			Operation = ModifierOperation.Multiply,
-			Value = EliteBossHealthScale,
+			Value = eliteScale,
 			Source = this,
 		});
 		_eliteBoss.RefreshStats();
@@ -674,8 +679,12 @@ public partial class EncounterController : Node3D
 		_spawned.Add(_eliteBoss);
 		AliveCount++;
 		TotalSpawned++;
-		ActRoguelike.Core.GameLog.Write("Spawn", $"白板首领降临（血量倍率 {EliteBossHealthScale:0.##}，无压力 / 无词条）");
+		ActRoguelike.Core.GameLog.Write("Spawn", $"白板首领降临（血量倍率 {eliteScale:0.##}（来源：{(BossRow(EliteBossScene) != null ? "表 boss_final" : "场景导出值")}），无压力 / 无词条）");
 	}
+
+	/// <summary>预制体 → 首领表的行（按 <c>ScenePath</c> 配对；读不到 → null，调用方回退到场景里的值）。</summary>
+	private static BossConfig? BossRow(PackedScene scene)
+		=> ConfigRows.ByScenePath<BossConfig>(scene.ResourcePath);
 
 	public void SpawnBossNow()
 	{
@@ -689,6 +698,9 @@ public partial class EncounterController : Node3D
 		Vector3 center = _player != null && IsInstanceValid(_player) ? _player.GlobalPosition : GlobalPosition;
 
 		Boss = BossScene.Instantiate<Unit>();
+		// 单位表（`Config/Tables/Bosses/boss_*.tres`）：生命/护甲/移速/攻击/持有技能/标签。
+		// 与敌人一样，必须在 `Unit._EnterTree` 之前套用（先 ApplyTo、再 AddChild）。
+		BossRow(BossScene)?.ApplyTo(Boss);
 		parent.AddChild(Boss);
 		Boss.GlobalPosition = center + new Vector3(-BossSpawnDistance, 0.6f, 0f);
 		Balance.ScaleEnemy(Boss, this, true);

@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="PackedScene" path="res://Scenes/Summons/Drone.tscn" id="3_scene"]
+
+[sub_resource type="Resource" id="p_skl_summon_0"]
+script = ExtResource("2_param")
+Key = "Count"
+Value = 1
+Note = "一次召唤几架"
+
+[sub_resource type="Resource" id="p_skl_summon_1"]
+script = ExtResource("2_param")
+Key = "Radius"
+Value = 2.5
+Note = "召唤落点半径"
+
+[sub_resource type="Resource" id="p_skl_summon_2"]
+script = ExtResource("2_param")
+Key = "MaxAlive"
+Value = 3
+Note = "场上同时存在的上限"
+
+[sub_resource type="Resource" id="p_skl_summon_3"]
+script = ExtResource("2_param")
+Key = "SummonScene"
+Value = ExtResource("3_scene")
+Note = "召唤物预制体"
+
+[resource]
+script = ExtResource("1_row")
+Id = "skl_summon"
+DisplayName = "召唤无人机"
+NodeName = "AbilitySummon"
+ClassHint = "SummonAbility"
+InputAction = "summon"
+Aim = 0
+Cooldown = 5.0
+Windup = 0.25
+Recover = 0.25
+Enabled = false
+Params = [SubResource("p_skl_summon_0"), SubResource("p_skl_summon_1"), SubResource("p_skl_summon_2"), SubResource("p_skl_summon_3")]
+Note = "玩家技能（召唤控制专用，G）：召唤 Drone.tscn。"

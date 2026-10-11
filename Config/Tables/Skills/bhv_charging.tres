@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="AbilityConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_bhv_charging_0"]
+script = ExtResource("2_param")
+Key = "NodeName"
+Value = "AbilityCharge"
+Note = "要开场启用的能力节点"
+
+[resource]
+script = ExtResource("1_row")
+Id = "bhv_charging"
+DisplayName = "冲锋强化"
+Aim = 0
+Windup = 0.3
+Recover = 0.3
+Enabled = true
+Params = [SubResource("p_bhv_charging_0")]
+ApplyHandler = "EnableAbility"
+Weight = 1.0
+Note = "行为型词条（Boss Build）：开场就会冲锋。"
