@@ -23,3 +23,7 @@ _art_staging/
 .run_ai_*
 .ai_*
 
+
+# --- 编辑器插件的会话状态（每次打开都会变，不该入库）---
+addons/resources_spreadsheet_view/saved_state.json
+
