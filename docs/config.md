@@ -26,7 +26,7 @@
 | 增幅项（19 条强化·进化·异化） | `Config/Tables/Upgrades/*.tres` | 一条增幅 | 19 |
 | 关卡（预算 / 波次 / 敌人白名单 / Boss 词条数 / Pressure 规则） | `Config/Tables/Stages/stg_*.tres` | 一关 | 3 |
 | 局外成长（碎片价格 / 每级效果） | `Config/Tables/Meta/meta_*.tres` | 一项 | 5 |
-| **全局开关**（敌人/Boss 倍率、节奏、Boss 压力曲线、伤害跳字、血条、节点间距、区域杀高度） | **`Config/Balance.tres`**（还在原地） | — | 28 个字段 |
+| **全局开关**（敌人/Boss 倍率、节奏、Boss 压力曲线、伤害跳字、血条、节点间距、区域杀高度） | **`Config/Balance.tres`**（还在原地） | — | 30 个字段 |
 
 - **改完要重新运行游戏才生效**（数值在开局一次性应用，不热重载）。
 - 两种改法都行：Godot 编辑器里双击 `.tres` 用 Inspector 改（有中文分组），或直接用文本编辑器改。

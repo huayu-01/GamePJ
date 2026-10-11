@@ -2414,7 +2414,7 @@ public WeaponFieldMask Overrides { get; set; } = WeaponFieldMask.All;
 | ✅ **同时是 12 张表的索引持有者** | 11 个 `[Export] XxxConfig[]` 数组 + 既有的 `Stages`，元素全部是独立 `ExtResource`：<br>`Stages` / `Weapons` / `Characters` / `Enemies` / **`Bosses`** / **`Summons`** / **`Skills`** / **`PressureMods`** / `Effects` / `Nodes` / `Upgrades` / `MetaUpgrades`（阶段 3 新增的 4 个加粗） |
 | ⏸ **没有**把索引分散到各系统 | **理由**：① 分散会造出 12 个"谁持有哪张表"的新约定，[architecture.md](architecture.md):134「加新全局入口前先问：能不能传参」的精神是**少入口**；② `ConfigRows` 是一个静态索引器，谁来 `Rebuild` 都一样，而现在只有 `Balance._Ready` 一处；③ **回退语义要能一眼看出"整份配置有没有加载上"** —— `Balance.FileLoaded` 已经是那个开关，分散后它会失去意义 |
 | 顺序依赖 | `Balance._Ready` → `CallDeferred(BuildTableIndex)`（**必须 defer**，见 §5 阶段 2 的坑 1）→ `ConfigRows.Rebuild(...)` ×11 + `SetKind` ×9 + `RewardTable.Build` + `BossPerkCatalog.Build(Config.Skills, Config.PressureMods)` + 关卡白名单校验（未知 Id 写警告） |
-| `BalanceConfig` 的标量字段 | **28 个**（阶段 2 之后 30 个，阶段 3 删掉两个死字段 `EliteBossHealthScale` / `BossHealthBarScale`） |
+| `BalanceConfig` 的标量字段 | **30 个**（标量；另有 12 个表索引数组。阶段 3 删掉两个死字段 `EliteBossHealthScale` / `BossHealthBarScale`） |
 
 ### 8.2 读表 / 回退的固定写法（新代码照抄）
 
