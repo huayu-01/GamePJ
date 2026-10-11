@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PressureModConfig" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/PressureModConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_pmod_summon_haste_0"]
+script = ExtResource("2_param")
+Key = "Cooldown"
+Value = 0.75
+Note = "召唤冷却的倍率（14 秒 → 10.5 秒 = 增援来得更密）"
+
+[resource]
+script = ExtResource("1_row")
+Id = "pmod_summon_haste"
+DisplayName = "召唤急速"
+DescriptionTemplate = "召唤冷却 ×0.75（14 秒 → 10.5 秒）"
+Weight = 1.0
+Tags = PackedStringArray("Defense", "Skill")
+BossIds = PackedStringArray("boss_final")
+AbilityNode = "AbilitySummon"
+AbilityScales = [SubResource("p_pmod_summon_haste_0")]
+Note = "**技能参数词条**（数值型，§7.5）：只改召唤的**冷却**，不改 Count（召唤几个）—— Count 是整数属性，乘算会被隐式截断（3×1.5 = 4.5 → 4），不如换成冷却来得干净、且叠乘语义明确（14 → 10.5 → 7.875）。召唤要到阶段 3（或被「召唤师」词条提前）才解锁，所以它同样是「潜伏型」强化。限定词同 pmod_scream_echo。权重 1。"

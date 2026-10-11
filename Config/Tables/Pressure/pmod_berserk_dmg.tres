@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PressureModConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/PressureModConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="2_stat"]
+
+[sub_resource type="Resource" id="m_pmod_berserk_dmg_0"]
+script = ExtResource("2_stat")
+Stat = "DamageMultiplier"
+Operation = 1
+Value = 1.25
+
+[resource]
+script = ExtResource("1_row")
+Id = "pmod_berserk_dmg"
+DisplayName = "狂暴·伤害"
+DescriptionTemplate = "伤害 ×1.25"
+Weight = 3.0
+Tags = PackedStringArray("Offense")
+Modifiers = [SubResource("m_pmod_berserk_dmg_0")]
+Note = "数值型强化（Boss Pressure 池）：只改乘区，不挂任何行为/技能 —— 与 Boss Build 严格分离（关卡核心文档 §7.1）。原 pmod_berserk（伤害+攻速两条参数挤在一栏）拆开后的**伤害那一栏**：效果值 1.25 与拆分前逐位一致，所以「同一栏抽到 3 次 = 伤害 ×1.25³ = 1.95」的叠乘语义**没变**（变的是：一抽只买一个参数了）。权重 3 = **继承母行权重、不均分**（母行 3 → 伤害栏 3 + 攻速栏 3，池内合计 12）：这样每条参数的概率（25%）都低于原母行（42.9%）、没有任何一条被凭空放大；权重总量守恒的是「母行」而不是「单参数」，见 docs/config.md 的「Pressure 词条拆分」一节。"

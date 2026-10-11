@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BalanceConfig" load_steps=107 format=3]
+[gd_resource type="Resource" script_class="BalanceConfig" load_steps=114 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/BalanceConfig.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -87,8 +87,6 @@
 [ext_resource type="Resource" path="res://Config/Tables/Skills/bhv_summoner.tres" id="86_bhv_summoner"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/bhv_screaming.tres" id="87_bhv_screaming"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/bhv_charging.tres" id="88_bhv_charging"]
-[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_berserk.tres" id="89_pmod_berserk"]
-[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_fortress.tres" id="90_pmod_fortress"]
 [ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_swift.tres" id="91_pmod_swift"]
 [ext_resource type="Resource" path="res://Config/Tables/Bosses/boss_final.tres" id="92_boss_final"]
 [ext_resource type="Resource" path="res://Config/Tables/Summons/summon_drone.tres" id="93_summon_drone"]
@@ -106,6 +104,13 @@
 [ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_skill_elite.tres" id="105_ai_skill_elite"]
 [ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_boss.tres" id="106_ai_boss"]
 [ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_drone.tres" id="107_ai_drone"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_berserk_dmg.tres" id="108_pmod_berserk_dmg"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_berserk_speed.tres" id="109_pmod_berserk_speed"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_fortress_hp.tres" id="110_pmod_fortress_hp"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_fortress_armor.tres" id="111_pmod_fortress_armor"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_scream_echo.tres" id="112_pmod_scream_echo"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_charge_impact.tres" id="113_pmod_charge_impact"]
+[ext_resource type="Resource" path="res://Config/Tables/Pressure/pmod_summon_haste.tres" id="114_pmod_summon_haste"]
 
 [resource]
 script = ExtResource("1_balance")
@@ -149,7 +154,7 @@ PressurePerPoint = 100
 FreeChallengeBaseQuota = 1
 FreeChallengeMaxQuota = 2
 Skills = [ExtResource("64_skl_dash"), ExtResource("65_skl_burst"), ExtResource("66_skl_melee"), ExtResource("67_skl_summon"), ExtResource("68_skl_control"), ExtResource("69_skl_enemy_chaser_melee"), ExtResource("70_skl_enemy_fast_melee_melee"), ExtResource("71_skl_enemy_exploder_blow"), ExtResource("72_skl_enemy_jumping_leap"), ExtResource("73_skl_enemy_ranged_shot"), ExtResource("74_skl_enemy_charger_charge"), ExtResource("75_skl_enemy_screamer_scream"), ExtResource("76_skl_enemy_guard_melee"), ExtResource("77_skl_enemy_elite_melee"), ExtResource("78_skl_enemy_elite_buff"), ExtResource("79_skl_enemy_elite_control"), ExtResource("80_skl_boss_melee"), ExtResource("81_skl_boss_scream"), ExtResource("82_skl_boss_charge"), ExtResource("83_skl_boss_summon"), ExtResource("84_skl_drone_melee"), ExtResource("85_bhv_awakened"), ExtResource("86_bhv_summoner"), ExtResource("87_bhv_screaming"), ExtResource("88_bhv_charging")]
-PressureMods = [ExtResource("89_pmod_berserk"), ExtResource("90_pmod_fortress"), ExtResource("91_pmod_swift")]
+PressureMods = [ExtResource("108_pmod_berserk_dmg"), ExtResource("109_pmod_berserk_speed"), ExtResource("110_pmod_fortress_hp"), ExtResource("111_pmod_fortress_armor"), ExtResource("91_pmod_swift"), ExtResource("112_pmod_scream_echo"), ExtResource("113_pmod_charge_impact"), ExtResource("114_pmod_summon_haste")]
 Bosses = [ExtResource("92_boss_final")]
 Summons = [ExtResource("93_summon_drone")]
 AiProfiles = [ExtResource("97_ai_chaser"), ExtResource("98_ai_fast_melee"), ExtResource("99_ai_exploder"), ExtResource("100_ai_jumping_melee"), ExtResource("101_ai_ranged"), ExtResource("102_ai_charger"), ExtResource("103_ai_screamer"), ExtResource("104_ai_guard"), ExtResource("105_ai_skill_elite"), ExtResource("106_ai_boss"), ExtResource("107_ai_drone")]

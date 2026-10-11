@@ -34,6 +34,13 @@
 >   `StageController.AddPressureForNode`；`StageDefinition.PressureUpgradeTags` 从"半活"变成真消费者；
 >   §7.3 的跨阈值改成**显式逐次循环**；**两个抽取点彻底分开**（Boss 开场词条只抽行为型 = Boss Build，
 >   Pressure 转换只抽数值型 = §7.5）。进度与实测见 **§5 阶段 6**。
+> - **阶段 7（2026-10，用户要求「3 条拆成 5 条 / 每个参数单独占一个词条栏 / 技能参数也进词条 / 限定词要刷新判定」）**：
+>   `Pressure/` 从 **3 行 → 8 行**（5 条数值型参数栏 + 3 条技能参数栏）；
+>   `PressureModConfig` 多 **5 列**（`AbilityNode` / `AbilityScales` / `AttackScales` = 技能参数，
+>   `BossIds` / `StageIds` = 限定词）；新增 `Scripts/Boss/PerkQualifier.cs`（限定词数据 + 判定）与
+>   `BossPerkCatalog.ApplyWithRefresh`（**在 Boss 出生时**判限定词、不成立就**换抽**）。
+>   **两个既有抽取点（`StageController` / `EncounterController`）一行都没改** —— 判定挂在 `perk.Apply` 里。
+>   进度、权重依据、强度换算与实测见 **§5 阶段 7** 与 [config.md](config.md) 的「配置表阶段 7 实测」。
 >
 > 🔗 **与 [config-tooling.md](config-tooling.md) 的分工**：那份文档回答"**用什么工具**批量编辑这些表"，结论是装 `Edit Resources as Table` 插件、**把文件夹当表、一行一个 `.tres` 文件**。
 > **这个形态是本文表格设计的硬约束** —— 本文的行布局（§2.3）与文件粒度取舍（§6.2）已经按它对齐：**每一行 = 独立的 `.tres` 文件，一个文件夹 = 一张表**。
@@ -1282,14 +1289,17 @@ public static StatusEffect? Create(string id, float duration)
 > |---|---|---|
 > | 一张表 `BossModifierConfig` + `Source` 枚举（"开局词条 / 节点触发 / 压力触发"三合一） | **两张表**：行为型 = `Config/Tables/Skills/bhv_*.tres`（`AbilityConfig.ApplyHandler` 非空，4 行）；数值型 = **`Config/Tables/Pressure/pmod_*.tres`**（`PressureModConfig`，3 行） | 用户拍板"**首领行为表本质也是一些技能**"—— 行为型直接并进技能表复用通用项 + `Params` + `AttackParams`；两种来源的字段本来就不一样（数值型只需要 `Modifiers`），`Source` 枚举因此**没加** |
 > | 目录 `Config/Tables/BossMods/`、索引 `BossModifiers` | 目录 `Pressure/`、索引 `BalanceConfig.PressureMods` | 与"压力"这个系统同名，少一层翻译 |
-> | 数值型字段 `TargetStat` + `Operation` + `Value`（标量） | `StatOverride[] Modifiers`（一行可改多项） | 狂暴要同时改伤害与攻速，标量表达不了；`StatOverride` 已在增幅项表验证过 |
+> | 数值型字段 `TargetStat` + `Operation` + `Value`（标量） | `StatOverride[] Modifiers`（一行可改多项） | 狂暴要同时改伤害与攻速，标量表达不了；`StatOverride` 已在增幅项表验证过。⚠️ **阶段 7 起一行只放一项**（用户要求"每个参数单独占一个词条栏"），`Modifiers` 现在每行只有 1 条 |
 > | `MaxLevel` / `Source` | **没加** | 无消费者（"不留不生效的列"纪律），§5 阶段 6 有说明 |
 > | 无 `Tags` | **加了 `Tags`** | §7.4/§7.5 要求"候选内容与适用规则可配"，`StageDefinition.PressureUpgradeTags` / `NodeConfig.BossModifierTags` 靠它生效 |
-> | `Weight` 与增幅项共用一套加权抽取 | ✅ 照原稿做了（`WeightedPick`，阶段 0 抽出公共工具） | 阶段 6 起**真的按权重抽**（有 30000 次实测） |
+> | `Weight` 与增幅项共用一套加权抽取 | ✅ 照原稿做了（`WeightedPick`，阶段 0 抽出公共工具） | 阶段 6 起**真的按权重抽**（有 30000 次实测）；阶段 7 起池子 **8 条**、权重 3/3/2/2/2/1/1/1 |
+> | 无"技能参数"列 | **阶段 7 加了 3 列**：`AbilityNode` + `AbilityScales` + `AttackScales` | §7.5 明列"技能冷却等参数"属**数值型**，所以技能参数进本表（不进 Boss Build）；`Value` 是**倍率**（乘在能力当前值上），保证"同一条抽两次继续叠乘" |
+> | 无"适用条件"字段 | **阶段 7 加了 2 列**：`BossIds` + `StageIds`（+ `AbilityNode` 隐含"必须有这个技能节点"） | 用户要求"限定词记得做好刷新判定"：判定在 **Boss 出生时**（`BossPerkCatalog.ApplyWithRefresh`），抽签时不判、不复用 |
 >
-> **两个抽取点（阶段 6 起）**：Boss 开场词条 `BossPerkCatalog.Roll()` 只抽**行为型**；Pressure 转换
-> `BossPerkCatalog.RollPressure(tags)` 只抽**数值型**（`Filters` 按 `Tags` 过滤、按 `Weight` 加权）。
-> 见 §5 阶段 6 与 [config.md](config.md) 的「配置表阶段 6 实测」。
+> **三个抽取/判定点（阶段 6/7）**：Boss 开场词条 `BossPerkCatalog.Roll()` 只抽**行为型**；Pressure 转换
+> `BossPerkCatalog.RollPressure(tags)` 只抽**数值型**（按 `Tags` 过滤、按 `Weight` 加权）；
+> **限定词判定** `BossPerkCatalog.ApplyWithRefresh(perk, context)` 在**首领出生时**跑（判不成立就换抽另一条）。
+> 见 §5 阶段 6 / §5 阶段 7 与 [config.md](config.md) 的「配置表阶段 6 / 7 实测」。
 
 **目录**：`Config/Tables/BossMods/boss_*.tres`（一行一个文件）；索引用 `Balance.tres` 上的 `[Export] BossModifierConfig[] BossModifiers`
 **替换**：`BossPerk.cs:33-117`（7 条词条 + 4 处十进制）**+** `StageController.AddPressureForNode()`（`StageController.cs:334-359`）里那段硬编码的节点 → 压力映射
@@ -2191,7 +2201,7 @@ public static string DescribePools()
 | `SummonConfig` | `UnitConfig` | `ScenePath` · `LifetimeSeconds` | `Summons/` **1** |
 | `CharacterConfig` | `UnitConfig` | 武器开关 / 能力开关矩阵 | `Characters/` **3** |
 | `AbilityConfig` | `ConfigRow` | 寻址（`NodeName` / `ClassHint`）· 通用项（`Aim` / `Cooldown` / `Windup` / `Recover` / `Enabled` / `Approach*`）· `Params`（子类专属）· `AttackParams`（命中体/武器组件）· `ApplyHandler` + `Weight`（**首领行为词条**用） | `Skills/` **25** |
-| `PressureModConfig` | `ConfigRow` | `Weight`（阶段 6 起真的加权）· **`Tags`**（阶段 6 新增：数值型候选的适用规则）· `Modifiers : StatOverride[]`（**只允许数值操作**） | `Pressure/` **3** |
+| `PressureModConfig` | `ConfigRow` | `Weight`（阶段 6 起真的加权）· **`Tags`**（阶段 6：数值型候选的适用规则）· `Modifiers : StatOverride[]`（**只允许数值操作**，阶段 7 起一行只放一项）· **`AbilityNode` + `AbilityScales` + `AttackScales`**（阶段 7：技能参数，`Value` = 倍率）· **`BossIds` + `StageIds`**（阶段 7：限定词，**Boss 出生时**判定） | `Pressure/` **8**（5 数值型参数栏 + 3 技能参数栏） |
 
 > 与 §3 的设计相比，落地时**砍掉了三列没有消费者的**（"不留让人误以为能调的列"）：
 > `UnitConfig.IconPath`（敌人/召唤物没有任何图标界面；首领头像是 `BarBoss.tscn` 的固定色块）、
@@ -2212,7 +2222,8 @@ public static string DescribePools()
 
 **首领强化的两套来源（关卡核心文档 §7.1）**：行为/技能型 = 技能表里 `ApplyHandler` 非空的 4 行
 （`bhv_awakened` / `bhv_summoner` / `bhv_screaming` / `bhv_charging`，由 `BossPerkCatalog` 的处理器注册表编译）；
-数值型 = `Pressure/` 的 3 行（`pmod_berserk` / `pmod_fortress` / `pmod_swift`）。
+数值型 = `Pressure/` 的 **8 行**（阶段 7 起：`pmod_berserk_dmg` / `pmod_berserk_speed` / `pmod_fortress_hp` /
+`pmod_fortress_armor` / `pmod_swift` / `pmod_scream_echo` / `pmod_charge_impact` / `pmod_summon_haste`）。
 两张表**分别编译、各自独立回退**（一侧读不到不会让另一侧变空）；`PressureOnly` / `BehaviorOnly`
 让两套来源可独立追踪。**没有**为 Pressure 加"可被玩家增幅修改"的接口（§7.2 明令禁止）。
 
@@ -2220,6 +2231,8 @@ public static string DescribePools()
 > `All` 现在**只是日志统计用**，不再是任何抽取点的候选集；
 > Boss 开场词条 `Roll()` **只抽行为型**（Boss Build），Pressure 转换 `RollPressure(tags)` **只抽数值型**（§7.5，加权 + 标签过滤）。
 > 所以**开场词条的结果会变**（候选 7 → 4），这是 §7.1 要求的分离；自测的 `+187.5 → 1` / `+225 → 3` 仍逐位不变。见 §5 阶段 6。
+> ✅ **阶段 7 追加第三个点**：`ApplyWithRefresh` 在**首领出生时**判限定词（`BossIds` / `StageIds` / 必须有技能节点），
+> 判不成立就换抽 —— 抽签（`RollPressure`）**不判**限定词，因为那时首领还不存在。见 §5 阶段 7。
 
 **顺手修掉的既有问题**（详见 [config-tables-inventory.md](config-tables-inventory.md) §5）：
 
@@ -2348,6 +2361,50 @@ AbilityId skl_dash ｜ 近战 伤害 32 间隔 0.75 射程 2.4 击退 5 命中�
 >    现在转换的产出是"抽一条数值强化套到 Boss 身上"，两头都算就是重复计。**需要一轮平衡测试**。
 >
 > ⚠️ **未做（第八章范围，已记录）**：§8.2 的"免费挑战不加 Pressure"闸门没接，免费挑战目前也会累积 Pressure。
+> （⏩ 后续补记：**该闸门已在 2026-10 接上**，见 [config.md](config.md) 的「免费挑战额度（§8.2）」一节。）
+
+### 阶段 7：Pressure 词条"一参数一栏" + 技能参数入池 + 限定词刷新判定 ✅ **已完成（2026-10）**
+
+> **需求**（用户原话）：「词条我这里只看到了 3 条，`Pressure/` 里的，不过这三条应该**拆成 5 条**的，
+> **每个参数单独占一个词条栏**。如果可以的话**把一些技能的参数也加入词条里**
+> （尽管每个 boss 可能都不同，**限定词记得做好刷新判定**）」
+> 详细实测 / 权重依据 / 强度换算 / 回退验证见 [config.md](config.md) 的「配置表阶段 7 实测」。
+>
+> | 变化 | 文件 |
+> |---|---|
+> | `Pressure/` **3 行 → 8 行**：`pmod_berserk` → `pmod_berserk_dmg` + `pmod_berserk_speed`；`pmod_fortress` → `pmod_fortress_hp` + `pmod_fortress_armor`；`pmod_swift` 不变；新增 3 条技能参数行 | `Config/Tables/Pressure/*.tres`（8 个行文件） |
+> | `PressureModConfig` 新增 **5 列**：`AbilityNode`（目标技能节点）· `AbilityScales`（能力节点参数倍率）· `AttackScales`（命中体参数倍率）· `BossIds` / `StageIds`（限定词） | `Scripts/Config/PressureModConfig.cs` |
+> | 新增 **`PerkQualifier`**：限定词数据 + `FailedReason(context)`（**每次调用现算，没有任何缓存字段**）+ 首领/关卡身份解析（单位行 Id 优先） | `Scripts/Boss/PerkQualifier.cs`（新文件） |
+> | `BossPerk` 拆成 **`Effect`（效果本体）+ `Apply`（入口 = 先判限定词）**；新增 `AsRolled(tags)`（抽签副本，带 `RollTags`）/ `MarkRedrawn()`（把名字改写成 `原→实际生效`） | `Scripts/Boss/BossPerk.cs` |
+> | 新增 **`BossPerkCatalog.ApplyWithRefresh`**：**Boss 出生时**判限定词 → 成立就生效、不成立就**换抽**同标签池的另一条（循环上界 = 池大小，不死循环）、全判过就只写日志 | `Scripts/Boss/BossPerk.cs` |
+> | `RollPressure(tags)` 改为返回**带标签的副本**（换抽要用同一组标签；也避免改写共享的编译期实例）；新增私有 `RollPressureExcept(tags, excludeIds)` | `Scripts/Boss/BossPerk.cs` |
+> | 代码兜底 `FallbackPressure` **3 条 → 8 条**（与表同 Id / 权重 / 限定词 / 效果），照 `ScaleAbility` / `ScaleHitbox` 走同一条效果路径 | `Scripts/Boss/BossPerk.cs` |
+> | 数值池的**行为型护栏**：技能参数想写 `Enabled` / `ApplyHandler` / `NodeName` → 警告并跳过（§7.1 边界） | `Scripts/Boss/BossPerk.cs` |
+> | 自测探针（池明细 / 技能参数叠乘 / 同一条词条两次判定 / 换抽实测 / 关卡限定 / 端到端 3 次出生） | `Scripts/Boss/BossPerkProbe.cs`（新文件）+ `SelfTest.ReportTables` 一行调用 |
+> | `Balance.tres`：7 条新行文件的 `[ext_resource]`（id 108–114）+ `PressureMods` 数组改指 8 条；`pmod_berserk.tres` / `pmod_fortress.tres` 与它们的 ext_resource 一起删除 | `Config/Balance.tres` |
+>
+> **拆分依据（简述，完整算式见 config.md）**：
+> 权重 = **继承母行**（3、3、2、2、2）而不是均分 —— 每个老参数的概率**一律**变成原来的 7/15 = 46.7%，没人被单独放大；
+> 技能型每条给 **1**（合计 20% 权重，数值型仍占 80%）。单条数值**一个都没动**（1.25/1.2/1.4/+150/1.35 逐字相同）。
+> 代价（**必须知道**）：一抽只买一个参数 → 每抽期望强度 = 原来的 **58.9%**，
+> 而且"最强的那一条"仍小于原来的每抽总量 → **调权重补不回来**，要补只能改单条数值或降阈值。
+>
+> **验收（实测）**：
+> - `build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（每改一步都跑）。
+> - 自测硬指标 **`+187.5 → 1` / `+225 → 3` 逐位不变**（只由点数与阈值决定，与池子无关）；`Boss 出生 … 3 条`也不变。
+>   变的只有**应该变**的两处：`Pressure 3 → 8`（索引行第 7 位与「首领强化来源」），以及 `立即抽取 [...]` 里的名字。
+> - **技能参数真的落到技能上**：`AbilityScream.Cooldown 7 → 5.6 → 4.48`（**叠乘**，不是覆盖）、
+>   `AbilityCharge 命中体.Damage 20 → 25`；真实出生里也有 `尖啸回响` 生效的样本。
+> - **限定词刷新判定**（真实出生，`run_20261011_233032.log`）：第 1 关抽到 `铁壁·护甲` →
+>   出生时判**不成立** → 换抽 `狂暴·伤害` → `套用 3 条 [狂暴·攻速、铁壁·护甲→狂暴·伤害、尖啸回响]`
+>   → `Boss 生命 900 护甲 200 伤害×1.485`（**护甲 200 而不是 350** = 那一栏真的没生效；
+>   `1.485 = 0.9 × 1.25（换抽到的）× 1.32（压力 4 级）` = 换抽到的效果真的落了地）。
+> - **同一条词条两次判定结果不同**（探针）：Boss.tscn → 成立；同一帧换成 Chaser.tscn → 不成立 → 换抽。
+> - **回退验证**（清空 `Balance.tres` 的 `PressureMods` 数组跑一整轮）：日志写 `Pressure 0（Balance.tres 已加载）`
+>   + `数值型 Pressure 8 条（来源：代码兜底）`，池明细与表在时**逐字相同**，技能参数/限定词/换抽全部照常，
+>   `+187.5 → 1` / `+225 → 3` 与表在时逐字相同，Pressure 相关 warning/error **0 条**。
+> - ⚠️ 已知不准确的一行（**本轮边界内改不了**）：清空索引时 `StageController` 那条日志仍硬编码写
+>   `（来源：表 Pressure）`；真实来源看 `BossPerkCatalog` 打的那一行（它写"代码兜底"）。
 
 ### 阶段 4（原计划编号）：技能表 + 敌人表 + 节点表（T2 + T5 + T7）
 

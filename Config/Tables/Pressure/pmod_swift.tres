@@ -17,4 +17,4 @@ DescriptionTemplate = "移速 +35%"
 Weight = 2.0
 Tags = PackedStringArray("Mobility")
 Modifiers = [SubResource("m_pmod_swift_0")]
-Note = "数值型强化（Boss Pressure 池）。权重 2。想只让「机动类」进候选，就把抽取点的标签填 Mobility（节点行 BossModifierTags / 关卡行 PressureUpgradeTags）。"
+Note = "数值型强化（Boss Pressure 池）**机动那一栏**（母行 pmod_berserk / pmod_fortress 拆成"一参数一栏"时它本来就是单参数，所以原样保留、文件名不变）。权重 2 = 母行权重（池内合计 15：数值型 12 + 技能型 3），单条 13.3%。效果值 1.35 与拆分前逐位一致。想只让「机动类」进候选，就把抽取点的标签填 Mobility（节点行 BossModifierTags / 关卡行 PressureUpgradeTags）；本行没有限定词（所有关卡都能抽到）。"

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PressureModConfig" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/PressureModConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_pmod_scream_echo_0"]
+script = ExtResource("2_param")
+Key = "Cooldown"
+Value = 0.8
+Note = "尖啸冷却的倍率（相对当前值；14 秒→不适用，本行作用在技能行给的 7 秒上）"
+
+[resource]
+script = ExtResource("1_row")
+Id = "pmod_scream_echo"
+DisplayName = "尖啸回响"
+DescriptionTemplate = "尖啸冷却 ×0.8（7 秒 → 5.6 秒）"
+Weight = 1.0
+Tags = PackedStringArray("Offense", "Skill")
+BossIds = PackedStringArray("boss_final")
+AbilityNode = "AbilityScream"
+AbilityScales = [SubResource("p_pmod_scream_echo_0")]
+Note = "**技能参数词条**（数值型）：关卡核心文档 §7.5 明列「生命值、伤害、攻击速度或技能冷却等参数」都属 **Pressure 数值型**，所以技能参数进的是**本表**而不是 Boss Build（§7.1：行为型留给 bhv_*）。它只改**已有技能的一个数值参数**，绝不启用/新增技能（那仍是 Boss Build 的职责，代码里对 Enabled 这类键会警告并跳过）。加法：AbilityScales 的 Value 是**倍率**（乘在能力节点的当前值上，所以同一条抽两次会继续叠乘：7 → 5.6 → 4.48），不是绝对赋值。⚠ 限定词两条：BossIds=[boss_final]（这条是为这个 Boss 的技能配的）+ AbilityNode=AbilityScream（**这个 Boss 必须真的有这个技能节点**）—— 换一个没有尖啸的 Boss 时，它会在 Boss 出生时被判为不成立并改抽别的（见 docs/config.md 的「限定词与刷新判定」）。权重 1：技能参数只强化一个技能的一个参数、而且尖啸要到阶段 2（或被「尖啸强化」词条开场解锁）才真的会放，所以给最小的 1；三条技能词条合计 3/15 = 20%，数值型仍占 80%。"

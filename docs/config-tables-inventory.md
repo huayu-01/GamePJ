@@ -35,7 +35,7 @@
 > | #9 技能/能力表（⏳ 未做，优先级高） | ✅ **已做**：`Config/Tables/Skills/` **25 行**（5 玩家 + 16 单位 + 4 首领行为词条），`AbilityConfig` 含通用项 + `Params` + `AttackParams`；由 `UnitConfig.Skills`（**资源引用**）指向 |
 > | #10 敌人按敌种表（⏳ 未做，优先级高） | ✅ **已做**：`Config/Tables/Enemies/` 10 行（1 全局 + 9 敌种），`EnemyConfig : UnitConfig`，生成时"先 ApplyTo 再 AddChild" |
 > | #12 首领行为/技能表（🔴 新发现） | ✅ **已做**：4 条行为型词条并入**技能表**（`bhv_awakened` / `bhv_summoner` / `bhv_screaming` / `bhv_charging`，`ApplyHandler` 非空），`BossPerkCatalog` 改成表驱动 + 处理器注册表 |
-> | #11 首领增强表（数值型 Pressure，⏳ 未做） | ✅ **阶段 6 已做完**：`Config/Tables/Pressure/` 3 行（`pmod_berserk` / `pmod_fortress` / `pmod_swift`），`Weight` 真的加权、新增 `Tags` 列；**抽取点已与行为型拆开**（Boss 开场词条只抽行为型，Pressure 转换只抽数值型）；`NodeConfig` 的三个字段全部接进 `StageController.AddPressureForNode` |
+> | #11 首领增强表（数值型 Pressure，⏳ 未做） | ✅ **阶段 6 已做完**：`Config/Tables/Pressure/` 3 行（`pmod_berserk` / `pmod_fortress` / `pmod_swift`），`Weight` 真的加权、新增 `Tags` 列；**抽取点已与行为型拆开**（Boss 开场词条只抽行为型，Pressure 转换只抽数值型）；`NodeConfig` 的三个字段全部接进 `StageController.AddPressureForNode`。**⏩ 阶段 7 追加**：池子拆成 **8 行**（一栏一个参数 + 3 条技能参数），多 5 列（`AbilityNode` / `AbilityScales` / `AttackScales` / `BossIds` / `StageIds`），限定词在 **Boss 出生时**判定并换抽 —— 见 [config.md](config.md) 的「配置表阶段 7 实测」 |
 > | #24 单位本体表（建议并入 #10） | ✅ **已做**：抽成 **`UnitConfig` 基类**（生命 / 攻击四项 / 移速 / Tags / 持有技能 / 表现），`EnemyConfig` / `BossConfig` / `SummonConfig` / `CharacterConfig` 全部继承它 |
 > | #19 召唤物表（🔴 优先级中） | ✅ **已做**：`Config/Tables/Summons/summon_drone.tres`（含 `LifetimeSeconds = 25`） |
 > | §2.2 的 `AllowedEnemies` 按中文显示名匹配（"这里必须一起修"） | ✅ **已修**：改成 `StageDefinition.AllowedEnemyIds`（按敌人表 Id），生成项与行按**预制体路径**配对；未知 Id 开局写警告 |

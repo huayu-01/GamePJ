@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PressureModConfig" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/PressureModConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_pmod_charge_impact_0"]
+script = ExtResource("2_param")
+Key = "Damage"
+Value = 1.25
+Note = "冲锋命中体伤害的倍率（20 → 25）"
+
+[resource]
+script = ExtResource("1_row")
+Id = "pmod_charge_impact"
+DisplayName = "冲锋冲击"
+DescriptionTemplate = "冲锋伤害 ×1.25（20 → 25）"
+Weight = 1.0
+Tags = PackedStringArray("Offense", "Skill")
+BossIds = PackedStringArray("boss_final")
+AbilityNode = "AbilityCharge"
+AttackScales = [SubResource("p_pmod_charge_impact_0")]
+Note = "**技能参数词条**（数值型，§7.5）：作用在 AbilityCharge 的**命中体**（AttackHitbox.Damage）上，不是单位属性 —— 所以用 AttackScales 这一栏（键 = 命中体属性名，Value = 倍率）。倍率语义保证叠乘：20 → 25 → 31.25。限定词同 pmod_scream_echo（BossIds + 必须有 AbilityCharge 节点）。权重 1（见 pmod_scream_echo 的 Note）。"

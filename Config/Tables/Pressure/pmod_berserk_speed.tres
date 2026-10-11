@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PressureModConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/PressureModConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="2_stat"]
+
+[sub_resource type="Resource" id="m_pmod_berserk_speed_0"]
+script = ExtResource("2_stat")
+Stat = "AttackSpeedMultiplier"
+Operation = 1
+Value = 1.2
+
+[resource]
+script = ExtResource("1_row")
+Id = "pmod_berserk_speed"
+DisplayName = "狂暴·攻速"
+DescriptionTemplate = "攻速 ×1.2"
+Weight = 3.0
+Tags = PackedStringArray("Offense")
+Modifiers = [SubResource("m_pmod_berserk_speed_0")]
+Note = "数值型强化（Boss Pressure 池）：原 pmod_berserk 拆开后的**攻速那一栏**。效果值 1.2 与拆分前逐位一致（同一栏抽 3 次 = 攻速 ×1.2³ = 1.728）。权重 3 = 继承母行权重（见 pmod_berserk_dmg 的 Note）。"

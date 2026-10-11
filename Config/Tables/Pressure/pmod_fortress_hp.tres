@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PressureModConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/PressureModConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="2_stat"]
+
+[sub_resource type="Resource" id="m_pmod_fortress_hp_0"]
+script = ExtResource("2_stat")
+Stat = "MaxHealthMultiplier"
+Operation = 1
+Value = 1.4
+
+[resource]
+script = ExtResource("1_row")
+Id = "pmod_fortress_hp"
+DisplayName = "铁壁·生命"
+DescriptionTemplate = "最大生命 ×1.4"
+Weight = 2.0
+Tags = PackedStringArray("Defense")
+Modifiers = [SubResource("m_pmod_fortress_hp_0")]
+Note = "数值型强化（Boss Pressure 池）：原 pmod_fortress 拆开后的**生命那一栏**（护甲那一栏在 pmod_fortress_armor）。效果值 1.4 与拆分前逐位一致，叠乘语义不变（3 次 = ×1.4³ = 2.744）。权重 2 = 继承母行权重（见 pmod_berserk_dmg 的 Note）。"

@@ -11,7 +11,16 @@ namespace ActRoguelike.Boss;
 public sealed class BossPerk
 {
 	public required string Id { get; init; }
-	public required string Name { get; init; }
+
+	/// <summary>
+	/// 显示名（日志与 HUD 用）。
+	/// ⚠️ 它**可以被改写**：限定词在首领出生时判不成立、改抽了另一条时，会被写成
+	/// <c>「原词条→实际生效的词条」</c>（见 <see cref="MarkRedrawn"/>）——
+	/// 这样 <c>StageController</c> / <c>EncounterController</c> 里那两条**既有日志**（它们先 Apply、后取 Name）
+	/// 说的仍然是"真正生效的那一条"，不会写一个没生效的名字。
+	/// </summary>
+	public string Name { get; set; } = string.Empty;
+
 	public string Description { get; init; } = string.Empty;
 	public float Weight { get; init; } = 1f;
 
@@ -21,7 +30,67 @@ public sealed class BossPerk
 	/// </summary>
 	public string[] Tags { get; init; } = System.Array.Empty<string>();
 
-	public required Action<BossPerkContext> Apply { get; init; }
+	/// <summary>
+	/// 词条的**限定词**（适用条件）：只对某个首领 / 某几关 / 必须有某个技能节点才生效。
+	/// 默认 <see cref="PerkQualifier.Any"/>（不限）。
+	/// </summary>
+	public PerkQualifier Qualifier { get; init; } = PerkQualifier.Any;
+
+	/// <summary>
+	/// 这次抽签用的**候选标签**（`RollPressure(tags)` 传进来的那一组）。限定词判不成立时，
+	/// 换抽会用同一组标签把候选限制回同一批（见 <see cref="RollTags"/>）。
+	/// 行为型词条（<c>Roll()</c>）为 null = **不换抽**（词条条数由关卡行 `BossPerkCount` 定死，
+	/// 判不成立只写日志跳过）。
+	/// </summary>
+	public string[]? RollTags { get; init; }
+
+	/// <summary>词条的**效果本体**（数值操作 / 行为能力）。限定词与刷新判定都在 <see cref="Apply"/> 里，不在这里。</summary>
+	public required Action<BossPerkContext> Effect { get; init; }
+
+	private Action<BossPerkContext>? _apply;
+
+	/// <summary>
+	/// 抽取点调用的入口。**签名与接线方式没有变**（<c>StageController</c> / <c>EncounterController</c>
+	/// 依旧写 <c>perk.Apply(context)</c>），但内部先做一件事：
+	/// <b>用"此刻的上下文"重新判一次限定词</b>（首领出生时的那一次），判不成立就换抽 ——
+	/// 所以"同一局里先抽到、后出生"不会复用抽签时的结论。
+	/// </summary>
+	public Action<BossPerkContext> Apply => _apply ??= context => BossPerkCatalog.ApplyWithRefresh(this, context);
+
+	/// <summary>
+	/// 带"这次抽签用的标签"的一份副本 —— <c>RollPressure</c> 抽中时包一层。
+	/// 为什么必须是副本：换抽会把 <see cref="Name"/> 改写成"原词条→换抽词条"，
+	/// 若改在编译期共享的那个实例上，这份改动会跟着留到下一局（跨局污染）。
+	/// </summary>
+	public BossPerk AsRolled(System.Collections.Generic.IReadOnlyList<string>? rollTags)
+	{
+		var copy = new BossPerk
+		{
+			Id = Id,
+			Name = Name,
+			Description = Description,
+			Weight = Weight,
+			Tags = Tags,
+			Qualifier = Qualifier,
+			Effect = Effect,
+			RollTags = rollTags == null || rollTags.Count == 0 ? System.Array.Empty<string>() : ToArray(rollTags),
+		};
+		return copy;
+	}
+
+	/// <summary>限定词不成立、改抽了 <paramref name="applied"/> 之后，把名字改写成"原词条→实际生效的词条"。</summary>
+	public void MarkRedrawn(BossPerk applied) => Name = $"{Name}→{applied.Name}";
+
+	private static string[] ToArray(System.Collections.Generic.IReadOnlyList<string> source)
+	{
+		var copy = new string[source.Count];
+		for (int i = 0; i < source.Count; i++)
+		{
+			copy[i] = source[i];
+		}
+
+		return copy;
+	}
 }
 
 /// <summary>套用词条时能拿到的东西。</summary>
@@ -65,47 +134,98 @@ public sealed class BossPerkContext
 public static class BossPerkCatalog
 {
 	/// <summary>
-	/// 数值型（Pressure 池）的代码兜底 —— 表读不到时用它，逐条与分表前一致（含标签与权重，
-	/// 与 `Config/Tables/Pressure/pmod_*.tres` 三行对齐）。**不要删**，这是回退路径。
+	/// 数值型（Pressure 池）的代码兜底 —— 表读不到时用它，**逐条与
+	/// `Config/Tables/Pressure/pmod_*.tres` 八行对齐**（同样的 Id / 显示名 / 权重 / 标签 / 限定词 / 效果）。
+	///
+	/// ⚠️ 为什么拆成 8 条也要跟着改：兜底若还留着"伤害+攻速挤在一栏"的旧样子，表一读不到就会
+	/// **静默换挡**成"一抽买两个参数"（正是项目里反复踩的那个坑）。所以兜底必须与表同结构、同数值。
+	/// **不要删**，这是回退路径。
 	/// </summary>
 	private static readonly BossPerk[] FallbackPressure =
 	{
 		new BossPerk
 		{
-			Id = "berserk",
-			Name = "狂暴",
-			Description = "伤害 +25%，攻速 +20%",
+			Id = "pmod_berserk_dmg",
+			Name = "狂暴·伤害",
+			Description = "伤害 ×1.25",
 			Weight = 3f,
 			Tags = new[] { "Offense" },
-			Apply = context =>
-			{
-				Mod(context, "DamageMultiplier", ModifierOperation.Multiply, 1.25f);
-				Mod(context, "AttackSpeedMultiplier", ModifierOperation.Multiply, 1.2f);
-			},
+			Effect = context => Mod(context, "DamageMultiplier", ModifierOperation.Multiply, 1.25f),
 		},
 		new BossPerk
 		{
-			Id = "fortress",
-			Name = "铁壁",
-			Description = "最大生命 +40%，护甲 +150",
+			Id = "pmod_berserk_speed",
+			Name = "狂暴·攻速",
+			Description = "攻速 ×1.2",
+			Weight = 3f,
+			Tags = new[] { "Offense" },
+			Effect = context => Mod(context, "AttackSpeedMultiplier", ModifierOperation.Multiply, 1.2f),
+		},
+		new BossPerk
+		{
+			Id = "pmod_fortress_hp",
+			Name = "铁壁·生命",
+			Description = "最大生命 ×1.4",
 			Weight = 2f,
 			Tags = new[] { "Defense" },
-			Apply = context =>
-			{
-				Mod(context, "MaxHealthMultiplier", ModifierOperation.Multiply, 1.4f);
-				Mod(context, "MaxArmorAdd", ModifierOperation.Add, 150f);
-			},
+			Effect = context => Mod(context, "MaxHealthMultiplier", ModifierOperation.Multiply, 1.4f),
 		},
 		new BossPerk
 		{
-			Id = "swift",
+			Id = "pmod_fortress_armor",
+			Name = "铁壁·护甲",
+			Description = "护甲 +150",
+			Weight = 2f,
+			Tags = new[] { "Defense" },
+			Qualifier = new PerkQualifier { StageIds = new[] { "stg_inner", "stg_core" } },
+			Effect = context => Mod(context, "MaxArmorAdd", ModifierOperation.Add, 150f),
+		},
+		new BossPerk
+		{
+			Id = "pmod_swift",
 			Name = "疾行",
-			Description = "移速 +35%",
+			Description = "移速 ×1.35",
 			Weight = 2f,
 			Tags = new[] { "Mobility" },
-			Apply = context => Mod(context, "MoveSpeedMultiplier", ModifierOperation.Multiply, 1.35f),
+			Effect = context => Mod(context, "MoveSpeedMultiplier", ModifierOperation.Multiply, 1.35f),
+		},
+
+		// 技能参数词条（§7.5：技能冷却等工作在数值型这一栏；限定词 = 这个 Boss 必须真的有这个技能节点）。
+		new BossPerk
+		{
+			Id = "pmod_scream_echo",
+			Name = "尖啸回响",
+			Description = "尖啸冷却 ×0.8",
+			Weight = 1f,
+			Tags = new[] { "Offense", "Skill" },
+			Qualifier = BossFinalSkill("AbilityScream"),
+			Effect = context => ScaleAbility(context, "AbilityScream", "Cooldown", 0.8f),
+		},
+		new BossPerk
+		{
+			Id = "pmod_charge_impact",
+			Name = "冲锋冲击",
+			Description = "冲锋伤害 ×1.25",
+			Weight = 1f,
+			Tags = new[] { "Offense", "Skill" },
+			Qualifier = BossFinalSkill("AbilityCharge"),
+			Effect = context => ScaleHitbox(context, "AbilityCharge", "Damage", 1.25f),
+		},
+		new BossPerk
+		{
+			Id = "pmod_summon_haste",
+			Name = "召唤急速",
+			Description = "召唤冷却 ×0.75",
+			Weight = 1f,
+			Tags = new[] { "Defense", "Skill" },
+			Qualifier = BossFinalSkill("AbilitySummon"),
+			Effect = context => ScaleAbility(context, "AbilitySummon", "Cooldown", 0.75f),
 		},
 	};
+
+	/// <summary>技能参数词条的兜底限定词：只对 `boss_final`、且它必须真的有这个技能节点。</summary>
+	private static PerkQualifier BossFinalSkill(string abilityNode)
+		=> new() { BossIds = new[] { "boss_final" }, RequiredAbilityNode = abilityNode };
 
 	/// <summary>行为/技能型（Boss Build）的代码兜底 —— 表读不到时用它，逐条与分表前一致。</summary>
 	private static readonly BossPerk[] FallbackBehavior =
@@ -115,7 +235,7 @@ public static class BossPerkCatalog
 			Id = "awakened",
 			Name = "提前觉醒",
 			Description = "开场即带 1 级压力",
-			Apply = context =>
+			Effect = context =>
 			{
 				if (context.Pressure != null)
 				{
@@ -128,7 +248,7 @@ public static class BossPerkCatalog
 			Id = "summoner",
 			Name = "召唤师",
 			Description = "压力每次升级多召唤 1 个增援，且更早开始召唤",
-			Apply = context =>
+			Effect = context =>
 			{
 				if (context.Pressure != null)
 				{
@@ -142,7 +262,7 @@ public static class BossPerkCatalog
 			Id = "screaming",
 			Name = "尖啸强化",
 			Description = "开场就会范围尖啸",
-			Apply = context =>
+			Effect = context =>
 			{
 				if (context.Boss.GetNodeOrNull<Ability>("AbilityScream") is { } scream)
 				{
@@ -155,7 +275,7 @@ public static class BossPerkCatalog
 			Id = "charging",
 			Name = "冲锋强化",
 			Description = "开场就会冲锋",
-			Apply = context =>
+			Effect = context =>
 			{
 				if (context.Boss.GetNodeOrNull<Ability>("AbilityCharge") is { } charge)
 				{
@@ -210,7 +330,10 @@ public static class BossPerkCatalog
 	private static IReadOnlyList<BossPerk>? _pressure;
 	private static IReadOnlyList<BossPerk>? _behavior;
 
-	/// <summary>数值型强化候选（Pressure 池）—— 只有 <see cref="RollPressure"/> 会用它。表读不到 → 代码兜底 3 条。</summary>
+	/// <summary>
+	/// 数值型强化候选（Pressure 池）—— 只有 <see cref="RollPressure"/> 会用它。
+	/// 表读不到 → 代码兜底 8 条（5 条数值型参数栏 + 3 条技能参数栏，与表同结构同数值）。
+	/// </summary>
 	public static IReadOnlyList<BossPerk> PressureOnly => _pressure ?? FallbackPressure;
 
 	/// <summary>行为/技能型词条候选（Boss Build）—— 只有 <see cref="Roll"/> 会用它。表读不到 → 代码兜底 4 条。</summary>
@@ -269,15 +392,107 @@ public static class BossPerkCatalog
 	/// <b>Pressure 转换池（§7.5）抽取</b>：从**数值型**候选里按权重抽 1 条。
 	/// 候选先按 <paramref name="tags"/> 过滤（两层合并规则见 <see cref="FilterPressure"/>）；
 	/// 池空 → 返回 null（调用方只写日志，不静默变强）。
+	///
+	/// ⚠️ 这里**只做标签预筛，不判限定词** —— 抽签发生在"一次挑战完成"时，那时首领还不存在
+	/// （拿不到"这个 Boss 有没有这个技能"）；限定词一律留到**首领出生**时判（见 <see cref="ApplyWithRefresh"/>）。
+	/// 返回的是带 <see cref="BossPerk.RollTags"/> 的一份**副本**（换抽时要用同一组标签、且不能污染编译期实例）。
 	/// </summary>
 	/// <param name="tags">
 	/// 本次抽取允许的标签（来自节点行的 <c>BossModifierTags</c>，其次关卡行的 <c>PressureUpgradeTags</c>）。
 	/// 空 = 不限制。
 	/// </param>
 	public static BossPerk? RollPressure(IReadOnlyList<string>? tags)
+		=> RollPressureExcept(tags, System.Array.Empty<string>());
+
+	/// <summary>
+	/// 同 <see cref="RollPressure"/>，但可以**排除若干 Id**（限定词判不成立时换抽用：
+	/// 把已经判过、已经不合条件的那些排除掉，避免反复抽到同一条而死循环）。池被排空 → 返回 null。
+	/// </summary>
+	private static BossPerk? RollPressureExcept(IReadOnlyList<string>? tags, IReadOnlyList<string> excludeIds)
 	{
-		List<BossPerk> picked = WeightedPick.Pick(FilterPressure(tags), perk => perk.Weight, 1, Rng);
-		return picked.Count > 0 ? picked[0] : null;
+		List<BossPerk> pool = FilterPressure(tags);
+		if (excludeIds.Count > 0)
+		{
+			pool.RemoveAll(perk => Contains(excludeIds, perk.Id));
+		}
+
+		List<BossPerk> picked = WeightedPick.Pick(pool, perk => perk.Weight, 1, Rng);
+		return picked.Count > 0 ? picked[0].AsRolled(tags) : null;
+	}
+
+	private static bool Contains(IReadOnlyList<string> ids, string id)
+	{
+		for (int i = 0; i < ids.Count; i++)
+		{
+			if (ids[i] == id)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	/// 抽取点统一入口（<see cref="BossPerk.Apply"/> 指向这里）：**在首领出生的这一刻**先做"限定词刷新判定"。
+	///
+	/// 判定规则：
+	/// <list type="number">
+	/// <item>成立 → 直接生效（效果本体写在 <see cref="BossPerk.Effect"/> 里）。</item>
+	/// <item>不成立 → 写一行日志（说明哪一条限定词不成立、当时的 Boss/关卡是什么），
+	///   然后**换抽**另一条（同标签池、排除已经判过的 Id）并重新判定 —— 所以"一抽"不会白费，
+	///   也不会因为"抽签时条件成立"就复用那个结论。</item>
+	/// <item>池里所有候选都判过一遍仍无适用者 → 只写日志，**不静默变强**（不临时造一条效果出来）。</item>
+	/// </list>
+	/// 循环次数上界 = 候选池大小（每次换抽都排除掉一个 Id），不会死循环。
+	/// </summary>
+	internal static void ApplyWithRefresh(BossPerk perk, BossPerkContext context)
+	{
+		var tried = new List<string>();
+		BossPerk? current = perk;
+
+		while (current != null)
+		{
+			if (Contains(tried, current.Id))
+			{
+				break;
+			}
+
+			tried.Add(current.Id);
+
+			string? reason = current.Qualifier.FailedReason(context);
+			if (reason == null)
+			{
+				current.Effect(context);
+
+				if (!ReferenceEquals(current, perk))
+				{
+					perk.MarkRedrawn(current);
+				}
+
+				if (current.Qualifier.HasAny)
+				{
+					ActRoguelike.Core.GameLog.Write(
+						"Config",
+						$"词条限定词（Boss 出生时判定）：{current.Id}「{current.Name}」限定 [{current.Qualifier.Describe()}] → 成立 → 已生效（Boss {PerkQualifier.BossIdentityOf(context.Boss)} · 关卡 {PerkQualifier.CurrentStageText()}）");
+				}
+
+				return;
+			}
+
+			ActRoguelike.Core.GameLog.Write(
+				"Config",
+				$"词条限定词（Boss 出生时判定）：{current.Id}「{current.Name}」限定 [{current.Qualifier.Describe()}] → **不成立**（{reason} · Boss {PerkQualifier.BossIdentityOf(context.Boss)} · 关卡 {PerkQualifier.CurrentStageText()}）→ 换抽另一条（每次出生都重新判，不复用抽签时的结论）");
+
+			current = current.RollTags == null ? null : RollPressureExcept(current.RollTags, tried);
+		}
+
+		if (tried.Count > 1)
+		{
+			ActRoguelike.Core.GameLog.Write(
+				"Config",
+				$"词条限定词：候选 {tried.Count} 条都判过仍无适用者（[{string.Join(",", tried)}]），这次强化未兑现（不静默变强）。");
+		}
 	}
 
 	/// <summary>本次抽取的候选池（不改任何状态；给日志/自测取证用）。</summary>
@@ -332,13 +547,18 @@ public static class BossPerkCatalog
 			}
 
 			string perkTags = perk.Tags.Length == 0 ? "无标签" : string.Join(",", perk.Tags);
-			text.Append($"{perk.Id} 权重 {perk.Weight:0.##} 标签 [{perkTags}] → {Mathf.Max(WeightedPick.MinWeight, perk.Weight) / total * 100f:0.#}%");
+			string qualifier = perk.Qualifier.HasAny ? $" 限定 [{perk.Qualifier.Describe()}]" : string.Empty;
+			text.Append($"{perk.Id} 权重 {perk.Weight:0.##} 标签 [{perkTags}]{qualifier} → {Mathf.Max(WeightedPick.MinWeight, perk.Weight) / total * 100f:0.#}%");
 		}
 
 		return $"候选 {pool.Count} 条 [{text}]";
 	}
 
-	/// <summary>数值型：Modifiers 里的每条 StatOverride 都挂到 Boss 的 StatSheet 上。</summary>
+	/// <summary>
+	/// 数值型：`Modifiers`（单位属性）+ `AbilityScales` / `AttackScales`（**技能参数**）都挂到 Boss 身上。
+	/// 限定词（`BossIds` / `StageIds` / `AbilityNode`）原样带进运行期词条 —— **不在编译期判**，
+	/// 留到首领出生时由 <see cref="ApplyWithRefresh"/> 判（这是"刷新判定"的关键）。
+	/// </summary>
 	private static IReadOnlyList<BossPerk>? CompilePressure(IReadOnlyList<PressureModConfig>? rows)
 	{
 		if (rows == null || rows.Count == 0)
@@ -362,7 +582,13 @@ public static class BossPerkCatalog
 				Description = ConfigText.Format(captured.DescriptionTemplate, captured, captured.Params),
 				Weight = captured.Weight,
 				Tags = captured.Tags,
-				Apply = context => ApplyModifiers(context, captured),
+				Qualifier = new PerkQualifier
+				{
+					BossIds = captured.BossIds,
+					StageIds = captured.StageIds,
+					RequiredAbilityNode = captured.AbilityNode,
+				},
+				Effect = context => ApplyPressureRow(context, captured),
 			});
 		}
 
@@ -398,19 +624,132 @@ public static class BossPerkCatalog
 				Name = captured.DisplayName,
 				Description = ConfigText.Format(captured.DescriptionTemplate, captured, captured.Params),
 				Weight = captured.Weight,
-				Apply = context => handler(context, captured),
+				Effect = context => handler(context, captured),
 			});
 		}
 
 		return built.Count == 0 ? null : built;
 	}
 
-	private static void ApplyModifiers(BossPerkContext context, PressureModConfig row)
+	/// <summary>数值型一行的效果 = 单位属性修正（<c>Modifiers</c>）+ 技能参数（<c>AbilityScales</c> / <c>AttackScales</c>）。</summary>
+	private static void ApplyPressureRow(BossPerkContext context, PressureModConfig row)
 	{
 		foreach (StatOverride entry in row.Modifiers)
 		{
 			Mod(context, entry.Stat, entry.Operation, entry.Value);
 		}
+
+		if (string.IsNullOrEmpty(row.AbilityNode))
+		{
+			return; // 纯单位属性行（5 条数值型参数栏就是这一类）。
+		}
+
+		// 限定词里已经要求"这个 Boss 必须有这个技能节点"，走到这里理论上一定找得到；
+		// 但"没找到"必须是**响的**（不静默跳过），所以还是判一次。
+		if (context.Boss.GetNodeOrNull<Ability>(row.AbilityNode) is not { } ability)
+		{
+			GD.PushWarning($"[BossPerkCatalog] {row.Id} 要改的技能节点 {row.AbilityNode} 在 {context.Boss.Name} 上找不到，本条只生效了单位属性部分。");
+			return;
+		}
+
+		foreach (ParamEntry entry in row.AbilityScales)
+		{
+			ScaleProperty(row, ability, entry, $"技能 {row.AbilityNode}");
+		}
+
+		if (row.AttackScales.Length == 0)
+		{
+			return;
+		}
+
+		// 命中体：与 `AbilityConfig.ApplyAttackParams` 同一套寻址（命中体优先，没有就退到武器组件）。
+		Node? strike = (Node?)NodeSearch.FindInSubtree<AttackHitbox>(ability)
+			?? NodeSearch.FindInSubtree<ActRoguelike.Weapons.Weapon>(ability);
+		if (strike == null)
+		{
+			GD.PushWarning($"[BossPerkCatalog] {row.Id} 填了命中体参数，但 {row.AbilityNode} 下面既没有命中体也没有武器组件，已跳过。");
+			return;
+		}
+
+		foreach (ParamEntry entry in row.AttackScales)
+		{
+			ScaleProperty(row, strike, entry, $"技能 {row.AbilityNode} 的命中体");
+		}
+	}
+
+	/// <summary>
+	/// 把一条 <see cref="ParamEntry"/> 当**倍率**乘在目标节点的当前值上（不是绝对赋值）——
+	/// 这样同一条词条抽到两次会继续叠乘（尖啸冷却 7 → 5.6 → 4.48），而不是"第二次白抽"。
+	/// 属性不存在 / 属于行为型开关（<c>Enabled</c>）都会**写警告并跳过**，绝不静默改坏。
+	/// </summary>
+	private static void ScaleProperty(PressureModConfig row, Node target, ParamEntry entry, string what)
+	{
+		if (string.IsNullOrEmpty(entry.Key))
+		{
+			return;
+		}
+
+		// §7.1 的边界：数值池**不许**碰"这个技能开不开"这类行为开关（那是 Boss Build 的 bhv_* 词条）。
+		if (entry.Key is "Enabled" or "ApplyHandler" or "NodeName")
+		{
+			GD.PushWarning($"[BossPerkCatalog] {row.Id} 想改 {what} 的 {entry.Key} —— 这属于**行为型**（Boss Build），数值型词条不许碰，已跳过。");
+			return;
+		}
+
+		Variant current = target.Get(entry.Key);
+		if (current.VariantType == Variant.Type.Nil)
+		{
+			GD.PushWarning($"[BossPerkCatalog] {row.Id} 的参数 {entry.Key} 在 {target.GetType().Name} 上不存在，已跳过。");
+			return;
+		}
+
+		float before = current.AsSingle();
+		float after = before * entry.AsFloat(1f);
+		target.Set(entry.Key, after);
+		ActRoguelike.Core.GameLog.Write("Config", $"Pressure 技能参数：{row.Id}「{row.DisplayName}」→ {what}.{entry.Key} {before:0.###} → {after:0.###}（×{entry.AsFloat(1f):0.###}）");
+	}
+
+	/// <summary>兜底词条用：把能力节点上的某个属性按倍率改一次（与表行同一条代码路径，不走 ParamEntry）。</summary>
+	private static void ScaleAbility(BossPerkContext context, string abilityNode, string property, float scale)
+	{
+		if (context.Boss.GetNodeOrNull<Ability>(abilityNode) is not { } ability)
+		{
+			GD.PushWarning($"[BossPerkCatalog] 兜底词条要改的技能节点 {abilityNode} 在 {context.Boss.Name} 上找不到，已跳过。");
+			return;
+		}
+
+		ScaleDirect(abilityNode, ability, property, scale);
+	}
+
+	/// <summary>兜底词条用：把技能命中体上的某个属性按倍率改一次。</summary>
+	private static void ScaleHitbox(BossPerkContext context, string abilityNode, string property, float scale)
+	{
+		if (context.Boss.GetNodeOrNull<Ability>(abilityNode) is not { } ability)
+		{
+			GD.PushWarning($"[BossPerkCatalog] 兜底词条要改的技能节点 {abilityNode} 在 {context.Boss.Name} 上找不到，已跳过。");
+			return;
+		}
+
+		if (NodeSearch.FindInSubtree<AttackHitbox>(ability) is not { } hitbox)
+		{
+			GD.PushWarning($"[BossPerkCatalog] 兜底词条在 {abilityNode} 下面找不到命中体，已跳过。");
+			return;
+		}
+
+		ScaleDirect($"{abilityNode} 的命中体", hitbox, property, scale);
+	}
+
+	private static void ScaleDirect(string what, Node target, string property, float scale)
+	{
+		if (target.Get(property).VariantType == Variant.Type.Nil)
+		{
+			GD.PushWarning($"[BossPerkCatalog] 兜底词条的参数 {property} 在 {target.GetType().Name} 上不存在，已跳过。");
+			return;
+		}
+
+		float before = target.Get(property).AsSingle();
+		target.Set(property, before * scale);
+		ActRoguelike.Core.GameLog.Write("Config", $"Pressure 技能参数（兜底）：{what}.{property} {before:0.###} → {before * scale:0.###}（×{scale:0.###}）");
 	}
 
 	private static void Mod(BossPerkContext context, string stat, ModifierOperation operation, float value)
