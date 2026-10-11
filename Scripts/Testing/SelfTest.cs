@@ -606,8 +606,20 @@ public partial class SelfTest : Node
 		string poolIdText = weapon == null
 			? "无武器"
 			: string.IsNullOrEmpty(weapon.PoolId) ? "（留空 → 走「标签匹配 → 通用」两层）" : weapon.PoolId;
+
+		// docs/rewards.md 的硬指标是"枪手 18 / **召唤 19**"：上面 PoolPreview 那行只覆盖枪手，
+		// 这里用**同一个武器**另建一个池把召唤控制角色那一侧也量出来（不改 RunController 的状态 ——
+		// 只换 RewardPool.SummonerAllowed 这一个开关，差异应当恰好是 mut_summon 那 1 条）。
+		string summonerCount = "无武器";
+		if (weapon != null)
+		{
+			var summonerPool = new RewardPool { SummonerAllowed = true };
+			summonerPool.Initialize(weapon);
+			summonerCount = $"{summonerPool.Roll(new RunBuild(), 40).Count} 条（期望 19）";
+		}
+
 		GameLog.Write("SelfTest",
-			$"配置表比对·升级池：武器 PoolId「{poolIdText}」（期望 pool_pistol） 池表 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()} 行（期望 3）/ 选项行里指定了池的 {pooledOptions} 条 ｜ 专属层 {exactLayer} 条（命中 {exactHit}）· 类别层 {tagLayer} 条（命中 {tagHit}）· 通用层 {genericLayer} 条");
+			$"配置表比对·升级池：武器 PoolId「{poolIdText}」（期望 pool_pistol） 池表 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()} 行（期望 3）/ 选项行里指定了池的 {pooledOptions} 条 ｜ 专属层 {exactLayer} 条（命中 {exactHit}）· 类别层 {tagLayer} 条（命中 {tagHit}）· 通用层 {genericLayer} 条 ｜ 召唤控制池 {summonerCount}");
 
 		// 敌人表（阶段 3）：行数 + 白名单按 Id 匹配的结果 + 一行逐项数值。
 		ActRoguelike.Config.EnemyConfig? global = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.EnemyConfig>("enemy_global");

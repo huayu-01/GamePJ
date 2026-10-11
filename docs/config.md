@@ -394,10 +394,15 @@ RewardConfig（Config/Tables/Upgrades/*.tres，19 行：一行一个选项）
 [Config] 升级池：3 个（来源：表 UpgradePools）—— 武器指向 [wpn_pistol→pool_pistol、wpn_sniper→pool_sniper、wpn_rifle→pool_rifle]；选项行里指定了池的 0 条，其余走「标签匹配 → 通用」两层
 [SelfTest] 配置表比对·索引：武器 3/角色 3/敌人 10/首领 1/召唤物 1/技能 25/Pressure 3/效果 9/节点 9/局外 5/升级池 3（期望 3/3/10/1/1/25/3/9/9/5/3）
 [SelfTest] 配置表比对·增幅项：共 19 条（强化 10 / 进化 4 / 异化 5，期望 19 = 10/4/5） 用了表=True 当前池子=18 条（枪手期望 18 条）
-[SelfTest] 配置表比对·升级池：武器 PoolId「pool_pistol」（期望 pool_pistol） 池表 3 行（期望 3）/ 选项行里指定了池的 0 条 ｜ 专属层 0 条（命中 0）· 类别层 4 条（命中 4）· 通用层 15 条
+[SelfTest] 配置表比对·升级池：武器 PoolId「pool_pistol」（期望 pool_pistol） 池表 3 行（期望 3）/ 选项行里指定了池的 0 条 ｜ 专属层 0 条（命中 0）· 类别层 4 条（命中 4）· 通用层 15 条 ｜ 召唤控制池 19 条（期望 19）
 ```
 
-**"枪手 18 条"这个硬指标逐位不变**：改前 / 改后两次自测日志逐行 diff，**除了上面这两行新增内容与索引行的扩展，
+**"枪手 18 / 召唤 19"这个硬指标（[rewards.md](rewards.md):79-86）逐位不变**：
+- 枪手 18 条 —— `当前池子=18 条`，与改前逐字相同；
+- 召唤 19 条 —— 阶段 4 给自测补了这一侧的**实测**（用同一个武器另建一个 `RewardPool { SummonerAllowed = true }`，
+  不动 `RunController` 的状态），实测 **19 条**，与文档记录一致（差的那 1 条就是 `mut_summon`）。
+
+改前 / 改后两次自测日志逐行 diff，**除了上面这两行新增内容与索引行的扩展，
 所有配置相关行（玩家 / 武器 / 节点 / 效果 / 敌人 / 技能 / 增幅项）完全相同**（其余差异只有随机敌种与帧率）。
 
 ### 第一层真的会拦人（两次临时实验，做完已还原）
@@ -432,6 +437,26 @@ RewardConfig（Config/Tables/Upgrades/*.tres，19 行：一行一个选项）
 2. **加一条只给狙击枪的进化**：新建一行 `.tres`，`Pool` 填 `pool_sniper`（一个引用列，不必碰别的文件）。
 3. **调"某把武器的升级池里全部增幅的强度"**：筛出那几行 → 在 `Modifiers` 列上批量改。
 4. **想让两把武器共享一个池**：让这两个武器行的 `Pool` 指向**同一个池行**；只想共享其中一部分选项，直接用第②层的武器标签（`AttackTags` ↔ `RequiredWeaponTags`）。
+
+### 编辑器里的可编辑性实测（`Edit Resources as Table` v2.7，真机）
+
+在**运行中的编辑器**里调插件自己的 API（`EditorInterface.set_main_screen_editor("ResourceTables")` + `editor_view.display_folder(...)`），
+实测三张表的行数与列：
+
+| 表 | 行数 | 列（节选关键项） |
+|---|---|---|
+| `Config/Tables/Upgrades/` | **19** | …`RequiredWeaponTags`、**`Pool`**、`RequiresSummoner`、`Excludes`、**`ConflictsWith`**、`Modifiers`…（**`PoolTags` 已消失**） |
+| `Config/Tables/Weapons/` | **3** | …`AttackTags`、**`Pool`**、`Damage`、`FireInterval`… |
+| `Config/Tables/UpgradePools/` | **3** | `Id` / `Slot` / `DisplayName` / `DescriptionTemplate` / `Note` / `Params`（新目录 = 新表，一行一个池） |
+
+属性元数据（`PROPERTY_USAGE_EDITOR`）实测：**`Pool(type=24, hint=17)`**（24 = `OBJECT`、17 = `RESOURCE_TYPE` → **资源引用列**）、
+**`ConflictsWith(type=34)`**（`PackedStringArray` → 普通可编辑数组列）。
+两边的 `Pool` 列都可用编辑器的资源选择器改（与 `chr_*.tres → skl_*.tres` 那套引用列一样）。
+
+> ⚠️ 观察记录（**与阶段 4 无关**）：程序化快速切表时插件偶发一条
+> `editor_view.gd:296 … Invalid access … on base object of type 'Array[Object]'`（`insert_row_sorted` 对"数组列"取值那一段），
+> 属于上一轮已记录的那批插件脆弱点（commit `7972a4f` 修过 5 类，未含这一处）；
+> **不影响表格的渲染与编辑** —— 复测连续两次 `display_folder` 后 `rows` 仍是 19 / 3 且元素全是 `Resource`。
 
 ## 按键映射（当前）
 
