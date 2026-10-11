@@ -2221,11 +2221,16 @@ public static string DescribePools()
    在开局一次性校验并写警告 —— 这正是 §1.4-F4 与 §5 阶段 4 里"最容易出错的一步"的落地。
 
 **首领强化的两套来源（关卡核心文档 §7.1）**：行为/技能型 = 技能表里 `ApplyHandler` 非空的 4 行
-（`bhv_awakened` / `bhv_summoner` / `bhv_screaming` / `bhv_charging`，由 `BossPerkCatalog` 的处理器注册表编译）；
-数值型 = `Pressure/` 的 **8 行**（阶段 7 起：`pmod_berserk_dmg` / `pmod_berserk_speed` / `pmod_fortress_hp` /
-`pmod_fortress_armor` / `pmod_swift` / `pmod_scream_echo` / `pmod_charge_impact` / `pmod_summon_haste`）。
+（`bhv_awakened` / `bhv_summoner` / `bhv_screaming` / `bhv_charging`，由 `BossPerkCatalog` 的处理器注册表编译）
+—— **界面上叫「技能」**；
+数值型 = `Pressure/` 的 **7 行**（阶段 7 是 8 行：`pmod_berserk_dmg` / `pmod_berserk_speed` / `pmod_fortress_hp` /
+`pmod_fortress_armor` / `pmod_swift` / `pmod_scream_echo` / `pmod_charge_impact` / `pmod_summon_haste`；
+**其中 `pmod_fortress_armor`「铁壁·护甲」已按用户要求整行下线（表行 + `Balance.tres` + 代码兜底）**）
+—— **界面上叫「词条」**。
 两张表**分别编译、各自独立回退**（一侧读不到不会让另一侧变空）；`PressureOnly` / `BehaviorOnly`
 让两套来源可独立追踪。**没有**为 Pressure 加"可被玩家增幅修改"的接口（§7.2 明令禁止）。
+> ⚠️ 术语与护甲下线的完整记录见 [config.md](config.md) 的「用户三项修正实测」（同轮还改了
+> 命中特效的位置：`HitEffectHeightOffset` 已删除，改用目标碰撞体表面的实际命中点）。
 
 > ✅ **阶段 6 起两个抽取点也分开了**（本节之前写的是"`All` = 数值型在前 + 行为型在后，开场抽取随机序列不变"的**过渡态**）：
 > `All` 现在**只是日志统计用**，不再是任何抽取点的候选集；
@@ -2379,6 +2384,7 @@ AbilityId skl_dash ｜ 近战 伤害 32 间隔 0.75 射程 2.4 击退 5 命中�
 > | 新增 **`BossPerkCatalog.ApplyWithRefresh`**：**Boss 出生时**判限定词 → 成立就生效、不成立就**换抽**同标签池的另一条（循环上界 = 池大小，不死循环）、全判过就只写日志 | `Scripts/Boss/BossPerk.cs` |
 > | `RollPressure(tags)` 改为返回**带标签的副本**（换抽要用同一组标签；也避免改写共享的编译期实例）；新增私有 `RollPressureExcept(tags, excludeIds)` | `Scripts/Boss/BossPerk.cs` |
 > | 代码兜底 `FallbackPressure` **3 条 → 8 条**（与表同 Id / 权重 / 限定词 / 效果），照 `ScaleAbility` / `ScaleHitbox` 走同一条效果路径 | `Scripts/Boss/BossPerk.cs` |
+> | ⚠️ **后续一轮**：`pmod_fortress_armor`「铁壁·护甲」从表、`Balance.tres`、**以及上面这份代码兜底**里一起下线（8 → 7 条）；自测期望串同步 `…/25/8/…` → `…/25/7/…`；`StageIds` 探针改用合成限定词 | `Config/Tables/Pressure/` + `Config/Balance.tres` + `Scripts/Boss/BossPerk.cs` + `Scripts/Boss/BossPerkProbe.cs` + `Scripts/Testing/SelfTest.cs` |
 > | 数值池的**行为型护栏**：技能参数想写 `Enabled` / `ApplyHandler` / `NodeName` → 警告并跳过（§7.1 边界） | `Scripts/Boss/BossPerk.cs` |
 > | 自测探针（池明细 / 技能参数叠乘 / 同一条词条两次判定 / 换抽实测 / 关卡限定 / 端到端 3 次出生） | `Scripts/Boss/BossPerkProbe.cs`（新文件）+ `SelfTest.ReportTables` 一行调用 |
 > | `Balance.tres`：7 条新行文件的 `[ext_resource]`（id 108–114）+ `PressureMods` 数组改指 8 条；`pmod_berserk.tres` / `pmod_fortress.tres` 与它们的 ext_resource 一起删除 | `Config/Balance.tres` |

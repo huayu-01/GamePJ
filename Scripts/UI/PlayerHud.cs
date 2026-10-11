@@ -23,10 +23,10 @@ public partial class PlayerHud : CanvasLayer
 	/// <summary>延迟条跟随速度（比例/秒）。</summary>
 	private const float DelayFollowSpeed = 0.6f;
 
-	/// <summary>血条栏上最多显示几个**不同**词条（超出的折叠成 "…+N"）—— 词条多了不能把血条挤爆。</summary>
+	/// <summary>血条栏上最多显示几个**不同**的首领强化条目（技能 + 词条；超出的折叠成 "…+N"）—— 多了不能把血条挤爆。</summary>
 	private const int BossBarPerkLimit = 5;
 
-	/// <summary>顶部那一行状态文字更窄，词条上限再收一档。</summary>
+	/// <summary>顶部那一行状态文字更窄，强化条目上限再收一档。</summary>
 	private const int BossStatusPerkLimit = 4;
 
 	/// <summary>交互提示里顺带写出的「首领状况」快捷键（取自预览面板的默认键，避免两处漂移）。</summary>
@@ -46,7 +46,7 @@ public partial class PlayerHud : CanvasLayer
 	private Label _bossName = null!;
 	private Label _bossState = null!;
 
-	/// <summary>血条栏上的词条行（行为型 ◆ + 数值型 ◇，见 <see cref="BossPerkText"/>）。</summary>
+	/// <summary>血条栏上的首领强化行（**技能** ◆ + **词条** ◇，见 <see cref="BossPerkText"/>）。</summary>
 	private Label _bossPerks = null!;
 	private Label _build = null!;
 	private HealthBarWidget _healthBar = null!;
@@ -148,7 +148,7 @@ public partial class PlayerHud : CanvasLayer
 			var phases = boss.GetNodeOrNull<BossPhaseController>("Phases");
 			var pressure = boss.GetNodeOrNull<BossPressure>("Pressure");
 
-			// 近距离（血条面板展开）时词条由**面板那一条**负责显示，这里不再重复 —— 否则同一串词条出现两次。
+			// 近距离（血条面板展开）时强化条目由**面板那一条**负责显示，这里不再重复 —— 否则同一串名字出现两次。
 			string perkLine = BossBarExpanded ? string.Empty : PerkLine(BossStatusPerkLimit);
 			string perks = perkLine.Length > 0 ? $"   {perkLine}" : string.Empty;
 			_status.Text = $"BOSS {boss.Health:0}/{boss.MaxHealth:0}   阶段 {(phases?.Phase ?? 0) + 1}   压力 {pressure?.Level ?? 0}{perks}";
@@ -207,7 +207,7 @@ public partial class PlayerHud : CanvasLayer
 		_bossPerks = RequireChild<Label>(panel, "Panel/PerkLabel");
 
 		// ⚠️ 预制体里的 `Panel` 自带 `visible = false`（自首个提交起），而代码只切根节点的可见性 ——
-		// 于是头像/名字/血条/词条**从来没有显示过**（只有 BossBarExpanded / BossDistance 两个只读属性在动）。
+		// 于是头像/名字/血条/强化行**从来没有显示过**（只有 BossBarExpanded / BossDistance 两个只读属性在动）。
 		// 这里明确打开它：开合由根节点（_bossPanel.Visible）负责，内部 Panel 常显。
 		RequireChild<Control>(panel, "Panel").Visible = true;
 
@@ -262,23 +262,23 @@ public partial class PlayerHud : CanvasLayer
 		_bossName.Text = $"{boss.Name}   {boss.Health:0} / {boss.MaxHealth:0}";
 		_bossState.Text = $"{_stage?.Definition?.DisplayName}   距离 {distance:0}";
 
-		// 词条行：行为型（Boss Build）+ 数值型（Pressure）都要显示，并带标记区分来源（§7.1）。
+		// 强化行：技能（Boss Build）+ 词条（Pressure）都要显示，并带标记区分来源（§7.1）。
 		string perkLine = PerkLine(BossBarPerkLimit);
 		_bossPerks.Text = perkLine;
 		_bossPerks.Visible = perkLine.Length > 0;
 	}
 
 	/// <summary>
-	/// 本关首领词条的一行文案 —— **两套来源都显示**（用户要求"在血条栏上显示词条名"）：
-	/// 行为型来自这一场遭遇（<see cref="EncounterController.BossPerks"/>，Boss 出生时抽的 Boss Build 词条），
-	/// 数值型来自关卡（<see cref="StageController.PressurePerks"/>，Pressure 阈值转换抽到的数值强化）。
-	/// 标记与折叠规则在 <see cref="BossPerkText"/> 里（HUD 与预览面板共用一份）。
+	/// 本关首领强化的一行文案 —— **两套来源都显示**，而且**叫法分开**（用户拍板：行为型是技能、数值型才是词条）：
+	/// 技能来自这一场遭遇（<see cref="EncounterController.BossPerks"/>，Boss 出生时抽的 Boss Build 技能/行为），
+	/// 词条来自关卡（<see cref="StageController.PressurePerks"/>，Pressure 阈值转换抽到的数值强化）。
+	/// 计数名词、标记与折叠规则都在 <see cref="BossPerkText"/> 里（HUD 与预览面板共用一份）。
 	/// </summary>
 	private string PerkLine(int limit)
 	{
-		IReadOnlyList<BossPerk>? behavior = _encounter?.BossPerks;
-		IReadOnlyList<BossPerk>? numbers = _stage?.PressurePerks;
-		string list = BossPerkText.FormatLine(behavior, numbers, limit);
-		return list.Length == 0 ? string.Empty : $"词条 {BossPerkText.Total(behavior, numbers)} {list}";
+		IReadOnlyList<BossPerk>? skills = _encounter?.BossPerks;
+		IReadOnlyList<BossPerk>? entries = _stage?.PressurePerks;
+		string list = BossPerkText.FormatLine(skills, entries, limit);
+		return list.Length == 0 ? string.Empty : $"{BossPerkText.Summary(skills, entries)} {list}";
 	}
 }

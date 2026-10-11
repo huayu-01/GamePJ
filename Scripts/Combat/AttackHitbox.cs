@@ -1,5 +1,4 @@
 using System;
-using ActRoguelike.Config;
 using Godot;
 
 namespace ActRoguelike.Combat;
@@ -149,16 +148,114 @@ public partial class AttackHitbox : Area3D
 				continue;
 			}
 
+			// 命中点先算、再结算：一击致死时 `Unit.Die()` 会把 `CollisionLayer` 归零，顺序反了容易踩到
+			// "目标已经进入死亡态"这类边界（本方法不读层，但先算后打更符合直觉）。
+			Vector3 hitPoint = ResolveHitPoint(target);
+
 			Vector3 direction = target.GlobalPosition - GlobalPosition;
 			direction.Y = 0f;
 			target.ReceiveHit(_attack.RollHit(target, direction.Normalized(), target.GlobalPosition));
 
-			// 击中特效（Binbun Hit FX）：命中体判定的是"重叠"、手上没有表面命中点，
-			// 而单位原点在**脚底** —— 直接用目标原点会把火花打在地上，所以抬到胸口高度。
-			// 抬升量读 `Balance.tres` 的「表现 · 命中特效 · 高度偏移」，不写死在这里。
-			HitEffect.Spawn(this, target.GlobalPosition + (Vector3.Up * Balance.Settings.HitEffectHeightOffset));
+			// 击中特效（Binbun Hit FX）：**打在哪就炸在哪**（用户要求：「实际应该在命中的位置发生特效」）。
+			HitEffect.Spawn(this, hitPoint);
 
 			HitLanded?.Invoke(target);
 		}
+	}
+
+	/// <summary>
+	/// **实际命中点** = 目标碰撞体表面上**离命中体最近**的那一点
+	/// （用户要求：「实际应该在命中的位置发生特效」）。
+	///
+	/// <para><b>为什么是几何最近点，而不是打一条射线</b>：重叠判定本身不给接触点
+	/// （`GetOverlappingBodies()` 与 `Area3D` 的信号都只有"撞上了谁"，没有 position），最初这里补的是
+	/// 一条朝目标身体的射线 —— 但射线读的是**物理空间在查询那一瞬间**的状态，实测不稳：目标被脚本挪动、
+	/// 刚被冻住、或刚被打死（<c>Unit.Die()</c> 把 <c>CollisionLayer</c> 归零）时，脚本位置与物理位置不一致，
+	/// 射线会**静默打空**、特效退回身体中心（自测里 7 次跑出过 3 次打空）。几何最近点只依赖两边的
+	/// **碰撞体本身**，与物理空间的时序无关；语义也更贴切 —— "这一刀落在身上的哪一面"本来就是
+	/// "离刀最近的那一面"。</para>
+	///
+	/// <para><b>位置怎么算</b>：把命中体的世界坐标投到目标那个碰撞体上（单位预制体里的直接子节点
+	/// `Body`）—— 胶囊：先投到中轴线段、再沿半径推到表面；球：沿半径推；盒：先转进局部空间、再夹到盒面上。
+	/// <b>认不出的形状 / 没有碰撞体</b> → 退回**碰撞体中心**（同样是几何量，不是配置里的魔数）。</para>
+	///
+	/// <para>⚠️ 调用点在 <see cref="Unit.ReceiveHit"/> **之前**：一击致死时 <c>Unit.Die()</c> 会把
+	/// <c>CollisionLayer</c> 归零（本方法不读层，但"先算命中点、再结算"这个顺序本身也更符合直觉）。</para>
+	///
+	/// <para>因此 `Balance.tres` 里那列 <c>HitEffectHeightOffset</c> 没有消费者了，已随本次改动删除：
+	/// 高矮不同的单位各自把特效落在自己身上，不需要再调一个全局高度。</para>
+	/// </summary>
+	private Vector3 ResolveHitPoint(Unit target)
+	{
+		Vector3 from = GlobalPosition;
+		foreach (Node child in target.GetChildren())
+		{
+			if (child is not CollisionShape3D { Disabled: false } shapeNode || shapeNode.Shape == null)
+			{
+				continue;
+			}
+
+			Transform3D shape = shapeNode.GlobalTransform;
+
+			// 单位被整体缩放时（精英怪 `EliteModifier.ModelScale` 1.35）碰撞体也跟着缩放，
+			// 形状自己的 radius/height 是不缩放的原始值 —— 所以半径要乘上变换的缩放量。
+			float scale = shape.Basis.Y.Length();
+
+			switch (shapeNode.Shape)
+			{
+				case CapsuleShape3D capsule:
+				{
+					Vector3 axis = shape.Basis.Y.Normalized();
+					float radius = capsule.Radius * scale;
+					float half = Mathf.Max(0f, (capsule.Height * 0.5f) - capsule.Radius) * scale;
+					Vector3 center = shape.Origin;
+					Vector3 projected = center + (axis * Mathf.Clamp((from - center).Dot(axis), -half, half));
+					Vector3 offset = from - projected;
+					return offset.LengthSquared() < 0.0001f
+						? projected + (Vector3.Up * radius) // 几乎贴在中轴上：往上顶一个半径，别把特效塞进身体里
+						: projected + (offset.Normalized() * radius);
+				}
+
+				case SphereShape3D sphere:
+				{
+					Vector3 offset = from - shape.Origin;
+					float radius = sphere.Radius * scale;
+					return offset.LengthSquared() < 0.0001f
+						? shape.Origin + (Vector3.Up * radius)
+						: shape.Origin + (offset.Normalized() * radius);
+				}
+
+				case BoxShape3D box:
+				{
+					// 转进盒的局部空间再夹到盒面上：夹完的那一点就是"离命中体最近的那一面"。
+					Vector3 local = shape.AffineInverse() * from;
+					Vector3 half = box.Size * 0.5f;
+					var clamped = new Vector3(
+						Mathf.Clamp(local.X, -half.X, half.X),
+						Mathf.Clamp(local.Y, -half.Y, half.Y),
+						Mathf.Clamp(local.Z, -half.Z, half.Z));
+					return shape * clamped;
+				}
+			}
+		}
+
+		return BodyCenter(target);
+	}
+
+	/// <summary>
+	/// 目标的身体中心 = 它**直接子节点**里的第一个碰撞体位置（单位预制体里那个 `Body`：1.8m 单位在 0.9 处 = 胸口）。
+	/// 只看直接子节点是有意的：能力节点下的那些 `Shape` 是**攻击命中体**（Area3D 的子节点），不是身体。
+	/// </summary>
+	private static Vector3 BodyCenter(Unit target)
+	{
+		foreach (Node child in target.GetChildren())
+		{
+			if (child is CollisionShape3D { Disabled: false } shape)
+			{
+				return shape.GlobalPosition;
+			}
+		}
+
+		return target.GlobalPosition;
 	}
 }

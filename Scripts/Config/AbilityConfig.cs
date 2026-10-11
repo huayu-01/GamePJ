@@ -13,9 +13,10 @@ namespace ActRoguelike.Config;
 /// <item><b>单位技能</b>（<see cref="ApplyHandler"/> 留空）：描述"某个单位身上的某个能力节点怎么配"。
 ///   通用项（冷却/前摇/后摇/朝向/开关/接近距离）+ <see cref="ConfigRow.Params"/> 里的子类专属参数
 ///   （<c>Distance</c> / <c>Count</c> / <c>ChargeSpeed</c> / <c>TriggerRadius</c> …）。</item>
-/// <item><b>首领行为词条</b>（<see cref="ApplyHandler"/> 非空）：<b>Boss Build</b>（首领实际获得的战斗行为）。
-///   由 <c>ActRoguelike.Boss.BossPerkCatalog</c> 编译成运行期词条。⚠️ 关卡核心文档 §7.1：行为型（本类）与
-///   数值型（`Config/Tables/Pressure/` 的 <c>pmod_*.tres</c>）**必须能按来源分开**，不得混成一个无法区分来源的池。</item>
+/// <item><b>首领行为技能</b>（<see cref="ApplyHandler"/> 非空）：<b>Boss Build</b>（首领实际获得的战斗行为）。
+///   由 <c>ActRoguelike.Boss.BossPerkCatalog</c> 编译成运行期条目。⚠️ 关卡核心文档 §7.1：行为型（本类，
+///   在界面上叫**技能**）与数值型（`Config/Tables/Pressure/` 的 <c>pmod_*.tres</c>，在界面上叫**词条**）
+///   **必须能按来源分开**，不得混成一个无法区分来源的池。</item>
 /// </list>
 ///
 /// 数值权威：**这一行**。行读不到时调用方什么都不做，能力保留场景里的值。
@@ -27,7 +28,7 @@ public partial class AbilityConfig : ConfigRow
 	[ExportGroup("寻址")]
 	/// <summary>
 	/// 目标节点名（`AbilityMelee` / `AbilityScream` / `AbilityDash` …）—— 单位表按它找能力节点。
-	/// 首领行为词条行留空（它们不挂在某个节点上，而是改 Boss 的构筑/压力字段）。
+	/// 首领行为技能行留空（它们不挂在某个节点上，而是改 Boss 的构筑/压力字段）。
 	/// </summary>
 	[Export] public string NodeName { get; set; } = string.Empty;
 
@@ -70,17 +71,17 @@ public partial class AbilityConfig : ConfigRow
 	/// </summary>
 	[Export] public ParamEntry[] AttackParams { get; set; } = System.Array.Empty<ParamEntry>();
 
-	[ExportGroup("首领行为词条（Boss Build；这两列只有词条行用）")]
+	[ExportGroup("首领行为技能（Boss Build；这两列只有技能行用）")]
 	/// <summary>
 	/// 处理器 id（<c>BossPerkCatalog</c> 里注册的字符串）。**留空 = 这是一条普通单位技能行**；
-	/// 非空 = 这是一条首领行为词条，会被编译成运行期词条参与 Boss Build 抽取。
+	/// 非空 = 这是一条首领行为技能（`bhv_*.tres`），会被编译成运行期条目参与 Boss Build 抽取。
 	/// </summary>
 	[Export] public string ApplyHandler { get; set; } = string.Empty;
 
-	/// <summary>词条抽中概率（只在 <see cref="ApplyHandler"/> 非空时有意义）。</summary>
+	/// <summary>抽中概率（只在 <see cref="ApplyHandler"/> 非空时有意义）。</summary>
 	[Export] public float Weight { get; set; } = 1f;
 
-	/// <summary>这条行是不是"首领行为词条"（Boss Build），而不是挂在单位身上的普通技能。</summary>
+	/// <summary>这条行是不是"首领行为技能"（Boss Build），而不是挂在单位身上的普通技能。</summary>
 	public bool IsBossBuild => !string.IsNullOrEmpty(ApplyHandler);
 
 	/// <summary>

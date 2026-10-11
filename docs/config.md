@@ -26,6 +26,14 @@
 > 单位表（`UnitConfig`）多一列 **`AiProfile`**（**资源引用**，指向档案行）。
 > 以前"让所有敌人更激进"要开 10 个场景改 30 处，现在在 `AiProfiles/` 这一张表里按列排序/批量改即可。
 > 细节、实测与两次回退验证见文末「配置表阶段 5」一节。
+>
+> **2026-10 用户三项修正（本轮）**：① **Pressure 池里的「铁壁·护甲」整行下线**（用户：「护甲目前就只给
+> 精英怪使用就好了，首领不需要」）→ 池子 **8 → 7 条**，护甲的**唯一**来源现在是精英怪的 `EliteModifier`；
+> ② **术语修正**（用户：「行为型的词条其实不太对，这个应该是算是技能」）→ **行为型 = 技能、数值型 = 词条**，
+> 界面/日志/文档统一（`◆` / `◇` 两个标记不变，改成"计数带名词"）；
+> ③ **命中特效改到实际命中点**（用户：「实际应该在命中的位置发生特效」）→ `AttackHitbox` 用
+> **目标碰撞体表面最近点**取代"目标原点 + 全局高度偏移"，`HitEffectHeightOffset` 这一列因此删除。
+> 细节、判据与两次连跑的实测见文末「用户三项修正实测」。
 
 ## 调参去哪张表
 
@@ -35,8 +43,8 @@
 | **AI 行为（按敌种/首领/召唤物）**：索敌半径、目标刷新间隔、每个行为节点的**优先级与参数**（追击距离 / 舒适圈 / 撤退阈值 / 技能槽开关） | `Config/Tables/AiProfiles/ai_*.tres` | 一个单位的整套 AI 参数 | **11**（9 敌种 + 首领 + 无人机） |
 | **首领**：生命/护甲/移速/攻击四项/持有技能/白板副本血量 | `Config/Tables/Bosses/boss_final.tres` | 一个首领 | 1 |
 | **召唤物**：数值 + 存活时间 | `Config/Tables/Summons/summon_drone.tres` | 一个召唤物 | 1 |
-| **技能**：冷却/前摇/后摇/朝向/开关/接近区间 + 子类专属参数 + 命中体参数 | `Config/Tables/Skills/skl_*.tres` | 一个技能 | **25**（5 玩家 + 16 单位 + 4 首领行为词条） |
-| **首领数值强化池（Pressure）**：权重 / **候选标签** / 改哪些属性 / **技能参数** / **限定词**（只对哪个 Boss、哪几关） | `Config/Tables/Pressure/pmod_*.tres` | 一条数值强化 = **一个参数栏** | **8**（5 数值型参数栏 + 3 技能参数栏） |
+| **技能**：冷却/前摇/后摇/朝向/开关/接近区间 + 子类专属参数 + 命中体参数 | `Config/Tables/Skills/skl_*.tres` | 一个技能 | **25**（5 玩家 + 16 单位 + 4 首领行为技能） |
+| **首领数值强化池（Pressure = 界面上的「词条」）**：权重 / **候选标签** / 改哪些属性 / **技能参数** / **限定词**（只对哪个 Boss、哪几关） | `Config/Tables/Pressure/pmod_*.tres` | 一条数值强化 = **一个参数栏** | **7**（4 数值型参数栏 + 3 技能参数栏） |
 | 玩家基础数值与攻击组 | `Config/Tables/Characters/chr_*.tres` | 一个角色 | 3 |
 | 武器数值（伤害/射速/弹匣/装填/散布/**击退**/暴击/弹速/**升级池**） | `Config/Tables/Weapons/wpn_*.tres` | 一把武器 | 3 |
 | **升级池**（"某把武器的升级池"这个粒度；武器表正向指过来） | `Config/Tables/UpgradePools/pool_*.tres` | 一个池 | 3 |
@@ -180,26 +188,28 @@
 | `Config/Tables/Bosses/boss_final.tres` | 1 | 生命 900 / 护甲 200 / 移速 3.6 / 攻击 24·1.8·3.4·6 / 标签 Boss,Melee；**持有技能 4 行**（`skl_boss_melee` / `skl_boss_scream` / `skl_boss_charge` / `skl_boss_summon`）；`EliteCopyHealthScale = 0.35`（白板首领副本的血量倍率） |
 | `Config/Tables/Summons/summon_drone.tres` | 1 | 生命 40 / 移速 6.0 / 攻击 6·0.9·1.8·1.5 / 标签 Summon / `LifetimeSeconds = 25` |
 | `Config/Tables/Skills/skl_*.tres` | 21 | 技能：`NodeName`（目标能力节点）+ 通用项（Aim/Cooldown/Windup/Recover/Enabled/Approach*）+ `Params`（子类专属，Key = 属性名）+ `AttackParams`（命中体/武器组件） |
-| `Config/Tables/Skills/bhv_*.tres` | 4 | **首领行为词条**（Boss Build）：`ApplyHandler` 非空的技能行，由 `BossPerkCatalog` 编译成运行期词条 |
-| `Config/Tables/Pressure/pmod_*.tres` | **8** | **首领数值强化池**（Pressure）：**一栏一个参数** —— 狂暴·伤害(3/Offense) / 狂暴·攻速(3/Offense) / 铁壁·生命(2/Defense) / 铁壁·护甲(2/Defense，限定第 2·3 关) / 疾行(2/Mobility) / 尖啸回响(1/Offense,Skill) / 冲锋冲击(1/Offense,Skill) / 召唤急速(1/Defense,Skill)。前 5 条是 `StatOverride` 单位属性，后 3 条是**技能参数**（`AbilityScales` / `AttackScales`，见下）。括号里是 **`Weight` / `Tags`** |
+| `Config/Tables/Skills/bhv_*.tres` | 4 | **首领行为技能**（Boss Build）：`ApplyHandler` 非空的技能行，由 `BossPerkCatalog` 编译成运行期条目。**界面上叫「技能」**（用户拍板：行为型的那些本来就是技能，不是"词条"） |
+| `Config/Tables/Pressure/pmod_*.tres` | **7** | **首领数值强化池**（Pressure，**界面上叫「词条」**）：**一栏一个参数** —— 狂暴·伤害(3/Offense) / 狂暴·攻速(3/Offense) / 铁壁·生命(2/Defense) / 疾行(2/Mobility) / 尖啸回响(1/Offense,Skill) / 冲锋冲击(1/Offense,Skill) / 召唤急速(1/Defense,Skill)。前 4 条是 `StatOverride` 单位属性，后 3 条是**技能参数**（`AbilityScales` / `AttackScales`，见下）。括号里是 **`Weight` / `Tags`**。⚠️ **原「铁壁·护甲」(+150 甲) 已按用户要求整行删除**（「护甲目前就只给精英怪使用就好了，首领不需要」） |
 
 **⚠️ 首领强化的两套来源必须能分开（关卡核心文档 §7.1）**：
-行为/技能型在**技能表**里（`ApplyHandler` 非空的那 4 行），数值型在 **Pressure 表**里（8 行）。
+行为/技能型在**技能表**里（`ApplyHandler` 非空的那 4 行 = 界面上的**技能**），数值型在 **Pressure 表**里（7 行 = 界面上的**词条**）。
 两张表分别编译、各自独立回退（一侧读不到不会让另一侧变空），开局日志会分开打条数：
-`首领强化来源：数值型 Pressure 8 条（来源：表 Pressure）/ 行为型 Boss Build 4 条（来源：表 Skills）`。
+`首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）`。
 
 **配置表阶段 6 起，两个抽取点也彻底分开了**（这是 §7.1/§7.5 的硬要求）：
 
 | 抽取点 | 候选 | 谁触发 | 代码入口 |
 |---|---|---|---|
-| **Boss 开场词条**（Boss Build） | **只有行为型 4 条** | Boss 出生时，词条数 = `StageDefinition.BossPerkCount` | `BossPerkCatalog.Roll(count)` |
-| **Pressure 转换**（§7.5 数值池） | **只有数值型 8 条**（按 `Tags` 过滤 + 按 `Weight` 加权） | 每跨过一次 Pressure 阈值**立即**抽一次（**抽签**不判限定词） | `BossPerkCatalog.RollPressure(tags)` |
+| **Boss 开场技能**（Boss Build） | **只有行为型 4 条** | Boss 出生时，技能数 = `StageDefinition.BossPerkCount` | `BossPerkCatalog.Roll(count)` |
+| **Pressure 转换**（§7.5 数值池） | **只有数值型 7 条**（按 `Tags` 过滤 + 按 `Weight` 加权） | 每跨过一次 Pressure 阈值**立即**抽一次（**抽签**不判限定词） | `BossPerkCatalog.RollPressure(tags)` |
 | **限定词判定**（阶段 7） | 上面抽到的那一条 | **Boss 出生时**（两条路都要经过 `perk.Apply`） | `BossPerkCatalog.ApplyWithRefresh` |
 
 ⚠️ 两套来源因此在代码里可以**独立配置、独立追踪、独立结算**（§7.5 最后一句）。
 **没有**为 Pressure 设计"可被玩家增幅修改"的接口（§7.2 明令禁止）。
-⚠️ **行为变化**：开场词条的候选集从"数值型 + 行为型合并的 7 条"变成"只有行为型 4 条" ——
+⚠️ **行为变化**：开场技能的候选集从"数值型 + 行为型合并的 7 条"变成"只有行为型 4 条" ——
 这是文档要求的变化（不是回归）；数值型改由 Pressure 转换产出。详见文末「配置表阶段 6」。
+⚠️ **术语（用户 2026-10 修正）**：**行为型 = 技能、数值型 = 词条**，两者不能再统称"词条"
+（行为型的那 4 行本来就是技能表里的行）。界面上 `◆` = 技能、`◇` = 词条。见文末「用户三项修正实测」。
 
 **技能表的两个约定**（避免两个真源）：
 1. **单位的"主攻击"四个数以单位行为准**（`ApplyAttackTo` 在技能行之后套用）。
@@ -384,11 +394,19 @@
 | `ShowHitEffects` | 命中 / 击中时是否播放命中特效（**一个开关管两条路径**：投射物命中 + 命中体击中） |
 | `HitEffectScenePath` | 命中特效预制体（默认 `res://Assets/Effects/fx_combat_hit.tscn` = Binbun Hit FX，CC0） |
 | `HitEffectLifetime` | 特效存活多少秒之后自毁（默认 **1.8** = 素材 `main` 动画 1.6s + 0.2s 尾巴）。⚠️ 给 0 = 每次命中都在场景里留一个常驻节点 |
-| `HitEffectHeightOffset` | **命中体那一跳**的竖直抬升（单位原点在脚底，1.0 ≈ 1.8m 单位的胸口）；投射物那一路不用它（射线命中点本来就在身上） |
+
+> **`HitEffectHeightOffset` 已删除（用户 2026-10 指示 ⑤：「实际应该在命中的位置发生特效」）**：
+> 命中体那一路原来落在"目标原点 + 这个全局高度"（单位原点在脚底，所以要 +1.0 抬到胸口），
+> 现在改成落在**目标碰撞体表面上离命中体最近的那一点**（`AttackHitbox.ResolveHitPoint`），
+> 兜底点也是碰撞体自己的中心 —— 全局高度偏移因此**没有任何消费者**了，留一列"改了没用的配置"
+> 是项目反复清理过的东西，所以整列删掉（字段 + `Balance.tres` 的那一行一起删）。
+> 细节、判据与实测见文末「用户三项修正实测」§三。
 
 > 出生逻辑只有一处：`Scripts/Combat/HitEffect.cs`（`Projectile.ResolveImpact` 与
 > `AttackHitbox._PhysicsProcess` 各调一行）。为什么必须由 C# 管寿命、以及两条路径的截图证据，
 > 见 [art-integration-log.md](art-integration-log.md) 的「第三轮」。
+> 两条路径的**位置**口径：投射物用**射线命中点**（`Projectile` 本来就有）；命中体用
+> **碰撞体表面最近点**（`AttackHitbox.ResolveHitPoint`，几何算法，不读物理空间）。
 
 ## 当前取值（2026-10 原型）
 
@@ -1102,6 +1120,11 @@ W2/W3 只改了 `.tres` 的 `Weight` 列（没重新编译）就换了分布 →
 
 ## 配置表阶段 7 实测（2026-10：Pressure 词条拆成"一参数一栏" + 技能参数入池 + 限定词刷新判定）
 
+> ⚠️ **本节是阶段 7 当时的记录（池子 8 条）。后续一轮按用户指示做了三处修正**：
+> **①「铁壁·护甲」整行删除（池子 8 → 7 条）**、② 行为型改称**技能**（数值型才叫**词条**）、
+> ③ 命中特效改到**实际命中点**。所以本节里的 `8 条`、`20% / 13.3% / 6.7%` 概率、
+> 以及带「铁壁·护甲」的日志样本都是**历史样本**，当前口径见文末「用户三项修正实测」。
+
 **需求原话**：「词条我这里只看到了 3 条，`Pressure/` 里的，不过这三条应该**拆成 5 条**的，
 **每个参数单独占一个词条栏**。如果可以的话**把一些技能的参数也加入词条里**
 （尽管每个 boss 可能都不同，**限定词记得做好刷新判定**）」
@@ -1115,7 +1138,7 @@ W2/W3 只改了 `.tres` 的 `Weight` 列（没重新编译）就换了分布 →
 | `pmod_berserk_dmg` | 狂暴·伤害 | `DamageMultiplier` ×1.25 | **3** | 20.0% | ← `pmod_berserk`（拆） |
 | `pmod_berserk_speed` | 狂暴·攻速 | `AttackSpeedMultiplier` ×1.2 | **3** | 20.0% | ← `pmod_berserk`（拆） |
 | `pmod_fortress_hp` | 铁壁·生命 | `MaxHealthMultiplier` ×1.4 | **2** | 13.3% | ← `pmod_fortress`（拆） |
-| `pmod_fortress_armor` | 铁壁·护甲 | `MaxArmorAdd` +150（Add） | **2** | 13.3% | ← `pmod_fortress`（拆）+ **限定关卡** |
+| ~~`pmod_fortress_armor`~~ | ~~铁壁·护甲~~ | ~~`MaxArmorAdd` +150（Add）~~ | ~~2~~ | ~~13.3%~~ | ← `pmod_fortress`（拆）+ 限定关卡 —— **该行已在后续一轮整行删除**（用户：「护甲目前就只给精英怪使用就好了，首领不需要」） |
 | `pmod_swift` | 疾行 | `MoveSpeedMultiplier` ×1.35 | **2** | 13.3% | 本来就是单参数，**文件名不变** |
 | `pmod_scream_echo` | 尖啸回响 | `AbilityScream.Cooldown` ×0.8 | **1** | 6.7% | 🆕 **技能参数** |
 | `pmod_charge_impact` | 冲锋冲击 | `AbilityCharge` 命中体 `Damage` ×1.25 | **1** | 6.7% | 🆕 **技能参数** |
@@ -1338,6 +1361,151 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
   `ConfigRows.Count<AbilityConfig>()`（自测的 `25 行`）与 `BossPerkCatalog.BehaviorOnly`（自测的 `4 条`）
   两个既有回归指标**同时漂**，也模糊了"行为 vs 数值"的界线。
 - 想让**行为型**词条也带限定词（比如"某个行为词条只对某关生效"）需要给 `AbilityConfig` 加列 ——
-  本轮没做（`Scripts/Config/` 的其它行类同时有别的改动在进行）。行为型词条天然的自我限定是
+  本轮没做（`Scripts/Config/` 的其它行类同时有别的改动在进行）。行为型条目天然的自我限定是
   "它引用的能力节点找不到就写警告跳过"（`EnableAbility` 处理器）。
+
+## 用户三项修正实测（2026-10：护甲下线 + 术语「技能 / 词条」+ 命中特效落在**命中点**）
+
+**需求原话（三句，来自同一轮评审）**：
+> ②「**护甲目前就只给精英怪使用就好了，首领不需要**」
+> ④「**行为型的词条其实不太对，这个应该是算是技能**」
+> ⑤「不需要（细分开关），**实际应该在命中的位置发生特效**」
+
+**编译**：`& build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（每一步都跑）。
+**自测**：`selftest.flag` + gdmcp `run_project`，两次连跑（`run_20261012_003652.log` / `run_20261012_003734.log`）**数值逐位相同**，跑完全程到「=== 自测结束 ===」并自动退出；flag 跑完即删。
+
+### 一、② 护甲只给精英怪：`pmod_fortress_armor` 整行下线（Pressure 8 → 7 条）
+
+一行数据要在**三个地方同时**下线，缺一个就会出问题（第二个是项目反复踩的静默回退坑）：
+
+| # | 改哪里 | 怎么改 | 不改会怎样 |
+|---|---|---|---|
+| ① | 行文件 `Config/Tables/Pressure/pmod_fortress_armor.tres` | **删除文件**（该目录没有 `.uid`） | 留下没人引用的孤儿行 |
+| ② | `Config/Balance.tres` | **`[ext_resource]` 那一行**（`id="111_pmod_fortress_armor"`）与 **`PressureMods` 数组里那一项**一起删；`load_steps` 114 → 113 | 只删行文件 → **整份 `Balance.tres` 加载失败**、所有数值静默回退（config.md 顶部那条纪律） |
+| ③ | **代码兜底** `Scripts/Boss/BossPerk.cs` 的 `FallbackPressure` | 删掉那条 `BossPerk`（表读不到时用的那份） | 表一读不到，首领**又会吃护甲**（静默换挡）—— 正是阶段 7 注释里防的那类坑 |
+
+**精英怪的护甲来源（读代码确认，没误伤）**：精英护甲**与 Pressure 无关**，来自
+`Scripts/Combat/EliteModifier.cs`（`ArmorAdd = 120`，`_Ready` 里 `Stats.AddModifier("MaxArmorAdd", Add, 120)`；
+由 `EncounterController` 在生成时 `enemy.AddChild(new EliteModifier())` 挂上）。
+改动后全项目 `MaxArmorAdd` 的**生产者只剩 EliteModifier 这一个**（`grep` 实测：
+`EliteModifier.cs:35` 一处，消费者是 `Unit.RefreshStats`），所以"护甲只给精英怪"这条现在是代码事实。
+
+**实测**（两次连跑一致）：
+
+```
+[Config] 首领强化来源（…§7.1…）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**）4 条（来源：表 Skills）
+[Config] Pressure 转换池（§7.5…）：候选 7 条 [pmod_berserk_dmg 权重 3 → 23.1% · pmod_berserk_speed 权重 3 → 23.1% ·
+         pmod_fortress_hp 权重 2 → 15.4% · pmod_swift 权重 2 → 15.4% · pmod_scream_echo 权重 1 → 7.7% ·
+         pmod_charge_impact 权重 1 → 7.7% · pmod_summon_haste 权重 1 → 7.7%]
+[SelfTest] 配置表比对·索引：… 技能 25/Pressure 7/…（期望 3/3/10/1/1/25/7/9/9/5/3/11）
+[SelfTest] Pressure 词条池（数值型 = 界面上的**词条**）：7 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）
+         ｜ 带限定词的 3 条（期望 3 = 3 技能参数）｜ 明细：[…没有 pmod_fortress_armor…]
+[SelfTest] 限定词刷新判定·关卡限定（合成限定词 StageIds=[stg_core]，池里已无行用它）：当前关卡 → 不成立 ｜
+         把当前关卡换成 stg_core 再判 → 成立
+```
+
+**连带的三处同步**（都是"描述必须跟上数据"）：
+- 自测期望串 `…/25/**8**/9/…` → `…/25/**7**/9/…`（`SelfTest.ReportTables`）；探针
+  `Pressure 词条池：… 期望 8 = 5+3` → `期望 7 = 4+3`、`带限定词的 4 条` → `3 条`（`BossPerkProbe`）。
+- ⚠️ **`StageIds` 现在池里没有行再用它了**（它是 `pmod_fortress_armor` 独有的限定词）。
+  字段与判定逻辑**保留**（以后要给某条加关卡限定不用重写判定），探针改成用一个**合成限定词**
+  `StageIds=[stg_core]` 继续验证"同一帧换关卡 → 结论不同"，`DebugStageIdOverride` 因此仍然有消费者。
+- 行文件里的 Note（`pmod_fortress_hp.tres`）与 `BossPerkCatalog` 的类注释都写明了"护甲那一栏已删除"。
+- 权重分母 15 → **13**，所以**每一条的概率都变了**（20% → 23.1% 等）；抽取的**随机序列也会漂**
+  （候选少一条）—— 这是"下线一条"的必然结果，不是回归。
+
+### 二、④ 术语：行为型 = **技能**，数值型 = **词条**（只改面向人的文案）
+
+用户指出的问题：HUD 把两类东西**统称"词条"**（`◆` 行为型 / `◇` 数值型），但行为型的那些
+**本来就是技能**（`Config/Tables/Skills/bhv_*.tres`，是技能表里的行，首领"学会/觉醒一个技能"）。
+
+**改成的口径**（全项目统一这一条）：
+
+| 来源 | 表 | 界面/日志/文档里的叫法 | 标记 |
+|---|---|---|---|
+| 行为型 Boss Build | `Config/Tables/Skills/bhv_*.tres`（`ApplyHandler` 非空） | **技能** | `◆` |
+| 数值型 Pressure | `Config/Tables/Pressure/pmod_*.tres` | **词条** | `◇` |
+
+**`◆` / `◇` 符号体系保持不变**（判断与理由）：两个记号本来就区分了来源，用户提的是**叫法**不对；
+换字形会让既有截图 / 日志 / 文档里的记号失去对应，收益为零。区分手段改成**计数带名词**：
+
+```
+词条 4 ◆提前觉醒 ◆冲锋强化 ◇狂暴 ◇疾行×2          ← 改前（两类都叫"词条"，是错的）
+技能 2 · 词条 2 ◆提前觉醒 ◆冲锋强化 ◇狂暴 ◇疾行×2   ← 改后（`BossPerkText.Summary` 生成）
+```
+
+**改了哪些文件**（**没有**改任何 `bhv_*` 文件名 / 目录 / 类名 / 字段名 —— 用户明确要求不动）：
+
+| 文件 | 改了什么 |
+|---|---|
+| `Scripts/UI/BossPerkText.cs` | 类注释与两个标记的注释改口径；新增 `Summary()`（"技能 N · 词条 N"）；`FormatLine`/`Lines`/`Total` 的注释同步 |
+| `Scripts/UI/PlayerHud.cs` | 血条栏那一行改用 `Summary()`（原来写死 `"词条 {总数}"`）；相关注释 |
+| `Scripts/UI/BossPreviewScreen.cs` | 【词条】一节拆成 **【技能】**（行为型 Boss Build）+ **【词条】**（数值型 Pressure）两节 |
+| `Scripts/Boss/BossPerk.cs` | 日志（`首领强化来源` / `Pressure 转换池` / 抽取点）、类注释、`Roll()` 的注释改成"开场技能" |
+| `Scripts/Config/AbilityConfig.cs` | `[ExportGroup("首领行为技能（Boss Build；…）")]`（**编辑器里能看到的那一行**）+ 注释；⚠️ 只改标题字符串，不改字段名/类型/默认值 |
+| `Scripts/Config/{BossConfig,StageDefinition,NodeConfig,PressureModConfig}.cs` | 注释里的"行为词条"→"行为技能"/"开场技能"，`StageDefinition` 的分组标题「开场词条数」→「开场技能数」 |
+| `Scripts/Encounter/EncounterController.cs` | 注释与"白板首领"的措辞（`BossPerkCount` 的注释） |
+| `docs/config.md`、`docs/boss.md`、`docs/todo-handoff.md`、`docs/art-integration-log.md` | 本文档各处 + 交接文档的任务条目 + 特效那一节 |
+
+**刻意没碰的两处**（写明原因，避免下一个人以为漏了）：
+- `Scripts/Run/StageController.cs`：题面边界是"Pressure 结算逻辑只改数据不改算法"，所以哪怕
+  那两条日志里还写着"与 Boss Build **行为词条**分开结算"也没动 —— 要改建议单独一次提交、只动字符串。
+- `Scripts/Encounter/EncounterController.cs` 的 `SpawnBossNow` 日志 `无压力 / 无词条`：这里的"词条"
+  是**泛称"没有任何强化"**（技能与数值都没有），不是把行为型叫成词条，所以保留原样（保持既有日志可比对）。
+
+### 三、⑤ 命中特效：落在**实际命中点**（并删掉 `HitEffectHeightOffset`）
+
+**改前**：`AttackHitbox._PhysicsProcess` 里写的是
+`target.GlobalPosition + Up × Balance.Settings.HitEffectHeightOffset`（默认 1.0）——
+即"目标原点（脚底）+ 一个全局胸口高度"。**改后**：`AttackHitbox.ResolveHitPoint(target)`。
+
+**取的到底是什么点**：把**命中体自己的世界坐标**投到**目标碰撞体**上，取**表面上最近的那一点**
+（单位预制体里的直接子节点 `Body`：胶囊 → 先投到中轴线段、再沿半径推到表面；球 → 沿半径推；
+盒 → 转进局部空间再夹到盒面上；认不出的形状 / 没有碰撞体 → 退回**碰撞体中心**）。
+语义就是"这一刀落在身上的哪一面"，而且完全由**碰撞体几何**决定。
+
+**为什么不用射线（试过，被实测否掉）**：重叠判定（`GetOverlappingBodies()`）只回答"撞上了谁"，
+**不给接触点**，所以第一版实现是"从命中体朝目标身体中心打一条射线、取 `hit["position"]`"
+（与 `Projectile` 同款 API）。**自测里 7 次跑出 3 次"打空"**：射线读的是**物理空间在查询那一瞬间**
+的状态，而下面三种情况里脚本位置 ≠ 物理位置 —— 目标被脚本挪动（探针 `GlobalPosition += 10m` 后
+同一帧射线直接打空）、刚被冻住、或刚被打死（`Unit.Die()` 把 `CollisionLayer` 归零，射线再也找不到它）。
+打空的后果是**静默退化**成兜底点（特效落回身体中心），不报错、不写警告。几何最近点没有这些时序依赖。
+（顺带留下的两处纪律：命中点**先算、再 `ReceiveHit`**；射线版本还需要"逐个排除挡路的怪"才能在
+人堆里打中目标 —— 几何版不需要。）
+
+**`HitEffectHeightOffset` 的处置 = 删除**（字段 + `Balance.tres` 的那一行一起删）：它唯一的消费者
+就是被替换掉的那一行代码，留着就是"一列改了没用的死配置"（与配置表阶段 3 清理死字段同一条纪律）。
+投射物那条路径（`Projectile.ResolveImpact`）**一行没动** —— 它本来就有精确的射线命中点。
+⚠️ 红线遵守：`Scenes/Combat/Explosion.tscn` 的 `SphereShape3D radius=1` 与 `Lifetime=0.12` **一个字节没动**
+（`Explosion` 继承 `AttackHitbox`，所以爆炸打到谁就用谁的表面点）。
+
+**判据与证据**（探针不重算命中点，而是量"这个点离碰撞体表面有多远"——落进身体里就会 ≈ 半径）：
+`SelfTest` 新增命中特效探针：把玩家的近战命中体挪到**目标正东 1.0m**（敌人在命中体盒内、命中体中心在
+敌人体外）并激活；目标**先冻住**（`ProcessMode.Disabled`，否则 0.2 秒的结算窗口里它自己会跑掉，
+量出来的距离里会混进位移）；结算时读 `HitEffect.RecentSpawns`（DEBUG-only 的出生点记录，
+`AttackHitbox` 真的传进去的那个点）+ 场景里新出生的特效节点互为佐证。
+
+```
+[SelfTest] 命中特效探针·准备：玩家近战命中体已挪到 FastMelee 正东 1.0m 并激活 ｜ 命中体原点 (2.33, 0, 4.06) ｜
+         目标身体中心 (1.33, 0.8, 4.06)（= 它 `Body` 碰撞体自己的位置）· 碰撞体半径 0.4 ｜ 目标已临时冻结（结算时还原）
+[SelfTest] 命中特效位置实测（用户要求 5：特效出现在**实际命中的位置**）：正式代码写下的出生点 (1.21, 0.8, 3.71) ｜
+         到 FastMelee 碰撞体**表面**的偏差 0.026 米（半径 0.4 → 落在表面上；偏差 ≈ 半径 才叫「掉进身体里」）·
+         离地 0.8（身体中心离地 0.8）｜ 对照·旧做法基线（目标原点 + 高度 1.0）到表面偏差 0.4 米（= 掉在身体里、离地写死 1.0）｜
+         目标这次被打死了=True ｜ 旁证·同批新出生节点 4 个：[「VFXHit_02」(3 粒子) 距身体中心 0.66 · …]
+```
+
+读法：**新做法 0.026 米**（= 贴在碰撞体表面上，残差来自命中体自己在这 0.2 秒里被玩家带着走了 2~3 厘米）；
+**旧做法 0.4 米**（正好等于胶囊半径 —— 点落在中轴上，也就是**埋在身体里**）。
+两次连跑数字**逐位相同**（`0.026` / `0.400`），这条现在是可回归的硬指标。
+`HitEffect.RecentSpawns` 是 `#if DEBUG` 的取证字段（Release 构建里不存在），正式逻辑从不读它。
+
+### 四、这一轮**没有**做的事（留给下一轮决定）
+
+- ⚠️ **首领本体的护甲没动**：`Config/Tables/Bosses/boss_final.tres` 与 `Scenes/Enemies/Boss.tscn` 仍是
+  **200 基甲**。用户原话是"护甲就只给精英怪使用，首领不需要"，但**这次下线的是 Pressure 池里那条护甲词条**
+  （题面明确的范围）；"要不要把首领的 200 基甲也拿掉"是**数值决策**（会影响护甲优先/破甲的整条链路），
+  没有顺手动。要动的话改一处即可：`boss_final.tres` 的 `Armor`（行优先、场景兜底）。
+- ⚠️ **Pressure 的强度需要重新平衡**：池子从 8 条变 7 条，单条概率整体上扬（20% → 23.1% 等），
+  且阶段 7 已知的"每抽期望强度只有拆分前的 58.9%"这条结论**不受影响**（它由"一抽只买一个参数"决定）。
+- `StageController` 里那两条日志的措辞没有跟着改（边界约束，见 §二末尾）。
 

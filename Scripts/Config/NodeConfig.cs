@@ -76,7 +76,7 @@ public partial class NodeConfig : ConfigRow
 	/// <summary>
 	/// 这个节点触发的抽取允许哪些**数值型**候选标签（留空 = 不表态 → 用关卡行的
 	/// <see cref="StageDefinition.PressureUpgradeTags"/>；两层都空 = 不限制）。
-	/// ⚠️ 只描述数值型强化（关卡核心文档 §7.1）—— 行为/技能型词条是 Boss Build 的职责，不在这里。
+	/// ⚠️ 只描述数值型强化（关卡核心文档 §7.1，= 界面上的**词条**）—— 行为/技能型（**技能**）是 Boss Build 的职责，不在这里。
 	/// </summary>
 	[Export] public string[] BossModifierTags { get; set; } = System.Array.Empty<string>();
 }

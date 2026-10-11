@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ActRoguelike.Config;
 using Godot;
 
@@ -12,7 +13,8 @@ namespace ActRoguelike.Combat;
 ///   手上有一个**精确的射线命中点**，特效就炸在那儿。</item>
 /// <item><b>击中（命中体）</b>：<see cref="AttackHitbox._PhysicsProcess"/> —— 近战挥砍 / AOE / 冲锋 /
 ///   爆炸的判定窗口（<see cref="Explosion"/> 继承自它，所以爆炸打到的单位也走这条）。
-///   这条路径**没有表面命中点**（判定的是"重叠"，不是射线），所以用目标原点 + 配置里的胸口高度偏移。</item>
+///   这条路径的判定是"重叠"，重叠检测**不给接触点**，所以由 <c>AttackHitbox.ResolveHitPoint</c>
+///   补一条射线取**目标碰撞体表面的实际命中点**（用户要求：「实际应该在命中的位置发生特效」）。</item>
 /// </list>
 /// 两处共用同一个特效资源、同一个全局开关与同一套生命周期，所以出生逻辑只写一份。</para>
 ///
@@ -75,6 +77,11 @@ public static class HitEffect
 		parent.AddChild(fx);
 		fx.GlobalPosition = position;
 
+#if DEBUG
+		// 自测取证用（正式逻辑从不读它；Release 构建里这些成员不存在）。
+		RecordSpawn(position);
+#endif
+
 		// 自己计时销毁（素材不自毁，见类注释）。<= 0 = 不接管（交给特效自己，慎用）。
 		if (settings.HitEffectLifetime > 0f)
 		{
@@ -87,6 +94,28 @@ public static class HitEffect
 			};
 		}
 	}
+
+#if DEBUG
+	/// <summary>
+	/// 自测取证用：**最近 8 次**出生的世界坐标（= `AttackHitbox` / `Projectile` 真的传进来的那个点）。
+	///
+	/// <para>为什么不是"最近一次"：一次近战挥砍在人堆里会同时打中好几只，**每只都生一份特效** ——
+	/// 只留最后一次，自测就分不清"哪一份是这一只怪的"。自测拿它跟"回读场景里的节点"互为佐证。</para>
+	/// </summary>
+	public static IReadOnlyList<Vector3> RecentSpawns => _recentSpawns;
+
+	private static readonly List<Vector3> _recentSpawns = new();
+
+	private static void RecordSpawn(Vector3 position)
+	{
+		if (_recentSpawns.Count >= 8)
+		{
+			_recentSpawns.RemoveAt(0);
+		}
+
+		_recentSpawns.Add(position);
+	}
+#endif
 
 	/// <summary>读特效预制体（表里的路径优先，读不到就警告一次并跳过）。</summary>
 	private static PackedScene? ResolveScene(BalanceConfig settings)

@@ -17,7 +17,7 @@ namespace ActRoguelike.Config;
 /// <b>§7.5 的转换池已经接线（配置表阶段 6）</b>：Pressure 每跨过一次阈值就<b>立即</b>从本表抽一条
 /// （<see cref="ActRoguelike.Boss.BossPerkCatalog.RollPressure"/>，按 <see cref="Weight"/> 真加权），
 /// 抽签点在 <c>StageController.AddPressureForNode</c>，套用点在 Boss 出生时。
-/// 而 Boss <b>开场词条</b>那条路只从行为型里抽（<c>BossPerkCatalog.Roll</c>）——
+/// 而 Boss <b>开场技能</b>那条路只从行为型里抽（<c>BossPerkCatalog.Roll</c>；行为型 = 界面上的"技能"）——
 /// 两套来源各有各的抽取点，不再合成一个池。
 ///
 /// ⚠️ 也**没有**为 Pressure 设计"可被玩家增幅修改"的接口（§7.2 明令禁止）。
@@ -38,7 +38,7 @@ public partial class PressureModConfig : ConfigRow
 	/// 抽取点用"节点行的 <see cref="NodeConfig.BossModifierTags"/>（优先）→ 关卡行的
 	/// <see cref="StageDefinition.PressureUpgradeTags"/> → 留空"决定这次允许哪些标签：
 	/// 候选 = 标签有交集的那些行；两层都留空 = 不限制（本表全部行都是候选）。
-	/// ⚠️ 只描述数值型强化，**绝不包含行为或技能型词条**（那是 Boss Build 的职责）。
+	/// ⚠️ 只描述数值型强化（= 界面上的**词条**），**绝不包含行为或技能型**（那些是界面上的**技能**，Boss Build 的职责）。
 	/// </summary>
 	[Export] public string[] Tags { get; set; } = System.Array.Empty<string>();
 

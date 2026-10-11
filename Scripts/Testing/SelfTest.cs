@@ -113,10 +113,12 @@ public partial class SelfTest : Node
 
 			case 3 when _timer > 5.0f:
 				ReportCombat(stage);
+				BeginHitEffectProbe();
 				Next();
 				break;
 
 			case 4 when _timer > 0.2f:
+				ReportHitEffectProbe();
 				stage?.DebugStartCombat(2);
 				GameLog.Write("SelfTest", $"开战（2 波上限）：{stage?.DebugState}");
 				PressFireOnce();
@@ -523,7 +525,7 @@ public partial class SelfTest : Node
 				: $"配置表比对·武器：伤害 {weapon.Damage:0}（期望 24） 间隔 {weapon.FireInterval:0.##}（期望 0.26） 弹匣 {weapon.EffectiveMagazineSize}（期望 12） 装填 {weapon.ReloadTime:0.##}（期望 0.7） 散布 {weapon.SpreadDegrees:0.##}（期望 0.5） 击退 {weapon.Knockback:0.##}（期望 2.5） 暴击 {weapon.CritChance:0.##}（期望 0.15） 弹速 {weapon.ProjectileSpeed:0}（期望 90） 预瞄FOV {weapon.AimFov:0}（期望 55） 穿透 {weapon.BasePierce}（期望 0） 连发 {weapon.Automatic}（期望 False）");
 
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}（期望 3/3/10/1/1/25/8/9/9/5/3/11）");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}（期望 3/3/10/1/1/25/7/9/9/5/3/11）");
 
 		GameLog.Write("SelfTest",
 			$"配置表比对·节点表：进化层 {NodePlacement.LayerOf(RewardNodeKind.Evolution)}/波 {NodePlacement.WavesFor(RewardNodeKind.Evolution)}（期望 2/3） 强化层 {NodePlacement.LayerOf(RewardNodeKind.Enhancement)}/波 {NodePlacement.WavesFor(RewardNodeKind.Enhancement)}（期望 1/2） 恢复层 {NodePlacement.LayerOf(RewardNodeKind.Heal)}/波 {NodePlacement.WavesFor(RewardNodeKind.Heal)}（期望 0/1） 商店价目 {RewardService.ShopCost(0)}/{RewardService.ShopCost(1)}/{RewardService.ShopCost(2)}（期望 5/12/18） 标题 {RewardService.TitleFor(RewardNodeKind.Mutation)}（期望 异化池）");
@@ -631,7 +633,7 @@ public partial class SelfTest : Node
 		// 技能表（阶段 3）：行数 + 首领强化的两套来源必须能分开。
 		ActRoguelike.Config.AbilityConfig? dashRow = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AbilityConfig>("skl_dash");
 		GameLog.Write("SelfTest",
-			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 25 = 5 玩家 + 16 单位 + 4 首领行为） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型 {ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型 {ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 8 = 5 数值型参数栏 + 3 技能参数栏）");
+			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 25 = 5 玩家 + 16 单位 + 4 首领行为） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型（**技能**）{ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型（**词条**）{ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）");
 
 		// AI 行为表（阶段 5）：行数 + "敌人行 → 档案"的关联 + **真的写进去了**的硬证据。
 		ActRoguelike.Config.AiProfileConfig? chaserAi = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AiProfileConfig>("ai_chaser");
@@ -782,11 +784,243 @@ public partial class SelfTest : Node
 		// ③ 面板文案：自测不用开界面就能断言"当前首领状况"里真的有 Pressure 与词条（用户需求 3）。
 		GameLog.Write("SelfTest", $"首领状况面板（{BossPreviewScreen.Describe(stage, stage.CurrentNode).Replace("\n", " ／ ")}");
 
-		// ④ 血条栏那一行词条（用户需求 2）：行为型 + 数值型合并显示、同名折叠成 ×N。
-		//    这里场上还没有 Boss，所以行为型为空、只有本关抽到的数值型 —— 折叠规则照常生效。
+		// ④ 血条栏那一行强化（用户需求 2）：技能 + 词条合并显示、同名折叠成 ×N、计数带名词。
+		//    这里场上还没有 Boss，所以技能那一侧为空、只有本关抽到的数值型词条 —— 折叠规则照常生效。
 		int total = BossPerkText.Total(null, stage.PressurePerks);
-		GameLog.Write("SelfTest", $"词条显示（血条栏一行，上限 5：同名折叠成 ×N、超出折叠成 …+N）：{BossPerkText.FormatLine(null, stage.PressurePerks, 5)}（本关抽到 {total} 条，期望总数 {total} = 显示条数之和）");
+		GameLog.Write("SelfTest", $"强化显示（血条栏一行，上限 5：同名折叠成 ×N、超出折叠成 …+N）：{BossPerkText.Summary(null, stage.PressurePerks)} {BossPerkText.FormatLine(null, stage.PressurePerks, 5)}（本关抽到 {total} 条，期望总数 {total} = 显示条数之和）");
+
+		// ⑤ 两套来源**同时有**时的计数名词（「技能 N · 词条 N」）—— 这里场上还没有首领，
+		//    所以拿行为型池（`bhv_*` = 界面上说的"技能"）当样本，纯文案断言、不用开界面。
+		//    没有这一行的话，"技能 + 词条并存"那一条分支在自测里永远不会被走到。
+		GameLog.Write("SelfTest", $"强化显示（技能 + 词条并存，计数名词 = 「技能 N · 词条 N」）：{BossPerkText.Summary(ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly, stage.PressurePerks)} {BossPerkText.FormatLine(ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly, stage.PressurePerks, 5)}");
 	}
+
+	// === 命中特效位置探针（用户要求 5：「实际应该在命中的位置发生特效」）===
+	// 真打一次近战：把玩家身上那个近战命中体挪到"贴着敌人、但中心在敌人体外"的位置再激活 ——
+	// 于是走的是**与正式战斗完全相同**的一条路（重叠判定 → ReceiveHit → HitEffect.Spawn）。
+	// 探针只做两件事：① 结算时回读**场景里刚出生的那个特效节点**（不是重算一遍公式）；
+	// ② 把它与"旧做法的基线"（目标原点 + 全局高度偏移，本次已删除）并排量出来。
+	// ⚠️ 命中前把目标**临时冻住**（`ProcessMode.Disabled`）：否则敌人 AI 会在"命中"与"结算"之间跑掉，
+	// 量出来的距离里会混进它自己的位移，看起来像"特效位置不对"（那是假象，不是 bug）。
+	private readonly HashSet<ulong> _fxBefore = new();
+	private Unit? _fxTarget;
+	private AttackHitbox? _fxHitbox;
+	private Transform3D _fxHitboxHome;
+	private Vector3 _fxHitboxOrigin;
+	private Vector3 _fxBodyCenter;
+	private float _fxTargetRadius;
+	private ProcessModeEnum _fxTargetProcessMode = ProcessModeEnum.Inherit;
+
+	/// <summary>命中特效探针·准备（在 <c>ReportCombat</c> 之后调用；结算在下一个阶段）。</summary>
+	private void BeginHitEffectProbe()
+	{
+		_fxTarget = null;
+		_fxHitbox = null;
+		_fxBefore.Clear();
+
+		Node? scene = GetTree().CurrentScene;
+		Unit? player = PlayerLocator.Player;
+		if (scene == null || player == null)
+		{
+			GameLog.Write("SelfTest", "命中特效探针：找不到当前场景或玩家，跳过。");
+			return;
+		}
+
+		foreach (Node child in scene.GetChildren())
+		{
+			_fxBefore.Add(child.GetInstanceId());
+		}
+
+		AttackHitbox? hitbox = player.GetNodeOrNull<ActRoguelike.Abilities.Ability>("AbilityMelee") is { } melee
+			? NodeSearch.FindInSubtree<AttackHitbox>(melee)
+			: null;
+
+		// 挑**血最少**的那一只：这样大概率会打出一击致死，正好覆盖"死亡会把 CollisionLayer 归零、
+		// 之后任何射线都找不到它"这条最容易踩的边界（命中点必须在结算之前取，见 `AttackHitbox`）。
+		Unit? enemy = null;
+		foreach (Node node in GetTree().GetNodesInGroup("enemy_units"))
+		{
+			if (node is Unit candidate && !candidate.IsDead && (enemy == null || candidate.Health < enemy.Health))
+			{
+				enemy = candidate;
+			}
+		}
+
+		if (hitbox == null || enemy == null)
+		{
+			GameLog.Write("SelfTest", $"命中特效探针：找不到玩家近战命中体（{hitbox != null}）或场上没有活着的敌人（{enemy != null}），跳过。");
+			return;
+		}
+
+		_fxHitbox = hitbox;
+		_fxHitboxHome = hitbox.GlobalTransform;
+		_fxTarget = enemy;
+		_fxTargetProcessMode = enemy.ProcessMode;
+		enemy.ProcessMode = ProcessModeEnum.Disabled; // 冻住：命中与结算之间它不能动（结算时还原）
+		_fxBodyCenter = BodyCenterOf(enemy);
+		_fxTargetRadius = BodyRadiusOf(enemy);
+
+		// ⚠️ **刻意不挪目标**：实测（2026-10，本探针第四轮）把 `CharacterBody3D` 直接 `GlobalPosition += 10m`
+		// 之后，脚本这边位置变了、**物理空间里的位置没变**（同一帧同参数的射线直接"打空"），
+		// 于是探针量到的是"脚本位置 vs 物理位置"的错位，不是命中点算法的问题。
+		// 真实战斗里目标都是自己走过来的（物理位置可信），所以探针也不挪它 —— 只挪**命中体**（Area3D，
+		// 实测它的位移对射线是即时可见的，第一轮就是这么量出"落在碰撞体表面"的）。
+		// 人堆里挡在前面的怪由 `AttackHitbox.ResolveHitPoint` 逐个排除后继续往前打（不会退化成兜底点）。
+
+		// 命中体中心 = 目标正东 1.0m：命中体盒子 2.6×1.8×2.6、半长 1.3 → 敌人在盒**内**（重叠成立），
+		// 而命中体中心在敌人体**外** → 射线必然"从外面打到表面上"，正是要测的那条路。
+		hitbox.GlobalPosition = enemy.GlobalPosition + new Vector3(1f, 0f, 0f);
+		_fxHitboxOrigin = hitbox.GlobalPosition;
+		hitbox.Activate(player);
+
+		GameLog.Write("SelfTest",
+			$"命中特效探针·准备：玩家近战命中体已挪到 {enemy.Name} 正东 1.0m 并激活 ｜ 命中体原点 {Fmt(_fxHitboxOrigin)} ｜ 目标身体中心 {Fmt(_fxBodyCenter)}（= 它 `Body` 碰撞体自己的位置）· 碰撞体半径 {_fxTargetRadius:0.###} ｜ 目标已临时冻结（结算时还原）");
+	}
+
+	/// <summary>
+	/// 命中特效探针·结算。两路证据并排给出：
+	/// ① **正式代码写下的出生点**（`HitEffect.RecentSpawns`，DEBUG 才有）= 结论；
+	/// ② 同时刻场景里新出生的节点 = 旁证（人堆里一次挥砍会同时打中好几只，所以这一路只用来对照）。
+	/// </summary>
+	private void ReportHitEffectProbe()
+	{
+		AttackHitbox? hitbox = _fxHitbox;
+		Unit? target = _fxTarget;
+		if (hitbox != null)
+		{
+			hitbox.Deactivate();
+			hitbox.GlobalTransform = _fxHitboxHome; // 还原：探针不该改变这一局的近战命中体位置
+		}
+
+		if (target == null || !IsInstanceValid(target))
+		{
+			return;
+		}
+
+		target.ProcessMode = _fxTargetProcessMode; // 解冻
+
+		// ② 旁证：`HitEffect.Spawn` 把特效挂在 `CurrentScene` 下，所以"新出生的直接子节点"里就有它。
+		var born = new List<string>();
+		Node? scene = GetTree().CurrentScene;
+		if (scene != null)
+		{
+			foreach (Node child in scene.GetChildren())
+			{
+				if (_fxBefore.Contains(child.GetInstanceId()) || child is not Node3D node)
+				{
+					continue;
+				}
+
+				born.Add($"「{child.Name}」({CountParticles(node)} 粒子) 距身体中心 {node.GlobalPosition.DistanceTo(_fxBodyCenter):0.##}");
+			}
+		}
+
+		// ① 结论：正式代码最近 8 次出生点里**离目标身体中心最近**的那一个（= 这一只怪的特效）。
+		Vector3? spawn = null;
+		float nearestSpawn = float.MaxValue;
+		foreach (Vector3 candidate in HitEffect.RecentSpawns)
+		{
+			float distance = candidate.DistanceTo(_fxBodyCenter);
+			if (distance < nearestSpawn)
+			{
+				nearestSpawn = distance;
+				spawn = candidate;
+			}
+		}
+
+		if (spawn is not { } point)
+		{
+			GameLog.Write("SelfTest", $"命中特效位置实测：`HitEffect` 一次都没记录到出生点（场景里新出生节点 {born.Count} 个：[{string.Join(" · ", born)}]）—— 没打中或开关关着，跳过。");
+			return;
+		}
+
+		// 判据（**与命中点算法解耦**）：这个点离目标碰撞体**表面**有多远。
+		// 落在表面上 → 偏差 ≈ 0；落进身体里 → 偏差 = 半径量级。旧做法（目标原点 + 高度 1.0）
+		// 正好落在中轴上，所以它的偏差 ≈ 半径 —— 一眼就能看出两种做法的差别。
+		float deviation = SurfaceDeviation(target, point);
+		float oldDeviation = SurfaceDeviation(target, target.GlobalPosition + (Vector3.Up * 1f));
+		float centerHeight = _fxBodyCenter.Y - target.GlobalPosition.Y;
+		GameLog.Write("SelfTest",
+			$"命中特效位置实测（用户要求 5：特效出现在**实际命中的位置**）：正式代码写下的出生点 {Fmt(point)}（`HitEffect.RecentSpawns` 最近 {HitEffect.RecentSpawns.Count} 次里离目标最近的一个）｜ 到 {target.Name} 碰撞体**表面**的偏差 {deviation:0.###} 米（半径 {_fxTargetRadius:0.###} → 落在表面上；偏差 ≈ 半径 才叫「掉进身体里」）· 离地 {point.Y - target.GlobalPosition.Y:0.###}（身体中心离地 {centerHeight:0.###}）｜ 对照·旧做法基线（目标原点 + 高度 1.0）到表面偏差 {oldDeviation:0.###} 米（= 掉在身体里、离地写死 1.0）｜ 目标这次被打死了={target.IsDead} ｜ 旁证·同批新出生节点 {born.Count} 个：[{string.Join(" · ", born)}]");
+	}
+
+	/// <summary>
+	/// 点到目标碰撞体**表面**的距离（探针的判据，故意不复用 `AttackHitbox` 里那套"造点"的代码）：
+	/// 胶囊 = |到中轴段线的距离 − 半径|；球 = |到球心的距离 − 半径|；盒 = 到最近盒面的距离。认不出的形状返回 0。
+	/// </summary>
+	private static float SurfaceDeviation(Unit unit, Vector3 point)
+	{
+		foreach (Node child in unit.GetChildren())
+		{
+			if (child is not CollisionShape3D { Disabled: false } shapeNode || shapeNode.Shape == null)
+			{
+				continue;
+			}
+
+			Transform3D shape = shapeNode.GlobalTransform;
+			float scale = shape.Basis.Y.Length();
+			switch (shapeNode.Shape)
+			{
+				case CapsuleShape3D capsule:
+				{
+					Vector3 axis = shape.Basis.Y.Normalized();
+					float radius = capsule.Radius * scale;
+					float half = Mathf.Max(0f, (capsule.Height * 0.5f) - capsule.Radius) * scale;
+					Vector3 center = shape.Origin;
+					Vector3 projected = center + (axis * Mathf.Clamp((point - center).Dot(axis), -half, half));
+					return Mathf.Abs(point.DistanceTo(projected) - radius);
+				}
+
+				case SphereShape3D sphere:
+					return Mathf.Abs(point.DistanceTo(shape.Origin) - (sphere.Radius * scale));
+
+				case BoxShape3D box:
+				{
+					Vector3 local = shape.AffineInverse() * point;
+					Vector3 half = box.Size * 0.5f;
+					Vector3 delta = new(
+						Mathf.Max(0f, Mathf.Abs(local.X) - half.X),
+						Mathf.Max(0f, Mathf.Abs(local.Y) - half.Y),
+						Mathf.Max(0f, Mathf.Abs(local.Z) - half.Z));
+					return delta.Length() * scale;
+				}
+			}
+		}
+
+		return 0f;
+	}
+
+	/// <summary>子树里的粒子节点数（用来确认"新出生的那个节点"确实是那份命中特效，而不是别人）。</summary>
+	private static int CountParticles(Node node)
+	{
+		int count = node is GpuParticles3D ? 1 : 0;
+		foreach (Node child in node.GetChildren())
+		{
+			count += CountParticles(child);
+		}
+
+		return count;
+	}
+
+	private static CollisionShape3D? BodyShapeOf(Unit unit)
+	{
+		foreach (Node child in unit.GetChildren())
+		{
+			if (child is CollisionShape3D shape && !shape.Disabled)
+			{
+				return shape;
+			}
+		}
+
+		return null;
+	}
+
+	private static Vector3 BodyCenterOf(Unit unit) => BodyShapeOf(unit)?.GlobalPosition ?? unit.GlobalPosition;
+
+	private static float BodyRadiusOf(Unit unit)
+		=> BodyShapeOf(unit)?.Shape is CapsuleShape3D capsule ? capsule.Radius : 0f;
+
+	private static string Fmt(Vector3 v) => $"({v.X:0.##}, {v.Y:0.##}, {v.Z:0.##})";
 
 	/// <summary>当前角色（供验证读取）。</summary>
 	public static bool Active { get; private set; }

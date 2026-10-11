@@ -11,7 +11,7 @@ namespace ActRoguelike.UI;
 
 /// <summary>
 /// 首领状况预览面板（用户需求）：「在交互时可以有面板预览当前首领状况」—— 本关攒了多少 Pressure、
-/// 抽到了哪些词条、首领现在是什么数值，集中在一张只读面板里。
+/// 首领学到了哪些**技能**、抽到了哪些**词条**、首领现在是什么数值，集中在一张只读面板里。
 /// 后期要做词典图鉴，届时与它合并（用户原话）。
 ///
 /// 走既有 UI 框架，不绕过任何一层：
@@ -163,26 +163,30 @@ public partial class BossPreviewScreen : OverlayScreen
 		return string.Join(" · ", parts);
 	}
 
-	/// <summary>两套来源分列显示（§7.1：行为型 Boss Build / 数值型 Pressure 必须能区分来源）。</summary>
+	/// <summary>
+	/// 两套来源分列显示（§7.1：行为型 Boss Build / 数值型 Pressure 必须能区分来源），
+	/// 而且**叫法分开**（用户拍板）：行为型 = **技能**（它本来就是技能表里的行），数值型 = **词条**。
+	/// </summary>
 	private static void AppendPerks(StringBuilder text, StageController stage, EncounterController? encounter)
 	{
 		IReadOnlyList<BossPerk> behavior = encounter?.BossPerks ?? System.Array.Empty<BossPerk>();
 		IReadOnlyList<BossPerk> numbers = stage.PressurePerks;
 
-		text.Append("【词条】\n");
+		text.Append("【技能】（行为型 · Boss Build：首领降临时抽，学到就是它的了）\n");
 		if (behavior.Count == 0)
 		{
 			int expected = stage.Definition?.BossPerkCount ?? 0;
-			text.Append($"  {BossPerkText.BehaviorMark} 行为型（Boss Build）：首领降临时抽 {expected} 条（现在还没有）\n");
+			text.Append($"  {BossPerkText.BehaviorMark} 首领降临时抽 {expected} 条（现在还没有）\n");
 		}
 		else
 		{
-			text.Append($"  {BossPerkText.BehaviorMark} 行为型（Boss Build，首领降临时抽）{behavior.Count} 条\n");
+			text.Append($"  {BossPerkText.BehaviorMark} 技能 {behavior.Count} 条（首领降临时抽）\n");
 			text.Append(BossPerkText.Lines(behavior, BossPerkText.BehaviorMark));
 		}
 
 		string applied = stage.PressurePerksApplied ? "已套用到首领身上" : "首领降临时套用";
-		text.Append($"  {BossPerkText.PressureMark} 数值型（Pressure 阈值转换）{numbers.Count} 条（{applied}）\n");
+		text.Append("【词条】（数值型 · Pressure 阈值转换：一个参数一栏）\n");
+		text.Append($"  {BossPerkText.PressureMark} 词条 {numbers.Count} 条（{applied}）\n");
 		if (numbers.Count == 0)
 		{
 			text.Append("      （还没有跨过阈值）\n");
@@ -202,7 +206,7 @@ public partial class BossPreviewScreen : OverlayScreen
 		Unit? boss = encounter?.Boss;
 		if (boss == null || !GodotObject.IsInstanceValid(boss) || boss.IsDead)
 		{
-			text.Append("  尚未降临（打 Boss 门后出场；上面抽到的数值强化/行为词条都在它出生时套用）\n");
+			text.Append("  尚未降临（打 Boss 门后出场；上面抽到的技能与词条都在它出生时套用）\n");
 			return;
 		}
 

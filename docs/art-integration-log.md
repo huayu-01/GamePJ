@@ -660,7 +660,7 @@ if (GD.Load<PackedScene>("res://Assets/Effects/fx_combat_hit.tscn") is { } hitFx
 |---|---|
 | `reparent(..., true)` 在 `physics_interpolation = true` 下**会丢缩放** | **全程没有 reparent**：特效出生时就 `AddChild` 到最终父节点，再写一次 `GlobalPosition` |
 | Binbun 的粒子**尺寸不跟随节点缩放**（shader 里直接写 `POSITION`） | 所以**没有**开"特效缩放"配置列 —— 那会是一列改了没用的死配置；要改尺寸就改 `fx_combat_hit.tscn` 的材质/网格 |
-| 命中体那一路**没有表面命中点**（判定的是"重叠"），而单位原点在**脚底** | 用 `GlobalPosition + Up × HitEffectHeightOffset`（配置项，默认 1.0 = 1.8m 单位的胸口）；投射物那一路直接用射线命中点 |
+| 命中体那一路**没有表面命中点**（判定的是"重叠"），而单位原点在**脚底** | **当时**用 `GlobalPosition + Up × HitEffectHeightOffset`（配置项，默认 1.0 = 1.8m 单位的胸口）；投射物那一路直接用射线命中点。⚠️ **后续一轮按用户要求改成"落在实际命中点"**：那一列配置**已删除**，命中体那一路改用 `AttackHitbox.ResolveHitPoint`（**目标碰撞体表面上离命中体最近的那一点**，几何算法，不读物理空间）—— 为什么不用射线见 [config.md](config.md)「用户三项修正实测」§三 |
 | `fx_weapon_muzzle.tscn` 那条 `alpha_multiplier` 轨道（运行期把 `material_override` 弄成 null，会刷警告） | **与命中特效无关**：`fx_combat_hit.tscn` 里 `alpha_multiplier` 出现 **0 次**（`Select-String` 实测），本轮也没有往枪口那套里加东西 |
 
 ## 10.3 实测证据（可复现，不用编辑器、不用 MCP）

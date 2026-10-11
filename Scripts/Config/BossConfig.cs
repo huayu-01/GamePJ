@@ -13,7 +13,7 @@ namespace ActRoguelike.Config;
 /// ⚠️ 首领的"行为"分两处，**不要混**（关卡核心文档 §7.1）：
 /// <list type="bullet">
 /// <item>它**会什么技能** → 本行的 <see cref="UnitConfig.Skills"/>（普通技能行）。</item>
-/// <item>它**开局额外获得什么行为词条** → 技能表里 <c>ApplyHandler</c> 非空的那些行（Boss Build 池）。</item>
+/// <item>它**开局额外获得什么技能**（Boss Build，界面上的"技能"）→ 技能表里 <c>ApplyHandler</c> 非空的那些行。</item>
 /// <item>它的**数值型强化**（Pressure）→ `Config/Tables/Pressure/`，与本表无关。</item>
 /// </list>
 /// </summary>

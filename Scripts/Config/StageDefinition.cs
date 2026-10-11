@@ -55,7 +55,7 @@ public partial class StageDefinition : Resource
 	/// <summary>本关开局的免费挑战额度（额度内挑战节点不加 Pressure）。</summary>
 	[Export] public int FreeChallengeQuota { get; set; } = 2;
 
-	[ExportGroup("Boss（护卫数量 / 倍率 / 开场词条数）")]
+	[ExportGroup("Boss（护卫数量 / 倍率 / 开场技能数）")]
 	/// <summary>Boss 出生时带的护卫数量。</summary>
 	[Export] public int BossGuardCount { get; set; } = 2;
 
@@ -65,7 +65,7 @@ public partial class StageDefinition : Resource
 	/// <summary>本关 Boss 的伤害倍率（与全局 <c>BossDamageMultiplier</c> 相乘）。</summary>
 	[Export] public float BossDamageMultiplier { get; set; } = 1f;
 
-	/// <summary>Boss 词条数量（策划文档 §12 Boss 构筑；只抽**行为型**，见 §7.1）。</summary>
+	/// <summary>Boss 开场**技能**条数（策划文档 §12 Boss 构筑；只抽**行为型** = 技能，见 §7.1）。</summary>
 	[Export] public int BossPerkCount { get; set; } = 2;
 
 	/// <summary>
@@ -111,7 +111,8 @@ public partial class StageDefinition : Resource
 	/// → 本字段（关卡级兜底）→ 两层都留空 = **不限制**（Pressure 表里每一行都是候选）。
 	/// 命中规则 = 候选行 <c>PressureModConfig.Tags</c> 与本值**有交集**。
 	///
-	/// ⚠️ 只描述数值型强化（生命/伤害/攻速/移速这类，§7.5），**绝不包含行为或技能型词条** ——
+	/// ⚠️ 只描述数值型强化（生命/伤害/攻速/移速这类，§7.5，也就是界面上的**词条**），
+	/// **绝不包含行为或技能型**（那些是界面上的**技能**）——
 	/// 那是 Boss Build 的职责，两者必须能独立配置、独立追踪、独立结算（§7.1）。
 	/// 消费者是 <c>StageController.PickTags</c>（配置表阶段 6 起真的生效；在此之前它只进日志）。
 	/// </summary>

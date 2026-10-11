@@ -130,7 +130,7 @@ public static class BossPerkProbe
 
 		GameLog.Write(
 			"SelfTest",
-			$"Pressure 词条池：{BossPerkCatalog.PressureOnly.Count} 条（期望 8 = 5 数值型参数栏 + 3 技能参数栏）｜ 带限定词的 {withQualifier} 条（期望 4 = 1 数值型关卡限定 + 3 技能参数）｜ 明细：[{string.Join(" · ", perPerk)}]");
+			$"Pressure 词条池（数值型 = 界面上的**词条**）：{BossPerkCatalog.PressureOnly.Count} 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）｜ 带限定词的 {withQualifier} 条（期望 3 = 3 技能参数）｜ 明细：[{string.Join(" · ", perPerk)}]");
 		GameLog.Write("SelfTest", $"Pressure 词条池·出率（权重真进分母）：{BossPerkCatalog.DescribePressurePool(null)}");
 
 		if (GD.Load<PackedScene>("res://Scenes/Enemies/Boss.tscn") is not { } bossScene)
@@ -209,24 +209,22 @@ public static class BossPerkProbe
 			chaser.Free();
 		}
 
-		// ④ 关卡限定：pmod_fortress_armor 只允许 stg_inner / stg_core。
-		if (Find("pmod_fortress_armor") is { } armor)
-		{
-			string inStage1 = Judge(armor.Qualifier, context);
+		// ④ 关卡限定（`StageIds`）：池里**已经没有行再用它**了 —— 唯一带 StageIds 的那一条
+		//    （`pmod_fortress_armor`「铁壁·护甲」）已按用户要求整行删除（"护甲目前就只给精英怪使用，
+		//    首领不需要"，护甲现在只来自精英怪的 `EliteModifier`）。
+		//    字段与判定逻辑仍然在（以后要给某一条加关卡限定不用重写判定），所以这里用一个**合成限定词**
+		//    证明它照样有效：同一个限定词、同一帧，只换"当前关卡"这个条件 → 结论不同（也证明没有缓存）。
+		var stageOnly = new PerkQualifier { StageIds = new[] { "stg_core" } };
+		string inStage1 = Judge(stageOnly, context);
 
-			// 自测专用开关：把"当前关卡"当成最后一关再判一次（同一条词条、同一帧）。
-			PerkQualifier.DebugStageIdOverride = "stg_core";
-			string inStage3 = Judge(armor.Qualifier, context);
+		// 自测专用开关：把"当前关卡"当成最后一关再判一次（同一个限定词、同一帧）。
+		PerkQualifier.DebugStageIdOverride = "stg_core";
+		string inStage3 = Judge(stageOnly, context);
+		PerkQualifier.DebugStageIdOverride = null;
 
-			float armorBefore = boss.MaxArmor;
-			armor.Apply(context); // 这次限定词成立 → 真的落地
-			float armorAfter = boss.MaxArmor;
-			PerkQualifier.DebugStageIdOverride = null;
-
-			GameLog.Write(
-				"SelfTest",
-				$"限定词刷新判定·关卡限定（pmod_fortress_armor，限定 [stg_inner,stg_core]）：当前第 1 关 → {inStage1} ｜ 把当前关卡换成 stg_core 再判 → {inStage3}（期望：前者不成立、后者成立）｜ 成立那次真的落地：护甲 {armorBefore:0.#} → {armorAfter:0.#}（期望 200 → 350）");
-		}
+		GameLog.Write(
+			"SelfTest",
+			$"限定词刷新判定·关卡限定（合成限定词 StageIds=[stg_core]，池里已无行用它）：当前关卡 → {inStage1} ｜ 把当前关卡换成 stg_core 再判 → {inStage3}（期望：前者不成立、后者成立）");
 
 		// ⑤ 端到端串一遍：真抽 3 次（与 StageController 一样走 RollPressure）→ 在"首领出生"时套用。
 		// 这一步是"同一个进程里多次生成"的实测：每次出生都重新判限定词，抽到的名字会漂、判定不会省。

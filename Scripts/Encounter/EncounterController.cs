@@ -48,7 +48,7 @@ public partial class EncounterController : Node3D
 	public float BossHealthScale { get; set; } = 1f;
 	public float BossDamageScale { get; set; } = 1f;
 
-	/// <summary>Boss 词条数量（策划文档 §12 Boss 构筑），由 Stage 配置决定。</summary>
+	/// <summary>Boss 开场**技能**条数（策划文档 §12 Boss 构筑，界面上叫技能不叫词条），由 Stage 配置决定。</summary>
 	public int BossPerkCount { get; set; } = 2;
 
 	/// <summary>波次生成模式（用户需求：一波一波刷，剩 ≤1 只才刷下一波）。</summary>
@@ -68,11 +68,12 @@ public partial class EncounterController : Node3D
 	private int _waveIndex;
 
 	/// <summary>
-	/// 本次 Boss 抽到的**行为型**（Boss Build）词条，供 HUD 与首领预览面板显示。
+	/// 本次 Boss 抽到的**行为型**（Boss Build）条目 —— 界面上显示为**技能**（用户拍板：行为型的那些本来就是技能），
+	/// 供 HUD 与首领预览面板显示。
 	///
-	/// ⚠️ 只含行为型 —— 数值型（Pressure）由 <c>StageController.PressurePerks</c> 单独持有，
+	/// ⚠️ 只含行为型 —— 数值型（Pressure = 词条）由 <c>StageController.PressurePerks</c> 单独持有，
 	/// 两套来源必须能区分，不许合并（关卡核心文档 §7.1）。
-	/// 这里给的是词条对象（含 <c>Name</c> / <c>Description</c>），不是光秃秃的名字 ——
+	/// 这里给的是条目对象（含 <c>Name</c> / <c>Description</c>），不是光秃秃的名字 ——
 	/// HUD 与预览面板要显示的是同两份数据。
 	/// </summary>
 	public IReadOnlyList<BossPerk> BossPerks => _bossPerks;
@@ -100,7 +101,7 @@ public partial class EncounterController : Node3D
 	/// <summary>该节点是否是 Boss 节点。</summary>
 	public bool IsBossNode => BossScene != null;
 
-	/// <summary>「白板首领副本」（关卡核心文档 L231/L315）：每个 Encounter 的最终阶段都要打一个无压力、无词条的弱化首领。</summary>
+	/// <summary>「白板首领副本」（关卡核心文档 L231/L315）：每个 Encounter 的最终阶段都要打一个无压力、无强化（没有开场技能、也没有数值词条）的弱化首领。</summary>
 	[Export] public PackedScene? EliteBossScene { get; set; }
 
 	/// <summary>白板首领的血量倍率（相对普通首领）。</summary>
@@ -658,7 +659,7 @@ public partial class EncounterController : Node3D
 	}
 
 	/// <summary>Encounter 清场后出场 Boss 与技能精英（阶段 6），阶段流程也可直接调用。</summary>
-	/// <summary>生成白板首领：弱化血量、不带 Pressure、不带 Boss 构筑词条。</summary>
+	/// <summary>生成白板首领：弱化血量、不带 Pressure（词条）、不带 Boss 构筑（开场技能）。</summary>
 	private void SpawnEliteBossNow()
 	{
 		if (EliteBossScene == null)
@@ -733,7 +734,8 @@ public partial class EncounterController : Node3D
 			pressure.InitialLevel = BossInitialPressure;
 		}
 
-		// Boss 构筑：随机词条（策划文档 §12）。压力与技能的词条要在 Pressure 初始化之后套用。
+		// Boss 构筑：随机抽开场**技能**（策划文档 §12，界面上的"技能"= 行为型 Boss Build）。
+		// 压力（数值型词条）要在 Pressure 初始化之后套用，所以这一段排在它后面。
 		_bossPerks.Clear();
 		foreach (BossPerk perk in BossPerkCatalog.Roll(BossPerkCount))
 		{

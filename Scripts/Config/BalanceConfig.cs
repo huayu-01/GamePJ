@@ -205,7 +205,8 @@ public partial class BalanceConfig : Resource
 	/// <summary>
 	/// 命中 / 击中时是否播放命中特效（Binbun Hit FX）。**一个开关管两条路径**：
 	/// ① <c>Projectile.ResolveImpact</c>（投射物命中，用射线命中点）；
-	/// ② <c>AttackHitbox._PhysicsProcess</c>（近战 / AOE / 冲锋 / 爆炸的命中体击中，用目标胸口高度）。
+	/// ② <c>AttackHitbox._PhysicsProcess</c>（近战 / AOE / 冲锋 / 爆炸的命中体击中，用 <c>ResolveHitPoint</c>
+	/// 取**目标碰撞体表面的实际命中点**）。
 	/// 出生逻辑只有一处：<see cref="ActRoguelike.Combat.HitEffect.Spawn"/>。
 	/// </summary>
 	[Export] public bool ShowHitEffects { get; set; } = true;
@@ -221,11 +222,11 @@ public partial class BalanceConfig : Resource
 	/// </summary>
 	[Export] public float HitEffectLifetime { get; set; } = 1.8f;
 
-	/// <summary>
-	/// 命中体（近战 / AOE / 爆炸）那一路的**竖直抬升**：单位原点在脚底，火花打在脚底很怪。
-	/// 投射物那一路不用它（射线命中点本来就在身体上）。1.0 ≈ 1.8m 身高单位的胸口。
-	/// </summary>
-	[Export] public float HitEffectHeightOffset { get; set; } = 1f;
+	// ⚠️ 这里原来有一列 `HitEffectHeightOffset`（命中体那一路的"竖直抬升"，默认 1.0），**已删除**：
+	// 用户要求"实际应该在命中的位置发生特效"，于是那一路改成朝目标**碰撞体中心**打一条射线、取表面接触点
+	// （`AttackHitbox.ResolveHitPoint`），兜底点也是碰撞体自己的位置。全局高度偏移因此没有任何消费者，
+	// 留着就是"一列改了没用的死配置"（与配置表阶段 3 的清理同一条纪律）。
+	// 投射物那一路本来就用射线命中点，从来没读过它。
 
 	[ExportGroup("节点 / 关卡约束")]
 	/// <summary>节点之间的最小间距（关卡核心文档 L106）。</summary>

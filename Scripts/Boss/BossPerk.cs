@@ -7,7 +7,14 @@ using Godot;
 
 namespace ActRoguelike.Boss;
 
-/// <summary>Boss 词条（策划文档 §12 Boss 构筑）：让 Boss 也有自己的「构筑」，而不是只有血量差异。</summary>
+/// <summary>
+/// Boss 强化条目（策划文档 §12 Boss 构筑）：让 Boss 也有自己的「构筑」，而不是只有血量差异。
+///
+/// ⚠️ 类名保持 <c>BossPerk</c>（不改名、不换文件），但**两类条目在人话里叫法不同**（用户 2026-10 拍板）：
+/// <b>行为型 = 技能</b>（Boss Build，来自 `Config/Tables/Skills/bhv_*.tres`，它本来就是技能表的行）、
+/// <b>数值型 = 词条</b>（Pressure 池 `Config/Tables/Pressure/pmod_*.tres`）。
+/// 所以下面注释里凡是写"词条"的地方，若指的是行为型，都已经改称**技能**。
+/// </summary>
 public sealed class BossPerk
 {
 	public required string Id { get; init; }
@@ -15,7 +22,7 @@ public sealed class BossPerk
 	/// <summary>
 	/// 显示名（日志与 HUD 用）。
 	/// ⚠️ 它**可以被改写**：限定词在首领出生时判不成立、改抽了另一条时，会被写成
-	/// <c>「原词条→实际生效的词条」</c>（见 <see cref="MarkRedrawn"/>）——
+	/// <c>「原条目→实际生效的条目」</c>（见 <see cref="MarkRedrawn"/>）——
 	/// 这样 <c>StageController</c> / <c>EncounterController</c> 里那两条**既有日志**（它们先 Apply、后取 Name）
 	/// 说的仍然是"真正生效的那一条"，不会写一个没生效的名字。
 	/// </summary>
@@ -25,13 +32,13 @@ public sealed class BossPerk
 	public float Weight { get; init; } = 1f;
 
 	/// <summary>
-	/// **数值型**候选的适用标签（关卡核心文档 §7.4/§7.5 的"强化池权重或适用规则"）。
-	/// 只有 Pressure 转换池会用它筛候选；行为型词条留空（Boss Build 不做标签过滤）。
+	/// **数值型**（词条）候选的适用标签（关卡核心文档 §7.4/§7.5 的"强化池权重或适用规则"）。
+	/// 只有 Pressure 转换池会用它筛候选；行为型（技能）留空（Boss Build 不做标签过滤）。
 	/// </summary>
 	public string[] Tags { get; init; } = System.Array.Empty<string>();
 
 	/// <summary>
-	/// 词条的**限定词**（适用条件）：只对某个首领 / 某几关 / 必须有某个技能节点才生效。
+	/// 条目的**限定词**（适用条件）：只对某个首领 / 某几关 / 必须有某个技能节点才生效。
 	/// 默认 <see cref="PerkQualifier.Any"/>（不限）。
 	/// </summary>
 	public PerkQualifier Qualifier { get; init; } = PerkQualifier.Any;
@@ -39,12 +46,12 @@ public sealed class BossPerk
 	/// <summary>
 	/// 这次抽签用的**候选标签**（`RollPressure(tags)` 传进来的那一组）。限定词判不成立时，
 	/// 换抽会用同一组标签把候选限制回同一批（见 <see cref="RollTags"/>）。
-	/// 行为型词条（<c>Roll()</c>）为 null = **不换抽**（词条条数由关卡行 `BossPerkCount` 定死，
+	/// 行为型（技能，<c>Roll()</c>）为 null = **不换抽**（技能条数由关卡行 `BossPerkCount` 定死，
 	/// 判不成立只写日志跳过）。
 	/// </summary>
 	public string[]? RollTags { get; init; }
 
-	/// <summary>词条的**效果本体**（数值操作 / 行为能力）。限定词与刷新判定都在 <see cref="Apply"/> 里，不在这里。</summary>
+	/// <summary>条目的**效果本体**（数值操作 / 行为能力）。限定词与刷新判定都在 <see cref="Apply"/> 里，不在这里。</summary>
 	public required Action<BossPerkContext> Effect { get; init; }
 
 	private Action<BossPerkContext>? _apply;
@@ -93,7 +100,7 @@ public sealed class BossPerk
 	}
 }
 
-/// <summary>套用词条时能拿到的东西。</summary>
+/// <summary>套用强化条目（技能 / 词条）时能拿到的东西。</summary>
 public sealed class BossPerkContext
 {
 	public required Unit Boss { get; init; }
@@ -102,7 +109,8 @@ public sealed class BossPerkContext
 }
 
 /// <summary>
-/// Boss 词条目录。加内容只加一行定义；效果走 StatSheet 的 Modifier 或直接改 Boss 的组件参数，
+/// Boss 强化目录（两类来源：**技能** = 行为型 Boss Build / **词条** = 数值型 Pressure）。
+/// 加内容只加一行定义；效果走 StatSheet 的 Modifier 或直接改 Boss 的组件参数，
 /// 不往 Boss 脚本里加分支（策划文档 §12：Boss Build 与 Boss Pressure、Boss Skill 分离）。
 /// </summary>
 /// <remarks>
@@ -114,16 +122,17 @@ public sealed class BossPerkContext
 /// <list type="bullet">
 /// <item><b>行为/技能型</b> → `Config/Tables/Skills/` 里 <c>ApplyHandler</c> 非空的那 4 行
 ///   （<c>bhv_awakened</c> / <c>bhv_summoner</c> / <c>bhv_screaming</c> / <c>bhv_charging</c>）。</item>
-/// <item><b>数值型</b> → `Config/Tables/Pressure/` 的 <c>pmod_*.tres</c>
-///   （<c>pmod_berserk</c> / <c>pmod_fortress</c> / <c>pmod_swift</c>）。</item>
+/// <item><b>数值型</b> → `Config/Tables/Pressure/` 的 <c>pmod_*.tres</c>（当前 7 行：
+///   <c>pmod_berserk_dmg</c> / <c>pmod_berserk_speed</c> / <c>pmod_fortress_hp</c> / <c>pmod_swift</c>
+///   + 3 条技能参数 <c>pmod_scream_echo</c> / <c>pmod_charge_impact</c> / <c>pmod_summon_haste</c>）。</item>
 /// </list>
 /// <see cref="Build"/> 把两张表分别编译，<see cref="All"/> 按"数值型在前、行为型在后"合并
 /// （保留 `All` 只为日志与统计；**它已经不是任何抽取点的候选集**）。
 ///
 /// <b>两个抽取点彻底分开（配置表阶段 6，关卡核心文档 §7.1/§7.5 的硬要求）</b>：
 /// <list type="bullet">
-/// <item><b>Boss 开场词条 = Boss Build</b> → <see cref="Roll"/>，**只从行为型**里抽
-///   （<c>EncounterController.SpawnBossNow</c> 调用，词条数 = <c>StageDefinition.BossPerkCount</c>）。</item>
+/// <item><b>Boss 开场技能 = Boss Build</b> → <see cref="Roll"/>，**只从行为型**里抽
+///   （<c>EncounterController.SpawnBossNow</c> 调用，条数 = <c>StageDefinition.BossPerkCount</c>）。</item>
 /// <item><b>Pressure 转换 = 数值强化</b> → <see cref="RollPressure"/>，只从 <b>数值型</b>里抽，
 ///   按 <see cref="BossPerk.Weight"/> 真加权、按 <see cref="BossPerk.Tags"/> 过滤候选
 ///   （<c>StageController.AddPressureForNode</c> 在**跨过阈值的那一刻**调用，套用点在 Boss 出生时）。</item>
@@ -135,11 +144,16 @@ public static class BossPerkCatalog
 {
 	/// <summary>
 	/// 数值型（Pressure 池）的代码兜底 —— 表读不到时用它，**逐条与
-	/// `Config/Tables/Pressure/pmod_*.tres` 八行对齐**（同样的 Id / 显示名 / 权重 / 标签 / 限定词 / 效果）。
+	/// `Config/Tables/Pressure/pmod_*.tres` 七行对齐**（同样的 Id / 显示名 / 权重 / 标签 / 限定词 / 效果）。
 	///
 	/// ⚠️ 为什么拆成 8 条也要跟着改：兜底若还留着"伤害+攻速挤在一栏"的旧样子，表一读不到就会
 	/// **静默换挡**成"一抽买两个参数"（正是项目里反复踩的那个坑）。所以兜底必须与表同结构、同数值。
 	/// **不要删**，这是回退路径。
+	///
+	/// ⚠️ **护甲那一栏（`pmod_fortress_armor`，+150 甲）已按用户要求删除**（"护甲目前就只给精英怪使用，
+	/// 首领不需要"）—— 表行、`Balance.tres` 的数组项与 ext_resource、以及这里这条兜底**同一次改动**一起下线。
+	/// 只删表行不改兜底 = 表一读不到首领又会吃护甲（静默换挡）；精英怪的护甲来自另一套
+	/// （<see cref="ActRoguelike.Combat.EliteModifier.ArmorAdd"/>，与 Pressure 无关），所以不受影响。
 	/// </summary>
 	private static readonly BossPerk[] FallbackPressure =
 	{
@@ -169,16 +183,6 @@ public static class BossPerkCatalog
 			Weight = 2f,
 			Tags = new[] { "Defense" },
 			Effect = context => Mod(context, "MaxHealthMultiplier", ModifierOperation.Multiply, 1.4f),
-		},
-		new BossPerk
-		{
-			Id = "pmod_fortress_armor",
-			Name = "铁壁·护甲",
-			Description = "护甲 +150",
-			Weight = 2f,
-			Tags = new[] { "Defense" },
-			Qualifier = new PerkQualifier { StageIds = new[] { "stg_inner", "stg_core" } },
-			Effect = context => Mod(context, "MaxArmorAdd", ModifierOperation.Add, 150f),
 		},
 		new BossPerk
 		{
@@ -286,9 +290,9 @@ public static class BossPerkCatalog
 	};
 
 	/// <summary>
-	/// 行为型词条的处理器（"首领行为表本质也是一些技能"—— 签名与增幅项的 <c>RewardEffectRegistry</c>
-	/// 同构，只是上下文换成 <see cref="BossPerkContext"/>）。
-	/// 加一条行为型词条 = 加一行 `.tres`；只有**全新的行为种类**才需要在这里加一行。
+	/// 行为型（**技能**）的处理器 —— 用户原话：「首领行为表本质也是一些技能」。
+	/// 签名与增幅项的 <c>RewardEffectRegistry</c> 同构，只是上下文换成 <see cref="BossPerkContext"/>；
+	/// 加一条行为型技能 = 加一行 `.tres`；只有**全新的行为种类**才需要在这里加一行。
 	/// </summary>
 	private static readonly Dictionary<string, Action<BossPerkContext, AbilityConfig>> Handlers = new()
 	{
@@ -332,11 +336,11 @@ public static class BossPerkCatalog
 
 	/// <summary>
 	/// 数值型强化候选（Pressure 池）—— 只有 <see cref="RollPressure"/> 会用它。
-	/// 表读不到 → 代码兜底 8 条（5 条数值型参数栏 + 3 条技能参数栏，与表同结构同数值）。
+	/// 表读不到 → 代码兜底 7 条（4 条数值型参数栏 + 3 条技能参数栏，与表同结构同数值）。
 	/// </summary>
 	public static IReadOnlyList<BossPerk> PressureOnly => _pressure ?? FallbackPressure;
 
-	/// <summary>行为/技能型词条候选（Boss Build）—— 只有 <see cref="Roll"/> 会用它。表读不到 → 代码兜底 4 条。</summary>
+	/// <summary>行为/技能型候选（Boss Build，界面上叫**技能**）—— 只有 <see cref="Roll"/> 会用它。表读不到 → 代码兜底 4 条。</summary>
 	public static IReadOnlyList<BossPerk> BehaviorOnly => _behavior ?? FallbackBehavior;
 
 	/// <summary>全部候选（数值型在前、行为型在后）。**只用于日志与统计**，两个抽取点各自只用自己的那一半。</summary>
@@ -366,22 +370,23 @@ public static class BossPerkCatalog
 
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
-			$"首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure {PressureOnly.Count} 条（来源：{(pressure != null ? "表 Pressure" : "代码兜底")}）/ 行为型 Boss Build {BehaviorOnly.Count} 条（来源：{(behavior != null ? "表 Skills" : "代码兜底")}）");
+			$"首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）{PressureOnly.Count} 条（来源：{(pressure != null ? "表 Pressure" : "代码兜底")}）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）{BehaviorOnly.Count} 条（来源：{(behavior != null ? "表 Skills" : "代码兜底")}）");
 
 		// §7.5「候选内容和权重由配置定义」：把转换池的候选 / 权重 / 由权重算出的概率打出来。
 		// 这一行是**确定性**的（不含随机），所以可以直接当回归指标逐字比对。
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
-			$"Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型）：{DescribePressurePool(null)}；抽取点 2 个：Boss 开场词条 Roll() 只抽行为型（{BehaviorOnly.Count} 条），Pressure RollPressure() 只抽数值型");
+			$"Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：{DescribePressurePool(null)}；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（{BehaviorOnly.Count} 条），Pressure RollPressure() 只抽数值型（词条）");
 	}
 
 	/// <summary>
-	/// <b>Boss 开场词条（Boss Build）抽取</b>：随机抽 count 个不重复的**行为/技能型**词条（加权）。
+	/// <b>Boss 开场技能（Boss Build）抽取</b>：随机抽 count 个不重复的**行为/技能型**条目（加权）。
+	/// 抽出来的这些在界面上就叫**技能**（用户拍板：行为型的那些本来就是技能，不是"词条"）。
 	///
 	/// ⚠️ 配置表阶段 6 起这里**只抽行为型**（原来抽的是"数值型 + 行为型"合并的 7 条）。
 	/// 这是关卡核心文档 §7.1「Boss Pressure 与 Boss Build 必须保持分离 / 不能合并成一个无法区分来源的
 	/// 强化池」的落地：数值型改由 §7.5 的 Pressure 转换池（<see cref="RollPressure"/>）单独负责。
-	/// 所以**开场词条的结果会变**（候选集 7 → 4），这是文档要求的行为变化，不是回归。
+	/// 所以**开场技能的结果会变**（候选集 7 → 4），这是文档要求的行为变化，不是回归。
 	/// 随机数发生器仍是本类自己的静态 <see cref="Rng"/>（与 RewardPool 的实例 RNG 分开，
 	/// 共用一把会让奖励抽取的随机序列也漂）。
 	/// </summary>
@@ -689,7 +694,7 @@ public static class BossPerkCatalog
 			return;
 		}
 
-		// §7.1 的边界：数值池**不许**碰"这个技能开不开"这类行为开关（那是 Boss Build 的 bhv_* 词条）。
+		// §7.1 的边界：数值池**不许**碰"这个技能开不开"这类行为开关（那是 Boss Build 的 bhv_* 技能行）。
 		if (entry.Key is "Enabled" or "ApplyHandler" or "NodeName")
 		{
 			GD.PushWarning($"[BossPerkCatalog] {row.Id} 想改 {what} 的 {entry.Key} —— 这属于**行为型**（Boss Build），数值型词条不许碰，已跳过。");
