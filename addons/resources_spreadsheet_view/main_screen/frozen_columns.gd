@@ -33,7 +33,9 @@ func _on_grid_updated() -> void:
 
 	var first_visible_column := 0
 	for i in editor_view.columns.size():
-		if grid.get_child(i).visible:
+		# [项目补丁] grid 的子节点可能还在延迟释放中，get_child(i) 会是 null。
+		var col_cell := grid.get_child(i) if i < grid.get_child_count() else null
+		if col_cell != null and col_cell.visible:
 			first_visible_column = i
 			break
 

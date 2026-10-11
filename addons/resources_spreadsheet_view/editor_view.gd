@@ -204,7 +204,14 @@ func _update_visible_rows(force_rebuild : bool = true):
 
 	var cells_left_to_free : int = node_table_root.get_child_count() - (last_row - first_row) * columns.size()
 	while cells_left_to_free > 0:
-		node_table_root.get_child(0).free()
+		# [项目补丁] get_child(0) 可能是已被 queue_free 标记但尚未释放的节点（返回 null），
+		# 直接 .free() 会崩。这里改为先取出来判空，并顺手清理无效子节点。
+		if node_table_root.get_child_count() <= 0:
+			break
+		var doomed := node_table_root.get_child(0)
+		if doomed == null:
+			break
+		doomed.free()
 		cells_left_to_free -= 1
 	
 	var color_rows : bool = ProjectSettings.get_setting(TablesPluginSettingsClass.PREFIX + "color_rows")

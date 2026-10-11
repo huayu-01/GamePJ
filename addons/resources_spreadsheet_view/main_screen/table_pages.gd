@@ -40,7 +40,9 @@ func _on_grid_updated():
 	var pagelist_line := HSeparator.new()
 	pagelist_line.size_flags_horizontal = SIZE_EXPAND_FILL
 	pagelist_node.add_child(pagelist_line)
-	btns[current_page].button_pressed = true
+	# [项目补丁] 页数变化时 current_page 可能越界（切到行数更少的表时发生）。
+	if current_page >= 0 and current_page < btns.size() and btns[current_page] != null:
+		btns[current_page].button_pressed = true
 
 	var sort_property : StringName = node_editor_view_root.sorting_by
 	if sort_property == "": sort_property = "resource_path"

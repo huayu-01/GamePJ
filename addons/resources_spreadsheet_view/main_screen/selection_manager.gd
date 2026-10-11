@@ -44,7 +44,14 @@ func _ready():
 
 
 func _draw():
-	if edited_cells.size() == 0 or edit_cursor_positions.size() != edited_cells.size() or !column_editors[edited_cells[0].x].is_text():
+	if edited_cells.size() == 0 or edit_cursor_positions.size() != edited_cells.size():
+		return
+	# [项目补丁] edited_cells[0].x 是列索引，切表时 column_editors 可能还没建到那么多列，
+	# 直接下标访问会越界（在字段多的表上必现）。这里改为先做范围与空值检查。
+	var first_col : int = int(edited_cells[0].x)
+	if first_col < 0 or first_col >= column_editors.size() or column_editors[first_col] == null:
+		return
+	if !column_editors[first_col].is_text():
 		return
 
 	var font := get_theme_font(&"font", &"Label")

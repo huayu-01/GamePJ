@@ -32,23 +32,26 @@ func try_edit_value(value, type, property_hint) -> bool:
 	contents_label.text = str(value)
 	
 	var is_generic_array : bool = _stored_type == TYPE_ARRAY and !value.is_typed()
+	# [项目补丁] Packed*Array 没有 get_typed_builtin()（那是 Array 的方法），而我们的字段里有
+	# PackedStringArray（Tags/AllowedEnemies 等），直接调用会报 Nonexistent function 并导致无法编辑。
+	var typed_builtin : int = value.get_typed_builtin() if (value is Array and value.is_typed()) else TYPE_NIL
 	button_box.get_child(1).visible = (
-		is_generic_array or value.get_typed_builtin() == TYPE_STRING or value.get_typed_builtin() == TYPE_STRING_NAME
+		is_generic_array or typed_builtin == TYPE_STRING or typed_builtin == TYPE_STRING_NAME
 		or _stored_type == TYPE_PACKED_STRING_ARRAY
 	)
 	button_box.get_child(2).visible = (
-		is_generic_array or value.get_typed_builtin() == TYPE_INT
+		is_generic_array or typed_builtin == TYPE_INT
 		or _stored_type == TYPE_PACKED_INT32_ARRAY or _stored_type == TYPE_PACKED_INT64_ARRAY
 	)
 	button_box.get_child(3).visible = (
-		is_generic_array or value.get_typed_builtin() == TYPE_FLOAT
+		is_generic_array or typed_builtin == TYPE_FLOAT
 		or _stored_type == TYPE_PACKED_FLOAT32_ARRAY or _stored_type == TYPE_PACKED_FLOAT64_ARRAY
 	)
 	button_box.get_child(5).visible = (
-		is_generic_array or value.get_typed_builtin() == TYPE_OBJECT
+		is_generic_array or typed_builtin == TYPE_OBJECT
 	)
 
-	if value.get_typed_builtin() == TYPE_OBJECT:
+	if typed_builtin == TYPE_OBJECT:
 		if !value_input is EditorResourcePicker:
 			var new_input : EditorResourcePicker = load("res://addons/resources_spreadsheet_view/editor_resource_array_picker.gd").new()
 			new_input.size_flags_horizontal = SIZE_EXPAND_FILL
