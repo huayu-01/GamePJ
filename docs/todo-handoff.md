@@ -138,6 +138,30 @@ Scripts/
 > 6 处死字段清理 · 敌人倍率静默换挡修复 · `BarEnemy` 居中修复。
 > 详见 [config.md](config.md) 的「配置表阶段 3 实测」与 [config-schema.md](config-schema.md) §5 阶段 3。
 
+### 任务 E：Pressure 词条"一参数一栏"（3→8 条）+ 技能参数入池 + 限定词刷新判定 ✅ 已完成（2026-10）
+
+> **用户要求**：① 3 条应该拆成 5 条（**每个参数单独占一个词条栏**）；② 把一些**技能的参数**也加入词条；
+> ③ 每个 boss 可能都不同，**限定词记得做好刷新判定**。
+>
+> **做了什么**：
+> 1. **数值型 3 → 5 条**（`pmod_berserk` → 伤害/攻速两条，`pmod_fortress` → 生命/护甲两条，`pmod_swift` 不变）+
+>    **3 条技能参数词条**（尖啸回响 / 冲锋冲击 / 召唤急速）= **8 条**。权重**继承母行**（3/3/2/2/2）+ 技能型各 1。
+> 2. **技能参数进 `Pressure/`（数值型）而不是 `Skills/`**：依据 §7.5 明列「技能冷却等参数」属数值型；
+>    `PressureModConfig` 多 `AbilityNode` / `AbilityScales` / `AttackScales`，`Value` 是**倍率**（可叠乘）。
+> 3. **限定词 + 刷新判定**：`PerkQualifier`（`BossIds` / `StageIds` / 必须有技能节点）+ `BossPerkCatalog.ApplyWithRefresh`
+>    —— 判定在 **Boss 出生时**（`perk.Apply` 里），不成立就**换抽**；`StageController` / `EncounterController` **一行没改**。
+>
+> **⚠️ 需要知道的两件事**：
+> - **每抽的期望强度降到原来的 58.9%**（"一抽只买一个参数"的必然结果，且**调权重补不回来**）——
+>   要补只能提高单条数值或降阈值，**这是一轮平衡测试的入口**。
+> - 旧行文件 `pmod_berserk.tres` / `pmod_fortress.tres` **已删除**（与 `Balance.tres` 的数组项 + ext_resource 同一次改动）。
+> - 行为型词条（`bhv_*`）**还没有**限定词列（要给 `AbilityConfig` 加列才行，本轮没做）。
+>
+> 证据：`build.ps1 --no-incremental` 0/0；自测 `+187.5 → 1` / `+225 → 3` **逐位不变**；
+> 真实出生实测有"抽到铁壁·护甲 → 出生时判不成立 → 换抽狂暴·伤害 → 护甲停在 200"的完整链条；
+> 回退（清空 `PressureMods`）跑满一轮，池明细与表在时逐字相同。
+> 详见 [config.md](config.md) 的「配置表阶段 7 实测」与 [config-schema.md](config-schema.md) §5 阶段 7。
+
 ### 任务 D：§8.2 免费挑战闸门 + HUD 词条 + 首领状况预览面板 ✅ 已完成（2026-10）
 
 > **做了什么**（三件事，用户一次提的）：
