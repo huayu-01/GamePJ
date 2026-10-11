@@ -1,0 +1,53 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Levels/TestArena.tscn" id="1_arena"]
+[ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Chaser.tscn" id="4_chaser"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/FastMelee.tscn" id="5_fast"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/JumpingMelee.tscn" id="6_jump"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Charger.tscn" id="7_charger"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/RangedEnemy.tscn" id="8_ranged"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Screamer.tscn" id="9_screamer"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Guard.tscn" id="10_guard"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Exploder.tscn" id="11_exploder"]
+[ext_resource type="Script" path="res://Scripts/Combat/EliteModifier.cs" id="12_elite"]
+
+[node name="TestEnemies" type="Node3D"]
+
+[node name="TestArena" parent="." instance=ExtResource("1_arena")]
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+MaxHealth = 3000.0
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="Chaser" parent="Enemies" instance=ExtResource("4_chaser")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.5, 0)
+
+[node name="FastMelee" parent="Enemies" instance=ExtResource("5_fast")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4, 0.5, 6.4)
+
+[node name="JumpingMelee" parent="Enemies" instance=ExtResource("6_jump")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 9)
+
+[node name="Charger" parent="Enemies" instance=ExtResource("7_charger")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.4, 0.5, 6.4)
+
+[node name="Ranged" parent="Enemies" instance=ExtResource("8_ranged")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.5, 0)
+
+[node name="Screamer" parent="Enemies" instance=ExtResource("9_screamer")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.4, 0.5, -6.4)
+
+[node name="Guard" parent="Enemies" instance=ExtResource("10_guard")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -9)
+
+[node name="EliteMarker" type="Node" parent="Enemies/Guard"]
+script = ExtResource("12_elite")
+
+[node name="Exploder" parent="Enemies" instance=ExtResource("11_exploder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.5, -9)
+
+[node name="Hud" parent="." instance=ExtResource("3_hud")]

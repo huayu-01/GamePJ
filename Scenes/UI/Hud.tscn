@@ -1,0 +1,106 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/PlayerHud.cs" id="1_hud"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Bars/BarPlayer.tscn" id="2_bar"]
+
+[node name="Hud" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Health" type="Label" parent="Root"]
+offset_left = 24.0
+offset_top = 16.0
+offset_right = 520.0
+offset_bottom = 52.0
+theme_override_font_sizes/font_size = 26
+text = "HP"
+
+[node name="PlayerBar" parent="Root" instance=ExtResource("2_bar")]
+
+[node name="CrosshairH" type="ColorRect" parent="Root"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -9.0
+offset_top = -1.0
+offset_right = 9.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.9)
+
+[node name="CrosshairV" type="ColorRect" parent="Root"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1.0
+offset_top = -9.0
+offset_right = 1.0
+offset_bottom = 9.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.9)
+
+[node name="CrosshairDot" type="ColorRect" parent="Root"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1.5
+offset_top = -1.5
+offset_right = 1.5
+offset_bottom = 1.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.85, 0.3, 1)
+
+[node name="Status" type="Label" parent="Root"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 16.0
+offset_right = 300.0
+offset_bottom = 52.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 24
+text = ""
+horizontal_alignment = 1
+
+[node name="Build" type="Label" parent="Root"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -64.0
+offset_right = 900.0
+offset_bottom = -20.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = ""
+vertical_alignment = 1
+
+[node name="Ammo" type="Label" parent="Root"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -260.0
+offset_top = -64.0
+offset_right = -24.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 26
+text = "- / -"
+horizontal_alignment = 2

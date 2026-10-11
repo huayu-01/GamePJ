@@ -1,0 +1,84 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="3_presentation"]
+[ext_resource type="Script" path="res://Scripts/AI/EnemyBrain.cs" id="4_brain"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/UseAbilityBehavior.cs" id="5_use_ability"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/ChaseBehavior.cs" id="6_chase"]
+[ext_resource type="Script" path="res://Scripts/Abilities/AreaAttackAbility.cs" id="7_explode"]
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="8_hitbox"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.4
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.85, 0.85, 0.2, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_body")
+radius = 0.4
+height = 1.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_blast"]
+radius = 4.0
+
+[node name="Exploder" type="CharacterBody3D"]
+script = ExtResource("1_unit")
+Faction = 1
+MaxHealth = 25.0
+MoveSpeed = 5.5
+Tags = PackedStringArray("Suicide", "AreaDenial", "Chaser")
+
+[node name="Body" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_movement")
+FaceMovementDirection = false
+TurnSharpness = 12.0
+
+[node name="Brain" type="Node" parent="."]
+script = ExtResource("4_brain")
+SearchRange = 40.0
+
+[node name="Explode" type="Node" parent="Brain"]
+script = ExtResource("5_use_ability")
+Priority = 100
+
+[node name="Chase" type="Node" parent="Brain"]
+script = ExtResource("6_chase")
+Priority = 10
+StopDistance = 1.0
+
+[node name="AbilityExplode" type="Node3D" parent="."]
+script = ExtResource("7_explode")
+Cooldown = 30.0
+Windup = 0.35
+Recover = 0.1
+ActiveTime = 0.12
+TriggerRadius = 2.4
+KillSelf = true
+ApproachMinRange = 0.0
+ApproachMaxRange = 2.4
+
+[node name="Attack" type="Area3D" parent="AbilityExplode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("8_hitbox")
+Damage = 22.0
+Knockback = 5.0
+AttackTags = PackedStringArray("AoE", "Explosion")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityExplode/Attack"]
+shape = SubResource("SphereShape3D_blast")
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("3_presentation")

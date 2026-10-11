@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Interaction/RewardNode.cs" id="1_node"]
+[ext_resource type="Mesh" path="res://Assets/Models/mesh_node_reward.tres" id="2_mesh"]
+
+[node name="RewardNode" type="Node3D"]
+script = ExtResource("1_node")
+Prompt = "强化池"
+InteractRadius = 3.2
+Kind = 1
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+mesh = ExtResource("2_mesh")
+
+[node name="Label" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+billboard = 1
+no_depth_test = true
+outline_size = 12
+font_size = 64
+text = "强化池"
+
+[node name="Animation" type="AnimationPlayer" parent="."]

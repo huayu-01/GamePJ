@@ -1,0 +1,241 @@
+using ActRoguelike.Boss;
+using ActRoguelike.Combat;
+using ActRoguelike.Encounter;
+using ActRoguelike.Interaction;
+using ActRoguelike.Rewards;
+using ActRoguelike.Run;
+using ActRoguelike.Weapons;
+using ActRoguelike.Core;
+using Godot;
+
+namespace ActRoguelike.UI;
+
+/// <summary>最小 HUD：玩家生命条/数值、准星、弹药、节点进度与构筑。只读 Gameplay 状态。</summary>
+public partial class PlayerHud : CanvasLayer
+{
+	/// <summary>玩家血条预制体：由 Hud.tscn 实例化（节点名 PlayerBar），代码不建它。</summary>
+	private const string PlayerBarNode = "Root/PlayerBar";
+
+	/// <summary>首领血条预制体：代码实例化一份挂到 HUD 层上。</summary>
+	private static readonly PackedScene BossBarScene = GD.Load<PackedScene>("res://Scenes/UI/Bars/BarBoss.tscn");
+
+	/// <summary>延迟条跟随速度（比例/秒）。</summary>
+	private const float DelayFollowSpeed = 0.6f;
+
+	private Label _health = null!;
+	private Label _ammo = null!;
+	private Label _status = null!;
+	/// <summary>首领血条是否展开为完整形态（验证用只读状态）。</summary>
+	public bool BossBarExpanded { get; private set; }
+
+	/// <summary>与首领的当前距离（验证用）。</summary>
+	public float BossDistance { get; private set; }
+
+	private Control? _bossPanel;
+	private ProgressBar _bossBar = null!;
+	private Label _bossName = null!;
+	private Label _bossState = null!;
+	private Label _build = null!;
+	private HealthBarWidget _healthBar = null!;
+	private Unit? _player;
+	private Weapon? _weapon;
+	private EncounterController? _encounter;
+	private RunController? _run;
+	private StageController? _stage;
+	private float _healthRatio = 1f;
+
+	public override void _Ready()
+	{
+		_health = GetNode<Label>("Root/Health");
+		_ammo = GetNode<Label>("Root/Ammo");
+		_status = GetNode<Label>("Root/Status");
+		_build = GetNode<Label>("Root/Build");
+
+		// 血条只按名字取节点、只当 Control 用 —— 美术可以把填充换成贴图/NinePatch，类型不再被写死。
+		_healthBar = HealthBarWidget.Bind(GetNode<Control>(PlayerBarNode));
+	}
+
+	private float _hudAccum;
+	private string _lastStatus = string.Empty;
+	private string _lastVitals = string.Empty;
+
+	public override void _Process(double delta)
+	{
+		// HUD 不需要 60Hz：20Hz 足够，文本只在变化时写（Godot 的 Text setter 有开销）。
+		_hudAccum += (float)delta;
+		if (_hudAccum < 0.05f)
+		{
+			return;
+		}
+
+		_hudAccum = 0f;
+
+		if (_player == null || !IsInstanceValid(_player))
+		{
+			_player = PlayerLocator.Player;
+			_weapon = _player != null ? FindWeapon(_player) : null;
+		}
+
+		if (_player == null)
+		{
+			return;
+		}
+
+		// 首领血条面板：放在所有分支之前，保证任何状态下都会更新。
+		if (_bossPanel == null)
+		{
+			BuildBossPanel();
+		}
+
+		UpdateBossPanel();
+
+		string extra = string.Empty;
+		if (_player.Armor > 0f)
+		{
+			extra += $"  甲 {_player.Armor:0}";
+		}
+
+		if (_player.Shield > 0f)
+		{
+			extra += $"  盾 {_player.Shield:0}";
+		}
+
+		_health.Text = $"HP {_player.Health:0}/{_player.MaxHealth:0}{extra}";
+
+		UpdateHealthBar(Mathf.Clamp(_player.Health / Mathf.Max(1f, _player.MaxHealth), 0f, 1f));
+
+		if (_weapon == null)
+		{
+			_ammo.Text = string.Empty;
+		}
+		else
+		{
+			_ammo.Text = _weapon.IsReloading ? "装填中…" : $"{_weapon.Ammo} / {_weapon.EffectiveMagazineSize}";
+		}
+
+		_encounter ??= GetTree().GetFirstNodeInGroup("encounters") as EncounterController;
+		_run ??= GetTree().GetFirstNodeInGroup("run_controller") as RunController;
+		_stage ??= GetTree().GetFirstNodeInGroup("stage") as StageController;
+		_encounter = _stage?.CurrentNode ?? _encounter;
+
+		string prompt = PlayerInteractInput.Prompt;
+		string build = _run?.Build.Describe() ?? string.Empty;
+		_build.Text = prompt.Length > 0 ? $"{prompt}\n{build}" : build;
+
+		if (_player.IsDead)
+		{
+			_status.Text = "已阵亡";
+		}
+		else if (_encounter?.Boss is { } boss && IsInstanceValid(boss) && !boss.IsDead)
+		{
+			var phases = boss.GetNodeOrNull<BossPhaseController>("Phases");
+			var pressure = boss.GetNodeOrNull<BossPressure>("Pressure");
+			string perks = _encounter.BossPerkNames.Count > 0
+				? "   [" + string.Join("·", _encounter.BossPerkNames) + "]"
+				: string.Empty;
+			_status.Text = $"BOSS {boss.Health:0}/{boss.MaxHealth:0}   阶段 {(phases?.Phase ?? 0) + 1}   压力 {pressure?.Level ?? 0}{perks}";
+		}
+		else if (_encounter == null)
+		{
+			_status.Text = string.Empty;
+		}
+		else
+		{
+			// 现在是自由探索：显示关卡、剩余节点与隔离次数（策划文档 §6.2/§6.3）。
+			string stageInfo = _stage != null
+				? $"{_stage.Definition?.DisplayName ?? "Stage"}   " +
+				  $"剩余节点 {_stage.RemainingNodes}   隔离次数 {_stage.FreeQuotaLeft}   用时 {_stage.ElapsedSeconds:0}s   "
+				: string.Empty;
+
+			// 召唤物数量（角色 3 的召唤与控制，策划文档 §7.3/§13）。
+			int summons = GetTree().GetNodesInGroup("summon_units").Count;
+			string summonInfo = summons > 0 ? $"召唤 {summons}   " : string.Empty;
+			_status.Text = $"{stageInfo}{summonInfo}敌人 {_encounter.AliveCount}";
+		}
+	}
+
+	private static Weapon? FindWeapon(Node root)
+	{
+		foreach (Node child in root.GetChildren())
+		{
+			if (child is Weapon weapon)
+			{
+				return weapon;
+			}
+
+			Weapon? nested = FindWeapon(child);
+			if (nested != null)
+			{
+				return nested;
+			}
+		}
+
+		return null;
+	}
+	// === 首领血条（用户需求：唯一的首领不用头顶血条，改在屏幕上方；近距离展开完整血条，远距离只留头像） ===
+
+	/// <summary>实例化 BarBoss 预制体。位置/尺寸/头像/字号都在场景里，这里只按名字抓节点。</summary>
+	private void BuildBossPanel()
+	{
+		Control panel = BossBarScene.Instantiate<Control>();
+
+		// 预制体的根节点名是 BarBoss，挂到 HUD 上时沿用旧代码的节点名 BossPanel（树结构不变）。
+		panel.Name = "BossPanel";
+
+		// 按名字取一次并缓存（节点名改了要同步这里，别让它静默失效）。
+		_bossBar = RequireChild<ProgressBar>(panel, "Panel/Bar");
+		_bossName = RequireChild<Label>(panel, "Panel/NameLabel");
+		_bossState = RequireChild<Label>(panel, "Panel/StateLabel");
+
+		_bossPanel = panel;
+		AddChild(_bossPanel);
+	}
+
+	private static T RequireChild<T>(Node parent, string path)
+		where T : Node
+		=> parent.GetNodeOrNull<T>(path) ?? throw new System.InvalidOperationException($"Boss 血条预制体缺少 {path} 节点");
+
+	/// <summary>数值更新：只改填充比例，不碰预制体给的宽度/位置。</summary>
+	private void UpdateHealthBar(float ratio)
+	{
+		bool hit = ratio < _healthRatio;
+		_healthRatio = ratio;
+		_healthBar.SetRatio(ratio, HealthColor(ratio), hit);
+
+		// 表现更新：残影条跟随（独立方法，以后换成动画只改这里）。
+		_healthBar.AdvanceDelay(ratio, DelayFollowSpeed, (float)GetProcessDeltaTime());
+	}
+
+	/// <summary>玩家血量配色：绿 → 黄 → 红。换配色改这里（或改成按预制体主题色）。</summary>
+	private static Color HealthColor(float ratio)
+		=> ratio > 0.5f ? new Color(0.4f, 0.85f, 0.4f) : ratio > 0.25f ? new Color(1f, 0.8f, 0.3f) : new Color(1f, 0.35f, 0.3f);
+
+	private void UpdateBossPanel()
+	{
+		var boss = GetTree().GetFirstNodeInGroup("boss_units") as Unit;
+		if (boss == null || !IsInstanceValid(boss) || boss.IsDead)
+		{
+			_bossPanel!.Visible = false;
+			BossBarExpanded = false;
+			return;
+		}
+
+		// 只在玩家**靠近首领**时显示整个面板（含头像）。
+		// 用户反馈：远离时留一个头像会在打小怪时造成"到处都是首领"的错觉。
+		var player = GetTree().GetFirstNodeInGroup("player_units") as Unit;
+		float distance = player != null && IsInstanceValid(player) ? player.GlobalPosition.DistanceTo(boss.GlobalPosition) : 0f;
+		bool near = distance <= ActRoguelike.Config.Balance.Settings.BossBarFullRange;
+		BossBarExpanded = near;
+		BossDistance = distance;
+		_bossPanel!.Visible = near;
+		if (!near)
+		{
+			return;
+		}
+
+		// 数值更新（与表现分开：以后加动画只动这里，不动可见性与距离逻辑）。
+		_bossBar.Value = boss.MaxHealth > 0f ? boss.Health / boss.MaxHealth : 0f;
+		_bossName.Text = $"{boss.Name}   {boss.Health:0} / {boss.MaxHealth:0}";
+		_bossState.Text = $"{_stage?.Definition?.DisplayName}   距离 {distance:0}";
+	}
+}

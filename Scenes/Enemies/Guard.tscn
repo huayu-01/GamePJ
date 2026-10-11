@@ -1,0 +1,90 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="3_presentation"]
+[ext_resource type="Script" path="res://Scripts/Combat/BlockComponent.cs" id="4_block"]
+[ext_resource type="Script" path="res://Scripts/AI/EnemyBrain.cs" id="5_brain"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/MeleeAttackBehavior.cs" id="6_attack"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/ChaseBehavior.cs" id="7_chase"]
+[ext_resource type="Script" path="res://Scripts/Abilities/MeleeAttackAbility.cs" id="8_melee"]
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="9_hitbox"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.6
+height = 2.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.55, 0.6, 0.68, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_body")
+radius = 0.6
+height = 2.1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_attack"]
+size = Vector3(2.2, 1.8, 2.2)
+
+[node name="Guard" type="CharacterBody3D"]
+script = ExtResource("1_unit")
+Faction = 1
+MaxHealth = 130.0
+MaxArmor = 60.0
+ArmorDamageReduction = 0.35
+KnockbackResistance = 0.85
+MoveSpeed = 2.6
+Tags = PackedStringArray("Melee", "Guard", "Tank")
+
+[node name="Body" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="Block" type="Node" parent="."]
+script = ExtResource("4_block")
+BlockDamageMultiplier = 0.25
+FrontDotThreshold = -0.35
+BreakThreshold = 45.0
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_movement")
+FaceMovementDirection = false
+TurnSharpness = 5.0
+
+[node name="Brain" type="Node" parent="."]
+script = ExtResource("5_brain")
+SearchRange = 30.0
+
+[node name="Attack" type="Node" parent="Brain"]
+script = ExtResource("6_attack")
+Priority = 100
+
+[node name="Chase" type="Node" parent="Brain"]
+script = ExtResource("7_chase")
+Priority = 10
+StopDistance = 2.0
+
+[node name="AbilityMelee" type="Node3D" parent="."]
+script = ExtResource("8_melee")
+Cooldown = 1.6
+Windup = 0.5
+Recover = 0.4
+AttackRange = 2.4
+
+[node name="Attack" type="Area3D" parent="AbilityMelee"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1.0)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("9_hitbox")
+Damage = 14.0
+Knockback = 3.0
+AttackTags = PackedStringArray("Melee")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityMelee/Attack"]
+shape = SubResource("BoxShape3D_attack")
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("3_presentation")

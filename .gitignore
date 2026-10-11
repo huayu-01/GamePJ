@@ -1,0 +1,20 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# --- .NET / 构建产物 ---
+bin/
+obj/
+*.user
+*.suo
+
+# --- 工具与本地残留 ---
+.gdmcp/
+NVIDIA Corporation/
+%SystemDrive%/
+
+# --- 素材暂存（未接入的包，196MB）---
+_art_staging/
+
+# --- 编辑器缓存（可重建）---
+.godot/

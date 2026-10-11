@@ -1,0 +1,142 @@
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Player/PlayerController.cs" id="1_player"]
+[ext_resource type="PackedScene" path="res://Scenes/Camera/CameraRig.tscn" id="2_rig"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="3_movement"]
+[ext_resource type="Script" path="res://Scripts/Interaction/PlayerInteractInput.cs" id="10_interact"]
+[ext_resource type="Script" path="res://Scripts/Abilities/MeleeAttackAbility.cs" id="11_melee"]
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="12_hitbox"]
+[ext_resource type="Script" path="res://Scripts/Abilities/SummonAbility.cs" id="13_summon"]
+[ext_resource type="PackedScene" path="res://Scenes/Summons/Drone.tscn" id="14_drone"]
+[ext_resource type="Script" path="res://Scripts/Abilities/AreaAttackAbility.cs" id="15_area"]
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="16_hitbox2"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="4_presentation"]
+[ext_resource type="Script" path="res://Scripts/Combat/ChallengerMark.cs" id="17_mark"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/Pistol.tscn" id="5_pistol"]
+[ext_resource type="Script" path="res://Scripts/Player/PlayerWeaponInput.cs" id="6_weapon_input"]
+[ext_resource type="Script" path="res://Scripts/Abilities/DashAbility.cs" id="7_dash"]
+[ext_resource type="Script" path="res://Scripts/Abilities/BurstFireAbility.cs" id="8_burst"]
+[ext_resource type="Script" path="res://Scripts/Player/PlayerAbilityInput.cs" id="9_ability_input"]
+[ext_resource type="PackedScene" path="res://Assets/Models/player/mesh_player_body.glb" id="18_playerbody"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_control"]
+radius = 8.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_playermelee"]
+size = Vector3(2.6, 1.8, 2.6)
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_player")
+Faction = 0
+MaxHealth = 120.0
+MoveSpeed = 7.0
+Tags = PackedStringArray("Player", "Gun")
+
+
+[node name="Body" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" parent="." instance=ExtResource("18_playerbody")]
+transform = Transform3D(-2.6814, 0, 0, 0, 2.6814, 0, 0, 0, -2.6814, 0, 0, 0)
+
+[node name="AnimationPlayer" parent="Model" index="1"]
+autoplay = "idle"
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("3_movement")
+TurnSharpness = 16.0
+
+[node name="CameraRig" parent="." instance=ExtResource("2_rig")]
+
+[node name="WeaponMount" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.7, -0.34)
+
+[node name="Pistol" parent="WeaponMount" instance=ExtResource("5_pistol")]
+
+[node name="WeaponInput" type="Node3D" parent="WeaponMount/Pistol"]
+script = ExtResource("6_weapon_input")
+
+[node name="AbilityDash" type="Node3D" parent="."]
+script = ExtResource("7_dash")
+Aim = 0
+Cooldown = 1.2
+Distance = 6.0
+Duration = 0.22
+InvulnerableTime = 0.18
+
+[node name="AbilityBurst" type="Node3D" parent="."]
+script = ExtResource("8_burst")
+Cooldown = 10.0
+BurstInterval = 0.06
+Duration = 2.5
+Aim = 2
+Windup = 0.0
+Recover = 0.1
+
+[node name="AbilityInput" type="Node3D" parent="."]
+script = ExtResource("9_ability_input")
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("4_presentation")
+[node name="InteractInput" type="Node" parent="."]
+script = ExtResource("10_interact")
+[node name="AbilityMelee" type="Node3D" parent="."]
+script = ExtResource("11_melee")
+Enabled = false
+Cooldown = 0.75
+Windup = 0.18
+Recover = 0.25
+AttackRange = 2.4
+
+[node name="Attack" type="Area3D" parent="AbilityMelee"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -1.3)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("12_hitbox")
+Damage = 32.0
+Knockback = 5.0
+AttackTags = PackedStringArray("Melee", "Heavy")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityMelee/Attack"]
+shape = SubResource("BoxShape3D_playermelee")
+[node name="AbilitySummon" type="Node3D" parent="."]
+script = ExtResource("13_summon")
+Enabled = false
+Cooldown = 5.0
+Windup = 0.25
+Recover = 0.25
+Count = 1
+Radius = 2.5
+MaxAlive = 3
+SummonScene = ExtResource("14_drone")
+[node name="AbilityControl" type="Node3D" parent="."]
+script = ExtResource("15_area")
+Enabled = false
+Cooldown = 8.0
+Windup = 0.25
+Recover = 0.4
+ActiveTime = 0.15
+TriggerRadius = 8.0
+ApproachMinRange = 0.0
+ApproachMaxRange = 8.0
+
+[node name="Attack" type="Area3D" parent="AbilityControl"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("16_hitbox2")
+Damage = 4.0
+Knockback = 0.0
+StatusId = "Stun"
+StatusDuration = 2.0
+AttackTags = PackedStringArray("Control", "AoE")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityControl/Attack"]
+shape = SubResource("SphereShape3D_control")
+[node name="ChallengerMark" type="Node3D" parent="."]
+script = ExtResource("17_mark")

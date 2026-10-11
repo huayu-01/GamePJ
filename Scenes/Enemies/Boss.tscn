@@ -1,0 +1,187 @@
+[gd_scene load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="3_presentation"]
+[ext_resource type="Script" path="res://Scripts/AI/EnemyBrain.cs" id="4_brain"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/MeleeAttackBehavior.cs" id="5_melee_behavior"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/UseAbilityBehavior.cs" id="6_use_ability"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/ChaseBehavior.cs" id="7_chase"]
+[ext_resource type="Script" path="res://Scripts/Abilities/MeleeAttackAbility.cs" id="8_melee"]
+[ext_resource type="Script" path="res://Scripts/Abilities/AreaAttackAbility.cs" id="9_area"]
+[ext_resource type="Script" path="res://Scripts/Abilities/ChargeAttackAbility.cs" id="10_charge"]
+[ext_resource type="Script" path="res://Scripts/Abilities/SummonAbility.cs" id="11_summon"]
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="12_hitbox"]
+[ext_resource type="Script" path="res://Scripts/Boss/BossPhaseController.cs" id="13_phases"]
+[ext_resource type="Script" path="res://Scripts/Boss/BossPressure.cs" id="14_pressure"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Chaser.tscn" id="15_add"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 1.0
+height = 2.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.55, 0.12, 0.28, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_body")
+radius = 1.0
+height = 2.8
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_melee"]
+size = Vector3(3.0, 2.4, 3.0)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_scream"]
+radius = 7.5
+
+[node name="Boss" type="CharacterBody3D"]
+script = ExtResource("1_unit")
+Faction = 1
+MaxHealth = 900.0
+MaxArmor = 200.0
+ArmorDamageReduction = 0.3
+KnockbackResistance = 1.0
+MoveSpeed = 3.6
+Tags = PackedStringArray("Boss", "Melee")
+
+[node name="Body" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_movement")
+FaceMovementDirection = false
+TurnSharpness = 5.0
+
+[node name="Brain" type="Node" parent="."]
+script = ExtResource("4_brain")
+SearchRange = 60.0
+
+[node name="Scream" type="Node" parent="Brain"]
+script = ExtResource("6_use_ability")
+Priority = 120
+AbilityNodeName = "AbilityScream"
+
+[node name="Charge" type="Node" parent="Brain"]
+script = ExtResource("6_use_ability")
+Priority = 110
+AbilityNodeName = "AbilityCharge"
+
+[node name="Attack" type="Node" parent="Brain"]
+script = ExtResource("5_melee_behavior")
+Priority = 100
+
+[node name="Summon" type="Node" parent="Brain"]
+script = ExtResource("6_use_ability")
+Priority = 60
+AbilityNodeName = "AbilitySummon"
+
+[node name="Chase" type="Node" parent="Brain"]
+script = ExtResource("7_chase")
+Priority = 10
+StopDistance = 2.4
+
+[node name="AbilityMelee" type="Node3D" parent="."]
+script = ExtResource("8_melee")
+Cooldown = 1.8
+Windup = 0.55
+Recover = 0.5
+AttackRange = 3.4
+
+[node name="Attack" type="Area3D" parent="AbilityMelee"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -1.6)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("12_hitbox")
+Damage = 24.0
+Knockback = 6.0
+AttackTags = PackedStringArray("Melee", "Heavy")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityMelee/Attack"]
+shape = SubResource("BoxShape3D_melee")
+
+[node name="AbilityScream" type="Node3D" parent="."]
+script = ExtResource("9_area")
+Enabled = false
+Cooldown = 7.0
+Windup = 0.7
+Recover = 0.9
+ActiveTime = 0.2
+TriggerRadius = 8.0
+ApproachMinRange = 0.0
+ApproachMaxRange = 8.0
+
+[node name="Attack" type="Area3D" parent="AbilityScream"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("12_hitbox")
+Damage = 14.0
+Knockback = 8.0
+AttackTags = PackedStringArray("AoE", "Scream")
+StatusId = "Weaken"
+StatusDuration = 4.0
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityScream/Attack"]
+shape = SubResource("SphereShape3D_scream")
+
+[node name="AbilityCharge" type="Node3D" parent="."]
+script = ExtResource("10_charge")
+Enabled = false
+Cooldown = 7.0
+Windup = 0.6
+Recover = 0.7
+ChargeSpeed = 18.0
+MaxDistance = 18.0
+ApproachMinRange = 5.0
+ApproachMaxRange = 16.0
+
+[node name="Attack" type="Area3D" parent="AbilityCharge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -1.8)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("12_hitbox")
+Damage = 20.0
+Knockback = 10.0
+AttackTags = PackedStringArray("Melee", "Charge")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityCharge/Attack"]
+shape = SubResource("BoxShape3D_melee")
+
+[node name="AbilitySummon" type="Node3D" parent="."]
+script = ExtResource("11_summon")
+Enabled = false
+Cooldown = 14.0
+Windup = 0.6
+Recover = 0.4
+Count = 3
+Radius = 6.0
+SummonScene = ExtResource("15_add")
+
+[node name="Phases" type="Node" parent="."]
+script = ExtResource("13_phases")
+PhaseFractions = PackedFloat32Array(1, 0.65, 0.33)
+Phase2Abilities = PackedStringArray("AbilityScream", "AbilityCharge")
+Phase3Abilities = PackedStringArray("AbilitySummon")
+PhaseDamageMultipliers = PackedFloat32Array(1, 1.2, 1.5)
+PhaseAttackSpeedMultipliers = PackedFloat32Array(1, 1, 1.2)
+
+[node name="Pressure" type="Node" parent="."]
+script = ExtResource("14_pressure")
+Interval = 12.0
+MaxLevel = 5
+DamagePerLevel = 0.08
+AttackSpeedPerLevel = 0.06
+MoveSpeedPerLevel = 0.05
+AddSpawnLevel = 3
+AddsPerLevel = 1
+AddSpawnRadius = 9.0
+AddScene = ExtResource("15_add")
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("3_presentation")
+DeathLinger = 2.5

@@ -1,0 +1,8 @@
+[gd_resource type="SphereMesh" load_steps=2 format=3]
+
+[ext_resource type="Material" path="res://Assets/Materials/mat_combat_explosion.tres" id="1_mat"]
+
+[resource]
+material = ExtResource("1_mat")
+radius = 1.0
+height = 2.0

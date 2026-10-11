@@ -1,0 +1,86 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="3_presentation"]
+[ext_resource type="Script" path="res://Scripts/AI/EnemyBrain.cs" id="4_brain"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/UseAbilityBehavior.cs" id="5_use_ability"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/KeepDistanceBehavior.cs" id="6_keep"]
+[ext_resource type="Script" path="res://Scripts/Abilities/AreaAttackAbility.cs" id="7_scream"]
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="8_hitbox"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.5
+height = 2.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.25, 0.8, 0.75, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_body")
+radius = 0.5
+height = 2.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_scream"]
+radius = 7.5
+
+[node name="Screamer" type="CharacterBody3D"]
+script = ExtResource("1_unit")
+Faction = 1
+MaxHealth = 70.0
+MoveSpeed = 3.0
+Tags = PackedStringArray("Controller", "AreaDenial")
+
+[node name="Body" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_movement")
+FaceMovementDirection = false
+TurnSharpness = 6.0
+
+[node name="Brain" type="Node" parent="."]
+script = ExtResource("4_brain")
+SearchRange = 30.0
+
+[node name="Scream" type="Node" parent="Brain"]
+script = ExtResource("5_use_ability")
+Priority = 100
+
+[node name="KeepDistance" type="Node" parent="Brain"]
+script = ExtResource("6_keep")
+Priority = 20
+PreferredDistance = 6.0
+Tolerance = 1.5
+
+[node name="AbilityScream" type="Node3D" parent="."]
+script = ExtResource("7_scream")
+Cooldown = 4.0
+Windup = 0.6
+Recover = 0.8
+ActiveTime = 0.2
+TriggerRadius = 7.0
+ApproachMinRange = 0.0
+ApproachMaxRange = 7.0
+
+[node name="Attack" type="Area3D" parent="AbilityScream"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("8_hitbox")
+Damage = 6.0
+Knockback = 6.0
+AttackTags = PackedStringArray("AoE", "Scream")
+StatusId = "Slow"
+StatusDuration = 3.0
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityScream/Attack"]
+shape = SubResource("SphereShape3D_scream")
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("3_presentation")

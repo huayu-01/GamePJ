@@ -1,0 +1,151 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="3_presentation"]
+[ext_resource type="Script" path="res://Scripts/Combat/BlockComponent.cs" id="4_block"]
+[ext_resource type="Script" path="res://Scripts/AI/EnemyBrain.cs" id="5_brain"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/MeleeAttackBehavior.cs" id="6_attack"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/UseAbilityBehavior.cs" id="7_use_ability"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/ChaseBehavior.cs" id="8_chase"]
+[ext_resource type="Script" path="res://Scripts/Abilities/MeleeAttackAbility.cs" id="9_melee"]
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="10_hitbox"]
+[ext_resource type="Script" path="res://Scripts/Abilities/BuffAlliesAbility.cs" id="11_buff"]
+[ext_resource type="Script" path="res://Scripts/Combat/EliteModifier.cs" id="12_elite"]
+[ext_resource type="Script" path="res://Scripts/Abilities/AreaAttackAbility.cs" id="13_area"]
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="14_hitbox"]
+[ext_resource type="Script" path="res://Scripts/Combat/EliteSkillRandomizer.cs" id="15_random"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.6
+height = 2.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.6, 0.5, 0.85, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_body")
+radius = 0.6
+height = 2.1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_attack"]
+size = Vector3(2.2, 1.8, 2.2)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_elitecontrol"]
+radius = 6.0
+[node name="SkillElite" type="CharacterBody3D"]
+script = ExtResource("1_unit")
+Faction = 1
+MaxHealth = 200.0
+MaxArmor = 90.0
+ArmorDamageReduction = 0.35
+KnockbackResistance = 0.9
+MoveSpeed = 2.9
+Tags = PackedStringArray("Elite", "Support", "Melee")
+
+[node name="Body" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="Block" type="Node" parent="."]
+script = ExtResource("4_block")
+BlockDamageMultiplier = 0.3
+FrontDotThreshold = -0.35
+BreakThreshold = 55.0
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_movement")
+FaceMovementDirection = false
+TurnSharpness = 6.0
+
+[node name="Brain" type="Node" parent="."]
+script = ExtResource("5_brain")
+SearchRange = 45.0
+
+[node name="Attack" type="Node" parent="Brain"]
+script = ExtResource("6_attack")
+Priority = 100
+
+[node name="Buff" type="Node" parent="Brain"]
+script = ExtResource("7_use_ability")
+Priority = 90
+AbilityNodeName = "AbilityBuff"
+
+[node name="Chase" type="Node" parent="Brain"]
+script = ExtResource("8_chase")
+Priority = 10
+StopDistance = 2.1
+
+[node name="AbilityMelee" type="Node3D" parent="."]
+script = ExtResource("9_melee")
+Cooldown = 1.6
+Windup = 0.45
+Recover = 0.35
+AttackRange = 2.5
+
+[node name="Attack" type="Area3D" parent="AbilityMelee"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -1.0)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("10_hitbox")
+Damage = 12.0
+Knockback = 3.0
+AttackTags = PackedStringArray("Melee")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityMelee/Attack"]
+shape = SubResource("BoxShape3D_attack")
+
+[node name="AbilityBuff" type="Node3D" parent="."]
+script = ExtResource("11_buff")
+Cooldown = 5.5
+Windup = 0.4
+Recover = 0.3
+Radius = 11.0
+BuffDuration = 5.0
+StatusId = "Empowered"
+IncludeSelf = true
+
+[node name="Elite" type="Node" parent="."]
+script = ExtResource("12_elite")
+HealthMultiplier = 1.0
+ArmorAdd = 0.0
+DamageMultiplier = 1.0
+MoveSpeedMultiplier = 1.0
+KnockbackResistance = 0.0
+ModelScale = 1.2
+Tint = Color(0.75, 0.4, 0.95, 1)
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("3_presentation")
+[node name="AbilityControl" type="Node3D" parent="."]
+script = ExtResource("13_area")
+Enabled = false
+Cooldown = 9.0
+Windup = 0.4
+Recover = 0.5
+ActiveTime = 0.15
+TriggerRadius = 6.0
+ApproachMinRange = 0.0
+ApproachMaxRange = 6.0
+
+[node name="Attack" type="Area3D" parent="AbilityControl"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("14_hitbox")
+Damage = 6.0
+Knockback = 2.0
+StatusId = "Stun"
+StatusDuration = 2.0
+AttackTags = PackedStringArray("Control", "AoE")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityControl/Attack"]
+shape = SubResource("SphereShape3D_elitecontrol")
+
+[node name="SkillRandomizer" type="Node" parent="."]
+script = ExtResource("15_random")
+Skills = PackedStringArray("AbilityBuff", "AbilityControl")

@@ -1,0 +1,88 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="3_presentation"]
+[ext_resource type="Script" path="res://Scripts/AI/EnemyBrain.cs" id="4_brain"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/ChaseBehavior.cs" id="5_chase"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/MeleeAttackBehavior.cs" id="6_attack"]
+[ext_resource type="Script" path="res://Scripts/Abilities/MeleeAttackAbility.cs" id="7_melee"]
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="8_hitbox"]
+[ext_resource type="Script" path="res://Scripts/Combat/SummonLifetime.cs" id="9_lifetime"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_drone"]
+radius = 0.3
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_drone"]
+albedo_color = Color(0.35, 0.95, 0.85, 1)
+emission_enabled = true
+emission = Color(0.2, 0.7, 0.6, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_drone"]
+material = SubResource("StandardMaterial3D_drone")
+radius = 0.3
+height = 1.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_drone"]
+size = Vector3(1.4, 1.0, 1.4)
+
+[node name="Drone" type="CharacterBody3D"]
+script = ExtResource("1_unit")
+Faction = 0
+MaxHealth = 40.0
+MoveSpeed = 6.0
+Tags = PackedStringArray("Summon")
+
+[node name="Body" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+shape = SubResource("CapsuleShape3D_drone")
+
+[node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+mesh = SubResource("CapsuleMesh_drone")
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_movement")
+FaceMovementDirection = false
+TurnSharpness = 10.0
+
+[node name="Brain" type="Node" parent="."]
+script = ExtResource("4_brain")
+SearchRange = 22.0
+TargetRefreshInterval = 0.3
+
+[node name="Attack" type="Node" parent="Brain"]
+script = ExtResource("6_attack")
+Priority = 100
+
+[node name="Chase" type="Node" parent="Brain"]
+script = ExtResource("5_chase")
+Priority = 10
+StopDistance = 1.6
+
+[node name="AbilityMelee" type="Node3D" parent="."]
+script = ExtResource("7_melee")
+Cooldown = 0.9
+Windup = 0.15
+Recover = 0.2
+AttackRange = 1.8
+
+[node name="Attack" type="Area3D" parent="AbilityMelee"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.7)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("8_hitbox")
+Damage = 6.0
+Knockback = 1.5
+AttackTags = PackedStringArray("Melee")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityMelee/Attack"]
+shape = SubResource("BoxShape3D_drone")
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("3_presentation")
+[node name="Lifetime" type="Node" parent="."]
+script = ExtResource("9_lifetime")
+Lifetime = 25.0

@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Projectile.cs" id="1_projectile"]
+[ext_resource type="Mesh" path="res://Assets/Models/mesh_combat_bullet.tres" id="2_mesh"]
+[ext_resource type="Material" path="res://Assets/Particles/ps_combat_trail.tres" id="3_trail"]
+[ext_resource type="Mesh" path="res://Assets/Models/mesh_combat_trail.tres" id="4_trail_quad"]
+
+[node name="Bullet" type="Node3D"]
+script = ExtResource("1_projectile")
+Speed = 75.0
+MaxLifetime = 2.2
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_mesh")
+
+[node name="Trail" type="GPUParticles3D" parent="Mesh"]
+visibility_aabb = AABB(-20, -20, -20, 40, 40, 40)
+emitting = true
+amount = 60
+lifetime = 0.35
+fixed_fps = 0
+process_material = ExtResource("3_trail")
+draw_pass_1 = ExtResource("4_trail_quad")

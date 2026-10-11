@@ -1,0 +1,107 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://Scripts/Interaction/BaseTerminal.cs" id="2_terminal"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/BaseScreen.tscn" id="3_base"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/StartScreen.tscn" id="4_start"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/HelpScreen.tscn" id="5_help"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/LoadingScreen.tscn" id="6_loading"]
+
+[sub_resource type="BoxShape3D" id="Shape_ground"]
+size = Vector3(26, 1, 26)
+
+[sub_resource type="StandardMaterial3D" id="Mat_ground"]
+albedo_color = Color(0.22, 0.24, 0.28, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_ground"]
+material = SubResource("Mat_ground")
+size = Vector3(26, 1, 26)
+
+[sub_resource type="StandardMaterial3D" id="Mat_upgrade"]
+albedo_color = Color(0.35, 0.75, 0.45, 1)
+emission_enabled = true
+emission = Color(0.12, 0.35, 0.18, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_loadout"]
+albedo_color = Color(0.4, 0.6, 0.95, 1)
+emission_enabled = true
+emission = Color(0.12, 0.2, 0.4, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_help"]
+albedo_color = Color(0.95, 0.85, 0.4, 1)
+emission_enabled = true
+emission = Color(0.35, 0.3, 0.1, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_gate"]
+albedo_color = Color(0.9, 0.35, 0.35, 1)
+emission_enabled = true
+emission = Color(0.4, 0.12, 0.12, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_terminal"]
+size = Vector3(1.6, 2.2, 1.6)
+
+[node name="Base" type="Node3D"]
+
+[node name="Ground" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("Shape_ground")
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("Mesh_ground")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.86, -0.35, 0.36, 0, 0.71, 0.7, -0.5, -0.6, 0.61, 0, 12, 0)
+light_energy = 1.1
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 9)
+
+[node name="TerminalUpgrades" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.1, 0)
+script = ExtResource("2_terminal")
+Kind = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="TerminalUpgrades"]
+mesh = SubResource("Mesh_terminal")
+surface_material_override/0 = SubResource("Mat_upgrade")
+
+[node name="TerminalLoadout" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 1.1, 0)
+script = ExtResource("2_terminal")
+Kind = 1
+
+[node name="Mesh" type="MeshInstance3D" parent="TerminalLoadout"]
+mesh = SubResource("Mesh_terminal")
+surface_material_override/0 = SubResource("Mat_loadout")
+
+[node name="TerminalHelp" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 1.1, 0)
+script = ExtResource("2_terminal")
+Kind = 2
+
+[node name="Mesh" type="MeshInstance3D" parent="TerminalHelp"]
+mesh = SubResource("Mesh_terminal")
+surface_material_override/0 = SubResource("Mat_help")
+
+[node name="TerminalGate" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.1, 0)
+script = ExtResource("2_terminal")
+Kind = 3
+TargetScene = "res://Scenes/Main.tscn"
+
+[node name="Mesh" type="MeshInstance3D" parent="TerminalGate"]
+mesh = SubResource("Mesh_terminal")
+surface_material_override/0 = SubResource("Mat_gate")
+
+[node name="Screens" type="Node" parent="."]
+
+[node name="BaseScreen" parent="Screens" instance=ExtResource("3_base")]
+
+[node name="StartScreen" parent="Screens" instance=ExtResource("4_start")]
+
+[node name="HelpScreen" parent="Screens" instance=ExtResource("5_help")]
+[node name="LoadingScreen" parent="." instance=ExtResource("6_loading")]

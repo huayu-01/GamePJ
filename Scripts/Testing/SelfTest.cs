@@ -1,0 +1,538 @@
+using System.Collections.Generic;
+using ActRoguelike.Combat;
+using ActRoguelike.Config;
+using ActRoguelike.Core;
+using ActRoguelike.Encounter;
+using ActRoguelike.Interaction;
+using ActRoguelike.Run;
+using ActRoguelike.UI;
+using ActRoguelike.Rewards;
+using Godot;
+
+namespace ActRoguelike.Debug;
+
+/// <summary>
+/// 无 MCP 时的自动化验证入口（只在命令行带 ``--selftest`` 时激活，正常运行零影响）。
+///
+/// 用法（Godot 可执行文件 + 项目路径）：
+/// <code>
+/// Godot_v4.7.2-stable_mono_win64.exe --path F:\Godot项目\项目a --headless --quit-after 900 -- --selftest
+/// </code>
+///
+/// 它会：跳过界面直接开局 → 打印节点布置（应为 10 个 / 2-5-3 分层）→ 强制开一场战斗
+/// → 打印波次生成结果（一次性刷出、波数）→ 退出。
+/// </summary>
+public partial class SelfTest : Node
+{
+#if DEBUG
+	// 仅在 Debug 构建里存在：Release 下这个类退化成空 Node，autoload 仍然有效但什么都不做。
+
+	private int _phase;
+	private float _timer;
+
+	public override void _Ready()
+	{
+		ProcessMode = ProcessModeEnum.Always;
+		bool wanted = false;
+		foreach (string arg in OS.GetCmdlineUserArgs())
+		{
+			if (arg == "--selftest")
+			{
+				wanted = true;
+			}
+		}
+
+		// 也支持文件开关：user://selftest.flag 存在即激活（MCP 的 run_project 无法传命令行参数）。
+		if (!wanted && FileAccess.FileExists("user://selftest.flag"))
+		{
+			wanted = true;
+		}
+
+		if (!wanted)
+		{
+			SetProcess(false);
+			return;
+		}
+
+		GameLog.Write("SelfTest", "=== 自测开始 ===");
+	}
+
+	public override void _Process(double delta)
+	{
+		if (_probeProbing)
+		{
+			SamplePresentation((float)delta);
+		}
+
+		if (_pendingFireRelease)
+		{
+			_pendingFireRelease = false;
+			Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = false });
+		}
+
+		if (_pendingKeyUp is { } release)
+		{
+			_pendingKeyUp = null;
+			Input.ParseInputEvent(new InputEventKey { Keycode = release, PhysicalKeycode = release, Pressed = false });
+		}
+
+		_timer += (float)delta;
+		var run = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController");
+		var stage = GetTree().Root.GetNodeOrNull<StageController>("Main/Stage");
+
+		switch (_phase)
+		{
+			case 0 when _timer > 1.0f:
+				// 模拟"从基地出发"：这样 RunController 会直接开局，不再弹出征面板挡住画面。
+				RunSetup.HasSelection = true;
+				RunSetup.Weapon = WeaponPresetKind.Pistol;
+				run?.BeginRunWithCharacter(PlayerCharacterKind.Gunner, WeaponPresetKind.Pistol);
+				// _boot 在第一帧就弹过出征面板，这里把它关掉，否则截图看不到战斗画面。
+				GetTree().Root.GetNodeOrNull<BaseScreen>("Main/RunController/BaseScreen")?.Close();
+				GetTree().Root.GetNodeOrNull<StartScreen>("Main/RunController/StartScreen")?.Close();
+				GetTree().Paused = false;
+				GameLog.Write("SelfTest", $"开局后 Paused={GetTree().Paused}（若为 True 说明界面栈还压着，战斗逻辑不会跑）");
+				Next();
+				break;
+
+			case 1 when _timer > 1.5f:
+				GameLog.Write("SelfTest", $"波数映射：进化={StageController.WavesFor(RewardNodeKind.Evolution)}（期望3） 异化={StageController.WavesFor(RewardNodeKind.Mutation)}（期望3） 强化={StageController.WavesFor(RewardNodeKind.Enhancement)}（期望2） 商店={StageController.WavesFor(RewardNodeKind.Shop)}（期望2） 材料={StageController.WavesFor(RewardNodeKind.Resource)}（期望1） 恢复={StageController.WavesFor(RewardNodeKind.Heal)}（期望1） 特殊={StageController.WavesFor(RewardNodeKind.Special)}（期望1）");
+				ReportNodes(stage);
+				ReportSpacing(stage);
+				stage?.AddPressureForNode(RewardNodeKind.Evolution);
+				stage?.AddPressureForNode(RewardNodeKind.Mutation);
+				GameLog.Write("SelfTest", $"Pressure 测试（进化 150×1.25 + 异化 150×1.5）：{stage?.DebugState}");
+				stage?.AddPressureForNode(RewardNodeKind.Enhancement);
+				GameLog.Write("SelfTest", $"Pressure 测试（再加一次中价值，应不变）：{stage?.DebugState}");
+				Next();
+				break;
+
+			case 2 when _timer > 0.5f:
+				GetTree().Paused = false;
+				GameLog.Write("SelfTest", $"解除暂停后 Paused={GetTree().Paused}，准备开战");
+				stage?.DebugStartCombat();
+				Next();
+				break;
+
+			case 3 when _timer > 5.0f:
+				ReportCombat(stage);
+				Next();
+				break;
+
+			case 4 when _timer > 0.2f:
+				stage?.DebugStartCombat(2);
+				GameLog.Write("SelfTest", $"开战（2 波上限）：{stage?.DebugState}");
+				PressFireOnce();
+				Next();
+				break;
+
+			case 5 when _timer > 1.5f:
+				foreach (string group in new[] { "enemy_units", "boss_units" })
+				{
+					foreach (Node node in GetTree().GetNodesInGroup(group))
+					{
+						if (node is Unit unit)
+						{
+							unit.ApplyDirectDamage(99999f, null);
+						}
+					}
+				}
+
+				GameLog.Write("SelfTest", "已击杀场上全部敌人，等待波次推进与完成判定…");
+				Next();
+				break;
+
+			case 6 when _timer > 1.5f:
+				foreach (string group in new[] { "enemy_units", "boss_units" })
+				{
+					foreach (Node node in GetTree().GetNodesInGroup(group))
+					{
+						if (node is Unit unit)
+						{
+							unit.ApplyDirectDamage(99999f, null);
+						}
+					}
+				}
+
+				GameLog.Write("SelfTest", $"已击杀白板首领，等待结算…");
+				Next();
+				break;
+
+			// === 端到端：真的走过去、按 F 交互、按数字键选奖励（不用 DebugTriggerNode 抄近路）===
+			case 7 when _timer > 0.3f:
+				MovePlayerToNode(stage, RewardNodeKind.Enhancement);
+				GameLog.Write("SelfTest", "端到端：已传送到强化节点旁，准备按 F");
+				Next();
+				break;
+
+			case 8 when _timer > 0.9f:
+				GameLog.Write("SelfTest", $"端到端：按 F（当前交互提示 = {PlayerInteractInput.Prompt}）");
+				PressKey(Key.F);
+				Next();
+				break;
+
+			case 9 when _timer > 1.0f:
+				var reward = GetTree().Root.GetNodeOrNull<RewardScreen>("Main/RunController/RewardScreen");
+				GameLog.Write("SelfTest", $"端到端：按 F 之后 奖励界面打开 = {reward?.IsOpen}  Paused = {GetTree().Paused}");
+				PressKey(Key.Key1);
+				Next();
+				break;
+
+			case 10 when _timer > 3.0f:
+				GameLog.Write("SelfTest", $"端到端：选完奖励之后的状态 = {stage?.DebugState}");
+				Next();
+				break;
+
+			// === 表现层：前进时逐帧采样「物理步进 / 相机平滑 / 渲染帧率」===
+			// 残影排查：模型是 Unit 的子节点（不做位置插值），所以「一直在缓动 + 残影」只可能来自
+			// ① 相机在 _Process 里平滑跟随、而物理按固定 60Hz 步进，两者频率不一致 → 画面抖动/滞后；
+			// ② 渲染帧率与物理帧率不同步（物理插值未开）→ 角色位置每 2~3 个渲染帧才跳一次。
+			case 11:
+				_timer = 0f;
+				// 玩家现在挂在 Stage 下面（不是 Main/Player），用统一入口取。
+				_probePlayer = PlayerLocator.Player ?? GetTree().GetFirstNodeInGroup("player_units") as Unit;
+				_probeRig = _probePlayer?.GetNodeOrNull<Node3D>("CameraRig");
+				_probePrevPlayer = _probePlayer?.GlobalPosition ?? Vector3.Zero;
+				_probePrevRig = _probeRig?.GlobalPosition ?? Vector3.Zero;
+				_probeProbing = true;
+				Input.ParseInputEvent(new InputEventKey { Keycode = Key.W, PhysicalKeycode = Key.W, Pressed = true });
+				GameLog.Write("SelfTest", $"表现采样：按住 W 前进（fps={Engine.GetFramesPerSecond()} 物理Hz={Engine.PhysicsTicksPerSecond} 物理插值={ProjectSettings.GetSetting("physics/common/physics_interpolation").AsBool()} 玩家={_probePlayer != null} 相机={_probeRig != null}）");
+				Next();
+				break;
+
+			case 12 when _timer > 2.5f:
+				_probeProbing = false;
+				Input.ParseInputEvent(new InputEventKey { Keycode = Key.W, PhysicalKeycode = Key.W, Pressed = false });
+				ReportPresentation();
+				Next();
+				break;
+
+			case 13:
+				GameLog.Write("SelfTest", "=== 自测结束 ===");
+				SetProcess(false);
+				GetTree().Quit();
+				break;
+		}
+	}
+
+	/// <summary>把玩家传送到指定类型节点旁边（用于端到端交互测试）。</summary>
+	private void MovePlayerToNode(StageController? stage, RewardNodeKind kind)
+	{
+		// 玩家现在挂在 Stage 下面（不是 Main/Player），用统一入口取。
+		var player = PlayerLocator.Player ?? GetTree().GetFirstNodeInGroup("player_units") as Unit;
+		if (stage == null || player == null)
+		{
+			return;
+		}
+
+		foreach (Node child in stage.GetChildren())
+		{
+			if (child is RewardNode node && node.Kind == kind)
+			{
+				node.Enabled = true;
+				node.Visible = true;
+				Vector3 target = node.GlobalPosition + new Vector3(0f, 0.8f, 1.6f);
+				player.GlobalPosition = target;
+				return;
+			}
+		}
+	}
+
+	/// <summary>
+	/// 注入一次按键：按下后**下一帧**才松开。
+	/// 必须跨帧 —— IsActionJustPressed 只在"输入被处理的那一帧"为真，
+	/// 同一帧里注入又立即松开，游戏侧可能完全看不到这次按下。
+	/// </summary>
+	private static void PressKey(Key key)
+	{
+		Input.ParseInputEvent(new InputEventKey { Keycode = key, PhysicalKeycode = key, Pressed = true });
+		_pendingKeyUp = key;
+	}
+
+	private static Key? _pendingKeyUp;
+
+	/// <summary>
+	/// 开一枪。手枪 24 伤害 < 敌人 26 血，所以敌人会残血但不死 —— 用来观察血条位置。
+	/// 跨帧松开：单击武器用 IsActionJustPressed，同帧按下又松开会被漏掉。
+	/// </summary>
+	private static void PressFireOnce()
+	{
+		Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true });
+		_pendingFireRelease = true;
+	}
+
+	private static bool _pendingFireRelease;
+
+	private void ReportInteraction(StageController? stage, int round)
+	{
+		bool accepted = stage?.DebugTriggerNode(RewardNodeKind.Evolution) ?? false;
+		int depth = UiRouter.Instance?.StackDepth ?? -1;
+		GameLog.Write("SelfTest", $"交互 #{round}：接受={accepted} Paused={GetTree().Paused} 界面栈深={depth} 状态=[{stage?.DebugState}]");
+	}
+
+	private void Next()
+	{
+		_phase++;
+		_timer = 0f;
+	}
+
+	// === 表现层采样（残影排查用）===
+	// 逐帧记录：物理步进时角色位移、相机位移、两者相位差、以及渲染帧间隔抖动。
+	private Unit? _probePlayer;
+	private Node3D? _probeRig;
+	private bool _probeProbing;
+	private Vector3 _probePrevPlayer;
+	private Vector3 _probePrevRig;
+	private readonly List<float> _probePlayerStep = new();
+	private readonly List<float> _probeRigStep = new();
+	private readonly List<float> _probeRigOffset = new();
+	private readonly List<float> _probeFrameMs = new();
+	private readonly List<float> _probePlayerStepNonZero = new();
+	private readonly List<float> _probeInterpStep = new();
+	private readonly List<float> _probeInterpOffset = new();
+	private readonly List<float> _probeRigInterpStep = new();
+	private readonly List<float> _probeRigInterpOffset = new();
+
+	private void SamplePresentation(float delta)
+	{
+		if (_probePlayer == null || _probeRig == null)
+		{
+			return;
+		}
+
+		Vector3 player = _probePlayer.GlobalPosition;
+		Vector3 rig = _probeRig.GlobalPosition;
+		_probePlayerStep.Add(player.DistanceTo(_probePrevPlayer));
+		_probeRigStep.Add(rig.DistanceTo(_probePrevRig));
+		_probeRigOffset.Add(_probePrevPlayer.DistanceTo(rig));
+		_probeFrameMs.Add(delta * 1000f);
+
+		// 渲染器真正用的变换：开了物理插值后它会落在两个物理帧之间（≠ GlobalPosition）。
+		Vector3 interp = _probePlayer.GetGlobalTransformInterpolated().Origin;
+		if (_probePrevInterp != null)
+		{
+			_probeInterpStep.Add(interp.DistanceTo(_probePrevInterp.Value));
+		}
+
+		Vector3 rigInterp = _probeRig.GetGlobalTransformInterpolated().Origin;
+		if (_probePrevRigInterp != null)
+		{
+			_probeRigInterpStep.Add(rigInterp.DistanceTo(_probePrevRigInterp.Value));
+		}
+
+		_probeRigInterpOffset.Add(interp.DistanceTo(rigInterp));
+		_probePrevRigInterp = rigInterp;
+		_probeInterpOffset.Add(player.DistanceTo(interp));
+		_probePrevInterp = interp;
+		_probePrevPlayer = player;
+		_probePrevRig = rig;
+	}
+
+	private Vector3? _probePrevInterp;
+	private Vector3? _probePrevRigInterp;
+
+	private void ReportPresentation()
+	{
+		if (_probePlayerStep.Count < 10)
+		{
+			GameLog.Write("SelfTest", $"表现采样：样本不足（{_probePlayerStep.Count}），跳过");
+			return;
+		}
+
+		foreach (float step in _probePlayerStep)
+		{
+			if (step > 0.0001f)
+			{
+				_probePlayerStepNonZero.Add(step);
+			}
+		}
+
+		int frozenFrames = _probePlayerStep.Count - _probePlayerStepNonZero.Count;
+		int frozenInterp = 0;
+		foreach (float step in _probeInterpStep)
+		{
+			if (step <= 0.0001f)
+			{
+				frozenInterp++;
+			}
+		}
+
+		GameLog.Write("SelfTest",
+			$"表现采样：帧数={_probePlayerStep.Count} 物理位置位移为 0 的帧={frozenFrames}（{(frozenFrames * 100f / _probePlayerStep.Count):0.#}%）" +
+			$" 插值后位移为 0 的帧={frozenInterp}（{(frozenInterp * 100f / Mathf.Max(1, _probeInterpStep.Count)):0.#}%）" +
+			$" 物理Hz={Engine.PhysicsTicksPerSecond} 渲染fps均值={(_probePlayerStep.Count / Mathf.Max(0.0001f, Sum(_probeFrameMs) / 1000f)):0.#}");
+		GameLog.Write("SelfTest",
+			$"表现采样：物理位置单帧位移 均值={Mean(_probePlayerStepNonZero):0.0000} 最小={Min(_probePlayerStepNonZero):0.0000} 最大={Max(_probePlayerStepNonZero):0.0000} 标准差={StdDev(_probePlayerStep, Mean(_probePlayerStep)):0.0000}");
+		GameLog.Write("SelfTest",
+			$"表现采样：插值后单帧位移 均值={Mean(_probeInterpStep):0.0000} 最小={Min(_probeInterpStep):0.0000} 最大={Max(_probeInterpStep):0.0000} 标准差={StdDev(_probeInterpStep, Mean(_probeInterpStep)):0.0000}（越接近 0 越平滑）");
+		GameLog.Write("SelfTest",
+			$"表现采样：物理位置↔插值位置 偏差 均值={Mean(_probeInterpOffset):0.0000} 最大={Max(_probeInterpOffset):0.0000}（>0 说明插值真的生效了）");
+		GameLog.Write("SelfTest",
+			$"表现采样：相机插值后单帧位移 均值={Mean(_probeRigInterpStep):0.0000} 最小={Min(_probeRigInterpStep):0.0000} 最大={Max(_probeRigInterpStep):0.0000} 标准差={StdDev(_probeRigInterpStep, Mean(_probeRigInterpStep)):0.0000}");
+		GameLog.Write("SelfTest",
+			$"表现采样：角色↔相机（都用插值后位置）相位差 均值={Mean(_probeRigInterpOffset):0.0000} 最小={Min(_probeRigInterpOffset):0.0000} 最大={Max(_probeRigInterpOffset):0.0000} 标准差={StdDev(_probeRigInterpOffset, Mean(_probeRigInterpOffset)):0.0000}（这才是真正决定画面抖动的量）");
+		GameLog.Write("SelfTest",
+			$"表现采样：相机单帧位移 均值={Mean(_probeRigStep):0.0000} 最小={Min(_probeRigStep):0.0000} 最大={Max(_probeRigStep):0.0000} 标准差={StdDev(_probeRigStep, Mean(_probeRigStep)):0.0000}");
+		GameLog.Write("SelfTest",
+			$"表现采样：角色↔相机 相位差 均值={Mean(_probeRigOffset):0.000} 最小={Min(_probeRigOffset):0.000} 最大={Max(_probeRigOffset):0.000}（残影=这个值在帧间反复变化）");
+		GameLog.Write("SelfTest",
+			$"表现采样：渲染帧间隔 均值={Mean(_probeFrameMs):0.00}ms 最小={Min(_probeFrameMs):0.00} 最大={Max(_probeFrameMs):0.00} 标准差={StdDev(_probeFrameMs, Mean(_probeFrameMs)):0.00}");
+	}
+
+	private static float Sum(List<float> values)
+	{
+		float total = 0f;
+		foreach (float value in values)
+		{
+			total += value;
+		}
+
+		return total;
+	}
+
+	private static float Mean(List<float> values) => values.Count == 0 ? 0f : Sum(values) / values.Count;
+
+	private static float Min(List<float> values)
+	{
+		float min = float.MaxValue;
+		foreach (float value in values)
+		{
+			min = Mathf.Min(min, value);
+		}
+
+		return values.Count == 0 ? 0f : min;
+	}
+
+	private static float Max(List<float> values)
+	{
+		float max = float.MinValue;
+		foreach (float value in values)
+		{
+			max = Mathf.Max(max, value);
+		}
+
+		return values.Count == 0 ? 0f : max;
+	}
+
+	private static float StdDev(List<float> values, float mean)
+	{
+		if (values.Count == 0)
+		{
+			return 0f;
+		}
+
+		float total = 0f;
+		foreach (float value in values)
+		{
+			float diff = value - mean;
+			total += diff * diff;
+		}
+
+		return Mathf.Sqrt(total / values.Count);
+	}
+
+	private static void ReportNodes(StageController? stage)
+	{
+		if (stage == null)
+		{
+			GameLog.Write("SelfTest", "节点检查失败：找不到 Stage");
+			return;
+		}
+
+		int high = 0;
+		int mid = 0;
+		int low = 0;
+		int total = 0;
+		var names = new List<string>();
+		foreach (Node child in stage.GetChildren())
+		{
+			if (child is not RewardNode node || !node.Enabled)
+			{
+				continue;
+			}
+
+			total++;
+			names.Add($"{node.Name}(Kind={node.Kind})");
+			switch (node.Kind)
+			{
+				case RewardNodeKind.Evolution or RewardNodeKind.Mutation:
+					high++;
+					break;
+				case RewardNodeKind.Enhancement or RewardNodeKind.Shop:
+					mid++;
+					break;
+				default:
+					low++;
+					break;
+			}
+		}
+
+		GameLog.Write("SelfTest", $"节点布置：启用 {total} 个（高 {high} / 中 {mid} / 低 {low}）→ 期望 10（2/5/3）");
+		GameLog.Write("SelfTest", $"节点清单：{string.Join(", ", names)}");
+	}
+
+	private static void ReportSpacing(StageController? stage)
+	{
+		if (stage == null)
+		{
+			return;
+		}
+
+		var list = new List<RewardNode>();
+		foreach (Node child in stage.GetChildren())
+		{
+			if (child is RewardNode { Enabled: true } node)
+			{
+				list.Add(node);
+			}
+		}
+
+		float min = float.MaxValue;
+		string pair = "-";
+		for (int i = 0; i < list.Count; i++)
+		{
+			for (int j = i + 1; j < list.Count; j++)
+			{
+				float distance = list[i].GlobalPosition.DistanceTo(list[j].GlobalPosition);
+				if (distance < min)
+				{
+					min = distance;
+					pair = $"{list[i].Name}↔{list[j].Name}";
+				}
+			}
+		}
+
+		GameLog.Write("SelfTest", $"节点间距：最小 {min:0.##}（{pair}），阈值 {ActRoguelike.Config.Balance.Settings.MinNodeSpacing:0.#}");
+	}
+
+	private static void ReportCombat(StageController? stage)
+	{
+		EncounterController? encounter = stage?.CurrentNode;
+		if (encounter == null)
+		{
+			GameLog.Write("SelfTest", "战斗检查失败：找不到 Encounter");
+			return;
+		}
+
+		var enemies = new List<string>();
+		foreach (Node node in encounter.GetTree().GetNodesInGroup("enemy_units"))
+		{
+			if (node is Unit unit && !unit.IsDead)
+			{
+				enemies.Add(unit.Name.ToString());
+			}
+		}
+
+		int players = encounter.GetTree().GetNodesInGroup("player_units").Count;
+		int enemiesInGroup = encounter.GetTree().GetNodesInGroup("enemy_units").Count;
+		int summons = encounter.GetTree().GetNodesInGroup("summon_units").Count;
+		GameLog.Write("SelfTest", $"分组：player_units={players} enemy_units={enemiesInGroup} summon_units={summons}");
+		GameLog.Write("SelfTest", $"诊断：EntryCount={encounter.EntryCount} Started={encounter.Started} WaveMode={encounter.WaveModeOn} IsRunning={encounter.IsRunning} IsCompleted={encounter.IsCompleted} WaveIndex={encounter.WaveIndex} WaveRemaining={encounter.WaveRemaining} 预算={encounter.RemainingBudget}");
+		GameLog.Write("SelfTest", $"战斗检查：本场 WaveCount={encounter.WaveCount}，场上存活 {enemies.Count} 只");
+		GameLog.Write("SelfTest", $"敌种：{(enemies.Count == 0 ? "-" : string.Join(", ", enemies))}");
+	}
+
+	/// <summary>当前角色（供验证读取）。</summary>
+	public static bool Active { get; private set; }
+#endif
+}

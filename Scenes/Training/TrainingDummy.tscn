@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="1_unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2_movement"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="3_presentation"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.6
+height = 2.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.62, 0.45, 0.26, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_body")
+radius = 0.6
+height = 2.2
+
+[node name="TrainingDummy" type="CharacterBody3D"]
+script = ExtResource("1_unit")
+Faction = 1
+MaxHealth = 600.0
+MaxArmor = 60.0
+ArmorDamageReduction = 0.25
+KnockbackResistance = 1.0
+MoveSpeed = 0.0
+Tags = PackedStringArray("Dummy", "Tank")
+
+[node name="Body" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="Label" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+billboard = 1
+no_depth_test = true
+outline_size = 12
+font_size = 64
+text = "纯木桩"
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_movement")
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("3_presentation")

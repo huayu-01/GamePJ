@@ -1,0 +1,28 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Levels/TestArena.tscn" id="1_arena"]
+[ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://Scenes/Training/TrainingDummy.tscn" id="3_dummy"]
+[ext_resource type="PackedScene" path="res://Scenes/Training/TrainingAttacker.tscn" id="4_attacker"]
+[ext_resource type="PackedScene" path="res://Scenes/Training/TrainingShooter.tscn" id="5_shooter"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="6_hud"]
+
+[node name="TestLab" type="Node3D"]
+
+[node name="TestArena" parent="." instance=ExtResource("1_arena")]
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Targets" type="Node3D" parent="."]
+
+[node name="PureDummy" parent="Targets" instance=ExtResource("3_dummy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.4)
+
+[node name="AttackerDummy" parent="Targets" instance=ExtResource("4_attacker")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, 0)
+
+[node name="ShooterDummy" parent="Targets" instance=ExtResource("5_shooter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -3)
+
+[node name="Hud" parent="." instance=ExtResource("6_hud")]
