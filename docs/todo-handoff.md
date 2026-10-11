@@ -115,6 +115,10 @@ Scripts/
 >    且**不要为 Pressure 设计"可被玩家增幅修改"的接口**。
 > 3. **收尾决定**：`RewardConfig.PoolTags` / `ConflictsWith` 两个死字段（接上或删掉）、
 >    `WeaponConfig.ApplicableWeapons` 反向指（武器↔升级池关联）、`Pistol.tscn` 的数值（回退基线）。
+>    → ✅ **`PoolTags` / `ConflictsWith` 已在阶段 4 处理**（前者删除、后者接上）；
+>    `WeaponConfig.ApplicableWeapons` **全项目从未存在过**，且用户拍板改成**正向指**（武器 → 升级池表），
+>    所以不再需要它；`Pistol.tscn` 的数值**仍未动**（它现在是"表读不到时的回退基线"）。
+>    见 [config.md](config.md) 的「配置表阶段 4 实测」。
 >
 > ✅ **阶段 3 已完成（2026-10）**：统一单位表（`UnitConfig` 基类 + 敌人 10 行 / 首领 1 行 / 召唤物 1 行 +
 > 角色表改继承）· 技能表 25 行（含 4 条首领行为词条）· 首领数值强化池 3 行 · 白名单改成按 Id ·

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="UpgradePoolConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/UpgradePoolConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "pool_pistol"
+Slot = 1
+DisplayName = "手枪升级池"
+Note = "手枪（wpn_pistol）对应的升级池。成员 = 增幅项表里 Pool 指向本行的那些选项；本行不反过来列武器与选项（成员关系只有一个真源）。"

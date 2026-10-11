@@ -34,13 +34,17 @@ public sealed class RewardDefinition
 	public required string Description { get; init; }
 	public RewardKind Kind { get; init; } = RewardKind.Enhancement;
 
-	/// <summary>池标签（Gun / Projectile / KillTrigger / Healing / Movement …）。</summary>
-	public string[] PoolTags { get; init; } = Array.Empty<string>();
+	/// <summary>
+	/// 本项**专属的升级池 Id**（空 = 落到"标签匹配 / 通用"两层）。
+	/// 由 <c>RewardTable</c> 编译磁盘行时从 <c>RewardConfig.Pool</c> 引用收集而来
+	/// （不把 `Config.UpgradePoolConfig` 这个**磁盘类型**带进运行期视图，见 config-schema.md §4.5.4）。
+	/// </summary>
+	public string[] ApplicablePoolIds { get; init; } = Array.Empty<string>();
 
 	/// <summary>要求武器具备的标签；为空表示不限武器。</summary>
 	public string[] RequiredWeaponTags { get; init; } = Array.Empty<string>();
 
-	/// <summary>与这些 Id 互斥。</summary>
+	/// <summary>与这些 Id 互斥（**单向**：已拥有 → 本项不进池；由 <c>RewardConfig.ConflictsWith</c> 填入口）。</summary>
 	public string[] ConflictsWith { get; init; } = Array.Empty<string>();
 
 	public float Weight { get; init; } = 1f;
@@ -56,8 +60,26 @@ public sealed class RewardDefinition
 
 	public required Action<RewardContext> Apply { get; init; }
 
+	/// <summary>
+	/// **三级回退**（设计文档 config-schema.md §4.5.3 的分层；方向按用户 2026-10 拍板改成"武器 → 池"）：
+	///
+	/// ① **专属池**：<see cref="ApplicablePoolIds"/> 非空 → 只有 <c>weapon.PoolId</c> 在其中时才允许
+	///    （**不再看标签**：这一条只属于那个池，也就是只属于指向该池的武器）；
+	/// ② **武器类别**：本项没指定池 → 逐个 <see cref="RequiredWeaponTags"/> 查 <c>weapon.HasTag</c>
+	///    （现有 4 条进化走这层，行为与分表前**逐位一致**）；
+	/// ③ **通用**：两者都为空 → 恒真（现有 10 条强化 + 5 条异化走这层）。
+	///
+	/// 武器行没填 Pool / 池表读不到 / 整份表没加载 → <c>weapon.PoolId</c> 为空 → 自动落到 ②③，
+	/// 这就是"读不到则使用自身的默认值"在**关联**层面的同一套语义。
+	/// </summary>
 	public bool AllowsWeapon(Weapon weapon)
 	{
+		if (ApplicablePoolIds.Length > 0)
+		{
+			return !string.IsNullOrEmpty(weapon.PoolId)
+				&& Array.IndexOf(ApplicablePoolIds, weapon.PoolId) >= 0;
+		}
+
 		foreach (string tag in RequiredWeaponTags)
 		{
 			if (!weapon.HasTag(tag))

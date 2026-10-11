@@ -14,7 +14,6 @@ script = ExtResource("2_xsrpr")
 RewardKind = 2
 ApplyHandler = "Lifesteal"
 HandlerParams = [SubResource("Resource_s10vj")]
-PoolTags = PackedStringArray("Mutation", "Healing")
 Id = "mut_lifesteal"
 DisplayName = "吸血"
 DescriptionTemplate = "造成伤害的 12% 回复为生命"

@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="WeaponConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WeaponConfig" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_sniper.tres" id="2_pool"]
 
 [resource]
 script = ExtResource("1_row")
@@ -10,6 +11,7 @@ DisplayName = "激光狙击枪"
 DescriptionTemplate = "高伤单发、可穿透 {BasePierce} 个目标（{Damage:0} 伤害 / {MagazineSize} 发弹匣）"
 ScenePath = "res://Scenes/Weapons/Pistol.tscn"
 AttackTags = PackedStringArray("Projectile", "Gun", "Physical")
+Pool = ExtResource("2_pool")
 Damage = 60.0
 FireInterval = 0.95
 MagazineSize = 5

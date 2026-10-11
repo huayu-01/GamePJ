@@ -66,6 +66,7 @@ public partial class Balance : Node
 		ConfigRows.Rebuild(Config.Effects);
 		ConfigRows.Rebuild(Config.Nodes);
 		ConfigRows.Rebuild(Config.Upgrades);
+		ConfigRows.Rebuild(Config.UpgradePools);
 		ConfigRows.Rebuild(Config.MetaUpgrades);
 
 		// 节点表额外建"节点类型 → 行 Id"的索引（RewardService / NodePlacement 按类型查）。
@@ -76,6 +77,9 @@ public partial class Balance : Node
 
 		// 增幅项要编译成运行期目录（表优先、代码内置兜底），编译结果与来源写在日志里。
 		ActRoguelike.Rewards.RewardTable.Build(Config.Upgrades);
+
+		// 武器 → 升级池 → 选项 的三层关联（配置表阶段 4）：读不到表 / 武器行没填 Pool 也在这里留痕。
+		ReportUpgradePools();
 
 		// 首领强化：数值型（Pressure 表）与行为型（技能表里 ApplyHandler 非空的行）分别编译，
 		// 两者必须能按来源分开（关卡核心文档 §7.1）。
@@ -105,6 +109,54 @@ public partial class Balance : Node
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
 			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
+	}
+
+	/// <summary>
+	/// 把"武器 → 升级池 → 选项"的关联写进日志（配置表阶段 4 的"顺藤摸瓜"入口，设计文档 §4.5.5）。
+	///
+	/// 三层回退：① 武器行精确指向的池命中 → ② 标签匹配（现有 4 条进化走这层）→ ③ 通用池
+	/// （现有 10 条强化 + 5 条异化）。**回退路径在这里一眼能看出来** —— 池表读不到、或武器行没填 Pool 时，
+	/// 条数与"武器指向"列表都会变成空/未填，但**玩法数值不变**（全部落到②③两层，与分表前逐位一致）。
+	/// </summary>
+	private void ReportUpgradePools()
+	{
+		var byWeapon = new System.Text.StringBuilder();
+		foreach (WeaponConfig row in Config.Weapons)
+		{
+			if (row == null)
+			{
+				continue;
+			}
+
+			if (byWeapon.Length > 0)
+			{
+				byWeapon.Append('、');
+			}
+
+			byWeapon.Append($"{row.Id}→{(row.Pool == null ? "（未填）" : row.Pool.Id)}");
+
+			// 行文件被引用 ≠ 被索引：池行只被武器引用、却没加进 Balance.tres 的 UpgradePools 数组时，
+			// 池表看上去是空的，但引用仍在。这种不一致必须报出来（和关卡白名单那次同一个纪律）。
+			if (row.Pool != null && ConfigRows.ById<UpgradePoolConfig>(row.Pool.Id) == null)
+			{
+				GD.PushWarning($"[Balance] 武器 {row.Id} 的 Pool 指向「{row.Pool.Id}」，但这个池不在 Balance.tres 的 UpgradePools 索引里。");
+				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 武器 {row.Id} 指向的升级池「{row.Pool.Id}」不在 UpgradePools 索引里（引用还在，索引里查不到）。");
+			}
+		}
+
+		int assignedOptions = 0;
+		foreach (RewardConfig row in Config.Upgrades)
+		{
+			if (row?.Pool != null)
+			{
+				assignedOptions++;
+			}
+		}
+
+		int poolCount = ConfigRows.Count<UpgradePoolConfig>();
+		ActRoguelike.Core.GameLog.Write(
+			"Config",
+			$"升级池：{poolCount} 个（来源：{(poolCount > 0 ? "表 UpgradePools" : "代码默认值（表读不到）")}）—— 武器指向 [{byWeapon}]；选项行里指定了池的 {assignedOptions} 条，其余走「标签匹配 → 通用」两层");
 	}
 
 	/// <summary>

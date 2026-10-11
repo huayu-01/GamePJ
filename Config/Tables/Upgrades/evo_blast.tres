@@ -19,7 +19,6 @@ Value = 0.6
 script = ExtResource("2_upjn1")
 RewardKind = 1
 RequiredWeaponTags = PackedStringArray("Gun")
-PoolTags = PackedStringArray("Evolution", "Gun")
 Modifiers = [SubResource("Resource_k8i8c"), SubResource("Resource_rcwfy")]
 Id = "evo_blast"
 DisplayName = "爆裂弹头"

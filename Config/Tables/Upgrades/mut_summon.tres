@@ -21,7 +21,6 @@ RewardKind = 2
 ApplyHandler = "SummonOnKill"
 HandlerParams = [SubResource("Resource_e3edr"), SubResource("Resource_5gt5b")]
 RequiresSummoner = true
-PoolTags = PackedStringArray("Mutation", "Summon")
 Id = "mut_summon"
 DisplayName = "亡者随从"
 DescriptionTemplate = "每击杀 1 个敌人召唤 1 架无人机（最多 2 架）"

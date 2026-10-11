@@ -6,7 +6,6 @@
 script = ExtResource("1_fpx8b")
 RewardKind = 2
 ApplyHandler = "AmmoOnKill"
-PoolTags = PackedStringArray("Mutation", "Reload")
 Id = "mut_supply"
 DisplayName = "战地补给"
 DescriptionTemplate = "击杀敌人立刻补满弹匣"

@@ -105,14 +105,38 @@ public static class RewardEffectRegistry
 			Name = string.IsNullOrEmpty(row.DisplayName) ? row.Id : row.DisplayName,
 			Description = row.DescriptionTemplate,
 			Kind = row.RewardKind,
-			PoolTags = row.PoolTags,
+			ApplicablePoolIds = PoolIdsOf(row),
 			RequiredWeaponTags = row.RequiredWeaponTags,
+			ConflictsWith = row.ConflictsWith,
 			Excludes = row.Excludes,
 			Weight = row.Weight,
 			MaxStacks = row.MaxStacks,
 			RequiresSummoner = row.RequiresSummoner,
 			Apply = handler(row),
 		};
+	}
+
+	/// <summary>
+	/// 把行上的"专属升级池"引用编译成池 Id 列表（<c>RewardDefinition.ApplicablePoolIds</c>）。
+	///
+	/// 只把 **Id 字符串**交给运行期视图，不带 `Config.UpgradePoolConfig` 这个磁盘类型过去 ——
+	/// 运行期视图不认识配置文件类（config-schema.md §2.2 的分层）；而"引用会不会悬空"的问题
+	/// 在**磁盘侧**已经由"资源引用"解决了（池行被删 → 这里收到 null → 返回空 → 落到②③两层）。
+	/// </summary>
+	private static string[] PoolIdsOf(RewardConfig row)
+	{
+		if (row.Pool == null)
+		{
+			return Array.Empty<string>();
+		}
+
+		if (string.IsNullOrEmpty(row.Pool.Id))
+		{
+			GD.PushWarning($"[Config] 增幅项 {row.Id} 指向的升级池行没有填 Id，已忽略（这一条会落到「标签匹配 → 通用」两层）。");
+			return Array.Empty<string>();
+		}
+
+		return new[] { row.Pool.Id };
 	}
 
 	/// <summary>读一个数字参数，缺失就用调用方给的兜底值（缺参数不是错误 —— 这行不需要它）。</summary>

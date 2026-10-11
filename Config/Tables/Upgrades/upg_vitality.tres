@@ -12,7 +12,6 @@ Value = 25.0
 [resource]
 script = ExtResource("2_1j762")
 MaxStacks = 3
-PoolTags = PackedStringArray("Health")
 Modifiers = [SubResource("Resource_h42hj")]
 Id = "upg_vitality"
 DisplayName = "强化肌体"

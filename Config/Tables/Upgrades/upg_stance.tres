@@ -12,7 +12,6 @@ Value = 0.08
 [resource]
 script = ExtResource("2_a7mk2")
 MaxStacks = 3
-PoolTags = PackedStringArray("Defense")
 Modifiers = [SubResource("Resource_73epe")]
 Id = "upg_stance"
 DisplayName = "稳固站姿"

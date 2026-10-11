@@ -12,7 +12,6 @@ Operation = 0
 script = ExtResource("2_n2cea")
 MaxStacks = 2
 Excludes = PackedStringArray("evo_ricochet")
-PoolTags = PackedStringArray("Projectile")
 Modifiers = [SubResource("Resource_rt6es")]
 Id = "upg_pierce_round"
 DisplayName = "贯穿弹头"

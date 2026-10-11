@@ -12,7 +12,6 @@ Value = 3.0
 [resource]
 script = ExtResource("2_047t4")
 MaxStacks = 2
-PoolTags = PackedStringArray("Magazine")
 Modifiers = [SubResource("Resource_26b2b")]
 Id = "upg_ext_mag"
 DisplayName = "扩容弹匣"

@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="WeaponConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WeaponConfig" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_pistol.tres" id="2_pool"]
 
 [resource]
 script = ExtResource("1_row")
@@ -10,6 +11,7 @@ DisplayName = "手枪"
 DescriptionTemplate = "单发高伤、精准，适合中远距离点射（{Damage:0} 伤害 / {MagazineSize} 发弹匣）"
 ScenePath = "res://Scenes/Weapons/Pistol.tscn"
 AttackTags = PackedStringArray("Projectile", "Gun", "Physical")
+Pool = ExtResource("2_pool")
 Damage = 24.0
 FireInterval = 0.26
 MagazineSize = 12

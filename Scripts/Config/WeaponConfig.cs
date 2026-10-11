@@ -27,6 +27,19 @@ public partial class WeaponConfig : ConfigRow
 	/// <summary>与 <c>RewardPool</c> 的 <c>RequiredWeaponTags</c> 配对（决定这条武器能吃到哪些进化）。</summary>
 	[Export] public string[] AttackTags { get; set; } = { "Projectile", "Gun", "Physical" };
 
+	[ExportGroup("升级池")]
+	/// <summary>
+	/// 本武器对应的**升级池**（`Config/Tables/UpgradePools/pool_*.tres`，一行一个池）。
+	///
+	/// **正向引用**：武器指池、**池不指武器**（用户 2026-10 拍板；取代 config-schema.md §4.5 / §6.9
+	/// "增幅项反向指武器"的推荐方案）。"哪个选项属于哪个池"写在**选项行**的 `RewardConfig.Pool` 列上
+	/// —— 一个选项占一行 + 一个引用列，池行不重复列一遍。
+	///
+	/// 读表时经 <see cref="ApplyTo"/> 写进 <see cref="Weapon.PoolId"/>，供奖励池做"精确池"匹配（第一层）。
+	/// **留空** = 本武器不吃"专属池"这一层，只走"标签匹配 → 通用"两层（与分表前逐位一致）。
+	/// </summary>
+	[Export] public UpgradePoolConfig? Pool { get; set; }
+
 	[ExportGroup("数值")]
 	/// <summary>单发伤害。</summary>
 	[Export] public float Damage { get; set; } = 24f;
@@ -101,6 +114,9 @@ public partial class WeaponConfig : ConfigRow
 		weapon.AimFov = AimFov;
 		weapon.Automatic = Automatic;
 		weapon.AttackTags = AttackTags;
+		// 身份：本武器属于哪个升级池（`RewardDefinition.AllowsWeapon` 的第一层用它做精确匹配）。
+		// 池行被删 / 没填时 Pool 为 null → 留空 → 自动落到"标签匹配 → 通用"两层。
+		weapon.PoolId = Pool?.Id ?? string.Empty;
 		weapon.RefillMagazine();
 	}
 }

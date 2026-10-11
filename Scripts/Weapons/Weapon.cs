@@ -48,6 +48,14 @@ public partial class Weapon : Node3D
 	/// <summary>关掉后这把武器不参与射击（近战角色用），左键改由近战能力接管。</summary>
 	[Export] public bool Enabled { get; set; } = true;
 
+	/// <summary>
+	/// 本武器对应的**升级池 Id**（配置表阶段 4），由 <c>WeaponConfig.ApplyTo</c> 从武器表的
+	/// <c>Pool</c> 列写入。奖励池用它做"精确池"匹配（`RewardDefinition.AllowsWeapon` 的第一层）；
+	/// **留空** = 这一局只走"标签匹配（<see cref="AttackTags"/>）→ 通用"两层。
+	/// 表读不到时这里就是场景里的值（默认空），行为与分表前逐位一致。
+	/// </summary>
+	[Export] public string PoolId { get; set; } = string.Empty;
+
 	public Unit? OwnerUnit { get; private set; }
 	public bool IsAiming { get; private set; }
 	public bool IsReloading { get; private set; }

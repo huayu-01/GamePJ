@@ -11,7 +11,6 @@ Value = 1.1
 [resource]
 script = ExtResource("2_yv3rr")
 MaxStacks = 3
-PoolTags = PackedStringArray("Movement")
 Modifiers = [SubResource("Resource_ee4e5")]
 Id = "upg_boots"
 DisplayName = "战术靴"

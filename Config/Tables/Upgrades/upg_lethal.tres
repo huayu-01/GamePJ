@@ -12,7 +12,6 @@ Value = 0.35
 [resource]
 script = ExtResource("2_b2c0n")
 MaxStacks = 2
-PoolTags = PackedStringArray("Crit")
 Modifiers = [SubResource("Resource_4jrjf")]
 Id = "upg_lethal"
 DisplayName = "致命打击"

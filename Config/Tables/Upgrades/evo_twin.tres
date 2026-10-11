@@ -12,7 +12,6 @@ Operation = 0
 script = ExtResource("2_asao6")
 RewardKind = 1
 RequiredWeaponTags = PackedStringArray("Gun")
-PoolTags = PackedStringArray("Evolution", "Gun")
 Modifiers = [SubResource("Resource_2a7s5")]
 Id = "evo_twin"
 DisplayName = "双管齐下"

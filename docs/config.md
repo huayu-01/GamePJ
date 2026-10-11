@@ -1,6 +1,6 @@
 # 数值配置（调参唯一入口）
 
-**所有可调数值拆成 12 张表，全部挂在 [`Config/Balance.tres`](../Config/Balance.tres) 上；运行期由 autoload `Balance` 读取并建索引。**
+**所有可调数值拆成 13 张表，全部挂在 [`Config/Balance.tres`](../Config/Balance.tres) 上；运行期由 autoload `Balance` 读取并建索引。**
 
 > **2026-10 配置表阶段 2（重要变化）**：`Balance` 从"唯一数值**文件**"变成"唯一数值**门面 + 表索引**"。
 > 业务代码**仍然写 `Balance.Settings.Xxx`**（这条约定没变），但数值的实际家在 `Config/Tables/<分组>/` 里，
@@ -9,6 +9,11 @@
 > **2026-10 配置表阶段 3（单位表 + 技能表）**：新增 **单位表基类 `UnitConfig`**（攻击/生命/移速/持有技能/行为&类/表现）
 > 与 **技能表 `AbilityConfig`**；敌人 9 个敌种 + 首领 + 召唤物各成一行；白名单从"按中文显示名"改成"按 Id"。
 > 细节与实测见文末「配置表阶段 3」一节。
+>
+> **2026-10 配置表阶段 4（武器 → 升级池 → 选项 的三层关联）**：新增第 13 张表 **升级池**
+> （`Config/Tables/UpgradePools/pool_*.tres`，一行一个池）；武器行多一列 **`Pool`**（正向指向池），
+> 增幅项行多一列 **`Pool`**（一个选项占一行 + 这个引用列 = "池成员"的唯一真源），
+> 并**删掉了 `PoolTags` 死字段、把 `ConflictsWith` 接上了**。细节与实测见文末「配置表阶段 4」一节。
 
 ## 调参去哪张表
 
@@ -20,10 +25,11 @@
 | **技能**：冷却/前摇/后摇/朝向/开关/接近区间 + 子类专属参数 + 命中体参数 | `Config/Tables/Skills/skl_*.tres` | 一个技能 | **25**（5 玩家 + 16 单位 + 4 首领行为词条） |
 | **首领数值强化池（Pressure）** | `Config/Tables/Pressure/pmod_*.tres` | 一条数值强化 | 3 |
 | 玩家基础数值与攻击组 | `Config/Tables/Characters/chr_*.tres` | 一个角色 | 3 |
-| 武器数值（伤害/射速/弹匣/装填/散布/**击退**/暴击/弹速） | `Config/Tables/Weapons/wpn_*.tres` | 一把武器 | 3 |
+| 武器数值（伤害/射速/弹匣/装填/散布/**击退**/暴击/弹速/**升级池**） | `Config/Tables/Weapons/wpn_*.tres` | 一把武器 | 3 |
+| **升级池**（"某把武器的升级池"这个粒度；武器表正向指过来） | `Config/Tables/UpgradePools/pool_*.tres` | 一个池 | 3 |
 | 效果参数（燃烧 dps / 减速 / 眩晕 / 爆炸 / 吸血 / 召唤上限 / 连锁闪电） | `Config/Tables/Effects/eff_*.tres` | 一个效果 | 9 |
 | 奖励节点（标题 / 层 / 波数 / 商店价目） | `Config/Tables/Nodes/node_*.tres` | 一种节点 | 9 |
-| 增幅项（19 条强化·进化·异化） | `Config/Tables/Upgrades/*.tres` | 一条增幅 | 19 |
+| 增幅项（19 条强化·进化·异化，含"属于哪个升级池"一列） | `Config/Tables/Upgrades/*.tres` | 一条增幅 | 19 |
 | 关卡（预算 / 波次 / 敌人白名单 / Boss 词条数 / Pressure 规则） | `Config/Tables/Stages/stg_*.tres` | 一关 | 3 |
 | 局外成长（碎片价格 / 每级效果） | `Config/Tables/Meta/meta_*.tres` | 一项 | 5 |
 | **全局开关**（敌人/Boss 倍率、节奏、Boss 压力曲线、伤害跳字、血条、节点间距、区域杀高度） | **`Config/Balance.tres`**（还在原地） | — | 30 个字段 |
@@ -112,14 +118,18 @@
 
 ### 武器表 `Config/Tables/Weapons/`（3 行）
 
-| 行 | 伤害 | 间隔 | 弹匣 | 装填 | 散布 | **击退** | 穿透 | 连发 |
-|---|---|---|---|---|---|---|---|---|
-| `wpn_pistol`（槽 1） | 24 | 0.26 | 12 | 0.7 | 0.5 | **2.5** | 0 | ❌ |
-| `wpn_sniper`（槽 2） | 60 | 0.95 | 5 | 1.4 | 0.2 | **4.0** | 2 | ❌ |
-| `wpn_rifle`（槽 3） | 13 | 0.12 | 30 | 1.2 | 1.6 | **1.2** | 0 | ✅ |
+| 行 | 伤害 | 间隔 | 弹匣 | 装填 | 散布 | **击退** | 穿透 | 连发 | **升级池** |
+|---|---|---|---|---|---|---|---|---|---|
+| `wpn_pistol`（槽 1） | 24 | 0.26 | 12 | 0.7 | 0.5 | **2.5** | 0 | ❌ | `pool_pistol` |
+| `wpn_sniper`（槽 2） | 60 | 0.95 | 5 | 1.4 | 0.2 | **4.0** | 2 | ❌ | `pool_sniper` |
+| `wpn_rifle`（槽 3） | 13 | 0.12 | 30 | 1.2 | 1.6 | **1.2** | 0 | ✅ | `pool_rifle` |
 
 三把武器**共用同一个 `Pistol.tscn` 节点**，只换数值（`RunController.EquipWeapon` → `WeaponConfig.ApplyTo`），
 所以不会重建节点、不会弄丢挂在武器下的输入组件。
+
+**升级池列（阶段 4 新增）**：`WeaponConfig.Pool` **正向指向** `Config/Tables/UpgradePools/pool_*.tres`
+的一行；套表时写进 `Weapon.PoolId`，奖励池用它做"精确池"匹配（三级回退的第一层）。
+**池行不反过来指武器** —— 详见下面的「配置表阶段 4」。
 
 > ℹ️ 分表前狙击/步枪的暴击率、暴击倍率、弹速、预瞄 FOV、被动装填延迟**全部借用 `Pistol*` 的值**；
 > 分表后它们各自有独立字段，当前**默认值仍与手枪相同**（0.15 / 2.0 / 90 / 55 / 3），所以行为没变。
@@ -186,6 +196,13 @@
 |---|---|---|
 | `StatSet` | 14 | 纯数据：改 `StatSheet` 的某项（数值在 `Modifiers` 里） |
 | `ChainLightning` / `Lifesteal` / `BurnOnHit` / `SummonOnKill` / `AmmoOnKill` | 各 1 | 需要一行 C#（加新机制仍要写一行代码，见 [config-schema.md](config-schema.md) §6.1） |
+
+**阶段 4 改动（19 行的数值一个都没动）**：
+- ➕ 新增一列 **`Pool`**（指向 `Config/Tables/UpgradePools/pool_*.tres`）—— 现在**19 行全是空的**，
+  空的语义 = "走标签匹配 / 通用两层"，所以**行为与分表前逐位一致**。要加"某把武器专属"的选项就往这一列填。
+- ➕ 新增一列 **`ConflictsWith`**（单向互斥：已拥有列表里的 Id → 本项不再进池）。原来这个字段只存在于
+  运行期视图上、**表里没有入口**，所以永远为空；现在能填了（默认空 = 行为不变）。
+- ➖ **删掉 `PoolTags` 死字段**（原来 19 行都在认真填它，但全项目**没有任何消费者**）。
 
 > ⚠️ `Weight` 目前 19 条**都写成 1.0** → 加权抽取仍退化成等概率（与分表前一致，**故意不改**，改了抽样分布会变）。
 > 现在**改得动了**：想调某条的出率就改它的 `Weight` 一行。
@@ -338,6 +355,83 @@
 > ⚠️ 一个值得记住的边界：**清空 `Skills` 索引数组不会让"某个单位行的持有技能"失效** ——
 > 技能引用写在**单位行文件**里（`chr_*.tres` / `enemy_*.tres` 的 `ext_resource`），
 > 数组只是"给 `ConfigRows` 建索引、给日志报数"用的。要真正回退到场景值，得清空**单位表**那一侧的数组。
+
+## 配置表阶段 4 实测（2026-10：武器 → 升级池 → 选项 的三层关联）
+
+**编译**：`& build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（每改一步都跑，全程 0/0）。
+
+### 结构（用户拍板：武器指池、池不指武器、一个选项占一行）
+
+```
+WeaponConfig（Config/Tables/Weapons/wpn_*.tres，3 行）
+  └─ Pool ──────► UpgradePoolConfig（Config/Tables/UpgradePools/pool_*.tres，3 行：一行一个池）
+                      ▲
+RewardConfig（Config/Tables/Upgrades/*.tres，19 行：一行一个选项）
+  └─ Pool ────────────┘（留空 = 落到"标签匹配 / 通用"两层）
+```
+
+| 问题 | 结论 |
+|---|---|
+| **"一个选项占一栏"是什么意思** | **一行 = 一个选项**（`Upgrades/` 里 19 行就是 19 个选项），"属于哪个池"是这行上的**一个引用列** `Pool`。**不是**"池行里塞一个选项数组" —— 用户原话的解读见 [config-tooling-yard.md](config-tooling-yard.md) §4.3：「"一个选项占一栏"天然就是一个标量字段……一栏里放多个选项（`Array[StringName]`）反而拿不到编辑器下拉」 |
+| **池表里有什么** | 只有**身份**（`Id` / `Slot` / `DisplayName` / `Note`）。**成员关系不在池行里** —— 池行既不列武器也不列选项，成员关系只有一个真源（选项行的 `Pool` 列） |
+| 为什么池行这么薄 | 它存在的意义是让"武器 → 池"成为**资源引用**（改名/删文件时 Godot 把引用置 null，能检测），而不是拼字符串（拼错会静默失效）。与 `chr_*.tres → skl_*.tres` 是同一套写法 |
+
+### 三级回退（`RewardDefinition.AllowsWeapon`）
+
+| 层 | 条件 | 现有内容 |
+|---|---|---|
+| ① **专属池** | 选项行的 `Pool` 非空 → 只有 `Weapon.PoolId` 等于它的武器能拿到（**此时不看标签**） | 今天 **0 条**（新增能力，留白） |
+| ② **武器标签** | `Pool` 为空，且 `RequiredWeaponTags` 全部命中 `weapon.AttackTags` | **现有 4 条进化**（`"Gun"`）—— 行为与分表前**逐位一致** |
+| ③ **通用池** | 两层都为空 | **现有 10 条强化 + 5 条异化** |
+
+`Weapon.PoolId` 由 `WeaponConfig.ApplyTo` 从武器表的 `Pool` 列写入；
+**武器行没填 / 池表读不到 / 整份表没加载 → 留空 → 自动落到 ②③**。
+`RewardPool` / `RunBuild` / `RunController` **一行都没改**（`Initialize(Weapon)` 与 `AllowsWeapon(weapon)` 的签名不变）。
+
+### 自测实测（`selftest.flag` + gdmcp）
+
+```
+[Config] 升级池：3 个（来源：表 UpgradePools）—— 武器指向 [wpn_pistol→pool_pistol、wpn_sniper→pool_sniper、wpn_rifle→pool_rifle]；选项行里指定了池的 0 条，其余走「标签匹配 → 通用」两层
+[SelfTest] 配置表比对·索引：武器 3/角色 3/敌人 10/首领 1/召唤物 1/技能 25/Pressure 3/效果 9/节点 9/局外 5/升级池 3（期望 3/3/10/1/1/25/3/9/9/5/3）
+[SelfTest] 配置表比对·增幅项：共 19 条（强化 10 / 进化 4 / 异化 5，期望 19 = 10/4/5） 用了表=True 当前池子=18 条（枪手期望 18 条）
+[SelfTest] 配置表比对·升级池：武器 PoolId「pool_pistol」（期望 pool_pistol） 池表 3 行（期望 3）/ 选项行里指定了池的 0 条 ｜ 专属层 0 条（命中 0）· 类别层 4 条（命中 4）· 通用层 15 条
+```
+
+**"枪手 18 条"这个硬指标逐位不变**：改前 / 改后两次自测日志逐行 diff，**除了上面这两行新增内容与索引行的扩展，
+所有配置相关行（玩家 / 武器 / 节点 / 效果 / 敌人 / 技能 / 增幅项）完全相同**（其余差异只有随机敌种与帧率）。
+
+### 第一层真的会拦人（两次临时实验，做完已还原）
+
+| 实验 | 做法 | 实测 |
+|---|---|---|
+| **A（正向）** | 临时给 `upg_dmg_up` 填 `Pool = pool_pistol`（= 手枪自己的池） | `专属层 1 条（命中 1）`、**池子仍是 18 条** ✓ |
+| **B（反向）** | 把同一行改指 `pool_sniper`（≠ 手枪的池） | `专属层 1 条（命中 0）`、**池子掉到 17 条** ✓（手枪真的拿不到它了） |
+
+### 回退路径主动验证（两次，各跑一整轮自测）
+
+| 清空什么 | 日志留痕 | 池子条数 | 玩法数值 |
+|---|---|---|---|
+| **三个武器行的 `Pool` 字段** | `升级池：3 个（…）—— 武器指向 [wpn_pistol→（未填）、wpn_sniper→（未填）、wpn_rifle→（未填）]`、`武器 PoolId「（留空 → 走「标签匹配 → 通用」两层）」`；**没有 warning**（"武器没指定专属池"是合法状态，不是错误） | **18 条（不变）** | 武器 24 / 0.26 / 12 / 0.7 … 全部不变 |
+| **`Balance.tres` 的 `UpgradePools` 索引数组**（模拟池表读不到） | `升级池：0 个（来源：代码默认值（表读不到））` + 3 条 `⚠ 武器 wpn_x 指向的升级池「pool_x」不在 UpgradePools 索引里` | **18 条（不变）** | 全部不变 |
+
+> ⚠️ **从第二次验证挖出来的边界（与技能表那次同一类坑）**：清空 `UpgradePools` 索引数组**不会**让武器丢掉池 Id ——
+> 池引用写在**武器行文件**里（`wpn_*.tres` 的 `ext_resource`），数组只是"给 `ConfigRows` 建索引、给日志报数"用的，
+> 实测那时 `武器 PoolId` 仍然是 `pool_pistol`。要真正回退到"这批武器没有专属池"，得清空**武器行**那一侧的字段（上表第一行）。
+
+### 顺手处理的三个死字段
+
+| 字段 | 处置 |
+|---|---|
+| `RewardConfig.PoolTags` / `RewardDefinition.PoolTags`（19 行都在认真填，**全项目 0 消费者**） | **删除**：行类字段、运行期视图字段、`RewardEffectRegistry.Compile` 的赋值、`RewardCatalog` 三个工厂的 `tag` 参数与 15 个调用点、19 个 `.tres` 里的那一行。语义被**两张新列**取代（`RewardConfig.Pool` 专属池 + 原有的 `RequiredWeaponTags` 标签层） |
+| `RewardDefinition.ConflictsWith`（`Compile` 里**没有填入口** → 永远为空数组） | **接上**：`RewardConfig` 加 `ConflictsWith` 列、`Compile` 填进运行期视图（`RewardPool.Roll` 早就在读它）。语义 = **单向**：已拥有列表里任一 Id → 本项不再进池（与 `Excludes` 的双向判定互补）。默认空 = 行为不变 |
+| `WeaponConfig.ApplicableWeapons`（设计文档 §4.5 推荐的"反向指"） | **全项目不存在**（`grep` 只命中文档）。用户拍板改成**正向指**（武器 → 池），所以这个反向字段**不需要建**；[config-schema.md](config-schema.md) §4.5 / §6.9 的推荐已标注为"被拍板取代" |
+
+### 顺藤摸瓜（以后怎么用）
+
+1. **看某把武器有哪些专属选项**：在 `Config/Tables/Upgrades/` 里按 `Pool` 列筛选（或按它排序）→ 属于该池的行聚在一起。
+2. **加一条只给狙击枪的进化**：新建一行 `.tres`，`Pool` 填 `pool_sniper`（一个引用列，不必碰别的文件）。
+3. **调"某把武器的升级池里全部增幅的强度"**：筛出那几行 → 在 `Modifiers` 列上批量改。
+4. **想让两把武器共享一个池**：让这两个武器行的 `Pool` 指向**同一个池行**；只想共享其中一部分选项，直接用第②层的武器标签（`AttackTags` ↔ `RequiredWeaponTags`）。
 
 ## 按键映射（当前）
 

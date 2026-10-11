@@ -29,6 +29,22 @@
 >
 > 阶段 3 的完整证据（实测日志、逐项比对、回退验证）见 [config.md](config.md) 的「配置表阶段 3 实测」
 > 与 [config-schema.md](config-schema.md) §5 阶段 3。
+>
+> ---
+>
+> ## ⚠️ 2026-10 更新 2：配置表阶段 4 已落地（本文再增 3 处过时结论）
+>
+> 阶段 4（武器 → 升级池 → 选项 的三层关联）做完之后，下面这些盘点结论**已经处理**：
+>
+> | 本文条目 | 阶段 4 的处理 |
+> |---|---|
+> | #28 武器 ↔ 升级池关联（🔴 新发现） | ✅ **已做，但形态与本文建议相反**：**新开了一张池表** `Config/Tables/UpgradePools/pool_*.tres`（3 行 = 一行一个池），由 `WeaponConfig.Pool` **正向**指过来（用户拍板；本文当时建议"照设计文档的反向指做、不新开表"）。池的成员由**选项行**的 `RewardConfig.Pool` 声明 —— **一个选项占一行 + 一个引用列**。详见 §2.19 的更新块 |
+> | §5-② `RewardDefinition.PoolTags`（纯死字段） | 🗑 **已删除**（含 19 行 `.tres` 里的 `PoolTags = …`、`RewardCatalog` 三个工厂的 `tag` 参数与 15 个调用点）；语义由 `RewardConfig.Pool` + `RequiredWeaponTags` 取代 |
+> | §5-② `RewardDefinition.ConflictsWith`（死代码） | ✅ **已接上**：`RewardConfig` 新增 `ConflictsWith` 列，`RewardEffectRegistry.Compile` 填充（`RewardPool.Roll` 早就在读） |
+> | §2.20 `Weight` 加权抽取退化 | ⏸ **仍是老样子**（19 条全 1.0，**故意不动** —— 改了抽样分布会变） |
+> | §6.5「与 config-schema.md 的差异」里关于武器↔池的两行 | ⚠️ **两边的建议都没被采纳**，以阶段 4 的实现为准 |
+>
+> 阶段 4 的完整证据（实测日志、逐位比对、第一层拦截实验、两次回退验证）见 [config.md](config.md) 的「配置表阶段 4 实测」。
 
 >
 > 计数口径：**一个文件夹 = 一张表**（[config-tooling.md](config-tooling.md) 的硬约束），
@@ -41,11 +57,11 @@
 | 问题 | 结论 |
 |---|---|
 | 一共列出多少张表 | **47 张** |
-| 已落地 | **8 张**（⚠️ 阶段 3 之后是 **12 张**，见文首的更新节） |
+| 已落地 | **8 张**（⚠️ 阶段 3 之后是 **12 张**，**阶段 4 之后是 13 张** —— 新增 `UpgradePools/pool_*.tres` 3 行，见 §2.19 与文首的更新节） |
 | 设计里有但没做 | **3 张**（技能表 T2 / 敌人按敌种表 T5 扩展 / 首领增强表 T9）—— ⚠️ T2 与 T5 已在阶段 3 做完；T9 的"节点驱动"仍未做 |
-| **本文新发现** | **36 张**（`config-schema.md` 未列为独立表的） |
+| **本文新发现** | **36 张**（`config-schema.md` 未列为独立表的）—— ⚠️ 其中 **#28 武器↔升级池已在阶段 4 落地**（形态与本文建议不同，见 §2.19） |
 | 最该先做的三张 | ① **敌人按敌种表** ② **技能/能力表** ③ **AI 行为表** —— 理由见 §4 |
-| 盘点发现的主要问题 | 见 §5：**6 处死字段**（2 个 Balance 字段 + `IsFinalBoss` + 效果表 4 列）、**1 处双真源静默换挡**（敌人全局倍率）、**3 处加权抽取退化**（`RewardConfig.Weight` / `BossPerk.Weight` / `ConflictsWith`）、**3 处数值只靠 C# 默认值撑着**（`Pistol.tscn` / `PlayerInputConfig` / `EnemyConfig.MoveSpeedMultiplier`）、**1 处疑似未生效的列**（`Weapon.ProjectileSpeed`）、**11 处该改成资源引用的字符串外键** |
+| 盘点发现的主要问题 | 见 §5：**6 处死字段**（2 个 Balance 字段 ✅阶段3 + `IsFinalBoss` + 效果表 4 列）、**1 处双真源静默换挡**（敌人全局倍率 ✅阶段3）、**3 处加权抽取退化**（`RewardConfig.Weight` / `BossPerk.Weight` / `ConflictsWith` ✅阶段4接上其一）、**3 处数值只靠 C# 默认值撑着**（`Pistol.tscn` / `PlayerInputConfig` / `EnemyConfig.MoveSpeedMultiplier`）、**1 处疑似未生效的列**（`Weapon.ProjectileSpeed`）、**11 处该改成资源引用的字符串外键**。🆕 阶段 4 另**删除**了 `PoolTags` 这处死字段（原表里没单列，混在 `RewardDefinition` 那一行里） |
 
 **「已落地 8 张」的现状**（`Config/Tables/` 下 53 个行文件，索引全挂在 `Config/Balance.tres` 的 `[Export] XxxConfig[]` 数组上）：
 
@@ -56,14 +72,15 @@
 
 | 表 | 行数 | 行类 | 自身列数 | 含基类共 | 索引字段（`BalanceConfig.cs`） |
 |---|---|---|---|---|---|
-| `Weapons/` | 3 | `WeaponConfig` | 21 | 27 | `Weapons`（:84） |
+| `Weapons/` | 3 | `WeaponConfig` | 21 → **22**（阶段 4 加 `Pool`） | 28 | `Weapons`（:84） |
 | `Characters/` | 3 | `CharacterConfig` | 10 | 16 | `Characters`（:88） |
 | `Enemies/` | 1 | `EnemyConfig` | 10 | 16 | `Enemies`（:92） |
 | `Effects/` | 10 | `EffectConfig` | 11 | 17 | `Effects`（:96） |
 | `Nodes/` | 9 | `NodeConfig` | 15 | 21 | `Nodes`（:100） |
-| `Upgrades/` | 19 | `RewardConfig` | 10 | 16 | `Upgrades`（:104） |
+| `Upgrades/` | 19 | `RewardConfig` | 10 → **11**（阶段 4：−`PoolTags` +`Pool` +`ConflictsWith`） | 17 | `Upgrades`（:104） |
 | `Meta/` | 5 | `MetaUpgradeConfig` | 7 | 13 | `MetaUpgrades`（:108） |
 | `Stages/` | 3 | `StageDefinition` | 23 | 23 | `Stages`（:63） |
+| 🆕 `UpgradePools/` | 3 | `UpgradePoolConfig` | 0（只有身份） | 6 | `UpgradePools`（阶段 4 新增） |
 
 ---
 
@@ -78,7 +95,7 @@
 | 3 | `EnemyConfig` | 敌人（当前只有全局倍率一行） | ✅已落地（仅全局行） | `Config/Tables/Enemies/enemy_global.tres` | 10(+6) | `Balance.ScaleEnemy`（`Balance.cs:86-93`）、`EncounterController.cs:418` | — |
 | 4 | `EffectConfig` | 效果与状态参数 | ✅已落地（**但 4 列无消费者**，见 §5-②） | `Config/Tables/Effects/eff_*.tres`（10 行） | 11(+6)（其中 `Value/Value2/Radius/TickSeconds` 死） | `StatusPresets.Create`（`StatusEffect.cs:43`）、`buff`/`burn` 等 | — |
 | 5 | `NodeConfig` | 节点类型、分层、波数、商店价目 | ✅已落地 | `Config/Tables/Nodes/node_*.tres`（9 行） | 15(+6)（其中 `BossPressurePoints/BossModifierRolls/BossModifierTags` 是空壳） | `RewardService`（:21,33,53）、`NodePlacement`（:22,39） | — |
-| 6 | `RewardConfig` | 增幅项（强化/进化/异化） | ✅已落地 | `Config/Tables/Upgrades/*.tres`（19 行） | 10(+6)（其中 `Weight` / `PoolTags` 无实际效果） | `RewardTable.Build` → `RewardPool.Roll` | — |
+| 6 | `RewardConfig` | 增幅项（强化/进化/异化） | ✅已落地 | `Config/Tables/Upgrades/*.tres`（19 行） | 11(+6)（`Weight` 仍无实际效果；`PoolTags` **阶段 4 已删**；`Pool` / `ConflictsWith` **阶段 4 新增**） | `RewardTable.Build` → `RewardPool.Roll` | — |
 | 7 | `MetaUpgradeConfig` | 局外成长条目 | ✅已落地 | `Config/Tables/Meta/meta_*.tres`（5 行） | 7(+6) | `MetaProgress`（:33,37） | — |
 | 8 | `StageDefinition` | 关卡（含 Pressure 规则） | ✅已落地 | `Config/Tables/Stages/stg_*.tres`（3 行） | 23（**不含**基类公共列）（其中 `IsFinalBoss` 是死字段） | `RunController.ResolveStages`、`StageController.ApplyStage` | — |
 | 9 | `AbilityConfig`（T2） | 技能/能力的通用参数与专属参数 | ⏳设计里有但没做 | `Scenes/Player/Player.tscn:64-140`（**40 处**） + 9 个子类各自的 `[Export]` | ~50 | `Ability` 及 9 个子类、`PlayerAbilityInput`、`EnemyBrain` | **高** |
@@ -100,7 +117,7 @@
 | 25 | `CharacterMovementConfig` | 移动物理手感（重力/加速度/跳跃/击退衰减/转身锐度） | 🔴新发现 | `CharacterMovement.cs:12-25` 默认值；`Player.tscn:52`、各敌人场景 | 8 | `CharacterMovement._PhysicsProcess`（:127-177） | 中 |
 | 26 | `WeaponSceneConfig` | 武器预制体自身的数值（与武器表重复） | 🔴新发现 | `Scenes/Weapons/Pistol.tscn:16-27` | 11 | `Weapon` 组件（表读不到时的回退基线） | **该删不该建**（见 §5-③） |
 | 27 | `PlayerInputConfig` | 玩家操作手感（瞄准射线长度 / 默认 FOV / ADS 插值速度） | 🔴新发现 | `PlayerWeaponInput.cs:15-17`（**全是默认值，场景里没覆盖**） | 3 | `PlayerWeaponInput._Process`（:68,89-90） | 中 |
-| 28 | `UpgradePoolLink` | 武器 ↔ 它的升级池（正向关联） | 🔴新发现（设计 §4.5 只有反向指） | **不存在**；`RewardConfig.RequiredWeaponTags`（:39）只到「Gun」粒度 | 1 列 | `RewardPool.Initialize`（:18-28） | 中 |
+| 28 | `UpgradePoolLink` | 武器 ↔ 它的升级池（正向关联） | ✅**已落地（2026-10 阶段 4）** —— 形态与本文当时的建议不同：不是"给 `RewardConfig` 加一列"，而是**新开一张池表** `Config/Tables/UpgradePools/pool_*.tres`（3 行，一行一个池），由 `WeaponConfig.Pool` **正向**指过来 | `Config/Tables/UpgradePools/pool_*.tres`（3 行）+ `WeaponConfig.Pool` + `RewardConfig.Pool` | `UpgradePoolConfig` 0 自有列（只有身份）+ 两侧各 1 个引用列 | `RewardDefinition.AllowsWeapon`（三级回退） | ✅ 已完成 |
 | 29 | `RewardPoolFilter` | 奖励池的抽取规则参数 | 🔴新发现 | `RewardPool.cs`（无导出字段）；`RewardChoiceCount` 在 `BalanceConfig.cs:111` | 3 | `RewardPool.Roll`（:33-86） | 中 |
 | 30 | `TriggerRuleConfig` | 触发规则的冷却与每链次数上限 | 🔴新发现 | `RunBuild.cs:78-80`（`Cooldown` / `MaxTriggersPerChain=4`） | 2 | `TriggerRule.OnRaised`（:104-132） | 低 |
 | 31 | `MapManagerConfig` | 导航烘焙 / 点位供给 / 落点容差 | 🔴新发现 | `MapManager.cs:21-33` 默认值（**Main.tscn 的 MapManager 节点一处都没覆盖**） + 硬编码 `2f/10f/28/0.7/1.15/1.3/1.65`（`NodePlacement.cs:63-91`）、`3/12/1.5/6/0.3`（`MapManager.cs:179-202`） | 4+11 | `MapManager.Bake`（:73-127）、各点位方法 | 中 |
@@ -499,7 +516,14 @@
 **建议**：不建表，但**合并到一个地方**（让 `DefaultFov` 从相机读，或删掉 `PlayerWeaponInput.DefaultFov`）。
 **优先级：中**（这是「同一个数值在多处重复」的又一处，见 §5-①）。
 
-### 2.19 【#28】**新发现** 武器 ↔ 升级池关联表 —— `UpgradePoolLink`
+### 2.19 【#28】✅ **已落地（2026-10 配置表阶段 4）** 武器 ↔ 升级池关联
+
+> **本节结论已过时，保留作历史**：下面写的"**建议按设计文档的反向指做（少一张表），不新开**"**没有被采纳**。
+> 用户拍板要的是**正向指**（「武器的配置表里确实是需要有指向对应池表的字段，而对应池表则不指向其对应武器，
+> 而池表里则是一个选项占用一栏」），所以最终**新开了一张池表**：`Config/Tables/UpgradePools/pool_*.tres`
+> （3 行 = 一行一个池），`WeaponConfig.Pool` 正向指向它，池的成员由**选项行**（`RewardConfig.Pool`）声明
+> —— 一个选项占一行 + 一个引用列。实测与回退验证见 [config.md](config.md) 的「配置表阶段 4 实测」。
+> ⚠️ 本文当时说"反向指做不了 O(1) 查询"这条**是对的**，而正向指正好补上了它。
 
 `config-schema.md` §4.5 论证过：现在**只有「升级项要求武器有某个 tag」的反向指**
 （`RewardConfig.RequiredWeaponTags`，`RewardConfig.cs:39`），4 条进化全都只声明 `"Gun"`
@@ -802,13 +826,19 @@ var scene = GD.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn");
 
 ### ② 死字段 / 没有消费者的字段
 
+> ✅ **2026-10 配置表阶段 4 已收尾其中两个**（本表保留原文，改动用 ✅/🗑 标出）：
+> `RewardDefinition.PoolTags` **已删除**、`RewardDefinition.ConflictsWith` **已接上**
+> （`RewardConfig` 新增 `ConflictsWith` 列 + `RewardEffectRegistry.Compile` 填充）。
+> 其余各行（`Weight` / `BossPerk.Weight` / `IsFinalBoss` / 效果表镜像列 …）**状态不变**。
+> 阶段 3 已修的 6 处（两个 Balance 死字段 / `IsFinalBoss` 之外的…）见 [config.md](config.md) 的「配置表阶段 3」。
+
 | 字段 | 定义处 | 赋值处 | 读取处 | 结论 |
 |---|---|---|---|---|
-| **`BalanceConfig.BossHealthBarScale`** | `BalanceConfig.cs:158` | `Balance.tres:99`（`= 4.0`） | **全项目 0 处** | 🔴 **纯死字段**。BOSS 血条的尺寸实际由 `BarBoss.tscn:20-23`（`offset_left=-240` / `right=240` / `top=14` / `bottom=92`）决定（`PlayerHud.cs:198-207` 只改比例，注释自己写了「不碰预制体给的宽度/位置」）。**建议删除，或接进 `PlayerHud.UpdateBossPanel`** |
-| **`BalanceConfig.EliteBossHealthScale`** | `BalanceConfig.cs:127` | `Balance.tres:92`（`= 0.35`） | **全项目 0 处** | 🔴 **死字段**。生效的是 `EncounterController.EliteBossHealthScale`（`EncounterController.cs:100`，默认也是 0.35），`Main.tscn:63-65` 的 `Combat` 节点**没覆盖它**，所以现在恰好也是 0.35 —— **看起来对，但改 Balance 不起作用**。**建议删掉 Balance 那份**（或让 `EncounterController` 读它） |
-| `RewardConfig.Weight` | `RewardConfig.cs:25` | **19 行 `.tres` 全没写** | `RewardPool.Roll`（:85，读了但恒为 1f） | 加权抽取退化成等概率（老问题 #5，**分表后未修**） |
-| `RewardDefinition.ConflictsWith` | `RewardDefinition.cs:44` | **从未被赋值** | `RewardPool.cs:68-75` | 死代码（老问题 #5；`RewardEffectRegistry.Compile` :102-115 **根本没有填这个字段**，所以即使 `RewardConfig` 想填也没入口） |
-| `RewardDefinition.PoolTags` | `RewardDefinition.cs:38` | `RewardCatalog.cs:98,113,126` + 19 行 `.tres` 的 `PoolTags` | **从无** | 纯死字段（`RewardPool` 只用 `RequiredWeaponTags` 与 `Excludes`）。**现在 19 行 `.tres` 都在认真填它 —— 纯粹的填表工作量浪费** |
+| **`BalanceConfig.BossHealthBarScale`** | `BalanceConfig.cs:158` | `Balance.tres:99`（`= 4.0`） | **全项目 0 处** | 🔴 **纯死字段**。BOSS 血条的尺寸实际由 `BarBoss.tscn:20-23`（`offset_left=-240` / `right=240` / `top=14` / `bottom=92`）决定（`PlayerHud.cs:198-207` 只改比例，注释自己写了「不碰预制体给的宽度/位置」）。**建议删除，或接进 `PlayerHud.UpdateBossPanel`** ✅ **阶段 3 已删除** |
+| **`BalanceConfig.EliteBossHealthScale`** | `BalanceConfig.cs:127` | `Balance.tres:92`（`= 0.35`） | **全项目 0 处** | 🔴 **死字段**。生效的是 `EncounterController.EliteBossHealthScale`（`EncounterController.cs:100`，默认也是 0.35），`Main.tscn:63-65` 的 `Combat` 节点**没覆盖它**，所以现在恰好也是 0.35 —— **看起来对，但改 Balance 不起作用**。**建议删掉 Balance 那份**（或让 `EncounterController` 读它） ✅ **阶段 3 已搬进 `boss_final.tres` 的 `EliteCopyHealthScale`** |
+| `RewardConfig.Weight` | `RewardConfig.cs:25` | **19 行 `.tres` 全没写** | `RewardPool.Roll`（:85，读了但恒为 1f） | 加权抽取退化成等概率（老问题 #5，**分表后未修，阶段 4 也没动** —— 改它会变抽样分布） |
+| `RewardDefinition.ConflictsWith` | `RewardDefinition.cs:44` | ~~**从未被赋值**~~ → ✅ **阶段 4 起由 `RewardConfig.ConflictsWith` 填** | `RewardPool.cs:68-75` | ✅ **已接上**（老问题 #5 的一半）。默认空 = 行为不变；语义是**单向**：已拥有列表里任一 Id → 本项不进池 |
+| `RewardDefinition.PoolTags` | ~~`RewardDefinition.cs:38`~~ | ~~`RewardCatalog.cs:98,113,126` + 19 行 `.tres` 的 `PoolTags`~~ | **从无** | 🗑 **阶段 4 已删除**（连同 19 行 `.tres` 里的那一行、`RewardCatalog` 三个工厂的 `tag` 参数与 15 个调用点）。语义由 `RewardConfig.Pool`（专属池）+ `RequiredWeaponTags`（标签层）取代 |
 | `BossPerk.Weight` | `BossPerk.cs:15` | 7 条全默认 `1f` | `BossPerk.cs:134` | 同上，等概率 |
 | `NodeConfig.BossPressurePoints` / `BossModifierRolls` / `BossModifierTags` | `NodeConfig.cs:55,58,61` | **9 行 `.tres` 全没写** | **0 处** | 空壳（源码注释也承认「本阶段只落数据，尚未接进玩法」，:53） |
 | `StageDefinition.PressureUpgradeTags` | `StageDefinition.cs:92` | **3 行都没写** | 只在日志（`StageController.cs:104-107`） | 空壳（注释自认「在池实现之前，改它不会改变任何玩法数值」，:88-90） |
@@ -964,7 +994,8 @@ Select-String -Path Scripts\**\*.cs -Pattern '\.Value\b' -Recurse | Select-Strin
 | 波次/预算 | §1.2-G4 提过「两份」，归入关卡表 | 列为 #17，**结论同为「并入关卡表」**，但列出了 `WaveMode/WaveMinEnemies/WaveMaxEnemies/WaveMaxTypes` 等**关卡表当前没有的列** |
 | 投射物/召唤物 | §1.2-C5/B8 提过，未列表 | 列为 #18 / #19 |
 | 表现参数（跳字/血条/相机/UI） | §1.2-A9/A10/H10 提过，未给结论 | **§3-①② 明确给出「不建表」的理由**（不随内容变化 / 是玩家设置） |
-| 死字段 | 列了 5 个（`Weight` / `ConflictsWith` / `PoolTags` / `BossPerk.Weight`） | **新增 6 处**：`BalanceConfig.BossHealthBarScale` / `BalanceConfig.EliteBossHealthScale` / `StageDefinition.IsFinalBoss` / `EffectConfig.Value·Value2·Radius·TickSeconds` / `EffectConfig.Duration`（被调用方架空）/ `NodeConfig.BossPressurePoints·BossModifierRolls·BossModifierTags` |
+| 死字段 | 列了 5 个（`Weight` / `ConflictsWith` / `PoolTags` / `BossPerk.Weight`） | **新增 6 处**：`BalanceConfig.BossHealthBarScale` / `BalanceConfig.EliteBossHealthScale` / `StageDefinition.IsFinalBoss` / `EffectConfig.Value·Value2·Radius·TickSeconds` / `EffectConfig.Duration`（被调用方架空）/ `NodeConfig.BossPressurePoints·BossModifierRolls·BossModifierTags`。<br>🆕 **2026-10 阶段 4**：这 5 个里 `PoolTags` 已删、`ConflictsWith` 已接上；两个 Balance 字段已在阶段 3 删除/搬家 |
+| 武器 ↔ 升级池 | §4.5 推荐**反向指**（`RewardConfig.ApplicableWeapons`） | 本文 §2.19 当时建议"按设计文档的反向指做、不新开表"。🆕 **实际落地是正向指 + 新开池表**（用户拍板，2026-10 阶段 4），两条建议都**没有**被采纳 —— 见 §2.19 的更新块与 [config.md](config.md) 的「配置表阶段 4 实测」 |
 | 静默换挡 | §1.4-① 讲过关卡表的漂移（已修） | **新增一处**：`Balance.ScaleEnemy` 的敌人全局倍率（0.75 → 1f / 0.3 → 0.8f，且无日志） |
 | 疑似未生效的列 | 无 | **新增**：`Weapon.ProjectileSpeed`（`Weapon.TryFire` 从不用它，见 §6.3-1） |
 | 已落地表的列数 | 文中引用的是设计时的规划值（如「角色表 13 字段」） | **按实际代码数**：`CharacterConfig` 落地为 **10** 列（+6 基类），砍掉了没消费者的列 |

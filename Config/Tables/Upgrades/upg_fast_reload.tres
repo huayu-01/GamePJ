@@ -11,7 +11,6 @@ Value = 1.25
 [resource]
 script = ExtResource("2_g13eg")
 MaxStacks = 2
-PoolTags = PackedStringArray("Reload")
 Modifiers = [SubResource("Resource_83gsn")]
 Id = "upg_fast_reload"
 DisplayName = "快速装填"

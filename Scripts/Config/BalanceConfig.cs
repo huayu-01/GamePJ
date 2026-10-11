@@ -131,6 +131,15 @@ public partial class BalanceConfig : Resource
 	/// <summary>增幅项表（`Config/Tables/Upgrades/upg_*.tres`）。空 = 用 <c>RewardCatalog.Fallback</c>。</summary>
 	[Export] public RewardConfig[] Upgrades { get; set; } = System.Array.Empty<RewardConfig>();
 
+	[ExportGroup("表索引 · 升级池")]
+	/// <summary>
+	/// 升级池表（`Config/Tables/UpgradePools/pool_*.tres`）：**一行一个池**。
+	/// **武器 → 池**是正向引用（<see cref="WeaponConfig.Pool"/>），池行**不**反过来指武器；
+	/// "哪个选项属于哪个池"写在**选项行**的 `RewardConfig.Pool` 列上（一个选项占一行 + 一个引用列）。
+	/// 空 = 没有池可用 → 全部走"标签匹配 → 通用"两层（与分表前逐位一致）。
+	/// </summary>
+	[Export] public UpgradePoolConfig[] UpgradePools { get; set; } = System.Array.Empty<UpgradePoolConfig>();
+
 	[ExportGroup("表索引 · 局外成长")]
 	/// <summary>局外成长表（`Config/Tables/Meta/meta_*.tres`）。空 = 用 <c>MetaProgress</c> 里的代码内置系数。</summary>
 	[Export] public MetaUpgradeConfig[] MetaUpgrades { get; set; } = System.Array.Empty<MetaUpgradeConfig>();

@@ -13,7 +13,6 @@ script = ExtResource("2_yfwy6")
 RewardKind = 1
 RequiredWeaponTags = PackedStringArray("Gun")
 Excludes = PackedStringArray("upg_pierce_round", "evo_ap")
-PoolTags = PackedStringArray("Evolution", "Gun")
 Modifiers = [SubResource("Resource_66vfv")]
 Id = "evo_ricochet"
 DisplayName = "跳弹"

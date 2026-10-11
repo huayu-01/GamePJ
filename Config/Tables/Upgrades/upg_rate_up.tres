@@ -11,7 +11,6 @@ Value = 1.12
 [resource]
 script = ExtResource("2_wtrlg")
 MaxStacks = 3
-PoolTags = PackedStringArray("AttackSpeed")
 Modifiers = [SubResource("Resource_f0vld")]
 Id = "upg_rate_up"
 DisplayName = "高速扳机"

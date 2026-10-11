@@ -21,25 +21,25 @@ public static class RewardCatalog
 	public static readonly RewardDefinition[] Fallback =
 	{
 		// ───────── 强化（改参数，可叠层） ─────────
-		Enhance("dmg_up", "增伤弹头", "伤害 +15%", 3, "Damage",
+		Enhance("dmg_up", "增伤弹头", "伤害 +15%", 3,
 			c => Mod(c, "DamageMultiplier", ModifierOperation.Multiply, 1.15f)),
-		Enhance("rate_up", "高速扳机", "射速 +12%", 3, "AttackSpeed",
+		Enhance("rate_up", "高速扳机", "射速 +12%", 3,
 			c => Mod(c, "AttackSpeedMultiplier", ModifierOperation.Multiply, 1.12f)),
-		Enhance("boots", "战术靴", "移动速度 +10%", 3, "Movement",
+		Enhance("boots", "战术靴", "移动速度 +10%", 3,
 			c => Mod(c, "MoveSpeedMultiplier", ModifierOperation.Multiply, 1.10f)),
-		Enhance("vitality", "强化肌体", "最大生命 +25", 3, "Health",
+		Enhance("vitality", "强化肌体", "最大生命 +25", 3,
 			c => Mod(c, "MaxHealthAdd", ModifierOperation.Add, 25f)),
-		Enhance("scope", "精准准星", "暴击率 +8%", 3, "Crit",
+		Enhance("scope", "精准准星", "暴击率 +8%", 3,
 			c => Mod(c, "CritChanceAdd", ModifierOperation.Add, 0.08f)),
-		Enhance("lethal", "致命打击", "暴击伤害 +35%", 2, "Crit",
+		Enhance("lethal", "致命打击", "暴击伤害 +35%", 2,
 			c => Mod(c, "CritMultiplierAdd", ModifierOperation.Add, 0.35f)),
-		Enhance("fast_reload", "快速装填", "装填速度 +25%", 2, "Reload",
+		Enhance("fast_reload", "快速装填", "装填速度 +25%", 2,
 			c => Mod(c, "ReloadSpeedMultiplier", ModifierOperation.Multiply, 1.25f)),
-		Enhance("ext_mag", "扩容弹匣", "弹匣 +3", 2, "Magazine",
+		Enhance("ext_mag", "扩容弹匣", "弹匣 +3", 2,
 			c => Mod(c, "MagazineSizeAdd", ModifierOperation.Add, 3f)),
-		Enhance("stance", "稳固站姿", "受到的伤害 -8%", 3, "Defense",
+		Enhance("stance", "稳固站姿", "受到的伤害 -8%", 3,
 			c => Mod(c, "DamageReductionAdd", ModifierOperation.Add, 0.08f)),
-		Enhance("pierce_round", "贯穿弹头", "子弹可多穿透 1 个目标", 2, "Projectile",
+		Enhance("pierce_round", "贯穿弹头", "子弹可多穿透 1 个目标", 2,
 			c => Mod(c, "PierceAdd", ModifierOperation.Add, 1f), excludes: new[] { "evo_ricochet" }),
 
 		// ───────── 进化（武器限定，改核心行为） ─────────
@@ -56,7 +56,7 @@ public static class RewardCatalog
 		}),
 
 		// ───────── 异化（加新规则，通过 Trigger/Effect 实现） ─────────
-		Mutation("mut_chain", "连锁闪电", "击杀敌人时对附近敌人放电", 1, "KillTrigger", c =>
+		Mutation("mut_chain", "连锁闪电", "击杀敌人时对附近敌人放电", 1, c =>
 		{
 			c.Player.AddChild(new ChainLightningRule
 			{
@@ -67,15 +67,15 @@ public static class RewardCatalog
 				Jumps = 3,
 			});
 		}),
-		Mutation("mut_lifesteal", "吸血", "造成伤害的 12% 回复为生命", 1, "Healing", c =>
+		Mutation("mut_lifesteal", "吸血", "造成伤害的 12% 回复为生命", 1, c =>
 		{
 			c.Player.AddChild(new LifestealRule { RewardId = "mut_lifesteal", Ratio = 0.12f });
 		}),
-		Mutation("mut_burn", "灼烧弹", "命中使目标燃烧 3 秒", 1, "Damage", c =>
+		Mutation("mut_burn", "灼烧弹", "命中使目标燃烧 3 秒", 1, c =>
 		{
 			c.Player.AddChild(new BurnOnHitRule { RewardId = "mut_burn", Duration = 3f });
 		}),
-		Mutation("mut_summon", "亡者随从", "每击杀 1 个敌人召唤 1 架无人机（最多 2 架）", 1, "Summon", c =>
+		Mutation("mut_summon", "亡者随从", "每击杀 1 个敌人召唤 1 架无人机（最多 2 架）", 1, c =>
 		{
 			c.Player.AddChild(new SummonOnKillRule
 			{
@@ -84,7 +84,7 @@ public static class RewardCatalog
 				MaxSummons = 2,
 			});
 		}, requiresSummoner: true),
-		Mutation("mut_supply", "战地补给", "击杀敌人立刻补满弹匣", 1, "Reload", c =>
+		Mutation("mut_supply", "战地补给", "击杀敌人立刻补满弹匣", 1, c =>
 		{
 			c.Player.AddChild(new AmmoOnKillRule { RewardId = "mut_supply" });
 		}),
@@ -103,7 +103,12 @@ public static class RewardCatalog
 
 	public static RewardDefinition? Find(string id) => Array.Find(All, d => d.Id == id);
 
-	private static RewardDefinition Enhance(string id, string name, string description, int maxStacks, string tag, Action<RewardContext> apply, string[]? excludes = null, bool requiresSummoner = false)
+	/// <summary>
+	/// 兜底目录的三个工厂。⚠️ 阶段 4 删掉了它们的 <c>tag</c> 参数：那个参数只喂给已删除的死字段
+	/// <c>PoolTags</c>（"这条属于哪个池"现在由**专属池引用** + 武器标签两层表达，见
+	/// <c>RewardDefinition.AllowsWeapon</c> 的三级回退）。
+	/// </summary>
+	private static RewardDefinition Enhance(string id, string name, string description, int maxStacks, Action<RewardContext> apply, string[]? excludes = null, bool requiresSummoner = false)
 		=> new()
 		{
 			Id = id,
@@ -111,7 +116,6 @@ public static class RewardCatalog
 			Description = description,
 			Kind = RewardKind.Enhancement,
 			MaxStacks = maxStacks,
-			PoolTags = new[] { tag },
 			Apply = apply,
 			Excludes = excludes ?? System.Array.Empty<string>(),
 			RequiresSummoner = requiresSummoner,
@@ -126,12 +130,11 @@ public static class RewardCatalog
 			Kind = RewardKind.Evolution,
 			MaxStacks = maxStacks,
 			RequiredWeaponTags = new[] { weaponTag },
-			PoolTags = new[] { "Evolution", weaponTag },
 			Apply = apply,
 			Excludes = excludes ?? System.Array.Empty<string>(),
 		};
 
-	private static RewardDefinition Mutation(string id, string name, string description, int maxStacks, string tag, Action<RewardContext> apply, string[]? excludes = null, bool requiresSummoner = false)
+	private static RewardDefinition Mutation(string id, string name, string description, int maxStacks, Action<RewardContext> apply, string[]? excludes = null, bool requiresSummoner = false)
 		=> new()
 		{
 			Id = id,
@@ -139,7 +142,6 @@ public static class RewardCatalog
 			Description = description,
 			Kind = RewardKind.Mutation,
 			MaxStacks = maxStacks,
-			PoolTags = new[] { "Mutation", tag },
 			Apply = apply,
 			Excludes = excludes ?? System.Array.Empty<string>(),
 			RequiresSummoner = requiresSummoner,

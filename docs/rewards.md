@@ -65,7 +65,9 @@
 | 判定 | 字段 | 规则 |
 |---|---|---|
 | **互斥** | `RewardDefinition.Excludes` | **双向**：候选排斥已拥有的，或已拥有的奖励排斥候选，都不会进池 |
+| **单向互斥** | `RewardDefinition.ConflictsWith` | 已拥有列表里任一 Id → 本项不进池（**阶段 4 才接上**：表里现在有 `RewardConfig.ConflictsWith` 列与 `Compile` 填充入口；默认空） |
 | **角色限定** | `RewardDefinition.RequiresSummoner` | 只有召唤控制角色（`PlayerCharacterKind.Summoner`）才会出现 |
+| **武器限定（三级回退）** | `RewardDefinition.ApplicablePoolIds` / `RequiredWeaponTags` | ① 选项行填了 `Pool` → 只有 `Weapon.PoolId` 等于它的武器能拿到；② 没填池但填了武器标签 → 按 `weapon.AttackTags` 匹配；③ 两者都空 → 所有武器。**阶段 4 新增第①层**（表：`Config/Tables/UpgradePools/pool_*.tres`，武器行 `Pool` 正向指过去） |
 
 当前配置：
 
@@ -84,6 +86,12 @@
 | 角色 3 召唤控制 | 19 | **True** ✓ |
 
 （相差正好 1 条 = 亡者随从。）
+
+> 🆕 **阶段 4 复核（2026-10）**：上面这条"枪手 18 / 召唤 19"在加完"武器 → 升级池 → 选项"三层关联之后
+> **逐位不变**（自测 `配置表比对·增幅项：… 当前池子=18 条（枪手期望 18 条）`）。
+> 原因是 19 条增幅项的 `Pool` 列**全是空的** → 全部落到②③两层，与分表前一致。
+> 第一层（专属池）是**留白的新能力**：给某一行填上 `Pool`，那条就只属于指向该池的武器
+> （实测：把 `upg_dmg_up` 填成 `pool_sniper` 后，手枪的池子从 18 掉到 17）。
 
 ⚠ 互斥对的**运行时采样**还没跑出来（需要在同一局先拿到跳弹、再看穿透是否消失，靠随机抽到该组合，本轮没碰上）；配置与双向判定逻辑都已就位，下一次游玩时可以顺带观察。
 

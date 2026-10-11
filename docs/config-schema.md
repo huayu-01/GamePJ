@@ -17,6 +17,12 @@
 >   `Skills` 25 行 / `Pressure` 3 行）；`EnemyConfig` / `BossConfig` / `SummonConfig` / `CharacterConfig`
 >   全部改为 `: UnitConfig`；白名单从"按中文显示名"改成"按敌人表 Id"。
 >   进度、实测与回退验证见 **§5 阶段 3**。
+> - **阶段 4（2026-10，用户点名要的"武器 → 升级池 → 选项"三层关联）**：新增**升级池表
+>   `UpgradePoolConfig`**（`Config/Tables/UpgradePools/`，3 行 = 一共 **13 张表**），
+>   `WeaponConfig.Pool`（**正向指**）+ `RewardConfig.Pool`（**一个选项占一行 + 一个引用列**）；
+>   **三级回退**落在 `RewardDefinition.AllowsWeapon`；顺手**删掉死字段 `PoolTags`、接上 `ConflictsWith`**。
+>   ⚠️ 这一轮**推翻了本文 §4.5.2 / §6.9 的"反向指"推荐** —— 用户拍板要正向指，理由与落地形态见
+>   **§4.5.0** 与 **§5 阶段 4**。
 >
 > 🔗 **与 [config-tooling.md](config-tooling.md) 的分工**：那份文档回答"**用什么工具**批量编辑这些表"，结论是装 `Edit Resources as Table` 插件、**把文件夹当表、一行一个 `.tres` 文件**。
 > **这个形态是本文表格设计的硬约束** —— 本文的行布局（§2.3）与文件粒度取舍（§6.2）已经按它对齐：**每一行 = 独立的 `.tres` 文件，一个文件夹 = 一张表**。
@@ -29,7 +35,7 @@
 |---|---|
 | 盘出多少可配置项 | **632 处磁盘配置实例**（`Scenes/**.tscn` 里 513 处脚本属性赋值 + `Config/Balance.tres` 里 119 处）+ **305 个 C# 可导出属性槽**（分布在 49 个文件） |
 | 多少当前硬编码 | 全项目 **214 处**十进制字面量；剔除测试代码（48）、纯表现/UI 布局（61）、clamp/epsilon/形状数学后，**约 65 处是"可调玩法数值"**（A 类 40 + B 类 25）。其中 **40 处集中在 7 个文件**：**30 处在 6 个纯"目录式"文件**里（`RewardCatalog` 11 / `StatusEffect` 6 / `BossPerk` 4 / `MetaProgress` 4 / `RunSettlement` 3 / `SpawnPlanner` 2），另 10 处在 ~~`RunController.DefaultStages()`~~ —— 这 40 处就是"应该整表外置"的候选。✅ 其中 `RunController` 那 10 处已随阶段 1 删除 |
-| 拆几张表 | **11 张**（T1–T11）：武器 / 技能 / 增幅项 / 角色 / 敌人 / 关卡 / 节点 / 状态 / **首领增强（含词条）** / 局外成长（见 §3）。✅ **已落地 12 个表目录**（阶段 1+2+3）：`Weapons` / `Characters` / `Enemies` / `Bosses` / `Summons` / `Skills` / `Pressure` / `Effects` / `Nodes` / `Upgrades` / `Meta` / `Stages`；⏸ 只剩 **Pressure 转换池的接线**（表已就位、抽取点未接线，见 §5 阶段 3） |
+| 拆几张表 | **11 张**（T1–T11）：武器 / 技能 / 增幅项 / 角色 / 敌人 / 关卡 / 节点 / 状态 / **首领增强（含词条）** / 局外成长（见 §3）。✅ **已落地 13 个表目录**（阶段 1+2+3+4）：`Weapons` / `Characters` / `Enemies` / `Bosses` / `Summons` / `Skills` / `Pressure` / **`UpgradePools`** / `Effects` / `Nodes` / `Upgrades` / `Meta` / `Stages`；⏸ 只剩 **Pressure 转换池的接线**（表已就位、抽取点未接线，见 §5 阶段 3） |
 | 第一阶段做哪张 | **关卡表（T6）**。理由见 §5 的「阶段 1」小节：类已经存在（`StageDefinition` 15 个字段）、改动只有 2 个调用点、有现成自测可逐项比对、而且顺手消掉一个**已经漂移的真 bug**。✅ **阶段 0 与阶段 1 已完成（2026-10）**，进度与实测证据见 §5；两条新挖出来的坑见 §5 阶段 1 与 §7.2 |
 | 行怎么放 | **一行 = 一个 `.tres` 文件，一个文件夹 = 一张表**（[config-tooling.md](config-tooling.md) 推荐的 `Edit Resources as Table` 插件按文件夹分组，这是硬约束）。`Balance.tres` 持有 `[Export] XxxConfig[]` 数组显式引用这些行 —— **不扫目录**，导出后也不会掉文件 |
 | 最需要拍板的 | **效果怎么表达**（`ApplyHandler` 字符串 + C# 处理器注册表，还是允许内嵌脚本）—— 这一条决定整套体系是"可校验的数据"还是"换皮代码"（见 §6.1）。另有两条与你的两个场景直接相关：**武器→升级池的关联方向**（§6.9）与**场景 A 的范围**（§6.10） |
@@ -39,7 +45,7 @@
 | 用户的原话场景 | 照本设计怎么做 | 落在哪一节 |
 |---|---|---|
 | 「调**奖励节点用于增强首领的抽奖值和强化参数**」 | 分三处：**抽几次** → `NodeConfig.BossModifierRolls`（按节点累加）；**抽中概率** → `BossModifierConfig.Weight`（与增幅项同一套加权抽取，抽成公共的 `WeightedPick`）；**强化参数** → `BossModifierConfig` 的通用项（`TargetStat`+`Operation`+`Value`）与键值对组 `Params`。**归到 T11 首领增强表**（不与增幅项混表，理由见 §3 T11） | §3 T11 |
-| 「调**某个武器的基础参数 + 其对应升级池里的增幅参数**」 | 武器基础参数 → T1 武器表；"对应升级池" → **T3 增幅项行上加一列 `ApplicableWeapons : WeaponConfig[]`（反向指、资源引用）**，两级回退：精确武器 → 武器类别标签 → 通用。⚠️ **现在代码里没有这个粒度**（只有 `"Gun"` 一个类别标签，三把武器共用一个池；`PoolTags` 是死字段） | §3 T3 + §4.5 |
+| 「调**某个武器的基础参数 + 其对应升级池里的增幅参数**」 | 武器基础参数 → T1 武器表；"对应升级池" → ✅ **阶段 4 已落地**：**武器行 `WeaponConfig.Pool` 正向指向一个新表 `UpgradePoolConfig`（一行一个池）**，池的成员 = 增幅项行里 `RewardConfig.Pool` 指向它的那些行（**一个选项占一行 + 一个引用列**）。三级回退：① 专属池 → ② 武器类别标签（现有 4 条进化）→ ③ 通用池（现有 10 强化 + 5 异化）。~~反向指 `ApplicableWeapons`~~ 已被用户拍板否决，见 §4.5.0 | §3 T3 + §4.5 |
 
 **一句话方案**：把「谁有什么参数」从 C# 委托/三元表达式里搬进 `Config/Tables/<分组>/*.tres`，**一行 = 一个 `.tres` 文件**；每张表在磁盘上是若干独立 `Resource` 行、在运行期**编译成现有类**（`RewardDefinition` / `StatusEffect` / `BossPerk` 等形态不变），所以 `RewardPool` / `RunBuild` / `RunController` / `EncounterController` 这些消费方**一行都不用改**；`Balance.tres` 通过 `[Export] XxxConfig[]` 数组把这些行**显式引用**起来（不扫目录），因此 `Balance` 仍是唯一数值入口；读表统一走 `ConfigTable.ById()` / `TryLoad<T>()`，读不到就回退到组件自身的 `[Export]` 默认值——这正是 `Balance.cs:25` 已经在用的写法。
 
@@ -200,8 +206,10 @@
 
 > ✅ **2026-10 状态**：① 已修（阶段 1）；② 未修（波次规模两份，`SpawnPlanner` 的 const 与 `EncounterController` 的导出值）；
 > ③ 未修（`Pistol.tscn` 的数值仍是回退基线，表是权威）；④ 已修（阶段 2：节点表替掉了重复 switch）；
-> ⑤ 部分修（`RewardConfig.Weight` 19 条仍全是 1.0 —— 故意不改分布；`PoolTags` / `ConflictsWith` 仍是死字段，属 §4.5.6 的收尾决定）；
-> ⑥ 未做（`ApplicableWeapons` 反向指，§6.9 待拍板）；⑦ 未做（节点驱动见 §5 阶段 3 的第 3 步）。
+> ⑤ ✅ **已修（阶段 4）**：`RewardConfig.Weight` 19 条仍全是 1.0（故意不改分布），但
+> `PoolTags` **已删除**、`ConflictsWith` **已接上**（有了 `RewardConfig.ConflictsWith` 列与 `Compile` 里的填充）；
+> ⑥ ✅ **已修（阶段 4）**：改成用户要的**正向指**（武器 → 升级池表），三级回退零回归，见 §4.5.0；
+> ⑦ 未做（节点驱动见 §5 阶段 3 的第 3 步）。
 > **阶段 3 新修掉的问题**（本文档 §1.4 之外、由 [config-tables-inventory.md](config-tables-inventory.md) §5 盘出来的）
 > 见 §5 阶段 3 的"顺手修掉的既有问题"表：2 个 Balance 死字段 · `IsFinalBoss` · 效果表 4 列镜像 ·
 > `SpawnDisplayName` · 敌人倍率静默换挡 · `BarEnemy` 居中。
@@ -242,18 +250,23 @@
 
 **④ 节点价值层与波数在两处重复实现。** `NodePlacement.cs:18-26` 与 `StageController.cs:653-661` 是同一段 `switch`（`Evolution|Mutation → 2`、`Enhancement|Shop → 1`、`_ → 0`；`WavesFor` = `2→3 / 1→2 / _→1`）。改关卡规则要改两处 —— 归入节点表（T7）后只剩表里一列。
 
-**⑤ 三张表的 `Weight` / `ConflictsWith` / `PoolTags` 是死配置。**
+**⑤ 三张表的 `Weight` / `ConflictsWith` / `PoolTags` 是死配置。** ✅ **阶段 4 收尾：`PoolTags` 已删、`ConflictsWith` 已接上**（`Weight` 仍故意不动）
 
 | 字段 | 定义处 | 赋值处 | **读取处** | 结论 |
 |---|---|---|---|---|
-| `RewardDefinition.Weight` | `RewardDefinition.cs:46` | 19 条**全没填**（`RewardCatalog.cs:16-86`） | `RewardPool.cs:89,96`（读了，但值恒为 `1f`） | 加权抽取退化成等概率 |
-| `RewardDefinition.ConflictsWith` | `RewardDefinition.cs:44` | **从未被赋值**（三个工厂方法只设 `Excludes`） | `RewardPool.cs:67-75` | 判定永远走空 = 死代码 |
-| `RewardDefinition.PoolTags` | `RewardDefinition.cs:38` | `RewardCatalog.cs:98,113,126` | **从无** | 纯死字段 |
+| `RewardDefinition.Weight` | `RewardDefinition.cs:46` | 19 条**全没填**（`RewardCatalog.cs:16-86`） | `RewardPool.cs:89,96`（读了，但值恒为 `1f`） | 加权抽取退化成等概率（**故意不改**，改了抽样分布会变） |
+| `RewardDefinition.ConflictsWith` | `RewardDefinition.cs:44` | ~~从未被赋值~~ → ✅ 阶段 4 起由 `RewardConfig.ConflictsWith` 填 | `RewardPool.cs:67-75` | ✅ **已接上**（默认空 = 行为不变） |
+| `RewardDefinition.PoolTags` | ~~`RewardDefinition.cs:38`~~ | ~~`RewardCatalog.cs:98,113,126` + 19 行 `.tres`~~ | **从无** | 🗑 **阶段 4 已删除**（连同 19 行 `.tres` 里的那一行）；语义由 `RewardConfig.Pool` + `RequiredWeaponTags` 取代 |
 | `BossPerk.Weight` | `BossPerk.cs:15` | 7 条**全没填**（`BossPerk.cs:33-117`） | `BossPerk.cs:132,139` | 同上，等概率 |
 
 分表时把它们接上（`Weight` 接进公共的 `WeightedPick`，见 §3 T9）或**明示删掉** —— 留着不生效的字段比没有更糟。
 
-**⑥ 没有"某把武器 → 它的升级池"这个关联。** `RewardPool.Initialize` 只按 `RequiredWeaponTags` 与 `Weapon.AttackTags` 匹配标签（`RewardPool.cs:18-28` → `RewardDefinition.cs:59-70` → `Weapon.cs:93`），而 4 条进化全部只声明 `"Gun"`（`RewardCatalog.cs:104-116`）、三把武器共用同一个 `Pistol.tscn`（`RunController.cs:383-386` 只改数值不换节点），所以**三把枪共用一个池**。场景 B 要的"顺藤摸瓜"今天无处可下手 —— 完整分析见 **§4.5**。
+**⑥ 没有"某把武器 → 它的升级池"这个关联。** ✅ **阶段 4 已修**（用户拍板的**正向指**方案，见 §4.5.0 与 §5 阶段 4）：
+新增升级池表 `Config/Tables/UpgradePools/pool_*.tres`，`WeaponConfig.Pool` → 池行 ← `RewardConfig.Pool`（一个选项占一行 + 一个引用列），
+`RewardDefinition.AllowsWeapon` 变成三级回退（专属池 → 武器标签 → 通用）。
+**原文保留如下（当时的现状）**：`RewardPool.Initialize` 只按 `RequiredWeaponTags` 与 `Weapon.AttackTags` 匹配标签（`RewardPool.cs:18-28` → `RewardDefinition.cs:59-70` → `Weapon.cs:93`），而 4 条进化全部只声明 `"Gun"`（`RewardCatalog.cs:104-116`）、三把武器共用同一个 `Pistol.tscn`（`RunController.cs:383-386` 只改数值不换节点），所以**三把枪共用一个池**。
+> ⚠️ 这条**部分仍成立**：三把枪的**标签层②与通用层③**依然相同（4 条进化仍归三把枪共有）；
+> 变的是现在**多了一层"专属池"**可以用 —— 19 条现有选项一条都没改，池这一层目前是空的（留白）。
 
 **⑦ "奖励节点 → 增强首领"只实现了三分之一。** 有"确定性的压力点数累积"（`StageController.AddPressureForNode`，`StageController.cs:334-359`），缺"按权重抽取"、缺"强化参数可配"，而且压力参数在 `Balance.tres:107-109` 与 `Scenes/Enemies/Boss.tscn` 上**有两份**（前者覆盖后者，`EncounterController.cs:665-667`）。完整分析见 **§3 T9** 的缺口表。
 
@@ -305,6 +318,8 @@ Config/
       skl_dash.tres  skl_burst.tres  skl_melee.tres  skl_summon.tres  skl_control.tres
     Upgrades/                     ← 增幅项表（用户重点）
       upg_dmg_up.tres  upg_rate_up.tres  … 共 19 个
+    UpgradePools/                 ← ✅ 阶段 4：升级池表（一行一个池）
+      pool_pistol.tres  pool_sniper.tres  pool_rifle.tres
     Characters/
       chr_gunner.tres  chr_heavy.tres  chr_summoner.tres
     Enemies/
@@ -331,7 +346,7 @@ Config/
 |---|---|---|
 | 分组目录 | PascalCase 复数（对齐 `Assets/Materials/`） | `Config/Tables/Weapons/` |
 | 行文件 | `<分组前缀>_<语义名>.tres`，全小写 `snake_case`；**文件名与行里的 `Id` 取同一个语义名**，便于人肉对照 | `wpn_pistol.tres` / `upg_dmg_up.tres` / `enemy_chaser.tres` |
-| 前缀词表 | `wpn_` 武器 · `skl_` 技能 · `upg_` 增幅项 · `chr_` 角色 · `enemy_` 敌人 · `stg_` 关卡 · `node_` 节点 · `sts_` 状态 · `perk_` Boss 词条 · `meta_` 局外成长 | — |
+| 前缀词表 | `wpn_` 武器 · `skl_` 技能 · `upg_` 增幅项 · `chr_` 角色 · `enemy_` 敌人 · `stg_` 关卡 · `node_` 节点 · `sts_` 状态 · `perk_` Boss 词条 · `meta_` 局外成长 · **`pool_` 升级池（阶段 4）** | — |
 | 行 `Id` 字段 | `<分组前缀>_<语义名>`，**一次定好不再改**（会被存档 / 别的表 / `AllowedEnemyIds` 引用）；**可以**与文件名相同以降低认知负担 | `wpn_pistol`、`enemy_chaser`、`upg_dmg_up` |
 
 > **为什么不给行编号（`武器1` / `武器2`）当文件名**：用户说的"武器1/武器2"是**槽位**（`Slot` 字段），槽位会随版本调整（新武器插到中间），文件名和 `Id` 一旦定了就不该跟着动。文件名和 `Id` 用**语义名**，槽位用 `Slot` —— 两者分工见 §4.1。
@@ -364,6 +379,7 @@ Config/
 | `ScenePath` | `string` | `"res://Scenes/Weapons/Pistol.tscn"` | 武器预制体。**换武器不再重建节点**（`RunController.cs:383-386` 的既有约定），只在需要换模型/投射物时才换预制体 |
 | `ProjectileScene` | `PackedScene?` | `null` | 投射物预制体 |
 | `AttackTags` | `string[]` | `["Projectile","Gun","Physical"]` | 与 `RewardPool` 的 `RequiredWeaponTags` 配对 |
+| ✅ **`Pool`** | `UpgradePoolConfig?` | `null` | **阶段 4 新增（场景 B 的核心字段）**：本武器**正向指向**它的升级池（`Config/Tables/UpgradePools/pool_*.tres`）。`ApplyTo` 时写进 `Weapon.PoolId`，供奖励池做"专属池"匹配。留空 = 只走"标签层 / 通用层"（= 分表前的行为） |
 | `Damage` | `float` | `24f` | 单发伤害 |
 | `FireInterval` | `float` | `0.26f` | 射击间隔 |
 | `MagazineSize` | `int` | `12` | 弹匣 |
@@ -683,11 +699,12 @@ public partial class AbilityConfig : Resource
 | **`Note`** | `string` | `""` | **字符串值（机制/增幅说明）** |
 | `DescriptionTemplate` | `string` | `""` | 文本类参数项（支持 `{Value}` 等占位符，§4.4） |
 | `Kind` | `RewardKind` | `Enhancement` | 强化 / 进化 / 异化 |
-| **`ApplicableWeapons`** | `WeaponConfig[]` | `[]` | **★ 指向"属于哪几把武器的升级池"（反向指、资源引用）。**留空 = 走下面的类别标签；都留空 = 通用池。**场景 B 的核心字段，详见 §4.5** |
-| `RequiredWeaponTags` | `string[]` | `[]` | 武器**类别**限定（`Gun` / `Melee`）。精确武器匹配不上时的**回退层** |
-| `PoolTags` | `string[]` | `[]` | ⚠️ **现状是死字段**（`RewardPool` 从不读它，§1.4-⑤）。改名 `UpgradePoolId` 用起来、或删掉 —— 见 §4.5 |
+| **`Pool`** | `UpgradePoolConfig?` | `null` | ✅ **阶段 4 实际采用**：本选项**专属的升级池**（正向关联的"第二半"，第一半是武器行的 `Pool`）。**一个选项占一行 + 这一个引用列** = 池成员关系的唯一真源。留空 = 落到下面的标签层 / 通用层 |
+| `RequiredWeaponTags` | `string[]` | `[]` | 武器**类别**限定（`Gun` / `Melee`）。`Pool` 留空时的**第二层** |
+| ~~`ApplicableWeapons`~~ | — | — | ❌ **未采用**（§4.5.0 拍板改成"武器 → 池"正向指），字段从未存在 |
+| ~~`PoolTags`~~ | — | — | 🗑 **阶段 4 已删除**（死字段，19 行白填了）。语义被 `Pool` + `RequiredWeaponTags` 取代 |
 | `Excludes` | `string[]` | `[]` | 双向互斥 |
-| `ConflictsWith` | `string[]` | `[]` | ⚠️ 现状也是死字段（`RewardCatalog` 19 条全没填，`RewardPool.cs:67-75` 的判定永远走空，§1.4-⑤）。接上或删掉 |
+| ✅ `ConflictsWith` | `string[]` | `[]` | **阶段 4 已接上**：单向互斥（已拥有列表里任一 Id → 本项不进池）。以前表里没有入口所以永远为空，现在 `RewardEffectRegistry.Compile` 会填它（`RewardPool.Roll` 早就在读） |
 | `MaxStacks` | `int` | `3` | 层数上限（0 = 不限） |
 | `RequiresSummoner` | `bool` | `false` | 角色限定 |
 | `ApplyHandler` | `string` | `"StatMultiplier"` | 效果绑定（§6.1 拍板点） |
@@ -729,23 +746,19 @@ public partial class RewardConfig : Resource
     [Export] public Rewards.RewardKind Kind { get; set; } = Rewards.RewardKind.Enhancement;
 
     /// <summary>
-    /// 这个增幅项属于哪几把武器的升级池（**反向指、资源引用**）。
-    /// 用 WeaponConfig[] 而不是武器 id 字符串：武器行被删/改名时 Godot 会自动断引用，不会留下悬空 id。
-    /// 留空 = 走 RequiredWeaponTags 的类别回退；两者都留空 = 通用池（强化类都是这种）。
-    /// 详见 §4.5。
+    /// 这个选项**专属的升级池**（阶段 4 实际采用；池行是 Config/Tables/UpgradePools/pool_*.tres）。
+    /// **一个选项占一行 + 这一个引用列** —— 池行不反过来列选项，成员关系只有一个真源。
+    /// 填了 = 只有 Weapon.PoolId 等于它的武器能拿到（不看下面的标签）；
+    /// 留空 = 走 RequiredWeaponTags 的类别层；两者都留空 = 通用池（强化类都是这种）。详见 §4.5.0。
     /// </summary>
-    [Export] public WeaponConfig[] ApplicableWeapons { get; set; } = System.Array.Empty<WeaponConfig>();
+    [Export] public UpgradePoolConfig? Pool { get; set; }
 
-    /// <summary>武器**类别**标签（Gun / Melee / Launcher）。精确匹配不上时用它兜底。</summary>
+    /// <summary>武器**类别**标签（Gun / Melee / Launcher）。专属池留空时用它兜底。</summary>
     [Export] public string[] RequiredWeaponTags { get; set; } = System.Array.Empty<string>();
 
-    /// <summary>
-    /// ⚠️ 现在这个字段**从未被 RewardPool 读取**（§1.4-⑤）。
-    /// 三种处理方式见 §4.5：① 当作"池分组"真的用起来；② 改名 UpgradePoolId 表达"属于哪个升级池"；③ 直接删掉。
-    /// 本设计倾向 ② 或 ③ —— **不要**原样保留一个死字段。
-    /// </summary>
-    [Export] public string[] PoolTags { get; set; } = System.Array.Empty<string>();
     [Export] public string[] Excludes { get; set; } = System.Array.Empty<string>();
+
+    /// <summary>单向互斥：已拥有这些 Id 里任意一个 → 本项不进池（阶段 4 才在 Compile 里接上）。</summary>
     [Export] public string[] ConflictsWith { get; set; } = System.Array.Empty<string>();
     [Export] public int MaxStacks { get; set; } = 3;
     [Export] public bool RequiresSummoner { get; set; }
@@ -928,7 +941,7 @@ public static class RewardTable
                 Name = captured.DisplayName,
                 Description = ConfigText.Format(captured.DescriptionTemplate, captured, captured.Params),
                 Kind = captured.Kind,
-                PoolTags = captured.PoolTags,
+                ApplicablePoolIds = captured.Pool == null ? System.Array.Empty<string>() : new[] { captured.Pool.Id },
                 RequiredWeaponTags = captured.RequiredWeaponTags,
                 Excludes = captured.Excludes,
                 ConflictsWith = captured.ConflictsWith,
@@ -986,7 +999,6 @@ TargetStat = "DamageMultiplier"
 Operation = 1
 Value = 1.15
 MaxStacks = 3
-PoolTags = PackedStringArray("Damage")
 DescriptionTemplate = "伤害 +15%"
 Note = "通用项：AttackInstance 生成时读 DamageMultiplier（Weapon.cs:181）"
 ApplyHandler = "StatMultiplier"
@@ -1020,7 +1032,6 @@ Weight = 1.0
 Operation = 2
 Kind = 1
 RequiredWeaponTags = PackedStringArray("Gun")
-PoolTags = PackedStringArray("Evolution", "Gun")
 MaxStacks = 1
 DescriptionTemplate = "子弹命中时产生小范围爆炸"
 Note = "多参数：命中后产生 3.5 米爆炸，伤害为本体的 60%"
@@ -1070,7 +1081,6 @@ Slot = 3
 DisplayName = "连锁闪电"
 Weight = 1.0
 Kind = 2
-PoolTags = PackedStringArray("Mutation", "KillTrigger")
 MaxStacks = 1
 DescriptionTemplate = "击杀敌人时对附近敌人放电（{Range} 米 / {Jumps} 跳）"
 Note = "击杀触发：0.12 秒链间隔 / 14 伤害 / 7 米范围 / 3 跳"
@@ -1354,7 +1364,7 @@ public static class WeightedPick
 | `DisplayName` | `string` | `""` | HUD 上的词条名（`PlayerHud.cs:133-134` 已经在拼 `_bossPerkNames`） |
 | `IconPath` | `string` | `""` | 图标 |
 | **`Source`** | `BossModifierSource` | `OpeningPerk` | **新增**：`OpeningPerk`（开局词条）/ `FromNode`（奖励节点挑战得来）/ `FromPressure`（压力升级触发）。配合 `Tags` 决定"这次抽取的候选范围" |
-| `Tags` | `string[]` | `[]` | 候选过滤标签（如 `"Evolution"` / `"Mutation"` 对应节点类型）。⚠️ 现在 `RewardDefinition.PoolTags` **从未被读取**（§1.4-⑤），别重犯同一个错 —— 这个字段**必须**在抽取时真的用上，并有一条自测输出证明 |
+| `Tags` | `string[]` | `[]` | 候选过滤标签（如 `"Evolution"` / `"Mutation"` 对应节点类型）。⚠️ 反面教材：`RewardDefinition.PoolTags` 曾经就是这样**填了但从未被读取**的字段（阶段 4 已删，§1.4-⑤）—— 别重犯，这个字段**必须**在抽取时真的用上，并有一条自测输出证明 |
 | **`Weight`** | `float` | `1f` | 抽中概率 |
 | `TargetStat` / `Operation` / `Value` | `string` / `ModifierOperation` / `float` | `""` / `Multiply` / `1f` | 通用项 |
 | `Params` | `ParamEntry[]` | `[]` | 键值对组（多参数 / 改 `BossPressure` 字段 / 启用技能节点） |
@@ -1742,6 +1752,29 @@ public static class ConfigText
 
 > 用户原话：「我要调整**某个武器的基础参数以及其与其对应的升级池里的增幅参数**」——关键要求是**能顺藤摸瓜**，不是在一张大表里用肉眼找。
 
+#### 4.5.0 ✅ 2026-10 拍板并已实施（下面 4.5.2–4.5.4 是**被取代**的推荐方案）
+
+用户明确要求的是**正向指**：「武器的配置表里确实是需要有指向对应池表的字段，而**对应池表则不指向其对应武器**，
+而**池表里则是一个选项占用一栏**」。所以最终落地的形态是（实测与回退验证见 §5 阶段 4）：
+
+```
+WeaponConfig（武器表 3 行）
+  └─ Pool ─────► UpgradePoolConfig（Config/Tables/UpgradePools/pool_*.tres，3 行 = 一行一个池）
+                     ▲
+RewardConfig（增幅项表 19 行 = 一行一个选项）
+  └─ Pool ───────────┘（留空 = 落到"标签匹配 / 通用"两层）
+```
+
+| 决策点 | 结论与依据 |
+|---|---|
+| 关联方向 | **武器 → 池**（正向）。池行**不**反指武器，也**不**列选项 |
+| "一个选项占一栏"怎么落 | **一行 = 一个选项**（19 行不动），"属于哪个池"是它上面的**一个引用列**。依据：用户原话在 [config-tooling-yard.md](config-tooling-yard.md) §4.3 被解读为"**一栏一个标量**"，而"**一栏里放多个选项**（`Array`）"恰恰是编辑器拿不到的形态 —— 所以成员关系**不能**写成池行上的数组 |
+| 成员关系的唯一真源 | **选项行的 `Pool` 列**（池行不重复列一遍 → 不会出现 §1.4-① 那种双真源漂移） |
+| 池行的职责 | **身份锚点**：让"武器→池"是两个 `.tres` 之间的**资源引用**（删/改名时引用置 null 可检测），而不是拼字符串 |
+| 三级回退 | 保留 §4.5.3 的**分层**，但第一层从"精确武器"换成"**精确池**"：`RewardDefinition.AllowsWeapon` 里 `ApplicablePoolIds` 非空 → 只认 `weapon.PoolId` |
+| 纯增量 | 19 条增幅项的**数值与字段一个都没改**（新列 `Pool` 全空 = 走②③两层），`RewardPool` / `RunBuild` / `RunController` **一行没改** |
+| 死字段 `PoolTags` | ✅ **删除**（见下 4.5.6）—— 它的语义被"专属池引用 + 武器标签"两张列取代 |
+
 #### 4.5.1 先说现状：这个关联**现在不存在**（读代码后的结论）
 
 | 环节 | 代码 | 事实 |
@@ -1757,8 +1790,9 @@ public static class ConfigText
 > 也就是说：**"调某武器的升级池"这个动作今天无处可下手** —— 要么动全部武器，要么改代码。
 
 **顺带的第二个发现**：`RewardDefinition.PoolTags`（`RewardDefinition.cs:38`）在 `RewardCatalog.cs:98,113,126` 被赋值，但 **`RewardPool` 里从未读取过它** —— 与 `Weight`、`ConflictsWith` 一样是死字段（§1.4 ⑤⑥）。
+> ✅ **阶段 4 已处置**：`PoolTags` 删除、`ConflictsWith` 接上，见 §4.5.6 与 §5 阶段 4。
 
-#### 4.5.2 推荐方案：**反向指 + 资源引用数组**
+#### 4.5.2 ❌ 推荐方案（**未采用**）：**反向指 + 资源引用数组**
 
 ```
 T1 武器表（行）                          T3 增幅项表（行）
@@ -1888,18 +1922,24 @@ public static string DescribePools()
 ```
 
 迁移完成后，这条输出与 [rewards.md](rewards.md):79-86 的"枪手 18 / 召唤 19"一起，就是"关联没坏"的硬证据。
+> ✅ **已按等价形态落地（阶段 4）**：自测里新增 `配置表比对·升级池：武器 PoolId「pool_pistol」… 专属层 0 条（命中 0）· 类别层 4 条（命中 4）· 通用层 15 条`，
+> 判据是 `RewardDefinition.ApplicablePoolIds` + `AllowsWeapon`（池版，不再是武器版）。
 
-#### 4.5.6 `PoolTags` 这个死字段怎么处理（顺带拍板）
+#### 4.5.6 `PoolTags` 这个死字段怎么处理 —— ✅ **已拍板：删掉（阶段 4 落地）**
 
-现在它有三个可能的归宿，**别原样留着**：
+**最终做法**：**删除**，并用两张**新列**取代它的语义 —— ① `RewardConfig.Pool`（专属池引用，第一层）、
+② 原有的 `RequiredWeaponTags`（武器类别，第二层）。删除范围：`RewardConfig.PoolTags`、
+`RewardDefinition.PoolTags`、`RewardEffectRegistry.Compile` 的赋值、`RewardCatalog` 三个工厂的 `tag` 参数
+与 15 个调用点、以及 **19 个 `.tres` 行文件里的 `PoolTags = …` 那一行**。
+
+> 下面是当时的三个候选（保留作为决策记录）。**没有采纳第一条**："池"在这个项目里的粒度**不是**自由标签，
+> 而是**每把武器一个池**（用户原话），所以用资源引用比用 `string` 标签更贴切、也不会拼错。
 
 | 选项 | 说明 |
 |---|---|
-| ⭐ **改名 `UpgradePoolId`（`string`）用起来** | 表达"这条增幅属于哪个**逻辑池**"（如 `"pool_gun_core"` / `"pool_high_risk"`）。可以支持"一次抽奖只从某个池里抽"（`RewardService.FilterFor` 现在只能按 `RewardKind` 过滤，`RewardService.cs:16-24`）。**这是最有价值的用法**：用户以后想做"武器池 / 高风险池 / 稀有池"时不用改代码 |
+| **改名 `UpgradePoolId`（`string`）用起来** | 表达"这条增幅属于哪个**逻辑池**"（如 `"pool_gun_core"` / `"pool_high_risk"`）。可以支持"一次抽奖只从某个池里抽"（`RewardService.FilterFor` 现在只能按 `RewardKind` 过滤，`RewardService.cs:16-24`） |
 | **当作标签真的用起来** | 让 `RewardPool.Roll` 接受 `string[] requiredPoolTags` 参数并过滤。⚠️ 那么它和 `ApplicableWeapons` / `RequiredWeaponTags` 就有三重过滤语义，容易搞混 |
-| **直接删掉**（连同 `RewardCatalog.cs:98,113,126` 的赋值） | 最省事。如果短期没有"逻辑池"需求，删掉比留着强 —— 死字段会误导后来人以为它在生效 |
-
-**我建议第一条**（改名 `UpgradePoolId` 并接进 `RewardPool` 的过滤），因为它顺手把"池子"这个用户反复提到的概念变成一等公民；但**如果阶段 2 想快**，先删掉、等真需要再加，也完全可以（见 §6）。
+| ⭐ **直接删掉**（连同 `RewardCatalog.cs:98,113,126` 的赋值） | **← 实际采用**。死字段会误导后来人以为它在生效；"池"改由 `UpgradePoolConfig` 资源引用表达 |
 
 ---
 
@@ -2089,7 +2129,8 @@ public static string DescribePools()
 3. ⏸ `RunSetup.Weapon/Character`（`RunSetup.cs:13-16`）**仍存枚举**；`WeaponPresetKind` / `PlayerCharacterKind` 保留为"槽位壳"（`Slot = (int)kind + 1`）。**没改** —— 改它会牵动 `StartScreen` / `UiService` / `SelfTest` 多处，收益（少两个枚举）不值这个风险（§6.4）。
 4. ⏸ `Scenes/Weapons/Pistol.tscn:16-25` 的去留（§6.3）**没动**：它现在的值是 22/0.32/8/1.15/75…，与武器表**不再冲突**（表是权威、每局开局覆盖），
    但它仍是"打开预制体看到 22、实际打 24"的困惑源。**建议下一步把它清空为 `Weapon.cs` 的默认值**。
-5. ✅ `WeaponConfig` 里已预留跨武器字段（`AttackTags` / `ScenePath` / `ModelPath` / `IconPath`），**但"武器→升级池"的关联方向（§4.5.2 `ApplicableWeapons`）这一步没做** —— 场景 B 仍待拍板。
+5. ✅ `WeaponConfig` 里已预留跨武器字段（`AttackTags` / `ScenePath` / `ModelPath` / `IconPath`）。
+   → 🆕 **"武器→升级池"的关联已在阶段 4 落地**（正向指，不是这里写的 `ApplicableWeapons` 反向指）：见 §4.5.0 与 §5 阶段 4。
 
 **验证**：见阶段 2 的比对表（手枪 11 项逐项一致、玩家 4 项一致、`PoolPreview` 18 条不变）。
 ❗ **未做**：三把武器各自开一局验证狙击/步枪的暴击/弹速（分表前它们**共用** `Pistol*` 的值，现在各自有独立字段，默认值仍写成 0.15/2/90/55/3 所以**行为不变**；要按武器区分得改行文件）。
@@ -2158,7 +2199,33 @@ AbilityId skl_dash ｜ 近战 伤害 32 间隔 0.75 射程 2.4 击退 5 命中�
 `单位表实测（FastMelee）：生命 26 …（技能行 Id skl_enemy_fast_melee_melee）`；
 把 5 个新数组清空后仍能跑完自测、日志显示"来源：代码兜底 / 场景导出值"且敌人倍率**不再换挡**。
 
-### 阶段 4：技能表 + 敌人表 + 节点表（T2 + T5 + T7）
+### 阶段 4：武器 → 升级池 → 选项（§4.5 的落地）✅ **已完成（2026-10）**
+
+> **做了什么**（详细实测/回退验证/逐位比对见 [config.md](config.md) 的「配置表阶段 4 实测」）：
+>
+> | 变化 | 文件 |
+> |---|---|
+> | 新行类 **`UpgradePoolConfig : ConfigRow`**（只承载身份：Id/Slot/DisplayName/Note） | `Scripts/Config/UpgradePoolConfig.cs` |
+> | 新表 **`Config/Tables/UpgradePools/pool_{pistol,sniper,rifle}.tres`**（3 行 = 一行一个池） | 新目录 |
+> | 索引数组 `BalanceConfig.UpgradePools` + `ConfigRows.Rebuild` + **`ReportUpgradePools()` 日志留痕** | `BalanceConfig.cs` / `Balance.cs` |
+> | **正向指**：`WeaponConfig.Pool` → `ApplyTo` 写 `Weapon.PoolId`（`[Export]`，表读不到时用场景值 = 空） | `WeaponConfig.cs` / `Weapon.cs` |
+> | **一个选项占一行 + 一个引用列**：`RewardConfig.Pool` | `RewardConfig.cs` |
+> | **三级回退**：`RewardDefinition.ApplicablePoolIds` + `AllowsWeapon` 重写 | `RewardDefinition.cs` |
+> | 编译入口：`PoolIdsOf(row)` + `ConflictsWith = row.ConflictsWith` | `RewardEffectRegistry.cs` |
+> | 死字段清理：删 `PoolTags`（含 19 行 `.tres`）/ 删工厂的 `tag` 参数与 15 个调用点 | `RewardCatalog.cs` + 19 个行文件 |
+> | 自测新增 `配置表比对·升级池`（三层条数 + `PoolId`），索引行加 `升级池 3` | `SelfTest.cs` |
+>
+> **验收（实测）**：`build.ps1 --no-incremental -v minimal` **0 warning / 0 error**；
+> 自测 `当前池子=18 条（枪手期望 18 条）` **逐位不变**，改前/改后配置相关日志逐行 diff 只有新增的那几行；
+> 两次临时实验证明第一层会拦人（A：选项指向本武器的池 → 命中 1、池子 18；B：指向别的池 → 命中 0、池子 17）；
+> 两次回退验证（清武器行 `Pool` / 清 `UpgradePools` 索引）= 池子仍是 18、玩法数值全不变、
+> 后者会打 3 条"池不在索引里"的 warning。
+>
+> ⚠️ **本轮推翻的设计**：§4.5.2 推荐的"**反向指** `RewardConfig.ApplicableWeapons`"**未采用**（用户要求正向指）。
+> `WeaponConfig.ApplicableWeapons` 这个字段**全项目从未存在过**（只在文档里），所以没有代码要删。
+> §6.9 的取舍点因此有结论了（见该节）。
+
+### 阶段 4（原计划编号）：技能表 + 敌人表 + 节点表（T2 + T5 + T7）
 
 - ✅ **节点表（T7）已在阶段 2 做完**：`Config/Tables/Nodes/node_*.tres` 9 行，替掉 `RewardService` 两个 switch + `NodePlacement`/`StageController` 的重复实现。
   ⏸ **未做**：`SpawnsEncounter` / `MaterialPath` / `IconPath` 三个字段已就位但**还没接进 `RewardNode`**（当前它们仍读各自场景里的值）。
@@ -2180,7 +2247,8 @@ AbilityId skl_dash ｜ 近战 伤害 32 间隔 0.75 射程 2.4 击退 5 命中�
      三个字段**已经就位**（`node_*.tres` 里默认为 0/0/空 = 不生效），接线点是 `StageController` 的累加与
      `EncounterController.BossModifierRolls`。接线时按 `BossPerkCatalog.PressureOnly` / `BehaviorOnly` 分开抽。
 - ✅ **`_fallback` 旧目录没删**（`RewardCatalog.Fallback` / `StatusPresets.Fallback`）—— 按设计这是回退路径，不是技术债。
-- ⏸ 收尾决定 §4.5.6：`PoolTags` 改成 `UpgradePoolId` 用起来、还是删掉。
+- ⏸ 收尾决定 §4.5.6：`PoolTags` 改成 `UpgradePoolId` 用起来、还是删掉。 → ✅ **已拍板：删掉（阶段 4 落地）**，
+  并新增 `UpgradePoolConfig` 升级池表 + `WeaponConfig.Pool` 正向指（见上面的「阶段 4」与 §4.5.0）。
 
 **场景 A 的验收**（做完第 3 步之后）：
 - 改 `Config/Tables/Nodes/node_evolution.tres` 的 `BossModifierRolls` 从 `0` → `3`，跑一局确认 Boss 身上的词条数变了、HUD 上的 `_bossPerkNames` 变长。
@@ -2301,16 +2369,19 @@ public WeaponFieldMask Overrides { get; set; } = WeaponFieldMask.All;
 
 `MetaProgress.cs:47` 现在是 `CostOf(level) = 10 * (level + 1)`（线性）。进表之后是 `BaseCost=10` + `CostGrowth=10`（同样线性），**表达力没变**。如果你以后想要指数/分段曲线，表里要么加一个 `Curve` 资源字段，要么把 `CostGrowth` 改成乘数。**这一条不影响现在做不做表，只需要你确认"线性够用"**。
 
-### 6.9 ⭐ 武器 ↔ 升级池：关联方向（场景 B）
+### 6.9 ⭐ 武器 ↔ 升级池：关联方向（场景 B）—— ✅ **已拍板：正向指（2026-10，已实施）**
+
+> **结论**：用户选**正向指** —— 「武器的配置表里确实是需要有指向对应池表的字段，而**对应池表则不指向其对应武器**，
+> 而**池表里则是一个选项占用一栏**」。落地形态见 **§4.5.0**，实测见 **§5 阶段 4**。
+> 关键点：正向指**没有**引入第二个真源 —— 武器行写"我属于哪个池"，**选项行**写"我属于哪个池"，
+> 池行自身不写任何一方；两边都是**资源引用**（不是字符串）。
+> 下面的对比表保留为决策记录（"反向指"一栏**未采用**）。
 
 | 选项 | 优点 | 缺点 |
 |---|---|---|
-| ⭐ **反向指**：`RewardConfig.ApplicableWeapons : WeaponConfig[]` | 加一条增幅项**只碰一个文件**；一条适用多把武器只写一处；在表插件里**就是增幅项表的一列**，可筛选/可批量改 | "这把武器有哪些升级池"要按列筛选看，不能打开武器行直接看到 |
-| **正向指**：`WeaponConfig.UpgradePool : RewardConfig[]` | 打开武器行直接看到池子 | 加一条增幅项要**同时改武器表**（两个文件）；一条适用于多把武器要在 N 行里各维护一次；表插件里数组列要"单独打开成另一张表"才编辑得了 |
-| **双向指**（两边都写） | 都能直接看到 | **两个真源**，必然漂移 —— §1.4-① 的关卡表就是这么坏的，不要重犯 |
-
-**我建议反向指 + 资源引用**（理由与完整对比见 §4.5.2）。**需要你确认**：以后策划的日常动作是"加一条增幅项、顺便指定它属于哪几把武器"（→ 反向指顺手），还是"打开某把武器、一次性安排它的整条升级路线"（→ 正向指顺手）？
-> 如果答案是后者，还有一个折中：保持反向指为**唯一权威**，同时提供一个**只读**的"武器 → 池子"视图（就是 §4.5.5 那个 `DescribePools()` 输出，或表插件里的列筛选）—— 既能看到正向视图，又不会有两个真源。
+| ⭐ **正向指**：`WeaponConfig.Pool : UpgradePoolConfig`（**实际采用**） | 打开武器行**直接看到**它的池（用户要的就是这个）；加池只碰池表；池可被多把武器共用 | 要看"池里有哪些选项"得按**选项行的 `Pool` 列**筛选（不能打开池行就看到列表）—— 这是"一个选项占一栏"的必然结果 |
+| ~~**反向指**：`RewardConfig.ApplicableWeapons : WeaponConfig[]`~~ | 加一条增幅项只碰一个文件 | **未采用**：反向视图不符合用户要的"武器 → 池"入口；且用户明确说池表不指武器 |
+| **双向指**（两边都写） | 都能直接看到 | **两个真源**，必然漂移 —— §1.4-① 的关卡表就是这么坏的，**不要重犯**（本轮也没有犯：成员关系只在选项行上） |
 
 ### 6.10 ⭐ 场景 A 的范围：只做表，还是连"节点驱动"一起做
 
@@ -2411,10 +2482,10 @@ public WeaponFieldMask Overrides { get; set; } = WeaponFieldMask.All;
 | 它是什么 | 说明 |
 |---|---|
 | ✅ **仍是全项目数值的唯一入口** | 业务代码继续写 `Balance.Settings.Xxx`（[todo-handoff.md](todo-handoff.md) 的"统一入口"约定**没变**）。`Balance` 从"唯一数值**文件**"变成"唯一数值**门面**"（§2.1 就是这么设计的） |
-| ✅ **同时是 12 张表的索引持有者** | 11 个 `[Export] XxxConfig[]` 数组 + 既有的 `Stages`，元素全部是独立 `ExtResource`：<br>`Stages` / `Weapons` / `Characters` / `Enemies` / **`Bosses`** / **`Summons`** / **`Skills`** / **`PressureMods`** / `Effects` / `Nodes` / `Upgrades` / `MetaUpgrades`（阶段 3 新增的 4 个加粗） |
+| ✅ **同时是 13 张表的索引持有者** | 12 个 `[Export] XxxConfig[]` 数组 + 既有的 `Stages`，元素全部是独立 `ExtResource`：<br>`Stages` / `Weapons` / `Characters` / `Enemies` / **`Bosses`** / **`Summons`** / **`Skills`** / **`PressureMods`** / `Effects` / `Nodes` / `Upgrades` / **`UpgradePools`** / `MetaUpgrades`（阶段 3 新增的 4 个、阶段 4 新增的 1 个加粗） |
 | ⏸ **没有**把索引分散到各系统 | **理由**：① 分散会造出 12 个"谁持有哪张表"的新约定，[architecture.md](architecture.md):134「加新全局入口前先问：能不能传参」的精神是**少入口**；② `ConfigRows` 是一个静态索引器，谁来 `Rebuild` 都一样，而现在只有 `Balance._Ready` 一处；③ **回退语义要能一眼看出"整份配置有没有加载上"** —— `Balance.FileLoaded` 已经是那个开关，分散后它会失去意义 |
-| 顺序依赖 | `Balance._Ready` → `CallDeferred(BuildTableIndex)`（**必须 defer**，见 §5 阶段 2 的坑 1）→ `ConfigRows.Rebuild(...)` ×11 + `SetKind` ×9 + `RewardTable.Build` + `BossPerkCatalog.Build(Config.Skills, Config.PressureMods)` + 关卡白名单校验（未知 Id 写警告） |
-| `BalanceConfig` 的标量字段 | **30 个**（标量；另有 12 个表索引数组。阶段 3 删掉两个死字段 `EliteBossHealthScale` / `BossHealthBarScale`） |
+| 顺序依赖 | `Balance._Ready` → `CallDeferred(BuildTableIndex)`（**必须 defer**，见 §5 阶段 2 的坑 1）→ `ConfigRows.Rebuild(...)` ×12 + `SetKind` ×9 + `RewardTable.Build` + **`ReportUpgradePools()`（阶段 4：武器→池→选项的留痕）** + `BossPerkCatalog.Build(Config.Skills, Config.PressureMods)` + 关卡白名单校验（未知 Id 写警告） |
+| `BalanceConfig` 的标量字段 | **30 个**（标量；另有 **13 个表索引数组**。阶段 3 删掉两个死字段 `EliteBossHealthScale` / `BossHealthBarScale`） |
 
 ### 8.2 读表 / 回退的固定写法（新代码照抄）
 

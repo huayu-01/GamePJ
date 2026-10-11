@@ -35,9 +35,19 @@ public partial class RewardConfig : ConfigRow
 	/// </summary>
 	[Export] public ParamEntry[] HandlerParams { get; set; } = System.Array.Empty<ParamEntry>();
 
-	[ExportGroup("池过滤")]
-	/// <summary>要求武器具备的标签；空 = 不限武器（取代 <c>RequiredWeaponTags</c>）。</summary>
+	[ExportGroup("池过滤（三级回退：① 专属池 → ② 武器标签 → ③ 通用）")]
+	/// <summary>要求武器具备的标签；空 = 不限武器（**第二层**：现有 4 条进化走这层）。</summary>
 	[Export] public string[] RequiredWeaponTags { get; set; } = System.Array.Empty<string>();
+
+	/// <summary>
+	/// 本选项**专属的升级池**（`Config/Tables/UpgradePools/pool_*.tres`）—— **第一层**。
+	/// 填了 = 只有 <c>Weapon.PoolId</c> 等于它的武器能拿到这一条，**此时不再看 <see cref="RequiredWeaponTags"/>**；
+	/// 留空 = 落到第二层（标签匹配）与第三层（通用池：现有 10 条强化 + 5 条异化）。
+	///
+	/// **选项行是"池成员"的唯一真源**：池行不反过来列选项（一个选项占一行 + 一个引用列；
+	/// "一栏里塞多个选项"的数组形态恰恰是编辑器拿不到的，见 docs/config-tooling-yard.md §4.3）。
+	/// </summary>
+	[Export] public UpgradePoolConfig? Pool { get; set; }
 
 	/// <summary>只有召唤控制角色才能拿到。</summary>
 	[Export] public bool RequiresSummoner { get; set; }
@@ -45,8 +55,13 @@ public partial class RewardConfig : ConfigRow
 	/// <summary>互斥的增幅项 Id（双向判定）。</summary>
 	[Export] public string[] Excludes { get; set; } = System.Array.Empty<string>();
 
-	/// <summary>池标签。</summary>
-	[Export] public string[] PoolTags { get; set; } = System.Array.Empty<string>();
+	/// <summary>
+	/// **单向**互斥：已经拥有这些 Id 里的任意一个时，本项不再进池
+	/// （与 <see cref="Excludes"/> 的双向判定互补；<c>RewardPool.Roll</c> 读它）。
+	/// 阶段 4 之前 <c>RewardDefinition.ConflictsWith</c> 在编译时**没有任何填入口**，所以永远是空数组；
+	/// 现在表里能填了（默认空 = 行为不变）。
+	/// </summary>
+	[Export] public string[] ConflictsWith { get; set; } = System.Array.Empty<string>();
 
 	/// <summary>
 	/// 属性修正（<c>StatSet</c> 处理器用）。取代 `RewardCatalog` 里 <c>Mod(c, "DamageMultiplier", Multiply, 1.15f)</c> 这类闭包。
