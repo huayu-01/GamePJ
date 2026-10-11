@@ -2103,13 +2103,19 @@ public static string DescribePools()
 
 | 类 | 继承 | 自己声明的列 | 目录 / 行数 |
 |---|---|---|---|
-| `UnitConfig` | `ConfigRow`（抽象，不导出） | 生命（生命/护甲/护盾/护甲减伤/额外减伤/击退抗性）· 攻击四项（`AttackDamage` / `AttackInterval` / `AttackRange` / `AttackKnockback`）· 移速 · 行为&类（`Tags`）· **持有技能 `Skills : AbilityConfig[]`**（资源引用）· 表现（`ModelPath` / `IconPath` / `ModelScale`） | —（基类） |
+| `UnitConfig` | `ConfigRow`（抽象，不导出） | 生命（生命/护甲/护盾/护甲减伤/额外减伤/击退抗性）· 攻击四项（`AttackDamage` / `AttackInterval` / `AttackRange` / `AttackKnockback`）· 移速 · 行为&类（`Tags`）· **持有技能 `Skills : AbilityConfig[]`**（资源引用）· 表现（`ModelPath` / `ModelScale`） | —（基类） |
 | `EnemyConfig` | `UnitConfig` | 全局倍率行（`IsGlobal` + 4 个倍率）· 刷怪（`ScenePath` / `Cost` / `Weight` / `MinElapsedSeconds` / `EliteChance`） | `Enemies/` **10** |
 | `BossConfig` | `UnitConfig` | `ScenePath` · `EliteCopyHealthScale` | `Bosses/` **1** |
 | `SummonConfig` | `UnitConfig` | `ScenePath` · `LifetimeSeconds` | `Summons/` **1** |
-| `CharacterConfig` | `UnitConfig` | 武器开关 / 默认武器 / 能力开关矩阵 | `Characters/` **3** |
-| `AbilityConfig` | `ConfigRow` | 寻址（`NodeName` / `ClassHint` / `InputAction`）· 通用项（`Aim` / `Cooldown` / `Windup` / `Recover` / `Enabled` / `Approach*`）· `Params`（子类专属）· `AttackParams`（命中体/武器组件）· `ApplyHandler` + `Weight`（**首领行为词条**用） | `Skills/` **25** |
+| `CharacterConfig` | `UnitConfig` | 武器开关 / 能力开关矩阵 | `Characters/` **3** |
+| `AbilityConfig` | `ConfigRow` | 寻址（`NodeName` / `ClassHint`）· 通用项（`Aim` / `Cooldown` / `Windup` / `Recover` / `Enabled` / `Approach*`）· `Params`（子类专属）· `AttackParams`（命中体/武器组件）· `ApplyHandler` + `Weight`（**首领行为词条**用） | `Skills/` **25** |
 | `PressureModConfig` | `ConfigRow` | `Weight` · `Modifiers : StatOverride[]`（**只允许数值操作**） | `Pressure/` **3** |
+
+> 与 §3 的设计相比，落地时**砍掉了三列没有消费者的**（"不留让人误以为能调的列"）：
+> `UnitConfig.IconPath`（敌人/召唤物没有任何图标界面；首领头像是 `BarBoss.tscn` 的固定色块）、
+> `AbilityConfig.InputAction`（按键由 `PlayerAbilityInput` 按能力类硬编码 + `project.godot [input]` 决定，
+> 改键是「设置表」那件事）、`CharacterConfig.DefaultWeaponId`（阶段 2 起就没人读，开局武器由 `StartScreen` 决定）。
+> `ModelPath` / `ModelScale` 保留了，因为它们在 `UnitConfig.ApplyModel` 里有真实代码路径（当前所有行留空 = 用场景模型）。
 
 **三条关键设计（都是为了避免两个真源）**：
 

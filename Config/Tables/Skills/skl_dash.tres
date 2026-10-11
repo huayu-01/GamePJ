@@ -27,7 +27,6 @@ Id = "skl_dash"
 DisplayName = "滑铲"
 NodeName = "AbilityDash"
 ClassHint = "DashAbility"
-InputAction = "dash"
 Aim = 0
 Cooldown = 1.2
 Windup = 0.3

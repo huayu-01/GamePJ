@@ -50,7 +50,6 @@ Id = "skl_control"
 DisplayName = "控制立场"
 NodeName = "AbilityControl"
 ClassHint = "AreaAttackAbility"
-InputAction = "control"
 Aim = 0
 Cooldown = 8.0
 Windup = 0.25

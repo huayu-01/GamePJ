@@ -21,7 +21,6 @@ Id = "skl_burst"
 DisplayName = "火力倾泻"
 NodeName = "AbilityBurst"
 ClassHint = "BurstFireAbility"
-InputAction = "burst"
 Aim = 2
 Cooldown = 10.0
 Windup = 0.0

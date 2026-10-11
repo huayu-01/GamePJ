@@ -83,8 +83,8 @@ public abstract partial class UnitConfig : ConfigRow
 	/// <summary>替换占位模型用的预制体（空 = 用场景里自带的占位模型）。</summary>
 	[Export(PropertyHint.File, "*.glb,*.gltf,*.tscn")] public string ModelPath { get; set; } = string.Empty;
 
-	/// <summary>图标路径（首领用：屏幕上方首领面板的头像）。空 = 用预制体自带的图标。</summary>
-	[Export(PropertyHint.File, "*.png,*.svg")] public string IconPath { get; set; } = string.Empty;
+	// ⚠️ 刻意**没有** IconPath 列：敌人/召唤物现在没有任何"图标"界面（首领面板的头像是 BarBoss.tscn 的
+	// 固定色块），加一列没人读的图标路径就是死配置。要做首领头像时再加一列 + 一处 UI（`PlayerHud`）。
 
 	/// <summary>整体缩放（含碰撞体，与 <see cref="EliteModifier"/> 的 ModelScale 同一套做法）。1 = 不缩放。</summary>
 	[Export(PropertyHint.Range, "0.1,5,0.05")] public float ModelScale { get; set; } = 1f;

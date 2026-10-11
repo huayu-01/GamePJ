@@ -33,8 +33,9 @@ public partial class AbilityConfig : ConfigRow
 	/// <summary>期望的脚本类名（`DashAbility` 等）。填了就在套用时校验，不匹配只警告、不静默写坏。</summary>
 	[Export] public string ClassHint { get; set; } = string.Empty;
 
-	/// <summary>按键动作名（`dash` / `burst` / `summon` / `control`）。空 = 无按键（敌人技能）。</summary>
-	[Export] public string InputAction { get; set; } = string.Empty;
+	// ⚠️ 刻意**没有** InputAction 列：按键动作名现在由 `PlayerAbilityInput` 按能力**类**硬编码
+	// （`Input.IsActionJustPressed("dash"/"burst"/"summon"/"control")`）+ `project.godot [input]` 决定。
+	// 加一列没人读的"按键"只会让人以为改了它就能改键 —— 改键是「设置表」那件事（见 docs/config.md 末尾）。
 
 	[ExportGroup("通用项（多数技能填这一组）")]
 	/// <summary>释放方向来源（行里给了就用行里的；所有行都会显式给出，与场景里的值一致）。</summary>

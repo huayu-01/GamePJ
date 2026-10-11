@@ -34,7 +34,6 @@ Id = "skl_summon"
 DisplayName = "召唤无人机"
 NodeName = "AbilitySummon"
 ClassHint = "SummonAbility"
-InputAction = "summon"
 Aim = 0
 Cooldown = 5.0
 Windup = 0.25

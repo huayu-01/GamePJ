@@ -19,8 +19,8 @@ public partial class CharacterConfig : UnitConfig
 	/// <summary>这个角色能不能用枪（近战重装 = false，左键改由近战能力接管）。</summary>
 	[Export] public bool WeaponEnabled { get; set; } = true;
 
-	/// <summary>开局默认拿的武器 Id（对应 <c>Config/Tables/Weapons/</c> 里的行；空 = 不动）。</summary>
-	[Export] public string DefaultWeaponId { get; set; } = string.Empty;
+	// ⚠️ 刻意**删掉了** DefaultWeaponId：它从阶段 2 起就是"填了没人读"的列（开局武器由
+	// `StartScreen` 的选择 → `RunSetup.Weapon` 决定），留着只会让人以为能配"这个角色的默认枪"。
 
 	[ExportGroup("能力开关矩阵（取代硬编码的 if/else）")]
 	/// <summary>

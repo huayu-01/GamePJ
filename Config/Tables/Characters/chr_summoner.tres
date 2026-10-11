@@ -19,7 +19,6 @@ MaxShield = 0.0
 MoveSpeed = 6.8
 DamageReduction = 0.0
 WeaponEnabled = true
-DefaultWeaponId = "wpn_pistol"
 EnabledAbilityIds = PackedStringArray("SummonAbility", "AreaAttackAbility")
 DisabledAbilityIds = PackedStringArray("MeleeAttackAbility")
 AttackDamage = 32.0
