@@ -26,6 +26,28 @@
   首领没有任何获取途径（2026-10 用户要求「去掉首领的甲」；判据见 [config.md](config.md) 的「首领去甲 + 单位动画实测」）。
 - **死亡**：HP ≤ 0 立即 `IsDead = true` 并从碰撞层移除（逻辑死亡与视觉死亡分离）；死亡单位不再被射线/AOE/索敌选中。
 
+## 护甲的表现层（2026-10 第六轮，**管线一行没改**）
+
+用户需求 §五 #8：「玩家和怪物**有护甲时血量上应该要有其他效果来显示护甲的进度和碎甲效果**，甚至是**模型的额外显示效果**」。
+
+| 要显示的东西 | 读的是哪个既有事实 | 谁在读 |
+|---|---|---|
+| **护甲进度**（血条上多一条甲条） | `Unit.Armor` / `Unit.MaxArmor`（`Unit` 上早就有；`MaxArmor > 0` 才显示，甲打光后留**空条**） | `WorldOverlay.UpdateBar`（敌人）/ `PlayerHud.UpdateArmorBar`（玩家） |
+| **碎甲**（甲条闪白 + 模型上炸一圈） | **`Unit.ArmorBroke` C# 事件** —— 它只在**甲从 >0 掉到 0** 那一次触发（`Unit.ReceiveHit` 的 Armor 段），所以"甲被扣"与"甲碎了"天然分开 | `WorldOverlay.OnUnitArmorBroke` / `PlayerHud.OnPlayerArmorBroke` |
+| **跳字里的「甲 N」** | `DamageResult.ArmorLost`（`Unit.Damaged` 事件带出来的那次结算结果） | `WorldOverlay.OnUnitDamaged` |
+| **模型的额外效果** | 上面那个 `ArmorBroke` → `Scripts/UI/ArmorBreakFx.Spawn()`：水平扩散环 + 一层快速褪去的亮壳，0.42 秒自己回收 | 同两处 |
+
+⚠️ **甲为 0 的单位（首领 / 木桩）不会误播碎甲**：`Unit.ReceiveHit` 的 Armor 段整段跳过，`ArmorBroke` 根本不会触发
+（首领去甲的判据见上面的「护甲是所有单位的通用属性」那一条）。实测：`白板首领实例：生命 315 护甲 0`，战斗中没有任何碎甲特效。
+
+⚠️ **"只掉甲、没掉血"的单位也会出血条**：`GameplayEventBus` 的 `Damaged` 事件里 `Value` 只有 `HealthLost`
+（甲被吸收时那条事件是 0），所以血条登记多了一条判据 —— 见 `WorldOverlay.OnUnitDamaged` 与 `UpdateBar` 里的注释；
+**没有甲的单位（`MaxArmor <= 0`）行为与改动前逐位一致**（只看血量），所以"满血不显示血条"这条老设计对无甲怪没有任何变化。
+
+证据（截图与逐条打印见 [ui.md](ui.md) §16.6）：`docs/screenshots/feel_01_armor_progress.png`（甲条 48/64 = 0.75）、
+`feel_02_armor_break.png`（碎甲环 + 「甲 45」「105」）、探针输出 `甲条 0px / 底 66px（比例 0） 甲条可见=True 血条 52.8px`、
+`碎甲模型特效：ArmorBreakFx 节点 1 个 → 0 个`。
+
 ## 模块
 
 | 模块 | 职责 |

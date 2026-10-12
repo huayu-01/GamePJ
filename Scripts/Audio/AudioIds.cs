@@ -28,4 +28,14 @@ public static class AudioIds
 
 	/// <summary>界面打开（触发点：<c>OverlayScreen.BeginOpen</c>，所有弹窗共用一处）。</summary>
 	public const string UiOpen = "ui_open";
+
+	/// <summary>
+	/// 交互物**失败响应**的音效（触发点：<c>Interactable`Failed</c>/<c>Rejected</c> → 表现层，
+	/// 用户需求 §五 #13「失败增加一个失败响应、抖动效果、音效、玩家被略微击退」）。
+	///
+	/// <para>它**刻意复用**能力卡那一条 <c>ui_card_fail</c>（同一类"操作被拒"的低频嗡声）：
+	/// 不新增素材、不新增音效表行、也不动 <c>Balance.tres</c> 的音频索引 ——
+	/// 想换成专门的一条，就照 docs/audio.md §5 加一个 <c>sfx_*</c> 行，再把这里的值改掉（改一行字符串）。</para>
+	/// </summary>
+	public const string InteractFail = "ui_card_fail";
 }

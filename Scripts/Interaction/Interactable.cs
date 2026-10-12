@@ -33,6 +33,15 @@ public abstract partial class Interactable : Node3D
 	/// <summary>交互被拒时触发（挑战者状态），供表现层做反馈。</summary>
 	public event System.Action? Rejected;
 
+	/// <summary>
+	/// 交互**失败**时触发（范围外 / 已用完 / 子类当场不接受…），供表现层做失败反馈
+	/// （用户需求 §五 #13：失败响应 + 抖动 + 音效 + 玩家略微击退）。
+	///
+	/// <para>⚠️ 它只是**多了一条通知**：判定顺序、消耗与复位逻辑一行都没有改
+	/// （原来 `if (!CanInteract || !OnInteract()) return false;` 的语义完全不变）。</para>
+	/// </summary>
+	public event System.Action? Failed;
+
 	/// <summary>提示文字，例如「强化池」。改它会让头顶名牌跟着刷新（见 OnNameChanged）。</summary>
 	[Export]
 	public string Prompt
@@ -63,14 +72,21 @@ public abstract partial class Interactable : Node3D
 
 	public string CurrentPrompt => Used ? $"{Prompt}（已用）" : $"按 F 使用：{Prompt}";
 
-	/// <summary>外观网格（场景里必须叫 Mesh）。</summary>
-	protected MeshInstance3D? VisualMesh => GetNodeOrNull<MeshInstance3D>(MeshNodeName);
+	/// <summary>
+	/// 外观网格（场景里必须叫 Mesh）。**public** 是为了让"只加表现"的
+	/// <see cref="InteractablePresentation"/> 能拿到它做描边与抖动 —— 判定逻辑不读它。
+	/// </summary>
+	public MeshInstance3D? VisualMesh => GetNodeOrNull<MeshInstance3D>(MeshNodeName);
 
 	public override void _Ready()
 	{
 		HideNameplates(this);
 		Register();
 		ApplyIdleVisual();
+
+		// 表现（#13）：描边 + 按键图标 + 失败响应。**没挂也会自动补一个**，
+		// 所以新增交互物不需要改任何预制体（与 UnitAnimator.Ensure 同一条做法）。
+		InteractablePresentation.Ensure(this);
 	}
 
 	public override void _ExitTree() => All.Remove(this);
@@ -114,6 +130,8 @@ public abstract partial class Interactable : Node3D
 
 		if (!CanInteract || !OnInteract())
 		{
+			// 表现层失败反馈（#13）：音效 + 抖动 + 玩家略微击退。判定结果与返回值不变。
+			Failed?.Invoke();
 			return false;
 		}
 

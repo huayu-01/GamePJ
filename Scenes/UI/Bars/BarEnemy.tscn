@@ -18,6 +18,21 @@ offset_bottom = 9.0
 mouse_filter = 2
 color = Color(0, 0, 0, 0.65)
 
+[node name="ArmorBg" type="ColorRect" parent="Content"]
+offset_top = -7.0
+offset_right = 66.0
+offset_bottom = -2.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="ArmorFill" type="ColorRect" parent="Content"]
+offset_left = 1.0
+offset_top = -6.0
+offset_right = 65.0
+offset_bottom = -3.0
+mouse_filter = 2
+color = Color(0.72, 0.86, 1, 1)
+
 [node name="DelayBar" type="ColorRect" parent="Content"]
 visible = false
 offset_left = 1.0

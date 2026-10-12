@@ -28,4 +28,5 @@ AttackKnockback = 5.0
 JumpHeightMultiplier = 1.4
 JumpSpeedMultiplier = 2.0
 Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("4_skl"), ExtResource("5_skl"), ExtResource("6_skl")]
+ModelPath = "res://Assets/Models/player/mesh_player_body_summoner.glb"
 Note = "角色 3：召唤与控制。"

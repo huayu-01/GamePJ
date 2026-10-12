@@ -55,6 +55,12 @@ public static class UiIcons
 	/// <summary>「角色持有」面板 / HUD 图标条的标题图标。</summary>
 	public static Texture2D? Holdings => Named("ic_ui_build_holdings");
 
+	/// <summary>
+	/// 交互物的**按键图标**（用户需求 §五 #13：「靠近可交互对象时目标有一圈描边和一个按键图标」）。
+	/// 一张键帽 + 「F」；换键位时改这个 SVG（文件名不变）或改这里的映射。
+	/// </summary>
+	public static Texture2D? InteractKey => Named("ic_ui_key_f");
+
 	/// <summary>设置菜单的分类图标（分类 id → 图标，新增 section 时在这里加一行即可）。</summary>
 	public static Texture2D? ForSection(string id) => id switch
 	{
@@ -140,7 +146,7 @@ public static class UiIcons
 	{
 		"ic_ui_reward_enhance", "ic_ui_reward_evolution", "ic_ui_reward_mutation",
 		"ic_ui_node_weapon", "ic_ui_node_resource", "ic_ui_node_heal", "ic_ui_node_special",
-		"ic_ui_node_shop", "ic_ui_node_portal", "ic_ui_build_holdings",
+		"ic_ui_node_shop", "ic_ui_node_portal", "ic_ui_build_holdings", "ic_ui_key_f",
 		"ic_ui_set_graphics", "ic_ui_set_controls", "ic_ui_set_audio",
 		// 能力卡（第三批）：一张卡一个图标，名字写在卡行的 IconName 列上。
 		"ic_ui_card_vitality", "ic_ui_card_damage", "ic_ui_card_speed", "ic_ui_card_crit",

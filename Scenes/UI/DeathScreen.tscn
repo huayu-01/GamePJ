@@ -1,0 +1,69 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/DeathScreen.cs" id="1_death"]
+[ext_resource type="Theme" path="res://Assets/UI/Themes/ui_theme.tres" id="2_theme"]
+
+[node name="DeathScreen" type="CanvasLayer"]
+layer = 30
+script = ExtResource("1_death")
+
+[node name="Root" type="Control" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("2_theme")
+
+[node name="Dim" type="ColorRect" parent="Root"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.88)
+
+[node name="Panel" type="PanelContainer" parent="Root"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 32.0
+offset_right = -48.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root/Panel"]
+alignment = 1
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="Root/Panel/VBox"]
+theme_type_variation = &"UiTitle"
+text = "本局结束"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="Root/Panel/VBox"]
+text = ""
+horizontal_alignment = 1
+
+[node name="Placeholder" type="Label" parent="Root/Panel/VBox"]
+theme_type_variation = &"UiCaption"
+text = "演示动画（占位）—— 正式版这里是场景切换的过渡演出"
+horizontal_alignment = 1
+
+[node name="Countdown" type="ProgressBar" parent="Root/Panel/VBox"]
+custom_minimum_size = Vector2(720, 20)
+size_flags_horizontal = 4
+max_value = 1.0
+step = 0.001
+value = 0.0
+show_percentage = false
+
+[node name="Hint" type="Label" parent="Root/Panel/VBox"]
+theme_type_variation = &"UiCaption"
+text = ""
+horizontal_alignment = 1

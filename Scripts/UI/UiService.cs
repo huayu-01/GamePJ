@@ -194,8 +194,8 @@ public partial class UiService : Node
 		return true;
 	}
 
-	/// <summary>打开通用多选一（商店 / 武器改造）。</summary>
-	public bool OpenChoose(string title, IReadOnlyList<string> options, Action<int> onChosen, bool allowCancel = false)
+	/// <summary>打开通用多选一（商店 / 武器改造 / 基地选角色）。<paramref name="hint"/> 留空用界面默认提示。</summary>
+	public bool OpenChoose(string title, IReadOnlyList<string> options, Action<int> onChosen, bool allowCancel = false, string? hint = null)
 	{
 		if (Screen<ChooseScreen>() is not { IsOpen: false } screen)
 		{
@@ -204,7 +204,7 @@ public partial class UiService : Node
 
 		screen.ScreenLayer = OverlayScreen.UiLayer.Modal;
 		screen.AllowCancel = allowCancel;
-		screen.Open(title, options, onChosen);
+		screen.Open(title, options, onChosen, hint);
 		return true;
 	}
 

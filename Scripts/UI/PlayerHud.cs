@@ -6,6 +6,7 @@ using ActRoguelike.Rewards;
 using ActRoguelike.Run;
 using ActRoguelike.Weapons;
 using ActRoguelike.Core;
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -38,6 +39,7 @@ public partial class PlayerHud : CanvasLayer
 	private Label _health = null!;
 	private Label _ammo = null!;
 	private Label _status = null!;
+	private Control _root = null!;
 	/// <summary>首领血条是否展开为完整形态（验证用只读状态）。</summary>
 	public bool BossBarExpanded { get; private set; }
 
@@ -68,10 +70,13 @@ public partial class PlayerHud : CanvasLayer
 		_status = GetNode<Label>("Root/Status");
 		_build = GetNode<Label>("Root/Build");
 		_buildIcons = GetNode<HBoxContainer>("Root/BuildIcons");
+		_root = GetNode<Control>("Root");
 
 		// 血条只按名字取节点、只当 Control 用 —— 美术可以把填充换成贴图/NinePatch，类型不再被写死。
 		_healthBar = HealthBarWidget.Bind(GetNode<Control>(PlayerBarNode));
 	}
+
+	public override void _ExitTree() => BindPlayer(null);
 
 	private float _hudAccum;
 	private string _lastStatus = string.Empty;
@@ -101,6 +106,7 @@ public partial class PlayerHud : CanvasLayer
 		{
 			_player = PlayerLocator.Player;
 			_weapon = _player != null ? FindWeapon(_player) : null;
+			BindPlayer(_player);
 		}
 
 		if (_player == null)
@@ -136,6 +142,10 @@ public partial class PlayerHud : CanvasLayer
 		_health.Text = $"HP {_player.Health:0}/{_player.MaxHealth:0}{extra}";
 
 		UpdateHealthBar(Mathf.Clamp(_player.Health / Mathf.Max(1f, _player.MaxHealth), 0f, 1f));
+
+		// 护甲进度（用户需求 §五 #8）+ 恢复跳字（§五 #9）：都挂在 HUD 每 0.05 秒的那一次刷新里。
+		UpdateArmorBar(_player);
+		MaybeShowHealNumber(_player);
 
 		if (_weapon == null)
 		{
@@ -362,6 +372,85 @@ public partial class PlayerHud : CanvasLayer
 	/// <summary>玩家血量配色：绿 → 黄 → 红。换配色改这里（或改成按预制体主题色）。</summary>
 	private static Color HealthColor(float ratio)
 		=> ratio > 0.5f ? new Color(0.4f, 0.85f, 0.4f) : ratio > 0.25f ? new Color(1f, 0.8f, 0.3f) : new Color(1f, 0.35f, 0.3f);
+
+	// === 护甲进度 / 碎甲 / 恢复（用户需求 §五 #8 与 #9）===
+
+	/// <summary>当前 HUD 绑定的玩家（<see cref="Unit.ArmorBroke"/> 是 C# 事件，退订要还同一批委托）。</summary>
+	private Unit? _boundPlayer;
+
+	private Action? _armorBroke;
+
+	/// <summary>上一次刷新的生命值（用来发现"恢复"——<c>Unit.Heal</c> 不发任何事件，见 <see cref="DamageNumbers"/>）。</summary>
+	private float _lastHealth;
+
+	/// <summary>玩家引用变化时成对订阅 / 退订（HUD 每 0.05 秒跑一次，这里只在真的换了人才动）。</summary>
+	private void BindPlayer(Unit? player)
+	{
+		if (ReferenceEquals(player, _boundPlayer))
+		{
+			return;
+		}
+
+		if (_boundPlayer != null && IsInstanceValid(_boundPlayer) && _armorBroke != null)
+		{
+			_boundPlayer.ArmorBroke -= _armorBroke;
+		}
+
+		_boundPlayer = player;
+		_armorBroke = null;
+		_lastHealth = player != null && IsInstanceValid(player) ? player.Health : 0f;
+
+		if (player == null || !IsInstanceValid(player))
+		{
+			return;
+		}
+
+		_armorBroke = () => OnPlayerArmorBroke(player);
+		player.ArmorBroke += _armorBroke;
+	}
+
+	/// <summary>护甲进度：有甲上限就显示甲条（甲被打光留空条，玩家能看出"甲没了"而不是"甲条消失了"）。</summary>
+	private void UpdateArmorBar(Unit player)
+		=> _healthBar.SetArmor(
+			player.MaxArmor > 0f ? Mathf.Clamp(player.Armor / player.MaxArmor, 0f, 1f) : 0f,
+			player.MaxArmor > 0f);
+
+	/// <summary>碎甲：甲条闪白 + 玩家模型上炸一圈（<see cref="Unit.ArmorBroke"/> 只在甲从 &gt;0 掉到 0 时触发）。</summary>
+	private void OnPlayerArmorBroke(Unit player)
+	{
+		_healthBar.FlashArmorBreak();
+		ArmorBreakFx.Spawn(this, player.GlobalPosition);
+	}
+
+	/// <summary>
+	/// 恢复跳字（§五 #9 的「恢复」）：全项目只有玩家会回血，而 <c>Unit.Heal</c> 不发事件
+	/// （Combat 本轮只读，不能加钩子），所以在这里用"血量比上次刷新时高了多少"来发现它。
+	/// </summary>
+	private void MaybeShowHealNumber(Unit player)
+	{
+		float gained = player.Health - _lastHealth;
+		_lastHealth = player.Health;
+
+		if (gained <= 0.5f || !ActRoguelike.Config.Balance.Settings.ShowDamageNumbers)
+		{
+			return;
+		}
+
+		if (GetViewport().GetCamera3D() is not { } camera)
+		{
+			return;
+		}
+
+		Vector3 world = player.GlobalPosition + (Vector3.Up * 1.5f);
+		if (camera.IsPositionBehind(world))
+		{
+			return;
+		}
+
+		ActRoguelike.Config.BalanceConfig config = ActRoguelike.Config.Balance.Settings;
+		DamageNumbers.ShowHeal(_root, camera.UnprojectPosition(world), gained,
+			config.DamageNumberFontSize, config.DamageNumberRise, config.DamageNumberLifetime);
+	}
 
 	private void UpdateBossPanel()
 	{

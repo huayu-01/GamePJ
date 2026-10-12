@@ -30,6 +30,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/SettingsScreen.tscn" id="28_settings"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/BuildScreen.tscn" id="29_build"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/AbilityMatrixScreen.tscn" id="30_matrix"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/DeathScreen.tscn" id="31_death"]
 
 [node name="Main" type="Node3D" unique_id=218913370]
 
@@ -54,6 +55,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 [node name="BuildScreen" parent="." instance=ExtResource("29_build")]
 
 [node name="AbilityMatrixScreen" parent="." instance=ExtResource("30_matrix")]
+
+[node name="DeathScreen" parent="." instance=ExtResource("31_death")]
 
 [node name="RunController" type="Node" parent="." unique_id=983817383]
 script = ExtResource("9_run")

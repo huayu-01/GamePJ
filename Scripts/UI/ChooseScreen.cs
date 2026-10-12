@@ -37,7 +37,11 @@ public partial class ChooseScreen : OverlayScreen
 		_template = _cards.GetNode<Button>("CardTemplate");
 	}
 
-	public void Open(string title, IReadOnlyList<string> options, Action<int> onChosen)
+	/// <summary>
+	/// 打开多选一。<paramref name="hint"/> 留空时用默认提示（"选定后立刻触发战斗"）；
+	/// 基地的装备配置台会传自己的文案（那里选完不会立刻开战）。
+	/// </summary>
+	public void Open(string title, IReadOnlyList<string> options, Action<int> onChosen, string? hint = null)
 	{
 		if (IsOpen || options.Count == 0)
 		{
@@ -47,7 +51,7 @@ public partial class ChooseScreen : OverlayScreen
 		_onChosen = onChosen;
 		_count = options.Count;
 		_title.Text = title;
-		_hint.Text = "按数字键或点击选择（选定后立刻触发战斗）";
+		_hint.Text = string.IsNullOrEmpty(hint) ? "按数字键或点击选择（选定后立刻触发战斗）" : hint;
 
 		foreach (Node child in _cards.GetChildren())
 		{

@@ -1,7 +1,9 @@
 using ActRoguelike.Config;
 using ActRoguelike.Core;
+using ActRoguelike.Rewards;
 using ActRoguelike.Run;
 using ActRoguelike.UI;
+using System.Collections.Generic;
 using Godot;
 
 namespace ActRoguelike.Interaction;
@@ -64,12 +66,7 @@ public partial class BaseTerminal : Interactable
 
 			case TerminalKind.Loadout:
 				GameLog.Write("Flow", "基地：打开装备配置台");
-				return ui.OpenLoadout(kind =>
-				{
-					RunSetup.Weapon = kind;
-					RunSetup.HasSelection = true;
-					GameLog.Write("Flow", $"基地：选定武器 {kind}");
-				});
+				return OpenLoadoutFlow(ui);
 
 			case TerminalKind.Help:
 				GameLog.Write("Flow", "基地：打开说明台");
@@ -92,5 +89,46 @@ public partial class BaseTerminal : Interactable
 
 				return true;
 		}
+	}
+
+	/// <summary>
+	/// 装备配置台：**先选角色、再选武器**，两步都在选定的那一刻写进 <see cref="RunSetup"/>，
+	/// 基地里的玩家立刻换成对应的目标（用户需求 §五 #4：方便进关卡前熟悉角色）。
+	///
+	/// <list type="bullet">
+	/// <item>角色文案与关卡里的 Configure 步**同一套来源**（<c>RunController.CharacterCardText</c> +
+	///   角色表的 <c>DescriptionTemplate</c>），不在这里抄第二份数字；</item>
+	/// <item>真正"换人"的是常驻基地的 <c>Scripts/UI/LoadoutPreview.cs</c>（模型 + 数值 + 枪械开关），
+	///   它盯着 <see cref="RunSetup"/> 变化 —— 所以这里只负责"选了什么"。</item>
+	/// </list>
+	/// </summary>
+	private static bool OpenLoadoutFlow(UiService ui)
+	{
+		var options = new List<string>();
+		foreach (PlayerCharacterKind kind in System.Enum.GetValues<PlayerCharacterKind>())
+		{
+			options.Add(RunController.CharacterCardText(kind));
+		}
+
+		return ui.OpenChoose(
+			"选择角色（基地里可以直接看到换人）",
+			options,
+			index =>
+			{
+				RunSetup.Character = (PlayerCharacterKind)index;
+				RunSetup.HasSelection = true;
+				GameLog.Write("Flow", $"基地：选定角色 {RunSetup.Character}（基地玩家已切换）");
+
+				// 第二步：武器。近战重装的角色行说 `WeaponEnabled = false` —— 仍然允许选，
+				// 出征时按角色行把枪收起来（与关卡里 `RunController.ApplyBalance` 的规则一致）。
+				ui.OpenLoadout(kind =>
+				{
+					RunSetup.Weapon = kind;
+					RunSetup.HasSelection = true;
+					GameLog.Write("Flow", $"基地：选定武器 {kind}（基地玩家已切换）");
+				});
+			},
+			allowCancel: true,
+			hint: "按数字键或点击选择角色；选定后接着选武器");
 	}
 }

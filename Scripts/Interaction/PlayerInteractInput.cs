@@ -13,6 +13,13 @@ public partial class PlayerInteractInput : Node
 	/// <summary>当前可交互提示（HUD 读；没有可交互物时为空字符串）。</summary>
 	public static string Prompt { get; private set; } = string.Empty;
 
+	/// <summary>
+	/// 当前**选中的那一个**可交互物（范围内最近的一个；没有就是 null）。
+	/// 供表现层决定"只给目标描边 + 按键图标"（用户需求 §五 #13）——只读，
+	/// 选择逻辑还是下面那个 <see cref="FindNearest"/>，一行没改。
+	/// </summary>
+	public static Interactable? Current { get; private set; }
+
 	private bool _held;
 	private Node3D? _player;
 
@@ -22,11 +29,13 @@ public partial class PlayerInteractInput : Node
 	{
 		if (_player == null)
 		{
+			Current = null;
 			Prompt = string.Empty;
 			return;
 		}
 
 		Interactable? nearest = FindNearest();
+		Current = nearest;
 		Prompt = nearest == null ? string.Empty : nearest.CurrentPrompt;
 
 		// 按住不重复触发。

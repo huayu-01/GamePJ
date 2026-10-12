@@ -25,6 +25,7 @@
 | 图标？ | `Assets/UI/Icons/ic_ui_*.svg`（13 张，**项目自制 SVG**，Godot 原生导入）+ `Scripts/UI/UiIcons.cs`（**唯一映射表**）。构筑元素 / 奖励卡片 / 设置分类 Tab 都用图标；说明只在**选取界面**与**鼠标悬停**（`tooltip_text`）。见 §13。 |
 | 场景里的节点还写名字吗？ | **不写了**：`RewardNode.tscn` 的 `Label3D` 名牌已删，基类 `Interactable` 还会无条件把任何 `Label3D` 子孙藏掉。见 §13。 |
 | 想一次看全部证据？ | [art-integration-log.md](art-integration-log.md) 的 **第五轮** 一节：逐项改动 + 全部截图 + 自测输出。**本轮（第六轮）的证据在 §10~§13 各自的表里**（截图 `ui_10` ~ `ui_17`、探针输出、自测硬指标）。 |
+| **第六轮（表现批）改了什么？** | **§16**：#9 跳字分类（伤害/甲/盾/格挡/无敌/其他伤害/恢复，共 7 类）、#8 护甲进度 + 碎甲（血条上的甲条 + 模型上的破甲环）、#13 交互表现（描边 + 按键图标 + 失败抖动/音效/击退）、#4 基地实时换装（模型 + 数值 + 枪械）。**判定与伤害管线一行没改**（见 §16.4 的逐条核对表）。#3 死亡流程单独一篇：[death-flow.md](death-flow.md)。 |
 
 ---
 
@@ -239,9 +240,11 @@ UiDangerButton/styles/normal = SubResource("StyleBoxTexture_danger_normal")
   - `Fill` / `DelayBar`：贴图从 `res://icon.svg`（**Godot 图标，而且 `stretch_mode=1` 是平铺** ——
     等于把 Godot 机器人脑袋铺满血条，这是个既有观感 bug）换成 **`tex_ui_bar_fill.png`**（Kenney 血条的中间段，24×24，平铺无缝，带顶部高光）。
     代码对 `TextureRect` 走 `Modulate`，所以**绿→黄→红仍然生效**（截图 `ui_08` 里是满血绿条）。
-- **没动**：`BarEnemy.tscn`（敌人脚下血条，本来就是 `ColorRect`，换贴图要动 `Fill` 的 `stretch_mode` 与尺寸换算）、
+- **没动（换贴图这件事）**：`BarEnemy.tscn`（敌人脚下血条，本来就是 `ColorRect`，换贴图要动 `Fill` 的 `stretch_mode` 与尺寸换算）、
   `BarBoss.tscn`（首领血条，`ProgressBar` + 预制体里的 `StyleBoxFlat` 填充色，且它的 `Icon` 现在是 Godot 图标占位）。
   三者结构一致，照 `BarPlayer` 的做法抄即可。
+  **第六轮起 `BarEnemy` / `BarPlayer` 多了一条护甲条**（`ArmorBg` / `ArmorFill`，在血条上方）——见 §16.2；
+  `BarBoss` 仍然没有（首领无甲，见 [combat.md](combat.md)）。
 
 ---
 
@@ -617,4 +620,147 @@ SetKeyHints(
 拍摄台：`Scenes/UI/_AbilityShowcase.tscn`（摆状态 + 四种交互 + 音效/缓动，全程沙箱不留痕）、
 `Scenes/UI/_AbilityInGame.tscn`（在真的 Main.tscn 里验接线与按键）。
 两个都是**留在仓库里**的工具，"以后改能力矩阵再跑一次"即可。
+
+---
+
+## 16. 表现批（第六轮：跳字分类 / 护甲表现 / 交互表现 / 基地换装）
+
+> 本轮做的是需求包 §五的 **#9 伤害数字分类**、**#8 护甲表现**、**#13 交互表现**、**#4 基地实时换装**
+> （**#3 死亡流程单独一篇：[death-flow.md](death-flow.md)**）。
+> 原则：**只加表现，不碰判定**。伤害管线（`Scripts/Combat/Unit.ReceiveHit`）、交互判定（`Interactable`）、
+> 数值计算**一行都没有改**（`RunController` 动了两处，逐行说明见 [death-flow.md](death-flow.md) §3）。
+
+### 16.1 #9 跳字分类（**伤害 / 甲 / 盾 / 格挡 / 无敌 / 其他伤害 / 恢复**）
+
+用户原话：「对敌人的跳数字要有不同的显示效果：**伤害 / 甲 / 恢复 / 其他伤害（电/燃烧）/ 格挡 / 无敌**等」。
+
+**每一类的数据来源都是既有事实**（`Scripts/UI/DamageNumbers.cs` 的类注释里也写了同一张表）：
+
+| 类别 | 数据来源（**不是新造的一套**） | 颜色 / 前缀 |
+|---|---|---|
+| 伤害 | `DamageResult.HealthLost`（`Unit.Damaged` 事件带出来的那次结算结果） | 暖黄 `#ffd959` |
+| 暴击 | 同一处的 `DamageResult.Critical` | 橙 + 字号 ×1.35 + 更粗描边 |
+| 甲 | `DamageResult.ArmorLost` | 冷钢蓝 `#b8dbff`，文字「甲 N」 |
+| 盾 | `DamageResult.ShieldLost` | 蓝 `#8cb8ff`，文字「盾 N」 |
+| 格挡 | `DamageResult.Blocked`（数值 = 甲+盾+血的实际总损失） | 淡蓝白 `#d9e6ff`，文字「格挡 N」 |
+| 无敌 | `GameplayEventKind.Hit` **之后**读 `Unit.IsInvulnerable`（命中事件在无敌判定之前抛出，而这时它还是 true；无敌时**不会**走 `Damaged`） | 灰白 `#c7d1eb`，文字「无敌」（**节流 0.35s**，冲刺无敌帧会被连续命中） |
+| 其他伤害（电/燃烧） | `HitInstance.Attack == null && Attacker == null`（状态效果的每秒伤害与环境直伤就是这样造的实例；普通攻击一定带 `AttackInstance`），认得出 `Burn` 就写「燃 N」 | 洋红 `#ff80d9` |
+| 恢复 | **`Unit.Heal` 不发任何事件**（Combat 只读），所以由已经在轮询血量的 `PlayerHud`（20Hz）发现"血量比上次高"时调用 `DamageNumbers.ShowHeal` | 绿 `#73ff8c`，文字「＋N」 |
+
+**同一次命中最多同时出 3 个数字**（甲 + 盾 + 伤害 / 格挡），靠 `DamageNumbers.SlotOffsetOf()` 上下错开 —— 不会叠在一个像素上。
+"我方打出的"与"敌人打出的"区别从字体颜色挪到了**描边色**（因为字体颜色已经被"类别"占用了）。
+
+⚠️ **为什么必须订阅每个单位的 `Unit.Damaged`**：`GameplayEventBus` 的 `Damaged` 事件里 `Value` **只有 `HealthLost`** ——
+「甲 / 盾 / 格挡 / 暴击 / 这次伤害是不是燃烧」全都在 `DamageResult` 上。订阅是在**第一次命中**时建立的
+（`GameplayEventKind.Hit` 先于结算抛出，所以连第一次命中的甲数字都不会漏），死亡 / 退树时成对退订。
+
+### 16.2 #8 护甲进度与碎甲（血条 + 模型）
+
+- **血条上多一条甲条**：`Scenes/UI/Bars/BarEnemy.tscn`（`Content/ArmorBg` + `Content/ArmorFill`）与
+  `Scenes/UI/Bars/BarPlayer.tscn`（`ArmorBg` + `ArmorFill`，在血条**上方**）。
+  节点名是**约定**（`HealthBarWidget` 按名字递归找）：预制体里没有这两条就静默跳过（`BarBoss` 就没有）。
+- **甲条可见规则**：`MaxArmor > 0` 才显示；甲打光后**留空条**（玩家能看出"甲没了"而不是"甲条消失了"）。
+- **碎甲**：`Unit.ArmorBroke`（只在甲从 >0 掉到 0 时触发）→ 甲条闪白 + `ArmorBreakFx`（水平环 + 亮壳，0.42s 自回收）。
+- ⚠️ **"只掉甲、没掉血"也会出血条**：`GameplayEventBus.Damaged` 的 `Value` 是 `HealthLost`（甲吸收时为 0），
+  所以登记血条多了一条"甲/盾也掉了"的判据；**无甲单位行为与改动前逐位一致**。
+- 细节与信号来源见 [combat.md](combat.md) 的「护甲的表现层」。
+
+### 16.3 #13 交互表现（描边 + 按键图标 + 失败响应）
+
+- **组件**：`Scripts/Interaction/InteractablePresentation.cs`（约定节点名 `Presentation`）。
+  与 `UnitAnimator.Ensure` 同一条做法：`Interactable._Ready()` 里 `InteractablePresentation.Ensure(this)` ——
+  **任何交互物（现有的/新写的）不需要改预制体就自动有表现**。
+- **描边**：给外观网格挂一个"反向外壳"子网格（同一份 `Mesh` + 只画背面的发光材质 + `Grow`），
+  **不需要后处理、不需要改预制体**；只在"目标"身上可见。
+- **按键图标**：`Sprite3D` + `Assets/UI/Icons/ic_ui_key_f.svg`（手写键帽 + 「F」，项目自制），
+  始终朝向镜头、`no_depth_test`、浮在网格顶部（高度按 `Mesh` 的 AABB 算）并轻轻上下浮动。
+- **只看最近的那一个**：目标由 `PlayerInteractInput.Current` 决定（玩家端每帧挑的"范围内最近的可交互物"，
+  只读属性）。两个节点挨在一起时不会同时高亮。
+- **失败响应**：`Interactable.Failed` / `Interactable.Rejected` → `AudioManager.Play(AudioIds.InteractFail)`
+  + 抖外观网格（**不是根节点**：根节点的 scale 被出现/消失补间占用）+ 描边闪红 + 玩家被略微击退
+  （`CharacterMovement.AddImpulse`，默认冲量 4.5 → 实测位移 ≈ **0.64 米**，方向背离交互物）。
+- **音效复用**：`AudioIds.InteractFail = "ui_card_fail"`（能力卡那条"操作被拒"的低频嗡）——
+  **不新增素材、不新增音效表行、不动 `Balance.tres`**；想换成专门的一条，照 [audio.md](audio.md) §5 加行再改这个字符串。
+
+### 16.4 怎么保证"没动交互判定"（可逐条核对）
+
+| 判定/流程 | 这轮有没有碰 |
+|---|---|
+| `Interactable._PhysicsProcess` 的范围检测（10Hz、`PlayerInteractRange`） | **一行没改** |
+| `CanInteract`（`!Used && !Vanished && PlayerInRange && Enabled`） | **一行没改** |
+| `Interact()` 的挑战者拒绝分支（`StageController.ChallengerActive`） | 判定一行没改，只在**返回 false 之前**多抛了一条 `Failed` 通知 |
+| `Interact()` 的失败分支 `if (!CanInteract \|\| !OnInteract())` | 判定与顺序一行没改，只在 `return false` 前多抛了一条 `Failed` 通知 |
+| 消耗（`SingleUse` → `Used = true` → `OnUsed()`） | **一行没改** |
+| `ResetNode()` / `Appear()` / `Disappear()` / `FinishDisappear` | **一行没改** |
+| 新增的东西 | ① `public event Action? Failed`；② `Failed?.Invoke()` 一行；③ `_Ready()` 里 `Ensure` 一行；④ `VisualMesh` 从 `protected` 放宽到 `public`（表现层要拿它做描边与抖动）；⑤ `PlayerInteractInput.Current` 只读属性（选择逻辑没改） |
+
+机器可判定证据（拍摄台打印）：`交互返回=False`（场景里没有 StageController）→ `失败计数=1`
++ `失败音效：last=ui_card_fail 累计=1 缺失 id=[]` + `玩家被击退：0.64 米` —— 而 `当前目标/高亮/描边可见/图标可见` 全程不乱。
+
+### 16.5 #4 基地里选装备/角色 → 玩家实时切换
+
+用户原话：「在基地时选取了什么装备/角色时，**玩家就切换到相应的目标**，方便进关卡前熟悉角色」。
+
+| 环节 | 做法 |
+|---|---|
+| 选取界面 | 装备配置台（`BaseTerminal.Kind = Loadout`）→ **先选角色**（`ChooseScreen`，基地场景新挂了它）→ **再选武器**（`StartScreen`）。角色卡文案复用 `RunController.CharacterCardText`（与关卡 Configure 步**同一套来源**） |
+| 切换本体 | `Scripts/UI/LoadoutPreview.cs`（挂在 `Scenes/Levels/Base.tscn` 的玩家下）：盯 `RunSetup.Character/Weapon` 变化 → 换模型 / 套数值 / 收放枪械 |
+| 模型从哪来 | 角色表 `Config/Tables/Characters/chr_*.tres` 的 `ModelPath`（**新增两行**：重装 → `Assets/Models/player/mesh_player_body_heavy.glb`，召唤 → `..._summoner.glb`）；留空 = 场景自带那个（枪手就是这一档） |
+| 为什么不调 `UnitConfig.ApplyTo` | 它里面的换模型是"`Free()` 旧模型 + `AddChild` 新实例"，而 `UnitAnimator` 已经绑在旧的 `Model/AnimationPlayer` 上 → 运行期会留下指向已释放节点的引用（每帧报错）。这里改成**每个角色各留一份预览模型、靠 `Visible` 切换**，不释放任何既有节点 |
+| 数值 | `Unit.ApplyBaseStats`（生命/护甲/护盾/移速）+ `DamageReduction`，与关卡里 `RunController.ApplyBalance` 同一个入口；**不叠加局外强化**（那是出征才算的） |
+| 枪械 | 角色行 `WeaponEnabled = false`（近战重装）→ 收起基地玩家的 `WeaponMount/Pistol`；武器表那一行也套到基地玩家的 `Weapon` 组件上 |
+| ⚠️ 一个真实时序坑 | `LoadoutPreview._Ready` 可能**早于配置表建好**（实测 `Balance` 的索引晚约 1 秒就绪）→ 那一次读不到角色行，所以组件记下 `_rowMissing` 并在下一帧自动补一次（否则基地玩家永远是场景默认数值 120/0） |
+
+⚠️ 模型复用说明（**照实记录**）：`mesh_player_body_heavy.glb` = Kenney Mini Characters 的 `character-male-e`（与守卫同一个模型）、
+`..._summoner.glb` = `character-female-d`（原包里唯一没被任何敌人用掉的那个）。素材来自**项目已经用着的那一包**（CC0），
+要换专用模型时**只改角色表的 `ModelPath` 一列**，代码一行不用动。
+
+### 16.6 验证：三个拍摄台 + 逐条探针输出
+
+> 与 `_UiShowcase.tscn` 同一套思路（命令行直跑 + 截图 + 打印），**不依赖 MCP**。
+> 拍摄台本身留在仓库里：`Scripts/Testing/_FeelProbe.cs`（`Mode = arena / base / death`）+ 三个场景。
+
+```powershell
+$godot = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64.exe'
+& $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_FeelShowcase.tscn'   # #8 #9 #13
+& $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_FeelBase.tscn'       # #4（真的 Base.tscn + 真的交互台）
+& $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_FeelDeath.tscn'      # #3（继承自 Main.tscn，见 death-flow.md）
+```
+
+实测输出（关键几行，`run_20261012_1946xx.log`，三个场景 stderr 里 **0 条 ERROR**）：
+
+```
+[Feel] 命中「普通命中（甲吸收）」：原始 20 → 最终 15（甲 15 / 盾 0 / 血 0 格挡=False 无敌=False）
+[Feel] 跳字[甲吸收] 1 个：「甲 15」@b8dbff
+[Feel] 敌人血条[甲吸收]：甲条 48px / 底 66px（比例 0.73） 甲条可见=True 血条 64px     ← 血一点没掉也有条
+[Feel] 跳字[碎甲] 2 个：「甲 45」@b8dbff 「105」@ffd959
+[Feel] 碎甲模型特效：ArmorBreakFx 节点 1 个（0.42 秒后自己回收） → 0 个
+[Feel] 敌人血条[碎甲（下一帧更新后）]：甲条 0px（比例 0） 甲条可见=True 血条 52.8px
+[Feel] 跳字[格挡] 3 个：「无敌」@c7d1eb 「甲 7」@b8dbff 「格挡 7」@d9e6ff
+[Feel] 跳字[燃烧] 1 个：「燃 6」@ff80d9 ／ [Feel] 跳字[直伤（有攻击者）] 2 个：「燃 6」「30」@ffd959
+[Feel] 恢复跳字（HUD 层）：1 个：「＋35」@73ff8c
+[Feel] 交互表现[靠近]：当前目标=RewardNode 同一个=True 高亮=True 描边可见=True 按键图标有=True 图标可见=True 失败计数=0
+[Feel] 交互表现[失败瞬间]：… 失败计数=1  ／ 失败音效：last=ui_card_fail 累计=1 缺失 id=[]
+[Feel] 玩家被击退：0.64 米（方向背离交互物，冲量 4.5）  ／ 图标表：22 张可加载（含按键图标 ic_ui_key_f）
+[Feel] 装备配置台：找到=True 玩家在范围内=True 交互接受=True ／ 选角色界面打开=True 按键提示=2 条
+[Feel] 按 2 选角色后：RunSetup.Character=Heavy 武器界面打开=True
+[Feel] 基地预览[重装 + 狙击枪]：模型=[.../mesh_player_body_heavy.glb] 预览实例=1 枪可见=False 玩家生命=380 甲=140
+[Feel] 基地预览[召唤 + 手枪]：模型=[.../mesh_player_body_summoner.glb] 预览实例=2 枪可见=True 玩家生命=210 甲=60
+```
+
+| 截图 | 内容 |
+|---|---|
+| `feel_01_armor_progress.png` | 甲条（血条上方那条冷钢蓝）+ 「甲 15」（近景） |
+| `feel_02_armor_break.png` | 碎甲：模型上一圈扩散环 + 「甲 45」「105」 |
+| `feel_03b_invuln_block.png` | 「无敌」（木桩）+「格挡 7」（守卫） |
+| `feel_03_number_kinds.png` | 「燃 6」（其他伤害）+「60」（伤害）+「＋35」（恢复） |
+| `feel_04b_outline_off.png` / `feel_04_interact_highlight.png` | 同一机位的**对照**：关掉 / 打开描边 + 按键图标 |
+| `feel_05_interact_fail.png` | 失败响应：描边闪红 + 护盾式的抖动（同一瞬间还播了 `ui_card_fail`） |
+| `feel_06_base_choose_character.png` | 基地配置台第一步：选角色（全屏卡片） |
+| `feel_07_base_choose_weapon.png` | 第二步：选武器 |
+| `feel_08_base_heavy_preview.png` | 选完「近战重装 + 狙击枪」：基地玩家**换成重装模型、枪收起**、生命 380 / 甲 140 |
+| `feel_09_base_summoner_preview.png` | 再选「召唤控制 + 手枪」：模型再换、枪回来、生命 210 / 甲 60 |
+| `feel_10`~`feel_13` | 死亡流程四张（见 [death-flow.md](death-flow.md) §4） |
+
+
 

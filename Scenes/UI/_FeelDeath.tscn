@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Main.tscn" id="1_main"]
+[ext_resource type="Script" path="res://Scripts/Testing/_FeelProbe.cs" id="2_probe"]
+
+[node name="Main" instance=ExtResource("1_main")]
+
+[node name="FeelProbe" type="Node3D" parent="."]
+script = ExtResource("2_probe")
+Mode = "death"

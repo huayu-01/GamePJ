@@ -355,10 +355,23 @@ public partial class RunController : Node
 		string body = victory
 			? $"通关！三关全部清理，用时 {seconds:0} 秒\n{_build.Describe()}"
 			: $"你在 {_stage?.Definition?.DisplayName ?? "关卡"} 阵亡\n用时 {seconds:0} 秒\n{_build.Describe()}";
-		_screen?.OpenMessage(victory ? "胜利" : "本局结束", body, "按 Enter 或点击重新开始");
 		int earned = RunSettlement.ShardsFor(_stageIndex, _stage?.ChallengesUsed ?? 0, victory);
 		MetaProgress.AddShards(earned);
 		body += $"\n获得碎片 +{earned}（累计 {MetaProgress.Shards}）";
+
+		// 阵亡 → **死亡流程**（用户需求 §五 #3）：死亡动画 → 演示过渡面板（占位）→ 回基地。
+		// 这一段**替代**原来的"立刻弹结算消息、按 Enter 回基地"，所以要在 OpenMessage 之前返回；
+		// 场景里没有 DeathScreen 时（老场景 / 单独跑某个测试场景）自动落回原来的消息路径，不会卡住。
+		// ⚠️ 顺带修掉一个既有 bug：原来连着调了两次 `OpenMessage`（第二次想补上碎片那行），
+		// 而 `UiService.OpenMessage` 要求 `IsOpen == false` —— 第二次必然被拒，所以"获得碎片 +N"从来没显示过。
+		if (!victory && GetTree().CurrentScene?.GetNodeOrNull<DeathScreen>("DeathScreen") is { } death)
+		{
+			// 回基地由 DeathScreen 自己切场景，不再需要"按 Enter 重开"那条路。
+			_restartOnDismiss = false;
+			death.BeginDeath("本局结束", body);
+			return;
+		}
+
 		_screen?.OpenMessage(victory ? "胜利" : "本局结束", body, "按 Enter 或点击重新开始");
 	}
 
@@ -430,11 +443,25 @@ public partial class RunController : Node
 		=> ConfigRows.BySlot<CharacterConfig>((int)kind + 1);
 
 	/// <summary>
+	/// 角色的默认标题（关卡里的 Configure 步与基地的配置台共用这一份措辞；
+	/// 基地那边不传标题时就走这里，所以两处不会漂移）。
+	/// </summary>
+	public static string DefaultCharacterTitle(PlayerCharacterKind kind) => kind switch
+	{
+		PlayerCharacterKind.Heavy => "近战重装 — 高血高甲，左键近战重击",
+		PlayerCharacterKind.Summoner => "召唤控制 — G 键召唤无人机（最多 3 架）",
+		_ => "远程枪手 — 三把枪、灵活走位",
+	};
+
+	/// <summary>
 	/// 角色选择界面的卡片文案。数值来自角色表（`DescriptionTemplate` 支持 <c>{字段名}</c> 占位符）；
 	/// 读不到角色行时退回原来的硬编码写法（用 BalanceConfig 上的旧字段），保证界面不会空掉。
+	///
+	/// <para>**public**：基地的装备配置台（<c>BaseTerminal</c>）复用它，角色卡的文案就只有这一处来源。</para>
 	/// </summary>
-	private static string CharacterCardText(PlayerCharacterKind kind, string title)
+	public static string CharacterCardText(PlayerCharacterKind kind, string? title = null)
 	{
+		title ??= DefaultCharacterTitle(kind);
 		CharacterConfig? row = CharacterRow(kind);
 		if (row != null)
 		{
