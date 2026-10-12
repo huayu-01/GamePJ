@@ -80,6 +80,18 @@ public partial class SelfTest : Node
 		var run = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController");
 		var stage = GetTree().Root.GetNodeOrNull<StageController>("Main/Stage");
 
+		// [项目补丁] 玩家在自测途中被打死会走死亡流程（第四批的 DeathScreen）回归基地，
+		// 而自测状态机没有死亡分支 → 后续阶段永远等不到 → 进程永不退出、日志混在一起。
+		// 改前的 run_20261012_194229.log / 194407.log 就是这个现象（死亡分支=3、完成=0）。
+		// 这里检测到玩家阵亡就立刻收尾退出，让后续批次的自测不会卡住。
+		if (PlayerLocator.Player is { IsDead: true })
+		{
+			GameLog.Write("SelfTest", "⚠️ 自测中断：玩家在途中阵亡（已走死亡流程回基地），剩余阶段跳过并退出。");
+			GetTree().Paused = false;
+			SetProcess(false);
+			GetTree().Quit();
+			return;
+		}
 		switch (_phase)
 		{
 			case 0 when _timer > 1.0f:
