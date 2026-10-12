@@ -322,6 +322,13 @@
 
 **另外**：`UiService` 是按**类型**找界面（`Scripts/UI/UiService.cs:44-58` 递归 `FindInTree<T>`），所以**界面节点名改了不影响 `UiService`**——但上表里的路径会炸。界面必须仍然是 `OverlayScreen` 的子类，否则 `UiService` 找不到（`OpenUpgrades/OpenLoadout/OpenHelp/OpenRewards/OpenChoose/OpenMessage` 全部返回 false，静默失败）。
 
+> **2026-10 第八轮新增一组**：`Aura`、`Aura/Ring`、`Aura/Rim`、`Aura/Glow`
+> —— `RewardNode.cs` 的 `AuraNodeName` / `AuraRingName` / `AuraRimName` / `AuraGlowName`
+> （按**价值档位**给脚下光圈上色；同时是 `RewardNode.tscn` 里 `Aura:scale` 与 `Aura/*:transparency`
+> 两条动画轨道的路径）。改名 → 光圈不再按价值换色、`dead` 时也不会变暗，**全部静默**。
+> 上表"15 组共 26 个"是那次 `grep` 的**当时快照**，加上这一组是 **16 组 30 个**（细节见
+> [art-onboarding.md](art-onboarding.md) §三.1.3）。
+
 ### 8.4 UI 换成贴图的类型陷阱
 
 - `Root/PlayerBar/{Fill,DelayBar}` **不再强转类型**：代码按名字取节点、只当 `Control` 用（`HealthBarWidget`，`PlayerHud.cs` / `WorldOverlay.cs`）→ 填充条可以自由换成 `TextureRect` / `NinePatchRect` / `ColorRect`。⚠️ 节点名不能改。

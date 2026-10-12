@@ -1,0 +1,8 @@
+[gd_resource type="TorusMesh" format=3]
+
+[resource]
+resource_name = "mesh_node_aura_ring"
+inner_radius = 0.45
+outer_radius = 0.85
+rings = 48
+ring_segments = 4

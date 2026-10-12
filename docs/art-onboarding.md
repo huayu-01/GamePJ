@@ -42,17 +42,23 @@ Assets/
 
 ### 1. 换某个交互物的模型（奖励节点 / Boss 门）
 
-> ✅ **2026-10 第七轮已按本节换过一次**（奖励节点 = `LowPolyGemsPack2` 的 `gem1`），实测数据与证据见文末
-> 「第七轮」更新记录。**下面这一节就是那次换完之后的现状**。
+> ✅ **2026-10 第七轮换过一次**（奖励节点 = `LowPolyGemsPack2` 的 `gem1`），
+> ✅ **2026-10 第八轮改成"9 种类型 9 颗不同形状"**（用户纠正：「我的期望是使用**不同形状**的模型
+> 而不是**一个模型去换色**」）+ 加了**周身光圈**（光圈颜色 = 价值程度）。
+> 实测数据与证据见文末「第七轮 / 第八轮」更新记录，逐颗宝石的量见 §三.1.1.1。
 
 现在的节点结构（`Scenes/Interactables/RewardNode.tscn`）：
 
 ```
 RewardNode（Node3D，挂 RewardNode.cs）
   ├─ Float（Node3D）              ← 上下浮动 + 自转做在它身上
-  │    └─ Mesh（MeshInstance3D）  ← mesh = Assets/Models/nodes/mesh_node_gem.tres；scale 1.35；position.y 0.55
+  │    └─ Mesh（MeshInstance3D）  ← mesh = Assets/Models/nodes/mesh_node_<kind>.tres（**按类型换形状**）；scale 1.35；position.y 0.55
   ├─ Animation（AnimationPlayer） ← idle / active / dead 三条状态动画（见 §三.1.2）
-  └─ Presentation（Node3D）       ← InteractablePresentation（描边 + 按键图标），IconGap = 1.15
+  ├─ Presentation（Node3D）       ← InteractablePresentation（描边 + 按键图标），IconGap = 1.15
+  └─ Aura（Node3D）               ← **周身光圈**（见 §三.1.3），三个环：
+       ├─ Ring（MeshInstance3D）   ← 色带：光圈颜色 = 价值档位色，Unshaded + HDR 亮度，会吃到 glow
+       ├─ Rim（MeshInstance3D）    ← 外圈暗描边（"亮色 + 黑描边"里的黑，负责在近白地板上画出边界）
+       └─ Glow（MeshInstance3D）   ← 外发光（同色半透明一大圈）
 ```
 
 **三条铁律**：
@@ -65,9 +71,13 @@ RewardNode（Node3D，挂 RewardNode.cs）
 2. `Mesh` 必须是 **MeshInstance3D**。把整个 FBX/GLB 作为**场景实例**挂在下面（根是 `Node3D`）会 `VisualMesh == null`
    → 静默失去上色与淡出。要换模型就换它的 `mesh`（一个独立的 `mesh_*.tres`）。
 3. **材质挂在网格上，不挂在场景上**（§二）：网格的 `.tres` 里写 `material`，场景只引用网格。
+   ⚠️ **例外：光圈**（`Aura/*`）的材质**必须按实例覆盖**（`SetSurfaceOverrideMaterial`），
+   因为它的颜色是**每档不同**的配置数据（§三.1.3）；那三份材质由代码按颜色缓存，**共用的资源从不被修改**。
 4. **交互半径、`Prompt`、`SingleUse` 是玩法参数，不是美术参数**（红线见 §六）。
 
 #### 1.1 奖励节点新模型：**实测**出来的轴心 / 朝向 / 缩放（不是猜的）
+
+> ⚠️ 下表是 **第七轮量 `gem1`** 的那一份（12 颗**逐颗**的实测量在 **§三.1.1.1**，别只看这一张）。
 
 | 量什么 | 怎么量 | 实测结果 |
 |---|---|---|
@@ -78,17 +88,15 @@ RewardNode（Node3D，挂 RewardNode.cs）
 | **法线** | 顶点相对形心的方向 · 法线，取平均 | `+0.6759` → **法线本来就是朝外的**（不需要取负）。这两件事**独立**，必须分别量 |
 | **源文件里的摆放偏移** | 看 FBX 根下的子节点 `transform` | 每个宝石的 `MeshInstance3D` 带着 Blender 场景里的 X 偏移（`gem1` = +5、`gem2` = +7 … 每 2 米一个）。**只有把网格抽成独立资源才会消失**（抽出来之后网格是居中的） |
 
-**怎么抽出 `mesh_node_gem.tres`**（工具已入库，可复用换另一颗宝石）：
+**怎么抽出 `mesh_node_<kind>.tres`**（工具已入库，**改一个 `MAP` 就能换一组宝石 / 换映射**）：
 
 ```powershell
-# 1) 只把要用的那一颗 .fbx 拷进 Assets/Models/nodes/（连同它引用的两张 png，保持相对路径）
+# 1) 把要用的 .fbx 拷进 Assets/Models/nodes/（保持包内原名 gemN.fbx；它引用的两张 png 本项目不读）
 # 2) 让 Godot 生成 .import：
 & '<Godot 引擎路径>\Godot_v4.7.2-stable_mono_win64.exe' --headless --path '<项目>' --import
-# 3) 跑抽取工具（会打印 V / 法线外向度，并按需修正绕序与法线）：
+# 3) 跑抽取工具（**逐颗打印 V / 法线外向度 / 轴心 / 尺寸**，并按需修正绕序与法线；顺带出两张 12 颗对比图）：
 & '<Godot 引擎路径>\Godot_v4.7.2-stable_mono_win64.exe' --path '<项目>' res://Scenes/Interactables/_ExtractGem.tscn
-# 4) 手工给生成的 .tres 补一行材质（工具只导出几何）：
-#    [ext_resource type="Material" path="res://Assets/Materials/mat_node_reward.tres" id="1_mat"]
-#    并把 "material": ExtResource("1_mat") 放进 `_surfaces` 的那个字典里
+# 4) 材质**不用手工补**：工具会把 `mat_node_<kind>.tres` 写进网格的 `_surfaces` 里（`surface_set_material`）
 ```
 
 > ⚠️ **不要**在 `.tscn` 里直接引用 `xxx.fbx::ArrayMesh_1p084` 这种**子资源路径**：
@@ -97,7 +105,70 @@ RewardNode（Node3D，挂 RewardNode.cs）
 >
 > ⚠️ `ArrayMesh` **没有** `material` 属性（那是 `PrimitiveMesh` 才有的）——写 `material = ExtResource(...)`
 > 会被当成无效属性忽略掉、网格变默认材质。要写进 `_surfaces` 字典里的 `"material"` 键
-> （`surface_set_material` 的序列化形式），否则**在类型材质缺失时**那个"退回默认蓝"的兜底是空的。
+> （`surface_set_material` 的序列化形式）。工具用的是 `array_mesh.surface_set_material(0, mat)`，等价且不会写错。
+
+#### 1.1.1 12 颗宝石的**逐颗实测量** + 9 种类型用哪一颗（第八轮）
+
+素材：`…\素材\模型\LowPolyGemsPack2.zip`（0.4 MB，**12 颗宝石** `Meshes/gem1..12.fbx` + 2 张贴图 + blend）。
+进仓库的是 **12 个 `.fbx`（约 230 KB，包内原名 `gemN.fbx`）+ 已抽出的 9 个 `mesh_node_<kind>.tres`**；
+**zip / blend / Unity shadergraph 一律不入库**。两张 png（`PalleteTex.png` / `ReflectionTex.png`）虽然也拷了，
+**但游戏里不读**：FBX 里写的是作者机器的绝对路径（`D:\Librarys\Desktop\Low Poly gems pack 2\…`），
+导入时解析不到，而且按类型上色的材质会整体覆盖表面材质。
+
+**逐颗实测量**（`_ExtractGem.tscn` 一次跑完打印的，单位 = 米；`V` 是散度定理算的有向体积）：
+
+| 宝石 | 顶点/三角 | `V`（源 → 修正后） | 法线外向度 | 轴心 `min.y` | 尺寸 x×y×z | 形状（看 §四 的两张对比图） |
+|---|---|---|---|---|---|---|
+| `gem1` | 40 / 18 | −0.427193 → **+0.427193** | +0.6759 | 0.0000 | 1.20 × 1.00 × 1.20 | 经典多面钻石（宽冠 + 收窄亭部），**12 颗里最好认** |
+| `gem2` | 260 / 276 | −0.139036 → **+0.139036** | +0.0064 | 0.0000 | 1.00 × 1.00 × 0.20 | 圆角方块（**薄片**，倒角最细） |
+| `gem3` | 112 / 96 | −0.210958 → **+0.210958** | +0.5266 | −0.0000 | 1.00 × 1.00 × 0.50 | 圆角方块（比 gem2 厚） |
+| `gem4` | 72 / 24 | −0.111111 → **+0.111111** | +0.6655 | −0.0000 | 1.00 × 1.00 × 1.00 | **四角星** |
+| `gem5` | 72 / 44 | −0.376543 → **+0.376543** | +0.8031 | 0.0000 | 1.00 × 1.00 × 1.00 | **厚实盾形**（下尖），**体积最大**、法线最外 |
+| `gem6` | 64 / 32 | −0.089658 → **+0.089658** | +0.5742 | 0.0000 | 1.00 × 1.00 × 0.25 | 倒五边形（本垒板状，形心偏高） |
+| `gem7` | 84 / 40 | −0.051552 → **+0.051552** | +0.6253 | 0.0000 | 0.50 × 1.00 × 0.25 | 细长六棱晶（**最窄**） |
+| `gem8` | 82 / 42 | −0.067130 → **+0.067130** | +0.6498 | **+0.0097** | 0.75 × 1.00 × 0.25 | 水滴 / 长五边形（形心 0.338，**唯一底部离原点 1 cm 的**） |
+| `gem9` | 96 / 52 | −0.159175 → **+0.159175** | +0.5033 | 0.0000 | 1.00 × 1.00 × 0.25 | 八边形圆块 |
+| `gem10` | 36 / 12 | −0.125000 → **+0.125000** | +0.5660 | 0.0000 | 1.00 × 1.00 × 0.50 | 六边形晶块（面数最少） |
+| `gem11` | 24 / 8 | −0.166667 → **+0.166667** | +0.5090 | 0.0000 | 1.00 × 1.00 × 0.50 | 正方形板块 |
+| `gem12` | 64 / 32 | −0.054687 → **+0.054687** | +0.6250 | −0.0000 | 0.50 × 1.00 × 0.25 | 细长尖晶（与 gem7 同族） |
+
+**从这张表能读出来的四件事**（第八轮实测，上一轮只有 1 颗的样本时看不出来）：
+
+1. **12 颗的绕序全都是反的**（`V` 全为负）→ **逐颗都要修**，不能因为修过 `gem1` 就以为都一样。
+   修完 `V` 全部为正（`|V|` 与修正前相同，只是符号）。
+2. **12 颗的法线本来就都对**（外向度全为正，最小 `gem2` 的 +0.0064 —— 薄片的平面法线几乎垂直于"相对形心方向"，
+   所以这个指标接近 0 是**正常**的，不是"要取负"的信号）。→ **绕序与法线是两件独立的事，分别量、分别修**。
+3. **12 颗的高度都正好 1.00 m**（宽度 0.50~1.20、厚度 0.20~1.20）→ **等比 `scale = 1.35` 让所有类型一样高（1.35 m）**，
+   不用逐个调；`min.y = 0.0000`（gem8 差 1 cm）→ 轴心都在脚底，`Mesh.position.y = 0.55` 就是"离地 0.55 m"。
+4. ⚠️ **12 颗里有 8 颗是"薄片"**（厚度 0.20~0.50）：它们的辨识度靠**正面剪影**，转到侧面会变成一条窄边。
+   所以本轮的做法是"**形状（认类型）+ 材质色（认类型）+ 光圈色（认价值）**"三重编码，
+   而不是只靠形状 —— 见 §三.1.3。
+
+**9 种类型用哪一颗**（`_extract_gem.gd` 的 `MAP`；挑的判据 = **形状辨识度**，高价值节点优先给最好认的形状）：
+
+| `RewardNodeKind` | 宝石 | 形状（远处一眼认出的依据） | 材质色（`mat_node_<kind>`） | 价值标签 → 光圈色 |
+|---|---|---|---|---|
+| `Weapon`(0) | `gem7` | 细长六棱晶（刀锋感） | 橙 (0.90, 0.50, 0.05) | ⚠️ 节点表里**没有这一行**（A3 已并入进化池）→ 光圈中性白 |
+| `Enhancement`(1) | `gem5` | 厚实盾形（**立体**，体积最大） | 青蓝 (0.35, 0.80, 1.00) | `tag_mid` → **青蓝** |
+| `Evolution`(2) | `gem1` | **经典多面钻石**（最好认） | 紫 (0.62, 0.34, 0.98) | `tag_high` → **金** |
+| `Mutation`(3) | `gem4` | **四角星**（异变爆发） | 品红 (0.95, 0.18, 0.72) | `tag_high` → **金** |
+| `Resource`(4) | `gem10` | 六边形晶块（矿） | 金黄 (0.98, 0.87, 0.28) | `tag_low` → **绿** |
+| `Heal`(5) | `gem8` | **水滴 / 长五边形**（药水） | 绿 (0.30, 0.90, 0.45) | `tag_low` → **绿** |
+| `Special`(6) | `gem6` | 倒五边形（本垒板状，形状少见） | 近白 (0.95, 0.96, 1.00) | `tag_low` → **绿** |
+| `Shop`(7) | `gem9` | 八边形圆块（币） | 红 (0.95, 0.25, 0.35) | `tag_mid` → **青蓝** |
+| `Portal`(8) | `gem11` | 正方形板块（门 / 传送口） | 青绿 (0.10, 1.00, 0.75) | `tag_low` → **绿** |
+
+**留下备用的 3 颗**（加新节点类型时从这里挑，别再从头选 12 颗）：
+
+| 宝石 | 形状 | 留给什么用途 |
+|---|---|---|
+| `gem2` | 圆角方块，**最薄**（0.20 深），倒角最细（260 顶点） | 再加一个"**块状资源**"类节点（宝箱 / 材料堆）时的首选 —— 它有 12 颗里最精细的倒角 |
+| `gem3` | 圆角方块，厚一档（0.50 深） | 同上，但要**比 gem2 更厚实**的那种（例如"重铸台"） |
+| `gem12` | 细长尖晶（0.50 宽） | 再加一个"**尖晶 / 碎片**"类节点（例如"诅咒 / 祭坛"）—— 与 `gem7`（Weapon）同族、比它更细 |
+
+> 加新类型时**不用改代码**：放一份 `Assets/Materials/mat_node_<新枚举名小写>.tres` +
+> 往 `_extract_gem.gd` 的 `MAP` 里加一行 + 重跑工具生成 `mesh_node_<新枚举名小写>.tres` 即可
+> （`RewardNode.BuildShapes/BuildPalette` 都是按枚举名自动映射的）。
 
 #### 1.2 节点的三种状态动画：**待机 / 激活 / 失效**
 
@@ -107,20 +178,55 @@ RewardNode（Node3D，挂 RewardNode.cs）
 
 | 动画名（`Animation` 里的 AnimationPlayer） | 对应**已有**状态 | 表现 |
 |---|---|---|
-| `idle` **待机** | 可用、玩家不在范围（`!CanInteract && Enabled`） | 慢速上下浮动（0 → 0.18 m，3 秒循环）+ 慢速自转（3 秒一圈）+ 不透明 |
-| `active` **激活** | 玩家在范围内、这一刻真能按 F（`CanInteract`） | 浮得更高更快（0 → 0.28 m，1.2 秒）+ 自转快 2.5 倍 + 微微胀缩（1.35 ↔ 1.5，脉动） |
-| `dead` **失效** | `!Enabled`（本关没抽中的节点 / **降临物下落中**）或用完（`Used` / `Vanished`） | 下沉（0.04 m）+ 缩小（1.08）+ **半透明 0.72**（"熄灭"） |
+| `idle` **待机** | 可用、玩家不在范围（`!CanInteract && Enabled`） | 慢速上下浮动（0 → 0.18 m，3 秒循环）+ 慢速自转（3 秒一圈）+ 不透明 + **光圈正常**（`Aura:scale` 1 ↔ 1.06 呼吸） |
+| `active` **激活** | 玩家在范围内、这一刻真能按 F（`CanInteract`） | 浮得更高更快（0 → 0.28 m，1.2 秒）+ 自转快 2.5 倍 + 微微胀缩（1.35 ↔ 1.5，脉动）+ **光圈胀得更快更大**（1 ↔ 1.16，1.2 秒） |
+| `dead` **失效** | `!Enabled`（本关没抽中的节点 / **降临物下落中**）或用完（`Used` / `Vanished`） | 下沉（0.04 m）+ 缩小（1.08）+ **半透明 0.72**（"熄灭"）+ **光圈缩到 0.55 并几乎消失**（`Ring/Rim/Glow` 的 `transparency` 0.82 / 0.90 / 0.95） |
 
 **约束（照抄就能加新节点的状态动画）**：
 
 - **不要动根节点的 `scale`**：那是 `Appear()` / `Disappear()` 补间的地盘（互相打断）。
-  动 `Float`（浮动 / 自转）与 `Mesh`（缩放 / 透明度）就够。
-- **不要动共享材质**：一局 10 个节点共用同一份 `mat_node_<kind>.tres`，动它会把同类节点一起改掉
-  （"半透明"用的是 `MeshInstance3D.transparency`，它是**每实例**的，安全）。
+  动 `Float`（浮动 / 自转）、`Mesh`（缩放 / 透明度）与 `Aura`（光圈缩放 / 透明度）就够。
+- **不要动共享材质**：一局 10 个节点共用同一份 `mat_node_<kind>.tres` **与同一份光圈材质**，
+  动它会把同类 / 同档位的节点一起改掉（"半透明"用的是 `MeshInstance3D.transparency`，它是**每实例**的，安全；
+  光圈也**只动 `transparency` 这个每实例属性**，绝不写材质）。
 - `appear` / `disappear` 这两条名字**优先级更高**：状态机会在它们播放期间**不抢播放器**
   （`Interactable.RefreshStateAnimation` 里那条 guard）。没做状态动画的交互物（Boss 门、基地交互台）
   只是**什么都不播**，一次查表之后就不再查（零开销）。
-- 拍摄台：`res://Scenes/Interactables/_NodeShowcase.tscn`（三种状态并排 + 逐项读数 + 出图，用法见 §四）。
+- 拍摄台：`res://Scenes/Interactables/_NodeShowcase.tscn`（三种状态并排 + 三档光圈 + 9 种类型 + 失效对比 +
+  逐项读数 + 出图，用法见 §四）。
+
+#### 1.3 周身**光圈**：颜色 = **价值程度**（第八轮）
+
+需求原话：「后面其实是考虑**加入一些周身特效来做信息展示的**，比如**光圈**，**光圈颜色来表示价值程度**」。
+
+**做成了什么**：悬浮的宝石**脚下一圈贴地平放的光环**（`RewardNode.tscn` 的 `Aura` 下三个环，见 §三.1 的结构图）：
+
+| 子节点 | 网格 | 材质 | 作用 |
+|---|---|---|---|
+| `Ring` | `Assets/Models/nodes/mesh_node_aura_ring.tres`（`TorusMesh` 内 0.45 / 外 0.85，压扁到 12% 厚） | **价值档位色**，`Unshaded` + albedo ×2.2（HDR） | 主色带。`Unshaded` = 不参与光照 → **亮地板与暗天空下颜色一致**；×2.2 超过场地 glow 阈值 2.0 → 自带光晕 |
+| `Rim` | `mesh_node_aura_rim.tres`（内 0.85 / 外 0.97） | 固定暗色 (0.04, 0.04, 0.05) ×0.1 | **外圈黑描边**（准星那套"亮色 + 黑描边"：亮色负责暗背景、描边负责近白地板） |
+| `Glow` | 复用 `Ring` 的网格，缩放到 1.42 倍 | 同色 ×1.5、alpha **0.32** | 外发光（"周身"这件事要看得出来，又不抢色带的色相） |
+
+- **颜色从配置读，代码里一个档位色都没写死**：`Config/Tables/ValueTags/tag_*.tres` 新增一列
+  **`AuraColor`**（`Scripts/Config/ValueTagConfig.cs`）。取值链与"这个节点值几波"**完全同一条**：
+  节点行的 `ValueTags` → 标签行；多个标签命中时取 `WaveCount` **最大**的那一行。
+
+| 价值标签 | 波数 | `AuraColor` | 谁挂它 |
+|---|---|---|---|
+| `tag_high` | 4 | **金** `(1, 0.75, 0.15)` | 进化池 / 异化池 |
+| `tag_mid` | 3 | **青蓝** `(0.15, 0.72, 1)` | 强化池 / 补给站 |
+| `tag_low` | 1 | **绿** `(0.4, 0.86, 0.45)` | 局外资源 / 恢复 / 特殊奖励 / 降临节点 |
+
+- **三档只靠色相区分**（金 / 青蓝 / 绿），不靠明度 —— 这样在近白地板和紫色星空下都不会混。
+- **失效节点不发光**：`dead` 动画把光圈缩到 0.55 并把三个环的 `transparency` 拉到 0.82~0.95
+  （"已经用掉的节点"在 `Disappear()` 里整个缩掉并隐藏）。
+- ⚠️ **实现上的一个真坑（自测抓到的）**：光圈颜色要读 `Balance` 的**表索引**，而那张索引是
+  `Balance.CallDeferred(BuildTableIndex)` 建的 —— `Main.tscn` 里节点的 `_Ready` **早于**那次 defer，
+  于是第一次读到"空索引"，颜色被当成"读不到"**缓存**住了 → **整局光圈都是中性白**（截图看不出来，日志里有）。
+  修法两条：① `RewardNode.ApplyIdleVisual()` 里 **`CallDeferred` 再跑一次** `ApplyAuraColor`（defer 队列先进先出，
+  `Balance` 排在主场景之前，所以这一跑索引必然已就绪）；② **只有真读到才写缓存**，读不到不落缓存。
+- ⚠️ **`Kind = Weapon` 光圈是中性白**：它**没有节点表行**（A3 之后并入了进化池），所以没有价值标签可读 ——
+  这是刻意的，不是漏配（日志里也**不**报 warning：有行却解析不出标签才报）。
 
 ### 2. 换单位模型（玩家 / 9 种敌人 / Boss / 召唤物）
 
@@ -223,13 +329,22 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
 **优先用上面的命令行直跑**；`stop_project` 是全局的，会杀掉别的代理的自测，**不要用**
 （详见 [todo-handoff.md](todo-handoff.md) 末节）。
 
-### 奖励节点模型的拍摄台（换模型 / 调状态动画时用它出图）
+### 奖励节点模型的拍摄台（换模型 / 调状态动画 / 调光圈时用它出图）
 
 ```powershell
-# 三种状态并排 + 逐项读数（Float.y 采样、当前动画、transparency）+ 4 张图
+# 三种状态并排 + 三档光圈 + 失效对比 + 9 种类型总览 + 逐项读数 + 8 张图
 & '<Godot>\Godot_v4.7.2-stable_mono_win64.exe' --path 'F:\Godot项目\项目a' res://Scenes/Interactables/_NodeShowcase.tscn
-# 出图：docs/screenshots/node_40_states.png（全景）/ 41 idle / 42 active / 43 dead / 44 kinds（按类型上色）
-# 读数：user://logs/godot.log 里搜 [NodeShot]
+# 出图：docs/screenshots/node_40_states.png（三态全景）/ 41 idle / 42 active / 43 dead
+#       44_kinds9（9 种类型总览：形状 + 光圈色）/ 45_aura_tiers（三档光圈，玩家视角）/ 
+#       46_aura_dead（失效 vs 可用并排）/ 47_kinds9_far（26 米外：远处还能不能认）
+# 读数：stdout / user://logs/godot.log 里搜 [NodeShot]
+```
+
+**挑宝石形状的对比图**（一次性工具 `_ExtractGem.tscn` 顺带出的，12 颗一样大、正交投影）：
+
+```powershell
+& '<Godot>\Godot_v4.7.2-stable_mono_win64.exe' --path 'F:\Godot项目\项目a' res://Scenes/Interactables/_ExtractGem.tscn
+# 出图：docs/screenshots/gem_00_sheet.png（正交正视：看剪影）/ gem_01_sheet_tilt.png（3/4 视角：看厚度，认薄片）
 ```
 
 ## 五、改名前必须先改代码的节点
@@ -239,7 +354,8 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
 | 节点名 | 谁在用 | 影响的场景 |
 |---|---|---|
 | `Mesh` | `Interactable`（"用尽变暗" / 按类型上色 / 淡出）、`InteractablePresentation`（描边 / 抖动 / 图标高度） | 奖励节点、Boss 门、基地 4 个交互台（**名字不能改；2026-10 第七轮起允许嵌套在子节点下**） |
-| `Float` | `RewardNode` 的**状态动画轨道**（`Float:position` / `Float:rotation`） | 奖励节点（改这个名字要同步改 `RewardNode.tscn` 的动画轨道路径） |
+| `Float` | `RewardNode` 的**状态动画轨道**（`Float:position` / `Float:rotation` / `Float/Mesh:scale` / `Float/Mesh:transparency`） | 奖励节点（改这个名字要同步改 `RewardNode.tscn` 的动画轨道路径） |
+| `Aura`、`Aura/{Ring,Rim,Glow}` | `RewardNode`（`AuraNodeName` / `AuraRingName` / `AuraRimName` / `AuraGlowName`：按价值档位上光圈颜色）、**状态动画轨道**（`Aura:scale`、`Aura/*:transparency`） | 奖励节点（2026-10 第八轮新增；改名要同步改 `RewardNode.cs` 的常量与 `RewardNode.tscn` 的动画轨道） |
 | `Muzzle` | `Weapon`（枪口位置） | 各武器 |
 | `Hud/Root/PlayerBar`、`BarPlayer/Fill`、`BarPlayer/DelayBar` | `PlayerHud`（`_Ready` 按名字抓） | HUD |
 | `Hud/BossPanel`、`Panel/{Icon,NameLabel,Bar,StateLabel}` | `PlayerHud`（`BuildBossPanel`，`BossPanel` 是代码挂上去时的名字） | `BarBoss.tscn` |
@@ -352,3 +468,39 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
 6. **拍摄台**：`Scenes/Interactables/_NodeShowcase.tscn` + `_node_shot.gd`（三种状态并排 + 真实玩家触发 `active` +
    逐项读数 + 出图），抽取工具 `_ExtractGem.tscn` + `_extract_gem.gd`（换另一颗宝石时复用）。
    截图：`docs/screenshots/node_40_states.png` / `node_41_idle.png` / `node_42_active.png` / `node_43_dead.png` / `node_44_kinds.png`。
+
+---
+
+## 更新记录（2026-10 · 第八轮：9 种类型 = 9 颗**不同形状**的宝石 + 周身光圈颜色 = 价值程度）
+
+> 用户上一轮看到实物后的纠正：「我之前让替换节点模型，虽然替换了，但是**我的期望是使用不同形状的模型
+> 而不是一个模型去换色**，后面其实是考虑**加入一些周身特效来做信息展示的，比如光圈，光圈颜色来表示价值程度**」。
+> **交互判定 / 范围 / 消耗 / 复位逻辑一行未改**（`Interactable.cs` 这一轮**没有改动**）。
+
+1. **12 颗宝石全部入库**（`Assets/Models/nodes/gem1.fbx` … `gem12.fbx`，包内原名，约 230 KB；
+   原来那颗 `gem_node_reward.fbx` 就是 `gem1.fbx` —— 实测 sha256 完全相同，已删掉避免两份；
+   zip / blend / Unity shadergraph **不入库**；两张 png 在库里但**游戏不读**，见 §三.1.1.1）。
+2. **9 种类型各一颗不同形状的宝石**，每颗抽成独立的 `Assets/Models/nodes/mesh_node_<kind>.tres`
+   （形状 + 材质 + 挑选依据**全表见 §三.1.1.1**）：`Weapon`=细长六棱晶 / `Enhancement`=厚实盾形 /
+   `Evolution`=**经典多面钻石** / `Mutation`=四角星 / `Resource`=六边形晶块 / `Heal`=水滴 /
+   `Special`=倒五边形 / `Shop`=八边形圆块 / `Portal`=正方形板块。
+   **备用 3 颗**（`gem2` / `gem3` / `gem12`）与它们的用途也写在那张表下面。
+   `RewardNode.BuildShapes()` 按**枚举名自动映射**文件名（与 `BuildPalette()` 同一条规则），加新类型不用改代码。
+3. **逐颗实测：12 颗的绕序**全是反的**（`V` 全为负）、**法线本来就都对**（外向度全为正，
+   薄片的 `gem2` 只有 +0.0064 属正常）；轴心全部在脚底（`min.y = 0`，`gem8` 差 1 cm）；
+   **高度全是 1.00 m**（宽 0.50~1.20 / 厚 0.20~1.20）→ 等比 `scale = 1.35` 即可，不用逐个调。见 §三.1.1.1。
+4. **周身光圈**（`RewardNode.tscn` 新增 `Aura/Ring|Rim|Glow`）：贴地平放的光环，
+   **颜色从价值标签配置读**（`Config/Tables/ValueTags/tag_*.tres` 新增 `AuraColor` 列）：
+   高=金 / 中=青蓝 / 低=绿；`Ring` 用 `Unshaded` + HDR 亮度（亮地板与暗天空下一致、且吃 glow），
+   `Rim` 是固定暗描边（准星那套"亮色 + 黑描边"），`Glow` 是同色半透明外发光。设计细节见 §三.1.3。
+5. **光圈与三状态动画并存**：`dead`（`!Enabled` / `Used` / `Vanished`）把光圈缩到 0.55 并把三个环的
+   `transparency` 拉到 0.82~0.95 —— **失效节点不再发光**；`idle` 呼吸、`active` 胀得更快更大。
+   ⚠️ 动画**只动每实例的 `transparency` 与 `Aura:scale`**，绝不写材质（材质是按档位共享的）。
+6. **一个自测抓到的真 bug**（已修，见 §三.1.3 末）：光圈颜色要读 `Balance` 的表索引，而那是
+   `CallDeferred` 建的 → 节点的 `_Ready` 早于它 → 颜色被"读不到"的结果缓存住，**整局光圈都是中性白**
+   （画面上看不出异常，只有日志里那行 warning 能证明）。修法：`CallDeferred` 再跑一次 + **只缓存成功的读取**。
+7. **拍摄台扩了 4 张图**：`node_44_kinds9.png`（9 种形状 + 三档光圈总览）/ `node_45_aura_tiers.png`
+   （三档光圈在**真 TestArena**、玩家视角下）/ `node_46_aura_dead.png`（失效 vs 可用并排）/
+   `node_47_kinds9_far.png`（26 米外：形状认不清时光圈颜色还认得出）；抽取工具顺带出
+   `gem_00_sheet.png`（正交正视剪影）/ `gem_01_sheet_tilt.png`（3/4 视角看厚度）—— **挑形状就是照这两张挑的**。
+   工具用法见 §四。

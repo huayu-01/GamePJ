@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c6gecv1y3upec"
-path="res://.godot/imported/gem_node_reward.fbx-034b6948c979c5acc67e071973165a35.scn"
+uid="uid://n020qbhaedhw"
+path="res://.godot/imported/gem9.fbx-41fa13af8ec0f48bb10347bdb9a2ff8b.scn"
 
 [deps]
 
-source_file="res://Assets/Models/nodes/gem_node_reward.fbx"
-dest_files=["res://.godot/imported/gem_node_reward.fbx-034b6948c979c5acc67e071973165a35.scn"]
+source_file="res://Assets/Models/nodes/gem9.fbx"
+dest_files=["res://.godot/imported/gem9.fbx-41fa13af8ec0f48bb10347bdb9a2ff8b.scn"]
 
 [params]
 

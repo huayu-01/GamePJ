@@ -332,18 +332,29 @@
 
 ### 价值标签表 `Config/Tables/ValueTags/`（3 行，2026-10 新增）
 
-**这张表是"节点开几波"的唯一驱动者**（取代原来按 `RewardNodeKind` 枚举硬编码的 `Layer` 开关）：
+**这张表是"节点开几波"的唯一驱动者**（取代原来按 `RewardNodeKind` 枚举硬编码的 `Layer` 开关）；
+**2026-10 第八轮起，它同时是"节点脚下那圈光圈什么颜色"的唯一驱动者**（用户：「加入一些周身特效来做信息展示的，
+比如**光圈**，**光圈颜色来表示价值程度**」）：
 
-| 行 | 标签 | 波数 | 谁挂它 |
-|---|---|---|---|
-| `tag_high` | 高价值 | **4** | `node_evolution` / `node_mutation`（Layer 2）· 代码兜底里 `Kind = Weapon` 也按高价值算（A3：武器限定池 = 进化池） |
-| `tag_mid` | 中价值 | **3** | `node_enhance` / `node_shop`（Layer 1） |
-| `tag_low` | 低价值 | **1** | `node_resource` / `node_heal` / `node_special` / `node_portal`（Layer 0） |
+| 行 | 标签 | 波数 | **光圈颜色 `AuraColor`** | 谁挂它 |
+|---|---|---|---|---|
+| `tag_high` | 高价值 | **4** | **金** `(1, 0.75, 0.15)` | `node_evolution` / `node_mutation`（Layer 2）· 代码兜底里 `Kind = Weapon` 也按高价值算（A3：武器限定池 = 进化池） |
+| `tag_mid` | 中价值 | **3** | **青蓝** `(0.15, 0.72, 1)` | `node_enhance` / `node_shop`（Layer 1） |
+| `tag_low` | 低价值 | **1** | **绿** `(0.4, 0.86, 0.45)` | `node_resource` / `node_heal` / `node_special` / `node_portal`（Layer 0） |
 
 - 索引：`Balance.tres` 的 `[Export] ValueTagConfig[] ValueTags`（元素指向上面三个行文件）。
 - 消费链只有一处：`NodePlacement.WavesFor(kind)` ——
   ① 节点行 `ValueTags` 命中的标签行取 `WaveCount`（多个标签命中时取**最大**）→
   ② 节点行自己的 `WaveCount` → ③ 按 `Layer` 的代码兜底（2→4 / 1→3 / 其它→1）。
+- **光圈颜色（第八轮新增列）**：`ValueTagConfig.AuraColor` → `RewardNode.AuraColorFor(kind)`，
+  取值链与上面**完全同一条**（节点行 `ValueTags` → 标签行，多标签取 `WaveCount` 最大）。
+  - **规格**：材质 `Unshaded`（不参与光照 → 亮地板与暗天空下颜色一致）+ HDR 亮度（> 场地 glow 阈值 2.0 才会带光晕）；
+    外圈另有一条固定**暗描边**（"亮色 + 黑描边"的思路，白地板上靠它画出边界）。见 [art-onboarding.md](art-onboarding.md) §三.1.3。
+  - **三档只靠色相区分**（金 / 青蓝 / 绿），**别只改明度** —— 明度差在近白地板上几乎看不出来。
+  - 读不到（节点行没有 / 标签拼错）→ 用中性白 `(0.85, 0.9, 1)`，并在日志里说一声（有节点行却解析不出标签才报 warning）。
+    ⚠️ **`Kind = Weapon` 是中性白**：它没有节点表行（C2 已并入进化池），这是**刻意**的，不是漏配。
+  - 开局日志：`[Node] 奖励节点光圈颜色：Evolution → 价值标签「tag_high」（4 波）的 AuraColor (1, 0.75, 0.15, 1)（来源：表 ValueTags）`
+    （每种类型一条，只报一次）。
 - 节点行挂了一个**拼错的标签**时，`Balance.ReportValueTags()` 会写 warning + 日志（不静默落到下一层）：
   `⚠ 节点行 X 的价值标签「Y」在 ValueTags 表里找不到。`
 - 开局日志会同时打出**标签定了几波**与**每个节点实际算出几波**：

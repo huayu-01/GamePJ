@@ -8,4 +8,5 @@ Id = "tag_mid"
 Slot = 2
 DisplayName = "中价值"
 WaveCount = 3
-Note = "中价值节点：强化池 / 补给站（Layer = 1）。用户需求「中刷 3」。"
+AuraColor = Color(0.15, 0.72, 1, 1)
+Note = "中价值节点：强化池 / 补给站（Layer = 1）。用户需求「中刷 3」。光圈颜色 = **青蓝**（与高价值的金、低价值的绿**不同色相**，不靠明度区分）。"

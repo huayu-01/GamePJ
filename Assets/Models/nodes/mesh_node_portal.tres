@@ -1,0 +1,18 @@
+[gd_resource type="ArrayMesh" format=4]
+
+[ext_resource type="Material" path="res://Assets/Materials/mat_node_portal.tres" id="1_uveej"]
+
+[resource]
+resource_name = "mesh_node_portal"
+_surfaces = [{
+"aabb": AABB(-0.5, 1.3271575e-14, -0.25, 1, 1, 0.5),
+"attribute_data": PackedByteArray("DnmtPmouAj/SvtQ+ak9APw55rT5pcH4/DnmtPmlwfj/SvtQ+ak9AP5YE/D5pcH4/lgT8Pmlwfj/SvtQ+ak9AP5YE/D5qLgI/lgT8PmouAj/SvtQ+ak9APw55rT5qLgI/0r7UPmpPQD8Oea0+ai4CPw55rT5pcH4/0r7UPmpPQD8Oea0+aXB+P5YE/D5pcH4/0r7UPmpPQD+WBPw+aXB+P5YE/D5qLgI/0r7UPmpPQD+WBPw+ai4CPw55rT5qLgI/"),
+"format": 34359742487,
+"index_count": 24,
+"index_data": PackedByteArray("AAACAAEAAwAFAAQABgAIAAcACQALAAoADAAOAA0ADwARABAAEgAUABMAFQAXABYA"),
+"material": ExtResource("1_uveej"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AAAAvwAAgD9M764zAAAAAAAAAD8AAIA+AAAAv1YUbyhM766zAAAAv1YUbyhM766zAAAAAAAAAD8AAIA+AAAAP1YUbyhM766zAAAAP1YUbyhM766zAAAAAAAAAD8AAIA+AAAAPwAAgD9M764zAAAAPwAAgD9M764zAAAAAAAAAD8AAIA+AAAAvwAAgD9M764zAAAAAAIAAD8AAIC+AAAAvwAAgD9M764zAAAAv1YUbyhM766zAAAAAAIAAD8AAIC+AAAAv1YUbyhM766zAAAAP1YUbyhM766zAAAAAAIAAD8AAIC+AAAAP1YUbyhM766zAAAAPwAAgD9M764zAAAAAAIAAD8AAIC+AAAAPwAAgD9M764zAAAAvwAAgD9M764zVVX/f1TV/79VVf9/VNX/v1VV/39U1f+//39UVf///7//f1RV////v/9/VFX///+/qar/f///VdWpqv9///9V1amq/3///1XV/3+pqv///7//f6mq////v/9/qar///+/AABU1f7/qioAAFTV/v+qKgAAVNX+/6oqVNUAAP///z9U1QAA////P1TVAAD///8//v9U1VTV/z/+/1TVVNX/P/7/VNVU1f8/VNX//////z9U1f//////P1TV//////8/")
+}]

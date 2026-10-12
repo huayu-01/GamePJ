@@ -1,16 +1,16 @@
-[gd_resource type="ArrayMesh" load_steps=2 format=4]
+[gd_resource type="ArrayMesh" format=4]
 
-[ext_resource type="Material" path="res://Assets/Materials/mat_node_reward.tres" id="1_mat"]
+[ext_resource type="Material" path="res://Assets/Materials/mat_node_evolution.tres" id="1_dwukk"]
 
 [resource]
-resource_name = "mesh_node_gem"
+resource_name = "mesh_node_evolution"
 _surfaces = [{
-"material": ExtResource("1_mat"),
 "aabb": AABB(-0.6000001, 0, -0.6633437, 1.2, 1, 1.2),
 "attribute_data": PackedByteArray("VVWdPgAAgDtVVUU+AACAOwAAgD4AAIA7q6qSPgAAgDurqlo+AACAOwAAqD4AANA9AACAPgAA/j4AAJg+AADQPauqWj4AAIA7AABQPgAA0D0AADA+AADQPVVVRT4AAIA7AACAPgAAgDsAAIA+AADQPQAAqD4AANA9VVWdPgAAgDsAAJg+AADQPQAAUD4AANA9q6paPgAAgDurqpI+AACAOwAAMD4AANA9AACAPgAA0D0AAIA+AACAO1VVRT4AAIA7AACoPgAA0D0AAJg+AADQPauqkj4AAIA7VVWdPgAAgDsAAFA+AADQPQAAgD4AAP4+AAAwPgAA0D0AAIA+AADQPQAAgD4AAP4+AACoPgAA0D0AAJg+AADQPQAAgD4AAP4+AABQPgAA0D0AADA+AADQPQAAgD4AAP4+AACAPgAA0D0="),
 "format": 34359742487,
 "index_count": 54,
 "index_data": PackedByteArray("AAACAAEAAAABAAMAAwABAAQABQAHAAYACAAKAAkACgAIAAsADAAOAA0ADgAMAA8AEAASABEAEgAQABMAFAAWABUAFgAUABcAGAAaABkAGgAYABsAHAAeAB0AHwAhACAAIgAkACMAJQAnACYA"),
+"material": ExtResource("1_dwukk"),
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
 "vertex_count": 40,

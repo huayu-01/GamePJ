@@ -2,5 +2,9 @@
 
 [ext_resource type="Script" path="res://Scenes/Interactables/_extract_gem.gd" id="1_tool"]
 
-[node name="ExtractGem" type="Node"]
+[node name="ExtractGem" type="Node3D"]
 script = ExtResource("1_tool")
+
+[node name="Camera" type="Camera3D" parent="."]
+current = true
+fov = 55.0

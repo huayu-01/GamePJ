@@ -72,21 +72,75 @@ func _ready() -> void:
 	await _shoot_close(_active, "node_42_active.png")
 	await _shoot_close(_dead, "node_43_dead.png")
 
-	# ── ④ 按类型上色还在不在（三个节点换成三种 Kind，同一张图里看三色）──
-	_idle.Kind = 2
-	_active.Kind = 3
-	_dead.Kind = 5
-	await _frames(10)
-	print("[NodeShot] 换 Kind 后的覆盖材质：", _idle.Kind, "→", _override_path(_idle),
-		" / ", _active.Kind, "→", _override_path(_active), " / ", _dead.Kind, "→", _override_path(_dead))
-	await _shoot_from(Vector3(0, 2.6, -7.5), Vector3(0, 1.1, 0), "node_44_kinds.png")
+	# ── ④ 三档**光圈颜色**（= 价值程度：低绿 / 中青蓝 / 高金）──
+	# Kind：3 = Mutation（tag_high 金）、1 = Enhancement（tag_mid 青蓝）、4 = Resource（tag_low 绿）
+	_idle.Kind = 3
+	_active.Kind = 1
+	_dead.Kind = 4
+	_dead.Enabled = true
+	await _frames(20)
+	print("[NodeShot] ── 三档光圈（颜色来自 Config/Tables/ValueTags/tag_*.tres 的 AuraColor 列）──")
+	for node in [_idle, _active, _dead]:
+		_aura_readout(node)
+	await _shoot_from(Vector3(0.0, 4.0, -9.0), Vector3(0.0, 1.0, 0.0), "node_45_aura_tiers.png")
+
+	# ── ⑤ 失效节点（!Enabled）的光圈**要变暗**：同一个 Kind 并排对比 ──
+	_idle.Kind = 4
+	_dead.Kind = 4
+	_dead.Enabled = false
+	_active.visible = false
+	await _frames(20)
+	print("[NodeShot] ── 失效对比（左 x=-4 可用 / 右 x=+4 Enabled=false）──")
+	_aura_readout(_idle)
+	_aura_readout(_dead)
+	await _shoot_from(Vector3(0.0, 4.2, -10.0), Vector3(0.0, 1.0, 0.0), "node_46_aura_dead.png")
+
+	# ── ⑥ 9 种类型总览：形状都不一样（挑形状的依据见 docs/art-onboarding.md §三.1.3）──
+	_active.visible = true
+	for node in [_idle, _active, _dead]:
+		node.visible = false
+	# 玩家挪到画面外（只隐藏不够：他身上带的光/特效会落在网格中间，把中间那个节点的光圈照白）
+	_player.visible = false
+	_player.global_position = Vector3(0.0, 0.6, 30.0)
+	var spawned: Array[Node3D] = []
+	for i in range(9):
+		var node: Node3D = _spawn_node(Vector3((i % 3 - 1) * 4.5, 0.0, (i / 3 - 1) * 4.0), "Kind=%d" % i)
+		node.Kind = i
+		spawned.append(node)
+	await _frames(20)
+	print("[NodeShot] ── 9 种类型（Kind 0..8 = Weapon…Portal）──")
+	for node in spawned:
+		_aura_readout(node)
+	await _shoot_from(Vector3(0.0, 5.5, 9.0), Vector3(0.0, 0.6, 0.0), "node_44_kinds9.png")
+	# 远处（26 米，混战距离）：形状基本看不清了，这时候**靠光圈颜色认价值**
+	await _shoot_from(Vector3(0.0, 5.5, 26.0), Vector3(0.0, 1.2, 0.0), "node_47_kinds9_far.png")
 
 	get_tree().quit()
 
-func _override_path(node: Node3D) -> String:
+## 逐项读数：形状（网格资源）/ 网格自带材质 / 按类型覆盖材质 / 光圈三环颜色 / 状态动画
+func _aura_readout(node: Node3D) -> void:
 	var mesh: MeshInstance3D = node.get_node("Float/Mesh")
-	var mat := mesh.get_surface_override_material(0)
-	return mat.resource_path if mat != null else "（无）"
+	var ring: MeshInstance3D = node.get_node("Aura/Ring")
+	var rim: MeshInstance3D = node.get_node("Aura/Rim")
+	var glow: MeshInstance3D = node.get_node("Aura/Glow")
+	print("[NodeShot] Kind=", node.Kind,
+		" 形状=", mesh.mesh.resource_path.get_file(),
+		" 网格自带材质=", _res_name(mesh.mesh.surface_get_material(0)),
+		" 实例覆盖=", _res_name(mesh.get_surface_override_material(0)),
+		" | 光圈色带=", _color_of(ring.get_surface_override_material(0)),
+		" 暗描边=", _color_of(rim.get_surface_override_material(0)),
+		" 外发光=", _color_of(glow.get_surface_override_material(0)),
+		" | 环 transparency=", "%.2f" % ring.transparency,
+		" 状态动画=", node.DebugStateAnimation)
+
+func _res_name(res: Resource) -> String:
+	return res.resource_path.get_file() if res != null else "（无）"
+
+func _color_of(mat: Material) -> String:
+	if mat is StandardMaterial3D:
+		var c := (mat as StandardMaterial3D).albedo_color
+		return "(%.2f, %.2f, %.2f, a=%.2f)" % [c.r, c.g, c.b, c.a]
+	return "（无）"
 
 func _spawn_node(at: Vector3, label: String) -> Node3D:
 	var node: Node3D = (load(NODE_SCENE) as PackedScene).instantiate()

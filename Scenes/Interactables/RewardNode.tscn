@@ -1,8 +1,10 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Interaction/RewardNode.cs" id="1_node"]
-[ext_resource type="Mesh" path="res://Assets/Models/nodes/mesh_node_gem.tres" id="2_mesh"]
+[ext_resource type="Mesh" path="res://Assets/Models/nodes/mesh_node_enhancement.tres" id="2_mesh"]
 [ext_resource type="Script" path="res://Scripts/Interaction/InteractablePresentation.cs" id="3_pres"]
+[ext_resource type="Mesh" path="res://Assets/Models/nodes/mesh_node_aura_ring.tres" id="4_aura_ring"]
+[ext_resource type="Mesh" path="res://Assets/Models/nodes/mesh_node_aura_rim.tres" id="5_aura_rim"]
 
 [sub_resource type="Animation" id="Animation_idle"]
 resource_name = "idle"
@@ -51,6 +53,54 @@ tracks/3/path = NodePath("Float/Mesh:transparency")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Aura:scale")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.75, 1.5, 2.25, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(1, 1, 1), Vector3(1.04, 1.04, 1.04), Vector3(1.06, 1.06, 1.06), Vector3(1.04, 1.04, 1.04), Vector3(1, 1, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Aura/Ring:transparency")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Aura/Rim:transparency")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Aura/Glow:transparency")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
 "times": PackedFloat32Array(0, 3),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
@@ -109,6 +159,54 @@ tracks/3/keys = {
 "update": 0,
 "values": [0.0, 0.0]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Aura:scale")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6, 0.9, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(1, 1, 1), Vector3(1.1, 1.1, 1.1), Vector3(1.16, 1.16, 1.16), Vector3(1.1, 1.1, 1.1), Vector3(1, 1, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Aura/Ring:transparency")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Aura/Rim:transparency")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Aura/Glow:transparency")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
 
 [sub_resource type="Animation" id="Animation_dead"]
 resource_name = "dead"
@@ -162,6 +260,54 @@ tracks/3/keys = {
 "update": 0,
 "values": [0.72, 0.72]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Aura:scale")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.55, 0.55, 0.55), Vector3(0.55, 0.55, 0.55)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Aura/Ring:transparency")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.82, 0.82]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Aura/Rim:transparency")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.9, 0.9]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Aura/Glow:transparency")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.95, 0.95]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_node"]
 _data = {
@@ -190,3 +336,20 @@ libraries = {
 [node name="Presentation" type="Node3D" parent="."]
 script = ExtResource("3_pres")
 IconGap = 1.15
+
+[node name="Aura" type="Node3D" parent="."]
+
+[node name="Ring" type="MeshInstance3D" parent="Aura"]
+transform = Transform3D(1, 0, 0, 0, 0.12, 0, 0, 0, 1, 0, 0.032, 0)
+mesh = ExtResource("4_aura_ring")
+cast_shadow = 0
+
+[node name="Rim" type="MeshInstance3D" parent="Aura"]
+transform = Transform3D(1, 0, 0, 0, 0.16, 0, 0, 0, 1, 0, 0.028, 0)
+mesh = ExtResource("5_aura_rim")
+cast_shadow = 0
+
+[node name="Glow" type="MeshInstance3D" parent="Aura"]
+transform = Transform3D(1.42, 0, 0, 0, 0.06, 0, 0, 0, 1.42, 0, 0.02, 0)
+mesh = ExtResource("4_aura_ring")
+cast_shadow = 0
