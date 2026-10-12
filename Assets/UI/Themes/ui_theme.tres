@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=17 format=3]
+[gd_resource type="Theme" load_steps=19 format=3]
 
 [ext_resource type="Texture2D" path="res://Assets/UI/Textures/tex_ui_panel_frame.png" id="1_panel"]
 [ext_resource type="Texture2D" path="res://Assets/UI/Textures/tex_ui_panel_frame_small.png" id="2_panel_small"]
@@ -136,6 +136,30 @@ texture_margin_bottom = 8.0
 region_rect = Rect2(6, 0, 180, 33)
 modulate_color = Color(0.68, 0.72, 0.8, 1)
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_keycap"]
+content_margin_left = 11.0
+content_margin_top = 5.0
+content_margin_right = 11.0
+content_margin_bottom = 5.0
+texture = ExtResource("3_glass_small")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+modulate_color = Color(0.72, 0.86, 1, 0.95)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_tile"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+texture = ExtResource("2_panel_small")
+texture_margin_left = 17.0
+texture_margin_top = 17.0
+texture_margin_right = 17.0
+texture_margin_bottom = 17.0
+modulate_color = Color(0.24, 0.3, 0.42, 0.92)
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_primary_disabled"]
 content_margin_left = 22.0
 content_margin_top = 12.0
@@ -175,6 +199,15 @@ UiCaption/base_type = &"Label"
 UiCaption/colors/font_color = Color(0.66, 0.75, 0.9, 1)
 UiCaption/constants/outline_size = 0
 UiCaption/font_sizes/font_size = 15
+UiKeyCap/base_type = &"Label"
+UiKeyCap/colors/font_color = Color(0.06, 0.09, 0.14, 1)
+UiKeyCap/colors/font_outline_color = Color(0, 0, 0, 0)
+UiKeyCap/constants/outline_size = 0
+UiKeyCap/font_sizes/font_size = 16
+UiKeyCapBox/base_type = &"PanelContainer"
+UiKeyCapBox/styles/panel = SubResource("StyleBoxTexture_keycap")
+UiTile/base_type = &"PanelContainer"
+UiTile/styles/panel = SubResource("StyleBoxTexture_tile")
 UiPrimaryButton/base_type = &"Button"
 UiPrimaryButton/colors/font_color = Color(1, 1, 1, 1)
 UiPrimaryButton/colors/font_disabled_color = Color(0.75, 0.78, 0.84, 0.7)

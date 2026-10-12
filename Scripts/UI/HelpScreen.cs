@@ -53,6 +53,12 @@ public partial class HelpScreen : OverlayScreen
 	{
 		if (!IsOpen)
 		{
+			SetKeyHints(
+				KeyHint.Of(ToggleKey, "关闭"),
+				(Key.Escape, "关闭"),
+				(BossPreviewScreen.DefaultToggleKey, "首领状况"),
+				(BuildScreen.DefaultToggleKey, "角色持有"),
+				(Key.O, "设置"));
 			BeginOpen();
 		}
 	}

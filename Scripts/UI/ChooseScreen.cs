@@ -63,10 +63,18 @@ public partial class ChooseScreen : OverlayScreen
 			card.Visible = true;
 			card.Text = $"[{i + 1}] {options[i]}";
 			card.Alignment = HorizontalAlignment.Left;
+
+			// 标题能对上节点类型时给个图标（"强化池 / 进化池…"）；对不上就只留文字。
+			card.Icon = UiIcons.ForTitle(title);
+
 			int index = i;
 			card.Pressed += () => Choose(index);
 			_cards.AddChild(card);
 		}
+
+		SetKeyHints(AllowCancel
+			? new[] { KeyHint.Text("1 ~ 4", "选择"), KeyHint.Of(Key.Escape, "放弃") }
+			: new[] { KeyHint.Text("1 ~ 4", "选择") });
 
 		BeginOpen();
 	}

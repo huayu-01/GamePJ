@@ -25,6 +25,12 @@ public partial class UiRouter : Node
 	{
 		Instance = this;
 		ProcessMode = ProcessModeEnum.Always;
+
+		// 玩家设置的唯一启动应用点（音量 / 窗口 / 按键重绑）。
+		// 刻意**不加新的 autoload**（architecture.md 第 4 条：能不加全局入口就不加）——
+		// UiRouter 已经排在场景之前，且每个场景里都有界面会用到这些设置。
+		// 渲染画质要等场景里有 WorldEnvironment，由 SettingsScreen._Ready 每次进场景套一次。
+		SettingsStore.ApplyOnStartup();
 	}
 
 	public override void _ExitTree()

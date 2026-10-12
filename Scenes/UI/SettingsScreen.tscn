@@ -1,0 +1,81 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/Settings/SettingsScreen.cs" id="1_settings"]
+[ext_resource type="Theme" path="res://Assets/UI/Themes/ui_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Textures/tex_ui_bar_frame.png" id="3_divider"]
+
+[node name="SettingsScreen" type="CanvasLayer"]
+layer = 14
+script = ExtResource("1_settings")
+ScreenLayer = 1
+CloseOnCancel = true
+ToggleKey = 79
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("2_theme")
+
+[node name="Dim" type="ColorRect" parent="Root"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.04, 0.05, 0.08, 0.94)
+
+[node name="Panel" type="PanelContainer" parent="Root"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 32.0
+offset_right = -48.0
+offset_bottom = -96.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root/Panel"]
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Root/Panel/VBox"]
+theme_type_variation = &"UiTitle"
+text = "设置"
+horizontal_alignment = 1
+
+[node name="Divider" type="NinePatchRect" parent="Root/Panel/VBox"]
+custom_minimum_size = Vector2(0, 16)
+texture = ExtResource("3_divider")
+patch_margin_left = 20
+patch_margin_top = 8
+patch_margin_right = 20
+patch_margin_bottom = 8
+modulate = Color(0.5, 0.82, 1, 0.9)
+
+[node name="Body" type="HBoxContainer" parent="Root/Panel/VBox"]
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="Tabs" type="VBoxContainer" parent="Root/Panel/VBox/Body"]
+custom_minimum_size = Vector2(260, 0)
+theme_override_constants/separation = 10
+
+[node name="PageScroll" type="ScrollContainer" parent="Root/Panel/VBox/Body"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Page" type="VBoxContainer" parent="Root/Panel/VBox/Body/PageScroll"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Hint" type="Label" parent="Root/Panel/VBox"]
+theme_type_variation = &"UiCaption"
+text = "分类与总线都从注册表读：分类在 SettingsSections，音量直接读 AudioServer —— 加一个不用改界面。改动立刻生效并保存到 user://settings.cfg（项目文件不动）。"
+horizontal_alignment = 1
+autowrap_mode = 2

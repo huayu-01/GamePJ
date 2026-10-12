@@ -23,6 +23,16 @@ const SCREENS := [
 	{"name": "ChooseScreen", "file": "ui_05_choosescreen.png"},
 	{"name": "BossPreviewScreen", "file": "ui_06_bosspreview.png"},
 	{"name": "LoadingScreen", "file": "ui_07_loadingscreen.png"},
+	{"name": "SettingsScreen", "file": "ui_10_settings.png"},
+	{"name": "BuildScreen", "file": "ui_11_build.png"},
+]
+
+## 图标清单（与 `Scripts/UI/UiIcons.cs` 的 Names() 同一份；探针逐个 load 一遍证明"图真的能读出来"）。
+const ICONS := [
+	"ic_ui_reward_enhance", "ic_ui_reward_evolution", "ic_ui_reward_mutation",
+	"ic_ui_node_weapon", "ic_ui_node_resource", "ic_ui_node_heal", "ic_ui_node_special",
+	"ic_ui_node_shop", "ic_ui_node_portal", "ic_ui_build_holdings",
+	"ic_ui_set_graphics", "ic_ui_set_controls", "ic_ui_set_audio",
 ]
 
 ## 样本卡片文案（只给「卡片是运行时按数据生成」的那几个界面用；不影响界面逻辑）
@@ -30,6 +40,15 @@ const CARD_TEXTS := {
 	"StartScreen": ["1. 手枪 · 均衡（弹匣 12 / 射速中）", "2. 步枪 · 连射（弹匣 30 / 射速快）"],
 	"RewardScreen": ["1. 伤害 +10%　（攻击类）", "2. 最大生命 +15　（生存类）", "3. 暴击率 +4%　（攻击类）"],
 	"ChooseScreen": ["1. 进化池　（把已有增幅升到下一阶段）", "2. 异化池　（强力但有代价）", "3. 商店　（用碎片换资源）"],
+}
+
+## 样本卡片的图标 —— 与真实代码同一张图标表
+## （StartScreen 用武器图标、RewardScreen 用奖励类型图标、ChooseScreen 按标题取节点图标），
+## 所以截图里的图标就是玩家真正会看到的那几个。
+const CARD_ICONS := {
+	"StartScreen": ["ic_ui_node_weapon", "ic_ui_node_weapon"],
+	"RewardScreen": ["ic_ui_reward_enhance", "ic_ui_reward_enhance", "ic_ui_reward_mutation"],
+	"ChooseScreen": ["ic_ui_reward_evolution", "ic_ui_reward_mutation", "ic_ui_node_shop"],
 }
 
 const EXPLODE_AT := Vector3(0.0, 1.2, 0.0)
@@ -84,6 +103,8 @@ func _ready() -> void:
 	# 界面弹窗会把树暂停（OverlayScreen 的分层策略），拍摄脚本必须不受暂停影响。
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_report_theme()
+	_report_icons()
+	_report_nameplates()
 	_run()
 
 
@@ -98,6 +119,44 @@ func _shot(file: String) -> void:
 	var img := get_viewport().get_texture().get_image()
 	var err := img.save_png(SHOT_DIR + file)
 	print("[UiShot] ", SHOT_DIR + file, "  ", img.get_width(), "x", img.get_height(), " err=", err)
+
+
+## 交互物"场景里不显示文字"的自检（用户需求 4）：
+## 实例化真正的 `RewardNode.tscn`，数它子树里有多少 `Label3D`（期望 0 个）。
+func _report_nameplates() -> void:
+	var ps := load("res://Scenes/Interactables/RewardNode.tscn") as PackedScene
+	if ps == null:
+		print("[UiShot] 名牌自检：找不到 RewardNode.tscn")
+		return
+	var node := ps.instantiate()
+	add_child(node)
+	var labels := _collect_label3d(node)
+	var visible_labels := 0
+	for l in labels:
+		if (l as Label3D).visible:
+			visible_labels += 1
+	print("[UiShot] 交互物名牌：RewardNode 里的 Label3D 共 ", labels.size(), " 个（可见 ", visible_labels, " 个）—— 期望 0 / 0")
+	node.queue_free()
+
+
+func _collect_label3d(node: Node) -> Array:
+	var found: Array = []
+	for child in node.get_children():
+		if child is Label3D:
+			found.append(child)
+		elif child is Node3D:
+			found.append_array(_collect_label3d(child))
+	return found
+
+
+## 图标表自检：逐个 load「Assets/UI/Icons/」下的 SVG（证明"图标代替文字"真的接上了图）。
+func _report_icons() -> void:
+	var missing: Array = []
+	for icon in ICONS:
+		if ResourceLoader.load("res://Assets/UI/Icons/%s.svg" % icon) == null:
+			missing.append(icon)
+	print("[UiShot] 图标：", ICONS.size() - missing.size(), "/", ICONS.size(), " 张可加载",
+		"" if missing.is_empty() else "  缺失=%s" % str(missing))
 
 
 ## 把主题 / 字体结论打进日志（截图之外的第二份证据）。
@@ -131,11 +190,16 @@ func _setup_screen(screen: Node, name: String) -> void:
 	var texts: Array = CARD_TEXTS.get(name, [])
 	var tpl := screen.get_node_or_null("Root/Panel/VBox/Cards/CardTemplate") as Button
 	if tpl != null and not texts.is_empty():
+		var card_icons: Array = CARD_ICONS.get(name, [])
+		var i := 0
 		for t in texts:
 			var b := tpl.duplicate() as Button
 			b.visible = true
 			b.text = String(t)
+			if not card_icons.is_empty():
+				b.icon = load("res://Assets/UI/Icons/%s.svg" % card_icons[i % card_icons.size()])
 			tpl.get_parent().add_child(b)
+			i += 1
 
 	if name == "BossPreviewScreen":
 		var body := screen.get_node_or_null("Root/Panel/VBox/Body") as Label
@@ -151,6 +215,7 @@ func _setup_screen(screen: Node, name: String) -> void:
 			"Root/Panel/VBox/Upgrades/Crit": "暴击率 +3% ／ 等级 0 　（费用 15）",
 			"Root/Panel/VBox/Upgrades/Reload": "装弹速度 +6% ／ 等级 1 　（费用 25）",
 			"Root/Panel/VBox/Start": "开始探索（进入配置）",
+			"Root/Panel/VBox/Settings": "设置（画面 / 控制 / 音量）",
 			"Root/Panel/VBox/Shards": "碎片：120",
 		}
 		for path in sample:
@@ -159,6 +224,35 @@ func _setup_screen(screen: Node, name: String) -> void:
 				(lbl as Label).text = String(sample[path])
 			elif lbl is Button:
 				(lbl as Button).text = String(sample[path])
+
+	# 设置菜单：分类与内容都在 _Ready / ShowSection 里生成（分类来自注册表）。
+	if name == "SettingsScreen":
+		screen.call("ShowSection", 0)
+		print("[UiShot] 设置分类数=", screen.get("SectionCount"), " ids=", screen.get("SectionIds"),
+			" 当前页=", screen.get("ActiveSection"))
+
+	# 角色持有面板：用真实奖励目录填示例格（不依赖本局状态）。
+	if name == "BuildScreen":
+		screen.call("DebugShowSample", 12)
+
+	# 按键提示栏：**每个界面都塞一组示例**（结构是基类建的，界面只负责填内容）。
+	# 截图里每个界面底部都能看到那一栏 —— 这就是"多数面板都需要按键提示"的样子。
+	if screen.has_method("DebugSetSampleKeyHints"):
+		screen.call("DebugSetSampleKeyHints")
+
+	_report_key_hints(screen, name)
+
+
+## 按键提示栏的自检（"结构必须存在 / 层级最高 / 背景透明不吃鼠标"三件事的机器可判定形式）。
+func _report_key_hints(screen: Node, name: String) -> void:
+	var bar := screen.get_node_or_null("Root/KeyHintBar")
+	print("[UiShot] 按键提示栏 ", name, "：节点=", bar != null,
+		" 在树里=", screen.get("HasKeyHintBar"),
+		" 最后子节点=", screen.get("KeyHintBarTopmost"),
+		" ZIndex=", screen.get("KeyHintBarZIndex"),
+		" 鼠标穿透=", screen.get("KeyHintBarIgnoresMouse"),
+		" 条目=", screen.get("KeyHintCount"),
+		" 可见=", screen.get("KeyHintsVisible"))
 
 
 func _run() -> void:
@@ -189,6 +283,14 @@ func _run() -> void:
 			_setup_screen(screen, name)
 			await _frames(8)
 			await _shot(String(entry["file"]))
+
+			# 设置菜单有 3 页：把「控制 / 音量」也各拍一张（分类可扩展 + 4 条总线都要有证据）。
+			if name == "SettingsScreen":
+				for page in [{"index": 1, "file": "ui_12_settings_controls.png"}, {"index": 2, "file": "ui_13_settings_audio.png"}]:
+					screen.call("ShowSection", page["index"])
+					await _frames(6)
+					await _shot(String(page["file"]))
+
 			screen.queue_free()
 			get_tree().paused = false
 			await _frames(4)
@@ -242,7 +344,11 @@ func _shoot_hud() -> void:
 	var player := player_scene.instantiate()
 	add_child(player)
 	(player as Node3D).global_position = Vector3(0, 0.5, 6)
-	add_child(hud_scene.instantiate())
+	var hud := hud_scene.instantiate()
+	add_child(hud)
+	# HUD 上的构筑图标条：用真实奖励目录塞几个示例（真实一局里它由 RunBuild 驱动）。
+	if hud.has_method("DebugSetSampleBuildIcons"):
+		hud.call("DebugSetSampleBuildIcons", 6)
 	await _frames(45)
 	await _shot("ui_08_hud_ingame.png")
 	await _frames(30)

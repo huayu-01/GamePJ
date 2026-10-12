@@ -136,6 +136,35 @@ public partial class UiService : Node
 		return true;
 	}
 
+	/// <summary>
+	/// 打开**全屏设置菜单**（画面 / 控制 / 音量，分类可扩展）。
+	/// 快捷键由界面自己处理（<see cref="SettingsScreen.ToggleKey"/>，默认 O）；这里留语义化入口给按钮用。
+	/// </summary>
+	public bool OpenSettings()
+	{
+		if (Screen<SettingsScreen>() is not { } screen)
+		{
+			return false;
+		}
+
+		screen.CloseOnCancel = true;
+		screen.Open();
+		return true;
+	}
+
+	/// <summary>打开**「角色持有」面板**（本局构筑，图标矩阵 + 悬停说明）。快捷键 C。</summary>
+	public bool OpenBuild()
+	{
+		if (Screen<BuildScreen>() is not { } screen)
+		{
+			return false;
+		}
+
+		screen.CloseOnCancel = true;
+		screen.Open();
+		return true;
+	}
+
 	/// <summary>打开三选一奖励（关卡节点用）。</summary>
 	public bool OpenRewards(IReadOnlyList<RewardDefinition> options, string title)
 	{

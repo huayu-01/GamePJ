@@ -18,15 +18,19 @@
 | 为什么中文不是自带字体？ | **体积**：一个能覆盖简中的开源字体最小也是 **17 MB**（Noto Sans SC 可变体）/ **24 MB**（霞鹜文楷单字重）。本轮任务明确"不要下大文件"，所以**先调研 + 用系统字体占位**，换法见 §4。**注意：系统字体是"开发期占位"，发行前必须换成自带字体**（玩家机器上不一定有雅黑）。 |
 | 准星接在哪？ | `Assets/UI/Textures/tex_ui_crosshair_dot.png`（**一个点**，48×48 实心白圆点 + 羽化边，2026-10 用户要求改回点）→ `Scenes/UI/Hud.tscn` 的 **`Root/Crosshair`**（`TextureRect`，屏幕中央 20×20）。改动前是 Kenney 的描边十字 + 圆圈（`tex_ui_crosshair_default.png`，已删除）。 |
 | glow 开了吗？ | 开了：`Scenes/Levels/TestArena.tscn` 的 `WorldEnvironment` → **`glow_enabled = true`、`glow_hdr_threshold = 2.0`、`glow_intensity = 0.5`、`glow_blend_mode = 1`（Screen）、只开 4/5/6 三档半径**。为什么阈值这么高见 §7。 |
-| 改了几个界面？ | **外观全部 8 个（主题级）+ 2 个重点做了完整示范**（`BaseScreen` 加了标题带 / 分隔条 / 主按钮，`HelpScreen` 验证长中文正文）。没有把 7 个弹窗逐个"铺满"——这是刻意的，见 §3。 |
-| 想一次看全部证据？ | [art-integration-log.md](art-integration-log.md) 的 **第五轮** 一节：逐项改动 + 全部截图 + 自测输出。 |
+| 改了几个界面？ | **外观全部 9 个（主题级）+ 2 个新界面**（`SettingsScreen` 全屏设置菜单、`BuildScreen` 角色持有面板）。**7 个旧界面已全部改成"全屏类界面"**（面板铺满、内容居中），见 §11。 |
+| 按键提示栏在哪？ | **在 UI 基类里**：`OverlayScreen.SetKeyHints(...)`，屏幕底部一栏「键 + 说明」。**结构永远存在**（`Root/KeyHintBar`），界面可以不填、不显示。**第三批写能力矩阵界面时照 §10 抄。** |
+| 设置菜单？ | `SettingsScreen`（快捷键 **O** / 基地界面的「设置」按钮）：画面 / 控制 / 音量，**分类来自注册表**（加一页 = 注册一行），存 `user://settings.cfg`。见 §12。 |
+| 图标？ | `Assets/UI/Icons/ic_ui_*.svg`（13 张，**项目自制 SVG**，Godot 原生导入）+ `Scripts/UI/UiIcons.cs`（**唯一映射表**）。构筑元素 / 奖励卡片 / 设置分类 Tab 都用图标；说明只在**选取界面**与**鼠标悬停**（`tooltip_text`）。见 §13。 |
+| 场景里的节点还写名字吗？ | **不写了**：`RewardNode.tscn` 的 `Label3D` 名牌已删，基类 `Interactable` 还会无条件把任何 `Label3D` 子孙藏掉。见 §13。 |
+| 想一次看全部证据？ | [art-integration-log.md](art-integration-log.md) 的 **第五轮** 一节：逐项改动 + 全部截图 + 自测输出。**本轮（第六轮）的证据在 §10~§13 各自的表里**（截图 `ui_10` ~ `ui_17`、探针输出、自测硬指标）。 |
 
 ---
 
 ## 1. 文件清单（本轮新增）
 
 ```
-Assets/UI/                                   ← 本轮新建（assets.md §1 的 UI/ 目录）
+Assets/UI/                                   ← 第五轮新建（assets.md §1 的 UI/ 目录）
   Textures/tex_ui_panel_frame.png            128×128  大面板底（切角九宫格）
   Textures/tex_ui_panel_frame_small.png       64×64   小面板底 / 焦点框（同上，1×）
   Textures/tex_ui_panel_glass.png            128×128  圆角玻璃面板底（备选，本轮未接线）
@@ -39,8 +43,17 @@ Assets/UI/                                   ← 本轮新建（assets.md §1 �
   Themes/ui_theme.tres                                 主题（唯一入口）
   Licenses/license_kenney_{ui_pack_scifi,crosshair_pack,fonts}.txt   CC0 原文（照抄进仓库）
 
-Scenes/UI/_UiShowcase.tscn + _ui_shot.gd     ← 验证工具（见 §8）：一次运行拍完 7 个界面 + HUD + glow 前后
+Assets/UI/Icons/                             ← 第六轮新建（13 张**自制 SVG**，见 §13）
+  ic_ui_reward_{enhance,evolution,mutation}.svg        奖励类型（强化 / 进化 / 异化）
+  ic_ui_node_{weapon,resource,heal,special,shop,portal}.svg   地面节点类型
+  ic_ui_set_{graphics,controls,audio}.svg              设置菜单分类 Tab
+  ic_ui_build_holdings.svg                             「角色持有」面板标题
+
+Scenes/UI/_UiShowcase.tscn + _ui_shot.gd     ← 验证工具（见 §8）：一次运行拍完 9 个界面 + HUD + glow 前后
 ```
+
+> **SVG 是新类别**：`Assets/UI/Icons/ic_ui_<分组>_<名字>.svg`。Godot 原生导入 SVG（无需图片工具链），
+> **改图标 = 改一个文本文件**；`.import` 要一起入库（`Import` 一次即可，`--headless --import` 也行）。
 
 > **命名**照 [assets.md](assets.md) §2：`tex_ui_<变体>.png`（类别 `tex_` / 分组 `ui`）。
 > 字体是**新类别**，本轮用 `font_ui_<变体>.ttf`（`assets.md` 的表里还没有 `font_` 前缀，建议补一行）。
@@ -77,8 +90,11 @@ Scenes/UI/_UiShowcase.tscn + _ui_shot.gd     ← 验证工具（见 §8）：一
 | `Button/colors/font_*`、`Button/constants/outline_size = 2` | — | 文字自带 2px 描边（在 3D 场景上可读） |
 | `Label/colors/font_color`、`Label/constants/outline_size = 2` | — | 同上 |
 | `UiTitle/styles/normal` | `StyleBoxTexture_title_band` | **`region_rect = Rect2(6,0,180,33)` 把蓝色横带从按钮图里裁出来**，所以标题天生带 Kenney 那种"标题条" |
-| `UiPrimaryButton/styles/*` | `StyleBoxTexture_primary_*` | 同一块蓝色横带铺满整个按钮 = 主行动按钮 |
+| `UiPrimaryButton/styles/*` | `StyleBoxTexture_primary_*` | 同一块蓝色横带铺满整个按钮 = 主行动按钮，**也用在设置菜单选中的那个分类 Tab 上** |
 | `UiCaption/colors/font_color`、`font_size = 15` | — | 次要说明文字（灰、无描边） |
+| **`UiKeyCapBox/styles/panel`** | `StyleBoxTexture_keycap` | **按键提示栏的键帽**（浅色小底板，让"键"看起来像键）；配 `UiKeyCap` 深色字 |
+| **`UiKeyCap/font_size = 16`、`font_color` 深色** | — | 键帽里的字（不描边：底板本身是浅色） |
+| **`UiTile/styles/panel`** | `StyleBoxTexture_tile` | **构筑图标格 / HUD 图标格**（112×112 与 44×44 都用它） |
 
 > **为什么要用 `modulate_color` 而不是多存几张图**：Kenney 的每个状态都有现成 PNG（`*_screws` 等），
 > 但**同一张图 + 不同 modulate** 改起来只要动一个数字，而且**换主题色只需要改这一列**。
@@ -308,7 +324,212 @@ UiDangerButton/styles/normal = SubResource("StyleBoxTexture_danger_normal")
 
 ---
 
-## 10. 还没做的（可以接着推，按性价比排序）
+## 10. 按键提示栏（**写在 UI 基类里，第三批能力系统照着这一节做**）
+
+用户原话：「大部分界面给一栏位置做按键提示（**层级要高且背景透明**，要避免会被遮挡和遮挡其他元素），**写在 UI 的基类里**……多数面板是需要按键提示的，它们**可以不用编辑或显示但不能没有**」。
+
+### 10.1 它是什么 / 在哪
+
+| 问题 | 答案 |
+|---|---|
+| 类 | `OverlayScreen`（`Scripts/UI/OverlayScreen.cs`）—— **所有弹层的基类**，所以每个界面天生就有 |
+| 节点 | `Root/KeyHintBar`（由基类在 `InitializeOverlay()` 里**无条件建出来**；场景里若手写了同名节点就用场景那个） |
+| 位置 | 屏幕**底部整条**、水平居中（`anchor_top/bottom = 1`，高 62px、距底 18px） |
+| 层级 | ① 它是 `Root` 的**最后一个子节点**；② `ZIndex = 100`。两条独立保证 → 同屏任何元素都压不过它 |
+| 背景 | **全透明**：这一栏自己没有任何 `Panel` / `ColorRect`，只有几个小键帽（键帽有底，说明文字没有底） |
+| 鼠标 | 整条 + 每个子节点都是 `MouseFilter = Ignore` → **绝不吃鼠标事件**（不会重演"准星挡住镜头"那个坑，见 architecture.md 第 7 条） |
+| 默认可见性 | **不填就 `Visible = false`**（结构在树里，但不占视觉）。填了内容才出现 |
+
+### 10.2 API（`OverlayScreen` 的成员，子类直接用）
+
+```csharp
+// ① 一次性替换整栏（最常用）。KeyHint 有三种形态 + 两种隐式转换：
+SetKeyHints(
+    KeyHint.Of(Key.F, "使用"),              // 键盘键 → "F"
+    KeyHint.Mouse(MouseButton.Right, "升级"), // 鼠标键 → "鼠标右键"
+    KeyHint.Text("1 ~ 5", "选择"),           // 任意文本（组合键 / 长按）
+    (Key.Escape, "关闭"));                   // 元组写法： (Key, string) 或 (string, string)
+
+// ② 追加 / 清空 / 整栏显隐
+AddKeyHint(Key.Tab, "切换");     // 也有 AddKeyHint(string keys, string caption) 与 AddKeyHint(KeyHint)
+ClearKeyHints();                 // 清空（结构仍在）
+ShowKeyHints(false);             // 整栏藏起来（比如过场动画时）
+
+// ③ 只读查询（自检 / GDScript 探针直接读）
+bool HasKeyHints          // 有没有内容
+bool KeyHintsVisible      // 现在画没画
+int  KeyHintCount         // 条目数
+bool HasKeyHintBar        // 结构在不在树里      ← "不能没有"的机器可判定形式
+bool KeyHintBarTopmost    // 是不是 Root 最后一个子节点
+int  KeyHintBarZIndex     // 100
+bool KeyHintBarIgnoresMouse
+protected HBoxContainer UiKeyHintBar   // 想自己塞控件时用（正常情况用 SetKeyHints 就够）
+
+// ④ 验证 / 拍图用（任何界面一行就能看到提示栏长什么样）
+DebugSetSampleKeyHints();
+```
+
+**什么时候调**：在 `Open()` 里、`BeginOpen()` **之前**（和 `CloseOnCancel` 一起设置最清楚）。
+在 `_Ready()` 里 `InitializeOverlay()` **之前**调也不会丢 —— 内容先存着，初始化时统一建。
+
+### 10.3 第三批（能力矩阵界面）该写什么
+
+```csharp
+public void Open()
+{
+    CloseOnCancel = true;
+    SetKeyHints(
+        KeyHint.Mouse(MouseButton.Left, "激活 / 长按解锁"),
+        KeyHint.Mouse(MouseButton.Right, "升级 / 长按重置"),
+        (Key.Escape, "关闭"));
+    BeginOpen();
+}
+```
+
+### 10.4 现状（每个界面实际填了什么）
+
+| 界面 | 提示栏内容 |
+|---|---|
+| `BaseScreen` | `1 ~ 5` 购买永久强化 ｜ `Enter` 出征 ｜ `O` 设置 ｜ `H` 说明 |
+| `StartScreen` | `1 / 2 / 3` 选择武器 ｜ `Enter` 默认手枪 ｜ `悬停` 看武器数值 |
+| `RewardScreen` | `1 / 2 / 3` 选择奖励 ｜ `悬停` 看说明（结算提示时是 `Enter` 确定） |
+| `ChooseScreen` | `1 ~ 4` 选择（允许放弃时多一条 `Escape` 放弃） |
+| `HelpScreen` | `H` 关闭 ｜ `Escape` 关闭 ｜ `B` 首领状况 ｜ `C` 角色持有 ｜ `O` 设置 |
+| `BossPreviewScreen` | `B` 关闭 ｜ `Escape` 关闭 |
+| `SettingsScreen` | `O` 关闭 ｜ `Escape` 关闭 ｜ `Q` 上一类 ｜ `E` 下一类 |
+| `BuildScreen` | `C` 关闭 ｜ `Escape` 关闭 ｜ `悬停` 看说明 |
+| `LoadingScreen` | **没有**（它刻意不继承 `OverlayScreen`：不走界面栈、自己暂停整棵树，见类注释）；加载页也没有可按键的动作 |
+
+### 10.5 验证（本轮实测，探针逐界面输出）
+
+```
+[UiShot] 按键提示栏 BaseScreen：节点=true 在树里=true 最后子节点=true ZIndex=100 鼠标穿透=true 条目=4 可见=true
+[UiShot] 按键提示栏 SettingsScreen：…（同上，条目=4）
+[UiShot] 按键提示栏 LoadingScreen：节点=false（它不继承基类，预期）
+[Probe] ① OpenSettings=true … 提示栏条目=4 提示栏可见=true 提示栏最后子节点=true ZIndex=100
+```
+截图：`ui_01`~`ui_06`、`ui_10`~`ui_13` 每张底部那一栏就是它（`ui_15`/`ui_16` 是**真的 `Open()` 打开后**的内容）。
+
+---
+
+## 11. 全屏化：7 个旧界面全部铺满
+
+用户原话：「其他的 ui 界面**尽可能做成全屏类的界面**」。改动**只动布局，不动逻辑**（节点路径一个都没改，所以 C# 只多了一个 `Settings` 按钮的引用）。
+
+| 界面 | 改前 | 改后 |
+|---|---|---|
+| `BaseScreen` | 760×460 居中窗 | 面板铺满（左右 48 / 上下 32），标题带横贯整屏，内容垂直居中；永久强化从单列改成 **2 列网格**；按钮 852px 居中；多了「设置」按钮 |
+| `StartScreen` | 800×440 | 面板铺满，卡片 1000×96 居中排列 |
+| `RewardScreen` | 640×380 | 面板铺满，卡片 1000×92 居中 |
+| `ChooseScreen` | 800×420 | 面板铺满，卡片 1000×92 居中 |
+| `HelpScreen` | 760×500 | 面板铺满，正文 `size_flags_vertical = 3` 撑满高度、字号 20 |
+| `BossPreviewScreen` | 920×660 | 面板铺满，正文撑满 |
+| `LoadingScreen` | 已经是全屏 | 没动（本来就是整屏黑底 + 居中文字） |
+| `SettingsScreen` / `BuildScreen` | 新界面 | 从第一版就是全屏（左分类栏 + 右内容 / 图标矩阵） |
+
+**两条硬约束**（别踩）：
+1. **底部要给按键提示栏留位置**：内容会到屏幕底部的界面（Help / BossPreview / Settings / Build），面板 `offset_bottom = -96`（提示栏占底部 62px + 余量）。改这几个界面时**别把 `offset_bottom` 改回 -32**，否则正文会被提示栏压住。
+2. **节点路径不变**：`Root/Panel/VBox/...` 是 C# 与拍摄台按名字取的；`Upgrades` 从 `VBoxContainer` 换成 `GridContainer` 是安全的（代码只按名字取它下面的 5 个按钮），但**名字一个都不能改**。
+
+---
+
+## 12. 全屏设置菜单（`SettingsScreen`）
+
+用户原话：「需要一个**占用全屏设置菜单**，菜单最少应该包含**画面/控制/音量**这几类的设置（**不写死**，避免后面要加的时候大改动）」。
+
+| 项 | 做法 |
+|---|---|
+| 界面 | `Scenes/UI/SettingsScreen.tscn` + `Scripts/UI/Settings/SettingsScreen.cs`（继承 `OverlayScreen`，`UiLayer.Panel`） |
+| 打开 | 快捷键 **O**（`ToggleKey`，`_Process` 里做边沿检测）｜ 基地界面的「设置」按钮 ｜ `UiService.Instance.OpenSettings()` |
+| 结构 | 面板铺满 → 左 `Tabs`（分类） + 右 `PageScroll/Page`（内容，**带滚动**：控制页 13 行在 1080p 下正好装不下） |
+| 分类 | **注册表驱动**，见下 |
+| 存哪 | `user://settings.cfg`（`ConfigFile`，**玩家机器上的东西不进仓库**）；启动时由 `UiRouter._Ready → SettingsStore.ApplyOnStartup()` 套用音量 / 窗口 / 按键重绑；**画质与 glow 由 `SettingsScreen._Ready → ApplySceneQuality()` 每次进场景套一次**（glow 在 `WorldEnvironment` 上，autoload 阶段还没有场景） |
+
+### 12.1 「分类可扩展」到底怎么加一页（**这是本节的重点**）
+
+```csharp
+// 1) 写一个分类（SettingsSections.cs 里有三个现成的例子：画面 / 控制 / 音量）
+public sealed class AbilitySettingsSection : ISettingsSection
+{
+    public string Id => "ability";      // 也是 settings.cfg 的节名
+    public string Title => "能力";
+    public void Build(VBoxContainer page, SettingsScreen screen)
+    {
+        SettingsUi.AddTitle(page, "能力");
+        SettingsUi.AddOption(page, "默认排序", new[] { "按额度", "按名字" }, 0, index => { /* 落盘 + 生效 */ });
+        SettingsUi.AddCheck(page, "显示未解锁", true, value => { });
+        SettingsUi.AddSlider(page, "预览规模", 1, 5, 1, 3, v => $"{v:0}", v => { });
+    }
+}
+
+// 2) 注册一行（放在任何静态构造 / 初始化里；id 相同会覆盖，热重载不会冒两页）
+SettingsSections.Register(() => new AbilitySettingsSection());
+```
+
+`SettingsScreen` **不知道有哪几个分类**：它只 `SettingsSections.CreateAll()` → 每个分类建一个 Tab（图标 + 标题）→ 切到哪页就调那页的 `Build(page, screen)`。
+所以"加一个 section 就多一页"是**真的**，界面代码一行都不用改。自检里可以直接读 `SettingsScreen.SectionCount` / `SectionIds` 证明（本轮实测 `分类数=3 ｜ ids=graphics / input / audio`）。
+
+### 12.2 三页里各有什么（都是**立刻生效 + 落盘**）
+
+| 页 | 内容 |
+|---|---|
+| **画面** | 显示模式（窗口化 / 全屏 / 无边框全屏）、分辨率（1280×720 ~ 3840×2160）、垂直同步、最大帧率（30~240）、**画质预设**（低 = 渲染 75% / 中 = 默认 / 高 = 2× MSAA）、**glow 开关 + glow 强度**（0~200%，基于场景文件里的原值乘） |
+| **控制** | **13 个玩法动作逐条列出当前键位 + 「重绑」**（点重绑 → 按任意键；Esc 取消；另有「恢复默认键位」）。只列 `project.godot` 的玩法动作，**不列 `ui_*` 内置动作**（把 Esc 绑掉会把自己锁在界面里） |
+| **音量** | **循环 `AudioServer.BusCount`** 逐条总线（现在 4 条：`Master` 总音量 / `Music` 音乐 / `SFX` 音效 / `UI` 界面音效）各一条滑条 + 静音 + 「恢复默认音量」。**加一条总线这里自动多一组**，只有中文名要在这张表里补一行 |
+
+⚠️ **重绑只写 `user://settings.cfg`**（`InputMap.ActionEraseEvents/AddEvent` 是运行期的），**项目文件不动**。跑自测前若你自己在设置里改过键位，记得删掉 `user://settings.cfg`，否则自测按的键会打不准（自测用 `Input.ParseInputEvent` 合成真实按键）。
+
+### 12.3 证据
+
+| 项 | 结果 |
+|---|---|
+| 真实打开路径（`UiService.OpenSettings()`） | `[Probe] ① OpenSettings=true IsOpen=true Paused=true MouseMode=0 分类数=3 分类=graphics / input / audio 栈深=1` |
+| Esc 关闭（`UiRouter` 路径） | `[Probe] ② Esc 之后 IsOpen=false Paused=false 栈深=0` |
+| 截图 | `ui_10_settings.png`（画面）、`ui_12_settings_controls.png`（控制）、`ui_13_settings_audio.png`（音量）、`ui_15_settings_opened.png`（**真的打开**后的样子） |
+
+---
+
+## 13. 图标化（构筑元素 / 卡片 / 分类）
+
+用户原话：「**尽量使用图标去代替文字**，比如**构筑元素都用图标**（这需要**一个面板来显示角色持有**），**只有选取界面和鼠标悬停时显示说明**，**场景里的那些什么强化池这些不需要显示**」。
+
+### 13.1 图从哪来
+
+`Assets/UI/Icons/ic_ui_*.svg`（**13 张，手写 SVG**：矢量、可改、零依赖、Godot 原生导入；颜色写在文件里，换色 = 改一个十六进制）。
+名字带 `reward_`（奖励类型）/ `node_`（地面节点类型）/ `set_`（设置分类）/ `build_holdings`。
+
+**唯一映射表 = `Scripts/UI/UiIcons.cs`**：
+
+| 方法 | 用途 |
+|---|---|
+| `UiIcons.ForReward(RewardDefinition)` | 奖励类型（强化 / 进化 / 异化）→ 图标 |
+| `UiIcons.ForNodeKind(RewardNodeKind)` | 地面节点 9 种 → 图标 |
+| `UiIcons.ForWeapon(WeaponPresetKind)` | 武器卡片 |
+| `UiIcons.ForTitle(string)` | **只有标题字符串**的通用多选一（`ChooseScreen`）：拿 `RewardService.TitleFor` 那张表反查 |
+| `UiIcons.ForSection(string)` | 设置分类 Tab 图标（新增分类在这里加一行） |
+| `UiIcons.Named(string)` / `DebugLoadedCount()` | 按名字取 / 自检 |
+
+**读不到图返回 `null`**（界面只显示文字，不报错、不抛异常）—— 与"表读不到就用自身默认值"同一条纪律。
+
+### 13.2 三处落地 + 说明什么时候出现
+
+| 位置 | 图标化后 | 说明文字出现在哪 |
+|---|---|---|
+| **HUD**（`Hud.tscn` 的 `Root/BuildIcons`） | 本局构筑 = **一行小图标**（每格 44×44，叠层数写 `×N`）；**原来那行「构筑：名字／名字」的文字已经删掉** | 不显示（HUD 鼠标是捕获的，悬停没意义） |
+| **角色持有面板**（`BuildScreen`，快捷键 **C**） | 全屏 **图标矩阵**（7 列，112×112 的格子），`GridContainer` 居中 | **鼠标悬停**：`tooltip_text =「名字 ×N（类型）」+ 说明`。面板是 `UiLayer.Panel`（打开即暂停 + 放开鼠标），所以悬停真的能悬停 |
+| **选取界面**（`RewardScreen` / `StartScreen` / `ChooseScreen`） | `Button.Icon` = 对应图标（卡片左侧 64×64），文字保留 | **就在卡片上**（用户明确要求"选取界面"可以显示说明） |
+
+### 13.3 场景交互物**不再显示文字**
+
+- `Scenes/Interactables/RewardNode.tscn` 的 `Label`（`Label3D`，"强化池"）**已删除**。
+- 基类 `Interactable._Ready()` 里加了 `HideNameplates(this)`：**任何** `Label3D` 子孙都会被置为不可见 —— 以后谁在交互物上挂名牌都不会露出来，而**交互判定 / 范围检测 / 消耗 / 复位一行没动**（`RewardNode.cs` 一行没改，它找不到名牌节点会直接 return）。
+- 玩家仍然知道那是哪种池子：**走近按 F**（HUD 的 `按 F 使用：强化池` 提示还在）+ 节点自身的颜色。
+- 自检：`[UiShot] 交互物名牌：RewardNode 里的 Label3D 共 0 个（可见 0 个）—— 期望 0 / 0`；
+  截图 `ui_08_hud_ingame.png` 里地面节点上方**没有任何浮空文字**。
+
+---
+
+## 14. 还没做的（可以接着推，按性价比排序）
 
 | 项 | 说明 |
 |---|---|

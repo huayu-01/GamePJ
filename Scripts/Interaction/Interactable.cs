@@ -68,6 +68,7 @@ public abstract partial class Interactable : Node3D
 
 	public override void _Ready()
 	{
+		HideNameplates(this);
 		Register();
 		ApplyIdleVisual();
 	}
@@ -208,9 +209,32 @@ public abstract partial class Interactable : Node3D
 	/// <summary>把外观恢复成"可用"状态（子类覆盖，例如奖励节点按类型上色）。</summary>
 	protected virtual void ApplyIdleVisual() => VisualMesh?.SetSurfaceOverrideMaterial(0, null);
 
-	/// <summary>名字 / 类型变化后的表现刷新（奖励节点用它更新头顶 Label3D）。</summary>
+	/// <summary>名字 / 类型变化后的表现刷新（子类要更新视觉时覆盖它；**头顶不再有名牌**，见 HideNameplates）。</summary>
 	protected virtual void OnNameChanged()
 	{
+	}
+
+	/// <summary>
+	/// 用户需求（图标化）：「场景里的那些什么强化池这些不需要显示」——
+	/// 交互物**不再在场景里写名字**：名字只在走近后的 HUD 提示、选取界面与鼠标悬停时出现。
+	///
+	/// 做法是"基类无条件藏掉 <see cref="Label3D"/> 子孙节点"，而不是删掉某一个场景里的节点：
+	/// 这样任何交互物（现有的 / 以后新写的）只要挂了名牌就不会露出来，
+	/// 而**交互判定、范围检测、消耗与复位逻辑一行都没有动**。
+	/// </summary>
+	private static void HideNameplates(Node root)
+	{
+		foreach (Node child in root.GetChildren())
+		{
+			if (child is Label3D label)
+			{
+				label.Visible = false;
+			}
+			else if (child is Node3D)
+			{
+				HideNameplates(child);
+			}
+		}
 	}
 
 	/// <summary>登记为可交互目标（消失时摘掉，复位 / 出现时登记回来）。</summary>

@@ -20,6 +20,7 @@ public partial class BaseScreen : OverlayScreen
 	private Button _crit = null!;
 	private Button _reload = null!;
 	private Button _start = null!;
+	private Button _settings = null!;
 	private Action? _onStart;
 
 	public override void _Ready()
@@ -34,6 +35,7 @@ public partial class BaseScreen : OverlayScreen
 		_crit = GetNode<Button>("Root/Panel/VBox/Upgrades/Crit");
 		_reload = GetNode<Button>("Root/Panel/VBox/Upgrades/Reload");
 		_start = GetNode<Button>("Root/Panel/VBox/Start");
+		_settings = GetNode<Button>("Root/Panel/VBox/Settings");
 
 		_health.Pressed += () => { MetaProgress.BuyHealth(); Refresh(); };
 		_damage.Pressed += () => { MetaProgress.BuyDamage(); Refresh(); };
@@ -41,6 +43,7 @@ public partial class BaseScreen : OverlayScreen
 		_crit.Pressed += () => { MetaProgress.BuyCrit(); Refresh(); };
 		_reload.Pressed += () => { MetaProgress.BuyReload(); Refresh(); };
 		_start.Pressed += Begin;
+		_settings.Pressed += () => UiService.Instance?.OpenSettings();
 	}
 
 	public void Open(Action onStart)
@@ -53,6 +56,14 @@ public partial class BaseScreen : OverlayScreen
 		_onStart = onStart;
 		MetaProgress.Load();
 		Refresh();
+
+		// 按键提示栏（基类提供）：基地界面能用键做的事都在这一栏里，不用去翻说明。
+		SetKeyHints(
+			("1 ~ 5", "购买永久强化"),
+			(Key.Enter, "出征"),
+			("O", "设置"),
+			("H", "说明"));
+
 		BeginOpen();
 	}
 

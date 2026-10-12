@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://Scripts/Interaction/BaseTerminal.cs" id="2_terminal"]
@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/HelpScreen.tscn" id="5_help"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/LoadingScreen.tscn" id="6_loading"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/BossPreviewScreen.tscn" id="7_preview"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/SettingsScreen.tscn" id="8_settings"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/BuildScreen.tscn" id="9_build"]
 
 [sub_resource type="BoxShape3D" id="Shape_ground"]
 size = Vector3(26, 1, 26)
@@ -106,4 +108,6 @@ surface_material_override/0 = SubResource("Mat_gate")
 
 [node name="HelpScreen" parent="Screens" instance=ExtResource("5_help")]
 [node name="BossPreviewScreen" parent="Screens" instance=ExtResource("7_preview")]
+[node name="SettingsScreen" parent="Screens" instance=ExtResource("8_settings")]
+[node name="BuildScreen" parent="Screens" instance=ExtResource("9_build")]
 [node name="LoadingScreen" parent="." instance=ExtResource("6_loading")]

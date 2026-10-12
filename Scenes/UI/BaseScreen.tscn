@@ -27,19 +27,19 @@ mouse_filter = 2
 color = Color(0.05, 0.06, 0.09, 0.92)
 
 [node name="Panel" type="PanelContainer" parent="Root"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -380.0
-offset_top = -230.0
-offset_right = 380.0
-offset_bottom = 230.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 32.0
+offset_right = -48.0
+offset_bottom = -32.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBox" type="VBoxContainer" parent="Root/Panel"]
-theme_override_constants/separation = 14
+alignment = 1
+theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="Root/Panel/VBox"]
 theme_type_variation = &"UiTitle"
@@ -56,34 +56,44 @@ patch_margin_bottom = 8
 modulate = Color(0.5, 0.82, 1, 0.9)
 
 [node name="Shards" type="Label" parent="Root/Panel/VBox"]
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 24
 text = "碎片：0"
 horizontal_alignment = 1
 
 [node name="Hint" type="Label" parent="Root/Panel/VBox"]
 theme_type_variation = &"UiCaption"
-text = "碎片来自战斗与关卡进度。按 1/2/3 购买永久强化，Enter 出征。"
+text = "碎片来自战斗与关卡进度。按 1/2/3/4/5 购买永久强化，Enter 出征，O 打开设置。"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Upgrades" type="VBoxContainer" parent="Root/Panel/VBox"]
-theme_override_constants/separation = 8
+[node name="Upgrades" type="GridContainer" parent="Root/Panel/VBox"]
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 2
 
 [node name="Health" type="Button" parent="Root/Panel/VBox/Upgrades"]
-custom_minimum_size = Vector2(680, 48)
+custom_minimum_size = Vector2(420, 56)
 
 [node name="Damage" type="Button" parent="Root/Panel/VBox/Upgrades"]
-custom_minimum_size = Vector2(680, 48)
+custom_minimum_size = Vector2(420, 56)
 
 [node name="Speed" type="Button" parent="Root/Panel/VBox/Upgrades"]
-custom_minimum_size = Vector2(680, 48)
+custom_minimum_size = Vector2(420, 56)
 
 [node name="Crit" type="Button" parent="Root/Panel/VBox/Upgrades"]
-custom_minimum_size = Vector2(680, 48)
+custom_minimum_size = Vector2(420, 56)
 
 [node name="Reload" type="Button" parent="Root/Panel/VBox/Upgrades"]
-custom_minimum_size = Vector2(680, 48)
+custom_minimum_size = Vector2(420, 56)
 
 [node name="Start" type="Button" parent="Root/Panel/VBox"]
-custom_minimum_size = Vector2(680, 56)
+custom_minimum_size = Vector2(852, 62)
+size_flags_horizontal = 4
 theme_type_variation = &"UiPrimaryButton"
+text = "开始探索（进入配置）"
+
+[node name="Settings" type="Button" parent="Root/Panel/VBox"]
+custom_minimum_size = Vector2(852, 52)
+size_flags_horizontal = 4
+text = "设置（画面 / 控制 / 音量）"

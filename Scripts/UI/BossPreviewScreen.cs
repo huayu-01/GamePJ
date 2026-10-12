@@ -84,6 +84,7 @@ public partial class BossPreviewScreen : OverlayScreen
 		}
 
 		_body.Text = Describe(StageController.Instance, StageController.Instance?.CurrentNode);
+		SetKeyHints(KeyHint.Of(ToggleKey, "关闭"), (Key.Escape, "关闭"));
 		BeginOpen();
 	}
 

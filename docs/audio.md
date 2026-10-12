@@ -268,6 +268,6 @@ deferred 上下文创建 ProgressDialog 报错，与本次改动无关）。所�
 |---|---|---|
 | **没有 3D 定位音** | 全部是 2D（`AudioStreamPlayer`），没有距离衰减/声道定位 | 加一条 `PlaySfxAt(id, position)` + 一组 `AudioStreamPlayer3D` 声部；**表结构不用动**（`Bus` 已经分流） |
 | **没有音乐素材** | `Music` 总线与 `PlayMusic(id)` 都在，但**表里 0 行 `Bus = Music`** | 放一个 `.ogg` + 加一行（`Loop` 在那个 `.ogg` 的 **Import 设置**里勾，不是表里的列） |
-| **没有音量设置界面** | 总线的音量只能手改 `default_bus_layout.tres` | 走 `AudioServer.SetBusVolumeDb` + 存 `user://settings.cfg`（与按键设置同一批做） |
+| **没有音量设置界面** | ✅ **2026-10 第六轮已做**：全屏设置菜单（`SettingsScreen`，快捷键 O）的**音量**页循环 `AudioServer.BusCount` 逐条总线给滑条 + 静音，落 `user://settings.cfg`，启动时由 `UiRouter._Ready → SettingsStore.ApplyOnStartup()` 套用。见 [ui.md](ui.md) §12 | 想加"按类别"的音量曲线就在 `AudioSettingsSection` 里加一行 |
 | **音效表没有"变体数组"** | 一条 id = 一个文件（靠 `PitchRandom` 制造变化） | 要轮播多个变体就加一列 `Variants`（`AudioStream[]`），`AudioManager` 里按顺序取 |
 | **`ui_click` 是"全按钮一个音"** | 所有 `BaseButton.Pressed` 共用 `ui_click` | 想按按钮分类就加一个 `Button` 的 meta/组约定，或在 `OverlayScreen` 子类里覆盖 |

@@ -50,6 +50,8 @@ public partial class RewardScreen : OverlayScreen
 		button.Alignment = HorizontalAlignment.Center;
 		button.Pressed += DismissMessage;
 
+		SetKeyHints((Key.Enter, "确定"), ("点击按钮", "确定"));
+
 		BeginOpen();
 	}
 
@@ -66,9 +68,15 @@ public partial class RewardScreen : OverlayScreen
 		{
 			RewardDefinition definition = _options[i];
 			Button card = CreateCard($"[{i + 1}] {definition.Name}（{KindLabel(definition.Kind)}）\n{definition.Description}");
+
+			// 图标代替文字：类型（强化 / 进化 / 异化）一眼可辨，文字留给"这一条到底做什么"。
+			card.Icon = UiIcons.ForReward(definition);
+
 			int index = i;
 			card.Pressed += () => Choose(index);
 		}
+
+		SetKeyHints(("1 / 2 / 3", "选择奖励"), ("悬停", "看说明"));
 
 		BeginOpen();
 	}

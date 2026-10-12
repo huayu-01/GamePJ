@@ -43,9 +43,11 @@ public partial class StartScreen : OverlayScreen
 		_onChosen = onChosen;
 
 		ClearCards();
-		CreateCard(0, WeaponCardText(WeaponPresetKind.Pistol, "[1] 手枪\n单发高伤、精准，适合中远距离点射"));
-		CreateCard(1, WeaponCardText(WeaponPresetKind.Sniper, "[2] 激光狙击枪\n高伤单发"));
-		CreateCard(2, WeaponCardText(WeaponPresetKind.Rifle, "[3] 步枪\n按住左键连发，续航最好"));
+		CreateCard(0, WeaponPresetKind.Pistol, WeaponCardText(WeaponPresetKind.Pistol, "[1] 手枪\n单发高伤、精准，适合中远距离点射"));
+		CreateCard(1, WeaponPresetKind.Sniper, WeaponCardText(WeaponPresetKind.Sniper, "[2] 激光狙击枪\n高伤单发"));
+		CreateCard(2, WeaponPresetKind.Rifle, WeaponCardText(WeaponPresetKind.Rifle, "[3] 步枪\n按住左键连发，续航最好"));
+
+		SetKeyHints(("1 / 2 / 3", "选择武器"), (Key.Enter, "默认手枪"), ("悬停", "看武器数值"));
 
 		BeginOpen();
 	}
@@ -80,12 +82,16 @@ public partial class StartScreen : OverlayScreen
 		}
 	}
 
-	private void CreateCard(int index, string text)
+	private void CreateCard(int index, WeaponPresetKind kind, string text)
 	{
 		var card = (Button)_template.Duplicate();
 		card.Visible = true;
 		card.Text = text;
 		card.Alignment = HorizontalAlignment.Left;
+
+		// 图标代替文字：武器用图标，具体数值留在文字里（选择界面允许有说明）。
+		card.Icon = UiIcons.ForWeapon(kind);
+
 		card.Pressed += () => Choose(index);
 		_cards.AddChild(card);
 	}

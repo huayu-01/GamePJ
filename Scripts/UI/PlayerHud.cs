@@ -29,8 +29,11 @@ public partial class PlayerHud : CanvasLayer
 	/// <summary>顶部那一行状态文字更窄，强化条目上限再收一档。</summary>
 	private const int BossStatusPerkLimit = 4;
 
-	/// <summary>交互提示里顺带写出的「首领状况」快捷键（取自预览面板的默认键，避免两处漂移）。</summary>
-	private static readonly string BossPreviewHint = $"[{OS.GetKeycodeString(BossPreviewScreen.DefaultToggleKey)} 首领状况]";
+	/// <summary>交互提示里顺带写出的「首领状况 / 角色持有 / 设置」快捷键（取自各自界面的默认键，避免两处漂移）。</summary>
+	private static readonly string BossPreviewHint =
+		$"[{OS.GetKeycodeString(BossPreviewScreen.DefaultToggleKey)} 首领状况] " +
+		$"[{OS.GetKeycodeString(BuildScreen.DefaultToggleKey)} 角色持有] " +
+		$"[{OS.GetKeycodeString(Key.O)} 设置]";
 
 	private Label _health = null!;
 	private Label _ammo = null!;
@@ -49,6 +52,7 @@ public partial class PlayerHud : CanvasLayer
 	/// <summary>血条栏上的首领强化行（**技能** ◆ + **词条** ◇，见 <see cref="BossPerkText"/>）。</summary>
 	private Label _bossPerks = null!;
 	private Label _build = null!;
+	private HBoxContainer _buildIcons = null!;
 	private HealthBarWidget _healthBar = null!;
 	private Unit? _player;
 	private Weapon? _weapon;
@@ -63,6 +67,7 @@ public partial class PlayerHud : CanvasLayer
 		_ammo = GetNode<Label>("Root/Ammo");
 		_status = GetNode<Label>("Root/Status");
 		_build = GetNode<Label>("Root/Build");
+		_buildIcons = GetNode<HBoxContainer>("Root/BuildIcons");
 
 		// 血条只按名字取节点、只当 Control 用 —— 美术可以把填充换成贴图/NinePatch，类型不再被写死。
 		_healthBar = HealthBarWidget.Bind(GetNode<Control>(PlayerBarNode));
@@ -71,6 +76,15 @@ public partial class PlayerHud : CanvasLayer
 	private float _hudAccum;
 	private string _lastStatus = string.Empty;
 	private string _lastVitals = string.Empty;
+
+	/// <summary>构筑图标条当前的内容签名（只有变了才重建节点）。</summary>
+	private string _buildSignature = string.Empty;
+
+	/// <summary>拍图 / 探针塞了示例图标（这时不再被真实构筑状态覆盖）。</summary>
+	private bool _debugSampleBuild;
+
+	/// <summary>HUD 上画了几个构筑图标（验证用只读属性）。</summary>
+	public int BuildIconCount => _buildIcons != null && IsInstanceValid(_buildIcons) ? _buildIcons.GetChildCount() : 0;
 
 	public override void _Process(double delta)
 	{
@@ -133,11 +147,14 @@ public partial class PlayerHud : CanvasLayer
 		}
 
 		string prompt = PlayerInteractInput.Prompt;
-		string build = _run?.Build.Describe() ?? string.Empty;
 
-		// 站在可交互物旁边（= "交互时"）顺带提示首领状况面板的快捷键。
+		// 站在可交互物旁边（= "交互时"）顺带提示首领状况 / 角色持有 / 设置的快捷键。
 		string interactHint = prompt.Length > 0 ? $"   {BossPreviewHint}" : string.Empty;
-		_build.Text = prompt.Length > 0 ? $"{prompt}{interactHint}\n{build}" : build;
+		_build.Text = prompt.Length > 0 ? $"{prompt}{interactHint}" : string.Empty;
+
+		// 构筑**不再写成一串文字**（用户需求：构筑元素都用图标）：
+		// HUD 只放一行小图标，名字与说明去 C 面板（那里鼠标能用，悬停才有意义）。
+		RefreshBuildIcons(_run?.Build);
 
 		if (_player.IsDead)
 		{
@@ -190,6 +207,118 @@ public partial class PlayerHud : CanvasLayer
 
 		return null;
 	}
+
+	// === 构筑图标条（用户需求：「构筑元素都用图标」「说明只在选取界面和鼠标悬停时显示」）===
+
+	/// <summary>
+	/// 本局构筑在 HUD 上只放**一行图标**（不写名字）：名字与说明在 <see cref="BuildScreen"/>（快捷键 C）里，
+	/// 那里界面是暂停的、鼠标是放开的，悬停提示才有意义。
+	/// 内容签名没变就不重建节点（HUD 每 0.05 秒跑一次，重建节点太贵）。
+	/// </summary>
+	private void RefreshBuildIcons(RunBuild? build)
+	{
+		if (_debugSampleBuild)
+		{
+			return;   // 拍图 / 探针塞的示例图标，不要被真实状态覆盖
+		}
+
+		string signature = BuildSignature(build);
+		if (signature == _buildSignature)
+		{
+			return;
+		}
+
+		_buildSignature = signature;
+		foreach (Node child in _buildIcons.GetChildren())
+		{
+			_buildIcons.RemoveChild(child);
+			child.QueueFree();
+		}
+
+		if (build == null)
+		{
+			return;
+		}
+
+		foreach (RewardDefinition definition in build.Acquired)
+		{
+			_buildIcons.AddChild(BuildIcon(definition, build.StacksOf(definition.Id)));
+		}
+	}
+
+	private static string BuildSignature(RunBuild? build)
+	{
+		if (build == null || build.Acquired.Count == 0)
+		{
+			return string.Empty;
+		}
+
+		var parts = new List<string>(build.Acquired.Count);
+		foreach (RewardDefinition definition in build.Acquired)
+		{
+			parts.Add($"{definition.Id}×{build.StacksOf(definition.Id)}");
+		}
+
+		return string.Join("|", parts);
+	}
+
+	/// <summary>一格：图标 + 叠层数（与 <see cref="BuildScreen"/> 同一套图标表）。</summary>
+	private static Control BuildIcon(RewardDefinition definition, int stacks)	{
+		var tile = new PanelContainer
+		{
+			ThemeTypeVariation = "UiTile",
+			CustomMinimumSize = new Vector2(44, 44),
+			MouseFilter = Control.MouseFilterEnum.Ignore,
+		};
+
+		var icon = new TextureRect
+		{
+			Texture = UiIcons.ForReward(definition),
+			ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+			StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+			MouseFilter = Control.MouseFilterEnum.Ignore,
+		};
+
+		var count = new Label
+		{
+			Text = stacks > 1 ? $"×{stacks}" : string.Empty,
+			HorizontalAlignment = HorizontalAlignment.Right,
+			VerticalAlignment = VerticalAlignment.Bottom,
+			MouseFilter = Control.MouseFilterEnum.Ignore,
+		};
+
+		// ⚠️ 外层是普通 Control（不是容器）：子节点**必须自己锚满**，否则尺寸是 0×0 → 图标看不见
+		//（踩过一次：HUD 上只看到 6 个空底板）。
+		var stack = new Control { MouseFilter = Control.MouseFilterEnum.Ignore };
+		stack.AddChild(icon);
+		stack.AddChild(count);
+		icon.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+		count.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+		tile.AddChild(stack);
+		return tile;
+	}
+
+	/// <summary>
+	/// 验证 / 拍图用：用**真实的奖励目录**填几个构筑图标（不依赖本局状态）。
+	/// 拍摄台拿它拍到"HUD 上的构筑图标条长什么样"，不需要真去打通一局。
+	/// </summary>
+	public void DebugSetSampleBuildIcons(int count = 6)
+	{
+		_debugSampleBuild = true;
+		foreach (Node child in _buildIcons.GetChildren())
+		{
+			_buildIcons.RemoveChild(child);
+			child.QueueFree();
+		}
+
+		RewardDefinition[] all = RewardCatalog.All;
+		int shown = Mathf.Min(count, all.Length);
+		for (int i = 0; i < shown; i++)
+		{
+			_buildIcons.AddChild(BuildIcon(all[i], i % 3 == 0 ? 2 : 1));
+		}
+	}
+
 	// === 首领血条（用户需求：唯一的首领不用头顶血条，改在屏幕上方；近距离展开完整血条，远距离只留头像） ===
 
 	/// <summary>实例化 BarBoss 预制体。位置/尺寸/头像/字号都在场景里，这里只按名字抓节点。</summary>
