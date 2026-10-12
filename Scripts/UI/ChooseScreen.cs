@@ -5,7 +5,7 @@ using Godot;
 namespace ActRoguelike.UI;
 
 /// <summary>
-/// 通用多选一界面（武器池、以后的商店/事件都用它）：给定标题与若干选项文本，回调选中的下标。
+/// 通用多选一界面（进化池、以后的商店/事件都用它）：给定标题与若干选项文本，回调选中的下标。
 /// 复用 OverlayScreen 的防误触与 Esc 约定。
 /// </summary>
 public partial class ChooseScreen : OverlayScreen
