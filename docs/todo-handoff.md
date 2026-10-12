@@ -305,3 +305,49 @@ Scripts/
 - 基地场景 `Scenes/Levels/Base.tscn`（4 个交互台 + 出击门），主场景已切到基地
 
 **已知未解决**：`MapManager` 的**运行时导航烘焙始终得到 0 个多边形**（`TestArena.tscn` 里的 `NavigationRegion3D` 也是空数据）。所有点位供给都有兜底路径，所以不影响玩法，**暂时不管**。
+
+---
+
+## ⚠️ 编辑器构建失败 / MCP 起不来（2026-10-12 实测确认）
+
+**现象**
+- 编辑器 Problems 报：`无法解析 SDK "Godot.NET.Sdk/4.7.2"` / `找不到指定的 SDK`
+- `run_project` 报：`Play was requested but no debugger session became active` 或
+  `The scene likely failed to load — check ProjectSettings application/run/main_scene`
+- `runtime info` / `runtime screenshot` 报：`no_active_sessions`
+
+**根因（用户实测结论 —— 不是代码问题、不是 SDK 没装）**
+
+**有子代理在同时运行时就会出现。** 多个 Godot 实例并发会抢编辑器的构建回调：
+编辑器 `play_custom_scene` 触发 C#「运行前构建」，而它在 deferred 上下文里建
+ProgressDialog 失败：
+
+```
+Do not use progress dialog (task) while flushing the message queue
+```
+
+→ 构建回调失败 → 没有 debugger session → 运行/截图全都拿不到。
+
+**解法**
+1. **重启编辑器**（大概率解决）—— 关掉编辑器进程后重新起：
+   ```powershell
+   & 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64.exe' `
+     -e --path 'F:\Godot项目\项目a' --mcp-port=9080
+   ```
+   ⚠️ **若当时仍有代理在跑，重启后仍会失败** —— 这是预期的，等代理收工再重启。
+2. **任何时候都可靠的绕过：命令行直跑 + 读日志**（不依赖编辑器与 MCP）
+   ```powershell
+   $godot = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64.exe'
+   '1' | Set-Content 'C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\selftest.flag'
+   Start-Process $godot -ArgumentList '--path','F:\Godot项目\项目a','res://Scenes/Main.tscn'
+   Start-Sleep -Seconds 27
+   Remove-Item 'C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\selftest.flag'  # 必须删
+   # 日志：C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\logs\
+   ```
+   ⚠️ **必须带场景参数** —— 主场景是基地，不带会进基地（自测会因为找不到 `Main/Stage` 而输出一堆空值）。
+
+**给并行代理的纪律**
+- 跑验证**优先用命令行直跑**，不要依赖 MCP 运行时桥
+- **`stop_project` 是全局的**，会杀掉别的代理正在跑的自测实例 —— 不要随便用
+- 设置 `selftest.flag` 的窗口要尽量短（它会影响那几秒内**任何**启动的游戏实例）
+- 若必须用编辑器：**用完把自己的编辑器实例关掉**
