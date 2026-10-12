@@ -515,9 +515,12 @@ SettingsSections.Register(() => new AbilitySettingsSection());
 
 | 位置 | 图标化后 | 说明文字出现在哪 |
 |---|---|---|
-| **HUD**（`Hud.tscn` 的 `Root/BuildIcons`） | 本局构筑 = **一行小图标**（每格 44×44，叠层数写 `×N`）；**原来那行「构筑：名字／名字」的文字已经删掉** | 不显示（HUD 鼠标是捕获的，悬停没意义） |
-| **角色持有面板**（`BuildScreen`，快捷键 **C**） | 全屏 **图标矩阵**（7 列，112×112 的格子），`GridContainer` 居中 | **鼠标悬停**：`tooltip_text =「名字 ×N（类型）」+ 说明`。面板是 `UiLayer.Panel`（打开即暂停 + 放开鼠标），所以悬停真的能悬停 |
+| **HUD**（`Hud.tscn` 的 `Root/BuildIcons`） | 本局构筑 = **一行小图标**（每格 44×44，叠层数写 `×N`）；**原来那行「构筑：名字／名字」的文字已经删掉** | 不显示（HUD 鼠标是捕获的，悬停没意义） || **角色持有面板**（`BuildScreen`，快捷键 **C**） | 全屏 **图标矩阵**（7 列，112×112 的格子），`GridContainer` 居中 | **鼠标悬停**：`tooltip_text =「名字 ×N（类型）」+ 说明`。面板是 `UiLayer.Panel`（打开即暂停 + 放开鼠标），所以悬停真的能悬停 |
 | **选取界面**（`RewardScreen` / `StartScreen` / `ChooseScreen`） | `Button.Icon` = 对应图标（卡片左侧 64×64），文字保留 | **就在卡片上**（用户明确要求"选取界面"可以显示说明） |
+
+**实机证据（走的是真实 `RunBuild`，不是示例数据）**：`ui_14_ingame_hud_real_build.png` ——
+`Main.tscn` 跑自测，第 9 阶段（真的走过去按 F、真的选了一条奖励）之后，HUD 左下角就出现那一格构筑图标。
+拍摄台 / 探针里的 `DebugSetSampleBuildIcons(count)` 只是"不打通一局也能拍"的捷径，**渲染走的是同一个 `BuildIcon()`**。
 
 ### 13.3 场景交互物**不再显示文字**
 
