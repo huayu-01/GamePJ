@@ -70,6 +70,9 @@ public partial class Balance : Node
 		ConfigRows.Rebuild(Config.Upgrades);
 		ConfigRows.Rebuild(Config.UpgradePools);
 		ConfigRows.Rebuild(Config.MetaUpgrades);
+		// 能力卡（局外装备层，见 docs/ability-cards.md）：**与 Skills 是两层**，
+		// 所以是独立的一张表 + 独立的一行日志条数，绝不混进技能表的计数里。
+		ConfigRows.Rebuild(Config.AbilityCards);
 
 		// 节点表额外建"节点类型 → 行 Id"的索引（RewardService / NodePlacement 按类型查）。
 		foreach (NodeConfig row in Config.Nodes)
@@ -90,6 +93,9 @@ public partial class Balance : Node
 
 		// 单位行 → AI 档案（配置表阶段 5）：读不到表 / 单位行没挂档案也在这里留痕。
 		ReportAiProfiles();
+
+		// 能力卡（局外装备层）：卡表行数 + 额度上限公式 + "授予技能"卡指向的技能行在不在索引里。
+		ReportAbilityCards();
 
 		// 首领强化：数值型（Pressure 表）与行为型（技能表里 ApplyHandler 非空的行）分别编译，
 		// 两者必须能按来源分开（关卡核心文档 §7.1）。
@@ -118,7 +124,7 @@ public partial class Balance : Node
 
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
-			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()} / AI 档案 {ConfigRows.Count<AiProfileConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
+			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()} / AI 档案 {ConfigRows.Count<AiProfileConfig>()} / 能力卡 {ConfigRows.Count<AbilityCardConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
 	}
 
 	/// <summary>
@@ -245,6 +251,58 @@ public partial class Balance : Node
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
 			$"AI 档案：{profileCount} 个（来源：{(profileCount > 0 ? "表 AiProfiles" : "代码默认值（表读不到）")}）—— 单位指向 [{links}]；有预制体但没挂档案的 {unlinked} 个");
+	}
+
+	/// <summary>
+	/// 把能力卡表的规模与"额度上限怎么算"写进日志（`docs/ability-cards.md` 的"顺藤摸瓜"入口）。
+	///
+	/// 三件事必须能一眼看出来：① 读到几张卡（没读到 = 矩阵全是空位，不是崩溃）；
+	/// ② 额度上限 = 基础 + 扩增行 × 每级增量（**"额度也能用局外资源升级"的落地形式**）；
+	/// ③ "授予技能"卡指向的技能行在不在 <c>Skills</c> 索引里（引用还在、索引查不到也要报出来 ——
+	/// 与升级池 / AI 档案同一条纪律）。
+	/// </summary>
+	private void ReportAbilityCards()
+	{
+		int cardCount = ConfigRows.Count<AbilityCardConfig>();
+		var lines = new System.Text.StringBuilder();
+		foreach (AbilityCardConfig row in Config.AbilityCards)
+		{
+			if (row == null)
+			{
+				continue;
+			}
+
+			if (lines.Length > 0)
+			{
+				lines.Append('、');
+			}
+
+			lines.Append($"{row.Id}（{row.QuotaCost} 点/解锁 {row.UnlockCost}/上限 Lv{row.MaxLevel}）");
+
+			if (row.Effect != AbilityCardEffectKind.GrantSkill)
+			{
+				continue;
+			}
+
+			if (row.Skill == null)
+			{
+				GD.PushWarning($"[Balance] 能力卡 {row.Id} 是授予技能型，但没填 Skill（技能行）—— 这张卡激活后不会有任何效果。");
+				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 能力卡 {row.Id} 是授予技能型但没填 Skill 列。");
+				continue;
+			}
+
+			if (ConfigRows.ById<AbilityConfig>(row.Skill.Id) == null)
+			{
+				GD.PushWarning($"[Balance] 能力卡 {row.Id} 的 Skill 指向「{row.Skill.Id}」，但这个技能不在 Balance.tres 的 Skills 索引里。");
+				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 能力卡 {row.Id} 指向的技能行「{row.Skill.Id}」不在 Skills 索引里（引用还在，索引里查不到）。");
+			}
+		}
+
+		MetaUpgradeConfig? quota = ConfigRows.ById<MetaUpgradeConfig>(ActRoguelike.AbilityCards.AbilityStore.QuotaRowId);
+		ActRoguelike.Core.GameLog.Write(
+			"Config",
+			$"能力卡（局外装备层，与 Skills 是两层）：{cardCount} 张（来源：{(cardCount > 0 ? "表 AbilityCards" : "代码默认值（表读不到）")}）—— [{lines}]；"
+			+ $"额度上限 = 基础 {Config.AbilityQuotaBase} + 扩增行 {(quota == null ? "（读不到 meta_quota，每级 +1）" : $"{quota.Id} 每级 +{quota.PerLevel:0.##}（1 级价格 {quota.BaseCost}，每级 +{quota.CostGrowth}）")}");
 	}
 
 	/// <summary>

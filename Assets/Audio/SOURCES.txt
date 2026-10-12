@@ -14,6 +14,16 @@ Assets/Audio/sfx/sfx_enemy_die.ogg    ← kenney_impact-sounds.zip    Audio/impa
 Assets/Audio/ui/ui_click.ogg          ← kenney_interface-sounds.zip Audio/click_002.ogg
 Assets/Audio/ui/ui_open.ogg           ← kenney_interface-sounds.zip Audio/open_001.ogg
 
+项目自制（不是外部素材，因此不涉及任何第三方许可）
+----------------------------------------------------------------
+Assets/Audio/ui/ui_card_unlock.wav    能力卡解锁（升调三音）
+Assets/Audio/ui/ui_card_upgrade.wav   能力卡升级（双音上滑）
+Assets/Audio/ui/ui_card_fail.wav      能力卡失败 / 元素震动（低频嗡）
+Assets/Audio/ui/ui_card_reset.wav     能力卡重置升级（降调三音）
+  生成方式：`_tools/make_ui_card_sfx.ps1`（16-bit PCM 单声道 22050Hz WAV，纯数学生成）。
+  重做 / 改音色：改那个脚本里的频率与时长再跑一次（脚本入库，便于复现）。
+  想换成 Kenney 的现成音效也可以：同名 .ogg 放进来、改音效表的 Stream 一列（零 C#）。
+
 素材包页面
 ----------------------------------------------------------------
 Kenney · Sci-fi Sounds      https://kenney.nl/assets/sci-fi-sounds       （70 个文件）

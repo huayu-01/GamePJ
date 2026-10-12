@@ -180,6 +180,28 @@ public partial class BalanceConfig : Resource
 	/// <summary>局外成长表（`Config/Tables/Meta/meta_*.tres`）。空 = 用 <c>MetaProgress</c> 里的代码内置系数。</summary>
 	[Export] public MetaUpgradeConfig[] MetaUpgrades { get; set; } = System.Array.Empty<MetaUpgradeConfig>();
 
+	[ExportGroup("表索引 · 能力卡（局外装备层）")]
+	/// <summary>
+	/// **能力卡表**（`Config/Tables/AbilityCards/card_*.tres`）：**一行 = 一张卡**。
+	///
+	/// <para>⚠️ 这是**局外**的一层（解锁 / 升级 / 激活开关 / 占用额度点数，存 `user://ability_cards.cfg`），
+	/// 与 `Skills`（**局内**的单位技能，一行一个技能节点怎么配）**不是同一张表、也不是同一层**。
+	/// 两者的唯一接触点是 <see cref="AbilityCardConfig.Skill"/> 那一列（资源引用）。
+	/// 判断依据与"为什么不能混"写在 `docs/ability-cards.md` §1。</para>
+	///
+	/// 空 = 一张卡都没有 → 能力矩阵界面显示"空位"，玩法完全不受影响（本局没有卡效果）。
+	/// </summary>
+	[Export] public AbilityCardConfig[] AbilityCards { get; set; } = System.Array.Empty<AbilityCardConfig>();
+
+	[ExportGroup("能力卡 · 额度点数")]
+	/// <summary>
+	/// 额度点数的**初始上限**（激活一张卡就占用它的 <see cref="AbilityCardConfig.QuotaCost"/>，超过上限激活不了）。
+	/// <b>上限本身也能扩增</b>：扩增量在局外成长行 `Config/Tables/Meta/meta_quota.tres` 上
+	/// （每级 <c>PerLevel</c> 点，价格走那一行的 <c>BaseCost/CostGrowth</c>），
+	/// 所以"额度也能用局外资源升级"是**同一套局外成长表**的第 6 行，不是新机制。
+	/// </summary>
+	[Export] public int AbilityQuotaBase { get; set; } = 6;
+
 	[ExportGroup("表索引 · 音效")]
 	/// <summary>
 	/// 音效表（`Config/Tables/Audio/audio_*.tres`）：**一行一条音效** = id + 资源引用 + 音量/音高随机范围 + 总线。

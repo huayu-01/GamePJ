@@ -20,6 +20,7 @@
 | glow 开了吗？ | 开了：`Scenes/Levels/TestArena.tscn` 的 `WorldEnvironment` → **`glow_enabled = true`、`glow_hdr_threshold = 2.0`、`glow_intensity = 0.5`、`glow_blend_mode = 1`（Screen）、只开 4/5/6 三档半径**。为什么阈值这么高见 §7。 |
 | 改了几个界面？ | **外观全部 9 个（主题级）+ 2 个新界面**（`SettingsScreen` 全屏设置菜单、`BuildScreen` 角色持有面板）。**7 个旧界面已全部改成"全屏类界面"**（面板铺满、内容居中），见 §11。 |
 | 按键提示栏在哪？ | **在 UI 基类里**：`OverlayScreen.SetKeyHints(...)`，屏幕底部一栏「键 + 说明」。**结构永远存在**（`Root/KeyHintBar`），界面可以不填、不显示。**第三批写能力矩阵界面时照 §10 抄。** |
+| 能力矩阵（局外卡牌）长什么样？ | `Scenes/UI/AbilityMatrixScreen.tscn`（快捷键 **K**，全屏 **6×3 = 18 格**矩阵）。元素是**基类组件** `AbilityCardTile.tscn`：三状态（变暗/恢复颜色/边框外光圈）+ 六档等级色的边框 + 四种交互（左键长按解锁 / 左键激活 / 右键升级 / 右键长按重置）。见 **§15**。 |
 | 设置菜单？ | `SettingsScreen`（快捷键 **O** / 基地界面的「设置」按钮）：画面 / 控制 / 音量，**分类来自注册表**（加一页 = 注册一行），存 `user://settings.cfg`。见 §12。 |
 | 图标？ | `Assets/UI/Icons/ic_ui_*.svg`（13 张，**项目自制 SVG**，Godot 原生导入）+ `Scripts/UI/UiIcons.cs`（**唯一映射表**）。构筑元素 / 奖励卡片 / 设置分类 Tab 都用图标；说明只在**选取界面**与**鼠标悬停**（`tooltip_text`）。见 §13。 |
 | 场景里的节点还写名字吗？ | **不写了**：`RewardNode.tscn` 的 `Label3D` 名牌已删，基类 `Interactable` 还会无条件把任何 `Label3D` 子孙藏掉。见 §13。 |
@@ -398,6 +399,7 @@ public void Open()
 | `BossPreviewScreen` | `B` 关闭 ｜ `Escape` 关闭 |
 | `SettingsScreen` | `O` 关闭 ｜ `Escape` 关闭 ｜ `Q` 上一类 ｜ `E` 下一类 |
 | `BuildScreen` | `C` 关闭 ｜ `Escape` 关闭 ｜ `悬停` 看说明 |
+| **`AbilityMatrixScreen`** | **鼠标左键 激活 / 长按解锁 ｜ 鼠标右键 升级 / 长按重置升级 ｜ `M` 扩增额度 ｜ 鼠标悬停 看效果与价格 ｜ `Escape` 关闭**（5 条，实测 `条目=5 可见=true ZIndex=100 鼠标穿透=true`） |
 | `LoadingScreen` | **没有**（它刻意不继承 `OverlayScreen`：不走界面栈、自己暂停整棵树，见类注释）；加载页也没有可按键的动作 |
 
 ### 10.5 验证（本轮实测，探针逐界面输出）
@@ -544,3 +546,75 @@ SettingsSections.Register(() => new AbilitySettingsSection());
 | UI 音效 | `Assets/Audio/` 有别人放进去的 `ui_click.ogg` / `ui_open.ogg`（Kenney Interface Sounds, CC0）→ 挂到主题的 `Button` 音效或 `UiRouter` 上 |
 | 准星随散布变化 | 要写 C#：`Crosshair` 的 `scale` 跟着武器散布走 |
 | `_ArtShowcase` 那套"展示台" | UI 也有了自己的展示台（`_UiShowcase.tscn`），建议以后**每个界面改完都跑一次 `-- ui`** 留证据 |
+
+---
+
+## 15. 能力矩阵界面（第三批：能力卡 = 局外装备层，2026-10）
+
+> 用户需求 §二：「大概就是像**卡牌一样展开矩阵排序**，比如 **5×5 / 6×6 / 3×6 / 6×4** 这样的**全屏矩阵**，
+> 这样每个元素视觉上都比较大」+ 元素三状态 / 四种交互 / 边框色表等级 / 光圈在边框外 / 预留间隔。
+> **数值与状态层怎么工作的看 [ability-cards.md](ability-cards.md)（那一篇是能力系统的唯一入口）；本节只讲外观与交互。**
+
+### 15.1 两个场景
+
+| 场景 | 是什么 |
+|---|---|
+| `Scenes/UI/AbilityMatrixScreen.tscn` | **全屏矩阵界面**（`CanvasLayer` layer 16 / `ScreenLayer = Panel` → 打开即暂停 + 放开鼠标）。挂在 **`Scenes/Main.tscn`**（与 `BuildScreen` / `SettingsScreen` 并列），快捷键 **K**，或 `UiService.OpenAbilityMatrix()` |
+| `Scenes/UI/AbilityCardTile.tscn` | **元素基类组件**（一格 = 一张卡）。界面只负责建格子 / 判定 / 额度栏 / 图例；三状态、交互、读条、震动、缓动、音效**全在元素里** |
+
+**行列不写死**：`Columns = 6`、`Rows = 3`（导出属性）= **18 格**，1920×1080 下每格 ≈ **232×214**。
+卡不满时补**空位**占位格（"位置先占住"，加到 18 张都不用改界面）。
+
+### 15.2 三状态 / 边框色 / 光圈（外观部分）
+
+| 状态 / 元素 | 表现 |
+|---|---|
+| **未解锁** | 内容 `Modulate = (0.40,0.42,0.48)`（**变暗**）+ 更深的底板 + 等级 0 的**灰**边框 + 状态行写"未解锁" |
+| **解锁未激活** | 内容恢复**白色**，边框按等级着色 |
+| **激活** | `Glow`（`Panel` + `StyleBoxFlat`：`DrawCenter=false` + 边框 3px + `ShadowSize=10`）**比 `Frame` 大 9px** → **光圈落在边框外**；颜色 = 边框色；`modulate:a` 在 0.55↔1.0 之间**呼吸**（`Tween` 循环） |
+| **边框颜色 = 等级** | 灰 0 `#6b7080` → 白 1 `#ebf0ff` → 绿 2 `#59eb6b` → 蓝 3 `#57a3ff` → 紫 4 `#b86bff` → 红 5 `#ff5747`（**唯一一处**：`AbilityCardTile.LevelColor`，图例也从它取色，不抄第二遍） |
+| **预留间隔** | 格 232×214 + **14px** 行列间隔；光圈往外扩 9px 也不会互相压住 |
+
+**没有用任何新贴图**：底板、边框、光圈全是代码建的 `StyleBoxFlat`（`AddThemeStyleboxOverride`），
+所以"换一个等级色"只改 `LevelColor` 一个 `switch`。
+
+### 15.3 四种交互（行为部分，与 [ability-cards.md](ability-cards.md) §5.4 同一张表）
+
+| 操作 | 行为 |
+|---|---|
+| **左键长按**（未解锁） | 底部出现**读条**（0.7s，`LongPressSeconds` 导出）→ 到 1.0 才判定资源 → 不够**震动元素** / 够则**解锁**并播"略微放大 + 闪一下"（`Tween`） |
+| **左键单击**（已解锁） | 激活 / 关闭（占用额度） |
+| **右键单击** | 升级（资源不够 → 震动） |
+| **右键长按**（等级 > 1） | 读条 → 重置升级进度并**归还升级费** |
+| 失败（任意原因） | **震动元素**（绕中心来回摆 + 红闪）+ `ui_card_fail` |
+| 音效 | 解锁 `ui_card_unlock` / 升级 `ui_card_upgrade` / 重置 `ui_card_reset` / 激活 `ui_click` / 失败 `ui_card_fail`（都是表驱动，见 §6.3） |
+| 说明文字 | **只在鼠标悬停**（`TooltipText`：名字 / 等级 / 状态 / 额度占用 / 下一级效果 / 价格） |
+
+### 15.4 按键提示栏（照 §10 写的实例）
+
+```csharp
+SetKeyHints(
+    KeyHint.Mouse(MouseButton.Left, "激活 / 长按解锁"),
+    KeyHint.Mouse(MouseButton.Right, "升级 / 长按重置升级"),
+    KeyHint.Of(QuotaKey, "扩增额度"),          // M
+    KeyHint.Text("鼠标悬停", "看效果与价格"),
+    (Key.Escape, "关闭"));
+```
+实测：`结构在树里=true 条目=5 可见=true ZIndex=100 鼠标穿透=true`。
+
+### 15.5 截图与自检（复现命令见 [ability-cards.md](ability-cards.md) §7）
+
+| 截图 | 内容 |
+|---|---|
+| `ability_01_matrix_states.png` | 18 格矩阵全貌：**六档等级色 + 三状态**（4 张激活带光圈、3 张解锁未激活、1 张未解锁变暗）+ 额度栏 + 图例 + 提示栏 |
+| `ability_02_charging.png` | 左键长按**读条中**（进度条可见，`ChargeProgress = 0.40`） |
+| `ability_03_unlocked.png` | 读条结束**刚解锁**（Lv1、内容恢复颜色、白边框、播放放大闪一下） |
+| `ability_04_active_glow.png` | 右键升级两次 + 左键激活后：**等级色边框 + 边框外光圈** |
+| `ability_05_after_interactions.png` | 四种交互 + 故意失败 + 额度扩增之后 |
+| `ability_06_ingame_opened.png` | **真的 `Main.tscn`** 里（基地界面之上）打开的能力矩阵 —— `UiService.OpenAbilityMatrix()` 找到界面 = 接线成功 |
+| `ability_07_ingame_toggle_key.png` | 合成按键 **K** 打开的那一张（走的是界面自己的 `ToggleKey` 边沿检测） |
+
+拍摄台：`Scenes/UI/_AbilityShowcase.tscn`（摆状态 + 四种交互 + 音效/缓动，全程沙箱不留痕）、
+`Scenes/UI/_AbilityInGame.tscn`（在真的 Main.tscn 里验接线与按键）。
+两个都是**留在仓库里**的工具，"以后改能力矩阵再跑一次"即可。
+

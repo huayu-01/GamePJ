@@ -66,6 +66,14 @@ public static class UiIcons
 	};
 
 	/// <summary>
+	/// **能力卡** → 图标（卡行的 <see cref="ActRoguelike.Config.AbilityCardConfig.IconName"/> 列，
+	/// 不含目录与扩展名）。加一张卡 = 在卡行里写一个图标名；没有对应 SVG 时返回 <c>null</c>
+	/// （界面只显示文字，不报错）。用 <see cref="Named"/> 直查，所以卡表**不需要**在这里加 switch 分支。
+	/// </summary>
+	public static Texture2D? ForAbilityCard(ActRoguelike.Config.AbilityCardConfig? card)
+		=> card == null ? null : Named(card.IconName);
+
+	/// <summary>
 	/// 按**界面标题**取图标（通用多选一 <see cref="ChooseScreen"/> 只拿得到标题字符串）。
 	/// 标题来自 <c>RewardService.TitleFor</c> 那张表，所以节点加一种类型时这里自动跟着走。
 	/// </summary>
@@ -134,6 +142,9 @@ public static class UiIcons
 		"ic_ui_node_weapon", "ic_ui_node_resource", "ic_ui_node_heal", "ic_ui_node_special",
 		"ic_ui_node_shop", "ic_ui_node_portal", "ic_ui_build_holdings",
 		"ic_ui_set_graphics", "ic_ui_set_controls", "ic_ui_set_audio",
+		// 能力卡（第三批）：一张卡一个图标，名字写在卡行的 IconName 列上。
+		"ic_ui_card_vitality", "ic_ui_card_damage", "ic_ui_card_speed", "ic_ui_card_crit",
+		"ic_ui_card_reload", "ic_ui_card_magazine", "ic_ui_card_summon", "ic_ui_card_control",
 	};
 
 	private static readonly Dictionary<string, Texture2D?> _cache = new();

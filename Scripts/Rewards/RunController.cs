@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ActRoguelike.Abilities;
+using ActRoguelike.AbilityCards;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
 using ActRoguelike.Encounter;
@@ -117,6 +118,11 @@ public partial class RunController : Node
 			// 角色的「表现 · 动画」6 列也要应用 —— 否则表里填了动画名/阈值对玩家无效（死配置）。
 			character.ApplyAnimationTo(_player);
 		}
+
+		// 能力卡（局外装备层）：激活的卡在这里套到玩家身上（数值修饰 + 授予技能）。
+		// 位置刻意放在**角色表的能力开关矩阵与技能行之后** —— 一张"授予技能"的卡要赢过角色的
+		// DisabledAbilityIds（卡 = 玩家花局外资源买的额外能力）。规则与存盘在 AbilityStore，见 docs/ability-cards.md。
+		AbilityEffects.ApplyToPlayer(_player, this);
 
 		if (_stage == null)
 		{

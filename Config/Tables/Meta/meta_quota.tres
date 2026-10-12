@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MetaUpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/MetaUpgradeConfig.cs" id="1_e0ph0"]
+
+[resource]
+script = ExtResource("1_e0ph0")
+SaveKey = "quota_level"
+Stat = "AbilityQuotaAdd"
+PerLevel = 1.0
+BaseCost = 30
+CostGrowth = 20
+MaxLevel = 0
+Id = "meta_quota"
+Slot = 6
+DisplayName = "容量扩容"
+DescriptionTemplate = "能力卡额度上限 +{PerLevel:0}"
+Note = "能力卡（局外装备层）的额度点数上限的扩增等级。等级本体不在 meta.cfg，而是存进 user://ability_cards.cfg 的 [quota] quota_level（由 AbilityStore 读写）；这一行提供的是每级增量与价格公式，Stat 只是可读文案（能力卡的额度不经过 StatSheet）。"

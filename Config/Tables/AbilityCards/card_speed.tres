@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AbilityCardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityCardConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+IconName = "ic_ui_card_speed"
+QuotaCost = 2
+MaxLevel = 5
+UnlockCost = 30
+UpgradeBaseCost = 20
+UpgradeCostGrowth = 15
+Effect = 1
+Stat = "MoveSpeedMultiplier"
+PerLevel = 0.05
+Id = "card_speed"
+Slot = 3
+DisplayName = "疾风之靴"
+DescriptionTemplate = "移动速度 +5%／级（激活占 2 点额度）"
+Note = "与局外成长表 meta_speed 同一条属性键，但那是**永久**成长、这是**可关闭的卡**——两者叠加是设计意图（卡要付出额度）。"

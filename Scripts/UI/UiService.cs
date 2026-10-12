@@ -165,6 +165,22 @@ public partial class UiService : Node
 		return true;
 	}
 
+	/// <summary>
+	/// 打开**能力矩阵界面**（局外卡牌：解锁 / 升级 / 激活 / 额度扩增）。
+	/// 快捷键由界面自己处理（<see cref="AbilityMatrixScreen.ToggleKey"/>，默认 K）；这里留语义化入口给按钮用。
+	/// </summary>
+	public bool OpenAbilityMatrix()
+	{
+		if (Screen<AbilityMatrixScreen>() is not { } screen)
+		{
+			return false;
+		}
+
+		screen.CloseOnCancel = true;
+		screen.Open();
+		return true;
+	}
+
 	/// <summary>打开三选一奖励（关卡节点用）。</summary>
 	public bool OpenRewards(IReadOnlyList<RewardDefinition> options, string title)
 	{

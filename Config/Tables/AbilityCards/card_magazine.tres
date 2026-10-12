@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AbilityCardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityCardConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+IconName = "ic_ui_card_magazine"
+QuotaCost = 2
+MaxLevel = 5
+UnlockCost = 30
+UpgradeBaseCost = 20
+UpgradeCostGrowth = 15
+Effect = 0
+Stat = "MagazineSizeAdd"
+PerLevel = 3.0
+Id = "card_magazine"
+Slot = 6
+DisplayName = "扩容弹匣"
+DescriptionTemplate = "弹匣容量 +3 发／级（激活占 2 点额度）"
+Note = "加法型，键与增幅项 upg_ext_mag 一致（MagazineSizeAdd → Weapon.EffectiveMagazineSize）。"

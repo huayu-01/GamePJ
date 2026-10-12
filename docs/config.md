@@ -1,6 +1,14 @@
 # 数值配置（调参唯一入口）
 
-**所有可调数值拆成 14 张表，全部挂在 [`Config/Balance.tres`](../Config/Balance.tres) 上；运行期由 autoload `Balance` 读取并建索引。**
+**所有可调数值拆成 17 张表，全部挂在 [`Config/Balance.tres`](../Config/Balance.tres) 上；运行期由 autoload `Balance` 读取并建索引。**
+
+> **2026-10 配置表阶段 8（能力卡 = 局外装备层）**：新增第 17 张表 **能力卡**
+> （`Config/Tables/AbilityCards/card_*.tres`，**一行 = 一张卡**，现有 8 行）+ 局外成长表多一行
+> **`meta_quota`（额度扩增）** + `BalanceConfig` 多两个字段（`AbilityCards` 索引数组、`AbilityQuotaBase` 基础额度）。
+> ⚠️ **能力卡与 `Skills/`（局内单位技能，25 行）是两层不同的东西**，所以是**两张表**而不是一张 ——
+> 判断依据写在 [ability-cards.md](ability-cards.md) §1，唯一的接触点是 `AbilityCardConfig.Skill` 那一列（资源引用）。
+> 这一轮顺带把 `配置表比对·索引` 的期望值从 `…/局外 5/…` 改成 `…/局外 6/…/能力卡 8`（加表的必然结果，其余 11 个数字逐位不变）。
+> 细节、实测与截图见 [ability-cards.md](ability-cards.md) 与本文末「配置表阶段 8 实测」。
 
 > **2026-10 配置表阶段 2（重要变化）**：`Balance` 从"唯一数值**文件**"变成"唯一数值**门面 + 表索引**"。
 > 业务代码**仍然写 `Balance.Settings.Xxx`**（这条约定没变），但数值的实际家在 `Config/Tables/<分组>/` 里，
@@ -52,8 +60,9 @@
 | 奖励节点（标题 / 层 / 波数 / 商店价目 / **给多少 Pressure、额外抽几次、候选标签**） | `Config/Tables/Nodes/node_*.tres` | 一种节点 | 9 |
 | 增幅项（19 条强化·进化·异化，含"属于哪个升级池"一列） | `Config/Tables/Upgrades/*.tres` | 一条增幅 | 19 |
 | 关卡（预算 / 波次 / 敌人白名单 / Boss 词条数 / Pressure 规则） | `Config/Tables/Stages/stg_*.tres` | 一关 | 3 |
-| 局外成长（碎片价格 / 每级效果） | `Config/Tables/Meta/meta_*.tres` | 一项 | 5 |
-| **全局开关**（敌人/Boss 倍率、节奏、Boss 压力曲线、伤害跳字、血条、节点间距、区域杀高度） | **`Config/Balance.tres`**（还在原地） | — | 30 个字段 |
+| 局外成长（碎片价格 / 每级效果） | `Config/Tables/Meta/meta_*.tres` | 一项 | **6**（5 项永久强化 + **1 项能力卡额度扩增** `meta_quota`） |
+| **能力卡（局外装备层）**：解锁价 / 各级升级价 / **占用几点额度** / 等级上限 / 图标 / 说明 / **激活后的效果** | `Config/Tables/AbilityCards/card_*.tres` | **一张卡** | **8**（6 张数值 + 2 张授予技能）｜详见 [ability-cards.md](ability-cards.md) |
+| **全局开关**（敌人/Boss 倍率、节奏、Boss 压力曲线、伤害跳字、血条、节点间距、区域杀高度、**能力卡基础额度**） | **`Config/Balance.tres`**（还在原地） | — | 31 个字段 |
 
 - **改完要重新运行游戏才生效**（数值在开局一次性应用，不热重载）。
 - 两种改法都行：Godot 编辑器里双击 `.tres` 用 Inspector 改（有中文分组），或直接用文本编辑器改。
@@ -340,7 +349,7 @@
 > ⚠️ `Weight` 目前 19 条**都写成 1.0** → 加权抽取仍退化成等概率（与分表前一致，**故意不改**，改了抽样分布会变）。
 > 现在**改得动了**：想调某条的出率就改它的 `Weight` 一行。
 
-### 局外成长表 `Config/Tables/Meta/`（5 行）
+### 局外成长表 `Config/Tables/Meta/`（6 行）
 
 | 行 | 存档键 | 每级效果 | 价格 |
 |---|---|---|---|
@@ -349,6 +358,13 @@
 | `meta_speed` | `speed_level` | 移速 +3% | 同上 |
 | `meta_crit` | `crit_level` | 暴击率 +3% | 同上 |
 | `meta_reload` | `reload_level` | 装填速度 +6% | 同上 |
+| `meta_quota` | `quota_level` ⚠️**不在 meta.cfg** | **能力卡额度上限 +1** | **30 + 20 × 等级** |
+
+> ⚠️ `meta_quota` 是配置表阶段 8 新增的第 6 行，也是"**额度上限本身也能用局外资源扩增**"（需求 §一）的落地形式。
+> 它的**等级**存在 `user://ability_cards.cfg` 的 `[quota] quota_level`（由 `AbilityStore` 读写），
+> **不在 `user://meta.cfg`**（`MetaProgress` 只认它自己那 5 个 `*_level` 键）；这一行只提供"每级几点 / 每级多少钱"。
+> 所以 `SaveKey` / `Stat` 两列对它是"给人看的元数据"，**不要照着它去 `MetaProgress` 里找 `quota_level`**。
+> 细节见 [ability-cards.md](ability-cards.md) §2.3。
 
 > ⚠️ **存档兼容红线**：存档键名（`SaveKey`）必须保持 `health_level` 等原值，改了老玩家进度会归零。
 
@@ -1854,4 +1870,57 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 - ⚠️ **`Weapon` / `Enhancement` / `Shop` 三个节点都挂 `tag_mid`，但用户原话里的"升级"没指明对应哪一个**：
   当前按"层级 + 现有奖励类型"解释（见上表）。若用户认为武器池属于"高价值"，改 `node_weapon` 一行的标签
   （并把 `Layer` 一起改成 2，否则"节点布置 2/5/3"这条硬指标会漂）。
+
+## 配置表阶段 8 实测（2026-10：能力卡 = 局外装备层）
+
+**做了什么**：新增第 17 张表 `Config/Tables/AbilityCards/card_*.tres`（8 行）+ 局外成长表第 6 行
+`Config/Tables/Meta/meta_quota.tres`（额度扩增）+ `BalanceConfig` 两个字段
+（`AbilityCards` 索引数组、`AbilityQuotaBase = 6`）+ 4 条 `ui_card_*` 音效行 + 8 张卡图标 SVG。
+**完整说明、表结构、加卡步骤、界面与交互的实现见 [ability-cards.md](ability-cards.md)。**
+
+**编译**：`& build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（每改一步都跑，全程 0/0）。
+
+**开局日志**（新的两行）：
+
+```
+[Config] 能力卡（局外装备层，与 Skills 是两层）：8 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、
+         card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）、
+         card_reload（2 点/解锁 25/上限 Lv5）、card_magazine（2 点/解锁 30/上限 Lv5）、card_summon（4 点/解锁 60/上限 Lv3）、
+         card_control（4 点/解锁 60/上限 Lv3）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 7 / 效果 9 / 节点 9 / 局外成长 6 / AI 档案 11 / 能力卡 8（Balance.tres 已加载）
+[Audio] 配置表：音效 9（来源：表 Audio）—— … ；ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)
+```
+
+**自测（`selftest.flag` + 直跑 `res://Scenes/Main.tscn`）实测**：
+
+```
+[SelfTest] 配置表比对·索引：武器 3/角色 3/敌人 10/首领 1/召唤物 1/技能 25/Pressure 7/效果 9/节点 9/局外 6/升级池 3/AI 档案 11/能力卡 8
+           （期望 3/3/10/1/1/25/7/9/9/6/3/11/8）
+[SelfTest] 配置表比对·能力卡：8 张（来源：表 AbilityCards） 额度上限 6 = 基础 6 + 扩增 Lv0 × 1（扩增行 meta_quota 费用 30）
+           全部卡 Id [card_vitality,card_damage,card_speed,card_crit,card_reload,card_magazine,card_summon,card_control]
+[SelfTest] 能力卡·冒烟⑪ 额度不足（上限 6）：装下 2 张后额度 5/6，再激活「疾风之靴」（要 2 点）→ QuotaFull（期望 QuotaFull）｜额度未变 5/6
+[SelfTest] 能力卡·冒烟⑮ 还原后：额度 0/6（扩增 Lv0）｜碎片 279｜…（期望与起点一致；内存钱包剩 970，玩家的 user:// 文件未改动）
+[SelfTest] 能力卡实测（激活真的影响局内）：强化肌体（card_vitality Lv2）MaxHealthAdd +40 → 最大生命 270 → 310（+40）
+           ｜ 无人机协议（card_summon Lv1）授予 skl_summon → AbilitySummon.Enabled False → True … ｜ 清理后最大生命 270（期望还原到 270）
+```
+
+**⚠️ `配置表比对·索引` 的期望值变了（加表的必然结果，已同步）**：
+`局外 5 → 6`（新增 `meta_quota` 行）+ 末尾多一项 `能力卡 8`。
+
+| 硬指标 | 改动前（`run_20261012_185256.log`） | 本轮（`run_20261012_191238.log`） | 判定 |
+|---|---|---|---|
+| 节点布置 | 启用 10 个（高 2 / 中 5 / 低 3） | 启用 10 个（高 2 / 中 5 / 低 3） | **逐位一致** |
+| Pressure 测试（进化+异化） | pressure=3 pmods=3 bank=0 challenges=2 … | 同 | **逐位一致** |
+| 端到端按 F | 奖励界面打开 = True Paused = True | 同 | **逐位一致** |
+| 配置表比对·玩家 | 生命 270（250 + 元进度加成 20） | 生命 270（同上） | **逐位一致** |
+| 配置表比对·索引 | …局外 5/升级池 3/AI 档案 11 | …局外 6/升级池 3/AI 档案 11/能力卡 8 | **预期内变化**（新增一行表 + 新表） |
+
+整轮 `ERROR / Exception` **0 条**，`selftest.flag` 已删（`Test-Path` = False）。
+
+**回退路径（本轮 ⚠️ 只做了代码层设计，没有主动跑一遍空表）**：与其它表同一条纪律 ——
+`AbilityStore.Rows` 直接读 `Balance.Settings.AbilityCards`，表读不到就是空数组：
+矩阵只显示"空位"、`AbilityEffects` 一条效果都不加、日志写 `能力卡：… 0 张（来源：代码默认值（表读不到））`，
+玩法其余部分（节点布置 / Pressure / 端到端）不受影响；`meta_quota` 行读不到时 `QuotaPerLevel` 兜底为 1（与表里一致）。
+要主动验证：把 `Balance.tres` 的 `AbilityCards` 数组项与顶部对应的 `[ext_resource]` **一起**删掉再跑一轮自测
+（⚠️ **只删数组项不删 `ext_resource`、或只删行文件不删引用，都会让整份 `Balance.tres` 加载失败**）。
 

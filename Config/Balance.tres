@@ -118,6 +118,19 @@
 [ext_resource type="Resource" path="res://Config/Tables/ValueTags/tag_high.tres" id="120_tag_high"]
 [ext_resource type="Resource" path="res://Config/Tables/ValueTags/tag_mid.tres" id="121_tag_mid"]
 [ext_resource type="Resource" path="res://Config/Tables/ValueTags/tag_low.tres" id="122_tag_low"]
+[ext_resource type="Resource" path="res://Config/Tables/Meta/meta_quota.tres" id="123_meta_quota"]
+[ext_resource type="Resource" path="res://Config/Tables/AbilityCards/card_vitality.tres" id="124_card_vitality"]
+[ext_resource type="Resource" path="res://Config/Tables/AbilityCards/card_damage.tres" id="125_card_damage"]
+[ext_resource type="Resource" path="res://Config/Tables/AbilityCards/card_speed.tres" id="126_card_speed"]
+[ext_resource type="Resource" path="res://Config/Tables/AbilityCards/card_crit.tres" id="127_card_crit"]
+[ext_resource type="Resource" path="res://Config/Tables/AbilityCards/card_reload.tres" id="128_card_reload"]
+[ext_resource type="Resource" path="res://Config/Tables/AbilityCards/card_magazine.tres" id="129_card_magazine"]
+[ext_resource type="Resource" path="res://Config/Tables/AbilityCards/card_summon.tres" id="130_card_summon"]
+[ext_resource type="Resource" path="res://Config/Tables/AbilityCards/card_control.tres" id="131_card_control"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_card_unlock.tres" id="132_audio_ui_card_unlock"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_card_upgrade.tres" id="133_audio_ui_card_upgrade"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_card_fail.tres" id="134_audio_ui_card_fail"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_card_reset.tres" id="135_audio_ui_card_reset"]
 
 [resource]
 script = ExtResource("1_balance")
@@ -141,8 +154,10 @@ Nodes = [ExtResource("22_node_weapon"), ExtResource("23_node_enhance"), ExtResou
 ValueTags = [ExtResource("120_tag_high"), ExtResource("121_tag_mid"), ExtResource("122_tag_low")]
 Upgrades = [ExtResource("36_upg_dmg_up"), ExtResource("37_upg_rate_up"), ExtResource("38_upg_boots"), ExtResource("39_upg_vitality"), ExtResource("40_upg_scope"), ExtResource("41_upg_lethal"), ExtResource("42_upg_fast_reload"), ExtResource("43_upg_ext_mag"), ExtResource("44_upg_stance"), ExtResource("45_upg_pierce_round"), ExtResource("46_evo_twin"), ExtResource("47_evo_ap"), ExtResource("48_evo_ricochet"), ExtResource("49_evo_blast"), ExtResource("50_mut_chain"), ExtResource("51_mut_lifesteal"), ExtResource("52_mut_burn"), ExtResource("53_mut_summon"), ExtResource("54_mut_supply")]
 UpgradePools = [ExtResource("94_pool_pistol"), ExtResource("95_pool_sniper"), ExtResource("96_pool_rifle")]
-MetaUpgrades = [ExtResource("31_meta_health"), ExtResource("32_meta_damage"), ExtResource("33_meta_speed"), ExtResource("34_meta_crit"), ExtResource("35_meta_reload")]
-Audio = [ExtResource("115_audio_sfx_weapon_fire"), ExtResource("116_audio_sfx_combat_hit"), ExtResource("117_audio_sfx_enemy_die"), ExtResource("118_audio_ui_click"), ExtResource("119_audio_ui_open")]
+MetaUpgrades = [ExtResource("31_meta_health"), ExtResource("32_meta_damage"), ExtResource("33_meta_speed"), ExtResource("34_meta_crit"), ExtResource("35_meta_reload"), ExtResource("123_meta_quota")]
+AbilityCards = [ExtResource("124_card_vitality"), ExtResource("125_card_damage"), ExtResource("126_card_speed"), ExtResource("127_card_crit"), ExtResource("128_card_reload"), ExtResource("129_card_magazine"), ExtResource("130_card_summon"), ExtResource("131_card_control")]
+AbilityQuotaBase = 6
+Audio = [ExtResource("115_audio_sfx_weapon_fire"), ExtResource("116_audio_sfx_combat_hit"), ExtResource("117_audio_sfx_enemy_die"), ExtResource("118_audio_ui_click"), ExtResource("119_audio_ui_open"), ExtResource("132_audio_ui_card_unlock"), ExtResource("133_audio_ui_card_upgrade"), ExtResource("134_audio_ui_card_fail"), ExtResource("135_audio_ui_card_reset")]
 RewardChoiceCount = 3
 ShowDamageNumbers = true
 DamageNumberLifetime = 0.8

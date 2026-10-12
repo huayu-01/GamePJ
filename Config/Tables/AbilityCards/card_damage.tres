@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AbilityCardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityCardConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+IconName = "ic_ui_card_damage"
+QuotaCost = 3
+MaxLevel = 5
+UnlockCost = 40
+UpgradeBaseCost = 30
+UpgradeCostGrowth = 20
+Effect = 1
+Stat = "DamageMultiplier"
+PerLevel = 0.06
+Id = "card_damage"
+Slot = 2
+DisplayName = "凶戾印记"
+DescriptionTemplate = "全部伤害 +6%／级（激活占 3 点额度）"
+Note = "演示卡 2（乘法型）：StatMultiply 到 DamageMultiplier，倍率增量 = PerLevel × 等级（与局外成长表的 Multiply 语义一致）。"

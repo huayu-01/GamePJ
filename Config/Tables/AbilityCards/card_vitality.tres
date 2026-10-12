@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AbilityCardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityCardConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+IconName = "ic_ui_card_vitality"
+QuotaCost = 2
+MaxLevel = 5
+UnlockCost = 30
+UpgradeBaseCost = 20
+UpgradeCostGrowth = 15
+Effect = 0
+Stat = "MaxHealthAdd"
+PerLevel = 20.0
+Id = "card_vitality"
+Slot = 1
+DisplayName = "强化肌体"
+DescriptionTemplate = "最大生命 +{PerLevel}／级（激活占 2 点额度）"
+Note = "演示卡 1（数值型）：StatAdd 到 MaxHealthAdd，所以走 Unit.RefreshStats 那条已有的派生属性路径，一行 C# 都不用新写。"

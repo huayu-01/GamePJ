@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AbilityCardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityCardConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+IconName = "ic_ui_card_crit"
+QuotaCost = 2
+MaxLevel = 5
+UnlockCost = 35
+UpgradeBaseCost = 25
+UpgradeCostGrowth = 15
+Effect = 0
+Stat = "CritChanceAdd"
+PerLevel = 0.04
+Id = "card_crit"
+Slot = 4
+DisplayName = "锐利直觉"
+DescriptionTemplate = "暴击率 +4%／级（激活占 2 点额度）"
+Note = "加法型：CritChanceAdd 是 Weapon 读的属性键（与局外成长 meta_crit 同一键）。"

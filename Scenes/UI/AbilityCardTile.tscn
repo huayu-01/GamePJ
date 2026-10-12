@@ -1,0 +1,80 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/AbilityCardTile.cs" id="1_tile"]
+
+[node name="AbilityCardTile" type="Control"]
+custom_minimum_size = Vector2(232, 214)
+offset_right = 232.0
+offset_bottom = 214.0
+mouse_filter = 0
+script = ExtResource("1_tile")
+
+[node name="Glow" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -9.0
+offset_top = -9.0
+offset_right = 9.0
+offset_bottom = 9.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+
+[node name="Frame" type="PanelContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Pad" type="MarginContainer" parent="Frame"]
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="Frame/Pad"]
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="Icon" type="TextureRect" parent="Frame/Pad/VBox"]
+custom_minimum_size = Vector2(0, 74)
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Frame/Pad/VBox"]
+mouse_filter = 2
+theme_override_font_sizes/font_size = 19
+text = "能力卡"
+horizontal_alignment = 1
+
+[node name="Status" type="Label" parent="Frame/Pad/VBox"]
+mouse_filter = 2
+theme_type_variation = &"UiCaption"
+text = "未解锁"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Frame/Pad/VBox"]
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "长按左键解锁"
+horizontal_alignment = 1
+
+[node name="Progress" type="ProgressBar" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 9.0
+offset_top = -19.0
+offset_right = -9.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+visible = false
+max_value = 100.0
+show_percentage = false

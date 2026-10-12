@@ -61,6 +61,7 @@ public partial class BaseScreen : OverlayScreen
 		SetKeyHints(
 			("1 ~ 5", "购买永久强化"),
 			(Key.Enter, "出征"),
+			(Key.K, "能力卡"),
 			("O", "设置"),
 			("H", "说明"));
 
@@ -131,6 +132,8 @@ public partial class BaseScreen : OverlayScreen
 			case Key.Enter or Key.KpEnter or Key.Space:
 				Begin();
 				break;
+			// ⚠️ 这里**刻意不处理 K**：能力矩阵界面自己用 ToggleKey=K 做边沿检测（它常驻在场景里），
+			// 两边都读同一个物理键会变成"按一下开、同一帧又被关掉"。提示栏里那一条 K 是给它看的。
 		}
 	}
 }

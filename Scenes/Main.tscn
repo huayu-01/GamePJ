@@ -29,6 +29,7 @@
 [ext_resource type="Script" uid="uid://3wj8m1he6twb" path="res://Scripts/World/MapManager.cs" id="26_map"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/SettingsScreen.tscn" id="28_settings"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/BuildScreen.tscn" id="29_build"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/AbilityMatrixScreen.tscn" id="30_matrix"]
 
 [node name="Main" type="Node3D" unique_id=218913370]
 
@@ -51,6 +52,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 [node name="SettingsScreen" parent="." instance=ExtResource("28_settings")]
 
 [node name="BuildScreen" parent="." instance=ExtResource("29_build")]
+
+[node name="AbilityMatrixScreen" parent="." instance=ExtResource("30_matrix")]
 
 [node name="RunController" type="Node" parent="." unique_id=983817383]
 script = ExtResource("9_run")
