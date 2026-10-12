@@ -80,14 +80,15 @@ internal static class DamageNumbers
 	};
 
 	/// <summary>
-	/// 跳字的**起始垂直错位**（像素，屏幕坐标向下为正；同一次命中最多同时出 3 个数字）。
-	/// 甲/盾/格挡/无敌往下、伤害往上 —— 这样"甲 12"和"5"不会叠在同一个像素上。
+	/// 跳字的**起始垂直错位**（像素，屏幕坐标向下为正；同一次命中最多同时出 4 个数字）。
+	/// 甲/盾/无敌往上、伤害居中、格挡往下 —— 这样"甲 12 / 5 / 格挡 17"不会叠在同一个像素上
+	/// （踩过一次：格挡与甲都给了 -20，两个数字正好重合）。
 	/// </summary>
 	public static float SlotOffsetOf(DamageNumberKind kind) => kind switch
 	{
 		DamageNumberKind.Armor => -20f,
 		DamageNumberKind.Shield => -36f,
-		DamageNumberKind.Block => -20f,
+		DamageNumberKind.Block => 20f,
 		DamageNumberKind.Invulnerable => -20f,
 		_ => 0f,
 	};
