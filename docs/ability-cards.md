@@ -5,9 +5,9 @@
 > 相关：[config.md](config.md)（配置表体系与纪律）、[ui.md](ui.md)（界面外观唯一入口，**§10 按键提示栏**）、
 > [audio.md](audio.md)（加音效要做什么）。
 >
-> 一句话：**能力卡 = 局外的卡牌**（可解锁 → 可用局外碎片多次升级 → 可激活/关闭），
+> 一句话：**能力卡 = 局外的卡牌**（可解锁 → 可用局外碎片多次升级 → 可激活/关闭，
 > **激活时占用"额度点数"**，玩家总额度有限（**上限本身也能用局外资源扩增**），
-> 界面是**全屏矩阵**（默认 6×3 = 18 格，每格 ≈ 232×214 像素）。
+> 界面是**满屏矩阵**（默认 6×3 = 18 格，格子尺寸随容器自适应，**卡不够时用占位卡填满、不翻页**）。
 > 状态存 `user://ability_cards.cfg`，激活的效果在**本局开局**由 `RunController.ApplyBalance` 套到玩家身上。
 
 ---
@@ -22,10 +22,11 @@
 | 花什么资源？ | **碎片**（`MetaProgress`）—— 需求里的"局外资源"就是它，本系统**没有另建货币**。 |
 | 额度上限怎么算？ | `Balance.tres → AbilityQuotaBase`（基础 6）+ 局外成长行 **`Config/Tables/Meta/meta_quota.tres`** 的 `PerLevel` × 扩增等级。 |
 | 界面在哪？ | `Scenes/UI/AbilityMatrixScreen.tscn` + `Scripts/UI/AbilityMatrixScreen.cs`，**挂 `Scenes/Main.tscn`**，快捷键 **K**（`UiService.OpenAbilityMatrix()` 也能开）。 |
-| 元素（基类）在哪？ | `Scenes/UI/AbilityCardTile.tscn` + `Scripts/UI/AbilityCardTile.cs` —— 三状态 + 四种交互 + 读条 + 震动 + 音效**全在它里面**。 |
+| 空位怎么办？ | **空位也是一张卡**（**占位卡**，用户 A5）：卡表里没有对应行的那一格就是它 —— **没有解锁条件 → 永远无法解锁 / 激活 / 升级**，但点它 / 长按它的**读条、震动、失败音效照旧**（见 §5.6）。矩阵**永远是填满的矩形、不翻页**，格子尺寸随容器自适应。 |
+| 元素（基类）在哪？ | `Scenes/UI/AbilityCardTile.tscn` + `Scripts/UI/AbilityCardTile.cs` —— 三状态 + 四种交互 + 读条 + 震动 + 音效**全在它里面**（占位卡走的是**同一条**代码路径）。 |
 | 激活后真的生效吗？ | 生效。`AbilityEffects.ApplyToPlayer` 在 `RunController.ApplyBalance` 末尾被调 1 行；实测"最大生命 250 → 290"、"`AbilitySummon.Enabled` False → True"。 |
 | 加一张卡要改几个文件？ | **2 个**（加一行 `.tres` + 挂进 `Balance.tres` 的数组）—— **零 C#**。详见 §8。 |
-| 表读不到会怎样？ | 矩阵全是"空位"、本局没有任何卡效果，**玩法其余部分完全不受影响**（与"表读不到就用自身默认值"同一条纪律）。 |
+| 表读不到会怎样？ | 矩阵全是**占位卡**、本局没有任何卡效果，**玩法其余部分完全不受影响**（与"表读不到就用自身默认值"同一条纪律）。 |
 
 ---
 
@@ -261,7 +262,7 @@ public interface IAbilityCardHost
 | 激活 = **有一圈光圈** | `Glow`（`Panel` + `StyleBoxFlat`，`DrawCenter=false` + `BorderWidth=3` + `ShadowSize=10`）**比 `Frame` 大 9px** → 光圈落在**边框外**；颜色 = 边框色；`Modulate.a` 在 0.55↔1.0 之间呼吸（Tween 循环） |
 | 边框颜色表示等级：**灰0 > 白1 > 绿2 > 蓝3 > 紫4 > 红5** | `LevelColor()`（`#6b7080 / #ebf0ff / #59eb6b / #57a3ff / #b86bff / #ff5747`） |
 | 光圈颜色与边框对应 | 同一处 `LevelColor(level)` 同时喂给 `Frame` 与 `Glow` |
-| **制作时预留足够的间隔** | 矩阵格 232×214 + **14px** 行列间隔（`GridContainer` 的 h/v_separation）；光圈往外扩 9px 也不会互相压住 |
+| **制作时预留足够的间隔** | 矩阵格尺寸随容器自适应（1920×1080 下实测 284×220）+ **14px** 行列间隔（`GridContainer` 的 h/v_separation）；光圈往外扩 9px 也不会互相压住 |
 
 ### 5.4 四种交互（逐条对照需求）
 
@@ -290,9 +291,30 @@ public interface IAbilityCardHost
 > **加一种新效果**（比如"每局开始多一次三选一"）：`AbilityCardEffectKind` 加一个值 →
 > `AbilityEffects.ApplyCore` 加一个 `case` → 加一行卡。**三步，界面完全不用碰**。
 
+### 5.6 占位卡（用户 A5：「空的位置也有卡牌占着……一直无法解锁」）
+
+**怎么区分**：`AbilityCardTile.Card == null` ⇔ 占位卡（`IsPlaceholder`）。界面建格子时，
+`i < 卡表行数` 的格子 `Bind(卡行, host)`，其余 `Bind(null, host)` —— 也就是
+**"卡表里没有对应行"就是占位卡**，不需要在表里造一行假卡，也不需要在元素上多一个开关。
+
+| 占位卡的性质 | 实现（**没有第二条分支**） |
+|---|---|
+| **永远无法解锁 / 激活 / 升级** | 宿主（`AbilityMatrixScreen.Request`）看到 `tile.Card == null` 就返回 `AbilityCardResult.NoCard` → 四种操作全部落到失败分支；`AbilityStore` 一行都没碰过（它只认卡行） |
+| **但交互反馈照旧**（点它 / 长按它 → 震动 + 失败音效） | `_GuiInput` 不再排除 `Card == null`；`_Process` 的读条、`FinishHold`、`RunAction` 都走**同一条路**：读到 `NoCard` → `FailCount++` + `PlayFailShake()` + `ui_card_fail`。左键长按照样读满 0.7 秒的条（它的"等级"恒为 0，与"未解锁的真卡"同一条读条分支） |
+| **看起来也是一张卡** | 灰边框（比"未解锁"压暗一档，`PlaceholderBorderAlpha = 0.55`）+ 底板 + `ic_ui_card_placeholder.svg`（卡框 + 加号）+ 名字「占位卡」+ 状态「占位卡 · 不可解锁」+ 提示「未设定解锁条件」+ tooltip 说明怎么把它变成真卡 |
+| **不影响真卡** | 真正的卡仍进 `_tiles`（`TileCount` / `TileAt(i)` 的语义没变）；占位卡单独进 `_placeholders`（`PlaceholderCount` / `PlaceholderAt(i)`） |
+
+**机器可判定证据**（`AbilityMatrixScreen.DebugRunPlaceholderFeedback()`，拍摄台里跑的就是玩家点它时那条路）：
+
+```
+占位卡交互：Unlock → NoCard ｜ ToggleActive → NoCard ｜ Upgrade → NoCard ｜ ResetUpgrades → NoCard
+　｜ 反馈：失败（震动 + 失败音效）4 次 / 成功 0 次（期望 4 / 0）
+　｜ 失败音效 last=ui_card_fail 缺失 id=[]（期望 ui_card_fail）｜ 状态：（占位卡） Lv0 占位卡 … 失败=4
+```
+
 ---
 
-## 6. 界面：`AbilityMatrixScreen`（全屏矩阵）
+## 6. 界面：`AbilityMatrixScreen`（满屏矩阵）
 
 ### 6.1 布局
 
@@ -305,16 +327,33 @@ AbilityMatrixScreen (CanvasLayer, layer=16, ScreenLayer=Panel → 打开即暂�
             ├── Title  「能力矩阵 · 局外装备」
             ├── Divider
             ├── Header  ← 碎片 / **额度 used / cap（扩增 Lv）** / 「扩增额度 +1（费用 N）」按钮
-            ├── Matrix  ← GridContainer，**列 6 × 行 3 = 18 格**（`Columns` / `Rows` 是导出属性，改一行就能变 5×5 / 6×4…）
+            ├── Matrix  ← GridContainer，**铺满剩余空间**（size_flags = Fill+Expand），列 = `Columns`、行 = `RowsFor(卡数)`
             ├── Legend  ← 六档等级色图例（代码生成，颜色取自 `AbilityCardTile.LevelColor`，不是抄一遍）
-            └── Footer  ← 三状态说明 + 解锁/激活计数
+            └── Footer  ← 三状态说明 + 解锁/激活/张数 + 矩阵格数与占位卡数
 ```
 
-- **不写死行列**：`Columns = 6`、`Rows = 3`（需求点名过 5×5 / 6×6 / 3×6 / 6×4 这类"全屏矩阵"，所以做成导出属性）。
-  1920×1080 下每格 ≈ 232×214 —— **"每个元素视觉上都比较大"**。
-- **卡不满就补"空位"**：格数 = `max(Columns × Rows, 卡数)`，空位是只占位置的空框（tooltip 写明"加一张卡就填进这里"）。
-  这就是"位置先占住"：以后从 8 张加到 18 张，界面不用动。
-- 卡表行数变了才**重建**矩阵（`RebuildIfNeeded`），平时点卡片只 `RefreshAll()` 刷状态 —— 不重建节点、不打断缓动。
+- **不写死行列**：`Columns = 6`（导出属性）、`Rows = 3`（**最少**行数）。需求点名过 5×5 / 6×6 / 3×6 / 6×4 这类"满屏矩阵"。
+- **永远是一个填满的矩形、不翻页**（用户 A5）：
+
+  ```
+  行数 = max(Rows, ceil(卡数 / Columns))          ← AbilityMatrixScreen.RowsFor(卡数, 列, 最少行)
+  格数 = Columns × 行数                            ← 一定 ≥ 卡数、且一定能整除列数（最后一行不缺角）
+  不足的格子 = 占位卡（§5.6）
+  ```
+
+  实测（`DebugSlotPlan`，**不动真表**的纯算式）：`8 张 → 6×3 = 18 格（占位卡 10）`、
+  `18 张 → 6×3 = 18 格（占位 0）`、`19 张 → 6×4 = 24 格（占位 5）`、`25 张 → 6×5 = 30 格（占位 5）`、
+  `60 张 → 6×10 = 60 格（占位 0）` —— 全部满足「填满矩形、不翻页」。
+- **格子尺寸自适应**：场景里**不再有 232×214 这种写死的格子尺寸** ——
+  `AbilityCardTile` 的 `custom_minimum_size` 只是"能缩到多小"（120×110），
+  `size_flags = Fill+Expand`；`Matrix` 容器也是 Fill+Expand，于是
+  **格子尺寸 = 矩阵区 ÷ (列, 行)**，由 `GridContainer` 按当前容器（也就是屏幕）分配。
+
+  实测（1920×1080，`DebugMatrixReport`）：`矩阵区 1772×686 → 每格 284×220px`
+  —— 正好是 `(1772 − 5×14) / 6 = 283.7` 与 `(686 − 2×14) / 3 = 219.3`。
+  （改窗口/分辨率时矩阵区跟着变，格子跟着变；`project.godot` 是 `canvas_items` + `expand`，
+  所以逻辑坐标恒为 1920×1080、整体随窗口缩放。）
+- 卡表行数 / 行数变了才**重建**矩阵（`RebuildIfNeeded`），平时点卡片只 `RefreshAll()` 刷状态 —— 不重建节点、不打断缓动。
 
 ### 6.2 键盘 / 提示栏（照 `docs/ui.md` §10 抄）
 
@@ -412,16 +451,27 @@ Remove-Item "$ud\selftest.flag"        # 必须删
 > `局外 5 → 6`（新增额度扩增行 `meta_quota`）+ 末尾多一项 `能力卡 8`。
 > 其余 11 个数字**逐位不变**；`节点布置` / `Pressure 测试` / `端到端按 F` 三条硬指标与改动前**逐字一致**（已 diff 确认）。
 
-### 7.3 界面拍摄台（3 张状态图 + 交互自检）
+### 7.3 界面拍摄台（状态图 + 占位卡反馈 + 交互自检）
 
 ```powershell
 & $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_AbilityShowcase.tscn'
 ```
 
-输出 `docs/screenshots/ability_01…05*.png` 与逐条 `[AbilityShot]` 行。
+输出 `docs/screenshots/ability_01…05*`、`ability_08_placeholder_feedback.png` 与逐条 `[AbilityShot]` 行。
 **全程在沙箱里**（内存钱包 + 不落盘），跑完 `user://ability_cards.cfg` **仍然不存在**。
 它用 `DebugBeginCharge` / `DebugReleaseCharge` 走**真的读条与结算**（`_Process` → `RunAction`），
-所以读条截图里的进度条与解锁动画都是真表现。
+所以读条截图里的进度条与解锁动画都是真表现；占位卡那张也是**真的走了一遍失败分支**（图上能看到它正在抖 + 红闪）。
+
+本轮（A5）新增的 3 行证据（模板输出，实际数字随屏幕分辨率变）：
+
+```
+满屏矩阵算式：0 张 → 6×3 = 18 格（占位卡 18）✓ ｜ 8 张 → 6×3 = 18 格（占位卡 10）✓ ｜ 18 张 → 6×3 = 18 格（占位卡 0）✓
+  ｜ 19 张 → 6×4 = 24 格（占位卡 5）✓ ｜ 25 张 → 6×5 = 30 格（占位卡 5）✓ ｜ 60 张 → 6×10 = 60 格（占位卡 0）✓
+  → 全部满足「填满矩形、不翻页」 = True
+逐格：列 6 × 行 3 → 18 格（真卡 8 + 占位卡 10）｜视口 1920×1080 → 矩阵区 1772×686 → 每格 284×220px（自适应…）
+占位卡交互：Unlock → NoCard ｜ ToggleActive → NoCard ｜ Upgrade → NoCard ｜ ResetUpgrades → NoCard
+  ｜ 反馈：失败（震动 + 失败音效）4 次 / 成功 0 次（期望 4 / 0）｜ 失败音效 last=ui_card_fail 缺失 id=[]
+```
 
 ### 7.4 端到端：激活的卡真的影响下一局
 
@@ -444,7 +494,7 @@ Remove-Item "$env:APPDATA\Godot\app_userdata\ACT Roguelike\ability_cards.cfg"
 
 ```
 [AbilityInGame] UiService.OpenAbilityMatrix() = true（true = Main.tscn 里真的挂着这个界面）
-[AbilityInGame] 界面 IsOpen=true 矩阵格数=18（卡 8 + 空位） 表行数=8
+[AbilityInGame] 界面 IsOpen=true 矩阵格数=18（真卡 8 + 占位卡 10） 表行数=8
 [AbilityInGame] 提示栏：结构在树里=true 条目=5 可见=true ZIndex=100 鼠标穿透=true
 [AbilityInGame] Close() 之后 IsOpen=false（期望 False）
 [AbilityInGame] 合成按键 K 之后 IsOpen=true（期望 True —— 玩家按 K 走的就是这条 ToggleKey 路）
@@ -492,7 +542,8 @@ Remove-Item "$env:APPDATA\Godot\app_userdata\ACT Roguelike\ability_cards.cfg"
    （`…/能力卡 9（期望 3/3/10/1/1/25/7/9/9/6/3/11/9）`）。**只改这一个数字**。
 
 **不需要改的**：`AbilityCardTile.cs`、`AbilityMatrixScreen.cs`、`AbilityStore.cs`、`AbilityEffects.cs`、
-任何 `.tscn`、任何别的表。矩阵会自动多一格（空位自动少一格），图标按 `IconName` 自动找。
+任何 `.tscn`、任何别的表。矩阵会自动多一格（**占位卡自动少一张**），图标按 `IconName` 自动找；
+如果加满到超过 `列 × 最少行`，矩阵会**自己多长一行**（永远填满、不翻页）。
 
 **加一种新效果**（第三步，才需要 C#）：
 `AbilityCardEffectKind` 加一个 enum 值 → `AbilityEffects.ApplyCore` 加一个 `case` → 加一行卡。
@@ -520,3 +571,11 @@ Remove-Item "$env:APPDATA\Godot\app_userdata\ACT Roguelike\ability_cards.cfg"
    `var x := node.call(...)` 会因"从 Variant 推导类型"**直接解析失败**，整个拍摄台起不来（实测栽过一次）。
 9. **音频表要一起加**：新音效的 `.tres` 不加进 `Balance.tres` 的 `Audio` 数组 = "文件在、表在、就是没声音"。
 10. **不要用 `stop_project` / 不要在别的代理跑自测时用 MCP 的 `run_project`**：见 `docs/todo-handoff.md` 末尾。
+11. **占位卡不是空框，也别把格子尺寸写死回去**（A5 的两条红线）：
+    - 占位卡是**真的 `AbilityCardTile`**（`Card == null`）—— 谁在 `_GuiInput` / `RunAction` 里加一句
+      `if (Card == null) return;`，占位卡立刻变成"死格子"（用户明确不要这个）；
+      **只有宿主**（`AbilityMatrixScreen.Request`）该对 `Card == null` 返回 `NoCard`。
+    - `AbilityCardTile.tscn` 的 `custom_minimum_size` 只是"能缩到多小"，**矩阵靠 Expand 铺满**；
+      把它改回 `(232, 214)` 之类的大固定值，格子尺寸就不再随屏幕走了（而且小窗口会溢出）。
+12. **占用额度的记账与占位卡无关**：`AbilityStore.QuotaUsed` 只扫**卡表行**，占位卡进不了任何统计
+    （`UnlockedCount` / `ActiveCount` / `QuotaUsed` 都不会被它影响）。

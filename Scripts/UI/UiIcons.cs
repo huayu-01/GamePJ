@@ -75,9 +75,15 @@ public static class UiIcons
 	/// **能力卡** → 图标（卡行的 <see cref="ActRoguelike.Config.AbilityCardConfig.IconName"/> 列，
 	/// 不含目录与扩展名）。加一张卡 = 在卡行里写一个图标名；没有对应 SVG 时返回 <c>null</c>
 	/// （界面只显示文字，不报错）。用 <see cref="Named"/> 直查，所以卡表**不需要**在这里加 switch 分支。
+	///
+	/// <para><paramref name="card"/> 为 <c>null</c> = **占位卡**（矩阵空位，用户 A5）：返回
+	/// <see cref="AbilityCardPlaceholder"/> 那张"待添加的卡"图，所以占位卡看起来也是一张卡、不是空格子。</para>
 	/// </summary>
 	public static Texture2D? ForAbilityCard(ActRoguelike.Config.AbilityCardConfig? card)
-		=> card == null ? null : Named(card.IconName);
+		=> card == null ? AbilityCardPlaceholder : Named(card.IconName);
+
+	/// <summary>占位卡（矩阵空位）的图标：`Assets/UI/Icons/ic_ui_card_placeholder.svg`。</summary>
+	public static Texture2D? AbilityCardPlaceholder => Named("ic_ui_card_placeholder");
 
 	/// <summary>
 	/// 按**界面标题**取图标（通用多选一 <see cref="ChooseScreen"/> 只拿得到标题字符串）。

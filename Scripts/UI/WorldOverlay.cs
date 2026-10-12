@@ -23,7 +23,8 @@ internal sealed class HealthBarWidget
 	public const string LabelNode = "Label";
 	public const string AnimationNode = "Animation";
 
-	/// <summary>护甲条的节点名（用户需求 §五 #8：血量上要有护甲进度）。预制体里没有就是没有 —— 静默跳过。</summary>
+	/// <summary>护甲遮罩的节点名（用户 A6：有甲才显示、罩在血条上）。
+	/// 预制体里没有这两条 = 这个预制体不画护甲（<c>BarBoss</c> 就没有，首领 0 甲）—— 静默跳过。</summary>
 	public const string ArmorFillNode = "ArmorFill";
 	public const string ArmorBgNode = "ArmorBg";
 
@@ -53,12 +54,10 @@ internal sealed class HealthBarWidget
 
 		// 护甲条满宽取自预制体自身（与血条不同宽也没关系）；原色用于"碎甲闪白"之后还原。
 		ArmorWidth = armorFill?.Size.X ?? 0f;
-		ArmorColor = armorFill switch
-		{
-			ColorRect rect => rect.Color,
-			Control control => control.Modulate,
-			_ => new Color(0.72f, 0.86f, 1f),
-		};
+		// 护甲遮罩的"原色"用于碎甲闪白之后还原。⚠️ 读 **Modulate** 而不是 Color：
+		// 新样式里 Color 自己就带染色与透明度（`Color(0.72,0.86,1,0.45)` 那层"塑料"），
+		// modulate 才是额外乘上去的那一层 —— 还原成 Color 会把染色乘两遍，ColorRect 型的护甲条会越闪越暗。
+		ArmorModulate = armorFill?.Modulate ?? Colors.White;
 	}
 
 	/// <summary>满宽（比例 1.0）时填充条的像素宽度/高度，取自预制体。</summary>
@@ -75,8 +74,8 @@ internal sealed class HealthBarWidget
 	/// <summary>护甲条满宽时的像素宽度（0 = 这个预制体没有护甲条）。</summary>
 	public float ArmorWidth { get; }
 
-	/// <summary>护甲条的原色（碎甲闪白的恢复色）。</summary>
-	private Color ArmorColor { get; }
+	/// <summary>护甲遮罩的原始 modulate（碎甲闪白之后还原到它）。</summary>
+	private Color ArmorModulate { get; }
 
 	/// <summary>这个预制体有没有护甲条。</summary>
 	public bool HasArmorBar => _armorFill != null;
@@ -119,9 +118,16 @@ internal sealed class HealthBarWidget
 	}
 
 	/// <summary>
-	/// 护甲进度（用户需求 §五 #8）：有甲的单位在**血量上方**多一条甲条。
-	/// 甲为 0 但 <c>MaxArmor &gt; 0</c> 时仍然显示（空条）—— 玩家要能看出"甲被打光了"，
-	/// 而不是"甲条忽然消失"；完全没有甲的单位（首领 / 木桩）整条隐藏。
+	/// 护甲进度（用户 A6：「**要有护甲才会被显示出来**，期望上是**有一圈半透明遮罩遮住血条**，
+	/// 就像**血条包裹了一层塑料**，且**比血条大一点点**」）。
+	///
+	/// <para>预制体里那两个节点就是那层塑料：<c>ArmorBg</c> = 罩住整条血条、比血条大 2px 的半透明壳
+	/// （带一圈高亮边框），<c>ArmorFill</c> = 壳里那层磨砂的"甲"（比例 = 剩余甲，从右往左退）。</para>
+	///
+	/// <para><b>可见性</b>：<paramref name="visible"/> 由调用方按 <c>MaxArmor &gt; 0</c> 决定 ——
+	/// **无甲的单位（首领 / 白板怪 / 0 甲角色）任何护甲视觉都不显示**；
+	/// 有甲上限但甲被打光时仍然显示（只剩那层空壳）—— 玩家要能看出"甲被打光了"，
+	/// 而不是"护甲条忽然消失"。</para>
 	/// </summary>
 	public void SetArmor(float ratio, bool visible)
 	{
@@ -143,7 +149,7 @@ internal sealed class HealthBarWidget
 
 	/// <summary>
 	/// 碎甲闪一下（读 <see cref="Unit.ArmorBroke"/>，只在甲从 &gt;0 掉到 0 时触发）：
-	/// 甲条瞬间刷白再回到原色 —— 与模型上那圈 <see cref="ArmorBreakFx"/> 同时发生。
+	/// 那层"塑料"瞬间刷白再回到原色 —— 与模型上那圈 <see cref="ArmorBreakFx"/> 同时发生。
 	/// </summary>
 	public void FlashArmorBreak()
 	{
@@ -154,7 +160,7 @@ internal sealed class HealthBarWidget
 
 		_armorFill.Modulate = Colors.White;
 		Tween tween = _armorFill.CreateTween();
-		tween.TweenProperty(_armorFill, "modulate", ArmorColor, 0.45f)
+		tween.TweenProperty(_armorFill, "modulate", ArmorModulate, 0.45f)
 			.SetTrans(Tween.TransitionType.Sine);
 	}
 
@@ -579,7 +585,8 @@ public partial class WorldOverlay : CanvasLayer
 
 		widget.SetRatio(Mathf.Clamp(ratio, 0f, 1f), HealthColor(ratio), false);
 
-		// 护甲条：建出来的这一帧就要有正确比例，否则会先闪一下满甲。
+		// 护甲遮罩：建出来的这一帧就要有正确比例，否则会先闪一下满甲；
+		// 无甲上限的单位（MaxArmor = 0）连壳都不给（`visible: false`）—— 首领血条因此天然没有护甲视觉。
 		widget.SetArmor(
 			unit.MaxArmor > 0f ? Mathf.Clamp(unit.Armor / unit.MaxArmor, 0f, 1f) : 0f,
 			unit.MaxArmor > 0f);

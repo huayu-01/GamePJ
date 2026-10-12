@@ -20,12 +20,12 @@
 | glow 开了吗？ | 开了：`Scenes/Levels/TestArena.tscn` 的 `WorldEnvironment` → **`glow_enabled = true`、`glow_hdr_threshold = 2.0`、`glow_intensity = 0.5`、`glow_blend_mode = 1`（Screen）、只开 4/5/6 三档半径**。为什么阈值这么高见 §7。 |
 | 改了几个界面？ | **外观全部 9 个（主题级）+ 2 个新界面**（`SettingsScreen` 全屏设置菜单、`BuildScreen` 角色持有面板）。**7 个旧界面已全部改成"全屏类界面"**（面板铺满、内容居中），见 §11。 |
 | 按键提示栏在哪？ | **在 UI 基类里**：`OverlayScreen.SetKeyHints(...)`，屏幕底部一栏「键 + 说明」。**结构永远存在**（`Root/KeyHintBar`），界面可以不填、不显示。**第三批写能力矩阵界面时照 §10 抄。** |
-| 能力矩阵（局外卡牌）长什么样？ | `Scenes/UI/AbilityMatrixScreen.tscn`（快捷键 **K**，全屏 **6×3 = 18 格**矩阵）。元素是**基类组件** `AbilityCardTile.tscn`：三状态（变暗/恢复颜色/边框外光圈）+ 六档等级色的边框 + 四种交互（左键长按解锁 / 左键激活 / 右键升级 / 右键长按重置）。见 **§15**。 |
+| 能力矩阵（局外卡牌）长什么样？ | `Scenes/UI/AbilityMatrixScreen.tscn`（快捷键 **K**，**满屏 6×3 = 18 格**矩阵，格子尺寸随容器自适应、**不翻页**）。元素是**基类组件** `AbilityCardTile.tscn`：三状态（变暗/恢复颜色/边框外光圈）+ 六档等级色的边框 + 四种交互（左键长按解锁 / 左键激活 / 右键升级 / 右键长按重置）；**空位由"占位卡"填满**（卡表里没有对应行 → 永不解锁，但点它照常震动 + 失败音效）。见 **§15**。 |
 | 设置菜单？ | `SettingsScreen`（快捷键 **O** / 基地界面的「设置」按钮）：画面 / 控制 / 音量，**分类来自注册表**（加一页 = 注册一行），存 `user://settings.cfg`。见 §12。 |
 | 图标？ | `Assets/UI/Icons/ic_ui_*.svg`（13 张，**项目自制 SVG**，Godot 原生导入）+ `Scripts/UI/UiIcons.cs`（**唯一映射表**）。构筑元素 / 奖励卡片 / 设置分类 Tab 都用图标；说明只在**选取界面**与**鼠标悬停**（`tooltip_text`）。见 §13。 |
 | 场景里的节点还写名字吗？ | **不写了**：`RewardNode.tscn` 的 `Label3D` 名牌已删，基类 `Interactable` 还会无条件把任何 `Label3D` 子孙藏掉。见 §13。 |
 | 想一次看全部证据？ | [art-integration-log.md](art-integration-log.md) 的 **第五轮** 一节：逐项改动 + 全部截图 + 自测输出。**本轮（第六轮）的证据在 §10~§13 各自的表里**（截图 `ui_10` ~ `ui_17`、探针输出、自测硬指标）。 |
-| **第六轮（表现批）改了什么？** | **§16**：#9 跳字分类（伤害/甲/盾/格挡/无敌/其他伤害/恢复，共 7 类）、#8 护甲进度 + 碎甲（血条上的甲条 + 模型上的破甲环）、#13 交互表现（描边 + 按键图标 + 失败抖动/音效/击退）、#4 基地实时换装（模型 + 数值 + 枪械）。**判定与伤害管线一行没改**（见 §16.4 的逐条核对表）。#3 死亡流程单独一篇：[death-flow.md](death-flow.md)。 |
+| **第六轮（表现批）改了什么？** | **§16**：#9 跳字分类（伤害/甲/盾/格挡/无敌/其他伤害/恢复，共 7 类）、#8 护甲进度 + 碎甲（§16.2，**2026-10 用户 A6 改成"血条上罩一层半透明塑料"**）、#13 交互表现（描边 + 按键图标 + 失败抖动/音效/击退）、#4 基地实时换装（模型 + 数值 + 枪械）。**判定与伤害管线一行没改**（见 §16.4 的逐条核对表）。#3 死亡流程单独一篇：[death-flow.md](death-flow.md)。 |
 
 ---
 
@@ -243,8 +243,8 @@ UiDangerButton/styles/normal = SubResource("StyleBoxTexture_danger_normal")
 - **没动（换贴图这件事）**：`BarEnemy.tscn`（敌人脚下血条，本来就是 `ColorRect`，换贴图要动 `Fill` 的 `stretch_mode` 与尺寸换算）、
   `BarBoss.tscn`（首领血条，`ProgressBar` + 预制体里的 `StyleBoxFlat` 填充色，且它的 `Icon` 现在是 Godot 图标占位）。
   三者结构一致，照 `BarPlayer` 的做法抄即可。
-  **第六轮起 `BarEnemy` / `BarPlayer` 多了一条护甲条**（`ArmorBg` / `ArmorFill`，在血条上方）——见 §16.2；
-  `BarBoss` 仍然没有（首领无甲，见 [combat.md](combat.md)）。
+  **第六轮起 `BarEnemy` / `BarPlayer` 各多了一层"护甲塑料"（`ArmorBg` / `ArmorFill`，罩在血条上、比血条大 2px/边）**——见 §16.2；
+  `BarBoss.tscn` 仍然**一个护甲节点都没有**（首领 0 甲，所以天然不显示任何护甲视觉 —— 这正是 A6 要的"有甲才显示"）。
 
 ---
 
@@ -562,11 +562,12 @@ SettingsSections.Register(() => new AbilitySettingsSection());
 
 | 场景 | 是什么 |
 |---|---|
-| `Scenes/UI/AbilityMatrixScreen.tscn` | **全屏矩阵界面**（`CanvasLayer` layer 16 / `ScreenLayer = Panel` → 打开即暂停 + 放开鼠标）。挂在 **`Scenes/Main.tscn`**（与 `BuildScreen` / `SettingsScreen` 并列），快捷键 **K**，或 `UiService.OpenAbilityMatrix()` |
-| `Scenes/UI/AbilityCardTile.tscn` | **元素基类组件**（一格 = 一张卡）。界面只负责建格子 / 判定 / 额度栏 / 图例；三状态、交互、读条、震动、缓动、音效**全在元素里** |
+| `Scenes/UI/AbilityMatrixScreen.tscn` | **满屏矩阵界面**（`CanvasLayer` layer 16 / `ScreenLayer = Panel` → 打开即暂停 + 放开鼠标）。挂在 **`Scenes/Main.tscn`**（与 `BuildScreen` / `SettingsScreen` 并列），快捷键 **K**，或 `UiService.OpenAbilityMatrix()` |
+| `Scenes/UI/AbilityCardTile.tscn` | **元素基类组件**（一格 = 一张卡）。界面只负责建格子 / 判定 / 额度栏 / 图例；三状态、交互、读条、震动、缓动、音效**全在元素里**（**占位卡也是这个组件**，见 §15.6） |
 
-**行列不写死**：`Columns = 6`、`Rows = 3`（导出属性）= **18 格**，1920×1080 下每格 ≈ **232×214**。
-卡不满时补**空位**占位格（"位置先占住"，加到 18 张都不用改界面）。
+**行列不写死**：`Columns = 6`、`Rows = 3`（导出属性，`Rows` 是**最少**行数）= 18 格。
+1920×1080 下每格实测 **284×220**（旧版是写死的 232×214）—— 格子尺寸 = 矩阵区 ÷ 行列，**随屏幕/容器自适应**（§15.6）。
+**卡不满时补的是"占位卡"**（不是空框）：矩阵永远是**填满的矩形、不翻页**（加到 19 张就自动变 6×4 = 24 格）。
 
 ### 15.2 三状态 / 边框色 / 光圈（外观部分）
 
@@ -576,7 +577,7 @@ SettingsSections.Register(() => new AbilitySettingsSection());
 | **解锁未激活** | 内容恢复**白色**，边框按等级着色 |
 | **激活** | `Glow`（`Panel` + `StyleBoxFlat`：`DrawCenter=false` + 边框 3px + `ShadowSize=10`）**比 `Frame` 大 9px** → **光圈落在边框外**；颜色 = 边框色；`modulate:a` 在 0.55↔1.0 之间**呼吸**（`Tween` 循环） |
 | **边框颜色 = 等级** | 灰 0 `#6b7080` → 白 1 `#ebf0ff` → 绿 2 `#59eb6b` → 蓝 3 `#57a3ff` → 紫 4 `#b86bff` → 红 5 `#ff5747`（**唯一一处**：`AbilityCardTile.LevelColor`，图例也从它取色，不抄第二遍） |
-| **预留间隔** | 格 232×214 + **14px** 行列间隔；光圈往外扩 9px 也不会互相压住 |
+| **预留间隔** | 格尺寸随容器自适应（1920×1080 下实测 **284×220**）+ **14px** 行列间隔；光圈往外扩 9px 也不会互相压住 |
 
 **没有用任何新贴图**：底板、边框、光圈全是代码建的 `StyleBoxFlat`（`AddThemeStyleboxOverride`），
 所以"换一个等级色"只改 `LevelColor` 一个 `switch`。
@@ -592,6 +593,7 @@ SettingsSections.Register(() => new AbilitySettingsSection());
 | 失败（任意原因） | **震动元素**（绕中心来回摆 + 红闪）+ `ui_card_fail` |
 | 音效 | 解锁 `ui_card_unlock` / 升级 `ui_card_upgrade` / 重置 `ui_card_reset` / 激活 `ui_click` / 失败 `ui_card_fail`（都是表驱动，见 §6.3） |
 | 说明文字 | **只在鼠标悬停**（`TooltipText`：名字 / 等级 / 状态 / 额度占用 / 下一级效果 / 价格） |
+| **占位卡（A5）** | 四种操作**全部**判为 `NoCard` → 走**同一条**失败分支（`FailCount++` + `PlayFailShake()` + `ui_card_fail`）；左键长按照样读满 0.7 秒的条。见 §15.6 |
 
 ### 15.4 按键提示栏（照 §10 写的实例）
 
@@ -609,17 +611,36 @@ SetKeyHints(
 
 | 截图 | 内容 |
 |---|---|
-| `ability_01_matrix_states.png` | 18 格矩阵全貌：**六档等级色 + 三状态**（4 张激活带光圈、3 张解锁未激活、1 张未解锁变暗）+ 额度栏 + 图例 + 提示栏 |
+| `ability_01_matrix_states.png` | **满屏 18 格矩阵**全貌：**六档等级色 + 三状态 + 10 张占位卡**（4 张激活带光圈、3 张解锁未激活、1 张未解锁变暗、10 张占位卡）+ 额度栏 + 图例 + 提示栏 |
 | `ability_02_charging.png` | 左键长按**读条中**（进度条可见，`ChargeProgress = 0.40`） |
 | `ability_03_unlocked.png` | 读条结束**刚解锁**（Lv1、内容恢复颜色、白边框、播放放大闪一下） |
 | `ability_04_active_glow.png` | 右键升级两次 + 左键激活后：**等级色边框 + 边框外光圈** |
 | `ability_05_after_interactions.png` | 四种交互 + 故意失败 + 额度扩增之后 |
 | `ability_06_ingame_opened.png` | **真的 `Main.tscn`** 里（基地界面之上）打开的能力矩阵 —— `UiService.OpenAbilityMatrix()` 找到界面 = 接线成功 |
 | `ability_07_ingame_toggle_key.png` | 合成按键 **K** 打开的那一张（走的是界面自己的 `ToggleKey` 边沿检测） |
+| `ability_08_placeholder_feedback.png` | **占位卡被点/长按之后**：那一格正在**抖动 + 红闪**（四种操作全部 `NoCard` → 震动 + `ui_card_fail`，状态一个字节不变） |
 
-拍摄台：`Scenes/UI/_AbilityShowcase.tscn`（摆状态 + 四种交互 + 音效/缓动，全程沙箱不留痕）、
+拍摄台：`Scenes/UI/_AbilityShowcase.tscn`（摆状态 + 四种交互 + 占位卡反馈 + 音效/缓动，全程沙箱不留痕）、
 `Scenes/UI/_AbilityInGame.tscn`（在真的 Main.tscn 里验接线与按键）。
 两个都是**留在仓库里**的工具，"以后改能力矩阵再跑一次"即可。
+
+### 15.6 占位卡与自适应（用户 A5）
+
+用户原话：「直接做**满屏矩阵不翻页**，**空的位置也有卡牌占着**，但是会**因为没有设定解锁条件而处于一直无法解锁**，
+**自适应大小**，保证后续**永远是填满的矩阵**」。
+
+| 要做的 | 怎么做的（外观/交互视角；数据与判定的完整说明在 [ability-cards.md](ability-cards.md) §5.6 / §6.1） |
+|---|---|
+| **满屏矩阵、不翻页** | `Matrix` 是 `GridContainer` 且 `size_flags = Fill+Expand`；格数 = `Columns × max(Rows, ceil(卡数/Columns))` —— 永远是**填满的矩形**，不存在第二页。实测算式：`8 张 → 6×3 = 18 格`、`19 张 → 6×4 = 24 格`、`25 张 → 6×5 = 30 格` |
+| **空位也是"卡"** | 占位卡是**真的 `AbilityCardTile`**（`Card == null`）：灰边框（压暗一档）+ 底板 + 图标 `ic_ui_card_placeholder.svg`（卡框 + 加号）+ 名字「占位卡」+ 状态「占位卡 · 不可解锁」+ 提示「未设定解锁条件」+ tooltip 教你把它变成真卡 |
+| **一直无法解锁** | 卡表里**没有对应行** → 宿主对四种操作一律返回 `NoCard`；它没有等级、不进 `UnlockedCount` / `ActiveCount` / `QuotaUsed` 任何一个统计 |
+| **但交互反馈照旧** | 点它 / 长按它照常读条、**震动**（`PlayFailShake`）、**失败音效**（`ui_card_fail`）—— 走的是**同一条** `RunAction` 失败分支，不是为占位卡写的第二套 |
+| **自适应大小** | 场景里**不再有写死的格子尺寸**：元素 `custom_minimum_size = 120×110` 只是"能缩到多小"，靠 `Fill+Expand` 铺满；实测 1920×1080 下 `矩阵区 1772×686 → 每格 284×220px`（= 矩阵区按 6 列 3 行分摊，含 14px 间隔） |
+
+机器可判定证据（拍摄台逐行打印，见 [ability-cards.md](ability-cards.md) §7.3）：
+`列 6 × 行 3 → 18 格（真卡 8 + 占位卡 10）`、`满屏矩阵算式 … → 全部满足「填满矩形、不翻页」 = True`、
+`占位卡交互：Unlock → NoCard ｜ ToggleActive → NoCard ｜ Upgrade → NoCard ｜ ResetUpgrades → NoCard
+｜ 反馈：失败（震动 + 失败音效）4 次 / 成功 0 次 ｜ 失败音效 last=ui_card_fail`。
 
 ---
 
@@ -654,16 +675,55 @@ SetKeyHints(
 「甲 / 盾 / 格挡 / 暴击 / 这次伤害是不是燃烧」全都在 `DamageResult` 上。订阅是在**第一次命中**时建立的
 （`GameplayEventKind.Hit` 先于结算抛出，所以连第一次命中的甲数字都不会漏），死亡 / 退树时成对退订。
 
-### 16.2 #8 护甲进度与碎甲（血条 + 模型）
+### 16.2 #8 护甲进度与碎甲（血条 + 模型）—— **2026-10 按用户 A6 改版：那层"塑料"**
 
-- **血条上多一条甲条**：`Scenes/UI/Bars/BarEnemy.tscn`（`Content/ArmorBg` + `Content/ArmorFill`）与
-  `Scenes/UI/Bars/BarPlayer.tscn`（`ArmorBg` + `ArmorFill`，在血条**上方**）。
-  节点名是**约定**（`HealthBarWidget` 按名字递归找）：预制体里没有这两条就静默跳过（`BarBoss` 就没有）。
-- **甲条可见规则**：`MaxArmor > 0` 才显示；甲打光后**留空条**（玩家能看出"甲没了"而不是"甲条消失了"）。
-- **碎甲**：`Unit.ArmorBroke`（只在甲从 >0 掉到 0 时触发）→ 甲条闪白 + `ArmorBreakFx`（水平环 + 亮壳，0.42s 自回收）。
+用户原话（A6）：「关于护甲条，**要有护甲才会被显示出来**，期望上是**有一圈半透明遮罩遮住血条**，
+就像**血条包裹了一层塑料**，且**比血条大一点点**」。
+（改版前是在血条**上方**加一对独立的 `ArmorBg` / `ArmorFill` 甲条 —— 那个形式已经删掉。）
+
+**两个节点，一层"塑料"**（`Scenes/UI/Bars/BarEnemy.tscn` 的 `Content/ArmorBg` + `Content/ArmorFill`，
+`BarPlayer.tscn` 的 `ArmorBg` + `ArmorFill`；**都排在 `Fill` / `DelayBar` 之后**，所以真的盖在血条上）：
+
+| 节点 | 类型 | 是什么 | 尺寸 |
+|---|---|---|---|
+| `ArmorBg` | `Panel` + `StyleBoxFlat` | **那层塑料壳**：半透明冷钢蓝底（alpha 0.14）+ **1px 高亮边框**（alpha 0.55）+ 圆角 | **比血条大 2px/边**（玩家 268×24 vs 血条框 264×20；敌人 70×13 vs 血条底 66×9） |
+| `ArmorFill` | `ColorRect`（冷钢蓝 alpha 0.45） | 壳里那层**磨砂的"甲"**：宽度 = 剩余甲比例，**从右往左退**，甲退掉的地方露出血条本色 | 满宽同 `ArmorBg` |
+
+- **有护甲才显示**（A6 的核心）：`MaxArmor > 0` 才 `SetArmor(..., visible: true)` ——
+  **首领（0 甲，`BarBoss.tscn` 根本没有护甲节点）/ 白板怪 / 0 甲角色，一点护甲视觉都没有**（连壳都不给）。
+  两个节点在预制体里默认 `visible = false`，所以"还没有玩家/单位"的那几帧也不会闪出一条空壳。
+  实测：`无甲单位：Chaser 生命 60 甲 0/0 … 壳 隐藏(70×13) 甲填充 隐藏(70px)`。
+- **甲打光留空壳**：有甲上限的单位甲被打光时，`ArmorFill` 宽 0 而 `ArmorBg` 仍在 ——
+  玩家能看出"甲没了"而不是"护甲条忽然消失"（这一点与改版前一致）。
+- **碎甲**：`Unit.ArmorBroke`（只在甲从 >0 掉到 0 时触发）→ 那层塑料**闪白**（`FlashArmorBreak`）
+  + 模型上 `ArmorBreakFx`（水平环 + 亮壳，0.42s 自回收）。**改版没有动它**。
+- ⚠️ `FlashArmorBreak` 的还原色读的是节点的 **`Modulate`**（不是 `Color`）：新样式的 `Color` 自带染色与透明度，
+  还原成 `Color` 会把染色乘两遍（`ColorRect` 型的护甲条会越闪越暗）。
 - ⚠️ **"只掉甲、没掉血"也会出血条**：`GameplayEventBus.Damaged` 的 `Value` 是 `HealthLost`（甲吸收时为 0），
   所以登记血条多了一条"甲/盾也掉了"的判据；**无甲单位行为与改动前逐位一致**。
-- 细节与信号来源见 [combat.md](combat.md) 的「护甲的表现层」。
+- 细节与信号来源见 [combat.md](combat.md) 的「护甲的表现层」，判定（扣甲顺序 / 减伤）**一行没动**。
+
+**截图**（`_FeelShowcase.tscn`，mode=arena）：
+
+| 截图 | 内容 |
+|---|---|
+| `feel_01_armor_progress.png` | 有甲敌人（甲 45/60）脚下的血条：罩着半透明塑料、磨砂"甲"占了 75% |
+| `feel_01b_armor_none.png` | **同屏对照**：有甲木桩（有塑料）vs 无甲追猎者（`MaxArmor = 0`，**一条护甲视觉都没有**） |
+| `feel_01c_player_armor.png` | 玩家 HUD 血条（甲 39/60、血满）：血一点没掉也看得见护甲进度 |
+| `feel_02_armor_break.png` | 碎甲：模型上一圈扩散环 + 血条上的空壳 |
+| **`armor_a6_zoom.png`** | **放大对照图**（从上面几张真实截图裁剪 + 最近邻放大，不是新渲染）：有甲敌人血条 / 无甲敌人血条 / 玩家血条 |
+
+机器可判定输出（实测）：
+
+```
+[Feel] 无甲单位：Chaser 生命 60 甲 0/0（MaxArmor = 0 → 期望任何护甲视觉都隐藏）
+[Feel] 护甲视觉[有甲木桩 vs 无甲追猎者（血条按登记顺序）] 血条 2 条：
+       壳 显示(70×13) 甲填充 显示(52.5px) 血条底 66×9 血 64px ／
+       壳 隐藏(70×13) 甲填充 隐藏(70px) 血条底 66×9 血 51.2px
+[Feel] 玩家血条护甲遮罩：壳 显示(268×24) 甲填充 显示(174.2px) 血条框 264×20 血 260px（壳比血条框每边大 2px）
+[Feel] 碎甲模型特效：ArmorBreakFx 节点 1 个（0.42 秒后自己回收） → 0 个
+[Feel] 敌人血条[碎甲（下一帧更新后）]：护甲遮罩 0px / 整条 70px（比例 0） 遮罩可见=True 血条 52.8px
+```
 
 ### 16.3 #13 交互表现（描边 + 按键图标 + 失败响应）
 
@@ -727,21 +787,26 @@ $godot = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono
 & $godot --path 'F:\Godot项目\项目a' 'res://Scenes/UI/_FeelDeath.tscn'      # #3（继承自 Main.tscn，见 death-flow.md）
 ```
 
-实测输出（关键几行，`run_20261012_1946xx.log`，三个场景 stderr 里 **0 条 ERROR**）：
+实测输出（关键几行；`[Feel]` 行是这三个场景**直接跑时的控制台输出**（它们走 `GD.Print`，不写进 `user://logs`），
+第六轮原版与 **A6 改版后**的两批都在下面，三个场景 stderr 里 **0 条 ERROR**）：
 
 ```
+[Feel] 木桩：生命 600 甲 60/60 减伤 0.25 ／ 无甲单位：Chaser 生命 60 甲 0/0（MaxArmor = 0 → 期望任何护甲视觉都隐藏）
 [Feel] 命中「普通命中（甲吸收）」：原始 20 → 最终 15（甲 15 / 盾 0 / 血 0 格挡=False 无敌=False）
 [Feel] 跳字[甲吸收] 1 个：「甲 15」@b8dbff
-[Feel] 敌人血条[甲吸收]：甲条 48px / 底 66px（比例 0.73） 甲条可见=True 血条 64px     ← 血一点没掉也有条
+[Feel] 敌人血条[甲吸收]：护甲遮罩 52.5px / 整条 70px（比例 0.75） 遮罩可见=True 血条 64px｜壳 70×13 vs 血条底 66×9   ← 血一点没掉也有遮罩
+[Feel] 护甲视觉[有甲木桩 vs 无甲追猎者] 血条 2 条：壳 显示(70×13) 甲填充 显示(52.5px) … ／ 壳 隐藏(70×13) 甲填充 隐藏(70px) …
 [Feel] 跳字[碎甲] 2 个：「甲 45」@b8dbff 「105」@ffd959
 [Feel] 碎甲模型特效：ArmorBreakFx 节点 1 个（0.42 秒后自己回收） → 0 个
-[Feel] 敌人血条[碎甲（下一帧更新后）]：甲条 0px（比例 0） 甲条可见=True 血条 52.8px
+[Feel] 敌人血条[碎甲（下一帧更新后）]：护甲遮罩 0px（比例 0） 遮罩可见=True 血条 52.8px     ← 空壳还在
 [Feel] 跳字[格挡] 3 个：「无敌」@c7d1eb 「甲 7」@b8dbff 「格挡 7」@d9e6ff
 [Feel] 跳字[燃烧] 1 个：「燃 6」@ff80d9 ／ [Feel] 跳字[直伤（有攻击者）] 2 个：「燃 6」「30」@ffd959
 [Feel] 恢复跳字（HUD 层）：1 个：「＋35」@73ff8c
 [Feel] 交互表现[靠近]：当前目标=RewardNode 同一个=True 高亮=True 描边可见=True 按键图标有=True 图标可见=True 失败计数=0
 [Feel] 交互表现[失败瞬间]：… 失败计数=1  ／ 失败音效：last=ui_card_fail 累计=1 缺失 id=[]
-[Feel] 玩家被击退：0.64 米（方向背离交互物，冲量 4.5）  ／ 图标表：22 张可加载（含按键图标 ic_ui_key_f）
+[Feel] 玩家被击退：0.636 米（方向背离交互物，冲量 4.5）  ／ 图标表：22 张可加载（含按键图标 ic_ui_key_f）
+[Feel] 玩家护甲：39/60（血 120/120 —— 血没掉也要看得见护甲进度）
+[Feel] 玩家血条护甲遮罩：壳 显示(268×24) 甲填充 显示(174.2px) 血条框 264×20 血 260px（壳比血条框每边大 2px）
 [Feel] 装备配置台：找到=True 玩家在范围内=True 交互接受=True ／ 选角色界面打开=True 按键提示=2 条
 [Feel] 按 2 选角色后：RunSetup.Character=Heavy 武器界面打开=True
 [Feel] 基地预览[重装 + 狙击枪]：模型=[.../mesh_player_body_heavy.glb] 预览实例=1 枪可见=False 玩家生命=380 甲=140
@@ -750,7 +815,10 @@ $godot = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono
 
 | 截图 | 内容 |
 |---|---|
-| `feel_01_armor_progress.png` | 甲条（血条上方那条冷钢蓝）+ 「甲 15」（近景） |
+| `feel_01_armor_progress.png` | 有甲敌人血条：**罩着一层半透明塑料**（甲 45/60 → 磨砂"甲"占 75%）+ 「甲 15」（近景） |
+| `feel_01b_armor_none.png` | **有甲 vs 无甲同屏对照**：木桩（有塑料）/ 追猎者（`MaxArmor = 0`，**一条护甲视觉都没有**） |
+| `feel_01c_player_armor.png` | 玩家 HUD 血条（甲 39/60、血满）：血一点没掉也看得见护甲进度 |
+| `armor_a6_zoom.png` | **放大对照图**（真实截图裁剪 + 最近邻放大）：有甲敌人 / 无甲敌人 / 玩家 三条血条 |
 | `feel_02_armor_break.png` | 碎甲：模型上一圈扩散环 + 「甲 45」「105」 |
 | `feel_03b_invuln_block.png` | 「无敌」（木桩）+「格挡 7」（守卫） |
 | `feel_03_number_kinds.png` | 「燃 6」（其他伤害）+「60」（伤害）+「＋35」（恢复） |

@@ -47,6 +47,9 @@ public partial class _FeelProbe : Node3D
 	private Unit? _player;
 	private Unit? _dummy;
 	private Unit? _guard;
+
+	/// <summary>无甲单位（追猎者，<c>MaxArmor = 0</c>）：用来验用户 A6 的「要有护甲才会被显示出来」。</summary>
+	private Unit? _plain;
 	private CanvasLayer? _overlay;
 	private Node? _hud;
 	private Camera3D? _cam;
@@ -197,17 +200,46 @@ public partial class _FeelProbe : Node3D
 			}
 
 			GD.Print($"[Feel] 守卫：生命 {_guard.MaxHealth:0} 甲 {_guard.Armor:0}/{_guard.MaxArmor:0} 格挡倍率 {_guard.Block?.BlockDamageMultiplier}");
+
+			// 无甲单位（A6 的对照）：**一条护甲视觉都不该有** —— 连"塑料壳"都不给。
+			_plain = GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate<Unit>();
+			if (_plain.GetNodeOrNull<UnitAnimator>(UnitAnimator.NodeName) == null)
+			{
+				_plain.AddChild(new UnitAnimator { Name = UnitAnimator.NodeName });
+			}
+
+			AddChild(_plain);
+			_plain.GlobalPosition = new Vector3(4.4f, 0f, 3.4f);
+			foreach (Node child in _plain.GetChildren())
+			{
+				if (child is EnemyBrain or Ability)
+				{
+					child.SetProcess(false);
+					child.SetPhysicsProcess(false);
+				}
+			}
+
+			GD.Print($"[Feel] 无甲单位：{_plain.Name} 生命 {_plain.MaxHealth:0} 甲 {_plain.Armor:0}/{_plain.MaxArmor:0}（MaxArmor = 0 → 期望任何护甲视觉都隐藏）");
 		});
 
-		// ① 甲还在：一次打不穿的伤害 → 应该出现「甲 N」，并且敌人血条上多出甲条（**血一点没掉**也要显示）。
+		// ① 甲还在：一次打不穿的伤害 → 应该出现「甲 N」，并且敌人血条上罩着那层半透明"塑料"（**血一点没掉**也要显示）。
 		Later(0.8f, () =>
 		{
 			Hit(_dummy!, 20f, "普通命中（甲吸收）");
 			PrintNumbers("甲吸收");
 			PrintBars("甲吸收");
-			Look(new Vector3(-2.2f, 1.5f, 4.2f), new Vector3(-2.2f, 0.55f, 1.2f));   // 拉近看甲条
+			Look(new Vector3(-2.2f, 1.5f, 4.2f), new Vector3(-2.2f, 0.55f, 1.2f));   // 拉近看护甲遮罩
 		});
 		Later(0.15f, () => Shot("feel_01_armor_progress.png"));
+
+		// ①b A6 的对照：**有甲的木桩 vs 无甲的追猎者**，同屏看"有甲才显示"。
+		Later(0.05f, () =>
+		{
+			Hit(_plain!, 12f, "无甲单位");
+			PrintArmorVisual("有甲木桩 vs 无甲追猎者（血条按登记顺序）");
+			Look(new Vector3(1.0f, 2.4f, 8.6f), new Vector3(1.0f, 0.9f, 1.8f));
+		});
+		Later(0.15f, () => Shot("feel_01b_armor_none.png"));
 
 		// ② 打碎甲：一次超出剩余甲的伤害 → 「甲 N」+「伤害 N」+ 碎甲特效（环 + 甲条闪白）。
 		Later(1.0f, () =>
@@ -318,7 +350,21 @@ public partial class _FeelProbe : Node3D
 			GD.Print($"[Feel] 图标表：{UiIcons.DebugLoadedCount()} 张可加载（含按键图标 ic_ui_key_f）");
 		});
 
-		// ⑥ 让超时/漏截图也能看到结论。
+		// ⑥ 玩家血条上的护甲遮罩（A6）：给玩家 60 甲、再打掉一点甲（**血一点不掉**）→ HUD 那条血条也罩上塑料。
+		// ⚠️ 排在"恢复跳字"之后：护甲会吸收伤害，早给甲会把 ③ 的「＋35」恢复证据吃掉。
+		Later(0.5f, () =>
+		{
+			_player!.ApplyBaseStats(_player.MaxHealth, 60f, 0f, _player.MoveSpeed);
+			_player.ApplyDirectDamage(30f, _guard);
+			GD.Print($"[Feel] 玩家护甲：{_player.Armor:0}/{_player.MaxArmor:0}（血 {_player.Health:0}/{_player.MaxHealth:0} —— 血没掉也要看得见护甲进度）");
+			WideShot();
+		});
+
+		// HUD 每 0.05 秒才刷一次，隔一会儿再读才是"屏幕上真的画出来的样子"。
+		Later(0.3f, () => PrintPlayerArmor());
+		Later(0.05f, () => Shot("feel_01c_player_armor.png"));
+
+		// ⑦ 让超时/漏截图也能看到结论。
 		Later(0.5f, () => PrintNumbers("收尾（跳字应已淡出）"));
 	}
 
@@ -345,7 +391,7 @@ public partial class _FeelProbe : Node3D
 		GD.Print($"[Feel] 跳字[{tag}] {texts.Count} 个：{string.Join(" ", texts)}");
 	}
 
-	/// <summary>敌人血条上的护甲条 / 血量条（读的是预制体里真实的 Control 尺寸）。</summary>
+	/// <summary>敌人血条上的护甲遮罩 / 血量条（读的是预制体里真实的 Control 尺寸）。</summary>
 	private void PrintBars(string tag)
 	{
 		Control bars = _overlay!.GetNode<Control>("Bars");
@@ -359,10 +405,39 @@ public partial class _FeelProbe : Node3D
 		var armorFill = root?.GetNodeOrNull<Control>("Content/ArmorFill");
 		var armorBg = root?.GetNodeOrNull<Control>("Content/ArmorBg");
 		var fill = root?.GetNodeOrNull<Control>("Content/Fill");
+		var bg = root?.GetNodeOrNull<Control>("Content/Bg");
 		float armorRatio = armorFill != null && armorBg != null && armorBg.Size.X > 0f ? armorFill.Size.X / armorBg.Size.X : 0f;
 		GD.Print(
-			$"[Feel] 敌人血条[{tag}]：甲条 {armorFill?.Size.X:0.#}px / 底 {armorBg?.Size.X:0.#}px（比例 {armorRatio:0.##}）"
-			+ $" 甲条可见={armorFill?.Visible} 血条 {fill?.Size.X:0.#}px");
+			$"[Feel] 敌人血条[{tag}]：护甲遮罩 {armorFill?.Size.X:0.#}px / 整条 {armorBg?.Size.X:0.#}px（比例 {armorRatio:0.##}）"
+			+ $" 遮罩可见={armorFill?.Visible} 血条 {fill?.Size.X:0.#}px｜壳 {armorBg?.Size.X:0.#}×{armorBg?.Size.Y:0.#} vs 血条底 {bg?.Size.X:0.#}×{bg?.Size.Y:0.#}（大一点点）");
+	}
+
+	/// <summary>
+	/// A6：「**要有护甲才会被显示出来**」的机器可判定形式 —— 逐条血条打印那层塑料壳/甲填充的可见性与尺寸。
+	/// 血条按**登记顺序**排列（先受伤的先建），所以前面的行对应先受伤的单位。
+	/// </summary>
+	private void PrintArmorVisual(string tag)
+	{
+		Control bars = _overlay!.GetNode<Control>("Bars");
+		var lines = new List<string>();
+		foreach (Node child in bars.GetChildren())
+		{
+			if (child is not Control root)
+			{
+				continue;
+			}
+
+			Control? shell = root.GetNodeOrNull<Control>("Content/ArmorBg");
+			Control? charge = root.GetNodeOrNull<Control>("Content/ArmorFill");
+			Control? barBg = root.GetNodeOrNull<Control>("Content/Bg");
+			Control? fill = root.GetNodeOrNull<Control>("Content/Fill");
+			lines.Add(
+				$"壳 {(shell?.Visible == true ? "显示" : "隐藏")}({shell?.Size.X:0.#}×{shell?.Size.Y:0.#})"
+				+ $" 甲填充 {(charge?.Visible == true ? "显示" : "隐藏")}({charge?.Size.X:0.#}px)"
+				+ $" 血条底 {barBg?.Size.X:0.#}×{barBg?.Size.Y:0.#} 血 {fill?.Size.X:0.#}px");
+		}
+
+		GD.Print($"[Feel] 护甲视觉[{tag}] 血条 {bars.GetChildCount()} 条：{string.Join(" ／ ", lines)}");
 	}
 
 	private void PrintHighlight(string tag)
@@ -404,6 +479,20 @@ public partial class _FeelProbe : Node3D
 	/// <summary>碎甲特效的机器可判定形式：场景里现在有几个 <c>ArmorBreakFx</c> 节点。</summary>
 	private void PrintArmorFx()
 		=> GD.Print($"[Feel] 碎甲模型特效：ArmorBreakFx 节点 {CountByName(GetTree().Root, "ArmorBreakFx")} 个（0.42 秒后自己回收）");
+
+	/// <summary>玩家 HUD 血条上的护甲遮罩（A6）：壳/甲填充的可见性与尺寸（血条框 264×20 → 壳该是 268×24，即每边大 2px）。</summary>
+	private void PrintPlayerArmor()
+	{
+		Control? root = _hud is CanvasLayer hud ? hud.GetNodeOrNull<Control>("Root/PlayerBar") : null;
+		Control? shell = root?.GetNodeOrNull<Control>("ArmorBg");
+		Control? charge = root?.GetNodeOrNull<Control>("ArmorFill");
+		Control? fill = root?.GetNodeOrNull<Control>("Fill");
+		Control? frame = root?.GetNodeOrNull<Control>("BarBg");
+		GD.Print(
+			$"[Feel] 玩家血条护甲遮罩：壳 {(shell?.Visible == true ? "显示" : "隐藏")}({shell?.Size.X:0.#}×{shell?.Size.Y:0.#})"
+			+ $" 甲填充 {(charge?.Visible == true ? "显示" : "隐藏")}({charge?.Size.X:0.#}px)"
+			+ $" 血条框 {frame?.Size.X:0.#}×{frame?.Size.Y:0.#} 血 {fill?.Size.X:0.#}px（壳比血条框每边大 2px）");
+	}
 
 	/// <summary>恢复跳字挂在 HUD 层（<c>PlayerHud</c> 的 Root），所以单独数一次「＋N」。</summary>
 	private void PrintHealNumber()

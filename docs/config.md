@@ -1949,7 +1949,7 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 
 **回退路径（本轮 ⚠️ 只做了代码层设计，没有主动跑一遍空表）**：与其它表同一条纪律 ——
 `AbilityStore.Rows` 直接读 `Balance.Settings.AbilityCards`，表读不到就是空数组：
-矩阵只显示"空位"、`AbilityEffects` 一条效果都不加、日志写 `能力卡：… 0 张（来源：代码默认值（表读不到））`，
+矩阵只显示**占位卡**、`AbilityEffects` 一条效果都不加、日志写 `能力卡：… 0 张（来源：代码默认值（表读不到））`，
 玩法其余部分（节点布置 / Pressure / 端到端）不受影响；`meta_quota` 行读不到时 `QuotaPerLevel` 兜底为 1（与表里一致）。
 要主动验证：把 `Balance.tres` 的 `AbilityCards` 数组项与顶部对应的 `[ext_resource]` **一起**删掉再跑一轮自测
 （⚠️ **只删数组项不删 `ext_resource`、或只删行文件不删引用，都会让整份 `Balance.tres` 加载失败**）。

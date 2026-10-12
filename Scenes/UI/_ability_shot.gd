@@ -85,7 +85,19 @@ func _run() -> void:
 	print("[AbilityShot] 额度栏：", _screen.call("DebugHeaderText"))
 	print("[AbilityShot] 状态：", _screen.call("DebugSummary"))
 	print("[AbilityShot] 逐格：", _screen.call("DebugMatrixReport"))
+	print("[AbilityShot] 满屏矩阵算式：", _screen.call("DebugSlotPlan"))
 	await _shot("ability_01_matrix_states.png")
+
+	# ── 占位卡（用户 A5）：不可解锁 / 激活 / 升级，但**点它照常有反馈**（震动 + 失败音效）──
+	print("[AbilityShot] ", _screen.call("DebugRunPlaceholderFeedback"))
+	var placeholder: Object = _screen.call("PlaceholderAt", 0)
+	if placeholder != null:
+		placeholder.call("DebugRunAction", 0)          # 再点一次，抓"正在震动"的那一帧
+		await _frames(3)
+		await _shot("ability_08_placeholder_feedback.png")
+		print("[AbilityShot] 占位卡点一下之后：", placeholder.call("DebugState"))
+	else:
+		print("[AbilityShot] 拿不到占位卡（期望 ≥ 1：默认 6×3 = 18 格 / 8 张卡）")
 
 	# ── 交互①②：左键长按读条 → 解锁（拍一张读条中的，再拍一张解锁后的）──
 	_tile = _screen.call("TileAt", LOCKED_INDEX)

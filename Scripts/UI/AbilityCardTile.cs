@@ -58,11 +58,20 @@ public interface IAbilityCardHost
 /// ③ 右键**单击** → 升级；<br/>
 /// ④ 右键**长按** → 读条 → 重置升级进度并归还升级费。<br/>
 /// 失败（资源不够 / 额度不够 / 未解锁 / 已满级 / 没得重置）一律 **震动元素 + 失败音效**。</para>
+///
+/// <para><b>占位卡</b>（用户 A5：「空的位置也有卡牌占着，但是会因为没有设定解锁条件而处于一直无法解锁」）：
+/// <see cref="Card"/> 为 <c>null</c> 的那一格就是占位卡 —— **卡表里没有对应行**，所以它没有解锁条件、
+/// <b>永远不会解锁 / 激活 / 升级</b>（宿主对它一律返回 <see cref="AbilityCardResult.NoCard"/>）。
+/// 但它**不是死格子**：四种交互与失败反馈（读条、震动、失败音效）与真卡**走同一条代码路径**
+/// （<see cref="RunAction"/> 只按结果决定动画与音效，不需要为占位卡写第二条分支）。</para>
 /// </summary>
 public partial class AbilityCardTile : Control
 {
 	/// <summary>长按读条时长（秒）。两者（解锁 / 重置）共用它。</summary>
 	[Export(PropertyHint.Range, "0.2,2,0.05")] public float LongPressSeconds { get; set; } = 0.7f;
+
+	/// <summary>占位卡边框的不透明度（<see cref="BorderColor"/> 与 <see cref="RefreshVisual"/> 共用同一个值）。</summary>
+	public const float PlaceholderBorderAlpha = 0.55f;
 
 	/// <summary>震动幅度（弧度）与时长（秒）。"失效/失败的交互都要震动对应元素"。</summary>
 	[Export] public float ShakeRadians { get; set; } = 0.055f;
@@ -70,8 +79,11 @@ public partial class AbilityCardTile : Control
 	/// <summary>震动时长（秒）。</summary>
 	[Export] public float ShakeSeconds { get; set; } = 0.28f;
 
-	/// <summary>这张卡（null = 还没绑定）。</summary>
+	/// <summary>这张卡（<c>null</c> = **占位卡**：卡表里还没有对应的行，所以它没有解锁条件）。</summary>
 	public AbilityCardConfig? Card { get; private set; }
+
+	/// <summary>这一格是占位卡吗（卡表里没有对应行 → 永远无法解锁 / 激活 / 升级，但交互反馈照旧）。</summary>
+	public bool IsPlaceholder => Card == null;
 
 	/// <summary>规则判定的宿主（由界面注入）。</summary>
 	public IAbilityCardHost? Host { get; set; }
@@ -84,11 +96,13 @@ public partial class AbilityCardTile : Control
 	/// <summary>激活中吗。</summary>
 	public bool IsActive => AbilityStore.IsActive(Card?.Id);
 
-	/// <summary>三状态之一（界面上的"变暗 / 恢复颜色 / 光圈"就是它）。</summary>
-	public string StateName => Level <= 0 ? "未解锁" : IsActive ? "激活" : "解锁未激活";
+	/// <summary>三状态之一（界面上的"变暗 / 恢复颜色 / 光圈"就是它）；占位卡是第四种展示。</summary>
+	public string StateName => IsPlaceholder ? "占位卡" : Level <= 0 ? "未解锁" : IsActive ? "激活" : "解锁未激活";
 
-	/// <summary>边框 / 光圈当前的颜色（= 等级色）。</summary>
-	public Color BorderColor => LevelColor(Level);
+	/// <summary>边框 / 光圈当前的颜色（= 等级色；占位卡是压暗一档的灰）。</summary>
+	public Color BorderColor => IsPlaceholder
+		? new Color(LevelColor(0).R, LevelColor(0).G, LevelColor(0).B, PlaceholderBorderAlpha)
+		: LevelColor(Level);
 
 	/// <summary>光圈现在亮着吗（激活才亮）。</summary>
 	public bool HasGlow => _glow is { Visible: true };
@@ -148,8 +162,12 @@ public partial class AbilityCardTile : Control
 
 	private void UpdatePivot() => PivotOffset = Size * 0.5f;
 
-	/// <summary>绑定一张卡（界面建格子时调一次）。</summary>
-	public void Bind(AbilityCardConfig card, IAbilityCardHost host)
+	/// <summary>
+	/// 绑定一格的宿主（界面建格子时调一次）。
+	/// <paramref name="card"/> 传 <c>null</c> = **占位卡**（"空位也放一张卡"），
+	/// 除了不显示卡面内容、失败反馈照旧之外，与真卡**没有任何行为差异**。
+	/// </summary>
+	public void Bind(AbilityCardConfig? card, IAbilityCardHost host)
 	{
 		Card = card;
 		Host = host;
@@ -171,17 +189,26 @@ public partial class AbilityCardTile : Control
 
 		int level = Level;
 		bool active = IsActive;
-		Color border = LevelColor(level);
 		bool locked = level <= 0;
+		bool placeholder = IsPlaceholder;
+		Color border = LevelColor(level);
+		if (placeholder)
+		{
+			// 占位卡：用与"未解锁"同一档的**灰**，但压暗一档 —— 一眼能看出"这里还没有卡"，
+			// 又不至于像坏掉的格子（用户要的是"填满的矩阵"，不是"死格子"）。
+			border = new Color(border.R, border.G, border.B, PlaceholderBorderAlpha);
+		}
 
 		// ① 底板 + 边框：边框颜色 = 等级色；激活时边框加粗一档。
 		var box = new StyleBoxFlat
 		{
-			BgColor = locked
-				? new Color(0.07f, 0.08f, 0.11f, 0.96f)
-				: active
-					? new Color(0.14f, 0.17f, 0.25f, 0.99f)
-					: new Color(0.10f, 0.12f, 0.18f, 0.97f),
+			BgColor = placeholder
+				? new Color(0.06f, 0.07f, 0.10f, 0.72f)
+				: locked
+					? new Color(0.07f, 0.08f, 0.11f, 0.96f)
+					: active
+						? new Color(0.14f, 0.17f, 0.25f, 0.99f)
+						: new Color(0.10f, 0.12f, 0.18f, 0.97f),
 			BorderColor = border,
 			CornerRadiusTopLeft = 6,
 			CornerRadiusTopRight = 6,
@@ -236,7 +263,7 @@ public partial class AbilityCardTile : Control
 
 		if (_name != null)
 		{
-			_name.Text = Card?.DisplayName ?? "（空）";
+			_name.Text = Card?.DisplayName ?? "占位卡";
 		}
 
 		if (_status != null)
@@ -278,7 +305,8 @@ public partial class AbilityCardTile : Control
 	{
 		if (Card == null)
 		{
-			return "空位";
+			// 占位卡（用户 A5）：没有解锁条件，所以永远停在"不可解锁"。
+			return "占位卡 · 不可解锁";
 		}
 
 		if (level <= 0)
@@ -295,7 +323,7 @@ public partial class AbilityCardTile : Control
 	{
 		if (Card == null)
 		{
-			return string.Empty;
+			return "未设定解锁条件";
 		}
 
 		if (level <= 0)
@@ -315,7 +343,11 @@ public partial class AbilityCardTile : Control
 	{
 		if (Card == null)
 		{
-			return string.Empty;
+			return "占位卡（矩阵空位）\n"
+				+ "这一格在卡表里还没有对应行，所以**没有解锁条件** —— 它永远不会解锁、激活、升级。\n"
+				+ "（交互反馈照旧：点它 / 长按它一样会震动 + 失败音效。）\n"
+				+ "要把它变成真正的卡：在 Config/Tables/AbilityCards/ 加一行 .tres，"
+				+ "再挂进 Config/Balance.tres 的 AbilityCards 数组。";
 		}
 
 		int next = level <= 0 ? 1 : Mathf.Min(Card.MaxLevel, level + 1);
@@ -336,7 +368,9 @@ public partial class AbilityCardTile : Control
 
 	public override void _GuiInput(InputEvent @event)
 	{
-		if (Card == null || @event is not InputEventMouseButton button)
+		// ⚠️ 这里**不**排除占位卡：用户要的是"填满的矩阵"而不是"死格子"，
+		// 点它 / 长按它照常读条、照常震动 + 失败音效（占位卡的失败在宿主那一侧判定）。
+		if (@event is not InputEventMouseButton button)
 		{
 			return;
 		}
@@ -362,12 +396,13 @@ public partial class AbilityCardTile : Control
 
 	public override void _Process(double delta)
 	{
-		if (!_holding || Card == null)
+		if (!_holding)
 		{
 			return;
 		}
 
 		// 有读条的操作（左键解锁 / 右键重置）才走计时；单击的那两种不等读条。
+		// 占位卡的等级恒为 0，所以它和"未解锁的真卡"走**同一条**读条路径（左键长按读条 → 失败）。
 		bool charging = _holdButton == MouseButton.Left ? Level <= 0 : Level > 1;
 		if (!charging)
 		{
@@ -433,7 +468,7 @@ public partial class AbilityCardTile : Control
 			_progress.Visible = false;
 		}
 
-		if (wasLong || Card == null)
+		if (wasLong)
 		{
 			return;   // 长按已经在读条结束时结算过了
 		}
@@ -444,11 +479,9 @@ public partial class AbilityCardTile : Control
 	/// <summary>跑一次操作：判定交给宿主，**本元素按结果决定动画与音效**。</summary>
 	public void RunAction(AbilityCardAction action)
 	{
-		if (Card == null)
-		{
-			return;
-		}
-
+		// ⚠️ 占位卡也走这里：宿主对它返回 <see cref="AbilityCardResult.NoCard"/> →
+		// 落到下面的失败分支（震动 + 失败音效），所以"不可解锁但**有反馈**"是**同一条代码路径**，
+		// 不需要为占位卡写第二套交互。
 		AbilityCardResult result = Host?.Request(this, action) ?? AbilityCardResult.NoCard;
 		LastResult = result;
 		if (result == AbilityCardResult.Ok)
@@ -650,6 +683,6 @@ public partial class AbilityCardTile : Control
 	/// 见 architecture.md 第 6 条：自定义 struct / 泛型方法不能给脚本调）。
 	/// </summary>
 	public string DebugState()
-		=> $"{Card?.Id} Lv{Level} {StateName} 边框#{BorderColor.ToHtml(false)} 光圈={HasGlow}"
+		=> $"{Card?.Id ?? "（占位卡）"} Lv{Level} {StateName} 边框#{BorderColor.ToHtml(false)} 光圈={HasGlow}"
 			+ $" 读条={IsCharging}({ChargeProgress:0.00}) 成功={SuccessCount} 失败={FailCount} 末次={LastResult}";
 }

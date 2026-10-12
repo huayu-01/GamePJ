@@ -3,9 +3,11 @@
 [ext_resource type="Script" path="res://Scripts/UI/AbilityCardTile.cs" id="1_tile"]
 
 [node name="AbilityCardTile" type="Control"]
-custom_minimum_size = Vector2(232, 214)
-offset_right = 232.0
-offset_bottom = 214.0
+custom_minimum_size = Vector2(120, 110)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+offset_right = 120.0
+offset_bottom = 110.0
 mouse_filter = 0
 script = ExtResource("1_tile")
 
@@ -40,7 +42,7 @@ mouse_filter = 2
 theme_override_constants/separation = 5
 
 [node name="Icon" type="TextureRect" parent="Frame/Pad/VBox"]
-custom_minimum_size = Vector2(0, 74)
+custom_minimum_size = Vector2(0, 40)
 size_flags_vertical = 3
 mouse_filter = 2
 expand_mode = 1

@@ -1,6 +1,18 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Texture2D" path="res://icon.svg" id="1_white"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_armor_shell"]
+bg_color = Color(0.72, 0.86, 1, 0.14)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.72, 0.86, 1, 0.55)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_left = 2
+corner_radius_bottom_right = 2
 
 [node name="Root" type="Control"]
 mouse_filter = 2
@@ -18,21 +30,6 @@ offset_bottom = 9.0
 mouse_filter = 2
 color = Color(0, 0, 0, 0.65)
 
-[node name="ArmorBg" type="ColorRect" parent="Content"]
-offset_top = -7.0
-offset_right = 66.0
-offset_bottom = -2.0
-mouse_filter = 2
-color = Color(0, 0, 0, 0.55)
-
-[node name="ArmorFill" type="ColorRect" parent="Content"]
-offset_left = 1.0
-offset_top = -6.0
-offset_right = 65.0
-offset_bottom = -3.0
-mouse_filter = 2
-color = Color(0.72, 0.86, 1, 1)
-
 [node name="DelayBar" type="ColorRect" parent="Content"]
 visible = false
 offset_left = 1.0
@@ -49,6 +46,24 @@ offset_right = 65.0
 offset_bottom = 8.0
 mouse_filter = 2
 color = Color(0.4, 0.9, 0.4, 1)
+
+[node name="ArmorBg" type="Panel" parent="Content"]
+visible = false
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 68.0
+offset_bottom = 11.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_armor_shell")
+
+[node name="ArmorFill" type="ColorRect" parent="Content"]
+visible = false
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 68.0
+offset_bottom = 11.0
+mouse_filter = 2
+color = Color(0.72, 0.86, 1, 0.45)
 
 [node name="Label" type="Label" parent="Content"]
 visible = false

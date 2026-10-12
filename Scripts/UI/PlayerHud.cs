@@ -409,13 +409,13 @@ public partial class PlayerHud : CanvasLayer
 		player.ArmorBroke += _armorBroke;
 	}
 
-	/// <summary>护甲进度：有甲上限就显示甲条（甲被打光留空条，玩家能看出"甲没了"而不是"甲条消失了"）。</summary>
+	/// <summary>护甲进度（用户 A6）：**有甲上限**才在血条上罩一层半透明塑料；甲被打光只留空壳（"甲没了"看得见）。</summary>
 	private void UpdateArmorBar(Unit player)
 		=> _healthBar.SetArmor(
 			player.MaxArmor > 0f ? Mathf.Clamp(player.Armor / player.MaxArmor, 0f, 1f) : 0f,
 			player.MaxArmor > 0f);
 
-	/// <summary>碎甲：甲条闪白 + 玩家模型上炸一圈（<see cref="Unit.ArmorBroke"/> 只在甲从 &gt;0 掉到 0 时触发）。</summary>
+	/// <summary>碎甲：那层塑料闪白 + 玩家模型上炸一圈（<see cref="Unit.ArmorBroke"/> 只在甲从 &gt;0 掉到 0 时触发）。</summary>
 	private void OnPlayerArmorBroke(Unit player)
 	{
 		_healthBar.FlashArmorBreak();

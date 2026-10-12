@@ -79,8 +79,8 @@ theme_type_variation = &"UiPrimaryButton"
 text = "扩增额度"
 
 [node name="Matrix" type="GridContainer" parent="Root/Panel/VBox"]
-size_flags_horizontal = 4
-size_flags_vertical = 4
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
 columns = 6

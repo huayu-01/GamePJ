@@ -83,7 +83,7 @@ func _run() -> void:
 		return
 
 	print("[AbilityInGame] 界面 IsOpen=", screen.get("IsOpen"),
-		" 矩阵格数=", screen.get("SlotCount"), "（卡 ", screen.get("TileCount"), " + 空位）",
+		" 矩阵格数=", screen.get("SlotCount"), "（真卡 ", screen.get("TileCount"), " + 占位卡 ", screen.get("PlaceholderCount"), "）",
 		" 表行数=", screen.get("CardRowCount"))
 	print("[AbilityInGame] 提示栏：结构在树里=", screen.get("HasKeyHintBar"),
 		" 条目=", screen.get("KeyHintCount"), " 可见=", screen.get("KeyHintsVisible"),
