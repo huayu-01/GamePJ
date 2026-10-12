@@ -7,7 +7,7 @@ using Godot;
 
 namespace ActRoguelike.Interaction;
 
-/// <summary>节点类型（策划文档 §6.2：武器池 / 强化池 / 进化池 / 异化池 / 局外资源 / 恢复 / 特殊奖励）。</summary>
+/// <summary>节点类型（策划文档 §6.2；⚠️ 没有「武器池」这个类型 —— 那个叫法指的就是**进化池**，用户 2026-10-12 拍板 A3）。</summary>
 public enum RewardNodeKind
 {
 	Weapon,

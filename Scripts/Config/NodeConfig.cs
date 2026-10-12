@@ -19,7 +19,7 @@ public partial class NodeConfig : ConfigRow
 	/// <summary>节点类型（对应 <see cref="RewardNodeKind"/> 与 `Main.tscn` 上的 <c>Kind</c>）。</summary>
 	[Export] public RewardNodeKind Kind { get; set; } = RewardNodeKind.Enhancement;
 
-	/// <summary>界面标题（取代 <c>RewardService.TitleFor</c>，例如"武器池"）。</summary>
+	/// <summary>界面标题（取代 <c>RewardService.TitleFor</c>，例如"进化池"）。</summary>
 	[Export] public string Title { get; set; } = string.Empty;
 
 	/// <summary>奖励池过滤（取代 <c>RewardService.FilterFor</c>）。<c>true</c> = 不按类型过滤、走全池。</summary>

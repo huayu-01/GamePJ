@@ -108,12 +108,13 @@ public partial class SelfTest : Node
 				break;
 
 			case 1 when _timer > 1.5f:
-				GameLog.Write("SelfTest", $"波数映射：进化={StageController.WavesFor(RewardNodeKind.Evolution)}（期望4） 异化={StageController.WavesFor(RewardNodeKind.Mutation)}（期望4） 强化={StageController.WavesFor(RewardNodeKind.Enhancement)}（期望3） 商店={StageController.WavesFor(RewardNodeKind.Shop)}（期望3） 材料={StageController.WavesFor(RewardNodeKind.Resource)}（期望1） 恢复={StageController.WavesFor(RewardNodeKind.Heal)}（期望1） 特殊={StageController.WavesFor(RewardNodeKind.Special)}（期望1）");
+				GameLog.Write("SelfTest", $"波数映射：进化={StageController.WavesFor(RewardNodeKind.Evolution)}（期望4） 异化={StageController.WavesFor(RewardNodeKind.Mutation)}（期望4） 武器限定（=进化池）={StageController.WavesFor(RewardNodeKind.Weapon)}（期望4，用户 A3：没有「武器池」，那个叫法就是进化池、算高价值） 强化={StageController.WavesFor(RewardNodeKind.Enhancement)}（期望3） 商店={StageController.WavesFor(RewardNodeKind.Shop)}（期望3） 材料={StageController.WavesFor(RewardNodeKind.Resource)}（期望1） 恢复={StageController.WavesFor(RewardNodeKind.Heal)}（期望1） 特殊={StageController.WavesFor(RewardNodeKind.Special)}（期望1）");
 				GameLog.Write("SelfTest", $"价值标签表：{SelfTestValueTagSummary()}");
 				ReportNodes(stage);
 				ReportSpacing(stage);
 				ReportTables(stage);
 				ReportPressureGate(stage);
+				ReportAmbientSpawns(stage);
 				Next();
 				break;
 
@@ -536,7 +537,7 @@ public partial class SelfTest : Node
 			nodes.Add($"{kind}={StageController.WavesFor(kind)}");
 		}
 
-		return $"标签 [{string.Join(" ", tags)}]（期望 tag_high=4 tag_low=1 tag_mid=3）→ 节点 [{string.Join(" ", nodes)}]（期望 Evolution=4 Mutation=4 Weapon=3 Enhancement=3 Shop=3 Resource=1 Heal=1 Special=1 Portal=1）";
+		return $"标签 [{string.Join(" ", tags)}]（期望 tag_high=4 tag_low=1 tag_mid=3）→ 节点 [{string.Join(" ", nodes)}]（期望 Evolution=4 Mutation=4 Weapon=4（用户 A3：武器限定池 = 进化池 = 高价值）Enhancement=3 Shop=3 Resource=1 Heal=1 Special=1 Portal=1）";
 	}
 
 	private void Next()
@@ -722,12 +723,18 @@ public partial class SelfTest : Node
 
 			total++;
 			names.Add($"{node.Name}(Kind={node.Kind})");
-			switch (node.Kind)
+
+			// ⚠️ 高/中/低按**价值层**数（`NodePlacement.LayerOf` = 节点表的 `Layer`，也就是价值标签那一层），
+			// **不再按 `RewardNodeKind` 枚举 switch** —— 用户 A3 拍板"没有武器池、那个叫法就是进化池（高价值）"
+			// 之后，按枚举数会把 `Weapon` 这类节点数进"低"，与它挂的价值标签自相矛盾。
+			// 当前场景里没有 `Kind=Weapon` 的实例，所以这条改动**不改变数字**（仍然 2/5/3），
+			// 但规则从此与价值标签一致：以后把哪种奖励挂到高价值标签上，它就数进"高"。
+			switch (NodePlacement.LayerOf(node.Kind))
 			{
-				case RewardNodeKind.Evolution or RewardNodeKind.Mutation:
+				case 2:
 					high++;
 					break;
-				case RewardNodeKind.Enhancement or RewardNodeKind.Shop:
+				case 1:
 					mid++;
 					break;
 				default:
@@ -736,7 +743,7 @@ public partial class SelfTest : Node
 			}
 		}
 
-		GameLog.Write("SelfTest", $"节点布置：启用 {total} 个（高 {high} / 中 {mid} / 低 {low}）→ 期望 10（2/5/3）");
+		GameLog.Write("SelfTest", $"节点布置：启用 {total} 个（高 {high} / 中 {mid} / 低 {low}）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）");
 		GameLog.Write("SelfTest", $"节点清单：{string.Join(", ", names)}");
 	}
 
@@ -818,13 +825,15 @@ public partial class SelfTest : Node
 		// 节点波数的**来源**必须能一眼看出来（"高 4 / 中 3 / 低 1 是标签算出来的、不是代码写死的"）。
 		GameLog.Write("SelfTest", $"配置表比对·价值标签：{SelfTestValueTagSummary()}");
 
-		// 跳跃（需求 #2）：角色行的两列 → 组件上的实际值。
-		// ⚠️ 期望的**落点**是 7.69 m/s（场景 6.5 × √1.4）与空中加速 30 / 最大下落 120（各 ×2）——
-		// 只在"表读到了"时成立；表读不到时组件保留 6.5，这一行会明显不同（回退路径也必须看得出来）。
+		// 跳跃（需求 A2）：角色行给的是**固定值**，直接套到组件上。
+		// ⚠️ 期望的**落点**是 13 m/s（角色行 `JumpVelocity`，场景回退值 6.5）与重力缩放 3.6
+		// （角色行 `JumpGravityScale`，场景回退值 1.8）—— 只在"表读到了"时成立；表读不到时组件保留
+		// 6.5 / 1.8，这一行会明显不同（回退路径也必须看得出来）。
+		// 空中加速 / 最大下落**不再乘任何倍率**（上一批的 `JumpSpeedMultiplier` 已删除），所以期望回到场景值 15 / 60。
 		if (player?.Movement is { } movement)
 		{
 			GameLog.Write("SelfTest",
-				$"配置表比对·跳跃：起跳速度 {movement.JumpVelocity:0.##}（期望 7.69 = 场景 6.5 × √1.4）空中加速 {movement.AirAcceleration:0.#}（期望 30）最大下落 {movement.MaxFallSpeed:0.#}（期望 120）重力缩放 {movement.GravityScale:0.##}（期望 1.8，没动过）");
+				$"配置表比对·跳跃：起跳速度 {movement.JumpVelocity:0.##}（期望 13 = 角色行固定值，场景回退 6.5）重力缩放 {movement.GravityScale:0.##}（期望 3.6 = 角色行固定值，场景回退 1.8）空中加速 {movement.AirAcceleration:0.#}（期望 15 = 场景值，不再乘倍率）最大下落 {movement.MaxFallSpeed:0.#}（期望 60 = 场景值）");
 		}
 		else
 		{
@@ -1094,6 +1103,77 @@ public partial class SelfTest : Node
 		//    所以拿行为型池（`bhv_*` = 界面上说的"技能"）当样本，纯文案断言、不用开界面。
 		//    没有这一行的话，"技能 + 词条并存"那一条分支在自测里永远不会被走到。
 		GameLog.Write("SelfTest", $"强化显示（技能 + 词条并存，计数名词 = 「技能 N · 词条 N」）：{BossPerkText.Summary(ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly, stage.PressurePerks)} {BossPerkText.FormatLine(ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly, stage.PressurePerks, 5)}");
+	}
+
+	/// <summary>
+	/// 关卡内定期刷怪（用户需求 #6）的取证。三件事：
+	/// ① 打出配置（间隔 / 每档秒数 / 每档强度 / 上限，来源 `Balance.tres` 的全局标量 `AmbientSpawn*`）；
+	/// ② **真的走一遍正式入口**刷两只"游离怪"：一只在第 0 档，一只在把本关时钟拨快 120 秒之后，
+	///    并排量出"生命 / 伤害被增强了多少"（这就是"每过 120 秒就增强接下来刷出的怪"的实测）；
+	/// ③ 量出落点与玩家的距离 + 导航状态（= 落点复用了 `MapManager` 那一份能力，不是新造的一套）。
+	///
+	/// 量完立刻把这两只清掉（不给后面的阶段留残留），并顺带证明"游离怪**不进** Encounter 的预算与
+	/// 清场判定"（不然节点挑战会因为"场外还有别的怪"永远结不了算）。
+	/// </summary>
+	private void ReportAmbientSpawns(StageController? stage)
+	{
+		if (stage == null)
+		{
+			GameLog.Write("SelfTest", "定期刷怪检查失败：找不到 Stage");
+			return;
+		}
+
+		BalanceConfig config = Balance.Settings;
+		EncounterController? encounter = stage.CurrentNode;
+		GameLog.Write("SelfTest", $"关卡内定期刷怪（需求 #6）：{stage.AmbientSummary}（来源：Balance.tres 全局标量 AmbientSpawn*）｜ 本关可生成项 [{encounter?.AllowedEntrySummary}]");
+		string before = $"Encounter 自己的账：预算 {encounter?.RemainingBudget:0.#} / 存活 {encounter?.AliveCount} / 已生成 {encounter?.TotalSpawned}";
+
+		Unit? first = stage.DebugSpawnAmbientNow();
+		GameLog.Write("SelfTest", $"定期刷怪·第 0 档（间隔到时刷出的第一只）：{AmbientLine(first)}");
+		GameLog.Write("SelfTest", $"定期刷怪·不碰 Encounter 的账：{before} → 现在 预算 {encounter?.RemainingBudget:0.#}（期望不变）/ 存活 {encounter?.AliveCount}（期望不变）/ 游离怪 {stage.AmbientAliveCount} 只");
+
+		int step = stage.DebugAdvanceAmbientClock(config.AmbientSpawnEscalateSeconds);
+		Unit? second = stage.DebugSpawnAmbientNow();
+		GameLog.Write("SelfTest", $"定期刷怪·第 {step} 档（本关时钟拨快 {config.AmbientSpawnEscalateSeconds:0.#}s 之后才刷的）：{AmbientLine(second)}");
+		GameLog.Write("SelfTest", stage.AmbientStrengthStep == step
+			? $"定期刷怪·增强口径：每档 ×{1f + config.AmbientSpawnStrengthStep:0.##}，第 {step} 档 → 生命与伤害都 ×{1f + (config.AmbientSpawnStrengthStep * step):0.##}（只影响**之后**刷出的怪，已刷出的不动）"
+			: "定期刷怪·增强口径异常：档位没跟上（期望和刷怪时用的档位一致）");
+
+		first?.ApplyDirectDamage(99999f, null);
+		second?.ApplyDirectDamage(99999f, null);
+		GameLog.Write("SelfTest", $"定期刷怪·清理：两只已击杀 → 场上游离怪 {stage.AmbientAliveCount} 只（期望 0，不给后面的阶段留残留）");
+	}
+
+	/// <summary>一只游离怪的一行读数（生命 / 主攻击伤害 / 落点 / 离玩家多远 / 导航是否就绪）。</summary>
+	private static string AmbientLine(Unit? unit)
+	{
+		if (unit == null || !IsInstanceValid(unit))
+		{
+			return "没刷出来（期望刷出一只）";
+		}
+
+		var abilities = new List<ActRoguelike.Abilities.Ability>();
+		NodeSearch.CollectInSubtree(unit, abilities);
+		AttackHitbox? hit = null;
+		foreach (ActRoguelike.Abilities.Ability ability in abilities)
+		{
+			hit = NodeSearch.FindInSubtree<AttackHitbox>(ability);
+			if (hit != null)
+			{
+				break;
+			}
+		}
+
+		Unit? player = PlayerLocator.Player;
+		Vector3 position = unit.GlobalPosition;
+		float distance = player == null ? -1f : position.DistanceTo(player.GlobalPosition);
+		bool navReady = ActRoguelike.World.MapManager.Instance is { IsReady: true };
+
+		// 生命/伤害的**倍率账**：全局难度（敌种 0.75 / 0.3）+ 本关缩放 + 强度档位都在这两个簿记里，
+		// 所以"每 120 秒增强一档"这件事在**伤害**那一侧也能被量出来（只看命中体的 Damage 是基础值，量不出倍率）。
+		float healthScale = unit.Stats.Get("MaxHealthMultiplier");
+		float damageScale = unit.Stats.Get("DamageMultiplier");
+		return $"{unit.Name} 生命 {unit.MaxHealth:0.#}（倍率账 生命×{healthScale:0.####} / 伤害×{damageScale:0.####}）伤害 {hit?.Damage:0.#} 落点 {position}（离玩家 {distance:0.#}m，导航网格就绪={navReady}）";
 	}
 
 	// === 命中特效位置探针（用户要求 5：「实际应该在命中的位置发生特效」）===

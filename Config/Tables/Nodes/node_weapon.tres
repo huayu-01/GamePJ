@@ -5,10 +5,12 @@
 [resource]
 script = ExtResource("1_j8jua")
 Kind = 0
-Title = "武器池"
+Title = "进化池"
+Layer = 2
 RewardKind = 1
-WaveCount = 3
-ValueTags = PackedStringArray("tag_mid")
+WaveCount = 4
+ValueTags = PackedStringArray("tag_high")
 Id = "node_weapon"
 Slot = 1
-DisplayName = "武器池"
+DisplayName = "进化池"
+Note = "「武器池」只是口头说法、不是实体（用户 2026-10-12 拍板 A3）：确切来说是**进化池** —— 武器（本质是角色的攻击方式）的限定池，攻击方式的改动巨大，所以算**高价值**（tag_high / Layer 2 / 4 波）。本行与 node_evolution 发的是同一类奖励（RewardKind = Evolution = 改攻击方式），区别只是它对应「武器限定」的那一份（Config/Tables/UpgradePools/pool_*.tres 按攻击方式分的三个池）。"

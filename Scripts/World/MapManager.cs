@@ -174,7 +174,9 @@ public partial class MapManager : Node3D
 
 	/// <summary>
 	/// 在中心附近找一圈内的可行走点。刷怪点、降临点都用它。
-	/// 导航网格不可用时退回"中心点"（调用方仍能跑，只是不保证避开建筑）。
+	/// 导航网格可用时用它吸附；**不可用时退回"随机环点 + 地面射线 + 球形避障"**
+	/// （<see cref="FallbackRingPoint"/>）—— 本项目实测运行时烘焙得到 0 个多边形
+	/// （见 docs/todo-handoff.md 的「已知未解决」），所以这条兜底路径**就是实际生效的那条**。
 	/// </summary>
 	public Vector3 RingPoint(Vector3 center, float minRadius, float maxRadius, int rings = 3, int samples = 12)
 	{
@@ -196,6 +198,64 @@ public partial class MapManager : Node3D
 						return walkable + (Vector3.Up * 0.3f);
 					}
 				}
+			}
+
+			return center + (Vector3.Up * 0.3f);
+		}
+
+		return FallbackRingPoint(center, minRadius, maxRadius);
+	}
+
+	/// <summary>
+	/// 导航网格不可用时的兜底落点：随机方向 + 环上的随机半径 → 向下打一条地面射线 → 球形避障
+	/// （与 `NodePlacement.PlaceSafely` 同一套探测参数，**不是第二套落点规则**）。
+	///
+	/// ⚠️ 以前这里是 `return center + Up * 0.3` —— 那等于"刷怪点 = 玩家脚下"，
+	/// 用户需求 #6「场景里会定期在任意有效位置刷出怪物」里的"任意有效位置"就名存实亡
+	/// （所有敌人、白板首领、降临物都贴在玩家身上出现）。采样全部失败时才退回原点。
+	/// </summary>
+	private Vector3 FallbackRingPoint(Vector3 center, float minRadius, float maxRadius, int attempts = 16)
+	{
+		PhysicsDirectSpaceState3D? space = GetWorld3D()?.DirectSpaceState;
+		if (space == null)
+		{
+			return center + (Vector3.Up * 0.3f);
+		}
+
+		for (int attempt = 0; attempt < attempts; attempt++)
+		{
+			float angle = (float)GD.RandRange(0d, Mathf.Tau);
+			float radius = (float)GD.RandRange(minRadius, Mathf.Max(minRadius, maxRadius));
+			var probe = new Vector3(
+				center.X + (Mathf.Cos(angle) * radius),
+				center.Y + 2f,
+				center.Z + (Mathf.Sin(angle) * radius));
+
+			// ① 找脚下地面（World 层 = 1）；够不着就换一个方向。
+			var ray = PhysicsRayQueryParameters3D.Create(probe, probe + (Vector3.Down * 12f), 1);
+			Godot.Collections.Dictionary hit = space.IntersectRay(ray);
+			if (hit.Count == 0)
+			{
+				continue;
+			}
+
+			Vector3 ground = (Vector3)hit["position"];
+			if (Mathf.Abs(ground.Y - center.Y) > 6f)
+			{
+				continue;
+			}
+
+			// ② 球形避障：不要落在墙里 / 斜坡里（球心要抬到半径之上，否则永远与脚下地面重叠）。
+			var shape = new PhysicsShapeQueryParameters3D
+			{
+				Shape = new SphereShape3D { Radius = 1.3f },
+				Transform = new Transform3D(Basis.Identity, ground + (Vector3.Up * 1.65f)),
+				CollisionMask = 1,
+			};
+
+			if (space.IntersectShape(shape, 1).Count == 0)
+			{
+				return ground + (Vector3.Up * 0.3f);
 			}
 		}
 

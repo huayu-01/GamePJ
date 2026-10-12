@@ -591,7 +591,7 @@ public partial class RunController : Node
 		return true;
 	}
 
-	/// <summary>通用多选一界面（武器池、商店等）。allowCancel = 允许 Esc 放弃（回调收到 -1）。</summary>
+	/// <summary>通用多选一界面（进化池、商店等）。allowCancel = 允许 Esc 放弃（回调收到 -1）。</summary>
 	public bool OpenChoice(string title, IReadOnlyList<string> options, Action<int> onChosen, bool allowCancel = false)
 	{
 		_chooseScreen ??= UiService.Instance?.Screen<ChooseScreen>();
@@ -696,7 +696,7 @@ public partial class RunController : Node
 			_poolReady = true;
 		}
 
-		// 武器池 / 局外资源 / 特殊奖励暂时没有独立系统，先走通用池。
+		// 进化（没有「武器池」这个类型，见用户 A3）/ 局外资源 / 特殊奖励暂时没有独立系统，先走通用池。
 		RewardKind? filter = RewardService.FilterFor(kind);
 
 		_current.Clear();

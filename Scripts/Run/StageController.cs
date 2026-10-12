@@ -105,6 +105,34 @@ public partial class StageController : Node3D
 	public int WavesOpenedInStage => _wavesOpenedInStage;
 
 	/// <summary>
+	/// 诊断用：**本关定期刷出的"游离怪"当前还活着几只**（用户需求 #6）。列表是"刷出来时登记"的，
+	/// 读的时候顺手剪掉已死/已释放的，所以它同时是"场上真实数量"。
+	/// </summary>
+	public int AmbientAliveCount
+	{
+		get
+		{
+			PruneAmbient();
+			return _ambientUnits.Count;
+		}
+	}
+
+	/// <summary>诊断用：定期刷怪当前的**强度档位**（0 = 还没跨过第一个 120 秒）。</summary>
+	public int AmbientStrengthStep => _ambientSteps;
+
+	/// <summary>
+	/// 诊断用（自测/日志）：定期刷怪的一行摘要 —— 间隔 / 每档秒数 / 每档强度 / 上限 / 已过秒数 / 当前档位 / 场上只数。
+	/// </summary>
+	public string AmbientSummary
+	{
+		get
+		{
+			BalanceConfig config = Balance.Settings;
+			return $"间隔 {config.AmbientSpawnInterval:0.#}s / 每 {config.AmbientSpawnEscalateSeconds:0.#}s 增强一档（每档 ×{1f + config.AmbientSpawnStrengthStep:0.##}）/ 上限 {config.AmbientSpawnMaxAlive} 只 / 本关已过 {_ambientElapsed:0.#}s / 当前档位 {_ambientSteps} / 场上 {AmbientAliveCount} 只";
+		}
+	}
+
+	/// <summary>
 	/// 诊断用：**「挑战者状态」当前是开是关**。
 	///
 	/// 自测用它验证用户报的那个 bug（直接开门打 Boss → 打完卡在"挑战中"、进不了降临节点）：
@@ -159,6 +187,30 @@ public partial class StageController : Node3D
 	/// 避免"本关累计"这个量在两处各记一份）。
 	/// </summary>
 	private int _wavesOpenedInStage;
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// 关卡内的定期刷怪（用户需求 #6，2026-10-12）
+	//
+	// 用户原话：「当角色进入关卡时，场景里会**定期在任意有效位置刷出怪物**，**每过 120 秒**
+	// （可调整的参数）就**增强接下来刷出的怪物**（提升强度或更强类型的怪）」。
+	//
+	// 它与节点的 Encounter **并存**（不是替代）：Encounter 仍按节点价值的波数开战，
+	// 这套只是"关卡本身一直在往外冒怪"的压力。
+	// 落点**复用** EncounterController 的刷怪路径（→ `SpawnPlanner` → `MapManager.SpawnPoint`），
+	// 没有第二套"找有效位置"的实现。
+	// ─────────────────────────────────────────────────────────────────────────
+
+	/// <summary>距离下一次刷游离怪还有多少秒。</summary>
+	private float _ambientTimer;
+
+	/// <summary>本关已经过了多少秒（只在这套机制开着时累加；切关清零）。</summary>
+	private float _ambientElapsed;
+
+	/// <summary>当前强度档位 = 本关已过秒数 ÷ 每档秒数（切关清零）。</summary>
+	private int _ambientSteps;
+
+	/// <summary>本关刷出的游离怪（只用来数"场上还有几只"，已死/已释放的读的时候剪掉）。</summary>
+	private readonly List<Unit> _ambientUnits = new();
 
 	/// <summary>
 	/// 本关由 Pressure 转换（+ 节点行额外次数）抽到、但**还没套用**的数值强化 ——
@@ -226,6 +278,12 @@ public partial class StageController : Node3D
 		_wavesOpenedInStage = 0;
 		_pendingPressurePerks.Clear();
 		_pressureApplied = false;
+
+		// 定期刷怪（需求 #6）按**关卡**重置：换关就从头计时、档位回 0（游离怪本身由 ClearField 清掉）。
+		_ambientTimer = Balance.Settings.AmbientSpawnInterval;
+		_ambientElapsed = 0f;
+		_ambientSteps = 0;
+		_ambientUnits.Clear();
 
 		// 免费挑战额度：初始 1 次、每关 +1、上限 2（关卡核心文档 L405-416）。
 		// 注意只统计"会刷怪的节点"，StartEncounter 才会让 ChallengesUsed 递增。
@@ -809,6 +867,117 @@ public partial class StageController : Node3D
 			ClearField();
 			SpawnPortal(where);
 		}
+
+		// 关卡内的定期刷怪（需求 #6）：与节点的 Encounter 并行，互不干扰。
+		UpdateAmbientSpawns((float)delta);
+	}
+
+	/// <summary>
+	/// 关卡内的定期刷怪 + 每 <c>AmbientSpawnEscalateSeconds</c> 秒增强（用户需求 #6）。
+	///
+	/// 四条纪律：
+	/// ① **只在"进了关卡"之后跑**（<see cref="Definition"/> 为空 = 还没开局，连计时都不累加）；
+	/// ② **0 = 关掉**（<c>AmbientSpawnInterval &lt;= 0</c> → 整套机制不参与，行为与接它之前逐位一致）；
+	/// ③ 落点**复用** <see cref="EncounterController.SpawnAmbient"/>（→ MapManager 的可行走点），
+	///    所以是"任意有效位置"而不是随机丢在建筑里；
+	/// ④ 游离怪**不进** Encounter 的预算/波次/清场判定（那边只认自己刷出来的那些），
+	///    所以节点的挑战难度与完成条件一行都没变。
+	/// </summary>
+	private void UpdateAmbientSpawns(float dt)
+	{
+		BalanceConfig config = Balance.Settings;
+		if (config.AmbientSpawnInterval <= 0f || Definition == null || _encounter == null)
+		{
+			return;
+		}
+
+		_ambientElapsed += dt;
+
+		// 强度档位：每过一个 AmbientSpawnEscalateSeconds 就 +1 档，**只影响之后刷出的怪**（已刷出的不动）。
+		int steps = config.AmbientSpawnEscalateSeconds > 0f
+			? (int)(_ambientElapsed / config.AmbientSpawnEscalateSeconds)
+			: 0;
+		if (steps > _ambientSteps)
+		{
+			_ambientSteps = steps;
+			Core.GameLog.Write(
+				"Spawn",
+				$"定期刷怪·增强：本关已过 {_ambientElapsed:0.#}s → 强度档位 {_ambientSteps}（之后刷出的怪 生命/伤害 ×{1f + (config.AmbientSpawnStrengthStep * _ambientSteps):0.##}）");
+		}
+
+		_ambientTimer -= dt;
+		if (_ambientTimer > 0f)
+		{
+			return;
+		}
+
+		_ambientTimer = config.AmbientSpawnInterval;
+
+		PruneAmbient();
+		if (config.AmbientSpawnMaxAlive > 0 && _ambientUnits.Count >= config.AmbientSpawnMaxAlive)
+		{
+			Core.GameLog.Write("Spawn", $"定期刷怪：跳过这一次（场上游离怪 {_ambientUnits.Count} 只已达上限 {config.AmbientSpawnMaxAlive}）");
+			return;
+		}
+
+		Unit? spawned = SpawnAmbientNow();
+		if (spawned == null)
+		{
+			Core.GameLog.Write("Spawn", "定期刷怪：这一次没刷出来（找不到玩家 / 本关没有可生成项），下个间隔再试");
+		}
+	}
+
+	/// <summary>
+	/// 立刻按**当前档位**刷一只游离怪，并登记进"场上游离怪"名单（返回 null = 这次没刷出来）。
+	/// 自测也走这一个入口（<see cref="DebugSpawnAmbientNow"/>），保证"量到的"与"正式跑的"是同一条路。
+	/// </summary>
+	private Unit? SpawnAmbientNow()
+	{
+		float strength = 1f + (Balance.Settings.AmbientSpawnStrengthStep * _ambientSteps);
+		Unit? spawned = _encounter?.SpawnAmbient(strength);
+		if (spawned == null)
+		{
+			return null;
+		}
+
+		_ambientUnits.Add(spawned);
+		Core.GameLog.Write(
+			"Spawn",
+			$"定期刷怪：{spawned.Name} 落在 {spawned.GlobalPosition}（强度档位 {_ambientSteps} → 生命/伤害 ×{strength:0.##}，场上游离怪 {_ambientUnits.Count} 只）");
+		return spawned;
+	}
+
+	/// <summary>剪掉已死/已释放的游离怪（AliveCount 那种"缓存在读的时候重算"的同一套做法）。</summary>
+	private void PruneAmbient()
+	{
+		for (int i = _ambientUnits.Count - 1; i >= 0; i--)
+		{
+			if (!IsInstanceValid(_ambientUnits[i]) || _ambientUnits[i].IsDead)
+			{
+				_ambientUnits.RemoveAt(i);
+			}
+		}
+	}
+
+	/// <summary>自测用：立刻按当前档位刷一只游离怪（与正式路径同一个入口）。</summary>
+	public Unit? DebugSpawnAmbientNow() => SpawnAmbientNow();
+
+	/// <summary>
+	/// 自测用：把"本关已过秒数"往前拨 <paramref name="seconds"/> 秒并立刻结算档位 ——
+	/// 用来在几秒内验证"每 120 秒增强一档"这条规则（不用真的等 120 秒）。
+	/// 真实流程里秒数只会由 <see cref="UpdateAmbientSpawns"/> 按物理帧累加。
+	/// </summary>
+	public int DebugAdvanceAmbientClock(float seconds)
+	{
+		BalanceConfig config = Balance.Settings;
+		_ambientElapsed += seconds;
+		if (config.AmbientSpawnEscalateSeconds > 0f)
+		{
+			_ambientSteps = (int)(_ambientElapsed / config.AmbientSpawnEscalateSeconds);
+		}
+
+		Core.GameLog.Write("Spawn", $"定期刷怪·自测：把本关时钟拨快 {seconds:0.#}s → 已过 {_ambientElapsed:0.#}s / 档位 {_ambientSteps}");
+		return _ambientSteps;
 	}
 
 	/// <summary>

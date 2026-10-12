@@ -35,25 +35,26 @@ public partial class CharacterConfig : UnitConfig
 	/// <summary>要让哪些 <c>Ability</c> 处于**关闭**状态的名单（同样写类名）。两个名单之外的保持场景里的原状。</summary>
 	[Export] public string[] DisabledAbilityIds { get; set; } = System.Array.Empty<string>();
 
-	[ExportGroup("跳跃（只有玩家读这两列，见 CharacterMovement.ApplyJumpConfig）")]
+	[ExportGroup("跳跃（只有玩家读这两列，见 CharacterMovement.ApplyJumpConfigDeferred）")]
 	/// <summary>
-	/// **跳跃高度**倍数（1 = 与 `Player.tscn` 的 <c>Movement.JumpVelocity</c> 一样高）。
+	/// **起跳速度的固定值**（m/s，直接套到 <c>CharacterMovement.JumpVelocity</c>，不做任何倍率/平方根运算）。
 	///
-	/// 高度与起跳速度是平方关系（<c>h = v² / 2g</c>），所以实现里对速度取的是**平方根**：
-	/// 这一列填 1.4 = 跳得比原来高 40%，起跳速度 ×1.183。
+	/// 用户 2026-10-12 拍板（需求 A2）：「要的是**直接改固定值**哦不是做**逻辑运算**，就是觉得之前
+	/// **跳跃的过程太漫长，起跳速度也要快**」—— 所以这里就是"起跳那一瞬间的垂直速度"本身，
+	/// 填多少就是多少（场景里的 <c>Player.tscn → Movement.JumpVelocity</c> 只是**读不到表时的回退值**）。
 	///
-	/// ⚠️ 它**只管高度**：真正决定"跳起来多快"的是 <see cref="JumpSpeedMultiplier"/>。
-	/// 用户原话是「高度 +40%，速度 +100%」—— 两者在同一个 <c>JumpVelocity</c> 上无法同时成立
-	/// （速度 ×2 会让高度 ×4），所以拆成两个旋钮，谁想改哪一边就改哪一边。
+	/// ⚠️ 跳跃高度与起跳速度是平方关系（<c>h = v² / 2g</c>）：起跳速度翻倍 → 高度 ×4，
+	/// 而且**在重力不变时滞空时间也会翻倍**（反而更"漫长"）。所以旁边还有
+	/// <see cref="JumpGravityScale"/> 一起给固定值 —— 想要"起跳更快、过程更短"就要两个一起调。
 	/// </summary>
-	[Export(PropertyHint.Range, "0.1,6,0.05")] public float JumpHeightMultiplier { get; set; } = 1f;
+	[Export(PropertyHint.Range, "1,30,0.1")] public float JumpVelocity { get; set; } = 6.5f;
 
 	/// <summary>
-	/// **跳跃速度**倍数（1 = 与场景里的值一样快）。乘在"空中加速"与"最大下落速度"上
-	/// （<c>CharacterMovement.AirAcceleration</c> / <c>MaxFallSpeed</c>）——
-	/// 这两个量才真的是速度：起跳速度已经被"高度"那一列按平方根占用了。
+	/// **重力缩放的固定值**（直接套到 <c>CharacterMovement.GravityScale</c>；1 = 引擎默认重力
+	/// 9.8 × 1，1.8 = 组件原来的值）。留 0 = 不覆盖（保留场景里的值）。
 	///
-	/// 起跳那一瞬间的手感（离开地面的速度）由**高度**列决定，所以想"整体更快"时两列一起加。
+	/// 它决定"落回来有多快"：起跳速度抬上去之后，只有把重力也抬上去，整个跳跃过程才会**更短**
+	/// （用户抱怨的就是"过程太漫长"）。两列都是固定值，没有任何倍率运算。
 	/// </summary>
-	[Export(PropertyHint.Range, "0.1,6,0.05")] public float JumpSpeedMultiplier { get; set; } = 1f;
+	[Export(PropertyHint.Range, "0,10,0.05")] public float JumpGravityScale { get; set; } = 1.8f;
 }

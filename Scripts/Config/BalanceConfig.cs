@@ -2,7 +2,7 @@ using Godot;
 
 namespace ActRoguelike.Config;
 
-/// <summary>可选武器（开局配置与武器池节点用）。数值都在 BalanceConfig 里，不写死进预制体。</summary>
+/// <summary>可选武器（开局配置与进化池节点用）。数值都在 BalanceConfig 里，不写死进预制体。</summary>
 public enum WeaponPresetKind
 {
 	Pistol,
@@ -65,6 +65,38 @@ public partial class BalanceConfig : Resource
 
 	/// <summary>生成间隔倍率（越大出怪越慢）。</summary>
 	[Export] public float SpawnIntervalMultiplier { get; set; } = 1f;
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// 关卡内的定期刷怪（用户需求 #6，2026-10-12）
+	//
+	// 用户原话：「当角色进入关卡时，场景里会**定期在任意有效位置刷出怪物**，**每过 120 秒**
+	// （可调整的参数）就**增强接下来刷出的怪物**（提升强度或更强类型的怪）」。
+	//
+	// 为什么放在**全局标量**而不是关卡表（`Config/Tables/Stages/`）：这是"所有关卡共用的压力节奏"
+	// （与 `NodeBudgetMultiplier` / `SpawnIntervalMultiplier` 同类），按关卡行放会让 3 行各存 4 个
+	// 一样的数；真要按关卡区分时，再往 `StageDefinition` 加同名覆盖列即可（表优先、这里是回退）。
+	// ─────────────────────────────────────────────────────────────────────────
+	[ExportGroup("节奏 · 关卡内的定期刷怪（需求 #6：定期刷怪 + 每 120 秒增强）")]
+	/// <summary>
+	/// 关卡内的定期刷怪间隔（秒）。<b>0 = 关掉这套机制</b>（只留节点的 Encounter 刷怪，与接它之前完全一致）。
+	/// </summary>
+	[Export] public float AmbientSpawnInterval { get; set; } = 30f;
+
+	/// <summary>
+	/// 每隔多少秒给"之后刷出的怪"加一档强度（用户点名的参数：120）。<b>0 = 不增强</b>（永远按第 0 档刷）。
+	/// </summary>
+	[Export] public float AmbientSpawnEscalateSeconds { get; set; } = 120f;
+
+	/// <summary>
+	/// 每档强度加多少（0.25 = 每档 ×1.25，生命与伤害一起乘）。当前档位 = 关卡已过秒数 ÷ 上面那个间隔。
+	/// </summary>
+	[Export] public float AmbientSpawnStrengthStep { get; set; } = 0.25f;
+
+	/// <summary>
+	/// 场上最多同时存在几只"游离怪"（定期刷出来的那些）。达到上限就先不刷，避免玩家绕圈时无限堆积。
+	/// <b>0 = 不限</b>。
+	/// </summary>
+	[Export] public int AmbientSpawnMaxAlive { get; set; } = 6;
 
 	[ExportGroup("Boss（倍率与压力曲线）")]
 	/// <summary>Boss 生命倍率。</summary>

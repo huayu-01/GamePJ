@@ -349,6 +349,103 @@ public partial class EncounterController : Node3D
 		CheckCompleted();
 	}
 
+	/// <summary>
+	/// **关卡内的定期刷怪**（用户需求 #6，2026-10-12）：按本关的可生成列表抽一种敌人，在玩家周围的
+	/// **可行走点**（走 `SpawnPlanner` → `MapManager.SpawnPoint`，与波次刷怪**同一份落点能力**）生成一只
+	/// 「游离怪」。
+	///
+	/// ⚠️ <b>它与波次/预算完全无关</b>：不扣 <see cref="RemainingBudget"/>、不进 <see cref="_spawned"/>、
+	/// 不增加 <see cref="AliveCount"/>、也不受 <see cref="MaxConcurrent"/> 限制 ——
+	/// 所以**不会**参与本场的清场判定（把游离怪算进去的话，节点挑战会因为"场外还有别的怪"永远结不了算）。
+	/// 调用方是 <c>StageController</c>（关卡编排者），它自己管节奏与强度档位。
+	///
+	/// <paramref name="strengthScale"/> = 生命与伤害的倍率（"每过 120 秒增强一档"，见
+	/// <c>BalanceConfig.AmbientSpawnStrengthStep</c>）；1 = 不增强。
+	/// 读不到可生成项 / 找不到玩家时返回 <c>null</c>（调用方不当作错误）。
+	/// </summary>
+	public Unit? SpawnAmbient(float strengthScale = 1f)
+	{
+		Unit? player = _player != null && IsInstanceValid(_player) && !_player.IsDead ? _player : FindPlayer();
+		if (player == null)
+		{
+			return null;
+		}
+
+		EnemySpawnEntry? entry = PickAmbientEntry();
+		if (entry?.Scene == null)
+		{
+			return null;
+		}
+
+		var enemy = entry.Scene.Instantiate<Unit>();
+
+		// 与波次刷怪同序：实例化 → ApplyTo → AddChild（`Unit._EnterTree` 要捕获基础值）。
+		EnemyRow(entry)?.ApplyTo(enemy);
+		AddChild(enemy);
+		enemy.GlobalPosition = SpawnPlanner.FindSpawnPoint(player.GlobalPosition, MinSpawnDistance, SpawnRadius);
+
+		// 全局难度倍率 + 本关缩放：与波次刷怪同一条路（游离怪不该是特例）。
+		Balance.ScaleEnemy(enemy, this, false);
+		if (!Mathf.IsEqualApprox(EnemyHealthScale, 1f))
+		{
+			enemy.Stats.AddModifier(new StatModifier { Stat = "MaxHealthMultiplier", Operation = ModifierOperation.Multiply, Value = EnemyHealthScale, Source = this });
+		}
+
+		if (!Mathf.IsEqualApprox(EnemyDamageScale, 1f))
+		{
+			enemy.Stats.AddModifier(new StatModifier { Stat = "DamageMultiplier", Operation = ModifierOperation.Multiply, Value = EnemyDamageScale, Source = this });
+		}
+
+		// 强度档位（需求 #6：「每过 120 秒就增强接下来刷出的怪物」）——生命与伤害一起乘。
+		if (!Mathf.IsEqualApprox(strengthScale, 1f))
+		{
+			enemy.Stats.AddModifier(new StatModifier { Stat = "MaxHealthMultiplier", Operation = ModifierOperation.Multiply, Value = strengthScale, Source = this });
+			enemy.Stats.AddModifier(new StatModifier { Stat = "DamageMultiplier", Operation = ModifierOperation.Multiply, Value = strengthScale, Source = this });
+		}
+
+		enemy.RefreshStats();
+		enemy.FillVitals();
+		return enemy;
+	}
+
+	/// <summary>
+	/// 游离怪的加权抽签：与 <see cref="PickEntry"/> 同一份权重，但**不看预算与解锁时间**
+	/// （那两样是"一场 Encounter 内部"的约束；游离怪不占预算，强度改由时间档位决定）。
+	/// </summary>
+	private EnemySpawnEntry? PickAmbientEntry()
+	{
+		float totalWeight = 0f;
+		foreach (EnemySpawnEntry entry in _entries)
+		{
+			if (entry.Scene != null)
+			{
+				totalWeight += Mathf.Max(0.01f, entry.Weight);
+			}
+		}
+
+		if (totalWeight <= 0f)
+		{
+			return null;
+		}
+
+		float roll = (float)GD.RandRange(0d, totalWeight);
+		foreach (EnemySpawnEntry entry in _entries)
+		{
+			if (entry.Scene == null)
+			{
+				continue;
+			}
+
+			roll -= Mathf.Max(0.01f, entry.Weight);
+			if (roll <= 0f)
+			{
+				return entry;
+			}
+		}
+
+		return null;
+	}
+
 	private EnemySpawnEntry? PickEntry()
 	{
 		float totalWeight = 0f;

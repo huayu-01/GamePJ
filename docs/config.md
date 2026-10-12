@@ -161,11 +161,11 @@
 
 ### 角色表 `Config/Tables/Characters/`（3 行）
 
-| 行 | 生命 | 护甲 | 移速 | 减伤 | 武器 | 能力开关 | **攻击组**（伤害/间隔/范围/击退） |
-|---|---|---|---|---|---|---|---|
-| `chr_gunner`（槽 1） | 250 | 40 | 7.0 | 0 | ✅ | 关 Melee/Summon/Control | 32 / 0.75 / 2.4 / 5 |
-| `chr_heavy`（槽 2） | 380 | 140 | 6.2 | 12% | ❌ | 开 Melee，关 Summon/Control | 32 / 0.75 / 2.4 / 5 |
-| `chr_summoner`（槽 3） | 210 | 60 | 6.8 | 0 | ✅ | 开 Summon/Control，关 Melee | 32 / 0.75 / 2.4 / 5 |
+| 行 | 生命 | 护甲 | 移速 | 减伤 | 武器 | 能力开关 | **攻击组**（伤害/间隔/范围/击退） | **跳跃**（起跳速度 / 重力缩放，固定值） |
+|---|---|---|---|---|---|---|---|---|
+| `chr_gunner`（槽 1） | 250 | 40 | 7.0 | 0 | ✅ | 关 Melee/Summon/Control | 32 / 0.75 / 2.4 / 5 | **13.0 / 3.6** |
+| `chr_heavy`（槽 2） | 380 | 140 | 6.2 | 12% | ❌ | 开 Melee，关 Summon/Control | 32 / 0.75 / 2.4 / 5 | **13.0 / 3.6** |
+| `chr_summoner`（槽 3） | 210 | 60 | 6.8 | 0 | ✅ | 开 Summon/Control，关 Melee | 32 / 0.75 / 2.4 / 5 | **13.0 / 3.6** |
 
 角色表**继承 `UnitConfig`**，所以"攻击组"就是**左键近战重击的四个数**（原先散在 `Balance.tres` 的
 `HeavyMeleeDamage` 与 `Player.tscn` 的命中体/能力上，现在合成一处）：伤害 32 / 间隔 0.75 / 范围 2.4 / 击退 5。
@@ -294,7 +294,7 @@
 
 | 行 | 节点类型 | 层 | 波数 | 价值标签（→ 波数由标签表给） | 奖励过滤 | 界面标题 |
 |---|---|---|---|---|---|---|
-| `node_weapon` | Weapon | 1 | 3 | `tag_mid` | 进化 | 武器池 |
+| `node_weapon` | Weapon | **2** | **4** | **`tag_high`** | 进化 | **进化池**（旧称"武器池"，用户 A3 拍板：那个叫法就是进化池） |
 | `node_enhance` | Enhancement | 1 | 3 | `tag_mid` | 强化 | 强化池 |
 | `node_evolution` | Evolution | 2 | 4 | `tag_high` | 进化 | 进化池 |
 | `node_mutation` | Mutation | 2 | 4 | `tag_high` | 异化 | 异化池 |
@@ -320,8 +320,8 @@
 
 | 行 | 标签 | 波数 | 谁挂它 |
 |---|---|---|---|
-| `tag_high` | 高价值 | **4** | `node_evolution` / `node_mutation`（Layer 2） |
-| `tag_mid` | 中价值 | **3** | `node_weapon` / `node_enhance` / `node_shop`（Layer 1） |
+| `tag_high` | 高价值 | **4** | `node_evolution` / `node_mutation`（Layer 2）· **`node_weapon`（Layer 2，2026-10-12 用户 A3：武器限定池 = 进化池 = 高价值）** |
+| `tag_mid` | 中价值 | **3** | `node_enhance` / `node_shop`（Layer 1） |
 | `tag_low` | 低价值 | **1** | `node_resource` / `node_heal` / `node_special` / `node_portal`（Layer 0） |
 
 - 索引：`Balance.tres` 的 `[Export] ValueTagConfig[] ValueTags`（元素指向上面三个行文件）。
@@ -332,7 +332,11 @@
   `⚠ 节点行 X 的价值标签「Y」在 ValueTags 表里找不到。`
 - 开局日志会同时打出**标签定了几波**与**每个节点实际算出几波**：
   `价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]`
-  `节点波数（高 4 / 中 3 / 低 1）：node_weapon（tag_mid）3 波 · node_evolution（tag_high）4 波 · …`
+  `节点波数（高 4 / 中 3 / 低 1）：node_weapon（tag_high）4 波 · node_evolution（tag_high）4 波 · …`
+  ⚠️ `node_weapon` 自 2026-10-12（用户拍板 A3）起挂 `tag_high`、`Layer = 2`、**4 波** —— 那个节点就是
+  **进化池**（用户：「没有定义武器池，只是一个说法，确切来说是进化池…进化池算高价值，因为攻击方式的改动巨大」）。
+  `Config/Tables/UpgradePools/` 那 3 行（`pool_pistol` / `pool_sniper` / `pool_rifle`）只有身份、**没有价值标签列**，
+  所以这次改动落在**节点行**这一侧（价值标签本来就是 `NodeConfig.ValueTags` 的列）。
 
 ### 增幅项表 `Config/Tables/Upgrades/`（19 行）
 
@@ -407,6 +411,19 @@
 |---|---|
 | `NodeBudgetMultiplier` | 节点总预算倍率（越大敌人越多、节点越久） |
 | `SpawnIntervalMultiplier` | 生成间隔倍率（越大出怪越慢） |
+
+### 节奏 · 关卡内的定期刷怪（需求 #6，2026-10-12 新增：定期刷怪 + 每 120 秒增强）
+| 参数 | 含义 | 现值 |
+|---|---|---|
+| `AmbientSpawnInterval` | 进关后每隔多少秒在**有效位置**刷一只"游离怪"。**0 = 关掉这套机制** | **30** |
+| `AmbientSpawnEscalateSeconds` | 每隔多少秒给**之后**刷出的怪加一档强度（用户点名的参数） | **120** |
+| `AmbientSpawnStrengthStep` | 每档强度加多少（0.25 = 每档 生命/伤害 ×1.25） | **0.25** |
+| `AmbientSpawnMaxAlive` | 场上最多同时几只游离怪（0 = 不限） | **6** |
+
+- 参数在**全局标量**而不是关卡表：这是所有关卡共用的压力节奏（与上面两个同类），按关卡行放会让 3 行各存一份相同的数。
+- 落点**复用** `EncounterController.SpawnAmbient` → `SpawnPlanner.FindSpawnPoint` → `MapManager.SpawnPoint`（**没有第二套落点实现**）。
+- 游离怪**不扣 Encounter 的预算、不进它的 `AliveCount`/`MaxConcurrent`、不参与清场判定**（否则节点挑战永远结不了算）。
+- 细节、实现位置与实测见 [stages.md](stages.md) 的「关卡内的定期刷怪 + 每 120 秒增强」一节。
 
 ### Boss
 | 参数 | 含义 |
@@ -796,11 +813,13 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 > 面板正文由 `BossPreviewScreen.Describe(stage, encounter)` 生成（**静态 + 只读入参**，所以自测不开界面也能断言内容）；
 > 界面由 `UiService.OpenBossPreview()` 打开，**没有绕过 UiService / UiRouter**。
 
-## 开局配置与武器池
+## 开局配置与进化池
 
 - 开局先弹 **Configure 画面**（`Scenes/UI/StartScreen.tscn`）：按 1 选手枪 / 按 2 选狙击枪 / 按 3 选步枪 → 进入 Stage 1。
   卡片文案来自武器表的 `DescriptionTemplate`（支持 `{Damage:0}` 这类占位符）。
-- **武器池节点**：互动后弹出**三选一**，选定即触发本场 Encounter。用的是通用选择界面 `ChooseScreen`，以后商店/事件节点可直接复用。
+- **进化池节点**：互动后弹出**三选一**，选定即触发本场 Encounter。用的是通用选择界面 `ChooseScreen`，以后商店/事件节点可直接复用。
+  （旧文档里这一段写作"武器池"；用户 2026-10-12 拍板 A3：「没有定义武器池，只是一个说法，确切来说是进化池」——
+  它 = 武器（角色的攻击方式）的**限定池**，算**高价值**。见上面「节点表」/「价值标签表」与 [stages.md](stages.md)。）
 
 ## 节点自身的数值
 
@@ -813,22 +832,26 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 
 > **成本与预算的整除关系**：节点结束时余额若低于任何可用敌人的成本，会被当作「已花完」直接结算（不会卡住）。所以节点预算最好是成本的整数倍，否则最后会有一点余额被浪费。
 
-## 跳跃参数（用户需求 #2，2026-10）
+## 跳跃参数（用户需求 A2，2026-10-12 **改成固定值**）
 
 **跳跃的两个数在角色表里**（`Config/Tables/Characters/chr_*.tres`），不在 `Player.tscn` 上 —— 场景里的
-`Movement.JumpVelocity = 6.5` 只是**回退值**（表整个读不到时才用）。
+`Movement.JumpVelocity = 6.5` / `Movement.GravityScale = 1.8` 只是**回退值**（表整个读不到时才用）。
+
+用户 2026-10-12 拍板（需求 A2）：「要的是**直接改固定值**哦不是做**逻辑运算**，就是觉得之前
+**跳跃的过程太漫长，起跳速度也要快**」。所以上一批那套 `JumpHeightMultiplier`(1.4) + `JumpSpeedMultiplier`(2.0)
+的**倍率运算已经整段删除**（两列 + 读它们的代码路径一起删），现在表里给的是**绝对值**：
 
 | 列 | 含义 | 现在三行都填 |
 |---|---|---|
-| `JumpHeightMultiplier` | **跳多高**的倍数（1 = 与场景里的值一样高）。高度与起跳速度是平方关系 `h = v²/2g`，所以实现里对速度取的是**平方根**：填 1.4 → 起跳速度 ×1.183、跳得比原来高 40% | **1.4** |
-| `JumpSpeedMultiplier` | **多快**的倍数（1 = 与场景里的值一样快）。乘在 `CharacterMovement.AirAcceleration` 与 `MaxFallSpeed` 上 —— 这两个量才真的是"速度" | **2.0** |
+| `JumpVelocity` | **起跳速度的固定值**（m/s）—— 直接套到 `CharacterMovement.JumpVelocity`，填多少就是多少（不做平方根、不做倍率） | **13.0**（场景回退 6.5） |
+| `JumpGravityScale` | **重力缩放的固定值** —— 直接套到 `CharacterMovement.GravityScale`；留 0 = 不覆盖 | **3.6**（场景回退 1.8） |
 
-> ⚠️ **为什么拆成两列**：用户原话是「高度 +40%，速度 +100%」。
-> 这两个要求**在同一个 `JumpVelocity` 上无法同时成立** —— 起跳速度 ×2 会让高度 ×4（不是 +40%）。
-> 所以按"谁想要哪一边就改哪一边"拆成两个旋钮：
-> **高度那一列**按平方根只抬高度；**速度那一列**按原样乘速度（空中加速、下落速度）。
-> 想要"跳得又高又快"，两列一起加即可（当前就是这么配的）。
-> 若确认用户要的是"高度 +40% 且 起跳速度 +100%（= 高度 ×4）"，把 `JumpHeightMultiplier` 改成 4 即可。
+> ⚠️ **为什么还给了重力这一列**：跳跃高度与起跳速度是平方关系（`h = v²/2g`），**滞空时间**是 `2v/g` ——
+> 只把起跳速度翻倍会让高度 ×4 且**滞空时间也翻倍**（那正好是用户抱怨的"过程太漫长"）。
+> 所以"起跳更快 + 过程更短"必须两个固定值一起给：`v 6.5 → 13`、`g 1.8 → 3.6`
+> → 起跳速度 ×2、跳跃高度 ×2（1.2 m → 2.4 m）、**滞空 0.74 s（比改前的 0.87 s 更短）**。
+> 两列都是固定值，**没有任何倍率/开方运算**（这正是用户要的"直接改固定值"）。
+> 空中加速（15）与最大下落（60）**不再被乘任何倍率**，保持场景值。
 
 **只有玩家读这两列**（`CharacterMovement.ApplyJumpConfigDeferred`：按 `player_units` 组判定 + 按
 `RunSetup.Character` 选行）。敌人/召唤物的跳跃留在各自场景上（`JumpingMelee.tscn` 的 `JumpVelocity = 9`），
@@ -839,10 +862,11 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 > 首轮实测就是这么静默失效的（12 个单位全打出 `player_units 组=False`，跳跃配置一次都没生效，
 > 而且**没有任何报错**）。修好之后的证据是日志里**只有一行**跳跃（玩家），12 个敌人一个都不打。
 
-读不到角色行时**什么都不做**（玩家保留场景里的 6.5）。生效时日志有一行留痕：
+读不到角色行时**什么都不做**（玩家保留场景里的 6.5 / 1.8）。生效时日志有一行留痕：
 
 ```
-[Config] 跳跃：角色行 chr_gunner（高度×1.4 速度×2）→ 起跳速度 7.69 m/s（高度系数 1.183）/ 空中加速 30 / 最大下落 120（来源：表 Characters，读不到则用场景导出值）
+[Config] 跳跃：角色行 chr_gunner → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[SelfTest] 配置表比对·跳跃：起跳速度 13（期望 13 = 角色行固定值，场景回退 6.5）重力缩放 3.6（期望 3.6 = 角色行固定值，场景回退 1.8）空中加速 15（期望 15 = 场景值，不再乘倍率）最大下落 60（期望 60 = 场景值）
 ```
 
 > 已知边界：玩家在基地**中途换角色**不会重算这两列（`RunController.ApplyBalance` 换角色时会重建数值，
@@ -1765,7 +1789,7 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 
 | # | 内容 | 落点 |
 |---|---|---|
-| **2** | 跳跃高度 +40% / 速度 +100% | 角色表新增两列 `JumpHeightMultiplier = 1.4` / `JumpSpeedMultiplier = 2.0`（三行都填）+ `CharacterMovement.ApplyJumpConfigDeferred`（`CallDeferred`，只有玩家读表）。见上面「跳跃参数」一节 |
+| **2** | 跳跃高度 +40% / 速度 +100% | 角色表新增两列 `JumpHeightMultiplier = 1.4` / `JumpSpeedMultiplier = 2.0`（三行都填）+ `CharacterMovement.ApplyJumpConfigDeferred`（`CallDeferred`，只有玩家读表）。见上面「跳跃参数」一节。⚠️ **这两列已在 2026-10-12（用户拍板 A2）整段删除**，改成固定值 `JumpVelocity` / `JumpGravityScale` —— 见下面「用户 A2/A3 + 需求 #6 实测」 |
 | **5** | 白板首领只在第 8 波出现 | 关卡表新增列 `EliteBossMinWave = 8`（三行都填）+ `EncounterController.MinWaveForEliteBoss` / `WavesOpenedBefore` / `WavesTotal` 门槛判定 + `StageController._wavesOpenedInStage` 累计。见上面「白板首领副本」一节 |
 | **7** | 节点波数按价值标签（高 4 / 中 3 / 低 1） | 新增**价值标签表** `Config/Tables/ValueTags/tag_*.tres`（3 行）+ `NodeConfig.ValueTags` 列（9 行都填）+ `NodePlacement.WavesFor` 改成三层取值。见上面「价值标签表」一节 |
 | **11** | 准星改回一个点 | `Assets/UI/Textures/tex_ui_crosshair_dot.png`（48×48，实心白点）+ `Scenes/UI/Hud.tscn` 的 `Root/Crosshair` 换成它（`stretch_mode = 5`）。旧的 Kenney 描边十字 `tex_ui_crosshair_default.png` 已删（全项目只有 `Hud.tscn` 引它） |
@@ -1872,9 +1896,10 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 - ⚠️ **准星只是一个点，没有跟随散布/瞄准变化**（原来也没有；`Hud.tscn` 的 `Crosshair` 仍是纯 `TextureRect`）。
 - ⚠️ **白板首领的"第 8 波"是**本关累计**而不是"某个 Encounter 的第 8 波"（原因见上）。
   当前三关的节点波数（1～4）加起来最多 16 波，所以第 8 波通常落在第 3～4 个节点上。
-- ⚠️ **`Weapon` / `Enhancement` / `Shop` 三个节点都挂 `tag_mid`，但用户原话里的"升级"没指明对应哪一个**：
-  当前按"层级 + 现有奖励类型"解释（见上表）。若用户认为武器池属于"高价值"，改 `node_weapon` 一行的标签
-  （并把 `Layer` 一起改成 2，否则"节点布置 2/5/3"这条硬指标会漂）。
+- ⚠️ **`Weapon` 节点已按用户 2026-10-12 的拍板（A3）改成 `tag_high` / `Layer = 2` / 4 波**：
+  用户明确"没有武器池这个东西，就是进化池、算高价值"（见上面「节点表」「价值标签表」）。
+  自测的「节点布置 10（高 2 / 中 5 / 低 3）」**没有漂** —— 场景里没有 `Kind = Weapon` 的实例；漂的是
+  `价值标签表 → 节点 [Weapon=4]`。详见下面「用户 A2/A3 + 需求 #6 实测」。
 
 ## 配置表阶段 8 实测（2026-10：能力卡 = 局外装备层）
 
@@ -1928,4 +1953,53 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 玩法其余部分（节点布置 / Pressure / 端到端）不受影响；`meta_quota` 行读不到时 `QuotaPerLevel` 兜底为 1（与表里一致）。
 要主动验证：把 `Balance.tres` 的 `AbilityCards` 数组项与顶部对应的 `[ext_resource]` **一起**删掉再跑一轮自测
 （⚠️ **只删数组项不删 `ext_resource`、或只删行文件不删引用，都会让整份 `Balance.tres` 加载失败**）。
+
+## 用户 A2 / A3 + 需求 #6 实测（2026-10-12）
+
+需求文档：`docs/requirements-ability-system.md` 的「用户拍板与新增需求（2026-10-12 第二轮）」A2 / A3 与 §五 #6。
+
+**编译**：`& build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（每改一步都跑，全程 0/0）。
+
+### 一、三项各自改了什么
+
+| # | 内容 | 落点 |
+|---|---|---|
+| **A2** | 跳跃**去掉倍率运算**、改成**直接改固定值**（起跳速度要快、过程不要漫长） | 角色表**删两列**（`JumpHeightMultiplier` / `JumpSpeedMultiplier`）**加两列**（`JumpVelocity = 13.0` / `JumpGravityScale = 3.6`，三行都填）+ `CharacterMovement.ApplyJumpConfigDeferred` 改成直接赋值。见上面「跳跃参数」一节 |
+| **A3** | 「武器池」不存在 → 它就是**进化池**，且算**高价值**（4 波） | `Config/Tables/Nodes/node_weapon.tres`：`Title`/`DisplayName` → **进化池**、`Layer = 2`、`WaveCount = 4`、`ValueTags = tag_high`；`RewardService.FallbackTitle(Weapon)` → `"进化池"`；代码注释与文档里的"武器池"字样一并清理。**目录 `UpgradePools/` 与类 `UpgradePoolConfig` 刻意没动**（那是第三批刚落地的"池"的通用名） |
+| **#6** | 关卡内**定期刷怪** + **每 120 秒增强** | 新增 4 个全局标量（`AmbientSpawnInterval` / `AmbientSpawnEscalateSeconds` / `AmbientSpawnStrengthStep` / `AmbientSpawnMaxAlive`）+ `StageController.UpdateAmbientSpawns` / `SpawnAmbientNow` / `PruneAmbient` + `EncounterController.SpawnAmbient`（复用波次刷怪的落点链路）。见 [stages.md](stages.md) 的「关卡内的定期刷怪」一节 |
+
+### 二、硬指标逐位对照（`run_20261012_221413.log`）
+
+```
+配置表比对·索引：武器 3/角色 3/敌人 10/首领 1/召唤物 1/技能 25/Pressure 7/效果 9/节点 9/局外 6/升级池 3/AI 档案 11/能力卡 8   ← 逐位不变
+节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）        ← A3 之后**没有漂**（原因见下）
+Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3 bank=0   ← 逐位不变
+端到端：按 F 之后 奖励界面打开 = True  Paused = True                ← 逐位不变
+🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）  ← 逐位不变
+[Audio] 配置表：音效 13（来源：表 Audio）                            ← 逐位不变
+配置表比对·跳跃：起跳速度 13 / 重力缩放 3.6 / 空中加速 15 / 最大下落 60   ← A2 的新期望（旧的是 7.69 / 30 / 120）
+```
+
+**为什么「节点布置 10（高 2 / 中 5 / 低 3）」没漂**：`Main.tscn` 的那 10 个实例里**没有 `Kind = Weapon` 的节点**
+（4 强化 + 进化 + 异化 + 商店 + 材料 + 恢复 + 特殊），所以把 `node_weapon` 那一行的 `Layer` 从 1 改成 2
+不会改变任何一层的**实际数量**。真正变了的是 **`价值标签表 → 节点 [Weapon=3]` → `Weapon=4`**（已同步期望值），
+以及自测的高/中/低改成**按价值层**（`NodePlacement.LayerOf`）数而不是按 `RewardNodeKind` 枚举数 ——
+这样"标签说它值几波"与"它被数进哪一层"从此不可能互相矛盾。
+
+### 三、A2 的取值与理由
+
+- `JumpVelocity` **6.5 → 13**（起跳速度 ×2：用户「起跳速度也要快」）。
+- `JumpGravityScale` **1.8 → 3.6**（重力 ×2）：因为滞空时间 = `2v/g`，**只抬起跳速度会让滞空翻倍**
+  （那正是用户抱怨的"过程太漫长"）。两列一起给 → 高度 ×2（1.2 m → 2.4 m）、**滞空 0.87 s → 0.74 s（更短）**。
+- 空中加速（15）/ 最大下落（60）**不再乘任何倍率**（上一批的 `JumpSpeedMultiplier` 已删）。
+- ⚠️ 与需求文档 A2 里那句"(高度会随之 ×4，这是可接受的)"的差别：那是"只改 `JumpVelocity`"的算法后果，
+  与用户同一句话里的"**过程太漫长**"直接矛盾，所以这里按"两个固定值"落地；数值本身按 A1 属占位、表里随时可改。
+
+### 四、整轮无异常
+
+`ERROR / Exception / warning` **0 条**；`selftest.flag` 已删（`Test-Path` = False）。
+三轮自测逐位一致（`run_20261012_221308.log` / `run_20261012_221413.log` / `run_20261012_221803.log`，
+随机敌种与帧率除外）。另外把 `AmbientSpawnInterval` / `AmbientSpawnEscalateSeconds` 临时改成 6 / 10
+跑了一轮**自然计时路径**的验证（`run_20261012_221654.log`：每隔 6~7 秒刷一只、每 10 秒档位 +1，
+全部硬指标照样逐位一致、自测跑完整），跑完已还原成 30 / 120。
 

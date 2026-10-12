@@ -65,7 +65,8 @@ public static class RewardService
 	/// <summary>节点表读不到时的兜底（= 分表前的那份 switch，数值逐条一致）。</summary>
 	private static RewardKind? FallbackFilter(RewardNodeKind kind) => kind switch
 	{
-		// 武器池 = 改造武器的攻击方式（用户澄清：初始武器选定后不可更换）。
+		// 没有「武器池」这个类型（用户 A3 拍板）：那个叫法指的就是**进化池** ——
+		// 武器（= 角色的攻击方式）的限定池 = 改造攻击方式（初始武器选定后不可更换）。
 		RewardNodeKind.Weapon => RewardKind.Evolution,
 		RewardNodeKind.Enhancement => RewardKind.Enhancement,
 		RewardNodeKind.Evolution => RewardKind.Evolution,
@@ -76,7 +77,7 @@ public static class RewardService
 	/// <summary>节点表读不到时的兜底标题。</summary>
 	private static string FallbackTitle(RewardNodeKind kind) => kind switch
 	{
-		RewardNodeKind.Weapon => "武器池",
+		RewardNodeKind.Weapon => "进化池",
 		RewardNodeKind.Enhancement => "强化池",
 		RewardNodeKind.Evolution => "进化池",
 		RewardNodeKind.Mutation => "异化池",
