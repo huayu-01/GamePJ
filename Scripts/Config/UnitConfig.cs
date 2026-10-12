@@ -34,8 +34,12 @@ public abstract partial class UnitConfig : ConfigRow
 	/// <summary>最大生命。进场景树之前套用（"先 ApplyTo、再 AddChild"）。</summary>
 	[Export] public float MaxHealth { get; set; } = 100f;
 
-	/// <summary>最大护甲（先扣护甲再扣血；护甲大于 0 时按 <see cref="ArmorDamageReduction"/> 减伤）。</summary>
-	[Export] public float MaxArmor { get; set; }
+	/// <summary>
+	/// **开局护甲**（进场时给多少甲）。护甲**没有上限**（用户 2026-10-12 拍板 C1），
+	/// 所以这一列不是"最大护甲"：套用之后护甲是一个累加值，被打就减、只有 <see cref="Unit.GrantArmor"/> 能加。
+	/// 护甲大于 0 时按 <see cref="ArmorDamageReduction"/> 减伤。
+	/// </summary>
+	[Export] public float StartingArmor { get; set; }
 
 	/// <summary>最大护盾（在护甲之前被消耗，不吃护甲减伤）。</summary>
 	[Export] public float MaxShield { get; set; }
@@ -161,7 +165,7 @@ public abstract partial class UnitConfig : ConfigRow
 			return;
 		}
 
-		unit.ApplyBaseStats(MaxHealth, MaxArmor, MaxShield, MoveSpeed);
+		unit.ApplyBaseStats(MaxHealth, StartingArmor, MaxShield, MoveSpeed);
 		unit.ArmorDamageReduction = ArmorDamageReduction;
 		unit.DamageReduction = DamageReduction;
 		unit.KnockbackResistance = KnockbackResistance;

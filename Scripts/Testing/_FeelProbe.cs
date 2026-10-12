@@ -48,7 +48,7 @@ public partial class _FeelProbe : Node3D
 	private Unit? _dummy;
 	private Unit? _guard;
 
-	/// <summary>无甲单位（追猎者，<c>MaxArmor = 0</c>）：用来验用户 A6 的「要有护甲才会被显示出来」。</summary>
+	/// <summary>无甲单位（追猎者，<c>ArmorPeak = 0</c>）：用来验用户 A6 的「要有护甲才会被显示出来」。</summary>
 	private Unit? _plain;
 	private CanvasLayer? _overlay;
 	private Node? _hud;
@@ -184,7 +184,7 @@ public partial class _FeelProbe : Node3D
 			_dummy.AddChild(new UnitAnimator { Name = UnitAnimator.NodeName });
 			AddChild(_dummy);
 			_dummy.GlobalPosition = new Vector3(-2.2f, 0f, 1.2f);
-			GD.Print($"[Feel] 木桩：生命 {_dummy.MaxHealth:0} 甲 {_dummy.Armor:0}/{_dummy.MaxArmor:0} 减伤 {_dummy.ArmorDamageReduction:0.##}");
+			GD.Print($"[Feel] 木桩：生命 {_dummy.MaxHealth:0} 甲 {_dummy.Armor:0}/{_dummy.ArmorPeak:0} 减伤 {_dummy.ArmorDamageReduction:0.##}");
 
 			// 守卫（正面格挡 0.25）：把 AI 与技能停掉，只当"会格挡的靶子"。
 			_guard = GD.Load<PackedScene>("res://Scenes/Enemies/Guard.tscn").Instantiate<Unit>();
@@ -199,7 +199,7 @@ public partial class _FeelProbe : Node3D
 				}
 			}
 
-			GD.Print($"[Feel] 守卫：生命 {_guard.MaxHealth:0} 甲 {_guard.Armor:0}/{_guard.MaxArmor:0} 格挡倍率 {_guard.Block?.BlockDamageMultiplier}");
+			GD.Print($"[Feel] 守卫：生命 {_guard.MaxHealth:0} 甲 {_guard.Armor:0}/{_guard.ArmorPeak:0} 格挡倍率 {_guard.Block?.BlockDamageMultiplier}");
 
 			// 无甲单位（A6 的对照）：**一条护甲视觉都不该有** —— 连"塑料壳"都不给。
 			_plain = GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate<Unit>();
@@ -219,7 +219,7 @@ public partial class _FeelProbe : Node3D
 				}
 			}
 
-			GD.Print($"[Feel] 无甲单位：{_plain.Name} 生命 {_plain.MaxHealth:0} 甲 {_plain.Armor:0}/{_plain.MaxArmor:0}（MaxArmor = 0 → 期望任何护甲视觉都隐藏）");
+			GD.Print($"[Feel] 无甲单位：{_plain.Name} 生命 {_plain.MaxHealth:0} 甲 {_plain.Armor:0}/{_plain.ArmorPeak:0}（ArmorPeak = 0 → 期望任何护甲视觉都隐藏）");
 		});
 
 		// ① 甲还在：一次打不穿的伤害 → 应该出现「甲 N」，并且敌人血条上罩着那层半透明"塑料"（**血一点没掉**也要显示）。
@@ -356,7 +356,7 @@ public partial class _FeelProbe : Node3D
 		{
 			_player!.ApplyBaseStats(_player.MaxHealth, 60f, 0f, _player.MoveSpeed);
 			_player.ApplyDirectDamage(30f, _guard);
-			GD.Print($"[Feel] 玩家护甲：{_player.Armor:0}/{_player.MaxArmor:0}（血 {_player.Health:0}/{_player.MaxHealth:0} —— 血没掉也要看得见护甲进度）");
+			GD.Print($"[Feel] 玩家护甲：{_player.Armor:0}/{_player.ArmorPeak:0}（血 {_player.Health:0}/{_player.MaxHealth:0} —— 血没掉也要看得见护甲进度）");
 			WideShot();
 		});
 
@@ -644,7 +644,7 @@ public partial class _FeelProbe : Node3D
 		GD.Print(
 			$"[Feel] 基地预览[{tag}]：角色 {RunSetup.Character} 武器 {RunSetup.Weapon} "
 			+ $"模型=[{_preview?.PreviewModelPath}] 预览实例={_preview?.PreviewModelCount} 枪可见={pistol?.Visible} "
-			+ $"玩家生命={(_preview?.GetParent() as Unit)?.MaxHealth:0} 甲={(_preview?.GetParent() as Unit)?.MaxArmor:0}");
+			+ $"玩家生命={(_preview?.GetParent() as Unit)?.MaxHealth:0} 甲={(_preview?.GetParent() as Unit)?.ArmorPeak:0}");
 	}
 
 	// ───────────────────────── #3：死亡流程 ─────────────────────────

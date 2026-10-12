@@ -16,7 +16,12 @@ public static class NodePlacement
 	/// <summary>
 	/// 节点价值层：2 高（进化/异化）、1 中（强化/商店）、0 低（局外资源/回复/特殊）。
 	/// 层与波数**优先读节点表**（`Config/Tables/Nodes/node_*.tres` 的 `Layer` / `WaveCount`），
-	/// 读不到行时回退到下面这份 switch（= 分表前的规则，数值逐条一致）。
+	/// 读不到行时回退到下面这份 switch（= 分表前的规则）。
+	///
+	/// ⚠️ `Weapon` 也在这里表态（用户 A3 + C2）："武器限定池"这个叫法指的就是**进化池**，
+	/// 属于高价值；C2 把重复的 `node_weapon` 行合并进 `node_evolution` 之后，节点表里
+	/// 再没有 `Kind = Weapon` 的行，这个分支就是它唯一的价值层来源（不加就会退化成 Layer 0 / 1 波，
+	/// 与"进化池 = 高价值"自相矛盾）。场景里本来就没有 `Weapon` 实例，所以数字一个都不变。
 	/// </summary>
 	public static int LayerOf(RewardNodeKind kind)
 	{
@@ -28,7 +33,7 @@ public static class NodePlacement
 
 		return kind switch
 		{
-			RewardNodeKind.Evolution or RewardNodeKind.Mutation => 2,
+			RewardNodeKind.Weapon or RewardNodeKind.Evolution or RewardNodeKind.Mutation => 2,
 			RewardNodeKind.Enhancement or RewardNodeKind.Shop => 1,
 			_ => 0,
 		};

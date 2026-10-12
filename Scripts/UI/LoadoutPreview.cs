@@ -178,7 +178,7 @@ public partial class LoadoutPreview : Node
 			return;
 		}
 
-		_player.ApplyBaseStats(row.MaxHealth, row.MaxArmor, row.MaxShield, row.MoveSpeed);
+		_player.ApplyBaseStats(row.MaxHealth, row.StartingArmor, row.MaxShield, row.MoveSpeed);
 		_player.DamageReduction = row.DamageReduction;
 	}
 

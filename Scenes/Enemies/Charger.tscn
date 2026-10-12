@@ -22,7 +22,7 @@ size = Vector3(2.4, 1.8, 2.4)
 script = ExtResource("1_unit")
 Faction = 1
 MaxHealth = 90.0
-MaxArmor = 30.0
+StartingArmor = 30.0
 MoveSpeed = 3.2
 Tags = PackedStringArray("Melee", "Bruiser", "Charger")
 

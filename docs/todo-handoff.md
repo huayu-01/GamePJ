@@ -138,6 +138,40 @@ Scripts/
 > 6 处死字段清理 · 敌人倍率静默换挡修复 · `BarEnemy` 居中修复。
 > 详见 [config.md](config.md) 的「配置表阶段 3 实测」与 [config-schema.md](config-schema.md) §5 阶段 3。
 
+### 任务 G：用户第三轮 C1（护甲无上限）+ C2（节点池规则）✅ 已完成（2026-10-12）
+
+> **用户原话**：C1「**有甲了才会显示**，**护甲没有上限额度**，所以**可以删除掉 `MaxArmor`** 的」；
+> C2「**进化池里会出什么选项是根据交互的角色持有的攻击方式（武器）**，并没有"**放哪个进化池节点**"的说法……
+> 而**池里一开始有什么，应该在进入关卡初始化的时候就判断好的**」。
+> 需求原文：[requirements-ability-system.md](requirements-ability-system.md) 的「用户第三轮澄清（2026-10-12）」。
+>
+> **做了什么**：
+> 1. **C1**：`Unit.MaxArmor` / `UnitConfig.MaxArmor` → **`StartingArmor`（开局护甲）**（**改名，值一个没动**）；
+>    `MaxArmorMultiplier` / `MaxArmorAdd` 两个 StatSheet 键与 `RefreshStats` 里"抬高上限并补甲"那段**删除**；
+>    新增 `Unit.GrantArmor()`（精英怪 `EliteModifier.ArmorAdd = 120` 改走它 —— "纯粹的加甲"）；
+>    **显示判据 `MaxArmor > 0` → `Armor > 0`**（3 处 `SetArmor(...)`：`PlayerHud.UpdateArmorBar` /
+>    `WorldOverlay.UpdateBar` / `WorldOverlay.CreateBar`）→ **甲打光不再留空壳**；
+>    甲条比例的分母换成运行期派生的 `Unit.ArmorPeak`（不来自配置、不参与结算）。
+>    ⚠️ `ArmorDamageReduction`（减伤）与 `ArmorBroke`（碎甲，仍是"甲从 >0 掉到 0 那一次"）**一行没动**；
+>    `BarBoss.tscn` / 首领没动（0 甲 → 依然天然不显示）。
+>    ⚠️ **必然的行为变化**：本来 0 甲的敌种精英化后**真的多出 120 甲**（旧实现只是把上限抬到 120、甲仍是 0）。
+> 2. **C2**：候选集**原来在"第一次交互时"才建**（四个惰性分支，其中两个忘了设 `SummonerAllowed`）→
+>    改成 **`RunController.InitializePool()`，只在进关卡的 `ApplyBalance()` 里调一次**；
+>    交互时只从定好的池里抽（仍然按当前构筑过滤互斥/层数/节点 `Kind`）。
+>    **重复的两个进化池节点行合并**：删 `node_weapon.tres`（`Kind = Weapon`，场景无实例、`BossPressurePoints` 是 0），
+>    保留 `node_evolution.tres`；`Balance.tres` 的 `[ext_resource]` 与 `Nodes` 数组项**同一次**删；
+>    `NodePlacement.LayerOf` 兜底补 `Weapon => 2`（否则 `Weapon=4` 会掉到 1）；
+>    `Config/Tables/UpgradePools/` 三个按攻击方式分的池**保留不动**。**`Id`/类/目录一律没改名。**
+> 3. **硬指标**：除 **`配置表比对·索引` 的 `节点 9 → 8`**（合并 = 少一个行文件，必然结果）之外**逐位一致** ——
+>    `节点布置 10（高 2/中 5/低 3）`（**它数的是场景实例，不是表行**）、`Pressure=3`、`端到端 F`、`音效 13`、
+>    `增幅项 19 条 / 池子 18 条`、`价值标签 → 节点 [Weapon=4 …]` 全部照旧；日志无 `Balance.tres` 加载失败。
+>
+> **数据改了哪 18 个文件**：行文件 14（`Enemies/` 9 + `Bosses/` 1 + `Summons/` 1 + `Characters/` 3，
+> 含三个角色行的 `DescriptionTemplate` 占位符）+ 场景 4（`Guard` / `Charger` / `SkillElite` / `TrainingDummy`），
+> 外加**删除** `Config/Tables/Nodes/node_weapon.tres`。全部 **LF + 无 BOM**。
+> **`Balance.tres` 里本来没有护甲字段**（C1 完全没碰它），C2 才碰了它的 `Nodes` 数组。
+> 细节与两侧实测见 [config.md](config.md) 的「护甲无上限 + 进化池合并实测」。
+
 ### 任务 F：用户三项修正（护甲只给精英 / 行为型改称技能 / 命中特效落在命中点）✅ 已完成（2026-10）
 
 > **用户原话**：②「**护甲目前就只给精英怪使用就好了，首领不需要**」、

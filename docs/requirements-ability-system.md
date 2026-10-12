@@ -340,7 +340,24 @@
 
 # 用户第三轮澄清（2026-10-12）
 
-## C1. 护甲：**没有上限额度** → 删掉 `MaxArmor`，判据改成 `Armor > 0`
+## C1. 护甲：**没有上限额度** → 删掉 `MaxArmor`，判据改成 `Armor > 0` ✅ **已完成（2026-10-12）**
+
+> ✅ **落地结果（本轮）**：
+> - `Unit.MaxArmor` / `UnitConfig.MaxArmor` → **`StartingArmor`（开局护甲）**（改名，值一个没动：
+>   玩家 40/140/60、守卫 60、冲锋兵 30、技能精英 90、木桩 60、首领 0）；`MaxArmorMultiplier` / `MaxArmorAdd`
+>   两个 StatSheet 键与 `RefreshStats` 里"抬高上限并补甲"那一段**整对删除**。
+> - **显示判据改成 `Armor > 0`**（实际是 **3 处**：`PlayerHud.UpdateArmorBar` / `WorldOverlay.UpdateBar` /
+>   `WorldOverlay.CreateBar`）→ **甲打光后连空壳都不显示**（回答上一批的待定项）。
+>   ⚠️ 甲条的**比例**需要一个分母，所以新增了 `Unit.ArmorPeak`（**运行期派生**、不来自任何配置、不参与结算）
+>   —— 除"空壳不再显示"之外，画面与改动前逐位一致；见 [config.md](config.md) 的「护甲无上限实测」§一。
+> - `ArmorDamageReduction`（减伤）按用户要求**保持原样**（`Armor > 0f ? ArmorDamageReduction : 0f` 一行没动）。
+> - `ArmorBroke`（碎甲）**触发条件与消费方一行没动**（仍是"甲从 >0 掉到 0 那一次"）。
+> - `EliteModifier.ArmorAdd = 120` 保留，改成**直接加甲**（`Unit.GrantArmor`）——"纯粹的加甲"。
+>   ⚠️ 顺带的必然变化：本来 0 甲的敌种精英化后**真的多出 120 甲**（改动前只是把上限抬到 120、甲仍是 0）。
+> - `BarBoss.tscn` / 首领一行没动（0 甲 → `Armor > 0` 判据下依然"天然不显示"）。
+> - 改了 **14 个行文件 + 4 个场景**；`Balance.tres` 里本来就没有护甲字段，**没碰它**（行文件是原地改列名，不是删/改名）。
+> - 证据：构建 0 warning / 0 error；自测硬指标逐位一致（`配置表比对·玩家：… 护甲 40（期望 40）`、`节点布置 10（2/5/3）`、
+>   `Pressure=3`、`端到端 F`、`音效 13`、`增幅项 19 条 / 池子 18 条`），日志无 `Balance.tres` 加载失败。
 
 用户原话：
 > 「**有甲了才会显示**，**护甲没有上限额度**，所以**可以删除掉 `MaxArmor`** 的」
@@ -352,7 +369,28 @@
 - ⚠️ **`ArmorDamageReduction`（减伤）要不要跟着动？** 它现在按 `Armor > 0 ? ArmorDamageReduction : 0` 取值；删了 `MaxArmor` 不影响这条，但**要确认减伤是否也该改**（用户没说，**先只删上限**）
 - ⚠️ 精英怪的 `EliteModifier.ArmorAdd = 120` —— 这也是"加甲"，**在没有上限之后依然是合法的加甲途径**（但名字里的 `Add` 语义现在更准确了）
 
-## C2. 节点池的规则（⚠️ 我之前理解错了）
+## C2. 节点池的规则（⚠️ 我之前理解错了）✅ **已完成（2026-10-12）**
+
+> ✅ **落地结果（本轮）**：
+> - **先读代码确认了现状**：候选集**不是**每次交互重算，但**是"第一次交互时"才建的**（四个惰性分支：
+>   `RunController.OfferRareRewards` / `OfferRewards` / `PoolPreview` / `OpenRewardForNode`），
+>   其中两个还忘了设 `SummonerAllowed`（先撞上特殊奖励节点 → 召唤角色整局抽不到「亡者随从」）。
+> - **改成进关卡初始化时定**：新增 `RunController.InitializePool()`，只在 `ApplyBalance()` 里调一次
+>   （`BeginRunWithCharacter` → `ApplyBalance` → `ApplyStage(0)`），四个交互点退化成 `EnsurePool()` 兜底；
+>   交互时仍然按当前构筑过滤（互斥 / 层数 / `ConflictsWith` / 节点 `Kind`）—— 那几条依赖"你现在已经有什么"。
+> - **重复节点行合并**：删 `node_weapon.tres`（`Kind = Weapon`，场景里一个实例都没有），保留 `node_evolution.tres`
+>   （`Kind = Evolution`，`Main.tscn` 的 `NodeEvolution` 就是它；且它带着 `BossPressurePoints = 150`，
+>   保留 `node_weapon` 会让进化节点丢掉 150 点 Pressure → `Pressure=3` 那条硬指标会漂）。
+>   两行的 `Title`/`RewardKind`/`Layer`/`WaveCount`/`ValueTags` **本来就逐列相同**，所以没有需要取舍的列；
+>   `Id` / 类 / 目录 / `RewardNodeKind` 枚举**一律没改名**（`UpgradePools/` 三个池也**保留不动**）。
+> - **索引同步**：`Balance.tres` 的 `Nodes` 数组与 `[ext_resource]` **同一次**删掉（否则整份加载失败）；
+>   `NodePlacement.LayerOf` 的代码兜底补 `Weapon => 2`（表里没有这一行之后，它是 `Kind = Weapon` 唯一的价值层来源，
+>   不补 `Weapon=4` 会掉到 1，与 A3 自相矛盾）。
+> - **硬指标**：`节点布置 10（高 2 / 中 5 / 低 3）` **没变**（它数的是**场景实例**，不是表行）；
+>   唯一变的是 `配置表比对·索引` 的 **`节点 9 → 8`**（少一个行文件，必然结果，已同步期望值）；
+>   功能侧的 `Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution / node_mutation` 逐字不变。
+> - 证据：构建 0/0；自测全程跑完（`池子 18 条`、`召唤控制池 19 条`、`端到端 F`、`Pressure=3`、`音效 13`）。
+> - 详见 [config.md](config.md) 的「护甲无上限 + 进化池合并实测」§二 与 [rewards.md](rewards.md) 的「抽取流程」。
 
 用户原话：
 > 「节点的规则**一开始就说明清楚的**，**进化池里会出什么选项是根据交互的角色持有的攻击方式（武器）**，并没有"**放哪个进化池节点**"的说法，像其他的**强化池、异化池则基本是多数通用，部分限定**，**限定的部分也是由交互时的角色和武器决定**，而**池里一开始有什么，应该在进入关卡初始化的时候就判断好的**。」

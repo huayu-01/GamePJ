@@ -62,7 +62,7 @@ public static class BossPerkProbe
 		var snapshot = new List<string>
 		{
 			$"生命 {unit.MaxHealth:0.#}",
-			$"护甲 {unit.MaxArmor:0.#}",
+			$"护甲 {unit.Armor:0.#}",
 			$"伤害×{unit.Stats.Get("DamageMultiplier"):0.###}",
 			$"攻速×{unit.Stats.Get("AttackSpeedMultiplier"):0.###}",
 			$"移速×{unit.Stats.Get("MoveSpeedMultiplier"):0.###}",
@@ -252,6 +252,6 @@ public static class BossPerkProbe
 	}
 
 	private static string Vitals(Unit boss)
-		=> $"Boss 生命 {boss.MaxHealth:0.#} 护甲 {boss.MaxArmor:0.#} 伤害×{boss.Stats.Get("DamageMultiplier"):0.###} 攻速×{boss.Stats.Get("AttackSpeedMultiplier"):0.###} 移速×{boss.Stats.Get("MoveSpeedMultiplier"):0.###}";
+		=> $"Boss 生命 {boss.MaxHealth:0.#} 护甲 {boss.Armor:0.#} 伤害×{boss.Stats.Get("DamageMultiplier"):0.###} 攻速×{boss.Stats.Get("AttackSpeedMultiplier"):0.###} 移速×{boss.Stats.Get("MoveSpeedMultiplier"):0.###}";
 }
 #endif

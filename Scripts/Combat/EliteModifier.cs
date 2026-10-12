@@ -9,6 +9,12 @@ namespace ActRoguelike.Combat;
 public partial class EliteModifier : Node
 {
 	[Export] public float HealthMultiplier { get; set; } = 2.5f;
+
+	/// <summary>
+	/// 给精英**直接加多少护甲**（用户 C1：护甲没有上限，所以这是纯粹的"加甲"，
+	/// 不再是"抬高护甲上限" —— 原先这里是 <c>MaxArmorAdd</c> 修正器）。
+	/// 走 <see cref="Unit.GrantArmor"/>，进树前后调用都能正确结算。
+	/// </summary>
 	[Export] public float ArmorAdd { get; set; } = 120f;
 	[Export] public float DamageMultiplier { get; set; } = 1.4f;
 	[Export] public float MoveSpeedMultiplier { get; set; } = 0.9f;
@@ -32,7 +38,9 @@ public partial class EliteModifier : Node
 
 		_applied = true;
 		unit.Stats.AddModifier(new StatModifier { Stat = "MaxHealthMultiplier", Operation = ModifierOperation.Multiply, Value = HealthMultiplier, Source = this });
-		unit.Stats.AddModifier(new StatModifier { Stat = "MaxArmorAdd", Operation = ModifierOperation.Add, Value = ArmorAdd, Source = this });
+
+		// 护甲没有上限（用户 C1）：直接加甲，不再经 StatSheet 的 MaxArmorAdd 抬高"上限"。
+		unit.GrantArmor(ArmorAdd);
 		unit.Stats.AddModifier(new StatModifier { Stat = "DamageMultiplier", Operation = ModifierOperation.Multiply, Value = DamageMultiplier, Source = this });
 		unit.Stats.AddModifier(new StatModifier { Stat = "MoveSpeedMultiplier", Operation = ModifierOperation.Multiply, Value = MoveSpeedMultiplier, Source = this });
 		unit.KnockbackResistance = Mathf.Max(unit.KnockbackResistance, KnockbackResistance);

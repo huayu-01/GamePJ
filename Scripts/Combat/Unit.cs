@@ -14,7 +14,16 @@ public partial class Unit : CharacterBody3D
 	[Export] public Faction Faction { get; set; } = Faction.Enemy;
 
 	[Export] public float MaxHealth { get; set; } = 100f;
-	[Export] public float MaxArmor { get; set; }
+
+	/// <summary>
+	/// **开局护甲**（护甲**没有上限** —— 用户 2026-10-12 拍板 C1：「护甲没有上限额度，所以可以删除掉 MaxArmor 的」）。
+	///
+	/// 这个值只是"进场时给多少甲"：<see cref="_Ready"/> 与 <see cref="FillVitals"/> 把它写进 <see cref="Armor"/>，
+	/// 之后护甲就是一个**累加值**（被打就减、<see cref="GrantArmor"/> 可以加），**不存在"最大护甲"**，
+	/// 所以它也**不是**护甲条的分母（分母是运行期派生的 <see cref="ArmorPeak"/>）。
+	/// </summary>
+	[Export] public float StartingArmor { get; set; }
+
 	[Export] public float MaxShield { get; set; }
 
 	/// <summary>护甲大于 0 时提供的伤害减免。</summary>
@@ -42,14 +51,34 @@ public partial class Unit : CharacterBody3D
 	private BlockComponent? _block;
 
 	private float _baseMaxHealth;
-	private float _baseMaxArmor;
+	private float _startingArmor;
+
+	/// <summary>
+	/// 由 <see cref="GrantArmor"/> 累积的**额外护甲**（精英怪的 <c>EliteModifier.ArmorAdd</c> 走这里）。
+	/// 护甲没有上限，所以它不是"上限"、也不进 <c>StatSheet</c>；记一份是为了让
+	/// "进树前就加了甲"（子节点 <c>_Ready</c> 早于单位本身）与"进树后加甲"结果一致。
+	/// </summary>
+	private float _armorBonus;
+
 	private float _baseMaxShield;
 
 	/// <summary>可选的移动能力组件（名为 Movement 的子节点）。没有移动能力的单位该属性为 null。</summary>
 	public CharacterMovement? Movement { get; private set; }
 
 	public float Health { get; private set; }
+
+	/// <summary>当前护甲。**没有上限**（用户 C1）：被打就减，只在 <see cref="GrantArmor"/> 时增加。</summary>
 	public float Armor { get; private set; }
+
+	/// <summary>
+	/// 这个单位**见过的最高护甲值**（运行期派生，只增不减）。
+	///
+	/// 存在的唯一理由是**表现层需要一个分母**：护甲既然没有上限，<c>Armor</c> 自己没法算出"还剩几成"，
+	/// 而护甲条（用户需求 §五 #8 / A6 的那层"塑料"）要显示进度。它**不来自任何配置、不能外部设置、
+	/// 不参与战斗结算** —— 严格地说它是"开局护甲 + 加甲"的副产物，不是"最大护甲"这个概念。
+	/// </summary>
+	public float ArmorPeak { get; private set; }
+
 	public float Shield { get; private set; }
 	public bool IsDead { get; private set; }
 	public bool IsInvulnerable { get; set; }
@@ -75,7 +104,7 @@ public partial class Unit : CharacterBody3D
 	public override void _EnterTree()
 	{
 		_baseMaxHealth = MaxHealth;
-		_baseMaxArmor = MaxArmor;
+		_startingArmor = StartingArmor;
 		_baseMaxShield = MaxShield;
 	}
 
@@ -100,17 +129,17 @@ public partial class Unit : CharacterBody3D
 		AddToGroup(HasTag("Summon") ? "summon_units" : Faction == Faction.Player ? "player_units" : "enemy_units");
 		RefreshStats();
 		Health = MaxHealth;
-		Armor = MaxArmor;
+		FillArmor();
 		Shield = MaxShield;
 	}
 
 	/// <summary>把基础值替换为配置值并回满（开局套用平衡配置）。</summary>
-	public void ApplyBaseStats(float maxHealth, float maxArmor, float maxShield, float moveSpeed)
+	public void ApplyBaseStats(float maxHealth, float armor, float maxShield, float moveSpeed)
 	{
 		_baseMaxHealth = maxHealth;
 		MaxHealth = maxHealth;
-		_baseMaxArmor = maxArmor;
-		MaxArmor = maxArmor;
+		_startingArmor = armor;
+		StartingArmor = armor;
 		_baseMaxShield = maxShield;
 		MaxShield = maxShield;
 		MoveSpeed = moveSpeed;
@@ -122,8 +151,36 @@ public partial class Unit : CharacterBody3D
 	public void FillVitals()
 	{
 		Health = MaxHealth;
-		Armor = MaxArmor;
+		FillArmor();
 		Shield = MaxShield;
+	}
+
+	/// <summary>
+	/// 护甲归位到"开局护甲 + 累计加甲"（进树 / 回满时调用；护甲没有上限，所以只写一个值、不夹上限）。
+	/// </summary>
+	private void FillArmor()
+	{
+		Armor = Mathf.Max(0f, _startingArmor + _armorBonus);
+		ArmorPeak = Mathf.Max(ArmorPeak, Armor);
+	}
+
+	/// <summary>
+	/// **直接加护甲**（护甲没有上限，用户 C1）：精英怪的 <c>EliteModifier.ArmorAdd</c> 走这里，
+	/// 取代原来的 <c>MaxArmorAdd</c> 修正器 —— 那个修正是"抬高上限"，现在没有上限这回事了。
+	///
+	/// 允许在**进树前**调用（精英组件挂在单位下，子节点的 <c>_Ready</c> 早于单位本身的 <c>_Ready</c>）：
+	/// 那时先记进 <see cref="_armorBonus"/>，等 <see cref="FillArmor"/> 一并结算。
+	/// </summary>
+	public void GrantArmor(float amount)
+	{
+		if (amount <= 0f)
+		{
+			return;
+		}
+
+		_armorBonus += amount;
+		Armor = Mathf.Max(0f, Armor + amount);
+		ArmorPeak = Mathf.Max(ArmorPeak, Armor);
 	}
 
 	private void SeedStats()
@@ -144,8 +201,8 @@ public partial class Unit : CharacterBody3D
 		Stats.SetBase("CritMultiplierAdd", 0f);
 		Stats.SetBase("MaxHealthMultiplier", 1f);
 		Stats.SetBase("MaxHealthAdd", 0f);
-		Stats.SetBase("MaxArmorMultiplier", 1f);
-		Stats.SetBase("MaxArmorAdd", 0f);
+		// ⚠️ 没有 MaxArmorMultiplier / MaxArmorAdd：护甲没有上限（用户 C1），
+		// 加甲走 Unit.GrantArmor 这一条路径，不再经 StatSheet 抬高"上限"。
 		Stats.SetBase("MaxShieldMultiplier", 1f);
 		Stats.SetBase("MaxShieldAdd", 0f);
 		Stats.SetBase("DamageReductionAdd", 0f);
@@ -156,14 +213,10 @@ public partial class Unit : CharacterBody3D
 	public void RefreshStats()
 	{
 		MaxHealth = Mathf.Max(1f, (_baseMaxHealth * Stats.Get("MaxHealthMultiplier")) + Stats.Get("MaxHealthAdd"));
-		float armorMax = Mathf.Max(0f, (_baseMaxArmor * Stats.Get("MaxArmorMultiplier")) + Stats.Get("MaxArmorAdd"));
-		if (armorMax > MaxArmor && Armor > 0f)
-		{
-			Armor += armorMax - MaxArmor;
-		}
 
-		MaxArmor = armorMax;
-		Armor = Mathf.Min(Armor, MaxArmor);
+		// 护甲**不在这里重算**（用户 C1：它是累加值、没有上限）—— 被打掉的甲不会被 RefreshStats 补回来，
+		// 加甲只走 GrantArmor。这里只保证不出现负甲。
+		Armor = Mathf.Max(0f, Armor);
 
 		float shieldMax = Mathf.Max(0f, (_baseMaxShield * Stats.Get("MaxShieldMultiplier")) + Stats.Get("MaxShieldAdd"));
 		if (shieldMax > MaxShield && Shield > 0f)

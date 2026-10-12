@@ -250,9 +250,18 @@ Stage 1 · 外围   剩余节点 5   隔离次数 2   用时 2s   敌人 0
 > **目录与类名刻意没动**（`Config/Tables/UpgradePools/` 与 `UpgradePoolConfig` 是第三批刚落地的"池"的通用名，
 > 而且那里只有身份、没有价值标签 —— 价值标签是**节点行**这一侧的列）。
 >
+> ✅ **同一轮（2026-10-12 第三轮 C2）那一行已整行合并进 `node_evolution`**：用户明确「**并没有"放哪个进化池节点"的说法**」，
+> 所以两个进化池节点行（`node_weapon` / `node_evolution`，`Title`/`RewardKind`/`Layer`/`WaveCount`/`ValueTags` 逐列相同）
+> 只留一行 `node_evolution`（场景里的实例就是 `Kind = Evolution`；`node_weapon` 的 `BossPressurePoints` 是 0，
+> 保留它会让进化节点丢掉 150 点 Pressure）。**节点表 9 行 → 8 行**，`配置表比对·索引` 的 `节点 9 → 8`；
+> `NodePlacement.LayerOf` 的兜底补了 `Weapon => 2`，所以 `节点 [Weapon=4 …]` 与下面的实测数字**一个都没变**。
+> 「按攻击方式分的三个限定池」= `Config/Tables/UpgradePools/pool_*.tres`（**保留不动**）。
+> 详见 [config.md](config.md) 的「护甲无上限 + 进化池合并实测」§二。
+>
 > ⚠️ **「节点布置 10（高 2 / 中 5 / 低 3）」这条硬指标没有漂**，因为 `Main.tscn` 里**没有 `Kind = Weapon` 的节点实例**
-> （场景里那 10 个是 4 强化 + 进化 + 异化 + 商店 + 材料 + 恢复 + 特殊），所以改它的 `Layer` 不会改变任何一层的实际数量。
-> 变的是这两处：`价值标签表 → 节点 [Weapon=3]` 变成 **`Weapon=4`**，以及自测的高/中/低改成**按价值层**
+> （场景里那 10 个是 4 强化 + 进化 + 异化 + 商店 + 材料 + 恢复 + 特殊），所以改它的 `Layer`、乃至删掉那一行，
+> 都不会改变任何一层的实际数量（**这条指标数的是场景实例，不是表行**）。
+> A3 那一轮变的是这两处：`价值标签表 → 节点 [Weapon=3]` 变成 **`Weapon=4`**，以及自测的高/中/低改成**按价值层**
 > （`NodePlacement.LayerOf`）数而不是按 `RewardNodeKind` 枚举数 —— 规则与标签自此一致（以后把哪种奖励挂到
 > 高价值标签上，它就数进"高"）。
 

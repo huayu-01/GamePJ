@@ -124,10 +124,9 @@ internal sealed class HealthBarWidget
 	/// <para>预制体里那两个节点就是那层塑料：<c>ArmorBg</c> = 罩住整条血条、比血条大 2px 的半透明壳
 	/// （带一圈高亮边框），<c>ArmorFill</c> = 壳里那层磨砂的"甲"（比例 = 剩余甲，从右往左退）。</para>
 	///
-	/// <para><b>可见性</b>：<paramref name="visible"/> 由调用方按 <c>MaxArmor &gt; 0</c> 决定 ——
-	/// **无甲的单位（首领 / 白板怪 / 0 甲角色）任何护甲视觉都不显示**；
-	/// 有甲上限但甲被打光时仍然显示（只剩那层空壳）—— 玩家要能看出"甲被打光了"，
-	/// 而不是"护甲条忽然消失"。</para>
+	/// <para><b>可见性</b>：<paramref name="visible"/> 由调用方按 <c>Armor &gt; 0</c> 决定（用户 C1）——
+	/// **没甲的单位（首领 / 白板怪 / 0 甲角色）任何护甲视觉都不显示**，
+	/// **甲被打光的单位也不显示**（不留空壳）；比例的分母是运行期派生的 <see cref="Unit.ArmorPeak"/>。</para>
 	/// </summary>
 	public void SetArmor(float ratio, bool visible)
 	{
@@ -329,7 +328,7 @@ public partial class WorldOverlay : CanvasLayer
 		// 血条登记：**护甲被扣也要建条**（用户需求 §五 #8 要能看出"护甲进度"）——
 		// `GameplayEventBus` 的 Damaged 事件里只有 HealthLost，甲被吸收时那条事件是 0，
 		// 所以"只掉甲、没掉血"的单位必须在**这里**（读得到 DamageResult）才登记得上。
-		if (IsBarCandidate(unit) && (unit.Health < unit.MaxHealth || unit.Armor < unit.MaxArmor || unit.Shield < unit.MaxShield))
+		if (IsBarCandidate(unit) && (unit.Health < unit.MaxHealth || unit.Armor < unit.ArmorPeak || unit.Shield < unit.MaxShield))
 		{
 			RegisterBar(unit);
 		}
@@ -442,9 +441,9 @@ public partial class WorldOverlay : CanvasLayer
 		// 满血不显示（保留原设计）：受伤后显示，回满后隐藏。
 		// ⚠️ 有甲的单位多一条判据（用户需求 §五 #8）：**血满了但甲被打掉**时也要留着血条 ——
 		// 否则"甲被打光"这件事在画面上完全看不到（甲吸收伤害时血量一点没掉）。
-		// 没有甲的单位（MaxArmor <= 0）行为与改动前逐位一致：只看血量。
+		// 没有甲的单位（ArmorPeak = 0）行为与改动前逐位一致：只看血量。
 		float ratio = unit.MaxHealth > 0f ? Mathf.Clamp(unit.Health / unit.MaxHealth, 0f, 1f) : 0f;
-		bool fullArmor = unit.MaxArmor <= 0f || unit.Armor >= unit.MaxArmor;
+		bool fullArmor = unit.ArmorPeak <= 0f || unit.Armor >= unit.ArmorPeak;
 		bool hidden = ratio >= 1f && fullArmor;
 
 		// 血条放在脚下（用户需求）：沿 -Up 偏移。
@@ -461,10 +460,10 @@ public partial class WorldOverlay : CanvasLayer
 		bar.Ratio = ratio;
 		bar.Widget.SetRatio(ratio, HealthColor(ratio), hit);
 
-		// 护甲进度（用户需求 §五 #8）：有甲上限的单位显示甲条，甲被打光也留着空条。
+		// 护甲进度（用户需求 §五 #8 + C1）：判据是 **Armor > 0**（有甲才显示），甲打光就整个隐藏（不留空壳）。
 		bar.Widget.SetArmor(
-			unit.MaxArmor > 0f ? Mathf.Clamp(unit.Armor / unit.MaxArmor, 0f, 1f) : 0f,
-			unit.MaxArmor > 0f);
+			unit.Armor > 0f ? Mathf.Clamp(unit.Armor / Mathf.Max(1f, unit.ArmorPeak), 0f, 1f) : 0f,
+			unit.Armor > 0f);
 
 		// 表现更新：残影条跟随（独立方法，以后换成动画只改这里）。
 		bar.Widget.AdvanceDelay(ratio, DelayFollowSpeed, delta);
@@ -586,10 +585,10 @@ public partial class WorldOverlay : CanvasLayer
 		widget.SetRatio(Mathf.Clamp(ratio, 0f, 1f), HealthColor(ratio), false);
 
 		// 护甲遮罩：建出来的这一帧就要有正确比例，否则会先闪一下满甲；
-		// 无甲上限的单位（MaxArmor = 0）连壳都不给（`visible: false`）—— 首领血条因此天然没有护甲视觉。
+		// 没甲的单位（Armor = 0）连壳都不给（`visible: false`）—— 首领血条因此天然没有护甲视觉。
 		widget.SetArmor(
-			unit.MaxArmor > 0f ? Mathf.Clamp(unit.Armor / unit.MaxArmor, 0f, 1f) : 0f,
-			unit.MaxArmor > 0f);
+			unit.Armor > 0f ? Mathf.Clamp(unit.Armor / Mathf.Max(1f, unit.ArmorPeak), 0f, 1f) : 0f,
+			unit.Armor > 0f);
 
 		_barLayer.AddChild(root);
 		return new EventBar { Root = root, Widget = widget, Ratio = ratio };

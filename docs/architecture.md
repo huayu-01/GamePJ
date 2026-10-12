@@ -29,7 +29,7 @@
 
 1. **子节点 `_Ready` 早于父节点**：组件不能在 `_Ready` 里读父节点在 `_Ready` 中才赋的值。
    - `Unit.Movement` → Ability/Behavior 用惰性属性读取。
-   - `Unit` 的基础值（MaxHealth/MaxArmor/MaxShield）必须在 `_EnterTree` 捕获，否则被精英组件的 `RefreshStats` 提前改写。
+   - `Unit` 的基础值（MaxHealth/StartingArmor/MaxShield）必须在 `_EnterTree` 捕获，否则被精英组件的 `RefreshStats` 提前改写。
 2. **兄弟节点的 `_Ready` 顺序按子节点顺序**：`RunController` 早于 `Stage`，所以不能在 `_Ready` 里按小组找 `Stage` —— 首次查找失败后必须在首帧惰性绑定。
 3. **Godot 只沿“直接父节点”解析 3D 变换**：把 `Area3D`(命中体) / `Node3D`(武器) 挂在普通 `Node` 下，它们会掉到世界原点。
    - 因此 `Ability` 必须是 `Node3D`（命中体、武器、Muzzle 都是它的子节点）。

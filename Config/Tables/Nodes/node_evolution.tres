@@ -14,3 +14,4 @@ Id = "node_evolution"
 Slot = 3
 DisplayName = "进化池"
 BossPressurePoints = 150.0
+Note = "**进化池**（用户 2026-10-12 C2：「进化池里会出什么选项是根据交互的角色持有的攻击方式（武器）」，而且「没有"放哪个进化池节点"的说法」）—— 所以这一行是**唯一的**进化池节点行：原 `node_weapon` 那一行（Kind = Weapon / Slot 1 / 同一份 Title+Layer+ValueTags+RewardKind）已整行合并到这里并删除，`Id`/`Kind`/`Slot` 没有改名（C2 明确要求不动类与目录）。它发的奖励是 `RewardKind = Evolution`（改攻击方式），**按攻击方式分的那三个限定池**在 Config/Tables/UpgradePools/pool_pistol|sniper|rifle.tres（武器行的 Pool 正向指过去），选项行的 Pool / RequiredWeaponTags 决定谁能抽到。Layer 2 / tag_high / 4 波 = 高价值（A3：攻击方式的改动巨大）。"

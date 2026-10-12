@@ -85,7 +85,7 @@ public partial class RunController : Node
 		// 角色数值来自角色表（`Config/Tables/Characters/chr_*.tres`）；读不到行就用玩家场景里的原始数值。
 		CharacterConfig? character = CharacterRow(_character);
 		float maxHealth = character?.MaxHealth ?? _player!.MaxHealth;
-		float armor = character?.MaxArmor ?? _player!.MaxArmor;
+		float armor = character?.StartingArmor ?? _player!.StartingArmor;
 		float moveSpeed = character?.MoveSpeed ?? _player!.MoveSpeed;
 		float reduction = character?.DamageReduction ?? _player!.DamageReduction;
 
@@ -123,6 +123,12 @@ public partial class RunController : Node
 		// 位置刻意放在**角色表的能力开关矩阵与技能行之后** —— 一张"授予技能"的卡要赢过角色的
 		// DisabledAbilityIds（卡 = 玩家花局外资源买的额外能力）。规则与存盘在 AbilityStore，见 docs/ability-cards.md。
 		AbilityEffects.ApplyToPlayer(_player, this);
+
+		// 奖励候选池：**进关卡初始化时**就按"当前角色 + 当前武器"把池内容定下来（用户 2026-10-12 C2：
+		// 「进化池里会出什么选项是根据交互的角色持有的攻击方式（武器）……池里一开始有什么，
+		// 应该在进入关卡初始化的时候就判断好的」）。放在这里而不是第一次交互时 ——
+		// ApplyBalance 正是"角色/武器都定了、进关卡"的那一刻（BeginRunWithCharacter → ApplyStage(0)）。
+		InitializePool();
 
 		if (_stage == null)
 		{
@@ -467,7 +473,7 @@ public partial class RunController : Node
 		{
 			string detail = ConfigText.Format(
 				string.IsNullOrEmpty(row.DescriptionTemplate)
-					? "（{MaxHealth:0} 生命 / {MaxArmor:0} 护甲 / 减伤 {DamageReduction}）"
+					? "（{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 减伤 {DamageReduction}）"
 					: row.DescriptionTemplate,
 				row,
 				row.Params);
@@ -538,6 +544,46 @@ public partial class RunController : Node
 		ApplyStage(0);
 	}
 
+	/// <summary>
+	/// **按当前角色与武器把奖励候选池定下来**（池里有什么 = 交互的角色 × 攻击方式，用户 C2）。
+	///
+	/// 调用点只有一处：<see cref="ApplyBalance"/>（= 进关卡初始化）。在此之前池是"每次交互时惰性建"的
+	/// 四个分支，其中两个只调了 <see cref="RewardPool.Initialize"/>、忘了 <c>SummonerAllowed</c> ——
+	/// 谁先被交互（例如先撞上特殊奖励节点）就会让召唤控制角色整局拿不到"亡者随从"。
+	/// 现在初始化只有这一条路，角色/武器限定层一起定，交互时只从定好的池里抽。
+	/// </summary>
+	private void InitializePool()
+	{
+		if (_weapon == null)
+		{
+			return;
+		}
+
+		// ① 武器限定层：专属池（ApplicablePoolIds）→ 武器标签（RequiredWeaponTags）→ 通用。
+		_pool.Initialize(_weapon);
+		// ② 角色限定层：只有召唤控制角色才有召唤类奖励（RequiresSummoner）。
+		_pool.SummonerAllowed = _character == PlayerCharacterKind.Summoner;
+		_poolReady = true;
+
+		// 留痕（用户 C2 问的就是"池是什么时候定的"）：这一行只在进关卡初始化时出现，
+		// 之后每次交互只从这份池里抽（抽取时仍然要按当前构筑过滤互斥/层数/节点类型）。
+		// ⚠️ 条数是**武器层过滤后**的候选数；角色限定项（RequiresSummoner）在抽取时按 SummonerAllowed 再筛，
+		// 所以枪手这里会是 19 条、实际抽得到 18 条（`docs/rewards.md` 的硬指标）。
+		string poolId = string.IsNullOrEmpty(_weapon.PoolId) ? "留空（走标签匹配 → 通用）" : _weapon.PoolId;
+		ActRoguelike.Core.GameLog.Write(
+			"Reward",
+			$"奖励池按当前角色/武器定下来了（进关卡初始化）：角色 {_character} · 武器 {_weaponKind}（PoolId {poolId}）→ 候选 {_pool.CandidateCount} 条（武器层之后；角色限定项在抽取时再筛 SummonerAllowed={_pool.SummonerAllowed}）");
+	}
+
+	/// <summary>兜底：池子还没定就先定一次（正常路径一定在进关卡时已经定过）。</summary>
+	private void EnsurePool()
+	{
+		if (!_poolReady)
+		{
+			InitializePool();
+		}
+	}
+
 	/// <summary>稀有池三选一（特殊奖励节点）：只出进化与异化。</summary>
 	private bool OfferRareRewards(Action onChosen)
 	{
@@ -546,11 +592,7 @@ public partial class RunController : Node
 			return false;
 		}
 
-		if (!_poolReady)
-		{
-			_pool.Initialize(_weapon);
-			_poolReady = true;
-		}
+		EnsurePool();
 
 		_current.Clear();
 		_current.AddRange(_pool.Roll(_build, Balance.Settings.RewardChoiceCount, null, new[] { RewardKind.Evolution, RewardKind.Mutation }));
@@ -572,12 +614,7 @@ public partial class RunController : Node
 			return false;
 		}
 
-		if (!_poolReady)
-		{
-			_pool.Initialize(_weapon);
-			_pool.SummonerAllowed = _character == PlayerCharacterKind.Summoner;
-			_poolReady = true;
-		}
+		EnsurePool();
 
 		_current.Clear();
 		_current.AddRange(_pool.Roll(_build, Balance.Settings.RewardChoiceCount));
@@ -615,13 +652,8 @@ public partial class RunController : Node
 				return string.Empty;
 			}
 
-			if (!_poolReady)
-			{
-				_pool.Initialize(_weapon);
-				_poolReady = true;
-			}
+			EnsurePool();
 
-			_pool.SummonerAllowed = _character == PlayerCharacterKind.Summoner;
 			List<RewardDefinition> list = _pool.Roll(_build, 40);
 			return string.Join(",", list.ConvertAll(reward => reward.Id));
 		}
@@ -690,11 +722,7 @@ public partial class RunController : Node
 			return true;
 		}
 
-		if (!_poolReady)
-		{
-			_pool.Initialize(_weapon);
-			_poolReady = true;
-		}
+		EnsurePool();
 
 		// 进化（没有「武器池」这个类型，见用户 A3）/ 局外资源 / 特殊奖励暂时没有独立系统，先走通用池。
 		RewardKind? filter = RewardService.FilterFor(kind);

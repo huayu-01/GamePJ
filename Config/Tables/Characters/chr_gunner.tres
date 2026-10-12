@@ -11,7 +11,7 @@
 script = ExtResource("1_row")
 DisabledAbilityIds = PackedStringArray("MeleeAttackAbility", "SummonAbility", "AreaAttackAbility")
 MaxHealth = 250.0
-MaxArmor = 40.0
+StartingArmor = 40.0
 MoveSpeed = 7.0
 AttackDamage = 32.0
 AttackInterval = 0.75
@@ -23,5 +23,5 @@ Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("4_skl"), ExtR
 Id = "chr_gunner"
 Slot = 1
 DisplayName = "远程枪手"
-DescriptionTemplate = "{MaxHealth:0} 生命 / {MaxArmor:0} 护甲"
+DescriptionTemplate = "{MaxHealth:0} 生命 / {StartingArmor:0} 护甲"
 Note = "角色 1：远程枪手。攻击组是左键近战重击的四个数（该角色默认关了近战，但换技能后仍可开）。"

@@ -18,31 +18,42 @@
 - **快照 vs 命中读取**：攻击侧属性在 `AttackInstance` 创建时快照（战斗规则说明 §4）。需要“命中时读取”的效果属于后续 Trigger/Effect。
 - **护甲/护盾顺序**：采用 战斗规则说明 §12 的当前推荐 `Damage → Armor → Shield → HP`（全局唯一，不在各单位里各写一套）。
 - **减伤叠加**：`1-(1-护甲减伤)(1-额外减伤)`，总量上限 90%。公式属待策划确认项，先固定在此处。
-- **护甲是所有单位的通用属性，但"有甲"要看数据**：`Unit` / `UnitConfig` 基类上人人都有 `MaxArmor`，
+- **护甲是所有单位的通用属性，但"有甲"要看数据**：`Unit` / `UnitConfig` 基类上人人都有 `StartingArmor`（**开局护甲**），
   实际谁有甲由单位表给（玩家 40/140/60、守卫 60、冲锋兵 30、技能精英 90、**首领 0**）。
+  ⚠️ **护甲没有上限**（用户 2026-10-12 第三轮 C1：「护甲没有上限额度，所以可以删除掉 `MaxArmor` 的」）——
+  它是**累加值**：`StartingArmor` 只是"进场给多少甲"，之后被打就减、只有 `Unit.GrantArmor()` 能加，
+  **不存在"最大护甲"**（`MaxArmor` / `MaxArmorMultiplier` / `MaxArmorAdd` / `UnitConfig.MaxArmor` 全部已删除）。
   ⚠️ **甲为 0 时管线会自动跳过两件事**：① `CombinedDamageReduction()` 里 `Armor > 0f ? ArmorDamageReduction : 0f`
   → 护甲减伤那一项取 0（所以场景里留着 `ArmorDamageReduction = 0.3` 也不会偷偷减伤）；② `Armor` 阶段整段跳过
-  （不吸收伤害、也不发 `ArmorBroke`）。**护甲现在唯一的"额外获取手段"是精英怪的 `EliteModifier`（`MaxArmorAdd +120`）**，
+  （不吸收伤害、也不发 `ArmorBroke`）。**护甲现在唯一的"额外获取手段"是精英怪的 `EliteModifier`（`ArmorAdd +120` → `GrantArmor`）**，
   首领没有任何获取途径（2026-10 用户要求「去掉首领的甲」；判据见 [config.md](config.md) 的「首领去甲 + 单位动画实测」）。
 - **死亡**：HP ≤ 0 立即 `IsDead = true` 并从碰撞层移除（逻辑死亡与视觉死亡分离）；死亡单位不再被射线/AOE/索敌选中。
 
-## 护甲的表现层（2026-10 第六轮，**管线一行没改**）
+## 护甲的表现层（2026-10 第六轮，**管线一行没改**；判据在 C1 改过一次）
 
 用户需求 §五 #8：「玩家和怪物**有护甲时血量上应该要有其他效果来显示护甲的进度和碎甲效果**，甚至是**模型的额外显示效果**」。
 
 | 要显示的东西 | 读的是哪个既有事实 | 谁在读 |
 |---|---|---|
-| **护甲进度**（血条上多一条甲条） | `Unit.Armor` / `Unit.MaxArmor`（`Unit` 上早就有；`MaxArmor > 0` 才显示，甲打光后留**空条**） | `WorldOverlay.UpdateBar`（敌人）/ `PlayerHud.UpdateArmorBar`（玩家） |
+| **护甲进度**（血条上多一条甲条） | `Unit.Armor` / `Unit.ArmorPeak`（`Armor > 0` 才显示；比例 = `Armor / ArmorPeak`，**甲打光后整条隐藏**） | `WorldOverlay.UpdateBar` / `WorldOverlay.CreateBar`（敌人）/ `PlayerHud.UpdateArmorBar`（玩家） |
 | **碎甲**（甲条闪白 + 模型上炸一圈） | **`Unit.ArmorBroke` C# 事件** —— 它只在**甲从 >0 掉到 0** 那一次触发（`Unit.ReceiveHit` 的 Armor 段），所以"甲被扣"与"甲碎了"天然分开 | `WorldOverlay.OnUnitArmorBroke` / `PlayerHud.OnPlayerArmorBroke` |
 | **跳字里的「甲 N」** | `DamageResult.ArmorLost`（`Unit.Damaged` 事件带出来的那次结算结果） | `WorldOverlay.OnUnitDamaged` |
 | **模型的额外效果** | 上面那个 `ArmorBroke` → `Scripts/UI/ArmorBreakFx.Spawn()`：水平扩散环 + 一层快速褪去的亮壳，0.42 秒自己回收 | 同两处 |
+
+> **C1 改了什么（2026-10-12 第三轮）**：显示判据从 `MaxArmor > 0` 改成 **`Armor > 0`**（用户：「有甲了才会显示」），
+> 所以**甲打光之后连空壳都不留**（`Armor == 0` 整个隐藏）；`ArmorBroke`（碎甲表现）**判据与触发点一行没动**。
+> 比例的分母换成运行期派生的 `Unit.ArmorPeak`（这个单位见过的最高甲，不来自任何配置、不参与结算）——
+> 护甲没有上限之后 `Armor` 自己算不出"还剩几成"，而甲条要显示进度。
+> ⚠️ **精英那一路的语义变了**（C1 的必然结果）：`EliteModifier.ArmorAdd` 以前是"抬高护甲上限"
+> （`MaxArmorAdd` 修正器），对**本来 0 甲的敌人**（追猎者/自爆兵/远程兵…）只会把上限抬到 120 而甲停在 0
+> （等于空壳、不吸收伤害）；现在它是**直接加甲**，所以那些精英怪真的多出 120 甲。有甲敌种（守卫 60→180、冲锋兵 30→150）与改动前一致。
 
 ⚠️ **甲为 0 的单位（首领 / 木桩）不会误播碎甲**：`Unit.ReceiveHit` 的 Armor 段整段跳过，`ArmorBroke` 根本不会触发
 （首领去甲的判据见上面的「护甲是所有单位的通用属性」那一条）。实测：`白板首领实例：生命 315 护甲 0`，战斗中没有任何碎甲特效。
 
 ⚠️ **"只掉甲、没掉血"的单位也会出血条**：`GameplayEventBus` 的 `Damaged` 事件里 `Value` 只有 `HealthLost`
 （甲被吸收时那条事件是 0），所以血条登记多了一条判据 —— 见 `WorldOverlay.OnUnitDamaged` 与 `UpdateBar` 里的注释；
-**没有甲的单位（`MaxArmor <= 0`）行为与改动前逐位一致**（只看血量），所以"满血不显示血条"这条老设计对无甲怪没有任何变化。
+**没有甲的单位（`ArmorPeak <= 0`）行为与改动前逐位一致**（只看血量），所以"满血不显示血条"这条老设计对无甲怪没有任何变化。
 
 证据（截图与逐条打印见 [ui.md](ui.md) §16.6）：`docs/screenshots/feel_01_armor_progress.png`（甲条 48/64 = 0.75）、
 `feel_02_armor_break.png`（碎甲环 + 「甲 45」「105」）、探针输出 `甲条 0px / 底 66px（比例 0） 甲条可见=True 血条 52.8px`、
@@ -89,7 +100,9 @@
 | Exploder（自爆） | Chase + AreaAttack(KillSelf) | 贴近后爆炸并自身死亡 |
 
 **精英**：`EliteModifier` 挂在普通敌人下即可（也能由 Encounter 按概率运行时添加），只加 Modifier + 体型/配色，不复制敌人脚本。
-实测：守卫 MaxHealth 130→325、MaxArmor 60→180、scale 1.35，并加入 `elite_units` 组。
+实测：守卫 MaxHealth 130→325、护甲 60→180（`ArmorAdd` 走 `Unit.GrantArmor`）、scale 1.35，并加入 `elite_units` 组。
+⚠️ C1 之后 `ArmorAdd` 是**纯粹的加甲**：本来 0 甲的敌种（追猎者/自爆兵/远程兵…）精英化后也会真的拿到 120 甲
+（改动前那条 `MaxArmorAdd` 只把它们的上限抬到 120、甲仍是 0，等于一层不吸收伤害的空壳）。
 
 **避障**：`Behavior.AvoidObstacles` 在 Chase / KeepDistance 前进前探路，被柱子/墙角挡住时改为侧移（每 1.2 秒翻转方向）。没有寻路系统，复杂地形仍可能绕远。
 

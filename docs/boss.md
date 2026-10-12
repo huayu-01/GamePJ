@@ -44,15 +44,18 @@ Boss 也有自己的「构筑」：生成时按 Stage 配置随机抽 N 个**开
 > 表行 + `Balance.tres` 的数组项/ext_resource + `BossPerkCatalog` 的**代码兜底**同一次改动一起下线
 > （只删表行不改兜底 = 表读不到时首领又会吃护甲，是静默换挡）。
 > **精英怪的护甲不受影响**：它来自 `Scripts/Combat/EliteModifier.cs`（`ArmorAdd = 120`），
-> 与 Pressure 无关；改动后全项目 `MaxArmorAdd` 的生产者只剩它一个。
+> 与 Pressure 无关；改动后全项目这一族的生产者只剩它一个（C1 之后走 `Unit.GrantArmor`，不再用 `MaxArmorAdd` 修正器）。
 > 权重分母 15 → 13，所以**每条的概率都变了**（20% → 23.1% 等）、抽取的随机序列也会漂。
 > 细节见 [config.md](config.md) 的「用户三项修正实测」§一。
 
 > **2026-10 再一轮（用户「去掉首领的甲」）**：**首领本体的 200 基甲也去掉了** ——
-> `Config/Tables/Bosses/boss_final.tres` 的 `MaxArmor` 现在是 **0**，`Scenes/Enemies/Boss.tscn` 那份同值导出一并归零
-> （行是权威、场景是回退，两处不同值就是静默换挡）。
-> **护甲字段一个都没删**（`Unit`/`UnitConfig` 基类上的 `MaxArmor` / `Armor` / `ArmorDamageReduction` 都在）——
+> `Config/Tables/Bosses/boss_final.tres` 的那一列现在是 **0**（C1 之后列名叫 `StartingArmor`），
+> `Scenes/Enemies/Boss.tscn` 那份同值导出一并归零（行是权威、场景是回退，两处不同值就是静默换挡）。
+> ⚠️ 当时"护甲字段一个都没删"（`Unit`/`UnitConfig` 基类上的 `MaxArmor` / `Armor` / `ArmorDamageReduction` 都在）——
 > 用户澄清「护甲是**所有单位**都能有的通用属性，只是首领**默认没有获取手段**」。
+> **2026-10-12 第三轮 C1 覆盖了后半句**：用户改口「护甲没有上限额度，所以可以删除掉 `MaxArmor`」→
+> 那一列改名为 **`StartingArmor`**、`MaxArmorMultiplier` / `MaxArmorAdd` 删除（`Armor` / `ArmorDamageReduction` /
+> `ArmorBroke` 保留）；首领的值仍是 0，`BarBoss.tscn` 依然没有护甲节点，所以画面上**一点变化都没有**。
 > 首领现在也没有别的加甲途径（`EliteModifier` 只挂在普通敌人上；`BossPressure` / `Balance.ScaleEnemy` / Pressure 池
 > 都不碰护甲 —— grep 结论见 [config.md](config.md) 的「首领去甲 + 单位动画实测」§一）。
 > 伤害管线因此走 `…→ Block → DR(护甲减伤自动取 0) → Armor 段跳过 → Shield 0 → HP`，

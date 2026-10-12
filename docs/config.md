@@ -57,7 +57,7 @@
 | 武器数值（伤害/射速/弹匣/装填/散布/**击退**/暴击/弹速/**升级池**） | `Config/Tables/Weapons/wpn_*.tres` | 一把武器 | 3 |
 | **升级池**（"某把武器的升级池"这个粒度；武器表正向指过来） | `Config/Tables/UpgradePools/pool_*.tres` | 一个池 | 3 |
 | 效果参数（燃烧 dps / 减速 / 眩晕 / 爆炸 / 吸血 / 召唤上限 / 连锁闪电） | `Config/Tables/Effects/eff_*.tres` | 一个效果 | 9 |
-| 奖励节点（标题 / 层 / 波数 / 商店价目 / **给多少 Pressure、额外抽几次、候选标签**） | `Config/Tables/Nodes/node_*.tres` | 一种节点 | 9 |
+| 奖励节点（标题 / 层 / 波数 / 商店价目 / **给多少 Pressure、额外抽几次、候选标签**） | `Config/Tables/Nodes/node_*.tres` | 一种节点 | **8**（C2 合并了两个进化池节点行，见「节点表」一节） |
 | 增幅项（19 条强化·进化·异化，含"属于哪个升级池"一列） | `Config/Tables/Upgrades/*.tres` | 一条增幅 | 19 |
 | 关卡（预算 / 波次 / 敌人白名单 / Boss 词条数 / Pressure 规则） | `Config/Tables/Stages/stg_*.tres` | 一关 | 3 |
 | 局外成长（碎片价格 / 每级效果） | `Config/Tables/Meta/meta_*.tres` | 一项 | **6**（5 项永久强化 + **1 项能力卡额度扩增** `meta_quota`） |
@@ -161,6 +161,11 @@
 
 ### 角色表 `Config/Tables/Characters/`（3 行）
 
+> ⚠️ **"护甲"这一列现在是 `StartingArmor`（开局护甲），不是"最大护甲"**（2026-10-12 用户第三轮 C1：
+> 「护甲没有上限额度，所以可以删除掉 `MaxArmor`」）。同名列在 `UnitConfig` / `Unit` 上已改名，
+> 数值一个都没动；4 个带甲的敌人场景（`Guard` / `Charger` / `SkillElite` / `TrainingDummy`）里的导出一并改名。
+> 详见文末「护甲无上限 + 进化池合并实测」§一。
+
 | 行 | 生命 | 护甲 | 移速 | 减伤 | 武器 | 能力开关 | **攻击组**（伤害/间隔/范围/击退） | **跳跃**（起跳速度 / 重力缩放，固定值） |
 |---|---|---|---|---|---|---|---|---|
 | `chr_gunner`（槽 1） | 250 | 40 | 7.0 | 0 | ✅ | 关 Melee/Summon/Control | 32 / 0.75 / 2.4 / 5 | **13.0 / 3.6** |
@@ -202,7 +207,7 @@
 
 | 表 | 行 | 关键内容 |
 |---|---|---|
-| `Config/Tables/Bosses/boss_final.tres` | 1 | 生命 900 / **护甲 0**（用户要求「去掉首领的甲」；护甲字段仍留在 `Unit` / `UnitConfig` 基类上，只是首领没有任何获取手段 —— 见文末「首领去甲 + 单位动画实测」）/ 移速 3.6 / 攻击 24·1.8·3.4·6 / 标签 Boss,Melee；**持有技能 4 行**（`skl_boss_melee` / `skl_boss_scream` / `skl_boss_charge` / `skl_boss_summon`）；`EliteCopyHealthScale = 0.35`（白板首领副本的血量倍率） |
+| `Config/Tables/Bosses/boss_final.tres` | 1 | 生命 900 / **护甲 0**（用户要求「去掉首领的甲」；护甲列仍留在 `Unit` / `UnitConfig` 基类上 —— C1 之后叫 `StartingArmor`，只是首领没有任何获取手段 —— 见文末「首领去甲 + 单位动画实测」）/ 移速 3.6 / 攻击 24·1.8·3.4·6 / 标签 Boss,Melee；**持有技能 4 行**（`skl_boss_melee` / `skl_boss_scream` / `skl_boss_charge` / `skl_boss_summon`）；`EliteCopyHealthScale = 0.35`（白板首领副本的血量倍率） |
 | `Config/Tables/Summons/summon_drone.tres` | 1 | 生命 40 / 移速 6.0 / 攻击 6·0.9·1.8·1.5 / 标签 Summon / `LifetimeSeconds = 25` |
 | `Config/Tables/Skills/skl_*.tres` | 21 | 技能：`NodeName`（目标能力节点）+ 通用项（Aim/Cooldown/Windup/Recover/Enabled/Approach*）+ `Params`（子类专属，Key = 属性名）+ `AttackParams`（命中体/武器组件） |
 | `Config/Tables/Skills/bhv_*.tres` | 4 | **首领行为技能**（Boss Build）：`ApplyHandler` 非空的技能行，由 `BossPerkCatalog` 编译成运行期条目。**界面上叫「技能」**（用户拍板：行为型的那些本来就是技能，不是"词条"） |
@@ -290,13 +295,12 @@
 > ③ **技能行**的 `AttackParams → Knockback`（技能自己的命中体，例如玩家控制立场 0 / 首领冲锋 10）。
 > 全局倍率那个旋钮（原来在 `eff_knockback`）**尚未实现**，所以没有留在表里当摆设。
 
-### 节点表 `Config/Tables/Nodes/`（9 行）
+### 节点表 `Config/Tables/Nodes/`（**8** 行，2026-10-12 C2 合并后）
 
 | 行 | 节点类型 | 层 | 波数 | 价值标签（→ 波数由标签表给） | 奖励过滤 | 界面标题 |
 |---|---|---|---|---|---|---|
-| `node_weapon` | Weapon | **2** | **4** | **`tag_high`** | 进化 | **进化池**（旧称"武器池"，用户 A3 拍板：那个叫法就是进化池） |
 | `node_enhance` | Enhancement | 1 | 3 | `tag_mid` | 强化 | 强化池 |
-| `node_evolution` | Evolution | 2 | 4 | `tag_high` | 进化 | 进化池 |
+| `node_evolution` | Evolution | 2 | 4 | `tag_high` | 进化 | **进化池**（唯一的一行；`Kind = Evolution`） |
 | `node_mutation` | Mutation | 2 | 4 | `tag_high` | 异化 | 异化池 |
 | `node_resource` | Resource | 0 | 1 | `tag_low` | 不过滤 | 局外资源 |
 | `node_heal` | Heal | 0 | 1 | `tag_low` | 不过滤 | 恢复状态 |
@@ -304,6 +308,18 @@
 | `node_shop` | Shop | 1 | 3 | `tag_mid` | 不过滤 | 补给站 |
 | `node_portal` | Portal | 0 | 1 | `tag_low` | 不过滤 | 降临节点（不触发战斗） |
 
+> ⚠️ **`node_weapon` 那一行已整行删除（2026-10-12 用户第三轮 C2）**：它和 `node_evolution` 的
+> `Title`/`DisplayName`/`RewardKind`/`Layer`/`WaveCount`/`ValueTags` **逐列相同**，唯一区别是
+> `Kind = Weapon`（Slot 1）—— 而用户明确说了「**并没有"放哪个进化池节点"的说法**」，即**不区分多个进化池节点**。
+> 所以两行合并成 `node_evolution` 一行：`Id` / `Kind` / `Slot` **都没有改名**（C2 要求不动类与目录），
+> 场景 `Main.tscn` 里本来就只有 `Kind = Evolution` 的实例、一个 `Kind = Weapon` 的实例都没有。
+> 「按攻击方式分的限定池」落在 `Config/Tables/UpgradePools/pool_pistol|sniper|rifle.tres` 三行上（**保留不动**）——
+> 那才是"进化池的选项由角色持有的攻击方式（武器）决定"这条链路的落点。
+> 排序/索引不受影响（`Balance.tres` 的 `Nodes` 数组删掉一项、`load_steps` 同步减一）。
+> ⚠️ **`Kind = Weapon` 的价值层兜底改成 2**（`NodePlacement.LayerOf`）：表里再没有 `Kind = Weapon` 的行之后，
+> 这个分支就是它唯一的价值层来源（不加会退化成 Layer 0 / 1 波，与 A3「武器限定池 = 进化池 = 高价值」自相矛盾）；
+> 自测里 `Weapon=4` 因此**逐位不变**。
+>
 > **波数这一列现在只是兜底**：真正生效的波数来自**价值标签表**（下一节），由
 > `NodePlacement.WavesFor` 按「标签行 → 本行 `WaveCount` → 按价值层的代码兜底」取值。
 > 表里两个数写成一致（4/4/3/3/1…）只是为了"关掉标签表也不会突变"。
@@ -320,7 +336,7 @@
 
 | 行 | 标签 | 波数 | 谁挂它 |
 |---|---|---|---|
-| `tag_high` | 高价值 | **4** | `node_evolution` / `node_mutation`（Layer 2）· **`node_weapon`（Layer 2，2026-10-12 用户 A3：武器限定池 = 进化池 = 高价值）** |
+| `tag_high` | 高价值 | **4** | `node_evolution` / `node_mutation`（Layer 2）· 代码兜底里 `Kind = Weapon` 也按高价值算（A3：武器限定池 = 进化池） |
 | `tag_mid` | 中价值 | **3** | `node_enhance` / `node_shop`（Layer 1） |
 | `tag_low` | 低价值 | **1** | `node_resource` / `node_heal` / `node_special` / `node_portal`（Layer 0） |
 
@@ -332,11 +348,25 @@
   `⚠ 节点行 X 的价值标签「Y」在 ValueTags 表里找不到。`
 - 开局日志会同时打出**标签定了几波**与**每个节点实际算出几波**：
   `价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]`
-  `节点波数（高 4 / 中 3 / 低 1）：node_weapon（tag_high）4 波 · node_evolution（tag_high）4 波 · …`
-  ⚠️ `node_weapon` 自 2026-10-12（用户拍板 A3）起挂 `tag_high`、`Layer = 2`、**4 波** —— 那个节点就是
-  **进化池**（用户：「没有定义武器池，只是一个说法，确切来说是进化池…进化池算高价值，因为攻击方式的改动巨大」）。
-  `Config/Tables/UpgradePools/` 那 3 行（`pool_pistol` / `pool_sniper` / `pool_rifle`）只有身份、**没有价值标签列**，
-  所以这次改动落在**节点行**这一侧（价值标签本来就是 `NodeConfig.ValueTags` 的列）。
+  `节点波数（高 4 / 中 3 / 低 1）：node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · …`
+  （2026-10-12 C2 之前这一串里还有 `node_weapon（tag_high）4 波`；那一行已合并进 `node_evolution`。）
+  ⚠️ `node_evolution` 自 2026-10-12（用户拍板 A3，C2 起它也是**唯一**的进化池行）挂 `tag_high`、`Layer = 2`、**4 波** ——
+  它就是**进化池**（用户：「没有定义武器池，只是一个说法，确切来说是进化池…进化池算高价值，因为攻击方式的改动巨大」）。
+  `Config/Tables/UpgradePools/` 那 3 行（`pool_pistol` / `pool_sniper` / `pool_rifle`）只有身份、**没有价值标签列**（C2 明令保留），
+  所以价值标签这件事落在**节点行**这一侧（价值标签本来就是 `NodeConfig.ValueTags` 的列）。
+
+### 奖励池的候选集是什么时候定的（2026-10-12 用户第三轮 C2）
+
+用户原话：「**进化池里会出什么选项是根据交互的角色持有的攻击方式（武器）**……而**池里一开始有什么，
+应该在进入关卡初始化的时候就判断好的**」。
+
+| 问题 | 答案 |
+|---|---|
+| 候选集是**什么时候**算的 | **进关卡初始化时**（`RunController.ApplyBalance` → `InitializePool()`，即 `BeginRunWithCharacter` 里"角色/武器都定了"的那一刻）；`InitializePool` 之前它是**四个交互点里的惰性分支**（谁先被交互谁建池） |
+| 交互时还算不算 | **只做"从定好的池里抽"**：按节点类型（`Kind` 过滤）+ 当前构筑（互斥 / 层数上限 / `ConflictsWith` / 角色限定）筛一遍再加权抽 —— 这几条**天然必须每次交互算**（它们依赖"你现在已经有什么"），但**候选项的来源集合**不再变 |
+| 池内容由什么决定 | ① **武器**：`RewardPool.Initialize(weapon)` 的三层（专属池 `Pool` → 武器标签 `RequiredWeaponTags` → 通用）；② **角色**：`SummonerAllowed`（`RequiresSummoner` 的召唤类奖励） |
+| 顺手修的 bug | 原来四个懒建分支里只有两个设了 `SummonerAllowed` —— 如果某局第一个被交互的是**特殊奖励**节点，召唤控制角色整局抽不到「亡者随从」。现在初始化只有一条路，两层一起定 |
+| 留痕 | 开局日志 `[Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Gunner · 武器 Pistol（PoolId pool_pistol）→ 候选 19 条（武器层之后；角色限定项在抽取时再筛 SummonerAllowed=False）`。⚠️ 这里 19 = **武器层过滤后**的候选数（含只在召唤角色才进抽取的「亡者随从」），枪手**实际可抽** 18 条（`docs/rewards.md` 的硬指标） |
 
 ### 增幅项表 `Config/Tables/Upgrades/`（19 行）
 
@@ -1510,10 +1540,10 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 | ③ | **代码兜底** `Scripts/Boss/BossPerk.cs` 的 `FallbackPressure` | 删掉那条 `BossPerk`（表读不到时用的那份） | 表一读不到，首领**又会吃护甲**（静默换挡）—— 正是阶段 7 注释里防的那类坑 |
 
 **精英怪的护甲来源（读代码确认，没误伤）**：精英护甲**与 Pressure 无关**，来自
-`Scripts/Combat/EliteModifier.cs`（`ArmorAdd = 120`，`_Ready` 里 `Stats.AddModifier("MaxArmorAdd", Add, 120)`；
-由 `EncounterController` 在生成时 `enemy.AddChild(new EliteModifier())` 挂上）。
-改动后全项目 `MaxArmorAdd` 的**生产者只剩 EliteModifier 这一个**（`grep` 实测：
-`EliteModifier.cs:35` 一处，消费者是 `Unit.RefreshStats`），所以"护甲只给精英怪"这条现在是代码事实。
+`Scripts/Combat/EliteModifier.cs` 的 `ArmorAdd = 120`（由 `EncounterController` 在生成时 `enemy.AddChild(new EliteModifier())` 挂上）。
+⚠️ **C1（2026-10-12 第三轮）之后它走 `unit.GrantArmor(ArmorAdd)`**，不再是 `Stats.AddModifier("MaxArmorAdd", …)`
+（护甲没有上限，"抬高上限"这套已经没有意义）：`MaxArmorAdd` / `MaxArmorMultiplier` 两个 StatSheet 键**整对删除**，
+全项目再无生产者，所以"护甲只给精英怪"这条仍然是代码事实（生产者只剩 EliteModifier 这一处，走 `GrantArmor`）。
 
 **实测**（两次连跑一致）：
 
@@ -1645,9 +1675,12 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 ### 四、这一轮**没有**做的事（留给下一轮决定）
 
 - ✅ **首领本体的护甲已在本轮去掉（用户明确要求「去掉首领的甲」）** —— 上一轮记的"没动"这一条**已作废**：
-  `boss_final.tres` 的 `MaxArmor` 现在是 **0**、`Boss.tscn` 那份同值导出也一并归零（表是权威、场景是回退，两处必须同值）。
-  **护甲字段一个都没删**（`Unit.MaxArmor/Armor/ArmorDamageReduction` + `UnitConfig.MaxArmor/ArmorDamageReduction`
+  `boss_final.tres` 的那一列现在是 **0**（C1 之后叫 `StartingArmor`，值不变）、`Boss.tscn` 那份同值导出也一并归零（表是权威、场景是回退，两处必须同值）。
+  ⚠️ 当时"护甲字段一个都没删"（`Unit.MaxArmor/Armor/ArmorDamageReduction` + `UnitConfig.MaxArmor/ArmorDamageReduction`
   全部原样保留）—— 用户澄清："护甲是**所有单位**都能有的通用属性，只是首领**默认没有获取手段**"。
+  **2026-10-12 第三轮 C1 覆盖了后半句**：用户改口「**护甲没有上限额度，所以可以删除掉 `MaxArmor` 的**」，
+  于是 `MaxArmor` → **`StartingArmor`（开局护甲）**、`MaxArmorMultiplier` / `MaxArmorAdd` **删除**
+  （`Armor` / `ArmorDamageReduction` / `ArmorBroke` / `DamageResult.ArmorLost` 全部保留），详见文末「护甲无上限实测」。
   完整判据、伤害管线怎么走、以及"还有谁能给首领加甲"的 grep 结论见文末「首领去甲 + 单位动画实测」。
 - ⚠️ **Pressure 的强度需要重新平衡**：池子从 8 条变 7 条，单条概率整体上扬（20% → 23.1% 等），
   且阶段 7 已知的"每抽期望强度只有拆分前的 58.9%"这条结论**不受影响**（它由"一抽只买一个参数"决定）。
@@ -1663,13 +1696,16 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 
 ### 一、首领去甲：权威在哪、改了什么
 
+> ⚠️ 本节的列名按**当时的** `MaxArmor` 记录；**C1（2026-10-12 第三轮）之后同一列叫 `StartingArmor`**（值不变），
+> `MaxArmorMultiplier` / `MaxArmorAdd` 已删除 —— 见文末「护甲无上限实测」§一。
+
 | 问题 | 结论 |
 |---|---|
-| **权威在哪** | **`Config/Tables/Bosses/boss_final.tres` 的 `MaxArmor`**。生成路径 `EncounterController.SpawnBossNow()` 是 `Instantiate → BossRow(BossScene)?.ApplyTo(Boss) → AddChild`（`EncounterController.cs:708-712`），`UnitConfig.ApplyTo` 里 `unit.ApplyBaseStats(...)` 会把 `_baseMaxArmor` 与 `MaxArmor` 一起写成行里的值，而 `Unit._EnterTree` 在 `AddChild` 时才捕获基础值 → **行覆盖场景**。白板首领副本（`SpawnEliteBossNow`）走同一条路（`:670-672`）。 |
-| **场景那一份** | `Scenes/Enemies/Boss.tscn` 的 `MaxArmor = 200.0` 是**回退值**（表读不到时才生效）。两处不同值 = 项目反复警告的"**静默换挡**"，所以本轮**两处一起归零**：行里写 `MaxArmor = 0.0`（与 `enemy_chaser.tres` 等 0 甲行的写法一致），场景里**删掉那一行**（0 甲的敌人场景都不写它）。 |
-| **字段有没有被删/摘掉** | **完全没有**。`Unit.MaxArmor` / `Unit.Armor` / `Unit.ArmorDamageReduction` / `UnitConfig.MaxArmor` / `UnitConfig.ArmorDamageReduction` / `MaxArmorMultiplier` / `MaxArmorAdd` / `ArmorBroke` 事件 / `DamageResult.ArmorLost` / HUD 的"甲 N" / `BossPreviewScreen` 的护甲一栏 —— **一个都没动**（用户澄清：护甲是所有单位通用的属性）。 |
-| **还有谁能给首领加甲？** | 全项目 grep（`MaxArmorAdd` / `MaxArmorMultiplier` / `ArmorAdd` / `MaxArmor`、`Scripts/**` + `Config/**` + `Scenes/**`）只有**一个**生产者：`Scripts/Combat/EliteModifier.cs:12,35`（`ArmorAdd = 120` → `MaxArmorAdd`）。它**只挂在普通敌人身上**：`EncounterController.cs:454-457`（`SpawnEnemy` 里按 `eliteChance` 添加）与 `Scenes/Enemies/SkillElite.tscn` 里手挂的那一个（该场景写 `ArmorAdd = 0.0`）。首领那条路（`SpawnBossNow` / `SpawnEliteBossNow`）**不加** `EliteModifier`。另外查过三个"看起来会加甲"的地方，结论都是**不加**：`BossPressure`（只加 `DamageMultiplier` / `AttackSpeedMultiplier` / `MoveSpeedMultiplier`）、`Balance.ScaleEnemy`（生命/伤害/移速）、Pressure 池 7 行（`DamageMultiplier` / `AttackSpeedMultiplier` / `MaxHealthMultiplier` / `MoveSpeedMultiplier` + 3 条技能参数）。**结论：首领现在没有任何获取护甲的途径。** |
-| **精英的甲** | **保留不动**（`EliteModifier.ArmorAdd = 120`）—— 它是精英怪的获取手段，与首领无关。 |
+| **权威在哪** | **`Config/Tables/Bosses/boss_final.tres` 的 `MaxArmor`（现名 `StartingArmor`）**。生成路径 `EncounterController.SpawnBossNow()` 是 `Instantiate → BossRow(BossScene)?.ApplyTo(Boss) → AddChild`（`EncounterController.cs:708-712`），`UnitConfig.ApplyTo` 里 `unit.ApplyBaseStats(...)` 会把基础护甲与 `StartingArmor` 一起写成行里的值，而 `Unit._EnterTree` 在 `AddChild` 时才捕获基础值 → **行覆盖场景**。白板首领副本（`SpawnEliteBossNow`）走同一条路（`:670-672`）。 |
+| **场景那一份** | `Scenes/Enemies/Boss.tscn` 当时那份 `MaxArmor = 200.0` 是**回退值**（表读不到时才生效）。两处不同值 = 项目反复警告的"**静默换挡**"，所以本轮**两处一起归零**：行里写 `MaxArmor = 0.0`（现名 `StartingArmor = 0.0`，与 `enemy_chaser.tres` 等 0 甲行的写法一致），场景里**删掉那一行**（0 甲的敌人场景都不写它）。 |
+| **字段有没有被删/摘掉** | **当时完全没有**（这一轮只改数值）。⚠️ **C1 之后不是这样了**：`Unit.MaxArmor` / `UnitConfig.MaxArmor` 改名为 **`StartingArmor`**，`MaxArmorMultiplier` / `MaxArmorAdd` **删除**；`Unit.Armor` / `ArmorDamageReduction` / `ArmorBroke` 事件 / `DamageResult.ArmorLost` / HUD 的"甲 N" / `BossPreviewScreen` 的护甲一栏 —— **仍然一个都没动**。 |
+| **还有谁能给首领加甲？** | 全项目 grep（`MaxArmorAdd` / `MaxArmorMultiplier` / `ArmorAdd` / `MaxArmor`、`Scripts/**` + `Config/**` + `Scenes/**`）只有**一个**生产者：`Scripts/Combat/EliteModifier.cs`（`ArmorAdd = 120`；C1 之后走 `Unit.GrantArmor`）。它**只挂在普通敌人身上**：`EncounterController.cs:454-457`（`SpawnEnemy` 里按 `eliteChance` 添加）与 `Scenes/Enemies/SkillElite.tscn` 里手挂的那一个（该场景写 `ArmorAdd = 0.0`）。首领那条路（`SpawnBossNow` / `SpawnEliteBossNow`）**不加** `EliteModifier`。另外查过三个"看起来会加甲"的地方，结论都是**不加**：`BossPressure`（只加 `DamageMultiplier` / `AttackSpeedMultiplier` / `MoveSpeedMultiplier`）、`Balance.ScaleEnemy`（生命/伤害/移速）、Pressure 池 7 行（`DamageMultiplier` / `AttackSpeedMultiplier` / `MaxHealthMultiplier` / `MoveSpeedMultiplier` + 3 条技能参数）。**结论：首领现在没有任何获取护甲的途径。** |
+| **精英的甲** | **保留不动**（`EliteModifier.ArmorAdd = 120`）—— 它是精英怪的获取手段，与首领无关。C1 之后它是**直接加甲**（`GrantArmor`），语义比原来更准确。 |
 
 **去掉之后伤害管线怎么走**（`Unit.ReceiveHit`，战斗规则说明 §12 的顺序一个字没改）：
 
@@ -2002,4 +2038,65 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 随机敌种与帧率除外）。另外把 `AmbientSpawnInterval` / `AmbientSpawnEscalateSeconds` 临时改成 6 / 10
 跑了一轮**自然计时路径**的验证（`run_20261012_221654.log`：每隔 6~7 秒刷一只、每 10 秒档位 +1，
 全部硬指标照样逐位一致、自测跑完整），跑完已还原成 30 / 120。
+
+---
+
+## 护甲无上限 + 进化池合并实测（2026-10-12 用户第三轮 C1 / C2）
+
+> 用户原话见 [requirements-ability-system.md](requirements-ability-system.md) 的「用户第三轮澄清（2026-10-12）」。
+> **构建**：`& build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（每改一步都跑）。
+> **自测**：命令行直跑（`selftest.flag` + `res://Scenes/Main.tscn`），跑完 `selftest.flag` 已删。
+
+### 一、C1：删掉 `MaxArmor`（护甲没有上限）
+
+| 问题 | 结论 |
+|---|---|
+| **删了什么** | `Unit.MaxArmor` → **`Unit.StartingArmor`**（`[Export]` 改名，**值不变**）；`UnitConfig.MaxArmor` → **`UnitConfig.StartingArmor`**（配置列改名）；`MaxArmorMultiplier` / `MaxArmorAdd` 两个 StatSheet 键**整对删除**（`Unit.SeedStats` 的两行 `SetBase` + `RefreshStats` 里那段"抬高上限并补甲"的逻辑）；`Unit._baseMaxArmor` → `_startingArmor`。**`Armor` / `ArmorDamageReduction` / `ArmorBroke` / `DamageResult.ArmorLost` 一个都没动**（C1 明确要求减伤那条保持原样）。 |
+| **为什么是"改名"而不是"删列"** | 单位表里必须有一列说"这个单位进场带多少甲"（玩家 40/140/60、守卫 60、冲锋兵 30、技能精英 90）。删掉就没有任何途径给初始护甲了。所以删的是**"上限"这个概念**（`MaxArmor*` 一族），留下的是**"开局护甲"这个事实**（`StartingArmor`）。 |
+| **加甲走哪条路** | 新增 `Unit.GrantArmor(amount)`：`Armor += amount`，并累计到 `_armorBonus`（进树前调用也成立 —— 精英组件是子节点，`_Ready` 早于单位本身的 `_Ready`）。`EliteModifier` 从"加 `MaxArmorAdd` 修正器"改成"调 `GrantArmor(ArmorAdd)`"。 |
+| **显示判据** | `MaxArmor > 0` → **`Armor > 0`**，共 **3 处**（任务书说"各一处"，实际是 3 处同样写法的 `SetArmor(...)`）：`PlayerHud.UpdateArmorBar`、`WorldOverlay.UpdateBar`、`WorldOverlay.CreateBar`（建条那一帧的初值，必须一起改否则编译不过）。**甲打光后连空壳都不显示**。 |
+| **甲条的比例从哪来** | `Unit.ArmorPeak`（**运行期派生**：这个单位见过的最高护甲，只增不减，**不来自任何配置、不能外部设置、不参与结算**）。护甲没有上限之后 `Armor` 自己算不出"还剩几成"，而甲条要显示进度。**这是本轮唯一一处需要判断的地方**：另一个选择是"有甲就整条铺满"（比例恒为 1），那会让 §五 #8 的护甲进度彻底消失；选 `ArmorPeak` 的结果是**除"空壳不再显示"之外，画面与改动前逐位一致**。 |
+| **`ArmorBroke`（碎甲）有没有受影响** | **没有**。触发点仍是 `Unit.ReceiveHit` 的 Armor 段"`Armor` 从 >0 掉到 0 那一次"，判据一个字没改；`WorldOverlay` / `PlayerHud` / `ArmorBreakFx` 三处消费方也没动。 |
+| **行为变化（必须知道的一条）** | `EliteModifier.ArmorAdd = 120` 现在是**纯粹的加甲**：本来 0 甲的敌种（追猎者 / 快速近战 / 自爆 / 跳跃 / 远程 / 尖啸）精英化后**真的多出 120 甲**。改动前那条 `MaxArmorAdd` 只把它们的护甲上限抬到 120、`Armor` 仍是 0（一层不吸收伤害、比例恒 0 的空壳），所以这是"语义修正"带来的数值变化，属 A1 的占位范围。有甲敌种（守卫 60→180、冲锋兵 30→150）与改动前一致。 |
+| **`BarBoss.tscn` / 首领** | 一行没动：首领本来就没有 `StartingArmor`（0），判据改成 `Armor > 0` 之后它依然"天然不显示"，`BarBoss.tscn` 里本来就没有护甲节点。 |
+| **改了哪些数据文件** | 行文件 **14 个**（`Enemies/` 9 个带甲行 —— `enemy_global` 是纯倍率行、本来就没有这一列；`Bosses/boss_final`；`Summons/summon_drone`；`Characters/chr_gunner|heavy|summoner`）+ 场景 **4 个**（`Guard.tscn` 60 / `Charger.tscn` 30 / `SkillElite.tscn` 90 / `TrainingDummy.tscn` 60）。三个角色行的 `DescriptionTemplate` 占位符 `{MaxArmor:0}` → `{StartingArmor:0}`（`ConfigText` 按**字段名**取，不改就是 `[ConfigText] 模板里的 {MaxArmor:0} 在配置行里找不到` 警告）。全部 **LF + 无 BOM**（逐个二进制校验过）。 |
+| **`Balance.tres` 存了吗** | **没有** `MaxArmor` 字段（它是全局标量表，护甲从来只在行文件/场景里），所以那次改动没有碰它 —— 也就没有"整份加载失败"的风险。⚠️ **行文件是原地改列名、不是删文件/改名**，所以 `[ext_resource]` 与数组项一个都没动。 |
+
+### 二、C2：池的候选集时机 + 合并重复的进化池节点行
+
+| 问题 | 结论 |
+|---|---|
+| **原来是什么时候算的** | **四个交互点的惰性分支**：`RunController` 的 `OfferRareRewards`(:549) / `OfferRewards`(:575) / `PoolPreview`(:618) / `OpenRewardForNode`(:693) 各写了一段 `if (!_poolReady) { _pool.Initialize(_weapon); _poolReady = true; }` —— **谁先被交互谁建池**。候选集本身（`RewardCatalog.All` 按武器三层过滤）建完之后不再变，但"什么时候建"是**第一次交互时**，不是进关卡时。⚠️ 其中两个分支（:549 / :693）**忘了设 `SummonerAllowed`**：某局若第一个被交互的是特殊奖励节点，召唤控制角色整局抽不到「亡者随从」。 |
+| **改成什么时机** | 新增 `RunController.InitializePool()`（武器层 + 角色限定层一次定完），**只在 `ApplyBalance()` 里调一次** —— `ApplyBalance` 就是"角色/武器都定了、即将进关卡"的那一刻（`BeginRunWithCharacter` → `ApplyBalance()` → `ApplyStage(0)`）。四个交互点改成 `EnsurePool()`（已定过就是空操作，只作兜底）。交互时仍然要按**当前构筑**筛（互斥 / 层数上限 / `ConflictsWith` / 节点 `Kind`）—— 这几条依赖"你现在已经有什么"，天然必须每次交互算；**变的是"候选项从哪来"**。 |
+| **留痕** | `[Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Gunner · 武器 Pistol（PoolId pool_pistol）→ 候选 19 条（武器层之后；角色限定项在抽取时再筛 SummonerAllowed=False）`。⚠️ 19 = **武器层过滤后**的候选数（含 `mut_summon`），枪手**实际可抽** 18 条（硬指标不变）。 |
+| **合并了哪两行** | 删 **`node_weapon.tres`**（`Kind = Weapon` / Slot 1），保留 **`node_evolution.tres`**（`Kind = Evolution` / Slot 3）。理由：两行的 `Title`/`DisplayName`/`RewardKind`/`Layer`/`WaveCount`/`ValueTags` **逐列相同**（都是「进化池」+ `Evolution` + Layer 2 + 4 波 + `tag_high`），唯一区别是 `Kind`；而**场景里的进化池实例是 `Kind = Evolution`**（`Main.tscn` 的 `NodeEvolution`），**`Kind = Weapon` 一个实例都没有**；另外 `node_weapon` 的 `BossPressurePoints` 是 **0**，保留它会让进化节点丢掉 150 点 Pressure（`Pressure=3` 那条硬指标会漂）。**`Id` / 类 / 目录 / 枚举一律没改名**（C2 明令）。 |
+| **`Rule`/字段怎么合并** | `ValueTags` 与 `Layer` 两边**本来就一样**（`tag_high` / 2），没有冲突；`BossPressurePoints = 150` 取的是 `node_evolution` 的（`node_weapon` 是 0，即"没表态"）；`node_weapon` 的 Note 里那句"这是武器（攻击方式）的限定池"**折进 `node_evolution.tres` 的新 Note**，并指明按攻击方式分的三个池在 `Config/Tables/UpgradePools/`。 |
+| **`UpgradePools/` 三个池** | **保留不动**（C2 明令）：`pool_pistol` / `pool_sniper` / `pool_rifle` 就是"进化池的选项由角色持有的攻击方式决定"这条链路的落点（武器行 `Pool` 正向指过去；选项行的 `Pool` / `RequiredWeaponTags` 决定谁能抽到）。 |
+| **"节点布置 10（高 2 / 中 5 / 低 3）"数的是表行还是场景实例** | **场景实例**（`SelfTest.ReportNodes` 遍历 `Stage` 的子节点里的 `RewardNode`，按 `NodePlacement.LayerOf(kind)` 分层）。所以删一行表**不会**改这个数字 —— 实测**仍然是 10（2/5/3）**。改的是 `配置表比对·索引` 里的 **`节点 9` → `节点 8`**（少一个行文件，必然结果，已同步期望值），以及开局日志 `节点波数（…）：…`（少一项）与 `Pressure 节点驱动：节点表 9 行里 2 行配了` → **`8 行里 2 行配了`**（配了的那两行仍然是 `node_evolution` / `node_mutation`，功能部分逐字不变）。 |
+| **`Kind = Weapon` 的兜底** | `NodePlacement.LayerOf` 的代码兜底补上 `RewardNodeKind.Weapon => 2`（与 `Evolution` / `Mutation` 同层）。表里再没有这一行之后，它就是 `Kind = Weapon` 唯一的价值层来源；不补的话 `WavesFor(Weapon)` 会从 4 掉到 1，自测的 `节点 [Weapon=4 …]` 那条硬指标会漂，而且与 A3「武器限定池 = 进化池 = 高价值」自相矛盾。 |
+| **`node_weapon` 的删除姿势** | `git rm` 行文件（该目录没有 `.uid`）+ **同一个改动里**删掉 `Balance.tres` 的 `[ext_resource ... id="22_node_weapon"]` 与 `Nodes = [...]` 里那一项 —— 正是 config.md 顶部那条纪律要求的姿势（只删行文件会让整份 `Balance.tres` 加载失败）。 |
+
+### 三、自测实测（C1 与 C2 各跑一轮，最终代码一轮）
+
+```
+[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 7 / 效果 9 / 节点 8 / 局外成长 6 / AI 档案 11 / 能力卡 8（Balance.tres 已加载）
+[Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Gunner · 武器 Pistol（PoolId pool_pistol）→ 候选 19 条（武器层之后；角色限定项在抽取时再筛 SummonerAllowed=False）
+[SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）
+[SelfTest] 配置表比对·玩家：生命 270（期望 250 + 元进度加成 20） 护甲 40（期望 40） 移速 7（期望 7） 减伤 0（期望 0）
+[SelfTest] 配置表比对·索引：… 节点 8/局外 6/升级池 3/AI 档案 11/能力卡 8（期望 3/3/10/1/1/25/7/9/8/6/3/11/8）
+[SelfTest] 配置表比对·节点表：进化层 2/波 4（期望 2/4） 强化层 1/波 3（期望 1/3） 恢复层 0/波 1（期望 0/1） 商店价目 5/12/18 标题 异化池
+[SelfTest] 配置表比对·价值标签：… → 节点 [Weapon=4 Enhancement=3 Evolution=4 Mutation=4 Resource=1 Heal=1 Special=1 Shop=3 Portal=1]
+[SelfTest] 配置表比对·增幅项：共 19 条（强化 10 / 进化 4 / 异化 5）用了表=True 当前池子=18 条（枪手期望 18 条）
+[SelfTest] 配置表比对·升级池：武器 PoolId「pool_pistol」（期望 pool_pistol） 池表 3 行 ｜ 专属层 0 条 · 类别层 4 条（命中 4）· 通用层 15 条 ｜ 召唤控制池 19 条（期望 19）
+[Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 …
+[SelfTest] 端到端：… pressure=3 pmods=3 bank=0 victory=False all=10         ← 逐位不变
+[Audio] 配置表：音效 13（来源：表 Audio）                                    ← 逐位不变
+[Audio] 音效统计：共 47 次 …（缺失 id 0 个）
+[SelfTest] === 自测结束 ===
+```
+
+**逐位不变**：`节点布置 10（2/5/3）`、`Pressure=3`、`端到端 F`（奖励界面打开 = True）、`音效 13`、
+`增幅项 19 条 / 池子 18 条`、`价值标签 → 节点 [Weapon=4 …]`、升级池三层与召唤控制池 19 条、玩家护甲 40 / 移速 7 / 减伤 0。
+**唯一变的一个数字**：`配置表比对·索引` 的 **`节点 9 → 8`**（合并两个节点行 = 少一个行文件，必然结果，已同步期望值）。
+日志里**没有** `Balance.tres` 加载失败 / 读表回退的迹象（`（Balance.tres 已加载）` + 各表条数与表在时一致）。
 
