@@ -226,7 +226,7 @@ if (!isTypeArgument && variantType == VariantType.Array)
    - **但这个办法对特性没用**（特性要编译期常量）。所以定义里硬编码，并在注释里写明出处。
 2. **值是"字符串 ID"，不是资源引用。** 下拉选出来的是 `&"upgrade_pool_common"` 这种 ID，不是 `UpgradePoolDef` 对象。运行时你要 `pools.LoadEntry(weapon.UpgradePool)`。
    - **好处**：文件改名/搬家不会断（这正是 YARD 的卖点）；目标资源**不会**因为引用而被自动加载。
-   - **代价**：**没有编译期校验**。`.tres` 里的 ID 打错了 → 运行时 `LoadEntry` 返回 `null`。**必须给 `null` 兜底**，否则就违反了本项目 `BalanceConfig.cs` 那套"读不到就用默认值"的语义（见 [config-tooling.md](config-tooling.md) 第零节）。默认值建议 `= ""`，并在 `LoadEntry` 后判空。
+   - **代价**：**没有编译期校验**。`.tres` 里的 ID 打错了 → 运行时 `LoadEntry` 返回 `null`。**必须给 `null` 兜底**，否则就违反了本项目 `ConfigIndexData.cs` 那套"读不到就用默认值"的语义（见 [config-tooling.md](config-tooling.md) 第零节）。默认值建议 `= ""`，并在 `LoadEntry` 后判空。
 
 ---
 
@@ -516,7 +516,7 @@ Config/
 
 ### 4.6 与 [config-tooling.md](config-tooling.md) 结论的关系
 
-**不冲突，是补充。** [config-tooling.md](config-tooling.md) 的**第 0 步（把 `BalanceConfig` 那张 ~100 列的宽表拆成"一类一个 `[GlobalClass]` 类、一行一个 `.tres`"）是本文所有结论的入场券**：
+**不冲突，是补充。** [config-tooling.md](config-tooling.md) 的**第 0 步（把 `ConfigIndexData` 那张 ~100 列的宽表拆成"一类一个 `[GlobalClass]` 类、一行一个 `.tres`"）是本文所有结论的入场券**：
 - **不拆表 → ERAT 无事可做**（没有"表"）
 - **不拆表 → YARD 也无事可做**（没有行资源可以登记进注册表）
 → **两者对前提的要求完全一样。所以先做第 0 步，这件事没有分歧。**

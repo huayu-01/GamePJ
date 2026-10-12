@@ -626,8 +626,8 @@ if (GD.Load<PackedScene>("res://Assets/Effects/fx_combat_hit.tscn") is { } hitFx
 
 # 第三轮：命中 / 击中特效**真的接线了**（2026-10）
 
-> **本轮范围**：`Scripts/Combat/{HitEffect.cs(新),Projectile.cs,AttackHitbox.cs}`、`Scripts/Config/BalanceConfig.cs`、
-> `Config/Balance.tres`、`docs/config.md`、`docs/art-integration-log.md`。
+> **本轮范围**：`Scripts/Combat/{HitEffect.cs(新),Projectile.cs,AttackHitbox.cs}`、`Scripts/Config/ConfigIndexData.cs`、
+> `Config/ConfigIndex.tres`、`docs/config.md`、`docs/art-integration-log.md`。
 > **没有动** `Explosion.tscn` 的 `SphereShape3D radius=1` 与 `Explosion.Lifetime=0.12`（红线），
 > **没有动** `Assets/Effects/fx_combat_hit.tscn` 一个字节（美术资源保持原样）。
 
@@ -638,7 +638,7 @@ if (GD.Load<PackedScene>("res://Assets/Effects/fx_combat_hit.tscn") is { } hitFx
 | 上一轮留下的"§9.5 (2) 命中特效接线"做完了吗？ | ✅ **做完了**，而且**两条命中路径都接了**。 |
 | 为什么是"两条"？ | grep `ReceiveHit` 全项目只有**两个**会造成伤害的命中入口：<br>① **投射物命中** `Projectile.ResolveImpact`（子弹/箭矢/气刃，手上有**精确射线命中点**）<br>② **命中体击中** `AttackHitbox._PhysicsProcess`（近战挥砍 / AOE / 冲锋 / **爆炸**——`Explosion` 继承它）<br>（`RewardCatalog` 的连锁闪电也走 `ReceiveHit`，但它是奖励效果不是"命中"，没接。） |
 | 接线代码在哪？ | 两个调用点各 **1 行** + 一个新文件 `Scripts/Combat/HitEffect.cs`（出生逻辑只有一处）。 |
-| 参数写死了吗？ | **没有**。开关 / 预制体路径 / 寿命 / 高度偏移四个都进了 `Config/Balance.tres` 的「表现 · 命中特效」组（见 [config.md](config.md)）。 |
+| 参数写死了吗？ | **没有**。开关 / 预制体路径 / 寿命 / 高度偏移四个都进了 `Config/ConfigIndex.tres` 的「表现 · 命中特效」组（见 [config.md](config.md)）。 |
 | 截图 | [fx_hit_01_bullet_projectile.png](screenshots/fx_hit_01_bullet_projectile.png)（子弹命中敌人胸口）、[fx_hit_02_enemy_melee_hitbox.png](screenshots/fx_hit_02_enemy_melee_hitbox.png)（敌人近战砍中玩家） |
 
 ## 10.1 ⚠️ 上一轮那句"加 3 行就行"**不够** —— 会漏节点（本轮实测）

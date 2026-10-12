@@ -48,7 +48,7 @@ public enum AbilityCardResult
 ///   `res://Config/` 是**表**（只读），`user://` 是**玩家进度**。见 `docs/ability-cards.md`。</item>
 /// <item><b>资源</b>：花的/退的都是 <see cref="MetaProgress"/> 的**碎片**（局外资源），
 ///   本类**不另建一套货币** —— 需求里的"局外资源"就是它。</item>
-/// <item><b>额度上限</b>：<c>BalanceConfig.AbilityQuotaBase</c> + 局外成长行 <c>meta_quota</c> 的每级增量，
+/// <item><b>额度上限</b>：<c>ConfigIndexData.AbilityQuotaBase</c> + 局外成长行 <c>meta_quota</c> 的每级增量，
 ///   所以"额度上限本身也能用局外资源扩增"是**同一套局外成长表**里的第 6 行，不是新机制。</item>
 /// <item><b>纪律</b>：任何一步失败都**不扣钱、不改状态**，并返回一个明确的
 ///   <see cref="AbilityCardResult"/> 让界面去震动元素（绝不静默失败）。</item>
@@ -89,15 +89,15 @@ public static class AbilityStore
 
 	// ───────────────────────── 表 / 额度上限 ─────────────────────────
 
-	/// <summary>卡表（顺序 = `Balance.tres` 的 `AbilityCards` 数组顺序 = 矩阵里的排布顺序）。</summary>
+	/// <summary>卡表（顺序 = `ConfigIndex.tres` 的 `AbilityCards` 数组顺序 = 矩阵里的排布顺序）。</summary>
 	public static System.Collections.Generic.IReadOnlyList<AbilityCardConfig> Rows
-		=> Balance.Settings.AbilityCards;
+		=> ConfigIndex.Settings.AbilityCards;
 
 	/// <summary>按 Id 取一行（读不到返回 null）。</summary>
 	public static AbilityCardConfig? Row(string? id) => ConfigRows.ById<AbilityCardConfig>(id);
 
-	/// <summary>额度上限的初始值（`Balance.tres` 的全局字段）。</summary>
-	public static int QuotaBase => Mathf.Max(0, Balance.Settings.AbilityQuotaBase);
+	/// <summary>额度上限的初始值（`ConfigIndex.tres` 的全局字段）。</summary>
+	public static int QuotaBase => Mathf.Max(0, ConfigIndex.Settings.AbilityQuotaBase);
 
 	/// <summary>额度上限的局外成长行（`Config/Tables/Meta/meta_quota.tres`；读不到返回 null）。</summary>
 	public static MetaUpgradeConfig? QuotaRow => ConfigRows.ById<MetaUpgradeConfig>(QuotaRowId);
@@ -533,7 +533,7 @@ public static class AbilityStore
 		AbilityCardConfig? locked = Rows.Count > 1 ? Rows[1] : null;
 		if (card == null)
 		{
-			lines.Add("配置表比对·能力卡：表里一张卡都没有（期望 ≥ 1）—— 检查 Config/Tables/AbilityCards/ 与 Balance.tres 的 AbilityCards 数组。");
+			lines.Add("配置表比对·能力卡：表里一张卡都没有（期望 ≥ 1）—— 检查 Config/Tables/AbilityCards/ 与 ConfigIndex.tres 的 AbilityCards 数组。");
 			return lines;
 		}
 

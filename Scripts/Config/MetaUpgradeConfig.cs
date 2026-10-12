@@ -5,7 +5,7 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 局外成长（元进度）表的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Meta/meta_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.MetaUpgrades"/>。
+/// 索引用 <see cref="ConfigIndexData.MetaUpgrades"/>。
 ///
 /// 取代 `MetaProgress.cs` 里 5 个硬编码系数（10 / 0.05 / 0.03 / 0.03 / 0.06）与价格公式 <c>10*(level+1)</c>。
 /// </summary>

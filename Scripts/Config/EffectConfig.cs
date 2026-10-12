@@ -43,7 +43,7 @@ public enum EffectKind
 
 /// <summary>
 /// **效果参数表**的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Effects/eff_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.Effects"/>。
+/// 索引用 <see cref="ConfigIndexData.Effects"/>。
 ///
 /// 为什么单独立表（用户点名要求）：击退值、燃烧值、减速/眩晕倍率这类"效果"参数原先散落在三处 ——
 /// ① 武器表里的 <c>Knockback</c>；② `StatusEffect.cs` 的 <c>switch</c> 里 6 个硬编码十进制；

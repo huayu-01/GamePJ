@@ -1,17 +1,21 @@
 # 数值配置（调参唯一入口）
 
-**所有可调数值拆成 17 张表，全部挂在 [`Config/Balance.tres`](../Config/Balance.tres) 上；运行期由 autoload `Balance` 读取并建索引。**
+> **`ConfigIndex`（原 `Balance`）不是"平衡参数表"** —— 它是**全局标量 + 17 张表的索引**。数值本体在各表的行文件里。
+> 换句话说：它**只回答"数值在哪"**（`Settings.Xxx` 指向哪一行），不回答"数值是多少"（那是 `Config/Tables/<分组>/*.tres` 里一行一个文件的事）。
+> 所以看见 `ConfigIndex.PlayerMaxHealth` 这类名字时不要以为数值写死在这里 —— 那只是**表读不到时的代码默认值**。
+
+**所有可调数值拆成 17 张表，全部挂在 [`Config/ConfigIndex.tres`](../Config/ConfigIndex.tres) 上；运行期由 autoload `ConfigIndex` 读取并建索引。**
 
 > **2026-10 配置表阶段 8（能力卡 = 局外装备层）**：新增第 17 张表 **能力卡**
 > （`Config/Tables/AbilityCards/card_*.tres`，**一行 = 一张卡**，现有 8 行）+ 局外成长表多一行
-> **`meta_quota`（额度扩增）** + `BalanceConfig` 多两个字段（`AbilityCards` 索引数组、`AbilityQuotaBase` 基础额度）。
+> **`meta_quota`（额度扩增）** + `ConfigIndexData` 多两个字段（`AbilityCards` 索引数组、`AbilityQuotaBase` 基础额度）。
 > ⚠️ **能力卡与 `Skills/`（局内单位技能，25 行）是两层不同的东西**，所以是**两张表**而不是一张 ——
 > 判断依据写在 [ability-cards.md](ability-cards.md) §1，唯一的接触点是 `AbilityCardConfig.Skill` 那一列（资源引用）。
 > 这一轮顺带把 `配置表比对·索引` 的期望值从 `…/局外 5/…` 改成 `…/局外 6/…/能力卡 8`（加表的必然结果，其余 11 个数字逐位不变）。
 > 细节、实测与截图见 [ability-cards.md](ability-cards.md) 与本文末「配置表阶段 8 实测」。
 
-> **2026-10 配置表阶段 2（重要变化）**：`Balance` 从"唯一数值**文件**"变成"唯一数值**门面 + 表索引**"。
-> 业务代码**仍然写 `Balance.Settings.Xxx`**（这条约定没变），但数值的实际家在 `Config/Tables/<分组>/` 里，
+> **2026-10 配置表阶段 2（重要变化）**：`ConfigIndex` 从"唯一数值**文件**"变成"唯一数值**门面 + 表索引**"。
+> 业务代码**仍然写 `ConfigIndex.Settings.Xxx`**（这条约定没变），但数值的实际家在 `Config/Tables/<分组>/` 里，
 > **一行一个 `.tres` 文件**。字段定义见 `Scripts/Config/*.cs`，缺字段/缺表都会回退到代码默认值。
 >
 > **2026-10 配置表阶段 3（单位表 + 技能表）**：新增 **单位表基类 `UnitConfig`**（攻击/生命/移速/持有技能/行为&类/表现）
@@ -62,7 +66,7 @@
 | 关卡（预算 / 波次 / 敌人白名单 / Boss 词条数 / Pressure 规则） | `Config/Tables/Stages/stg_*.tres` | 一关 | 3 |
 | 局外成长（碎片价格 / 每级效果） | `Config/Tables/Meta/meta_*.tres` | 一项 | **6**（5 项永久强化 + **1 项能力卡额度扩增** `meta_quota`） |
 | **能力卡（局外装备层）**：解锁价 / 各级升级价 / **占用几点额度** / 等级上限 / 图标 / 说明 / **激活后的效果** | `Config/Tables/AbilityCards/card_*.tres` | **一张卡** | **8**（6 张数值 + 2 张授予技能）｜详见 [ability-cards.md](ability-cards.md) |
-| **全局开关**（敌人/Boss 倍率、节奏、Boss 压力曲线、伤害跳字、血条、节点间距、区域杀高度、**能力卡基础额度**） | **`Config/Balance.tres`**（还在原地） | — | 31 个字段 |
+| **全局开关**（敌人/Boss 倍率、节奏、Boss 压力曲线、伤害跳字、血条、节点间距、区域杀高度、**能力卡基础额度**） | **`Config/ConfigIndex.tres`**（还在原地） | — | 31 个字段 |
 
 - **改完要重新运行游戏才生效**（数值在开局一次性应用，不热重载）。
 - 两种改法都行：Godot 编辑器里双击 `.tres` 用 Inspector 改（有中文分组），或直接用文本编辑器改。
@@ -76,10 +80,10 @@
   （动画名，**留空 = 不覆盖**）+ `AnimWalkMinSpeed` / `AnimRunMinSpeed`（走/跑的速度阈值，**留 0 = 不覆盖**）。
   **一行都不填也能动** —— 走组件默认值（`idle` / `walk` / `sprint` / `die`，阈值 0.15 / 4）。
 
-> ⚠️ **操作纪律（血泪教训）**：不要单独删/改 `Balance.tres` 引用到的行文件。
-> 只要引用的**任何一个**行文件缺失/改名，Godot 会**整份 `Balance.tres` 加载失败**（不是只丢那一行），
+> ⚠️ **操作纪律（血泪教训）**：不要单独删/改 `ConfigIndex.tres` 引用到的行文件。
+> 只要引用的**任何一个**行文件缺失/改名，Godot 会**整份 `ConfigIndex.tres` 加载失败**（不是只丢那一行），
 > 于是**所有**数值静默回到代码默认值（实测：玩家生命 250 → 140、武器变成 22/0.32/8/1.15）。
-> 要下线一行，就把 `Balance.tres` 里的数组项与顶部对应的 `[ext_resource]` 一起删。
+> 要下线一行，就把 `ConfigIndex.tres` 里的数组项与顶部对应的 `[ext_resource]` 一起删。
 > 详见 [config-schema.md](config-schema.md) §8.3。
 
 ## 参数中文说明（表里每个参数项怎么看懂）
@@ -114,7 +118,7 @@
 1. **`[ExportGroup("中文")]` —— Inspector 里真的能看到中文**（这就是"在右边的检查面板上显示"）。
    分组的字符串是**唯一**能被 C# 特性送进 Inspector 的可见文本，所以每个字段都必须落在某个中文标题下面
    （**没有落在任何 `[ExportGroup]` 里的字段会挤进上一个分组的标题下**，那是错的 —— 本轮顺手修了
-   `BalanceConfig` 里 `MinNodeSpacing`/`PressurePerPoint`/`KillPlaneY` 等挤在「表现 · 血条」下的问题）。
+   `ConfigIndexData` 里 `MinNodeSpacing`/`PressurePerPoint`/`KillPlaneY` 等挤在「表现 · 血条」下的问题）。
 2. **每个字段一句中文 `/// <summary>`** —— IDE（Rider / VS / VS Code）里鼠标停上去就能看，
    读代码时就在手边；虽然 Godot Inspector 不显示它（证据 ③），但它对人是有效的"悬停说明"。
 
@@ -122,17 +126,17 @@
 > `ConfigRow`（基类，它的两个分组会出现在**每一张表**的行文件上）/ `UnitConfig` / `EnemyConfig` / `BossConfig` /
 > `SummonConfig` / `CharacterConfig` / `WeaponConfig` / `AbilityConfig` / `AiProfileConfig` / `EffectConfig` /
 > `NodeConfig` / `RewardConfig` / `MetaUpgradeConfig` / `StageDefinition` / `UpgradePoolConfig` / `ParamEntry` /
-> `StatOverride` / `BalanceConfig`（全局字段）。并行代理同期把 `PressureModConfig` 改成了同一套写法（风格一致）。
+> `StatOverride` / `ConfigIndexData`（全局字段）。并行代理同期把 `PressureModConfig` 改成了同一套写法（风格一致）。
 >
 > | 指标 | 数量 |
 > |---|---|
-> | `[ExportGroup("中文…")]` | **75 个**（`BalanceConfig` 22 个、`ConfigRow` 基类 2 个） |
+> | `[ExportGroup("中文…")]` | **75 个**（`ConfigIndexData` 22 个、`ConfigRow` 基类 2 个） |
 > | `[Export]` 参数项 | **218 个** |
 > | 其中带紧邻中文 `/// <summary>` 的 | **218 个（100%）** |
 >
 > **逐类的真实分组**（headless 探针读 `get_property_list()` 打的，就是 Inspector 消费的那份元数据；
 > 括号里是不含 Godot 自带的那个类名分组）：
-> `Balance.tres` 22 组 · `enemy_chaser.tres` 11 组 · `chr_gunner.tres` 11 组 · `boss_final.tres` 10 组 ·
+> `ConfigIndex.tres` 22 组 · `enemy_chaser.tres` 11 组 · `chr_gunner.tres` 11 组 · `boss_final.tres` 10 组 ·
 > `summon_drone.tres` 10 组 · `ai_chaser.tres` 9 组 · `node_shop.tres` 7 组 · `skl_dash.tres` 6 组 ·
 > `eff_burn.tres` 5 组 · `wpn_pistol.tres` 5 组 · `upg_dmg_up.tres` 5 组 · `stg_outer.tres` 5 组 ·
 > `meta_health.tres` 4 组 · `pool_pistol.tres` 2 组。
@@ -140,7 +144,7 @@
 > **红线遵守**：本次只加/改 `[ExportGroup]` 特性行与 `/// <summary>` 注释行 ——
 > 用 `git diff -U0` 核对过，`Scripts/Config/**` 里**没有一行 `[Export]` 属性签名被改动**
 > （字段名 / 类型 / 默认值一个都没动），也没有动 `Config/Tables/**` 的任何数据。
-> 唯一的字段"搬动"是 `BalanceConfig.BossBarFullRange` 从文件末尾移到「表现 · 血条」组里（名字/类型/默认值不变），
+> 唯一的字段"搬动"是 `ConfigIndexData.BossBarFullRange` 从文件末尾移到「表现 · 血条」组里（名字/类型/默认值不变），
 > 因为它原来挂在错误的组标题下面；同时给 `MinNodeSpacing` / `PressurePerPoint` / `KillPlaneY` 等十个
 > "关卡约束"字段补了它们自己的「节点 / 关卡约束」标题（原来它们挤在「表现 · 血条」底下，标题是错的）。
 >
@@ -172,7 +176,7 @@
 | `chr_heavy`（槽 2） | 380 | 140 | 6.2 | 12% | ❌ | 开 Melee，关 Summon/Control | 32 / 0.75 / 2.4 / 5 | **13.0 / 3.6** |
 | `chr_summoner`（槽 3） | 210 | 60 | 6.8 | 0 | ✅ | 开 Summon/Control，关 Melee | 32 / 0.75 / 2.4 / 5 | **13.0 / 3.6** |
 
-角色表**继承 `UnitConfig`**，所以"攻击组"就是**左键近战重击的四个数**（原先散在 `Balance.tres` 的
+角色表**继承 `UnitConfig`**，所以"攻击组"就是**左键近战重击的四个数**（原先散在 `ConfigIndex.tres` 的
 `HeavyMeleeDamage` 与 `Player.tscn` 的命中体/能力上，现在合成一处）：伤害 32 / 间隔 0.75 / 范围 2.4 / 击退 5。
 "持有技能"列指向技能表的 5 行（`skl_dash` / `skl_burst` / `skl_melee` / `skl_summon` / `skl_control`）——
 **技能自己的前摇/后摇/朝向/命中体细节在技能行里，而主攻击的四个数由角色行说了算**（技能行的 `Cooldown` 留空 = 不覆盖）。
@@ -315,7 +319,7 @@
 > 场景 `Main.tscn` 里本来就只有 `Kind = Evolution` 的实例、一个 `Kind = Weapon` 的实例都没有。
 > 「按攻击方式分的限定池」落在 `Config/Tables/UpgradePools/pool_pistol|sniper|rifle.tres` 三行上（**保留不动**）——
 > 那才是"进化池的选项由角色持有的攻击方式（武器）决定"这条链路的落点。
-> 排序/索引不受影响（`Balance.tres` 的 `Nodes` 数组删掉一项、`load_steps` 同步减一）。
+> 排序/索引不受影响（`ConfigIndex.tres` 的 `Nodes` 数组删掉一项、`load_steps` 同步减一）。
 > ⚠️ **`Kind = Weapon` 的价值层兜底改成 2**（`NodePlacement.LayerOf`）：表里再没有 `Kind = Weapon` 的行之后，
 > 这个分支就是它唯一的价值层来源（不加会退化成 Layer 0 / 1 波，与 A3「武器限定池 = 进化池 = 高价值」自相矛盾）；
 > 自测里 `Weapon=4` 因此**逐位不变**。
@@ -342,7 +346,7 @@
 | `tag_mid` | 中价值 | **3** | **青蓝** `(0.15, 0.72, 1)` | `node_enhance` / `node_shop`（Layer 1） |
 | `tag_low` | 低价值 | **1** | **绿** `(0.4, 0.86, 0.45)` | `node_resource` / `node_heal` / `node_special` / `node_portal`（Layer 0） |
 
-- 索引：`Balance.tres` 的 `[Export] ValueTagConfig[] ValueTags`（元素指向上面三个行文件）。
+- 索引：`ConfigIndex.tres` 的 `[Export] ValueTagConfig[] ValueTags`（元素指向上面三个行文件）。
 - 消费链只有一处：`NodePlacement.WavesFor(kind)` ——
   ① 节点行 `ValueTags` 命中的标签行取 `WaveCount`（多个标签命中时取**最大**）→
   ② 节点行自己的 `WaveCount` → ③ 按 `Layer` 的代码兜底（2→4 / 1→3 / 其它→1）。
@@ -355,7 +359,7 @@
     ⚠️ **`Kind = Weapon` 是中性白**：它没有节点表行（C2 已并入进化池），这是**刻意**的，不是漏配。
   - 开局日志：`[Node] 奖励节点光圈颜色：Evolution → 价值标签「tag_high」（4 波）的 AuraColor (1, 0.75, 0.15, 1)（来源：表 ValueTags）`
     （每种类型一条，只报一次）。
-- 节点行挂了一个**拼错的标签**时，`Balance.ReportValueTags()` 会写 warning + 日志（不静默落到下一层）：
+- 节点行挂了一个**拼错的标签**时，`ConfigIndex.ReportValueTags()` 会写 warning + 日志（不静默落到下一层）：
   `⚠ 节点行 X 的价值标签「Y」在 ValueTags 表里找不到。`
 - 开局日志会同时打出**标签定了几波**与**每个节点实际算出几波**：
   `价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]`
@@ -418,7 +422,7 @@
 
 > ⚠️ **存档兼容红线**：存档键名（`SaveKey`）必须保持 `health_level` 等原值，改了老玩家进度会归零。
 
-## 还留在 `Balance.tres` 的全局字段
+## 还留在 `ConfigIndex.tres` 的全局字段
 
 ### 敌人 · 全局倍率（`Config/Tables/Enemies/enemy_global.tres` 是**优先来源**，这里是回退值）
 | 参数 | 含义 |
@@ -430,8 +434,8 @@
 
 > 敌人表的 `enemy_global` 行里同名四个值是**优先来源**，读不到才用上面这四个。
 > 🔧 **阶段 3 修的静默换挡**：这两个回退值原来是 `1f` / `0.8f`，而表里是 `0.75` / `0.3` ——
-> 表一读不到，敌人伤害会**静默 ×2.67 且没有任何日志**。现在两处对齐，并且 `Balance.ScaleEnemy`
-> 第一次套用时会在日志里写一行「敌人倍率：…（来源：表 enemy_global / 代码默认值 BalanceConfig）」。
+> 表一读不到，敌人伤害会**静默 ×2.67 且没有任何日志**。现在两处对齐，并且 `ConfigIndex.ScaleEnemy`
+> 第一次套用时会在日志里写一行「敌人倍率：…（来源：表 enemy_global / 代码默认值 ConfigIndexData）」。
 
 ### 节点 / 关卡约束
 | 参数 | 含义 |
@@ -508,7 +512,7 @@
 > 命中体那一路原来落在"目标原点 + 这个全局高度"（单位原点在脚底，所以要 +1.0 抬到胸口），
 > 现在改成落在**目标碰撞体表面上离命中体最近的那一点**（`AttackHitbox.ResolveHitPoint`），
 > 兜底点也是碰撞体自己的中心 —— 全局高度偏移因此**没有任何消费者**了，留一列"改了没用的配置"
-> 是项目反复清理过的东西，所以整列删掉（字段 + `Balance.tres` 的那一行一起删）。
+> 是项目反复清理过的东西，所以整列删掉（字段 + `ConfigIndex.tres` 的那一行一起删）。
 > 细节、判据与实测见文末「用户三项修正实测」§三。
 
 > 出生逻辑只有一处：`Scripts/Combat/HitEffect.cs`（`Projectile.ResolveImpact` 与
@@ -534,7 +538,7 @@
 自测（`selftest.flag` + gdmcp CLI）里新增了一组**逐项比对**日志，改完表可以照着核对：
 
 ```
-[Config] 配置表：武器 3 / 角色 3 / 敌人 1 / 效果 10 / 节点 9 / 局外成长 5（Balance.tres 已加载）
+[Config] 配置表：武器 3 / 角色 3 / 敌人 1 / 效果 10 / 节点 9 / 局外成长 5（ConfigIndex.tres 已加载）
 [Config] 增幅项表：19 条（来源：表）—— 强化 10 / 进化 4 / 异化 5。
 [SelfTest] 配置表比对·玩家：生命 270（期望 250 + 元进度加成 20） 护甲 40 移速 7 减伤 0
 [SelfTest] 配置表比对·武器：伤害 24 间隔 0.26 弹匣 12 装填 0.7 散布 0.5 击退 2.5 暴击 0.15 弹速 90 FOV 55 穿透 0 连发 False
@@ -555,7 +559,7 @@
 
 ```
 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure 3 条（来源：表 Pressure）/ 行为型 Boss Build 4 条（来源：表 Skills）
-[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 3 / 效果 9 / 节点 9 / 局外成长 5（Balance.tres 已加载）
+[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 3 / 效果 9 / 节点 9 / 局外成长 5（ConfigIndex.tres 已加载）
 [SelfTest] 配置表比对·索引：武器 3/角色 3/敌人 10/首领 1/召唤物 1/技能 25/Pressure 3/效果 9/节点 9/局外 5（期望 3/3/10/1/1/25/3/9/9/5）
 [SelfTest] 配置表比对·敌人表：10 行（期望 10 = 1 全局 + 9 敌种） 全局行 生命×0.75/伤害×0.3 本关白名单 [enemy_chaser,enemy_fast_melee,enemy_exploder]（期望按 Id） 实际可生成 [enemy_chaser(成本2), enemy_fast_melee(成本1), enemy_exploder(成本1)]
 [SelfTest] 配置表比对·敌人行 enemy_chaser：生命 60 移速 4.2 攻击 12 间隔 1.3 射程 2.3 击退 3 标签 [Melee,Chaser] 成本 2/权重 3 持有技能 [skl_enemy_chaser_melee]
@@ -577,8 +581,8 @@
 
 | 观察点 | 实测 |
 |---|---|
-| 日志留痕 | `配置表：… 敌人 0 / 首领 0 / 召唤物 0 / 技能 0 / Pressure 0 …（Balance.tres 已加载）`、`首领强化来源：数值型 Pressure 3 条（来源：代码兜底）/ 行为型 Boss Build 4 条（来源：代码兜底）`、9 条「关卡白名单里的 Id 在敌人表里找不到」的警告 |
-| **不再静默换挡** | `敌人倍率：普通 生命×0.75 伤害×0.3（来源：代码默认值 BalanceConfig（表读不到））` —— 与表在时**同值** |
+| 日志留痕 | `配置表：… 敌人 0 / 首领 0 / 召唤物 0 / 技能 0 / Pressure 0 …（ConfigIndex.tres 已加载）`、`首领强化来源：数值型 Pressure 3 条（来源：代码兜底）/ 行为型 Boss Build 4 条（来源：代码兜底）`、9 条「关卡白名单里的 Id 在敌人表里找不到」的警告 |
+| **不再静默换挡** | `敌人倍率：普通 生命×0.75 伤害×0.3（来源：代码默认值 ConfigIndexData（表读不到））` —— 与表在时**同值** |
 | 白名单 | 读不到敌人行 → **不筛**（8 个生成项全在，回退路径仍能玩），而不是"整关没怪" |
 | 敌人 | 用 `Scenes/Enemies/*.tscn` 的值（实测 JumpingMelee 生命 38 = 场景 50 × 0.75），技能行的 Id 变回类名 |
 | 白板首领 | `血量倍率 0.35（来源：场景导出值）` |
@@ -649,7 +653,7 @@ RewardConfig（Config/Tables/Upgrades/*.tres，19 行：一行一个选项）
 | 清空什么 | 日志留痕 | 池子条数 | 玩法数值 |
 |---|---|---|---|
 | **三个武器行的 `Pool` 字段** | `升级池：3 个（…）—— 武器指向 [wpn_pistol→（未填）、wpn_sniper→（未填）、wpn_rifle→（未填）]`、`武器 PoolId「（留空 → 走「标签匹配 → 通用」两层）」`；**没有 warning**（"武器没指定专属池"是合法状态，不是错误） | **18 条（不变）** | 武器 24 / 0.26 / 12 / 0.7 … 全部不变 |
-| **`Balance.tres` 的 `UpgradePools` 索引数组**（模拟池表读不到） | `升级池：0 个（来源：代码默认值（表读不到））` + 3 条 `⚠ 武器 wpn_x 指向的升级池「pool_x」不在 UpgradePools 索引里` | **18 条（不变）** | 全部不变 |
+| **`ConfigIndex.tres` 的 `UpgradePools` 索引数组**（模拟池表读不到） | `升级池：0 个（来源：代码默认值（表读不到））` + 3 条 `⚠ 武器 wpn_x 指向的升级池「pool_x」不在 UpgradePools 索引里` | **18 条（不变）** | 全部不变 |
 
 > ⚠️ **从第二次验证挖出来的边界（与技能表那次同一类坑）**：清空 `UpgradePools` 索引数组**不会**让武器丢掉池 Id ——
 > 池引用写在**武器行文件**里（`wpn_*.tres` 的 `ext_resource`），数组只是"给 `ConfigRows` 建索引、给日志报数"用的，
@@ -765,7 +769,7 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 
 ```
 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
-[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 3 / 效果 9 / 节点 9 / 局外成长 5 / AI 档案 11（Balance.tres 已加载）
+[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 3 / 效果 9 / 节点 9 / 局外成长 5 / AI 档案 11（ConfigIndex.tres 已加载）
 [SelfTest] 配置表比对·索引：武器 3/角色 3/敌人 10/首领 1/召唤物 1/技能 25/Pressure 3/效果 9/节点 9/局外 5/升级池 3/AI 档案 11（期望 3/3/10/1/1/25/3/9/9/5/3/11）
 [SelfTest] 配置表比对·AI 档案表：11 行（期望 11 = 9 敌种 + 首领 + 召唤物） 敌人行 enemy_chaser 挂的档案「ai_chaser」（期望 ai_chaser） 档案行 SearchRange 40（期望 40）
 [SelfTest] AI 档案实测（Chaser 预制体：先把 SearchRange/Chase.Priority 伪造为 -1，再 ApplyTo，与生成路径同序）：SearchRange 40（期望 40） Chase.Priority 10（期望 10） Chase.StopDistance 1.6（期望 1.6） Attack.Priority 100（期望 100）
@@ -785,7 +789,7 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 
 | 清空什么 | 日志留痕 | AI 实际行为 |
 |---|---|---|
-| **`Balance.tres` 的 `AiProfiles` 索引数组**（模拟"档案表读不到"） | `AI 档案：0 个（来源：代码默认值（表读不到））`、`配置表：… AI 档案 0 …`、**11 条** `⚠ 单位行 X 指向的 AI 档案「ai_x」不在 AiProfiles 索引里（引用还在，索引里查不到）`、自测那一行变成 `0 行（期望 11）` | **一点没变**（探针仍是 40/10/1.6/100、场上敌人仍是 `SearchRange 40 [Attack=P100 Chase=P10]`） |
+| **`ConfigIndex.tres` 的 `AiProfiles` 索引数组**（模拟"档案表读不到"） | `AI 档案：0 个（来源：代码默认值（表读不到））`、`配置表：… AI 档案 0 …`、**11 条** `⚠ 单位行 X 指向的 AI 档案「ai_x」不在 AiProfiles 索引里（引用还在，索引里查不到）`、自测那一行变成 `0 行（期望 11）` | **一点没变**（探针仍是 40/10/1.6/100、场上敌人仍是 `SearchRange 40 [Attack=P100 Chase=P10]`） |
 | **敌人行 `enemy_chaser.tres` 的 `AiProfile` 字段**（模拟"这个单位没挂档案"） | `单位指向` 列表里少了 `enemy_chaser→ai_chaser`、`有预制体但没挂档案的 1 个`、`敌人行 enemy_chaser 挂的档案「」（期望 ai_chaser）` | **组件默认值生效**：探针**保留我们伪造的 `SearchRange -1` / `Chase.Priority -1`**（`ApplyTo` 里整段跳过），`StopDistance 1.6` / `Attack.Priority 100` 也原样留在场景值上 |
 
 > ⚠️ **第一轮又验证了阶段 3/4 那条边界（同一类坑，第三次了）**：清空 `AiProfiles` **索引数组**
@@ -916,11 +920,11 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 ## 代码里不写死数值
 
 新增可调项时：
-1. 属于某张表的一行 → 在对应行类上加 `[Export]`，在建一个 `.tres` 行文件，再加进 `Balance.tres` 的索引数组；
-2. 是跨表全局开关 → 在 `BalanceConfig` 里加一个 `[Export]` → 在 `Balance.tres` 里给出默认值；
-3. 套用它的地方读 `Balance.Settings` 或 `ConfigRows.ById<T>(...)`。
+1. 属于某张表的一行 → 在对应行类上加 `[Export]`，在建一个 `.tres` 行文件，再加进 `ConfigIndex.tres` 的索引数组；
+2. 是跨表全局开关 → 在 `ConfigIndexData` 里加一个 `[Export]` → 在 `ConfigIndex.tres` 里给出默认值；
+3. 套用它的地方读 `ConfigIndex.Settings` 或 `ConfigRows.ById<T>(...)`。
 
-`EncounterController` 生成敌人后调用 `Balance.ScaleEnemy(unit, this, isBoss)` 套用倍率（优先读 `enemy_global` 行），
+`EncounterController` 生成敌人后调用 `ConfigIndex.ScaleEnemy(unit, this, isBoss)` 套用倍率（优先读 `enemy_global` 行），
 `RunController.ApplyBalance()` 套用角色/武器数值（读角色表与武器表）。
 
 ## 血条（用户需求，2026-01）
@@ -954,7 +958,7 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 
 | 项目 | 规则 | 配置 |
 |---|---|---|
-| 地图下方区域杀 | **所有单位**（玩家/敌人/Boss/召唤物）进入区域即击杀 | `KillPlaneY = -8`（Balance.tres）→ 区域中心取 `KillPlaneY - 30`，由 `MapManager.EnsureKillZone()` 建 `KillZone`（Area3D，进入即杀）；旧的 `KillPlane` 每帧遍历实现已删除 |
+| 地图下方区域杀 | **所有单位**（玩家/敌人/Boss/召唤物）进入区域即击杀 | `KillPlaneY = -8`（ConfigIndex.tres）→ 区域中心取 `KillPlaneY - 30`，由 `MapManager.EnsureKillZone()` 建 `KillZone`（Area3D，进入即杀）；旧的 `KillPlane` 每帧遍历实现已删除 |
 | 节点生成避障 | 节点启用/降临时先找脚下地面，再从原点螺旋外扩找一个球形探测不重叠的空位 | `StageController.PlaceSafely()` |
 
 避障实现要点（踩过的坑）：
@@ -983,7 +987,7 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 | `BossModifierRolls` | **节点表** | 挑战这个节点**额外**抽几次数值强化（与阈值无关；默认 0） |
 | `BossModifierTags` | **节点表** | 这个节点触发的抽取允许哪些候选标签（留空 → 用关卡行的 `PressureUpgradeTags`；两层都空 = 不限制） |
 | `PressureGrowthMultiplier` / `PressureThreshold` / `PressurePerNodeNormal` / `PressurePerNodeHighValue` / `PressureEvolutionBonus` / `PressureMutationBonus` / `PressureUpgradeTags` | **关卡表**（`stg_*.tres`） | Stage 倍率表的 7 项（§7.4） |
-| `PressurePerHighValueNode` / `PressurePerPoint` | `Balance.tres` | 全局默认值（行里留 0 时用它） |
+| `PressurePerHighValueNode` / `PressurePerPoint` | `ConfigIndex.tres` | 全局默认值（行里留 0 时用它） |
 | `Weight` / `Tags` / `Modifiers` | **Pressure 表**（`pmod_*.tres`） | §7.5 转换池的**候选内容与权重** |
 
 **计算规则（全项目只有这一处定义，在 `StageController.AddPressureForNode`）**：
@@ -994,12 +998,12 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
         否 ↓
 基础点数 = 节点行 BossPressurePoints        （挑战类型最具体，§7.2）
          → 关卡行按价值层的 HighValue / Normal（§7.4 的两个"基础 Pressure"，留 0 = 不表态）
-         → Balance.PressurePerHighValueNode（150，全局默认值）
+         → ConfigIndex.PressurePerHighValueNode（150，全局默认值）
 
 本次点数 = 基础点数 × 本关增长倍率 × 挑战类型额外比例      ← 组合顺序（§7.2 要求"明确的计算配置"）
-                            Stage 行       进化 1.25 / 异化 1.5（Stage 行优先，留 0 用 Balance）
+                            Stage 行       进化 1.25 / 异化 1.5（Stage 行优先，留 0 用 ConfigIndex）
 
-阈值     = 关卡行 PressureThreshold → Balance.PressurePerPoint（100）
+阈值     = 关卡行 PressureThreshold → ConfigIndex.PressurePerPoint（100）
 ```
 
 **转换（§7.3，逐次处理）**：入账后**每满一次阈值就立即抽一次数值强化**（所以一次结算跨过多个阈值 = 多次抽取，
@@ -1194,7 +1198,7 @@ public void AddPressureForNode(RewardNodeKind kind)
 | 文档条款 | 实现 | 状态 |
 |---|---|---|
 | §7.2 挑战完成后增加 Pressure | 清场后 `AddPressureForNode`（原本就有） | ✅ 原本就有 |
-| §7.2 **不同挑战类型有各自的增加值** | `NodeConfig.BossPressurePoints`（节点表 = 挑战类型）；留 0 → 关卡行按价值层 → Balance 150 | ✅ **阶段 6 新接** |
+| §7.2 **不同挑战类型有各自的增加值** | `NodeConfig.BossPressurePoints`（节点表 = 挑战类型）；留 0 → 关卡行按价值层 → ConfigIndex 150 | ✅ **阶段 6 新接** |
 | §7.2 **每个 Stage 用固定倍率表** | `StageDefinition.PressureGrowthMultiplier`（阶段 1 已就位，不随机） | ✅ 已就位 |
 | §7.2 进化/异化**额外比例**，**组合顺序明确** | `1.25` / `1.5`，顺序 `基础 × 本关倍率 × 类型比例`（只在 `AddPressureForNode` 定义一处，日志把三个因子都打出来） | ✅ 已就位 + 日志可核 |
 | §7.3 每 100 点 → 一次**随机强化** | 跨阈值时**立即**调用 `BossPerkCatalog.RollPressure`（数值池） | ✅ **阶段 6 新接** |
@@ -1216,7 +1220,7 @@ public void AddPressureForNode(RewardNodeKind kind)
 
 当前三行节点表里 **`node_evolution` 与 `node_mutation` 填了 `BossPressurePoints = 150`**（= 文档 §7.2 的固定值），
 其余 7 行留 0（走回退）。所以 `+187.5` / `+225` 与接之前**逐位一致**，但来源从
-`Balance 全局默认值` 变成了 **`节点表 node_evolution` / `节点表 node_mutation`**（日志可核）。
+`ConfigIndex 全局默认值` 变成了 **`节点表 node_evolution` / `节点表 node_mutation`**（日志可核）。
 
 ### `Weight` 真的生效了吗（实测证据）
 
@@ -1268,8 +1272,8 @@ W2/W3 只改了 `.tres` 的 `Weight` 列（没重新编译）就换了分布 →
 | 观察点 | 实测 |
 |---|---|
 | 池变成均匀 + 无标签 | `Pressure 转换池：候选 3 条 [pmod_berserk 权重 1 标签 [无标签] → 33.3% · …]` |
-| 节点表明确写出"全走回退" | `Pressure 节点驱动：节点表 9 行都没配 → 全部走「关卡行 → Balance 全局默认值」回退` |
-| 来源留痕 | `Pressure 累积：+187.5（基础 150（来源：Balance 全局默认值）× 本关倍率 1 × 类型比例 1.25）…` |
+| 节点表明确写出"全走回退" | `Pressure 节点驱动：节点表 9 行都没配 → 全部走「关卡行 → ConfigIndex 全局默认值」回退` |
+| 来源留痕 | `Pressure 累积：+187.5（基础 150（来源：ConfigIndex 全局默认值）× 本关倍率 1 × 类型比例 1.25）…` |
 | **数值不变** | `+187.5` / `+225` 与表在时**逐字相同**；`pressure=3 pmods=3 bank=0` 相同 |
 | 只有 warning、没有 error | 与 Pressure 相关的 warning / error **0 条**；自测全程走到 `=== 自测结束 ===` |
 | 玩法可用性 | 节点布置 / 间距 / 战斗 / 端到端按 F 打开奖励界面全部照旧通过 |
@@ -1507,7 +1511,7 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 
 | 观察点 | 实测 |
 |---|---|
-| 日志留痕 | `配置表：… 技能 25 / **Pressure 0** / …（Balance.tres 已加载）` + `首领强化来源：数值型 Pressure **8 条（来源：代码兜底）** / 行为型 Boss Build 4 条（来源：表 Skills）` |
+| 日志留痕 | `配置表：… 技能 25 / **Pressure 0** / …（ConfigIndex.tres 已加载）` + `首领强化来源：数值型 Pressure **8 条（来源：代码兜底）** / 行为型 Boss Build 4 条（来源：表 Skills）` |
 | **兜底与表同结构** | 池明细与表在时**逐字相同**（同样 8 条 Id / 权重 3·3·2·2·2·1·1·1 / 4 条限定词 / 同样的概率 20/20/13.3/13.3/13.3/6.7/6.7/6.7）—— 兜底**不再**退回"伤害+攻速挤在一栏"的旧形态（那会是一次静默换挡） |
 | 技能参数仍然生效 | `AbilityScream.Cooldown 7 → 5.6 → 4.48`、`AbilityCharge 命中体 Damage 20 → 25`；真实出生 `[狂暴·攻速、铁壁·生命、狂暴·攻速]` → `Boss 生命 1260` |
 | 限定词与换抽仍然生效 | 探针：Chaser 判定不成立 → 换抽；`铁壁·护甲→铁壁·生命`（成立那次真的落地：生命 900 → 1260）；端到端 3 抽 `疾行 ｜ 尖啸回响 ｜ 铁壁·护甲→铁壁·生命` |
@@ -1515,7 +1519,7 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 | 只有 warning、没有 error | 与 Pressure 相关的 warning / error **0 条**，自测走到 `=== 自测结束 ===` |
 | ⚠️ 已知不准确的一行（**本轮没改，StageController 不在本轮边界内**） | 清空索引时 `StageController` 那条日志仍写 `（阈值转换 3 次，**来源：表 Pressure**）` —— 这个字符串是硬编码的；真实来源以 `BossPerkCatalog` 打的那一行为准（这一行在回退时写的是"代码兜底"） |
 
-**清空"索引数组"不会让词条消失**（第三/四/五次踩到同一类坑）：行引用写在 `Balance.tres` 的
+**清空"索引数组"不会让词条消失**（第三/四/五次踩到同一类坑）：行引用写在 `ConfigIndex.tres` 的
 `[ext_resource]` 上，数组只是"建索引 + 报数"用的。要真正回退到"这批词条不存在"，
 得连 `[ext_resource]` 与行文件一起删。
 
@@ -1547,7 +1551,7 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 | # | 改哪里 | 怎么改 | 不改会怎样 |
 |---|---|---|---|
 | ① | 行文件 `Config/Tables/Pressure/pmod_fortress_armor.tres` | **删除文件**（该目录没有 `.uid`） | 留下没人引用的孤儿行 |
-| ② | `Config/Balance.tres` | **`[ext_resource]` 那一行**（`id="111_pmod_fortress_armor"`）与 **`PressureMods` 数组里那一项**一起删；`load_steps` 114 → 113 | 只删行文件 → **整份 `Balance.tres` 加载失败**、所有数值静默回退（config.md 顶部那条纪律） |
+| ② | `Config/ConfigIndex.tres` | **`[ext_resource]` 那一行**（`id="111_pmod_fortress_armor"`）与 **`PressureMods` 数组里那一项**一起删；`load_steps` 114 → 113 | 只删行文件 → **整份 `ConfigIndex.tres` 加载失败**、所有数值静默回退（config.md 顶部那条纪律） |
 | ③ | **代码兜底** `Scripts/Boss/BossPerk.cs` 的 `FallbackPressure` | 删掉那条 `BossPerk`（表读不到时用的那份） | 表一读不到，首领**又会吃护甲**（静默换挡）—— 正是阶段 7 注释里防的那类坑 |
 
 **精英怪的护甲来源（读代码确认，没误伤）**：精英护甲**与 Pressure 无关**，来自
@@ -1622,7 +1626,7 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 ### 三、⑤ 命中特效：落在**实际命中点**（并删掉 `HitEffectHeightOffset`）
 
 **改前**：`AttackHitbox._PhysicsProcess` 里写的是
-`target.GlobalPosition + Up × Balance.Settings.HitEffectHeightOffset`（默认 1.0）——
+`target.GlobalPosition + Up × ConfigIndex.Settings.HitEffectHeightOffset`（默认 1.0）——
 即"目标原点（脚底）+ 一个全局胸口高度"。**改后**：`AttackHitbox.ResolveHitPoint(target)`。
 
 **取的到底是什么点**：把**命中体自己的世界坐标**投到**目标碰撞体**上，取**表面上最近的那一点**
@@ -1639,7 +1643,7 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 （顺带留下的两处纪律：命中点**先算、再 `ReceiveHit`**；射线版本还需要"逐个排除挡路的怪"才能在
 人堆里打中目标 —— 几何版不需要。）
 
-**`HitEffectHeightOffset` 的处置 = 删除**（字段 + `Balance.tres` 的那一行一起删）：它唯一的消费者
+**`HitEffectHeightOffset` 的处置 = 删除**（字段 + `ConfigIndex.tres` 的那一行一起删）：它唯一的消费者
 就是被替换掉的那一行代码，留着就是"一列改了没用的死配置"（与配置表阶段 3 清理死字段同一条纪律）。
 投射物那条路径（`Projectile.ResolveImpact`）**一行没动** —— 它本来就有精确的射线命中点。
 ⚠️ 红线遵守：`Scenes/Combat/Explosion.tscn` 的 `SphereShape3D radius=1` 与 `Lifetime=0.12` **一个字节没动**
@@ -1715,7 +1719,7 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
 | **权威在哪** | **`Config/Tables/Bosses/boss_final.tres` 的 `MaxArmor`（现名 `StartingArmor`）**。生成路径 `EncounterController.SpawnBossNow()` 是 `Instantiate → BossRow(BossScene)?.ApplyTo(Boss) → AddChild`（`EncounterController.cs:708-712`），`UnitConfig.ApplyTo` 里 `unit.ApplyBaseStats(...)` 会把基础护甲与 `StartingArmor` 一起写成行里的值，而 `Unit._EnterTree` 在 `AddChild` 时才捕获基础值 → **行覆盖场景**。白板首领副本（`SpawnEliteBossNow`）走同一条路（`:670-672`）。 |
 | **场景那一份** | `Scenes/Enemies/Boss.tscn` 当时那份 `MaxArmor = 200.0` 是**回退值**（表读不到时才生效）。两处不同值 = 项目反复警告的"**静默换挡**"，所以本轮**两处一起归零**：行里写 `MaxArmor = 0.0`（现名 `StartingArmor = 0.0`，与 `enemy_chaser.tres` 等 0 甲行的写法一致），场景里**删掉那一行**（0 甲的敌人场景都不写它）。 |
 | **字段有没有被删/摘掉** | **当时完全没有**（这一轮只改数值）。⚠️ **C1 之后不是这样了**：`Unit.MaxArmor` / `UnitConfig.MaxArmor` 改名为 **`StartingArmor`**，`MaxArmorMultiplier` / `MaxArmorAdd` **删除**；`Unit.Armor` / `ArmorDamageReduction` / `ArmorBroke` 事件 / `DamageResult.ArmorLost` / HUD 的"甲 N" / `BossPreviewScreen` 的护甲一栏 —— **仍然一个都没动**。 |
-| **还有谁能给首领加甲？** | 全项目 grep（`MaxArmorAdd` / `MaxArmorMultiplier` / `ArmorAdd` / `MaxArmor`、`Scripts/**` + `Config/**` + `Scenes/**`）只有**一个**生产者：`Scripts/Combat/EliteModifier.cs`（`ArmorAdd = 120`；C1 之后走 `Unit.GrantArmor`）。它**只挂在普通敌人身上**：`EncounterController.cs:454-457`（`SpawnEnemy` 里按 `eliteChance` 添加）与 `Scenes/Enemies/SkillElite.tscn` 里手挂的那一个（该场景写 `ArmorAdd = 0.0`）。首领那条路（`SpawnBossNow` / `SpawnEliteBossNow`）**不加** `EliteModifier`。另外查过三个"看起来会加甲"的地方，结论都是**不加**：`BossPressure`（只加 `DamageMultiplier` / `AttackSpeedMultiplier` / `MoveSpeedMultiplier`）、`Balance.ScaleEnemy`（生命/伤害/移速）、Pressure 池 7 行（`DamageMultiplier` / `AttackSpeedMultiplier` / `MaxHealthMultiplier` / `MoveSpeedMultiplier` + 3 条技能参数）。**结论：首领现在没有任何获取护甲的途径。** |
+| **还有谁能给首领加甲？** | 全项目 grep（`MaxArmorAdd` / `MaxArmorMultiplier` / `ArmorAdd` / `MaxArmor`、`Scripts/**` + `Config/**` + `Scenes/**`）只有**一个**生产者：`Scripts/Combat/EliteModifier.cs`（`ArmorAdd = 120`；C1 之后走 `Unit.GrantArmor`）。它**只挂在普通敌人身上**：`EncounterController.cs:454-457`（`SpawnEnemy` 里按 `eliteChance` 添加）与 `Scenes/Enemies/SkillElite.tscn` 里手挂的那一个（该场景写 `ArmorAdd = 0.0`）。首领那条路（`SpawnBossNow` / `SpawnEliteBossNow`）**不加** `EliteModifier`。另外查过三个"看起来会加甲"的地方，结论都是**不加**：`BossPressure`（只加 `DamageMultiplier` / `AttackSpeedMultiplier` / `MoveSpeedMultiplier`）、`ConfigIndex.ScaleEnemy`（生命/伤害/移速）、Pressure 池 7 行（`DamageMultiplier` / `AttackSpeedMultiplier` / `MaxHealthMultiplier` / `MoveSpeedMultiplier` + 3 条技能参数）。**结论：首领现在没有任何获取护甲的途径。** |
 | **精英的甲** | **保留不动**（`EliteModifier.ArmorAdd = 120`）—— 它是精英怪的获取手段，与首领无关。C1 之后它是**直接加甲**（`GrantArmor`），语义比原来更准确。 |
 
 **去掉之后伤害管线怎么走**（`Unit.ReceiveHit`，战斗规则说明 §12 的顺序一个字没改）：
@@ -1951,7 +1955,7 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 ## 配置表阶段 8 实测（2026-10：能力卡 = 局外装备层）
 
 **做了什么**：新增第 17 张表 `Config/Tables/AbilityCards/card_*.tres`（8 行）+ 局外成长表第 6 行
-`Config/Tables/Meta/meta_quota.tres`（额度扩增）+ `BalanceConfig` 两个字段
+`Config/Tables/Meta/meta_quota.tres`（额度扩增）+ `ConfigIndexData` 两个字段
 （`AbilityCards` 索引数组、`AbilityQuotaBase = 6`）+ 4 条 `ui_card_*` 音效行 + 8 张卡图标 SVG。
 **完整说明、表结构、加卡步骤、界面与交互的实现见 [ability-cards.md](ability-cards.md)。**
 
@@ -1964,7 +1968,7 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
          card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）、
          card_reload（2 点/解锁 25/上限 Lv5）、card_magazine（2 点/解锁 30/上限 Lv5）、card_summon（4 点/解锁 60/上限 Lv3）、
          card_control（4 点/解锁 60/上限 Lv3）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
-[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 7 / 效果 9 / 节点 9 / 局外成长 6 / AI 档案 11 / 能力卡 8（Balance.tres 已加载）
+[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 7 / 效果 9 / 节点 9 / 局外成长 6 / AI 档案 11 / 能力卡 8（ConfigIndex.tres 已加载）
 [Audio] 配置表：音效 9（来源：表 Audio）—— … ；ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)
 ```
 
@@ -1995,11 +1999,11 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 整轮 `ERROR / Exception` **0 条**，`selftest.flag` 已删（`Test-Path` = False）。
 
 **回退路径（本轮 ⚠️ 只做了代码层设计，没有主动跑一遍空表）**：与其它表同一条纪律 ——
-`AbilityStore.Rows` 直接读 `Balance.Settings.AbilityCards`，表读不到就是空数组：
+`AbilityStore.Rows` 直接读 `ConfigIndex.Settings.AbilityCards`，表读不到就是空数组：
 矩阵只显示**占位卡**、`AbilityEffects` 一条效果都不加、日志写 `能力卡：… 0 张（来源：代码默认值（表读不到））`，
 玩法其余部分（节点布置 / Pressure / 端到端）不受影响；`meta_quota` 行读不到时 `QuotaPerLevel` 兜底为 1（与表里一致）。
-要主动验证：把 `Balance.tres` 的 `AbilityCards` 数组项与顶部对应的 `[ext_resource]` **一起**删掉再跑一轮自测
-（⚠️ **只删数组项不删 `ext_resource`、或只删行文件不删引用，都会让整份 `Balance.tres` 加载失败**）。
+要主动验证：把 `ConfigIndex.tres` 的 `AbilityCards` 数组项与顶部对应的 `[ext_resource]` **一起**删掉再跑一轮自测
+（⚠️ **只删数组项不删 `ext_resource`、或只删行文件不删引用，都会让整份 `ConfigIndex.tres` 加载失败**）。
 
 ## 用户 A2 / A3 + 需求 #6 实测（2026-10-12）
 
@@ -2071,7 +2075,7 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 | **行为变化（必须知道的一条）** | `EliteModifier.ArmorAdd = 120` 现在是**纯粹的加甲**：本来 0 甲的敌种（追猎者 / 快速近战 / 自爆 / 跳跃 / 远程 / 尖啸）精英化后**真的多出 120 甲**。改动前那条 `MaxArmorAdd` 只把它们的护甲上限抬到 120、`Armor` 仍是 0（一层不吸收伤害、比例恒 0 的空壳），所以这是"语义修正"带来的数值变化，属 A1 的占位范围。有甲敌种（守卫 60→180、冲锋兵 30→150）与改动前一致。 |
 | **`BarBoss.tscn` / 首领** | 一行没动：首领本来就没有 `StartingArmor`（0），判据改成 `Armor > 0` 之后它依然"天然不显示"，`BarBoss.tscn` 里本来就没有护甲节点。 |
 | **改了哪些数据文件** | 行文件 **14 个**（`Enemies/` 9 个带甲行 —— `enemy_global` 是纯倍率行、本来就没有这一列；`Bosses/boss_final`；`Summons/summon_drone`；`Characters/chr_gunner|heavy|summoner`）+ 场景 **4 个**（`Guard.tscn` 60 / `Charger.tscn` 30 / `SkillElite.tscn` 90 / `TrainingDummy.tscn` 60）。三个角色行的 `DescriptionTemplate` 占位符 `{MaxArmor:0}` → `{StartingArmor:0}`（`ConfigText` 按**字段名**取，不改就是 `[ConfigText] 模板里的 {MaxArmor:0} 在配置行里找不到` 警告）。全部 **LF + 无 BOM**（逐个二进制校验过）。 |
-| **`Balance.tres` 存了吗** | **没有** `MaxArmor` 字段（它是全局标量表，护甲从来只在行文件/场景里），所以那次改动没有碰它 —— 也就没有"整份加载失败"的风险。⚠️ **行文件是原地改列名、不是删文件/改名**，所以 `[ext_resource]` 与数组项一个都没动。 |
+| **`ConfigIndex.tres` 存了吗** | **没有** `MaxArmor` 字段（它是全局标量表，护甲从来只在行文件/场景里），所以那次改动没有碰它 —— 也就没有"整份加载失败"的风险。⚠️ **行文件是原地改列名、不是删文件/改名**，所以 `[ext_resource]` 与数组项一个都没动。 |
 
 ### 二、C2：池的候选集时机 + 合并重复的进化池节点行
 
@@ -2085,12 +2089,12 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 | **`UpgradePools/` 三个池** | **保留不动**（C2 明令）：`pool_pistol` / `pool_sniper` / `pool_rifle` 就是"进化池的选项由角色持有的攻击方式决定"这条链路的落点（武器行 `Pool` 正向指过去；选项行的 `Pool` / `RequiredWeaponTags` 决定谁能抽到）。 |
 | **"节点布置 10（高 2 / 中 5 / 低 3）"数的是表行还是场景实例** | **场景实例**（`SelfTest.ReportNodes` 遍历 `Stage` 的子节点里的 `RewardNode`，按 `NodePlacement.LayerOf(kind)` 分层）。所以删一行表**不会**改这个数字 —— 实测**仍然是 10（2/5/3）**。改的是 `配置表比对·索引` 里的 **`节点 9` → `节点 8`**（少一个行文件，必然结果，已同步期望值），以及开局日志 `节点波数（…）：…`（少一项）与 `Pressure 节点驱动：节点表 9 行里 2 行配了` → **`8 行里 2 行配了`**（配了的那两行仍然是 `node_evolution` / `node_mutation`，功能部分逐字不变）。 |
 | **`Kind = Weapon` 的兜底** | `NodePlacement.LayerOf` 的代码兜底补上 `RewardNodeKind.Weapon => 2`（与 `Evolution` / `Mutation` 同层）。表里再没有这一行之后，它就是 `Kind = Weapon` 唯一的价值层来源；不补的话 `WavesFor(Weapon)` 会从 4 掉到 1，自测的 `节点 [Weapon=4 …]` 那条硬指标会漂，而且与 A3「武器限定池 = 进化池 = 高价值」自相矛盾。 |
-| **`node_weapon` 的删除姿势** | `git rm` 行文件（该目录没有 `.uid`）+ **同一个改动里**删掉 `Balance.tres` 的 `[ext_resource ... id="22_node_weapon"]` 与 `Nodes = [...]` 里那一项 —— 正是 config.md 顶部那条纪律要求的姿势（只删行文件会让整份 `Balance.tres` 加载失败）。 |
+| **`node_weapon` 的删除姿势** | `git rm` 行文件（该目录没有 `.uid`）+ **同一个改动里**删掉 `ConfigIndex.tres` 的 `[ext_resource ... id="22_node_weapon"]` 与 `Nodes = [...]` 里那一项 —— 正是 config.md 顶部那条纪律要求的姿势（只删行文件会让整份 `ConfigIndex.tres` 加载失败）。 |
 
 ### 三、自测实测（C1 与 C2 各跑一轮，最终代码一轮）
 
 ```
-[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 7 / 效果 9 / 节点 8 / 局外成长 6 / AI 档案 11 / 能力卡 8（Balance.tres 已加载）
+[Config] 配置表：武器 3 / 角色 3 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 25 / Pressure 7 / 效果 9 / 节点 8 / 局外成长 6 / AI 档案 11 / 能力卡 8（ConfigIndex.tres 已加载）
 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Gunner · 武器 Pistol（PoolId pool_pistol）→ 候选 19 条（武器层之后；角色限定项在抽取时再筛 SummonerAllowed=False）
 [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）
 [SelfTest] 配置表比对·玩家：生命 270（期望 250 + 元进度加成 20） 护甲 40（期望 40） 移速 7（期望 7） 减伤 0（期望 0）
@@ -2109,5 +2113,5 @@ Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3
 **逐位不变**：`节点布置 10（2/5/3）`、`Pressure=3`、`端到端 F`（奖励界面打开 = True）、`音效 13`、
 `增幅项 19 条 / 池子 18 条`、`价值标签 → 节点 [Weapon=4 …]`、升级池三层与召唤控制池 19 条、玩家护甲 40 / 移速 7 / 减伤 0。
 **唯一变的一个数字**：`配置表比对·索引` 的 **`节点 9 → 8`**（合并两个节点行 = 少一个行文件，必然结果，已同步期望值）。
-日志里**没有** `Balance.tres` 加载失败 / 读表回退的迹象（`（Balance.tres 已加载）` + 各表条数与表在时一致）。
+日志里**没有** `ConfigIndex.tres` 加载失败 / 读表回退的迹象（`（ConfigIndex.tres 已加载）` + 各表条数与表在时一致）。
 

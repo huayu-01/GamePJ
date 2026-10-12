@@ -12,4 +12,4 @@ EliteChanceMultiplier = 1.0
 Id = "enemy_global"
 Slot = 1
 DisplayName = "敌人 · 全局倍率"
-Note = "数值逐条抄自 Balance.tres 的 EnemyHealthMultiplier / EnemyDamageMultiplier / EnemyMoveSpeedMultiplier / EliteChanceMultiplier。⚠️ 这四个值的 C# 回退（BalanceConfig 的属性初值）必须与这里保持一致，否则表读不到时会静默换一套难度（见 docs/config-tables-inventory.md §5-④）。"
+Note = "数值逐条抄自 ConfigIndex.tres 的 EnemyHealthMultiplier / EnemyDamageMultiplier / EnemyMoveSpeedMultiplier / EliteChanceMultiplier。⚠️ 这四个值的 C# 回退（ConfigIndexData 的属性初值）必须与这里保持一致，否则表读不到时会静默换一套难度（见 docs/config-tables-inventory.md §5-④）。"

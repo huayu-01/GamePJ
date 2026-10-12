@@ -140,7 +140,7 @@ public partial class MapManager : Node3D
 		var zone = new KillZone
 		{
 			Name = "KillZone",
-			CenterY = ActRoguelike.Config.Balance.Settings.KillPlaneY - 30f,
+			CenterY = ActRoguelike.Config.ConfigIndex.Settings.KillPlaneY - 30f,
 		};
 		(GetTree().CurrentScene ?? GetTree().Root).AddChild(zone);
 	}

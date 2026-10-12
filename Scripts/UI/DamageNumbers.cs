@@ -71,7 +71,7 @@ internal static class DamageNumbers
 		_ => new Color(0.45f, 1f, 0.55f),
 	};
 
-	/// <summary>字号倍率（相对 Balance 的 <c>DamageNumberFontSize</c>）。</summary>
+	/// <summary>字号倍率（相对 ConfigIndex 的 <c>DamageNumberFontSize</c>）。</summary>
 	public static float FontScaleOf(DamageNumberKind kind) => kind switch
 	{
 		DamageNumberKind.Critical => 1.35f,

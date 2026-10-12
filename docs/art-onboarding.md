@@ -220,11 +220,11 @@ RewardNode（Node3D，挂 RewardNode.cs）
 - **三档只靠色相区分**（金 / 青蓝 / 绿），不靠明度 —— 这样在近白地板和紫色星空下都不会混。
 - **失效节点不发光**：`dead` 动画把光圈缩到 0.55 并把三个环的 `transparency` 拉到 0.82~0.95
   （"已经用掉的节点"在 `Disappear()` 里整个缩掉并隐藏）。
-- ⚠️ **实现上的一个真坑（自测抓到的）**：光圈颜色要读 `Balance` 的**表索引**，而那张索引是
-  `Balance.CallDeferred(BuildTableIndex)` 建的 —— `Main.tscn` 里节点的 `_Ready` **早于**那次 defer，
+- ⚠️ **实现上的一个真坑（自测抓到的）**：光圈颜色要读 `ConfigIndex` 的**表索引**，而那张索引是
+  `ConfigIndex.CallDeferred(BuildTableIndex)` 建的 —— `Main.tscn` 里节点的 `_Ready` **早于**那次 defer，
   于是第一次读到"空索引"，颜色被当成"读不到"**缓存**住了 → **整局光圈都是中性白**（截图看不出来，日志里有）。
   修法两条：① `RewardNode.ApplyIdleVisual()` 里 **`CallDeferred` 再跑一次** `ApplyAuraColor`（defer 队列先进先出，
-  `Balance` 排在主场景之前，所以这一跑索引必然已就绪）；② **只有真读到才写缓存**，读不到不落缓存。
+  `ConfigIndex` 排在主场景之前，所以这一跑索引必然已就绪）；② **只有真读到才写缓存**，读不到不落缓存。
 - ⚠️ **`Kind = Weapon` 光圈是中性白**：它**没有节点表行**（A3 之后并入了进化池），所以没有价值标签可读 ——
   这是刻意的，不是漏配（日志里也**不**报 warning：有行却解析不出标签才报）。
 
@@ -289,13 +289,13 @@ RewardNode（Node3D，挂 RewardNode.cs）
 
 | 预制体 | 用在哪 | 谁实例化 |
 |---|---|---|
-| `BarEnemy.tscn` | 敌人脚下血条（每个受伤的怪一份） | `WorldOverlay.cs`（尺寸取 `Balance.tres`） |
+| `BarEnemy.tscn` | 敌人脚下血条（每个受伤的怪一份） | `WorldOverlay.cs`（尺寸取 `ConfigIndex.tres`） |
 | `BarBoss.tscn` | 界面顶部首领主血条 | `PlayerHud.cs`（挂到 HUD 层，节点名 `BossPanel`） |
 | `BarPlayer.tscn` | 左上角玩家血条 | `Hud.tscn`（实例节点名 `PlayerBar`） |
 
 - 三者结构一致：`Fill`（填充）、`DelayBar`（延迟条 / 受伤残影，受伤后缓慢跟随，可改颜色）、`Animation`（空 `AnimationPlayer` 占位）、可选 `Bg`（底色 / 边框）与 `Label`（文字占位）。
 - **控件类型随意换**：代码只按 `Control` 用它们（`size` / `modulate`），`ColorRect` / `TextureRect` / `NinePatchRect` 都行，`Fill` 已经是 `TextureRect`（贴图条）。
-- **尺寸**：`BarPlayer` 的宽高**由场景说了算**（代码只改填充宽度，不再每帧覆盖）；`BarEnemy` 的尺寸由 `Balance.tres` 的 `EnemyHealthBarWidth/Height` 决定，预制体按同比例整体缩放。
+- **尺寸**：`BarPlayer` 的宽高**由场景说了算**（代码只改填充宽度，不再每帧覆盖）；`BarEnemy` 的尺寸由 `ConfigIndex.tres` 的 `EnemyHealthBarWidth/Height` 决定，预制体按同比例整体缩放。
 - ⚠️ `BarEnemy` 里可缩放的整条内容都放在 `Content` 下、且**以 Root 原点为中心**（现在是 `Content` 摆在 `(-1,-1)`、尺寸 +2）—— 代码把 `Root.Position` 当血条中心，改布局要保持这个中心约定（偏了会打警告）。
 - 首领血条的 `Bar` 是 `ProgressBar`（不是 `Control` 填充条），填充色在预制体的 `theme_override_styles/fill` 里。
 
@@ -370,7 +370,7 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
 1. `Explosion.tscn` 的 **`SphereShape3D`** 是伤害判定基准
 2. `Interactable.OnUsed()` 要求材质是 **`StandardMaterial3D`** —— 换成 `ShaderMaterial` 会让"已用变暗"**静默失效**
 3. 交互物的**交互半径、提示文字**是玩法参数，不是表现
-4. `Balance.tres` 里的 `EnemyHealthBar*` 等是**数值配置**，不要当美术参数调
+4. `ConfigIndex.tres` 里的 `EnemyHealthBar*` 等是**数值配置**，不要当美术参数调
 
 ## 七、还没做的（可以接着推）
 
@@ -496,7 +496,7 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
 5. **光圈与三状态动画并存**：`dead`（`!Enabled` / `Used` / `Vanished`）把光圈缩到 0.55 并把三个环的
    `transparency` 拉到 0.82~0.95 —— **失效节点不再发光**；`idle` 呼吸、`active` 胀得更快更大。
    ⚠️ 动画**只动每实例的 `transparency` 与 `Aura:scale`**，绝不写材质（材质是按档位共享的）。
-6. **一个自测抓到的真 bug**（已修，见 §三.1.3 末）：光圈颜色要读 `Balance` 的表索引，而那是
+6. **一个自测抓到的真 bug**（已修，见 §三.1.3 末）：光圈颜色要读 `ConfigIndex` 的表索引，而那是
    `CallDeferred` 建的 → 节点的 `_Ready` 早于它 → 颜色被"读不到"的结果缓存住，**整局光圈都是中性白**
    （画面上看不出异常，只有日志里那行 warning 能证明）。修法：`CallDeferred` 再跑一次 + **只缓存成功的读取**。
 7. **拍摄台扩了 4 张图**：`node_44_kinds9.png`（9 种形状 + 三档光圈总览）/ `node_45_aura_tiers.png`

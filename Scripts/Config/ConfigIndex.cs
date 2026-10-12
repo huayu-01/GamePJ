@@ -5,20 +5,20 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 平衡配置单例（autoload）。所有系统通过 <see cref="Settings"/> 读数值。
-/// 配置文件缺失或字段缺失时回退到 <see cref="BalanceConfig"/> 的代码默认值。
+/// 配置文件缺失或字段缺失时回退到 <see cref="ConfigIndexData"/> 的代码默认值。
 /// </summary>
-public partial class Balance : Node
+public partial class ConfigIndex : Node
 {
-	public const string ConfigPath = "res://Config/Balance.tres";
+	public const string ConfigPath = "res://Config/ConfigIndex.tres";
 
-	public static Balance? Instance { get; private set; }
+	public static ConfigIndex? Instance { get; private set; }
 
-	private static readonly BalanceConfig Fallback = new();
+	private static readonly ConfigIndexData Fallback = new();
 
 	/// <summary>"敌人倍率来源"只写一次日志（见 <see cref="LogEnemyScalesOnce"/>）。</summary>
 	private static bool _enemyScaleLogged;
 
-	public BalanceConfig Config { get; private set; } = new();
+	public ConfigIndexData Config { get; private set; } = new();
 
 	/// <summary>
 	/// <see cref="ConfigPath"/> 是否真的加载成功。供日志区分「表已加载」与「整份配置回退到代码默认值」——
@@ -26,22 +26,22 @@ public partial class Balance : Node
 	/// </summary>
 	public bool FileLoaded { get; private set; }
 
-	public static BalanceConfig Settings => Instance?.Config ?? Fallback;
+	public static ConfigIndexData Settings => Instance?.Config ?? Fallback;
 
 	public override void _Ready()
 	{
 		Instance = this;
-		if (ResourceLoader.Exists(ConfigPath) && GD.Load<BalanceConfig>(ConfigPath) is { } loaded)
+		if (ResourceLoader.Exists(ConfigPath) && GD.Load<ConfigIndexData>(ConfigPath) is { } loaded)
 		{
 			Config = loaded;
 			FileLoaded = true;
 		}
 		else
 		{
-			GD.PushWarning($"[Balance] 未找到 {ConfigPath}，使用代码默认值。");
+			GD.PushWarning($"[ConfigIndex] 未找到 {ConfigPath}，使用代码默认值。");
 		}
 
-		// ⚠️ 必须 defer：`GameLog` 的 autoload 排在 `Balance` **之后**（project.godot 的 [autoload] 顺序），
+		// ⚠️ 必须 defer：`GameLog` 的 autoload 排在 `ConfigIndex` **之后**（project.godot 的 [autoload] 顺序），
 		// 在 `_Ready` 里直接写日志会被静默丢掉（首轮实测过：日志里一行 [Config] 都没有）。
 		// defer 之后所有 autoload 都已就绪，日志能落地，而主场景还没加载，所以不影响任何读取者。
 		CallDeferred(nameof(BuildTableIndex));
@@ -51,7 +51,7 @@ public partial class Balance : Node
 	/// 把分表的索引数组建成按 Id / Slot（以及节点表的按 Kind）查的字典。
 	///
 	/// **每一步都留痕**：日志里会写明每张表读到几行、来源是"表"还是"代码默认值"，
-	/// 这样出问题时不需要猜这一局用的是哪一套数值（上一轮踩过的坑：整份 Balance.tres
+	/// 这样出问题时不需要猜这一局用的是哪一套数值（上一轮踩过的坑：整份 ConfigIndex.tres
 	/// 静默回退，只有日志能证明）。
 	/// </summary>
 	private void BuildTableIndex()
@@ -117,14 +117,14 @@ public partial class Balance : Node
 					continue;
 				}
 
-				GD.PushWarning($"[Balance] 关卡 {stage.Id} 的 AllowedEnemyIds 里有未知敌人 Id「{id}」（敌人表里没有这一行）。");
+				GD.PushWarning($"[ConfigIndex] 关卡 {stage.Id} 的 AllowedEnemyIds 里有未知敌人 Id「{id}」（敌人表里没有这一行）。");
 				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 关卡 {stage.Id} 允许列表里的「{id}」在敌人表里找不到，这一条不会生效。");
 			}
 		}
 
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
-			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()} / AI 档案 {ConfigRows.Count<AiProfileConfig>()} / 能力卡 {ConfigRows.Count<AbilityCardConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
+			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()} / AI 档案 {ConfigRows.Count<AiProfileConfig>()} / 能力卡 {ConfigRows.Count<AbilityCardConfig>()}（ConfigIndex.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
 	}
 
 	/// <summary>
@@ -176,7 +176,7 @@ public partial class Balance : Node
 					continue;
 				}
 
-				GD.PushWarning($"[Balance] 节点行 {row.Id} 的价值标签「{tag}」在价值标签表里找不到，这一条不会生效（会落到节点行 WaveCount → 价值层兜底）。");
+				GD.PushWarning($"[ConfigIndex] 节点行 {row.Id} 的价值标签「{tag}」在价值标签表里找不到，这一条不会生效（会落到节点行 WaveCount → 价值层兜底）。");
 				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 节点行 {row.Id} 的价值标签「{tag}」在 ValueTags 表里找不到。");
 			}
 		}
@@ -208,11 +208,11 @@ public partial class Balance : Node
 
 			byWeapon.Append($"{row.Id}→{(row.Pool == null ? "（未填）" : row.Pool.Id)}");
 
-			// 行文件被引用 ≠ 被索引：池行只被武器引用、却没加进 Balance.tres 的 UpgradePools 数组时，
+			// 行文件被引用 ≠ 被索引：池行只被武器引用、却没加进 ConfigIndex.tres 的 UpgradePools 数组时，
 			// 池表看上去是空的，但引用仍在。这种不一致必须报出来（和关卡白名单那次同一个纪律）。
 			if (row.Pool != null && ConfigRows.ById<UpgradePoolConfig>(row.Pool.Id) == null)
 			{
-				GD.PushWarning($"[Balance] 武器 {row.Id} 的 Pool 指向「{row.Pool.Id}」，但这个池不在 Balance.tres 的 UpgradePools 索引里。");
+				GD.PushWarning($"[ConfigIndex] 武器 {row.Id} 的 Pool 指向「{row.Pool.Id}」，但这个池不在 ConfigIndex.tres 的 UpgradePools 索引里。");
 				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 武器 {row.Id} 指向的升级池「{row.Pool.Id}」不在 UpgradePools 索引里（引用还在，索引里查不到）。");
 			}
 		}
@@ -286,14 +286,14 @@ public partial class Balance : Node
 
 			if (row.Skill == null)
 			{
-				GD.PushWarning($"[Balance] 能力卡 {row.Id} 是授予技能型，但没填 Skill（技能行）—— 这张卡激活后不会有任何效果。");
+				GD.PushWarning($"[ConfigIndex] 能力卡 {row.Id} 是授予技能型，但没填 Skill（技能行）—— 这张卡激活后不会有任何效果。");
 				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 能力卡 {row.Id} 是授予技能型但没填 Skill 列。");
 				continue;
 			}
 
 			if (ConfigRows.ById<AbilityConfig>(row.Skill.Id) == null)
 			{
-				GD.PushWarning($"[Balance] 能力卡 {row.Id} 的 Skill 指向「{row.Skill.Id}」，但这个技能不在 Balance.tres 的 Skills 索引里。");
+				GD.PushWarning($"[ConfigIndex] 能力卡 {row.Id} 的 Skill 指向「{row.Skill.Id}」，但这个技能不在 ConfigIndex.tres 的 Skills 索引里。");
 				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 能力卡 {row.Id} 指向的技能行「{row.Skill.Id}」不在 Skills 索引里（引用还在，索引里查不到）。");
 			}
 		}
@@ -340,7 +340,7 @@ public partial class Balance : Node
 			// 行文件被引用 ≠ 被索引（与升级池那次同一个坑）。
 			if (ConfigRows.ById<AiProfileConfig>(row.AiProfile.Id) == null)
 			{
-				GD.PushWarning($"[Balance] 单位行 {row.Id} 的 AiProfile 指向「{row.AiProfile.Id}」，但这个档案不在 Balance.tres 的 AiProfiles 索引里。");
+				GD.PushWarning($"[ConfigIndex] 单位行 {row.Id} 的 AiProfile 指向「{row.AiProfile.Id}」，但这个档案不在 ConfigIndex.tres 的 AiProfiles 索引里。");
 				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 单位行 {row.Id} 指向的 AI 档案「{row.AiProfile.Id}」不在 AiProfiles 索引里（引用还在，索引里查不到）。");
 			}
 		}
@@ -349,15 +349,15 @@ public partial class Balance : Node
 	/// <summary>
 	/// 给生成出来的敌人/Boss 套用全局倍率（生成后立刻调用，会回满生命）。
 	/// 倍率**优先读敌人表的全局行**（`Config/Tables/Enemies/enemy_global.tres`），
-	/// 读不到才用 <see cref="BalanceConfig"/> 上的同名回退值 —— 这是"读不到表就用自身默认值"的落地。
+	/// 读不到才用 <see cref="ConfigIndexData"/> 上的同名回退值 —— 这是"读不到表就用自身默认值"的落地。
 	///
-	/// ⚠️ 回退值只有一个来源（<see cref="BalanceConfig"/> 的 <c>[Export]</c> 初值），且它与表里的值**一致**：
+	/// ⚠️ 回退值只有一个来源（<see cref="ConfigIndexData"/> 的 <c>[Export]</c> 初值），且它与表里的值**一致**：
 	/// 旧版本这里是 1f / 0.8f，而表里是 0.75 / 0.3，于是"表读不到"会让敌人伤害静默 ×2.67（没有任何日志）。
 	/// 现在两处对齐 + <see cref="LogEnemyScalesOnce"/> 留痕。
 	/// </summary>
 	public static void ScaleEnemy(Unit unit, Node source, bool isBoss)
 	{
-		BalanceConfig config = Settings;
+		ConfigIndexData config = Settings;
 		EnemyConfig? row = ConfigRows.ById<EnemyConfig>("enemy_global");
 
 		float enemyHealth = row?.HealthMultiplier ?? config.EnemyHealthMultiplier;
@@ -393,6 +393,6 @@ public partial class Balance : Node
 		_enemyScaleLogged = true;
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
-			$"敌人倍率：普通 生命×{enemyHealth:0.##} 伤害×{enemyDamage:0.##} 移速×{speed:0.##} / Boss 生命×{bossHealth:0.##} 伤害×{bossDamage:0.##}（来源：{(row != null ? "表 enemy_global" : "代码默认值 BalanceConfig（表读不到）")}）");
+			$"敌人倍率：普通 生命×{enemyHealth:0.##} 伤害×{enemyDamage:0.##} 移速×{speed:0.##} / Boss 生命×{bossHealth:0.##} 伤害×{bossDamage:0.##}（来源：{(row != null ? "表 enemy_global" : "代码默认值 ConfigIndexData（表读不到）")}）");
 	}
 }

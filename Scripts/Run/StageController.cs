@@ -127,7 +127,7 @@ public partial class StageController : Node3D
 	{
 		get
 		{
-			BalanceConfig config = Balance.Settings;
+			ConfigIndexData config = ConfigIndex.Settings;
 			return $"间隔 {config.AmbientSpawnInterval:0.#}s / 每 {config.AmbientSpawnEscalateSeconds:0.#}s 增强一档（每档 ×{1f + config.AmbientSpawnStrengthStep:0.##}）/ 上限 {config.AmbientSpawnMaxAlive} 只 / 本关已过 {_ambientElapsed:0.#}s / 当前档位 {_ambientSteps} / 场上 {AmbientAliveCount} 只";
 		}
 	}
@@ -144,8 +144,8 @@ public partial class StageController : Node3D
 	/// <summary>还没凑够一个阈值的余数（每次结算完清零、不结转，§7.3 第 5 条）。</summary>
 	public float PressureBank => _pressureBank;
 
-	/// <summary>本关的 Pressure 阈值（§7.3；关卡行留 0 → Balance 的全局默认值）。</summary>
-	public float PressureThresholdNow => ResolveThreshold(Definition, Balance.Settings);
+	/// <summary>本关的 Pressure 阈值（§7.3；关卡行留 0 → ConfigIndex 的全局默认值）。</summary>
+	public float PressureThresholdNow => ResolveThreshold(Definition, ConfigIndex.Settings);
 
 	/// <summary>
 	/// 本关由 Pressure 转换（+ 节点行额外次数）抽到的**数值型**强化，按抽取顺序（含重复）。
@@ -239,7 +239,7 @@ public partial class StageController : Node3D
 		string tags = definition.PressureUpgradeTags.Length == 0
 			? "不限制"
 			: string.Join(",", definition.PressureUpgradeTags);
-		ActRoguelike.Core.GameLog.Write("Node", $"Stage 表行：{definition.Id}（{definition.DisplayName}）Boss Pressure 规则：增长倍率 {definition.PressureGrowthMultiplier:0.##} / 阈值 {(definition.PressureThreshold > 0 ? definition.PressureThreshold : ActRoguelike.Config.Balance.Settings.PressurePerPoint)} / 数值强化候选 [{tags}]");
+		ActRoguelike.Core.GameLog.Write("Node", $"Stage 表行：{definition.Id}（{definition.DisplayName}）Boss Pressure 规则：增长倍率 {definition.PressureGrowthMultiplier:0.##} / 阈值 {(definition.PressureThreshold > 0 ? definition.PressureThreshold : ActRoguelike.Config.ConfigIndex.Settings.PressurePerPoint)} / 数值强化候选 [{tags}]");
 		ActRoguelike.Core.GameLog.Write("Node", $"Pressure 节点驱动：{DescribeNodePressureRules()}");
 
 		if (_encounter != null)
@@ -280,7 +280,7 @@ public partial class StageController : Node3D
 		_pressureApplied = false;
 
 		// 定期刷怪（需求 #6）按**关卡**重置：换关就从头计时、档位回 0（游离怪本身由 ClearField 清掉）。
-		_ambientTimer = Balance.Settings.AmbientSpawnInterval;
+		_ambientTimer = ConfigIndex.Settings.AmbientSpawnInterval;
 		_ambientElapsed = 0f;
 		_ambientSteps = 0;
 		_ambientUnits.Clear();
@@ -288,8 +288,8 @@ public partial class StageController : Node3D
 		// 免费挑战额度：初始 1 次、每关 +1、上限 2（关卡核心文档 L405-416）。
 		// 注意只统计"会刷怪的节点"，StartEncounter 才会让 ChallengesUsed 递增。
 		FreeChallengeQuota = Mathf.Min(
-			ActRoguelike.Config.Balance.Settings.FreeChallengeMaxQuota,
-			ActRoguelike.Config.Balance.Settings.FreeChallengeBaseQuota + (StageNumber - 1));
+			ActRoguelike.Config.ConfigIndex.Settings.FreeChallengeMaxQuota,
+			ActRoguelike.Config.ConfigIndex.Settings.FreeChallengeBaseQuota + (StageNumber - 1));
 
 		// 清掉上一关 Boss 死后降临的节点。
 		foreach (Node child in GetChildren())
@@ -511,7 +511,7 @@ public partial class StageController : Node3D
 	/// ① <see cref="NodeConfig.BossPressurePoints"/>（节点表那一行 = 挑战类型，最具体）；
 	/// ② Stage 行按价值层的 <see cref="StageDefinition.PressurePerNodeHighValue"/> /
 	///    <see cref="StageDefinition.PressurePerNodeNormal"/>（§7.4 的两个"基础 Pressure"字段）；
-	/// ③ <see cref="BalanceConfig.PressurePerHighValueNode"/>（全局默认值 150）。
+	/// ③ <see cref="ConfigIndexData.PressurePerHighValueNode"/>（全局默认值 150）。
 	///
 	/// <b>组合顺序（§7.2「组合顺序应通过明确的计算配置定义」—— 全项目只有这一处定义）</b>：
 	/// <c>本次点数 = 基础点数 × 本关增长倍率 × 挑战类型额外比例</c>。
@@ -547,7 +547,7 @@ public partial class StageController : Node3D
 			return;
 		}
 
-		BalanceConfig config = Balance.Settings;
+		ConfigIndexData config = ConfigIndex.Settings;
 		StageDefinition? stage = Definition;
 		NodeConfig? nodeRow = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
 
@@ -638,14 +638,14 @@ public partial class StageController : Node3D
 
 	/// <summary>
 	/// 基础 Pressure 的三层取值（§7.2 + §7.4）。节点行填了就用节点行（"挑战类型"最具体），
-	/// 否则按价值层用 Stage 行的两个基础值，最后才用 Balance 的全局默认值。
+	/// 否则按价值层用 Stage 行的两个基础值，最后才用 ConfigIndex 的全局默认值。
 	/// 返回的第二个值是**来源说明**，只用于日志留痕（回退纪律：来源必须能一眼看出来）。
 	/// </summary>
 	private static (float Points, string Source) ResolveBasePressure(
 		RewardNodeKind kind,
 		NodeConfig? nodeRow,
 		StageDefinition? stage,
-		BalanceConfig config)
+		ConfigIndexData config)
 	{
 		if (nodeRow is { BossPressurePoints: > 0f } row)
 		{
@@ -656,7 +656,7 @@ public partial class StageController : Node3D
 		{
 			return stage is { PressurePerNodeHighValue: > 0f } high
 				? (high.PressurePerNodeHighValue, $"关卡表 {high.Id}")
-				: (config.PressurePerHighValueNode, "Balance 全局默认值");
+				: (config.PressurePerHighValueNode, "ConfigIndex 全局默认值");
 		}
 
 		return stage is { PressurePerNodeNormal: > 0f } normal
@@ -664,8 +664,8 @@ public partial class StageController : Node3D
 			: (0f, "未配置（= 这个价值层不加 Pressure）");
 	}
 
-	/// <summary>本关的 Pressure 阈值（§7.3）：行里填了用行里的，留 0 → 用 Balance 的全局默认值。</summary>
-	private static float ResolveThreshold(StageDefinition? stage, BalanceConfig config)
+	/// <summary>本关的 Pressure 阈值（§7.3）：行里填了用行里的，留 0 → 用 ConfigIndex 的全局默认值。</summary>
+	private static float ResolveThreshold(StageDefinition? stage, ConfigIndexData config)
 		=> Mathf.Max(1f, Positive(stage?.PressureThreshold, config.PressurePerPoint));
 
 	/// <summary>
@@ -716,7 +716,7 @@ public partial class StageController : Node3D
 	/// <summary>
 	/// 节点表里配了 Boss Pressure 的行（§7.2「不同挑战类型具有各自的 Pressure 增加值」）。
 	/// 这是**确定性**的一行日志，可以当回归指标逐字比对；同时也是回退留痕：
-	/// 一行都没配时明确写出"全部走「关卡行 → Balance 全局默认值」回退"。
+	/// 一行都没配时明确写出"全部走「关卡行 → ConfigIndex 全局默认值」回退"。
 	/// </summary>
 	private static string DescribeNodePressureRules()
 	{
@@ -743,7 +743,7 @@ public partial class StageController : Node3D
 		}
 
 		return configured.Count == 0
-			? $"节点表 {total} 行都没配 → 全部走「关卡行 → Balance 全局默认值」回退"
+			? $"节点表 {total} 行都没配 → 全部走「关卡行 → ConfigIndex 全局默认值」回退"
 			: $"节点表 {total} 行里 {configured.Count} 行配了 → {string.Join(" · ", configured)}";
 	}
 
@@ -885,7 +885,7 @@ public partial class StageController : Node3D
 	/// </summary>
 	private void UpdateAmbientSpawns(float dt)
 	{
-		BalanceConfig config = Balance.Settings;
+		ConfigIndexData config = ConfigIndex.Settings;
 		if (config.AmbientSpawnInterval <= 0f || Definition == null || _encounter == null)
 		{
 			return;
@@ -933,7 +933,7 @@ public partial class StageController : Node3D
 	/// </summary>
 	private Unit? SpawnAmbientNow()
 	{
-		float strength = 1f + (Balance.Settings.AmbientSpawnStrengthStep * _ambientSteps);
+		float strength = 1f + (ConfigIndex.Settings.AmbientSpawnStrengthStep * _ambientSteps);
 		Unit? spawned = _encounter?.SpawnAmbient(strength);
 		if (spawned == null)
 		{
@@ -969,7 +969,7 @@ public partial class StageController : Node3D
 	/// </summary>
 	public int DebugAdvanceAmbientClock(float seconds)
 	{
-		BalanceConfig config = Balance.Settings;
+		ConfigIndexData config = ConfigIndex.Settings;
 		_ambientElapsed += seconds;
 		if (config.AmbientSpawnEscalateSeconds > 0f)
 		{
@@ -1126,7 +1126,7 @@ public partial class StageController : Node3D
 		}
 
 		// 先按最小间距挑，跨层累加已选节点；挑不够时再放宽补足并记录日志。
-		float spacing = ActRoguelike.Config.Balance.Settings.MinNodeSpacing;
+		float spacing = ActRoguelike.Config.ConfigIndex.Settings.MinNodeSpacing;
 		int picked = 0;
 		foreach (RewardNode candidate in pool)
 		{

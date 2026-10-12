@@ -5,9 +5,9 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 武器表的一行 —— **一个 `.tres` 文件就是一行**（`Config/Tables/Weapons/wpn_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.Weapons"/>（元素是独立 `ExtResource`）。
+/// 索引用 <see cref="ConfigIndexData.Weapons"/>（元素是独立 `ExtResource`）。
 ///
-/// 数值权威：**这一行**（原 `Balance.tres` 的 <c>Pistol*</c> / <c>Sniper*</c> / <c>Rifle*</c> 已搬到这里）。
+/// 数值权威：**这一行**（原 `ConfigIndex.tres` 的 <c>Pistol*</c> / <c>Sniper*</c> / <c>Rifle*</c> 已搬到这里）。
 /// <see cref="ApplyTo"/> 逐字段套到 <see cref="Weapon"/> 组件上；表读不到时由运行期回退到
 /// <see cref="Weapon"/> 自身的 <c>[Export]</c> 默认值（"读不到则使用自身的默认值"）。
 /// </summary>

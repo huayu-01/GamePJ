@@ -186,7 +186,7 @@ public partial class AttackHitbox : Area3D
 	/// <para>⚠️ 调用点在 <see cref="Unit.ReceiveHit"/> **之前**：一击致死时 <c>Unit.Die()</c> 会把
 	/// <c>CollisionLayer</c> 归零（本方法不读层，但"先算命中点、再结算"这个顺序本身也更符合直觉）。</para>
 	///
-	/// <para>因此 `Balance.tres` 里那列 <c>HitEffectHeightOffset</c> 没有消费者了，已随本次改动删除：
+	/// <para>因此 `ConfigIndex.tres` 里那列 <c>HitEffectHeightOffset</c> 没有消费者了，已随本次改动删除：
 	/// 高矮不同的单位各自把特效落在自己身上，不需要再调一个全局高度。</para>
 	/// </summary>
 	private Vector3 ResolveHitPoint(Unit target)

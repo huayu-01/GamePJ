@@ -6,7 +6,7 @@ namespace ActRoguelike.Config;
 /// 所有配置表行的基类（设计文档 config-schema.md §3）。
 ///
 /// **一个 `.tres` 文件 = 一行**，放在 `Config/Tables/&lt;分组&gt;/`；一个文件夹 = 一张表。
-/// 索引挂在 <see cref="BalanceConfig"/> 的 <c>[Export] XxxConfig[]</c> 数组上（元素是独立 `ExtResource`）。
+/// 索引挂在 <see cref="ConfigIndexData"/> 的 <c>[Export] XxxConfig[]</c> 数组上（元素是独立 `ExtResource`）。
 ///
 /// 每个字段都必须有 C# 属性初始化器当默认值 —— 这就是"读不到表就用自身默认值"里的那个默认值。
 ///

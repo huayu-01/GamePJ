@@ -70,7 +70,7 @@ public partial class LoadoutPreview : Node
 	public override void _Process(double delta)
 	{
 		// 基地里的选项来自交互台（RunSetup 是跨场景的静态配置），所以这里只做"变了就换"的边沿检测。
-		// ⚠️ 另外要处理一种真实时序：本组件 `_Ready` 可能早于配置表建好（实测 `Balance` 的索引晚一秒才就绪），
+		// ⚠️ 另外要处理一种真实时序：本组件 `_Ready` 可能早于配置表建好（实测 `ConfigIndex` 的索引晚一秒才就绪），
 		// 那一次读不到角色行 → 记下 `_rowMissing`，等表就绪后自动补一次（否则基地玩家永远是场景默认数值）。
 		if (RunSetup.Character != _character || RunSetup.Weapon != _weapon || _rowMissing)
 		{

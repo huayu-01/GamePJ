@@ -22,17 +22,17 @@
 
 | 需求描述 | 实际情况 |
 |---|---|
-| "如 `Config/Balance.tres`、`Stages/*.tres`" | **`Stages/` 目录不存在。**全项目 `Assets/`、`Scenes/` 之外的 `.tres` **只有一个**：`Config/Balance.tres` |
-| 关卡分文件存 | 关卡是 `Balance.tres` 里的 **`sub_resource` 块**，由 `[Export] public StageDefinition[] Stages` 承载（见 `Config/Balance.tres` 的 `[sub_resource type="Resource" id="Stage_1"]`） |
+| "如 `Config/ConfigIndex.tres`、`Stages/*.tres`" | **`Stages/` 目录不存在。**全项目 `Assets/`、`Scenes/` 之外的 `.tres` **只有一个**：`Config/ConfigIndex.tres` |
+| 关卡分文件存 | 关卡是 `ConfigIndex.tres` 里的 **`sub_resource` 块**，由 `[Export] public StageDefinition[] Stages` 承载（见 `Config/ConfigIndex.tres` 的 `[sub_resource type="Resource" id="Stage_1"]`） |
 
-**现在的真实形态**：一个 C# 类 `BalanceConfig`（**约 100 个 `[Export]` 属性**，全部是扁平的 `PlayerMaxHealth` / `PistolDamage` / `EnemyHealthMultiplier` 这种"一属性一值"）+ 一个 `Balance.tres` + 一个嵌套的 `StageDefinition[]`。
+**现在的真实形态**：一个 C# 类 `ConfigIndexData`（**约 100 个 `[Export]` 属性**，全部是扁平的 `PlayerMaxHealth` / `PistolDamage` / `EnemyHealthMultiplier` 这种"一属性一值"）+ 一个 `ConfigIndex.tres` + 一个嵌套的 `StageDefinition[]`。
 
 **关键的好消息 —— "读不到就用默认值"的语义已经在代码里了**：
 
 ```csharp
-// Scripts/Config/BalanceConfig.cs:31
+// Scripts/Config/ConfigIndexData.cs:31
 [GlobalClass]
-public partial class BalanceConfig : Resource
+public partial class ConfigIndexData : Resource
 {
     [Export] public float PlayerMaxHealth { get; set; } = 160f;   // ← C# 属性初始化器 = 默认值
     [Export] public float PistolDamage { get; set; } = 24f;
@@ -46,7 +46,7 @@ public partial class BalanceConfig : Resource
 
 > **一类实体 = 一个 C# Resource 类，一行 = 一个 `.tres` 文件（放在同一个文件夹里）。**
 
-今天 `PistolDamage` / `RifleDamage` / `SniperDamage` 是 `BalanceConfig` 上的三个**列**，不是三**行**。**在把"武器"从三列拆成一张有 N 行的武器表之前，本文推荐的所有工具都无事可做** —— 因为"表"还不存在。这个拆分是**工具的入场券**，不是工具的功能。
+今天 `PistolDamage` / `RifleDamage` / `SniperDamage` 是 `ConfigIndexData` 上的三个**列**，不是三**行**。**在把"武器"从三列拆成一张有 N 行的武器表之前，本文推荐的所有工具都无事可做** —— 因为"表"还不存在。这个拆分是**工具的入场券**，不是工具的功能。
 
 ---
 
@@ -130,7 +130,7 @@ public partial class BalanceConfig : Resource
 
 **不能做 / 对本项目的硬伤**：
 
-1. **它生成的是 `.gd`（GDScript）Resource 类。**本项目是 **C# mono**，配置类都是 `[GlobalClass] public partial class ... : Resource`。接进来会在 `res://tables` 里长出一套**平行的 GDScript 配置类型**，C# 侧只能用 `Resource.Get("字段名")` 弱类型读取，**丢掉 `Balance.Settings.PistolDamage` 这种编译期检查**。商店页只说"可以改类名"，**没有说能复用你已有的 C# 类** → 想用必须实测。
+1. **它生成的是 `.gd`（GDScript）Resource 类。**本项目是 **C# mono**，配置类都是 `[GlobalClass] public partial class ... : Resource`。接进来会在 `res://tables` 里长出一套**平行的 GDScript 配置类型**，C# 侧只能用 `Resource.Get("字段名")` 弱类型读取，**丢掉 `ConfigIndex.Settings.PistolDamage` 这种编译期检查**。商店页只说"可以改类名"，**没有说能复用你已有的 C# 类** → 想用必须实测。
 2. **V1 只做全量重导出，没有增量 diff**（官方 Limitations 自述）。整表重导 → 所有 `.tres` 时间戳/内容全变 → **git diff 变噪音**。
 3. 面向"**从 xlsx 生成**"，不是"**编辑已有的 `.tres`**"——和本项目现状方向相反。
 
@@ -416,7 +416,7 @@ print(data.records)   # 数组
 1. **它是唯一"一装就能解决"的工具。** 它做的事**恰好就是需求原话**："一个编辑器可以在这些表项目进行快速的编辑"。**把文件夹当表、一行一个资源、一列多选批量改** —— 不需要 CSV、不需要 Excel、不需要生成脚本、不需要数据库。**没有任何中间产物，因此没有任何中间产物能出错。**
 2. **版本管理天然满分。** 它**只改 `.tres` 本身**，而 `.tres` 是文本。改动是**一行一个字段**的 diff，`git blame` 能追到"谁把 `PistolDamage` 从 24 改成 30"。**这一条直接消灭了第六节那个 `.xlsx` 难题** —— 因为你根本不需要引入 `.xlsx`。
 3. **C# 兼容有一手证据。** issue #72 里 C# 用户实测报告 **"It works with C# Scripts."**，维护者据此加了 "Use Script" 选项。**这不是我推断的，是原始 issue 文本。**
-4. **"读不到就用默认值"的回退语义不受影响。** 数值始终留在同一批 `.tres` 里，缺失字段照样回退到 `BalanceConfig.cs` 的 C# 属性初始化器（`= 160f`）。**这条管线不新增任何环节，所以不可能破坏已有语义。**
+4. **"读不到就用默认值"的回退语义不受影响。** 数值始终留在同一批 `.tres` 里，缺失字段照样回退到 `ConfigIndexData.cs` 的 C# 属性初始化器（`= 160f`）。**这条管线不新增任何环节，所以不可能破坏已有语义。**
 5. **MIT + 仍在维护 + 卸载零成本。** MIT 许可（可改可商用）；`master` 到 **2026-01-27** 还在提交（社区 PR 到 2026-02 仍活跃）；纯 GDScript 编辑器插件，**不想用了删掉 `addons/` 目录就干净了**，不会在项目里留残渣。
 6. **它连"嵌套"都有解。** `StageDefinition[] Stages` 这种数组列，可以用**"把 Resource 数组列单独打开成另一张表"**来处理 —— 这是它 feature 列表里的原生能力，不用你自己拆。
 
@@ -443,7 +443,7 @@ Scripts/Config/
   CharacterDef.cs
 
 Config/
-  Balance.tres        ← 保持不动（全局倍率、表现开关、BOSS 压力曲线…）
+  ConfigIndex.tres        ← 保持不动（全局倍率、表现开关、BOSS 压力曲线…）
   Tables/
     Weapons/    wpn_pistol.tres   wpn_rifle.tres   wpn_sniper.tres
     Skills/     skl_x.gd          ...
@@ -454,7 +454,7 @@ Config/
 三条硬性约定：
 
 1. **每个类都写 `[GlobalClass]`** —— 否则 Godot 的"新建资源"对话框里选不到它，表也就建不起来。
-2. **每个 `[Export]` 都保留 C# 属性初始化器当默认值**（`[Export] public float Damage { get; set; } = 24f;`）—— **这是"读不到就用默认值"语义的唯一实现方式**，照抄 `BalanceConfig.cs` 的写法。
+2. **每个 `[Export]` 都保留 C# 属性初始化器当默认值**（`[Export] public float Damage { get; set; } = 24f;`）—— **这是"读不到就用默认值"语义的唯一实现方式**，照抄 `ConfigIndexData.cs` 的写法。
 3. **一个文件夹 = 一张表。** 插件的分组单位就是文件夹（外加按类/脚本筛选）。**不要把武器和技能混在一个目录里。**
 
 > 字段具体怎么定（武器表该有哪些列）→ **见 [config-schema.md](config-schema.md)，本文不越界。**
@@ -554,7 +554,7 @@ Config/
 | `.xlsx` 进 git 吗？ | **不进**。要留就留 `.csv`（文本可 diff）。**`.tres` 是唯一真相** |
 | Gridly / Lokalise / Crowdin？ | ❌ **没找到 Godot 数据表集成**，且 €99/月起 |
 | SQLite？ | ❌ **过度工程**：二进制 + 多一跳 + 原生依赖，而数据只有几百行 |
-| 最省事的兜底？ | 先把 `BalanceConfig` 里那 **~100 个扁平 `[Export]`** 按类型拆成几个 `[GlobalClass]` 类，**哪怕暂时不装插件**，光靠 Inspector 也会比现在好改 |
+| 最省事的兜底？ | 先把 `ConfigIndexData` 里那 **~100 个扁平 `[Export]`** 按类型拆成几个 `[GlobalClass]` 类，**哪怕暂时不装插件**，光靠 Inspector 也会比现在好改 |
 
 ---
 

@@ -75,10 +75,10 @@ public partial class RunController : Node
 		_stage.Victory += OnVictory;
 	}
 
-	/// <summary>把 Balance.tres 的数值套到玩家、武器与节点节奏上（开局与换角色时调用）。</summary>
+	/// <summary>把 ConfigIndex.tres 的数值套到玩家、武器与节点节奏上（开局与换角色时调用）。</summary>
 	private void ApplyBalance()
 	{
-		BalanceConfig config = Balance.Settings;
+		ConfigIndexData config = ConfigIndex.Settings;
 		bool heavy = _character == PlayerCharacterKind.Heavy;
 		bool summoner = _character == PlayerCharacterKind.Summoner;
 
@@ -293,24 +293,24 @@ public partial class RunController : Node
 
 	/// <summary>
 	/// 关卡序列的来源（设计文档 config-schema.md §4.2 / §5 阶段 1）：
-	/// **只有一个真源** —— <see cref="ActRoguelike.Config.BalanceConfig.Stages"/>（`Config/Balance.tres`
+	/// **只有一个真源** —— <see cref="ActRoguelike.Config.ConfigIndexData.Stages"/>（`Config/ConfigIndex.tres`
 	/// 上的数组，元素指向 `Config/Tables/Stages/stg_*.tres`）。
 	/// 读不到 / 空表 → 回退到 <see cref="StageDefinition"/> 自身的 `[Export]` 默认值，
-	/// **不再有第二份兜底表**（原来的 `DefaultStages()` 与 `Balance.tres` 已经漂移了 5 处，
+	/// **不再有第二份兜底表**（原来的 `DefaultStages()` 与 `ConfigIndex.tres` 已经漂移了 5 处，
 	/// 最严重的是 Stage2 的 AllowedEnemies 走兜底会变成"不限制"）。
-	/// ⚠️ 实测：删/改一个被引用的行文件 → Godot 会**整份** `Balance.tres` 加载失败，
+	/// ⚠️ 实测：删/改一个被引用的行文件 → Godot 会**整份** `ConfigIndex.tres` 加载失败，
 	/// 所以走的是"0 关 → 单关默认值"这条粗回退（其他数值也一起回退）。别再删行文件，见 docs/config-schema.md §5。
 	/// 回退留痕：日志里能直接看到这一局走的是"表"还是"默认值"。
 	/// </summary>
 	private static StageDefinition[] ResolveStages()
 	{
-		StageDefinition[] table = ActRoguelike.Config.Balance.Settings.Stages;
+		StageDefinition[] table = ActRoguelike.Config.ConfigIndex.Settings.Stages;
 		if (table is not { Length: > 0 })
 		{
 			// 连"整张表"都读不到时，把全局数值的来源也打出来：这样一眼能区分
-			// 「只是关卡表为空」和「连 Balance.tres 都没加载上（所有数值都回退了）」。
-			string source = ActRoguelike.Config.Balance.Instance?.FileLoaded == true ? "Balance.tres 已加载" : "Balance.tres 未加载（全部数值回退到代码默认值）";
-			ActRoguelike.Core.GameLog.Write("Flow", $"关卡表：0 关（来源：默认值）—— Balance 的 Stages 为空或未找到，使用 StageDefinition 自身的默认值。（{source}）");
+			// 「只是关卡表为空」和「连 ConfigIndex.tres 都没加载上（所有数值都回退了）」。
+			string source = ActRoguelike.Config.ConfigIndex.Instance?.FileLoaded == true ? "ConfigIndex.tres 已加载" : "ConfigIndex.tres 未加载（全部数值回退到代码默认值）";
+			ActRoguelike.Core.GameLog.Write("Flow", $"关卡表：0 关（来源：默认值）—— ConfigIndex 的 Stages 为空或未找到，使用 StageDefinition 自身的默认值。（{source}）");
 			GD.PushWarning("[Config] 关卡表为空，使用 StageDefinition 自身默认值。");
 			return new[] { new StageDefinition() };
 		}
@@ -320,7 +320,7 @@ public partial class RunController : Node
 		foreach (StageDefinition? row in table)
 		{
 			// ⚠️ 实测（2026-10）：行文件被删/改名时，**在游戏里根本走不到这里** —— 缺依赖会让
-			// `GD.Load<BalanceConfig>` 整份失败（于是走上面"0 关"那条分支，所有数值一起回退到代码默认值，
+			// `GD.Load<ConfigIndexData>` 整份失败（于是走上面"0 关"那条分支，所有数值一起回退到代码默认值，
 			// 实测玩家生命 250→160）。这个空档分支只在"数组里真的出现空元素"时兜底，纯粹是防 NullReference。
 			if (row == null)
 			{
@@ -434,7 +434,7 @@ public partial class RunController : Node
 			return;
 		}
 
-		// 回退（表为空 / 整份 Balance.tres 未加载）：保留"什么都没做"的语义 ——
+		// 回退（表为空 / 整份 ConfigIndex.tres 未加载）：保留"什么都没做"的语义 ——
 		// 武器组件自己的 [Export] 默认值就是这一把枪的数值。
 		GD.PushWarning($"[Config] 武器表里没有 {kind}（Slot {(int)kind + 1}）的行，保留武器组件自身的默认值。");
 		_weapon.RefillMagazine();
@@ -461,7 +461,7 @@ public partial class RunController : Node
 
 	/// <summary>
 	/// 角色选择界面的卡片文案。数值来自角色表（`DescriptionTemplate` 支持 <c>{字段名}</c> 占位符）；
-	/// 读不到角色行时退回原来的硬编码写法（用 BalanceConfig 上的旧字段），保证界面不会空掉。
+	/// 读不到角色行时退回原来的硬编码写法（用 ConfigIndexData 上的旧字段），保证界面不会空掉。
 	///
 	/// <para>**public**：基地的装备配置台（<c>BaseTerminal</c>）复用它，角色卡的文案就只有这一处来源。</para>
 	/// </summary>
@@ -595,7 +595,7 @@ public partial class RunController : Node
 		EnsurePool();
 
 		_current.Clear();
-		_current.AddRange(_pool.Roll(_build, Balance.Settings.RewardChoiceCount, null, new[] { RewardKind.Evolution, RewardKind.Mutation }));
+		_current.AddRange(_pool.Roll(_build, ConfigIndex.Settings.RewardChoiceCount, null, new[] { RewardKind.Evolution, RewardKind.Mutation }));
 		if (_current.Count == 0)
 		{
 			return false;
@@ -617,7 +617,7 @@ public partial class RunController : Node
 		EnsurePool();
 
 		_current.Clear();
-		_current.AddRange(_pool.Roll(_build, Balance.Settings.RewardChoiceCount));
+		_current.AddRange(_pool.Roll(_build, ConfigIndex.Settings.RewardChoiceCount));
 		if (_current.Count == 0)
 		{
 			return false;
@@ -717,7 +717,7 @@ public partial class RunController : Node
 		// 战斗型回复节点：先免费恢复一部分生命值，随后照常进 Encounter（关卡核心文档 L180-183）。
 		if (kind == RewardNodeKind.Heal)
 		{
-			_player.Heal(_player.MaxHealth * Balance.Settings.NodeHealRatio);
+			_player.Heal(_player.MaxHealth * ConfigIndex.Settings.NodeHealRatio);
 			onChosen();
 			return true;
 		}
@@ -728,7 +728,7 @@ public partial class RunController : Node
 		RewardKind? filter = RewardService.FilterFor(kind);
 
 		_current.Clear();
-		_current.AddRange(_pool.Roll(_build, Balance.Settings.RewardChoiceCount, filter));
+		_current.AddRange(_pool.Roll(_build, ConfigIndex.Settings.RewardChoiceCount, filter));
 		if (_current.Count == 0)
 		{
 			return false;

@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 MCPRuntimeProbe="*uid://bsg12huaf1u5i"
-Balance="*res://Scripts/Config/Balance.cs"
+ConfigIndex="*res://Scripts/Config/ConfigIndex.cs"
 UiRouter="*res://Scripts/UI/UiRouter.cs"
 GameLog="*res://Scripts/Core/GameLog.cs"
 AudioManager="*res://Scripts/Audio/AudioManager.cs"

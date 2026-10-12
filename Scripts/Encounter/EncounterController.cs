@@ -360,7 +360,7 @@ public partial class EncounterController : Node3D
 	/// 调用方是 <c>StageController</c>（关卡编排者），它自己管节奏与强度档位。
 	///
 	/// <paramref name="strengthScale"/> = 生命与伤害的倍率（"每过 120 秒增强一档"，见
-	/// <c>BalanceConfig.AmbientSpawnStrengthStep</c>）；1 = 不增强。
+	/// <c>ConfigIndexData.AmbientSpawnStrengthStep</c>）；1 = 不增强。
 	/// 读不到可生成项 / 找不到玩家时返回 <c>null</c>（调用方不当作错误）。
 	/// </summary>
 	public Unit? SpawnAmbient(float strengthScale = 1f)
@@ -385,7 +385,7 @@ public partial class EncounterController : Node3D
 		enemy.GlobalPosition = SpawnPlanner.FindSpawnPoint(player.GlobalPosition, MinSpawnDistance, SpawnRadius);
 
 		// 全局难度倍率 + 本关缩放：与波次刷怪同一条路（游离怪不该是特例）。
-		Balance.ScaleEnemy(enemy, this, false);
+		ConfigIndex.ScaleEnemy(enemy, this, false);
 		if (!Mathf.IsEqualApprox(EnemyHealthScale, 1f))
 		{
 			enemy.Stats.AddModifier(new StatModifier { Stat = "MaxHealthMultiplier", Operation = ModifierOperation.Multiply, Value = EnemyHealthScale, Source = this });
@@ -573,9 +573,9 @@ public partial class EncounterController : Node3D
 		AddChild(enemy);
 		enemy.GlobalPosition = SpawnPlanner.FindSpawnPoint(_player?.GlobalPosition ?? GlobalPosition, MinSpawnDistance, SpawnRadius);
 
-		// 精英概率倍率优先读敌人表的全局行（`Config/Tables/Enemies/enemy_global.tres`），读不到才用 Balance 的旧字段。
+		// 精英概率倍率优先读敌人表的全局行（`Config/Tables/Enemies/enemy_global.tres`），读不到才用 ConfigIndex 的旧字段。
 		float eliteScale = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.EnemyConfig>("enemy_global")?.EliteChanceMultiplier
-			?? Balance.Settings.EliteChanceMultiplier;
+			?? ConfigIndex.Settings.EliteChanceMultiplier;
 		float eliteChance = (entry.EliteChance + EliteChanceScale) * eliteScale;
 		if (eliteChance > 0f && GD.Randf() < eliteChance)
 		{
@@ -583,7 +583,7 @@ public partial class EncounterController : Node3D
 		}
 
 		// 全局难度倍率在生成后套用（会回满生命）；再乘本关自己的缩放。
-		Balance.ScaleEnemy(enemy, this, false);
+		ConfigIndex.ScaleEnemy(enemy, this, false);
 		if (!Mathf.IsEqualApprox(EnemyHealthScale, 1f))
 		{
 			enemy.Stats.AddModifier(new StatModifier { Stat = "MaxHealthMultiplier", Operation = ModifierOperation.Multiply, Value = EnemyHealthScale, Source = this });
@@ -745,7 +745,7 @@ public partial class EncounterController : Node3D
 	/// <summary>
 	/// 按 Stage 配置重建可生成列表。生成项的刷怪参数（成本/权重/解锁时间/精英概率）与开关**都来自敌人表**：
 	/// 生成项与行按**预制体路径**配对（改中文显示名不再影响任何逻辑），白名单按行的 <c>Id</c> 匹配。
-	/// 读不到行时（敌人表空 / Balance.tres 未加载）保留场景里的值、且不做白名单过滤（回退路径必须还能玩）。
+	/// 读不到行时（敌人表空 / ConfigIndex.tres 未加载）保留场景里的值、且不做白名单过滤（回退路径必须还能玩）。
 	/// </summary>
 	public void ApplyEntryFilter(StageDefinition definition)
 	{
@@ -813,7 +813,7 @@ public partial class EncounterController : Node3D
 		_eliteBoss.GlobalPosition = SpawnPlanner.FindSpawnPoint(_player?.GlobalPosition ?? GlobalPosition, MinSpawnDistance, SpawnRadius);
 
 		// 血量倍率优先读首领行（`Config/Tables/Bosses/boss_*.tres` 的 EliteCopyHealthScale），
-		// 读不到才用场景导出值 —— 以前 `Balance.tres` 里有一份**没有消费者**的同名副本，改了不起作用。
+		// 读不到才用场景导出值 —— 以前 `ConfigIndex.tres` 里有一份**没有消费者**的同名副本，改了不起作用。
 		float eliteScale = BossRow(EliteBossScene)?.EliteCopyHealthScale ?? EliteBossHealthScale;
 		_eliteBoss.Stats.AddModifier(new StatModifier
 		{
@@ -856,7 +856,7 @@ public partial class EncounterController : Node3D
 		BossRow(BossScene)?.ApplyTo(Boss);
 		parent.AddChild(Boss);
 		Boss.GlobalPosition = center + new Vector3(-BossSpawnDistance, 0.6f, 0f);
-		Balance.ScaleEnemy(Boss, this, true);
+		ConfigIndex.ScaleEnemy(Boss, this, true);
 		if (!Mathf.IsEqualApprox(BossHealthScale, 1f))
 		{
 			Boss.Stats.AddModifier(new StatModifier { Stat = "MaxHealthMultiplier", Operation = ModifierOperation.Multiply, Value = BossHealthScale, Source = this });
@@ -873,9 +873,9 @@ public partial class EncounterController : Node3D
 		var pressure = Boss.GetNodeOrNull<BossPressure>("Pressure");
 		if (pressure != null)
 		{
-			pressure.Interval = Balance.Settings.BossPressureInterval;
-			pressure.DamagePerLevel = Balance.Settings.BossPressureDamagePerLevel;
-			pressure.AttackSpeedPerLevel = Balance.Settings.BossPressureAttackSpeedPerLevel;
+			pressure.Interval = ConfigIndex.Settings.BossPressureInterval;
+			pressure.DamagePerLevel = ConfigIndex.Settings.BossPressureDamagePerLevel;
+			pressure.AttackSpeedPerLevel = ConfigIndex.Settings.BossPressureAttackSpeedPerLevel;
 			pressure.InitialLevel = BossInitialPressure;
 		}
 

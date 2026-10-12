@@ -9,7 +9,7 @@
 
 **职责**：一次 Encounter（节点触发的挑战 / Boss 战）从开始到结算的全部过程。
 **位置**：`Scripts/Encounter/EncounterController.cs`（716 行）
-**依赖**：`SpawnPlanner`（数量·类型·落点）、`MapManager`（可行走点）、`Balance`（缩放）、`BossPhaseController` / `BossPressure` / `BossPerkCatalog`（Boss 侧）
+**依赖**：`SpawnPlanner`（数量·类型·落点）、`MapManager`（可行走点）、`ConfigIndex`（缩放）、`BossPhaseController` / `BossPressure` / `BossPerkCatalog`（Boss 侧）
 
 ### 状态一览
 
@@ -147,5 +147,5 @@ RunController          一局：配置 → 关卡序列 → 结算 → 回基地
 - **`RunController` 仍偏胖**：流程编排 + 奖励分派 + 商店 + 结算挤在一起，`EndRun` / `OpenRewardForNode` 各自还带一段业务。下一步建议拆 `RewardService`（奖励池与分派）与 `RunSettlement`（碎片结算）。
 - **`EncounterController` 仍偏胖**：生成、波次、Boss、白板首领、完成判定五种关注点。下一步建议拆 `WaveDirector`（波次状态机）与 `BossPhaseRunner`（最终首领/白板首领两种模式）。
 - 两者的共同点是**都持有大量可变状态且被帧驱动**，所以拆分手法应该一致：把**纯逻辑与无状态计算**先抽成静态类（`SpawnPlanner` / `NodePlacement` / `RewardService` / `RunSettlement` 已经这么做了），状态机部分等 UI 定型后再动。
-- 区域杀**已经不是静态类**：`KillPlane` 那个「每帧遍历 4 个组查 Y」的实现已删除（2026-01），改为 `Scripts/World/KillZone.cs` 的 `Area3D` 碰撞区域，由 `MapManager.EnsureKillZone()` 创建，进入即杀。`Balance.KillPlaneY` 仍保留，含义变成「区域杀中心的高度基准」。
+- 区域杀**已经不是静态类**：`KillPlane` 那个「每帧遍历 4 个组查 Y」的实现已删除（2026-01），改为 `Scripts/World/KillZone.cs` 的 `Area3D` 碰撞区域，由 `MapManager.EnsureKillZone()` 创建，进入即杀。`ConfigIndex.KillPlaneY` 仍保留，含义变成「区域杀中心的高度基准」。
 

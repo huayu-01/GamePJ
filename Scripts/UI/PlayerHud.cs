@@ -437,7 +437,7 @@ public partial class PlayerHud : CanvasLayer
 		float gained = player.Health - _lastHealth;
 		_lastHealth = player.Health;
 
-		if (gained <= 0.5f || !ActRoguelike.Config.Balance.Settings.ShowDamageNumbers)
+		if (gained <= 0.5f || !ActRoguelike.Config.ConfigIndex.Settings.ShowDamageNumbers)
 		{
 			return;
 		}
@@ -453,7 +453,7 @@ public partial class PlayerHud : CanvasLayer
 			return;
 		}
 
-		ActRoguelike.Config.BalanceConfig config = ActRoguelike.Config.Balance.Settings;
+		ActRoguelike.Config.ConfigIndexData config = ActRoguelike.Config.ConfigIndex.Settings;
 		DamageNumbers.ShowHeal(_root, camera.UnprojectPosition(world), gained,
 			config.DamageNumberFontSize, config.DamageNumberRise, config.DamageNumberLifetime);
 	}
@@ -472,7 +472,7 @@ public partial class PlayerHud : CanvasLayer
 		// 用户反馈：远离时留一个头像会在打小怪时造成"到处都是首领"的错觉。
 		var player = GetTree().GetFirstNodeInGroup("player_units") as Unit;
 		float distance = player != null && IsInstanceValid(player) ? player.GlobalPosition.DistanceTo(boss.GlobalPosition) : 0f;
-		bool near = distance <= ActRoguelike.Config.Balance.Settings.BossBarFullRange;
+		bool near = distance <= ActRoguelike.Config.ConfigIndex.Settings.BossBarFullRange;
 		BossBarExpanded = near;
 		BossDistance = distance;
 		_bossPanel!.Visible = near;

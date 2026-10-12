@@ -23,7 +23,7 @@ public enum AudioBusKind
 
 /// <summary>
 /// **音效表**的一行 —— 一个 `.tres` 文件就是一条音效（`Config/Tables/Audio/audio_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.Audio"/>。运行期由 autoload <c>AudioManager</c> 读，业务代码只写
+/// 索引用 <see cref="ConfigIndexData.Audio"/>。运行期由 autoload <c>AudioManager</c> 读，业务代码只写
 /// <c>AudioManager.PlaySfx("sfx_xxx")</c> —— **调用方永远不需要知道文件在哪**。
 ///
 /// **一行 = id + 资源引用 + 音量 / 音高随机范围 + 总线**，所以在项目里"加一个音效"是两件事：

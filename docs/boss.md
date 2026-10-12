@@ -41,7 +41,7 @@ Boss 也有自己的「构筑」：生成时按 Stage 配置随机抽 N 个**开
 
 > **2026-10 后续修正（用户 ②）**：原 **`pmod_fortress_armor`「铁壁·护甲」(+150 甲) 已整行删除**
 > （原话：「**护甲目前就只给精英怪使用就好了，首领不需要**」）—— 池子 **8 → 7 条**，
-> 表行 + `Balance.tres` 的数组项/ext_resource + `BossPerkCatalog` 的**代码兜底**同一次改动一起下线
+> 表行 + `ConfigIndex.tres` 的数组项/ext_resource + `BossPerkCatalog` 的**代码兜底**同一次改动一起下线
 > （只删表行不改兜底 = 表读不到时首领又会吃护甲，是静默换挡）。
 > **精英怪的护甲不受影响**：它来自 `Scripts/Combat/EliteModifier.cs`（`ArmorAdd = 120`），
 > 与 Pressure 无关；改动后全项目这一族的生产者只剩它一个（C1 之后走 `Unit.GrantArmor`，不再用 `MaxArmorAdd` 修正器）。
@@ -56,7 +56,7 @@ Boss 也有自己的「构筑」：生成时按 Stage 配置随机抽 N 个**开
 > **2026-10-12 第三轮 C1 覆盖了后半句**：用户改口「护甲没有上限额度，所以可以删除掉 `MaxArmor`」→
 > 那一列改名为 **`StartingArmor`**、`MaxArmorMultiplier` / `MaxArmorAdd` 删除（`Armor` / `ArmorDamageReduction` /
 > `ArmorBroke` 保留）；首领的值仍是 0，`BarBoss.tscn` 依然没有护甲节点，所以画面上**一点变化都没有**。
-> 首领现在也没有别的加甲途径（`EliteModifier` 只挂在普通敌人上；`BossPressure` / `Balance.ScaleEnemy` / Pressure 池
+> 首领现在也没有别的加甲途径（`EliteModifier` 只挂在普通敌人上；`BossPressure` / `ConfigIndex.ScaleEnemy` / Pressure 池
 > 都不碰护甲 —— grep 结论见 [config.md](config.md) 的「首领去甲 + 单位动画实测」§一）。
 > 伤害管线因此走 `…→ Block → DR(护甲减伤自动取 0) → Armor 段跳过 → Shield 0 → HP`，
 > **首领的有效血量明显下降**（少 200 点吸收 + 少 30% 减免），本轮**没有**做补偿性调参。
@@ -107,7 +107,7 @@ Boss 也有自己的「构筑」：生成时按 Stage 配置随机抽 N 个**开
         否 ↓
   → 基础点数：节点表 NodeConfig.BossPressurePoints（挑战类型）
               → 关卡表按价值层的 PressurePerNodeHighValue / Normal
-              → Balance.PressurePerHighValueNode（150）
+              → ConfigIndex.PressurePerHighValueNode（150）
   → × 关卡表 PressureGrowthMultiplier（固定倍率表）
   → × 关卡表 PressureEvolutionBonus(1.25) / PressureMutationBonus(1.5)
   → 每满 PressureThreshold（100）点【立即】抽一次数值强化（逐次检查，跨多个阈值就抽多次）

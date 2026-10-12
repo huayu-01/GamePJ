@@ -14,7 +14,7 @@ namespace ActRoguelike.Rewards;
 public static class RewardCatalog
 {
 	/// <summary>
-	/// 代码内置目录 —— **兜底**。表（`Config/Tables/Upgrades/upg_*.tres` + `Balance.tres` 的
+	/// 代码内置目录 —— **兜底**。表（`Config/Tables/Upgrades/upg_*.tres` + `ConfigIndex.tres` 的
 	/// <c>Upgrades</c> 数组）读得到就用表；读不到才用这里的 C# 数组。
 	/// 这是"读不到表就用自身默认值"这条回退语义在增幅项上的落地。
 	/// </summary>
@@ -92,12 +92,12 @@ public static class RewardCatalog
 
 	/// <summary>
 	/// 本局实际使用的增幅项目录：**表优先**，表为空 / 未加载 → 回退到 <see cref="Fallback"/>。
-	/// 由 <c>Balance</c> 在 <c>_Ready</c> 里读表并编译好（见 <c>RewardTable.Build</c>），
+	/// 由 <c>ConfigIndex</c> 在 <c>_Ready</c> 里读表并编译好（见 <c>RewardTable.Build</c>），
 	/// 所以调用方（`RewardPool` / `RunController`）一行都不用改。
 	/// </summary>
 	public static RewardDefinition[] All { get; private set; } = Fallback;
 
-	/// <summary>换成本局目录（<c>Balance</c> 读表后调用；传 null 等于回到兜底目录）。</summary>
+	/// <summary>换成本局目录（<c>ConfigIndex</c> 读表后调用；传 null 等于回到兜底目录）。</summary>
 	public static void UseTable(RewardDefinition[]? rows)
 		=> All = rows is { Length: > 0 } ? rows : Fallback;
 

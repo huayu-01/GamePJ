@@ -7,12 +7,12 @@ namespace ActRoguelike.Config;
 /// 按 Id / Slot 查配置行的运行期索引（设计文档 config-schema.md §4.1）。
 ///
 /// **表里没有"表文件"**：磁盘上是一堆行 `.tres`（`Config/Tables/&lt;分组&gt;/xxx_*.tres`），
-/// 索引用的是 <see cref="BalanceConfig"/> 上的 <c>[Export] XxxConfig[]</c> 数组 —— 不扫目录。
+/// 索引用的是 <see cref="ConfigIndexData"/> 上的 <c>[Export] XxxConfig[]</c> 数组 —— 不扫目录。
 ///
 /// 纪律（与 <see cref="ConfigTable"/> 一致）：
 /// ① 读不到行 → 返回 null，**绝不抛异常、绝不另建兜底表**；
 /// ② 调用方拿到 null 时必须保留目标对象自身的 <c>[Export]</c> 默认值（"读不到则使用自身的默认值"）；
-/// ③ 索引为空是**正常状态**（例如 `Balance.tres` 没加载），只在真正要查具体 Id 时才需要在意。
+/// ③ 索引为空是**正常状态**（例如 `ConfigIndex.tres` 没加载），只在真正要查具体 Id 时才需要在意。
 /// </summary>
 public static class ConfigRows
 {

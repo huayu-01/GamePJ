@@ -4,7 +4,7 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 增幅项表的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Upgrades/upg_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.Upgrades"/>。
+/// 索引用 <see cref="ConfigIndexData.Upgrades"/>。
 ///
 /// **两层结构**（设计文档 config-schema.md §2.2）：磁盘行（本类）→ 运行期视图
 /// （<c>RewardDefinition</c>，带 <c>Action&lt;RewardContext&gt;</c> 委托）。

@@ -29,7 +29,7 @@ namespace ActRoguelike.Audio;
 ///
 /// <para><b>加一首曲子要做什么</b>（零 C#）：把 <c>.ogg</c> 放进 <c>Assets/Audio/music/</c>，
 /// 命名 <c>music_level_0X.ogg</c> / <c>music_challenge_0X.ogg</c>，加一行 <c>Config/Tables/Audio/audio_*.tres</c>
-/// （<c>Bus = Music</c>），再挂进 <c>Config/Balance.tres</c> 的 <c>Audio</c> 数组。见 docs/audio.md §九。</para>
+/// （<c>Bus = Music</c>），再挂进 <c>Config/ConfigIndex.tres</c> 的 <c>Audio</c> 数组。见 docs/audio.md §九。</para>
 /// </summary>
 public partial class MusicDirector : Node
 {

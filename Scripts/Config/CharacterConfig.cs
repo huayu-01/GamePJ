@@ -4,13 +4,13 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 角色表的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Characters/chr_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.Characters"/>。
+/// 索引用 <see cref="ConfigIndexData.Characters"/>。
 ///
 /// 角色也是"单位"：生命/护甲/移速/减伤/攻击组/持有技能/类标签都继承 <see cref="UnitConfig"/>，
 /// 这里只加角色私有的列（武器开关、默认武器、能力开关矩阵）。
 ///
 /// 取代 `RunController.ApplyBalance` 里那串 <c>heavy ? A : summoner ? B : C</c> 三元链与
-/// 硬编码的能力开关矩阵（原 `Balance.tres` 的 <c>Player*</c> / <c>Heavy*</c> / <c>Summoner*</c> 已搬到这里）。
+/// 硬编码的能力开关矩阵（原 `ConfigIndex.tres` 的 <c>Player*</c> / <c>Heavy*</c> / <c>Summoner*</c> 已搬到这里）。
 /// </summary>
 [Tool]
 [GlobalClass]

@@ -743,7 +743,7 @@ SetKeyHints(
   + 抖外观网格（**不是根节点**：根节点的 scale 被出现/消失补间占用）+ 描边闪红 + 玩家被略微击退
   （`CharacterMovement.AddImpulse`，默认冲量 4.5 → 实测位移 ≈ **0.64 米**，方向背离交互物）。
 - **音效复用**：`AudioIds.InteractFail = "ui_card_fail"`（能力卡那条"操作被拒"的低频嗡）——
-  **不新增素材、不新增音效表行、不动 `Balance.tres`**；想换成专门的一条，照 [audio.md](audio.md) §5 加行再改这个字符串。
+  **不新增素材、不新增音效表行、不动 `ConfigIndex.tres`**；想换成专门的一条，照 [audio.md](audio.md) §5 加行再改这个字符串。
 
 ### 16.4 怎么保证"没动交互判定"（可逐条核对）
 
@@ -772,7 +772,7 @@ SetKeyHints(
 | 为什么不调 `UnitConfig.ApplyTo` | 它里面的换模型是"`Free()` 旧模型 + `AddChild` 新实例"，而 `UnitAnimator` 已经绑在旧的 `Model/AnimationPlayer` 上 → 运行期会留下指向已释放节点的引用（每帧报错）。这里改成**每个角色各留一份预览模型、靠 `Visible` 切换**，不释放任何既有节点 |
 | 数值 | `Unit.ApplyBaseStats`（生命/护甲/护盾/移速）+ `DamageReduction`，与关卡里 `RunController.ApplyBalance` 同一个入口；**不叠加局外强化**（那是出征才算的） |
 | 枪械 | 角色行 `WeaponEnabled = false`（近战重装）→ 收起基地玩家的 `WeaponMount/Pistol`；武器表那一行也套到基地玩家的 `Weapon` 组件上 |
-| ⚠️ 一个真实时序坑 | `LoadoutPreview._Ready` 可能**早于配置表建好**（实测 `Balance` 的索引晚约 1 秒就绪）→ 那一次读不到角色行，所以组件记下 `_rowMissing` 并在下一帧自动补一次（否则基地玩家永远是场景默认数值 120/0） |
+| ⚠️ 一个真实时序坑 | `LoadoutPreview._Ready` 可能**早于配置表建好**（实测 `ConfigIndex` 的索引晚约 1 秒就绪）→ 那一次读不到角色行，所以组件记下 `_rowMissing` 并在下一帧自动补一次（否则基地玩家永远是场景默认数值 120/0） |
 
 ⚠️ 模型复用说明（**照实记录**）：`mesh_player_body_heavy.glb` = Kenney Mini Characters 的 `character-male-e`（与守卫同一个模型）、
 `..._summoner.glb` = `character-female-d`（原包里唯一没被任何敌人用掉的那个）。素材来自**项目已经用着的那一包**（CC0），

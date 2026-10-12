@@ -22,7 +22,7 @@ namespace ActRoguelike.UI;
 /// <item><b>元素是基类组件</b>：每一格都是 <see cref="AbilityCardTile"/>（三状态 + 四种交互 + 读条 + 震动 + 音效），
 ///   本界面只做三件事：建格子、<b>判定规则</b>（<see cref="IAbilityCardHost"/>）、以及额度栏 / 图例 / 文案。
 ///   换一个界面（比如以后要塞进基地界面）只要复用那个 .tscn + 实现一个宿主，交互一行都不用重写。</item>
-/// <item><b>数据从哪来</b>：`Balance.tres → AbilityCards` 数组（顺序就是矩阵顺序），
+/// <item><b>数据从哪来</b>：`ConfigIndex.tres → AbilityCards` 数组（顺序就是矩阵顺序），
 ///   **加一张卡 = 加一行 .tres + 加进那个数组**，本文件一个字都不用改（占位卡会自动少一张）。</item>
 /// </list>
 ///

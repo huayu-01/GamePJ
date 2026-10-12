@@ -2,7 +2,7 @@
 
 > 给"要把模型 / 材质 / 特效换成美术给的资源"的人看（程序或美术都适用）。
 > 项目：`F:\Godot项目\项目a`（Godot 4.7.2 stable mono / C#）。**本文是资源目录与命名的唯一约定。**
-> 相关：[architecture.md](architecture.md)（代码分层）、[config.md](config.md)（数值放 `Config/Balance.tres`）。
+> 相关：[architecture.md](architecture.md)（代码分层）、[config.md](config.md)（数值放 `Config/ConfigIndex.tres`）。
 
 ---
 

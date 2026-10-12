@@ -4,7 +4,7 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 首领表的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Bosses/boss_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.Bosses"/>。
+/// 索引用 <see cref="ConfigIndexData.Bosses"/>。
 ///
 /// 首领与普通敌人共用同一套**通用单位参数**（<see cref="UnitConfig"/>：攻击 / 生命 / 移速 /
 /// 持有技能 / 行为&amp;类 / 表现），这里只加首领私有的两列：
@@ -27,7 +27,7 @@ public partial class BossConfig : UnitConfig
 
 	/// <summary>
 	/// 「白板首领副本」的血量倍率（相对普通首领；关卡核心文档 L231/L315/L317）。
-	/// 以前这个值在 `Balance.tres` 里有一份**没有消费者**的副本（改了不起作用），
+	/// 以前这个值在 `ConfigIndex.tres` 里有一份**没有消费者**的副本（改了不起作用），
 	/// 实际生效的是 `EncounterController.EliteBossHealthScale`（场景导出，默认 0.35）。
 	/// 现在统一到这里：行是权威，读不到才用场景导出的值。
 	/// </summary>

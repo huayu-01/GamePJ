@@ -6,7 +6,7 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 节点表的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Nodes/node_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.Nodes"/>。
+/// 索引用 <see cref="ConfigIndexData.Nodes"/>。
 ///
 /// 它一处替掉三处硬编码：`RewardService.TitleFor` / <c>FilterFor</c> 两个 switch、
 /// `NodePlacement.LayerOf` 与 `StageController.WavesFor`（同一段逻辑写了两遍）、以及商店三项报价。
@@ -79,7 +79,7 @@ public partial class NodeConfig : ConfigRow
 	/// （组合顺序见 <c>StageController.AddPressureForNode</c>，全项目只有那一处定义）。
 	///
 	/// 取值优先级（只有一个真源）：本行（挑战类型最具体）→ 关卡行按价值层的
-	/// <c>PressurePerNodeHighValue</c> / <c>PressurePerNodeNormal</c> → <c>Balance.PressurePerHighValueNode</c>。
+	/// <c>PressurePerNodeHighValue</c> / <c>PressurePerNodeNormal</c> → <c>ConfigIndex.PressurePerHighValueNode</c>。
 	/// <b>留 0 = 本行不表态</b>，落到下一层（三行当前都填了 150，与文档 §7.2 的固定值一致）。
 	/// </summary>
 	[Export] public float BossPressurePoints { get; set; }

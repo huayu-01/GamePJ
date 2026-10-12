@@ -126,7 +126,7 @@ public partial class BossPreviewScreen : OverlayScreen
 	private static void AppendQuota(StringBuilder text, StageController stage)
 	{
 		text.Append("【免费挑战额度 · 关卡核心文档 §8】\n");
-		text.Append($"  本关额度 {stage.FreeChallengeQuota}（基础 {Balance.Settings.FreeChallengeBaseQuota} + 每关 1，上限 {Balance.Settings.FreeChallengeMaxQuota}）");
+		text.Append($"  本关额度 {stage.FreeChallengeQuota}（基础 {ConfigIndex.Settings.FreeChallengeBaseQuota} + 每关 1，上限 {ConfigIndex.Settings.FreeChallengeMaxQuota}）");
 		text.Append($"   已挑战 {stage.ChallengesUsed} 次   剩余 {stage.FreeQuotaLeft}\n");
 		text.Append(stage.CurrentChallengeFree
 			? "  闸门：下一次结算算「免费挑战」→ 完成后不增加 Pressure（§8.2）\n"
@@ -140,7 +140,7 @@ public partial class BossPreviewScreen : OverlayScreen
 		float growth = stageRow is { PressureGrowthMultiplier: > 0f } row ? row.PressureGrowthMultiplier : 1f;
 		text.Append("【Pressure · 关卡核心文档 §7】\n");
 		text.Append($"  阈值 {stage.PressureThresholdNow:0}   本关跨阈值 {stage.PressureRolls} 次（每跨一次立即抽 1 条数值强化）   余数 {stage.PressureBank:0.#}（转换后清零、不结转）\n");
-		text.Append($"  组合顺序：基础点数（节点表 → 关卡行 → Balance 全局默认值）× 本关倍率 {growth:0.##} × 类型比例（进化 / 异化）\n");
+		text.Append($"  组合顺序：基础点数（节点表 → 关卡行 → ConfigIndex 全局默认值）× 本关倍率 {growth:0.##} × 类型比例（进化 / 异化）\n");
 		text.Append($"  转换池候选：{DescribePool()}\n");
 		text.Append('\n');
 	}

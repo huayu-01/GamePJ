@@ -24,7 +24,7 @@ namespace ActRoguelike.Combat;
 /// ② 爆炸用的那个壳 <c>Assets/Effects/fx_detach_lifetime.gd</c> 在"父节点就是场景根"时会提前
 ///    <c>return</c>（它设计上是"从一个会死的宿主里脱身"），而我们的特效**正是**直接挂在场景根下的。
 /// 于是不自己计时的话，**每次命中都会在场景树里留下一个常驻节点**（打一梭子就多十几个）。
-/// 这里用配置里的 <see cref="BalanceConfig.HitEffectLifetime"/> 显式销毁（默认 1.8s = 素材 <c>main</c>
+/// 这里用配置里的 <see cref="ConfigIndexData.HitEffectLifetime"/> 显式销毁（默认 1.8s = 素材 <c>main</c>
 /// 动画 1.6s + 0.2s 尾巴）。</para>
 ///
 /// <para>⚠️ <b>刻意没有"特效缩放"配置列</b>：Binbun 这套粒子的尺寸**不跟随节点缩放**
@@ -37,7 +37,7 @@ namespace ActRoguelike.Combat;
 /// </summary>
 public static class HitEffect
 {
-	/// <summary>表里没填路径时的兜底（与 <see cref="BalanceConfig.HitEffectScenePath"/> 的默认值一致）。</summary>
+	/// <summary>表里没填路径时的兜底（与 <see cref="ConfigIndexData.HitEffectScenePath"/> 的默认值一致）。</summary>
 	public const string DefaultScenePath = "res://Assets/Effects/fx_combat_hit.tscn";
 
 	/// <summary>已解析的预制体缓存（命中每秒会发生好几次，不能每次都 GD.Load）。</summary>
@@ -53,9 +53,9 @@ public static class HitEffect
 	/// <param name="position">世界坐标下的命中点。</param>
 	public static void Spawn(Node context, Vector3 position)
 	{
-		BalanceConfig settings = Balance.Settings;
+		ConfigIndexData settings = ConfigIndex.Settings;
 
-		// 全局开关（`Config/Balance.tres` 的「表现 · 命中特效」组）—— 关掉之后两条路径一起停。
+		// 全局开关（`Config/ConfigIndex.tres` 的「表现 · 命中特效」组）—— 关掉之后两条路径一起停。
 		if (!settings.ShowHitEffects)
 		{
 			return;
@@ -118,7 +118,7 @@ public static class HitEffect
 #endif
 
 	/// <summary>读特效预制体（表里的路径优先，读不到就警告一次并跳过）。</summary>
-	private static PackedScene? ResolveScene(BalanceConfig settings)
+	private static PackedScene? ResolveScene(ConfigIndexData settings)
 	{
 		string path = string.IsNullOrEmpty(settings.HitEffectScenePath) ? DefaultScenePath : settings.HitEffectScenePath;
 		if (_resolved && _cachedPath == path)

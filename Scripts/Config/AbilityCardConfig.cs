@@ -24,7 +24,7 @@ public enum AbilityCardEffectKind
 
 /// <summary>
 /// **能力卡表**的一行 —— 一个 `.tres` 文件就是一张卡（`Config/Tables/AbilityCards/card_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.AbilityCards"/>。
+/// 索引用 <see cref="ConfigIndexData.AbilityCards"/>。
 ///
 /// <para>📌 <b>它与 <c>Config/Tables/Skills/</c> 的关系（本轮第一件要判断的事）</b>：
 /// 两者是**两层不同的东西**，所以**没有混进同一张表**：</para>
@@ -39,7 +39,7 @@ public enum AbilityCardEffectKind
 /// 一张"授予技能"的卡指向技能表里的一行 —— 卡说"你有这个技能"，技能行说"这个技能的具体参数"。
 /// 因此**能力卡没有复制任何技能参数**，改技能参数仍然只改 `Skills/` 一行。</para>
 ///
-/// <para>⚠️ 纪律与其它表完全一致：读不到行 → 调用方什么都不做；行文件被删会让**整份** `Balance.tres`
+/// <para>⚠️ 纪律与其它表完全一致：读不到行 → 调用方什么都不做；行文件被删会让**整份** `ConfigIndex.tres`
 /// 加载失败（所以下线一张卡要把数组项与 `[ext_resource]` 一起删）。</para>
 /// </summary>
 [Tool]

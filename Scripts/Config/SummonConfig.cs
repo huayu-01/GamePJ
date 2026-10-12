@@ -5,7 +5,7 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 召唤物表的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Summons/summon_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.Summons"/>。
+/// 索引用 <see cref="ConfigIndexData.Summons"/>。
 ///
 /// 召唤物也是"单位"：生命 / 护甲 / 移速 / 攻击组 / 持有技能 / 类标签都来自
 /// <see cref="UnitConfig"/>（Drone 的 `Tags = ["Summon"]` 决定它进 summon_units 组、

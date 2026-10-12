@@ -67,7 +67,7 @@ public partial class RewardNode : Interactable
 
 	/// <summary>
 	/// 每种类型的**光圈颜色**（按需从价值标签配置读、读一次缓存一份，见 <see cref="AuraColorFor"/>）。
-	/// **刻意不做成静态字段初始化**：它要读 `Balance` 的配置索引，那必须等 autoload 就绪（首次 `_Ready`）。
+	/// **刻意不做成静态字段初始化**：它要读 `ConfigIndex` 的配置索引，那必须等 autoload 就绪（首次 `_Ready`）。
 	/// </summary>
 	private static readonly Dictionary<RewardNodeKind, Color> AuraColors = new();
 
@@ -139,10 +139,10 @@ public partial class RewardNode : Interactable
 		}
 
 		// ③ 周身光圈的颜色 = 价值程度。
-		// ⚠️ 必须**再延后执行一次**：颜色要从 `Balance` 的**表索引**读，而那张索引是
-		// `Balance.CallDeferred(BuildTableIndex)` 建的 —— Main.tscn 里节点的 `_Ready` **早于**它
+		// ⚠️ 必须**再延后执行一次**：颜色要从 `ConfigIndex` 的**表索引**读，而那张索引是
+		// `ConfigIndex.CallDeferred(BuildTableIndex)` 建的 —— Main.tscn 里节点的 `_Ready` **早于**它
 		// （自测实测踩到：那时索引还是空的 → 颜色被"读不到"的结果定住，整局光圈都是中性白）。
-		// 延后队列先进先出，而 `Balance` 的 defer 排在整个主场景之前，所以这次执行时索引一定已就绪。
+		// 延后队列先进先出，而 `ConfigIndex` 的 defer 排在整个主场景之前，所以这次执行时索引一定已就绪。
 		// 先立刻执行一次，是为了"索引本来就已就绪"的常见情形（切关复位 / 运行期改 Kind）不慢一帧。
 		ApplyAuraColor();
 		CallDeferred(nameof(ApplyAuraColor));
@@ -180,7 +180,7 @@ public partial class RewardNode : Interactable
 	/// 这个类型的价值档位色 = 节点行命中的价值标签里 <see cref="ValueTagConfig.WaveCount"/> 最大的那一行的
 	/// <see cref="ValueTagConfig.AuraColor"/>（与"这个节点值几波"是同一条规则、同一个真源）。
 	///
-	/// <para><b>读不到时不缓存</b>：首次调用可能早于 `Balance` 建好表索引（见 <see cref="ApplyAuraColor"/>
+	/// <para><b>读不到时不缓存</b>：首次调用可能早于 `ConfigIndex` 建好表索引（见 <see cref="ApplyAuraColor"/>
 	/// 上面的说明），把"读不到"的结果缓存下来会让整局都是中性白 —— 那是自测实测踩到的真 bug。
 	/// 只有**真的读到**才写进 <see cref="AuraColors"/>。</para>
 	///

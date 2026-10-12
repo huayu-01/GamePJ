@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="BalanceConfig" load_steps=123 format=3]
+[gd_resource type="Resource" script_class="ConfigIndexData" load_steps=123 format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/BalanceConfig.cs" id="1_balance"]
+[ext_resource type="Script" path="res://Scripts/Config/ConfigIndexData.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_inner.tres" id="3_stg_inner"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_core.tres" id="4_stg_core"]

@@ -4,7 +4,7 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// **Pressure 数值强化池**的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Pressure/pmod_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.PressureMods"/>。
+/// 索引用 <see cref="ConfigIndexData.PressureMods"/>。
 ///
 /// 关卡核心文档 §7.1 的硬约束：**Boss Pressure（数值型强化）与 Boss Build（行为/技能型）必须分离**，
 /// 不得合并成一个无法区分来源的强化池。所以：

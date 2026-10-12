@@ -49,12 +49,12 @@ Get-Content $f.FullName | Where-Object { $_ -match '波开始|清场完成|端�
 
 ### 3. 其它约定
 
-- 数值一律放 `Config/Tables/<分组>/*.tres`（一行一个文件，索引挂在 `Config/Balance.tres` 的 `[Export] XxxConfig[]` 数组上）或 `Balance.tres` 的全局字段里，**不要硬编码在逻辑里**。见 [config.md](config.md) 的"调参去哪张表"。
-- **表是权威、代码是回退**：读不到表就用组件/行类自身的 `[Export]` 默认值（`Balance.FileLoaded` + 每个系统的"来源：表/默认值"日志能证明走的是哪条路）。
-- ⚠️ **不要单独删/改 `Balance.tres` 引用到的行文件** —— 一个行文件缺失会让**整份** `Balance.tres` 加载失败、所有数值静默回退。要下线一行，把数组项与对应的 `[ext_resource]` 一起删。
+- 数值一律放 `Config/Tables/<分组>/*.tres`（一行一个文件，索引挂在 `Config/ConfigIndex.tres` 的 `[Export] XxxConfig[]` 数组上）或 `ConfigIndex.tres` 的全局字段里，**不要硬编码在逻辑里**。见 [config.md](config.md) 的"调参去哪张表"。
+- **表是权威、代码是回退**：读不到表就用组件/行类自身的 `[Export]` 默认值（`ConfigIndex.FileLoaded` + 每个系统的"来源：表/默认值"日志能证明走的是哪条路）。
+- ⚠️ **不要单独删/改 `ConfigIndex.tres` 引用到的行文件** —— 一个行文件缺失会让**整份** `ConfigIndex.tres` 加载失败、所有数值静默回退。要下线一行，把数组项与对应的 `[ext_resource]` 一起删。
 - 玩家可见文案改动 → 同步更新 `docs/`。
 - 日志用 `ActRoguelike.Core.GameLog.Write("分类", "消息")`（分类：Flow / Node / Reward / Spawn / Combat / Map / **Config**）。
-  ⚠️ **`Balance` 的 `_Ready` 里不能直接写日志** —— `GameLog` 的 autoload 排在它之后，写进去会被静默丢掉。`Balance` 用 `CallDeferred` 绕过这一点。
+  ⚠️ **`ConfigIndex` 的 `_Ready` 里不能直接写日志** —— `GameLog` 的 autoload 排在它之后，写进去会被静默丢掉。`ConfigIndex` 用 `CallDeferred` 绕过这一点。
 - 运行时读数用 CLI 的 `await_runtime_condition`（**不是** `evaluate_debug_expression`，后者只在断点暂停时可用）：
   ```powershell
   $a = @{ expression = 'get_node("/root/Main/Stage").DebugState'; timeout_ms = 1500 } | ConvertTo-Json -Compress
@@ -83,7 +83,7 @@ Scripts/
 - `MapManager.Instance` —— 导航烘焙 + 刷怪点/降临点/节点落点
 - `UiService.Instance` —— 开界面（`OpenUpgrades/OpenLoadout/OpenHelp/OpenRewards/OpenChoose/OpenMessage`）
 - `UiRouter` —— 界面栈 / Esc / 暂停策略
-- `Balance.Settings` —— 所有数值（**唯一数值门面**；实际数值在 `Config/Tables/<分组>/` 的分表里，见 [config.md](config.md)）
+- `ConfigIndex.Settings` —— 所有数值（**唯一数值门面**；实际数值在 `Config/Tables/<分组>/` 的分表里，见 [config.md](config.md)）
 - `ConfigRows.ById<T>()` / `BySlot<T>()` / `ByKind<T,TKind>()` —— 读配置表的唯一入口（读不到 → `null` → 调用方回退到自身 `[Export]` 默认值）
 
 **UI 框架现状**：`OverlayScreen` 已支持分层（`UiLayer.Hud/Panel/Modal`，决定是否暂停）、防误触、开合动画（`FadeSeconds` / `OpenScaleFrom`）。
@@ -96,13 +96,13 @@ Scripts/
 
 ## 三、待办任务（本次交接的重点）
 
-### 任务 0：配置表体系阶段 2 —— Balance 拆成 8 张表 ✅ 已完成（2026-10）
+### 任务 0：配置表体系阶段 2 —— ConfigIndex 拆成 8 张表 ✅ 已完成（2026-10）
 
-> **做了什么**：`BalanceConfig` 从 74 字段降到 30 个全局字段；新增 8 张表（武器 3 / 角色 3 / 敌人 1 /
+> **做了什么**：`ConfigIndexData` 从 74 字段降到 30 个全局字段；新增 8 张表（武器 3 / 角色 3 / 敌人 1 /
 > **效果 10** / 节点 9 / 增幅项 19 / 局外成长 5 / 关卡 3，共 **53 个行文件**），全部"一行一个 `.tres`"，
-> 索引挂在 `Balance.tres` 的 `[Export] XxxConfig[]` 数组上。
+> 索引挂在 `ConfigIndex.tres` 的 `[Export] XxxConfig[]` 数组上。
 > **没有做逐行回退**（保持资源引用数组）—— 但**不要单独删/改行文件**，见下面那条纪律。
-> `Balance.Settings.Xxx` **仍然可用**（渐进迁移，没有大爆炸式重构）。
+> `ConfigIndex.Settings.Xxx` **仍然可用**（渐进迁移，没有大爆炸式重构）。
 > 进度 / 实测证据 / 逐项比对 / 两条新坑见 [config-schema.md](config-schema.md) §5 阶段 2 与 §8；调参入口见 [config.md](config.md)。
 >
 > **留给下一轮的三件事**（按建议顺序）：
@@ -159,17 +159,17 @@ Scripts/
 >    改成 **`RunController.InitializePool()`，只在进关卡的 `ApplyBalance()` 里调一次**；
 >    交互时只从定好的池里抽（仍然按当前构筑过滤互斥/层数/节点 `Kind`）。
 >    **重复的两个进化池节点行合并**：删 `node_weapon.tres`（`Kind = Weapon`，场景无实例、`BossPressurePoints` 是 0），
->    保留 `node_evolution.tres`；`Balance.tres` 的 `[ext_resource]` 与 `Nodes` 数组项**同一次**删；
+>    保留 `node_evolution.tres`；`ConfigIndex.tres` 的 `[ext_resource]` 与 `Nodes` 数组项**同一次**删；
 >    `NodePlacement.LayerOf` 兜底补 `Weapon => 2`（否则 `Weapon=4` 会掉到 1）；
 >    `Config/Tables/UpgradePools/` 三个按攻击方式分的池**保留不动**。**`Id`/类/目录一律没改名。**
 > 3. **硬指标**：除 **`配置表比对·索引` 的 `节点 9 → 8`**（合并 = 少一个行文件，必然结果）之外**逐位一致** ——
 >    `节点布置 10（高 2/中 5/低 3）`（**它数的是场景实例，不是表行**）、`Pressure=3`、`端到端 F`、`音效 13`、
->    `增幅项 19 条 / 池子 18 条`、`价值标签 → 节点 [Weapon=4 …]` 全部照旧；日志无 `Balance.tres` 加载失败。
+>    `增幅项 19 条 / 池子 18 条`、`价值标签 → 节点 [Weapon=4 …]` 全部照旧；日志无 `ConfigIndex.tres` 加载失败。
 >
 > **数据改了哪 18 个文件**：行文件 14（`Enemies/` 9 + `Bosses/` 1 + `Summons/` 1 + `Characters/` 3，
 > 含三个角色行的 `DescriptionTemplate` 占位符）+ 场景 4（`Guard` / `Charger` / `SkillElite` / `TrainingDummy`），
 > 外加**删除** `Config/Tables/Nodes/node_weapon.tres`。全部 **LF + 无 BOM**。
-> **`Balance.tres` 里本来没有护甲字段**（C1 完全没碰它），C2 才碰了它的 `Nodes` 数组。
+> **`ConfigIndex.tres` 里本来没有护甲字段**（C1 完全没碰它），C2 才碰了它的 `Nodes` 数组。
 > 细节与两侧实测见 [config.md](config.md) 的「护甲无上限 + 进化池合并实测」。
 
 ### 任务 F：用户三项修正（护甲只给精英 / 行为型改称技能 / 命中特效落在命中点）✅ 已完成（2026-10）
@@ -180,7 +180,7 @@ Scripts/
 >
 > **做了什么**：
 > 1. **`pmod_fortress_armor`「铁壁·护甲」整行下线**（Pressure **8 → 7 条**）：行文件 +
->    `Balance.tres` 的 `[ext_resource]`/数组项 + **`BossPerkCatalog.FallbackPressure` 里的代码兜底**
+>    `ConfigIndex.tres` 的 `[ext_resource]`/数组项 + **`BossPerkCatalog.FallbackPressure` 里的代码兜底**
 >    —— 三处同一次改（只删表行 = 表读不到时首领又吃护甲，静默换挡）。
 >    ✅ **精英护甲不受影响**：它来自 `Scripts/Combat/EliteModifier.cs`（`ArmorAdd = 120`），与 Pressure 无关；
 >    改完 `MaxArmorAdd` 的生产者全项目只剩它一个。自测期望串同步 `…/25/8/…` → `…/25/7/…`。
@@ -192,7 +192,7 @@ Scripts/
 >    （它们本来就区分来源，问题在"叫法"）。
 > 3. **命中特效落在实际命中点**：`AttackHitbox` 用**目标碰撞体表面上离命中体最近的那一点**
 >    （`ResolveHitPoint`：胶囊/球/盒三种形状 + 碰撞体中心兜底），取代"目标原点 + 全局高度偏移"；
->    **`HitEffectHeightOffset` 整列删除**（字段 + `Balance.tres` 那行）。投射物那条路径**一行没动**。
+>    **`HitEffectHeightOffset` 整列删除**（字段 + `ConfigIndex.tres` 那行）。投射物那条路径**一行没动**。
 >    ⚠️ 第一版实现是"打一条射线取接触点"，自测里 7 次跑出 3 次**静默打空**（射线读物理空间在查询那一刻的
 >    状态：目标被脚本挪动 / 刚被冻住 / 刚被打死都会打空）→ 改成几何算法，两次连跑数值逐位相同
 >    （出生点到碰撞体表面偏差 **0.026 m**，旧做法基线 **0.4 m** = 埋在身体里）。
@@ -232,7 +232,7 @@ Scripts/
 > **⚠️ 需要知道的两件事**：
 > - **每抽的期望强度降到原来的 58.9%**（"一抽只买一个参数"的必然结果，且**调权重补不回来**）——
 >   要补只能提高单条数值或降阈值，**这是一轮平衡测试的入口**。
-> - 旧行文件 `pmod_berserk.tres` / `pmod_fortress.tres` **已删除**（与 `Balance.tres` 的数组项 + ext_resource 同一次改动）。
+> - 旧行文件 `pmod_berserk.tres` / `pmod_fortress.tres` **已删除**（与 `ConfigIndex.tres` 的数组项 + ext_resource 同一次改动）。
 > - 行为型词条（`bhv_*`）**还没有**限定词列（要给 `AbilityConfig` 加列才行，本轮没做）。
 >
 > 证据：`build.ps1 --no-incremental` 0/0；自测 `+187.5 → 1` / `+225 → 3` **逐位不变**；
@@ -322,7 +322,7 @@ Scripts/
 1. 已删除 `Scripts/Run/KillPlane.cs`（连 `.uid`）—— 确认全项目无引用（`KillPlaneY` 是平衡配置，仍被 `MapManager.EnsureKillZone()` 使用，保留）。
 2. `docs/controller-flow.md` 已更新；`docs/config.md` 的区域杀一行也改成「所有单位进入即杀」。
 3. `docs/` 与代码不一致处（本次发现并已修）：
-   - `stages.md` 还写着「`ActiveNodeCount` 从 3 提到 6 / 实际启用 5 个」—— 实际 `Balance.tres` 是 `RewardNodeCount = 3/4/4`，自测实测启用 **10 个（2/5/3）**。
+   - `stages.md` 还写着「`ActiveNodeCount` 从 3 提到 6 / 实际启用 5 个」—— 实际 `ConfigIndex.tres` 是 `RewardNodeCount = 3/4/4`，自测实测启用 **10 个（2/5/3）**。
    - `stages.md` 的实测表还写着「剩余节点 3 / 免费挑战 2」，与当前「剩余节点 9 / 隔离次数 2」不符。
    - `config.md` 说「怪物血条改到脚下仍缺视觉确认」，实际 `docs/screenshots/healthbar_feet.png` 已有确认。
 

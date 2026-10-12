@@ -147,7 +147,7 @@
 这是一套**新的"压力递增"机制**（与节点的 Encounter 并存）。
 
 > ✅ **已完成（2026-10-12）**：`StageController.UpdateAmbientSpawns`（每帧、只有进了关卡才计时）按
-> `Balance.tres` 的全局标量 `AmbientSpawnInterval`（**30s**）/ `AmbientSpawnEscalateSeconds`（**120s**，用户点名的参数）/
+> `ConfigIndex.tres` 的全局标量 `AmbientSpawnInterval`（**30s**）/ `AmbientSpawnEscalateSeconds`（**120s**，用户点名的参数）/
 > `AmbientSpawnStrengthStep`（**0.25**/档）/ `AmbientSpawnMaxAlive`（**6**）定期刷"游离怪"。
 > 落点**复用** `EncounterController.SpawnAmbient` → `SpawnPlanner` → `MapManager.SpawnPoint`（没有第二套落点实现）；
 > 游离怪**不扣 Encounter 预算、不进它的 `AliveCount`/`MaxConcurrent`、不参与清场判定**，所以节点挑战一行没改坏。
@@ -355,9 +355,9 @@
 > - `EliteModifier.ArmorAdd = 120` 保留，改成**直接加甲**（`Unit.GrantArmor`）——"纯粹的加甲"。
 >   ⚠️ 顺带的必然变化：本来 0 甲的敌种精英化后**真的多出 120 甲**（改动前只是把上限抬到 120、甲仍是 0）。
 > - `BarBoss.tscn` / 首领一行没动（0 甲 → `Armor > 0` 判据下依然"天然不显示"）。
-> - 改了 **14 个行文件 + 4 个场景**；`Balance.tres` 里本来就没有护甲字段，**没碰它**（行文件是原地改列名，不是删/改名）。
+> - 改了 **14 个行文件 + 4 个场景**；`ConfigIndex.tres` 里本来就没有护甲字段，**没碰它**（行文件是原地改列名，不是删/改名）。
 > - 证据：构建 0 warning / 0 error；自测硬指标逐位一致（`配置表比对·玩家：… 护甲 40（期望 40）`、`节点布置 10（2/5/3）`、
->   `Pressure=3`、`端到端 F`、`音效 13`、`增幅项 19 条 / 池子 18 条`），日志无 `Balance.tres` 加载失败。
+>   `Pressure=3`、`端到端 F`、`音效 13`、`增幅项 19 条 / 池子 18 条`），日志无 `ConfigIndex.tres` 加载失败。
 
 用户原话：
 > 「**有甲了才会显示**，**护甲没有上限额度**，所以**可以删除掉 `MaxArmor`** 的」
@@ -383,7 +383,7 @@
 >   保留 `node_weapon` 会让进化节点丢掉 150 点 Pressure → `Pressure=3` 那条硬指标会漂）。
 >   两行的 `Title`/`RewardKind`/`Layer`/`WaveCount`/`ValueTags` **本来就逐列相同**，所以没有需要取舍的列；
 >   `Id` / 类 / 目录 / `RewardNodeKind` 枚举**一律没改名**（`UpgradePools/` 三个池也**保留不动**）。
-> - **索引同步**：`Balance.tres` 的 `Nodes` 数组与 `[ext_resource]` **同一次**删掉（否则整份加载失败）；
+> - **索引同步**：`ConfigIndex.tres` 的 `Nodes` 数组与 `[ext_resource]` **同一次**删掉（否则整份加载失败）；
 >   `NodePlacement.LayerOf` 的代码兜底补 `Weapon => 2`（表里没有这一行之后，它是 `Kind = Weapon` 唯一的价值层来源，
 >   不补 `Weapon=4` 会掉到 1，与 A3 自相矛盾）。
 > - **硬指标**：`节点布置 10（高 2 / 中 5 / 低 3）` **没变**（它数的是**场景实例**，不是表行）；
@@ -493,8 +493,8 @@
 | 失效节点不发光 | `dead` 动画：光圈缩到 0.55 + 三个环 `transparency` 0.82 / 0.90 / 0.95 | `docs/screenshots/node_46_aura_dead.png`（失效 vs 可用并排）+ 读数 `环 transparency=0.82 状态动画=dead` |
 | 判定逻辑没动 | `Scripts/Interaction/Interactable.cs` 本轮**零改动**（`git diff` 里没有它） | 自测端到端照旧：`端到端：按 F 之后 奖励界面打开 = True` / `互动降临节点：接受=True` / `关卡 1→2` / 全程无 ERROR |
 
-⚠️ **本轮踩到并修掉的一个真 bug**（记下来免得下一个人再踩）：光圈颜色要读 `Balance` 的**表索引**，
-而那张索引是 `Balance.CallDeferred(BuildTableIndex)` 建的 —— `Main.tscn` 里节点的 `_Ready` **早于**它，
+⚠️ **本轮踩到并修掉的一个真 bug**（记下来免得下一个人再踩）：光圈颜色要读 `ConfigIndex` 的**表索引**，
+而那张索引是 `ConfigIndex.CallDeferred(BuildTableIndex)` 建的 —— `Main.tscn` 里节点的 `_Ready` **早于**它，
 于是第一次读到的"空索引"被当成结果**缓存**住 → **整局光圈都是中性白**（画面上完全看不出异常，
 只有日志里那行 warning 能证明）。修法：① `ApplyIdleVisual()` 里 `CallDeferred` 再跑一次 `ApplyAuraColor`
-（defer 队列先进先出，`Balance` 排在主场景之前）；② **只缓存成功读到的颜色**。
+（defer 队列先进先出，`ConfigIndex` 排在主场景之前）；② **只缓存成功读到的颜色**。

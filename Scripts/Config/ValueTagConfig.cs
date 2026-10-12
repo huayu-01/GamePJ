@@ -4,7 +4,7 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// **价值标签表**的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/ValueTags/tag_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.ValueTags"/>。
+/// 索引用 <see cref="ConfigIndexData.ValueTags"/>。
 ///
 /// <b>它解决什么</b>：节点开几波以前写死在代码里（`Layer` 的开关：高 3 / 中 2 / 低 1），
 /// 加一种奖励就得回去改那三个数字。现在改成**按价值标签驱动**：

@@ -13,4 +13,4 @@ ValueTags = PackedStringArray("tag_mid")
 Id = "node_shop"
 Slot = 8
 DisplayName = "补给站"
-Note = "商店三项报价逐条抄自 Balance.tres 的 ShopHealCost / ShopRewardCost / ShopWeaponCost。"
+Note = "商店三项报价逐条抄自 ConfigIndex.tres 的 ShopHealCost / ShopRewardCost / ShopWeaponCost。"

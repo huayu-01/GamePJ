@@ -14,13 +14,13 @@ namespace ActRoguelike.Rewards;
 /// </summary>
 public static class RewardTable
 {
-	/// <summary>由 <c>Balance._Ready</c> 在读表之后调用一次。</summary>
+	/// <summary>由 <c>ConfigIndex._Ready</c> 在读表之后调用一次。</summary>
 	public static void Build(RewardConfig[]? rows)
 	{
 		if (rows == null || rows.Length == 0)
 		{
 			RewardCatalog.UseTable(null);
-			GameLog.Write("Config", $"增幅项表：0 条（来源：代码默认值）—— Balance 的 Upgrades 为空或未找到，使用 RewardCatalog.Fallback 的 {RewardCatalog.All.Length} 条。");
+			GameLog.Write("Config", $"增幅项表：0 条（来源：代码默认值）—— ConfigIndex 的 Upgrades 为空或未找到，使用 RewardCatalog.Fallback 的 {RewardCatalog.All.Length} 条。");
 			return;
 		}
 

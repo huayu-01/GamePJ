@@ -50,8 +50,8 @@ Boss 战内的压力仍按时间继续升级。
 
 > **关卡表的位置**（配置表体系阶段 1，见 [config-schema.md](config-schema.md) §3 T6 / §5）：
 > **一行 = 一个 `.tres` 文件**，放在 `Config/Tables/Stages/`：`stg_outer.tres` / `stg_inner.tres` / `stg_core.tres`；
-> 关卡顺序与索引仍是 `Config/Balance.tres` 上**已有的** `[Export] StageDefinition[] Stages` 数组（元素指向上面三个文件）。
-> 改某一关的数值 → 打开那一行的 `.tres`（或整张表一起看）；**不要**再往 `Balance.tres` 里塞内嵌 `sub_resource`。
+> 关卡顺序与索引仍是 `Config/ConfigIndex.tres` 上**已有的** `[Export] StageDefinition[] Stages` 数组（元素指向上面三个文件）。
+> 改某一关的数值 → 打开那一行的 `.tres`（或整张表一起看）；**不要**再往 `ConfigIndex.tres` 里塞内嵌 `sub_resource`。
 
 | 字段 | 含义 |
 |---|---|
@@ -71,14 +71,14 @@ Boss 战内的压力仍按时间继续升级。
 | `PressureEvolutionBonus` / `PressureMutationBonus` | 进化 / 异化挑战的额外比例（§7.4） |
 | `PressureUpgradeTags` | 本关 Pressure 转换后允许进入的**数值型**强化候选标签（§7.4；留空 = 不限制）。⚠️ 数值强化池本身尚未实现（§7.5），当前只写进日志 |
 
-> **Pressure 字段的取值规则**：行里填了就用行里的；留 0（= 未设置）就用 `Balance.tres` 上的全局默认值
+> **Pressure 字段的取值规则**：行里填了就用行里的；留 0（= 未设置）就用 `ConfigIndex.tres` 上的全局默认值
 > （`PressurePerHighValueNode` 150 / `PressureEvolutionBonus` 1.25 / `PressureMutationBonus` 1.5 / `PressurePerPoint` 100）。
 > 当前三行**都没填**，所以 Pressure 与分表之前逐位一致。
 > ⚠️ 关卡核心文档 §7.1 的硬约束：Pressure 只管**数值型**强化，行为/技能型走 Boss Build（`BossPerkCatalog`），两者不得合成一个池。
 
-序列写在 `Balance.tres` 的 `Stages` 数组里（`Config/Balance.tres`），指向 `Config/Tables/Stages/stg_*.tres`。
+序列写在 `ConfigIndex.tres` 的 `Stages` 数组里（`Config/ConfigIndex.tres`），指向 `Config/Tables/Stages/stg_*.tres`。
 **读不到 / 数组为空时回退到 `StageDefinition` 自身的 `[Export]` 默认值**（一关，`Stage 1`）；
-代码里**不再有**"内置三关兜底"（`RunController.DefaultStages()` 已在配置表阶段 1 删除 —— 它和 `Balance.tres` 漂移过 5 处）。走表还是走默认值，开局日志里有一行明确写出。
+代码里**不再有**"内置三关兜底"（`RunController.DefaultStages()` 已在配置表阶段 1 删除 —— 它和 `ConfigIndex.tres` 漂移过 5 处）。走表还是走默认值，开局日志里有一行明确写出。
 
 **切关流程**：Boss 阵亡 → 还有下一关就 `ApplyStage`（节点重新随机布置、挑战计数清零、门复位、场上清空、玩家回出生点并回满、构筑与生命保留）并弹「本关完成」提示；最后一关的 Boss 阵亡 → 通关结算。
 
@@ -233,7 +233,7 @@ Stage 1 · 外围   剩余节点 5   隔离次数 2   用时 2s   敌人 0
 | 1 中 | 强化池 / 补给站 | `tag_mid` | **3** |
 | 0 低 | 局外资源 / 恢复状态 / 特殊奖励 / 降临节点 | `tag_low` | **1** |
 
-- **标签表**：`Config/Tables/ValueTags/tag_*.tres`（3 行，索引在 `Balance.tres` 的 `ValueTags` 数组）。
+- **标签表**：`Config/Tables/ValueTags/tag_*.tres`（3 行，索引在 `ConfigIndex.tres` 的 `ValueTags` 数组）。
 - **节点行**：`NodeConfig.ValueTags`（字符串数组，9 行都填了）。
 - **取值链**（只有一处定义：`NodePlacement.WavesFor`）：
   ① 标签行 `WaveCount`（多标签命中取**最大**）→ ② 节点行自己的 `WaveCount` → ③ 按 `Layer` 的代码兜底（2→4 / 1→3 / 其它→1）。
@@ -287,7 +287,7 @@ Stage 1 · 外围   剩余节点 5   隔离次数 2   用时 2s   敌人 0
 | 项目 | 实现 |
 |---|---|
 | 谁在驱动 | `StageController.UpdateAmbientSpawns`（`_PhysicsProcess` 里每帧，只有 `Definition != null` 才计时 = "进了关卡"才开始） |
-| 节奏与强度参数 | **全局标量**（`Config/Balance.tres` 的 `AmbientSpawnInterval` = 30s / `AmbientSpawnEscalateSeconds` = 120s / `AmbientSpawnStrengthStep` = 0.25 / `AmbientSpawnMaxAlive` = 6），字段定义在 `Scripts/Config/BalanceConfig.cs` 的「节奏 · 关卡内的定期刷怪」组 |
+| 节奏与强度参数 | **全局标量**（`Config/ConfigIndex.tres` 的 `AmbientSpawnInterval` = 30s / `AmbientSpawnEscalateSeconds` = 120s / `AmbientSpawnStrengthStep` = 0.25 / `AmbientSpawnMaxAlive` = 6），字段定义在 `Scripts/Config/ConfigIndexData.cs` 的「节奏 · 关卡内的定期刷怪」组 |
 | 刷在哪 | **复用** `EncounterController.SpawnAmbient` → `SpawnPlanner.FindSpawnPoint` → `MapManager.SpawnPoint` → `MapManager.RingPoint`（**没有第二套落点实现**） |
 | 增强什么 | 档位 = 本关已过秒数 ÷ 120（切关清零）；每档给**之后**刷出的怪同时乘 生命与伤害（×1.25/档）。已刷出的怪不动 |
 | 与 Encounter 的关系 | 游离怪**不扣预算、不进 `_spawned`、不计入 `AliveCount`/`MaxConcurrent`**，所以**不参与本场的清场判定**（否则节点挑战会因为"场外还有别的怪"永远结不了算） |

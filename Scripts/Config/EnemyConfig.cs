@@ -4,12 +4,12 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 敌人表的一行 —— **一个 `.tres` 文件就是一行**（`Config/Tables/Enemies/enemy_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.Enemies"/>。
+/// 索引用 <see cref="ConfigIndexData.Enemies"/>。
 ///
 /// 分两类行（同一张表，用 <see cref="IsGlobal"/> 区分）：
 /// <list type="bullet">
 /// <item><b>全局倍率行</b>（<c>enemy_global</c>，<see cref="IsGlobal"/> = true）：难度总开关，
-///   取代 `Balance.tres` 的 <c>EnemyHealthMultiplier</c> / <c>EnemyDamageMultiplier</c> /
+///   取代 `ConfigIndex.tres` 的 <c>EnemyHealthMultiplier</c> / <c>EnemyDamageMultiplier</c> /
 ///   <c>EnemyMoveSpeedMultiplier</c> / <c>EliteChanceMultiplier</c>。只能有一行。</item>
 /// <item><b>按敌种的行</b>（每个敌人场景一行）：继承 <see cref="UnitConfig"/> 的通用单位参数
 ///   （攻击 / 生命 / 移速 / 持有技能 / 行为&amp;类 / 表现），再加这一类的私有列 ——

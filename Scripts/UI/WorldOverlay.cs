@@ -65,7 +65,7 @@ internal sealed class HealthBarWidget
 
 	public float FillHeight { get; private set; }
 
-	/// <summary>整条（含边框）在预制体里的像素尺寸，用于把 Balance.tres 的尺寸换算成缩放。</summary>
+	/// <summary>整条（含边框）在预制体里的像素尺寸，用于把 ConfigIndex.tres 的尺寸换算成缩放。</summary>
 	public float BgWidth { get; }
 
 	/// <summary>整条高度，等于填充高度（上下边框是 padding，不额外加高）。</summary>
@@ -312,7 +312,7 @@ public partial class WorldOverlay : CanvasLayer
 	/// </summary>
 	private void OnUnitDamaged(Unit unit, DamageResult result, HitInstance hit)
 	{
-		if (!Balance.Settings.ShowDamageNumbers || !IsInstanceValid(unit))
+		if (!ConfigIndex.Settings.ShowDamageNumbers || !IsInstanceValid(unit))
 		{
 			return;
 		}
@@ -322,7 +322,7 @@ public partial class WorldOverlay : CanvasLayer
 			return;
 		}
 
-		BalanceConfig config = Balance.Settings;
+		ConfigIndexData config = ConfigIndex.Settings;
 		bool byPlayer = hit.Attacker is { Faction: Faction.Player };
 
 		// 血条登记：**护甲被扣也要建条**（用户需求 §五 #8 要能看出"护甲进度"）——
@@ -370,7 +370,7 @@ public partial class WorldOverlay : CanvasLayer
 	/// <summary>无敌跳字（节流，见 <see cref="DamageNumbers.InvulnerableThrottleSeconds"/>：冲刺无敌帧会被连续命中）。</summary>
 	private void ShowInvulnerable(Unit unit)
 	{
-		if (!Balance.Settings.ShowDamageNumbers || !unit.IsInvulnerable)
+		if (!ConfigIndex.Settings.ShowDamageNumbers || !unit.IsInvulnerable)
 		{
 			return;
 		}
@@ -394,14 +394,14 @@ public partial class WorldOverlay : CanvasLayer
 			return;
 		}
 
-		BalanceConfig config = Balance.Settings;
+		ConfigIndexData config = ConfigIndex.Settings;
 		DamageNumbers.Spawn(_numberLayer, screen, DamageNumberKind.Invulnerable, 0f, unit, false,
 			config.DamageNumberFontSize, config.DamageNumberRise, config.DamageNumberLifetime);
 	}
 
 	public override void _Process(double delta)
 	{
-		if (!Balance.Settings.ShowEnemyHealthBars)
+		if (!ConfigIndex.Settings.ShowEnemyHealthBars)
 		{
 			ClearBars();
 			return;
@@ -435,7 +435,7 @@ public partial class WorldOverlay : CanvasLayer
 
 	private void UpdateBar(ulong id, Unit unit, float delta)
 	{
-		BalanceConfig config = Balance.Settings;
+		ConfigIndexData config = ConfigIndex.Settings;
 		EventBar bar = _bars[id];
 
 		// 满血不显示（保留原设计）：受伤后显示，回满后隐藏。
@@ -475,7 +475,7 @@ public partial class WorldOverlay : CanvasLayer
 
 	/// <summary>这个单位该由 WorldOverlay 画血条吗。Boss 交给 PlayerHud 的屏幕上方主血条，这里跳过。</summary>
 	private static bool IsBarCandidate(Unit unit)
-		=> Balance.Settings.ShowEnemyHealthBars
+		=> ConfigIndex.Settings.ShowEnemyHealthBars
 			&& unit.Faction != Faction.Player
 			&& !unit.HasTag("Boss")
 			&& !unit.IsDead
@@ -546,7 +546,7 @@ public partial class WorldOverlay : CanvasLayer
 			return;
 		}
 
-		BalanceConfig config = Balance.Settings;
+		ConfigIndexData config = ConfigIndex.Settings;
 		_bars[id] = CreateBar(config.EnemyHealthBarWidth, config.EnemyHealthBarHeight, unit.Health / Mathf.Max(1f, unit.MaxHealth), unit);
 	}
 
@@ -561,7 +561,7 @@ public partial class WorldOverlay : CanvasLayer
 	}
 
 	/// <summary>
-	/// 实例化 BarEnemy 预制体。尺寸由 Balance.tres 决定，外观（颜色/边框/文字/护甲条）由预制体决定。
+	/// 实例化 BarEnemy 预制体。尺寸由 ConfigIndex.tres 决定，外观（颜色/边框/文字/护甲条）由预制体决定。
 	/// ⚠️ 预制体的约定：可缩放的整条内容都放在 <c>Content</c> 下，且以 Root 原点为中心
 	/// （当前 BarEnemy.tscn 是 Content 摆在 (-1,-1)、宽高 +2）—— 这样 Root.Position 直接就是血条中心。
 	/// </summary>
@@ -570,7 +570,7 @@ public partial class WorldOverlay : CanvasLayer
 		Control root = EnemyBarScene.Instantiate<Control>();
 		HealthBarWidget widget = HealthBarWidget.Bind(root);
 
-		// Balance 改过尺寸就整体缩放 Content（缩放放 Content 上，Root 的 Position 才不受影响）。
+		// ConfigIndex 改过尺寸就整体缩放 Content（缩放放 Content 上，Root 的 Position 才不受影响）。
 		float scaleX = widget.BgWidth > 0f ? width / widget.BgWidth : 1f;
 		float scaleY = widget.BgHeight > 0f ? height / widget.BgHeight : 1f;
 		if (root.GetNodeOrNull<Control>("Content") is { } content)

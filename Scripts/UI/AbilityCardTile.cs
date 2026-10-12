@@ -347,7 +347,7 @@ public partial class AbilityCardTile : Control
 				+ "这一格在卡表里还没有对应行，所以**没有解锁条件** —— 它永远不会解锁、激活、升级。\n"
 				+ "（交互反馈照旧：点它 / 长按它一样会震动 + 失败音效。）\n"
 				+ "要把它变成真正的卡：在 Config/Tables/AbilityCards/ 加一行 .tres，"
-				+ "再挂进 Config/Balance.tres 的 AbilityCards 数组。";
+				+ "再挂进 Config/ConfigIndex.tres 的 AbilityCards 数组。";
 		}
 
 		int next = level <= 0 ? 1 : Mathf.Min(Card.MaxLevel, level + 1);

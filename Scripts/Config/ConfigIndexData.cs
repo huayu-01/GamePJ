@@ -2,7 +2,7 @@ using Godot;
 
 namespace ActRoguelike.Config;
 
-/// <summary>可选武器（开局配置与进化池节点用）。数值都在 BalanceConfig 里，不写死进预制体。</summary>
+/// <summary>可选武器（开局配置与进化池节点用）。数值都在 ConfigIndexData 里，不写死进预制体。</summary>
 public enum WeaponPresetKind
 {
 	Pistol,
@@ -24,7 +24,7 @@ public enum PlayerCharacterKind
 }
 
 /// <summary>
-/// 全局平衡配置（数值唯一入口 <see cref="Balance"/> 的持有者 + **分表索引**）。
+/// 全局平衡配置（数值唯一入口 <see cref="ConfigIndex"/> 的持有者 + **分表索引**）。
 ///
 /// **2026-10 配置表阶段 2 之后，这里只保留两类字段：**
 /// ① **跨表生效的全局开关**（敌人/Boss 全局倍率、节奏倍率、Boss 压力曲线、表现与 HUD、节点/关卡约束）——
@@ -40,7 +40,7 @@ public enum PlayerCharacterKind
 /// </summary>
 [Tool]
 [GlobalClass]
-public partial class BalanceConfig : Resource
+public partial class ConfigIndexData : Resource
 {
 	[ExportGroup("敌人 · 全局倍率")]
 	/// <summary>
@@ -124,14 +124,14 @@ public partial class BalanceConfig : Resource
 	// 每一张表在磁盘上是 `Config/Tables/<分组>/` 下一堆"一行一个文件"的 `.tres`，
 	// 这里只放**索引数组**：元素指向那些行文件的独立 `ExtResource`。
 	// 为什么是显式数组而不是扫目录：① 只被目录扫描引用的资源在导出时可能掉出打包范围；
-	// ② 扫目录会让"Balance 是唯一数值入口"这条约定失效（见 docs/todo-handoff.md）。
+	// ② 扫目录会让"ConfigIndex 是唯一数值入口"这条约定失效（见 docs/todo-handoff.md）。
 	//
 	// ⚠️ 操作纪律（上一轮实测的坑，见 config-schema.md §5 阶段 1）：
-	// **不要单独删/改被引用到的行文件** —— 只要 Balance.tres 引用的任何一个行文件缺失/改名，
-	// Godot 会**整份 Balance.tres 加载失败**（不是只丢那一行），于是所有数值静默回到代码默认值。
+	// **不要单独删/改被引用到的行文件** —— 只要 ConfigIndex.tres 引用的任何一个行文件缺失/改名，
+	// Godot 会**整份 ConfigIndex.tres 加载失败**（不是只丢那一行），于是所有数值静默回到代码默认值。
 	// 要下线一行，就把这里的数组项与顶部对应的 `[ext_resource]` **一起**删掉。
 	//
-	// 回退语义：数组为空 / 整份 Balance.tres 没加载 → 各系统读不到行 → 使用**自身** `[Export]` 默认值，
+	// 回退语义：数组为空 / 整份 ConfigIndex.tres 没加载 → 各系统读不到行 → 使用**自身** `[Export]` 默认值，
 	// 并且每个系统都会写一条带"来源：表 / 代码默认值"的日志留痕。
 	// ─────────────────────────────────────────────────────────────────────────
 
@@ -238,7 +238,7 @@ public partial class BalanceConfig : Resource
 	/// <summary>
 	/// 音效表（`Config/Tables/Audio/audio_*.tres`）：**一行一条音效** = id + 资源引用 + 音量/音高随机范围 + 总线。
 	/// 由 autoload <c>AudioManager</c> 读取（它自己 <c>ConfigRows.Rebuild</c> + 写"配置表：音效 N"日志，
-	/// 与其它表挂在 <c>Balance.BuildTableIndex</c> 里是同一条纪律）。
+	/// 与其它表挂在 <c>ConfigIndex.BuildTableIndex</c> 里是同一条纪律）。
 	/// 空 = 没有任何音效可播 → 所有 <c>PlaySfx</c>/<c>PlayUi</c> 都静默跳过并写一次 warning（玩法不受影响）。
 	/// </summary>
 	[Export] public AudioConfig[] Audio { get; set; } = System.Array.Empty<AudioConfig>();

@@ -116,7 +116,7 @@
 
 | 顺序 | 名称 | 类型 | 说明 |
 |---|---|---|---|
-| 1 | `Balance` | autoload | 所有数值的唯一入口，谁都可以最先读 |
+| 1 | `ConfigIndex` | autoload | 所有数值的唯一入口，谁都可以最先读 |
 | 2 | `GameLog` | autoload | 日志，进场景前就可用（`_Ready` 里不要依赖任何场景节点） |
 | 3 | `UiRouter` | autoload | 界面栈 → 决定暂停与鼠标模式 |
 | 4 | `UiService` | autoload | 界面服务：按类型查界面，**界面本体在场景里**，所以只做惰性查找 |

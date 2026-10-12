@@ -151,7 +151,7 @@ public static class BossPerkCatalog
 	/// **不要删**，这是回退路径。
 	///
 	/// ⚠️ **护甲那一栏（`pmod_fortress_armor`，+150 甲）已按用户要求删除**（"护甲目前就只给精英怪使用，
-	/// 首领不需要"）—— 表行、`Balance.tres` 的数组项与 ext_resource、以及这里这条兜底**同一次改动**一起下线。
+	/// 首领不需要"）—— 表行、`ConfigIndex.tres` 的数组项与 ext_resource、以及这里这条兜底**同一次改动**一起下线。
 	/// 只删表行不改兜底 = 表一读不到首领又会吃护甲（静默换挡）；精英怪的护甲来自另一套
 	/// （<see cref="ActRoguelike.Combat.EliteModifier.ArmorAdd"/>，与 Pressure 无关），所以不受影响。
 	/// </summary>

@@ -16,16 +16,16 @@
 
 | 问题 | 答案 |
 |---|---|
-| 卡表在哪？ | `Config/Tables/AbilityCards/card_*.tres`，**一行 = 一张卡**（现有 **8 张**）。索引挂在 `Config/Balance.tres` 的 `AbilityCards` 数组上。 |
+| 卡表在哪？ | `Config/Tables/AbilityCards/card_*.tres`，**一行 = 一张卡**（现有 **8 张**）。索引挂在 `Config/ConfigIndex.tres` 的 `AbilityCards` 数组上。 |
 | 行类？ | `Scripts/Config/AbilityCardConfig.cs`（继承 `ConfigRow`，所以每行都有 `Id` / `Slot` / `DisplayName` / `DescriptionTemplate` / `Note` / `Params`）。 |
 | 状态存哪？ | `user://ability_cards.cfg`（Godot 原生 `ConfigFile`）。**不是** `res://Config/`（那是表）、也**不是** `user://meta.cfg`（那是碎片与永久强化）。 |
 | 花什么资源？ | **碎片**（`MetaProgress`）—— 需求里的"局外资源"就是它，本系统**没有另建货币**。 |
-| 额度上限怎么算？ | `Balance.tres → AbilityQuotaBase`（基础 6）+ 局外成长行 **`Config/Tables/Meta/meta_quota.tres`** 的 `PerLevel` × 扩增等级。 |
+| 额度上限怎么算？ | `ConfigIndex.tres → AbilityQuotaBase`（基础 6）+ 局外成长行 **`Config/Tables/Meta/meta_quota.tres`** 的 `PerLevel` × 扩增等级。 |
 | 界面在哪？ | `Scenes/UI/AbilityMatrixScreen.tscn` + `Scripts/UI/AbilityMatrixScreen.cs`，**挂 `Scenes/Main.tscn`**，快捷键 **K**（`UiService.OpenAbilityMatrix()` 也能开）。 |
 | 空位怎么办？ | **空位也是一张卡**（**占位卡**，用户 A5）：卡表里没有对应行的那一格就是它 —— **没有解锁条件 → 永远无法解锁 / 激活 / 升级**，但点它 / 长按它的**读条、震动、失败音效照旧**（见 §5.6）。矩阵**永远是填满的矩形、不翻页**，格子尺寸随容器自适应。 |
 | 元素（基类）在哪？ | `Scenes/UI/AbilityCardTile.tscn` + `Scripts/UI/AbilityCardTile.cs` —— 三状态 + 四种交互 + 读条 + 震动 + 音效**全在它里面**（占位卡走的是**同一条**代码路径）。 |
 | 激活后真的生效吗？ | 生效。`AbilityEffects.ApplyToPlayer` 在 `RunController.ApplyBalance` 末尾被调 1 行；实测"最大生命 250 → 290"、"`AbilitySummon.Enabled` False → True"。 |
-| 加一张卡要改几个文件？ | **2 个**（加一行 `.tres` + 挂进 `Balance.tres` 的数组）—— **零 C#**。详见 §8。 |
+| 加一张卡要改几个文件？ | **2 个**（加一行 `.tres` + 挂进 `ConfigIndex.tres` 的数组）—— **零 C#**。详见 §8。 |
 | 表读不到会怎样？ | 矩阵全是**占位卡**、本局没有任何卡效果，**玩法其余部分完全不受影响**（与"表读不到就用自身默认值"同一条纪律）。 |
 
 ---
@@ -63,7 +63,7 @@
 - 卡说"**你有这个技能**"，技能行说"**这个技能的具体参数**"——**卡不复制任何技能参数**；
 - 改技能冷却/命中体参数仍然只改 `Skills/` 一行，**卡的 8 行一个字都不用动**；
 - 引用是**资源引用**而不是字符串 id：技能行被删/改名时 Godot 把引用置 null（**可判定、可警告**），
-  而且 `Balance.ReportAbilityCards()` 会在开局日志里报"卡指向的技能行不在 `Skills` 索引里"。
+  而且 `ConfigIndex.ReportAbilityCards()` 会在开局日志里报"卡指向的技能行不在 `Skills` 索引里"。
   这与 `chr_*.tres → skl_*.tres` / `wpn_*.tres → pool_*.tres` 是**同一套写法**。
 
 ---
@@ -108,7 +108,7 @@
 
 ### 2.3 额度上限的扩增行（`Config/Tables/Meta/meta_quota.tres`）
 
-额度上限 = **`Balance.tres → AbilityQuotaBase`（基础 6）** + **扩增等级 × 每级增量**。
+额度上限 = **`ConfigIndex.tres → AbilityQuotaBase`（基础 6）** + **扩增等级 × 每级增量**。
 扩增这一行是**已有的局外成长表**里的第 6 行（不是新机制）：
 
 ```
@@ -124,9 +124,9 @@ BaseCost = 30  CostGrowth = 20      → 1 级 30 / 2 级 50 / 3 级 70 …
 
 ### 2.4 索引与开局日志
 
-- `Scripts/Config/BalanceConfig.cs`：`[Export] AbilityCardConfig[] AbilityCards`（**表索引**）+
+- `Scripts/Config/ConfigIndexData.cs`：`[Export] AbilityCardConfig[] AbilityCards`（**表索引**）+
   `[Export] int AbilityQuotaBase = 6`（**跨表的全局开关**）。
-- `Scripts/Config/Balance.cs` 的 `BuildTableIndex()` 里 `ConfigRows.Rebuild(Config.AbilityCards)`，
+- `Scripts/Config/ConfigIndex.cs` 的 `BuildTableIndex()` 里 `ConfigRows.Rebuild(Config.AbilityCards)`，
   并由 `ReportAbilityCards()` 每条开局写一行日志：
 
   ```
@@ -389,7 +389,7 @@ SetKeyHints(
 | `ui_click` | 左键激活 / 关闭（复用已有的按钮点击音） | Kenney（CC0，已经在表里） |
 
 - 表行：`Config/Tables/Audio/audio_ui_card_{unlock,upgrade,reset,fail}.tres`，
-  已加进 `Balance.tres` 的 `Audio` 数组（**不加进去 = 文件在、表在、就是没声音**，见 `docs/audio.md` §五）。
+  已加进 `ConfigIndex.tres` 的 `Audio` 数组（**不加进去 = 文件在、表在、就是没声音**，见 `docs/audio.md` §五）。
 - 代码里的 id 常量在 `Scripts/AbilityCards/AbilityAudioIds.cs`
   （**没有**加进 `Scripts/Audio/AudioIds.cs` —— 那个文件不在本轮可改范围内；纪律完全一致：真源永远是音效表）。
 - 这 4 条是**项目自制**：`_tools/make_ui_card_sfx.ps1` 用数学公式生成 16-bit PCM 单声道 22050Hz WAV，
@@ -532,12 +532,12 @@ Remove-Item "$env:APPDATA\Godot\app_userdata\ACT Roguelike\ability_cards.cfg"
    Stat = "MaxHealthAdd"           # StatAdd/StatMultiply 才有意义
    PerLevel = 20.0
    Id = "card_<你的id>"
-   Slot = 9                        # 只影响"表里的顺序感"，矩阵顺序由 Balance.tres 的数组说了算
+   Slot = 9                        # 只影响"表里的顺序感"，矩阵顺序由 ConfigIndex.tres 的数组说了算
    DisplayName = "中文名"
    DescriptionTemplate = "一句话说明（悬停时显示）"
    Note = "为什么这么配 / 数据来源"
    ```
-3. **挂进索引**：`Config/Balance.tres` 顶部加一条
+3. **挂进索引**：`Config/ConfigIndex.tres` 顶部加一条
    `[ext_resource type="Resource" path="res://Config/Tables/AbilityCards/card_<你的id>.tres" id="1xx_card_xxx"]`，
    并在 `AbilityCards = [ ... ]` 里**按你想在矩阵里出现的顺序**追加 `ExtResource("1xx_card_xxx")`。
 4. **（可选）导入资源**：`Godot --headless --path <项目> --import`（新加了 SVG 才需要）。
@@ -557,8 +557,8 @@ Remove-Item "$env:APPDATA\Godot\app_userdata\ACT Roguelike\ability_cards.cfg"
 
 1. **不要动 `Config/Tables/Skills/` 的行内容**：那是局内的单位技能表（25 行 = 5 玩家 + 16 单位 + 4 首领行为），
    本系统只**引用**它（`AbilityCardConfig.Skill`）。混进去会同时破坏"两层分开"与"表只加不改"两条纪律。
-2. **`Balance.tres` 的数组不能只加文件不加项**：行文件"只放在目录里"是**不会生效**的
-   （索引只认 `Balance.tres` 的 `AbilityCards` 数组）；反过来说，**删/改被引用的行文件会让整份 `Balance.tres`
+2. **`ConfigIndex.tres` 的数组不能只加文件不加项**：行文件"只放在目录里"是**不会生效**的
+   （索引只认 `ConfigIndex.tres` 的 `AbilityCards` 数组）；反过来说，**删/改被引用的行文件会让整份 `ConfigIndex.tres`
    加载失败**、所有数值静默回退 —— 要下线一行就把数组项与 `[ext_resource]` **一起**删。
 3. **额度扩增等级不在 `meta.cfg`**：它在 `user://ability_cards.cfg` 的 `[quota] quota_level`。
    `meta_quota` 行只提供"每级几点 / 每级多少钱"。
@@ -572,7 +572,7 @@ Remove-Item "$env:APPDATA\Godot\app_userdata\ACT Roguelike\ability_cards.cfg"
    返回值一律用 Variant 兼容类型（string / int / bool / Node），见 `docs/architecture.md` 第 6 条。
 8. **GDScript 的 `:=` 不能接 `.call(...)` 的返回值**：本项目把 GDScript 警告当错误，
    `var x := node.call(...)` 会因"从 Variant 推导类型"**直接解析失败**，整个拍摄台起不来（实测栽过一次）。
-9. **音频表要一起加**：新音效的 `.tres` 不加进 `Balance.tres` 的 `Audio` 数组 = "文件在、表在、就是没声音"。
+9. **音频表要一起加**：新音效的 `.tres` 不加进 `ConfigIndex.tres` 的 `Audio` 数组 = "文件在、表在、就是没声音"。
 10. **不要用 `stop_project` / 不要在别的代理跑自测时用 MCP 的 `run_project`**：见 `docs/todo-handoff.md` 末尾。
 11. **占位卡不是空框，也别把格子尺寸写死回去**（A5 的两条红线）：
     - 占位卡是**真的 `AbilityCardTile`**（`Card == null`）—— 谁在 `_GuiInput` / `RunAction` 里加一句

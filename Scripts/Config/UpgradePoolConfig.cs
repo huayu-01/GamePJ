@@ -4,7 +4,7 @@ namespace ActRoguelike.Config;
 
 /// <summary>
 /// 升级池表的一行 —— **一个 `.tres` 文件就是一个池**（`Config/Tables/UpgradePools/pool_*.tres`）。
-/// 索引用 <see cref="BalanceConfig.UpgradePools"/>（元素是独立 `ExtResource`）。
+/// 索引用 <see cref="ConfigIndexData.UpgradePools"/>（元素是独立 `ExtResource`）。
 ///
 /// **关联方向（用户 2026-10 拍板，取代 config-schema.md §4.5 / §6.9 的"增幅项反向指武器"方案）**：
 /// <code>

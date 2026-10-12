@@ -23,4 +23,4 @@ AiProfile = ExtResource("6_ai")
 Id = "boss_final"
 Slot = 1
 DisplayName = "最终首领"
-Note = "数值逐条抄自 Boss.tscn 的 Unit / AbilityMelee / 命中体。EliteCopyHealthScale = 白板首领副本的血量倍率（取代 Balance.tres 里那份没有消费者的 EliteBossHealthScale）。Boss 的冲锋/尖啸/召唤的冷却与专属参数在对应的技能行里。⚠ StartingArmor = 0：护甲是**所有单位通用**的属性（字段留在 Unit / UnitConfig 基类上），但**首领没有任何获取护甲的途径** —— 用户要求「去掉首领的甲」；Pressure 池里那条「铁壁·护甲」上一轮已整行下线，精英怪的 EliteModifier.ArmorAdd 是**精英怪**的获取手段、与首领无关。Boss.tscn 上那份同值导出也已一并归零（表是权威、场景是回退，两处必须同值）。"
+Note = "数值逐条抄自 Boss.tscn 的 Unit / AbilityMelee / 命中体。EliteCopyHealthScale = 白板首领副本的血量倍率（取代 ConfigIndex.tres 里那份没有消费者的 EliteBossHealthScale）。Boss 的冲锋/尖啸/召唤的冷却与专属参数在对应的技能行里。⚠ StartingArmor = 0：护甲是**所有单位通用**的属性（字段留在 Unit / UnitConfig 基类上），但**首领没有任何获取护甲的途径** —— 用户要求「去掉首领的甲」；Pressure 池里那条「铁壁·护甲」上一轮已整行下线，精英怪的 EliteModifier.ArmorAdd 是**精英怪**的获取手段、与首领无关。Boss.tscn 上那份同值导出也已一并归零（表是权威、场景是回退，两处必须同值）。"

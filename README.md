@@ -58,7 +58,7 @@ docs/rewards.md      强化 / 进化 / 异化与触发器
 docs/boss.md         Boss 阶段、Boss 压力、Boss 构筑与技能精英
 docs/summons.md      召唤物系统
 docs/stages.md       Stage/Node 流程、Base/Configure、局外成长
-docs/config.md       数值配置（调参唯一入口：Config/Balance.tres）
+docs/config.md       数值配置（调参唯一入口：Config/ConfigIndex.tres）
 docs/testing.md      用 Godot MCP 做自动化验证的经验
 docs/logging.md      游戏日志（测试游玩后的分析入口）
 ```

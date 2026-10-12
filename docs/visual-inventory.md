@@ -6,7 +6,7 @@
 > 以 [art-integration-log.md](art-integration-log.md)（尤其 §9）为准，本文档其余章节是**第一轮扫描时的快照**。
 
 > **用途**：美术要换掉某个东西时，一眼看出「它在哪、现在长什么样、换起来有多难、会不会踩代码的坑」。
-> **来源**：只读扫描 `Scenes/**/*.tscn`（**34 个场景**）+ `Scripts/**/*.cs`（**85 个脚本**）+ `Config/Balance.tres`。
+> **来源**：只读扫描 `Scenes/**/*.tscn`（**34 个场景**）+ `Scripts/**/*.cs`（**85 个脚本**）+ `Config/ConfigIndex.tres`。
 > **本次没有修改任何 `.cs` / `.tscn`**；本文档是唯一产物。
 > **生成时间点**：扫描时 `Scenes/Interactables/`、`Scenes/Combat/` 正由**另一个代理**做「内联资源外置到 `Assets/`」，
 > 因此这两个目录的行内容可能已经被改动（本文档记录的是我读到的那一版）。`docs/assets.md` 在我扫描时**尚不存在**。
@@ -45,7 +45,7 @@
 | 脚下三角环（挑战者标记） | **没有场景**，`Scripts/Combat/ChallengerMark.cs:36-77` 代码生成 | 较难 |
 | 受击闪色 | `Scripts/Combat/UnitPresentation.cs:12-15`（`FlashColor`） | 较难 |
 | 精英怪染色/放大 | `Scripts/Combat/EliteModifier.cs:18-19`（`ModelScale` / `Tint`） | 较难 |
-| 敌人血条 / 伤害跳字 | `Scripts/UI/WorldOverlay.cs`（血条外观在 `Scenes/UI/Bars/BarEnemy.tscn`，尺寸在 `Config/Balance.tres:119-122`） | 容易（跳字较难） |
+| 敌人血条 / 伤害跳字 | `Scripts/UI/WorldOverlay.cs`（血条外观在 `Scenes/UI/Bars/BarEnemy.tscn`，尺寸在 `Config/ConfigIndex.tres:119-122`） | 容易（跳字较难） |
 | 玩家血条（左上） | 预制体 `Scenes/UI/Bars/BarPlayer.tscn`（Hud.tscn 实例化为 `Root/PlayerBar`），代码只改填充宽度 | 容易 |
 | Boss 屏幕上方血条 | 预制体 `Scenes/UI/Bars/BarBoss.tscn`，`Scripts/UI/PlayerHud.cs` 实例化 | 容易 |
 | 准星 / HP 文本 / 弹药文本 | `Scenes/UI/Hud.tscn` | 容易 |
@@ -59,7 +59,7 @@
 
 ## 1. 项目视觉现状（先看这一节，能省很多猜）
 
-1. **全项目没有任何美术资源**：没有 `.png` 贴图（除 `icon.svg` 与 `docs/screenshots/` 截图）、没有字体（`.ttf/.otf` 0 个）、没有 3D 模型（`.glb/.gltf/.fbx/.obj` 0 个）、没有任何 `Theme`/`StyleBox` 资源。唯一的 `.tres` 是 `Config/Balance.tres`。
+1. **全项目没有任何美术资源**：没有 `.png` 贴图（除 `icon.svg` 与 `docs/screenshots/` 截图）、没有字体（`.ttf/.otf` 0 个）、没有 3D 模型（`.glb/.gltf/.fbx/.obj` 0 个）、没有任何 `Theme`/`StyleBox` 资源。唯一的 `.tres` 是 `Config/ConfigIndex.tres`。
 2. **所有 3D 可见物 = Godot 内置图元 mesh（`CapsuleMesh`/`BoxMesh`/`CylinderMesh`/`SphereMesh`）+ 纯色 `StandardMaterial3D`**。
 3. **所有粒子效果不存在**：全项目 grep `Particles|GPUParticles|CPUParticles|MultiMesh|Decal|Trail|AnimationPlayer|Skeleton3D|ShaderMaterial` → **0 命中**（`.cs` / `.tscn` / `.tres` / `project.godot` 全部）。也就是说：**没有枪口火光、没有命中火花、没有脚步尘土、没有任何骨骼动画**。「特效」目前只有 `Explosion.tscn` 一个半透明球，和代码里的受击闪色。
 4. **所有 UI = 纯色 `ColorRect` + `Label` + 默认主题的 `PanelContainer`/`Button`**，没有任何贴图。
@@ -204,8 +204,8 @@
 |---|---|---|---|---|---|
 | UI | 血条容器 | `Bars`（空 Control，全屏、穿透） | `:9-15`，只当父节点用 | — | 容易 |
 | UI | 跳字容器 | `Numbers`（空 Control，全屏、穿透） | `:17-23` | — | 容易 |
-| UI | 敌人血条（每怪一条） | 预制体 `Scenes/UI/Bars/BarEnemy.tscn`，运行时实例化到 `Bars` 下 | `Content/Bg` 66×9 黑 0.65、`Content/Fill` 64×7、`Content/DelayBar`（残影，默认隐藏）；颜色按血量 绿`(0.4,0.9,0.4)`/黄`(1,0.8,0.3)`/红`(1,0.35,0.3)`（`WorldOverlay.HealthColor`）。尺寸来自 `Balance.tres:120-121`（`EnemyHealthBarWidth=64` / `Height=7`），预制体按同比例整体缩放；位置 = 单位原点**向下** `EnemyHealthBarTopOffset=0.25` 米投影（注意字段名叫 Top 其实是往脚下偏） | 换成贴图血条**不用改 C#**（改预制体：`Fill` 换 `TextureRect`、加边框、改颜色/圆角） | 容易 |
-| UI | 伤害跳字 | 运行时在 `Numbers` 下新建 `Label` | 文本=伤害值；玩家造成 = 黄 `(1,0.85,0.35)`、受到 = 红 `(1,0.4,0.35)`；字号 `DamageNumberFontSize=24`；描边黑 0.85 / `outline_size=5`；位置 = 单位位置 + **`Vector3.Up * 1.5`（硬编码在 `WorldOverlay.cs:73`）**；上浮 `70px` / `0.8s`（`Balance.tres:116-118`） | 换字体/贴图/暴击样式都要改 C# | 较难 |
+| UI | 敌人血条（每怪一条） | 预制体 `Scenes/UI/Bars/BarEnemy.tscn`，运行时实例化到 `Bars` 下 | `Content/Bg` 66×9 黑 0.65、`Content/Fill` 64×7、`Content/DelayBar`（残影，默认隐藏）；颜色按血量 绿`(0.4,0.9,0.4)`/黄`(1,0.8,0.3)`/红`(1,0.35,0.3)`（`WorldOverlay.HealthColor`）。尺寸来自 `ConfigIndex.tres:120-121`（`EnemyHealthBarWidth=64` / `Height=7`），预制体按同比例整体缩放；位置 = 单位原点**向下** `EnemyHealthBarTopOffset=0.25` 米投影（注意字段名叫 Top 其实是往脚下偏） | 换成贴图血条**不用改 C#**（改预制体：`Fill` 换 `TextureRect`、加边框、改颜色/圆角） | 容易 |
+| UI | 伤害跳字 | 运行时在 `Numbers` 下新建 `Label` | 文本=伤害值；玩家造成 = 黄 `(1,0.85,0.35)`、受到 = 红 `(1,0.4,0.35)`；字号 `DamageNumberFontSize=24`；描边黑 0.85 / `outline_size=5`；位置 = 单位位置 + **`Vector3.Up * 1.5`（硬编码在 `WorldOverlay.cs:73`）**；上浮 `70px` / `0.8s`（`ConfigIndex.tres:116-118`） | 换字体/贴图/暴击样式都要改 C# | 较难 |
 
 ### 6.3 弹窗界面（全部是纯色底 + 默认主题控件）
 
@@ -272,10 +272,10 @@
 
 | 血条 | 尺寸 | 锚点 / 位置 | 可配吗 |
 |---|---|---|---|
-| 敌人血条 | `Balance.tres:120-121` `EnemyHealthBarWidth=64` / `EnemyHealthBarHeight=7` | `Root` 无锚点：每帧把屏幕投影点减去 半尺寸 后设为 `Position`（预制体 `Content` 以 `Root` 原点为中心）；垂直方向取 `单位位置 - Up*0.25` | 尺寸**可配**（改 `.tres`，预制体按比例缩放）；颜色/形状**在预制体里**（`BarEnemy.tscn`） |
+| 敌人血条 | `ConfigIndex.tres:120-121` `EnemyHealthBarWidth=64` / `EnemyHealthBarHeight=7` | `Root` 无锚点：每帧把屏幕投影点减去 半尺寸 后设为 `Position`（预制体 `Content` 以 `Root` 原点为中心）；垂直方向取 `单位位置 - Up*0.25` | 尺寸**可配**（改 `.tres`，预制体按比例缩放）；颜色/形状**在预制体里**（`BarEnemy.tscn`） |
 | 玩家血条 | 预制体 `BarPlayer.tscn`：`BarBg` 264×20、`Fill` 260×16、`DelayBar` 同 `Fill`；代码**只改填充宽度**（`PlayerHud.UpdateHealthBar`） | 预制体 rect 固定（左上角 `24,56` 起），锚点 = 左上 | **全部可配**（改预制体；宽度不再被代码覆盖） |
 | Boss 血条 | 预制体 `BarBoss.tscn`：面板 `-240..240 / 14..92`、头像 44×44、进度条 `56..480` | 顶部居中锚点（`Panel` 锚 `0.5`） | **全部可配**，改美术不用改 C# |
-| 伤害跳字 | 字号/时长/上浮距离可配（`Balance.tres:116-118`） | **位置写死**：`单位位置 + Up*1.5`（`WorldOverlay.cs:73`） | 部分可配，**高度要改代码** |
+| 伤害跳字 | 字号/时长/上浮距离可配（`ConfigIndex.tres:116-118`） | **位置写死**：`单位位置 + Up*1.5`（`WorldOverlay.cs:73`） | 部分可配，**高度要改代码** |
 
 > 另：血条只在**受伤后**出现、满血即隐藏；`Boss` 标签的单位在 `WorldOverlay` 里被跳过，交给 `PlayerHud`。高个模型（Boss 2.8 米）的伤害跳字在 1.5 米处 = 腰部；小 Drone（1.0 米）则在头顶上方 0.5 米 —— 尺寸不统一是**现有现象**，不是 bug。
 > 三条血条都有**受伤残影条** `DelayBar`（按旧血量亮相后缓慢缩到真实血量，速度 0.6/秒）与**空 `AnimationPlayer` 占位**；填充比例写入（`SetRatio`）与表现更新（`AdvanceDelay`）是分开的两个方法，插动画只动后者。

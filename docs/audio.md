@@ -21,7 +21,7 @@
 Assets/Audio/sfx/*.ogg ─┐
 Assets/Audio/ui/*.ogg  ─┤  被引用
                         ▼
-Config/Tables/Audio/audio_*.tres  ──索引──►  Config/Balance.tres 的 [Export] AudioConfig[] Audio
+Config/Tables/Audio/audio_*.tres  ──索引──►  Config/ConfigIndex.tres 的 [Export] AudioConfig[] Audio
                         ▲                                        │
                         │ 读                                       ▼
                    AudioManager（autoload）◄── ConfigRows.Rebuild / ById
@@ -59,7 +59,7 @@ Config/Tables/Audio/audio_*.tres  ──索引──►  Config/Balance.tres 的
 
 ## 三、音频表（`Config/Tables/Audio/`）
 
-**一行 = 一条音效**，一行一个 `.tres`；索引挂在 `Config/Balance.tres` 的 `[Export] AudioConfig[] Audio` 上。
+**一行 = 一条音效**，一行一个 `.tres`；索引挂在 `Config/ConfigIndex.tres` 的 `[Export] AudioConfig[] Audio` 上。
 行类：`Scripts/Config/AudioConfig.cs`（继承 `ConfigRow`，所以每行都有 `Id` / `DisplayName` / `Note` 等通用列）。
 
 | 列 | 类型 | 含义 |
@@ -76,9 +76,9 @@ Config/Tables/Audio/audio_*.tres  ──索引──►  Config/Balance.tres 的
 行文件被删/改名时 Godot 把引用**置 null**（可判定、可警告），而字符串拼错一个字符只会**静默没声音**。
 Inspector 里它也是**类型过滤过的资源选择器**。
 
-> ⚠️ **操作纪律（与其它表完全一样）**：不要单独删/改 `Balance.tres` 引用到的行文件。
-> 只要引用的**任何一个**行文件缺失/改名，Godot 会**整份 `Balance.tres` 加载失败**，于是**所有**数值静默回到代码默认值。
-> 要下线一行，就把 `Balance.tres` 里的数组项与顶部对应的 `[ext_resource]` **一起**删。
+> ⚠️ **操作纪律（与其它表完全一样）**：不要单独删/改 `ConfigIndex.tres` 引用到的行文件。
+> 只要引用的**任何一个**行文件缺失/改名，Godot 会**整份 `ConfigIndex.tres` 加载失败**，于是**所有**数值静默回到代码默认值。
+> 要下线一行，就把 `ConfigIndex.tres` 里的数组项与顶部对应的 `[ext_resource]` **一起**删。
 
 **当前 13 行**（5 条示范 + 4 条能力卡音效 + **4 条 BGM**）：
 
@@ -163,11 +163,11 @@ Inspector 里它也是**类型过滤过的资源选择器**。
    - `Stream` = 把刚放进来的 `.ogg` **拖到这个槽**
    - `Bus` / `VolumeDb` / `VolumeRandomDb` / `PitchScale` / `PitchRandom`
    - `DisplayName` 写中文名、`Note` 写"触发点 + 素材来源"（方便下一个人）
-3. 把这一行**加进 `Config/Balance.tres` 的 `Audio` 数组**（在 `Audio = [ ... ]` 里追加一个 `ExtResource`，
+3. 把这一行**加进 `Config/ConfigIndex.tres` 的 `Audio` 数组**（在 `Audio = [ ... ]` 里追加一个 `ExtResource`，
    并在文件顶部加一条 `[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_xxx.tres" id="12N_audio_xxx"]`，
    顺手把 `load_steps` +1）。
 
-> ⚠️ 第 3 步不能省：行文件**只被目录里放着是不会生效的** —— 索引只认 `Balance.tres` 的数组。
+> ⚠️ 第 3 步不能省：行文件**只被目录里放着是不会生效的** —— 索引只认 `ConfigIndex.tres` 的数组。
 > 忘了加的表现是"**文件在、表在、就是没声音**"（启动日志里的条数与候选列表会立刻告诉你少了几条）。
 
 **如果你要的是一个"全新的触发点"**，再加一步（1 行 C#）：
@@ -193,7 +193,7 @@ AudioManager.PlaySfx("sfx_weapon_reload");   // ← 就这一行
 
 | 症状 | 原因 | 看哪里 |
 |---|---|---|
-| **完全没声音，日志里也没有 `首次播放`** | `Balance.tres` 的 `Audio` 数组里没加这一行 | 启动日志 `配置表：音效 N` 的 N 对不对 |
+| **完全没声音，日志里也没有 `首次播放`** | `ConfigIndex.tres` 的 `Audio` 数组里没加这一行 | 启动日志 `配置表：音效 N` 的 N 对不对 |
 | 日志有 `⚠ 音效「xxx」跳过了：音效表里没有这一行` | `Id` 拼错 / 大小写不符 / 行文件没加进数组 | 表里的 `Id` 与调用点那个字符串 |
 | 日志有 `⚠ … 但 Stream 是空的` | 那一行没把 `.ogg` 拖进 `Stream` | 该行 `.tres` 的 `Stream` 列 |
 | 声音被"截断"或和上一次重叠得很怪 | 同一帧播太多次、声部被抢占 | 把 `VolumeRandomDb` / `PitchRandom` 打开会自然一些；或调大声部数 |
@@ -262,7 +262,7 @@ deferred 上下文创建 ProgressDialog 报错，与本次改动无关）。所�
 [Audio] 音效统计：共 1 次 —— ui_click×1（缺失 id 0 个）
 ```
 
-**回退路径主动验证**（把 `Balance.tres` 的 `Audio` 数组整条删掉再跑一整轮自测，`run_20261012_010445.log`）：
+**回退路径主动验证**（把 `ConfigIndex.tres` 的 `Audio` 数组整条删掉再跑一整轮自测，`run_20261012_010445.log`）：
 
 | 观察点 | 实测 |
 |---|---|
@@ -278,7 +278,7 @@ deferred 上下文创建 ProgressDialog 报错，与本次改动无关）。所�
 | 项 | 现状 | 要做的话 |
 |---|---|---|
 | **没有 3D 定位音** | 全部是 2D（`AudioStreamPlayer`），没有距离衰减/声道定位 | 加一条 `PlaySfxAt(id, position)` + 一组 `AudioStreamPlayer3D` 声部；**表结构不用动**（`Bus` 已经分流） |
-| **音乐素材已接（2026-10 第七轮）** | ✅ `Music` 总线 + `PlayMusic` + **两套曲库**（关卡默认 / 挑战中）都在用，见 §九 | 想换曲子：把 `.ogg` 放进 `Assets/Audio/music/`（命名 `music_level_0X` / `music_challenge_0X`）+ 加一行表 + 挂进 `Balance.tres`，**零 C#** |
+| **音乐素材已接（2026-10 第七轮）** | ✅ `Music` 总线 + `PlayMusic` + **两套曲库**（关卡默认 / 挑战中）都在用，见 §九 | 想换曲子：把 `.ogg` 放进 `Assets/Audio/music/`（命名 `music_level_0X` / `music_challenge_0X`）+ 加一行表 + 挂进 `ConfigIndex.tres`，**零 C#** |
 | **没有音量设置界面** | ✅ **2026-10 第六轮已做**：全屏设置菜单（`SettingsScreen`，快捷键 O）的**音量**页循环 `AudioServer.BusCount` 逐条总线给滑条 + 静音，落 `user://settings.cfg`，启动时由 `UiRouter._Ready → SettingsStore.ApplyOnStartup()` 套用。见 [ui.md](ui.md) §12 | 想加"按类别"的音量曲线就在 `AudioSettingsSection` 里加一行 |
 | **音效表没有"变体数组"** | 一条 id = 一个文件（靠 `PitchRandom` 制造变化） | 要轮播多个变体就加一列 `Variants`（`AudioStream[]`），`AudioManager` 里按顺序取 |
 | **`ui_click` 是"全按钮一个音"** | 所有 `BaseButton.Pressed` 共用 `ui_click` | 想按按钮分类就加一个 `Button` 的 meta/组约定，或在 `OverlayScreen` 子类里覆盖 |
@@ -319,7 +319,7 @@ deferred 上下文创建 ProgressDialog 报错，与本次改动无关）。所�
    （**前缀决定它进哪套曲库**，序号只影响轮播顺序）。
 2. 在 `Config/Tables/Audio/` 加一行 `.tres`（照抄 `audio_music_level_01.tres`）：`Id` 同文件名、`Stream` 拖进来、**`Bus = 2`（Music）**、
    `VolumeDb ≈ -10`、`PitchRandom = 0`（音乐不要音高抖动）。
-3. 把它挂进 `Config/Balance.tres` 的 `Audio` 数组（`[ext_resource]` + 数组项 + `load_steps` +1）。
+3. 把它挂进 `Config/ConfigIndex.tres` 的 `Audio` 数组（`[ext_resource]` + 数组项 + `load_steps` +1）。
 4. `MusicDirector` 是**自动创建**的（`AudioManager._Ready` 里 `AddChild(new MusicDirector …)`）—— **不需要动 `project.godot` 的 autoload 表**。
 
 > ⚠️ **`.ogg` 的 Import 里 `loop` 必须是 false（默认就是）**：曲库轮播靠"播完"这件事（`Finished` 信号），

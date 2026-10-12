@@ -44,7 +44,7 @@ public partial class StageDefinition : Resource
 	///
 	/// ⚠️ 这里以前按**中文显示名**匹配（`"基础近战"` 这种），改一个文案就静默放行/屏蔽敌人 ——
 	/// 现在按敌人表的稳定键 <see cref="ConfigRow.Id"/> 匹配，显示名只用于界面与日志。
-	/// 未知 Id 会在开局由 <see cref="Balance"/> 校验并写警告（不再静默失效）。
+	/// 未知 Id 会在开局由 <see cref="ConfigIndex"/> 校验并写警告（不再静默失效）。
 	/// </summary>
 	[Export] public string[] AllowedEnemyIds { get; set; } = System.Array.Empty<string>();
 
@@ -86,10 +86,10 @@ public partial class StageDefinition : Resource
 	///
 	/// <b>取值规则（只有一条，避免出现两个真源）</b>：
 	/// 行里**填了**就用行里的（行是权威）；行里**留 0**（= 未设置）则回退到
-	/// <see cref="BalanceConfig"/> 上已有的全局默认值（150 / 1.25 / 1.5 / 100）。
-	/// 所以：① 没填 → 与分表之前（只读 Balance）逐位一致；② 缺一整张表 → 用本类默认值
-	/// （也就是"未设置"）→ 仍然落到 Balance 的全局默认值，不会静默换一套数值（§1.4-① 的教训）；
-	/// ③ 想按关调，只在这一行填，不必动 Balance。
+	/// <see cref="ConfigIndexData"/> 上已有的全局默认值（150 / 1.25 / 1.5 / 100）。
+	/// 所以：① 没填 → 与分表之前（只读 ConfigIndex）逐位一致；② 缺一整张表 → 用本类默认值
+	/// （也就是"未设置"）→ 仍然落到 ConfigIndex 的全局默认值，不会静默换一套数值（§1.4-① 的教训）；
+	/// ③ 想按关调，只在这一行填，不必动 ConfigIndex。
 	///
 	/// ⚠️ 这些字段**只描述数值型强化**（Boss Pressure）。行为/技能型强化属 Boss Build
 	/// （<see cref="ActRoguelike.Boss.BossPerkCatalog"/>），关卡核心文档 §7.1 明令两者不得合并成一个池。
@@ -98,7 +98,7 @@ public partial class StageDefinition : Resource
 	/// <summary>Pressure 增长倍率（§7.2「不同 Stage 使用固定的 Stage 倍率表进行调整，倍率必须可配置」）。&lt;= 0 → 按 1 处理（等于分表之前的乘数）。</summary>
 	[Export] public float PressureGrowthMultiplier { get; set; } = 1f;
 
-	/// <summary>Pressure 阈值：每满这么多点转成 1 点首领压力（§7.3；余数清零不结转）。&lt;= 0 → 用 Balance 的 PressurePerPoint。</summary>
+	/// <summary>Pressure 阈值：每满这么多点转成 1 点首领压力（§7.3；余数清零不结转）。&lt;= 0 → 用 ConfigIndex 的 PressurePerPoint。</summary>
 	[Export] public int PressureThreshold { get; set; }
 
 	/// <summary>
@@ -107,13 +107,13 @@ public partial class StageDefinition : Resource
 	/// </summary>
 	[Export] public float PressurePerNodeNormal { get; set; }
 
-	/// <summary>高价值挑战（进化/异化节点）完成后增加的基础 Pressure（§7.4）。&lt;= 0 → 用 Balance 的 PressurePerHighValueNode。</summary>
+	/// <summary>高价值挑战（进化/异化节点）完成后增加的基础 Pressure（§7.4）。&lt;= 0 → 用 ConfigIndex 的 PressurePerHighValueNode。</summary>
 	[Export] public float PressurePerNodeHighValue { get; set; }
 
-	/// <summary>进化类挑战对 Pressure 增加值的额外比例（§7.2「进化…可以按规则对 Pressure 增加值进行额外比例调整」）。&lt;= 0 → 用 Balance 的 PressureEvolutionBonus。</summary>
+	/// <summary>进化类挑战对 Pressure 增加值的额外比例（§7.2「进化…可以按规则对 Pressure 增加值进行额外比例调整」）。&lt;= 0 → 用 ConfigIndex 的 PressureEvolutionBonus。</summary>
 	[Export] public float PressureEvolutionBonus { get; set; }
 
-	/// <summary>异化类挑战对 Pressure 增加值的额外比例（同上）。&lt;= 0 → 用 Balance 的 PressureMutationBonus。</summary>
+	/// <summary>异化类挑战对 Pressure 增加值的额外比例（同上）。&lt;= 0 → 用 ConfigIndex 的 PressureMutationBonus。</summary>
 	[Export] public float PressureMutationBonus { get; set; }
 
 	/// <summary>

@@ -172,7 +172,7 @@ public partial class AudioManager : Node
 
 	private void LoadTable()
 	{
-		AudioConfig[] rows = Balance.Settings.Audio;
+		AudioConfig[] rows = ConfigIndex.Settings.Audio;
 		ConfigRows.Rebuild(rows);
 
 		int count = ConfigRows.Count<AudioConfig>();
@@ -195,7 +195,7 @@ public partial class AudioManager : Node
 			sb.Append($"{id}({row.Bus}{(row.Stream == null ? "，Stream 为空" : string.Empty)})");
 		}
 
-		// 与 `Balance.BuildTableIndex` 的日志同一格式：一眼能看出这张表读到几条、来自表还是代码默认值。
+		// 与 `ConfigIndex.BuildTableIndex` 的日志同一格式：一眼能看出这张表读到几条、来自表还是代码默认值。
 		GameLog.Write(
 			"Audio",
 			$"配置表：音效 {count}（来源：{(count > 0 ? "表 Audio" : "代码默认值（表读不到）")}）—— 总线 {MasterBus}(Master) / {_sfxBus}({SfxVoiceCount} 声部) / {_uiBus}({UiVoiceCount} 声部) / {_musicBus}(1 声部){(sb.Length > 0 ? $"；{sb}" : string.Empty)}");

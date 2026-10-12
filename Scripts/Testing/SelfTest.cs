@@ -778,12 +778,12 @@ public partial class SelfTest : Node
 			}
 		}
 
-		GameLog.Write("SelfTest", $"节点间距：最小 {min:0.##}（{pair}），阈值 {ActRoguelike.Config.Balance.Settings.MinNodeSpacing:0.#}");
+		GameLog.Write("SelfTest", $"节点间距：最小 {min:0.##}（{pair}），阈值 {ActRoguelike.Config.ConfigIndex.Settings.MinNodeSpacing:0.#}");
 	}
 
 	/// <summary>
 	/// 配置表阶段 2 的**逐项比对**：把分表后的实际数值打出来，
-	/// 与分表前 `Balance.tres` 的记录逐条对照（见 docs/config.md 的实测表）。
+	/// 与分表前 `ConfigIndex.tres` 的记录逐条对照（见 docs/config.md 的实测表）。
 	/// 玩家/武器数值来自 `Config/Tables/Characters` 与 `Config/Tables/Weapons`。
 	/// </summary>
 	private void ReportTables(StageController? stage)
@@ -903,7 +903,7 @@ public partial class SelfTest : Node
 		}
 
 		int pooledOptions = 0;
-		foreach (ActRoguelike.Config.RewardConfig row in ActRoguelike.Config.Balance.Settings.Upgrades)
+		foreach (ActRoguelike.Config.RewardConfig row in ActRoguelike.Config.ConfigIndex.Settings.Upgrades)
 		{
 			if (row?.Pool != null)
 			{
@@ -1107,7 +1107,7 @@ public partial class SelfTest : Node
 
 	/// <summary>
 	/// 关卡内定期刷怪（用户需求 #6）的取证。三件事：
-	/// ① 打出配置（间隔 / 每档秒数 / 每档强度 / 上限，来源 `Balance.tres` 的全局标量 `AmbientSpawn*`）；
+	/// ① 打出配置（间隔 / 每档秒数 / 每档强度 / 上限，来源 `ConfigIndex.tres` 的全局标量 `AmbientSpawn*`）；
 	/// ② **真的走一遍正式入口**刷两只"游离怪"：一只在第 0 档，一只在把本关时钟拨快 120 秒之后，
 	///    并排量出"生命 / 伤害被增强了多少"（这就是"每过 120 秒就增强接下来刷出的怪"的实测）；
 	/// ③ 量出落点与玩家的距离 + 导航状态（= 落点复用了 `MapManager` 那一份能力，不是新造的一套）。
@@ -1123,9 +1123,9 @@ public partial class SelfTest : Node
 			return;
 		}
 
-		BalanceConfig config = Balance.Settings;
+		ConfigIndexData config = ConfigIndex.Settings;
 		EncounterController? encounter = stage.CurrentNode;
-		GameLog.Write("SelfTest", $"关卡内定期刷怪（需求 #6）：{stage.AmbientSummary}（来源：Balance.tres 全局标量 AmbientSpawn*）｜ 本关可生成项 [{encounter?.AllowedEntrySummary}]");
+		GameLog.Write("SelfTest", $"关卡内定期刷怪（需求 #6）：{stage.AmbientSummary}（来源：ConfigIndex.tres 全局标量 AmbientSpawn*）｜ 本关可生成项 [{encounter?.AllowedEntrySummary}]");
 		string before = $"Encounter 自己的账：预算 {encounter?.RemainingBudget:0.#} / 存活 {encounter?.AliveCount} / 已生成 {encounter?.TotalSpawned}";
 
 		Unit? first = stage.DebugSpawnAmbientNow();
