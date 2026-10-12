@@ -20,7 +20,13 @@
 | 生成 | `_entries` / `_spawned` / `AliveCount` / `TotalSpawned` | 可生成项、已生成单位、存活数、累计生成 |
 | 预算 | `RemainingBudget` / `_spendable` / `_spawnTimer` | 总预算 / 可支配余额 / 生成间隔 |
 | Boss | `BossScene` / `Boss` / `BossActive` / `_bossPending` | 最终首领（Boss Door） |
-| 白板首领 | `EliteBossScene` / `_eliteBossSpawned` / `EliteBossHealthScale` | 每场末尾的弱化首领 |
+| 白板首领 | `EliteBossScene` / `_eliteBossSpawned` / `EliteBossHealthScale` / `MinWaveForEliteBoss` / `WavesOpenedBefore` | 弱化首领（**过了波次门槛才会出**，见下） |
+
+> **白板首领的波次门槛（需求包 #5，2026-10）**：判定量是 **本关累计波数**
+> （`WavesOpenedBefore` 由 `StageController` 每次开战前写入 + 本场 `_waveIndex`），
+> 门槛来自关卡表 `EliteBossMinWave`（三关都是 8）。
+> 一场 Encounter 的波数只有 1～4，按单场算门槛取 8 永远到不了，所以必须按本关累计。
+> 门槛没过时本场照常结算，累计波数在下一场继续长。
 
 ### 主循环（每物理帧）
 
@@ -29,8 +35,8 @@ flowchart TD
     A[StageController 每帧驱动] --> B[PruneSpawned 清理死亡单位 → 更新 AliveCount]
     B --> C{完成判定<br/>TotalSpawned>0 且 AliveCount==0 且波次出完}
     C -- 否 --> D[绑定玩家 _player]
-    C -- 是 --> E{白板首领已出?}
-    E -- 否 --> F[生成白板首领<br/>血量×0.35 / 无压力 / 无词条] --> D
+    C -- 是 --> E{白板首领已出?<br/>且 本关累计波数 ≥ 门槛?}
+    E -- 否（过门槛） --> F[生成白板首领<br/>血量×0.35 / 无压力 / 无词条] --> D
     E -- 是 --> G[IsCompleted=true<br/>发 EncounterCompleted / Finished]
     D --> H{WaveMode?}
     H -- 是 --> I{场上≤1只 且 白板首领未出}
@@ -122,6 +128,10 @@ flowchart TD
 3. **关卡完成不自动推进**，必须走 Boss Door → 降临节点。
 4. **结算一定落盘**（`MetaProgress.AddShards` 即使收益为 0 也写 `user://meta.cfg`）。
 5. **界面交互一律走 `UiService`**，业务代码不出现节点路径。
+6. **「挑战者状态」= `StageController.ChallengerActive`**，交互物按它决定"弹菜单还是拒绝"。
+   它现在的定义是 `!IsVictory && (_encounterRunning || (_bossFight && !_bossCleared && Boss 还活着))`
+   —— ⚠️ **Boss 战不算节点挑战**：Boss 一阵亡就立刻解除挑战者状态，否则降临节点会被自己的闸门拒掉
+   （需求包 #12 的死锁，见 [boss.md](boss.md) 的「打 Boss 之后的挑战者状态」）。
 
 ---
 

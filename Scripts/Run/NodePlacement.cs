@@ -7,8 +7,9 @@ namespace ActRoguelike.Run;
 /// <summary>
 /// 关卡节点的价值分层与摆放（从 StageController 抽出的独立职责）。
 ///
-/// 关卡核心文档：每个 Stage 固定 10 个节点 = 高价值 2 + 中价值 5 + 低价值 3，
-/// 高价值节点的挑战波数也更多（3 / 2 / 1 波）。
+/// 关卡核心文档：每个 Stage 固定 10 个节点 = 高价值 2 + 中价值 5 + 低价值 3。
+/// 高价值节点的挑战波数也更多 —— 用户本轮把映射从 **3 / 2 / 1** 改成 **4 / 3 / 1**，
+/// 并且**改成按价值标签驱动**（`Config/Tables/ValueTags/tag_*.tres`），不再按节点类型枚举硬编码。
 /// </summary>
 public static class NodePlacement
 {
@@ -33,16 +34,50 @@ public static class NodePlacement
 		};
 	}
 
-	/// <summary>某个价值层的节点会开几波（关卡核心文档 §波数：高 3 / 中 2 / 低 1）。</summary>
+	/// <summary>
+	/// 某个节点开几波 —— **按价值标签驱动**（用户需求：高价值 4 波 / 中价值 3 波 / 低价值 1 波，
+	/// 而且「这些不写死，假设后期有彩蛋或其他奖励也会在这些不同的价值标签里」）。
+	///
+	/// 取值链（只有这一处定义，<see cref="StageController"/> 只调用它）：
+	/// ① 节点行 <see cref="NodeConfig.ValueTags"/> 里的标签 → 价值标签表（`Config/Tables/ValueTags/tag_*.tres`）
+	///    的 <see cref="ValueTagConfig.WaveCount"/>，多个标签命中时取**最大**值；
+	/// ② 没挂标签 / 标签行读不到 → 节点行自己的 <see cref="NodeConfig.WaveCount"/>；
+	/// ③ 连节点表都读不到 → 按价值层的代码兜底（高 4 / 中 3 / 低 1，与表里的值一致）。
+	///
+	/// ⚠️ 加一种新奖励（彩蛋之类）时**不用改这个方法**：给它的节点行挂一个已有的价值标签
+	/// （或往价值标签表里加一行）。这就是"按标签驱动"而不是"按 <see cref="RewardNodeKind"/> 枚举硬编码"的意义。
+	/// </summary>
 	public static int WavesFor(RewardNodeKind kind)
 	{
 		NodeConfig? row = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
-		if (row != null)
+		if (row == null)
+		{
+			return LayerOf(kind) switch { 2 => 4, 1 => 3, _ => 1 };
+		}
+
+		// ① 价值标签 → 波数（多标签取最大：标签是"这个节点至少值几波"的声明）。
+		int fromTags = 0;
+		foreach (string tag in row.ValueTags)
+		{
+			if (ConfigRows.ById<ValueTagConfig>(tag) is { WaveCount: > 0 } tagRow)
+			{
+				fromTags = Mathf.Max(fromTags, tagRow.WaveCount);
+			}
+		}
+
+		if (fromTags > 0)
+		{
+			return fromTags;
+		}
+
+		// ② 节点行自己的波数（> 0 才算表过态）。
+		if (row.WaveCount > 0)
 		{
 			return row.WaveCount;
 		}
 
-		return LayerOf(kind) switch { 2 => 3, 1 => 2, _ => 1 };
+		// ③ 按价值层的代码兜底。
+		return row.Layer switch { 2 => 4, 1 => 3, _ => 1 };
 	}
 
 	/// <summary>

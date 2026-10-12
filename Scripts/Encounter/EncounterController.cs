@@ -107,6 +107,35 @@ public partial class EncounterController : Node3D
 	/// <summary>白板首领的血量倍率（相对普通首领）。</summary>
 	[Export] public float EliteBossHealthScale { get; set; } = 0.35f;
 
+	/// <summary>
+	/// **白板首领的波次门槛**（用户需求：「白板首领应该是要很久才出现的，基本只在第 8 波怪刷出」）。
+	///
+	/// 判定的量是<b>本关累计波数</b> = <see cref="WavesOpenedBefore"/>（本场之前已经开过的波数，
+	/// 由 StageController 每次开战前写入） + <see cref="_waveIndex"/>（本场已开的波数）——
+	/// **不是**"单场 Encounter 的第几波"：节点表的波数是 1～4（低 1 / 中 3 / 高 4），
+	/// 按单场算的话门槛取 8 就永远到不了，白板首领会从"每场都出"直接变成"永远不出"。
+	/// 按本关累计算：第 1～7 波打完白板首领都不来，第 8 波清空时才降临。
+	///
+	/// 留 0 = 门槛关掉（每场末尾照旧出，也就是这道闸门之前的行为）。
+	/// 关卡行可以在 <see cref="StageDefinition.EliteBossMinWave"/> 上覆盖本值。
+	/// </summary>
+	[Export] public int MinWaveForEliteBoss { get; set; } = 8;
+
+	/// <summary>本场开打**之前**本关已经开过的波数（StageController 在 Start 之前写入；每关清零）。</summary>
+	public int WavesOpenedBefore { get; set; }
+
+	/// <summary>诊断用：本关累计已开的波数（诊断/日志用；白板首领的闸门读它）。</summary>
+	public int WavesOpenedTotal => WavesOpenedBefore + _waveIndex;
+
+	/// <summary>诊断用：白板首领的波次门槛当前是否已满足（<c>true</c> = 本场清空后会降临白板首领）。</summary>
+	public bool EliteGateOpen => EliteBossScene != null && !_eliteBossSpawned && MeetsEliteBossWaveGate();
+
+	/// <summary>诊断用：本场是否已经降临过白板首领。</summary>
+	public bool EliteBossSpawned => _eliteBossSpawned;
+
+	/// <summary>诊断用：闸门的三项输入（本关累计波数 / 门槛 / 本场已开波数），自测与日志排查用。</summary>
+	public string EliteGateDetail => $"累计 {WavesOpenedTotal}（本场之前 {WavesOpenedBefore} + 本场 {_waveIndex}）/ 门槛 {MinWaveForEliteBoss} / 预制体 {(EliteBossScene != null ? "有" : "无")} / 已降临 {_eliteBossSpawned}";
+
 	private bool _eliteBossSpawned;
 	private Unit? _eliteBoss;
 
@@ -558,12 +587,20 @@ public partial class EncounterController : Node3D
 		// 关卡核心文档 L231/L315：常规波清空后先进入「白板首领副本」，打完它才算完成。
 		// 它独立于常规波数，也独立于 Boss Door 的最终首领（BossScene）——
 		// 普通 Encounter 的 BossScene 是 null，所以这段不能写在 if (BossScene != null) 里面。
-		if (EliteBossScene != null && !_eliteBossSpawned)
+		//
+		// 用户需求（本轮）：白板首领**只在第 8 波这类高波次出现**，不再每场末尾都来。
+		// 门槛不过 → 直接往下走正常的完成结算（本场照常算清场），累计波数会在下一场继续长。
+		if (EliteBossScene != null && !_eliteBossSpawned && MeetsEliteBossWaveGate())
 		{
 			_eliteBossSpawned = true;
-			ActRoguelike.Core.GameLog.Write("Spawn", "常规波已清空 → 进入白板首领副本");
+			ActRoguelike.Core.GameLog.Write("Spawn", $"常规波已清空 → 进入白板首领副本（本关累计第 {WavesOpenedTotal} 波，门槛 {MinWaveForEliteBoss}）");
 			SpawnEliteBossNow();
 			return;
+		}
+
+		if (EliteBossScene != null && !_eliteBossSpawned)
+		{
+			ActRoguelike.Core.GameLog.Write("Spawn", $"白板首领跳过：本关累计才第 {WavesOpenedTotal} 波（门槛 {MinWaveForEliteBoss}），本场直接结算");
 		}
 
 		IsRunning = false;
@@ -659,6 +696,12 @@ public partial class EncounterController : Node3D
 	}
 
 	/// <summary>Encounter 清场后出场 Boss 与技能精英（阶段 6），阶段流程也可直接调用。</summary>
+	/// <summary>
+	/// 白板首领的波次门槛判定：门槛 &lt;= 0 = 关闭这道闸门（照旧每场都出）；
+	/// 否则要求<b>本关累计波数</b>达到门槛（见 <see cref="MinWaveForEliteBoss"/> 的说明）。
+	/// </summary>
+	private bool MeetsEliteBossWaveGate() => MinWaveForEliteBoss <= 0 || WavesOpenedTotal >= MinWaveForEliteBoss;
+
 	/// <summary>生成白板首领：弱化血量、不带 Pressure（词条）、不带 Boss 构筑（开场技能）。</summary>
 	private void SpawnEliteBossNow()
 	{
@@ -685,9 +728,14 @@ public partial class EncounterController : Node3D
 		_eliteBoss.RefreshStats();
 		_eliteBoss.FillVitals();
 		_spawned.Add(_eliteBoss);
-		AliveCount++;
+
+		// ⚠️ **不要手写 `AliveCount++`**：AliveCount 是 _spawned 的缓存，只在 PruneSpawned() 里重算；
+		// 在同一个物理帧里多写一次，下一帧 PruneSpawned() 又会把它算回真实值 ——
+		// 于是 `CheckCompleted()` 开头的 `if (AliveCount > 0) return;` 会让"白板首领被打死后本场永远结算不了"。
+		// 这里直接重新数一遍，让缓存与真相一致（`TotalSpawned++` 仍然要写：它是累计数，不是缓存）。
+		PruneSpawned();
 		TotalSpawned++;
-		ActRoguelike.Core.GameLog.Write("Spawn", $"白板首领降临（血量倍率 {eliteScale:0.##}（来源：{(BossRow(EliteBossScene) != null ? "表 boss_final" : "场景导出值")}），无压力 / 无词条）");
+		ActRoguelike.Core.GameLog.Write("Spawn", $"白板首领降临（血量倍率 {eliteScale:0.##}（来源：{(BossRow(EliteBossScene) != null ? "表 boss_final" : "场景导出值")}），无压力 / 无词条 / 本关累计第 {WavesOpenedTotal} 波）");
 	}
 
 	/// <summary>预制体 → 首领表的行（按 <c>ScenePath</c> 配对；读不到 → null，调用方回退到场景里的值）。</summary>

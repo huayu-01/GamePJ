@@ -62,7 +62,8 @@ Boss 战内的压力仍按时间继续升级。
 | `RewardNodeCount` / `FreeChallengeQuota` | 本关布置几个节点、免费挑战几次 |
 | `BossGuardCount` / `BossHealthMultiplier` / `BossDamageMultiplier` | Boss 护卫数与 Boss 缩放 |
 | `BossPerkCount` | Boss 词条数量（Boss **Build**，即行为/技能） |
-| `IsFinalBoss` | 最终 Boss（打完即通关） |
+| `EliteBossMinWave` | **白板首领的波次门槛**（本关累计第几波之后才出；三关都是 8，留 0 = 闸门关掉）。见 [boss.md](boss.md) / [config.md](config.md) |
+| `IsFinalBoss`（**已删**） | 旧字段，配置表阶段 3 已下线 |
 | `PressureGrowthMultiplier` / `PressureThreshold` | Boss **Pressure**（数值强化）的本关增长倍率与转换阈值（关卡核心文档 §7.2/§7.3） |
 | `PressurePerNodeNormal` / `PressurePerNodeHighValue` | 普通 / 高价值挑战完成后增加的基础 Pressure（§7.4） |
 | `PressureEvolutionBonus` / `PressureMutationBonus` | 进化 / 异化挑战的额外比例（§7.4） |
@@ -163,6 +164,8 @@ Encounter 默认使用**波次模式**（`EncounterController.WaveMode = true`�
 ```
 
 波次参数目前是 `EncounterController` 的导出属性（在 `Scenes/Main.tscn` 的 `Stage/Combat`、`Stage/BossFight` 上可直接改）。
+**波数上限**（`WaveCount`）不在这里 —— 它每次开战前由 `StageController.StartEncounter` 按节点的**价值标签**写入
+（高 4 / 中 3 / 低 1，见上面「波数按价值标签」）。
 
 ## Boss 死亡流程（用户需求，2026-01）
 
@@ -217,3 +220,90 @@ Stage 1 · 外围   剩余节点 5   隔离次数 2   用时 2s   敌人 0
 
 实测（自测第一阶段日志）：`节点布置：启用 10 个（高 2 / 中 5 / 低 3）`，最小节点间距 9.74（阈值 8）✓
 （早期的「3 个 / 5 个」是节点数改动前的旧记录，已作废。）
+
+## 波数按价值标签（用户需求 #7，2026-10 改）
+
+**高 4 / 中 3 / 低 1**（原来是高 3 / 中 2 / 低 1），而且改成**按价值标签驱动**、不再按节点类型枚举硬编码。
+
+| 层 | 节点 | 价值标签 | 波数 |
+|---|---|---|---|
+| 2 高 | 进化池 / 异化池 | `tag_high` | **4** |
+| 1 中 | 武器池 / 强化池 / 补给站 | `tag_mid` | **3** |
+| 0 低 | 局外资源 / 恢复状态 / 特殊奖励 / 降临节点 | `tag_low` | **1** |
+
+- **标签表**：`Config/Tables/ValueTags/tag_*.tres`（3 行，索引在 `Balance.tres` 的 `ValueTags` 数组）。
+- **节点行**：`NodeConfig.ValueTags`（字符串数组，9 行都填了）。
+- **取值链**（只有一处定义：`NodePlacement.WavesFor`）：
+  ① 标签行 `WaveCount`（多标签命中取**最大**）→ ② 节点行自己的 `WaveCount` → ③ 按 `Layer` 的代码兜底（2→4 / 1→3 / 其它→1）。
+- **为什么用标签**：用户原话「这些不写死，假设后期有彩蛋或其他奖励也会在这些不同的价值标签里」——
+  加一种新奖励时只要给它的节点行挂一个已有标签（或加一行标签），**不用改任何代码**。
+- **日志留痕**：开局会打 `价值标签（节点波数来源）：3 行 …[tag_high→4 波、tag_mid→3 波、tag_low→1 波]` 与
+  `节点波数（高 4 / 中 3 / 低 1）：node_evolution（tag_high）4 波 · …`；
+  节点行挂了拼错的标签会 **warning + 日志**（不静默落到下一层）。
+
+> ⚠️ **`node_weapon` 留在 Layer 1 / `tag_mid`（3 波）**：用户列举的"升级"没指明对应哪个节点，
+> 这里按"现有层级 + 文档 L87-93（只有进化/异化算高价值）"解释。
+> 若把武器池也当高价值，要连 `Layer` 一起改成 2，否则「节点布置 2/5/3」那条硬指标会漂。
+
+实测（自测，逐位比对）：
+
+```
+波数映射：进化=4（期望4） 异化=4（期望4） 强化=3（期望3） 商店=3（期望3） 材料=1（期望1） 恢复=1（期望1） 特殊=1（期望1）
+价值标签表：标签 [tag_high=4波 tag_low=1波 tag_mid=3波]（期望 tag_high=4 tag_low=1 tag_mid=3）
+           → 节点 [Weapon=3 Enhancement=3 Evolution=4 Mutation=4 Resource=1 Heal=1 Special=1 Shop=3 Portal=1]
+配置表比对·节点表：进化层 2/波 4（期望 2/4） 强化层 1/波 3（期望 1/3） 恢复层 0/波 1（期望 0/1）
+节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）        ← 没有动任何节点的 Layer，所以没漂
+```
+
+（旧值 `进化层 2/波 3`、`强化层 1/波 2` 是本轮改动前的记录，已作废。）
+
+## 白板首领：只在第 8 波出现（用户需求 #5，2026-10 改）
+
+原来**每场 Encounter 末尾都出**白板首领；现在只有**本关累计波数**到门槛（三关都是 **8**）时才出。
+
+| 项目 | 实现 |
+|---|---|
+| 门槛 | 关卡表 `EliteBossMinWave`（8）→ `EncounterController.MinWaveForEliteBoss`；留 0 = 关掉闸门 |
+| 判定量 | `EncounterController.WavesOpenedBefore`（本场之前本关开过的波数）+ 本场 `WaveIndex` |
+| 累计来源 | `StageController._wavesOpenedInStage`：每场清空后 `+= _encounter.WaveIndex`，**每关清零** |
+| 门槛没过 | 本场照常正常结算（不再有"白板首领副本"这一阶段） |
+
+> ⚠️ **为什么是"本关累计"**：节点波数只有 1～4，按单场算门槛取 8 永远到不了 ——
+> 会从"每场都出"变成"永远不出"。按本关累计算，第 1～7 波都不出，累计到第 8 波清空时才降临。
+
+实测（自测同一轮里两种分支都跑到了）：
+
+```
+白板首领跳过：本关累计才第 1 波（门槛 8），本场直接结算
+白板首领跳过：本关累计才第 3 波（门槛 8），本场直接结算
+常规波已清空 → 进入白板首领副本（本关累计第 1 波，门槛 1）    ← 自测把门槛临时压到 1 做正向验证，跑完还原
+白板首领降临（血量倍率 0.35（来源：表 boss_final），无压力 / 无词条 / 本关累计第 1 波）
+```
+
+## 打 Boss 后卡在「挑战者状态」（用户需求 #12，真 bug，2026-10 修）
+
+**症状**（用户报的）：直接开门打 Boss → 打完无法进下一关，显示还在挑战中。
+
+**根因**：`ChallengerActive` 原来是 `_encounterRunning || (_bossFight && !IsVictory)`，
+而 `IsVictory` **只有互动降临节点才变 true** → Boss 一死就死锁（降临节点被自己的挑战者闸门拒掉）。
+
+**修法**：把 `_bossCleared` 也算成"这一战结束了"：
+
+```csharp
+!IsVictory && (_encounterRunning
+    || (_bossFight && !_bossCleared && _bossEncounter?.Boss is { } boss && !boss.IsDead))
+```
+
+**实测（自测阶段 18–22 = 用户那三步）**：
+
+```
+Boss 门：打开=True … 挑战者状态=True（期望 True：Boss 还活着）
+🔴 Boss 阵亡 → 挑战者状态=False（期望 False，这就是 bug #12 的修复点）
+降临节点：找到=True 提示=[按 F 使用：前往下一关]
+🔴 互动降临节点：接受=True（期望 True）→ 本关通关=True 关卡 1→2（期望 +1）挑战者状态=False（期望 False）
+```
+
+> ⚠️ 自测那个阶段的坑（都已写进代码注释）：① 必须排在"开 Boss 门"**之前**（开门后 `CurrentNode` 指向 Boss 那条
+> Encounter，且普通 Encounter 被 `StopSpawning` 冻住）；② **先把玩家挪远**再让 Boss 出场、并每帧打一次直到它阵亡
+> （Boss 与护卫在玩家附近生成，站着不动会被秒 → 整局结束 → 后面阶段全废）；③ 读 `IsVictory` 必须在同一行内读走
+> （下一关的 `ApplyStage` 会立刻把它复位）；④ 退出前 `GetTree().Paused = false`（刚切过关，树被 `UiRouter` 暂停着）。

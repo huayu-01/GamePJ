@@ -34,4 +34,26 @@ public partial class CharacterConfig : UnitConfig
 
 	/// <summary>要让哪些 <c>Ability</c> 处于**关闭**状态的名单（同样写类名）。两个名单之外的保持场景里的原状。</summary>
 	[Export] public string[] DisabledAbilityIds { get; set; } = System.Array.Empty<string>();
+
+	[ExportGroup("跳跃（只有玩家读这两列，见 CharacterMovement.ApplyJumpConfig）")]
+	/// <summary>
+	/// **跳跃高度**倍数（1 = 与 `Player.tscn` 的 <c>Movement.JumpVelocity</c> 一样高）。
+	///
+	/// 高度与起跳速度是平方关系（<c>h = v² / 2g</c>），所以实现里对速度取的是**平方根**：
+	/// 这一列填 1.4 = 跳得比原来高 40%，起跳速度 ×1.183。
+	///
+	/// ⚠️ 它**只管高度**：真正决定"跳起来多快"的是 <see cref="JumpSpeedMultiplier"/>。
+	/// 用户原话是「高度 +40%，速度 +100%」—— 两者在同一个 <c>JumpVelocity</c> 上无法同时成立
+	/// （速度 ×2 会让高度 ×4），所以拆成两个旋钮，谁想改哪一边就改哪一边。
+	/// </summary>
+	[Export(PropertyHint.Range, "0.1,6,0.05")] public float JumpHeightMultiplier { get; set; } = 1f;
+
+	/// <summary>
+	/// **跳跃速度**倍数（1 = 与场景里的值一样快）。乘在"空中加速"与"最大下落速度"上
+	/// （<c>CharacterMovement.AirAcceleration</c> / <c>MaxFallSpeed</c>）——
+	/// 这两个量才真的是速度：起跳速度已经被"高度"那一列按平方根占用了。
+	///
+	/// 起跳那一瞬间的手感（离开地面的速度）由**高度**列决定，所以想"整体更快"时两列一起加。
+	/// </summary>
+	[Export(PropertyHint.Range, "0.1,6,0.05")] public float JumpSpeedMultiplier { get; set; } = 1f;
 }

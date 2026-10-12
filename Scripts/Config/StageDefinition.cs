@@ -69,6 +69,18 @@ public partial class StageDefinition : Resource
 	[Export] public int BossPerkCount { get; set; } = 2;
 
 	/// <summary>
+	/// **白板首领的波次门槛**（用户需求：「刷新的怪物总是会出现白板首领，但是白板首领应该是要很久才出现的，
+	/// 基本只在第 8 波怪刷出」）。
+	///
+	/// 判定的量是<b>本关累计已开的波数</b>（跨多场 Encounter 累加，见 <c>StageController._wavesOpenedInStage</c>）：
+	/// 累计到这一波时，清空后才会降临白板首领；之前每场都直接正常结算。
+	/// 这个值每次开战前写给 <c>EncounterController.MinWaveForEliteBoss</c>（那边只是执行者，不持有策略）。
+	///
+	/// <b>留 0 = 这道闸门关掉</b>（每场末尾照旧出白板首领，也就是加快前的行为）。
+	/// </summary>
+	[Export] public int EliteBossMinWave { get; set; } = 8;
+
+	/// <summary>
 	/// Boss Pressure 的 Stage 倍率表（关卡核心文档 §7.4：Stage 倍率使用固定表、不随机生成；
 	/// 「具体倍率数值暂未最终确定，不能在核心代码中散落硬编码常量」）。
 	///

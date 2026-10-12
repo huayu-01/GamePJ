@@ -1,3 +1,5 @@
+using ActRoguelike.Config;
+using ActRoguelike.Run;
 using Godot;
 
 namespace ActRoguelike.Combat;
@@ -71,7 +73,63 @@ public partial class CharacterMovement : Node
 		if (_unit != null)
 		{
 			_unit.KnockbackReceived += OnKnockback;
+
+			// ⚠️ **必须 defer 一帧**：归属组（`player_units` / `enemy_units`）是在 `Unit._Ready` 里
+			// `AddToGroup` 的，而**子节点的 `_Ready` 早于父节点** —— 在 `_Ready` 里问 `IsInGroup`
+			// 拿到的永远是 false（首轮实测：12 个单位全是 `player_units 组=False`，跳跃配置一次都没生效）。
+			// defer 的调用排在当前帧所有 `_Ready` 之后，这时组已经登记好了。
+			CallDeferred(nameof(ApplyJumpConfigDeferred));
 		}
+	}
+
+	/// <summary>
+	/// 跳跃参数来自**角色表**（`Config/Tables/Characters/chr_*.tres` 的「跳跃」两组）——
+	/// 玩家预制体（`Player.tscn` 的 <c>Movement</c>）只保留 <c>JumpVelocity</c> 作为**回退值**。
+	///
+	/// ⚠️ **只有玩家读表**：表里那两列写的是"玩家手感"。敌人 / 召唤物的跳跃（如 `JumpingMelee.tscn`
+	/// 的 <c>JumpVelocity = 9</c>）留在各自场景上，否则调玩家的跳跃会连带改掉 9 个敌种的扑击高度。
+	/// 组判定按 `player_units`（`Unit._Ready` 里登记）。
+	///
+	/// ⚠️ 与 <see cref="UnitConfig.ApplyTo"/> 那条路径（实例化 → ApplyTo → AddChild）不同：
+	/// 这里就地解析（按玩家 <c>RunSetup.Character</c> 选行、读不到行就什么都不做）。同理，
+	/// 玩家在中途换角色不会重新算 —— <c>RunController.ApplyBalance</c> 换角色时会重建这一份数值，
+	/// 而那属于它的文件边界（本轮不碰）。
+	/// </summary>
+	private void ApplyJumpConfigDeferred()
+	{
+		if (_unit == null || !IsInstanceValid(_unit))
+		{
+			return;
+		}
+
+		// 只有玩家读表（按组判定）。
+		if (!_unit.IsInGroup("player_units"))
+		{
+			return;
+		}
+
+		if (ConfigRows.BySlot<CharacterConfig>((int)RunSetup.Character + 1) is not { } row)
+		{
+			// 表读不到 → 保留场景里的值（"读不到则使用自身的默认值"），但必须留痕，否则"跳跃没变"会查不出来。
+			ActRoguelike.Core.GameLog.Write(
+				"Config",
+				$"跳跃：角色行读不到（RunSetup.Character={RunSetup.Character} / 角色表 {ConfigRows.Count<CharacterConfig>()} 行）→ 起跳速度保持场景值 {JumpVelocity:0.##} m/s");
+			return;
+		}
+
+		// 高度那一列是"能跳多高"的倍数，速度与高度是平方关系（h = v²/2g）→ 取平方根才是速度倍数。
+		float lift = Mathf.Sqrt(Mathf.Max(0.01f, row.JumpHeightMultiplier));
+		JumpVelocity *= lift;
+
+		// 速度那一列是"起跳/位移快多少"的倍数（用户要的 +100%）。起跳速度乘完会同时抬高度，
+		// 两列是**两个旋钮**、不共用一条公式，取值见 `docs/config.md` 的「跳跃」一节。
+		float speed = Mathf.Max(0.01f, row.JumpSpeedMultiplier);
+		AirAcceleration *= speed;
+		MaxFallSpeed *= speed;
+
+		ActRoguelike.Core.GameLog.Write(
+			"Config",
+			$"跳跃：角色行 {row.Id}（高度×{row.JumpHeightMultiplier:0.##} 速度×{row.JumpSpeedMultiplier:0.##}）→ 起跳速度 {JumpVelocity:0.##} m/s（高度系数 {lift:0.###}）/ 空中加速 {AirAcceleration:0.#} / 最大下落 {MaxFallSpeed:0.#}（来源：表 Characters，读不到则用场景导出值）");
 	}
 
 	public override void _ExitTree()

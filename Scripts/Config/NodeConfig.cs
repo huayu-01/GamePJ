@@ -35,6 +35,23 @@ public partial class NodeConfig : ConfigRow
 	/// <summary>这个节点开几波。</summary>
 	[Export] public int WaveCount { get; set; } = 2;
 
+	/// <summary>
+	/// **价值标签**（用户需求：「节点刷怪调整，高价值节点会刷 4 波怪，中刷 3，低刷 1，对应
+	/// 异化 / 升级 / 双倍强化 / 多倍资源强化 / 特殊奖励 / 双倍资源恢复 / 一倍资源；这些不写死，
+	/// 假设后期有彩蛋或其他奖励也会在这些不同的价值标签里」）。
+	///
+	/// 元素是**价值标签表**（`Config/Tables/ValueTags/tag_*.tres`）里某一行的 <see cref="ConfigRow.Id"/>
+	/// （`tag_high` / `tag_mid` / `tag_low`）。一个节点可以挂多个标签。
+	///
+	/// <b>为什么用标签而不是枚举</b>：波数不再按 <see cref="Kind"/> 硬编码 ——
+	/// 以后加"彩蛋"这类新奖励，只要给它挂上已有标签（或新加一行标签）即可，
+	/// 不必回头改 <c>NodePlacement.WavesFor</c> 里的 switch。
+	///
+	/// 取值链见 <see cref="ValueTagConfig"/>（标签行 → 本行 <see cref="WaveCount"/> → 按价值层的代码兜底）。
+	/// 留空 = 这一行不表态，直接落到后两层。
+	/// </summary>
+	[Export] public string[] ValueTags { get; set; } = System.Array.Empty<string>();
+
 	[ExportGroup("表现（节点外观；空 = 用场景自带）")]
 	/// <summary>节点材质（.tres；空 = 用场景自带材质）。</summary>
 	[Export(PropertyHint.File, "*.tres")] public string MaterialPath { get; set; } = string.Empty;

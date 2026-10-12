@@ -19,3 +19,4 @@ BossGuardCount = 2
 BossHealthMultiplier = 1.0
 BossDamageMultiplier = 1.0
 BossPerkCount = 1
+EliteBossMinWave = 8

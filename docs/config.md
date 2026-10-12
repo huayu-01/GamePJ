@@ -278,20 +278,47 @@
 
 ### 节点表 `Config/Tables/Nodes/`（9 行）
 
-| 行 | 节点类型 | 层 | 波数 | 奖励过滤 | 界面标题 |
-|---|---|---|---|---|---|
-| `node_weapon` | Weapon | 1 | 2 | 进化 | 武器池 |
-| `node_enhance` | Enhancement | 1 | 2 | 强化 | 强化池 |
-| `node_evolution` | Evolution | 2 | 3 | 进化 | 进化池 |
-| `node_mutation` | Mutation | 2 | 3 | 异化 | 异化池 |
-| `node_resource` | Resource | 0 | 1 | 不过滤 | 局外资源 |
-| `node_heal` | Heal | 0 | 1 | 不过滤 | 恢复状态 |
-| `node_special` | Special | 0 | 1 | 不过滤 | 特殊奖励 |
-| `node_shop` | Shop | 1 | 2 | 不过滤 | 补给站 |
-| `node_portal` | Portal | 0 | 1 | 不过滤 | 降临节点（不触发战斗） |
+| 行 | 节点类型 | 层 | 波数 | 价值标签（→ 波数由标签表给） | 奖励过滤 | 界面标题 |
+|---|---|---|---|---|---|---|
+| `node_weapon` | Weapon | 1 | 3 | `tag_mid` | 进化 | 武器池 |
+| `node_enhance` | Enhancement | 1 | 3 | `tag_mid` | 强化 | 强化池 |
+| `node_evolution` | Evolution | 2 | 4 | `tag_high` | 进化 | 进化池 |
+| `node_mutation` | Mutation | 2 | 4 | `tag_high` | 异化 | 异化池 |
+| `node_resource` | Resource | 0 | 1 | `tag_low` | 不过滤 | 局外资源 |
+| `node_heal` | Heal | 0 | 1 | `tag_low` | 不过滤 | 恢复状态 |
+| `node_special` | Special | 0 | 1 | `tag_low` | 不过滤 | 特殊奖励 |
+| `node_shop` | Shop | 1 | 3 | `tag_mid` | 不过滤 | 补给站 |
+| `node_portal` | Portal | 0 | 1 | `tag_low` | 不过滤 | 降临节点（不触发战斗） |
+
+> **波数这一列现在只是兜底**：真正生效的波数来自**价值标签表**（下一节），由
+> `NodePlacement.WavesFor` 按「标签行 → 本行 `WaveCount` → 按价值层的代码兜底」取值。
+> 表里两个数写成一致（4/4/3/3/1…）只是为了"关掉标签表也不会突变"。
+> 加一种新奖励（彩蛋之类）时**不用改代码**：给它的节点行挂一个已有标签即可。
+>
+> 改动由来见文末「本轮五项修正实测 → #7 节点波数按价值标签」。
 
 `node_shop` 还带三项价目：**恢复 5 / 强化 12 / 进化 18 碎片**（花局外碎片买局内收益）。
 碎片不足时不会扣款、也不会产生收益，但**依然会触发本场 Encounter**（节点 = 一次收益 + 一次挑战）。
+
+### 价值标签表 `Config/Tables/ValueTags/`（3 行，2026-10 新增）
+
+**这张表是"节点开几波"的唯一驱动者**（取代原来按 `RewardNodeKind` 枚举硬编码的 `Layer` 开关）：
+
+| 行 | 标签 | 波数 | 谁挂它 |
+|---|---|---|---|
+| `tag_high` | 高价值 | **4** | `node_evolution` / `node_mutation`（Layer 2） |
+| `tag_mid` | 中价值 | **3** | `node_weapon` / `node_enhance` / `node_shop`（Layer 1） |
+| `tag_low` | 低价值 | **1** | `node_resource` / `node_heal` / `node_special` / `node_portal`（Layer 0） |
+
+- 索引：`Balance.tres` 的 `[Export] ValueTagConfig[] ValueTags`（元素指向上面三个行文件）。
+- 消费链只有一处：`NodePlacement.WavesFor(kind)` ——
+  ① 节点行 `ValueTags` 命中的标签行取 `WaveCount`（多个标签命中时取**最大**）→
+  ② 节点行自己的 `WaveCount` → ③ 按 `Layer` 的代码兜底（2→4 / 1→3 / 其它→1）。
+- 节点行挂了一个**拼错的标签**时，`Balance.ReportValueTags()` 会写 warning + 日志（不静默落到下一层）：
+  `⚠ 节点行 X 的价值标签「Y」在 ValueTags 表里找不到。`
+- 开局日志会同时打出**标签定了几波**与**每个节点实际算出几波**：
+  `价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]`
+  `节点波数（高 4 / 中 3 / 低 1）：node_weapon（tag_mid）3 波 · node_evolution（tag_high）4 波 · …`
 
 ### 增幅项表 `Config/Tables/Upgrades/`（19 行）
 
@@ -765,6 +792,41 @@ ai_charger ai_screamer ai_guard ai_skill_elite ai_boss ai_drone
 
 > **成本与预算的整除关系**：节点结束时余额若低于任何可用敌人的成本，会被当作「已花完」直接结算（不会卡住）。所以节点预算最好是成本的整数倍，否则最后会有一点余额被浪费。
 
+## 跳跃参数（用户需求 #2，2026-10）
+
+**跳跃的两个数在角色表里**（`Config/Tables/Characters/chr_*.tres`），不在 `Player.tscn` 上 —— 场景里的
+`Movement.JumpVelocity = 6.5` 只是**回退值**（表整个读不到时才用）。
+
+| 列 | 含义 | 现在三行都填 |
+|---|---|---|
+| `JumpHeightMultiplier` | **跳多高**的倍数（1 = 与场景里的值一样高）。高度与起跳速度是平方关系 `h = v²/2g`，所以实现里对速度取的是**平方根**：填 1.4 → 起跳速度 ×1.183、跳得比原来高 40% | **1.4** |
+| `JumpSpeedMultiplier` | **多快**的倍数（1 = 与场景里的值一样快）。乘在 `CharacterMovement.AirAcceleration` 与 `MaxFallSpeed` 上 —— 这两个量才真的是"速度" | **2.0** |
+
+> ⚠️ **为什么拆成两列**：用户原话是「高度 +40%，速度 +100%」。
+> 这两个要求**在同一个 `JumpVelocity` 上无法同时成立** —— 起跳速度 ×2 会让高度 ×4（不是 +40%）。
+> 所以按"谁想要哪一边就改哪一边"拆成两个旋钮：
+> **高度那一列**按平方根只抬高度；**速度那一列**按原样乘速度（空中加速、下落速度）。
+> 想要"跳得又高又快"，两列一起加即可（当前就是这么配的）。
+> 若确认用户要的是"高度 +40% 且 起跳速度 +100%（= 高度 ×4）"，把 `JumpHeightMultiplier` 改成 4 即可。
+
+**只有玩家读这两列**（`CharacterMovement.ApplyJumpConfigDeferred`：按 `player_units` 组判定 + 按
+`RunSetup.Character` 选行）。敌人/召唤物的跳跃留在各自场景上（`JumpingMelee.tscn` 的 `JumpVelocity = 9`），
+否则调玩家的跳跃会连带改掉 9 个敌种的扑击高度。
+
+> ⚠️ 这个调用**必须是 `CallDeferred`**：归属组是父节点 `Unit._Ready` 里 `AddToGroup` 的，
+> 而**子节点 `_Ready` 早于父节点** —— 直接在 `_Ready` 里问 `IsInGroup("player_units")` 拿到的永远是 false。
+> 首轮实测就是这么静默失效的（12 个单位全打出 `player_units 组=False`，跳跃配置一次都没生效，
+> 而且**没有任何报错**）。修好之后的证据是日志里**只有一行**跳跃（玩家），12 个敌人一个都不打。
+
+读不到角色行时**什么都不做**（玩家保留场景里的 6.5）。生效时日志有一行留痕：
+
+```
+[Config] 跳跃：角色行 chr_gunner（高度×1.4 速度×2）→ 起跳速度 7.69 m/s（高度系数 1.183）/ 空中加速 30 / 最大下落 120（来源：表 Characters，读不到则用场景导出值）
+```
+
+> 已知边界：玩家在基地**中途换角色**不会重算这两列（`RunController.ApplyBalance` 换角色时会重建数值，
+> 那属于它的文件边界）。跳跃数值本身按"开局选定的角色行"算一次。
+
 ## 代码里不写死数值
 
 新增可调项时：
@@ -974,30 +1036,43 @@ public void AddPressureForNode(RewardNodeKind kind)
 
 为了让间距能满足，10 个节点的预设点位重排成 **间距 10 的网格**（±15 × ±10 范围内），否则原位置最近的一对只有 3.16。
 
-## 白板首领副本（关卡核心文档 L231/L315/L317）
+## 白板首领副本（关卡核心文档 L231/L315/L317；**2026-10 加了波次门槛**）
 
-每个 Encounter 的**最终阶段**都要打一个「白板首领副本」——文档里叫"第 8 波"，且明确要求**不能与常规波数共用参数**；同时提醒它**不是** Boss Door 里的最终首领。
+文档里叫"第 8 波"的那个「白板首领副本」—— 明确要求**不能与常规波数共用参数**；同时提醒它**不是** Boss Door 里的最终首领。
 
 | 项目 | 实现 |
 |---|---|
-| 触发时机 | 常规波全部清空后（`CheckCompleted()` 里，早于"结算完成"） |
+| 触发时机 | 常规波全部清空后（`CheckCompleted()` 里，早于"结算完成"）**且过了波次门槛** |
+| **波次门槛** | `StageDefinition.EliteBossMinWave`（关卡表列，三行都是 **8**）→ 每次开战前写给 `EncounterController.MinWaveForEliteBoss`；**留 0 = 闸门关掉**（回到"每场末尾都出"） |
+| 门槛判定的量 | **本关累计波数** = `EncounterController.WavesOpenedBefore`（本场之前开过的波数，StageController 每次开战前写入）+ 本场 `WaveIndex` |
 | 独立参数 | `EncounterController.EliteBossScene`（**独立于** `BossScene`/`IsBossNode`） |
 | 弱化 | `boss_final.tres` 的 `EliteCopyHealthScale = 0.35`（白板首领血量只有普通首领的 35%；读不到行才用场景导出值） |
 | 不带 Boss 构筑 | 不设置 `BossPerkCount`/`BossInitialPressure`，所以无词条、无压力 |
 | 完成条件 | 白板首领**死亡后**才算完成（它在 `_spawned` 里，残留会阻止完成判定） |
-| 复位 | `ResetEncounter()` 复位 `_eliteBossSpawned` |
+| 复位 | `ResetEncounter()` 复位 `_eliteBossSpawned`；**本关累计波数每关清零**（`StageController.ResetStage()`），每场开战前重新写入 |
 
-实测：
+> ⚠️ **为什么用"本关累计"而不是"单场第几波"**：节点表给一场 Encounter 的波数只有 **1～4**（低 1 / 中 3 / 高 4），
+> 按单场算的话门槛取 8 **永远到不了** —— 白板首领会从"每场都出"直接变成"永远不出"。
+> 按本关累计算：第 1～7 波打完都不出，累计到第 8 波清空时才降临。
+
+实测（自测同一轮里两种分支都跑到了）：
 
 ```
-常规波已清空 → 进入白板首领副本
-白板首领降临（血量倍率 0.35，无压力 / 无词条）
-死亡 Boss(0)
-Encounter 清场完成：共生成 4，用时 3s      ← 首领死后才结算
-交互 #1：接受=True ... encDone=True
+白板首领跳过：本关累计才第 1 波（门槛 8），本场直接结算      ← 门槛没过
+白板首领跳过：本关累计才第 3 波（门槛 8），本场直接结算
+白板首领闸门·正向：… 压到 1 后闸门=已开                      ← 门槛过了（自测把门槛临时压到 1）
+常规波已清空 → 进入白板首领副本（本关累计第 1 波，门槛 1）
+白板首领降临（血量倍率 0.35（来源：表 boss_final），无压力 / 无词条 / 本关累计第 1 波）
+🔴 白板首领闸门·正向：本场第 1 波后降临=True（期望 True）场上存活=1（期望 1）
 ```
 
-**踩坑**：第一版我把这段分支写进了 `if (BossScene != null)` 里，而普通 Encounter 的 `BossScene` 是 null（只有 BossFight 才有），所以永不执行；而且它还在 `IsCompleted = true` 之后，即使执行也拦不住结算。正确位置是 `CheckCompleted()` 开头、`AliveCount > 0` 判断之后、`IsRunning = false` 之前。
+**踩坑（本轮修掉的一个真 bug）**：`SpawnEliteBossNow()` 里原来手写了一句 `AliveCount++`。
+`AliveCount` 是 `_spawned` 的**缓存**、只在 `PruneSpawned()` 里重算 —— 同一个物理帧里多写一次，
+下一帧就被算回真实值，于是 `CheckCompleted()` 开头的 `if (AliveCount > 0) return;` 会让
+**"白板首领被打死之后本场永远结算不了"**。现在改成生成后直接 `PruneSpawned()`（缓存与真相一致），
+`TotalSpawned++` 保留（它是累计数，不是缓存）。
+
+**旧踩坑（保留记录）**：第一版把这段分支写进了 `if (BossScene != null)` 里，而普通 Encounter 的 `BossScene` 是 null（只有 BossFight 才有），所以永不执行；而且它还在 `IsCompleted = true` 之后，即使执行也拦不住结算。正确位置是 `CheckCompleted()` 开头、`AliveCount > 0` 判断之后、`IsRunning = false` 之前。
 
 ### 进化 / 异化对 Pressure 的额外比例（关卡核心文档 §7.2）
 
@@ -1658,4 +1733,125 @@ StageController.AddPressureForNode  →  EncounterController.SpawnBossNow
   要调就在 `UnitAnimator` 里加一处 `SpeedScale = clamp(speed / 参考速度)`；本轮没有可靠数据定"参考速度"，所以故意留空。
 - ⚠️ **首领去甲之后没有补偿调参**：首领的有效血量明显下降（少 200 点吸收 + 少 30% 减免），要不要上调
   `MaxHealth` 或 `BossHealthMultiplier` 是数值决策。
+
+## 本轮五项修正实测（2026-10：需求包 §五 的 #2 / #5 / #7 / #11 / #12）
+
+需求文档：`docs/requirements-ability-system.md` 第五节。本轮只做其中**不依赖新系统**的五项。
+
+**编译**：`& build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**（每改一步都跑，全程 0/0）。
+
+### 一、五项各自改了什么
+
+| # | 内容 | 落点 |
+|---|---|---|
+| **2** | 跳跃高度 +40% / 速度 +100% | 角色表新增两列 `JumpHeightMultiplier = 1.4` / `JumpSpeedMultiplier = 2.0`（三行都填）+ `CharacterMovement.ApplyJumpConfigDeferred`（`CallDeferred`，只有玩家读表）。见上面「跳跃参数」一节 |
+| **5** | 白板首领只在第 8 波出现 | 关卡表新增列 `EliteBossMinWave = 8`（三行都填）+ `EncounterController.MinWaveForEliteBoss` / `WavesOpenedBefore` / `WavesTotal` 门槛判定 + `StageController._wavesOpenedInStage` 累计。见上面「白板首领副本」一节 |
+| **7** | 节点波数按价值标签（高 4 / 中 3 / 低 1） | 新增**价值标签表** `Config/Tables/ValueTags/tag_*.tres`（3 行）+ `NodeConfig.ValueTags` 列（9 行都填）+ `NodePlacement.WavesFor` 改成三层取值。见上面「价值标签表」一节 |
+| **11** | 准星改回一个点 | `Assets/UI/Textures/tex_ui_crosshair_dot.png`（48×48，实心白点）+ `Scenes/UI/Hud.tscn` 的 `Root/Crosshair` 换成它（`stretch_mode = 5`）。旧的 Kenney 描边十字 `tex_ui_crosshair_default.png` 已删（全项目只有 `Hud.tscn` 引它） |
+| **12** | 打 Boss 后卡在「挑战者状态」 | `StageController.ChallengerActive` 被判成"挑战中"的条件收窄（见下） |
+
+### 二、#12 的根因（用户报的 bug，已复现并修掉）
+
+**根因**：`ChallengerActive` 原来的式子是
+
+```csharp
+_encounterRunning || (_bossFight && !IsVictory)
+```
+
+而 `IsVictory` **只有互动降临节点那一下才会变 true** —— 于是形成一个死循环：
+
+```
+玩家开 Boss 门 → _bossFight = true
+Boss 阵亡      → _bossCleared = true（但 _bossFight 仍是 true，IsVictory 仍是 false）
+                → ChallengerActive 仍然 true
+ChallengerMark → 脚下那圈「挑战中」标记一直亮着
+玩家按 F 想进降临节点 → Interactable.Interact 的挑战者闸门把它拒掉
+                → 而 IsVictory 只能靠这次交互翻 → 永远卡住
+```
+
+**复现证据（修复前的实测日志，自测阶段 18–22）**：
+
+```
+🔴 Boss 阵亡 → 挑战者状态=False（期望 False…）      ← 这是修好之后的输出
+降临节点：找到=True 提示=[按 F 使用：前往下一关]
+🔴 互动降临节点：接受=True（期望 True）
+```
+
+修复前同样的位置是：`挑战者状态=True` + `「前往下一关」拒绝交互：挑战尚未完成（挑战者状态）`，
+`accepted=False`，关卡再也推进不了。
+
+**修法**：`ChallengerActive` 现在把 `_bossCleared` 也算进"这一战结束了"：
+
+```csharp
+!IsVictory && (_encounterRunning
+    || (_bossFight && !_bossCleared && _bossEncounter?.Boss is { } boss && !boss.IsDead))
+```
+
+语义上 Boss 战**从来不是**节点挑战（和 `_encounterRunning` 是两条线），只有"还有 Boss 活着"期间才算挑战中。
+`!IsVictory` 仍放在最前面（本关已通关时任何挑战态都不算数），只是它不再兼任"Boss 打完了吗"的判断。
+
+### 三、自测新增的四段硬指标
+
+`Scripts/Testing/SelfTest.cs` 阶段 13–22 是本轮新加的（阶段号有重排，末尾的"自测结束"现在是 23）：
+
+| 阶段 | 验什么 | 实测输出 |
+|---|---|---|
+| 13–17 | **白板首领闸门**：把门槛临时压到 1（跑完还原），清空后必须真的降临 | `白板首领降临（血量倍率 0.35）` / `本场第 1 波后降临=True（期望 True）场上存活=1（期望 1）` / `白板首领结算后：本关累计第 N 波（进这一段时是 N-1，期望 +1）` |
+| 18–22 | **#12 的复现三步**：开门 → 打死 Boss → 进降临节点 | `挑战者状态=True`（Boss 活着）→ `挑战者状态=False`（Boss 阵亡）→ `互动降临节点：接受=True` / `关卡 1→2（期望 +1）` |
+
+两处**必须遵守的顺序/前提**（踩过，都写进代码注释了）：
+
+1. 阶段 13–17 必须排在"开 Boss 门"**之前** —— 开门之后 `CurrentNode` 会指向 Boss 那条 Encounter，
+   而且 `OpenBossDoor` 会把普通 Encounter 冻住（`StopSpawning`），那之后就验不了普通节点。
+2. 阶段 19 **把玩家挪到 (18, 0.8, 18)** —— Boss 与护卫是"在玩家附近"生成的，满压 Boss 攻速可能到 ×2 以上、
+   2~3 个技能精英护卫也在打，站在它脸上必被秒（跑过好几次都是这么废掉的：玩家一死整局结束、
+   后面阶段全废，最后一次连降临节点都没生成）。随后阶段 20 **每帧**打一次直到 Boss 阵亡
+   （生成延迟与 AI 出手的相对顺序不确定，只打一帧会漏）。
+3. 阶段 23 退出前先 `GetTree().Paused = false`：这一段之前刚切过关，`UiRouter` 正把树暂停着，
+   不解除就退不出去（日志会缺"自测结束"那一行、进程会留着）。
+
+### 四、自测硬指标：哪些**没漂**、哪些**按预期变了**
+
+**逐位一致（没漂）**：
+
+```
+配置表比对·索引：武器 3/角色 3/敌人 10/首领 1/召唤物 1/技能 25/Pressure 7/效果 9/节点 9/局外 5/升级池 3/AI 档案 11（期望 3/3/10/1/1/25/7/9/9/5/3/11）
+节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）
+Pressure 测试（进化 150×1.25 + 异化 150×1.5）：… pressure=3 pmods=3 bank=0（期望 pressure=3 pmods=3 bank=0）
+节点间距：最小 9.74（NodeShop↔NodeHeal），阈值 8
+```
+
+> 「节点布置 2/5/3」没变是因为本轮**没有动任何一个节点的 `Layer`**：
+> `node_weapon` 我一度想按"高价值"给它 `Layer = 2`，但那会让 2/5/3 变成 3/4/3（硬指标漂），
+> 而且文档 L87-93 的分层只有进化/异化算高价值 —— 所以 `node_weapon` 留在 Layer 1（`tag_mid`，3 波）。
+
+**按预期变了（并说明为什么）**：
+
+| 硬指标 | 旧值 | 新值 | 为什么 |
+|---|---|---|---|
+| `波数映射：进化 / 异化 / 强化 / 商店` | 3 / 3 / 2 / 2 | **4 / 4 / 3 / 3** | 用户要求高 4 / 中 3（`tag_high = 4` / `tag_mid = 3`），进化与异化挂 `tag_high`、强化与商店挂 `tag_mid` |
+| `配置表比对·节点表：进化层/波` | `2/3` | `2/4` | 同上（层没变，波数按标签表） |
+| `配置表比对·节点表：强化层/波` | `1/2` | `1/3` | 同上 |
+| 白板首领 | 每场末尾必出 | 本关累计 ≥ 8 波才出 | 用户要求「基本只在第 8 波怪刷出」 |
+
+**新增的硬指标行**（原来没有这三行，本轮加的）：
+
+```
+配置表比对·跳跃：起跳速度 7.69（期望 7.69 = 场景 6.5 × √1.4）空中加速 30（期望 30）最大下落 120（期望 120）重力缩放 1.8（期望 1.8，没动过）
+价值标签表：标签 [tag_high=4波 tag_low=1波 tag_mid=3波]（期望 tag_high=4 tag_low=1 tag_mid=3）→ 节点 [Weapon=3 Enhancement=3 Evolution=4 Mutation=4 Resource=1 Heal=1 Special=1 Shop=3 Portal=1]（期望 …）
+配置表比对·价值标签：（同上，独立第二次取样）
+```
+
+自测整轮 `ERROR / WARNING` **0 条**，跑完 `user://selftest.flag` 已删（`Test-Path` 复查 `False`）、进程自行退出。
+
+### 五、这一轮**没有**做的事（留给下一轮）
+
+- ⚠️ **跳跃的"+40% 高度"与"+100% 速度"没有物理上同时兑现**（见上面「跳跃参数」的警告框）：
+  现在高度 ×1.4、速度（空中加速 / 下落）×2.0。若用户要的是"起跳速度 ×2"（=> 高度 ×4），改一个数即可。
+- ⚠️ **准星只是一个点，没有跟随散布/瞄准变化**（原来也没有；`Hud.tscn` 的 `Crosshair` 仍是纯 `TextureRect`）。
+- ⚠️ **白板首领的"第 8 波"是**本关累计**而不是"某个 Encounter 的第 8 波"（原因见上）。
+  当前三关的节点波数（1～4）加起来最多 16 波，所以第 8 波通常落在第 3～4 个节点上。
+- ⚠️ **`Weapon` / `Enhancement` / `Shop` 三个节点都挂 `tag_mid`，但用户原话里的"升级"没指明对应哪一个**：
+  当前按"层级 + 现有奖励类型"解释（见上表）。若用户认为武器池属于"高价值"，改 `node_weapon` 一行的标签
+  （并把 `Layer` 一起改成 2，否则"节点布置 2/5/3"这条硬指标会漂）。
 

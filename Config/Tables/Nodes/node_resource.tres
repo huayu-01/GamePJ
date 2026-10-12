@@ -9,6 +9,7 @@ Title = "局外资源"
 AnyRewardKind = true
 Layer = 0
 WaveCount = 1
+ValueTags = PackedStringArray("tag_low")
 Id = "node_resource"
 Slot = 5
 DisplayName = "局外资源"

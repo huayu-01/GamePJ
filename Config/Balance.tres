@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BalanceConfig" load_steps=116 format=3]
+[gd_resource type="Resource" script_class="BalanceConfig" load_steps=119 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/BalanceConfig.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -115,6 +115,9 @@
 [ext_resource type="Resource" path="res://Config/Tables/Audio/audio_sfx_enemy_die.tres" id="117_audio_sfx_enemy_die"]
 [ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_click.tres" id="118_audio_ui_click"]
 [ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_open.tres" id="119_audio_ui_open"]
+[ext_resource type="Resource" path="res://Config/Tables/ValueTags/tag_high.tres" id="120_tag_high"]
+[ext_resource type="Resource" path="res://Config/Tables/ValueTags/tag_mid.tres" id="121_tag_mid"]
+[ext_resource type="Resource" path="res://Config/Tables/ValueTags/tag_low.tres" id="122_tag_low"]
 
 [resource]
 script = ExtResource("1_balance")
@@ -135,6 +138,7 @@ Characters = [ExtResource("8_chr_gunner"), ExtResource("9_chr_heavy"), ExtResour
 Enemies = [ExtResource("11_enemy_global"), ExtResource("55_enemy_chaser"), ExtResource("56_enemy_fast_melee"), ExtResource("57_enemy_exploder"), ExtResource("58_enemy_jumping_melee"), ExtResource("59_enemy_ranged"), ExtResource("60_enemy_charger"), ExtResource("61_enemy_screamer"), ExtResource("62_enemy_guard"), ExtResource("63_enemy_skill_elite")]
 Effects = [ExtResource("12_eff_slow"), ExtResource("13_eff_weaken"), ExtResource("14_eff_burn"), ExtResource("15_eff_empowered"), ExtResource("16_eff_stun"), ExtResource("18_eff_explosion"), ExtResource("19_eff_lifesteal"), ExtResource("20_eff_summon_on_kill"), ExtResource("21_eff_chain_lightning")]
 Nodes = [ExtResource("22_node_weapon"), ExtResource("23_node_enhance"), ExtResource("24_node_evolution"), ExtResource("25_node_mutation"), ExtResource("26_node_resource"), ExtResource("27_node_heal"), ExtResource("28_node_special"), ExtResource("29_node_shop"), ExtResource("30_node_portal")]
+ValueTags = [ExtResource("120_tag_high"), ExtResource("121_tag_mid"), ExtResource("122_tag_low")]
 Upgrades = [ExtResource("36_upg_dmg_up"), ExtResource("37_upg_rate_up"), ExtResource("38_upg_boots"), ExtResource("39_upg_vitality"), ExtResource("40_upg_scope"), ExtResource("41_upg_lethal"), ExtResource("42_upg_fast_reload"), ExtResource("43_upg_ext_mag"), ExtResource("44_upg_stance"), ExtResource("45_upg_pierce_round"), ExtResource("46_evo_twin"), ExtResource("47_evo_ap"), ExtResource("48_evo_ricochet"), ExtResource("49_evo_blast"), ExtResource("50_mut_chain"), ExtResource("51_mut_lifesteal"), ExtResource("52_mut_burn"), ExtResource("53_mut_summon"), ExtResource("54_mut_supply")]
 UpgradePools = [ExtResource("94_pool_pistol"), ExtResource("95_pool_sniper"), ExtResource("96_pool_rifle")]
 MetaUpgrades = [ExtResource("31_meta_health"), ExtResource("32_meta_damage"), ExtResource("33_meta_speed"), ExtResource("34_meta_crit"), ExtResource("35_meta_reload")]

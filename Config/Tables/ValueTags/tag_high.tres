@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ValueTagConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ValueTagConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "tag_high"
+Slot = 1
+DisplayName = "高价值"
+WaveCount = 4
+Note = "高价值节点：异化池 / 进化池 / 武器池（Layer = 2）。用户需求「高价值节点会刷 4 波怪」。"

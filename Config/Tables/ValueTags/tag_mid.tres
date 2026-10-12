@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ValueTagConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ValueTagConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "tag_mid"
+Slot = 2
+DisplayName = "中价值"
+WaveCount = 3
+Note = "中价值节点：强化池 / 补给站（Layer = 1）。用户需求「中刷 3」。"

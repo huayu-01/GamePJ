@@ -47,8 +47,21 @@ public partial class StageController : Node3D
 	/// <summary>
 	/// 「挑战者」状态：挑战进行中（用户要求由关卡管理器持有）。
 	/// 交互物在交互时读它决定"弹菜单还是拒绝"，玩家的地面标记也读它决定显示与否。
+	///
+	/// 🔴 <b>这里曾经把「打完 Boss 之后的收尾阶段」也算成挑战中</b>（原式：
+	/// <c>_encounterRunning || (_bossFight &amp;&amp; !IsVictory)</c>），而 <c>IsVictory</c> 必须**互动降临节点**
+	/// 才会变 true —— 于是 Boss 一死就死锁：地面标记一直亮着"挑战中"，玩家按 F 想进降临节点却被
+	/// <see cref="Interactable.Interact"/> 的挑战者闸门拒掉，永远进不了下一关（用户报的就是这个）。
+	///
+	/// 现在把 <see cref="_bossCleared"/> 也算进"这一战结束了"：Boss 阵亡的那一刻
+	/// （<see cref="_PhysicsProcess"/> 的 <c>_bossCleared = true</c>）挑战者状态立刻解除，
+	/// 降临节点落地的提示与交互才走得通。语义上 Boss 战**从来不是**节点挑战，
+	/// 它和 <see cref="_encounterRunning"/>（节点挑战）本来就是两条线，只有"还有 Boss 活着"期间算挑战中。
+	///
+	/// <c>!IsVictory</c> 仍然在最前面（本关已经通关时任何挑战态都不算数），只是它**不能**再兼任
+	/// "Boss 打完了吗"的判断。
 	/// </summary>
-	public bool ChallengerActive => _encounterRunning || (_bossFight && !IsVictory);
+	public bool ChallengerActive => !IsVictory && (_encounterRunning || (_bossFight && !_bossCleared && _bossEncounter?.Boss is { } boss && !boss.IsDead));
 	public bool BossOpened { get; private set; }
 	public int ChallengesUsed { get; private set; }
 	public float ElapsedSeconds { get; private set; }
@@ -88,6 +101,18 @@ public partial class StageController : Node3D
 	/// <summary>本关跨过 Pressure 阈值的次数（每一次都会立即抽一条数值型强化，§7.3）。</summary>
 	public int PressureRolls => _pressureRolls;
 
+	/// <summary>诊断用：本关累计已开的波数（白板首领门槛读它；自测比对用）。</summary>
+	public int WavesOpenedInStage => _wavesOpenedInStage;
+
+	/// <summary>
+	/// 诊断用：**「挑战者状态」当前是开是关**。
+	///
+	/// 自测用它验证用户报的那个 bug（直接开门打 Boss → 打完卡在"挑战中"、进不了降临节点）：
+	/// Boss 阵亡之后这个值必须是 <c>false</c>，否则 <c>Interactable.Interact</c> 的挑战者闸门
+	/// 会把降临节点的交互拒掉（那时 <c>IsVictory</c> 还是 false，而它正是唯一能翻它的动作 —— 死锁）。
+	/// </summary>
+	public bool ChallengerStateNow => ChallengerActive;
+
 	/// <summary>还没凑够一个阈值的余数（每次结算完清零、不结转，§7.3 第 5 条）。</summary>
 	public float PressureBank => _pressureBank;
 
@@ -121,6 +146,19 @@ public partial class StageController : Node3D
 
 	/// <summary>本关已跨过阈值的次数（= 由 Pressure 转换触发的数值强化次数）。与 §8 的免费额度溢出是两码事。</summary>
 	private int _pressureRolls;
+
+	/// <summary>
+	/// 本关**已经开过多少波**（跨多场 Encounter 累加，每关清零）。
+	///
+	/// 只有白板首领的波次门槛读它（用户需求：「白板首领…基本只在第 8 波怪刷出」）：
+	/// 节点表给一场 Encounter 的波数只有 1～4（低 1 / 中 3 / 高 4），
+	/// 所以门槛必须按**本关累计**算 —— 按单场算的话门槛取 8 永远到不了，
+	/// 白板首领会从"每场都出"直接变成"永远不出"。
+	///
+	/// 每次开战前写进 <see cref="EncounterController.WavesOpenedBefore"/>（那边自己不重置，
+	/// 避免"本关累计"这个量在两处各记一份）。
+	/// </summary>
+	private int _wavesOpenedInStage;
 
 	/// <summary>
 	/// 本关由 Pressure 转换（+ 节点行额外次数）抽到、但**还没套用**的数值强化 ——
@@ -185,6 +223,7 @@ public partial class StageController : Node3D
 		_currentNodeKind = null;
 		_pressureBank = 0f;
 		_pressureRolls = 0;
+		_wavesOpenedInStage = 0;
 		_pendingPressurePerks.Clear();
 		_pressureApplied = false;
 
@@ -394,9 +433,15 @@ public partial class StageController : Node3D
 
 		_encounter.ResetEncounter();
 
-		// 波数按节点价值（关卡核心文档 L225-227）：高价值 3 波 / 中价值 2 波 / 低价值 1 波。
+		// 波数按节点价值（关卡核心文档 L225-227；波数映射见 docs/stages.md 的「波数按价值标签」一节）。
 		// 必须在 ResetEncounter 之后设置：Reset 会把 WaveCount 清掉。
 		_encounter.WaveCount = node == null ? 0 : NodePlacement.WavesFor(node.Kind);
+
+		// 白板首领的波次门槛（用户需求：只在第 8 波这类高波次出现）：把"本关之前已经开过的波数"
+		// 交给这条 Encounter，它按 `WavesOpenedBefore + 本场已开波数` 判定。
+		// 节点表给一场 Encounter 的波数只有 1～4，所以门槛必须按**本关累计**算，否则取 8 就永远到不了。
+		_encounter.WavesOpenedBefore = _wavesOpenedInStage;
+		_encounter.MinWaveForEliteBoss = Definition?.EliteBossMinWave ?? 0;
 		_encounter.Start();
 		NodeStarted?.Invoke(ChallengesUsed, _encounter);
 	}
@@ -735,6 +780,9 @@ public partial class StageController : Node3D
 		if (_encounterRunning && _encounter is { IsCleared: true })
 		{
 			_encounterRunning = false;
+
+			// 白板首领门槛的账：本场开了几波就累加几波（含被门槛拦掉、没出白板首领的那几场）。
+			_wavesOpenedInStage += _encounter.WaveIndex;
 			if (_currentNodeKind.HasValue)
 			{
 				AddPressureForNode(_currentNodeKind.Value);

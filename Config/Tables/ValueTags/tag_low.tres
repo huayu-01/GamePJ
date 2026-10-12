@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ValueTagConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ValueTagConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "tag_low"
+Slot = 3
+DisplayName = "低价值"
+WaveCount = 1
+Note = "低价值节点：局外资源 / 恢复状态 / 特殊奖励 / 降临节点（Layer = 0）。用户需求「低刷 1」。"

@@ -151,6 +151,18 @@ public partial class BalanceConfig : Resource
 	/// <summary>节点表（`Config/Tables/Nodes/node_*.tres`）。空 = 用 <c>RewardService</c> / <c>NodePlacement</c> 里的原 switch。</summary>
 	[Export] public NodeConfig[] Nodes { get; set; } = System.Array.Empty<NodeConfig>();
 
+	[ExportGroup("表索引 · 价值标签（节点开几波由它驱动）")]
+	/// <summary>
+	/// 价值标签表（`Config/Tables/ValueTags/tag_*.tres`）：**一行一个价值标签**（高 / 中 / 低…）+
+	/// 这个标签的节点开几波。节点行用 <see cref="NodeConfig.ValueTags"/> 以**字符串 Id** 指过来
+	/// （与技能/AI 档案用资源引用不同：一张节点行挂多个标签，字符串数组在编辑器里更好填，
+	/// 而且标签行读不到时能落到节点行自己的 <c>WaveCount</c> 兜底）。
+	///
+	/// 空 = 整张表读不到 → <c>NodePlacement.WavesFor</c> 落到"节点行 WaveCount → 按价值层的代码兜底"，
+	/// 玩法仍然可玩（高 4 / 中 3 / 低 1）。
+	/// </summary>
+	[Export] public ValueTagConfig[] ValueTags { get; set; } = System.Array.Empty<ValueTagConfig>();
+
 	[ExportGroup("表索引 · 增幅项")]
 	/// <summary>增幅项表（`Config/Tables/Upgrades/upg_*.tres`）。空 = 用 <c>RewardCatalog.Fallback</c>。</summary>
 	[Export] public RewardConfig[] Upgrades { get; set; } = System.Array.Empty<RewardConfig>();

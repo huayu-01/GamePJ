@@ -9,6 +9,7 @@ Title = "降临节点"
 AnyRewardKind = true
 Layer = 0
 WaveCount = 1
+ValueTags = PackedStringArray("tag_low")
 SpawnsEncounter = false
 Id = "node_portal"
 Slot = 9

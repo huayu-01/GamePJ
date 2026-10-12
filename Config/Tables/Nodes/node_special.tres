@@ -9,6 +9,7 @@ Title = "特殊奖励"
 AnyRewardKind = true
 Layer = 0
 WaveCount = 1
+ValueTags = PackedStringArray("tag_low")
 Id = "node_special"
 Slot = 7
 DisplayName = "特殊奖励"

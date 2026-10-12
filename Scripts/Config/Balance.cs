@@ -66,6 +66,7 @@ public partial class Balance : Node
 		ConfigRows.Rebuild(Config.PressureMods);
 		ConfigRows.Rebuild(Config.Effects);
 		ConfigRows.Rebuild(Config.Nodes);
+		ConfigRows.Rebuild(Config.ValueTags);
 		ConfigRows.Rebuild(Config.Upgrades);
 		ConfigRows.Rebuild(Config.UpgradePools);
 		ConfigRows.Rebuild(Config.MetaUpgrades);
@@ -75,6 +76,11 @@ public partial class Balance : Node
 		{
 			ConfigRows.SetKind(row.Kind, row.Id);
 		}
+
+		// 节点开几波由**价值标签**驱动（用户需求：高 4 / 中 3 / 低 1，且"不写死"）：
+		// 这里把每张标签行的波数写进日志，同时报出"挂了标签但标签行读不到"的脏数据 ——
+		// 后者会静默落到节点行的 WaveCount 兜底，不写日志就查不出来。
+		ReportValueTags();
 
 		// 增幅项要编译成运行期目录（表优先、代码内置兜底），编译结果与来源写在日志里。
 		ActRoguelike.Rewards.RewardTable.Build(Config.Upgrades);
@@ -113,6 +119,63 @@ public partial class Balance : Node
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
 			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()} / AI 档案 {ConfigRows.Count<AiProfileConfig>()}（Balance.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
+	}
+
+	/// <summary>
+	/// 把"价值标签 → 波数"写进日志（用户需求 #7 的"顺藤摸瓜"入口）。
+	///
+	/// 两条信息缺一不可：① 每张标签行的波数（高 4 / 中 3 / 低 1 是不是真的读到了）；
+	/// ② 每个节点行实际算出几波 + 用了哪一层（标签表 / 节点行 WaveCount / 价值层兜底）。
+	/// 不写②的话，"节点行挂了一个拼错的标签"就只会静默掉到下一层，改配置的人看不出问题。
+	/// </summary>
+	private void ReportValueTags()
+	{
+		var tagText = new System.Text.StringBuilder();
+		foreach (ValueTagConfig tag in Config.ValueTags)
+		{
+			if (tag == null)
+			{
+				continue;
+			}
+
+			if (tagText.Length > 0)
+			{
+				tagText.Append('、');
+			}
+
+			tagText.Append($"{tag.Id}→{tag.WaveCount} 波");
+		}
+
+		int tagCount = ConfigRows.Count<ValueTagConfig>();
+		ActRoguelike.Core.GameLog.Write(
+			"Config",
+			$"价值标签（节点波数来源）：{tagCount} 行（来源：{(tagCount > 0 ? "表 ValueTags" : "代码默认值（表读不到）")}）—— [{tagText}]");
+
+		var nodeText = new System.Text.StringBuilder();
+		foreach (NodeConfig row in Config.Nodes)
+		{
+			if (row == null)
+			{
+				continue;
+			}
+
+			string tags = row.ValueTags.Length == 0 ? "无标签" : string.Join("+", row.ValueTags);
+			nodeText.Append(nodeText.Length > 0 ? " · " : string.Empty);
+			nodeText.Append($"{row.Id}（{tags}）{ActRoguelike.Run.NodePlacement.WavesFor(row.Kind)} 波");
+
+			foreach (string tag in row.ValueTags)
+			{
+				if (ConfigRows.ById<ValueTagConfig>(tag) != null)
+				{
+					continue;
+				}
+
+				GD.PushWarning($"[Balance] 节点行 {row.Id} 的价值标签「{tag}」在价值标签表里找不到，这一条不会生效（会落到节点行 WaveCount → 价值层兜底）。");
+				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 节点行 {row.Id} 的价值标签「{tag}」在 ValueTags 表里找不到。");
+			}
+		}
+
+		ActRoguelike.Core.GameLog.Write("Config", $"节点波数（高 4 / 中 3 / 低 1）：{nodeText}");
 	}
 
 	/// <summary>

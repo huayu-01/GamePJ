@@ -16,7 +16,7 @@
 | 后续加界面素材要做什么？ | **三步**：① 贴图丢进 `Assets/UI/Textures/`（`tex_ui_*.png`）；② 需要新样式就在主题里加一个**类型变体**（`UiXxx/base_type`）；③ 场景节点上写 `theme_type_variation = &"UiXxx"`。**不用碰任何 C#**。细节见 §3。 |
 | 中文能显示吗？ | **能**，而且是**受控**的：主题的 `default_font` 是一个 **`SystemFont`**（按 `font_names` 优先级从系统里取「微软雅黑 UI → 微软雅黑 → Noto Sans SC → 思源黑体 …」）。实测 `中/文/·/…/◆/◇/A/7` 全部 `has_char = true`，截图见 `ui_01`~`ui_09`。 |
 | 为什么中文不是自带字体？ | **体积**：一个能覆盖简中的开源字体最小也是 **17 MB**（Noto Sans SC 可变体）/ **24 MB**（霞鹜文楷单字重）。本轮任务明确"不要下大文件"，所以**先调研 + 用系统字体占位**，换法见 §4。**注意：系统字体是"开发期占位"，发行前必须换成自带字体**（玩家机器上不一定有雅黑）。 |
-| 准星接在哪？ | `Assets/UI/Textures/tex_ui_crosshair_default.png`（Kenney 200 个里挑的第 112 号，`Outline` 描边版，148×148）→ `Scenes/UI/Hud.tscn` 的 **`Root/Crosshair`**（`TextureRect`，屏幕中央 56×56）。**原来那 3 个 `ColorRect`（`CrosshairH`/`CrosshairV`/`CrosshairDot`）已删除**；它们没有任何代码引用，删掉是安全的。 |
+| 准星接在哪？ | `Assets/UI/Textures/tex_ui_crosshair_dot.png`（**一个点**，48×48 实心白圆点 + 羽化边，2026-10 用户要求改回点）→ `Scenes/UI/Hud.tscn` 的 **`Root/Crosshair`**（`TextureRect`，屏幕中央 20×20）。改动前是 Kenney 的描边十字 + 圆圈（`tex_ui_crosshair_default.png`，已删除）。 |
 | glow 开了吗？ | 开了：`Scenes/Levels/TestArena.tscn` 的 `WorldEnvironment` → **`glow_enabled = true`、`glow_hdr_threshold = 2.0`、`glow_intensity = 0.5`、`glow_blend_mode = 1`（Screen）、只开 4/5/6 三档半径**。为什么阈值这么高见 §7。 |
 | 改了几个界面？ | **外观全部 8 个（主题级）+ 2 个重点做了完整示范**（`BaseScreen` 加了标题带 / 分隔条 / 主按钮，`HelpScreen` 验证长中文正文）。没有把 7 个弹窗逐个"铺满"——这是刻意的，见 §3。 |
 | 想一次看全部证据？ | [art-integration-log.md](art-integration-log.md) 的 **第五轮** 一节：逐项改动 + 全部截图 + 自测输出。 |
@@ -34,7 +34,7 @@ Assets/UI/                                   ← 本轮新建（assets.md §1 �
   Textures/tex_ui_header_band.png            192×64   标题带 / 主按钮（蓝色横带那条）
   Textures/tex_ui_bar_frame.png              192×48   分隔条 / 血条边框
   Textures/tex_ui_bar_fill.png                24×24   血条填充（平铺，会跟着代码染色）
-  Textures/tex_ui_crosshair_default.png      148×148  准星
+  Textures/tex_ui_crosshair_dot.png           48×48   准星（一个点；2026-10 改回，原来用的是 Kenney 描边十字）
   Fonts/font_ui_kenney_future.ttf                      HUD 数字字体（Kenney Future, CC0）
   Themes/ui_theme.tres                                 主题（唯一入口）
   Licenses/license_kenney_{ui_pack_scifi,crosshair_pack,fonts}.txt   CC0 原文（照抄进仓库）
@@ -196,15 +196,18 @@ UiDangerButton/styles/normal = SubResource("StyleBoxTexture_danger_normal")
 
 ## 5. 准星
 
-- 文件：`Assets/UI/Textures/tex_ui_crosshair_default.png`（Kenney **Crosshair Pack 1.1**，CC0；200 个里挑的
-  **`PNG/Outline (2×)/crosshair-112.png`**，148×148 —— 白色形状 + 半透明黑描边，**在亮地板和暗天空上都看得见**）。
-- 接在：`Scenes/UI/Hud.tscn` → **`Root/Crosshair`**（`TextureRect`，锚在屏幕中心，`offset ±28` = 56×56，
-  `expand_mode = 1` + `stretch_mode = 5`（保持比例居中），`modulate = (1,1,1,0.9)`）。
-- **替掉了什么**：原来 3 个 `ColorRect`（`CrosshairH` / `CrosshairV` / `CrosshairDot`）拼的 `+`。
-  已确认**全项目没有任何 C# 引用**这三个名字（`grep Crosshair Scripts/**/*.cs` 只命中 `AimUtil.GetCrosshair*` 两个方法名，那是"准星方向"不是节点）。
-- **换一个准星**：从 `_art_staging/extract/kenney_crosshair-pack/PNG/<变体>/crosshair-NNN.png` 里挑一张，
-  覆盖 `tex_ui_crosshair_default.png` 即可（**零改动**）。变体 4 类：`Light` / `Dark` / `Outline` / `Glow`，
-  每类有 1× 和 2×（retina）两套、各 200 张。挑选方法：把 PNG 目录拼成一张带编号的缩略图看（本轮就是这么挑的）。
+> **2026-10 用户改回"一个点"**（需求包 §五 #11：「准星改回一个点」）—— 原来的 Kenney 描边十字 + 圆圈已下线。
+
+- 文件：`Assets/UI/Textures/tex_ui_crosshair_dot.png`（**自带**，非外部素材：48×48 实心白圆点，
+  半径 2.6px + 1.1px 羽化边，四周透明；用 `System.Drawing` 生成，277 字节）。
+- 接在：`Scenes/UI/Hud.tscn` → **`Root/Crosshair`**（`TextureRect`，锚在屏幕中心，`offset ±10` = 20×20，
+  `stretch_mode = 5`（保持比例居中），`modulate = (1,1,1,0.9)`）。
+- **替掉了什么**：`tex_ui_crosshair_default.png`（Kenney Crosshair Pack 1.1 的 `crosshair-112`，148×148，
+  描边十字 + 圆圈）—— 已**整份删除**（含它的 `.import`）。全项目只有 `Hud.tscn` 引过它，删掉是安全的。
+  再往前那 3 个 `ColorRect`（`CrosshairH` / `CrosshairV` / `CrosshairDot`）更早就删了。
+- **换一个准星**：覆盖 `tex_ui_crosshair_dot.png` 即可（**零改动**，按路径引用）。
+  想回到 Kenney 那套就从 `_art_staging/extract/kenney_crosshair-pack/PNG/<变体>/crosshair-NNN.png` 里挑一张
+  （变体 4 类：`Light` / `Dark` / `Outline` / `Glow`，每类 1× 与 2× 各 200 张；挑选方法：把 PNG 目录拼成一张带编号的缩略图看）。
 - **还没做**：准星不随**散布/瞄准**变化（要写 C# 改 `Crosshair` 的 `scale`/`modulate`），也没有"命中反馈"变体。
 
 ---

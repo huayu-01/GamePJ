@@ -5,6 +5,9 @@
 [resource]
 script = ExtResource("1_p6q05")
 Title = "强化池"
+Layer = 1
+WaveCount = 3
+ValueTags = PackedStringArray("tag_mid")
 Id = "node_enhance"
 Slot = 2
 DisplayName = "强化池"

@@ -96,7 +96,8 @@ public partial class SelfTest : Node
 				break;
 
 			case 1 when _timer > 1.5f:
-				GameLog.Write("SelfTest", $"波数映射：进化={StageController.WavesFor(RewardNodeKind.Evolution)}（期望3） 异化={StageController.WavesFor(RewardNodeKind.Mutation)}（期望3） 强化={StageController.WavesFor(RewardNodeKind.Enhancement)}（期望2） 商店={StageController.WavesFor(RewardNodeKind.Shop)}（期望2） 材料={StageController.WavesFor(RewardNodeKind.Resource)}（期望1） 恢复={StageController.WavesFor(RewardNodeKind.Heal)}（期望1） 特殊={StageController.WavesFor(RewardNodeKind.Special)}（期望1）");
+				GameLog.Write("SelfTest", $"波数映射：进化={StageController.WavesFor(RewardNodeKind.Evolution)}（期望4） 异化={StageController.WavesFor(RewardNodeKind.Mutation)}（期望4） 强化={StageController.WavesFor(RewardNodeKind.Enhancement)}（期望3） 商店={StageController.WavesFor(RewardNodeKind.Shop)}（期望3） 材料={StageController.WavesFor(RewardNodeKind.Resource)}（期望1） 恢复={StageController.WavesFor(RewardNodeKind.Heal)}（期望1） 特殊={StageController.WavesFor(RewardNodeKind.Special)}（期望1）");
+				GameLog.Write("SelfTest", $"价值标签表：{SelfTestValueTagSummary()}");
 				ReportNodes(stage);
 				ReportSpacing(stage);
 				ReportTables(stage);
@@ -153,7 +154,10 @@ public partial class SelfTest : Node
 					}
 				}
 
-				GameLog.Write("SelfTest", $"已击杀白板首领，等待结算…");
+				// 白板首领现在有波次门槛（用户需求 #5：只在第 8 波这类高波次出现）。
+				// 自测这场只开了 2 波（DebugStartCombat(2)），所以**这里本来就不该有白板首领**——
+				// 日志如实写出来，免得看日志的人以为"少了一个环节"。
+				GameLog.Write("SelfTest", $"清场（2 波上限）：{stage?.DebugState} —— 白板首领闸门 {(stage?.CurrentNode?.EliteGateOpen == true ? "已开" : "未开")}（本关累计第 {stage?.WavesOpenedInStage} 波 / 门槛 {stage?.CurrentNode?.MinWaveForEliteBoss}，期望未开、本场直接结算）");
 				Next();
 				break;
 
@@ -206,12 +210,239 @@ public partial class SelfTest : Node
 				Next();
 				break;
 
-			case 13:
+			// === 白板首领闸门的**正向**验证（放在最后一段之前做：这一段的运行前提最干净）===
+			// 上面那几场只证明了"门槛没到时不出"；这里把门槛压到 1（= 本场开 1 波就满足）再开一场，
+			// 清空后必须**真的**降临白板首领 —— 否则"跳过"日志也可能来自别的原因，证明不了闸门本身是对的。
+			// ⚠️ 顺序讲究：必须排在"开 Boss 门"之前。开门之后 `CurrentNode` 会指向 Boss 那条 Encounter，
+			// 而且 `OpenBossDoor` 会把普通 Encounter 冻住（StopSpawning）—— 那之后就没法干净地验普通节点了。
+			case 13 when _timer > 0.3f:
+				_eliteProbe = FindRegularEncounter(stage);
+				_currentWaves = stage?.WavesOpenedInStage ?? 0;
+				if (_eliteProbe != null)
+				{
+					_eliteOriginalGate = _eliteProbe.MinWaveForEliteBoss;
+					_eliteOriginalScene = _eliteProbe.EliteBossScene;
+				}
+
+				// 先复位再设门槛：`ResetEncounter()` 清波次状态，顺序反了门槛就白设了。
+				_eliteProbe?.ResetEncounter();
+				if (_eliteProbe != null)
+				{
+					// 门槛压到"本场开 1 波就满足"：Start 之后 WaveIndex=1，累计（0 + 1）刚好够。
+					_eliteProbe.WavesOpenedBefore = 0;
+					_eliteProbe.MinWaveForEliteBoss = 1;
+					_eliteProbe.WaveCount = 1;
+					_eliteProbe.Start();
+				}
+
+				GameLog.Write("SelfTest", $"白板首领闸门·正向：普通 Encounter 找到={_eliteProbe != null} 原门槛={_eliteOriginalGate} 原预制体={(_eliteOriginalScene != null ? "有" : "无")} → 压到 1");
+				Unit? gateProbePlayer = PlayerLocator.Player;
+				GameLog.Write("SelfTest", $"白板首领闸门·正向·诊断：EntryCount={_eliteProbe?.EntryCount} 闸门=[{_eliteProbe?.EliteGateDetail}]（此时本场 WaveIndex 还是 0，所以「已开」要等第一波开出来才成立）树暂停={GetTree().Paused} 玩家={(gateProbePlayer == null ? "找不到" : $"存活={!gateProbePlayer.IsDead} 生命={gateProbePlayer.Health:0}")}");
+				Next();
+				break;
+
+			case 14 when _timer > 1.5f:
+				foreach (string group in new[] { "enemy_units", "boss_units" })
+				{
+					foreach (Node node in GetTree().GetNodesInGroup(group))
+					{
+						if (node is Unit unit)
+						{
+							unit.ApplyDirectDamage(99999f, null);
+						}
+					}
+				}
+
+				GameLog.Write("SelfTest", $"白板首领闸门·正向：清场那一刻 waveIndex={_eliteProbe?.WaveIndex} alive={_eliteProbe?.AliveCount} spawned={_eliteProbe?.TotalSpawned} 白板首领={_eliteProbe?.EliteBossSpawned}");
+				Next();
+				break;
+
+			case 15 when _timer > 1.5f:
+				// 白板首领必须真的在场，而且是"白板"：血量按首领行的 EliteCopyHealthScale = 0.35 弱化。
+				Unit? elite = null;
+				foreach (Node node in GetTree().GetNodesInGroup("boss_units"))
+				{
+					if (node is Unit unit && IsInstanceValid(unit))
+					{
+						elite = unit;
+						break;
+					}
+				}
+
+				GameLog.Write("SelfTest", $"🔴 白板首领闸门·正向：本场第 {_eliteProbe?.WaveIndex} 波后降临={_eliteProbe?.EliteBossSpawned}（期望 True）场上存活={_eliteProbe?.AliveCount}（期望 1）");
+				GameLog.Write("SelfTest", elite == null
+					? "🔴 白板首领闸门·正向：boss_units 组里找不到它（期望找到一个）"
+					: $"🔴 白板首领实例：生命 {elite.MaxHealth:0.#}（首领行 900 × 0.35 = 315，期望 315）护甲 {elite.Armor:0.#}（期望 0）标签 [{string.Join(",", elite.Tags)}]");
+				Next();
+				break;
+
+			case 16 when _timer > 0.5f:
+				// 打死白板首领 → 本场才算清场；同时把被临时改过的门槛与预制体还原。
+				foreach (string group in new[] { "enemy_units", "boss_units" })
+				{
+					foreach (Node node in GetTree().GetNodesInGroup(group))
+					{
+						if (node is Unit unit)
+						{
+							unit.ApplyDirectDamage(99999f, null);
+						}
+					}
+				}
+
+				if (_eliteProbe != null)
+				{
+					_eliteProbe.MinWaveForEliteBoss = _eliteOriginalGate;
+					_eliteProbe.EliteBossScene = _eliteOriginalScene;
+				}
+
+				GameLog.Write("SelfTest", $"白板首领闸门·还原：门槛回到 {_eliteProbe?.MinWaveForEliteBoss}（自测的临时改动不该留在正式流程里）");
+				Next();
+				break;
+
+			case 17 when _timer > 1.5f:
+				GameLog.Write("SelfTest", $"白板首领结算后：本关累计第 {stage?.WavesOpenedInStage} 波（进这一段时是 {_currentWaves}，期望 +1）状态=[{stage?.DebugState}]");
+				Next();
+				break;
+
+			// === 用户 bug #12：直接开门打 Boss → 打完卡在「挑战者状态」、进不了降临节点 ===
+			// 复现步骤就是玩家做的三步：① 开 Boss 门 ② 打死 Boss ③ 想进降临节点。
+			// 这里的硬指标：第 ② 步之后 ChallengerActive 必须是 false（原来它一直是 true，
+			// 因为 IsVictory 只有"互动降临节点"才会翻，于是降临节点的交互被自己的挑战者闸门拒掉 —— 死锁）。
+			case 18 when _timer > 0.3f:
+				bool opened = stage?.OpenBossDoor() ?? false;
+				_bossProbe = stage?.CurrentNode;
+				GameLog.Write("SelfTest", $"Boss 门：打开={opened} 状态=[{stage?.DebugState}] 挑战者状态={stage?.ChallengerStateNow}（期望 True：Boss 还活着）");
+				Next();
+				break;
+
+			case 19 when _timer > 0.2f:
+				// ⚠️ **先把玩家挪远**：Boss 与护卫是"在玩家附近"生成的（`BossSpawnDistance`），
+				// 而满压 Boss 的攻速可能到 ×2 以上、2~3 个技能精英护卫也在打 —— 站在它脸上必被秒
+				// （跑过好几次都是这么废掉的：玩家一死整局结束，后面的阶段全废，最后连降临节点都没生成）。
+				if (PlayerLocator.Player is { } mover)
+				{
+					mover.GlobalPosition = SelfTestAwaySpot;
+				}
+				GameLog.Write("SelfTest", $"Boss 已出生={_bossProbe?.BossActive} 挑战者状态={stage?.ChallengerStateNow}（期望 True）玩家已挪到远处 {SelfTestAwaySpot}（避免被 Boss 秒掉，那与要验的挑战者状态无关）");
+				Next();
+				break;
+
+			case 20 when _timer > 2.5f:
+				// 每帧打一次直到 Boss 阵亡：生成延迟与 AI 出手的相对顺序不确定，只打一帧会漏。
+				foreach (string group in new[] { "enemy_units", "boss_units" })
+				{
+					foreach (Node node in GetTree().GetNodesInGroup(group))
+					{
+						if (node is Unit unit)
+						{
+							unit.ApplyDirectDamage(999999f, null);
+						}
+					}
+				}
+
+				_bossKilled = _bossProbe?.Boss is { IsDead: true };
+				if (_bossKilled)
+				{
+					Next();
+				}
+
+				break;
+
+			case 21 when _timer > 2.0f:
+				GameLog.Write("SelfTest", $"🔴 Boss 阵亡 → 挑战者状态={stage?.ChallengerStateNow}（期望 False，这就是 bug #12 的修复点） 已通关={stage?.IsVictory}（期望 False） 玩家存活={PlayerLocator.Player is { IsDead: false }}");
+				Next();
+				break;
+
+			case 22 when _timer > 1.5f:
+				// 降临节点落地后必须真的**能被互动**：直接调 StageController.RequestRewardNode
+				// （这就是 Interactable.Interact 里挑战者闸门之后的同一条路径），成功就说明卡住的问题没了。
+				// ⚠️ 这里不看 CanInteract —— 它额外要求"玩家在交互半径内"，而自测的玩家没走过去；
+				// 被挑战者闸门拒掉时会返回 false，所以 accepted 这一个量就足以判定修复。
+				RewardNode? portal = FindPortal(stage);
+				GameLog.Write("SelfTest", $"降临节点：找到={portal != null} 提示=[{portal?.CurrentPrompt}] 玩家在范围内={portal?.PlayerInRange}（自测没走过去，不影响结论）");
+
+				// ⚠️ 三个量都要在**这一行之内**读走再打日志：
+				// ① 被挑战者闸门拒掉时 RequestRewardNode 会返回 false；
+				// ② 成功时 `IsVictory = true` + `Victory` 事件 → RunController 立刻切到下一关，
+				//    而**下一关**的 `ApplyStage` 会把 `IsVictory` 复位成 false（原来"接受=True 已通关=False"
+				//    的怪现象就是这么来的）；③ 关卡号 +1 才是"真的进关了"的旁证。
+				int stageBefore = stage?.StageNumber ?? -1;
+				int challengesBefore = stage?.ChallengesUsed ?? -1;
+				bool entered = portal != null && (stage?.RequestRewardNode(portal) ?? false);
+				bool victory = stage?.IsVictory ?? false;
+				bool challenger = stage?.ChallengerStateNow ?? false;
+				int stageAfter = stage?.StageNumber ?? -1;
+				GameLog.Write("SelfTest", $"🔴 互动降临节点：接受={entered}（期望 True）→ 本关通关={victory}（切关后会被下一关复位，所以这里只看它当场为 True：{victory || stageAfter > stageBefore}）关卡 {stageBefore}→{stageAfter}（期望 +1）已挑战 {challengesBefore}→{stage?.ChallengesUsed} 挑战者状态={challenger}（期望 False）");
+				Next();
+				break;
+
+			case 23:
 				GameLog.Write("SelfTest", "=== 自测结束 ===");
+
+				// ⚠️ 退出前先解除暂停：这一阶段之前刚切过一关，`UiRouter` 正把树暂停着
+				// （正式流程里玩家按 Enter 才会继续）。进程留着不退会让下一轮的日志文件混在一起。
+				GetTree().Paused = false;
 				SetProcess(false);
 				GetTree().Quit();
 				break;
 		}
+	}
+
+	/// <summary>白板首领闸门正向验证（阶段 13–17）盯着的普通 Encounter、它被临时改过的东西，以及进这一段时的累计波数。</summary>
+	private EncounterController? _eliteProbe;
+	private int _eliteOriginalGate;
+	private PackedScene? _eliteOriginalScene;
+	private int _currentWaves;
+
+	/// <summary>Boss 门那一段（阶段 18–22）盯着的就是 Boss 战那条 Encounter。</summary>
+	private EncounterController? _bossProbe;
+
+	/// <summary>诊断用：Boss 是否已经被自测打死（阶段 20 每帧检查，打死了才推进到下一阶段）。</summary>
+	private bool _bossKilled;
+
+	/// <summary>Boss 战那一段把玩家挪到这里的远处（Boss 与护卫是"在玩家附近"生成的，站脸上会被秒）。</summary>
+	private static readonly Vector3 SelfTestAwaySpot = new(18f, 0.8f, 18f);
+
+	/// <summary>
+	/// 找**普通节点**那条 Encounter（`Main.tscn` 的 <c>Stage/Combat</c>）——
+	/// 也就是挂了白板首领预制体的那一条。Boss 战那条（<c>Stage/BossFight</c>）不算：
+	/// 它没有 <c>EliteBossScene</c>，闸门永远判不开（自测第一次跑就踩到这个）。
+	/// </summary>
+	private static EncounterController? FindRegularEncounter(StageController? stage)
+	{
+		if (stage == null)
+		{
+			return null;
+		}
+
+		foreach (Node child in stage.GetChildren())
+		{
+			if (child is EncounterController { IsBossNode: false, EliteBossScene: not null } regular)
+			{
+				return regular;
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>找 Boss 死后降临的那个节点（`Kind = Portal`，由 StageController 动态实例化）。</summary>
+	private static RewardNode? FindPortal(StageController? stage)
+	{
+		if (stage == null)
+		{
+			return null;
+		}
+
+		foreach (Node child in stage.GetChildren())
+		{
+			if (child is RewardNode { Kind: RewardNodeKind.Portal } portal)
+			{
+				return portal;
+			}
+		}
+
+		return null;
 	}
 
 	/// <summary>把玩家传送到指定类型节点旁边（用于端到端交互测试）。</summary>
@@ -267,6 +498,33 @@ public partial class SelfTest : Node
 		bool accepted = stage?.DebugTriggerNode(RewardNodeKind.Evolution) ?? false;
 		int depth = UiRouter.Instance?.StackDepth ?? -1;
 		GameLog.Write("SelfTest", $"交互 #{round}：接受={accepted} Paused={GetTree().Paused} 界面栈深={depth} 状态=[{stage?.DebugState}]");
+	}
+
+	/// <summary>
+	/// 价值标签表的只读汇总：每一行标签的波数 + "节点类型 → 实际波数"（用户需求 #7 的硬指标留痕）。
+	///
+	/// 这张表是**节点开几波的驱动者**（取代原来按 <see cref="RewardNodeKind"/> 枚举硬编码的 3/2/1）：
+	/// 所以这里必须同时打出"标签定了几波"与"节点实际算出几波"，只打一个都证明不了链路是通的。
+	/// </summary>
+	private static string SelfTestValueTagSummary()
+	{
+		var tags = new List<string>();
+		foreach (string id in ConfigRows.Ids<ValueTagConfig>())
+		{
+			if (ConfigRows.ById<ValueTagConfig>(id) is { } row)
+			{
+				tags.Add($"{row.Id}={row.WaveCount}波");
+			}
+		}
+
+		tags.Sort(System.StringComparer.Ordinal);
+		var nodes = new List<string>();
+		foreach (RewardNodeKind kind in System.Enum.GetValues<RewardNodeKind>())
+		{
+			nodes.Add($"{kind}={StageController.WavesFor(kind)}");
+		}
+
+		return $"标签 [{string.Join(" ", tags)}]（期望 tag_high=4 tag_low=1 tag_mid=3）→ 节点 [{string.Join(" ", nodes)}]（期望 Evolution=4 Mutation=4 Weapon=3 Enhancement=3 Shop=3 Resource=1 Heal=1 Special=1 Portal=1）";
 	}
 
 	private void Next()
@@ -528,7 +786,23 @@ public partial class SelfTest : Node
 			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}（期望 3/3/10/1/1/25/7/9/9/5/3/11）");
 
 		GameLog.Write("SelfTest",
-			$"配置表比对·节点表：进化层 {NodePlacement.LayerOf(RewardNodeKind.Evolution)}/波 {NodePlacement.WavesFor(RewardNodeKind.Evolution)}（期望 2/3） 强化层 {NodePlacement.LayerOf(RewardNodeKind.Enhancement)}/波 {NodePlacement.WavesFor(RewardNodeKind.Enhancement)}（期望 1/2） 恢复层 {NodePlacement.LayerOf(RewardNodeKind.Heal)}/波 {NodePlacement.WavesFor(RewardNodeKind.Heal)}（期望 0/1） 商店价目 {RewardService.ShopCost(0)}/{RewardService.ShopCost(1)}/{RewardService.ShopCost(2)}（期望 5/12/18） 标题 {RewardService.TitleFor(RewardNodeKind.Mutation)}（期望 异化池）");
+			$"配置表比对·节点表：进化层 {NodePlacement.LayerOf(RewardNodeKind.Evolution)}/波 {NodePlacement.WavesFor(RewardNodeKind.Evolution)}（期望 2/4） 强化层 {NodePlacement.LayerOf(RewardNodeKind.Enhancement)}/波 {NodePlacement.WavesFor(RewardNodeKind.Enhancement)}（期望 1/3） 恢复层 {NodePlacement.LayerOf(RewardNodeKind.Heal)}/波 {NodePlacement.WavesFor(RewardNodeKind.Heal)}（期望 0/1） 商店价目 {RewardService.ShopCost(0)}/{RewardService.ShopCost(1)}/{RewardService.ShopCost(2)}（期望 5/12/18） 标题 {RewardService.TitleFor(RewardNodeKind.Mutation)}（期望 异化池）");
+
+		// 节点波数的**来源**必须能一眼看出来（"高 4 / 中 3 / 低 1 是标签算出来的、不是代码写死的"）。
+		GameLog.Write("SelfTest", $"配置表比对·价值标签：{SelfTestValueTagSummary()}");
+
+		// 跳跃（需求 #2）：角色行的两列 → 组件上的实际值。
+		// ⚠️ 期望的**落点**是 7.69 m/s（场景 6.5 × √1.4）与空中加速 30 / 最大下落 120（各 ×2）——
+		// 只在"表读到了"时成立；表读不到时组件保留 6.5，这一行会明显不同（回退路径也必须看得出来）。
+		if (player?.Movement is { } movement)
+		{
+			GameLog.Write("SelfTest",
+				$"配置表比对·跳跃：起跳速度 {movement.JumpVelocity:0.##}（期望 7.69 = 场景 6.5 × √1.4）空中加速 {movement.AirAcceleration:0.#}（期望 30）最大下落 {movement.MaxFallSpeed:0.#}（期望 120）重力缩放 {movement.GravityScale:0.##}（期望 1.8，没动过）");
+		}
+		else
+		{
+			GameLog.Write("SelfTest", "配置表比对·跳跃：拿不到玩家的 CharacterMovement（期望能拿到）");
+		}
 
 		ActRoguelike.Combat.StatusEffect? burn = ActRoguelike.Combat.StatusPresets.Create("Burn", 3f);
 		ActRoguelike.Combat.StatusEffect? slow = ActRoguelike.Combat.StatusPresets.Create("Slow", 3f);

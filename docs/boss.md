@@ -180,6 +180,66 @@ Boss 出生：套用本关 Pressure 数值强化 3 条 [疾行、铁壁·生命�
 Encounter 完成（预算耗尽且场上清空）→ 延迟数秒在玩家前方出场 Boss 与护卫，发出 `BossSpawned`。
 `SpawnBossNow()` 是公开接口，阶段 7 的 Node 流程可以直接调用。
 
+## 白板首领副本（需求包 #5：**只在第 8 波出现**，2026-10）
+
+「白板首领副本」是**普通节点 Encounter** 末尾那个无压力、无词条、无开场技能的弱化首领
+（`EliteBossScene`，血量 ×0.35 —— 独立于 Boss Door 的最终首领）。它现在**不再每场都出**：
+
+| 项目 | 值 |
+|---|---|
+| 门槛 | 关卡表 `EliteBossMinWave`（三关都是 **8**）→ `EncounterController.MinWaveForEliteBoss`；**留 0 = 闸门关掉** |
+| 判定的量 | **本关累计波数** = `WavesOpenedBefore`（本场之前开过的波数）+ 本场 `WaveIndex` |
+| 为什么按"本关累计" | 一场 Encounter 的波数只有 1～4（低 1 / 中 3 / 高 4），按单场算门槛取 8 **永远到不了** —— 会从"每场都出"变成"永远不出" |
+| 门槛没过时 | 本场照常正常结算，累计波数在下一场继续长 |
+| 累计复位 | 每关清零（`StageController.ResetStage()`），每次开战前重新写入 |
+
+实测（同一轮自测里两种分支都跑到了）：
+
+```
+白板首领跳过：本关累计才第 1 波（门槛 8），本场直接结算
+白板首领跳过：本关累计才第 3 波（门槛 8），本场直接结算
+常规波已清空 → 进入白板首领副本（本关累计第 1 波，门槛 1）     ← 自测把门槛临时压到 1 做正向验证
+白板首领降临（血量倍率 0.35（来源：表 boss_final），无压力 / 无词条 / 本关累计第 1 波）
+```
+
+> 🐛 **顺带修掉一个真 bug**：`SpawnEliteBossNow()` 里原来手写了一句 `AliveCount++`。
+> `AliveCount` 是 `_spawned` 的缓存、只在 `PruneSpawned()` 里重算 —— 同帧多写一次，下一帧就被算回真实值，
+> 于是 `CheckCompleted()` 开头的 `if (AliveCount > 0) return;` 会让**"白板首领被打死之后本场永远结算不了"**。
+> 现在改成生成后直接 `PruneSpawned()`。详细说明见 [config.md](config.md) 的「白板首领副本」一节。
+
+## 打 Boss 之后的「挑战者状态」（需求包 #12，真 bug，2026-10）
+
+**症状**：直接开门打 Boss → 打完进不了下一关，提示"还在挑战中"。
+
+**根因**：`StageController.ChallengerActive` 原来的式子是 `_encounterRunning || (_bossFight && !IsVictory)`，
+而 `IsVictory` **只有互动降临节点那一下才会变 true**：
+
+```
+开 Boss 门 → _bossFight = true
+Boss 阵亡  → _bossCleared = true（但 _bossFight 仍 true、IsVictory 仍 false）
+           → ChallengerActive 仍 true → 脚下「挑战中」标记一直亮
+           → 按 F 想进降临节点被 Interactable 的挑战者闸门拒掉
+           → 而 IsVictory 只能靠这次交互翻 → 死锁
+```
+
+**修法**：`ChallengerActive` 把 `_bossCleared` 也算成"这一战结束了"：
+
+```csharp
+!IsVictory && (_encounterRunning
+    || (_bossFight && !_bossCleared && _bossEncounter?.Boss is { } boss && !boss.IsDead))
+```
+
+语义上 **Boss 战从来不是节点挑战**（它和 `_encounterRunning` 是两条线），只有"还有 Boss 活着"期间才算挑战中。
+
+**实测（自测阶段 18–22，就是用户那三步）**：
+
+```
+Boss 门：打开=True … 挑战者状态=True（期望 True：Boss 还活着）
+🔴 Boss 阵亡 → 挑战者状态=False（期望 False，这就是 bug #12 的修复点） 已通关=False（期望 False）
+降临节点：找到=True 提示=[按 F 使用：前往下一关]
+🔴 互动降临节点：接受=True（期望 True）→ 本关通关=True 关卡 1→2（期望 +1）挑战者状态=False（期望 False）
+```
+
 ## 实测补充（脚本挂载问题修复后）
 
 | 检查项 | 结果 |
