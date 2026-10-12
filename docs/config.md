@@ -152,6 +152,11 @@
 顺带说明**两列本来就有、可以直接写中文**的地方：`ConfigRow.Note` / `DescriptionTemplate`
 （都是 `PropertyHint.MultilineText`，一行一条中文备注；`DescriptionTemplate` 还支持 `{字段名}` 占位符，见 `ConfigText`）。
 
+> ✅ **`{字段名:格式}` 也支持了（2026-10 修）**：`{MaxHealth:0}` / `{FireInterval:0.00}` / `{PerLevel:0}` 里的格式串会交给
+> .NET 数字格式化（**只对数字字段生效**，字符串/布尔字段忽略冒号后的部分；格式串写错退回默认写法、不报警告）。
+> 在此之前它是**静默失效**的：整段 `MaxHealth:0` 被当字段名 → 玩家界面上原样打出 `{MaxHealth:0}` + 一条 WARNING。
+> 细节与证据见 [config-schema.md](config-schema.md) §4.4.1。
+
 ## 各表参数（当前取值）
 
 ### 角色表 `Config/Tables/Characters/`（3 行）

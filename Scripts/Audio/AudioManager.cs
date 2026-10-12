@@ -97,7 +97,15 @@ public partial class AudioManager : Node
 
 		_music = NewVoice("MusicVoice", _musicBus);
 
+		// 一首放完的通知（OGG 的 Import 里 loop=false 才有）—— 曲库轮播靠它，见 MusicDirector。
+		_music.Finished += OnMusicFinished;
+
 		LoadTable();
+
+		// **状态音乐**（需求包 §五 #14）：按"关卡当前是什么状态"切两套 BGM 曲库。
+		// 这里 new 出来当子节点，而不是加进 project.godot 的 autoload —— 本批改动边界不允许动 project.godot，
+		// 而且它本来就该跟着 AudioManager 的生命周期走（ProcessMode=Always 也一样继承）。
+		AddChild(new MusicDirector { Name = "MusicDirector" });
 
 		// 敌人死亡：走既有的事件总线，**不碰任何玩法代码**（`Unit.ReceiveHit` 的伤害管线一行没改）。
 		GameplayEventBus.Raised += OnGameplayEvent;
@@ -147,6 +155,16 @@ public partial class AudioManager : Node
 
 	/// <summary>停掉当前音乐（音效不受影响）。</summary>
 	public static void StopMusic() => Instance?._music?.Stop();
+
+	/// <summary>一首音乐**自然播完**时触发（<see cref="MusicDirector"/> 的曲库轮播用它）。</summary>
+	/// <remarks><c>Stop()</c> 不会触发它 —— 只有放到结尾才会。</remarks>
+	public event System.Action? MusicEnded;
+
+	/// <summary>
+	/// 音乐声部（<b>只给同层的 <see cref="MusicDirector"/> 做淡入淡出用</b>；要播音乐一律走
+	/// <see cref="PlayMusic"/>，别直接拿它 <c>Play()</c> —— 那样会绕过表、日志与计数）。
+	/// </summary>
+	internal AudioStreamPlayer? MusicVoice => _music;
 
 	// ─────────────────────────────────────────────────────────────────────────
 	// 内部实现
@@ -332,6 +350,9 @@ public partial class AudioManager : Node
 	}
 
 	private void OnButtonPressed() => PlayUi(AudioIds.UiClick);
+
+	/// <summary>音乐声部放到结尾 → 转通知（曲库轮播）。</summary>
+	private void OnMusicFinished() => MusicEnded?.Invoke();
 
 #if DEBUG
 	/// <summary>自测取证用（Release 构建里不存在）：本局成功播放的次数。</summary>

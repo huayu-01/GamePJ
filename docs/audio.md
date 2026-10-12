@@ -80,7 +80,7 @@ Inspector 里它也是**类型过滤过的资源选择器**。
 > 只要引用的**任何一个**行文件缺失/改名，Godot 会**整份 `Balance.tres` 加载失败**，于是**所有**数值静默回到代码默认值。
 > 要下线一行，就把 `Balance.tres` 里的数组项与顶部对应的 `[ext_resource]` **一起**删。
 
-**当前 5 行**（就是本次接好的示范）：
+**当前 13 行**（5 条示范 + 4 条能力卡音效 + **4 条 BGM**）：
 
 | 行文件 | Id | 总线 | 文件 | 触发点 |
 |---|---|---|---|---|
@@ -89,8 +89,12 @@ Inspector 里它也是**类型过滤过的资源选择器**。
 | `audio_sfx_enemy_die.tres` | `sfx_enemy_die` | SFX | `Assets/Audio/sfx/sfx_enemy_die.ogg` | `GameplayEventBus` 的 `Died`（`Faction.Enemy`） |
 | `audio_ui_click.tres` | `ui_click` | UI | `Assets/Audio/ui/ui_click.ogg` | 所有 `BaseButton.Pressed`（运行期自动挂） |
 | `audio_ui_open.tres` | `ui_open` | UI | `Assets/Audio/ui/ui_open.ogg` | `OverlayScreen.BeginOpen` |
+| `audio_ui_card_unlock/upgrade/fail/reset.tres` | `ui_card_*` | UI | `Assets/Audio/ui/ui_card_*.wav` | 能力卡矩阵的 4 个操作（第六轮加的，见 [ability-cards.md](ability-cards.md)） |
+| `audio_music_level_01/02.tres` | `music_level_01/02` | **Music** | `Assets/Audio/music/music_level_*.ogg` | `MusicDirector`：**关卡默认曲库**（§九） |
+| `audio_music_challenge_01/02.tres` | `music_challenge_01/02` | **Music** | `Assets/Audio/music/music_challenge_*.ogg` | `MusicDirector`：**挑战中曲库**（§九） |
 
-素材全是 **Kenney CC0**（Sci-fi Sounds / Impact Sounds / Interface Sounds），来源对照见 `Assets/Audio/SOURCES.txt`。
+素材：前 5 条是 **Kenney CC0**（Sci-fi Sounds / Impact Sounds / Interface Sounds），来源对照见 `Assets/Audio/SOURCES.txt`；
+`ui_card_*` 是项目自制波形；4 条 BGM 来自 **AlkaKrab Music《10 Ambient RPG Tracks》**（素材包与许可见 `Assets/Audio/SOURCES.txt`）。
 
 ---
 
@@ -105,6 +109,9 @@ Inspector 里它也是**类型过滤过的资源选择器**。
 | `bool AudioManager.PlayMusic(string id)` | 播**音乐**（表里这一行的 `Bus` 应为 `Music`）；单声部，后一首顶掉前一首 |
 | `bool AudioManager.Play(string id)` | 唯一实现：查表 → 按行的 `Bus` 选总线与声部池 |
 | `void AudioManager.StopMusic()` | 停当前音乐（音效不受影响） |
+| `AudioManager.MusicEnded`（事件） | 一首音乐**自然播完**时触发（`Stop()` 不触发）—— 曲库轮播用它 |
+| `AudioManager.MusicVoice`（只读，`internal`） | 音乐声部本体，**只给 `MusicDirector` 做淡入淡出**；要播音乐一律走 `PlayMusic` |
+| `MusicDirector`（`AudioManager` 的子节点，自动创建） | **状态音乐**：两套 BGM 曲库 + 挑战切换（§九），零 C# 配置 |
 | `AudioIds.*` | 代码里用到的 id 常量（`AudioIds.WeaponFire` …）；**不是第二份真源**，写错会被 warning 抓出来 |
 
 > `PlaySfx` / `PlayUi` 只是**让调用点读起来更清楚的别名** —— 真正决定走哪条总线的是**表行的 `Bus` 列**，
@@ -123,7 +130,8 @@ Inspector 里它也是**类型过滤过的资源选择器**。
 2. **回退语义**：表读不到 / id 不存在 / `Stream` 为空 / 总线不存在 → **静默不播**（玩法绝不受影响），
    但每个 id **只写一次** warning（`GD.PushWarning` + 日志分类 `Audio`），不会刷屏、也不会"以为接好了其实没声音"。
 3. **日志三条线**（这是"音频没法用截图验证"的答案）：
-   - 启动一行：`配置表：音效 5（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、…`
+   - 启动一行：`配置表：音效 N（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、…`
+     （**N = 表里几行**；2026-10 第七轮起是 **13** —— 5 示范 + 4 能力卡 + 4 BGM，加音频行这个数字就会变，属于预期）
    - **每个 id 第一次真的播出来时一行**：`首次播放「sfx_weapon_fire」→ 总线 SFX / res://Assets/Audio/sfx/sfx_weapon_fire.ogg`
    - 退出时一行合计：`音效统计：共 30 次 —— ui_open×2、sfx_combat_hit×20、sfx_weapon_fire×1、sfx_enemy_die×7（缺失 id 0 个）`
 
@@ -198,6 +206,9 @@ AudioManager.PlaySfx("sfx_weapon_reload");   // ← 就这一行
 
 音频**没法用截图验证**。本项目的做法是**三条日志线 + 只读计数器**：
 
+> ⚠️ 下面 §六 / §七 的样例是**当初 5 行音效时**抓的（数字是当时的真实值，没有改写）；
+> **现在表里 13 行**，最新一轮的完整证据在 **§九**。
+
 1. **启动**（证明表和总线都到位）：
    ```
    [Audio] 配置表：音效 5（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；
@@ -267,7 +278,84 @@ deferred 上下文创建 ProgressDialog 报错，与本次改动无关）。所�
 | 项 | 现状 | 要做的话 |
 |---|---|---|
 | **没有 3D 定位音** | 全部是 2D（`AudioStreamPlayer`），没有距离衰减/声道定位 | 加一条 `PlaySfxAt(id, position)` + 一组 `AudioStreamPlayer3D` 声部；**表结构不用动**（`Bus` 已经分流） |
-| **没有音乐素材** | `Music` 总线与 `PlayMusic(id)` 都在，但**表里 0 行 `Bus = Music`** | 放一个 `.ogg` + 加一行（`Loop` 在那个 `.ogg` 的 **Import 设置**里勾，不是表里的列） |
+| **音乐素材已接（2026-10 第七轮）** | ✅ `Music` 总线 + `PlayMusic` + **两套曲库**（关卡默认 / 挑战中）都在用，见 §九 | 想换曲子：把 `.ogg` 放进 `Assets/Audio/music/`（命名 `music_level_0X` / `music_challenge_0X`）+ 加一行表 + 挂进 `Balance.tres`，**零 C#** |
 | **没有音量设置界面** | ✅ **2026-10 第六轮已做**：全屏设置菜单（`SettingsScreen`，快捷键 O）的**音量**页循环 `AudioServer.BusCount` 逐条总线给滑条 + 静音，落 `user://settings.cfg`，启动时由 `UiRouter._Ready → SettingsStore.ApplyOnStartup()` 套用。见 [ui.md](ui.md) §12 | 想加"按类别"的音量曲线就在 `AudioSettingsSection` 里加一行 |
 | **音效表没有"变体数组"** | 一条 id = 一个文件（靠 `PitchRandom` 制造变化） | 要轮播多个变体就加一列 `Variants`（`AudioStream[]`），`AudioManager` 里按顺序取 |
 | **`ui_click` 是"全按钮一个音"** | 所有 `BaseButton.Pressed` 共用 `ui_click` | 想按按钮分类就加一个 `Button` 的 meta/组约定，或在 `OverlayScreen` 子类里覆盖 |
+
+---
+
+## 九、状态音乐（BGM 曲库与挑战切换，2026-10 第七轮）
+
+> 用户原话（需求包 §五 #14）：「**状态音乐**，先随便搞点来占位，**关卡有默认 bgm 曲库**，**开启挑战时切换挑战时 bgm 曲库**」。
+
+### 两套曲库怎么定义（**约定优于配置：只看 id 前缀**）
+
+| 曲库 | 判据 | 现在有几首 | `MusicDirector` 什么时候用 |
+|---|---|---|---|
+| **关卡默认** | 音效表里 `Id` 以 **`music_level_`** 开头的行 | 2（`music_level_01/02`） | `StageController.Instance != null`（**在关卡里**）且**不在挑战中** |
+| **挑战中** | `Id` 以 **`music_challenge_`** 开头 | 2（`music_challenge_01/02`） | `StageController.ChallengerActive == true` |
+
+- **表内顺序 = 轮播顺序**：一首放完（`AudioStreamPlayer.Finished` → `AudioManager.MusicEnded`）就播同一曲库的下一首，到末尾回到第一首。
+- **两套曲库各自记住播到第几首**：挑战开始 / 结束来回切时，不会每次都从第 1 首重放。
+- **状态判据直接借 `StageController.ChallengerActive`**（与 `Interactable` 的"挑战中拒绝交互"闸门**同一个判据**）：
+  它 = `!IsVictory && (节点挑战进行中 || Boss 还活着)`，所以**节点挑战和 Boss 战都会切挑战 BGM**，
+  Boss 被打死的那一刻立刻切回关卡曲库（Boss 战不是节点挑战，语义见 `StageController.cs:47-64`）。
+- **没有为它加任何新状态 / 新信号**：`ChallengerActive` 是派生属性、流程层没有对应信号，
+  而本批改动边界只允许动 `Scripts/Audio/**` → `MusicDirector` 每帧读一个 bool（成本可忽略），
+  不在战斗 / 流程代码里插钩子。
+- **基地里没有 BGM**（`StageController.Instance == null` → 淡出停播）；关卡结束回基地时音乐淡出。
+  **这是刻意的**（"关卡有默认 bgm 曲库"，基地曲库还没有需求）。
+
+### 为什么不爆音（1 个声部的现实）
+
+`Music` 总线只有 **1 个声部**（后一首顶掉前一首）：直接 `Stop()` 一个正在响的音频会在波形中途切断 → **爆音**。
+所以切换路径是「**0.35s 淡出 → Stop → 播新的一首 → 0.35s 淡入**」（淡出终点 -60dB，淡入到**表行里的 `VolumeDb`**，
+音量仍然只由表决定，代码里不写死音量）。曲库内部轮播（上一首自然放完）不需要淡出，只有"换曲库/进离关卡"才淡。
+
+### 加一首曲子要做什么（**零 C#**，与加音效同一条纪律）
+
+1. 把 `.ogg` 放进 `Assets/Audio/music/`，命名 `music_level_03.ogg` / `music_challenge_03.ogg`
+   （**前缀决定它进哪套曲库**，序号只影响轮播顺序）。
+2. 在 `Config/Tables/Audio/` 加一行 `.tres`（照抄 `audio_music_level_01.tres`）：`Id` 同文件名、`Stream` 拖进来、**`Bus = 2`（Music）**、
+   `VolumeDb ≈ -10`、`PitchRandom = 0`（音乐不要音高抖动）。
+3. 把它挂进 `Config/Balance.tres` 的 `Audio` 数组（`[ext_resource]` + 数组项 + `load_steps` +1）。
+4. `MusicDirector` 是**自动创建**的（`AudioManager._Ready` 里 `AddChild(new MusicDirector …)`）—— **不需要动 `project.godot` 的 autoload 表**。
+
+> ⚠️ **`.ogg` 的 Import 里 `loop` 必须是 false（默认就是）**：曲库轮播靠"播完"这件事（`Finished` 信号），
+> 勾了 Loop 就永远播不完，一首曲子会一直响下去（`MusicDirector` 只在切曲库时换歌）。
+
+### 怎么在没有声音的情况下证明它真的切了
+
+三条日志线（音频无法截图，本项目的既有做法）：
+
+```
+[Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[Audio] 首次播放「music_level_01」→ 总线 Music / res://Assets/Audio/music/music_level_01.ogg      ← AudioManager 那三条线里的"首次播放"
+[Audio] 音乐：切到挑战曲库「music_challenge_01」（1/2 首）                                          ← 状态切换留痕
+```
+
+`MusicDirector` 还暴露了 `#if DEBUG` 只读值：`DebugCurrentMusic`（当前在播的 id）/ `DebugLibrary`（关卡 / 挑战）/ `DebugLibraries`（两套曲库内容）。
+
+### 本轮实测证据（`run_20261012_200351.log`，一整轮自测，0 条 ERROR / Exception）
+
+```
+[Audio] 配置表：音效 13（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；…、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)
+[Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[Audio] 音乐：切到关卡曲库「music_level_01」（1/2 首）        ← 进关（StageController 出现）
+[Audio] 首次播放「music_level_01」→ 总线 Music / res://Assets/Audio/music/music_level_01.ogg
+[Audio] 音乐：切到挑战曲库「music_challenge_01」（1/2 首）    ← 开启挑战（ChallengerActive=false→true）
+[Audio] 首次播放「music_challenge_01」→ 总线 Music / …/music_challenge_01.ogg
+[Audio] 音乐：切到关卡曲库「music_level_02」（2/2 首）        ← 挑战结束（回到关卡曲库，且轮播游标停在第 2 首）
+[Audio] 首次播放「music_level_02」→ 总线 Music / …/music_level_02.ogg
+[Audio] 音乐：切到挑战曲库「music_challenge_02」（2/2 首）    ← Boss 战
+[Audio] 音乐：切到关卡曲库「music_level_01」（1/2 首）        ← Boss 阵亡，挑战者状态解除
+[Audio] 音乐：切到挑战曲库「music_challenge_01」（1/2 首）    ← 第 2 关的节点挑战
+[Audio] 音效统计：共 46 次 —— music_level_01×2、ui_open×3、music_challenge_01×2、sfx_combat_hit×18、sfx_weapon_fire×1、sfx_enemy_die×17、music_level_02×2、music_challenge_02×1（缺失 id 0 个）
+```
+
+退出合计里的 7 次音乐播放**与 7 条"切到…曲库"日志逐条对得上**（没有多出来的、也没有漏掉的），
+`缺失 id 0 个` 说明 4 个音乐 id 全部在表里、`Stream` 都不为空。
+
+**素材**：`Assets/Audio/music/` 只放了 4 首（**从 10 首的包里挑的**：Ambient 6 / 8 给关卡，Ambient 5 / 7 给挑战，
+共 ~15 MB；**整个 382 MB 的包没有进仓库**）。来源与许可记在 `Assets/Audio/SOURCES.txt`。

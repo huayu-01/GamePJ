@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BalanceConfig" load_steps=119 format=3]
+[gd_resource type="Resource" script_class="BalanceConfig" load_steps=123 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/BalanceConfig.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -131,6 +131,10 @@
 [ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_card_upgrade.tres" id="133_audio_ui_card_upgrade"]
 [ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_card_fail.tres" id="134_audio_ui_card_fail"]
 [ext_resource type="Resource" path="res://Config/Tables/Audio/audio_ui_card_reset.tres" id="135_audio_ui_card_reset"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_music_level_01.tres" id="136_audio_music_level_01"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_music_level_02.tres" id="137_audio_music_level_02"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_music_challenge_01.tres" id="138_audio_music_challenge_01"]
+[ext_resource type="Resource" path="res://Config/Tables/Audio/audio_music_challenge_02.tres" id="139_audio_music_challenge_02"]
 
 [resource]
 script = ExtResource("1_balance")
@@ -157,7 +161,7 @@ UpgradePools = [ExtResource("94_pool_pistol"), ExtResource("95_pool_sniper"), Ex
 MetaUpgrades = [ExtResource("31_meta_health"), ExtResource("32_meta_damage"), ExtResource("33_meta_speed"), ExtResource("34_meta_crit"), ExtResource("35_meta_reload"), ExtResource("123_meta_quota")]
 AbilityCards = [ExtResource("124_card_vitality"), ExtResource("125_card_damage"), ExtResource("126_card_speed"), ExtResource("127_card_crit"), ExtResource("128_card_reload"), ExtResource("129_card_magazine"), ExtResource("130_card_summon"), ExtResource("131_card_control")]
 AbilityQuotaBase = 6
-Audio = [ExtResource("115_audio_sfx_weapon_fire"), ExtResource("116_audio_sfx_combat_hit"), ExtResource("117_audio_sfx_enemy_die"), ExtResource("118_audio_ui_click"), ExtResource("119_audio_ui_open"), ExtResource("132_audio_ui_card_unlock"), ExtResource("133_audio_ui_card_upgrade"), ExtResource("134_audio_ui_card_fail"), ExtResource("135_audio_ui_card_reset")]
+Audio = [ExtResource("115_audio_sfx_weapon_fire"), ExtResource("116_audio_sfx_combat_hit"), ExtResource("117_audio_sfx_enemy_die"), ExtResource("118_audio_ui_click"), ExtResource("119_audio_ui_open"), ExtResource("132_audio_ui_card_unlock"), ExtResource("133_audio_ui_card_upgrade"), ExtResource("134_audio_ui_card_fail"), ExtResource("135_audio_ui_card_reset"), ExtResource("136_audio_music_level_01"), ExtResource("137_audio_music_level_02"), ExtResource("138_audio_music_challenge_01"), ExtResource("139_audio_music_challenge_02")]
 RewardChoiceCount = 3
 ShowDamageNumbers = true
 DamageNumberLifetime = 0.8

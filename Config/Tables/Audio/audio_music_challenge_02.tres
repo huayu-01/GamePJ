@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AudioConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AudioConfig.cs" id="1_audio_cfg"]
+[ext_resource type="AudioStream" path="res://Assets/Audio/music/music_challenge_02.ogg" id="2_stream"]
+
+[resource]
+script = ExtResource("1_audio_cfg")
+Stream = ExtResource("2_stream")
+Bus = 2
+VolumeDb = -10.0
+VolumeRandomDb = 0.0
+PitchScale = 1.0
+PitchRandom = 0.0
+Id = "music_challenge_02"
+DisplayName = "挑战 BGM · 2（Ambient 7）"
+Note = "曲库：**挑战中**（id 前缀 music_challenge_）。第 1 首放完自动轮播到这一首。素材：10 Ambient RPG Tracks（AlkaKrab Music）包内 ogg/Ambient 7.ogg（包内文件名带一个多余空格）。"

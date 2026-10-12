@@ -22,6 +22,15 @@ public abstract partial class Interactable : Node3D
 	private const string AppearAnimation = "appear";
 	private const string DisappearAnimation = "disappear";
 
+	/// <summary>
+	/// **状态动画**（用户需求 §五 #15：节点要有「待机 / 激活 / 失效」三种状态动画）。
+	/// 三个名字与 <see cref="AnimationNodeName"/> 那个 AnimationPlayer 里的动画一一对应；
+	/// **没有对应动画的交互物（Boss 门、基地交互台…）什么都不播**，与 <see cref="AppearAnimation"/> 同一套回退语义。
+	/// </summary>
+	private const string IdleAnimation = "idle";
+	private const string ActiveAnimation = "active";
+	private const string DeadAnimation = "dead";
+
 	/// <summary>代码补间版的出现 / 消失时长（秒），只在 AnimationPlayer 里没有对应动画时使用。</summary>
 	private const float AppearSeconds = 0.35f;
 	private const float DisappearSeconds = 0.45f;
@@ -73,10 +82,16 @@ public abstract partial class Interactable : Node3D
 	public string CurrentPrompt => Used ? $"{Prompt}（已用）" : $"按 F 使用：{Prompt}";
 
 	/// <summary>
-	/// 外观网格（场景里必须叫 Mesh）。**public** 是为了让"只加表现"的
+	/// 外观网格（场景里必须叫 <c>Mesh</c>）。**public** 是为了让"只加表现"的
 	/// <see cref="InteractablePresentation"/> 能拿到它做描边与抖动 —— 判定逻辑不读它。
+	///
+	/// <para>先按直接子节点找（老场景零开销）；没有再**递归**找一次 —— 这样"网格节点"可以挂在一层
+	/// 中间节点下面（例如 §五 #15 的节点模型：上下浮动做在 <c>Float</c> 上、网格挂在 <c>Float/Mesh</c>，
+	/// 免得浮动动画和失败抖动的补间抢同一个 <c>position</c> 轨道）。**名字仍然是唯一契约**，
+	/// 只是不再限定"必须是第一层子节点"（见 docs/art-onboarding.md §三.1 与 §五）。</para>
 	/// </summary>
-	public MeshInstance3D? VisualMesh => GetNodeOrNull<MeshInstance3D>(MeshNodeName);
+	public MeshInstance3D? VisualMesh
+		=> GetNodeOrNull<MeshInstance3D>(MeshNodeName) ?? FindChild(MeshNodeName, recursive: true, owned: false) as MeshInstance3D;
 
 	public override void _Ready()
 	{
@@ -96,8 +111,22 @@ public abstract partial class Interactable : Node3D
 	private bool _vanishing;
 	private Tween? _visualTween;
 
+	/// <summary>当前正在播的状态动画（<c>idle</c> / <c>active</c> / <c>dead</c>；没有动画时是 null）。</summary>
+	private string? _stateAnimation;
+
+	/// <summary>这个场景里**没有**的状态动画名（查过一次就不再查：Boss 门 / 基地交互台不接状态动画，零开销）。</summary>
+	private readonly HashSet<string> _missingStateAnimations = new();
+
+	/// <summary>场景里的动画占位节点（只查一次，见 <see cref="AnimationPlayerNode"/>）。</summary>
+	private AnimationPlayer? _animation;
+	private bool _animationSearched;
+
 	public override void _PhysicsProcess(double delta)
 	{
+		// 状态动画（待机 / 激活 / 失效）完全由下面这些**已有的**状态推导出来，放在最前面：
+		// 关掉（Enabled=false）的节点也要能切到「失效」，所以必须在下面那个提前 return 之前。
+		RefreshStateAnimation();
+
 		if (!Enabled || Used || Vanished)
 		{
 			PlayerInRange = false;
@@ -168,6 +197,9 @@ public abstract partial class Interactable : Node3D
 		Scale = Vector3.One;
 		Register();
 		ApplyIdleVisual();
+
+		// 出现动画（美术接管时）优先：先放它；状态动画留给状态机在它播完之后接上（RefreshStateAnimation 会避让）。
+		_stateAnimation = null;
 
 		if (TryPlayAnimation(AppearAnimation) > 0f)
 		{
@@ -308,7 +340,7 @@ public abstract partial class Interactable : Node3D
 	/// </summary>
 	private float TryPlayAnimation(string name)
 	{
-		if (GetNodeOrNull<AnimationPlayer>(AnimationNodeName) is not { } player || !player.HasAnimation(name))
+		if (AnimationPlayerNode() is not { } player || !player.HasAnimation(name))
 		{
 			return 0f;
 		}
@@ -316,6 +348,74 @@ public abstract partial class Interactable : Node3D
 		player.Play(name);
 		return (float)player.GetAnimation(name).Length;
 	}
+
+	/// <summary>场景里的动画占位节点（节点名 <see cref="AnimationNodeName"/>），只查一次。</summary>
+	private AnimationPlayer? AnimationPlayerNode()
+	{
+		if (!_animationSearched)
+		{
+			_animationSearched = true;
+			_animation = GetNodeOrNull<AnimationPlayer>(AnimationNodeName);
+		}
+
+		return _animation;
+	}
+
+	/// <summary>
+	/// **状态动画**（用户需求 §五 #15「有待机 / 激活 / 失效的状态动画」）：
+	/// 三种状态**全部由已有的交互状态推导**（没有新增任何状态，也没有新增判定）——
+	///
+	/// <list type="table">
+	/// <item><term>dead 失效</term><description><see cref="Enabled"/> 为 false（本关没抽中的节点 / 降临物下落中）
+	///   或已经用完（<see cref="Used"/> / <see cref="Vanished"/>）→ 下沉 + 缩小 + 半透明（"熄灭"）；</description></item>
+	/// <item><term>active 激活</term><description><see cref="CanInteract"/>（玩家在范围内、这一刻真的能按 F）→
+	///   浮动更高更快 + 自转更快 + 微微胀缩（"被唤醒"）；</description></item>
+	/// <item><term>idle 待机</term><description>其余情况 → 慢速上下浮动 + 慢速自转。</description></item>
+	/// </list>
+	///
+	/// <para>⚠️ 它**只读状态、只播动画**：<see cref="Interact"/> 的判定顺序、范围检测、消耗与复位逻辑一行没动。
+	/// 动画里刻意**不碰根节点的 scale**（那是 <see cref="Appear"/> / <see cref="Disappear"/> 补间的地盘），
+	/// 也不碰共享材质（10 个节点共用一份材质，动它会把同类节点一起改掉）——
+	/// 只动节点自己的 <c>Float</c> / <c>Mesh</c> 两个子节点。</para>
+	/// </summary>
+	private void RefreshStateAnimation()
+	{
+		if (AnimationPlayerNode() is not { } player)
+		{
+			return;
+		}
+
+		// 出现 / 消失动画播放期间不抢播放器 —— 那两条是"美术接管"的钩子，优先级高于状态循环。
+		if (player.IsPlaying() && (player.CurrentAnimation == AppearAnimation || player.CurrentAnimation == DisappearAnimation))
+		{
+			return;
+		}
+
+		string wanted = !Enabled || Used || Vanished
+			? DeadAnimation
+			: (CanInteract ? ActiveAnimation : IdleAnimation);
+
+		if (wanted == _stateAnimation || _missingStateAnimations.Contains(wanted))
+		{
+			return;
+		}
+
+		if (TryPlayAnimation(wanted) > 0f)
+		{
+			_stateAnimation = wanted;
+		}
+		else
+		{
+			// 这个场景没做这条动画（老节点 / Boss 门 / 基地交互台）→ 记下来，别再每帧查一次。
+			_missingStateAnimations.Add(wanted);
+			_stateAnimation = null;
+		}
+	}
+
+#if DEBUG
+	/// <summary>自测 / 探针取证用：当前的状态动画名（没有对应动画时是 "-"）。</summary>
+	public string DebugStateAnimation => _stateAnimation ?? "-";
+#endif
 
 	/// <summary>复制一份当前外观材质并允许透明，用于淡出（复制 = 不会改到共享材质）。</summary>
 	private StandardMaterial3D? FadeCopyOfActiveMaterial()

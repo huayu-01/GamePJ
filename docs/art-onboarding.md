@@ -19,13 +19,13 @@
 
 ```
 Assets/
-  Models/       mesh_*.tres   （网格：几何形状与尺寸）
+  Models/       mesh_*.tres   （网格：几何形状与尺寸）+ <分组>/mesh_*.glb|fbx（源模型）
   Materials/    mat_*.tres    （材质：颜色、发光、透明）
   Textures/     tex_*.png     （以后加）
   Effects/      fx_*.tscn     （以后加：特效场景）
   Particles/    ps_*.tscn     （以后加：粒子场景）
   UI/           ui_*.png      （以后加：界面素材）
-  Audio/        sfx_*.ogg     （以后加）
+  Audio/        sfx_*.ogg / ui_*.ogg / music_*.ogg
 ```
 
 **命名**：`<类别>_<分组>_<变体>`，全小写。
@@ -42,9 +42,85 @@ Assets/
 
 ### 1. 换某个交互物的模型（奖励节点 / Boss 门）
 
-1. 改 `Assets/Models/mesh_node_reward.tres` 里的几何参数 —— **只改这一个文件，10 个节点同时生效**
-2. 或者新建一个网格资源（如 `mesh_node_reward_v2.tres`），把 `Scenes/Interactables/RewardNode.tscn` 里的 `mesh = ExtResource(...)` 指向它
-3. **⚠️ 节点名 `Mesh` 不能改** —— 代码按名字取它（`Interactable.cs` 的"用尽变暗"逻辑）
+> ✅ **2026-10 第七轮已按本节换过一次**（奖励节点 = `LowPolyGemsPack2` 的 `gem1`），实测数据与证据见文末
+> 「第七轮」更新记录。**下面这一节就是那次换完之后的现状**。
+
+现在的节点结构（`Scenes/Interactables/RewardNode.tscn`）：
+
+```
+RewardNode（Node3D，挂 RewardNode.cs）
+  ├─ Float（Node3D）              ← 上下浮动 + 自转做在它身上
+  │    └─ Mesh（MeshInstance3D）  ← mesh = Assets/Models/nodes/mesh_node_gem.tres；scale 1.35；position.y 0.55
+  ├─ Animation（AnimationPlayer） ← idle / active / dead 三条状态动画（见 §三.1.2）
+  └─ Presentation（Node3D）       ← InteractablePresentation（描边 + 按键图标），IconGap = 1.15
+```
+
+**三条铁律**：
+
+1. 节点名 **`Mesh` 不能改** —— `Interactable.VisualMesh` 按名字取它，"按类型上色 / 用尽淡出 / 失败抖动 / 描边 /
+   按键图标高度"**全部**读它，改名**静默失效**（不报错、颜色没了、抖动也没了）。
+   **但允许嵌套**（第七轮起 `VisualMesh` 先找直接子节点、找不到再**递归**找）：上面把它挂在 `Float` 下面是**故意的** ——
+   浮动动画要写 `Mesh.position`，而失败抖动补间也写 `Mesh.position`，两个作者同一个属性会互相覆盖；
+   所以浮动放在父节点 `Float` 上，抖动仍动 `Mesh`，两者叠加。
+2. `Mesh` 必须是 **MeshInstance3D**。把整个 FBX/GLB 作为**场景实例**挂在下面（根是 `Node3D`）会 `VisualMesh == null`
+   → 静默失去上色与淡出。要换模型就换它的 `mesh`（一个独立的 `mesh_*.tres`）。
+3. **材质挂在网格上，不挂在场景上**（§二）：网格的 `.tres` 里写 `material`，场景只引用网格。
+4. **交互半径、`Prompt`、`SingleUse` 是玩法参数，不是美术参数**（红线见 §六）。
+
+#### 1.1 奖励节点新模型：**实测**出来的轴心 / 朝向 / 缩放（不是猜的）
+
+| 量什么 | 怎么量 | 实测结果 |
+|---|---|---|
+| **轴心** | 实例化后算 `MeshInstance3D.get_aabb()`，看 `min.y` | **`min.y = 0.0000`** → 轴心在**底部**（脚底）。所以 `Mesh.position.y` 就是"离地多高"，**不需要再补半个身高** |
+| **高度 / 占地** | 同上 `size` | `1.2 × 1.0 × 1.2 m`（1 米高）→ 想要 1.35 米高就 **`scale = 1.35`**（等比，一个数搞定） |
+| **朝向** | 单独渲染观察 | 宝石是**多面体、没有正反面**，所以**这次不需要绕 Y 转 180°**（那条规则是给"有脸的单位"用的，见 §三.2） |
+| **顶点绕序** | 有向体积 `V = Σ a·(b×c)/6`（散度定理） | **`V = -0.427193` → 反了！** 这个包的 FBX 绕序是**顺时针**，Godot 默认剔背面 → 画面上会看到宝石"内壁"（空心 / 破面观感）。**修正 = 每个三角形交换后两个索引**，修完 `V = +0.427193` |
+| **法线** | 顶点相对形心的方向 · 法线，取平均 | `+0.6759` → **法线本来就是朝外的**（不需要取负）。这两件事**独立**，必须分别量 |
+| **源文件里的摆放偏移** | 看 FBX 根下的子节点 `transform` | 每个宝石的 `MeshInstance3D` 带着 Blender 场景里的 X 偏移（`gem1` = +5、`gem2` = +7 … 每 2 米一个）。**只有把网格抽成独立资源才会消失**（抽出来之后网格是居中的） |
+
+**怎么抽出 `mesh_node_gem.tres`**（工具已入库，可复用换另一颗宝石）：
+
+```powershell
+# 1) 只把要用的那一颗 .fbx 拷进 Assets/Models/nodes/（连同它引用的两张 png，保持相对路径）
+# 2) 让 Godot 生成 .import：
+& '<Godot 引擎路径>\Godot_v4.7.2-stable_mono_win64.exe' --headless --path '<项目>' --import
+# 3) 跑抽取工具（会打印 V / 法线外向度，并按需修正绕序与法线）：
+& '<Godot 引擎路径>\Godot_v4.7.2-stable_mono_win64.exe' --path '<项目>' res://Scenes/Interactables/_ExtractGem.tscn
+# 4) 手工给生成的 .tres 补一行材质（工具只导出几何）：
+#    [ext_resource type="Material" path="res://Assets/Materials/mat_node_reward.tres" id="1_mat"]
+#    并把 "material": ExtResource("1_mat") 放进 `_surfaces` 的那个字典里
+```
+
+> ⚠️ **不要**在 `.tscn` 里直接引用 `xxx.fbx::ArrayMesh_1p084` 这种**子资源路径**：
+> 后缀是导入器现生成的（12 颗宝石各不相同），重新导入后可能变 → 引用**静默失效**（节点变成看不见的空壳）。
+> 抽成 `mesh_*.tres` 之后几何数据独立于 FBX 的子资源命名。
+>
+> ⚠️ `ArrayMesh` **没有** `material` 属性（那是 `PrimitiveMesh` 才有的）——写 `material = ExtResource(...)`
+> 会被当成无效属性忽略掉、网格变默认材质。要写进 `_surfaces` 字典里的 `"material"` 键
+> （`surface_set_material` 的序列化形式），否则**在类型材质缺失时**那个"退回默认蓝"的兜底是空的。
+
+#### 1.2 节点的三种状态动画：**待机 / 激活 / 失效**
+
+需求原话：「这些应该是**悬浮的**，且**有待机/激活/失效的状态动画**」。
+三种状态**没有另造一套**，全部由 `Interactable` **已有的**交互状态推导（`Scripts/Interaction/Interactable.cs`
+的 `RefreshStateAnimation()`，只读状态、只播动画）：
+
+| 动画名（`Animation` 里的 AnimationPlayer） | 对应**已有**状态 | 表现 |
+|---|---|---|
+| `idle` **待机** | 可用、玩家不在范围（`!CanInteract && Enabled`） | 慢速上下浮动（0 → 0.18 m，3 秒循环）+ 慢速自转（3 秒一圈）+ 不透明 |
+| `active` **激活** | 玩家在范围内、这一刻真能按 F（`CanInteract`） | 浮得更高更快（0 → 0.28 m，1.2 秒）+ 自转快 2.5 倍 + 微微胀缩（1.35 ↔ 1.5，脉动） |
+| `dead` **失效** | `!Enabled`（本关没抽中的节点 / **降临物下落中**）或用完（`Used` / `Vanished`） | 下沉（0.04 m）+ 缩小（1.08）+ **半透明 0.72**（"熄灭"） |
+
+**约束（照抄就能加新节点的状态动画）**：
+
+- **不要动根节点的 `scale`**：那是 `Appear()` / `Disappear()` 补间的地盘（互相打断）。
+  动 `Float`（浮动 / 自转）与 `Mesh`（缩放 / 透明度）就够。
+- **不要动共享材质**：一局 10 个节点共用同一份 `mat_node_<kind>.tres`，动它会把同类节点一起改掉
+  （"半透明"用的是 `MeshInstance3D.transparency`，它是**每实例**的，安全）。
+- `appear` / `disappear` 这两条名字**优先级更高**：状态机会在它们播放期间**不抢播放器**
+  （`Interactable.RefreshStateAnimation` 里那条 guard）。没做状态动画的交互物（Boss 门、基地交互台）
+  只是**什么都不播**，一次查表之后就不再查（零开销）。
+- 拍摄台：`res://Scenes/Interactables/_NodeShowcase.tscn`（三种状态并排 + 逐项读数 + 出图，用法见 §四）。
 
 ### 2. 换单位模型（玩家 / 9 种敌人 / Boss / 召唤物）
 
@@ -126,22 +202,35 @@ Assets/
 
 ```powershell
 # 1) 编译（必须 0 warning / 0 error）
-& 'F:\Godot项目\项目a\build.ps1' -v minimal
+& 'F:\Godot项目\项目a\build.ps1' --no-incremental -v minimal
 
 # 2) 跑游戏内自测（会走完：进关 → 交互 → 奖励 → 战斗 → 结算）
 '1' | Set-Content 'C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\selftest.flag'
-$cli = 'F:\Godot项目\项目a\.gdmcp\bin\gdmcp.exe'
-& $cli tool-call run_project --args-json '{"allow_window":true,"scene_path":"res://Scenes/Main.tscn"}' --apply
-Start-Sleep -Seconds 20
+$godot = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64.exe'
+Start-Process $godot -ArgumentList '--path','F:\Godot项目\项目a','res://Scenes/Main.tscn'   # 必须带场景参数
+Start-Sleep -Seconds 27
 Remove-Item 'C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\selftest.flag'   # 必须删！
 
 # 3) 看日志有没有加载错误
 $dir = 'C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\logs'
-$f = Get-ChildItem "$dir\*.log" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+$f = Get-ChildItem "$dir\run_*.log" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|端到端'
 ```
 
 **⚠️ 编辑器会缓存场景**：用编辑器脚本 `load()` 验证时拿到的是**改动前的副本**，必须用 `ResourceLoader.CACHE_MODE_IGNORE` 强制读盘，否则会看到假失败。
+
+**⚠️ 2026-10 起：并发代理环境下 MCP 的 `run_project` 不可靠**（多开 Godot 会抢编辑器的构建回调），
+**优先用上面的命令行直跑**；`stop_project` 是全局的，会杀掉别的代理的自测，**不要用**
+（详见 [todo-handoff.md](todo-handoff.md) 末节）。
+
+### 奖励节点模型的拍摄台（换模型 / 调状态动画时用它出图）
+
+```powershell
+# 三种状态并排 + 逐项读数（Float.y 采样、当前动画、transparency）+ 4 张图
+& '<Godot>\Godot_v4.7.2-stable_mono_win64.exe' --path 'F:\Godot项目\项目a' res://Scenes/Interactables/_NodeShowcase.tscn
+# 出图：docs/screenshots/node_40_states.png（全景）/ 41 idle / 42 active / 43 dead / 44 kinds（按类型上色）
+# 读数：user://logs/godot.log 里搜 [NodeShot]
+```
 
 ## 五、改名前必须先改代码的节点
 
@@ -149,7 +238,8 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
 
 | 节点名 | 谁在用 | 影响的场景 |
 |---|---|---|
-| `Mesh` | `Interactable`（"用尽变暗"） | 奖励节点、Boss 门、基地 4 个交互台 |
+| `Mesh` | `Interactable`（"用尽变暗" / 按类型上色 / 淡出）、`InteractablePresentation`（描边 / 抖动 / 图标高度） | 奖励节点、Boss 门、基地 4 个交互台（**名字不能改；2026-10 第七轮起允许嵌套在子节点下**） |
+| `Float` | `RewardNode` 的**状态动画轨道**（`Float:position` / `Float:rotation`） | 奖励节点（改这个名字要同步改 `RewardNode.tscn` 的动画轨道路径） |
 | `Muzzle` | `Weapon`（枪口位置） | 各武器 |
 | `Hud/Root/PlayerBar`、`BarPlayer/Fill`、`BarPlayer/DelayBar` | `PlayerHud`（`_Ready` 按名字抓） | HUD |
 | `Hud/BossPanel`、`Panel/{Icon,NameLabel,Bar,StateLabel}` | `PlayerHud`（`BuildBossPanel`，`BossPanel` 是代码挂上去时的名字） | `BarBoss.tscn` |
@@ -236,3 +326,29 @@ Get-Content $f.FullName | Select-String -Pattern 'ERROR|Exception|清场完成|�
    爆炸火球从"一块平黄"变成"白热核心 + 橙色外焰 + 光晕"，枪口火光带上暖色光晕，**空场亮度基本不变**。
 6. **验证工具**：新增 `Scenes/UI/_UiShowcase.tscn` + `_ui_shot.gd`（一次运行拍完 7 个界面 + HUD + glow 前后），
    用法与两个坑（**别最小化窗口**、它拍的是真的 `TestArena.tscn` 环境）见 [ui.md](ui.md) §8。
+
+---
+
+## 更新记录（2026-10 · 第七轮：奖励节点换成宝石模型 + 待机/激活/失效状态动画）
+
+> 需求包 §五 **#15**「给节点模型更换模型，素材路径 `…\素材\模型\LowPolyGemsPack2.zip`，这些应该是悬浮的，
+> 且有待机/激活/失效的状态动画」。**交互判定 / 范围 / 消耗 / 复位逻辑一行未改。**
+
+1. **只拷了 1 个模型进仓库**（整个包 405 KB，包里有 12 颗宝石 + 2 张贴图 + blend + Unity shadergraph）：
+   - 源模型 `Assets/Models/nodes/gem_node_reward.fbx`（包内 `Meshes/gem1.fbx`）+ 它引用的
+     `PalleteTex.png` / `ReflectionTex.png`（游戏里**不读**这两张：按类型上色的材质会整体覆盖表面材质）；
+   - 用到的网格 `Assets/Models/nodes/mesh_node_gem.tres`（从 FBX **抽出来的 ArrayMesh**，轴心已居中在底部）；
+   - 挑选依据：12 颗全部导入后并排渲染对比（体积小、一次拍完），`gem1` 是多面钻石、从远处最认得出。
+2. **实测数据（不是猜的，见 §三.1.1）**：轴心 `min.y = 0.0000`（脚底）、尺寸 `1.2×1.0×1.2 m`、`scale = 1.35`、
+   多面体无正反面所以**不需要转 180°**；⚠️ **FBX 的顶点绕序是反的**（有向体积 `V = -0.427193`），
+   不修就会看到"内壁"（空心破面观感）→ 抽取时交换三角形索引修正（`V = +0.427193`）；法线本来就是朝外的（`+0.6759`）。
+3. **悬浮**：`Float` 子节点上的动画，`idle` 0→0.18 m / 3 秒，`active` 0→0.28 m / 1.2 秒；网格基准高度 `Mesh.y = 0.55`，
+   所以宝石是**离地悬浮**的（原来是 2.4 米高、底边贴地的圆柱）。
+4. **三种状态动画**（`idle` / `active` / `dead`）**全部由已有的交互状态推导**，见 §三.1.2 的表；
+   `Interactable.cs` 只加了一个 `RefreshStateAnimation()`（放表现）+ `VisualMesh` 改成"先直接子节点、再递归"。
+5. **一个连带修好的静默失效**：把网格挂到 `Float` 下面会让 `GetNodeOrNull<MeshInstance3D>("Mesh")` 返回 null
+   → 按类型上色 / 淡出 / 描边 / 抖动 / 图标高度**全部静默失效**。`VisualMesh` 现在会递归再找一次
+   （名字仍是唯一契约，只是不再限定"必须是第一层子节点"）。**这是本次唯一动到既有取节点方式的改动，判定逻辑没动。**
+6. **拍摄台**：`Scenes/Interactables/_NodeShowcase.tscn` + `_node_shot.gd`（三种状态并排 + 真实玩家触发 `active` +
+   逐项读数 + 出图），抽取工具 `_ExtractGem.tscn` + `_extract_gem.gd`（换另一颗宝石时复用）。
+   截图：`docs/screenshots/node_40_states.png` / `node_41_idle.png` / `node_42_active.png` / `node_43_dead.png` / `node_44_kinds.png`。

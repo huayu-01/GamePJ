@@ -38,4 +38,7 @@ public static class AudioIds
 	/// 想换成专门的一条，就照 docs/audio.md §5 加一个 <c>sfx_*</c> 行，再把这里的值改掉（改一行字符串）。</para>
 	/// </summary>
 	public const string InteractFail = "ui_card_fail";
+
+	// 音乐（BGM）刻意**不在这里列常量**：曲库是 MusicDirector 按音效表的 id 前缀
+	// （music_level_ / music_challenge_）扫出来的，加一首曲子不用改任何 C#（见 docs/audio.md §九）。
 }

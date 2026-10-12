@@ -30,6 +30,23 @@ Kenney · Sci-fi Sounds      https://kenney.nl/assets/sci-fi-sounds       （70 
 Kenney · Impact Sounds      https://kenney.nl/assets/impact-sounds       （130 个文件）
 Kenney · Interface Sounds   https://kenney.nl/assets/interface-sounds    （100 个文件）
 
+BGM（2026-10 第七轮，需求包 §五 #14「状态音乐」）
+----------------------------------------------------------------
+来源包：`10 Ambient RPG Tracks`（作者 **AlkaKrab Music**）
+  原始压缩包在项目外：F:\Godot项目\3d肉鸽雨中哈迪斯\素材\音源\10 Ambient RPG Tracks.zip（382 MB，**未入库**）
+  包内许可说明：`AlkaKrab Music License Info.pdf`（在同一个 zip 里，**没有拷进仓库**，因为它是 3.8 MB 的 PDF）
+  ⚠️ 发行前请再核对一次该包的许可条款（本项目只按"素材包允许商用"的默认理解先接占位）。
+
+只拷了 4 首（10 首里挑的，**整个包没有进仓库**）：
+
+  Assets/Audio/music/music_level_01.ogg      ← ogg/Ambient 6.ogg        （关卡默认曲库第 1 首）
+  Assets/Audio/music/music_level_02.ogg      ← ogg/Ambient 8.ogg        （关卡默认曲库第 2 首）
+  Assets/Audio/music/music_challenge_01.ogg  ← ogg/Ambient 5.ogg        （挑战中曲库第 1 首）
+  Assets/Audio/music/music_challenge_02.ogg  ← ogg/Ambient 7 .ogg       （挑战中曲库第 2 首；包内文件名带一个多余空格）
+
+  ⚠️ **文件名前缀决定它进哪套曲库**（`music_level_` / `music_challenge_`），见 docs/audio.md §九。
+  包内另有 mp3/ 与 Wav/ 两套同名文件（体积大得多），本项目用的是 **ogg/**。
+
 想加新音效怎么办：从这三个包（或任何 CC0 音效包）里再拷一个 .ogg 进来，
 按 <类别>_<分组>_<变体> 命名（sfx_* / ui_*），然后在 Config/Tables/Audio/ 加一行。
 详见 docs/audio.md。
