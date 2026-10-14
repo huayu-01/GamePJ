@@ -385,3 +385,53 @@ Do not use progress dialog (task) while flushing the message queue
 - **`stop_project` 是全局的**，会杀掉别的代理正在跑的自测实例 —— 不要随便用
 - 设置 `selftest.flag` 的窗口要尽量短（它会影响那几秒内**任何**启动的游戏实例）
 - 若必须用编辑器：**用完把自己的编辑器实例关掉**
+
+---
+
+## ✅ 编辑器 / MCP 的正确用法（2026-10-15 用户实测确认，**推翻了之前的结论**）
+
+### 真正的根因
+
+之前记录的「编辑器构建失败 / MCP 起不来」，**根因是 Godot 编辑器被关掉了** ——
+**不是代码问题、不是 SDK 没装、也不是"子代理并发"**。
+
+**用户实测**：**编辑器开着 → MCP 自动可用**（不需要额外配置）；
+编辑器关掉时，代理只能退回"命令行直跑"，于是**每次都要启一个 Godot 进程** →
+**慢，而且反复弹控制台窗口**。
+
+### 代理应该怎么做
+
+1. **先查编辑器在不在**：
+   ```powershell
+   & 'F:\Godot项目\项目a\.gdmcp\bin\gdmcp.exe' doctor     # 看 editor_connected
+   ```
+2. **不在就自己开一个**（不要干等、也不要一上来就命令行直跑）：
+   ```powershell
+   & 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64.exe' `
+     -e --path 'F:\Godot项目\项目a' --mcp-port=9080
+   # 等约 25 秒，再 doctor 确认 editor_connected: true
+   ```
+3. **然后优先用 MCP**：
+   ```powershell
+   & $cli tool-call run_project --args-json '{"allow_window":true,"scene_path":"res://Scenes/Main.tscn"}' --apply
+   & $cli runtime screenshot --format png --save-path 'user://x.png'
+   & $cli runtime info
+   ```
+   —— **比命令行直跑快得多，也不会反复弹控制台窗口。**
+4. **若 `run_project` 仍报 `no debugger session` / 构建回调失败**：
+   - 先**再试一次**；仍失败就在编辑器里手动"构建项目"一次，再试
+   - **最后**才退回下面的命令行直跑
+5. ⚠️ **用完不要关掉编辑器**（别的代理还要用）；⚠️ **也不要 `stop_project`**（它全局生效，会杀掉别人正在跑的自测）
+
+### 命令行直跑（**兜底**，编辑器/MCP 实在不可用时才用）
+
+```powershell
+$godot = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64.exe'
+'1' | Set-Content 'C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\selftest.flag'
+Start-Process $godot -ArgumentList '--path','F:\Godot项目\项目a','res://Scenes/Main.tscn'
+Start-Sleep -Seconds 40
+Remove-Item 'C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\selftest.flag'   # 必须删
+# 日志：C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\logs\
+```
+⚠️ **必须带场景参数**（主场景是基地；不带会进基地，自测输出一堆空值）。
+⚠️ `-- --char=xxx --weapon=yyy` 这类旁路参数只在需要绕过选题界面时用。
