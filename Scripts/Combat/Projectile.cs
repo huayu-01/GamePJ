@@ -98,7 +98,7 @@ public partial class Projectile : Node3D
 
 		if (collider is Unit target && _attack.Attacker != null && _attack.Attacker.IsHostileTo(target))
 		{
-			float now = Time.GetTicksMsec() / 1000f;
+		float now = Time.GetTicksMsec() / 1000f;
 			if (target.IsValidTarget && _tracker.TryRegister(target, _attack.Policy, _attack.HitInterval, now, 0))
 			{
 				_hitTargets.Add(target.GetInstanceId());
@@ -195,3 +195,7 @@ public partial class Projectile : Node3D
 		LookAt(GlobalPosition + direction, up);
 	}
 }
+
+
+
+

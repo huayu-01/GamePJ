@@ -1,0 +1,96 @@
+[gd_resource type="Animation" format=3]
+
+[resource]
+resource_name = "Skill_A1_ATK2"
+length = 0.2
+tracks/0/type = "position_3d"
+tracks/0/imported = true
+tracks/0/enabled = true
+tracks/0/path = NodePath("character-male-a/Skeleton3D:torso")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, -1.4438228e-15, 0.17625, -0.02875)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = true
+tracks/1/enabled = true
+tracks/1/path = NodePath("character-male-a/Skeleton3D:torso")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, -1, 0.033333335, 1, 0.09681088, 0, 0, -0.9953028, 0.1, 1, 0.09681088, 0, 0, -0.9953028, 0.13333334, 1, 0.05455931, 0, 0, -0.99851054, 0.16666667, 1, 0.02728982, 0, 0, -0.99962765, 0.2, 1, 0, 0, 0, -1)
+tracks/2/type = "rotation_3d"
+tracks/2/imported = true
+tracks/2/enabled = true
+tracks/2/path = NodePath("character-male-a/Skeleton3D:head")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, 0, 0, -1, 0.033333335, 1, -0.09681088, 0, 0, -0.9953028, 0.1, 1, -0.09681088, 0, 0, -0.9953028, 0.13333334, 1, -0.05455931, 0, 0, -0.99851054, 0.16666667, 1, -0.02728982, 0, 0, -0.99962765, 0.2, 1, 0, 0, 0, -1)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = true
+tracks/3/enabled = true
+tracks/3/path = NodePath("character-male-a/Skeleton3D:arm-left")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0.5, 0, -0.8660254, 0.033333335, 1, 0.032298416, 0.49895576, -0.055942494, -0.8642167, 0.1, 1, 0.03229841, 0.49895573, -0.055942487, -0.8642166, 0.13333334, 1, 0.01819146, 0.499669, -0.031508535, -0.86545205, 0.2, 1, 0, 0.5, 0, -0.8660254)
+tracks/4/type = "rotation_3d"
+tracks/4/imported = true
+tracks/4/enabled = true
+tracks/4/path = NodePath("character-male-a/Skeleton3D:arm-right")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, -0.5, 0, -0.8660254, 0.033333335, 1, 0.032298416, -0.49895576, 0.055942494, -0.8642167, 0.1, 1, 0.03229841, -0.49895573, 0.055942487, -0.8642166, 0.13333334, 1, 0.01819146, -0.499669, 0.031508535, -0.86545205, 0.2, 1, 0, -0.5, 0, -0.8660254)
+tracks/5/type = "position_3d"
+tracks/5/imported = true
+tracks/5/enabled = true
+tracks/5/path = NodePath("character-male-a/Skeleton3D:root")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/6/type = "rotation_3d"
+tracks/6/imported = true
+tracks/6/enabled = true
+tracks/6/path = NodePath("character-male-a/Skeleton3D:root")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/7/type = "position_3d"
+tracks/7/imported = true
+tracks/7/enabled = true
+tracks/7/path = NodePath("character-male-a/Skeleton3D:leg-left")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = PackedFloat32Array(0, 1, 0.083570965, 0.17625, -0.02875)
+tracks/8/type = "rotation_3d"
+tracks/8/imported = true
+tracks/8/enabled = true
+tracks/8/path = NodePath("character-male-a/Skeleton3D:leg-left")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/9/type = "position_3d"
+tracks/9/imported = true
+tracks/9/enabled = true
+tracks/9/path = NodePath("character-male-a/Skeleton3D:leg-right")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = PackedFloat32Array(0, 1, -0.083570965, 0.17625, -0.02875)
+tracks/10/type = "rotation_3d"
+tracks/10/imported = true
+tracks/10/enabled = true
+tracks/10/path = NodePath("character-male-a/Skeleton3D:leg-right")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/11/type = "method"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("..")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0.1),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["ATK"],
+"method": &"anim_event"
+}]
+}

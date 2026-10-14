@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WeaponConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+ScenePath = "res://Scenes/Weapons/Pistol.tscn"
+AttackTags = PackedStringArray("Projectile", "Energy", "Physical")
+Damage = 0.0
+FireInterval = 0.5
+MagazineSize = 1
+ReloadTime = 0.1
+AutoReloadDelay = 999.0
+SpreadDegrees = 0.0
+AimSpreadScale = 0.0
+MultiShotSpreadDegrees = 0.0
+ProjectilesPerShot = 1
+BasePierce = 0
+Knockback = 0.0
+CritChance = 0.05
+CritMultiplier = 2.0
+ProjectileSpeed = 150.0
+MaxLifetime = 1.6
+AimFov = 55.0
+Automatic = false
+Id = "wpn_energy_palm"
+Slot = 4
+DisplayName = "能量掌"
+DescriptionTemplate = "发射能量波：直线、无下坠、能穿透格挡（无视格挡效果）。伤害/弹速由武技技能行给。"
+Note = "[新增行·本轮只加不删] 角色 A 武器 1。⚠️ 它**不走** Weapon 组件的开火（那套有弹匣/装填，能量掌没有）：发射由角色 A 的武技技能（skl_a1_w1_*）用 EnergyWave 投射物完成。这一行的作用是身份 + 攻击标签 + 暴击基准 + 弹速，以及给「武器限定池」一个可指向的行。ScenePath 暂用 Pistol.tscn（手上模型，后续换 mesh 即可）。"

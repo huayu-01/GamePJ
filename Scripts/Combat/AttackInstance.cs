@@ -39,6 +39,18 @@ public sealed class AttackInstance
 
 	public string[] Tags { get; init; } = System.Array.Empty<string>();
 
+	/// <summary>
+	/// **这一次攻击无视格挡**（文档：能量波"能穿透格挡"，剑气"可被格挡"）。
+	/// 由攻击侧按武器/技能配置填，命中结算时走 <c>Unit.ResolveBlock</c> —— 是数据，不是特例分支。
+	/// </summary>
+	public bool BypassBlock { get; init; }
+
+	/// <summary>
+	/// 技能身份（`skl_a1_w1_1` 这类技能行 Id），与 <see cref="Ability"/> 并存的**稳定**身份键。
+	/// <see cref="Ability"/> 在武器路径上是 `WeaponFire` 这种字符串常量，增幅/统计需要能区分"哪一个技能"。
+	/// </summary>
+	public string AbilityKind { get; init; } = string.Empty;
+
 	/// <summary>命中后附加的状态效果（可为空）。</summary>
 	public StatusEffect? Status { get; init; }
 
@@ -59,6 +71,7 @@ public sealed class AttackInstance
 			Direction = direction,
 			Position = position,
 			Knockback = Knockback,
+			BypassBlock = BypassBlock,
 		};
 	}
 }

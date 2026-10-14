@@ -18,4 +18,13 @@ public sealed class HitInstance
 	public Vector3 Direction { get; init; }
 	public Vector3 Position { get; init; }
 	public float Knockback { get; init; }
+
+	/// <summary>
+	/// **无视格挡**（文档：能量波"能穿透格挡（无视格挡效果）"，而剑气"可被格挡"）。
+	///
+	/// 它是"这一次命中"的性质，所以从这里读，而不是给某个子弹类型写死一条特例
+	/// （见 <see cref="Unit.ResolveBlock"/>）。攻击侧在 <see cref="AttackInstance.BypassBlock"/> 上填，
+	/// <see cref="AttackInstance.RollHit"/> 原样带过来。
+	/// </summary>
+	public bool BypassBlock { get; init; }
 }

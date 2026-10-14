@@ -1,0 +1,34 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Projectile.cs" id="1_projectile"]
+[ext_resource type="Material" path="res://Assets/Materials/mat_energy_wave.tres" id="2_mat"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_wave"]
+material = ExtResource("2_mat")
+radius = 0.14
+height = 0.28
+radial_segments = 12
+rings = 6
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wave"]
+material = ExtResource("2_mat")
+top_radius = 0.1
+bottom_radius = 0.02
+height = 0.5
+radial_segments = 10
+rings = 1
+
+[node name="EnergyWave" type="Node3D"]
+script = ExtResource("1_projectile")
+Speed = 150.0
+GravityScale = 0.0
+MaxLifetime = 1.6
+Pierce = 0
+HitMask = 5
+
+[node name="Head" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_wave")
+
+[node name="Tail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.3)
+mesh = SubResource("CylinderMesh_wave")

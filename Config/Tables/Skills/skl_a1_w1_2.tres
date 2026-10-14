@@ -1,0 +1,85 @@
+[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_a1_w1_2_0"]
+script = ExtResource("2_param")
+Key = "ProjectileScenePath"
+Value = "res://Scenes/Combat/EnergyWave.tscn"
+Note = "能量波预制体（直线 / 无下坠 / 穿透格挡）"
+
+[sub_resource type="Resource" id="p_a1_w1_2_1"]
+script = ExtResource("2_param")
+Key = "Speed"
+Value = 250.0
+Note = "弹速（文档 武技2[憋个大的] 蓄力满：250）"
+
+[sub_resource type="Resource" id="p_a1_w1_2_2"]
+script = ExtResource("2_param")
+Key = "Damage"
+Value = 30.0
+Note = "伤害（文档 武技2 蓄力满：30）"
+
+[sub_resource type="Resource" id="p_a1_w1_2_3"]
+script = ExtResource("2_param")
+Key = "PerfectTime"
+Value = 0.5
+Note = "★ 完美时机：蓄力到 0.5s 即「闭合」（此后松手 = 完美时机那一发）。与动画 ATK 帧（0.10s）对齐：0.10 ÷ 0.5 = AnimSpeedScale 0.2"
+
+[sub_resource type="Resource" id="p_a1_w1_2_4"]
+script = ExtResource("2_param")
+Key = "PerfectDamageScale"
+Value = 1.3333334
+Note = "完美时机的伤害倍率（30 → 40）"
+
+[sub_resource type="Resource" id="p_a1_w1_2_5"]
+script = ExtResource("2_param")
+Key = "PerfectSpeedScale"
+Value = 1.6
+Note = "完美时机的弹速倍率（250 → 400）"
+
+[sub_resource type="Resource" id="p_a1_w1_2_6"]
+script = ExtResource("2_param")
+Key = "PerfectKnockback"
+Value = 2.0
+Note = "完美时机的额外击退（文档：「带略微的击退效果」）"
+
+[sub_resource type="Resource" id="p_a1_w1_2_7"]
+script = ExtResource("2_param")
+Key = "MaxLifetime"
+Value = 1.6
+Note = "存活时间（秒）"
+
+[sub_resource type="Resource" id="p_a1_w1_2_8"]
+script = ExtResource("2_param")
+Key = "BypassBlock"
+Value = true
+Note = "★ 子弹特性：能穿透格挡（无视格挡效果）"
+
+[sub_resource type="Resource" id="p_a1_w1_2_9"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Projectile", "Energy", "Physical")
+Note = "攻击标签（供增幅的武器标签匹配）"
+
+[resource]
+script = ExtResource("1_row")
+NodeName = "AbilityWeaponSkill2"
+ClassHint = "EnergyWaveAbility"
+InputAction = "weapon_skill_2"
+HoldToCharge = true
+AnimName = "Skill_A1_ATK2"
+AnimEvent = "ATK"
+AnimSpeedScale = 0.2
+Aim = 2
+Cooldown = 1.0
+Windup = 1.7
+Recover = 0.1
+Enabled = true
+Params = [SubResource("p_a1_w1_2_0"), SubResource("p_a1_w1_2_1"), SubResource("p_a1_w1_2_2"), SubResource("p_a1_w1_2_3"), SubResource("p_a1_w1_2_4"), SubResource("p_a1_w1_2_5"), SubResource("p_a1_w1_2_6"), SubResource("p_a1_w1_2_7"), SubResource("p_a1_w1_2_8"), SubResource("p_a1_w1_2_9")]
+Id = "skl_a1_w1_2"
+Slot = 0
+DisplayName = "憋个大的"
+DescriptionTemplate = "按住右键蓄力：蓄力满 0.5s 内松手 = 伤害 {Damage:0} / 弹速 {Speed:0}；正好闭合时松手 = 完美时机（伤害 40 / 弹速 400）。"
+Note = "角色 A 武器 1「能量掌」武技2（文档 CD:1 / 蓄力 30-250 / 完美时机 40-400，窗口 0.2s）。实现：按住右键播 Skill_A1_ATK2（速度 0.2× → 0.2s 的源段被拉成 1.0s），动画的 ATK 帧正好落在蓄力 0.5s 处；松手时按当前档位发射。★ AnimSpeedScale 就是"逻辑帧跟着动画走"的那条线：改蓄力时长只要改 PerfectTime 与它反比即可，事件帧始终命中。"

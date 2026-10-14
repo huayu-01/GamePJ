@@ -8,6 +8,13 @@ public enum WeaponPresetKind
 	Pistol,
 	Sniper,
 	Rifle,
+
+	/// <summary>
+	/// **[新增] 角色 A 武器 1「能量掌」**（`wpn_energy_palm`，Slot 4）。
+	/// ⚠️ 枚举顺序 = 武器表的 <c>Slot</c>（`RunController.WeaponRow` 用 <c>(int)kind + 1</c> 查表），
+	/// 所以新武器一律**往后追加**，不能插在中间。
+	/// </summary>
+	EnergyPalm,
 }
 
 /// <summary>可选角色（策划文档 §7）。</summary>
@@ -21,6 +28,12 @@ public enum PlayerCharacterKind
 
 	/// <summary>角色 3：召唤与控制（G 键主动召唤无人机）。</summary>
 	Summoner,
+
+	/// <summary>
+	/// **[新增] 角色 A［猎手］**（`chr_hunter`，Slot 4）。本轮只落地了武器 1「能量掌」的两个武技。
+	/// 同上：枚举顺序 = 角色表的 <c>Slot</c>，新角色往后追加。
+	/// </summary>
+	Hunter,
 }
 
 /// <summary>
@@ -170,6 +183,20 @@ public partial class ConfigIndexData : Resource
 	/// 里面 <c>ApplyHandler</c> 非空的那几行是**首领行为词条**（Boss Build）。
 	/// </summary>
 	[Export] public AbilityConfig[] Skills { get; set; } = System.Array.Empty<AbilityConfig>();
+
+	[ExportGroup("表索引 · 技能动画（动画生成器的配方表）")]
+	/// <summary>
+	/// **技能动画表**（`Config/Tables/SkillAnimations/anim_*.tres`）：**一行 = 一段技能动画的生成配方**
+	/// （源模型 + 源动画名 + 目标名 + 事件帧）。
+	///
+	/// <para>它不是"运行期要播的动画"，而是**生成器的输入**：编辑器菜单「项目 → 工具 → 生成技能动画」
+	/// 按这张表把 `Assets/Animations/&lt;库&gt;/&lt;名字&gt;.tres` 产出来，运行期由
+	/// <c>UnitAnimator</c> 按单位表的 <see cref="UnitConfig.AnimLibraryDir"/> 加载。
+	/// 加一段新技能动画 = 加一行这个表 + 跑一次生成器，**不改任何 C# 代码**。</para>
+	///
+	/// <para>空 = 没有任何技能动画可生成（技能会因为"没有动画"而拒绝执行，并写明确日志）。</para>
+	/// </summary>
+	[Export] public SkillAnimationConfig[] SkillAnimations { get; set; } = System.Array.Empty<SkillAnimationConfig>();
 
 	[ExportGroup("表索引 · Pressure 数值强化池")]
 	/// <summary>首领**数值型**强化池（`Config/Tables/Pressure/pmod_*.tres`）。行为型在技能表里，两者不得合并（§7.1）。</summary>

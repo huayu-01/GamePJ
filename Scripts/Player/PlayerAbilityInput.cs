@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
 using Godot;
@@ -5,37 +6,46 @@ using Godot;
 namespace ActRoguelike.Player;
 
 /// <summary>
-/// 玩家技能输入：把按键映射到角色/武器技能上。
-/// 技能本身不知道输入从哪来，敌人用同一套能力由 Behavior 触发。
+/// 玩家技能输入：把**按键动作**映射到角色/武器技能上。
+///
+/// <b>本轮的关键改动（用户硬要求：加角色/武器/技能不改代码）</b>：按键**不再按能力的 C# 类名硬编码**，
+/// 而是读技能行的 <see cref="AbilityConfig.InputAction"/> 列 —— 想让一个新技能按某个键，
+/// 就是**填一列表**，不是改这个文件。
+///
+/// 原来的写法是 <c>switch (child) { case DashAbility dash: ... Input.IsActionJustPressed("dash") }</c>，
+/// 于是"加一个技能"必然要动 C#，且 <c>AbilityConfig</c> 里连一列按键都没有（那条注释就是本轮推翻的决定）。
+///
+/// 支持两种按下方式（同一列 <c>HoldToCharge</c> 决定）：
+/// <list type="bullet">
+/// <item>点按：<c>IsActionJustPressed</c> → <c>TryActivate()</c>。</item>
+/// <item>按住蓄力：按下 → <c>TryActivate()</c>；按住期间每帧 <c>OnInputHeld(dt)</c>；松开 → <c>OnInputReleased()</c>。</item>
+/// </list>
 /// </summary>
 public partial class PlayerAbilityInput : Node
 {
 	private Unit _unit = null!;
-	private DashAbility? _dash;
-	private BurstFireAbility? _burst;
-	private SummonAbility? _summon;
-	private AreaAttackAbility? _control;
+	private readonly List<Ability> _abilities = new();
+
+	/// <summary>已经为哪些能力写过"这个按键动作在 project.godot 里不存在"的警告（只写一次，不刷屏）。</summary>
+	private static readonly HashSet<string> WarnedMissingActions = new();
 
 	public override void _Ready()
 	{
 		_unit = GetParent<Unit>();
-		foreach (Node child in _unit.GetChildren())
+		Collect(_unit);
+	}
+
+	/// <summary>把单位子树里的全部能力收进来（**不看类型**，只按表里的 <c>InputAction</c> 驱动）。</summary>
+	private void Collect(Node root)
+	{
+		foreach (Node child in root.GetChildren())
 		{
-			switch (child)
+			if (child is Ability ability)
 			{
-				case DashAbility dash:
-					_dash = dash;
-					break;
-				case BurstFireAbility burst:
-					_burst = burst;
-					break;
-				case SummonAbility summon:
-					_summon = summon;
-					break;
-				case AreaAttackAbility control:
-					_control = control;
-					break;
+				_abilities.Add(ability);
 			}
+
+			Collect(child);
 		}
 	}
 
@@ -46,30 +56,89 @@ public partial class PlayerAbilityInput : Node
 			return;
 		}
 
-		if (_dash != null && Input.IsActionJustPressed("dash"))
+		float dt = (float)delta;
+		foreach (Ability ability in _abilities)
 		{
-			_dash.TryActivate();
-		}
-
-		if (_burst != null && Input.IsActionJustPressed("burst"))
-		{
-			_burst.TryActivate();
-		}
-
-		// 角色 3：主动召唤（能力默认禁用，只有召唤师角色会启用）。
-		if (_summon is { Enabled: true } && Input.IsActionJustPressed("summon"))
-		{
-			_summon.TryActivate();
-		}
-
-		// 角色 3：范围定身冲击（策划文档 §7.3 的控制部分）。
-		if (_control is { Enabled: true } && Input.IsActionJustPressed("control"))
-		{
-			Unit? victim = Targeting.FindNearestHostile(_unit, _unit, _control.TriggerRadius);
-			if (victim != null)
+			if (!IsInstanceValid(ability))
 			{
-				_control.TryActivate(victim);
+				continue;
+			}
+
+			string action = ability.InputAction;
+			if (string.IsNullOrEmpty(action))
+			{
+				continue;
+			}
+
+			if (!InputMap.HasAction(action))
+			{
+				if (WarnedMissingActions.Add($"{action}"))
+				{
+					GD.PushWarning($"[PlayerAbilityInput] 技能 {ability.AbilityId} 要的按键动作「{action}」在 project.godot 的 [input] 里不存在，这个技能按不出来。");
+				}
+
+				continue;
+			}
+
+			if (!ability.HoldToCharge)
+			{
+				if (Input.IsActionJustPressed(action))
+				{
+					Activate(ability);
+				}
+
+				continue;
+			}
+
+			// 按住式：按下开始，按住期间累加，松开结束。
+			if (Input.IsActionJustPressed(action))
+			{
+				Activate(ability);
+			}
+
+			if (ability.IsBusy && Input.IsActionPressed(action))
+			{
+				ability.OnInputHeld(dt);
+			}
+
+			if (ability.IsBusy && Input.IsActionJustReleased(action))
+			{
+				ability.OnInputReleased();
 			}
 		}
+	}
+
+	/// <summary>
+	/// 在单位子树里找"绑在某个按键动作上"的技能（按技能行的 <see cref="AbilityConfig.InputAction"/> 匹配）。
+	///
+	/// 存在的理由：左键有两个消费者 —— 武器组件（<c>PlayerWeaponInput</c>）与"绑在左键上的武技"
+	/// （角色 A 的能量掌）。两个消费者都只读**表**，所以"哪个技能在左键上"是配置，不是代码分支。
+	/// </summary>
+	public static Ability? FindByInputAction(Unit unit, string action)
+	{
+		if (string.IsNullOrEmpty(action))
+		{
+			return null;
+		}
+
+		foreach (Node node in unit.FindChildren("*", string.Empty, true, false))
+		{
+			if (node is Ability ability && ability.Enabled && ability.InputAction == action)
+			{
+				return ability;
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// 触发一个技能。需要"范围内有目标"的技能（近战/控制）自己校验距离，够不着就不出招。
+	/// 这里只额外处理"需要一个目标"的通用约定：把最近敌对单位作为参数传进去（没有就传 null）。
+	/// </summary>
+	private void Activate(Ability ability)
+	{
+		Unit? victim = Targeting.FindNearestHostile(_unit, _unit, 200f);
+		ability.TryActivate(victim);
 	}
 }

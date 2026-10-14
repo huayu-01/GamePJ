@@ -79,6 +79,50 @@ public partial class UnitAnimator : Node
 	private float _speed;
 	private bool _dead;
 
+	/// <summary>技能动画库的目录/库名（来自单位表；空 = 这个单位没有技能动画）。</summary>
+	private string _skillDir = string.Empty;
+	private string _skillLibrary = "skills";
+
+	/// <summary>已经真的把技能动画库加进播放器了（惰性、只做一次）。</summary>
+	private bool _skillLibraryLoaded;
+
+	/// <summary>正在播技能动画：这段时间**不按移速切** idle/walk/sprint（否则技能第一帧就被运动覆盖掉）。</summary>
+	private bool _skillPlaying;
+
+	/// <summary>当前正在播的技能动画全名（`skills/Skill_A1_ATK1`），用于判断"播完了"。</summary>
+	private string _skillName = string.Empty;
+
+	/// <summary>当前这段技能动画上的事件帧（时刻 + 名字 + 参数）。</summary>
+	private readonly List<AnimationEventKey> _skillEvents = new();
+
+	/// <summary>上一次取的动画播放位置（用来判"这一帧跨过了哪个事件帧"）。</summary>
+	private double _skillLastPosition;
+
+	/// <summary>已经触发过的事件帧下标（每段动画只触发一次）。</summary>
+	private readonly HashSet<int> _skillFiredEvents = new();
+
+	/// <summary>
+	/// **技能动画事件帧的解析**（授权格式仍是 Godot 的方法轨道 —— 生成器照旧写
+	/// `anim_event` + args；运行期由这里把方法轨道上的关键帧读出来，在播放位置跨过它的那一帧触发）。
+	///
+	/// ⚠️ **为什么不用引擎的方法轨道回调**：实测在 Godot 4.7.2 里，技能动画的方法轨道
+	/// **一次都不会落到目标节点上**，而且会在混合器内部直接让进程崩掉
+	/// （`exit -1073741819` = 访问违规；同一份 `.tres` 在临时工程里、以及自测那个独立探针节点上都能正常触发）。
+	/// 所以运行期改用**位置跨越**：语义与"事件帧"完全一致（文档："子弹在事件帧到 ATK 时发射"），
+	/// 当帧生效、跟着 `speed_scale` 走、零引擎回调风险。授权格式没变，以后引擎修好了把开关一翻就行。
+	/// </summary>
+	private readonly record struct AnimationEventKey(double Time, string Name, string[] Args);
+
+	/// <summary>这次技能动画是否循环（循环的技能动画（如蓄力）不参与"播完就退出"的判定）。</summary>
+	private bool _skillLoops;
+
+	/// <summary>
+	/// 技能动画**还没接上**（<c>AnimationPlayer.Play</c> 是延迟生效的：刚调完的那一帧
+	/// <c>CurrentAnimation</c> 还是上一段）。这几帧里**不能**判"播完了"，否则技能动画会在
+	/// 还没开始播的时候就被这里的每帧守卫取消掉（实测：技能动画一秒都没播、事件帧永远不来）。
+	/// </summary>
+	private int _skillStartupGrace;
+
 	/// <summary>
 	/// 找单位下的 <c>Animator</c>；**没有就补一个** —— 这样"新增一个敌人"不需要在场景里手动挂节点，
 	/// 只要有 `Model/…/AnimationPlayer` 就自动有动画（读不到表也成立）。
@@ -139,6 +183,18 @@ public partial class UnitAnimator : Node
 			applied = true;
 		}
 
+		// 技能动画库（空 = 这个单位没有技能动画，例如木桩/无人机）。
+		if (!string.IsNullOrEmpty(row.AnimLibraryDir))
+		{
+			_skillDir = row.AnimLibraryDir;
+			if (!string.IsNullOrEmpty(row.AnimLibraryName))
+			{
+				_skillLibrary = row.AnimLibraryName;
+			}
+
+			applied = true;
+		}
+
 		if (applied)
 		{
 			_source = $"表 {row.Id}";
@@ -148,6 +204,41 @@ public partial class UnitAnimator : Node
 	/// <summary>当前正在播的动画名（调试 / 运行时探针用；没绑到播放器时是空串）。</summary>
 	public string CurrentAnimation => _current;
 
+	/// <summary>
+	/// 技能动画事件帧的**分发口**（用户在动画里挂的 `anim_event` 帧会走到这里）。
+	///
+	/// 为什么用事件而不是让技能自己轮询：事件帧必须**当帧**生效（`CallbackModeMethod = Immediate`），
+	/// 而 <c>Ability._PhysicsProcess</c> 与 <c>UnitAnimator</c> 的物理回调谁先谁后由节点顺序决定 ——
+	/// 走事件就等于"逻辑帧跟着动画走"，不依赖任何顺序假设。
+	///
+	/// 同一时刻只有一个单位在播技能动画（玩家），所以这里保持**单个**监听者，不做集合。
+	/// </summary>
+	public static event System.Action<string>? AnimationEvent;
+
+	/// <summary>场地里最后一个可用的 <see cref="UnitAnimator"/>（方法轨道的回调要静态入口）。</summary>
+	private static UnitAnimator? _currentAnimator;
+
+	/// <summary>
+	/// 动画方法轨道的接收方法（名字写死在这 —— 它就是动画资源里 <c>"method": &amp;"anim_event"</c> 那一项）。
+	///
+	/// ⚠️ 方法轨道的 path 是**相对 <c>AnimationMixer.RootNode</c>** 的；项目的 <c>AnimationPlayer</c>
+	/// 挂在 <c>Model</c>（`.glb` 实例根）子树里、<c>root_node</c> 是 <c>".."</c>，所以轨道 path 写
+	/// <c>".."</c> 正好落在 <c>Unit</c> 下 —— 也就是本组件身上（见 <c>SkillAnimationConfig.EventTargetPath</c>）。
+	/// </summary>
+	/// <summary>
+	/// **把一次动画事件帧广播出去**（由 <see cref="Unit.anim_event"/> 转发进来；方法轨道本身落在 Unit 上）。
+	///
+	/// ⚠️ 方法轨道的 path 是**相对 <c>AnimationMixer.RootNode</c>** 的；项目的 <c>AnimationPlayer</c>
+	/// 挂在 <c>Model</c>（`.glb` 实例根）子树里、<c>root_node</c> 是 <c>".."</c>，所以轨道 path 写
+	/// <c>".."</c> 时调用落在 <c>Unit</c> 上 —— 也就是本组件的父节点（见 <c>SkillAnimationConfig.EventTargetPath</c>）。
+	/// </summary>
+	/// <param name="name">事件名（`ATK` / `Dodge` / `Release` …，来自配置表）。</param>
+	public void RaiseAnimationEvent(string name)
+	{
+		int listeners = AnimationEvent?.GetInvocationList().Length ?? 0;
+		AnimationEvent?.Invoke(name);
+	}
+
 	/// <summary>这一条的实际参数来源（"表 enemy_chaser" / "组件默认值"），日志与探针用。</summary>
 	public string Source => _source;
 
@@ -155,11 +246,17 @@ public partial class UnitAnimator : Node
 	{
 		_unit = GetParent<Unit>();
 		_unit.Died += OnDied;
+		_currentAnimator = this;
 		Bind();
 	}
 
 	public override void _ExitTree()
 	{
+		if (_currentAnimator == this)
+		{
+			_currentAnimator = null;
+		}
+
 		if (IsInstanceValid(_unit))
 		{
 			_unit.Died -= OnDied;
@@ -175,6 +272,36 @@ public partial class UnitAnimator : Node
 
 		Vector3 velocity = _unit.Velocity;
 		_speed = new Vector2(velocity.X, velocity.Z).Length();
+
+		if (_skillPlaying)
+		{
+
+			// 技能动画不受移速影响；非循环的那几段播完就交还给运动（按移速切）。
+			if (_skillStartupGrace > 0)
+			{
+				// Play 是延迟生效的：给两帧时间让 CurrentAnimation 真的切过去，再开始判"播完没有"。
+				_skillStartupGrace--;
+				return;
+			}
+
+			// 事件帧：在播放位置跨过它的这一帧触发（当帧生效，跟 speed_scale 走）。
+			DriveSkillEvents();
+
+			// ⚠️ 判"播完"必须比的是 **_skillName**，不能比 _current：
+			// `Play(name)` 内部有"同名不重复"的早退（`name == _current`），而 _current 在
+			// PlaySkillAnimation 里已经被改成技能名了 —— 一旦这里把 _current 清空，同一次技能
+			// 就会被"复活"成一份新的播放（实测：动画永远停在 0.0000，事件帧永远不来）。
+			if (!_skillLoops && _player.CurrentAnimation != _skillName)
+			{
+				_skillPlaying = false;
+				_current = string.Empty;
+				_player.SpeedScale = 1f;
+			}
+			else
+			{
+				return;
+			}
+		}
 
 		Play(_speed >= RunMinSpeed ? _run : _speed >= WalkMinSpeed ? _walk : _idle, BlendSeconds);
 	}
@@ -192,6 +319,11 @@ public partial class UnitAnimator : Node
 	/// ⚠️ 必须自己设循环：`.glb` 导入的动画全是 `LOOP_NONE`（"播一遍停在最后一帧"），
 	/// 所以场景里那句 <c>autoplay="idle"</c> 只是摆了个静止姿势（docs/art-integration-log.md §6.3）。
 	/// 死亡那段**故意保持不循环** —— 停在倒地帧正好。
+	///
+	/// ⚠️ <b>技能动画库不在这里加载</b>：角色行的 <see cref="UnitConfig.AnimLibraryDir"/> 有可能
+	/// 晚于本组件的 <c>_Ready</c> 才套上来（<c>RunController.ApplyBalance</c> 在场景实例化之后跑），
+	/// 所以走 <see cref="RequireAnimation"/> 惰性加载。同样地，这里只给**本实例自己的播放器**设属性，
+	/// 不再去改 `.glb` 的共享 <c>Animation</c> 资源。
 	/// </summary>
 	private void Bind()
 	{
@@ -218,6 +350,12 @@ public partial class UnitAnimator : Node
 
 		LogOnce();
 		Play(_idle, 0f);
+
+		// 场景里已经填了技能动画库目录的话，**在 _Ready 里就加载**（不要等到第一次放技能）。
+		// 实测：等 AnimationPlayer 已经跑了很久、再运行期 AddAnimationLibrary + Play，
+		// 会让引擎在下一帧崩掉（exit -1073741819）；在 _Ready 里一次加载好就没事
+		// （自测里的独立探针也是"加载完再播"这条顺序，一直正常）。
+		PrepareSkillLibrary();
 	}
 
 	/// <summary>
@@ -256,12 +394,248 @@ public partial class UnitAnimator : Node
 		return fallback != null && _player.HasAnimation(fallback) ? fallback : string.Empty;
 	}
 
+	/// <summary>
+	/// 设置"idle / walk / 跑"这几段的循环。
+	///
+	/// ⚠️ <b>这里确实会写共享资源</b>（`.glb` 导入的那几段 `Animation` 是 13 个模型文件各自实例共享的子资源），
+	/// 但**只在值与当前不同时才写** —— 这样就永远不会有"A 单位把它设成循环、B 单位改成不循环"的互相踩踏，
+	/// 因为这几个循环标记在所有单位上都是同一个常量（idle/walk/跑 循环、die 不循环）。
+	///
+	/// <b>技能动画不走这里</b>：它们的循环标记在生成期写进各自的 `.tres`（<c>SkillAnimationConfig.Loop</c>），
+	/// 每个单位加载到的是独立资源 —— 那才是"按单位区分循环"的正确落点。
+	/// </summary>
 	private void SetLoop(string name, bool loop)
 	{
-		if (_player?.GetAnimation(name) is { } animation)
+		if (_player?.GetAnimation(name) is not { } animation)
 		{
-			// 同一个 .glb 的所有实例共享这几段 Animation，所以重复设成同一个值是幂等的。
-			animation.LoopMode = loop ? Animation.LoopModeEnum.Linear : Animation.LoopModeEnum.None;
+			return;
+		}
+
+		Animation.LoopModeEnum wanted = loop ? Animation.LoopModeEnum.Linear : Animation.LoopModeEnum.None;
+		if (animation.LoopMode != wanted)
+		{
+			animation.LoopMode = wanted;
+		}
+	}
+
+	/// <summary>
+	/// **技能动画的入口**（技能的能力在激活时调用它）。
+	///
+	/// 返回动画的**完整名**（`skills/Skill_A1_ATK1`）与加载进来的段数；段数 = 0 表示这个单位
+	/// 根本没有技能动画可播 —— 调用方（技能）据此**拒绝执行**（用户裁定：没动画不执行）。
+	///
+	/// ⚠️ <c>speed_scale</c> 设在**播放器**上（每实例独立，实测 498ms → 262ms），
+	/// 这样"加速动画释放"时事件帧仍然精确命中（实测 <c>anim_pos</c> = 0.1000 / 0.2518 / 0.4015）。
+	/// </summary>
+	/// <param name="animationName">技能动画名（表里的 <c>AnimName</c>，不带库名也行）。</param>
+	/// <param name="speedScale">动画速度倍率（1 = 原速；蓄力类技能用 &lt;1 拉长）。</param>
+	/// <param name="blend">混合时间（秒）。</param>
+	public string PlaySkillAnimation(string animationName, float speedScale, float blend = 0.08f)
+	{
+		PrepareSkillLibrary();
+		if (_player == null || string.IsNullOrEmpty(animationName))
+		{
+			return string.Empty;
+		}
+
+		string full = SkillAnimationLibrary.ResolveExact(_player, _skillLibrary, animationName);
+		if (full.Length == 0)
+		{
+			return string.Empty;
+		}
+
+		// ⚠️ **不要调 `_player.Stop()`**：实测（Godot 4.7.2）在"运行期才加进来动画库"的 AnimationPlayer 上，
+		// `Stop()` 之后紧接 `Seek()/Play()` 会把进程直接搞崩（exit -1073741819，访问违规）；
+		// 只 `Seek(0)` + `Play()` 就足够把技能动画从头播（`Play` 本身会重置到该段的起点）。
+		_player.SpeedScale = speedScale <= 0f ? 1f : speedScale;
+		_player.Play(full);
+
+		_skillName = full;
+		_skillPlaying = true;
+		_skillStartupGrace = 2;
+		_skillLoops = _player.GetAnimation(full)?.LoopMode != Animation.LoopModeEnum.None;
+		_current = full;
+		ReadSkillEvents(full);
+		GameLog.Write(
+			"Animation",
+			$"技能动画开播：{_unit.Name} → {full}（speed_scale={_player.SpeedScale:0.##}，循环={_skillLoops}，"
+			+ $"事件帧 {_skillEvents.Count} 个：{DescribeSkillEvents()}）");
+		return full;
+	}
+
+	/// <summary>让技能动画立刻停手（技能被取消 / 单位死亡时调用），把控制权交还运动动画。</summary>
+	public void StopSkillAnimation()
+	{
+		_skillPlaying = false;
+		_skillStartupGrace = 0;
+		_skillName = string.Empty;
+		_skillEvents.Clear();
+		_skillFiredEvents.Clear();
+		_current = string.Empty;
+		if (_player != null)
+		{
+			_player.SpeedScale = 1f;
+		}
+	}
+
+	/// <summary>
+	/// 把一段技能动画上的方法轨道事件帧读成"时刻 + 名字 + 参数"。
+	///
+	/// ⚠️ **为什么由本项目自己读方法轨道，而不是交给引擎回调**：实测在 Godot 4.7.2 里，
+	/// 技能动画的方法轨道**一次都不会落到目标节点上**，并且会在混合器内部直接让进程崩掉
+	/// （`exit -1073741819` = 访问违规）。同一份 `.tres` 在临时工程里、以及自测里那个独立探针
+	/// 节点上都能正常触发，所以这是"真项目这套层级 + 该引擎版本"上的问题，不是资源写坏了。
+	///
+	/// 于是运行期改成**位置跨越**：授权格式（方法轨道 + `anim_event` + args）**一点没变**，
+	/// 只是由这里把关键帧读出来，在播放位置跨过它的那一帧触发 —— 时机与引擎回调完全一致，
+	/// 跟着 `speed_scale` 走，且零引擎回调风险。以后引擎修好了，把这里换成回调即可。
+	/// </summary>
+	private void ReadSkillEvents(string full)
+	{
+		_skillEvents.Clear();
+		_skillFiredEvents.Clear();
+		_skillLastPosition = 0.0;
+
+		if (_player?.GetAnimation(full) is not { } animation)
+		{
+			return;
+		}
+
+		for (int track = 0; track < animation.GetTrackCount(); track++)
+		{
+			if (animation.TrackGetType(track) != Animation.TrackType.Method)
+			{
+				continue;
+			}
+
+			for (int key = 0; key < animation.TrackGetKeyCount(track); key++)
+			{
+				Variant raw = animation.TrackGetKeyValue(track, key);
+				if (raw.VariantType != Variant.Type.Dictionary)
+				{
+					continue;
+				}
+
+				var dict = raw.AsGodotDictionary();
+				if (!dict.TryGetValue("method", out Variant methodValue)
+					|| methodValue.AsString() != "anim_event"
+					|| !dict.TryGetValue("args", out Variant argsValue)
+					|| argsValue.VariantType != Variant.Type.Array)
+				{
+					continue;
+				}
+
+				var args = argsValue.AsGodotArray();
+				if (args.Count == 0)
+				{
+					continue;
+				}
+
+				var rest = new string[args.Count - 1];
+				for (int i = 1; i < args.Count; i++)
+				{
+					rest[i - 1] = args[i].AsString();
+				}
+
+				_skillEvents.Add(new AnimationEventKey(animation.TrackGetKeyTime(track, key), args[0].AsString(), rest));
+			}
+		}
+
+		_skillEvents.Sort((a, b) => a.Time.CompareTo(b.Time));
+	}
+
+	/// <summary>事件帧清单（日志用）。</summary>
+	private string DescribeSkillEvents()
+	{
+		if (_skillEvents.Count == 0)
+		{
+			return "（无）";
+		}
+
+		var text = new System.Text.StringBuilder();
+		foreach (AnimationEventKey key in _skillEvents)
+		{
+			text.Append(text.Length > 0 ? "、" : string.Empty);
+			text.Append($"{key.Name}@{key.Time:0.###}s");
+		}
+
+		return text.ToString();
+	}
+
+	/// <summary>
+	/// 每物理帧检查："播放位置从上一帧到这一帧"跨过了哪些事件帧 → 当帧触发。
+	/// 未触发过的事件帧只触发一次；动画回到起点（循环或重播）时重置。
+	/// </summary>
+	private void DriveSkillEvents()
+	{
+		if (_skillEvents.Count == 0 || _player == null)
+		{
+			return;
+		}
+
+		double now = _player.CurrentAnimationPosition;
+		if (now + 1e-6 < _skillLastPosition)
+		{
+			// 动画回到起点（循环段 / 重播）：允许事件帧再次触发。
+			_skillFiredEvents.Clear();
+		}
+
+		for (int i = 0; i < _skillEvents.Count; i++)
+		{
+			if (_skillFiredEvents.Contains(i))
+			{
+				continue;
+			}
+
+			AnimationEventKey key = _skillEvents[i];
+			if (now + 1e-6 < key.Time)
+			{
+				continue;
+			}
+
+			_skillFiredEvents.Add(i);
+			RaiseAnimationEvent(key.Name);
+		}
+
+		_skillLastPosition = now;
+	}
+
+	/// <summary>技能动画库是否已经就位（技能"没动画不执行"的判定依据）。</summary>
+	public bool HasSkillLibrary => SkillAnimationLibrary.ListAnimationFiles(_skillDir).Length > 0;
+
+	/// <summary>
+	/// 按名查一段技能动画（**全路径**，忽略大小写）。返回空串 = 没这段动画。
+	///
+	/// ⚠️ 只有这一条路：<c>AnimationPlayer.HasAnimation("Skill_A1_ATK1")</c> 对命名库里的动画
+	/// **永远返回 false**（实测），所以技能"先查动画是否存在"必须走这里。
+	/// </summary>
+	public string ResolveSkillAnimation(string animationName)
+	{
+		PrepareSkillLibrary();
+		return _player == null ? string.Empty : SkillAnimationLibrary.ResolveExact(_player, _skillLibrary, animationName);
+	}
+
+	/// <summary>
+	/// 惰性把技能动画库加进本单位的播放器（每实例一份）。已经加过就直接返回。
+	///
+	/// ⚠️ <c>SkillAnimationLibrary.LoadInto</c> 内部会设 <c>CallbackModeMethod = Immediate</c> ——
+	/// 事件帧必须**当帧**生效（默认 Deferred 会晚一帧、且排在物理之后，实测确认）。
+	/// </summary>
+	public void PrepareSkillLibrary()
+	{
+		if (_skillLibraryLoaded || _player == null || string.IsNullOrEmpty(_skillDir))
+		{
+			return;
+		}
+
+		int loaded = SkillAnimationLibrary.LoadInto(_player, _skillLibrary, _skillDir);
+		if (loaded > 0)
+		{
+			_skillLibraryLoaded = true;
+			GameLog.Write(
+				"Animation",
+				$"技能动画库已加载：{_unit.Name} ← {_skillDir}（库「{_skillLibrary}」{loaded} 段；"
+				+ $"回调模式 {_player.CallbackModeMethod}，查名用全路径如「{_skillLibrary}/<动画名>」）");
 		}
 	}
 
@@ -299,3 +673,5 @@ public partial class UnitAnimator : Node
 			+ $"阈值 {WalkMinSpeed:0.##}/{RunMinSpeed:0.##}（来源：{_source}）");
 	}
 }
+
+

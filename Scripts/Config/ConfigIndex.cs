@@ -63,6 +63,8 @@ public partial class ConfigIndex : Node
 		ConfigRows.Rebuild(Config.Summons);
 		ConfigRows.Rebuild(Config.AiProfiles);
 		ConfigRows.Rebuild(Config.Skills);
+		// 技能动画表（生成器的配方表）：运行期不"播"它，但索引起来才能被自测/生成器按 Id 取到。
+		ConfigRows.Rebuild(Config.SkillAnimations);
 		ConfigRows.Rebuild(Config.PressureMods);
 		ConfigRows.Rebuild(Config.Effects);
 		ConfigRows.Rebuild(Config.Nodes);

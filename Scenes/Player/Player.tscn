@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Player/PlayerController.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://Scenes/Camera/CameraRig.tscn" id="2_rig"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" path="res://Scripts/Player/PlayerAbilityInput.cs" id="9_ability_input"]
 [ext_resource type="PackedScene" path="res://Assets/Models/player/mesh_player_body.glb" id="18_playerbody"]
 [ext_resource type="Script" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
+[ext_resource type="Script" path="res://Scripts/Abilities/EnergyWaveAbility.cs" id="19_energy_wave"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -79,11 +80,9 @@ Aim = 2
 Windup = 0.0
 Recover = 0.1
 
-[node name="AbilityInput" type="Node3D" parent="."]
-script = ExtResource("9_ability_input")
-
 [node name="Presentation" type="Node" parent="."]
 script = ExtResource("4_presentation")
+
 [node name="InteractInput" type="Node" parent="."]
 script = ExtResource("10_interact")
 [node name="AbilityMelee" type="Node3D" parent="."]
@@ -141,5 +140,18 @@ AttackTags = PackedStringArray("Control", "AoE")
 shape = SubResource("SphereShape3D_control")
 [node name="ChallengerMark" type="Node3D" parent="."]
 script = ExtResource("17_mark")
+
+[node name="AbilityWeaponSkill1" type="Node3D" parent="."]
+script = ExtResource("19_energy_wave")
+Enabled = false
+
+[node name="AbilityWeaponSkill2" type="Node3D" parent="."]
+script = ExtResource("19_energy_wave")
+Enabled = false
+
 [node name="Animator" type="Node" parent="."]
 script = ExtResource("90_anim")
+AnimLibraryDir = "res://Assets/Animations/skills/"
+AnimLibraryName = "skills"
+[node name="AbilityInput" type="Node3D" parent="."]
+script = ExtResource("9_ability_input")

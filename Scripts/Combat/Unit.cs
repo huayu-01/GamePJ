@@ -94,6 +94,20 @@ public partial class Unit : CharacterBody3D
 	public bool IsValidTarget => !IsDead;
 	public bool HasTag(string tag) => Array.IndexOf(Tags, tag) >= 0;
 
+	/// <summary>
+	/// **技能动画事件帧的接收口**（生成表 <c>SkillAnimationConfig.EventMethod</c> 写的名字就是它）。
+	///
+	/// ⚠️ <b>为什么挂在 Unit 上而不是 UnitAnimator 上</b>：方法轨道的 path 是相对
+	/// <c>AnimationMixer.RootNode</c> 的，而项目里 <c>AnimationPlayer</c> 在 <c>Model</c>（`.glb` 实例根）
+	/// 子树内、<c>root_node</c> 就是 <c>".."</c>，所以轨道 path 写 <c>".."</c> 时**调用落在 Unit 自己身上**。
+	/// 这里再转发给 <c>UnitAnimator</c> 的分发口，技能才收得到（见 docs/anim-pipeline.md §3、§4.1）。
+	///
+	/// 没挂 <c>UnitAnimator</c> 的单位（木桩等）调用它是空操作，不报错。
+	/// </summary>
+	/// <param name="name">事件名（`ATK` / `Dodge` / `Release` …，来自配置表）。</param>
+	public void anim_event(string name)
+		=> GetNodeOrNull<UnitAnimator>(UnitAnimator.NodeName)?.RaiseAnimationEvent(name);
+
 	public bool IsHostileTo(Unit other) =>
 		Faction != Faction.Neutral && other.Faction != Faction.Neutral && Faction != other.Faction;
 
@@ -345,7 +359,17 @@ public partial class Unit : CharacterBody3D
 	}
 
 	/// <summary>格挡是多单位可用的独立机制（§14）；实际判定在 Block 子组件上，没有就不格挡。</summary>
-	protected virtual float ResolveBlock(HitInstance hit) => Block?.ResolveMultiplier(hit) ?? 1f;
+	protected virtual float ResolveBlock(HitInstance hit)
+	{
+		// "无视格挡"是**这一次命中**的性质（文档：能量波能穿透格挡，剑气不能）。
+		// 放在这里而不是给某个子弹类型写死判定，是因为它必须能被任意攻击开启。
+		if (hit.BypassBlock)
+		{
+			return 1f;
+		}
+
+		return Block?.ResolveMultiplier(hit) ?? 1f;
+	}
 
 	/// <summary>格挡组件（名为 Block 的子节点），守卫类单位使用。</summary>
 	public BlockComponent? Block => _block ??= GetNodeOrNull<BlockComponent>("Block");
@@ -517,3 +541,4 @@ public partial class Unit : CharacterBody3D
 
 	private void NotifyKill(Unit victim, HitInstance hit) => KillConfirmed?.Invoke(victim, hit);
 }
+

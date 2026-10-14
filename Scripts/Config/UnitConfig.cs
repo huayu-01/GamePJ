@@ -151,6 +151,22 @@ public abstract partial class UnitConfig : ConfigRow
 	/// </summary>
 	[Export] public float AnimRunMinSpeed { get; set; }
 
+	/// <summary>
+	/// **技能动画库目录**（`res://Assets/Animations/&lt;库名&gt;/`，末尾带 `/`）。
+	///
+	/// 这个单位（角色/敌人/召唤物）运行期要把这个目录下的全部 <c>.tres</c> 技能动画收进自己的
+	/// <c>AnimationPlayer</c> 的命名库里（见 <see cref="UnitAnimator.ApplyRow"/>）。
+	/// 那些 <c>.tres</c> 由 `Config/Tables/SkillAnimations/` 的配方表 + 编辑器菜单
+	/// 「项目 → 工具 → 生成技能动画」产出 —— **加一段技能动画不需要改任何代码**。
+	///
+	/// <b>空 = 这个单位没有技能动画</b>：需要动画的技能会因此**拒绝执行**并写明确日志
+	/// （用户裁定："严格要求有相应动画才会执行相应技能"，不做时间驱动兜底）。
+	/// </summary>
+	[Export(PropertyHint.Dir)] public string AnimLibraryDir { get; set; } = string.Empty;
+
+	/// <summary>技能动画的库名（与 <see cref="AnimLibraryDir"/> 的目录名一致；留空按目录名的最后一段推）。</summary>
+	[Export] public string AnimLibraryName { get; set; } = "skills";
+
 	/// <summary>作用距离的候选属性名，按能力子类依次尝试（见 <see cref="AttackRange"/>）。</summary>
 	private static readonly string[] RangeProperties = { "AttackRange", "TriggerRadius", "MaxRange", "MaxDistance" };
 
@@ -195,7 +211,8 @@ public abstract partial class UnitConfig : ConfigRow
 	public void ApplyAnimationTo(Unit unit)
 	{
 		if (string.IsNullOrEmpty(AnimIdle) && string.IsNullOrEmpty(AnimWalk) && string.IsNullOrEmpty(AnimRun)
-			&& string.IsNullOrEmpty(AnimDeath) && AnimWalkMinSpeed <= 0f && AnimRunMinSpeed <= 0f)
+			&& string.IsNullOrEmpty(AnimDeath) && AnimWalkMinSpeed <= 0f && AnimRunMinSpeed <= 0f
+			&& string.IsNullOrEmpty(AnimLibraryDir))
 		{
 			return;
 		}

@@ -257,6 +257,15 @@ public partial class RunController : Node
 	/// <summary>Configure 步：先选角色，枪手再选武器（没有界面就直接开局）。</summary>
 	private void BeginConfigure()
 	{
+		// 调试直接开局：`--char=chr_hunter --weapon=wpn_energy_palm`（按**表行 Id** 选，不是按索引）。
+		// 为什么不走界面：选题界面当前只列 3 个旧武器（那 3 个索引是旧表结构的一部分），
+		// 而"验证角色 A + 能量掌能玩"需要能真的进关卡。这条旁路只影响"从基地出发"的流程，
+		// 自测（BeginRunWithCharacter 直调）完全不受影响 —— 所以旧硬指标不会因为多了个开关而漂移。
+		if (TryApplyLoadoutOverride())
+		{
+			return;
+		}
+
 		var options = new List<string>
 		{
 			CharacterCardText(PlayerCharacterKind.Gunner, "远程枪手 — 三把枪、灵活走位"),
@@ -270,6 +279,86 @@ public partial class RunController : Node
 		}
 
 		ChooseCharacter(0);
+	}
+
+	/// <summary>
+	/// 调试用的"直接开局"：命令行 <c>--char=&lt;角色行 Id&gt; --weapon=&lt;武器行 Id&gt;</c>
+	/// （也可以传枚举名，例如 <c>--char=Hunter</c>）。
+	///
+	/// 存在的理由：选题界面当前只列了旧 3 把武器，而"角色 A + 能量掌"这一套要能真的进关卡玩一遍。
+	/// **按表行 Id 选**（不是按索引）—— 这正是"加角色/武器不改代码"该有的样子。
+	/// 一个参数都没给就返回 false，走正常界面流程。
+	/// </summary>
+	private bool TryApplyLoadoutOverride()
+	{
+		string? charArg = null;
+		string? weaponArg = null;
+		foreach (string arg in OS.GetCmdlineUserArgs())
+		{
+			if (arg.StartsWith("--char=", StringComparison.Ordinal))
+			{
+				charArg = arg.Substring("--char=".Length);
+			}
+			else if (arg.StartsWith("--weapon=", StringComparison.Ordinal))
+			{
+				weaponArg = arg.Substring("--weapon=".Length);
+			}
+		}
+
+		if (string.IsNullOrEmpty(charArg) && string.IsNullOrEmpty(weaponArg))
+		{
+			return false;
+		}
+
+		PlayerCharacterKind character = _character;
+		WeaponPresetKind weapon = _weaponKind;
+
+		if (!string.IsNullOrEmpty(charArg) && !TryResolveCharacter(charArg, out character))
+		{
+			GD.PushWarning($"[RunController] --char={charArg} 在角色表里找不到（也没有同名枚举），忽略。");
+		}
+
+		if (!string.IsNullOrEmpty(weaponArg) && !TryResolveWeapon(weaponArg, out weapon))
+		{
+			GD.PushWarning($"[RunController] --weapon={weaponArg} 在武器表里找不到（也没有同名枚举），忽略。");
+		}
+
+		ActRoguelike.Core.GameLog.Write("Flow", $"命令行指定开局：角色 {charArg ?? "（默认）"} → {character} / 武器 {weaponArg ?? "（默认）"} → {weapon}");
+		RunSetup.HasSelection = true;
+		RunSetup.Character = character;
+		RunSetup.Weapon = weapon;
+		BeginRunWithCharacter(character, weapon);
+		return true;
+	}
+
+	/// <summary>按角色表行 Id（或枚举名）解析角色。表是权威 —— 加一行角色就能直接 --char 用。</summary>
+	public static bool TryResolveCharacter(string idOrName, out PlayerCharacterKind kind)
+	{
+		foreach (CharacterConfig row in ConfigIndex.Settings.Characters)
+		{
+			if (row != null && string.Equals(row.Id, idOrName, StringComparison.OrdinalIgnoreCase))
+			{
+				kind = (PlayerCharacterKind)(row.Slot - 1);
+				return true;
+			}
+		}
+
+		return Enum.TryParse(idOrName, true, out kind);
+	}
+
+	/// <summary>按武器表行 Id（或枚举名）解析武器。</summary>
+	public static bool TryResolveWeapon(string idOrName, out WeaponPresetKind kind)
+	{
+		foreach (WeaponConfig row in ConfigIndex.Settings.Weapons)
+		{
+			if (row != null && string.Equals(row.Id, idOrName, StringComparison.OrdinalIgnoreCase))
+			{
+				kind = (WeaponPresetKind)(row.Slot - 1);
+				return true;
+			}
+		}
+
+		return Enum.TryParse(idOrName, true, out kind);
 	}
 
 	private void ChooseCharacter(int index)
@@ -456,6 +545,7 @@ public partial class RunController : Node
 	{
 		PlayerCharacterKind.Heavy => "近战重装 — 高血高甲，左键近战重击",
 		PlayerCharacterKind.Summoner => "召唤控制 — G 键召唤无人机（最多 3 架）",
+		PlayerCharacterKind.Hunter => "猎手 — 能量掌：左键能量波、右键蓄力",
 		_ => "远程枪手 — 三把枪、灵活走位",
 	};
 
@@ -485,13 +575,16 @@ public partial class RunController : Node
 	}
 
 	/// <summary>
-	/// 角色表的能力开关矩阵。读不到角色行时回退到分表前那段硬编码规则
-	/// （`melee.Enabled = heavy`、`summon/control.Enabled = summoner`），保证行为逐位一致。
+	/// 角色表的能力开关矩阵。两个名单里写 <b>技能行 Id</b>（`skl_a1_w1_1` —— 可读、稳定、一个技能一个名字）
+	/// **或**脚本类名（`MeleeAttackAbility` —— 旧写法，仍然认）。
 	///
-	/// ⚠️ 这里按**脚本类名**匹配（不是 <c>Ability.AbilityId</c>）：技能表落地后 <c>AbilityId</c> 会被
-	/// 写成技能行的 Id（`skl_melee` 这种），而名单里写的是类名（`MeleeAttackAbility`）。
-	/// 类名在"表在"与"表不在"两种情况下都成立（`Ability.EnsureInitialized` 用类名兜底），
-	/// 所以按类名匹配既与改动前逐位一致，又不会在回退路径上让近战/召唤角色丢掉技能。
+	/// ⚠️ 按类名匹配有个硬伤：**同一个类的两个技能没法分开开关**（角色 A 的两个武技都是
+	/// <c>EnergyWaveAbility</c>）。所以本轮把首选键改成 <c>Ability.AbilityId</c>：它在
+	/// <c>AbilityConfig.ApplyTo</c> 里被写成技能行的 Id，时机在 <see cref="ApplyAbilityMatrix"/>
+	/// 之前（先 <c>ApplySkillsTo</c> 再矩阵）。旧角色行（`chr_gunner` 等）里写的是类名，两条路都命中，
+	/// 所以行为与改动前逐位一致。
+	///
+	/// 读不到角色行时回退到分表前那段硬编码规则（`melee.Enabled = heavy`、`summon/control.Enabled = summoner`）。
 	/// </summary>
 	private void ApplyAbilityMatrix(CharacterConfig? character, bool heavy, bool summoner)
 	{
@@ -500,12 +593,13 @@ public partial class RunController : Node
 
 		foreach (Ability ability in abilities)
 		{
-			string id = ability.GetType().Name;
+			string classId = ability.GetType().Name;
+			string rowId = ability.AbilityId;
 
 			if (character == null)
 			{
 				// 回退：与分表前的规则一模一样。
-				ability.Enabled = id switch
+				ability.Enabled = classId switch
 				{
 					nameof(MeleeAttackAbility) => heavy,
 					nameof(SummonAbility) or nameof(AreaAttackAbility) => summoner,
@@ -514,15 +608,49 @@ public partial class RunController : Node
 				continue;
 			}
 
-			if (System.Array.IndexOf(character.EnabledAbilityIds, id) >= 0)
+			if (Matches(character.EnabledAbilityIds, rowId, classId))
 			{
 				ability.Enabled = true;
 			}
-			else if (System.Array.IndexOf(character.DisabledAbilityIds, id) >= 0)
+			else if (Matches(character.DisabledAbilityIds, rowId, classId))
 			{
 				ability.Enabled = false;
 			}
 		}
+
+		ActRoguelike.Core.GameLog.Write(
+			"Flow",
+			$"能力开关矩阵（角色 {character?.Id ?? "（表读不到，走代码默认值）"}）：{DescribeAbilities(abilities)}");
+	}
+
+	/// <summary>名单命中判定：技能行 Id 优先，其次脚本类名（旧写法）。</summary>
+	private static bool Matches(string[] names, string rowId, string classId)
+	{
+		if (names.Length == 0)
+		{
+			return false;
+		}
+
+		return (!string.IsNullOrEmpty(rowId) && System.Array.IndexOf(names, rowId) >= 0)
+			|| System.Array.IndexOf(names, classId) >= 0;
+	}
+
+	/// <summary>把"哪个技能开、哪个关"写进日志 —— 加技能后"按了没反应"最常见的原因就是这一行没配对。</summary>
+	private static string DescribeAbilities(System.Collections.Generic.List<Ability> abilities)
+	{
+		var text = new System.Text.StringBuilder();
+		foreach (Ability ability in abilities)
+		{
+			if (text.Length > 0)
+			{
+				text.Append('、');
+			}
+
+			string key = string.IsNullOrEmpty(ability.InputAction) ? "-" : ability.InputAction;
+			text.Append($"{ability.AbilityId}[{key}]={(ability.Enabled ? "开" : "关")}");
+		}
+
+		return text.ToString();
 	}
 
 	/// <summary>开局配置完成（选好武器）→ 进入第一关。</summary>

@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CharacterConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/CharacterConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_1.tres" id="2_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_2.tres" id="3_skl"]
+
+[resource]
+script = ExtResource("1_row")
+DisabledAbilityIds = PackedStringArray()
+EnabledAbilityIds = PackedStringArray("skl_a1_w1_1", "skl_a1_w1_2")
+WeaponEnabled = true
+MaxHealth = 200.0
+StartingArmor = 20.0
+MoveSpeed = 6.5
+AttackDamage = 0.0
+AttackInterval = 0.0
+AttackRange = 0.0
+AttackKnockback = 0.0
+JumpVelocity = 13.0
+JumpGravityScale = 3.6
+AnimLibraryDir = "res://Assets/Animations/skills/"
+AnimLibraryName = "skills"
+Skills = [ExtResource("2_skl"), ExtResource("3_skl")]
+Id = "chr_hunter"
+Slot = 4
+DisplayName = "猎手"
+DescriptionTemplate = "{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 移速 {MoveSpeed:0.#}"
+Note = "[新增行·本轮只加不删] 角色 A［猎手］。只落地了武器 1「能量掌」的两个武技（武技1 波波 / 武技2 憋个大的）；技能1[后撤]、技能2[跃升]、被动[灵动]、武器 2/3 还未实现 —— 所以这里没有指向它们的技能行（指向不存在的行会让 Godot 把引用置 null 并告警）。AnimLibraryDir 指向技能动画库目录（生成器的产物）；EnabledAbilityIds 按**技能行 Id** 匹配（同一个 EnergyWaveAbility 类的两个技能要能分开开关）。"

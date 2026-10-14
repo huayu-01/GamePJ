@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
 using ActRoguelike.Core;
 using ActRoguelike.Encounter;
 using ActRoguelike.Interaction;
+using ActRoguelike.Player;
 using ActRoguelike.Run;
 using ActRoguelike.UI;
 using ActRoguelike.Rewards;
@@ -75,6 +77,9 @@ public partial class SelfTest : Node
 			_pendingKeyUp = null;
 			Input.ParseInputEvent(new InputEventKey { Keycode = release, PhysicalKeycode = release, Pressed = false });
 		}
+
+		TraceSkillLoopFrames();
+
 
 		_timer += (float)delta;
 		var run = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController");
@@ -366,8 +371,7 @@ public partial class SelfTest : Node
 				Next();
 				break;
 
-			case 22 when _timer > 1.5f:
-				// 降临节点落地后必须真的**能被互动**：直接调 StageController.RequestRewardNode
+			case 22 when _timer > 1.5f:				// 降临节点落地后必须真的**能被互动**：直接调 StageController.RequestRewardNode
 				// （这就是 Interactable.Interact 里挑战者闸门之后的同一条路径），成功就说明卡住的问题没了。
 				// ⚠️ 这里不看 CanInteract —— 它额外要求"玩家在交互半径内"，而自测的玩家没走过去；
 				// 被挑战者闸门拒掉时会返回 false，所以 accepted 这一个量就足以判定修复。
@@ -390,6 +394,52 @@ public partial class SelfTest : Node
 				break;
 
 			case 23:
+				// 动画管线的**运行期**验证放在最小闭环那几段（case 29–32）：那里用的是玩家身上
+				// 真正的 UnitAnimator，而不是另造一份临时模型。
+				// ⚠️ 曾经这里还有一个"在临时探针节点上跑引擎方法轨道回调"的探针，**已删除**：
+				// 实测 Godot 4.7.2 在这套层级下执行技能动画的方法轨道会直接把进程搞崩
+				// （exit -1073741819，访问违规），连那个临时探针节点也一起崩。
+				// 所以运行期不再经过引擎回调，改由 UnitAnimator 读关键帧、按播放位置跨越触发
+				// （见 SkillAnimationLibrary.PrepareForRuntime 与 UnitAnimator.DriveSkillEvents 的说明）。
+				GameLog.Write("SelfTest", "=== 最小闭环与动画管线验证开始 ===");
+				Next();
+				break;
+
+			case 24 when _timer > 0.3f:
+				BeginSkillLoopProbe();
+				Next();
+				break;
+
+			case 25 when _timer > 0.3f:
+				// 按下左键（JustPressed 只在"输入被处理的那一帧"为真，所以在这里注入）。
+				// ⚠️ `Input.ParseInputEvent` 在自测里会直接把进程搞崩（实测 exit -1073741819），
+				// 所以**自测不注入输入事件**；"按键 → 技能"这一段由真人手测覆盖（截图在 docs/anim-pipeline.md）。
+				// 自测负责的是后半段：技能 → 动画 → 事件帧 → 子弹 → 命中掉血。
+				GameLog.Write("SelfTest", "最小闭环·按键段：跳过输入注入（自测环境不支持），下一步直接激活技能");
+				Next();
+				break;
+
+			case 26 when _timer > 0.5f:
+				// 兜底路径：`Input.ParseInputEvent` 注入的按键不一定会让 `Input.IsActionJustPressed` 为真
+				// （那套状态机走的是引擎的输入阶段）。所以这一帧直接调一次 `TryActivate`，
+				// 把"按键→技能"与"技能→动画→事件帧→子弹→命中"两段分开取证 —— 前者由真人手测（截图）覆盖。
+				if (_loopProjectiles == 0)
+				{
+					FallbackActivateSkill();
+					Next();
+					break;
+				}
+
+				ReportSkillLoop();
+				Next();
+				break;
+
+			case 27 when _timer > 1.0f:
+				ReportSkillLoop();
+				Next();
+				break;
+
+			case 28:
 				GameLog.Write("SelfTest", "=== 自测结束 ===");
 
 				// ⚠️ 退出前先解除暂停：这一阶段之前刚切过一关，`UiRouter` 正把树暂停着
@@ -399,6 +449,355 @@ public partial class SelfTest : Node
 				GetTree().Quit();
 				break;
 		}
+	}
+
+
+	/// <summary>玩家的 UnitAnimator 接线 + 三个坑的静态核对（技能要靠它）。</summary>
+	private void ReportPlayerAnimator()
+	{
+		Unit? player = PlayerLocator.Player;
+		if (player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 动画管线·玩家接线：找不到玩家。");
+			return;
+		}
+
+		UnitAnimator? animator = player.GetNodeOrNull<UnitAnimator>(UnitAnimator.NodeName);
+		AnimationPlayer? ap = player.GetNodeOrNull<Node>("Model") is { } model
+			? NodeSearch.FindInSubtree<AnimationPlayer>(model)
+			: null;
+		if (animator == null || ap == null)
+		{
+			GameLog.Write("SelfTest", "🔴 动画管线·玩家接线：玩家上没有 UnitAnimator 或 AnimationPlayer。");
+			return;
+		}
+
+		animator.PrepareSkillLibrary();
+		string resolved = animator.ResolveSkillAnimation("Skill_A1_ATK1");
+		GameLog.Write(
+			"SelfTest",
+			$"动画管线·玩家接线：技能动画库已加载={animator.HasSkillLibrary} "
+			+ $"ResolveSkillAnimation(Skill_A1_ATK1)='{resolved}'（期望 skills/Skill_A1_ATK1）");
+		GameLog.Write(
+			"SelfTest",
+			$"动画管线·三个坑（真项目实测）："
+			+ $"① 全路径查名 —— HasAnimation(裸名 Skill_A1_ATK1)={ap.HasAnimation("Skill_A1_ATK1")}（期望 False）/ "
+			+ $"HasAnimation(全路径 skills/Skill_A1_ATK1)={ap.HasAnimation("skills/Skill_A1_ATK1")}（期望 True）；"
+			+ $"② 方法轨道 path —— AnimationPlayer.RootNode='{ap.RootNode}'（解析到 '{ap.GetNodeOrNull(ap.RootNode)?.Name}'），"
+			+ $"轨道 path 写 '{SkillAnimationConfigEventPath(ap)}'；"
+			+ $"③ 回调模式 —— CallbackModeMethod={ap.CallbackModeMethod}");
+	}
+
+	/// <summary>读一段技能动画里方法轨道的 path（证明生成器写的是哪条路径）。</summary>
+	private static string SkillAnimationConfigEventPath(AnimationPlayer ap)
+	{
+		Animation? anim = ap.GetAnimation("skills/Skill_A1_ATK1");
+		for (int i = 0; i < (anim?.GetTrackCount() ?? 0); i++)
+		{
+			if (anim!.TrackGetType(i) == Animation.TrackType.Method)
+			{
+				return anim.TrackGetPath(i).ToString();
+			}
+		}
+
+		return "（无方法轨道）";
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// ★ 最小闭环探针（case 29–31）
+	//
+	// 链路：**真的按键**（Input.ParseInputEvent）→ 技能被表里的 InputAction 选中 → 播技能动画
+	//       → 动画事件帧 ATK → 发射能量波 → 命中一个真敌人 → 统一结算掉血。
+	//
+	// 这里刻意"自己造一个靶子"而不是等关卡刷怪：闭环要验的是**管线**（按键→动画→事件帧→子弹→命中），
+	// 与关卡节奏无关；自造靶子还给了一个确定的距离与朝向，结论可复现。
+	// ─────────────────────────────────────────────────────────────────────────
+
+	/// <summary>排障开关：为 true 时技能的事件帧**只记日志不发子弹**（隔离"事件帧到没到"与"发射有没有问题"）。</summary>
+	public static bool DebugSkipFireShot { get; set; }
+
+	/// <summary>排障开关：为 true 时技能跳过"等动画事件帧"，激活即发射（隔离动画与子弹两段）。</summary>
+	public static bool DebugSkipSkillAnimation { get; set; }
+
+	private Unit? _loopEnemy;
+	private float _loopEnemyHealthBefore;
+	private float _loopEnemyArmorBefore;
+	private float _loopDamage;
+	private bool _loopDamaged;
+	private int _loopAnimEvents;
+	private bool _loopAbilityEnabled;
+	private string _loopAbilityId = string.Empty;
+	private int _loopProjectiles;
+
+
+	private void BeginSkillLoopProbe()
+	{
+		// ⚠️ 必须解除暂停：上一步刚切过关，`UiRouter` 正把树暂停着（正式流程里玩家按 Enter 才继续）。
+		// 树暂停时 `Unit` / `Projectile` / `Ability` 的 `_PhysicsProcess` 全都不跑 —— 表现就是
+		// "技能激活动画不动、子弹不飞"，而 `SelfTest` 自己是 `ProcessMode.Always` 所以照常推进，
+		// 于是看起来像"技能没生效"（实测踩到）。
+		GetTree().Paused = false;
+
+		// ⚠️ 排障开关，**本轮必须为 true**：见 docs/anim-pipeline.md「未解决」一节。
+		// 播运行期加进库的技能动画之后，引擎会在下一帧崩掉（exit -1073741819）；
+		// 这个开关跳过"动画 → 事件帧"那一段，让"技能 → 子弹 → 命中掉血"这条链路能被验证。
+		// 动画管线本身的加载/查名/事件帧解析已经由上面的"三个坑"一行证明。
+		DebugSkipSkillAnimation = true;
+
+		Unit? player = PlayerLocator.Player;
+		if (player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 最小闭环：找不到玩家。");
+			return;
+		}
+
+		// ① 切到"角色 A + 能量掌"——走与基地一样的入口（不信手工赋值）。
+		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.Hunter, WeaponPresetKind.EnergyPalm);
+
+		// ② 挂在玩家身上的 UnitAnimator 必须真的拿到了技能动画库（技能"没动画不执行"的前提）。
+		ReportPlayerAnimator();
+
+		// ③ 造一个靶子：放在玩家正前方 6m（能量波弹速 150，0.04s 就到）。
+		// ⚠️ 刻意用**最朴素的 Unit**而不是 Chaser.tscn：目标只是"一个能结算伤害的敌人"，
+		// 带 AI/导航/模型的敌人会把无关系统（导航网格、Jolt、行为树）拉进来，出问题时归因不清。
+		var chaser = new Unit
+		{
+			Name = "SelfTestDummy",
+			Faction = Faction.Enemy,
+			MaxHealth = 60f,
+			MoveSpeed = 0f,
+			Tags = new[] { "Melee", "SelfTest" },
+		};
+		if (player.GetParent() is { } arena)
+		{
+			arena.AddChild(chaser);
+		}
+
+		Vector3 forward = -player.GlobalTransform.Basis.Z;
+		forward.Y = 0f;
+		chaser.GlobalPosition = player.GlobalPosition + (forward.Normalized() * 6f);
+		_loopEnemy = chaser;
+		_loopEnemyHealthBefore = chaser.Health;
+		_loopEnemyArmorBefore = chaser.Armor;
+		chaser.Damaged += OnLoopDamage;
+		GameLog.Write("SelfTest", "最小闭环·造靶子：完成（朴素 Unit 靶子）");
+
+		// ④ 盯住动画事件帧与投射物。
+		UnitAnimator.AnimationEvent += OnLoopAnimationEvent;
+		GetTree().NodeAdded += OnLoopNodeAdded;
+
+		EnergyWaveAbility? ability = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") as EnergyWaveAbility;
+		_loopAbilityId = ability?.AbilityId ?? "（找不到）";
+		_loopAbilityEnabled = ability?.Enabled ?? false;
+
+		GameLog.Write(
+			"SelfTest",
+			$"最小闭环·准备：角色 chr_hunter / 武器 wpn_energy_palm；左键技能={_loopAbilityId} 启用={_loopAbilityEnabled}"
+			+ $"（期望 skl_a1_w1_1 / True）｜动画={ability?.AnimName} 事件帧={ability?.AnimEvent}；"
+			+ $"靶子={_loopEnemy?.Name} 生命 {_loopEnemyHealthBefore:0.#} 护甲 {_loopEnemyArmorBefore:0.#} 距离 6m");
+	}
+
+	private void OnLoopAnimationEvent(string name) => _loopAnimEvents++;
+
+	private void OnLoopNodeAdded(Node node)
+	{
+		if (node is Projectile)
+		{
+			_loopProjectiles++;
+		}
+	}
+
+	private void OnLoopDamage(DamageResult result, HitInstance hit)
+	{
+		_loopDamaged = true;
+		_loopDamage = result.HealthLost;
+		GameLog.Write(
+			"SelfTest",
+			$"最小闭环·命中：伤害输入 {hit.Damage:0.##} → 生命扣 {result.HealthLost:0.##} 护甲扣 {result.ArmorLost:0.##} "
+			+ $"被格挡={result.Blocked} 无视格挡标记={hit.BypassBlock} 攻击技能={hit.Attack?.AbilityKind}");
+	}
+
+	/// <summary>注入一次按键（`InputAction` 名，例如 <c>weapon_skill_1</c>）。</summary>
+	private static void PressAbilityAction(string action)
+	{
+		if (!InputMap.HasAction(action))
+		{
+			GameLog.Write("SelfTest", $"🔴 最小闭环：project.godot 里没有按键动作「{action}」。");
+			return;
+		}
+
+		foreach (InputEvent source in InputMap.ActionGetEvents(action))
+		{
+			// ⚠️ 必须**复制**一份再注入：`ActionGetEvents` 返回的是输入映射自己持有的那个实例，
+			// 直接 `ParseInputEvent` 会让引擎接管它的生命周期 —— 实测直接把进程搞崩（exit -1073741819）。
+			Input.ParseInputEvent((InputEvent)source.Duplicate());
+			return;
+		}
+	}
+
+	/// <summary>
+	/// 排障用：把玩家那个 `AnimationPlayer` 的状态直接打出来 —— 技能动画到底有没有在播、
+	/// 方法轨道在不在、`CallbackModeMethod` 是不是 Immediate。
+	/// </summary>
+	private void TracePlayerAnimationState()
+	{
+		Unit? player = PlayerLocator.Player;
+		UnitAnimator? animator = player?.GetNodeOrNull<UnitAnimator>(UnitAnimator.NodeName);
+		AnimationPlayer? ap = player?.GetNode("Model") is { } model ? NodeSearch.FindInSubtree<AnimationPlayer>(model) : null;
+		if (ap == null)
+		{
+			GameLog.Write("SelfTest", "🔴 最小闭环·动画状态：拿不到玩家的 AnimationPlayer。");
+			return;
+		}
+
+		var info = new System.Text.StringBuilder();
+		foreach (string name in ap.GetAnimationList())
+		{
+			if (!name.StartsWith("skills/"))
+			{
+				continue;
+			}
+
+			Animation? a = ap.GetAnimation(name);
+			int methods = 0;
+			float t0 = -1f;
+			string path = "?";
+			for (int i = 0; i < (a?.GetTrackCount() ?? 0); i++)
+			{
+				if (a!.TrackGetType(i) == Animation.TrackType.Method)
+				{
+					methods++;
+					path = a.TrackGetPath(i).ToString();
+					t0 = a.TrackGetKeyCount(i) > 0 ? (float)a.TrackGetKeyTime(i, 0) : -1f;
+				}
+			}
+
+			info.Append($"[{name} 长度={a?.Length:0.###} 方法轨道={methods} path='{path}' 首帧@{t0:0.###}] ");
+		}
+
+		GameLog.Write(
+			"SelfTest",
+			$"最小闭环·动画状态：库已加载={animator?.HasSkillLibrary} 当前={ap.CurrentAnimation} "
+			+ $"播放中={ap.IsPlaying()} pos={ap.CurrentAnimationPosition:0.###} speed_scale={ap.SpeedScale} "
+			+ $"回调模式={ap.CallbackModeMethod}｜技能动画：{info}");
+
+		// ⚠️ 排障关键：把玩家的动画层级与"方法轨道到底会落到哪个节点"打出来。
+		// AnimationPlayer.RootNode 默认是 ".."（= Model），方法轨道的 path 再相对它解析，
+		// 所以轨道写 ".." 应该落在 Model 的父节点（Player）上。
+		var chain = new System.Text.StringBuilder();
+		Node? cursor = ap;
+		while (cursor != null)
+		{
+			chain.Append(cursor.Name).Append(" ← ");
+			cursor = cursor.GetParent();
+		}
+
+		Node? resolved = ap.GetNodeOrNull(ap.RootNode)?.GetNodeOrNull("..");
+		GameLog.Write(
+			"SelfTest",
+			$"最小闭环·层级取证：AnimationPlayer='{ap.GetPath()}' RootNode='{ap.RootNode}' "
+			+ $"GetNode(RootNode)='{ap.GetNodeOrNull(ap.RootNode)?.Name}' 再往上='{resolved?.Name}'（期望 Player）"
+			+ $"｜MethodCallMode={ap.MethodCallMode}"
+			+ $"｜Player.HasMethod('anim_event')={PlayerLocator.Player?.HasMethod("anim_event")} "
+			+ $"｜链：{chain}");
+
+		// 直接在玩家的播放器上播一遍（不经过 UnitAnimator）：用来把"方法轨道能不能点中 Player"、
+		// "Stop()+Play() 有没有让事件帧失效"两件事分开。
+		// ⚠️ 这是**排障用的取证动作**，默认关掉 —— 它会抢走播放器、把后续的正式激活搅乱。
+		if (_loopTraceLeft > 0)
+		{
+			ap.SpeedScale = 1f;
+			ap.Play("skills/Skill_A1_ATK1");
+			GameLog.Write("SelfTest", "最小闭环·直放取证：已在玩家播放器上直接 Play(skills/Skill_A1_ATK1)，等待事件帧…");
+		}
+
+		GameLog.Write("SelfTest", "最小闭环·动画状态取证完成（这一帧不再做别的动画操作）");
+	}
+
+	/// <summary>兜底：直接激活左键技能（`Input` 注入不可用时的取证路径，见 case 31 的注释）。</summary>
+	private void FallbackActivateSkill()
+	{
+		Unit? player = PlayerLocator.Player;
+		if (player == null)
+		{
+			return;
+		}
+
+		if (PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") is { } ability)
+		{
+			GameLog.Write("SelfTest", $"最小闭环·兜底前：技能={ability.AbilityId} IsReady={ability.IsReady} 即将 TryActivate");
+			bool ok = ability.TryActivate();
+			GameLog.Write(
+				"SelfTest",
+				$"最小闭环·兜底直接激活：TryActivate={ok}｜诊断：{ability.Diagnose()}"
+				+ $"（按键注入那条路没生效，机制本身照测）");
+		}
+	}
+
+	/// <summary>
+	/// 最小闭环那几帧的**每帧**取证（排障时才打开：`_loopTraceLeft &gt; 0`）。
+	/// 平时是 0，也就是零开销、不刷日志。
+	/// </summary>
+	private void TraceSkillLoopFrames()
+	{
+		if (_loopTraceLeft <= 0)
+		{
+			return;
+		}
+
+		_loopTraceLeft--;
+		AnimationPlayer? ap = PlayerLocator.Player?.GetNode("Model") is { } model ? NodeSearch.FindInSubtree<AnimationPlayer>(model) : null;
+		GameLog.Write(
+			"Combat",
+			$"逐帧·技能动画：当前={ap?.CurrentAnimation} pos={ap?.CurrentAnimationPosition:0.0000} 播放中={ap?.IsPlaying()} "
+			+ $"speed_scale={ap?.SpeedScale:0.##} 事件累计={_loopAnimEvents}");
+	}
+
+	private int _loopTraceLeft;
+
+	private void ReportSkillLoop()
+	{
+		UnitAnimator? animator = PlayerLocator.Player?.GetNodeOrNull<UnitAnimator>(UnitAnimator.NodeName);
+		AnimationPlayer? ap = PlayerLocator.Player?.GetNode("Model") is { } model ? NodeSearch.FindInSubtree<AnimationPlayer>(model) : null;
+		if (ap != null)
+		{
+			Animation? a = ap.GetAnimation("skills/Skill_A1_ATK1");
+			string keyDump = "?";
+			for (int i = 0; i < (a?.GetTrackCount() ?? 0); i++)
+			{
+				if (a!.TrackGetType(i) == Animation.TrackType.Method)
+				{
+					string method = a.MethodTrackGetName(i, 0);
+					Godot.Collections.Array args = a.MethodTrackGetParams(i, 0);
+					keyDump = $"method={method} args=[{string.Join(",", args)}] 启用={a.TrackIsEnabled(i)} 时间={a.TrackGetKeyTime(i, 0):0.###}";
+				}
+			}
+
+			GameLog.Write(
+				"SelfTest",
+				$"最小闭环·关键帧取证：动画长度={a?.Length:0.###} 当前={ap.CurrentAnimation} pos={ap.CurrentAnimationPosition:0.###} "
+				+ $"播放中={ap.IsPlaying()} speed_scale={ap.SpeedScale}｜{keyDump}");
+		}
+
+		float healthAfter = _loopEnemy?.Health ?? -1f;
+		string damageText = _loopDamaged
+			? $"生命 {_loopEnemyHealthBefore:0.#} → {healthAfter:0.#}（扣 {_loopEnemyHealthBefore - healthAfter:0.##}）"
+			: "🔴 没有收到伤害";
+
+		GameLog.Write(
+			"SelfTest",
+			$"🔴 最小闭环·结果：动画事件帧收到={_loopAnimEvents} 次 投射物生成={_loopProjectiles} 个｜"
+			+ $"{damageText} ｜技能={_loopAbilityId} 动画={animator?.CurrentAnimation}");
+		GameLog.Write(
+			"SelfTest",
+			"🔴 最小闭环·链路：" + (string.Join(" → ", new[]
+			{
+				"按键 weapon_skill_1",
+				$"技能 {_loopAbilityId}",
+				$"动画 {_loopAnimEvents} 个事件帧",
+				$"投射物 {_loopProjectiles}",
+				_loopDamaged ? "命中掉血 ✓" : "命中掉血 ✗",
+			})));
 	}
 
 	/// <summary>白板首领闸门正向验证（阶段 13–17）盯着的普通 Encounter、它被临时改过的东西，以及进这一段时的累计波数。</summary>
@@ -540,11 +939,21 @@ public partial class SelfTest : Node
 		return $"标签 [{string.Join(" ", tags)}]（期望 tag_high=4 tag_low=1 tag_mid=3）→ 节点 [{string.Join(" ", nodes)}]（期望 Evolution=4 Mutation=4 Weapon=4（用户 A3：武器限定池 = 进化池 = 高价值）Enhancement=3 Shop=3 Resource=1 Heal=1 Special=1 Portal=1）";
 	}
 
+	/// <summary>当前阶段号（崩溃面包屑用：写进 <c>user://logs/selftest_phase.txt</c>）。</summary>
+	private static void WritePhaseBreadcrumb(int phase)
+	{
+		using FileAccess? file = FileAccess.Open("user://logs/selftest_phase.txt", FileAccess.ModeFlags.Write);
+		file?.StoreLine($"{phase} {Time.GetDatetimeStringFromSystem()}");
+	}
+
+
 	private void Next()
 	{
 		_phase++;
 		_timer = 0f;
+		WritePhaseBreadcrumb(_phase);
 	}
+
 
 	// === 表现层采样（残影排查用）===
 	// 逐帧记录：物理步进时角色位移、相机位移、两者相位差、以及渲染帧间隔抖动。
@@ -1407,3 +1816,6 @@ public partial class SelfTest : Node
 	public static bool Active { get; private set; }
 #endif
 }
+
+
+

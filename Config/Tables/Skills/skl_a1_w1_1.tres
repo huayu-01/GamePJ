@@ -1,0 +1,73 @@
+[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_a1_w1_1_0"]
+script = ExtResource("2_param")
+Key = "ProjectileScenePath"
+Value = "res://Scenes/Combat/EnergyWave.tscn"
+Note = "能量波预制体（直线 / 无下坠 / 穿透格挡）"
+
+[sub_resource type="Resource" id="p_a1_w1_1_1"]
+script = ExtResource("2_param")
+Key = "Speed"
+Value = 150.0
+Note = "弹速（文档 武技1[波波]：150）"
+
+[sub_resource type="Resource" id="p_a1_w1_1_2"]
+script = ExtResource("2_param")
+Key = "Damage"
+Value = 10.0
+Note = "伤害（文档 武技1[波波]：10）"
+
+[sub_resource type="Resource" id="p_a1_w1_1_3"]
+script = ExtResource("2_param")
+Key = "MaxLifetime"
+Value = 1.6
+Note = "存活时间（秒）"
+
+[sub_resource type="Resource" id="p_a1_w1_1_4"]
+script = ExtResource("2_param")
+Key = "Pierce"
+Value = 0.0
+Note = "穿透数量（0 = 命中即消失；「穿透」增幅经 StatSheet.PierceAdd 叠加）"
+
+[sub_resource type="Resource" id="p_a1_w1_1_5"]
+script = ExtResource("2_param")
+Key = "Knockback"
+Value = 0.0
+Note = "击退（doc 未写 = 0）"
+
+[sub_resource type="Resource" id="p_a1_w1_1_6"]
+script = ExtResource("2_param")
+Key = "BypassBlock"
+Value = true
+Note = "★ 子弹特性：能穿透格挡（无视格挡效果）—— 文档「能量波」条目"
+
+[sub_resource type="Resource" id="p_a1_w1_1_7"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Projectile", "Energy", "Physical")
+Note = "攻击标签（供增幅的武器标签匹配）"
+
+[resource]
+script = ExtResource("1_row")
+NodeName = "AbilityWeaponSkill1"
+ClassHint = "EnergyWaveAbility"
+InputAction = "weapon_skill_1"
+HoldToCharge = false
+AnimName = "Skill_A1_ATK1"
+AnimEvent = "ATK"
+AnimSpeedScale = 1.0
+Aim = 2
+Cooldown = 0.5
+Windup = 0.08
+Recover = 0.42
+Enabled = true
+Params = [SubResource("p_a1_w1_1_0"), SubResource("p_a1_w1_1_1"), SubResource("p_a1_w1_1_2"), SubResource("p_a1_w1_1_3"), SubResource("p_a1_w1_1_4"), SubResource("p_a1_w1_1_5"), SubResource("p_a1_w1_1_6"), SubResource("p_a1_w1_1_7")]
+Id = "skl_a1_w1_1"
+Slot = 0
+DisplayName = "波波"
+DescriptionTemplate = "朝准星发射一发能量波：伤害 {Damage:0} / 弹速 {Speed:0}。子弹在动画事件帧 ATK 时发射。"
+Note = "角色 A 武器 1「能量掌」武技1（文档 CD:0.5 / 伤害 10 / 弹速 150）。★ 子弹特性：直线无下坠 + 穿透格挡（无视格挡效果）。全部数值由本行的 Params 给，代码里没有任何一处写死这几项。"

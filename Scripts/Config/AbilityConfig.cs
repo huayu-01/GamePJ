@@ -35,9 +35,35 @@ public partial class AbilityConfig : ConfigRow
 	/// <summary>期望的脚本类名（`DashAbility` 等）。填了就在套用时校验，不匹配只警告、不静默写坏。</summary>
 	[Export] public string ClassHint { get; set; } = string.Empty;
 
-	// ⚠️ 刻意**没有** InputAction 列：按键动作名现在由 `PlayerAbilityInput` 按能力**类**硬编码
-	// （`Input.IsActionJustPressed("dash"/"burst"/"summon"/"control")`）+ `project.godot [input]` 决定。
-	// 加一列没人读的"按键"只会让人以为改了它就能改键 —— 改键是「设置表」那件事（见 docs/config.md 末尾）。
+	/// <summary>
+	/// <b>这个技能绑哪个按键动作</b>（`project.godot` 的 `[input]` 名，例如 <c>weapon_skill_1</c>）。
+	///
+	/// <para>⚠️ 本轮**推翻了**原来的设计决定。原注释写的是："刻意**没有** InputAction 列：按键动作名现在由
+	/// <c>PlayerAbilityInput</c> 按能力**类**硬编码"—— 那条路让"加一个技能/角色/武器"必须改 C# 代码
+	/// （用户硬要求：只加表行）。现在输入层（<c>PlayerAbilityInput</c>）**只读这一列**。</para>
+	///
+	/// <para>留空 = 这个技能不由玩家按键直接触发（敌人技能 / 被动 / 由别的技能驱动）。
+	/// 填了但在 <c>project.godot</c> 里不存在的动作名，输入层会写一条警告并跳过（不静默）。</para>
+	/// </summary>
+	[Export] public string InputAction { get; set; } = string.Empty;
+
+	/// <summary>按住式输入（蓄力类技能用）：按住期间每帧回调，松开时回调一次"释放"。</summary>
+	[Export] public bool HoldToCharge { get; set; }
+
+	[ExportGroup("动画（「没有对应动画 → 技能不执行」，用户裁定）")]
+	/// <summary>
+	/// 这个技能要播的**技能动画名**（`Assets/Animations/skills/` 下的那一段，例如 <c>Skill_A1_ATK1</c>）。
+	///
+	/// 查名走全路径（<c>skills/Skill_A1_ATK1</c>），因为 <c>AnimationPlayer.HasAnimation</c> 不搜嵌套库。
+	/// **留空 = 这个技能不需要动画**（纯数值被动之类）；填了却查不到 → 技能**拒绝执行**并写明确日志。
+	/// </summary>
+	[Export] public string AnimName { get; set; } = string.Empty;
+
+	/// <summary>事件帧名（<c>ATK</c> / <c>Dodge</c> / <c>Release</c> …）：动画播到这一帧才释放效果。</summary>
+	[Export] public string AnimEvent { get; set; } = string.Empty;
+
+	/// <summary>动画速度倍率（&gt;1 加速释放，蓄力类 &lt;1 拉长）。写在每个单位自己的播放器上。</summary>
+	[Export] public float AnimSpeedScale { get; set; } = 1f;
 
 	[ExportGroup("通用项（多数技能填这一组）")]
 	/// <summary>释放方向来源（行里给了就用行里的；所有行都会显式给出，与场景里的值一致）。</summary>
@@ -102,6 +128,12 @@ public partial class AbilityConfig : ConfigRow
 
 		ability.AbilityId = Id;
 		ability.Aim = Aim;
+		// 按键与动画：**逐条照写**（空 = 不绑按键 / 不需要动画），因为它们决定"这个技能能不能被按出来"。
+		ability.InputAction = InputAction;
+		ability.HoldToCharge = HoldToCharge;
+		ability.AnimName = AnimName;
+		ability.AnimEvent = AnimEvent;
+		ability.AnimSpeedScale = AnimSpeedScale <= 0f ? 1f : AnimSpeedScale;
 		if (Cooldown > 0f)
 		{
 			ability.Cooldown = Cooldown;

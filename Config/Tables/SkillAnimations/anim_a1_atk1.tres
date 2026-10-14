@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillAnimationConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/SkillAnimationConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "anim_a1_atk1"
+DisplayName = "A1 武技1 波波 · ATK 帧"
+Note = "角色 A 武器 1（能量掌）武技1：源段单手射击，事件帧 ATK @0.08s（= 源段 40% 处）。子弹在这一帧发射。"
+SourceModelPath = "res://Assets/Models/player/mesh_player_body.glb"
+SourceAnimation = "holding-right-shoot"
+SourcePlayerPath = "AnimationPlayer"
+TargetName = "Skill_A1_ATK1"
+Library = "skills"
+OutputDir = "res://Assets/Animations/skills/"
+Loop = false
+EventNames = PackedStringArray("ATK")
+EventTimes = PackedFloat32Array(0.08)
+EventTargetPath = ".."
+EventMethod = "anim_event"
+
