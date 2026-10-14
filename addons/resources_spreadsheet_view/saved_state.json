@@ -22,6 +22,28 @@
         "visibility": 0.0
       }
     },
+    "res://Config/Tables/AbilityCards/": {
+      "metadata/_custom_type_script": {
+        "visibility": 0.0
+      },
+      "resource_local_to_scene": {
+        "visibility": 0.0
+      },
+      "resource_name": {
+        "visibility": 0.0
+      }
+    },
+    "res://Config/Tables/AiProfiles/": {
+      "metadata/_custom_type_script": {
+        "visibility": 0.0
+      },
+      "resource_local_to_scene": {
+        "visibility": 0.0
+      },
+      "resource_name": {
+        "visibility": 0.0
+      }
+    },
     "res://Config/Tables/Bosses/": {
       "metadata/_custom_type_script": {
         "visibility": 0.0
@@ -98,6 +120,50 @@
       "resource_name": {
         "visibility": 0.0
       }
+    },
+    "res://Config/Tables/UpgradePools/": {
+      "metadata/_custom_type_script": {
+        "visibility": 0.0
+      },
+      "resource_local_to_scene": {
+        "visibility": 0.0
+      },
+      "resource_name": {
+        "visibility": 0.0
+      }
+    },
+    "res://Config/Tables/Upgrades/": {
+      "metadata/_custom_type_script": {
+        "visibility": 0.0
+      },
+      "resource_local_to_scene": {
+        "visibility": 0.0
+      },
+      "resource_name": {
+        "visibility": 0.0
+      }
+    },
+    "res://Config/Tables/ValueTags/": {
+      "metadata/_custom_type_script": {
+        "visibility": 0.0
+      },
+      "resource_local_to_scene": {
+        "visibility": 0.0
+      },
+      "resource_name": {
+        "visibility": 0.0
+      }
+    },
+    "res://Config/Tables/Weapons/": {
+      "metadata/_custom_type_script": {
+        "visibility": 0.0
+      },
+      "resource_local_to_scene": {
+        "visibility": 0.0
+      },
+      "resource_name": {
+        "visibility": 0.0
+      }
     }
   },
   "recent_paths": [
@@ -109,7 +175,13 @@
     "res://Config/Tables/Enemies/",
     "res://Config/Tables/Stages/",
     "res://Config/Tables/Pressure/",
-    "res://Config/Tables/Summons/"
+    "res://Config/Tables/Summons/",
+    "res://Config/Tables/UpgradePools/",
+    "res://Config/Tables/Upgrades/",
+    "res://Config/Tables/ValueTags/",
+    "res://Config/Tables/Weapons/",
+    "res://Config/Tables/AbilityCards/",
+    "res://Config/Tables/AiProfiles/"
   ],
   "table_functions": {
     "filter": [

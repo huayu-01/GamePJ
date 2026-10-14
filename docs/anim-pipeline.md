@@ -146,53 +146,98 @@ Godot_v4.7.2-stable_mono_win64.exe --path 'F:\Godot项目\项目a' res://Scenes/
 
 按表行 Id 选（不是索引）——这正是"加角色/武器不改代码"该有的样子。
 
----
-
-## 6. ⚠️ 未解决（本轮没做完的，必须知道）
-
-### 6.1 自测里"播运行期新加进库的技能动画"会让引擎崩
-
-**现象**：`exit -1073741819`（访问违规），崩在**播放技能动画后的下一帧**。
-已经逐帧取证：`技能动画开播` 打印成功 → 下一帧 `UnitAnimator._PhysicsProcess` **一次都没进技能分支**就崩了。
-
-**已排除**：资源本身（同一份 `.tres` 在临时工程里正常）、`Stop()/Seek()`、`Play(blend)`、
-`TrackSetEnabled`、`PrepareForRuntime` 的复制、动画源片段（换成 `idle` 也一样崩）、
-`AnimationPlayer` 是否早已在跑（在 `_Ready` 里就加载库也一样崩）、命中特效、Jolt/导航。
-
-**因此**：`SelfTest.BeginSkillLoopProbe` 里 `DebugSkipSkillAnimation = true`——
-自测跳过"动画 → 事件帧"那一段，让"技能 → 子弹 → 命中"能被验证。
-动画管线本身的加载/查名/事件帧解析由 case 24 那一行证明。
-
-### 6.2 自测里"能量波命中结算"也让引擎崩
-
-**现象**：`能量波发射` 打印成功（伤害 10 / 弹速 150 / 无视格挡=True）→ 下一帧崩。
-已定位到 `Projectile.ResolveImpact` 的**"是敌人单位"那个分支内部**（`K1 ResolveImpact 进入` 打到了，
-后面的 `L1 是敌人单位` 没打到）。`GameplayEventBus` / `HitEffect` 都还没走到。
-
-**两个崩点都没有在真人手测里复现过**（手测时游戏窗口还在，没有崩），所以怀疑是
-**headless + 无窗口 + 自测这条特殊路径**触发的；但**没有证据**，不能当成"只影响自测"。
-
-### 6.3 因此本轮**没有**拿到"进关卡 → 按左键 → 看到动画播 → 看到子弹飞出 → 看到敌人掉血"的完整证据
-
-拿到的是：
-- ✅ 三个坑的真项目实测（§2）
-- ✅ 技能 → 子弹：`能量波发射：skl_a1_w1_1 伤害 10 弹速 150（普通，无视格挡=True，穿透 0，方向 …）`
-- ✅ 动画管线：加载 2 段 / 全路径查名 / 事件帧解析出 `ATK@0.08s` / `CallbackModeMethod=Immediate`
-- ❌ 动画真的播出来（引擎崩）
-- ❌ 子弹真的命中掉血（引擎崩）
-
-### 6.4 下一步建议
-
-1. 在**真人手测**（非 headless、正常窗口）里跑 `--char=chr_hunter --weapon=wpn_energy_palm`，
-   确认这两个崩点是否只在自测环境出现；
-2. 若手测也崩：用 Godot 的 `--verbose` + 崩溃转储定位到具体引擎调用，
-   或改用"播放器只播**全局库**里的裸名动画"绕开命名库这条路；
-3. 若手测正常：把 `SelfTest.DebugSkipSkillAnimation` 改回 `false`，并给命中链加一个不经过 `Projectile`
-   的直连探针（`target.ReceiveHit(...)`）来验证结算。
+> ⚠️ **这条命令行入口现在会在"基地已经选过一局"时静默失效**（`RunSetup.HasSelection` 那条分支
+> 抢在 `BeginConfigure` 之前 return 了）。根因与绕过办法见 §6.4-2 / §9。
 
 ---
 
-## 7. 旧硬指标对比（只加不删的验证）
+## 6. ✅ 本轮结论（2026-10-15）：**两个"引擎崩"都是误判**，最小闭环已跑通
+
+### 6.1 崩因查清：不是"播动画让引擎崩"，是**取证代码误用引擎 API**
+
+| 上一轮的说法 | 本轮实测结论 |
+|---|---|
+| ① "播运行期加进库的技能动画会让引擎崩"（`exit -1073741819`） | ❌ **误判**。真正崩的是 `SelfTest.ReportSkillLoop()` 里用 **`Animation.MethodTrackGetParams()`** 读方法轨道关键帧 —— 这个调用本身就让进程崩（调用栈 `MethodTrackGetParams → ReportSkillLoop → _Process`），而它恰好落在 case 27（技能动画刚播完那一帧），于是被当成"播动画把引擎搞崩"。全项目 grep 后改成**唯一安全的读法 `Animation.TrackGetKeyValue()`**（取回 `Dictionary{"method","args"}`，与运行期 `UnitAnimator.ReadSkillEvents` 同一口径）→ **自测全程跑完、退出码 0**。 |
+| ② "`Projectile.ResolveImpact` 的『是敌人单位』分支内部也崩" | ❌ **没复现**。修掉 ① 之后自测跑完（退出码 `0`），`ResolveImpact` 走"命中真敌人 → 扣血"这条路也不再崩。上一轮那两行 `K1/L1` 探针现场是被前一个崩溃打断的。 |
+
+**证据**（`--selftest` 日志）：
+```
+最小闭环·关键帧取证：动画长度=1.333 当前=skills/Skill_A1_ATK1 pos=0.887 播放中=True speed_scale=1｜
+  method=anim_event args=[ATK] 启用=False 时间=0.08 path='..'     ← 这行就是 TrackGetKeyValue 读出来的
+=== 自测结束 ===                                                   ← 退出码 0
+```
+崩因面包屑 `user://logs/selftest_phase.txt` **保留**（本轮它就是把崩溃钉在 case 27 的工具）。
+
+### 6.2 第二个真 bug：技能**收不到动画事件帧**（本轮修掉，否则闭环不可能成立）
+
+`DebugSkipSkillAnimation` 改回 `false` 之后，自测立刻暴露：
+
+```
+[Animation] 技能动画开播：Player → skills/Skill_A1_ATK1（… 事件帧 1 个：ATK@0.08s）
+[Combat]    ⚠ 技能 skl_a1_w1_1 等不到动画事件帧「ATK」，本次施法放弃
+```
+
+动画正常播、`UnitAnimator` 也真的发出了 `ATK` 帧（自测计数 `动画事件帧收到=1`），但**技能收不到** → 永远不发射。
+
+**根因**：`Ability.EnsureInitialized()` 里那次订阅**只会发生一次**（`_animEventHookedByMe`），
+而它被 `Ability._PhysicsProcess` 在**第一个物理帧**就调用了 —— 那一帧配置表还没套上来，
+`AnimEvent` 还是空串，于是这次"唯一的机会"被判为"这个技能不需要事件帧"，**之后永远不再订阅**。
+表的套用发生在 `_Process`（idle 帧）里的 `RunController.ApplyBalance → UnitConfig.ApplySkillsTo`，
+**晚于第一个物理帧**。
+
+**修法**（`Scripts/Abilities/Ability.cs`，**只加不删**）：把订阅抽成幂等的 `EnsureAnimEventHooked()`，
+在 `EnsureInitialized` / `_PhysicsProcess` / `TryActivate` 三处都可以补订阅。
+
+### 6.3 ✅ 最小闭环真的能玩：证据（真人手测 + 截图）
+
+入口：`--char=chr_hunter --weapon=wpn_energy_palm`（MCP 的 `run_project` 传不了 user args，
+改用 `RunController.BeginRunWithCharacter(Hunter, EnergyPalm)` 达到同一状态）。
+**左键是真人真按**（`mcp__windows__` 的鼠标工具落到游戏窗口上）。
+
+同一条日志窗口里三行连起来就是整条链路：
+
+```
+02:05:59 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK1（speed_scale=1，循环=False，事件帧 1 个：ATK@0.08s）
+02:05:59 [Combat]    能量波发射：skl_a1_w1_1 伤害 10 弹速 150（普通，无视格挡=True，穿透 0，方向 (0,-0.342,-0.9397)）
+02:05:59 [Combat]    伤害 Player(94.8) → Chaser(35) 10        ← 敌人 45 → 35（正好是表里的伤害 10）
+```
+
+截图（`docs/screenshots/`）：
+
+| 文件 | 证明什么 |
+|---|---|
+| `loop_shot_2.png` / `loop_shot_4.png` | **动画真的播出来**：角色处于"能量掌"出招姿态（手臂前伸），身前有能量特效 |
+| `loop_shot_hit.png` | **命中掉血**：敌人紧贴身前、血条已掉，头顶飘出伤害数字 **10** |
+
+复现步骤（下一步别人要重跑时照这个走）：见 §9。
+
+### 6.4 本轮**没做完**的 / 需要下一轮的
+
+1. **自测里「命中掉血」还没覆盖**。`SelfTest.BeginSkillLoopProbe` 的靶子是自造的 `Unit`；
+   本轮给它加了 `CollisionShape3D` 并按**真实弹道**摆位（从投射物出生点往前 0.8m），
+   但投射物的射线**依然打不到它**（靶子生命 60 → 60 未变；射线几何已核对过必然穿过胶囊中心，
+   同一份射线打真敌人 Chaser 是能中的 —— 也就是"自测自造靶子"这条路本身有问题，
+   下一轮建议**直接用 `Chaser.tscn` 实例当靶子**，或改用直连探针 `target.ReceiveHit(...)`）。
+   现在是"**动画 → 事件帧 → 发射**由自测覆盖（`投射物生成=1`），**命中掉血**由真人手测覆盖"。
+2. **`--char/--weapon` 在"基地已经选过一局"时会静默失效**：`RunController._Process` 里
+   `if (RunSetup.HasSelection) { BeginRunWithCharacter(...); return; }` 在 `BeginConfigure`（那里才读命令行）
+   **之前**就 return 了。`OS.GetCmdlineUserArgs()` 本身是好的（已用探针脚本验证 `--` 与 `++` 都能解析）。
+   下一轮把 `TryApplyLoadoutOverride()` 判到 `RunSetup.HasSelection` 前面即可。
+3. **左键会同时开一枪 0 伤害的手枪**：`chr_hunter.tres` 的 `WeaponEnabled = true`
+   （`wpn_energy_palm` 的 `ScenePath` 暂用 `Pistol.tscn`、`Damage = 0`），
+   所以每次左键除了能量波还打出一发 0 伤害子弹（日志 `伤害 Player(220) → Chaser(45) 0`）。
+   按这一行 `Note` 的原意（"它**不走** Weapon 组件的开火"），应把 `WeaponEnabled` 改成 `false`。
+4. **能量掌的瞄准口径与既有枪械不一致**：`EnergyWaveAbility` 走 `Ability.Aim = Crosshair` →
+   `AimUtil.GetCrosshairDirection`（**相机屏幕中心射线方向**，实测 ≈ `(0,-0.342,-0.9397)`，
+   斜向下 20°），从胸口射出后约 **3m 就落地** —— 近身（实测 1.5m 处）能命中，远距离打不到。
+   既有枪械是在 `PlayerWeaponInput` 里先 `IntersectRay` 求出**准星打到的那个世界点**再朝它开火。
+   下一轮统一成"朝准星点"更合理。
+5. `SelfTest` 里 `配置表比对·索引` 的**期望串还是旧的** `3/3/10/1/1/25/7/9/8/6/3/11/8`
+   （实际 `4/4/…/27`，是"只加不删"的预期变化）。它只是打印、不会失败，但会误导。
+
+---
+
+## 7. 旧硬指标对比（只加不删的验证 · 本轮逐位复核）
 
 | 指标 | 基线 | 本轮 | 结论 |
 |---|---|---|---|
@@ -200,12 +245,13 @@ Godot_v4.7.2-stable_mono_win64.exe --path 'F:\Godot项目\项目a' res://Scenes/
 | 节点布置 | 10（2/5/3） | 10（2/5/3） | 逐位一致 |
 | Pressure 测试 | pressure=3 pmods=3 bank=0 | pressure=3 pmods=3 bank=0 | 逐位一致 |
 | 白板首领实例 | 生命 315 / 护甲 0 | 生命 315 / 护甲 0 | 逐位一致 |
-| 配置表比对·玩家 | 生命 270 护甲 40 移速 7 | 同 | 逐位一致 |
-| 配置表比对·索引 | 3/3/10/1/1/25/7/9/8/6/3/11/8 | 4/4/10/1/1/27/7/9/8/6/3/11/8 | **只在新增行上变化（预期内）**，自测期望值待同步 |
+| 配置表比对·玩家 | 生命 270 护甲 40 移速 7 | 生命 270 护甲 40 移速 7 | 逐位一致 |
+| 端到端 F | `奖励界面打开 = True  Paused = True` | 同 | 逐位一致 |
+| 配置表比对·索引 | 3/3/10/1/1/25/7/9/8/6/3/11/8 | 4/4/10/1/1/27/7/9/8/6/3/11/8 | **只在新增行上变化（预期内）**，自测期望值待同步（见 §6.4-5） |
 
 `ConfigIndex.tres` 同步方式（**三处一起改**）：`load_steps` 123→131、新增 6 个 `[ext_resource]`、
 `Weapons`/`Characters`/`Skills`/`SkillAnimations` 四个数组各加项。
-每次改完都核对日志里的 `（ConfigIndex.tres 已加载）`。
+每次改完都核对日志里的 `（ConfigIndex.tres 已加载）`。**本轮没有改 `ConfigIndex.tres`。**
 
 ---
 
@@ -215,4 +261,35 @@ Godot_v4.7.2-stable_mono_win64.exe --path 'F:\Godot项目\项目a' res://Scenes/
 |---|---|
 | `ConfigIndex.tres` 改动前 | `F:\Godot项目\_refactor_backup\ConfigIndex.tres.before`（仓库外） |
 | 基线自测日志 | `F:\Godot项目\_refactor_backup\baseline_run.log` / `baseline_godot.log` |
-| 基线 `HEAD` | `7182e7a769ccaa042ce044d33231261b3e98d660`（`git rev-list --count` = 54） |
+| 动画管线那一轮的 `HEAD` | `36818fe`（本轮从它继续） |
+| 最初的基线 `HEAD` | `7182e7a769ccaa042ce044d33231261b3e98d660`（`git rev-list --count` = 54） |
+
+---
+
+## 9. 怎么复现"最小闭环"（下一轮照这个走）
+
+```powershell
+# ① 编辑器必须开着（MCP 才可用）：gdmcp doctor → editor_connected: true
+& 'F:\Godot项目\项目a\.gdmcp\bin\gdmcp.exe' doctor
+$cli = 'F:\Godot项目\项目a\.gdmcp\bin\gdmcp.exe'
+
+# ② 用 MCP 起窗口（run_project 传不了 user args，所以第 ③ 步用运行期入口代替 --char/--weapon）
+& $cli tool-call run_project --allow-open-world --apply `
+  --args-json '{"allow_window":true,"scene_path":"res://Scenes/Main.tscn"}'
+
+# ③ 运行期选角色/武器（等价于 --char=chr_hunter --weapon=wpn_energy_palm；Hunter=3 EnergyPalm=3）
+& $cli tool-call evaluate_runtime_expression --allow-open-world --apply `
+  --args-json '{"node_path":"/root/Main/RunController","expression":"BeginRunWithCharacter(3, 3)"}'
+& $cli tool-call evaluate_runtime_expression --allow-open-world --apply `
+  --args-json '{"node_path":"/root","expression":"get_node(\"/root/UiService\").CloseAll()"}'
+
+# ④ 战斗窗口在前台后，**真按左键**（mcp__windows__ 的 Click；或 SendInput）。
+#    想立刻看到命中：先把敌人摆到"准星方向 1.5m"处，再点左键：
+#    get_tree().get_nodes_in_group("enemy_units")[0].set("global_position",
+#        get_tree().get_first_node_in_group("player_units").global_position + Vector3(0,0,-1.5))
+
+# ⑤ 取证只看三行：技能动画开播 / 能量波发射 / 伤害 Player(...) → <敌人>(…)
+#    日志：C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\logs\run_*.log
+```
+
+⚠️ 玩家会掉血死亡（一局约 2 分钟），**进关卡后要尽快按左键**。

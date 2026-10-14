@@ -116,6 +116,9 @@ public abstract partial class Ability : Node3D
 			return;
 		}
 
+		// 每帧补一次订阅：配置表是在第一个物理帧之后才套上来的（见 EnsureAnimEventHooked 的说明）。
+		EnsureAnimEventHooked();
+
 		float dt = (float)delta;
 		if (CooldownRemaining > 0f)
 		{
@@ -133,6 +136,7 @@ public abstract partial class Ability : Node3D
 	public bool TryActivate(Unit? target = null)
 	{
 		EnsureInitialized();
+		EnsureAnimEventHooked();
 		if (OwnerUnit is null or { IsDead: true } || !IsReady || !CanActivate(target))
 		{
 			return false;
@@ -197,15 +201,35 @@ public abstract partial class Ability : Node3D
 		}
 
 		_initialized = true;
+		EnsureAnimEventHooked();
+		OnReady();
+	}
 
-		// 动画事件帧 → 这个能力。只在"本能力真的关心事件帧"时挂（否则每个技能都会收到别人的帧）。
-		if (!string.IsNullOrEmpty(AnimEvent) && !_animEventHookedByMe)
+	/// <summary>
+	/// 订阅"动画事件帧"（<see cref="UnitAnimator.AnimationEvent"/>）——**只在"本能力真的关心事件帧"时挂**
+	/// （否则每个技能都会收到别人的帧）。
+	///
+	/// ⚠️ <b>必须能被反复调用，不能只在 <see cref="EnsureInitialized"/> 里挂一次</b>（本轮修的真 bug，实测）：
+	/// <see cref="AnimEvent"/> 来自配置表，而表的套用（<c>RunController.ApplyBalance</c> →
+	/// <c>UnitConfig.ApplySkillsTo</c> → <c>AbilityConfig.ApplyTo</c>）发生在 <c>_Process</c>（idle 帧）里，
+	/// **晚于第一个物理帧**；而 <see cref="EnsureInitialized"/> 在第一个物理帧就被
+	/// <see cref="_PhysicsProcess"/> 调用了 —— 那时 <see cref="AnimEvent"/> 还是空的，
+	/// 于是这次"唯一的一次"订阅机会被判为"不需要"，`_animEventHookedByMe` 永远为 false，
+	/// 事件帧**永远不会送到这个能力**。
+	///
+	/// 表现（实测）：技能动画正常播、<c>UnitAnimator</c> 也真的发出了 <c>ATK</c> 帧，
+	/// 但技能收不到 → 既不发射、也没有任何报错，最终以
+	/// 「等不到动画事件帧「ATK」，本次施法放弃」收场（`EnergyWaveAbility.Tick` 的超时分支）。
+	/// </summary>
+	private void EnsureAnimEventHooked()
+	{
+		if (_animEventHookedByMe || string.IsNullOrEmpty(AnimEvent))
 		{
-			UnitAnimator.AnimationEvent += OnAnimationEvent;
-			_animEventHookedByMe = true;
+			return;
 		}
 
-		OnReady();
+		UnitAnimator.AnimationEvent += OnAnimationEvent;
+		_animEventHookedByMe = true;
 	}
 
 	public override void _ExitTree()

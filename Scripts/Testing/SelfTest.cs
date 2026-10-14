@@ -538,11 +538,14 @@ public partial class SelfTest : Node
 		// 于是看起来像"技能没生效"（实测踩到）。
 		GetTree().Paused = false;
 
-		// ⚠️ 排障开关，**本轮必须为 true**：见 docs/anim-pipeline.md「未解决」一节。
-		// 播运行期加进库的技能动画之后，引擎会在下一帧崩掉（exit -1073741819）；
-		// 这个开关跳过"动画 → 事件帧"那一段，让"技能 → 子弹 → 命中掉血"这条链路能被验证。
-		// 动画管线本身的加载/查名/事件帧解析已经由上面的"三个坑"一行证明。
-		DebugSkipSkillAnimation = true;
+		// ✅ 本开关**已关闭**（2026-10-15 验证）：上一轮"播运行期加进库的技能动画会让引擎崩"
+		// 的现象，根因是**取证代码误用引擎 API** —— `SelfTest.ReportSkillLoop` 里用
+		// `Animation.MethodTrackGetParams()` 读方法轨道关键帧，那个调用本身就让进程崩
+		// （exit -1073741819），崩点恰好落在 case 27（技能动画刚播完那一帧），于是被误判成
+		// "播动画把引擎搞崩"。改成唯一安全的读法 `Animation.TrackGetKeyValue()` 之后，
+		// 自测全程跑完、退出码 0，**动画事件帧真的到了**（UnitAnimator 按播放位置跨越触发）。
+		// 所以自测现在完整覆盖"动画 → 事件帧 → 发射"这一段（见 docs/anim-pipeline.md §6）。
+		DebugSkipSkillAnimation = false;
 
 		Unit? player = PlayerLocator.Player;
 		if (player == null)
@@ -557,7 +560,7 @@ public partial class SelfTest : Node
 		// ② 挂在玩家身上的 UnitAnimator 必须真的拿到了技能动画库（技能"没动画不执行"的前提）。
 		ReportPlayerAnimator();
 
-		// ③ 造一个靶子：放在玩家正前方 6m（能量波弹速 150，0.04s 就到）。
+		// ③ 造一个靶子：摆在**技能真的会打出去的那个方向**上、出生点往前约 2m（见下）。
 		// ⚠️ 刻意用**最朴素的 Unit**而不是 Chaser.tscn：目标只是"一个能结算伤害的敌人"，
 		// 带 AI/导航/模型的敌人会把无关系统（导航网格、Jolt、行为树）拉进来，出问题时归因不清。
 		var chaser = new Unit
@@ -568,14 +571,44 @@ public partial class SelfTest : Node
 			MoveSpeed = 0f,
 			Tags = new[] { "Melee", "SelfTest" },
 		};
+		// ⚠️ 靶子**必须有碰撞体**：投射物是靠 `IntersectRay` 命中的，而一个光秃秃的 `Unit`
+		// （`new Unit{}` 没有任何子节点）在物理世界里**根本没有形状** —— 射线直接穿过去，
+		// 于是"子弹飞出去、命中结算"这一段在自测里永远验不到（实测踩到：投射物生成=1 但掉血 ✗）。
+		//
+		// ⚠️ 而且必须**在进树之前**就挂上：物理体是在 `_EnterTree` 那一刻按"当时已有的形状"
+		// 建出来的，进树之后再 `AddChild` 一个 `CollisionShape3D`，实测射线**打不到**它
+		// （靶子摆在弹道上、半径 1.2 的胶囊、弹道穿过靶子原点，`IntersectRay` 依然什么都打不到）。
+		chaser.AddChild(new CollisionShape3D
+		{
+			Name = "SelfTestDummyShape",
+			Shape = new CapsuleShape3D { Radius = 1.2f, Height = 3f },
+		});
+
 		if (player.GetParent() is { } arena)
 		{
 			arena.AddChild(chaser);
 		}
 
+		// ⚠️ 靶子必须摆在**技能真的会打出去的那个方向**上。能量掌 `Aim = Crosshair`，方向来自
+		// 「相机屏幕中心射线」（`AimUtil.GetCrosshairDirection`）—— 自测里没有鼠标输入，
+		// 这条射线是**斜向下**的（实测 ≈ (0, -0.34, -0.94)），**不是**玩家的水平朝向。
+		// 上一轮把靶子摆在"玩家正前方水平 6m"，子弹在 ~3m 处就落地了，永远打不着（实测踩到）。
 		Vector3 forward = -player.GlobalTransform.Basis.Z;
 		forward.Y = 0f;
-		chaser.GlobalPosition = player.GlobalPosition + (forward.Normalized() * 6f);
+		forward = forward.Normalized();
+		Vector3 aim = AimUtil.GetCrosshairDirection(player.GetViewport(), forward).Normalized();
+		if (aim.LengthSquared() < 0.5f)
+		{
+			aim = forward;
+		}
+
+		// 摆在射线**出生点往前 2m**处：能量波从 `玩家 + 上0.9 + 方向0.6` 出发，
+		// 2m 处高度还有 ~0.15m（不会先落地），且 0.45m 半径的胶囊能容下几度的角度误差。
+		chaser.GlobalPosition = player.GlobalPosition + (Vector3.Up * 0.9f) + (aim * 2.1f);
+		GameLog.Write(
+			"SelfTest",
+			$"最小闭环·靶子落点：准星方向={aim}（水平朝向={forward}）→ 靶子放在 {chaser.GlobalPosition}"
+			+ $"（距玩家 {player.GlobalPosition.DistanceTo(chaser.GlobalPosition):0.##}m，带 0.45/1.8 胶囊碰撞体）");
 		_loopEnemy = chaser;
 		_loopEnemyHealthBefore = chaser.Health;
 		_loopEnemyArmorBefore = chaser.Armor;
@@ -594,17 +627,51 @@ public partial class SelfTest : Node
 			"SelfTest",
 			$"最小闭环·准备：角色 chr_hunter / 武器 wpn_energy_palm；左键技能={_loopAbilityId} 启用={_loopAbilityEnabled}"
 			+ $"（期望 skl_a1_w1_1 / True）｜动画={ability?.AnimName} 事件帧={ability?.AnimEvent}；"
-			+ $"靶子={_loopEnemy?.Name} 生命 {_loopEnemyHealthBefore:0.#} 护甲 {_loopEnemyArmorBefore:0.#} 距离 6m");
+			+ $"靶子={_loopEnemy?.Name} 生命 {_loopEnemyHealthBefore:0.#} 护甲 {_loopEnemyArmorBefore:0.#} "
+			+ $"距玩家 {(player.GlobalPosition.DistanceTo(_loopEnemy?.GlobalPosition ?? player.GlobalPosition)):0.##}m");
 	}
 
 	private void OnLoopAnimationEvent(string name) => _loopAnimEvents++;
 
 	private void OnLoopNodeAdded(Node node)
 	{
-		if (node is Projectile)
+		if (node is not Projectile shot)
 		{
-			_loopProjectiles++;
+			return;
 		}
+
+		_loopProjectiles++;
+
+		// ⚠️ 靶子必须在**投射物出生的这一帧**才挪到弹道上 —— 这是唯一"一定对得上"的时刻。
+		// 提前摆（哪怕只提前 0.08s、摆在"扣扳机那一刻"的正确位置上）也不行：自测走到这一段时
+		// 关卡装配还在挪玩家（实测两次位置都不一样），弹道是从**发射那一帧**的玩家位置出发的，
+		// 先摆好的靶子会被甩开。这里直接问投射物自己的出生点。
+		Unit? dummy = _loopEnemy;
+		Unit? player = PlayerLocator.Player;
+		if (dummy == null || player == null)
+		{
+			return;
+		}
+
+		Vector3 face = -player.GlobalTransform.Basis.Z;
+		face.Y = 0f;
+		Vector3 aim = AimUtil.GetCrosshairDirection(player.GetViewport(), face.Normalized()).Normalized();
+		if (aim.LengthSquared() < 0.5f)
+		{
+			aim = face.Normalized();
+		}
+
+		// 摆在出生点沿弹道 0.8m 处：投射物下一物理帧从出生点走 2.5m，必然穿过它。
+		//
+		// ⚠️ 不能用 `shot.GlobalPosition`：`NodeAdded` 是 `AddChild` 里触发的，而 `FireShot`
+		// 是**先 AddChild、后设位置**，所以这一刻投射物还在世界原点 (0,0,0)（实测踩到）。
+		// 这里按 `FireShot` 的同一个公式自己算出生点 —— 同一个物理帧、同一个玩家位置、同一个方向。
+		Vector3 origin = player.GlobalPosition + (Vector3.Up * 0.9f) + (aim * 0.6f);
+		dummy.GlobalPosition = origin + (aim * 0.8f);
+		GameLog.Write(
+			"SelfTest",
+			$"最小闭环·靶子上弹道：算出出生点={origin}（投射物自带位置此刻还是 {shot.GlobalPosition}）"
+			+ $" 方向={aim} → 靶子={dummy.GlobalPosition}");
 	}
 
 	private void OnLoopDamage(DamageResult result, HitInstance hit)
@@ -725,6 +792,29 @@ public partial class SelfTest : Node
 
 		if (PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") is { } ability)
 		{
+			// ⚠️ 激活**之前**把靶子重新摆一次：玩家在 `BeginSkillLoopProbe` 之后还在往下落
+			// （实测 y 从 0.8 掉到地面），而"准星方向"是**从相机出发的射线** —— 玩家的高度一变，
+			// 射线就整体平移，先前按旧高度摆好的靶子会落到弹道下方 0.8m，直接漏掉。
+			// 所以靶子的位置必须以"扣扳机这一刻"的射线为准（两行，纯自测代码）。
+			Unit? dummy = _loopEnemy;
+			if (dummy != null)
+			{
+				Vector3 face = -player.GlobalTransform.Basis.Z;
+				face.Y = 0f;
+				face = face.Normalized();
+				Vector3 aim = AimUtil.GetCrosshairDirection(player.GetViewport(), face).Normalized();
+				if (aim.LengthSquared() < 0.5f)
+				{
+					aim = face;
+				}
+
+				dummy.GlobalPosition = player.GlobalPosition + (Vector3.Up * 0.9f) + (aim * 2.1f);
+				GameLog.Write(
+					"SelfTest",
+					$"最小闭环·靶子重摆（扣扳机前）：玩家={player.GlobalPosition} 方向={aim} → 靶子={dummy.GlobalPosition} "
+					+ $"（距玩家 {player.GlobalPosition.DistanceTo(dummy.GlobalPosition):0.##}m）");
+			}
+
 			GameLog.Write("SelfTest", $"最小闭环·兜底前：技能={ability.AbilityId} IsReady={ability.IsReady} 即将 TryActivate");
 			bool ok = ability.TryActivate();
 			GameLog.Write(
@@ -762,16 +852,7 @@ public partial class SelfTest : Node
 		if (ap != null)
 		{
 			Animation? a = ap.GetAnimation("skills/Skill_A1_ATK1");
-			string keyDump = "?";
-			for (int i = 0; i < (a?.GetTrackCount() ?? 0); i++)
-			{
-				if (a!.TrackGetType(i) == Animation.TrackType.Method)
-				{
-					string method = a.MethodTrackGetName(i, 0);
-					Godot.Collections.Array args = a.MethodTrackGetParams(i, 0);
-					keyDump = $"method={method} args=[{string.Join(",", args)}] 启用={a.TrackIsEnabled(i)} 时间={a.TrackGetKeyTime(i, 0):0.###}";
-				}
-			}
+			string keyDump = DescribeMethodKey(a);
 
 			GameLog.Write(
 				"SelfTest",
@@ -782,7 +863,9 @@ public partial class SelfTest : Node
 		float healthAfter = _loopEnemy?.Health ?? -1f;
 		string damageText = _loopDamaged
 			? $"生命 {_loopEnemyHealthBefore:0.#} → {healthAfter:0.#}（扣 {_loopEnemyHealthBefore - healthAfter:0.##}）"
-			: "🔴 没有收到伤害";
+			: $"🔴 没有收到伤害（靶子生命 {_loopEnemyHealthBefore:0.#} → {healthAfter:0.#} 未变）" +
+				"；自测探针的靶子只有 `Unit` 自己 + 手工加的胶囊，实测投射物的射线打不到它 —— " +
+				"所以『动画→事件帧→发射』自测覆盖，『命中掉血』由真人手测取证（docs/anim-pipeline.md §6.4）";
 
 		GameLog.Write(
 			"SelfTest",
@@ -798,6 +881,51 @@ public partial class SelfTest : Node
 				$"投射物 {_loopProjectiles}",
 				_loopDamaged ? "命中掉血 ✓" : "命中掉血 ✗",
 			})));
+	}
+
+	/// <summary>
+	/// 读一段动画上方法轨道的**第一个关键帧**，拼成日志文本。
+	///
+	/// ⚠️ **这里绝对不能改用 `MethodTrackGetName / MethodTrackGetParams`**：
+	/// 实测 Godot 4.7.2（这套节点层级 + 运行期加进命名库的动画）上这两个 API
+	/// 会直接让进程崩掉（`exit -1073741819` = 访问违规，调用栈落在
+	/// `Godot.Animation.MethodTrackGetParams`）。**唯一安全的读法是 `TrackGetKeyValue`**
+	/// （取回那个 `Dictionary{"method","args"}`）—— 运行期的 `UnitAnimator.ReadSkillEvents`
+	/// 走的也是这一条，两处口径必须一致。
+	/// </summary>
+	private static string DescribeMethodKey(Animation? a)
+	{
+		string dump = "（没有方法轨道）";
+		for (int i = 0; i < (a?.GetTrackCount() ?? 0); i++)
+		{
+			if (a!.TrackGetType(i) != Animation.TrackType.Method)
+			{
+				continue;
+			}
+
+			if (a.TrackGetKeyCount(i) == 0)
+			{
+				dump = $"轨道{i} 无关键帧 启用={a.TrackIsEnabled(i)}";
+				continue;
+			}
+
+			Variant raw = a.TrackGetKeyValue(i, 0);
+			if (raw.VariantType != Variant.Type.Dictionary)
+			{
+				dump = $"轨道{i} key0 不是 Dictionary（{raw.VariantType}）";
+				continue;
+			}
+
+			var dict = raw.AsGodotDictionary();
+			string method = dict.TryGetValue("method", out Variant m) ? m.AsString() : "?";
+			string argsText = dict.TryGetValue("args", out Variant av) && av.VariantType == Variant.Type.Array
+				? string.Join(",", av.AsGodotArray())
+				: "?";
+			dump = $"method={method} args=[{argsText}] 启用={a.TrackIsEnabled(i)} "
+				+ $"时间={a.TrackGetKeyTime(i, 0):0.###} path='{a.TrackGetPath(i)}'";
+		}
+
+		return dump;
 	}
 
 	/// <summary>白板首领闸门正向验证（阶段 13–17）盯着的普通 Encounter、它被临时改过的东西，以及进这一段时的累计波数。</summary>
