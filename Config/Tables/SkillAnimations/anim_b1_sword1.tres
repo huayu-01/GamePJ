@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillAnimationConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/SkillAnimationConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "anim_b1_sword1"
+DisplayName = "角色 B 武器1 灵剑 武技1「破剑式」第 1 段 · ATK 帧"
+Note = "角色 B（武器大师）。★ 源段取自 mesh_player_body.glb 自带的 32 段之一（近战挥砍 = attack-melee-left/right、大回旋 = attack-kick-right、突刺 = holding-right、起手 = fall/jump、蓄力/架势 = holding-both）。★ EventTimes 填的是**源片段时刻**，生成器会按 Length/源长 等比缩放：ATK 落在 Length × (源时刻/源长)。★ 事件帧 ATK = 命中判定 + 斩断子弹；Combo = 开「连续按键」的输入窗口（两个都在动画里，武技1 就是动画驱动碰撞和间隔）。"
+SourceModelPath = "res://Assets/Models/player/mesh_player_body.glb"
+SourceAnimation = "attack-melee-right"
+SourcePlayerPath = "AnimationPlayer"
+TargetName = "Skill_B1_Sword1"
+Library = "skills"
+OutputDir = "res://Assets/Animations/skills/"
+Length = 0.403
+Loop = false
+EventNames = PackedStringArray("ATK", "Combo")
+EventTimes = PackedFloat32Array(0.375, 0.3875)
+EventTargetPath = ".."
+EventMethod = "anim_event"

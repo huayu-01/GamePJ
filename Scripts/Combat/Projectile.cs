@@ -73,7 +73,126 @@ public partial class Projectile : Node3D
 	private bool _exploded;
 	private Rid _ownerRid;
 
-	public override void _Ready() => AddToGroup("projectiles");
+	/// <summary>
+	/// **斩断"场景名匹配"的投射物**（P4 新增，只加不删）。
+	///
+	/// <para>文档（角色 B 武器 1「灵剑」武技1「破剑式」）：「每段都可以摧毁碰撞盒内的子弹
+	/// （**包括友军的**，但**无法斩断"能量波"**）」。所以判据不能是"敌对与否"，也不是"投射物的
+	/// 碰撞形状名"（实测：项目里的投射物预制体**没有** <c>CollisionShape3D</c> —— 弹道走射线、
+	/// 不靠形状），而是**投射物的来源场景名**：近战命中体把 <c>CutSceneNames</c>（表列）里的名字
+	/// 对应的投射物清掉，能量波的场景名（`EnergyWave`）不写进名单 → 斩不断。
+	/// **是数据，不是代码特例。**</para>
+	///
+	/// <para>名字来自 <see cref="SourceSceneName"/> = 投射物场景文件的基名
+	/// （`res://Scenes/Combat/Bullet.tscn` → `Bullet`）。名单里写基名即可。</para>
+	/// </summary>
+	/// <returns>真的清掉几个。</returns>
+	public static int CutBySceneName(string sceneName, Vector3 center, float radius)
+		=> CutBySceneName(sceneName, center, radius, null);
+
+	/// <summary>
+	/// 同上，并**按名单排除**（文档：「无法斩断"能量波"」→ 排除名单里写 `EnergyWave`）。
+	/// 排除名单是**表列**（`CutExcludeSceneNames`），不是代码里的特例分支。
+	/// </summary>
+	public static int CutBySceneName(string sceneName, Vector3 center, float radius, string[]? excludeSceneNames)
+	{
+		if (string.IsNullOrEmpty(sceneName) || radius <= 0f)
+		{
+			return 0;
+		}
+
+		float radiusSquared = radius * radius;
+		int cut = 0;
+		foreach (Node node in _live.ToArray())
+		{
+			if (!GodotObject.IsInstanceValid(node))
+			{
+				continue;
+			}
+
+			if (node is not Projectile projectile || projectile.SourceSceneName != sceneName)
+			{
+				continue;
+			}
+
+			if (excludeSceneNames != null && System.Array.IndexOf(excludeSceneNames, projectile.SourceSceneName) >= 0)
+			{
+				continue;
+			}
+
+			// 文档要的是"**碰撞盒内**的子弹"：以命中盒中心为球心做一次距离过滤。
+			if (projectile.GlobalPosition.DistanceSquaredTo(center) > radiusSquared)
+			{
+				continue;
+			}
+
+			cut++;
+			projectile.Cut();
+		}
+
+		return cut;
+	}
+
+	/// <summary>还活着（还没被清掉）的投射物数量 —— 自测取证用。</summary>
+	public static int LiveCount => _live.Count;
+
+	/// <summary>场上每个投射物的"场景名 @ 位置"（自测排障：一眼看出斩断半径够不够）。</summary>
+	public static string DebugSummary()
+	{
+		var parts = new System.Collections.Generic.List<string>();
+		foreach (Node node in _live)
+		{
+			if (node is Projectile projectile && GodotObject.IsInstanceValid(projectile))
+			{
+				parts.Add($"{projectile.SourceSceneName}@{projectile.GlobalPosition}");
+			}
+		}
+
+		return parts.Count == 0 ? "（无）" : string.Join(" / ", parts);
+	}
+
+	/// <summary>场内所有投射物的来源场景名（自测 / 排障：一眼看出"斩断名单该写什么"）。</summary>
+	public static string SourceSceneSummary()
+	{
+		var names = new System.Collections.Generic.List<string>();
+		foreach (Node node in _live)
+		{
+			if (node is Projectile projectile && !string.IsNullOrEmpty(projectile.SourceSceneName) && !names.Contains(projectile.SourceSceneName))
+			{
+				names.Add(projectile.SourceSceneName);
+			}
+		}
+
+		return names.Count == 0 ? "（场上没有投射物）" : string.Join("、", names);
+	}
+
+	/// <summary>
+	/// **本投射物的来源场景名**（`Bullet` / `EnergyWave` / `Arrow` / `SwordQi`…）。
+	/// 斩断判定认它 —— 见 <see cref="CutBySceneName"/>。
+	/// </summary>
+	public string SourceSceneName => _sourceSceneName ??= SceneFilePath.GetFile().GetBaseName();
+
+	/// <summary>被近战斩断时的一次性收尾（<see cref="CutBySceneName"/> 走它）。</summary>
+	private void Cut()
+	{
+		CutDown?.Invoke();
+		QueueFree();
+	}
+
+	/// <summary>被斩断时触发（自测取证：证明是"被斩断"而不是自己到期）。</summary>
+	public event System.Action? CutDown;
+
+	private static readonly System.Collections.Generic.List<Projectile> _live = new();
+	private string? _sourceSceneName;
+
+	public override void _Ready()
+	{
+		AddToGroup("projectiles");
+		_live.Add(this);
+
+	}
+
+	public override void _ExitTree() => _live.Remove(this);
 
 	public void Launch(AttackInstance attack, Vector3 direction)
 	{

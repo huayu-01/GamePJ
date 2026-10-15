@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_StanceSeconds"]
+script = ExtResource("2_param")
+Key = "StanceSeconds"
+Value = 0.75
+Note = "★ 文档 0.75 秒"
+
+[sub_resource type="Resource" id="p_GuardStartSeconds"]
+script = ExtResource("2_param")
+Key = "GuardStartSeconds"
+Value = 0.15
+Note = "举刀那一刻（之后才开始算架势）"
+
+[sub_resource type="Resource" id="p_GuardOnEvent"]
+script = ExtResource("2_param")
+Key = "GuardOnEvent"
+Value = "GuardOn"
+Note = "开架势的动画事件帧名"
+
+[sub_resource type="Resource" id="p_GuardOffEvent"]
+script = ExtResource("2_param")
+Key = "GuardOffEvent"
+Value = "GuardOff"
+Note = "收架势的动画事件帧名"
+
+[resource]
+script = ExtResource("1_row")
+NodeName = "AbilitySkill2"
+ClassHint = "GuardStanceAbility"
+InputAction = "skill_2"
+HoldToCharge = false
+AnimName = "Skill_B_Guard"
+AnimEvent = "GuardOn"
+AnimEventEnd = "GuardOff"
+AnimSpeedScale = 1.0
+Aim = 0
+Cooldown = 3.0
+Windup = 0.0
+Recover = 0.05
+Enabled = true
+Params = [SubResource("p_StanceSeconds"), SubResource("p_GuardStartSeconds"), SubResource("p_GuardOnEvent"), SubResource("p_GuardOffEvent")]
+Id = "skl_b_skill_2"
+Slot = 0
+DisplayName = "架"
+DescriptionTemplate = "角色短暂地进入架势 0.75 秒，如果这期间被敌人命中则规避这次攻击并退出架势。"
+Note = "[P4 新增行] 角色 B 技能2（文档 CD:3 / 架势 0.75 秒）。★ 「规避这次攻击」= 挨打时把这次命中无效化（Unit.IsInvulnerable 是既有的「这次命中不算」通路），然后立刻收招；每帧把上一帧自己设的那次规避清掉，所以架势剩余时间里**下一次命中仍会被规避**（这才是「挡一下」而不是「无敌到架势结束」）。★ 不动既有的 BlockComponent（那是**部分格挡**，语义不同）。"

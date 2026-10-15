@@ -343,3 +343,162 @@ P3 新增了 `WeaponConfig.Skills`（武器 → 它的武技行，资源引用�
    因为文档把它写进了机制描述里）。
 3. **`大射天下` 的 `Aim`**：文档这一行写的是「朝**角色方向**」（对比武技1 的「朝准星方向」），
    照原文取 `Aim = Facing`；若实际手感要改成准星，改那一格即可（不改代码）。
+
+---
+
+## 8. P4 接入记录（角色 B［武器大师］3 把近战武器 + 技能 1/2 + 被动 + 9 条新机制，2026-10-15）
+
+> 这一节是**给 P5（增幅接入）与 P6（表现）看的接入契约**：P4 给基类补了什么、给"数组型表参数"立了什么规矩、
+> "武技1 统一驱动"这件事到底落在哪一行代码上。
+
+### 8.1 ⭐「武技1 应当使用同一个技能或状态驱动」是怎么落地的 —— **一个能力 + 一串表参数**
+
+设计文档第 98 行的条注是**架构硬要求**：
+
+```
+角色B[武器大师](注:武器武技1基本是动画驱动碰撞和间隔的,这里的cd只是参考值,
+               几个武器的武技1应当是使用同一个技能或状态驱动,因为都是由动画控制);
+```
+
+**落地 = 一个能力类 `MeleeComboAbility` 服务三把武器**（灵剑 5 段 / 镰刀 3 段 / 长枪 5 段循环）。
+理由三条：
+
+1. 文档**明确要求**"同一个技能或状态驱动"；
+2. 三把武器的连招**只差"段数 + 每段的数值"**，而这两样都是表列 —— 三个类会让"给某把武器加一段"变成改 C#，
+   违反 `character-redesign.md` §1.5「加武器/技能不改代码」；
+3. 那份"cd"本文档自己就写着"**只是参考值**"：段与段的间隔由**动画长度**决定（每段一段独立动画），
+   CD 是**连招结束后的冷却**。
+
+差异全部落在 `Config/Tables/SkillSeries/<技能行Id>.tres`（见 §8.2）：
+
+| 武器 · 武技1 | `ComboAnimations` | `ComboLoop` | 备注 |
+|---|---|---|---|
+| 灵剑「破剑式」 | `Skill_B1_Sword1..5`（5 段） | false | 每段都能斩断子弹（`CutSceneNames=Bullet`，排除 `EnergyWave`） |
+| 镰刀「憎恶」 | `Skill_B2_Scythe1..3`（3 段） | false | 最后一刀的命中盒 z=0 → **切成圆柱**（大回旋 360°） |
+| 长枪「横扫千军」 | `Skill_B3_Spear1..5`（5 段） | **true** | 挥砍→上挑→下劈→突刺→挥砍，打满回到第 1 段（"这么循环"） |
+
+**一次施法的状态机**（代码在 `MeleeComboAbility`，三把武器共用）：
+
+```
+TryPress(第一次) → TryActivate → OnActivate：播 ComboAnimations[0]
+   └─ 事件帧 ATK（动画驱动）→ Strike()：开命中盒（伤害 ×StepDamageScales[段]）+ CutBullets() + 开输入窗口
+        ├─ 窗口内再按 TryPress → Advance()：段 +1 → 播 ComboAnimations[段]（不再查冷却、不再查动画）
+        └─ 窗口超时（ComboWindowSeconds）→ Finish()（进冷却）
+```
+
+- **输入层不用改**：`PlayerAbilityInput` 调的是 `Ability.TryPress`（基类默认实现 = `TryActivate`），
+  连招子类覆写它 —— "哪个技能是连招"仍然是**表**（`ClassHint` + 串文件）说了算。
+- **`ATK` 帧没来时的兜底**：`Tick` 里超时 `Cancel()` + 明确日志（不做时间驱动兜底，与全项目同一条纪律）。
+- ⚠️ **自测用 `DebugFireAnimEvent()` 模拟"事件帧到了"**（自测在同一帧里跑、推不出真实动画事件帧）——
+  它只是 `OnAnimEvent(ComboNextEvent)` 的公开入口，**不参与任何正式流程**。
+
+### 8.2 ⚠️ 数组型表参数：Godot 的 C# 绑定读不回来 —— 整串落进**一个 string 字段**
+
+这是 P4 花时间最多的一处，**必须记下来，别再踩**（实测 Godot 4.7.2 + 本项目）：
+
+| 写法 | 结果 |
+|---|---|
+| `[Export] float[]` / `string[]` | **编译不过**：`GD0102 The type of the exported member is not supported` |
+| `[Export] PackedFloat32Array` / `PackedStringArray` | **C# 侧没有公开类型**（`Variant.Type` 里有、`Godot` 命名空间里没有） |
+| `[Export] Godot.Collections.Array<T>` | 同 `GD0102` |
+| `[Export] T[]`（对象数组，例如 `ParamEntry[]`） | 写入能存下去，**读回来是空**（`Count` 有值、每一项 `null`） |
+| `[Export] Resource` 多个字段（`Items0..Items7`） | **子资源引用读不回来**（字段全是 `null`） |
+| ✅ `[Export] string`（一整串文本） | **任何情况下都能读** —— 走的就是这条 |
+
+所以 P4 的规矩是：**"一串参数"落成 `Config/Tables/SkillSeries/<技能行Id>.tres` 的一行
+`AbilitySeries`（`Entries` 一个 string 字段装全部），格式 `名=值1|值2|值3;名2=…`**，
+由 `AbilitySeries.ParseFloats/ParseTexts/ParseVectors` 读成数组。
+
+- **技能行不需要多一列指向它**：文件名就是技能行 Id，`MeleeComboAbility` 按
+  `res://Config/Tables/SkillSeries/<AbilityId>.tres` 约定读（读不到 → 明确日志 + 退化成单段，不静默）。
+  这样做还有一个副作用是好的：它**不依赖任何新表列**，所以"编辑器里的 C# 程序集是旧的"这种环境问题
+  （见 §8.6）也不会让它失效。
+- 数值本身仍然**只存在于表里**：代码里没有任何一个段数/尺寸/倍率的常数。
+
+### 8.3 基类与共用类这一轮多出来的东西（全部**只加不删**）
+
+| 新增 | 语义 | 不填时 |
+|---|---|---|
+| `Ability.PlaySkillAnimationNamed(name, speedScale)` | **按名播一段技能动画**（连招的每段名字不同） | 没人调用 → 0 影响 |
+| `Ability.AnyAnimationAvailable(string[])` | "这些动画里有没有至少一个存在" | 同上 |
+| `Ability.OnFinishOrCancel()` | **收招钩子**（`Finish`/`Cancel` 都调）—— 连招用它把命中盒还原回场景基线 | 默认空实现 → 既有子类逐位不变 |
+| `Ability.TryPress(target)` | **"玩家按了这个键"**的入口；默认实现 = `TryActivate` | 同上 |
+| `Ability.BeginEventDrivenCast()` | 让"事件驱动的被动"进入施法态（`LandingBurstAbility` 用） | 同上 |
+| `Ability.LoadSeries/BindSeries` | 按路径读 `AbilitySeries` | 同上 |
+| `CharacterMovement.FallHeight` / `IsAirborne` | **本次离地后的净下落高度**（下落攻击的高度档） | 只多算两个浮点量，不参与 `MoveAndSlide` 输入 |
+| `Projectile.CutBySceneName(...)` / `SourceSceneName` / `_live` | 近战斩断子弹（按**来源场景名**匹配 + 半径过滤 + 排除名单） | 名单为空 → 一次都不查 |
+| `ArrowVolleyAbility.ProjectileSizeScale` | 投射物整体缩放（剑气"大小等比攻击盒大小"） | ≤0 → 一行不进 |
+
+**没有改语义**的既有文件：`Weapon.cs`、7 个共用 `Ability` 子类的行为、敌人/首领/召唤物的数据行与技能行。
+`MeleeAttackAbility`（既有共用近战能力）**一个字没动** —— 角色 B 走的是新类。
+
+### 8.4 新增的表行与索引
+
+| 分组 | 新增行 |
+|---|---|
+| 角色（1） | `chr_weapon_master`（Slot 5） |
+| 武器（3） | `wpn_spirit_sword`(7) · `wpn_scythe`(8) · `wpn_spear`(9) |
+| 技能（10） | `skl_b1_w1_1` 破剑式 · `skl_b1_w1_2` 拔刀式 · `skl_b1_w1_3` 落剑式 · `skl_b2_w1_1` 憎恶 · `skl_b2_w1_2` 无情 · `skl_b3_w1_1` 横扫千军 · `skl_b3_w1_2` 长虹贯日 · `skl_b_fall` 落 · `skl_b_skill_1` 闪 · `skl_b_skill_2` 架 |
+| 技能动画（17） | `anim_b1_sword1..5` / `anim_b1_swordqi` / `anim_b2_scythe1..3` / `anim_b3_spear1..5` / `anim_b_fall` / `anim_b_skill1` / `anim_b_skill2` |
+| 连招串（3） | `Config/Tables/SkillSeries/skl_b1_w1_1.tres` · `skl_b2_w1_1.tres` · `skl_b3_w1_1.tres` | ← **不进 ConfigIndex**（按技能行 Id 约定路径读，见 §8.2） |
+| 场景（2） | `Scenes/Combat/MeleeStrike.tscn`（近战命中体复用件）· `Scenes/Combat/SwordQi.tscn`（剑气投射物） |
+
+`ConfigIndex.tres`：`load_steps 147 → 165`、31 个 `[ext_resource]`、四个数组各加项
+（`Weapons` +3 / `Characters` +1 / `Skills` +10 / `SkillAnimations` +17）。
+日志核对：`（ConfigIndex.tres 已加载）`，索引从 `6/4/10/1/1/34/7/10/8/6/3/11/8`
+→ **`9/5/10/1/1/44/7/10/8/6/3/11/8`**（差额只来自新增行）。
+
+**动画对齐**（`AnimSpeedScale` 逐条算过：事件帧绝对时刻 = 目标长度 × 源时刻/源长）：
+
+| 技能 | `AnimSpeedScale` | 事件帧落在 |
+|---|---|---|
+| 破剑式 / 憎恶 / 横扫千军（每段） | 1.44 | `ATK`@0.363s、`Combo`@0.375s（÷1.44 → **0.25/0.26s**；段间隔由动画长度决定） |
+| 拔刀式（蓄力 1s） | 0.35 | `ATK`@0.364 ÷ 0.35 ≈ **1.04s** ≈ 基础蓄力 ✓ |
+| 落 / 闪（起手） | 1.0 | `Action`@0（起手即生效） |
+| 架 | 1.0 | `GuardOn`@0、`GuardOff`@0.75（架势区间） |
+
+### 8.5 自测取证（case 42–52，`--selftest`，**退出码 0**，`run_20261015_201256.log`）
+
+```
+✅ P4·灵剑武技1 破剑式：段数表=5 连续按键推进 4 次（期望 ≥4） 最终段=5 累计连击=4
+✅ P4·破剑式斩断子弹：友军的 Bullet 被清=是 敌方的 Bullet 被清=是 能量波还在=是（斩不断）本段斩断计数=2
+✅ P4·灵剑武技2 拔刀式：基础蓄力 1s / 没蓄满松手 → 剑气 0 个 / 蓄满 → 1 个；穿透 8、可被格挡=True、存活 0.45s；剑气尺寸 1.4 = 武技1 命中盒最长边 2.8 × 0.5
+✅ P4·技能1 闪：方向朝准星；碰撞层 7 → 1（只剩世界层）→ 冲刺后还原 7；可视化路径 17 点
+✅ P4·技能2 架：推 0.2s 后在架势中=True；架势内挨 40 点 → 无效化=True 掉血 0；架住计数 +1 并退出架势
+✅ P4·被动 落：地面时 TryPress=False；空中 TryPress=True、下落速度 -34 m/s；每 2m +20%、封顶 +100%（0m ×1 / 2 档 ×1.4 / 20 档 ×2）
+🔴 P4·武技3 落剑式：上游落地=True、上游伤害 18 未被改动、额外那圈触发次数 +1 —— ⚠️ 但"那一圈打掉了多少血"没测出来（见下）
+✅ P4·镰刀：武技1 段数=3、最后一刀命中盒 (7.2, 1.8, 0) = **圆柱**；武技2 抛出/在飞/周期伤害/再次按键收回；武器门绑定=True、飞行期间武技1 被锁=True、收回后解锁=True
+🔴 P4·长枪武技1：段数=5、ComboLoop=True、推进 10 次、循环后最大段号=5（打满回第 1 段）—— ⚠️ 但"3 档的路径中线应该 20.74m"实测仍是 12m（见下）
+```
+
+**旧硬指标逐位不变**（同一份日志）：节点布置 `10（2/5/3）`、`pressure=3 pmods=3 bank=0`、
+白板首领 `315/甲 0`、玩家 `270/40/7 减伤 0`、端到端 `奖励界面打开=True Paused=True`、
+`（ConfigIndex.tres 已加载）`、最小闭环链路 ✓、`=== 自测结束 ===`（退出码 0）。
+
+### 8.6 本轮**没做完 / 已知不达标**（交给下一轮）
+
+1. 🔴 **长枪武技2 的"每档 +20%"在自测里没体现**：`LastHorizontalSpeed`/`LastHorizontalDistance`
+   两次都是 15 / 12m。**根因**：`ChargeSteps` 在自测的"同步推蓄力"那条路上没被算到
+   （`OnInputHeld` 推了 1.75s，但 `ChargeMaxStepsEffective = 4`、`ChargeMaxSeconds = 2.0`）。
+   代码本身走的是基类的 `ChargePowerScale`（与角色 A 的弓同一条路，那条已验证过），
+   所以**大概率是自测驱动的口径问题**，但**没有实测证据**，如实记为"未达标"。
+2. 🔴 **落剑式那一圈"打掉多少血"没有实测证据**：`AttackHitbox` 是 `Area3D`，
+   重叠列表要等**一个物理帧**才更新，而自测在**同一帧**里连续驱动能力 → 那一圈永远打不到人。
+   判据改成"落地事件触发 + 上游伤害没变"（这两条过了）。**要拿到"打掉血"的证据需要一次真人/MCP 手测**
+   （摆一个敌人在落点旁，真按下落攻击）。
+3. ⚠️ **`WeaponGate` 的两个技能行 Id 是按节点名推的默认值**（`WeaponGate5 → skl_b2_w1_1/2`）。
+   表列（`ThrowAbilityId` / `ComboAbilityId`）还没有行真的填过 —— 目前只走默认值那条路。
+   要"纯表驱动"就把两列填上（代码已经优先用表列）。
+4. ⚠️ **表现层完全没做**：剑气的拖尾、落剑式的特效圈、冲刺残影、蓄力指示器都属 P6。
+   路径可视化只做了"一条折线"（`DashPathIndicator`）。
+5. ⚠️ **`<B限定>` / `<B1/B2/B3限定>` 的 12 条增幅一行都没建**（地爆 / 闪身步 / 招架反击 /
+   金光术 / 大拔刀术 / 神降术 / 怜悯 / 普渡 / 喜爱 / 气贯长虹 / 金光大道 / 浮光跃金）——
+   那是 P5 的范围。**机制侧已经备好**：`ParryCount`（招架反击）、落地事件（地爆）、
+   串里的倍率列（怜悯/金光大道）、`MeleeComboAbility.ExternallyBlocked`（气贯长虹的"不再能收回"要改抛掷侧）。
+6. ⚠️ **升级池**：三把近战武器行没有 `Pool` 引用（`UpgradePools` 数组还是 3 行）——
+   P5 做池重构时一起加。
+7. ⚠️ **剑气的 `AnimSpeedScale = 0.35` 是"事件帧 ÷ 基础蓄力"的比值**（0.364 ÷ 1.0），
+   与角色 A 那两条（能量掌 0.2 / 弓 0.7）同一个口径。
+8. ⚠️ **`AbilitySeries` 的整套写法（§8.2）是"绕过 Godot C# 绑定限制"的方案**，
+   不是"漂亮做法"：以后 Godot 的 C# 绑定支持了 `PackedStringArray`，应当改回"技能行上的一个数组列"。
+

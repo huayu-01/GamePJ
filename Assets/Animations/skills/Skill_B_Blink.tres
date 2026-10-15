@@ -1,0 +1,96 @@
+[gd_resource type="Animation" format=3 uid="uid://chn3422v4x6tr"]
+
+[resource]
+resource_name = "Skill_B_Blink"
+length = 0.25
+tracks/0/type = "position_3d"
+tracks/0/imported = true
+tracks/0/enabled = true
+tracks/0/path = NodePath("character-male-a/Skeleton3D:leg-left")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0.0791, 0.221, -0.0867)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = true
+tracks/1/enabled = true
+tracks/1/path = NodePath("character-male-a/Skeleton3D:leg-left")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, -0.6087615, 0, 0, -0.7933534, 0.033333335, 1, -0.60156345, 0, 0, -0.798825, 0.06666667, 1, -0.5825484, 0, 0, -0.81279606, 0.1, 1, -0.5555315, 0, 0, -0.8314955, 0.13333334, 1, -0.52453935, 0, 0, -0.85138625, 0.16666667, 1, -0.49398682, 0, 0, -0.8694694, 0.2, 1, -0.46866608, 0, 0, -0.88337535, 0.23333333, 1, -0.453599, 0, 0, -0.89120585, 0.26666668, 1, -0.45359904, 0, 0, -0.8912059, 0.3, 1, -0.46866608, 0, 0, -0.8833754, 0.33333334, 1, -0.49398687, 0, 0, -0.8694694, 0.36666667, 1, -0.5245394, 0, 0, -0.8513862, 0.4, 1, -0.5555315, 0, 0, -0.8314956, 0.43333334, 1, -0.58254844, 0, 0, -0.8127961, 0.5, 1, -0.6087615, 0, 0, -0.7933534)
+tracks/2/type = "position_3d"
+tracks/2/imported = true
+tracks/2/enabled = true
+tracks/2/path = NodePath("character-male-a/Skeleton3D:leg-right")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, -0.0761, 0.22, -0.009)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = true
+tracks/3/enabled = true
+tracks/3/path = NodePath("character-male-a/Skeleton3D:leg-right")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0.3826835, 0, 0, -0.92387956, 0.033333335, 1, 0.3876475, 0, 0, -0.9218077, 0.06666667, 1, 0.4005493, 0, 0, -0.9162752, 0.1, 1, 0.4183833, 0, 0, -0.90827066, 0.13333334, 1, 0.4381814, 0, 0, -0.89888656, 0.16666667, 1, 0.45706922, 0, 0, -0.8894312, 0.2, 1, 0.4722874, 0, 0, -0.88144463, 0.23333333, 1, 0.48116767, 0, 0, -0.87662864, 0.26666668, 1, 0.48116767, 0, 0, -0.87662864, 0.3, 1, 0.47228742, 0, 0, -0.88144463, 0.33333334, 1, 0.4570692, 0, 0, -0.8894312, 0.36666667, 1, 0.4381814, 0, 0, -0.8988866, 0.4, 1, 0.41838333, 0, 0, -0.9082706, 0.43333334, 1, 0.40054935, 0, 0, -0.91627526, 0.5, 1, 0.3826835, 0, 0, -0.92387956)
+tracks/4/type = "rotation_3d"
+tracks/4/imported = true
+tracks/4/enabled = true
+tracks/4/path = NodePath("character-male-a/Skeleton3D:arm-left")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, 0, -0.1305262, -0.9914449, 0.033333335, 1, 0, 0, -0.13262801, -0.9911659, 0.06666667, 1, 0, 0, -0.13811041, -0.9904168, 0.1, 1, 0, 0, -0.1457377, -0.98932326, 0.13333334, 1, 0, 0, -0.15427612, -0.9880278, 0.16666667, 1, 0, 0, -0.16249683, -0.98670906, 0.2, 1, 0, 0, -0.16917749, -0.98558563, 0.23333333, 1, 0, 0, -0.17310068, -0.98490417, 0.26666668, 1, 0, 0, -0.1731007, -0.98490417, 0.3, 1, 0, 0, -0.16917749, -0.98558563, 0.33333334, 1, 0, 0, -0.16249683, -0.98670906, 0.36666667, 1, 0, 0, -0.15427612, -0.9880278, 0.4, 1, 0, 0, -0.14573768, -0.98932326, 0.43333334, 1, 0, 0, -0.13811043, -0.9904169, 0.5, 1, 0, 0, -0.1305262, -0.9914449)
+tracks/5/type = "rotation_3d"
+tracks/5/imported = true
+tracks/5/enabled = true
+tracks/5/path = NodePath("character-male-a/Skeleton3D:arm-right")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0, 0.1305262, -0.9914449, 0.033333335, 1, 0, 0, 0.13262801, -0.9911659, 0.06666667, 1, 0, 0, 0.13811041, -0.9904168, 0.1, 1, 0, 0, 0.1457377, -0.98932326, 0.13333334, 1, 0, 0, 0.15427612, -0.9880278, 0.16666667, 1, 0, 0, 0.16249683, -0.98670906, 0.2, 1, 0, 0, 0.16917749, -0.98558563, 0.23333333, 1, 0, 0, 0.17310068, -0.98490417, 0.26666668, 1, 0, 0, 0.1731007, -0.98490417, 0.3, 1, 0, 0, 0.16917749, -0.98558563, 0.33333334, 1, 0, 0, 0.16249683, -0.98670906, 0.36666667, 1, 0, 0, 0.15427612, -0.9880278, 0.4, 1, 0, 0, 0.14573768, -0.98932326, 0.43333334, 1, 0, 0, 0.13811043, -0.9904169, 0.5, 1, 0, 0, 0.1305262, -0.9914449)
+tracks/6/type = "rotation_3d"
+tracks/6/imported = true
+tracks/6/enabled = true
+tracks/6/path = NodePath("character-male-a/Skeleton3D:head")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = PackedFloat32Array(0, 1, 0, 0, 0, -1, 0.033333335, 1, -0.00042489858, 0, 0, -0.99999994, 0.06666667, 1, -0.0015337795, 0, 0, -0.99999887, 0.1, 1, -0.0030779184, 0, 0, -0.9999953, 0.13333334, 1, -0.0048085894, 0, 0, -0.99998844, 0.16666667, 1, -0.0064770663, 0, 0, -0.999979, 0.2, 1, -0.007834634, 0, 0, -0.9999693, 0.3, 1, -0.007834632, 0, 0, -0.9999693, 0.33333334, 1, -0.006477065, 0, 0, -0.999979, 0.36666667, 1, -0.0048085875, 0, 0, -0.99998844, 0.4, 1, -0.003077917, 0, 0, -0.9999953, 0.43333334, 1, -0.0015337785, 0, 0, -0.99999887, 0.5, 1, 0, 0, 0, -1)
+tracks/7/type = "position_3d"
+tracks/7/imported = true
+tracks/7/enabled = true
+tracks/7/path = NodePath("character-male-a/Skeleton3D:root")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/8/type = "rotation_3d"
+tracks/8/imported = true
+tracks/8/enabled = true
+tracks/8/path = NodePath("character-male-a/Skeleton3D:root")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/9/type = "position_3d"
+tracks/9/imported = true
+tracks/9/enabled = true
+tracks/9/path = NodePath("character-male-a/Skeleton3D:torso")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = PackedFloat32Array(0, 1, -1.4438228e-15, 0.17625, -0.02875)
+tracks/10/type = "rotation_3d"
+tracks/10/imported = true
+tracks/10/enabled = true
+tracks/10/path = NodePath("character-male-a/Skeleton3D:torso")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/11/type = "method"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("..")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0.25),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["Action"],
+"method": &"anim_event"
+}]
+}

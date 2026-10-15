@@ -71,6 +71,25 @@ public partial class CharacterMovement : Node
 	public bool IsGrounded => _body.IsOnFloor();
 	public Vector3 PlanarVelocity { get { Vector3 v = _body.Velocity; v.Y = 0f; return v; } }
 
+	/// <summary>
+	/// **本段滞空已经"净下落"了多少米**（P4 新增，只加不删）：从这次离地开始记录**最高点**，
+	/// 之后每帧算 <c>最高点.Y - 当前.Y</c>（夹在 ≥0）。落到地面时最后一次 <see cref="_PhysicsProcess"/>
+	/// 里仍然是"落地前那一帧"的值，所以"落地时的下落高度"读得到。
+	///
+	/// <para>用它的是角色 B 的下落攻击：设计文档第 99 行「**高度越高时伤害越高**，每 n 增加 20%，
+	/// 最高增加 100%」—— 高度必须是**量出来的**，不能靠"离地高度"近似（起跳后先升后降，
+	/// 离地高度会在上升到最高点时最大，那与"下落了多少"完全是两回事）。</para>
+	///
+	/// <para>⚠️ 默认（没有任何技能读它）行为逐位不变：它只在一处多算了两个浮点量，
+	/// 不参与 <c>MoveAndSlide</c> 的任何输入。</para>
+	/// </summary>
+	public float FallHeight { get; private set; }
+
+	private float _apexY;
+	private bool _apexTracking;
+
+	public bool IsAirborne => _body != null && !_body.IsOnFloor();
+
 	/// <summary>当前的移动意图方向（未归一化前的原样），位移技能用它决定冲刺方向。</summary>
 	public Vector3 IntentDirection => _intentDirection;
 
@@ -227,10 +246,25 @@ public partial class CharacterMovement : Node
 		if (_body.IsOnFloor())
 		{
 			_airJumpsLeft = ExtraAirJumps;
+			// 落地：这次的"最高点"追踪结束（FallHeight 保留最后一次的值，落地那一帧仍然读得到）。
+			_apexTracking = false;
 		}
 		else
 		{
 			velocity.Y = Mathf.Max(velocity.Y - _gravity * GravityScale * dt, -MaxFallSpeed);
+			// P4：滞空期间维护"最高点"（离地即开始，落地结束）。
+			float nowY = _body.GlobalPosition.Y;
+			if (!_apexTracking)
+			{
+				_apexTracking = true;
+				_apexY = nowY;
+			}
+			else
+			{
+				_apexY = Mathf.Max(_apexY, nowY);
+			}
+
+			FallHeight = Mathf.Max(0f, _apexY - nowY);
 		}
 
 		// 输入速度单独维护：不能从刚体速度里读回来，否则击退会叠加上一帧的击退形成正反馈。

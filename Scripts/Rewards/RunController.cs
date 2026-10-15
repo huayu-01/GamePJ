@@ -577,6 +577,7 @@ public partial class RunController : Node
 		PlayerCharacterKind.Heavy => "近战重装 — 高血高甲，左键近战重击",
 		PlayerCharacterKind.Summoner => "召唤控制 — G 键召唤无人机（最多 3 架）",
 		PlayerCharacterKind.Hunter => "猎手 — 能量掌：左键能量波、右键蓄力",
+		PlayerCharacterKind.WeaponMaster => "武器大师 — 三把近战武器：武技1 连招、武技2 武技、闪/架 + 下落攻击",
 		_ => "远程枪手 — 三把枪、灵活走位",
 	};
 

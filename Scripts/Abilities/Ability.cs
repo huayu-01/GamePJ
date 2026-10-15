@@ -265,6 +265,34 @@ public abstract partial class Ability : Node3D
 	/// <summary>剩余层数（<see cref="MaxCharges"/> &gt; 1 才用；&lt; 0 = 还没同步过）。</summary>
 	private int _charges = -1;
 
+	/// <summary>
+	/// **玩家按了一次本技能的键**（P4 新增，**只加不删**）。
+	///
+	/// <para>默认实现 = 原来的行为（<see cref="TryActivate"/>）。多段连招的子类覆写它：
+	/// 第一次按走 <see cref="TryActivate"/>（开新的一次施法），之后的按走"推进一段"。</para>
+	///
+	/// <para>为什么要有这个入口：<c>PlayerAbilityInput</c> 只认表里的 <c>InputAction</c> 列，
+	/// 它**不该知道**哪个技能是连招（那会把"加技能不改代码"这条纪律破掉）。</para>
+	/// </summary>
+	public virtual bool TryPress(Unit? target = null) => TryActivate(target);
+
+	/// <summary>
+	/// **由"事件驱动"而不是"按键驱动"的技能进入施法态**（P4 新增，**只加不删**）。
+	///
+	/// <para>被动技能（<c>LandingBurstAbility</c> 那种）没有按键，它的效果由上游技能的事件
+	/// （如「下落攻击落地」）触发 —— 那不是 <see cref="TryActivate"/> 那条路（那条要求
+	/// <see cref="IsReady"/>，而"触发间隔"是它自己判的），但也需要 <see cref="IsBusy"/> 与
+	/// <see cref="StateTime"/> 进入"施法中"，<see cref="Tick"/> 才会跑。</para>
+	///
+	/// <para>⚠️ 它**不消耗冷却**（冷却由调用方在结束时走 <see cref="Finish"/> 计），
+	/// 也不改任何既有状态机 —— 没人调它就等于不存在。</para>
+	/// </summary>
+	protected void BeginEventDrivenCast()
+	{
+		IsBusy = true;
+		StateTime = 0f;
+	}
+
 	/// <summary>上一次同步时看到的 <see cref="MaxCharges"/>（行换了就重置成满层）。</summary>
 	private int _chargesForMaxCharges = -1;
 
@@ -696,6 +724,94 @@ public abstract partial class Ability : Node3D
 	/// <summary>停掉技能动画（技能结束/取消时调用，把控制权交还"按移速切"）。</summary>
 	protected void StopSkillAnimation() => FindInOwner<UnitAnimator>()?.StopSkillAnimation();
 
+	/// <summary>
+	/// **按路径读一个 <c>AbilitySeries</c>**（P4 新增，**只加不删**）—— 技能行里"一串参数"（连招的每段
+	/// 动画名/命中盒/倍率）的标准入口。
+	///
+	/// <para>文件放 `Config/Tables/SkillSeries/*.tres`，技能行用**路径**（表列 <c>ComboSeriesPath</c>）
+	/// 指过来。用路径而不是"索引数组 + Id"，理由与 <c>ArrowVolleyAbility.ProjectileScenePath</c> 同一条：
+	/// **不需要给 ConfigIndex 加索引数组**（少一处"三处同改"的风险），而且行文件被删/改名时
+	/// <see cref="ResourceLoader.Exists"/> 直接返回 false（读不到就按"没配"处理，不静默换挡）。</para>
+	/// </summary>
+	protected static Config.AbilitySeries? LoadSeries(string path)
+	{
+		if (string.IsNullOrEmpty(path) || !ResourceLoader.Exists(path))
+		{
+			return null;
+		}
+
+		if (GD.Load<Config.AbilitySeries>(path) is { } row)
+		{
+			return row;
+		}
+
+		// 路径写错 / 文件不是 AbilitySeries 时**必须留痕**，否则只会表现为"连招只有一段"。
+		GameLog.Write("Config", $"⚠ 技能串「{path}」读不到或不是 AbilitySeries（连招会退化成单段）。");
+		return null;
+	}
+
+	/// <summary>
+	/// **把"一串表参数"绑到本能力上**（P4 新增，**只加不删**）。
+	///
+	/// <para>优先用**行里直接引用的那个资源**（<paramref name="inline"/>）；它为空时按
+	/// <paramref name="path"/> 去读技能串文件。两条路都不通就返回 null（调用方按"没配"处理，
+	/// 行为与改动前一致）。</para>
+	/// </summary>
+	protected static Config.AbilitySeries? BindSeries(Config.AbilitySeries? inline, string path)
+		=> inline ?? LoadSeries(path);
+
+	/// <summary>
+	/// **播一段"不是本行 <see cref="AnimName"/>"的技能动画**（P4 新增，**只加不删**）。
+	///
+	/// <para>存在的理由：角色 B 的三把近战武器，**武技1 的每一段连招都是一段独立的技能动画**
+	/// （见 `AbilityConfig.ComboAnimations`）—— "一段连招 = 一段动画"才是文档说的
+	/// 「武技1 基本是动画驱动碰撞和间隔的」。基类原来的 <see cref="PlaySkillAnimation"/> 只认
+	/// <see cref="AnimName"/> 这一个名字，所以这里补一个"按名播"的入口。</para>
+	///
+	/// <para>⚠️ 它只是把 <c>UnitAnimator.PlaySkillAnimation</c> 暴露出来（同一个函数、同一条
+	/// `speed_scale` 语义），**没有改动任何既有路径**：不调它的技能行为与改动前逐位一致。</para>
+	/// </summary>
+	/// <param name="animationName">技能动画名（表里的 <c>AnimName</c> 形态，不带库名也行）。</param>
+	/// <param name="speedScale">&gt;0 时覆盖本行的 <see cref="AnimSpeedScale"/>。</param>
+	/// <returns>真正播出去的动画全名；空 = 没播成。</returns>
+	protected string PlaySkillAnimationNamed(string animationName, float speedScale = 0f)
+	{
+		if (string.IsNullOrEmpty(animationName))
+		{
+			return string.Empty;
+		}
+
+		float scale = speedScale > 0f ? speedScale : AnimSpeedScale;
+		return FindInOwner<UnitAnimator>()?.PlaySkillAnimation(animationName, scale) ?? string.Empty;
+	}
+
+	/// <summary>
+	/// **这些动画名里有没有至少一个存在**（P4 新增，**只加不删**）。
+	///
+	/// <para>给"一段连招里每段是一段独立动画"的技能用：<see cref="TryActivate"/> 原来只校验
+	/// <see cref="AnimName"/> 一个名字，而连招的每一段名字不同。它只读不写，
+	/// **不填 <c>ComboAnimations</c> 的技能永远不会走到这里** → 默认行为逐位不变。</para>
+	/// </summary>
+	protected bool AnyAnimationAvailable(string[] animationNames)
+	{
+		UnitAnimator? animator = FindInOwner<UnitAnimator>();
+		if (animator == null)
+		{
+			return false;
+		}
+
+		animator.PrepareSkillLibrary();
+		foreach (string name in animationNames)
+		{
+			if (!string.IsNullOrEmpty(name) && animator.ResolveSkillAnimation(name).Length > 0)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	protected virtual void OnReady()
 	{
 	}
@@ -743,6 +859,7 @@ public abstract partial class Ability : Node3D
 		}
 
 		StopSkillAnimation();
+		OnFinishOrCancel();
 	}
 
 	protected void Cancel()
@@ -750,6 +867,21 @@ public abstract partial class Ability : Node3D
 		IsBusy = false;
 		StateTime = 0f;
 		StopSkillAnimation();
+		OnFinishOrCancel();
+	}
+
+	/// <summary>
+	/// **收招钩子**（P4 新增，**只加不删**）：<see cref="Finish"/> / <see cref="Cancel"/> 都会调它。
+	///
+	/// <para>存在的理由：多段连招（<c>MeleeComboAbility</c>）要保证"收招时命中盒一定是关的、
+	/// 命中盒形状还原回场景基线"。原来子类只能在 <see cref="Tick"/> 里自己判 <c>IsBusy</c>，
+	/// 而 <see cref="Cancel"/> 那条路（动画事件帧没来、被别的技能打断）会**绕过**那段收尾 ——
+	/// 于是命中盒会留在"上一段的尺寸"上（那正是"多段连招占位盒"最容易出的错）。</para>
+	///
+	/// <para>⚠️ 默认实现为空 → **所有既有子类的行为逐位不变**（它们一个字都没改）。</para>
+	/// </summary>
+	protected virtual void OnFinishOrCancel()
+	{
 	}
 
 	/// <summary>在拥有者子树里找组件（武器、命中体等），避免依赖节点名。</summary>

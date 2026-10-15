@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="WeaponConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_1.tres" id="2_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_2.tres" id="3_skl"]
+
+[resource]
+script = ExtResource("1_row")
+ScenePath = "res://Scenes/Weapons/Pistol.tscn"
+AttackTags = PackedStringArray("Melee", "Sword", "Physical")
+Damage = 0.0
+FireInterval = 0.5
+MagazineSize = 1
+ReloadTime = 0.1
+AutoReloadDelay = 999.0
+SpreadDegrees = 0.0
+AimSpreadScale = 0.0
+MultiShotSpreadDegrees = 0.0
+ProjectilesPerShot = 1
+BasePierce = 0
+Knockback = 0.0
+CritChance = 0.05
+CritMultiplier = 2.0
+ProjectileSpeed = 150.0
+MaxLifetime = 1.6
+AimFov = 55.0
+Automatic = false
+Skills = [ExtResource("2_skl"), ExtResource("3_skl")]
+Id = "wpn_spirit_sword"
+Slot = 7
+DisplayName = "灵剑"
+DescriptionTemplate = "近战武器：武技1 破剑式（5 段连招，可斩断子弹）/ 武技2 拔刀式（蓄力 1 秒发射剑气）。武技3 落剑式是被动。"
+Note = "[P4 新增行] 角色 B 武器1 灵剑（正式名待定）。⚠️ 它**不走** Weapon 组件的开火（那套有弹匣/装填）：攻击全部由本行 Skills 里那两个武技技能完成。这一行的作用是身份 + 攻击标签 + 暴击基准 + 指向自己的武技行（P3 起武技归属武器行，理由见 WeaponConfig.Skills 的注释）。ScenePath 暂用 Pistol.tscn（手上模型，近战武器其实用不到枪的模型）。"

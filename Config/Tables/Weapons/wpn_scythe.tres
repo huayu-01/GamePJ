@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="WeaponConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_1.tres" id="2_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_2.tres" id="3_skl"]
+
+[resource]
+script = ExtResource("1_row")
+ScenePath = "res://Scenes/Weapons/Pistol.tscn"
+AttackTags = PackedStringArray("Melee", "Scythe", "Physical")
+Damage = 0.0
+FireInterval = 0.5
+MagazineSize = 1
+ReloadTime = 0.1
+AutoReloadDelay = 999.0
+SpreadDegrees = 0.0
+AimSpreadScale = 0.0
+MultiShotSpreadDegrees = 0.0
+ProjectilesPerShot = 1
+BasePierce = 0
+Knockback = 0.0
+CritChance = 0.05
+CritMultiplier = 2.0
+ProjectileSpeed = 150.0
+MaxLifetime = 1.6
+AimFov = 55.0
+Automatic = false
+Skills = [ExtResource("2_skl"), ExtResource("3_skl")]
+Id = "wpn_scythe"
+Slot = 8
+DisplayName = "镰刀"
+DescriptionTemplate = "近战武器：武技1 憎恶（3 连招，最后一刀大回旋）/ 武技2 无情（抛出武器，旋转并周期性伤害；再次使用或靠近收回）。"
+Note = "[P4 新增行] 角色 B 武器2 镰刀（攻击范围较大）。攻击全部由本行 Skills 里那两个武技技能完成（Weapon 组件不开火）。"

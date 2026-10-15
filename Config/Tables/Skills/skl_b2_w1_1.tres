@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" path="res://Scripts/Config/AbilitySeries.cs" id="3_series"]
+
+[sub_resource type="Resource" id="p_StrikeActiveTime"]
+script = ExtResource("2_param")
+Key = "StrikeActiveTime"
+Value = 0.1
+Note = "单段模式下的判定时长（本行是多段，用 StepActiveTimes）"
+
+[sub_resource type="Resource" id="p_MaxAimDistance"]
+script = ExtResource("2_param")
+Key = "MaxAimDistance"
+Value = 60.0
+Note = "求准星世界点的射线长度（与其它武器口径一致）"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[resource]
+script = ExtResource("1_row")
+NodeName = "AbilityWeapon5Skill1"
+ClassHint = "MeleeComboAbility"
+InputAction = "weapon_skill_1"
+HoldToCharge = false
+AnimName = "Skill_B2_Scythe1"
+AnimEvent = "ATK"
+AnimEventEnd = "Combo"
+AnimSpeedScale = 1.44
+ComboNextEvent = "ATK"
+ComboWindowSeconds = 0.5
+ComboSeriesPath = "res://Config/Tables/SkillSeries/ser_b2_combo.tres"
+Aim = 0
+Cooldown = 0.5
+Windup = 0.05
+Recover = 0.05
+Enabled = true
+Params = [SubResource("p_StrikeActiveTime"), SubResource("p_MaxAimDistance")]
+Id = "skl_b2_w1_1"
+Slot = 0
+DisplayName = "憎恶"
+DescriptionTemplate = "三连招：连续按键可连续释放 3 段，前 2 刀半圆，最后一刀大回旋。"
+Note = "[P4 新增行] 角色 B 武器2 镰刀 武技1（文档 CD:0.5/0.5/0.8）。★ 与灵剑的破剑式共用 MeleeComboAbility 这一个类（文档第 98 行要求「几个武器的武技1 应当是使用同一个技能或状态驱动」）—— 差别只有段数（3 段 vs 5 段）与每段的命中盒/伤害。★ 前 2 刀半圆 = 盒子（z>0）；最后一刀大回旋 = 圆柱（z=0 → 本能力的 ApplyStepShape 切成 CylinderShape3D 360°）。"

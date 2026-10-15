@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_TriggerAbilityId"]
+script = ExtResource("2_param")
+Key = "TriggerAbilityId"
+Value = "skl_b_fall"
+Note = "★ 上游：下落攻击那一行（落地时本被动出手）"
+
+[sub_resource type="Resource" id="p_DamageScale"]
+script = ExtResource("2_param")
+Key = "DamageScale"
+Value = 1
+Note = "额外那一圈的伤害倍率（乘在上游本次实际伤害上）"
+
+[sub_resource type="Resource" id="p_ActiveTime"]
+script = ExtResource("2_param")
+Key = "ActiveTime"
+Value = 0.18
+Note = "额外那一圈的判定持续（秒）"
+
+[sub_resource type="Resource" id="p_Knockback"]
+script = ExtResource("2_param")
+Key = "Knockback"
+Value = 3
+Note = "额外那一圈的击退"
+
+[resource]
+script = ExtResource("1_row")
+NodeName = "AbilityPassive2"
+ClassHint = "LandingBurstAbility"
+InputAction = ""
+HoldToCharge = false
+AnimName = ""
+AnimSpeedScale = 1.0
+Aim = 0
+Cooldown = 5.0
+Windup = 0.0
+Recover = 0.05
+Enabled = true
+Params = [SubResource("p_TriggerAbilityId"), SubResource("p_DamageScale"), SubResource("p_ActiveTime"), SubResource("p_Knockback")]
+Id = "skl_b1_w1_3"
+Slot = 0
+DisplayName = "落剑式"
+DescriptionTemplate = "被动：你的下落攻击在落地时会造成额外的大范围攻击（不改变原有攻击，就是多一圈攻击判定+特效）。"
+Note = "[P4 新增行] 角色 B 武器1 灵剑 武技3（**被动**；文档 CD:5 —— 用户裁定「没写明按键的基本是被动，只是有些被动他是有触发间隔的」，所以这里的 CD 就是**触发间隔**：连按下落攻击时只有第一次与 5 秒后的那次触发）。★ 挂在下落攻击（skl_b_fall）的落地事件上，上游那一次攻击一个字节都没改。★ 文档里的 n（额外那圈的伤害/范围）= 预设值：伤害基准取上游本次伤害 ×DamageScale，范围见 Player 场景 AbilityPassive2/Attack 的球体半径 3.2m。"

@@ -25,6 +25,17 @@
 [ext_resource type="Script" path="res://Scripts/Combat/AirHoverController.cs" id="23_hover"]
 [ext_resource type="Script" path="res://Scripts/Abilities/AirJumpPassiveAbility.cs" id="24_air_jump"]
 [ext_resource type="Script" path="res://Scripts/Abilities/HawkEyeAbility.cs" id="25_hawk_eye"]
+[ext_resource type="Script" path="res://Scripts/Abilities/MeleeComboAbility.cs" id="26_melee_combo"]
+[ext_resource type="Script" path="res://Scripts/Abilities/SwordQiAbility.cs" id="27_sword_qi"]
+[ext_resource type="Script" path="res://Scripts/Abilities/ScytheThrowAbility.cs" id="28_scythe_throw"]
+[ext_resource type="Script" path="res://Scripts/Abilities/SpearThrowAbility.cs" id="29_spear_throw"]
+[ext_resource type="Script" path="res://Scripts/Abilities/BlinkDashAbility.cs" id="30_blink_dash"]
+[ext_resource type="Script" path="res://Scripts/Abilities/GuardStanceAbility.cs" id="31_guard"]
+[ext_resource type="Script" path="res://Scripts/Abilities/FallAttackAbility.cs" id="32_fall_attack"]
+[ext_resource type="Script" path="res://Scripts/Abilities/LandingBurstAbility.cs" id="33_landing_burst"]
+[ext_resource type="Script" path="res://Scripts/Combat/DashPathIndicator.cs" id="34_path"]
+[ext_resource type="Script" path="res://Scripts/Combat/WeaponGate.cs" id="35_weapon_gate"]
+[ext_resource type="PackedScene" path="res://Scenes/Combat/MeleeStrike.tscn" id="36_melee_strike"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -35,6 +46,27 @@ size = Vector3(2.6, 1.8, 2.6)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_control"]
 radius = 8.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sword"]
+size = Vector3(2.2, 1.6, 2.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_scythe"]
+size = Vector3(3.2, 1.8, 3.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_scythe_spin"]
+size = Vector3(3.6, 1.8, 3.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_spear"]
+size = Vector3(1.2, 1.2, 4.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lance"]
+size = Vector3(1.4, 1.4, 1.6)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_landing"]
+radius = 3.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_scythe_blade"]
+size = Vector3(0.12, 0.22, 1.1)
 
 [node name="Player" type="CharacterBody3D" unique_id=2029295370]
 script = ExtResource("1_player")
@@ -186,3 +218,141 @@ Enabled = false
 [node name="AbilityPassive" type="Node3D" parent="."]
 script = ExtResource("24_air_jump")
 Enabled = false
+
+[node name="AbilityFallAttack" type="Node3D" parent="."]
+script = ExtResource("32_fall_attack")
+Enabled = false
+
+[node name="Attack" parent="AbilityFallAttack" instance=ExtResource("36_melee_strike")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+Damage = 18.0
+Knockback = 2.0
+Policy = 1
+HitInterval = 0.25
+AttackTags = PackedStringArray("Melee", "Fall")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityFallAttack/Attack"]
+shape = SubResource("SphereShape3D_landing")
+
+[node name="AbilityWeapon4Skill1" type="Node3D" parent="."]
+script = ExtResource("26_melee_combo")
+Enabled = false
+
+[node name="Attack" parent="AbilityWeapon4Skill1" instance=ExtResource("36_melee_strike")]
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon4Skill1/Attack"]
+shape = SubResource("BoxShape3D_sword")
+
+[node name="AbilityWeapon4Skill2" type="Node3D" parent="."]
+script = ExtResource("27_sword_qi")
+Enabled = false
+ProjectileScenePath = "res://Scenes/Combat/SwordQi.tscn"
+
+[node name="Path" type="Node3D" parent="AbilityWeapon4Skill2"]
+script = ExtResource("34_path")
+
+[node name="AbilityWeapon5Skill1" type="Node3D" parent="."]
+script = ExtResource("26_melee_combo")
+Enabled = false
+
+[node name="Attack" parent="AbilityWeapon5Skill1" instance=ExtResource("36_melee_strike")]
+Damage = 26.0
+Knockback = 4.0
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon5Skill1/Attack"]
+shape = SubResource("BoxShape3D_scythe")
+
+[node name="AbilityWeapon5Skill2" type="Node3D" parent="."]
+script = ExtResource("28_scythe_throw")
+Enabled = false
+
+[node name="Attack" parent="AbilityWeapon5Skill2" instance=ExtResource("36_melee_strike")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+Damage = 22.0
+Knockback = 3.0
+Policy = 0
+HitInterval = 0.5
+AttackTags = PackedStringArray("Melee", "Spin")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon5Skill2/Attack"]
+shape = SubResource("BoxShape3D_scythe_spin")
+
+[node name="WeaponVisual" type="MeshInstance3D" parent="AbilityWeapon5Skill2"]
+visible = false
+mesh = SubResource("BoxMesh_scythe_blade")
+
+[node name="Path" type="Node3D" parent="AbilityWeapon5Skill2"]
+script = ExtResource("34_path")
+
+[node name="AbilityWeapon6Skill1" type="Node3D" parent="."]
+script = ExtResource("26_melee_combo")
+Enabled = false
+
+[node name="Attack" parent="AbilityWeapon6Skill1" instance=ExtResource("36_melee_strike")]
+Damage = 22.0
+Knockback = 3.5
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon6Skill1/Attack"]
+shape = SubResource("BoxShape3D_spear")
+
+[node name="AbilityWeapon6Skill2" type="Node3D" parent="."]
+script = ExtResource("29_spear_throw")
+Enabled = false
+
+[node name="Attack" parent="AbilityWeapon6Skill2" instance=ExtResource("36_melee_strike")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+Damage = 24.0
+Knockback = 3.0
+AttackTags = PackedStringArray("Melee", "Thrown")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon6Skill2/Attack"]
+shape = SubResource("BoxShape3D_lance")
+
+[node name="WeaponVisual" type="MeshInstance3D" parent="AbilityWeapon6Skill2"]
+visible = false
+mesh = SubResource("BoxMesh_scythe_blade")
+
+[node name="Path" type="Node3D" parent="AbilityWeapon6Skill2"]
+script = ExtResource("34_path")
+
+[node name="AbilitySkill1" type="Node3D" parent="."]
+script = ExtResource("30_blink_dash")
+Enabled = false
+
+[node name="Attack" parent="AbilitySkill1" instance=ExtResource("36_melee_strike")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+Damage = 14.0
+Knockback = 2.0
+Policy = 1
+HitInterval = 0.12
+AttackTags = PackedStringArray("Melee", "Dash")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilitySkill1/Attack"]
+shape = SubResource("SphereShape3D_landing")
+
+[node name="Path" type="Node3D" parent="AbilitySkill1"]
+script = ExtResource("34_path")
+
+[node name="AbilitySkill2" type="Node3D" parent="."]
+script = ExtResource("31_guard")
+Enabled = false
+
+[node name="AbilityPassive2" type="Node3D" parent="."]
+script = ExtResource("33_landing_burst")
+Enabled = false
+
+[node name="Attack" parent="AbilityPassive2" instance=ExtResource("36_melee_strike")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+Damage = 18.0
+Knockback = 3.0
+AttackTags = PackedStringArray("Melee", "Burst")
+
+[node name="Shape" type="CollisionShape3D" parent="AbilityPassive2/Attack"]
+shape = SubResource("SphereShape3D_landing")
+
+[node name="WeaponGate5" type="Node3D" parent="."]
+script = ExtResource("35_weapon_gate")
+
+[node name="WeaponGate6" type="Node3D" parent="."]
+script = ExtResource("35_weapon_gate")
+

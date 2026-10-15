@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="1_hitbox"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_strike"]
+size = Vector3(2.2, 1.6, 3.0)
+
+[node name="Attack" type="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -1.4)
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("1_hitbox")
+Damage = 20.0
+Knockback = 3.0
+Policy = 0
+HitInterval = 0.15
+CritChance = 0.05
+CritMultiplier = 2.0
+AttackTags = PackedStringArray("Melee", "Physical")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_strike")

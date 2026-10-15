@@ -1,0 +1,79 @@
+[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_Distance"]
+script = ExtResource("2_param")
+Key = "Distance"
+Value = 7
+Note = "冲刺距离（米）—— 文档写 n，预设 7"
+
+[sub_resource type="Resource" id="p_Duration"]
+script = ExtResource("2_param")
+Key = "Duration"
+Value = 0.18
+Note = "冲刺时长（秒）"
+
+[sub_resource type="Resource" id="p_PierceUnits"]
+script = ExtResource("2_param")
+Key = "PierceUnits"
+Value = true
+Note = "★ 全程穿透（只留世界层）"
+
+[sub_resource type="Resource" id="p_GrantInvulnerability"]
+script = ExtResource("2_param")
+Key = "GrantInvulnerability"
+Value = false
+Note = "文档没写无敌 → 关"
+
+[sub_resource type="Resource" id="p_ShowPath"]
+script = ExtResource("2_param")
+Key = "ShowPath"
+Value = true
+Note = "★ 需要设立一条可视化的路径（文档第 101 行）"
+
+[sub_resource type="Resource" id="p_PathWidth"]
+script = ExtResource("2_param")
+Key = "PathWidth"
+Value = 0.07
+Note = "路径线宽（米）"
+
+[sub_resource type="Resource" id="p_PathGroundOffset"]
+script = ExtResource("2_param")
+Key = "PathGroundOffset"
+Value = 0.06
+Note = "离地抬升（米）"
+
+[sub_resource type="Resource" id="p_PathSteps"]
+script = ExtResource("2_param")
+Key = "PathSteps"
+Value = 16.0
+Note = "路径采样段数"
+
+[sub_resource type="Resource" id="p_PathLingerSeconds"]
+script = ExtResource("2_param")
+Key = "PathLingerSeconds"
+Value = 0.15
+Note = "冲刺结束后路径还留多久（秒）"
+
+[resource]
+script = ExtResource("1_row")
+NodeName = "AbilitySkill1"
+ClassHint = "BlinkDashAbility"
+InputAction = "skill_1"
+HoldToCharge = false
+AnimName = "Skill_B_Blink"
+AnimEvent = "Action"
+AnimSpeedScale = 1.0
+Aim = 2
+Cooldown = 5.0
+Windup = 0.0
+Recover = 0.05
+Enabled = true
+Params = [SubResource("p_Distance"), SubResource("p_Duration"), SubResource("p_PierceUnits"), SubResource("p_GrantInvulnerability"), SubResource("p_ShowPath"), SubResource("p_PathWidth"), SubResource("p_PathGroundOffset"), SubResource("p_PathSteps"), SubResource("p_PathLingerSeconds")]
+Id = "skl_b_skill_1"
+Slot = 0
+DisplayName = "闪"
+DescriptionTemplate = "向准星方向冲刺（全程穿透但无法穿透地形），对路径上的敌人造成伤害，可以冲至空中；冲刺路径可视化。"
+Note = "[P4 新增行] 角色 B 技能1（文档 CD:5）。★ 全程穿透 = 冲刺期间把 CollisionMask 摘到只剩世界层（穿透单位、撞得到地形，MoveAndSlide 仍沿地形滑）；结束时**一定还原**。★ 文档里的 n（伤害/距离）→ 预设：伤害 14（在场景 AbilitySkill1/Attack 上）、距离 7m。★ 可视化路径 = DashPathIndicator（颜色/线宽/抬升都是表列）。"

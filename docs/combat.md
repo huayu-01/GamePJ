@@ -296,6 +296,29 @@
 挂 `SceneTree.NodeAdded` 观察每个 `Unit` 的进树生命 + 订阅 `Unit.Damaged`/`Died` 打印 `System.Environment.StackTrace`
 （只留 `ActRoguelike` 的帧），然后在同一帧里"裸 `add_child` + `RunController.BeginRunWithCharacter(...)`"。
 
+## P4 新增战斗机制（角色 B［武器大师］，2026-10-15）
+
+> 设计权威：`F:\Godot项目\3d肉鸽雨中哈迪斯\角色设计.txt` 第 98–163 行；接入契约见 [abilities.md](abilities.md) §8。
+
+| 机制 | 落点（文件 / 触发点） | 语义要点 | 表列 |
+|---|---|---|---|
+| **多段连招** | `Scripts/Abilities/MeleeComboAbility.cs`（**三把近战武器共用这一个类**） | 一次施法 = 打一段 + 开一个输入窗口；**事件帧 `ATK` 才判定**、`ATK` 同时开窗口；窗口内再按 → 段 +1（`TryPress`）；窗口超时 → `Finish()` 进冷却 | `Config/Tables/SkillSeries/<技能行Id>.tres` 的 `ComboAnimations` / `StepDamageScales` / `StepBoxSizes` / `StepBoxOffsets` / `StepActiveTimes` / `ComboWindowSeconds` / `ComboLoop` |
+| **近战斩断子弹** | `Projectile.CutBySceneName` ← `MeleeComboAbility.CutBullets`（`ATK` 帧） | 判据是"投射物的**来源场景名**"（`Bullet`），**不是敌我** → 友军的也清；**能量波在排除名单里 → 斩不断** | `CutSceneNames` / `CutExcludeSceneNames` / `CutRadius` |
+| **下落攻击** | `Scripts/Abilities/FallAttackAbility.cs` | 空中 + 按键（`fall_attack` = Ctrl）才可用；`DiveSpeed` 直接写垂直速度；下落期间命中盒常开（`IntervalPerTarget`）；**高度取"这次离地后净下落多少米"**（`CharacterMovement.FallHeight`）；落地抛 `Landed` 事件 | `DiveSpeed` / `HeightStep` / `DamageBonusPerStep` / `MaxDamageBonus` / `HomingMode` / `MaxDiveAngleDegrees` |
+| **冲刺（穿透 + 可视化路径）** | `Scripts/Abilities/BlinkDashAbility.cs` + `Scripts/Combat/DashPathIndicator.cs` | 冲刺期间 `CollisionMask` 只留世界层（**穿透单位、仍撞地形**），结束后**一定还原**；方向保留 Y 分量（可冲至空中）；路径 = `ImmediateMesh` 折线 | `Distance` / `Duration` / `PierceUnits` / `ShowPath` / `PathColor` / `PathWidth` / `PathSteps` |
+| **架势（架）** | `Scripts/Abilities/GuardStanceAbility.cs` | 架势内被命中 → 把这次命中**无效化**（`Unit.IsInvulnerable`）并立刻收招；**每帧把"自己设的那次规避"清掉** → 下一次命中仍会被规避（"挡一下"而不是"无敌到架势结束"） | `StanceSeconds` / `GuardStartSeconds`（`0.75` 来自文档） |
+| **武器抛出 / 收回** | `Scripts/Abilities/WeaponThrowAbility.cs`（镰刀/长枪共用）+ `ScytheThrowAbility` / `SpearThrowAbility` | 抛出 → 旋转 → 每 `DamageInterval` 秒一次判定 → 再次按键 / 靠近 / 到最远距离收回；收回途中也能再打一次 | `ThrowSpeed` / `ReturnSpeed` / `MaxThrowDistance` / `RecallOnSecondPress` / `RecallDistance` / `SpinDegreesPerSecond` / `DamageInterval` / `DamageOnReturn` |
+| **抛物线投射 + 路径可视化** | `SpearThrowAbility` + `DashPathIndicator.SampleArcToDistance` | 基础蓄力 1s；每蓄力 0.25s（档）**伤害 ×1.2、水平速度 ×1.2、路径中线 ×1.2**；"路径中线延长"是**非倍率维度**（速度放大、飞行时间不变） | `ArcGravity` / `FlightSeconds` / `ArcPathSteps` + 基类蓄力列 |
+| **武器不在手上 → 武技1 不能用** | `Scripts/Combat/WeaponGate.cs`（场景里的 `WeaponGate5` / `WeaponGate6`） | `WeaponThrowAbility.InFlightChanged` → `WeaponGate` → `MeleeComboAbility.SetExternallyBlocked`；默认按节点名推两个技能行 Id | — |
+| **落地额外一圈** | `Scripts/Abilities/LandingBurstAbility.cs` | 挂 `<技能行Id>_fall` 的 `Landed` 事件，**不改上游那一次攻击**，只多开一圈命中盒；CD 就是"触发间隔" | `TriggerAbilityId` / `DamageScale` / `ActiveTime` |
+| **朝准星方位冲下** | `FallAttackAbility.HomingMode = Crosshair`（表值） | 夹角超过"指向范围"就夹到最大范围的同方向；准星没指向地面就直直下落 | `HomingMode` / `MaxDiveAngleDegrees` |
+
+> ⚠️ **自测口径的两个限制**（也写在代码注释里）：
+> ① `Area3D` 的重叠列表要等**一个物理帧**才更新，而自测是在同一帧里连续驱动能力的 ——
+> 所以"下落攻击/落圈到底打掉了多少血"这一类**不在自测的判据里**（判据是"落地事件触发"与"上游伤害没变"）；
+> ② 同理，自测用 `MeleeComboAbility.DebugFireAnimEvent()` **模拟"事件帧到了"**来取证连招推进 ——
+> 真人那一路仍然完全由 `UnitAnimator` 的事件帧驱动（同一条 `OnAnimEvent`）。
+
 ## 已知限制
 
 - 格挡只有正面判定与破防阈值，没有格挡硬直、格挡反击与格挡资源。

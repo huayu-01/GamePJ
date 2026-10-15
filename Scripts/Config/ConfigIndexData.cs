@@ -21,6 +21,15 @@ public enum WeaponPresetKind
 
 	/// <summary>**[新增·P3] 角色 A 武器 3「弓」**（`wpn_bow`，Slot 6）：蓄力增伤增速 / 标记与追踪。</summary>
 	Bow,
+
+	/// <summary>**[新增·P4] 角色 B 武器 1「灵剑」**（`wpn_spirit_sword`，Slot 7）：5 段连招 + 蓄力剑气。</summary>
+	SpiritSword,
+
+	/// <summary>**[新增·P4] 角色 B 武器 2「镰刀」**（`wpn_scythe`，Slot 8）：3 连招 + 抛出武器。</summary>
+	Scythe,
+
+	/// <summary>**[新增·P4] 角色 B 武器 3「长枪」**（`wpn_spear`，Slot 9）：5 段循环连招 + 蓄力抛物线抛掷。</summary>
+	Spear,
 }
 
 /// <summary>可选角色（策划文档 §7）。</summary>
@@ -40,6 +49,12 @@ public enum PlayerCharacterKind
 	/// 同上：枚举顺序 = 角色表的 <c>Slot</c>，新角色往后追加。
 	/// </summary>
 	Hunter,
+
+	/// <summary>
+	/// **[新增·P4] 角色 B［武器大师］**（`chr_weapon_master`，Slot 5）：三把近战武器 + 闪/架 + 被动落。
+	/// 同上：枚举顺序 = 角色表的 <c>Slot</c>，新角色往后追加。
+	/// </summary>
+	WeaponMaster,
 }
 
 /// <summary>

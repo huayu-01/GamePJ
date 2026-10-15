@@ -104,6 +104,15 @@ public partial class ArrowVolleyAbility : Ability
 	/// <summary>求"准星世界点"时射线的最大长度。</summary>
 	[Export] public float MaxAimDistance { get; set; } = 200f;
 
+	/// <summary>
+	/// **投射物的整体缩放**（P4 新增，**只加不删**；≤0 = 不缩放）。
+	///
+	/// <para>文档（角色 B 灵剑武技2）：「剑气大小会**等比攻击盒大小**」—— 剑气就是一个被缩放的
+	/// 箭（同一个 <c>Projectile</c> 组件、同一套弹道/穿透/格挡语义），只是外观尺寸跟攻击盒走。
+	/// 默认 ≤0 → 这一行代码不进，**既有四把武器的箭/弹行为逐位不变**。</para>
+	/// </summary>
+	[Export] public float ProjectileSizeScale { get; set; }
+
 	[ExportGroup("完美时机（预留：本类与能量掌同一套表列，武技2 的两行都留空）")]
 	/// <summary>完美时机那一发的伤害绝对值（≤0 = 用普通 <see cref="Damage"/>）。</summary>
 	[Export] public float PerfectDamage { get; set; }
@@ -313,6 +322,12 @@ public partial class ArrowVolleyAbility : Ability
 			var arrow = ProjectileScene.Instantiate<Projectile>();
 			parent.AddChild(arrow);
 			arrow.GlobalPosition = origin;
+			// 剑气（P4）：投射物整体缩放；默认 ≤0 → 一行都不进（既有四把武器逐位不变）。
+			if (ProjectileSizeScale > 0f)
+			{
+				arrow.Scale = Vector3.One * ProjectileSizeScale;
+			}
+
 			arrow.Speed = shotSpeed;
 			arrow.GravityScale = GravityScale;
 			arrow.GravityStartDistance = GravityStartDistance;

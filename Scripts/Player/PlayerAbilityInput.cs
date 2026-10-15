@@ -133,12 +133,16 @@ public partial class PlayerAbilityInput : Node
 	}
 
 	/// <summary>
-	/// 触发一个技能。需要"范围内有目标"的技能（近战/控制）自己校验距离，够不着就不出招。
-	/// 这里只额外处理"需要一个目标"的通用约定：把最近敌对单位作为参数传进去（没有就传 null）。
+	/// 触发一次"按下"。走 <see cref="Ability.TryPress"/> 而不是直接 <c>TryActivate</c> ——
+	/// **多段连招**（角色 B 的三把近战武器武技1）的语义是"同一个键按第二下 = 推进到第 2 段"，
+	/// 而那属于那个技能自己的事（基类默认实现就是 <c>TryActivate</c>，所以既有技能行为逐位不变）。
+	///
+	/// <para>需要"范围内有目标"的技能（近战/控制）自己校验距离，够不着就不出招。
+	/// 这里只额外处理"需要一个目标"的通用约定：把最近敌对单位作为参数传进去（没有就传 null）。</para>
 	/// </summary>
 	private void Activate(Ability ability)
 	{
 		Unit? victim = Targeting.FindNearestHostile(_unit, _unit, 200f);
-		ability.TryActivate(victim);
+		ability.TryPress(victim);
 	}
 }

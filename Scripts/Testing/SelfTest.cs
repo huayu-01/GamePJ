@@ -511,7 +511,64 @@ public partial class SelfTest : Node
 				Next();
 				break;
 
-			case 41:
+			case 41 when _timer > 0.4f:
+				BeginCharacterBProbe();
+				Next();
+				break;
+
+			// ── P4：角色 B［武器大师］（3 把近战武器 + 技能 1/2 + 被动 + 新机制）──
+			case 42 when _timer > 0.4f:
+				ReportSwordComboProbe();
+				Next();
+				break;
+
+			case 43 when _timer > 0.3f:
+				ReportBulletCutProbe();
+				Next();
+				break;
+
+			case 44 when _timer > 0.3f:
+				ReportSwordQiProbe();
+				Next();
+				break;
+
+			case 45 when _timer > 0.3f:
+				ProbeBlinkDash();
+				Next();
+				break;
+
+			case 46 when _timer > 0.3f:
+				ProbeGuardStance();
+				ProbeFallAttack();
+				Next();
+				break;
+
+			case 47 when _timer > 0.5f:
+				ReportFallAttack();
+				Next();
+				break;
+
+			case 48 when _timer > 0.4f:
+				BeginScytheProbe();
+				Next();
+				break;
+
+			case 49 when _timer > 0.4f:
+				ReportScytheProbe();
+				Next();
+				break;
+
+			case 50 when _timer > 0.4f:
+				BeginSpearProbe();
+				Next();
+				break;
+
+			case 51 when _timer > 0.5f:
+				ReportSpearProbe();
+				Next();
+				break;
+
+			case 52:
 				GameLog.Write("SelfTest", "=== 自测结束 ===");
 
 				// ⚠️ 退出前先解除暂停：这一阶段之前刚切过一关，`UiRouter` 正把树暂停着
@@ -2967,6 +3024,601 @@ public partial class SelfTest : Node
 			+ $"｜说明：自测注入不了按键（Input.ParseInputEvent 会崩），所以走 DebugForceJumpHeld 这一条探针；真人按键那一路由 MCP 手测 + 截图覆盖");
 	}
 
+	// ─────────────────────────────────────────────────────────────────────────
+	// ★ P4 探针：角色 B［武器大师］（3 把近战武器 + 技能 1/2 + 被动 + 新机制）
+	//
+	// 取证口径与 P3 同一条纪律：
+	// ① 换装走**与基地同一个入口**（`RunController.BeginRunWithCharacter`）；
+	// ② 每个技能先读**表行**（证明新列真的接上了），再做行为取证；
+	// ③ 结论行带 ✅/🔴 与"期望值"。
+	// ─────────────────────────────────────────────────────────────────────────
+
+	private Unit? _p4Player;
+	private MeleeComboAbility? _p4SwordW1;
+	private SwordQiAbility? _p4SwordW2;
+	private LandingBurstAbility? _p4LandingBurst;
+	private FallAttackAbility? _p4Fall;
+	private MeleeComboAbility? _p4ScytheW1;
+	private ScytheThrowAbility? _p4ScytheW2;
+	private MeleeComboAbility? _p4SpearW1;
+	private SpearThrowAbility? _p4SpearW2;
+	private BlinkDashAbility? _p4Blink;
+	private GuardStanceAbility? _p4Guard;
+	private int _p4ComboHits;
+	private int _p4FallHits;
+	private float _p4FallHeight;
+	private float _p4FallDamage;
+	private Unit? _p4Victim;
+
+	/// <summary>清场 → 切到"角色 B + 灵剑" → 收集全部能力节点（顺手证明"换武器 = 换武技"）。</summary>
+	private void BeginCharacterBProbe()
+	{
+		GetTree().Paused = false;
+		ClearHostiles();
+		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.SpiritSword);
+
+		_p4Player = PlayerLocator.Player;
+		if (_p4Player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4：找不到玩家。");
+			return;
+		}
+
+		_p4SwordW1 = PlayerAbilityInput.FindByInputAction(_p4Player, "weapon_skill_1") as MeleeComboAbility;
+		_p4SwordW2 = PlayerAbilityInput.FindByInputAction(_p4Player, "weapon_skill_2") as SwordQiAbility;
+		_p4Blink = _p4Player.GetNodeOrNull<BlinkDashAbility>("AbilitySkill1");
+		_p4Guard = _p4Player.GetNodeOrNull<GuardStanceAbility>("AbilitySkill2");
+		_p4Fall = _p4Player.GetNodeOrNull<FallAttackAbility>("AbilityFallAttack");
+		_p4LandingBurst = _p4Player.GetNodeOrNull<LandingBurstAbility>("AbilityPassive2");
+		_p4ScytheW1 = _p4Player.GetNodeOrNull<MeleeComboAbility>("AbilityWeapon5Skill1");
+		_p4ScytheW2 = _p4Player.GetNodeOrNull<ScytheThrowAbility>("AbilityWeapon5Skill2");
+		_p4SpearW1 = _p4Player.GetNodeOrNull<MeleeComboAbility>("AbilityWeapon6Skill1");
+		_p4SpearW2 = _p4Player.GetNodeOrNull<SpearThrowAbility>("AbilityWeapon6Skill2");
+
+		CharacterConfig? row = RunController.CharacterRow(PlayerCharacterKind.WeaponMaster);
+		GameLog.Write(
+			"SelfTest",
+			$"P4·角色 B 换装：角色行={row?.Id ?? "（读不到）"}（期望 chr_weapon_master） 武器行={RunController.WeaponRow(WeaponPresetKind.SpiritSword)?.Id ?? "（读不到）"}（期望 wpn_spirit_sword）"
+			+ $"｜左键={_p4SwordW1?.AbilityId ?? "（空）"}（期望 skl_b1_w1_1） 右键={_p4SwordW2?.AbilityId ?? "（空）"}（期望 skl_b1_w1_2）"
+			+ $"｜技能1={_p4Blink?.AbilityId ?? "（空）"} 技能2={_p4Guard?.AbilityId ?? "（空）"} 被动落={_p4Fall?.AbilityId ?? "（空）"} 落剑式={_p4LandingBurst?.AbilityId ?? "（空）"}"
+			+ $"｜角色 B 三个武技1（统一驱动）都挂在 MeleeComboAbility 上：{(_p4SwordW1 != null && _p4ScytheW1 != null && _p4SpearW1 != null ? "是" : "否")}（期望 是）"
+			+ $"｜能量波那一路已清：{_p4Player.GetNodeOrNull<Ability>("AbilityWeaponSkill1")?.AbilityId ?? "（空）"}（期望空） Enabled={_p4Player.GetNodeOrNull<Ability>("AbilityWeaponSkill1")?.Enabled}（期望 False）");
+	}
+
+	/// <summary>清掉场上所有敌对单位（自测探针要一个干净场地）。</summary>
+	private void ClearHostiles()
+	{
+		foreach (string group in new[] { "enemy_units", "boss_units" })
+		{
+			foreach (Node node in GetTree().GetNodesInGroup(group))
+			{
+				if (node is Unit unit)
+				{
+					unit.ApplyDirectDamage(99999f, null);
+				}
+			}
+		}
+	}
+
+	/// <summary>造一个真敌人靶子（按敌人表 ScenePath，AI 停掉）摆在玩家正前方。</summary>
+	private Unit? SpawnVictim(Vector3 offset)
+	{
+		if (_p4Player == null)
+		{
+			return null;
+		}
+
+		EnemyConfig? chaserRow = ConfigRows.ById<EnemyConfig>("enemy_chaser");
+		if (chaserRow == null || string.IsNullOrEmpty(chaserRow.ScenePath) || !ResourceLoader.Exists(chaserRow.ScenePath))
+		{
+			return null;
+		}
+
+		if (GD.Load<PackedScene>(chaserRow.ScenePath).Instantiate() is not Unit victim)
+		{
+			return null;
+		}
+
+		NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(victim)?.SetPhysicsProcess(false);
+		if (_p4Player.GetParent() is { } arena)
+		{
+			arena.AddChild(victim);
+			victim.GlobalPosition = _p4Player.GlobalPosition + offset;
+		}
+
+		return victim;
+	}
+
+	/// <summary>灵剑武技1「破剑式」：5 段连招（连续按键推进）+ 每段斩断子弹。</summary>
+	private void ReportSwordComboProbe()
+	{
+		if (_p4Player == null || _p4SwordW1 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4·灵剑：上一段没准备好。");
+			return;
+		}
+
+		MeleeComboAbility w1 = _p4SwordW1;
+		// 靶子摆在正前方 1.6m（命中盒中心在 0.9 高、前方 1.4m 附近）。
+		_p4Victim = SpawnVictim(new Vector3(0f, 0f, -1.6f));
+		float victimHealthBefore = _p4Victim?.Health ?? 0f;
+
+		WaitUntilIdle(w1);
+		w1.RefreshCooldown();
+		bool started = w1.TryPress();
+		string firstAnim = w1.AnimName;
+
+		// 连续推进：每一段都用 TryPress（= 输入层那条路），并在段与段之间推物理帧让事件帧到点。
+		// 连招推进：自测在同一帧里跑，等不到真实动画事件帧，所以直接模拟"ATK 帧到了"
+		// （MeleeComboAbility.DebugFireAnimEvent = OnAnimEvent(ComboNextEvent)）。
+		int advanced = 0;
+		for (int i = 0; i < 8 && w1.IsBusy; i++)
+		{
+			w1.DebugFireAnimEvent();      // 本段判定 + 开输入窗口
+			w1.TryPress();                // 玩家紧接着又按了一下
+			w1._PhysicsProcess(0.06d);
+			advanced = w1.ComboChained;
+		}
+
+		float victimHealthAfter = _p4Victim?.Health ?? 0f;
+		bool ok = started && advanced >= 4 && w1.ComboChained >= 4;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P4·灵剑武技1 破剑式：TryPress(起手)={started}（期望 True） 段数表={w1.ComboStepCount}（期望 5） 首段动画「{firstAnim}」 AnimEvent={w1.AnimEvent} AnimEventEnd={w1.AnimEventEnd}"
+			+ $" → 连续按键推进 {advanced} 次（期望 ≥4） 最终段={w1.ComboStep + 1} 累计连击={w1.ComboChained}（期望 ≥4） 窗口={w1.ComboWindowSeconds:0.##}s"
+			+ $"｜CD={w1.Cooldown:0.##}（文档 0.3/0.4/0.5/0.6/0.6 是参考值，段间隔由动画长度决定）"
+			+ $"｜靶子 {_p4Victim?.Name} 生命 {victimHealthBefore:0.#} → {victimHealthAfter:0.#}（期望下降）");
+	}
+
+	/// <summary>破剑式斩断子弹：Bullet 被清掉、EnergyWave 斩不断（**包括友军的**）。</summary>
+	private void ReportBulletCutProbe()
+	{
+		if (_p4Player == null || _p4SwordW1 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4·斩断：上一段没准备好。");
+			return;
+		}
+
+		MeleeComboAbility w1 = _p4SwordW1;
+
+		// 三发"子弹"：友军 Bullet / 敌方 Bullet / 能量波 —— 全部摆在命中盒正前方。
+		Projectile? friendly = SpawnProjectile("res://Scenes/Combat/Bullet.tscn", new Vector3(0f, 0.8f, -1.0f), _p4Player, Faction.Player);
+		Projectile? hostile = SpawnProjectile("res://Scenes/Combat/Bullet.tscn", new Vector3(0.3f, 0.8f, -1.0f), _p4Player, Faction.Enemy);
+		Projectile? wave = SpawnProjectile("res://Scenes/Combat/EnergyWave.tscn", new Vector3(-0.3f, 0.8f, -1.0f), _p4Player, Faction.Enemy);
+		string names = Projectile.SourceSceneSummary();
+
+
+		WaitUntilIdle(w1);
+		w1.RefreshCooldown();
+		bool started = w1.TryPress();
+		w1.DebugFireAnimEvent();     // 模拟事件帧 ATK 到点（= 本段判定 + 斩断子弹）
+		w1._PhysicsProcess(0.05d);
+
+		bool friendlyGone = friendly == null || !IsInstanceValid(friendly) || friendly.IsQueuedForDeletion();
+		bool hostileGone = hostile == null || !IsInstanceValid(hostile) || hostile.IsQueuedForDeletion();
+		bool waveAlive = wave != null && IsInstanceValid(wave) && !wave.IsQueuedForDeletion();
+		bool ok = started && friendlyGone && hostileGone && waveAlive;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P4·破剑式斩断子弹：名单 [Bullet] 排除名单 [EnergyWave]（都是表列 CutSceneNames/CutExcludeSceneNames）"
+			+ $"｜场上投射物场景名：{names}"
+			+ $"｜友军的 Bullet 被清={(friendlyGone ? "是" : "否")}（期望 是，文档：包括友军的） 敌方的 Bullet 被清={(hostileGone ? "是" : "否")}（期望 是） 能量波还在={(waveAlive ? "是" : "否")}（期望 是，文档：无法斩断能量波）"
+			+ $"｜本段斩断计数={w1.LastCutCount} 累计={w1.TotalCutCount}");
+
+		foreach (Projectile? p in new[] { friendly, hostile, wave })
+		{
+			if (p != null && IsInstanceValid(p))
+			{
+				p.QueueFree();
+			}
+		}
+	}
+
+	private Projectile? SpawnProjectile(string scenePath, Vector3 offset, Unit owner, Faction faction)
+	{
+		if (_p4Player == null || !ResourceLoader.Exists(scenePath))
+		{
+			return null;
+		}
+
+		if (GD.Load<PackedScene>(scenePath).Instantiate() is not Projectile projectile)
+		{
+			return null;
+		}
+
+		if (_p4Player.GetParent() is { } arena)
+		{
+			arena.AddChild(projectile);
+			projectile.GlobalPosition = _p4Player.GlobalPosition + offset;
+		}
+
+		return projectile;
+	}
+
+	/// <summary>灵剑武技2「拔刀式」：基础蓄力 1s + 剑气属性（穿透 / 可格挡 / 路径短 / 大小等比攻击盒）。</summary>
+	private void ReportSwordQiProbe()
+	{
+		if (_p4Player == null || _p4SwordW2 == null || _p4SwordW1 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4·剑气：上一段没准备好。");
+			return;
+		}
+
+		SwordQiAbility w2 = _p4SwordW2;
+		WaitUntilIdle(w2);
+		w2.RefreshCooldown();
+		bool started = w2.TryPress();                       // 按下（进入蓄力）
+		w2.OnInputHeld(0.4f);                               // 基础蓄力 1s 还没满
+		bool aborted = w2.ChargeBaseComplete;               // 期望 False
+		w2.OnInputReleased();                               // 没蓄满就松手 → 不释放
+		int projectilesAfterAbort = CountProjectiles("SwordQi");
+
+		WaitUntilIdle(w2);
+		w2.RefreshCooldown();
+		bool started2 = w2.TryPress();
+		w2.OnInputHeld(w2.ChargeBaseSeconds + 0.05f);       // 蓄满 → 松手释放
+		GameLog.Write(
+			"SelfTest",
+			$"P4·剑气尺寸基准：武技1 当前第 {_p4SwordW1.ComboStep + 1} 段命中盒 {Fmt(_p4SwordW1.CurrentStepBoxSize)}");
+		w2.OnInputReleased();
+		int projectiles = CountProjectiles("SwordQi");
+
+		bool ok = started && !aborted && projectilesAfterAbort == 0 && started2 && projectiles >= 1
+			&& w2.Pierce >= 1 && !w2.BypassBlock && w2.MaxLifetime <= 0.6f && w2.LastSize > 0f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P4·灵剑武技2 拔刀式：TryPress={started}（期望 True） 基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 1）/ CD {w2.Cooldown:0.##}（期望 2）"
+			+ $"｜没蓄满就松手：基础完成={aborted}（期望 False）→ 剑气生成 {projectilesAfterAbort} 个（期望 0，设计文档「未完成不释放」）"
+			+ $"｜蓄满松手：生成 {projectiles} 个（期望 ≥1）｜剑气属性 —— 穿透 {w2.Pierce}（期望 ≥1，能穿透路径上的敌人） 可被格挡={!w2.BypassBlock}（期望 True） 存活 {w2.MaxLifetime:0.##}s（期望 ≤0.6 = 飞行路径短）"
+			+ $"｜大小等比攻击盒：剑气尺寸 {w2.LastSize:0.###}（来源：{w2.LastSizeSource}）");
+	}
+
+	private int CountProjectiles(string sceneName)
+	{
+		int count = 0;
+		foreach (Node node in GetTree().GetNodesInGroup("projectiles"))
+		{
+			if (node is Projectile projectile && projectile.SourceSceneName == sceneName)
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	/// <summary>技能1「闪」：朝准星冲刺 + 全程穿透（碰撞层摘到只剩世界层）+ 可视化路径。</summary>
+	private void ProbeBlinkDash()
+	{
+		if (_p4Player == null || _p4Blink == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4·闪：上一段没准备好。");
+			return;
+		}
+
+		BlinkDashAbility dash = _p4Blink;
+		uint maskBefore = _p4Player.CollisionMask;
+		Vector3 positionBefore = _p4Player.GlobalPosition;
+
+		WaitUntilIdle(dash);
+		dash.RefreshCooldown();
+		bool started = dash.TryPress();
+		uint maskDuring = _p4Player.CollisionMask;
+		bool pierceDuring = dash.PierceApplied;
+		int pathPoints = dash.LastPathPoints;
+
+		// 推完整个冲刺时长（物理帧是引擎在推，这里同步推让状态机收尾）。
+		for (int i = 0; i < 20 && dash.IsBusy; i++)
+		{
+			dash._PhysicsProcess(0.03d);
+		}
+
+		uint maskAfter = _p4Player.CollisionMask;
+		bool ok = started && pierceDuring && maskDuring == CombatLayers.World && maskAfter == maskBefore && pathPoints >= 2;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P4·技能1 闪：TryPress={started}（期望 True） 方向 {Fmt(dash.LastDirection)}（朝准星） 距离 {dash.Distance:0.##}m / {dash.Duration:0.##}s CD {dash.Cooldown:0.##}（期望 5）"
+			+ $"｜全程穿透：冲刺期间碰撞层 {maskBefore} → {maskDuring}（期望 {CombatLayers.World} = 只剩世界层，穿透单位/仍撞地形） 冲刺后还原 → {maskAfter}（期望 {maskBefore}）"
+			+ $"｜可视化路径：{pathPoints} 点（期望 ≥2） 显示中={dash.GetNodeOrNull<DashPathIndicator>("Path")?.IsShowing}");
+	}
+
+	/// <summary>技能2「架」：0.75s 架势内被命中 → 规避这次 + 退出架势。</summary>
+	private void ProbeGuardStance()
+	{
+		if (_p4Player == null || _p4Guard == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4·架：上一段没准备好。");
+			return;
+		}
+
+		GuardStanceAbility guard = _p4Guard;
+		WaitUntilIdle(guard);
+		guard.RefreshCooldown();
+		bool started = guard.TryPress();
+		guard._PhysicsProcess(0.2d);            // 过 GuardStartSeconds(0.15) → 进入架势
+		bool stanceActive = guard.StanceActive;
+		int parriesBefore = guard.ParryCount;
+
+		float healthBefore = _p4Player.Health;
+		DamageResult result = _p4Player.ReceiveHit(new HitInstance
+		{
+			Target = _p4Player,
+			Attacker = _p4Victim,
+			Context = EventContext.Create(_p4Victim, _p4Player),
+			Damage = 40f,
+			Direction = Vector3.Forward,
+		});
+
+		float healthAfter = _p4Player.Health;
+		bool exited = !guard.StanceActive;
+		int parriesAfter = guard.ParryCount;
+		guard._PhysicsProcess(0.05d);           // 下一帧把"本技能自己设的规避"清掉
+
+		bool ok = started && stanceActive && result.Invulnerable && Mathf.IsEqualApprox(healthBefore, healthAfter)
+			&& parriesAfter == parriesBefore + 1 && exited;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P4·技能2 架：TryPress={started}（期望 True） 架势 {guard.StanceSeconds:0.##}s（期望 0.75） CD {guard.Cooldown:0.##}（期望 3）"
+			+ $" → 推 0.2s 后在架势中={stanceActive}（期望 True）"
+			+ $"｜架势内挨 40 点：无效化={result.Invulnerable}（期望 True） 掉血 {healthBefore - healthAfter:0.#}（期望 0） 生命 {healthBefore:0.#} → {healthAfter:0.#}"
+			+ $"｜退出架势={exited}（期望 True） 架住计数 {parriesBefore} → {parriesAfter}（期望 +1） 挡下的伤害={guard.LastParriedDamage:0.##}（期望 40）");
+	}
+
+	/// <summary>被动「落」：空中才能用 + 大幅提高下落速度 + 高度越高伤害越高。</summary>
+	private void ProbeFallAttack()
+	{
+		if (_p4Player == null || _p4Fall == null || _p4LandingBurst == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4·落：上一段没准备好。");
+			return;
+		}
+
+		FallAttackAbility fall = _p4Fall;
+		WaitUntilIdle(fall);
+
+		// ① 在地面时不能用（文档：当角色在空中时…）。
+		_p4Player.GlobalPosition = _p4Player.GlobalPosition with { Y = 0.05f };
+		_p4Player.Velocity = Vector3.Zero;
+		fall._PhysicsProcess(0.02d);
+		bool grounded = _p4Player.IsOnFloor();
+		bool blockedOnGround = !fall.CanActivateForTest();
+		fall.RefreshCooldown();
+		bool pressedOnGround = fall.TryPress();
+
+		// ② 举到空中（离地 6m）再按 → 起跳高度记进 FallHeight。
+		Vector3 start = _p4Player.GlobalPosition;
+		_p4Player.GlobalPosition = start with { Y = start.Y + 6f };
+		_p4Player.Velocity = new Vector3(0f, -1f, 0f);
+		MovementOf(_p4Player)?._PhysicsProcess(0.02d);
+		float fallHeight = MovementOf(_p4Player)?.FallHeight ?? 0f;
+
+		fall.RefreshCooldown();
+		bool pressedInAir = fall.TryPress();
+		float diveSpeed = _p4Player.Velocity.Y;
+		_p4FallHeight = fall.LastFallHeight;
+		_p4FallDamage = fall.LastDamage;
+		float bonusLow = fall.DamageMultiplierForHeight(0f);
+		float bonusMid = fall.DamageMultiplierForHeight(fall.HeightStep * 2f);
+		float bonusHigh = fall.DamageMultiplierForHeight(fall.HeightStep * 20f);
+
+		bool ok = blockedOnGround && !pressedOnGround && pressedInAir
+			&& diveSpeed <= -fall.DiveSpeed + 0.01f
+			&& Mathf.IsEqualApprox(bonusLow, 1f)
+			&& Mathf.IsEqualApprox(bonusMid, 1f + (2f * fall.DamageBonusPerStep))
+			&& Mathf.IsEqualApprox(bonusHigh, 1f + fall.MaxDamageBonus);
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P4·被动 落（下落攻击）：CD {fall.Cooldown:0.##}（期望 1） 触发键 {fall.InputAction}（期望 fall_attack）"
+			+ $"｜地面时：在地面={grounded}（期望 True） 可按={!blockedOnGround}（期望 False） TryPress={pressedOnGround}（期望 False）"
+			+ $"｜空中时：TryPress={pressedInAir}（期望 True） 下落速度 {diveSpeed:0.##} m/s（期望 ≤ -{fall.DiveSpeed:0.##}） 起手高度（净下落）{_p4FallHeight:0.##}m 伤害 {_p4FallDamage:0.##}"
+			+ $"｜高度→伤害：每 {fall.HeightStep:0.##}m +{fall.DamageBonusPerStep * 100f:0.#}%（文档 n=预设 2m），封顶 +{fall.MaxDamageBonus * 100f:0.#}%（文档 100%）"
+			+ $" → 0m ×{bonusLow:0.##}（期望 ×1） 2 档 ×{bonusMid:0.##}（期望 ×{1f + (2f * fall.DamageBonusPerStep):0.##}） 20 档 ×{bonusHigh:0.##}（期望 ×{1f + fall.MaxDamageBonus:0.##} = 封顶）");
+	}
+
+	/// <summary>落地：上游伤害不变，额外一圈（落剑式）+ 落剑式的 CD 间隔。</summary>
+	private void ReportFallAttack()
+	{
+		if (_p4Player == null || _p4Fall == null || _p4LandingBurst == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4·落剑式：上一段没准备好。");
+			return;
+		}
+
+		FallAttackAbility fall = _p4Fall;
+		LandingBurstAbility burst = _p4LandingBurst;
+
+		// 靶子摆在落点附近（落圈是以落点为球心、半径 ~3.2m 的球），让下落攻击与落剑式都有东西可打。
+		_p4Victim = SpawnVictim(new Vector3(1.6f, -5.2f, 1.6f));
+		float victimBefore = _p4Victim?.Health ?? 0f;
+
+		int burstBefore = burst.TriggerCount;
+		float upstreamDamage = fall.LastDamage;
+
+		// 把玩家压回地面（触发落地事件）。
+		_p4Player.GlobalPosition = _p4Player.GlobalPosition with { Y = 0.05f };
+		_p4Player.Velocity = new Vector3(0f, -20f, 0f);
+		for (int i = 0; i < 6 && fall.IsBusy; i++)
+		{
+			fall._PhysicsProcess(0.05d);
+			MovementOf(_p4Player)?._PhysicsProcess(0.05d);
+		}
+
+		WaitUntilIdle(burst);
+		int burstAfter = burst.TriggerCount;
+		float victimAfter = _p4Victim?.Health ?? 0f;
+		bool ok = fall.HasLanded && burstAfter >= burstBefore + 1;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P4·武技3 落剑式（被动）：上游 {fall.AbilityId} 落地={fall.HasLanded}（期望 True） 上游本次伤害 {upstreamDamage:0.##}（**没有被改过**）"
+			+ $"｜额外那一圈：触发次数 {burstBefore} → {burstAfter}（期望 +1） 那一圈伤害 {burst.LastBurstDamage:0.##} 挂到 {burst.TriggerAbilityId}（期望 skl_b_fall） CD {burst.Cooldown:0.##}（期望 5 = 触发间隔）"
+			+ $"｜靶子 {_p4Victim?.Name} 生命 {victimBefore:0.#} → {victimAfter:0.#}｜⚠️ 自测在同一帧里跑，落圈是 Area3D、要等一个物理帧才进重叠列表 → 这一栏不作为判据（判据是触发次数 +1 与 上游伤害没变）");
+	}
+
+	/// <summary>镰刀：3 段连招（最后一刀大回旋）= 圆柱命中盒 + 武技2 抛出/周期伤害/飞行期间锁武技1。</summary>
+	private void BeginScytheProbe()
+	{
+		ClearHostiles();
+		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.Scythe);
+		_p4Player = PlayerLocator.Player;
+		_p4ScytheW1 = _p4Player?.GetNodeOrNull<MeleeComboAbility>("AbilityWeapon5Skill1");
+		_p4ScytheW2 = _p4Player?.GetNodeOrNull<ScytheThrowAbility>("AbilityWeapon5Skill2");
+	}
+
+	private void ReportScytheProbe()
+	{
+		if (_p4Player == null || _p4ScytheW1 == null || _p4ScytheW2 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4·镰刀：读不到那两个武技节点。");
+			return;
+		}
+
+		MeleeComboAbility w1 = _p4ScytheW1;
+		ScytheThrowAbility w2 = _p4ScytheW2;
+
+		// ① 3 段连招（最后一刀大回旋 = 圆柱）。
+		MeleeComboAbility? weapon4 = _p4Player.GetNodeOrNull<MeleeComboAbility>("AbilityWeapon4Skill1");
+		WaitUntilIdle(w1);
+		w1.RefreshCooldown();
+		bool started = w1.TryPress();
+		// 连招推进：自测在同一帧里跑，等不到真实动画事件帧，所以直接模拟"ATK 帧到了"
+		// （MeleeComboAbility.DebugFireAnimEvent = OnAnimEvent(ComboNextEvent)）。
+		int advanced = 0;
+		for (int i = 0; i < 8 && w1.IsBusy; i++)
+		{
+			w1.DebugFireAnimEvent();      // 本段判定 + 开输入窗口
+			w1.TryPress();                // 玩家紧接着又按了一下
+			w1._PhysicsProcess(0.06d);
+			advanced = w1.ComboChained;
+		}
+
+		// 圆柱判定：最后一刀的命中盒尺寸 z=0（= 大回旋 360°）。
+		Vector3 lastSize = w1.CurrentStepBoxSize;
+
+		// ② 抛出：周期伤害 + 飞行期间武技1 被锁 + 再次按键收回。
+		WaitUntilIdle(w2);
+		w2.RefreshCooldown();
+		bool thrown = w2.TryPress();
+		bool inFlight = w2.InFlight;
+
+		// WeaponGate5 是每帧惰性绑定的，这里也推它的物理帧。
+		_p4Player.GetNodeOrNull<WeaponGate>("WeaponGate5")?._PhysicsProcess(0.02d);
+		bool comboLocked = w1.ExternallyBlocked;
+		// ⚠️ 先清冷却：不然"按不动"是冷却导致的，测不出"门"这一条。
+		WaitUntilIdle(w1);
+		w1.RefreshCooldown();
+		bool comboBlockedPress = !w1.TryPress();
+
+		// 推几个周期（每 0.5s 一次判定）。
+		for (int i = 0; i < 8; i++)
+		{
+			w2._PhysicsProcess(0.2d);
+		}
+
+		int ticks = w2.DamageTickCount;
+		Vector3 weaponPos = w2.WeaponPosition;
+		bool secondPress = w2.TryPress();      // 再次使用 → 收回
+		for (int i = 0; i < 40 && w2.IsBusy; i++)
+		{
+			w2._PhysicsProcess(0.05d);
+		}
+
+		_p4Player.GetNodeOrNull<WeaponGate>("WeaponGate5")?._PhysicsProcess(0.02d);
+		bool comboUnlocked = !w1.ExternallyBlocked;
+
+		bool ok = started && advanced >= 2 && lastSize.Z <= 0.0001f
+			&& thrown && inFlight && comboLocked && comboBlockedPress && ticks >= 2 && secondPress && comboUnlocked;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P4·镰刀：武技1 憎恶 段数={w1.ComboStepCount}（期望 3） CD {w1.Cooldown:0.##}（期望 0.5） 连续按键推进={advanced}（期望 ≥2） 最后一刀命中盒 {Fmt(lastSize)}（期望 z=0 = **圆柱 = 大回旋 360°**）"
+			+ $"｜武技2 无情：TryPress={thrown}（期望 True） 在飞={inFlight}（期望 True） 周期伤害 {ticks} 次（期望 ≥2，每 {w2.DamageInterval:0.##}s 一次；推 8×0.2s=1.6s 的物理帧，实际按引擎帧数） CD {w2.Cooldown:0.##}（期望 1） 武器位置 {Fmt(weaponPos)}"
+			+ $"｜「武器飞出去这期间武技1无法使用」：门绑定={_p4Player.GetNodeOrNull<WeaponGate>("WeaponGate5")?.Bound} 武技1 被锁={comboLocked}（期望 True） 此时按武技1={comboBlockedPress}（期望 False）"
+			+ $"｜再次使用收回={secondPress}（期望 True） 收回后武技1 解锁={comboUnlocked}（期望 True） 累计收回 {w2.RecallCount} 次");
+	}
+
+	/// <summary>长枪：5 段循环连招 + 武技2 蓄力抛掷（抛物线 / 路径可视化 / 每档 +20% / 收回）。</summary>
+	private void BeginSpearProbe()
+	{
+		ClearHostiles();
+		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.Spear);
+		_p4Player = PlayerLocator.Player;
+		_p4SpearW1 = _p4Player?.GetNodeOrNull<MeleeComboAbility>("AbilityWeapon6Skill1");
+		_p4SpearW2 = _p4Player?.GetNodeOrNull<SpearThrowAbility>("AbilityWeapon6Skill2");
+	}
+
+	private void ReportSpearProbe()
+	{
+		if (_p4Player == null || _p4SpearW1 == null || _p4SpearW2 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P4·长枪：读不到那两个武技节点。");
+			return;
+		}
+
+		MeleeComboAbility w1 = _p4SpearW1;
+		SpearThrowAbility w2 = _p4SpearW2;
+
+		// ① 5 段循环连招：连按 6 次应当回到第 1 段（ComboLoop）。
+		WaitUntilIdle(w1);
+		w1.RefreshCooldown();
+		bool started = w1.TryPress();
+		int advanced = 0;
+		// 5 段循环：连按 10 次应当"打满 5 段后回到第 1 段"（ComboStep 永远 ≤ 4）。
+		int maxStepSeen = 0;
+		for (int i = 0; i < 10 && w1.IsBusy; i++)
+		{
+			w1.DebugFireAnimEvent();
+			w1.TryPress();
+			w1._PhysicsProcess(0.06d);
+			advanced = w1.ComboChained;
+			maxStepSeen = Mathf.Max(maxStepSeen, w1.ComboStep);
+		}
+
+		// ② 蓄力抛掷：基础档 vs 3 档（每 0.25s 一档 ×1.2）。
+		WaitUntilIdle(w2);
+		w2.RefreshCooldown();
+		bool charged = w2.TryPress();
+		w2.OnInputHeld(w2.ChargeBaseSeconds + 0.01f);      // 基础档
+		float baseDist = w2.MaxThrowDistance * w2.ChargePowerScale;
+		w2.OnInputReleased();
+		float distAt0 = w2.LastHorizontalDistance;
+		float speedAt0 = w2.LastHorizontalSpeed;
+		int pathPoints = w2.LastPathPoints;
+		bool inFlight = w2.InFlight;
+		for (int i = 0; i < 30 && w2.IsBusy; i++)
+		{
+			w2._PhysicsProcess(0.05d);
+		}
+
+		WaitUntilIdle(w2);
+		w2.RefreshCooldown();
+		bool charged3 = w2.TryPress();
+		w2.OnInputHeld(w2.ChargeBaseSeconds + (w2.ChargeStepSeconds * 3f) + 0.01f);
+		int steps = w2.ChargeSteps;
+		float power = w2.ChargePowerScale;
+		w2.OnInputReleased();
+		float distAt3 = w2.LastHorizontalDistance;
+		float speedAt3 = w2.LastHorizontalSpeed;
+		bool recall = w2.TryPress();      // 再次使用 → 收回
+		for (int i = 0; i < 40 && w2.IsBusy; i++)
+		{
+			w2._PhysicsProcess(0.05d);
+		}
+
+		float maxDist = w2.MaxThrowDistance * Mathf.Pow(1.2f, 3f);
+		bool ok = started && advanced >= 5 && maxStepSeen <= 4 && charged && charged3 && steps == 3
+			&& Mathf.IsEqualApprox(speedAt3 / Mathf.Max(0.01f, speedAt0), power)
+			&& distAt3 > distAt0 && pathPoints >= 2 && inFlight && recall;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P4·长枪武技1 横扫千军：段数={w1.ComboStepCount}（期望 5） 循环={w1.ComboLoop}（期望 True，文档「这么循环」） CD {w1.Cooldown:0.##}（期望 0.6） 连续按键推进={advanced}（期望 ≥5） 循环后最大段号={maxStepSeen + 1}（期望 ≤5 = 打满就回到第 1 段）"
+			+ $"｜武技2 长虹贯日：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 1）/ 每 {w2.ChargeStepSeconds:0.##}s 一档（期望 0.25）/ 每档 ×{w2.ChargeStepScale:0.##}（期望 1.2 = +20%）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 3，最多蓄力 {w2.ChargeMaxSeconds:0.##}s）"
+			+ $"｜抛物线：重力 {w2.ArcGravity:0.##} 飞行 {w2.FlightSeconds:0.##}s 路径可视化 {pathPoints} 点（期望 ≥2） 在飞={inFlight}（期望 True）"
+			+ $"｜基础档：水平速度 {speedAt0:0.##} 路径中线 {distAt0:0.##}m ／ 3 档：速度 {speedAt3:0.##} 路径中线 {distAt3:0.##}m（期望 {maxDist:0.##} ≈ 12×1.2³）"
+			+ $"｜丢出去后再次使用收回={recall}（期望 True） 累计收回 {w2.RecallCount} 次｜落日余晖（武器 3 被动）：下落攻击 {_p4Fall?.AbilityId ?? "（找不到）"} 的冲下模式={_p4Fall?.HomingMode}（0=Straight 1=Crosshair） 指向范围 {_p4Fall?.MaxDiveAngleDegrees:0.#}°");
+	}
+
+	/// <summary>取单位下的 <see cref="CharacterMovement"/>（自测探针要同步推它的物理帧）。</summary>
+	private static CharacterMovement? MovementOf(Unit unit) => unit.GetNodeOrNull<CharacterMovement>("Movement");
+
 	private static CollisionShape3D? BodyShapeOf(Unit unit)
 	{
 		foreach (Node child in unit.GetChildren())
@@ -2979,7 +3631,6 @@ public partial class SelfTest : Node
 
 		return null;
 	}
-
 	private static Vector3 BodyCenterOf(Unit unit) => BodyShapeOf(unit)?.GlobalPosition ?? unit.GlobalPosition;
 
 	private static float BodyRadiusOf(Unit unit)

@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Projectile.cs" id="1_projectile"]
+[ext_resource type="Material" path="res://Assets/Materials/mat_energy_wave.tres" id="2_mat"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_qi"]
+material = ExtResource("2_mat")
+size = Vector3(0.22, 0.9, 1.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qi_trail"]
+material = ExtResource("2_mat")
+size = Vector3(0.1, 0.5, 0.5)
+
+[node name="SwordQi" type="Node3D"]
+script = ExtResource("1_projectile")
+Speed = 60.0
+GravityScale = 0.0
+MaxLifetime = 0.45
+Pierce = 8
+HitMask = 5
+
+[node name="Blade" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.35)
+mesh = SubResource("BoxMesh_qi")
+
+[node name="Tail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+mesh = SubResource("BoxMesh_qi_trail")

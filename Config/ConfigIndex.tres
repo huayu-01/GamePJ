@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ConfigIndexData" load_steps=147 format=3]
+[gd_resource type="Resource" script_class="ConfigIndexData" load_steps=165 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/ConfigIndexData.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -157,6 +157,38 @@
 [ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_a3_draw.tres" id="160_anim_a3_draw"]
 [ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_a3_hawkeye.tres" id="161_anim_a3_hawkeye"]
 
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b1_sword1.tres" id="162_anim_b1_sword1"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b1_sword2.tres" id="163_anim_b1_sword2"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b1_sword3.tres" id="164_anim_b1_sword3"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b1_sword4.tres" id="165_anim_b1_sword4"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b1_sword5.tres" id="166_anim_b1_sword5"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b1_swordqi.tres" id="167_anim_b1_swordqi"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b2_scythe1.tres" id="168_anim_b2_scythe1"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b2_scythe2.tres" id="169_anim_b2_scythe2"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b2_scythe3.tres" id="170_anim_b2_scythe3"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b3_spear1.tres" id="171_anim_b3_spear1"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b3_spear2.tres" id="172_anim_b3_spear2"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b3_spear3.tres" id="173_anim_b3_spear3"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b3_spear4.tres" id="174_anim_b3_spear4"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b3_spear5.tres" id="175_anim_b3_spear5"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b_fall.tres" id="176_anim_b_fall"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b_skill1.tres" id="177_anim_b_skill1"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillAnimations/anim_b_skill2.tres" id="178_anim_b_skill2"]
+[ext_resource type="Resource" path="res://Config/Tables/Characters/chr_weapon_master.tres" id="179_chr_weapon_master"]
+[ext_resource type="Resource" path="res://Config/Tables/Weapons/wpn_spirit_sword.tres" id="180_wpn_spirit_sword"]
+[ext_resource type="Resource" path="res://Config/Tables/Weapons/wpn_scythe.tres" id="181_wpn_scythe"]
+[ext_resource type="Resource" path="res://Config/Tables/Weapons/wpn_spear.tres" id="182_wpn_spear"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_1.tres" id="183_skl_b1_w1_1"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_2.tres" id="184_skl_b1_w1_2"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_3.tres" id="185_skl_b1_w1_3"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_1.tres" id="186_skl_b2_w1_1"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_2.tres" id="187_skl_b2_w1_2"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b3_w1_1.tres" id="188_skl_b3_w1_1"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b3_w1_2.tres" id="189_skl_b3_w1_2"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_fall.tres" id="190_skl_b_fall"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_skill_1.tres" id="191_skl_b_skill_1"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_skill_2.tres" id="192_skl_b_skill_2"]
+
 [resource]
 script = ExtResource("1_balance")
 EnemyHealthMultiplier = 0.75
@@ -175,8 +207,8 @@ BossPressureInterval = 12.0
 BossPressureDamagePerLevel = 0.08
 BossPressureAttackSpeedPerLevel = 0.06
 Stages = [ExtResource("2_stg_outer"), ExtResource("3_stg_inner"), ExtResource("4_stg_core")]
-Weapons = [ExtResource("5_wpn_pistol"), ExtResource("6_wpn_sniper"), ExtResource("7_wpn_rifle"), ExtResource("142_wpn_energy_palm"), ExtResource("147_wpn_crossbow"), ExtResource("148_wpn_bow")]
-Characters = [ExtResource("8_chr_gunner"), ExtResource("9_chr_heavy"), ExtResource("10_chr_summoner"), ExtResource("143_chr_hunter")]
+Weapons = [ExtResource("5_wpn_pistol"), ExtResource("6_wpn_sniper"), ExtResource("7_wpn_rifle"), ExtResource("142_wpn_energy_palm"), ExtResource("147_wpn_crossbow"), ExtResource("148_wpn_bow"), ExtResource("180_wpn_spirit_sword"), ExtResource("181_wpn_scythe"), ExtResource("182_wpn_spear")]
+Characters = [ExtResource("8_chr_gunner"), ExtResource("9_chr_heavy"), ExtResource("10_chr_summoner"), ExtResource("143_chr_hunter"), ExtResource("179_chr_weapon_master")]
 Enemies = [ExtResource("11_enemy_global"), ExtResource("55_enemy_chaser"), ExtResource("56_enemy_fast_melee"), ExtResource("57_enemy_exploder"), ExtResource("58_enemy_jumping_melee"), ExtResource("59_enemy_ranged"), ExtResource("60_enemy_charger"), ExtResource("61_enemy_screamer"), ExtResource("62_enemy_guard"), ExtResource("63_enemy_skill_elite")]
 Effects = [ExtResource("12_eff_slow"), ExtResource("13_eff_weaken"), ExtResource("14_eff_burn"), ExtResource("15_eff_empowered"), ExtResource("16_eff_stun"), ExtResource("18_eff_explosion"), ExtResource("19_eff_lifesteal"), ExtResource("20_eff_summon_on_kill"), ExtResource("21_eff_chain_lightning"), ExtResource("146_eff_mark")]
 Nodes = [ExtResource("23_node_enhance"), ExtResource("24_node_evolution"), ExtResource("25_node_mutation"), ExtResource("26_node_resource"), ExtResource("27_node_heal"), ExtResource("28_node_special"), ExtResource("29_node_shop"), ExtResource("30_node_portal")]
@@ -209,9 +241,9 @@ PressureMutationBonus = 1.5
 PressurePerPoint = 100
 FreeChallengeBaseQuota = 1
 FreeChallengeMaxQuota = 2
-Skills = [ExtResource("64_skl_dash"), ExtResource("65_skl_burst"), ExtResource("66_skl_melee"), ExtResource("67_skl_summon"), ExtResource("68_skl_control"), ExtResource("69_skl_enemy_chaser_melee"), ExtResource("70_skl_enemy_fast_melee_melee"), ExtResource("71_skl_enemy_exploder_blow"), ExtResource("72_skl_enemy_jumping_leap"), ExtResource("73_skl_enemy_ranged_shot"), ExtResource("74_skl_enemy_charger_charge"), ExtResource("75_skl_enemy_screamer_scream"), ExtResource("76_skl_enemy_guard_melee"), ExtResource("77_skl_enemy_elite_melee"), ExtResource("78_skl_enemy_elite_buff"), ExtResource("79_skl_enemy_elite_control"), ExtResource("80_skl_boss_melee"), ExtResource("81_skl_boss_scream"), ExtResource("82_skl_boss_charge"), ExtResource("83_skl_boss_summon"), ExtResource("84_skl_drone_melee"), ExtResource("85_bhv_awakened"), ExtResource("86_bhv_summoner"), ExtResource("87_bhv_screaming"), ExtResource("88_bhv_charging"), ExtResource("144_skl_a1_w1_1"), ExtResource("145_skl_a1_w1_2"), ExtResource("149_skl_a2_w1_1"), ExtResource("150_skl_a2_w1_2"), ExtResource("151_skl_a3_w1_1"), ExtResource("152_skl_a3_w1_2"), ExtResource("153_skl_a1_skill_1"), ExtResource("154_skl_a1_skill_2"), ExtResource("155_skl_a1_passive")]
+Skills = [ExtResource("64_skl_dash"), ExtResource("65_skl_burst"), ExtResource("66_skl_melee"), ExtResource("67_skl_summon"), ExtResource("68_skl_control"), ExtResource("69_skl_enemy_chaser_melee"), ExtResource("70_skl_enemy_fast_melee_melee"), ExtResource("71_skl_enemy_exploder_blow"), ExtResource("72_skl_enemy_jumping_leap"), ExtResource("73_skl_enemy_ranged_shot"), ExtResource("74_skl_enemy_charger_charge"), ExtResource("75_skl_enemy_screamer_scream"), ExtResource("76_skl_enemy_guard_melee"), ExtResource("77_skl_enemy_elite_melee"), ExtResource("78_skl_enemy_elite_buff"), ExtResource("79_skl_enemy_elite_control"), ExtResource("80_skl_boss_melee"), ExtResource("81_skl_boss_scream"), ExtResource("82_skl_boss_charge"), ExtResource("83_skl_boss_summon"), ExtResource("84_skl_drone_melee"), ExtResource("85_bhv_awakened"), ExtResource("86_bhv_summoner"), ExtResource("87_bhv_screaming"), ExtResource("88_bhv_charging"), ExtResource("144_skl_a1_w1_1"), ExtResource("145_skl_a1_w1_2"), ExtResource("149_skl_a2_w1_1"), ExtResource("150_skl_a2_w1_2"), ExtResource("151_skl_a3_w1_1"), ExtResource("152_skl_a3_w1_2"), ExtResource("153_skl_a1_skill_1"), ExtResource("154_skl_a1_skill_2"), ExtResource("155_skl_a1_passive"), ExtResource("191_skl_b_skill_1"), ExtResource("192_skl_b_skill_2"), ExtResource("190_skl_b_fall"), ExtResource("183_skl_b1_w1_1"), ExtResource("184_skl_b1_w1_2"), ExtResource("185_skl_b1_w1_3"), ExtResource("186_skl_b2_w1_1"), ExtResource("187_skl_b2_w1_2"), ExtResource("188_skl_b3_w1_1"), ExtResource("189_skl_b3_w1_2")]
 PressureMods = [ExtResource("108_pmod_berserk_dmg"), ExtResource("109_pmod_berserk_speed"), ExtResource("110_pmod_fortress_hp"), ExtResource("91_pmod_swift"), ExtResource("112_pmod_scream_echo"), ExtResource("113_pmod_charge_impact"), ExtResource("114_pmod_summon_haste")]
-SkillAnimations = [ExtResource("140_anim_a1_atk1"), ExtResource("141_anim_a1_atk2"), ExtResource("156_anim_a1_backdash"), ExtResource("157_anim_a1_leap"), ExtResource("158_anim_a2_scatter"), ExtResource("159_anim_a2_charged_volley"), ExtResource("160_anim_a3_draw"), ExtResource("161_anim_a3_hawkeye")]
+SkillAnimations = [ExtResource("140_anim_a1_atk1"), ExtResource("141_anim_a1_atk2"), ExtResource("156_anim_a1_backdash"), ExtResource("157_anim_a1_leap"), ExtResource("158_anim_a2_scatter"), ExtResource("159_anim_a2_charged_volley"), ExtResource("160_anim_a3_draw"), ExtResource("161_anim_a3_hawkeye"), ExtResource("162_anim_b1_sword1"), ExtResource("163_anim_b1_sword2"), ExtResource("164_anim_b1_sword3"), ExtResource("165_anim_b1_sword4"), ExtResource("166_anim_b1_sword5"), ExtResource("167_anim_b1_swordqi"), ExtResource("168_anim_b2_scythe1"), ExtResource("169_anim_b2_scythe2"), ExtResource("170_anim_b2_scythe3"), ExtResource("171_anim_b3_spear1"), ExtResource("172_anim_b3_spear2"), ExtResource("173_anim_b3_spear3"), ExtResource("174_anim_b3_spear4"), ExtResource("175_anim_b3_spear5"), ExtResource("176_anim_b_fall"), ExtResource("177_anim_b_skill1"), ExtResource("178_anim_b_skill2")]
 Bosses = [ExtResource("92_boss_final")]
 Summons = [ExtResource("93_summon_drone")]
 AiProfiles = [ExtResource("97_ai_chaser"), ExtResource("98_ai_fast_melee"), ExtResource("99_ai_exploder"), ExtResource("100_ai_jumping_melee"), ExtResource("101_ai_ranged"), ExtResource("102_ai_charger"), ExtResource("103_ai_screamer"), ExtResource("104_ai_guard"), ExtResource("105_ai_skill_elite"), ExtResource("106_ai_boss"), ExtResource("107_ai_drone")]
