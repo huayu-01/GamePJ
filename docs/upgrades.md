@@ -81,6 +81,11 @@
 | **`MeleeLungeAdd`**（P5 新增） | `MeleeComboAbility.BeginLunge`（近战突进距离，米） | 0 |
 | **`ChargeBaseSecondsOverride` / `ChargeStepSecondsOverride` / `ChargeStepSecondsMultiplier`**（P5 新增） | `Ability.ChargeBaseSecondsEffective` / `ChargeStepSecondsEffective` | 0 / 0 / 1 |
 | **`VolleyCountOverride` / `VolleyDamagePerLostArrow`**（P5 新增） | `ArrowVolleyAbility.FireVolley` | 0 / 0 |
+| **`AbilityOverride` 处理器**（P5b 新增） | HandlerParams 里除 `AbilityId` 外每一条 = `Ability` 上的一个 `[Export]` 属性名 → 值，用 Godot 的 `Set()` 套用（属性名写错按 `GetPropertyList()` 查出并告警，**不静默**）；行上若带 `Modifiers` 则先按 `StatSet` 的语义套上 | 服务 7 条进化 |
+| **`TablePulse` 处理器 + `TablePulseRule`**（P5b 新增） | 事件 → 效果：`Trigger`（`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`）+ 一次性 CDR（`AbilityId` + `CooldownFraction` / `CooldownSeconds` / `RefreshAbility`）/ `Heal` / `HoverSeconds` / `RequireHover` / `ExtraAirJumps` + `JumpCap` / `Radius` + `Damage` | **一个类服务 6 条行** |
+| **`BurnOnHit` 的 `Cooldown`**（P5b 新增） | 命中挂状态那条规则自己的触发间隔（「冰晶」的"每 10 秒最多一次"） | 0（= 不拦，改动前行为） |
+| **`RampMaxCount` / `RampWindowSeconds`**（P5b 新增） | `ArrowVolleyAbility.FireVolley`：连续射击第 N 发时发数至少 N（「变奏」） | 0 / 0（= 一行不进） |
+| **`GameplayEventKind.Parried`**（P5b 新增的事件种类） | 抛点唯一：`GuardStanceAbility.OnOwnerHit`（架住那一刻）。订阅方：招架反击 / 能量护盾 | 没有订阅者时 `Raise` 什么也不做 |
 
 ⚠️ **新增键必须有基础值**（`Unit.SeedStats`）+ 读取端"读到 0 就按中性值算"的双保险 ——
 `architecture.md` 第 8 条：少一个基础值不能变成"零冷却 / 打不出伤害 / 跳不起来"。
@@ -91,6 +96,13 @@
   数值全部从 `row.HandlerParams` 读（`Param(row, "键", 兜底)` / `ParamText(...)`）。
 - 加一个"订阅战斗事件"的规则：写一个 `TriggerRule` 子类（`RunBuild` 会自动登记并驱动它的冷却），
   然后在 handler 里 `context.Player.AddChild(new XxxRule { … })`。**一个类服务所有同类行**（数值全在表里）。
+
+**P5b 就是这么做的两个例子**（可以直接照抄）：
+
+| 新东西 | 服务几条行 | 做法 |
+|---|---|---|
+| `AbilityOverride` 处理器 | **7 条**（有备无患 / 专注 / 龙之箭 / 气贯长虹 / 地爆 / 大拔刀术 / 神降术） | 不写 7 个特例：HandlerParams 里**除 `AbilityId` 外每一条都是"属性名 = 值"**，用 Godot 的 `Set()` 套到 `Ability.FindByAbilityId` 找到的那个节点上 |
+| `TablePulse` 处理器 + `TablePulseRule` | **6 条**（乱金柝 / 闪身步 / 招架反击 / 普渡 / 践踏死亡 / 能量护盾） | 一个类带 `Trigger` + 一组效果参数；差别只是"订哪种事件、出手做什么、数值多少" |
 
 ---
 
@@ -149,23 +161,49 @@
 | `✅ P5·层③互斥（平衡限制）` | 专一 × 花心（`<A2限定>`）：用的是**同一个 `Excludes` 字段** —— 用户 §1.3 说的两类互斥来源在实现上无区别 |
 | `✅ P5·实测拿到并生效` | 用**真实玩家 + 真实 `RewardContext`** 套「力量」（`DamageMultiplier` 1 → 1.15）与「攀高」（起跳速度 13 → 14.04 m/s），再按 `Source` 还原 —— **量测不留痕**，后面的旧硬指标仍然逐位可核 |
 
+**P5b 新增的四段取证**（同一条 `SelfTest.ReportP5Layers`，`--selftest` 退出码 0）：
+
+| 行 | 证什么 |
+|---|---|
+| `✅ P5b·层①限定（新行）` | 猎手+弓 **有** 变奏 / 龙之箭（`<A3限定>`）、**有** 乱金柝（`<A限定>` = 只要角色 A）、**没有** 金光术（`<B1限定>`）；武器大师+灵剑 **有** 金光术 / 地爆（`<B限定>`）/ 冰晶（通用异化）、**没有** 变奏 |
+| `✅ P5b·层②前置（新行）` | 空构筑里 **没有** 冰晶+ / 烈阳+；拿到「冰晶」后 **有** 冰晶+、**仍然没有** 烈阳+（它前置的是「烈阳」，两条链互不相干） |
+| `✅ P5b·实测表参数落到机制上` | **探测技能节点**（`new` 出来、**不进树**，与探针武器同一类做法）+ 7 条 `AbilityOverride` 行：后撤 `MaxCharges 3` / `Recharge 0.5s`、长枪武技2 `ChargeBaseSeconds 0.5` / 每档 `0.125`、弓武技1 `RampMaxCount 3` / `RampWindow 1.2s` / `ChargeMaxSeconds 3`、拔刀式 `ProjectileSizeScale 2` + 伤害乘区 `1.5`、落剑式 `Knockback 6` / `Cooldown 2s` / `DamageScale 1.6` |
+| `✅ P5b·实测异化规则` | **真实玩家 + 真实 `RewardContext`**：冰晶 → `BurnOnHitRule` `Cooldown 10s` + `StatusId Freeze`；能量护盾 → `TablePulseRule` `Trigger Parried` / 半径 6 / 伤害 20；践踏死亡 → 击杀匹配 `True`、**直接调 `Matches`/`Execute` 出手一次**后额外空中跳跃 `0 → 1`（封顶 3），量完把三条规则节点摘掉、跳跃次数还原 |
+
+⚠️ ⑨ 那一段**不往全局事件总线上抛真事件**（抛了会被关卡记账 / `GameLog` / 碎片当真，污染后面的旧硬指标），
+所以走的是"同一个 `Matches` / `Execute` 入口"的直接调用 —— 这两条判据写在日志里，读数时看得出来。
+
 ⚠️ 造"已拥有 X"的构筑走 `RunBuild.DebugGrantWithoutApplying`（**只记层数、不套效果**）——
 用 `Add` 会把 X 的效果真挂到玩家身上，那一局的数值就被探针污染了。
 
 ---
 
-## 6. 本批（P5）建了什么 / 没建什么
+## 6. 本批（P5 + P5b）建了什么 / 没建什么
 
-见 `docs/rewards.md` 末尾的「P5 落地记录」表（分类计数 + 逐条偏差）。
+| 池 | 设计文档要求 | 现有行 | 状态 |
+|---|---|---|---|
+| **进化** | 23 条（A 2+3+3+3 / B 3+3+3+3） | **27 行** = 设计文档 23 条**全建** + 4 条旧进化行（双管齐下 / 穿甲弹 / 跳弹 / 爆裂弹头，P6 清旧前保留） | ✅ 条数齐 |
+| **异化** | 文档 30 条（通用 12 + A 9 + B 9） | **28 行** = 通用 8 + A 9 + B 9 + 旧行 2（吸血 / 亡者随从 / 战地补给里通用那几条） | 🟡 通用还差 5 条 |
+| **强化** | 文档 9 条（+ 旧 10 条） | 19 行 | ✅ |
+
+逐条偏差（效果只接了一半、或整条没接的）见 [rewards.md](rewards.md) 的「P5b 落地记录」。
 
 ---
 
 ## 7. 边界（下一轮接着做）
 
-1. **通用异化池 12 条**（杀戮践踏 / 践踏死亡 / 护卫 / 能量护盾 / 烈阳 / 冰晶 / 烈阳+ / 冰晶+ / 巡飞弹 / 灵魂收割 / 落日剑 / 闪电链）**一行都没建** ——
-   它们要新的事件种类（落地 / 格挡成功 / 护甲破碎 / 暴击）与"掉落物拾取"系统（调研报告 M19/M28/M30/M31/M32）。
-2. **`<B1>/<B2>/<B3限定>` 的 9 条进化**（金光术 / 大拔刀术 / 神降术 / 怜悯 / 普渡 / 喜爱 / 气贯长虹 / 金光大道 / 浮光跃金）
-   **一行都没建** —— 每条都要动各自武技的子系统（`SwordQiAbility` / `LandingBurstAbility` / `WeaponThrowAbility` / `SpearThrowAbility` / `MeleeComboAbility` 的串参数）。
-3. **`<A3限定>` 的 3 条**（变奏 / 心眼 / 龙之箭）**没建** —— 需要"连续射击计数""被标记目标额外受伤""蓄力 2 秒后全穿透"三个新通路。
-4. **`<A1限定>` 的专注 / 发散**、**`<A2限定>` 花心的"追踪"** —— 需要"授予追踪（字符串参数）"与"标记层数→技能伤害"的处理器。
-5. 表现层（准星蓄力指示器 / 剑气拖尾 / 刀光缩放）属 P6。
+1. **通用异化还差 5 条**：杀戮践踏（要"跳跃事件"，现在没有）/ 护卫（奔跑态 + 格挡授予）/
+   巡飞弹（暴击事件**枚举有、全项目没有抛点**）/ 灵魂收割（要掉落物拾取系统）/ 落日剑（延迟落剑的新机制）。
+2. **3 条占位行没有任何效果**（行 `Note` 里都写了"⚠️ 占位行"）：
+   `evo_golden_qi` 金光术（要 `MeleeComboAbility` 每段额外生成一道剑气）、
+   `evo_affection` 喜爱（要飞行中的武器每 2 秒索敌转向）、
+   `evo_variation` 变奏（只接了"发数按连射序号"，"变得更强"那一半没接）。
+3. **各有一半没接**（都在行 `Note` 里逐条写明）：心眼 / 发散（按**目标身上的标记层数**加伤）、
+   龙之箭（蓄力 2 秒后箭变大 + 全穿透）、怜悯（"只释放最后一刀"）、气贯长虹（"不再能收回 / 落地立刻收回"）、
+   神降术（"范围更大"——半径在命中体上，不在那个能力的 `[Export]` 列里）、浮光跃金（"闪现至目标高度"）、
+   闪身步（没校验"这一杀是闪造成的"）、普渡（没校验"是最后一刀杀的"）。
+4. ⚠️ **`ArmorBroken` / `ShieldBroken` / `Critical` 三个枚举值全项目一个抛点都没有**（只有 `GameLog` 的
+   `switch` 认得它们）—— 凡是要订这三类事件的增幅（能量护盾的"护甲破碎"那一路、巡飞弹）**都得先补抛点**。
+5. ⚠️ **状态的"升级"语义缺失**：烈阳+ / 冰晶+ 与它们的前置同时持有时会**叠加**（文档语义是"变得更强"）；
+   而且 `EffectConfig` 没有跳伤间隔（`TickSeconds`）那一列 → 烈阳+ 现在用 `DamagePerSecond 6 → 12` 表达。
+6. 表现层（准星蓄力指示器 / 剑气拖尾 / 刀光缩放）属 P6。
