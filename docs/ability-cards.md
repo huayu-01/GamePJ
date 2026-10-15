@@ -97,7 +97,13 @@
 两个便利方法（算价与文案，**只有一处实现**，日志/悬停提示共用）：
 `UpgradeCostOf(level)`、`RefundFor(level)`（重置时该退多少）、`EffectText(level)`、`GrantedCooldown(level)`。
 
-### 2.2 现有 8 张卡（本轮的最小可用闭环）
+### 2.2 现有 4 张卡（P6b 之后）
+
+> ⚠️ **P6b 下线了 2 张**：`card_reload`（快速装填）/ `card_magazine`（扩容弹匣）——
+> 用户 2026-10-12 裁定「**没有弹匣的概念了**」，`Weapon` 的装填/弹匣逻辑已整组删除，
+> 这两张卡改的属性键（`ReloadSpeedMultiplier` / `MagazineSizeAdd`）**已经没有任何读取端**。
+> 另 2 张（`card_summon` / `card_control`）是 **P6a** 删的。
+> 见 [character-redesign.md](character-redesign.md) §五。
 
 | 行 Id | 名字 | 效果 | 额度 | 解锁 | 升级 | 上限 |
 |---|---|---|---|---|---|---|
@@ -105,13 +111,13 @@
 | `card_damage` | 凶戾印记 | `DamageMultiplier` ×(1+0.06/级) | 3 | 40 | 30 + 20/级 | 5 |
 | `card_speed` | 疾风之靴 | `MoveSpeedMultiplier` ×(1+0.05/级) | 2 | 30 | 20 + 15/级 | 5 |
 | `card_crit` | 锐利直觉 | `CritChanceAdd` **+0.04/级** | 2 | 35 | 25 + 15/级 | 5 |
-| `card_reload` | 快速装填 | `ReloadSpeedMultiplier` ×(1+0.08/级) | 2 | 25 | 15 + 10/级 | 5 |
-| `card_magazine` | 扩容弹匣 | `MagazineSizeAdd` **+3/级** | 2 | 30 | 20 + 15/级 | 5 |
-| `card_summon` | 无人机协议 | **授予 `skl_summon`**（G 键召唤无人机），每级 -0.5s 冷却 | 4 | 60 | 45 + 30/级 | 3 |
-| `card_control` | 控制立场 | **授予 `skl_control`**（范围定身），每级 -0.75s 冷却 | 4 | 60 | 45 + 30/级 | 3 |
+| ~~`card_reload`~~ | ~~快速装填~~ | **P6b 下线**（`ReloadSpeedMultiplier` 已无读取端） | — | — | — | — |
+| ~~`card_magazine`~~ | ~~扩容弹匣~~ | **P6b 下线**（`MagazineSizeAdd` 已无读取端） | — | — | — | — |
+| ~~`card_summon`~~ | ~~无人机协议~~ | **P6a 删除**（它授予的 `skl_summon` 随旧角色一起清） | — | — | — | — |
+| ~~`card_control`~~ | ~~控制立场~~ | **P6a 删除**（同上） | — | — | — | — |
 
-6 张数值卡 + 2 张授予技能卡 —— 这是覆盖了三种 `Effect` 的**示范**，不是最终数量。
-8 张卡的额度之和是 21 点，而初始上限只有 6 点，**所以必须取舍**（这正是需求要的东西）。
+4 张数值卡 —— 这是覆盖了两种 `Effect`（`StatAdd` / `StatMultiply`）的**示范**，不是最终数量。
+4 张卡的额度之和是 9 点，而初始上限只有 6 点，**所以必须取舍**（这正是需求要的东西）。
 
 ### 2.3 额度上限的扩增行（`Config/Tables/Meta/meta_quota.tres`）
 

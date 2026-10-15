@@ -148,7 +148,8 @@
 | **文档** | `docs/config.md` / `docs/combat.md` / `docs/rewards.md` 等提到弹匣装填的地方 |
 
 ⚠️ **注意**：本清单**只在 P6 执行**。P1（动画管线 + 最小闭环）**只加不删**，旧武器与旧卡暂时保留作参照。
-**✅ P6a 已执行**（2026-10-15）—— 见下面 §六；**弹匣/装填那一条横向清理还没做**（本批明令不许碰 `Weapon.cs`）。
+**✅ P6a 已执行**（2026-10-15）—— 见下面 §六；**✅ P6b 已把"弹匣/装填"这一条横向清理做完**（2026-10-16）——
+见下面 §七。
 
 ---
 
@@ -230,3 +231,75 @@
 会把角色 A 被动「灵动」已经授予的 1 次空中跳跃**吃掉**。旧 3 个角色都没有这个被动，所以一直没显形；
 自测基准换成猎手后立刻暴露（`1 → 1`）。改成按**当前值**累加（文档原话：「每次击杀都会获得额外跳跃的次数
 （额外跳跃次数最多 N 次）」），自测回到 `1 → 2`。
+
+---
+
+## 七、P6b 记录（2026-10-16 执行）
+
+> 这一轮是 **P1→P6 的最后一批**：弹匣清理 + 补异化 + 表现层 + UI 尾巴 + 两个可选清理。
+
+### 7.1 「没有弹匣的概念了」——清的 5 层（逐层清单）
+
+用户原话（2026-10-12）：`card_control` / `card_summon` **删**（P6a 已删）· `meta_reload` **下线** ·
+`card_magazine` / `card_reload` **下线** —— **「没有弹匣的概念了」**。
+
+| 层 | 清了什么 | 落在哪 |
+|---|---|---|
+| ① 配置表 | 行文件 `card_magazine.tres` / `card_reload.tres` / `meta_reload.tres` **删除**；`ConfigIndex.tres` **三处同改**（3 条 `[ext_resource]` + `MetaUpgrades`/`AbilityCards` 数组项 + `load_steps` 190→187） | `Config/Tables/…`、`Config/ConfigIndex.tres` |
+| ② 代码 | `Weapon.cs` 整组装填逻辑（`MagazineSize`/`ReloadTime`/`AutoReloadDelay`/`Ammo`/`IsReloading`/`EffectiveMagazineSize`/`EffectiveReloadTime`/`TryReload`/`RefillMagazine`/`FireFullMagazine`/`BeginInfiniteFire`/`InfiniteAmmo` + `ReloadStarted`/`ReloadCompleted`/`AmmoChanged` 三个事件）；`WeaponConfig` 三列 + `ApplyTo` 的 `RefillMagazine`；`PlayerWeaponInput` 的 reload 键；`MetaProgress` 的 `BonusReloadSpeed`/`_reloadLevel`/`ReloadCost`/`ReloadLevel`/存档键 `reload_level`；`RunController` 的 `ReloadSpeedMultiplier` 修饰符；`Unit.SeedStats` 的两个键；`GameplayEventKind.ReloadStarted/ReloadCompleted`；`RewardCatalog.AmmoOnKillRule` + `RewardEffectRegistry` 的 `AmmoOnKill` handler | `Scripts/…` |
+| ③ UI | `PlayerHud` 的弹药显示 + `Hud.tscn` 的 `Root/Ammo` 节点（连只服务它的 `_weapon` 字段与 `FindWeapon`）；`HelpScreen.tscn` 里「装填 / 火力倾泻」两行说明（顺带把已删的 Q 滑铲 / E 火力倾泻也改对了）；`Pistol.tscn` / `RangedEnemy.tscn` / `TrainingShooter.tscn` 三个场景里**已不存在的** `MagazineSize`/`ReloadTime` 属性行 | `Scripts/UI/`、`Scenes/` |
+| ④ 自测 | `SelfTest`「配置表比对·武器」去掉「弹匣 N / 装填 X」两项与相关期望串 | `Scripts/Testing/SelfTest.cs` |
+| ⑤ 输入 + 文档 | `project.godot` 的 `reload` 动作（确认无引用后删）+ `SettingsSections` 的绑定行 + `UiIcons` 两个卡图标名；本文档 + `upgrades.md`/`config.md`/`ability-cards.md`/`architecture.md`/`rewards.md` 的相关说明 | — |
+
+⚠️ **副作用（必须知道）**：`RangedEnemy` 原来靠 `MagazineSize 3` + `ReloadTime 2.5` 每 3 发停一下；
+概念删除后它变成"每 `FireInterval` 2 秒一发、永不装填"。**自测硬指标一位没变**（首领线不受它影响）。
+
+### 7.2 补的两条通用异化（5 条里做了 2 条）
+
+| 行 | id | 新机制 | 落在哪 | 预设值 |
+|---|---|---|---|---|
+| 杀戮践踏 | `mut_stomp` | 落地那一刻对周围敌人造成范围伤害 | `StompOnLandRule`（`Scripts/Rewards/RewardCatalog.cs`）：**轮询** `CharacterMovement.IsGrounded`/`FallHeight` 做落地边沿，范围伤害与「能量护盾」共用 `PulseDamage.Around` | 半径 3m / 伤害 15 / 最小落高 0（**文档只给了 `n`**） |
+| 巡飞弹 | `mut_homing_missile` | 暴击 → 发射追踪飞弹 | `HomingMissileOnCritRule`：给最近的敌人挂**专用信标状态** `MissileBeacon`，再发一枚 `HomingStatusId` = 它的飞弹（**复用 P3 的追踪弹通路**） | 伤害 50 来自文档；弹速 60 / 索敌 18m / 存活 4s / 信标 1.5s / 转向 360°/s 是预设 |
+
+**没做的 3 条**：护卫（要"奔跑态"，全项目还没有 sprint 输入/状态）、灵魂收割（要掉落物拾取系统）、
+落日剑（命中施加延迟落剑，机制量最大）。逐条理由见 [upgrades.md](upgrades.md) §7。
+
+### 7.3 表现层：准星处的蓄力指示器（用户描述最具体的那一条）
+
+`Scripts/UI/ChargeIndicator.cs` + `Scenes/UI/Hud.tscn` 的 `Root/ChargeIndicator` 节点。
+正方形四条边、每个角留缺口，缺口随 `Ability.ChargeProgress` 收到 0 = "闭合"；
+闭合 / 完美时机（`Ability.IsPerfectWindow`）时换成完美色 + 罩一圈光晕 + **把准星本体也染色**
+（`Crosshair` 的 `Modulate`）—— 正是文档第 44 行「闭合时准星会有个变色」。
+**只读运行期状态，一行战斗逻辑都不改**。几何量（半径/线宽/缺口/三个颜色）全是导出属性。
+截图：`docs/screenshots/p6b_charge_open_zoom.png` / `p6b_charge_closing_zoom.png` / `p6b_charge_perfect_zoom.png`。
+
+### 7.4 UI 两个尾巴（**顺带查出并修掉两个真缺陷**）
+
+1. **额度进度条看不出已占用部分**：给 `QuotaBar` 配了 `StyleBoxFlat`（fill 白底会被运行期改成三档色 /
+   background 深底 + 圆角 + 边框），并按占用比例三档变色（正常蓝 / ≥0.8 黄 / 满红）。
+   颜色与阈值是**场景导出值**。截图：`p6b_quota_bar_warn.png` / `p6b_quota_bar_full.png`。
+2. **自适应列数**（用户要求"确认列数跟着变、卡牌比例不变"）—— **实测它没在工作**，两个真缺陷：
+   - **A**：`RightPanel` 也是 `ExpandFill`，多余宽度被它分走 → 矩阵区几乎不随窗口变（1920→2592 只涨 26px）。
+     改成不参与扩张，矩阵独占剩余宽度。
+   - **B**：`OnMatrixResized` 读 `_matrix.Size.X`，而 GridContainer 的尺寸被"当前列数 × 卡宽"这个最小尺寸
+     顶住 → **窗口变窄时它根本不发 `Resized`**，列数只涨不跌（1920→11 列、拉宽→18 列、缩回 16:9 仍然 18 列、
+     矩阵还溢出右栏）。改成从 `Root`（锚满视口、不受子节点最小尺寸影响）算可用宽，
+     触发源也从 Matrix 换成 **Root 的 `Resized`**。
+   - **C**：页脚文案不刷新（重建后没调 `RefreshAll`）→ 出现过"矩阵真 18 列、页脚还写 10×3"。
+   - 实测（同一实例只改窗口大小）：1920×1080 → **12 列**（每格 110×176）· 2560×1000 → **19 列** ·
+     缩回 1920×1080 → **12 列**（两向都成立）· 3200×1000 → **24 列**。卡牌宽高比恒 0.625。
+     截图：`p6b_matrix_12col_narrow.png` / `p6b_matrix_19col_wide.png`。
+
+### 7.5 两个可选的裁定
+
+- ✅ **删掉 `MetaProgress.BuyHealth/BuyDamage/BuySpeed/BuyCrit/BuyReload`**（连同只服务它们的私有
+  `Buy(id, ref level)`）—— `BaseScreen` 删掉之后它们是死 API。**`Bonus*` 全部保留**
+  （`RunController.ApplyBalance` 每局开局仍在读）。`BuyReload` 与弹匣清理一起删。
+  ⚠️ `*Cost` / `*Level` 那几个只读访问器本轮**没有调用者也没被裁定删**，先留着（已在代码注释里写明）。
+- ✅ **`ApplyAbilityMatrix` 的顺序问题：只改注释，没动代码**。真实顺序是"矩阵先跑、技能行后跑"，
+  与注释写的相反；后果是**第一次套用**时 `Ability.AbilityId` 还是空串 → 只能退到类名匹配 →
+  与角色行里按**技能行 Id** 写的名单对不上 → 这一趟矩阵实际什么都没改（现状无害，
+  真正决定开关的是技能行自己的 `AbilityConfig.Enabled`）。
+  **为什么不改顺序**：矩阵内部的 `ResetAbilityBindings` 会连 `InputAction` 一起恢复场景基线，
+  它必须排在**所有**"行 → 能力"的写入之前；挪到技能行之后会把技能行刚写上的按键绑定清掉（实打实的回归）。
+  真要修得拆成三步（先 reset → 再技能行 → 再矩阵），留给后续。

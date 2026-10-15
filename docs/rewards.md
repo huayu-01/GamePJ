@@ -37,7 +37,11 @@
 - 链深度上限（复用 `EventContext.MaxDepth`，防止死亡爆炸互相递归）
 
 已实现：`ChainLightningRule`（击杀 → 附近敌人连锁闪电）、`LifestealRule`（造成伤害 → 回血）、
-`BurnOnHitRule`（命中 → 挂 Burn 状态）、`AmmoOnKillRule`（击杀 → 补满弹匣）。
+`BurnOnHitRule`（命中 → 挂 Burn 状态）、`SummonOnKillRule`（击杀 → 召唤无人机）。
+⚠️ **P6b 删掉了 `AmmoOnKillRule`**（击杀 → 补满弹匣）：它唯一的效果就是弹匣，随用户裁定
+「没有弹匣的概念了」整条清理（见 [character-redesign.md](character-redesign.md) §五）。
+P6b 另加了两条规则类：`StompOnLandRule`（落地 → 范围伤害，**轮询落地边沿**）与
+`HomingMissileOnCritRule`（暴击 → 追踪飞弹）。
 
 ## 新增的属性键
 

@@ -17,10 +17,10 @@
 | Boss | BossPhaseController（阶段与技能解锁）、BossPressure（随时间加压）、BossPerkCatalog（Boss 构筑词条） | `Scripts/Boss/` |
 | 召唤物 | 复用 Unit + Brain + Ability；`summon_units` 单独分组 | `Scenes/Summons/` |
 | 成长 | RewardCatalog / RewardPool / RunBuild / TriggerRule / RunController | `Scripts/Rewards/` |
-| 武器 | Weapon（攻击节奏、弹匣、换弹、多发射击、投射物生成） | `Scripts/Weapons/` |
+| 武器 | Weapon（攻击节奏、多发射击、投射物生成；⚠️ **P6b 起没有弹匣/装填概念**） | `Scripts/Weapons/` |
 | 玩家 | PlayerController、PlayerWeaponInput、PlayerAbilityInput | `Scripts/Player/` |
 | 界面 | OverlayScreen（弹层基类）+ UiRouter（路由）+ BaseScreen / StartScreen / ChooseScreen / RewardScreen | `Scripts/UI/` |
-| 表现 | UnitPresentation、PlayerHud（生命条/准星/弹药/节点/BOSS/构筑）、WorldOverlay（伤害跳字 + 敌人血条，**血条是事件驱动**：订阅 `GameplayEventBus` 的 `Damaged`/`Died` 增删，不每帧遍历单位组）、OverlayScreen/UiRouter（弹层基类与路由） | `Scripts/Combat/`、`Scripts/UI/` |
+| 表现 | UnitPresentation、PlayerHud（生命条/准星/节点/BOSS/构筑）、**ChargeIndicator（准星蓄力指示器，P6b）**、WorldOverlay（伤害跳字 + 敌人血条，**血条是事件驱动**：订阅 `GameplayEventBus` 的 `Damaged`/`Died` 增删，不每帧遍历单位组）、OverlayScreen/UiRouter（弹层基类与路由） | `Scripts/Combat/`、`Scripts/UI/` |
 | 镜头 | CameraRig（第三人称跟随 + 碰撞 + 构图偏移 TargetScreenHeight） | `Scripts/Camera/` |
 
 战斗细节见 [combat.md](combat.md)，成长系统见 [rewards.md](rewards.md)，Boss 见 [boss.md](boss.md)，流程与结算见 [stages.md](stages.md)，MCP 验证经验见 [testing.md](testing.md)。
@@ -86,7 +86,7 @@
 | `Scenes/Training/TrainingShooter.tscn` | **只远程不移动的木桩**（验证投射物与远程行为） |
 | `Scenes/TestLab.tscn` | 测试场：玩家 + 三种木桩，用于自动化验证 |
 | `Scenes/Levels/TestArena.tscn` | 测试场地，含光照与天空 |
-| `Scenes/UI/Hud.tscn` | 生命/护甲/护盾与弹药 |
+| `Scenes/UI/Hud.tscn` | 生命/护甲/护盾（⚠️ **P6b 删了弹药显示**）+ 准星 + 准星蓄力指示器 |
 | `Scenes/Main.tscn` | 可玩入口：场地 + 玩家 + 2 近战 + 1 远程 |
 
 实例覆盖（在父场景里改子场景属性，不改预制体本身）是调参首选方式。

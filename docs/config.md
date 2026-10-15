@@ -4,7 +4,15 @@
 > 3 个旧升级池 / 2 张旧能力卡**已删除**；`BaseScreen`（旧「永久强化」页）**整份删除**，
 > 局外成长台现在开**能力卡界面**；「左键归谁」由**武器行**的 `WeaponConfig.UsesWeaponComponent` 决定
 > （不再有 `CharacterConfig.WeaponEnabled`）。
-> **索引现在是 `6/2/10/1/1/39/7/13/8/6/6/11/6`**（旧读数 `9/5/10/1/1/44/7/13/8/6/9/11/8` 已过期）。
+>
+> ⚠️ **2026-10-16 P6b 之后**（见 [character-redesign.md](character-redesign.md) §五）：
+> **弹匣/装填整条横向清理** —— 删 3 个行文件（`card_magazine` / `card_reload` / `meta_reload`）、
+> `Weapon` 的装填逻辑与 HUD 弹药显示、`reload` 输入动作、`AmmoOnKill` handler；
+> 新增 2 条通用异化（`mut_stomp` 杀戮践踏 / `mut_homing_missile` 巡飞弹）+ 1 条效果行
+> （`eff_missile_beacon` 飞弹信标）。
+> **索引现在是 `6/2/10/1/1/39/7/14/8/5/6/11/4`**
+> （P6a 之后是 `6/2/10/1/1/39/7/13/8/6/6/11/6`；差额：效果 +1 / 局外 −1 / 能力卡 −2）。
+> **增幅项 59 条**（强化 9 / 进化 23 / 异化 27；P6a 之后是 57 = 9/23/25）。
 > 本文件下面大量读数（枪手 / 手枪 / 旧武器 / 池 `pool_pistol` / 玩家 270/40/7 …）都是**当时**的实测记录，
 > **保留作历史、不逐条改写**；要看当前值与每一处差额的来由，见
 > [character-redesign.md](character-redesign.md) §六。
@@ -412,7 +420,11 @@
 > ⚠️ `Weight` 目前 19 条**都写成 1.0** → 加权抽取仍退化成等概率（与分表前一致，**故意不改**，改了抽样分布会变）。
 > 现在**改得动了**：想调某条的出率就改它的 `Weight` 一行。
 
-### 局外成长表 `Config/Tables/Meta/`（6 行）
+### 局外成长表 `Config/Tables/Meta/`（6 行 → **P6b 后 5 行**）
+
+> ⚠️ **P6b**：`meta_reload`（装填速度 +6%/级，存档键 `reload_level`）随用户裁定
+> 「**没有弹匣的概念了**」**整行下线**（行文件 + `ConfigIndex` 数组项 + `MetaProgress` 的读写 +
+> `RunController` 的 `ReloadSpeedMultiplier` 修饰符一起删）。见 [character-redesign.md](character-redesign.md) §五。
 
 | 行 | 存档键 | 每级效果 | 价格 |
 |---|---|---|---|
@@ -420,7 +432,7 @@
 | `meta_damage` | `damage_level` | 伤害 +5% | 同上 |
 | `meta_speed` | `speed_level` | 移速 +3% | 同上 |
 | `meta_crit` | `crit_level` | 暴击率 +3% | 同上 |
-| `meta_reload` | `reload_level` | 装填速度 +6% | 同上 |
+| ~~`meta_reload`~~ | ~~`reload_level`~~ | **P6b 下线**（无弹匣概念） | — |
 | `meta_quota` | `quota_level` ⚠️**不在 meta.cfg** | **能力卡额度上限 +1** | **30 + 20 × 等级** |
 
 > ⚠️ `meta_quota` 是配置表阶段 8 新增的第 6 行，也是"**额度上限本身也能用局外资源扩增**"（需求 §一）的落地形式。

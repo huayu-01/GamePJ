@@ -1,5 +1,12 @@
 # 重构前调研报告（角色 / 武器 / 增幅）
 
+> ⚠️ **状态横幅（2026-10-16 P6b 加）**：本文件是 **P0 的只读调研快照**，里面所有"现状 / 待确认"条目
+> 都已经被后续阶段处理掉了，**不要再照着它判断现在的代码**。特别地：
+> **P6b 已经把"弹匣/装填"整条横向清理完**（用户裁定「没有弹匣的概念了」）——
+> 本文提到的 `Weapon` 弹匣/换弹逻辑、`MagazineSize` / `ReloadTime` / `ReloadSpeedMultiplier` /
+> `MagazineSizeAdd`、`meta_reload`、`card_magazine` / `card_reload` **全部已删除**。
+> 当前状态见 [character-redesign.md](character-redesign.md) §五 / §七 与 [config.md](config.md) 顶部横幅。
+
 > **性质**：只读调研，产出一份文档。除本文件外，**没有改动项目里任何代码 / 配置 / 场景**。
 > **权威来源**：`F:\Godot项目\3d肉鸽雨中哈迪斯\角色设计.txt`（243 行，已完整读完）+ 用户后续澄清 7 条。
 > **调研对象**：`F:\Godot项目\项目a`（Godot 4.7.2 stable mono / C#，137 个 `.cs`、22307 行，17 张配置表、134 个 `[ext_resource]`）。

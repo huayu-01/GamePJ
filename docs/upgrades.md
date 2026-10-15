@@ -68,7 +68,7 @@
 | Stat 键 | 谁在读 | 默认值 |
 |---|---|---|
 | `DamageMultiplier` | `Weapon.cs` / `EnergyWaveAbility` / `ArrowVolleyAbility` / `MeleeComboAbility.Strike` | 1 |
-| `AttackSpeedMultiplier` / `ReloadSpeedMultiplier` / `MagazineSizeAdd` | `Weapon.cs` | 1 / 1 / 0 |
+| `AttackSpeedMultiplier` | `Weapon.cs` | 1 |
 | `MoveSpeedMultiplier` | `CharacterMovement` | 1 |
 | `MaxHealthMultiplier` / `MaxHealthAdd` | `Unit.RefreshStats` | 1 / 0 |
 | `DamageReductionAdd` | `Unit.CombinedDamageReduction` | 0 |
@@ -83,6 +83,8 @@
 | **`VolleyCountOverride` / `VolleyDamagePerLostArrow`**（P5 新增） | `ArrowVolleyAbility.FireVolley` | 0 / 0 |
 | **`AbilityOverride` 处理器**（P5b 新增） | HandlerParams 里除 `AbilityId` 外每一条 = `Ability` 上的一个 `[Export]` 属性名 → 值，用 Godot 的 `Set()` 套用（属性名写错按 `GetPropertyList()` 查出并告警，**不静默**）；行上若带 `Modifiers` 则先按 `StatSet` 的语义套上 | 服务 7 条进化 |
 | **`TablePulse` 处理器 + `TablePulseRule`**（P5b 新增；P6a 支持多事件） | 事件 → 效果：`Trigger`（`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`，**可以逗号分隔多个，任一命中即出手**）+ 一次性 CDR（`AbilityId` + `CooldownFraction` / `CooldownSeconds` / `RefreshAbility`）/ `Heal` / `HoverSeconds` / `RequireHover` / `ExtraAirJumps` + `JumpCap` / `Radius` + `Damage` | **一个类服务 6 条行** |
+| **`StompOnLand` 处理器 + `StompOnLandRule`**（**P6b 新增**，服务「杀戮践踏」） | **落地那一刻**对周围敌人造成一次范围伤害：`Radius` / `Damage` / `MinFallHeight` / `Cooldown`（触发间隔）。⚠️ 它是**轮询落地边沿**而不是订阅事件 —— `CharacterMovement` 是共用战斗类（P6b 不许碰），没有抛起跳/落地事件；规则自己每帧读它**已公开**的 `IsGrounded` / `FallHeight`。范围伤害与「能量护盾」共用 `PulseDamage.Around` | 1 条 |
+| **`HomingMissileOnCrit` 处理器 + `HomingMissileOnCritRule`**（**P6b 新增**，服务「巡飞弹」） | 暴击 → 发射一枚**追踪飞弹**：`ProjectileScene` / `Damage` / `Speed` / `SeekRange` / `Lifetime` / `BeaconStatusId` / `BeaconSeconds` / `TurnRateDegrees` / `Cooldown`。复用的是 **P3 的追踪弹通路**（`Projectile.HomingStatusId` + 转向速度）：先给最近的敌人挂**专用信标状态**（`eff_missile_beacon`），再发一枚追这个状态的飞弹 | 1 条 |
 | **`BurnOnHit` 的 `Cooldown`**（P5b 新增） | 命中挂状态那条规则自己的触发间隔（「冰晶」的"每 10 秒最多一次"） | 0（= 不拦，改动前行为） |
 | **`RampMaxCount` / `RampWindowSeconds`**（P5b 新增） | `ArrowVolleyAbility.FireVolley`：连续射击第 N 发时发数至少 N（「变奏」） | 0 / 0（= 一行不进） |
 | **`GameplayEventKind.Parried`**（P5b 新增的事件种类） | 抛点唯一：`GuardStanceAbility.OnOwnerHit`（架住那一刻）。订阅方：招架反击 / 能量护盾 | 没有订阅者时 `Raise` 什么也不做 |
@@ -182,6 +184,9 @@
 
 > ⚠️ **2026-10-15 P6a 已清旧**：下面的"现有行"是 P5b 当时的读数；清旧后的实际行数见第三列括号里的注。
 > 全表 **74 → 57 行**（强化 9 / 进化 23 / 异化 25）。
+>
+> ⚠️ **2026-10-16 P6b**：异化 **25 → 27 行**（补了「杀戮践踏」`mut_stomp` 与「巡飞弹」
+> `mut_homing_missile`），**全表 59 行 = 强化 9 / 进化 23 / 异化 27**。通用异化还差 3 条（见 §7 第 1 条）。
 
 | 池 | 设计文档要求 | 现有行 | 状态 |
 |---|---|---|---|
@@ -195,9 +200,18 @@
 
 ## 7. 边界（下一轮接着做）
 
-1. **通用异化还差 5 条**：杀戮践踏（要"跳跃事件"，现在没有）/ 护卫（奔跑态 + 格挡授予）/
-   巡飞弹（✅ 暴击事件**已经有抛点了**，见下面第 4 条 —— 只差"发射一枚追踪飞弹"这个效果）/
-   灵魂收割（要掉落物拾取系统）/ 落日剑（延迟落剑的新机制）。
+1. **通用异化：P6b 做了 2 / 5，还差 3 条**：
+   - ✅ **杀戮践踏**（`mut_stomp`）—— `StompOnLandRule` 轮询落地边沿 + `PulseDamage.Around`；
+     半径 3 米 / 伤害 15 / 最小落高 0 是**预设值**（文档只给了 `n`）。
+   - ✅ **巡飞弹**（`mut_homing_missile`）—— `HomingMissileOnCritRule` 复用 P3 追踪弹通路；
+     伤害 50 来自文档，弹速 60 / 索敌 18m / 存活 4s / 信标 1.5s / 转向 360°/s 是预设值。
+   - ⬜ **护卫**（奔跑态授予格挡）：**全项目还没有"奔跑"这个输入/状态**
+     （`project.godot` 里没有 sprint 动作，代码里搜 `Sprint` 只命中动画名）。要先做一套最小奔跑
+     （按住 Shift + 在地面移动 = 奔跑），再谈"奔跑时获得一次格挡、格挡破碎 5 秒后才可再获取"。
+   - ⬜ **灵魂收割**（击杀掉落"灵魂"、玩家接触拾取回血）：要一个**掉落物拾取**系统
+     （新 `.tscn` + Area3D 触发 + 回血），预制体路径进表。
+   - ⬜ **落日剑**（武技1 对没有该标记的敌人施加"落日剑"，一段时间后剑落下造成伤害）：
+     要"命中施加延迟标记 + 延迟落剑伤害"两段新机制，是这 5 条里最大的一条。
 2. **3 条占位行没有任何效果**（行 `Note` 里都写了"⚠️ 占位行"）：
    `evo_golden_qi` 金光术（要 `MeleeComboAbility` 每段额外生成一道剑气）、
    `evo_affection` 喜爱（要飞行中的武器每 2 秒索敌转向）、
@@ -215,6 +229,17 @@
    （任一命中即出手），`mut_energy_shield` 填的是 `Parried,ArmorBroken`。
 5. ⚠️ **状态的"升级"语义缺失**：烈阳+ / 冰晶+ 与它们的前置同时持有时会**叠加**（文档语义是"变得更强"）；
    而且 `EffectConfig` 没有跳伤间隔（`TickSeconds`）那一列 → 烈阳+ 现在用 `DamagePerSecond 6 → 12` 表达。
-6. 表现层（准星蓄力指示器 / 剑气拖尾 / 刀光缩放）属 P6。
-7. ⚠️ **弹匣/装填那条横向清理还没做**（`card_magazine` / `card_reload` / `meta_reload` + `Weapon.cs` 的
-   装填逻辑 + HUD 的弹药显示）：P6a 明令不许碰 `Weapon.cs`，整条留给 P6b。
+6. **表现层**：✅ **P6b 做了「准星处的蓄力指示器」**（`Scripts/UI/ChargeIndicator.cs` +
+   `Scenes/UI/Hud.tscn` 的 `Root/ChargeIndicator` 节点）—— 正方形四条边、每个角留缺口，
+   缺口随 `Ability.ChargeProgress` 收到 0 即"闭合"，闭合 / 完美时机时换成完美色并给准星本体染色
+   （`Ability.IsPerfectWindow` 是 P2 就有的只读量，表现层只读它、不碰判定）。
+   截图：`docs/screenshots/p6b_charge_open_zoom.png` / `p6b_charge_closing_zoom.png` / `p6b_charge_perfect_zoom.png`。
+   ⬜ 还没做的表现层：开镜特效（弓武技2 的放大视角已有 FOV 收缩，缺屏幕级特效）、
+   后撤残影（技能1「后撤」）、剑气拖尾（灵剑武技2「拔刀式」）、落圈特效（灵剑武技3「落剑式」）。
+7. ✅ **P6b 已做**：弹匣/装填那条横向清理（`card_magazine` / `card_reload` / `meta_reload` +
+   `Weapon` 的装填逻辑 + HUD 的弹药显示 + `reload` 输入动作 + 自测期望串 + 文档）。
+   **清了 5 层**，逐层清单见 [character-redesign.md](character-redesign.md) §五。
+8. **P6b 新增的两条异化有自测行为取证**（`SelfTest.DebugP6bMutationProbe()`，跑在**最后一个阶段**）：
+   真实玩家 + 真敌人靶子，两条规则各真的出手一次 —— 践踏掉 15 血、巡飞弹 FireCount 1 / 目标挂上信标 /
+   场上多一枚投射物，量完全部还原。⚠️ 它直接调 `Execute`（不是按键/真实落地），
+   因为跑在最后是为了不污染前面的硬指标。

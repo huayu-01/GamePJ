@@ -1,5 +1,10 @@
 # 配置参数表体系设计（Config Schema）
 
+> ⚠️ **状态横幅（2026-10-16 P6b 加）**：本文件是**设计期的方案稿**，不是现状说明；
+> 它描述的分表方案早已落地，而里面出现的 `MagazineSize` / `ReloadTime` / `ReloadSpeedMultiplier` 等列
+> **已随用户裁定「没有弹匣的概念了」整条删除**（P6b，见 [character-redesign.md](character-redesign.md) §五）。
+> 现在的表清单与字段以下面两处为准：[config.md](config.md)（调参唯一入口）、`Scripts/Config/*.cs`（字段定义）。
+
 > 项目：`F:\Godot项目\项目a`（Godot 4.7.2 stable mono / C# / net8.0）
 > 本文回答三件事：**① 现在有哪些可配置项、哪些是硬编码；② 按类型怎么分表（类 / 字段 / `[Export]` / 目录）；③ 怎么分阶段搬过去而不炸。**
 > 相关：[todo-handoff.md](todo-handoff.md)（约定与统一入口）、[architecture.md](architecture.md)（分层与踩过的坑）、[controller-flow.md](controller-flow.md)（流程）、[assets.md](assets.md)（目录与命名规范）、[config.md](config.md)（当前数值入口）
