@@ -18,7 +18,9 @@
 
 | 特效 | 脚本 | ⭐ 只读来源（谁提供的） | 挂在哪 |
 |---|---|---|---|
-| 准星蓄力指示器（P6b） | `Scripts/UI/ChargeIndicator.cs` | `Ability.ChargeProgress` / `IsPerfectWindow` / `ChargeBaseComplete` / `IsCharging`（P2 基类） | `Scenes/UI/Hud.tscn` → `Root/ChargeIndicator` |
+| 准星蓄力指示器（P6b；**P7 收窄到能量掌武技2 独有 + 补全时序**） | `Scripts/UI/ChargeIndicator.cs` | `Ability.ChargeProgress` / `IsPerfectWindow` / `ChargeBaseComplete` / `IsCharging`（P2 基类）；**P7：数据源按技能行 Id `AbilityId` 认，不再按输入动作认** | `Scenes/UI/Hud.tscn` → `Root/ChargeIndicator` |
+| **蓄力完成反馈**（P7 ③，**所有蓄力技能通用**） | `Scripts/Combat/ChargeBodyFx.cs` | `Ability.IsCharging` / `ChargeBaseComplete`（**上升沿**）/ `IsPerfectWindow`（全是 P2 就有的只读量，**没有新增任何属性**） | `Scenes/Player/Player.tscn` → `Player/ChargeBodyFx` |
+| **蓄力时的描边**（P7 ④，**占位版**，与 ③ 同一个组件） | 同上 + `Assets/Effects/charge_rim_placeholder.gdshader` | 同上（只读 `IsCharging`） | 同上（运行期叠加在 `Player/Model` 的每个 `MeshInstance3D.MaterialOverlay` 上，**不改模型资源本身**） |
 | **开镜特效**（P6c） | `Scripts/UI/ScopeOverlay.cs` | `HawkEyeAbility.ZoomProgress`（**P6c 新增的只读属性**）/ `IsAiming` / `ZoomApplied` | `Scenes/UI/Hud.tscn` → `Root/ScopeOverlay`（Root 的**第一个**子节点） |
 | **后撤残影**（P6c） | `Scripts/Combat/AfterimageTrail.cs` | `BackdashAbility.InvulnerableOwned`（P3 就有的只读属性） | `Scenes/Player/Player.tscn` → `Player/Afterimage` |
 | **剑气拖尾**（P6c） | `Scripts/Combat/ProjectileTrail.cs` | `Projectile.VelocityDirection`（P4 就有的只读属性） | `Scenes/Combat/SwordQi.tscn` → `SwordQi/Trail`（**挂在剑气本体上**） |
@@ -60,6 +62,10 @@
    命名分组用 `[ExportGroup("...")]`（中文标题，和项目里其它组件一致）。
 5. **定"数据源节点"别写节点路径**：用**表里的行 Id**（`Ability.FindByAbilityId(unit, id)`）
    或**类型查找**，`[Export] string AbilityId` 兜住；节点名换过时不会静默失效（找不到会打日志）。
+   - ⚠️ **"某个按键上的技能"不是一个身份**：同一个 `weapon_skill_2` 上挂着 6 把武器各自的技能。
+     要给**某一个技能**做表现就按**技能行 Id** 找（P7 修的就是这个 bug：方形圈曾经在
+     弓武技2 / 短弩武技2 / 长枪武技2 蓄力时也冒出来，用户裁定「方形蓄力圈就是能量掌武技2独有的」）。
+     **填了 `AbilityId` 就只认它、找不到就不画**（不要"找不到就回退到按按键找"——那等于把 bug 放回来）。
 6. **2D 的 `Control` 必须 `mouse_filter = Ignore`**（`architecture.md` 第 7 条）：场景里写一次、
    `_Ready` 里再兜一次。
 7. **加探针与拍摄台**（P6b 立的规矩，四张实拍图就是靠它拍的）：
@@ -76,6 +82,18 @@
    想要"看清一个 0.2s 的瞬间"就**运行期调慢那几个 `[Export]`**（例如把拖尾存活 0.18s → 0.6s、
    把圈扩散 0.38s → 2.5s），**别改默认值、更别改代码**；截图里要说明哪几个数是拍摄用的。
 9. **文档**：本文件 §1 的表加一行 + `docs/abilities.md` 的"接入记录"节写一段。
+10. **"每次 X 发生时就给一次反馈"怎么接**（P7 ③ 立的第二条标准）：先去战斗层找
+    **有没有一个公开只读量能当"事实的上升沿"**，表现层自己在 `_Process` 里存一份"上一次的值"来判沿
+    （`ChargeBodyFx` 接"每次完成基础蓄力"就是读 `Ability.ChargeBaseComplete` 的 false→true，
+    **没有**给战斗层加事件、也没有改状态机）。⚠️ 只有**同一帧**发生的两件事（例如"基础蓄力完成"与
+    "进入完美窗口"）**不要叠两次反馈** —— 合成一次、用颜色 / 强度 / 尺寸**换档**区分。
+11. **音效不许写路径**：`AudioManager.PlaySfx("sfx_xxx")` 的 id 进
+    `Config/Tables/Audio/audio_*.tres`（**新加一行要三处同改 `ConfigIndex.tres`**：`load_steps` +
+    `[ext_resource]` + 数组项，见 `docs/audio.md`）。P7 ③ 就是这么加的 `sfx_charge_complete`。
+12. **要"往身上叠一层东西"就借 `MaterialOverlay`，别动 `MaterialOverride`**：
+    `MaterialOverride` 是本项目受击闪色（`UnitPresentation`）/ 精英染色（`EliteModifier`）在用的通道，
+    覆盖它会打架；`MaterialOverlay` 是**额外一遍**（不改原材质），用完把原值还回去就行。
+    想"蓄力时多一圈描边"就挂一个 `ShaderMaterial` 上去（P7 ④ 的 `charge_rim_placeholder.gdshader`）。
 
 ---
 
@@ -140,6 +158,10 @@ Afterimage_0.is_in_group("enemy_units")             = false
 | "一次采样"的错觉 | 只看一帧截图就以为特效没问题 | 至少拍两张（起始 / 扩散中），并把 `DebugState()` 一起记下来 |
 | **在 `_Ready` 里改自己的 `GlobalPosition`** | 生成方的写法是 `AddChild` **之后**才写 `GlobalPosition` —— `_Ready` 里那一句**当场被覆盖**（P6d 实测：灵魂的"地面拾取圈"被压到地板下面 0.1m，**看不见**；代码、日志、自测全绿，只有截图能看出来） | 要么把偏移做进**子节点**的局部坐标（本批的改法：圈的 `Position.y = RingGroundOffset`），要么让生成方在 `AddChild` **之前**设位置 |
 | 用 `TorusMesh` 画"地面上的圈" | 默认躺在 XZ 平面，但 `Rings` / `RingSegments` 写反会画成多边形（见上面那条） | 环：`Rings = 64`、`RingSegments = 6` |
+| **把"变色多久"挂在战斗层的完美窗口上** | 用户要的是「缩 → 闭合 → 变色 → **0.3s 后**变回原来的颜色但保持闭合」，而战斗层的 `PerfectWindowSeconds` 是 **0.2s**（表值、决定"松手算不算完美一击"、有平衡含义）—— 挂上去就会"表一动、表现跟着变" | 表现层的时长做**独立 `[Export]`**（`ChargeIndicator.PerfectColorSeconds = 0.3`）；战斗层那个只**读出来写进探针**，用来证明两者不是一个量 |
+| **表现层按"输入动作"找技能** | 一个 `weapon_skill_2` 上挂着 6 把武器的技能 → 只该给能量掌武技2 画的方形圈，弓/短弩/长枪蓄力时也画了 | 按**技能行 Id** 认（`[Export] string AbilityId`），填了就只认它、找不到就不画（P7 ①） |
+| **用 `MaterialOverride` 做"身上多加一层"** | 会顶掉受击闪色 / 精英染色（同一个通道） | 用 **`MaterialOverlay`**（额外一遍，退出时把原值还回去）—— P7 ④ |
+| **靠"一次 sleep 再截图"去抓一个 0.3s 的瞬间** | MCP 单次调用本身有 **~0.1–0.4s** 延迟（实测 `call_runtime_node_method` 往返就让采样点漂了 0.2s+），截图必然错过窗口 | 要么**运行期把那几个 `[Export]` 调长**（只为拍摄，默认值不动），要么**轮询一串采样**并同时读一个"真实时钟"（P7 读的是 `Ability.ChargeTime`）当锚点 —— 拿到的是一条**时间线**，比一张赌运气的图可信得多 |
 
 ---
 
@@ -216,6 +238,53 @@ Afterimage_0.is_in_group("enemy_units")             = false
 
 ---
 
+## 6.2 实拍（2026-10-16 · P7：准星收敛 / 准星时序 / 蓄力完成反馈 / 描边占位）
+
+**默认值一个都没改**（这一批的 5 张图全是默认参数下拍的；有一次曾想把 `FlashSeconds` 调长，
+但那两次 `evaluate_runtime_expression` 写属性失败了 —— 单表达式不支持赋值 —— 所以图里是真实默认值）。
+
+| 图 | 是什么 |
+|---|---|
+| `screenshots/p7_charge_tinted.png` / `_zoom` | 能量掌武技2 蓄力到 0.5s：方形圈**闭合**（缺口 0px）+ **金色变色 + 光晕 + 准星本体也染色** |
+| `screenshots/p7_charge_closed_reverted.png` / `_zoom` | **0.5s + 0.3s 之后**（还按着右键）：颜色回到蓄力色（青）、光晕收起，**形状依旧是闭合的**，缺口还是 0px |
+| `screenshots/p7_charge_burst.png` | 「基础蓄力完成」那一瞬间：角色被**金色闪光**罩住（满身加亮）+ 一圈**金色**扩大圈（完美档 ×1.8 半径）+ 音效 `sfx_charge_complete` |
+| `screenshots/p7_charge_rim_off.png` / `_zoom` | 对照组：**松手之后**同一个角色 —— 边缘光消失（与 `_rim_on_zoom` 逐像素不同） |
+| `screenshots/p7_charge_bow_nocircle.png` / `_zoom` | **反例**：弓 武技2「刹那之眼」蓄力中（`skl_a3_w1_2 蓄力中=true 基础蓄满=true`），**屏幕中心只有一个小点，没有方形圈** —— ① 的判据 |
+
+**③ 的时间线取证**（同一次按住右键，`Ability.ChargeTime` 当锚点；MCP 一次往返 ~0.1–0.2s，
+所以是"一串采样"而不是"一帧截图"）：
+
+```
+ChargeTime=0.24 | 进度=0.62 闭合=False 变色中=False（还剩 0s）
+ChargeTime=0.46 | 进度=1    闭合=True  变色中=True （还剩 0.1s）   ← 闭合 + 变色
+ChargeTime=0.82 | 进度=1    闭合=True  变色中=False（还剩 0s）     ← 0.3s 后：原色、仍然闭合
+ChargeTime=1.01 | 进度=1    闭合=True  变色中=False（还剩 0s）     ← 一直按着就一直闭合
+ChargeTime=1.19 … 2.09 同上
+```
+
+**② 的两个量确实不同**（同一行的探针里同时读出来）：
+`变色中=True（还剩 0.1s）` 时 `完美窗口=False`（战斗层那 0.2s 已经过了）——
+`PerfectColorSeconds = 0.3` 与表里的 `PerfectWindowSeconds = 0.2` 是两个独立的量。
+
+**③ 的通用的证据**（同一次运行里换武器，**代码一行没改**）：
+
+```
+[Combat] 蓄力完成反馈：skl_a1_w1_2 基础蓄力完成（同时在完美时机窗口里 → 金色 / ×1.8 档）
+         → 角色闪一下 0.22s（强度 1.53）+ 一圈扩大 2.7m（0.45s）+ 音效「sfx_charge_complete」（第 1 次 …）
+[Combat] 蓄力完成反馈：skl_a3_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）
+         + 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 3 次 …）      ← 弓 武技2 也吃到反馈（普通档）
+[Audio]  首次播放「sfx_charge_complete」→ 总线 SFX / res://Assets/Audio/ui/ui_card_unlock.wav
+[Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 2.7m（调用方给定（蓄力完成）），扩散 0.45s
+[Combat] 蓄力身体表现：模型「Model」上挂了 2 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader）
+```
+
+**⑤ 安全性读数**（`ChargeBodyFx.DebugState()` 末尾的固定三项）：
+`纯表现 不改 MaterialOverride / 无碰撞体 / 不进任何分组`；那一圈由 `LandingShockwave` 生成在
+`CurrentScene` 下的临时节点（**不是**单位子树），`LandingShockwave.DebugState()` 自带
+`纯表现 碰撞体=0 分组=0` 的那一行。
+
+---
+
 ## 7. 没做 / 边界
 
 - 「剑气拖尾」的**材质是代码里拼的**（`StandardMaterial3D` + 逐顶点色），没有做 `.tres` 美术资源；
@@ -229,3 +298,25 @@ Afterimage_0.is_in_group("enemy_units")             = false
 - `ArmorBreakFx`（破甲特效）里的 `TorusMesh` 也把 `Rings` / `RingSegments` 写反了
   （`Rings = 8, RingSegments = 24`），所以那个环看起来是**八边形**。它对 0.42s 的一次性特效
   影响不大，**本轮没动**（不在任务边界内）—— 要修就是两个数字对调。
+
+### 7.1 P7 这一批的边界（照实说）
+
+- **④ 的描边是占位**：`Assets/Effects/charge_rim_placeholder.gdshader` 是一个"菲涅尔边缘光"，
+  形态不追求好看（用户明说"这个后期在做，现在可以加一个占位的"）。正式版替换那个 `.gdshader`
+  文件即可 —— **C# 一个字都不用改**（路径是 `ChargeBodyFx.RimShaderPath`）。
+  读不到文件时会退回代码里的**内联兜底着色器**并写一条警告（`DebugState` 里那行
+  `叠加材质 2 份（文件 … / 代码内联兜底）` 就是用来区分走了哪条路的）。
+- **③ 的"一圈"不是"角色模型的透明残影副本"**：用户给的是"一圈扩大的透明残影**或**描边"，
+  本轮选的是**复用 P6c 的落圈**（`LandingShockwave.PlayOnce`，身体中段高度、无碰撞体）。
+  真要做"整个人的透明副本往前扩散"，就照 `AfterimageTrail` 的**做减法**那套（§3）来，
+  别复制出碰撞体/单位。
+- **③ 的音效素材是临时借的**：`Config/Tables/Audio/audio_sfx_charge_complete.tres` 的 `Stream`
+  现在指向项目自制的 `ui_card_unlock.wav`（"能力卡·解锁"那一声，语义最接近"就绪"）。
+  正式素材出来之后把 `Stream` 指过去即可（**代码不用改**，调用方只认
+  `AudioIds.ChargeComplete = "sfx_charge_complete"`）。总线刻意走 `SFX` 而不是 `UI`。
+- **"基础蓄力完成"与"进入完美窗口"是同一帧**（窗口就从那一刻起算），所以 ③ 只发**一次**反馈、
+  用颜色/强度/半径换档（金色 / ×1.8 / ×1.35）。如果哪天要给"完美窗口里松手打出的那一击"
+  单独的反馈，那是**另一个触发点**（`Ability.LastReleasePerfect`），本轮没做。
+- **准星圈只认 `skl_a1_w1_2`**（用户裁定）。要让另一个技能也用这个圈，就把
+  `Hud.tscn` 的 `ChargeIndicator.AbilityId` 填成那一行 —— 但那会让"两个技能同时蓄力"时只有一个有圈
+  （同一个组件只跟一条技能行），要两个都有圈得挂两个 `ChargeIndicator` 节点。

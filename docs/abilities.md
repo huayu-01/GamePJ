@@ -557,4 +557,57 @@ public float ZoomProgress { get; private set; }
 `（ConfigIndex.tres 已加载）`。**`ConfigIndex.tres` 一行没动**（表现层不该新增表行）。
 备份：`_refactor_backup/ConfigIndex.tres.p6cbefore`。
 
+---
+
+## 10. P7 接入记录（蓄力表现三件事：准星收敛 / 准星时序 / 完成反馈 + 描边占位，2026-10-16）
+
+> 这一节给"以后改蓄力表现"的人看。**战斗层（`Ability` 基类的三段状态机）一个字没动** ——
+> 本轮的输出全是"读 §1.1 那张表里的只读量"。逐条细节与踩的坑见 [vfx.md](vfx.md) §6.2。
+
+### 10.1 三条表现分别读什么
+
+| 用户要的 | 落在哪 | 读的只读量 |
+|---|---|---|
+| ① 「方形蓄力圈就是**能量掌武技2独有的**」 | `Scripts/UI/ChargeIndicator.cs`：数据源从"**按输入动作**找"改成"**按技能行 Id** 找"（`[Export] string AbilityId = "skl_a1_w1_2"`） | 不变（`IsCharging` / `ChargeProgress` / `ChargeBaseComplete`），只是**换了找的是哪一个技能** |
+| ② 「缩 → 闭合 → 变色 → **0.3s 后**变回原来的颜色，但**依旧是闭合形状**，还没松手的情况下」 | 同一个 `ChargeIndicator`：`ChargeBaseComplete` 的**上升沿**起一个**表现层自己的**计时器 | `ChargeBaseComplete`（上升沿）+ `ChargeProgress`（决定缺口）；`IsPerfectWindow` 只**读出来写进探针** |
+| ③ 「**所有武器**的蓄力表现，需要在**每次完成蓄力时**都有特效 + 音效」 | `Scripts/Combat/ChargeBodyFx.cs`（挂 `Player`）：遍历单位身上的**全部** `Ability`，任何一个 `IsCharging && ChargeBaseComplete` 的上升沿就发一次反馈（闪 + 一圈 + 音效） | `IsCharging` / `ChargeBaseComplete`（上升沿）/ `IsPerfectWindow`（换档用） |
+| ④ 「蓄力时的身体变化，比如模型多一圈菲涅尔描边……现在可以加一个**占位**的」 | 同上组件：蓄力期间把 `MaterialOverlay` 上的 `ShaderMaterial`（`Assets/Effects/charge_rim_placeholder.gdshader`，**占位**）的 `rim_strength` 拉起来、松手淡出 | 只读 `IsCharging` |
+
+**接入契约（加一个新的蓄力武器要不要改这里）**：**不用**。③ 是按"单位身上所有 `Ability`"扫的，
+不认类名、不认技能行 Id —— 新武器只要在表里填 `HoldToCharge = true` + `ChargeBaseSeconds > 0`，
+它蓄满那一刻自动就有闪 + 圈 + 音效。① 才是"某一条技能行专属"（要改就改那一个 `[Export]`）。
+
+### 10.2 ⭐ 两个"秒数"不是一个量（**别把它们看成同一个**）
+
+| 量 | 值 | 属于谁 | 含义 | 谁能改 |
+|---|---|---|---|---|
+| `Ability.PerfectWindowSeconds` | **0.2s** | 战斗层（**表列**，`skl_a1_w1_2`） | 能打出"完美一击"的时间窗：**松手**落在 `[基础蓄力完成, +0.2s]` 里才算完美 | 表（有平衡含义：改它等于改能量掌的手感） |
+| `ChargeIndicator.PerfectColorSeconds` | **0.3s** | 表现层（`[Export]`） | 准星闭合后**变色的持续时间**；过了就变回原来的颜色，**形状照样闭合** | 表现层导出属性（只影响观感） |
+
+用户给的原话里那个 **0.3s 是后者**。P7 里把前者**原样读出来**写进
+`ChargeIndicator.DebugState()`（`完美窗口=… （战斗层的 0.2s，与上面的变色时长是**两个量**）`），
+实测同一帧能读到 `变色中=True（还剩 0.1s）` 而 `完美窗口=False` —— 这就是"两个量"的直接证据。
+**表值一个都没改。**
+
+### 10.3 新增的音效表行（`ConfigIndex.tres` 三处同改）
+
+| 项 | 值 |
+|---|---|
+| 新文件 | `Config/Tables/Audio/audio_sfx_charge_complete.tres` |
+| `Id` | `sfx_charge_complete`（代码里只有 `AudioIds.ChargeComplete` 这个常量，**没有路径字符串**） |
+| `Bus` | `Sfx`（0）—— 它是战斗反馈，不是界面音 |
+| 触发点 | `ChargeBodyFx`：任意蓄力技能的 `ChargeBaseComplete` 由 false 变 true |
+| 素材 | **临时借用**项目自制的 `ui_card_unlock.wav`（"能力卡·解锁"那一声，语义最接近"就绪"）；正式素材出来把 `Stream` 指过去即可，**代码不用改** |
+| `ConfigIndex.tres` | `load_steps` 193 → **194**；新增 `[ext_resource] id="279_audio_sfx_charge_complete"`；`Audio` 数组末尾 +1 项（**音效 13 → 14 条**，`[Audio] 配置表：音效 14 … sfx_charge_complete(Sfx)` 可验） |
+
+> ⚠️ 表索引那 13 个数（`6/2/10/1/1/39/7/14/8/5/6/11/4`）**不含音效表**，所以"加一行音效"不会动它 ——
+> 这也是为什么这次敢动 `ConfigIndex.tres`（另一条硬指标 `（ConfigIndex.tres 已加载）` 就是它的护栏）。
+
+### 10.4 自测与硬指标
+
+`build.ps1 --no-incremental` **0 warning / 0 error**；`--selftest`
+`=== 自测结束 ===`、**退出码 0**；硬指标逐位不变（见 §9.4 那串）。
+`ConfigIndex.tres` **动了 3 处**（如上），备份：`_refactor_backup/ConfigIndex.tres.p7before`。
+
+
 
