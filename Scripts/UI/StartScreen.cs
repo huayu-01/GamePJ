@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ActRoguelike.Config;
 using ActRoguelike.Rewards;
 using Godot;
@@ -6,22 +7,26 @@ using Godot;
 namespace ActRoguelike.UI;
 
 /// <summary>
-/// 开局配置界面（主循环里 Base → Configure → Stage 的 Configure 步）。
-/// 目前只选武器；选定后回调 <see cref="RunController.BeginRunWith"/> 进入第一关。
+/// 选武器界面（基地「装备配置台」的第二步）。选定后回调 <c>Open</c> 传进来的委托。
 /// 复用 OverlayScreen 的防误触与 Esc 约定。
+///
+/// <para>⚠️ P6a：**列表改成直接遍历武器表**（`ConfigIndex.Settings.Weapons` 的资源数组），
+/// 不再逐个 <c>CreateCard(WeaponPresetKind.Pistol …)</c> 写死三把旧枪。这样：
+/// ① 清掉旧武器后界面自动只剩新武器；② 以后**加一把武器 = 加一行 `.tres`**，
+/// 这个文件一行都不用改（用户 §1.5「选角色/选武器界面要能容纳任意数量」）。</para>
 /// </summary>
 public partial class StartScreen : OverlayScreen
 {
-	/// <summary>0 = 手枪，1 = 激光狙击枪。</summary>
-	[Signal]
-	public delegate void WeaponChosenEventHandler(int index);
-
 	protected override Control Root => _root;
 
 	private Control _root = null!;
 	private Action<WeaponPresetKind>? _onChosen;
 	private Button _template = null!;
 	private VBoxContainer _cards = null!;
+	private Label _hint = null!;
+
+	/// <summary>这一次列出来的武器；顺序 = 卡片顺序 = 数字键 <c>1..N</c> 的下标 + 1。</summary>
+	private readonly List<WeaponPresetKind> _options = new();
 
 	public override void _Ready()
 	{
@@ -30,9 +35,10 @@ public partial class StartScreen : OverlayScreen
 		InitializeOverlay();
 		_cards = GetNode<VBoxContainer>("Root/Panel/VBox/Cards");
 		_template = _cards.GetNode<Button>("CardTemplate");
+		_hint = GetNode<Label>("Root/Panel/VBox/Hint");
 	}
 
-	/// <summary>打开配置界面；选完武器后回调。</summary>
+	/// <summary>打开选武器界面；选完武器后回调。</summary>
 	public void Open(Action<WeaponPresetKind> onChosen)
 	{
 		if (IsOpen)
@@ -41,37 +47,49 @@ public partial class StartScreen : OverlayScreen
 		}
 
 		_onChosen = onChosen;
-
 		ClearCards();
-		CreateCard(0, WeaponPresetKind.Pistol, WeaponCardText(WeaponPresetKind.Pistol, "[1] 手枪\n单发高伤、精准，适合中远距离点射"));
-		CreateCard(1, WeaponPresetKind.Sniper, WeaponCardText(WeaponPresetKind.Sniper, "[2] 激光狙击枪\n高伤单发"));
-		CreateCard(2, WeaponPresetKind.Rifle, WeaponCardText(WeaponPresetKind.Rifle, "[3] 步枪\n按住左键连发，续航最好"));
+		_options.Clear();
 
-		SetKeyHints(("1 / 2 / 3", "选择武器"), (Key.Enter, "默认手枪"), ("悬停", "看武器数值"));
+		// 表是唯一真源：数量 / 顺序 / 文案全部来自武器表（`Config/Tables/Weapons/wpn_*.tres`）。
+		foreach (WeaponConfig? row in ConfigIndex.Settings.Weapons)
+		{
+			if (row == null)
+			{
+				continue;
+			}
+
+			// 枚举值 = 行 `Slot - 1`（见 ConfigIndexData 的注释）；即使某个 Slot 还没有对应的
+			// 枚举成员，这里也能正确换回来（C# 枚举只是 int，`RunController.WeaponRow` 按 Slot 查表）。
+			var kind = (WeaponPresetKind)(row.Slot - 1);
+			_options.Add(kind);
+			CreateCard(_options.Count - 1, kind, WeaponCardText(row));
+		}
+
+		_hint.Text = _options.Count == 0
+			? "武器表读不到（ConfigIndex.tres 的 Weapons 索引为空）—— 这一局用玩家场景自带的武器数值。"
+			: $"按 1 ~ {_options.Count} 或点击选择（悬停看武器数值）";
+
+		SetKeyHints(
+			KeyHint.Text(_options.Count == 0 ? "—" : $"1 ~ {_options.Count}", "选择武器"),
+			(Key.Enter, "第一把"),
+			(Key.Escape, "返回"));
 
 		BeginOpen();
 	}
 
 	/// <summary>
-	/// 武器卡片文案。数值来自武器表（`Config/Tables/Weapons/wpn_*.tres` 的 <c>DescriptionTemplate</c>
-	/// 支持 <c>{字段名}</c> 占位符）；整张表读不到时只留标题 —— 这时武器组件用的是自身默认值，
-	/// 编不出具体数字（这比编错数字好）。
+	/// 武器卡片文案。标题与数值**都来自武器表**（<c>DisplayName</c> + <c>DescriptionTemplate</c>，
+	/// 后者支持 <c>{字段名}</c> 占位符）—— 代码里不写死任何武器名/数值。
 	/// </summary>
-	private static string WeaponCardText(WeaponPresetKind kind, string title)
+	private static string WeaponCardText(WeaponConfig row)
 	{
-		WeaponConfig? row = RunController.WeaponRow(kind);
-		if (row == null)
+		string title = string.IsNullOrEmpty(row.DisplayName) ? row.Id : row.DisplayName;
+		if (string.IsNullOrEmpty(row.DescriptionTemplate))
 		{
 			return title;
 		}
 
-		string detail = ConfigText.Format(
-			string.IsNullOrEmpty(row.DescriptionTemplate)
-				? "{Damage:0} 伤害 / {MagazineSize} 发弹匣"
-				: row.DescriptionTemplate,
-			row,
-			row.Params);
-		return $"{title}（{detail}）";
+		return $"{title}（{ConfigText.Format(row.DescriptionTemplate, row, row.Params)}）";
 	}
 
 	public override void Close()
@@ -109,21 +127,16 @@ public partial class StartScreen : OverlayScreen
 
 	private void Choose(int index)
 	{
-		if (InputBlocked)
+		if (InputBlocked || index < 0 || index >= _options.Count)
 		{
 			return;
 		}
 
+		WeaponPresetKind weapon = _options[index];
 		Action<WeaponPresetKind>? callback = _onChosen;
 		_onChosen = null;
-		EmitSignal(SignalName.WeaponChosen, index);
 		Close();
-		callback?.Invoke(index switch
-		{
-			1 => WeaponPresetKind.Sniper,
-			2 => WeaponPresetKind.Rifle,
-			_ => WeaponPresetKind.Pistol,
-		});
+		callback?.Invoke(weapon);
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -133,18 +146,31 @@ public partial class StartScreen : OverlayScreen
 			return;
 		}
 
-		int index = key.Keycode switch
+		if (key.Keycode is Key.Enter or Key.KpEnter or Key.Space)
 		{
-			Key.Key1 or Key.Kp1 => 0,
-			Key.Key2 or Key.Kp2 => 1,
-			Key.Key3 or Key.Kp3 => 2,
-			Key.Enter or Key.KpEnter or Key.Space => 0,
-			_ => -1,
-		};
+			Choose(0);
+			return;
+		}
 
-		if (index >= 0)
+		int digit = DigitOf(key.Keycode);
+		if (digit > 0)
 		{
-			Choose(index);
+			Choose(digit - 1);
 		}
 	}
+
+	/// <summary>主键盘数字键与小键盘数字键 → 1..9（0 = 不是数字键）。</summary>
+	private static int DigitOf(Key key) => key switch
+	{
+		Key.Key1 or Key.Kp1 => 1,
+		Key.Key2 or Key.Kp2 => 2,
+		Key.Key3 or Key.Kp3 => 3,
+		Key.Key4 or Key.Kp4 => 4,
+		Key.Key5 or Key.Kp5 => 5,
+		Key.Key6 or Key.Kp6 => 6,
+		Key.Key7 or Key.Kp7 => 7,
+		Key.Key8 or Key.Kp8 => 8,
+		Key.Key9 or Key.Kp9 => 9,
+		_ => 0,
+	};
 }

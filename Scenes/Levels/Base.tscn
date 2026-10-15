@@ -1,8 +1,7 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://Scripts/Interaction/BaseTerminal.cs" id="2_terminal"]
-[ext_resource type="PackedScene" path="res://Scenes/UI/BaseScreen.tscn" id="3_base"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/StartScreen.tscn" id="4_start"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/HelpScreen.tscn" id="5_help"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/LoadingScreen.tscn" id="6_loading"]
@@ -107,8 +106,6 @@ mesh = SubResource("Mesh_terminal")
 surface_material_override/0 = SubResource("Mat_gate")
 
 [node name="Screens" type="Node" parent="."]
-
-[node name="BaseScreen" parent="Screens" instance=ExtResource("3_base")]
 
 [node name="StartScreen" parent="Screens" instance=ExtResource("4_start")]
 

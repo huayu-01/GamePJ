@@ -178,7 +178,6 @@ public static class RewardEffectRegistry
 			Excludes = row.Excludes,
 			Weight = row.Weight,
 			MaxStacks = row.MaxStacks,
-			RequiresSummoner = row.RequiresSummoner,
 			Apply = handler(row),
 		};
 	}

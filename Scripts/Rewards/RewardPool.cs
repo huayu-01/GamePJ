@@ -57,8 +57,9 @@ public sealed partial class RewardPool : RefCounted
 		}
 	}
 
-	/// <summary>当前角色是不是召唤控制（决定「亡者随从」这类限定奖励是否进池）。</summary>
-	public bool SummonerAllowed { get; set; }
+	// ⚠️ P6a 删掉了 `SummonerAllowed`（"当前角色是不是召唤控制"）—— 它唯一的消费者是
+	// `RewardDefinition.RequiresSummoner`（= `mut_summon` 亡者随从）。角色限定统一走
+	// `RewardDefinition.AllowsCharacter`（在 Initialize 里就筛掉，不是"抽到了没效果"）。
 
 	public List<RewardDefinition> Roll(RunBuild build, int count, RewardKind? kindFilter = null, RewardKind[]? kindSet = null)
 	{
@@ -73,12 +74,6 @@ public sealed partial class RewardPool : RefCounted
 			}
 
 			if (kindSet is { Length: > 0 } && System.Array.IndexOf(kindSet, definition.Kind) < 0)
-			{
-				continue;
-			}
-
-			// 角色限定：召唤类奖励只有召唤控制角色才进池。
-			if (definition.RequiresSummoner && !SummonerAllowed)
 			{
 				continue;
 			}

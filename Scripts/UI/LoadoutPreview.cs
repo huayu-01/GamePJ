@@ -17,8 +17,8 @@ namespace ActRoguelike.UI;
 ///   指向哪个 `.glb`，就把基地玩家身上的外观换成哪一个（留空 = 场景自带的那一个）。</item>
 /// <item><b>换数值</b>：生命 / 护甲 / 护盾 / 移速 / 减伤按角色行套到基地玩家身上
 ///   （与 <c>RunController.ApplyBalance</c> 在关卡里做的是同一件事；基地里没有战斗，所以只是"看得见身份"）。</item>
-/// <item><b>换武器</b>：枪械开关按角色行的 <see cref="CharacterConfig.WeaponEnabled"/>（近战重装收起枪），
-///   并把武器表那一行套到基地玩家手上的 <c>Weapon</c> 组件上。</item>
+/// <item><b>换武器</b>：武器表那一行的数值套到基地玩家手上的 <c>Weapon</c> 组件上
+///   （6 把武器共用同一个节点，数值才是区别）。⚠️ P6a 起**不再**按角色行藏枪 —— 见 <c>ApplyWeapon</c>。</item>
 /// </list>
 ///
 /// <para><b>为什么不直接调 <see cref="UnitConfig.ApplyTo"/></b>：它里面的换模型是"<c>Free()</c> 掉旧模型再
@@ -90,7 +90,7 @@ public partial class LoadoutPreview : Node
 
 		ApplyPreviewModel(PreviewModelPath);
 		ApplyStats(row);
-		ApplyWeapon(row, weapon);
+		ApplyWeapon(weapon);
 
 		GameLog.Write(
 			"Flow",
@@ -183,15 +183,16 @@ public partial class LoadoutPreview : Node
 	}
 
 	/// <summary>
-	/// 武器：枪械开关按角色行（近战重装收起枪 → 模型上也看得出来），
-	/// 并把武器表那一行套到基地玩家手上的 <c>Weapon</c> 组件（三把枪共用同一个节点，数值才是区别）。
+	/// 武器：把武器表那一行套到基地玩家手上的 <c>Weapon</c> 组件（6 把武器共用同一个节点，数值才是区别）。
+	///
+	/// <para>⚠️ P6a **删掉了这里的"按角色行藏枪"**（原来 <c>WeaponMount/Pistol</c> 的 <c>SetVisible</c>
+	/// 读的是 <c>CharacterConfig.WeaponEnabled</c>）。两条理由：① 用户明确说他没设计过"出征时按角色行把枪
+	/// 收起来"；② 它会让**基地**把枪藏起来、**关卡**里枪又出现（关卡那边没人改可见性），
+	/// 与"进关卡相当于只是切场景"直接矛盾。现在基地与关卡都只认武器行。</para>
 	/// </summary>
-	private void ApplyWeapon(CharacterConfig? row, WeaponPresetKind weapon)
+	private void ApplyWeapon(WeaponPresetKind weapon)
 	{
-		bool enabled = row?.WeaponEnabled ?? true;
-		_player.GetNodeOrNull<Node3D>("WeaponMount/Pistol")?.SetVisible(enabled);
-
-		if (enabled && NodeSearch.FindInSubtree<Weapons.Weapon>(_player) is { } gun)
+		if (NodeSearch.FindInSubtree<Weapons.Weapon>(_player) is { } gun)
 		{
 			RunController.WeaponRow(weapon)?.ApplyTo(gun);
 		}

@@ -23,7 +23,6 @@
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/Screamer.tscn" id="21_screamer"]
 [ext_resource type="PackedScene" path="res://Scenes/Enemies/Guard.tscn" id="22_guard"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/StartScreen.tscn" id="23_start"]
-[ext_resource type="PackedScene" path="res://Scenes/UI/BaseScreen.tscn" id="24_base"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/ChooseScreen.tscn" id="25_choose"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/BossPreviewScreen.tscn" id="27_preview"]
 [ext_resource type="Script" uid="uid://3wj8m1he6twb" path="res://Scripts/World/MapManager.cs" id="26_map"]
@@ -60,8 +59,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 script = ExtResource("9_run")
 
 [node name="RewardScreen" parent="RunController" unique_id=1082604421 instance=ExtResource("10_rewards")]
-
-[node name="BaseScreen" parent="RunController" unique_id=508025901 instance=ExtResource("24_base")]
 
 [node name="ChooseScreen" parent="RunController" unique_id=1880528248 instance=ExtResource("25_choose")]
 

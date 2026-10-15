@@ -304,11 +304,13 @@ public sealed class ControlsSettingsSection : ISettingsSection
 		("move_left", "左移", Key.A),
 		("move_right", "右移", Key.D),
 		("jump", "跳跃", Key.Space),
-		("dash", "战术滑铲", Key.Q),
-		("burst", "火力倾泻", Key.E),
+		// ⚠️ P6a：`dash`（战术滑铲 Q）/ `burst`（火力倾泻 E）/ `control`（操控召唤物 V）/ `summon`（召唤 G）
+		// 四条旧角色的按键动作已随旧角色从 `project.godot` 的 [input] 里删除 —— 列在这里会让
+		// "重绑"那一行去读一个不存在的动作（`CurrentKeys` 会显示"InputMap 里没有这个动作"）。
+		("skill_1", "技能 1", Key.Q),
+		("skill_2", "技能 2", Key.E),
+		("fall_attack", "下落攻击", Key.Ctrl),
 		("reload", "装填", Key.R),
-		("control", "操控召唤物", Key.V),
-		("summon", "召唤", Key.G),
 		("interact", "互动（节点 / Boss 门）", Key.F),
 	};
 

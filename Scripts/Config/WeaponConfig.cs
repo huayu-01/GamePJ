@@ -28,6 +28,22 @@ public partial class WeaponConfig : ConfigRow
 	/// <summary>与 <c>RewardPool</c> 的 <c>RequiredWeaponTags</c> 配对（决定这条武器能吃到哪些进化）。</summary>
 	[Export] public string[] AttackTags { get; set; } = { "Projectile", "Gun", "Physical" };
 
+	/// <summary>
+	/// **这把武器是否由 <see cref="Weapon"/> 组件负责左键开火**（P6a 新增这一列，取代角色行的
+	/// `WeaponEnabled`）。
+	///
+	/// <list type="bullet">
+	/// <item><c>true</c> = 传统枪械：左键 → <c>Weapon.TryFire</c>（有弹匣/装填）。</item>
+	/// <item><c>false</c> = **武技驱动**：攻击全部由本行 <see cref="Skills"/> 里那几个技能完成，
+	///   <c>PlayerWeaponInput</c> 看到 <c>Weapon.Enabled == false</c> 就把左键交给
+	///   <c>InputAction = weapon_skill_1</c> 的那个技能（能量掌 / 短弩 / 弓 / 灵剑 / 镰刀 / 长枪 全是这种）。</item>
+	/// </list>
+	///
+	/// <para>默认 <c>true</c> —— 与 <c>Weapon.cs</c> 的 <c>Enabled</c> 默认值一致（"表读不到 → 用组件自身默认值"
+	/// 这条回退语义逐位不变）。新武器都是武技驱动，所以在各自的行里**显式写 false**。</para>
+	/// </summary>
+	[Export] public bool UsesWeaponComponent { get; set; } = true;
+
 	[ExportGroup("升级池")]
 	/// <summary>
 	/// 本武器对应的**升级池**（`Config/Tables/UpgradePools/pool_*.tres`，一行一个池）。
@@ -137,6 +153,9 @@ public partial class WeaponConfig : ConfigRow
 		weapon.AimFov = AimFov;
 		weapon.Automatic = Automatic;
 		weapon.AttackTags = AttackTags;
+		// 左键归谁：true = Weapon 组件的开火；false = 本行 Skills 里绑在 weapon_skill_1 的那个武技
+		// （`PlayerWeaponInput` 靠 `Weapon.Enabled` 分流）。表读不到时不写，组件保留自身默认值。
+		weapon.Enabled = UsesWeaponComponent;
 		// 身份：本武器属于哪个升级池（`RewardDefinition.AllowsWeapon` 的第一层用它做精确匹配）。
 		// 池行被删 / 没填时 Pool 为 null → 留空 → 自动落到"标签匹配 → 通用"两层。
 		weapon.PoolId = Pool?.Id ?? string.Empty;

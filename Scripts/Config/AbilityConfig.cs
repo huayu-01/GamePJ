@@ -27,12 +27,12 @@ public partial class AbilityConfig : ConfigRow
 {
 	[ExportGroup("寻址")]
 	/// <summary>
-	/// 目标节点名（`AbilityMelee` / `AbilityScream` / `AbilityDash` …）—— 单位表按它找能力节点。
+	/// 目标节点名（`AbilitySkill1` / `AbilityWeaponSkill1` / `AbilityScream` …）—— 单位表按它找能力节点。
 	/// 首领行为技能行留空（它们不挂在某个节点上，而是改 Boss 的构筑/压力字段）。
 	/// </summary>
 	[Export] public string NodeName { get; set; } = string.Empty;
 
-	/// <summary>期望的脚本类名（`DashAbility` 等）。填了就在套用时校验，不匹配只警告、不静默写坏。</summary>
+	/// <summary>期望的脚本类名（`BackdashAbility` 等）。填了就在套用时校验，不匹配只警告、不静默写坏。</summary>
 	[Export] public string ClassHint { get; set; } = string.Empty;
 
 	/// <summary>

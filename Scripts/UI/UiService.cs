@@ -80,18 +80,8 @@ public partial class UiService : Node
 
 	// ───────────────────────── 语义化接口（业务只调这些）─────────────────────────
 
-	/// <summary>打开局外强化台（碎片消费）。基地里的交互台用它。</summary>
-	public bool OpenUpgrades()
-	{
-		if (Screen<BaseScreen>() is not { } screen)
-		{
-			return false;
-		}
-
-		screen.CloseOnCancel = true;
-		screen.Open(() => { });
-		return true;
-	}
+	// ⚠️ P6a 删掉了 `OpenUpgrades()`（它开的 `BaseScreen` 是基地里那页旧的「永久强化」，
+	// 整份删除）—— 那一页的职责由 `OpenAbilityMatrix()`（能力卡：解锁 / 升级 / 激活 / 额度扩增）接管。
 
 	/// <summary>打开装备配置台（角色 / 武器）。</summary>
 	public bool OpenLoadout(Action<WeaponPresetKind> onChosen)

@@ -56,5 +56,5 @@ alignment = 0
 
 [node name="Hint" type="Label" parent="Root/Panel/VBox"]
 theme_type_variation = &"UiCaption"
-text = "按 1 / 2 / 3 或点击选择，随后进入 Stage 1"
+text = "按数字键或点击选择武器"
 horizontal_alignment = 1

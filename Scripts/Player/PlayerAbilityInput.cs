@@ -12,7 +12,7 @@ namespace ActRoguelike.Player;
 /// 而是读技能行的 <see cref="AbilityConfig.InputAction"/> 列 —— 想让一个新技能按某个键，
 /// 就是**填一列表**，不是改这个文件。
 ///
-/// 原来的写法是 <c>switch (child) { case DashAbility dash: ... Input.IsActionJustPressed("dash") }</c>，
+/// 原来的写法是 <c>switch (child) { case BackdashAbility a: ... Input.IsActionJustPressed("skill_1") }</c>，
 /// 于是"加一个技能"必然要动 C#，且 <c>AbilityConfig</c> 里连一列按键都没有（那条注释就是本轮推翻的决定）。
 ///
 /// 支持两种按下方式（同一列 <c>HoldToCharge</c> 决定）：

@@ -27,7 +27,7 @@ public partial class RunController : Node
 	/// <summary>
 	/// 玩家能力节点的**场景基线**（第一次套用角色/武器时抓的那份 `Enabled` / `InputAction` / `AbilityId`）。
 	/// 换角色/换武器时先恢复它，再让表写一遍 —— 否则上一套技能的按键绑定会留在能力节点上
-	/// （"Gunner 左键还打出一发能量波"，见 <see cref="ResetAbilityBindings"/>）。
+	/// （"上一把武器的左键武技还留在节点上"，见 <see cref="ResetAbilityBindings"/>）。
 	/// </summary>
 	private readonly Dictionary<Ability, (bool Enabled, string InputAction, string AbilityId)> _abilityBaseline = new();
 
@@ -42,11 +42,9 @@ public partial class RunController : Node
 	private StageDefinition[] _stages = Array.Empty<StageDefinition>();
 	private int _stageIndex;
 	private bool _restartOnDismiss;
-	private WeaponPresetKind _weaponKind = WeaponPresetKind.Pistol;
-	private StartScreen? _startScreen;
-	private BaseScreen? _baseScreen;
+	private WeaponPresetKind _weaponKind = WeaponPresetKind.EnergyPalm;
 	private ChooseScreen? _chooseScreen;
-	private PlayerCharacterKind _character = PlayerCharacterKind.Gunner;
+	private PlayerCharacterKind _character = PlayerCharacterKind.Hunter;
 	private int _boot;
 
 	public RunBuild Build => _build;
@@ -87,8 +85,6 @@ public partial class RunController : Node
 	private void ApplyBalance()
 	{
 		ConfigIndexData config = ConfigIndex.Settings;
-		bool heavy = _character == PlayerCharacterKind.Heavy;
-		bool summoner = _character == PlayerCharacterKind.Summoner;
 
 		// 角色数值来自角色表（`Config/Tables/Characters/chr_*.tres`）；读不到行就用玩家场景里的原始数值。
 		CharacterConfig? character = CharacterRow(_character);
@@ -107,15 +103,14 @@ public partial class RunController : Node
 
 		if (_weapon != null)
 		{
+			// 武器行的数值（含 `UsesWeaponComponent` → `Weapon.Enabled`）都在 `WeaponConfig.ApplyTo` 里。
+			// ⚠️ P6a 起**不再**在这里按角色行把枪收起来（用户 2026-10-15：他没设计过这个，进关卡"只是切场景"）。
 			EquipWeapon(_weaponKind);
-			// 近战角色收起枪械：左键改由近战能力接管（PlayerWeaponInput 里分流）。
-			// 开关矩阵也来自角色表（读不到行时回退到原来的 `!heavy` 规则）。
-			_weapon.Enabled = character?.WeaponEnabled ?? !heavy;
 		}
 
 		// 角色表的能力开关矩阵：取代原来三段硬编码的 `melee.Enabled = heavy` / `summon/control.Enabled = summoner`。
 		// 读不到角色行时回退到与分表前逐位一致的那套规则。
-		ApplyAbilityMatrix(character, heavy, summoner);
+		ApplyAbilityMatrix(character);
 
 		if (character != null)
 		{
@@ -204,8 +199,6 @@ public partial class RunController : Node
 			_boot = 1;
 			ApplyBalance();
 			_stages = ResolveStages();
-			_startScreen = UiService.Instance?.Screen<StartScreen>();
-			_baseScreen = UiService.Instance?.Screen<BaseScreen>();
 			MetaProgress.Load();
 
 			// ⚠️ **命令行旁路必须判在「基地已经选过一局」之前**（`docs/anim-pipeline.md` §6.4-2）：
@@ -220,25 +213,17 @@ public partial class RunController : Node
 				return;
 			}
 
-			if (_baseScreen != null)
-			{
-				// 主循环起点：Base（局外强化）→ Configure（选武器）→ Stage。
-				// 从基地场景出发时已经配置过，直接开局（见 BaseTerminal 的出击门）。
-				if (RunSetup.HasSelection)
-				{
-					ActRoguelike.Core.GameLog.Write("Flow", $"来自基地的配置：角色 {RunSetup.Character} / 武器 {RunSetup.Weapon}");
-					BeginRunWithCharacter(RunSetup.Character, RunSetup.Weapon);
-					_boot = 2;
-					return;
-				}
-
-				_baseScreen.Open(BeginConfigure);
-			}
-			else
-			{
-				BeginConfigure();
-			}
-
+			// 主循环起点：**基地场景**（`Scenes/Levels/Base.tscn`）→ 出击门（`BaseTerminal` 的
+			// `Kind = Gate`，走到跟前按 F）→ 本场景。出击门已经先把角色/武器写进 `RunSetup` 再切场景，
+			// 所以到这里"只是切场景"：直接按那份配置开局。
+			// ⚠️ P6a **删掉了「开始探索」按钮与它后面那道关卡内选人/选武器界面** —— 用户 2026-10-15：
+			// 「那个本身按了没意义……后来要求的进关卡就是去交互一个对象来进关卡，基地里是有做了一个的」。
+			// 没走基地就直接跑 `Main.tscn`（MCP / 命令行调试）时，`RunSetup` 的默认值
+			// （角色 A［猎手］+ 能量掌）就是这一局的配置，这条路一样成立。
+			ActRoguelike.Core.GameLog.Write(
+				"Flow",
+				$"开局配置：角色 {RunSetup.Character} / 武器 {RunSetup.Weapon}（基地里选过={RunSetup.HasSelection}）—— 进关卡只是切场景，直接开局");
+			BeginRunWithCharacter(RunSetup.Character, RunSetup.Weapon);
 			_boot = 2;
 		}
 
@@ -285,40 +270,16 @@ public partial class RunController : Node
 		}
 	}
 
-	/// <summary>Configure 步：先选角色，枪手再选武器（没有界面就直接开局）。</summary>
-	private void BeginConfigure()
-	{
-		// 调试直接开局：`--char=chr_hunter --weapon=wpn_energy_palm`（按**表行 Id** 选，不是按索引）。
-		// 为什么不走界面：选题界面当前只列 3 个旧武器（那 3 个索引是旧表结构的一部分），
-		// 而"验证角色 A + 能量掌能玩"需要能真的进关卡。这条旁路只影响"从基地出发"的流程，
-		// 自测（BeginRunWithCharacter 直调）完全不受影响 —— 所以旧硬指标不会因为多了个开关而漂移。
-		if (TryApplyLoadoutOverride())
-		{
-			return;
-		}
-
-		var options = new List<string>
-		{
-			CharacterCardText(PlayerCharacterKind.Gunner, "远程枪手 — 三把枪、灵活走位"),
-			CharacterCardText(PlayerCharacterKind.Heavy, "近战重装 — 高血高甲，左键近战重击"),
-			CharacterCardText(PlayerCharacterKind.Summoner, "召唤控制 — G 键召唤无人机（最多 3 架）"),
-		};
-
-		if (OpenChoice("选择角色", options, ChooseCharacter))
-		{
-			return;
-		}
-
-		ChooseCharacter(0);
-	}
-
 	/// <summary>
 	/// 调试用的"直接开局"：命令行 <c>--char=&lt;角色行 Id&gt; --weapon=&lt;武器行 Id&gt;</c>
 	/// （也可以传枚举名，例如 <c>--char=Hunter</c>）。
 	///
-	/// 存在的理由：选题界面当前只列了旧 3 把武器，而"角色 A + 能量掌"这一套要能真的进关卡玩一遍。
 	/// **按表行 Id 选**（不是按索引）—— 这正是"加角色/武器不改代码"该有的样子。
-	/// 一个参数都没给就返回 false，走正常界面流程。
+	/// 一个参数都没给就返回 false，走正常流程（基地里选好的那份配置，或默认值）。
+	///
+	/// <para>⚠️ P6a：关卡内那道 <c>BeginConfigure</c> 选人界面已随「开始探索」按钮一起删除
+	/// （用户 2026-10-15：「后来要求的进关卡就是去交互一个对象来进关卡」）。这条命令行旁路保留 ——
+	/// 它只改"这一局用哪个角色/武器"，与界面无关。</para>
 	/// </summary>
 	private bool TryApplyLoadoutOverride()
 	{
@@ -390,25 +351,6 @@ public partial class RunController : Node
 		}
 
 		return Enum.TryParse(idOrName, true, out kind);
-	}
-
-	private void ChooseCharacter(int index)
-	{
-		// 1 = 近战重装（不带枪）；其余角色继续选武器。
-		if (index == 1)
-		{
-			BeginRunWithCharacter(PlayerCharacterKind.Heavy, WeaponPresetKind.Pistol);
-			return;
-		}
-
-		PlayerCharacterKind character = index == 2 ? PlayerCharacterKind.Summoner : PlayerCharacterKind.Gunner;
-		if (_startScreen != null)
-		{
-			_startScreen.Open(kind => BeginRunWithCharacter(character, kind));
-			return;
-		}
-
-		BeginRunWithCharacter(character, _weaponKind);
 	}
 
 	/// <summary>
@@ -569,41 +511,32 @@ public partial class RunController : Node
 		=> ConfigRows.BySlot<CharacterConfig>((int)kind + 1);
 
 	/// <summary>
-	/// 角色的默认标题（关卡里的 Configure 步与基地的配置台共用这一份措辞；
-	/// 基地那边不传标题时就走这里，所以两处不会漂移）。
-	/// </summary>
-	public static string DefaultCharacterTitle(PlayerCharacterKind kind) => kind switch
-	{
-		PlayerCharacterKind.Heavy => "近战重装 — 高血高甲，左键近战重击",
-		PlayerCharacterKind.Summoner => "召唤控制 — G 键召唤无人机（最多 3 架）",
-		PlayerCharacterKind.Hunter => "猎手 — 能量掌：左键能量波、右键蓄力",
-		PlayerCharacterKind.WeaponMaster => "武器大师 — 三把近战武器：武技1 连招、武技2 武技、闪/架 + 下落攻击",
-		_ => "远程枪手 — 三把枪、灵活走位",
-	};
-
-	/// <summary>
-	/// 角色选择界面的卡片文案。数值来自角色表（`DescriptionTemplate` 支持 <c>{字段名}</c> 占位符）；
-	/// 读不到角色行时退回原来的硬编码写法（用 ConfigIndexData 上的旧字段），保证界面不会空掉。
+	/// 角色选择界面的卡片文案（标题 + 数值**全部来自角色表**：`DisplayName` + `DescriptionTemplate`，
+	/// 后者支持 <c>{字段名}</c> 占位符）。
+	///
+	/// <para>⚠️ P6a **删掉了旧的 <c>DefaultCharacterTitle</c> 那张"角色枚举 → 手写中文标题"的映射表**
+	/// —— 那正是"代码里写死角色名"（用户 §1.5 的硬要求）。现在加一个角色 = 加一行 `.tres`，
+	/// 标题跟 `DisplayName` 走，C# 一行不动。</para>
 	///
 	/// <para>**public**：基地的装备配置台（<c>BaseTerminal</c>）复用它，角色卡的文案就只有这一处来源。</para>
 	/// </summary>
-	public static string CharacterCardText(PlayerCharacterKind kind, string? title = null)
+	public static string CharacterCardText(PlayerCharacterKind kind)
 	{
-		title ??= DefaultCharacterTitle(kind);
 		CharacterConfig? row = CharacterRow(kind);
-		if (row != null)
+		if (row == null)
 		{
-			string detail = ConfigText.Format(
-				string.IsNullOrEmpty(row.DescriptionTemplate)
-					? "（{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 减伤 {DamageReduction}）"
-					: row.DescriptionTemplate,
-				row,
-				row.Params);
-			return $"{title}（{detail}）";
+			// 整张角色表都读不到：连名字都编不出来（这时玩家用的是场景里的原始数值）。
+			return "（角色表读不到）";
 		}
 
-		// 整张角色表都读不到：只留标题（这时玩家用的是场景里的原始数值，编不出具体数字）。
-		return title;
+		string title = string.IsNullOrEmpty(row.DisplayName) ? row.Id : row.DisplayName;
+		string detail = ConfigText.Format(
+			string.IsNullOrEmpty(row.DescriptionTemplate)
+				? "（{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 减伤 {DamageReduction}）"
+				: row.DescriptionTemplate,
+			row,
+			row.Params);
+		return $"{title}（{detail}）";
 	}
 
 	/// <summary>
@@ -613,37 +546,30 @@ public partial class RunController : Node
 	/// ⚠️ 按类名匹配有个硬伤：**同一个类的两个技能没法分开开关**（角色 A 的两个武技都是
 	/// <c>EnergyWaveAbility</c>）。所以本轮把首选键改成 <c>Ability.AbilityId</c>：它在
 	/// <c>AbilityConfig.ApplyTo</c> 里被写成技能行的 Id，时机在 <see cref="ApplyAbilityMatrix"/>
-	/// 之前（先 <c>ApplySkillsTo</c> 再矩阵）。旧角色行（`chr_gunner` 等）里写的是类名，两条路都命中，
-	/// 所以行为与改动前逐位一致。
+	/// 之前（先 <c>ApplySkillsTo</c> 再矩阵）。
 	///
-	/// 读不到角色行时回退到分表前那段硬编码规则（`melee.Enabled = heavy`、`summon/control.Enabled = summoner`）。
+	/// 读不到角色行时**只恢复场景基线**（不再有 `melee.Enabled = heavy` / `summon = summoner` 那套
+	/// 旧角色的硬编码规则 —— 那些角色已在 P6a 删除，`heavy` / `summoner` 两个变量也随之消失）。
 	/// </summary>
-	private void ApplyAbilityMatrix(CharacterConfig? character, bool heavy, bool summoner)
+	private void ApplyAbilityMatrix(CharacterConfig? character)
 	{
 		var abilities = new System.Collections.Generic.List<Ability>();
 		NodeSearch.CollectInSubtree(_player!, abilities);
 
 		// ⚠️ 先把能力恢复到**场景基线**再做矩阵：能力节点是 `Player.tscn` 的固定节点，而按键绑定/开关是
 		// **上一个角色/武器的技能行**写上去的，只套用"新角色列的那些行"清不掉它们（§6.4.6 的残留）。
-		// 这一步是幂等的：换回 Gunner 与一开局就是 Gunner 得到同一份状态。
+		// 这一步是幂等的：换回同一个角色与一开局就是它得到同一份状态。
 		ResetAbilityBindings(abilities);
 
 		foreach (Ability ability in abilities)
 		{
-			string classId = ability.GetType().Name;
-			string rowId = ability.AbilityId;
-
 			if (character == null)
 			{
-				// 回退：与分表前的规则一模一样。
-				ability.Enabled = classId switch
-				{
-					nameof(MeleeAttackAbility) => heavy,
-					nameof(SummonAbility) or nameof(AreaAttackAbility) => summoner,
-					_ => ability.Enabled,
-				};
 				continue;
 			}
+
+			string classId = ability.GetType().Name;
+			string rowId = ability.AbilityId;
 
 			if (Matches(character.EnabledAbilityIds, rowId, classId))
 			{
@@ -724,9 +650,6 @@ public partial class RunController : Node
 		return text.ToString();
 	}
 
-	/// <summary>开局配置完成（选好武器）→ 进入第一关。</summary>
-	public void BeginRunWith(WeaponPresetKind kind) => BeginRunWithCharacter(PlayerCharacterKind.Gunner, kind);
-
 	/// <summary>选好角色与武器 → 套用数值并进入第一关。</summary>
 	public void BeginRunWithCharacter(PlayerCharacterKind character, WeaponPresetKind kind)
 	{
@@ -747,8 +670,7 @@ public partial class RunController : Node
 	/// **按当前角色与武器把奖励候选池定下来**（池里有什么 = 交互的角色 × 攻击方式，用户 C2）。
 	///
 	/// 调用点只有一处：<see cref="ApplyBalance"/>（= 进关卡初始化）。在此之前池是"每次交互时惰性建"的
-	/// 四个分支，其中两个只调了 <see cref="RewardPool.Initialize"/>、忘了 <c>SummonerAllowed</c> ——
-	/// 谁先被交互（例如先撞上特殊奖励节点）就会让召唤控制角色整局拿不到"亡者随从"。
+	/// 四个分支 —— 谁先被交互（例如先撞上特殊奖励节点）就会拿到不同的池。
 	/// 现在初始化只有这一条路，角色/武器限定层一起定，交互时只从定好的池里抽。
 	/// </summary>
 	private void InitializePool()
@@ -763,18 +685,14 @@ public partial class RunController : Node
 		string characterId = CharacterRow(_character)?.Id ?? string.Empty;
 		// ② 限定（武器层）：专属池（ApplicablePoolIds）→ 武器标签（RequiredWeaponTags）→ 通用。
 		_pool.Initialize(_weapon, characterId);
-		// ③ 老的角色限定：只有召唤控制角色才有召唤类奖励（RequiresSummoner，P5 之前唯一的那一个布尔）。
-		_pool.SummonerAllowed = _character == PlayerCharacterKind.Summoner;
 		_poolReady = true;
 
 		// 留痕（用户 C2 问的就是"池是什么时候定的"）：这一行只在进关卡初始化时出现，
 		// 之后每次交互只从这份池里抽（抽取时仍然要按当前构筑过滤互斥/前置/层数/节点类型）。
-		// ⚠️ 条数是**限定两层过滤后**的候选数；`RequiresSummoner` 项在抽取时再筛，
-		// 所以枪手这里会比候选数少（`docs/rewards.md` 的硬指标）。
 		string poolId = string.IsNullOrEmpty(_weapon.PoolId) ? "留空（走标签匹配 → 通用）" : _weapon.PoolId;
 		ActRoguelike.Core.GameLog.Write(
 			"Reward",
-			$"奖励池按当前角色/武器定下来了（进关卡初始化）：角色 {_character}（行 Id「{(characterId.Length == 0 ? "（角色表读不到）" : characterId)}」）· 武器 {_weaponKind}（PoolId {poolId}）→ 候选 {_pool.CandidateCount} 条（限定两层之后；RequiresSummoner 项在抽取时再筛 SummonerAllowed={_pool.SummonerAllowed}）");
+			$"奖励池按当前角色/武器定下来了（进关卡初始化）：角色 {_character}（行 Id「{(characterId.Length == 0 ? "（角色表读不到）" : characterId)}」）· 武器 {_weaponKind}（PoolId {poolId}）→ 候选 {_pool.CandidateCount} 条（限定两层之后）");
 	}
 
 	/// <summary>兜底：池子还没定就先定一次（正常路径一定在进关卡时已经定过）。</summary>

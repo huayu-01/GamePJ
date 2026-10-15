@@ -16,7 +16,7 @@ public partial class BaseTerminal : Interactable
 {
 	public enum TerminalKind
 	{
-		/// <summary>局外强化台（碎片消费）。</summary>
+		/// <summary>局外成长台（碎片 → 能力卡：解锁 / 升级 / 激活 / 额度扩增）。</summary>
 		Upgrades,
 
 		/// <summary>装备配置台（角色 / 武器）。</summary>
@@ -42,7 +42,7 @@ public partial class BaseTerminal : Interactable
 		SingleUse = false;
 		Prompt = Kind switch
 		{
-			TerminalKind.Upgrades => "局外强化台",
+			TerminalKind.Upgrades => "局外成长台（能力卡）",
 			TerminalKind.Loadout => "装备配置台",
 			TerminalKind.Help => "操作说明台",
 			_ => "出击门",
@@ -61,8 +61,8 @@ public partial class BaseTerminal : Interactable
 		switch (Kind)
 		{
 			case TerminalKind.Upgrades:
-				GameLog.Write("Flow", "基地：打开局外强化台");
-				return ui.OpenUpgrades();
+				GameLog.Write("Flow", "基地：打开局外成长台（能力卡）");
+				return ui.OpenAbilityMatrix();
 
 			case TerminalKind.Loadout:
 				GameLog.Write("Flow", "基地：打开装备配置台");
@@ -104,10 +104,30 @@ public partial class BaseTerminal : Interactable
 	/// </summary>
 	private static bool OpenLoadoutFlow(UiService ui)
 	{
+		// ⚠️ 列表**遍历角色表**（不是遍历 `PlayerCharacterKind` 枚举）：加一个角色 = 加一行 `.tres`，
+		// 这里一行都不用改（用户 §1.5「界面要能容纳任意数量」）。枚举值 = 行 `Slot - 1`。
+		var kinds = new List<PlayerCharacterKind>();
 		var options = new List<string>();
-		foreach (PlayerCharacterKind kind in System.Enum.GetValues<PlayerCharacterKind>())
+		foreach (CharacterConfig? row in ConfigIndex.Settings.Characters)
 		{
+			if (row == null)
+			{
+				continue;
+			}
+
+			var kind = (PlayerCharacterKind)(row.Slot - 1);
+			kinds.Add(kind);
 			options.Add(RunController.CharacterCardText(kind));
+		}
+
+		// 整张角色表都读不到（`ConfigIndex.tres` 没加载）时才退回枚举本身，至少界面不空。
+		if (kinds.Count == 0)
+		{
+			foreach (PlayerCharacterKind kind in System.Enum.GetValues<PlayerCharacterKind>())
+			{
+				kinds.Add(kind);
+				options.Add(RunController.CharacterCardText(kind));
+			}
 		}
 
 		return ui.OpenChoose(
@@ -115,12 +135,20 @@ public partial class BaseTerminal : Interactable
 			options,
 			index =>
 			{
-				RunSetup.Character = (PlayerCharacterKind)index;
+				if (index < 0 || index >= kinds.Count)
+				{
+					return;
+				}
+
+				RunSetup.Character = kinds[index];
 				RunSetup.HasSelection = true;
 				GameLog.Write("Flow", $"基地：选定角色 {RunSetup.Character}（基地玩家已切换）");
 
-				// 第二步：武器。近战重装的角色行说 `WeaponEnabled = false` —— 仍然允许选，
-				// 出征时按角色行把枪收起来（与关卡里 `RunController.ApplyBalance` 的规则一致）。
+				// 第二步：武器。**这里不再有"按角色行把枪收起来"那套说法** —— 用户 2026-10-15：
+				// 「"出征时按角色行把枪收起来"，我并没有这么设计过，因为流程定的就是：在基地 > 默认配置/
+				// 选好配置 > 进关卡 > 完成最终首领/esc 点重开 > 回基地，相当于只是切场景」。
+				// 现在"左键归谁"由**武器行**的 `UsesWeaponComponent` 决定（武技驱动的武器不会去开火），
+				// 基地预览与关卡用的是同一个来源，所以选定即所见、出征只是切场景。
 				ui.OpenLoadout(kind =>
 				{
 					RunSetup.Weapon = kind;

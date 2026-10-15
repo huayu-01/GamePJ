@@ -9,12 +9,6 @@ Key = "StrikeActiveTime"
 Value = 0.1
 Note = "单段模式下的判定时长（本行是多段，用 StepActiveTimes）"
 
-[sub_resource type="Resource" id="p_MaxAimDistance"]
-script = ExtResource("2_param")
-Key = "MaxAimDistance"
-Value = 60.0
-Note = "求准星世界点的射线长度（与其它武器口径一致）"
-
 [resource]
 script = ExtResource("1_row")
 NodeName = "AbilityWeapon4Skill1"
@@ -31,4 +25,4 @@ Id = "skl_b1_w1_1"
 DisplayName = "破剑式"
 DescriptionTemplate = "一段连招，连续按键可连续释放 5 段；每段都可以摧毁碰撞盒内的子弹（包括友军的，但无法斩断能量波）。"
 Note = "[P4 新增行] 角色 B 武器1 灵剑 武技1（文档 CD:0.3/0.4/0.5/0.6/0.6；文档第 98 行的条注写着「cd 只是参考值，几个武器的武技1 应当是使用同一个技能或状态驱动，因为都是由动画控制」—— 所以这里的 CD 是连招结束后的冷却，段与段之间的间隔由动画长度决定）。★ 三把武器共用 MeleeComboAbility 这一个类，差别只有 ComboAnimations 的段数与每段的数值。★ 每段的命中盒尺寸/前伸/伤害倍率都是表列（类型 AbilitySeries，每项一个子资源）。★ CutSceneNames=Bullet、CutExcludeSceneNames=EnergyWave ——「能摧毁子弹但无法斩断能量波」是数据，不是代码分支。"
-Params = [SubResource("p_StrikeActiveTime"), SubResource("p_MaxAimDistance")]
+Params = [SubResource("p_StrikeActiveTime")]

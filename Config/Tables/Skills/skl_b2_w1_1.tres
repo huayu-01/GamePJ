@@ -9,12 +9,6 @@ Key = "StrikeActiveTime"
 Value = 0.1
 Note = "单段模式下的判定时长（本行是多段，用 StepActiveTimes）"
 
-[sub_resource type="Resource" id="p_MaxAimDistance"]
-script = ExtResource("2_param")
-Key = "MaxAimDistance"
-Value = 60.0
-Note = "求准星世界点的射线长度（与其它武器口径一致）"
-
 [resource]
 script = ExtResource("1_row")
 NodeName = "AbilityWeapon5Skill1"
@@ -31,4 +25,4 @@ Id = "skl_b2_w1_1"
 DisplayName = "憎恶"
 DescriptionTemplate = "三连招：连续按键可连续释放 3 段，前 2 刀半圆，最后一刀大回旋。"
 Note = "[P4 新增行] 角色 B 武器2 镰刀 武技1（文档 CD:0.5/0.5/0.8）。★ 与灵剑的破剑式共用 MeleeComboAbility 这一个类（文档第 98 行要求「几个武器的武技1 应当是使用同一个技能或状态驱动」）—— 差别只有段数（3 段 vs 5 段）与每段的命中盒/伤害。★ 前 2 刀半圆 = 盒子（z>0）；最后一刀大回旋 = 圆柱（z=0 → 本能力的 ApplyStepShape 切成 CylinderShape3D 360°）。"
-Params = [SubResource("p_StrikeActiveTime"), SubResource("p_MaxAimDistance")]
+Params = [SubResource("p_StrikeActiveTime")]

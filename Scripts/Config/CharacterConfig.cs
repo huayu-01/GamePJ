@@ -16,9 +16,12 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class CharacterConfig : UnitConfig
 {
-	[ExportGroup("武器（这个角色拿不拿枪）")]
-	/// <summary>这个角色能不能用枪（近战重装 = false，左键改由近战能力接管）。</summary>
-	[Export] public bool WeaponEnabled { get; set; } = true;
+	// ⚠️ P6a **删掉了** `WeaponEnabled`（"这个角色拿不拿枪 / 近战重装收起枪"）：用户 2026-10-15 明确
+	// 「"出征时按角色行把枪收起来"，**我并没有这么设计过**，因为流程定的就是：在基地 > 默认配置/选好配置 >
+	// 进关卡 > 完成最终首领/esc 点重开 > 回基地，**相当于只是切场景**」。
+	// 正确的归属是**武器行**：一把武器要么由 `Weapon` 组件开火、要么由武技驱动 ——
+	// 见 `WeaponConfig.UsesWeaponComponent`（6 把新武器全是"武技驱动"）。
+	// 从角色行读它还会造成"基地预览把枪藏起来、关卡里枪又出现"的不一致（与"只是切场景"矛盾）。
 
 	// ⚠️ 刻意**删掉了** DefaultWeaponId：它从阶段 2 起就是"填了没人读"的列（开局武器由
 	// `StartScreen` 的选择 → `RunSetup.Weapon` 决定），留着只会让人以为能配"这个角色的默认枪"。

@@ -2,59 +2,49 @@ using Godot;
 
 namespace ActRoguelike.Config;
 
-/// <summary>可选武器（开局配置与进化池节点用）。数值都在 ConfigIndexData 里，不写死进预制体。</summary>
+/// <summary>
+/// 可选武器（开局配置与进化池节点用）。数值都在 `Config/Tables/Weapons/` 的分表里，不写死进预制体。
+///
+/// <para>⚠️ **枚举值 = 武器表那一行的 `Slot - 1`**（`RunController.WeaponRow` 用 <c>(int)kind + 1</c> 查表）。
+/// P6a 删掉旧 3 把枪（`Pistol` / `Sniper` / `Rifle`）时**显式保留了这个等式**（剩下的成员写死数值），
+/// 所以删旧武器**没有**让其余武器的序号发生位移 —— 武器行的 `Slot`（4…9）与升级池行的 `Slot` 都不用动。</para>
+///
+/// <para>⚠️ 界面**不靠遍历这个枚举**来列武器（那样新加一行就看不见）：`StartScreen` 直接遍历
+/// <c>ConfigIndex.Settings.Weapons</c> 的**表行**，用 <c>(WeaponPresetKind)(row.Slot - 1)</c> 换回来。
+/// 所以"加一把武器"= 加一行 `.tres`，C# 一行不动（用户 §1.5）。</para>
+/// </summary>
 public enum WeaponPresetKind
 {
-	Pistol,
-	Sniper,
-	Rifle,
+	/// <summary>角色 A 武器 1「能量掌」（`wpn_energy_palm`，Slot 4）。</summary>
+	EnergyPalm = 3,
 
-	/// <summary>
-	/// **[新增] 角色 A 武器 1「能量掌」**（`wpn_energy_palm`，Slot 4）。
-	/// ⚠️ 枚举顺序 = 武器表的 <c>Slot</c>（`RunController.WeaponRow` 用 <c>(int)kind + 1</c> 查表），
-	/// 所以新武器一律**往后追加**，不能插在中间。
-	/// </summary>
-	EnergyPalm,
+	/// <summary>角色 A 武器 2「短弩」（`wpn_crossbow`，Slot 5）：散射三发 / 蓄力加发数。</summary>
+	Crossbow = 4,
 
-	/// <summary>**[新增·P3] 角色 A 武器 2「短弩」**（`wpn_crossbow`，Slot 5）：散射三发 / 蓄力加发数。</summary>
-	Crossbow,
+	/// <summary>角色 A 武器 3「弓」（`wpn_bow`，Slot 6）：蓄力增伤增速 / 标记与追踪。</summary>
+	Bow = 5,
 
-	/// <summary>**[新增·P3] 角色 A 武器 3「弓」**（`wpn_bow`，Slot 6）：蓄力增伤增速 / 标记与追踪。</summary>
-	Bow,
+	/// <summary>角色 B 武器 1「灵剑」（`wpn_spirit_sword`，Slot 7）：5 段连招 + 蓄力剑气。</summary>
+	SpiritSword = 6,
 
-	/// <summary>**[新增·P4] 角色 B 武器 1「灵剑」**（`wpn_spirit_sword`，Slot 7）：5 段连招 + 蓄力剑气。</summary>
-	SpiritSword,
+	/// <summary>角色 B 武器 2「镰刀」（`wpn_scythe`，Slot 8）：3 连招 + 抛出武器。</summary>
+	Scythe = 7,
 
-	/// <summary>**[新增·P4] 角色 B 武器 2「镰刀」**（`wpn_scythe`，Slot 8）：3 连招 + 抛出武器。</summary>
-	Scythe,
-
-	/// <summary>**[新增·P4] 角色 B 武器 3「长枪」**（`wpn_spear`，Slot 9）：5 段循环连招 + 蓄力抛物线抛掷。</summary>
-	Spear,
+	/// <summary>角色 B 武器 3「长枪」（`wpn_spear`，Slot 9）：5 段循环连招 + 蓄力抛物线抛掷。</summary>
+	Spear = 8,
 }
 
-/// <summary>可选角色（策划文档 §7）。</summary>
+/// <summary>
+/// 可选角色。⚠️ 与 <see cref="WeaponPresetKind"/> 同一条纪律：**枚举值 = 角色表行的 `Slot - 1`**
+/// （`RunController.CharacterRow` 用 <c>(int)kind + 1</c> 查表），且界面遍历的是**表行**不是这个枚举。
+/// </summary>
 public enum PlayerCharacterKind
 {
-	/// <summary>角色 1：远程枪手（三把枪）。</summary>
-	Gunner,
+	/// <summary>角色 A［猎手］（`chr_hunter`，Slot 4）。</summary>
+	Hunter = 3,
 
-	/// <summary>角色 2：近战与重型防御（左键近战重击）。</summary>
-	Heavy,
-
-	/// <summary>角色 3：召唤与控制（G 键主动召唤无人机）。</summary>
-	Summoner,
-
-	/// <summary>
-	/// **[新增] 角色 A［猎手］**（`chr_hunter`，Slot 4）。本轮只落地了武器 1「能量掌」的两个武技。
-	/// 同上：枚举顺序 = 角色表的 <c>Slot</c>，新角色往后追加。
-	/// </summary>
-	Hunter,
-
-	/// <summary>
-	/// **[新增·P4] 角色 B［武器大师］**（`chr_weapon_master`，Slot 5）：三把近战武器 + 闪/架 + 被动落。
-	/// 同上：枚举顺序 = 角色表的 <c>Slot</c>，新角色往后追加。
-	/// </summary>
-	WeaponMaster,
+	/// <summary>角色 B［武器大师］（`chr_weapon_master`，Slot 5）：三把近战武器 + 闪/架 + 被动落。</summary>
+	WeaponMaster = 4,
 }
 
 /// <summary>

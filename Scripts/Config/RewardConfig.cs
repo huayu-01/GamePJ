@@ -77,8 +77,9 @@ public partial class RewardConfig : ConfigRow
 	/// </summary>
 	[Export] public UpgradePoolConfig? Pool { get; set; }
 
-	/// <summary>只有召唤控制角色才能拿到。</summary>
-	[Export] public bool RequiresSummoner { get; set; }
+	// ⚠️ P6a **删掉了** `RequiresSummoner`（"只有召唤控制角色才能拿到"）：它唯一的用户是
+	// `mut_summon`（亡者随从），而那个角色与那条行都在 P6a 清掉了。角色限定现在统一走
+	// `RequiredCharacterIds`（资源不可用时的字符串名单，见下），不需要第二个只认"召唤师"的布尔。
 
 	/// <summary>互斥的增幅项 Id（双向判定）。</summary>
 	[Export] public string[] Excludes { get; set; } = System.Array.Empty<string>();

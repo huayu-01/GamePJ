@@ -9,12 +9,28 @@ public enum GameplayEventKind
 	Damaged,
 	Died,
 	Kill,
+
+	/// <summary>
+	/// **护甲被打光**那一刻（P6a 补上抛点）。抛点唯一：`Unit.ReceiveHit` 里 <c>ArmorBroke?.Invoke()</c> 那一处
+	/// （扣甲之后 <c>Armor &lt;= 0</c>）。订它的增幅：如「能量护盾」的"护甲破碎 → 对周围敌人造成伤害"那一路。
+	/// </summary>
 	ArmorBroken,
+
+	/// <summary>
+	/// **护盾被打光**那一刻（P6a 补上抛点）。抛点唯一：`Unit.ReceiveHit` 里 <c>ShieldBroke?.Invoke()</c> 那一处。
+	/// </summary>
 	ShieldBroken,
+
 	AbilityActivated,
 	WeaponFired,
 	ReloadStarted,
 	ReloadCompleted,
+
+	/// <summary>
+	/// **暴击命中**（P6a 补上抛点）。抛点唯一：`Unit.ReceiveHit` 里结算完这次命中之后，判据是
+	/// <c>HitInstance.Critical</c>（攻击方按 `CritChance` 掷出来的那一次）且真的打出了伤害。
+	/// 「是玩家的暴击才算」交给订阅方判（<c>TablePulseRule</c> 的 <c>mine</c> = Source == 玩家）。
+	/// </summary>
 	Critical,
 
 	/// <summary>
@@ -23,10 +39,6 @@ public enum GameplayEventKind
 	/// <para>抛点只有一处（`GuardStanceAbility.OnOwnerHit` 里 <c>ParryCount++</c> 那里），
 	/// 订阅方是增幅行「招架反击」（刷新技能 2 冷却）与「能量护盾」（对周围敌人造成伤害）——
 	/// 两条都是**表驱动的** <c>TablePulseRule</c>。</para>
-	///
-	/// <para>⚠️ 在它之前这个枚举里 `ArmorBroken` / `ShieldBroken` / `Critical` 就已经存在，
-	/// 但**一个抛点都没有**（只有 `GameLog` 的 switch 认得它们）——「能量护盾」的"护甲破碎"那一路
-	/// 仍然没有事件可订，所以那一半**没接**（见 `docs/upgrades.md` §7）。</para>
 	/// </summary>
 	Parried,
 }

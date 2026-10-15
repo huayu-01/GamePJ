@@ -660,8 +660,9 @@ public partial class _FeelProbe : Node3D
 	private void BuildDeath()
 	{
 		// 走"从基地出征"那条路，跳过开局界面，让 RunController 立刻开局（它的 `_Process` 第一帧才读这个开关）。
-		RunSetup.Character = PlayerCharacterKind.Gunner;
-		RunSetup.Weapon = WeaponPresetKind.Pistol;
+		// ⚠️ P6a：角色/武器换成清旧之后剩下的角色 A［猎手］+ 能量掌。
+		RunSetup.Character = PlayerCharacterKind.Hunter;
+		RunSetup.Weapon = WeaponPresetKind.EnergyPalm;
 		RunSetup.HasSelection = true;
 
 		// 挂在当前场景下、但**挪到树根**：这样死亡流程切场景时这个拍摄台不会被一起释放，

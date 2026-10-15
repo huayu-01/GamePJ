@@ -10,12 +10,16 @@ namespace ActRoguelike.Run;
 public static class RunSetup
 {
 	/// <summary>基地里选定的角色。</summary>
-	public static PlayerCharacterKind Character { get; set; } = PlayerCharacterKind.Gunner;
+	public static PlayerCharacterKind Character { get; set; } = PlayerCharacterKind.Hunter;
 
 	/// <summary>基地里选定的武器。</summary>
-	public static WeaponPresetKind Weapon { get; set; } = WeaponPresetKind.Pistol;
+	public static WeaponPresetKind Weapon { get; set; } = WeaponPresetKind.EnergyPalm;
 
-	/// <summary>是否已经在基地里做过配置（true = 直接开局）。</summary>
+	/// <summary>
+	/// 是否已经在基地里做过配置（true = 出击门按过 / 命令行旁路指定过）。
+	/// ⚠️ P6a 之后它**只用于日志留痕**：进关卡就是切场景，`RunController` 一律按
+	/// <see cref="Character"/> / <see cref="Weapon"/> 开局（不再有"没选过就先弹出征面板"那道门）。
+	/// </summary>
 	public static bool HasSelection { get; set; }
 
 	/// <summary>回到基地时清空（下次出征重新配置）。</summary>

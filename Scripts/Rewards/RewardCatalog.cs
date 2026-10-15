@@ -256,7 +256,13 @@ public partial class SummonOnKillRule : TriggerRule
 /// </summary>
 public partial class TablePulseRule : TriggerRule
 {
-	/// <summary>订阅哪一种事件：`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`。</summary>
+	/// <summary>
+	/// 订阅哪一种（或哪几种）事件：`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`。
+	///
+	/// <para>P6a：**支持逗号分隔的多个事件名**（任一命中即出手）。为什么需要：
+	/// 「能量护盾」的文档语义是「当**格挡 / 护甲**破碎时对周围敌人造成伤害」—— 两件事都要能触发同一条增幅，
+	/// 而它是**一行**增幅（一个 <c>Trigger</c> 列）。写法：<c>Trigger = "Parried,ArmorBroken"</c>。</para>
+	/// </summary>
 	public string Trigger { get; set; } = "Kill";
 
 	/// <summary>一次性 CDR 的目标（**技能行 Id**，不是节点名）：走 `Ability.FindByAbilityId`。</summary>
@@ -311,56 +317,51 @@ public partial class TablePulseRule : TriggerRule
 		}
 
 		bool mine = gameplayEvent.Source == _owner;
-		switch (Trigger)
+
+		// `Trigger` 是逗号分隔的事件名列表（P6a：「能量护盾」的"格挡 / 护甲破碎"两件事共用一个 Trigger 列）。
+		// 任一条命中即通过 —— 单值时行为与改前逐位一致。
+		bool kindOk = false;
+		foreach (string trigger in Triggers)
 		{
-			case "Kill":
-				if (gameplayEvent.Kind != GameplayEventKind.Kill || !mine)
-				{
-					return false;
-				}
-
+			if (MatchesKind(trigger, gameplayEvent, mine))
+			{
+				kindOk = true;
 				break;
+			}
+		}
 
-			case "Parried":
-				if (gameplayEvent.Kind != GameplayEventKind.Parried || !mine)
-				{
-					return false;
-				}
-
-				break;
-
-			case "Critical":
-				if (gameplayEvent.Kind != GameplayEventKind.Critical || !mine)
-				{
-					return false;
-				}
-
-				break;
-
-			case "ArmorBroken":
-				if (gameplayEvent.Kind != GameplayEventKind.ArmorBroken
-					|| (!mine && gameplayEvent.Target != _owner))
-				{
-					return false;
-				}
-
-				break;
-
-			case "Damaged":
-				if (gameplayEvent.Kind != GameplayEventKind.Damaged || !mine)
-				{
-					return false;
-				}
-
-				break;
-
-			default:
-				return false;
+		if (!kindOk)
+		{
+			return false;
 		}
 
 		// 「当角色有滞空时，击杀会刷新滞空时间」—— 条件放在 Matches 里（放 Execute 会白白吃掉一次冷却）。
 		return !RequireHover || (NodeSearch.FindInSubtree<AirHoverController>(_owner)?.HoverRemaining ?? 0f) > 0f;
 	}
+
+	/// <summary>
+	/// 单个事件名是否命中。**每一条的判据与 P5/P5b 落地时逐字一致**（只是从 switch 搬进了方法）：
+	/// <list type="bullet">
+	/// <item>`Kill` / `Parried` / `Critical` / `Damaged`：只看 <c>Source == 自己</c>（<c>mine</c>）。</item>
+	/// <item>`ArmorBroken`：<c>mine</c> **或** <c>Target == 自己</c> —— 因为"自己的甲被打碎"时
+	///   <c>Source</c> 是**敌人**、<c>Target</c> 才是自己（这条判据是 P5b 写好的，P6a 起才真的收得到事件）。</item>
+	/// </list>
+	/// </summary>
+	private bool MatchesKind(string trigger, in GameplayEvent gameplayEvent, bool mine) => trigger switch
+	{
+		"Kill" => gameplayEvent.Kind == GameplayEventKind.Kill && mine,
+		"Parried" => gameplayEvent.Kind == GameplayEventKind.Parried && mine,
+		"Critical" => gameplayEvent.Kind == GameplayEventKind.Critical && mine,
+		"ArmorBroken" => gameplayEvent.Kind == GameplayEventKind.ArmorBroken && (mine || gameplayEvent.Target == _owner),
+		"Damaged" => gameplayEvent.Kind == GameplayEventKind.Damaged && mine,
+		_ => false,
+	};
+
+	/// <summary>`Trigger` 拆出来的事件名列表（惰性缓存一次；`Trigger` 构造后不再改）。</summary>
+	private string[] Triggers => _triggers ??= Trigger.Split(
+		',', System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
+
+	private string[]? _triggers;
 
 	public override void Execute(GameplayEvent gameplayEvent)
 	{
@@ -410,10 +411,21 @@ public partial class TablePulseRule : TriggerRule
 			hover.Grant(HoverSeconds);
 		}
 
-		// ④ 额外空中跳跃（践踏死亡）：累计写入，上限来自表（SetExtraAirJumps 是幂等写入）。
-		if (ExtraAirJumps != 0)
+		// ④ 额外空中跳跃（践踏死亡）：**累加**授予。文档原话「每次击杀都会获得额外跳跃的次数
+		// （额外跳跃次数最多 N 次）」，所以是在**当前值**之上加，由表里的 `JumpCap` 封顶。
+		//
+		// ⚠️ P6a 修掉一个**潜伏 bug**：原来写的是 `SetExtraAirJumps(TriggerTally * ExtraAirJumps, JumpCap)`
+		// —— 那是「把总数**覆盖**成 自己触发次数 × 每次给多少」，会把**别人**已经授予的那几次吃掉。
+		// 受害的正是角色 A 的被动「灵动」（`AirJumpPassiveAbility` 授予 1 次）：拿了「践踏死亡」之后
+		// 击杀一次，额外跳跃反而从 1 掉回 1（没有增长）。旧 3 个角色都没有这个被动，所以一直没显形；
+		// P6a 把自测基准换成角色 A［猎手］之后它立刻暴露（`P5b·实测异化规则` 那一行 1 → 1）。
+		//
+		// 为什么"累加"是安全的：规则实例由 `_build.Add(...)` 在**选到这条增幅时**建一次，
+		// `RunBuild` 是 `RunController` 的 `readonly` 字段（一局一个），所以不会因为换角色/换武器
+		// 被重复套用而重复授予。（覆盖写法原本是为了防这件事，代价是吃掉别人的授予。）
+		if (ExtraAirJumps != 0 && _owner.Movement is { } movement)
 		{
-			_owner.Movement?.SetExtraAirJumps(TriggerTally * ExtraAirJumps, JumpCap);
+			movement.SetExtraAirJumps(movement.ExtraAirJumps + ExtraAirJumps, JumpCap);
 		}
 
 		// ⑤ 对周围敌人造成伤害（能量护盾）。

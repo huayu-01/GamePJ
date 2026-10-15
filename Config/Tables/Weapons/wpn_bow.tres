@@ -9,6 +9,7 @@
 script = ExtResource("1_row")
 Pool = ExtResource("4_pool")
 ScenePath = "res://Scenes/Weapons/Pistol.tscn"
+UsesWeaponComponent = false
 AttackTags = PackedStringArray("Projectile", "Arrow", "Physical")
 Damage = 0.0
 FireInterval = 0.5

@@ -313,6 +313,19 @@ public partial class Unit : CharacterBody3D
 			if (Armor <= 0f)
 			{
 				ArmorBroke?.Invoke();
+				// P6a：把"护甲被打光"抛到事件总线 —— **抛点唯一**（就在这一处，与 `Parried` 同一个标准）。
+				// 在此之前 `ArmorBroken` 这个枚举值全项目一个抛点都没有（只有 `GameLog` 的 switch 认得它），
+				// 所以订它的增幅（如「能量护盾」的"护甲破碎"那一路）根本收不到事件。
+				GameplayEventBus.Raise(new GameplayEvent
+				{
+					Kind = GameplayEventKind.ArmorBroken,
+					Source = hit.Attacker,
+					Target = this,
+					Value = armorLost,
+					Tag = hit.Attack?.Ability ?? string.Empty,
+					Position = hit.Position,
+					Context = hit.Context,
+				});
 			}
 		}
 
@@ -324,6 +337,17 @@ public partial class Unit : CharacterBody3D
 			if (Shield <= 0f)
 			{
 				ShieldBroke?.Invoke();
+				// P6a：同上 —— `ShieldBroken` 的**唯一**抛点（护盾被打光那一刻）。
+				GameplayEventBus.Raise(new GameplayEvent
+				{
+					Kind = GameplayEventKind.ShieldBroken,
+					Source = hit.Attacker,
+					Target = this,
+					Value = shieldLost,
+					Tag = hit.Attack?.Ability ?? string.Empty,
+					Position = hit.Position,
+					Context = hit.Context,
+				});
 			}
 		}
 
@@ -364,6 +388,24 @@ public partial class Unit : CharacterBody3D
 			Position = hit.Position,
 			Context = hit.Context,
 		});
+
+		// P6a：暴击命中 → **唯一的** `Critical` 抛点（就在结算完这一次命中之后）。
+		// 判据用的是 `HitInstance.Critical`（= 攻击方按 `CritChance` 掷出来的那一次），
+		// 不是"伤害数字大" —— 语义与 `DamageResult.Critical` 同一份来源，不会漂移。
+		// 触发者判据（Source == 玩家）交给订阅方（`TablePulseRule` 的 `mine`），所以敌人的暴击也不会误触发玩家的增幅。
+		if (hit.Critical && damage > 0f)
+		{
+			GameplayEventBus.Raise(new GameplayEvent
+			{
+				Kind = GameplayEventKind.Critical,
+				Source = hit.Attacker,
+				Target = this,
+				Value = damage,
+				Tag = hit.Attack?.Ability ?? string.Empty,
+				Position = hit.Position,
+				Context = hit.Context,
+			});
+		}
 
 		if (killed)
 		{

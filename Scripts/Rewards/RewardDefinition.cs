@@ -68,8 +68,8 @@ public sealed class RewardDefinition
 	/// <summary>互斥的奖励 Id：已经拥有其中任意一个时，本奖励不再出现在池子里（双向判定）。</summary>
 	public string[] Excludes { get; init; } = System.Array.Empty<string>();
 
-	/// <summary>只有召唤控制角色才能拿到（例如「亡者随从」）。</summary>
-	public bool RequiresSummoner { get; init; }
+	// ⚠️ P6a 删掉了 `RequiresSummoner`（唯一用户 `mut_summon` 已随旧角色一起清掉）。
+	// 角色限定统一走 `RequiredCharacterIds` + `AllowsCharacter`（见 RewardPool.Initialize）。
 
 	public required Action<RewardContext> Apply { get; init; }
 
