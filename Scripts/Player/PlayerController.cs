@@ -12,12 +12,16 @@ public partial class PlayerController : Unit
 {
 	private CharacterMovement _movement = null!;
 	private CameraRig? _camera;
+	private Combat.SprintController? _sprint;
 
 	public override void _Ready()
 	{
 		base._Ready();
 		_movement = GetNode<CharacterMovement>("Movement");
 		_camera = GetNodeOrNull<CameraRig>("CameraRig");
+		// ⚠️ 惰性查（**不要在 `_Ready` 里当成一定有**）：子节点的 `_Ready` 早于父节点，
+		// 而且"奔跑"是 P6d 才加的可选组件 —— 没有它时移动速度与改动前逐位相同。
+		_sprint = GetNodeOrNull<Combat.SprintController>("Sprint");
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -35,7 +39,8 @@ public partial class PlayerController : Unit
 		Vector3 right = _camera?.FlatRight ?? GlobalTransform.Basis.X;
 		Vector3 direction = right * input.X + forward * -input.Y;
 
-		_movement.SetIntent(direction, MoveSpeed);
+		// P6d：按住奔跑键且真的在移动时，意图速度 × 表里的倍率（没有 Sprint 组件 / 没在奔跑 → 原速）。
+		_movement.SetIntent(direction, _sprint?.EffectiveSpeed(MoveSpeed) ?? MoveSpeed);
 
 		if (Input.IsActionJustPressed("jump"))
 		{

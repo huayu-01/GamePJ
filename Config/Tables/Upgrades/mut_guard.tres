@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "Cooldown"
+Value = 5.0
+Note = "格挡破碎后要等多少秒才可再次获取（文档给的就是 5）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "BlockDamageMultiplier"
+Value = 0.0
+Note = "格挡后剩余的伤害比例（0 = 完全格挡）。⚠️ 文档没写，预设值"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "FrontDotThreshold"
+Value = 1.0
+Note = "正面判定阈值（1 = 任意方向都算挡到）。⚠️ 文档没写，预设值"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+ApplyHandler = "GuardOnSprint"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+Id = "mut_guard"
+DisplayName = "护卫"
+DescriptionTemplate = "奔跑时获得一次格挡，格挡破碎 5 秒后才可再次获取"
+Note = "[P6d 新增行] 文档第 172 行（异化池，全角色通用）「护卫:奔跑时获得一次格挡,格挡破碎{5}秒后才可再次获取;」。★ 触发条件 = 文档第 19 行那条**全角色通用机制「奔跑」**：「奔跑(只有在移动状态时才可以按住shift键进入,移动的更快,释放其他任何状态或技能都会退出奔跑)」—— P6d 为此补了 `project.godot` 的 `sprint` 动作（Shift）+ `SprintController`（`Scripts/Combat/SprintController.cs`，只读共用类已公开的量，**没碰 CharacterMovement**）+ 角色表两列（`SprintInputAction` / `SprintSpeedMultiplier`）。★ 格挡走**既有**的 `BlockComponent`（战斗规则说明 §14 的独立防御模块），规则在玩家身上按需建一个名为 Block 的子节点 —— **不选这条增幅就不会有这个节点**（默认行为逐位不变）。★ 消费者：`GuardOnSprintRule`（`Scripts/Rewards/RewardCatalog.cs`）：轮询 `SprintController.IsSprinting` 授予格挡，订阅 `Unit.Damaged` 读 `DamageResult.Blocked` 判定"格挡破碎"。★ **文档只给了 {5}**：Cooldown=5 来自文档；`BlockDamageMultiplier = 0`（完全格挡）与 `FrontDotThreshold = 1`（不看正面）是**预设值**。"

@@ -173,6 +173,18 @@ public static class RewardEffectRegistry
 				BeaconSeconds = Param(row, "BeaconSeconds", 1.5f),
 				TurnRateDegrees = Param(row, "TurnRateDegrees", 360f),
 			}),
+
+		// ⭐ P6d：**奔跑 → 获得一次格挡**（「护卫」）。触发靠轮询 P6d 新加的 `SprintController.IsSprinting`
+		// （"奔跑"是文档第 19 行那条全角色通用机制），格挡走**既有**的 `BlockComponent`；
+		// 数值（间隔 / 挡后剩伤 / 正面阈值）全来自行。
+		["GuardOnSprint"] = row => context =>
+			context.Player.AddChild(new GuardOnSprintRule
+			{
+				RewardId = row.Id,
+				Cooldown = Param(row, "Cooldown", 5f),
+				BlockDamageMultiplier = Param(row, "BlockDamageMultiplier", 0f),
+				FrontDotThreshold = Param(row, "FrontDotThreshold", 1f),
+			}),
 	};
 
 	/// <summary>这个 handler id 注册过吗（读表校验用）。</summary>

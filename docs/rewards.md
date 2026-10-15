@@ -215,3 +215,51 @@ stderr **0 个 ERROR**；旧硬指标逐位不变（节点布置 `10（2/5/3）`
     [2] 高速扳机（强化）射速 +12%
     武器: 伤害=24 弹匣=12
 ```
+
+---
+
+## P6d 落地记录（2026-10-16 · 补完最后 3 条通用异化）
+
+> P6b 之后通用异化还差 3 条（护卫 / 灵魂收割 / 落日剑）。这一批按「护卫 → 落日剑 → 灵魂收割」
+> 的顺序做完，**全表 59 → 62 行 = 强化 9 / 进化 23 / 异化 30**（= 设计文档要求的 30 条**全建**）。
+> 逐条的接入契约见 [upgrades.md](upgrades.md) §7；共用类一个都没动（`CharacterMovement` / `Weapon.cs` /
+> 7 个共用 `Ability` 子类 / 敌人·首领·召唤物的数据行与技能行**一行没碰**）。
+
+### 1「护卫」`mut_guard`（文档第 172 行）
+
+| 文档原文 | 落成了什么 | 在哪 |
+|---|---|---|
+| 「护卫:**奔跑**时获得一次格挡,格挡破碎{5}秒后才可再次获取;」 | `GuardOnSprintRule`：轮询"奔跑状态"授予一次格挡（走**既有**的 `BlockComponent`），订阅 `Unit.Damaged` 读 `DamageResult.Blocked` 判定"格挡破碎"，破碎后 `Cooldown` 秒才可再取 | `Scripts/Rewards/RewardCatalog.cs` + handler `GuardOnSprint`（`Scripts/Rewards/RewardEffectRegistry.cs`） |
+
+⚠️ **"奔跑"是本批新补的一条前置机制**（文档第 19 行「所有角色通用的机制」把它与跳跃并列）：
+
+| 补了什么 | 落点 | 纪律 |
+|---|---|---|
+| **按键** | `project.godot` 的 `[input]` 新增 `sprint`（**Shift**） | 进表/进工程文件，**没有写死在 C#** |
+| **按键名进表** | 角色表新增两列 `SprintInputAction`（`"sprint"`）/ `SprintSpeedMultiplier`（`1.5`，**预设值**） | `chr_hunter.tres` / `chr_weapon_master.tres` |
+| **状态** | 新组件 `Scripts/Combat/SprintController.cs`（挂在 `Player.tscn` 的 `Sprint` 节点）：`IsSprinting` / `EffectiveSpeed(base)` / `DebugState()`；进入条件 = 按住键 + **有移动意图** + 落地 + 没有位移技能 + 没有技能在出招（文档：「释放其他任何状态或技能都会退出奔跑」） | ⚠️ **`CharacterMovement` 一个字节都没改** —— 沿用 P6b「杀戮践踏」那条纪律：只读共用类**已经公开**的 `IntentDirection` / `IsGrounded` / `IsDashing` 与 `Ability.IsBusy` |
+| **生效点** | `PlayerController` 把 `SetIntent(direction, MoveSpeed)` 改成 `SetIntent(direction, _sprint?.EffectiveSpeed(MoveSpeed) ?? MoveSpeed)` | 没有 `Sprint` 组件 / 没在奔跑 → **逐位等于改动前** |
+
+**格挡怎么落的**（一段话）：`GuardOnSprintRule` 在拿到这条增幅后，按需在玩家身上建一个名为 `Block` 的
+`BlockComponent` 子节点（**不选这条增幅就没有这个节点**），获得格挡 = `Blocking = true`；
+格挡走的是 `Unit.ReceiveHit` **既有的**"格挡 → 减伤 → 护甲 → 护盾 → 生命"那条结算链，
+所以**共用战斗类一行没动**，也没有借用"无敌帧"（那会把"格挡"与"无敌"两件事混成一件）。
+
+**预设值**：文档只给了 `{5}`（= `Cooldown`）。**拍出来的三个**：`BlockDamageMultiplier = 0`（完全格挡）、
+`FrontDotThreshold = 1`（不看正面，任意方向都挡）、`SprintSpeedMultiplier = 1.5`（"移动的更快"没给数）。
+
+**行为取证**（`--selftest` 最后一段 `DebugP6dMutationProbe()`，退出码 0）：
+
+```
+✅ P6d·护卫行为取证（真实玩家 + 真实行 + 真实 RewardContext，量完还原）：→ GuardOnSprintRule 间隔 5（期望 5 ——
+文档给的就是 5）挡后剩伤 0（期望 0，预设）正面阈值 1（期望 1，预设）｜事件匹配恒 false=True（期望 True —— 它不是
+事件总线驱动，出手由 `PollOnce` 的奔跑轮询发起）｜没奔跑不授予=True（期望 True）｜奔跑授予=True（同一个入口
+PollOnce；奔跑来自 SprintController，按键「sprint」project.godot 里有=True）｜移速 未奔跑 6.8 → 奔跑 10.2
+（倍率 1.5，预设值）｜格挡节点 Block 存在=True（Blocking=True 剩伤=0 阈值=1）｜挨 40 点：Blocked=True（期望
+True）掉血 0（期望 0 = 完全格挡）护甲 25 → 25（期望不变）｜破碎=True 累计挡下=1（期望 1）重取剩余=5s（期望 5）
+｜重取门槛：+4.9s 还不能得=True（期望 True）→ 再 +0.2s 得=True（期望 True）
+```
+
+⚠️ 这一段**直接调 `PollOnce` / `ReceiveHit`**（与 `_Process`、真实命中走的是**同一个入口**），
+真实按键（按住 Shift 跑起来）那一路留给人手 MCP 验证 —— 与 P6b 探针同一条纪律（不污染前面的硬指标）。
+

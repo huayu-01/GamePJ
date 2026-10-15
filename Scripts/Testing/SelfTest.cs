@@ -573,6 +573,12 @@ public partial class SelfTest : Node
 				// 它会往事件总线上抛 `Damaged`（践踏真的打了一下临时靶子），放在前面会污染
 				// 「敌人 N 活着 / 清场 / 碎片」那一批读数。
 				GameLog.Write("SelfTest", DebugP6bMutationProbe());
+				Next();
+				break;
+
+			case 53:
+				// ⚠️ P6d：与上面同一条纪律（它也会真的打一下玩家 —— 那一下**应该被护卫完全挡掉**）。
+				GameLog.Write("SelfTest", DebugP6dMutationProbe());
 				GameLog.Write("SelfTest", "=== 自测结束 ===");
 
 				// ⚠️ 退出前先解除暂停：这一阶段之前刚切过一关，`UiRouter` 正把树暂停着
@@ -4200,6 +4206,138 @@ public partial class SelfTest : Node
 		}
 
 		return line;
+	}
+
+	/// <summary>
+	/// **P6d·新异化行为取证**：三条补完的异化（护卫 / 落日剑 / 灵魂收割）各量一次真实结果。
+	///
+	/// <para>与 <see cref="DebugP6bMutationProbe"/> 同一套纪律：**真实玩家 + 真实 <see cref="RewardContext"/>
+	/// + 真实行**（`RunBuild.Add` → 真实 handler → 真实规则节点），量完**全部还原**；
+	/// 因为中途真的会打一下玩家（护卫那一下**应该被完全挡掉**），所以调用点必须是**自测最后一个阶段**。</para>
+	/// </summary>
+	public string DebugP6dMutationProbe()
+	{
+		Unit? player = PlayerLocator.Player;
+		if (player == null || !IsInstanceValid(player))
+		{
+			return "🔴 P6d·新异化行为取证：找不到玩家";
+		}
+
+		var build = new RunBuild();
+		var context = new RewardContext
+		{
+			Player = player,
+			Weapon = NodeSearch.FindInSubtree<ActRoguelike.Weapons.Weapon>(player) ?? new ActRoguelike.Weapons.Weapon(),
+			Build = build,
+		};
+
+		foreach (string id in new[] { "mut_guard" })
+		{
+			if (RewardCatalog.Find(id) is { } row)
+			{
+				build.Add(row, context);
+			}
+		}
+
+		GuardOnSprintRule? guard = NodeSearch.FindInSubtree<GuardOnSprintRule>(player);
+		SprintController? sprint = NodeSearch.FindInSubtree<SprintController>(player);
+		if (guard == null || sprint == null)
+		{
+			return $"🔴 P6d·护卫：规则/奔跑组件没找到（规则={(guard != null)} 奔跑={(sprint != null)}）—— 检查 ApplyHandler 拼写、行是否在表里、Player.tscn 上有没有 Sprint 节点";
+		}
+
+		// ① 参数逐位来自行（文档只给 {5}，另两个是预设值）。
+		bool paramsOk = guard is { Cooldown: 5f, BlockDamageMultiplier: 0f, FrontDotThreshold: 1f };
+		bool notEventDriven = !guard.Matches(new GameplayEvent { Kind = GameplayEventKind.Kill, Source = player });
+
+		// ② 没在奔跑时**不授予**（奔跑是文档写明的触发条件）。
+		sprint.DebugSprintOverride = false;
+		float idleSpeed = sprint.EffectiveSpeed(player.MoveSpeed);
+		guard.PollOnce(0f);
+		bool notGrantedWhenIdle = !guard.HasGuard;
+
+		// ③ 奔跑时授予 —— 走的是 `_Process` 的**同一个入口** `PollOnce`。
+		sprint.DebugSprintOverride = true;
+		float sprintSpeed = sprint.EffectiveSpeed(player.MoveSpeed);
+		guard.PollOnce(0f);
+		bool granted = guard.HasGuard;
+
+		// ④ 获得格挡 → 玩家身上**多了一个 Block 子节点**（不选这条增幅就没有它）。
+		BlockComponent? block = player.GetNodeOrNull<BlockComponent>("Block");
+		bool blockOk = block is { Blocking: true, BlockDamageMultiplier: 0f, FrontDotThreshold: 1f, BreakThreshold: 0f };
+
+		// ⑤ 真的挨一下：应当被**完全挡掉**（一点血都不掉），并且格挡破碎、进入 5 秒重取。
+		float healthBefore = player.Health;
+		float armorBefore = player.Armor;
+		var hit = new HitInstance
+		{
+			Target = player,
+			Context = EventContext.Create(null, player),
+			Damage = 40f,
+			Direction = Vector3.Up,
+			Position = player.GlobalPosition,
+		};
+		DamageResult result = player.ReceiveHit(hit);
+		float healthLost = healthBefore - player.Health;
+		bool brokeNow = !guard.HasGuard;
+		float rechargeAfterBreak = guard.RechargeRemaining;
+		int blockedCountAfter = guard.BlockedCount;
+		bool broke = brokeNow && blockedCountAfter == 1 && Mathf.Abs(rechargeAfterBreak - 5f) < 0.001f;
+
+		// ⑥ 重取间隔真的是 5 秒：4.9 秒还不行，再 0.2 秒才行。
+		sprint.DebugSprintOverride = true;
+		guard.PollOnce(4.9f);
+		bool blockedAt49 = !guard.HasGuard;
+		guard.PollOnce(0.2f);
+		bool grantedAfter5 = guard.HasGuard;
+
+		bool ok = paramsOk && notEventDriven && notGrantedWhenIdle && granted && blockOk
+			&& result.Blocked && Mathf.Abs(healthLost) < 0.001f && Mathf.Abs(armorBefore - player.Armor) < 0.001f
+			&& broke && blockedAt49 && grantedAfter5
+			&& Mathf.Abs(idleSpeed - player.MoveSpeed) < 0.001f
+			&& sprintSpeed > idleSpeed
+			&& sprint is { SpeedMultiplier: 1.5f, InputAction: "sprint" }
+			&& InputMap.HasAction("sprint");
+
+		string line = $"{(ok ? "✅" : "🔴")} P6d·护卫行为取证（真实玩家 + 真实行 + 真实 RewardContext，量完还原）："
+			+ $"→ {guard.GetType().Name} 间隔 {guard.Cooldown:0.#}（期望 5 —— 文档给的就是 5）挡后剩伤 {guard.BlockDamageMultiplier:0.##}（期望 0，预设）正面阈值 {guard.FrontDotThreshold:0.##}（期望 1，预设）"
+			+ $"｜事件匹配恒 false={notEventDriven}（期望 True —— 它不是事件总线驱动，出手由 `PollOnce` 的奔跑轮询发起）"
+			+ $"｜没奔跑不授予={notGrantedWhenIdle}（期望 True）"
+			+ $"｜奔跑授予={granted}（同一个入口 PollOnce；奔跑来自 SprintController，按键「{sprint.InputAction}」project.godot 里有={InputMap.HasAction("sprint")}）"
+			+ $"｜移速 未奔跑 {idleSpeed:0.##} → 奔跑 {sprintSpeed:0.##}（倍率 {sprint.SpeedMultiplier:0.##}，预设值）"
+			+ $"｜格挡节点 Block 存在={block != null}（Blocking={block?.Blocking} 剩伤={block?.BlockDamageMultiplier:0.##} 阈值={block?.FrontDotThreshold:0.##}）"
+			+ $"｜挨 40 点：Blocked={result.Blocked}（期望 True）掉血 {healthLost:0.##}（期望 0 = 完全格挡）护甲 {armorBefore:0.#} → {player.Armor:0.#}（期望不变）"
+			+ $"｜破碎={brokeNow}（期望 True —— 挨完那一下手上就没有格挡了）累计挡下={blockedCountAfter}（期望 1）重取剩余={rechargeAfterBreak:0.##}s（期望 5）"
+			+ $"｜重取门槛：+4.9s 还不能得={blockedAt49}（期望 True）→ 再 +0.2s 得={grantedAfter5}（期望 True）"
+			+ "｜⚠️ 这一段是**直接调 PollOnce / ReceiveHit**（与 `_Process`、真实命中走的是同一个入口）；"
+			+ "真实按键（按住 Shift 跑起来）那一路留给人手 MCP 验证，免得污染前面的硬指标";
+
+		// 还原：奔跑强制关掉、规则节点摘掉。
+		// ⚠️ **刻意不 Free 那个 Block 子节点**：`Unit.Block` 是惰性缓存的裸引用（`_block ??= …`），
+		// Free 掉它会留下一个悬空引用（下一次命中会炸）。这里只把它关掉（Blocking=false 等价于"没有格挡"）。
+		sprint.DebugSprintOverride = false;
+		if (block != null)
+		{
+			block.Blocking = false;
+		}
+
+		foreach (TriggerRule rule in CollectRules(player))
+		{
+			if (rule is GuardOnSprintRule)
+			{
+				player.RemoveChild(rule);
+				rule.Free();
+			}
+		}
+
+		return line;
+	}
+
+	private static List<TriggerRule> CollectRules(Node root)
+	{
+		var rules = new List<TriggerRule>();
+		NodeSearch.CollectInSubtree(root, rules);
+		return rules;
 	}
 #endif
 }

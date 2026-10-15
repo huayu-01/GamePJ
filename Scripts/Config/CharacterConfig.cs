@@ -60,4 +60,23 @@ public partial class CharacterConfig : UnitConfig
 	/// （用户抱怨的就是"过程太漫长"）。两列都是固定值，没有任何倍率运算。
 	/// </summary>
 	[Export(PropertyHint.Range, "0,10,0.05")] public float JumpGravityScale { get; set; } = 1.8f;
+
+	[ExportGroup("奔跑（P6d 新增；只有玩家读这两列，见 SprintController）")]
+	/// <summary>
+	/// **奔跑键的动作名**（`project.godot` 的 `[input]`）。
+	///
+	/// <para>设计文档 `角色设计.txt` 第 19 行把奔跑列在「所有角色通用的机制」里：
+	/// 「奔跑(只有在移动状态时才可以按住 shift 键进入，移动的更快，释放其他任何状态或技能都会退出奔跑)」——
+	/// 所以这是**表列**而不是代码里的字面量（用户点名的纪律：按键必须进表，P1 时为硬编码栽过）。</para>
+	///
+	/// <para>留空 = 用组件自己的 <c>[Export]</c> 默认值（`sprint`）。</para>
+	/// </summary>
+	[Export] public string SprintInputAction { get; set; } = string.Empty;
+
+	/// <summary>
+	/// **奔跑时的移速倍率**（2 = 移速翻倍）。**≤0 = 不覆盖**（保留场景导出值 1 = 不加速）。
+	///
+	/// <para>文档只写了「移动的更快」，没给数字 —— 表里填的是**预设值**，行 `Note` 里注明。</para>
+	/// </summary>
+	[Export] public float SprintSpeedMultiplier { get; set; }
 }

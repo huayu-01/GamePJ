@@ -662,3 +662,193 @@ public partial class HomingMissileOnCritRule : TriggerRule
 			$"增幅·事件规则：{RewardId} 触发（暴击 → 巡飞弹，第 {FireCount} 发，追 {target.Name}，伤害 {Damage:0.#} 弹速 {Speed:0.#}）");
 	}
 }
+
+/// <summary>
+/// 异化「护卫」（**P6d 新增**）—— 文档 `角色设计.txt` 第 172 行：
+/// 「护卫:奔跑时获得一次格挡,格挡破碎{5}秒后才可再次获取;」。
+///
+/// <para><b>触发条件</b>：<see cref="SprintController.IsSprinting"/>（P6d 新增的"奔跑"状态，
+/// 文档第 19 行「所有角色通用的机制」）—— 奔跑中、手上没有格挡、且距上次破碎已过
+/// <see cref="TriggerRule.Cooldown"/> 秒（文档给的 <c>{5}</c> 就是它）→ 获得一次格挡。</para>
+///
+/// <para><b>格挡是什么</b>：走**既有的** <see cref="BlockComponent"/>（战斗规则说明 §14 的独立格挡模块），
+/// 规则自己在玩家身上建一个名为 <c>Block</c> 的子节点（**只在选到这条增幅时才建**，所以不选 = 逐位不变），
+/// 数值（<see cref="BlockDamageMultiplier"/> / <see cref="FrontDotThreshold"/>）全部来自行。
+/// 获得格挡 = <c>Blocking = true</c>；格挡破碎 = 一次命中真的被挡掉（<see cref="DamageResult.Blocked"/>）。</para>
+///
+/// <para><b>为什么不用"无敌帧"那条路</b>（<c>GuardStanceAbility</c> 的写法）：文档这里说的是**格挡**，
+/// 而格挡在本项目里有正式定义（独立防御机制、可部分减伤、可判正面）—— 用 <c>IsInvulnerable</c> 反而会把
+/// "格挡"与"无敌"两件事混成一件（那正是 <c>GuardStanceAbility</c> 的注释里写清楚的区分）。
+/// 顺带：<c>Unit.ReceiveHit</c> 的结算顺序里格挡在减伤**之前**，所以这里不需要动任何共用战斗类。</para>
+///
+/// <para><b>为什么是轮询 + 订阅 <c>Unit.Damaged</c>、而不是订阅事件总线</b>：与
+/// <see cref="StompOnLandRule"/> 同一条纪律 —— 事件总线上没有"被格挡了"这个种类，
+/// 而 <c>Unit.Damaged</c>（C# 事件）**已经**带着 <c>DamageResult.Blocked</c>，直接读它是最小改动。</para>
+/// </summary>
+public partial class GuardOnSprintRule : TriggerRule
+{
+	/// <summary>格挡后剩余的伤害比例（0 = 完全格挡）。来自行参数 <c>BlockDamageMultiplier</c>。</summary>
+	public float BlockDamageMultiplier { get; set; }
+
+	/// <summary>正面判定阈值（1 = 任意方向都算挡到，-1 = 只有正面）。来自行参数 <c>FrontDotThreshold</c>。</summary>
+	public float FrontDotThreshold { get; set; } = 1f;
+
+	/// <summary>现在手上有没有一次格挡（自测 / HUD）。</summary>
+	public bool HasGuard { get; private set; }
+
+	/// <summary>本局累计获得过几次格挡（自测取证）。</summary>
+	public int GuardGranted { get; private set; }
+
+	/// <summary>本局累计被打碎几次（= 真的挡掉了几次命中）。</summary>
+	public int BlockedCount { get; private set; }
+
+	/// <summary>距下次可获取还剩几秒（0 = 已经可以再获取）。</summary>
+	public float RechargeRemaining { get; private set; }
+
+	/// <summary>最近一次挡掉的伤害（自测取证）。</summary>
+	public float LastBlockedDamage { get; private set; }
+
+	private Unit? _owner;
+	private BlockComponent? _block;
+	private bool _subscribed;
+	private bool _warnedNoSprint;
+
+	/// <summary>本规则**不是**事件总线驱动的（"格挡成功"没有事件种类）——
+	/// 永远不匹配任何 <see cref="GameplayEvent"/>，出手完全由 <see cref="_Process"/> 的轮询发起。</summary>
+	public override bool Matches(GameplayEvent gameplayEvent) => false;
+
+	public override void _Ready()
+	{
+		base._Ready();
+		_owner = GetParent<Unit>();
+		if (_owner != null)
+		{
+			_owner.Damaged += OnOwnerDamaged;
+			_subscribed = true;
+		}
+	}
+
+	public override void _ExitTree()
+	{
+		if (_subscribed && _owner != null && GodotObject.IsInstanceValid(_owner))
+		{
+			_owner.Damaged -= OnOwnerDamaged;
+		}
+
+		_subscribed = false;
+		base._ExitTree();
+	}
+
+	public override void _Process(double delta)
+	{
+		PollOnce((float)delta);
+	}
+
+	/// <summary>
+	/// 轮询一次：扣重取计时 → 手上没格挡且计时到了且在奔跑 → 获得一次格挡。
+	/// **`_Process` 与自测探针走的是同一个入口**（证明"奔跑 → 获得格挡"这条链路本身，
+	/// 而不是探针自己另写一遍条件）。
+	/// </summary>
+	public void PollOnce(float delta)
+	{
+		if (!GodotObject.IsInstanceValid(_owner) || _owner!.IsDead)
+		{
+			return;
+		}
+
+		RechargeRemaining = Mathf.Max(0f, RechargeRemaining - delta);
+		if (HasGuard || RechargeRemaining > 0f)
+		{
+			return;
+		}
+
+		SprintController? sprint = NodeSearch.FindInSubtree<SprintController>(_owner);
+		if (sprint == null)
+		{
+			if (!_warnedNoSprint)
+			{
+				_warnedNoSprint = true;
+				GameLog.Write("Reward", $"⚠ 增幅 {RewardId}（护卫）：这个单位身上没有 SprintController → 永远进不了「奔跑」，这一条不会生效。");
+			}
+
+			return;
+		}
+
+		if (!sprint.IsSprinting)
+		{
+			return;
+		}
+
+		Execute(default);
+	}
+
+	/// <summary>
+	/// 授予一次格挡。**入口只有这一处**：<see cref="_Process"/> 的轮询（奔跑中）与自测探针的直接调用，
+	/// 走的都是它 —— 与 <see cref="StompOnLandRule"/> 同一个口径（"出手入口唯一"）。
+	/// </summary>
+	public override void Execute(GameplayEvent gameplayEvent) => Grant();
+
+	/// <summary>奔跑中 → 获得一次格挡（格挡组件按需建，只在**拿到这条增幅之后**才存在）。</summary>
+	private void Grant()
+	{
+		BlockComponent block = EnsureBlock();
+		block.Blocking = true;
+		HasGuard = true;
+		GuardGranted++;
+		GameLog.Write(
+			"Reward",
+			$"增幅·事件规则：{RewardId} 触发（奔跑 → 获得格挡，第 {GuardGranted} 次；挡后剩伤 {BlockDamageMultiplier:0.##} 正面阈值 {FrontDotThreshold:0.##}）");
+	}
+
+	/// <summary>被命中：这一下真的被格挡挡掉（<see cref="DamageResult.Blocked"/>）→ 格挡破碎 + 进入 {5} 秒重取间隔。</summary>
+	private void OnOwnerDamaged(DamageResult result, HitInstance hit)
+	{
+		if (!HasGuard || !result.Blocked)
+		{
+			return;
+		}
+
+		if (_block != null && GodotObject.IsInstanceValid(_block))
+		{
+			_block.Blocking = false;
+		}
+
+		HasGuard = false;
+		BlockedCount++;
+		LastBlockedDamage = hit.Damage;
+		RechargeRemaining = Cooldown;
+		GameLog.Write(
+			"Reward",
+			$"增幅·事件规则：{RewardId} 触发（格挡破碎，挡下 {hit.Damage:0.##} 点，累计 {BlockedCount} 次）→ {Cooldown:0.##}s 后才可再次获取");
+	}
+
+	/// <summary>
+	/// 拿格挡组件（没有就在玩家身上建一个名为 <c>Block</c> 的子节点）。
+	/// ⚠️ <c>Unit.Block</c> 是惰性查的（<c>_block ??= GetNodeOrNull&lt;BlockComponent&gt;("Block")</c>），
+	/// 所以运行期建出来的这个节点**会被 <c>Unit.ReceiveHit</c> 正常读到**，不需要改 <c>Unit</c>。
+	/// </summary>
+	private BlockComponent EnsureBlock()
+	{
+		if (_block != null && GodotObject.IsInstanceValid(_block))
+		{
+			return _block;
+		}
+
+		_block = _owner!.GetNodeOrNull<BlockComponent>("Block");
+		if (_block == null)
+		{
+			_block = new BlockComponent { Name = "Block", Blocking = false };
+			_owner.AddChild(_block);
+		}
+
+		_block.BlockDamageMultiplier = BlockDamageMultiplier;
+		_block.FrontDotThreshold = FrontDotThreshold;
+		_block.BreakThreshold = 0f;
+		return _block;
+	}
+
+	/// <summary>探针用：一行的实际状态。</summary>
+	public string DebugState()
+		=> $"护卫：手上有格挡={HasGuard} 累计获得={GuardGranted} 被打碎={BlockedCount} 重取剩余={RechargeRemaining:0.##}s"
+			+ $"｜数值 挡后剩伤={BlockDamageMultiplier:0.##} 正面阈值={FrontDotThreshold:0.##} 间隔={Cooldown:0.##}s";
+}
