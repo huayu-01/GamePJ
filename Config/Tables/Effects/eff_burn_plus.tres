@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EffectConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="2_row"]
+
+[resource]
+script = ExtResource("2_row")
+Kind = 1
+Duration = 3.0
+DamagePerSecond = 12.0
+Id = "BurnPlus"
+Slot = 13
+DisplayName = "燃烧+"
+Note = "[P5b 新增行] 文档第 179-180 行「燃烧+:间隔变为0.25秒」。⚠️ **预设偏离**：`EffectConfig` 目前没有「跳伤间隔（TickSeconds）」这一列（状态跳伤的间隔在 StatusEffect 的结算里），所以这一行用 DamagePerSecond 6 → 12 表达「更强」——文档原本说的是间隔减半（每 0.5s → 每 0.25s）。要完全照文档，得给 EffectConfig 加一列 TickSeconds 并让 StatusEffect 读它（P6）。挂它的增幅是 mut_burn_plus（前置 mut_burn）。"

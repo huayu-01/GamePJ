@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "StatusId"
+Value = "FreezePlus"
+Note = "挂效果表新增的 FreezePlus 行（3 秒版）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "Duration"
+Value = 3.0
+Note = "文档：冰冻+ 是 3 秒无法动"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "Cooldown"
+Value = 10.0
+Note = "每 10 秒最多一次"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+ApplyHandler = "BurnOnHit"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+Requires = PackedStringArray("mut_freeze")
+Id = "mut_freeze_plus"
+DisplayName = "冰晶+"
+DescriptionTemplate = "冰冻变成 3 秒无法动"
+Note = "[P5b 新增行] 文档第 179-180 行（异化池，全角色通用）「烈阳+/冰晶+:你的附加效果变得更强,前置:烈阳/冰晶;（冰冻+:3秒无法动）」。前置用 Requires（P5 的三层判定层②：没拿到「冰晶」时这一条**根本不进池**）。⚠️ 预设：拿到「冰晶+」之后**原来的 1 秒冰冻仍然会挂**（两条规则都在），所以目标身上会同时有 Freeze 与 FreezePlus —— 文档的语义是"升级"而不是"叠加"；要严格照文档需要一条状态替换通路（P6）。"

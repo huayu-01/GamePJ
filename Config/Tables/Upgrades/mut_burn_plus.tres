@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "StatusId"
+Value = "BurnPlus"
+Note = "挂效果表新增的 BurnPlus 行"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "Duration"
+Value = 3.0
+Note = "文档：持续 3 秒"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+ApplyHandler = "BurnOnHit"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1")]
+Requires = PackedStringArray("mut_burn")
+Id = "mut_burn_plus"
+DisplayName = "烈阳+"
+DescriptionTemplate = "燃烧变得更强"
+Note = "[P5b 新增行] 文档第 179-180 行（异化池，全角色通用）「烈阳+:你的附加效果变得更强,前置:烈阳;（燃烧+:间隔变为0.25秒）」。前置走 Requires（没拿到「烈阳/灼烧弹 mut_burn」时这一条根本不进池）。⚠️ **两处预设偏离**：① 间隔 0.5 → 0.25 秒需要 EffectConfig 的 TickSeconds 列（不存在）→ 本行用 DamagePerSecond 6 → 12 表达"更强"（见 eff_burn_plus 的 Note）；② 与「烈阳」同时持有时两段燃烧会**叠加**（比文档的"更强"更强）—— 状态替换/升级通路属 P6。"

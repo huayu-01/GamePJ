@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_bow.tres" id="1_pool"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "StatusId"
+Value = "Mark"
+Note = "挂 Mark（可叠加 5 层）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "Duration"
+Value = 6.0
+Note = "标记时长"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "BurnOnHit"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Pool = ExtResource("1_pool")
+Id = "evo_mindseye"
+DisplayName = "心眼"
+DescriptionTemplate = "你的箭会给命中的敌人贴上标记"
+Note = "[P5b 新增行] 文档第 93 行（进化池 <A3限定>）「心眼:你的箭会为命中的敌人施加标记,你对被标记的敌人造成的伤害提高{50}%」。**只接了前半**（箭命中即挂标记，复用 BurnOnHit + Mark）。⚠️ 后半「对被标记的敌人造成的伤害提高 50%」需要一条按目标状态加伤的新通路，P5b **未接** —— 见 docs/upgrades.md §7。"

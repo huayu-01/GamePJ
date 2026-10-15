@@ -1927,7 +1927,7 @@ public partial class SelfTest : Node
 		// 期望值同步成"只加不删"之后的实际值：武器 4/角色 4（各 +1 新增行）、技能 27（+2 武技）＝
 		// 4/4/10/1/1/27/7/9/8/6/3/11/8（`docs/anim-pipeline.md` §6.4-5）。
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}（期望 9/5/10/1/1/44/7/10/8/6/9/11/8；只打印、不比对。P4 之前是 9/5/10/1/1/44/7/10/8/6/3/11/8 —— P5 的差额**只有升级池 +6**，武器/角色/技能/效果/敌人一个字没动）");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}（期望 9/5/10/1/1/44/7/13/8/6/9/11/8；只打印、不比对。P4 之前是 9/5/10/1/1/44/7/10/8/6/3/11/8 —— P5 的差额**只有升级池 +6**；P5b 的差额**只有效果 +3**（冰晶 / 冰晶+ / 燃烧+ 三条状态行），武器/角色/技能/敌人一个字没动）");
 
 		// 能力卡（局外装备层，`docs/ability-cards.md`）：卡表读数 + 状态层全流程
 		// （解锁 → 重复解锁 → 升级 → 上限 → 重置归还 → 激活额度记账 → 未解锁/额度不足/碎片不足 → 额度扩增）。
@@ -1993,7 +1993,7 @@ public partial class SelfTest : Node
 		string poolIds = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController")?.PoolPreview ?? string.Empty;
 		string poolSize = poolIds.Length == 0 ? "空" : $"{poolIds.Split(',').Length} 条";
 		GameLog.Write("SelfTest",
-			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望 50 = 19/8/23） 用了表={(RewardCatalog.All.Length == 50 && RewardCatalog.All[0].Id == "upg_dmg_up")} 当前池子={poolSize}（枪手+手枪 期望 27 条 = 旧 18 + P5 通用强化 9；P5 的 31 条里只有 9 条通用强化对旧角色进池）");
+			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望 74 = 19/27/28） 用了表={(RewardCatalog.All.Length == 74 && RewardCatalog.All[0].Id == "upg_dmg_up")} 当前池子={poolSize}（枪手+手枪 期望 30 条 = 旧 18 + P5 通用强化 9 + P5b 通用异化 3；P5/P5b 新增的 55 条里只有这 12 条对旧角色进池）");
 
 		// 武器 → 升级池 → 选项（配置表阶段 4）：三级回退各层的条数 + 武器实际带上的池 Id。
 		// 这是设计文档 §4.5.5 要求的"顺藤摸瓜"只读校验。回退路径（武器行没填 Pool / 池表读不到）时
@@ -2048,7 +2048,7 @@ public partial class SelfTest : Node
 		{
 			var summonerPool = new RewardPool { SummonerAllowed = true };
 			summonerPool.Initialize(weapon);
-			summonerCount = $"{summonerPool.Roll(new RunBuild(), 40).Count} 条（期望 28 = 旧 19 + P5 通用强化 9）";
+			summonerCount = $"{summonerPool.Roll(new RunBuild(), 40).Count} 条（期望 31 = 旧 19 + P5 通用强化 9 + P5b 通用异化 3）";
 		}
 
 		GameLog.Write("SelfTest",
@@ -2282,6 +2282,158 @@ public partial class SelfTest : Node
 			$"{(powerOk && climbOk && restoreOk ? "✅" : "🔴")} P5·实测拿到并生效（真实玩家 + 真实 RewardContext）：强化「力量」伤害乘区 {damageBefore:0.####} → {damageAfter:0.####}（期望 ×1.15={damageBefore * 1.15f:0.####}）"
 			+ $"｜强化「攀高」单位起跳速度 {jumpBefore:0.###} → {jumpAfter:0.###} m/s（期望 ×1.08={jumpBefore * 1.08f:0.###}，消费者 CharacterMovement.EffectiveJumpVelocity）"
 			+ $"｜按 Source 还原后 {damageRestored:0.####}（期望 == {damageBefore:0.####} = {restoreOk}）—— 这一段量测不污染本局");
+
+		// ===== P5b：进化池 8 → 27（设计文档 23 条全建 + 4 条旧行进池保留）+ 异化池 23 → 28 =====
+		// ⑥ 层①（新行）：<A3限定>（猎手 + 弓）与 <B1限定>（武器大师 + 灵剑）各验一次 ——
+		//    这一批 24 条里大半是"角色 + 武器"两层同时限定，所以要再加一把探测武器。
+		var spiritSword = new ActRoguelike.Weapons.Weapon
+		{
+			PoolId = "pool_spirit_sword",
+			AttackTags = new[] { "Melee", "Sword", "Physical" },
+		};
+		RewardPool masterSword = MakePool(spiritSword, "chr_weapon_master");
+		string swordIds = Ids(masterSword, fresh);
+		bool limitP5b =
+			bowIds.Contains(",evo_variation,")          // <A3限定>：角色 A + 弓
+			&& bowIds.Contains(",evo_dragon_arrow,")
+			&& bowIds.Contains(",evo_stall_kill,")      // <A限定>：只要角色 A（3 把武器都拿得到）
+			&& !bowIds.Contains(",evo_golden_qi,")      // <B1限定>：角色不对 → 根本不进池
+			&& swordIds.Contains(",evo_golden_qi,")     // <B1限定>：角色 B + 灵剑
+			&& swordIds.Contains(",evo_ground_burst,")  // <B限定>：只要角色 B
+			&& swordIds.Contains(",mut_freeze,")        // 通用异化：没写限定的谁都进池
+			&& !swordIds.Contains(",evo_variation,");   // <A3限定>：角色/武器都不对
+		GameLog.Write("SelfTest",
+			$"{(limitP5b ? "✅" : "🔴")} P5b·层①限定（新行）：猎手+弓 候选 {hunterBow.CandidateCount} 条 含 变奏={bowIds.Contains(",evo_variation,")}（期望 True，A3限定） 含 乱金柝={bowIds.Contains(",evo_stall_kill,")}（期望 True，A限定=只要角色 A） 含 金光术={bowIds.Contains(",evo_golden_qi,")}（期望 False，B1限定）"
+			+ $"｜武器大师+灵剑 候选 {masterSword.CandidateCount} 条 含 金光术={swordIds.Contains(",evo_golden_qi,")}（期望 True） 含 地爆={swordIds.Contains(",evo_ground_burst,")}（期望 True，B限定） 含 变奏={swordIds.Contains(",evo_variation,")}（期望 False） 含 冰晶={swordIds.Contains(",mut_freeze,")}（期望 True，通用异化）");
+
+		// ⑦ 层②（新行）：这一批新增的两条带前置的异化各验一次（冰晶+ 要冰晶、烈阳+ 要烈阳，两条链互不相干）。
+		var withFreeze = new RunBuild();
+		if (RewardCatalog.Find("mut_freeze") is { } freezeRow)
+		{
+			withFreeze.DebugGrantWithoutApplying(freezeRow);
+		}
+
+		string afterFreeze = Ids(masterSword, withFreeze);
+		bool prereqP5b = !swordIds.Contains(",mut_freeze_plus,")
+			&& !swordIds.Contains(",mut_burn_plus,")
+			&& afterFreeze.Contains(",mut_freeze_plus,")
+			&& !afterFreeze.Contains(",mut_burn_plus,");
+		GameLog.Write("SelfTest",
+			$"{(prereqP5b ? "✅" : "🔴")} P5b·层②前置（新行）：空构筑里 含 冰晶+={swordIds.Contains(",mut_freeze_plus,")}（期望 False） 含 烈阳+={swordIds.Contains(",mut_burn_plus,")}（期望 False）"
+			+ $"｜拿到「冰晶」之后 含 冰晶+={afterFreeze.Contains(",mut_freeze_plus,")}（期望 True） 含 烈阳+={afterFreeze.Contains(",mut_burn_plus,")}（期望 False —— 它前置的是「烈阳」，两条链互不相干）");
+
+		// ⑧ **表里的参数真的落到了机制上**（P5b）：探测技能节点（`new` 出来、**不进树** —— 与上面那三个探针武器同一类做法）
+		//    覆盖 P5b 新加的处理器 `AbilityOverride`（7 条进化在用它：HandlerParams 里 key = Ability 的 [Export] 属性名）。
+		var probePlayer = new Unit();
+		var probeBackdash = new ChargeAttackAbility { AbilityId = "skl_a1_skill_1", MaxCharges = 1 };
+		var probeSpear = new ChargeAttackAbility { AbilityId = "skl_b3_w1_2" };
+		var probeBowSkill = new ArrowVolleyAbility { AbilityId = "skl_a3_w1_1" };
+		var probeDraw = new ArrowVolleyAbility { AbilityId = "skl_b1_w1_2" };
+		var probeLanding = new LandingBurstAbility { AbilityId = "skl_b1_w1_3" };
+		probePlayer.AddChild(probeBackdash);
+		probePlayer.AddChild(probeSpear);
+		probePlayer.AddChild(probeBowSkill);
+		probePlayer.AddChild(probeDraw);
+		probePlayer.AddChild(probeLanding);
+
+		var overrideBuild = new RunBuild();
+		var overrideContext = new RewardContext { Player = probePlayer, Weapon = spiritSword, Build = overrideBuild };
+		foreach (string id in new[]
+		{
+			"evo_spare_dodge", "evo_rainbow", "evo_variation", "evo_dragon_arrow",
+			"evo_great_draw", "evo_ground_burst", "evo_divine_descent",
+		})
+		{
+			if (RewardCatalog.Find(id) is { } row)
+			{
+				overrideBuild.Add(row, overrideContext);
+			}
+		}
+
+		bool overrideOk =
+			probeBackdash.MaxCharges == 3 && Mathf.Abs(probeBackdash.RechargeSeconds - 0.5f) < 0.0001f
+			&& Mathf.Abs(probeSpear.ChargeBaseSeconds - 0.5f) < 0.0001f
+			&& Mathf.Abs(probeSpear.ChargeStepSeconds - 0.125f) < 0.0001f
+			&& probeBowSkill.RampMaxCount == 3 && Mathf.Abs(probeBowSkill.RampWindowSeconds - 1.2f) < 0.0001f
+			&& Mathf.Abs(probeBowSkill.ChargeMaxSeconds - 3f) < 0.0001f
+			&& Mathf.Abs(probeDraw.ProjectileSizeScale - 2f) < 0.0001f
+			&& Mathf.Abs(probePlayer.Stats.Get("DamageMultiplier") - 1.5f) < 0.0001f
+			&& Mathf.Abs(probeLanding.Knockback - 6f) < 0.0001f
+			&& Mathf.Abs(probeLanding.Cooldown - 2f) < 0.0001f
+			&& Mathf.Abs(probeLanding.DamageScale - 1.6f) < 0.0001f;
+		GameLog.Write("SelfTest",
+			$"{(overrideOk ? "✅" : "🔴")} P5b·实测表参数落到机制上（探测技能节点，不进树）：有备无患 → 后撤 MaxCharges {probeBackdash.MaxCharges}（期望 3）Recharge {probeBackdash.RechargeSeconds:0.###}s（期望 0.5）"
+			+ $"｜气贯长虹 → 长枪武技2 基础蓄力 {probeSpear.ChargeBaseSeconds:0.###}s（期望 0.5）每档 {probeSpear.ChargeStepSeconds:0.###}s（期望 0.125）"
+			+ $"｜变奏 + 龙之箭 → 弓武技1 RampMaxCount {probeBowSkill.RampMaxCount}（期望 3）RampWindow {probeBowSkill.RampWindowSeconds:0.###}s（期望 1.2）蓄力上限 {probeBowSkill.ChargeMaxSeconds:0.###}s（期望 3）"
+			+ $"｜大拔刀术 → 拔刀式剑气体积 ×{probeDraw.ProjectileSizeScale:0.###}（期望 2）+ 伤害乘区 {probePlayer.Stats.Get("DamageMultiplier"):0.###}（期望 1.5）"
+			+ $"｜地爆 / 神降术 → 落剑式 Knockback {probeLanding.Knockback:0.###}（期望 6）Cooldown {probeLanding.Cooldown:0.###}s（期望 2）DamageScale {probeLanding.DamageScale:0.###}（期望 1.6）");
+
+		// ⑨ 异化（P5b）：三条新增异化的规则**真的挂上了、参数真的来自表**，并且真的能出手一次。
+		var ruleBuild = new RunBuild();
+		var ruleContext = new RewardContext { Player = livePlayer, Weapon = spiritSword, Build = ruleBuild };
+		foreach (string id in new[] { "mut_freeze", "mut_energy_shield", "mut_stomp_kill" })
+		{
+			if (RewardCatalog.Find(id) is { } row)
+			{
+				ruleBuild.Add(row, ruleContext);
+			}
+		}
+
+		BurnOnHitRule? freezeRule = null;
+		TablePulseRule? shieldRule = null;
+		TablePulseRule? stompRule = null;
+		var probeRules = new List<TriggerRule>();
+		NodeSearch.CollectInSubtree(livePlayer, probeRules);
+		foreach (TriggerRule rule in probeRules)
+		{
+			if (rule is BurnOnHitRule burn && burn.RewardId == "mut_freeze")
+			{
+				freezeRule = burn;
+			}
+
+			if (rule is TablePulseRule pulse && pulse.RewardId == "mut_energy_shield")
+			{
+				shieldRule = pulse;
+			}
+
+			if (rule is TablePulseRule stomp && stomp.RewardId == "mut_stomp_kill")
+			{
+				stompRule = stomp;
+			}
+		}
+
+		// 真的出手一次：**直接调 Matches/Execute**，不往全局事件总线上抛 —— 抛真事件会被别的订阅者
+		// （关卡记账 / GameLog / 碎片）当真，污染后面的旧硬指标。
+		int jumpsBefore = livePlayer.Movement?.ExtraAirJumps ?? 0;
+		var killProbe = new GameplayEvent { Kind = GameplayEventKind.Kill, Source = livePlayer };
+		var parryProbe = new GameplayEvent { Kind = GameplayEventKind.Parried, Source = livePlayer };
+		bool matched = stompRule != null && stompRule.Matches(killProbe)
+			&& shieldRule != null && shieldRule.Matches(parryProbe);
+		stompRule?.Execute(killProbe);
+		int jumpsAfter = livePlayer.Movement?.ExtraAirJumps ?? 0;
+		bool fired = jumpsAfter == Mathf.Min(jumpsBefore + 1, 3);
+		bool ruleOk = freezeRule is { Cooldown: 10f, StatusId: "Freeze" }
+			&& shieldRule is { Trigger: "Parried", Radius: 6f, Damage: 20f }
+			&& stompRule is { ExtraAirJumps: 1, JumpCap: 3, Trigger: "Kill" }
+			&& matched
+			&& fired;
+		GameLog.Write("SelfTest",
+			$"{(ruleOk ? "✅" : "🔴")} P5b·实测异化规则（真实玩家 + 真实 RewardContext）：冰晶 → {freezeRule?.GetType().Name} Cooldown {freezeRule?.Cooldown:0.#}s（期望 10）StatusId「{freezeRule?.StatusId}」（期望 Freeze）"
+			+ $"｜能量护盾 → TablePulseRule Trigger「{shieldRule?.Trigger}」（期望 Parried）半径 {shieldRule?.Radius:0.#}（期望 6）伤害 {shieldRule?.Damage:0.#}（期望 20）"
+			+ $"｜践踏死亡 → 击杀匹配={matched} 出手一次后 额外空中跳跃 {jumpsBefore} → {jumpsAfter}（期望 +1，封顶 {stompRule?.JumpCap}）");
+
+		// 清理（这一段量测不留痕）：摘掉三条规则节点、还原额外空中跳跃、释放探测单位。
+		foreach (TriggerRule rule in probeRules)
+		{
+			if (rule.RewardId is "mut_freeze" or "mut_energy_shield" or "mut_stomp_kill")
+			{
+				livePlayer.RemoveChild(rule);
+				rule.Free();
+			}
+		}
+
+		livePlayer.Movement?.SetExtraAirJumps(jumpsBefore, 3);
+		probePlayer.Free();
 	}
 
 	private static void ReportCombat(StageController? stage)

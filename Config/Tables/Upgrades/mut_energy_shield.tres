@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "Trigger"
+Value = "Parried"
+Note = "订阅架住/格挡成功（P5b 新增的事件种类）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "Radius"
+Value = 6.0
+Note = "作用半径"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "Damage"
+Value = 20.0
+Note = "伤害"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+ApplyHandler = "TablePulse"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+Id = "mut_energy_shield"
+DisplayName = "能量护盾"
+DescriptionTemplate = "格挡成功时对周围敌人造成伤害"
+Note = "[P5b 新增行] 文档第 172-173 行（异化池，全角色通用）「能量护盾:当你格挡/护甲破碎时对周围敌人造成伤害」。**只接了格挡那一路**（GameplayEventKind.Parried，P5b 新增，抛点在 GuardStanceAbility 架住那一刻）→ TablePulseRule 对 Radius 内的敌人造成伤害。⚠️ 「护甲破碎」那一路**没有事件抛点**（ArmorBroken / ShieldBroken 这两个枚举值一直都存在，但**全项目没有一处 Raise**）—— 未接，见 docs/upgrades.md §7。⚠️ 半径 6 / 伤害 20 都是预设（文档是 n）。"

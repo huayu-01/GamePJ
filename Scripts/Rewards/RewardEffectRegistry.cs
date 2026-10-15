@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
+using ActRoguelike.Core;
 using ActRoguelike.Weapons;
 using Godot;
 
@@ -22,21 +24,7 @@ public static class RewardEffectRegistry
 	private static readonly Dictionary<string, Handler> Handlers = new()
 	{
 		// 通用的"改 StatSheet"—— 19 条里有 14 条走它，只靠 Modifiers 里的数据表达，不需要新代码。
-		["StatSet"] = row => context =>
-		{
-			foreach (StatOverride entry in row.Modifiers)
-			{
-				context.Player.Stats.AddModifier(new StatModifier
-				{
-					Stat = entry.Stat,
-					Operation = entry.Operation,
-					Value = entry.Value,
-					Source = context.Build,
-				});
-			}
-
-			context.Player.RefreshStats();
-		},
+		["StatSet"] = row => context => ApplyModifiers(row, context),
 
 		// 异化：击杀触发连锁闪电（数值全部来自表的 HandlerParams）。
 		["ChainLightning"] = row => context =>
@@ -58,10 +46,13 @@ public static class RewardEffectRegistry
 			}),
 
 		// 异化：命中挂燃烧（时长来自表；每秒伤害在效果表的 Burn 行里）。
+		// P5 第二批（只加一列）：`Cooldown` —— 文档「冰晶」的"每 10 秒最多冰冻一次"就是它。
+		// 不填 → 0 = 改动前那条路（一次都不拦），逐位不变。
 		["BurnOnHit"] = row => context =>
 			context.Player.AddChild(new BurnOnHitRule
 			{
 				RewardId = row.Id,
+				Cooldown = Param(row, "Cooldown", 0f),
 				Duration = Param(row, "Duration", 3f),
 				StatusId = ParamText(row, "StatusId", "Burn"),
 			}),
@@ -82,6 +73,76 @@ public static class RewardEffectRegistry
 		// 强化「护甲」：护甲没有上限（用户 C1），所以**加甲**走 `Unit.GrantArmor` 这一条（不是 StatSheet 抬高上限）。
 		// 数值来自表（`Armor`），组件零个 —— 这是一条**纯表驱动**的处理器。
 		["GrantArmor"] = row => context => context.Player.GrantArmor(Param(row, "Armor", 0f)),
+
+		// ⭐ P5 第二批（只加）：**表驱动的"改某一条技能行"** ——
+		// HandlerParams 里除 AbilityId 之外的每一条都是「Ability 上的一个 [Export] 属性名 = 值」，
+		// 用 Godot 自己的 `GodotObject.Set()` 套用（不写反射、不为每个字段写一条特例）。
+		//
+		// 服务这些行（数值全在表里，代码里一个数字都没有）：
+		//   有备无患（后撤 MaxCharges=3 / RechargeSeconds=0.5）· 专注（武技2 CooldownMultiplier=0.5 +
+		//   完美时机窗口）· 神降术（武技3 Cooldown=2 / DamageScale）· 气贯长虹（武技2 ChargeBaseSeconds=0.5）·
+		//   龙之箭（武技1 ChargeMaxSeconds=3）· 地爆（落剑式 Knockback）· 大拔刀术（拔刀式 ProjectileSizeScale）。
+		//
+		// ⚠️ 属性名写错**不静默**：先按 `GetPropertyList()` 查存在性，不存在就打警告并跳过这一条。
+		["AbilityOverride"] = row => context =>
+		{
+			string abilityId = ParamText(row, "AbilityId", string.Empty);
+			if (string.IsNullOrEmpty(abilityId))
+			{
+				GD.PushWarning($"[Config] 增幅项 {row.Id} 的 AbilityOverride 没有填 AbilityId，已跳过（这一条不会生效）。");
+				return;
+			}
+
+			if (Ability.FindByAbilityId(context.Player, abilityId) is not { } ability)
+			{
+				GD.PushWarning($"[Config] 增幅项 {row.Id} 要改的技能行 {abilityId} 不在这位玩家身上，已跳过。");
+				return;
+			}
+
+			// 行上如果还带了 Modifiers，先按 StatSet 的语义套上（「大拔刀术」就是"伤害倍率 + 剑气体积"
+			// 两件事写在同一行里：前者走 Modifiers，后者走技能字段覆盖）。
+			ApplyModifiers(row, context);
+
+			var applied = new List<string>();
+			foreach (ParamEntry entry in row.HandlerParams)
+			{
+				if (entry.Key == "AbilityId")
+				{
+					continue;
+				}
+
+				if (!HasProperty(ability, entry.Key))
+				{
+					GD.PushWarning($"[Config] 增幅项 {row.Id} 的参数 \"{entry.Key}\" 在 {abilityId} 上不存在，已跳过这一条参数。");
+					continue;
+				}
+
+				ability.Set(entry.Key, entry.Value);
+				applied.Add($"{entry.Key}={entry.Value}");
+			}
+
+			GameLog.Write("Reward", $"增幅·技能覆盖：{row.Id} → 技能行 {abilityId} 覆盖了 [{string.Join(" ", applied)}]");
+		},
+
+		// ⭐ P5 第二批（只加）：**表驱动的"战斗事件 → 效果"**（一个类服务 6 条行，见 TablePulseRule 的注释）。
+		["TablePulse"] = row => context =>
+			context.Player.AddChild(new TablePulseRule
+			{
+				RewardId = row.Id,
+				Cooldown = Param(row, "Cooldown", 0f),
+				Trigger = ParamText(row, "Trigger", "Kill"),
+				AbilityId = ParamText(row, "AbilityId", string.Empty),
+				RequireHover = ParamBool(row, "RequireHover", false),
+				CooldownFraction = Param(row, "CooldownFraction", 0f),
+				CooldownSeconds = Param(row, "CooldownSeconds", 0f),
+				RefreshAbility = ParamBool(row, "RefreshAbility", false),
+				Heal = Param(row, "Heal", 0f),
+				HoverSeconds = Param(row, "HoverSeconds", 0f),
+				ExtraAirJumps = (int)Param(row, "ExtraAirJumps", 0f),
+				JumpCap = (int)Param(row, "JumpCap", 3f),
+				Radius = Param(row, "Radius", 0f),
+				Damage = Param(row, "Damage", 0f),
+			}),
 	};
 
 	/// <summary>这个 handler id 注册过吗（读表校验用）。</summary>
@@ -145,6 +206,27 @@ public static class RewardEffectRegistry
 		return new[] { row.Pool.Id };
 	}
 
+	/// <summary>
+	/// 「把行上的 Modifiers 套到玩家身上」那一段 —— `StatSet` 与 `AbilityOverride` **共用同一份**（只加不删：
+	/// 原来内联在 `StatSet` 里的代码原样搬过来，语义逐位不变；`Source` 仍然是那个 `RunBuild`，
+	/// 所以自测里 `RemoveBySource` 还能按组还原）。
+	/// </summary>
+	private static void ApplyModifiers(RewardConfig row, RewardContext context)
+	{
+		foreach (StatOverride entry in row.Modifiers)
+		{
+			context.Player.Stats.AddModifier(new StatModifier
+			{
+				Stat = entry.Stat,
+				Operation = entry.Operation,
+				Value = entry.Value,
+				Source = context.Build,
+			});
+		}
+
+		context.Player.RefreshStats();
+	}
+
 	/// <summary>读一个数字参数，缺失就用调用方给的兜底值（缺参数不是错误 —— 这行不需要它）。</summary>
 	private static float Param(RewardConfig row, string key, float fallback)
 	{
@@ -171,6 +253,40 @@ public static class RewardEffectRegistry
 		}
 
 		return fallback;
+	}
+
+	/// <summary>读一个布尔参数（`RequireHover` / `RefreshAbility` 这种开关）。</summary>
+	private static bool ParamBool(RewardConfig row, string key, bool fallback)
+	{
+		foreach (ParamEntry entry in row.HandlerParams)
+		{
+			if (entry.Key == key)
+			{
+				return entry.AsBool(fallback);
+			}
+		}
+
+		return fallback;
+	}
+
+	/// <summary>
+	/// 目标对象上**有没有这个 [Export] 属性**（`AbilityOverride` 用）。
+	///
+	/// <para>为什么要问这一句：Godot 的 `Set("写错的属性名", …)` 是**静默无效**的 ——
+	/// 那会让"表里写了参数、游戏里什么也没发生"变成一个查不出来的哑故障（`architecture.md` 第 8 条
+	/// 同一条纪律：宁可大声留痕）。`GetPropertyList()` 是 Godot 自己的属性清单，不引入反射。</para>
+	/// </summary>
+	private static bool HasProperty(GodotObject target, string propertyName)
+	{
+		foreach (Godot.Collections.Dictionary property in target.GetPropertyList())
+		{
+			if (property.TryGetValue("name", out Variant name) && name.AsString() == propertyName)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private static PackedScene? LoadScene(string path)

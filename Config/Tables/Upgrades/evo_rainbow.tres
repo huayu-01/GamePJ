@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_spear.tres" id="1_pool"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "AbilityId"
+Value = "skl_b3_w1_2"
+Note = "改哪一条技能行（长枪武技2 长虹贯日）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "ChargeBaseSeconds"
+Value = 0.5
+Note = "基础蓄力 1s → 0.5s（缩短 50%）"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "ChargeStepSeconds"
+Value = 0.125
+Note = "每档 0.25s → 0.125s"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "AbilityOverride"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Pool = ExtResource("1_pool")
+Id = "evo_rainbow"
+DisplayName = "气贯长虹"
+DescriptionTemplate = "武技2 的蓄力时间缩短 50%"
+Note = "[P5b 新增行] 文档第 160 行（进化池 <B3限定>）「气贯长虹:武技2不再能收回,而是会在落地后立刻收回,蓄力时间缩短{50}%」。**只接了蓄力**（1s → 0.5s、每档 0.25 → 0.125，都是 50%）。⚠️ 「不再能收回 / 落地后立刻收回」需要改抛掷侧的收回通路（SpearThrowAbility / WeaponThrowAbility 的 Recall），P5b **未接** —— 见 docs/upgrades.md §7。"

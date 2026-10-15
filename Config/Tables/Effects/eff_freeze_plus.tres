@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EffectConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "MoveSpeedMultiplier"
+Operation = 1
+Value = 0.0
+
+[sub_resource type="Resource" id="Resource_m1"]
+script = ExtResource("1_stat")
+Stat = "AttackSpeedMultiplier"
+Operation = 1
+Value = 0.0
+
+[resource]
+script = ExtResource("2_row")
+Kind = 5
+Duration = 3.0
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
+Id = "FreezePlus"
+Slot = 12
+DisplayName = "冰冻+"
+Note = "[P5b 新增行] 文档第 179-180 行「烈阳+/冰晶+:你的附加效果变得更强,前置:烈阳/冰晶;（冰冻+:3秒无法动;燃烧+:间隔变为0.25秒）」。这一行是「冰晶」的强化版：只差 Duration 1s → 3s（文档明确值）。挂它的增幅是 mut_freeze_plus（前置 mut_freeze）。"

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EffectConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "MoveSpeedMultiplier"
+Operation = 1
+Value = 0.0
+
+[sub_resource type="Resource" id="Resource_m1"]
+script = ExtResource("1_stat")
+Stat = "AttackSpeedMultiplier"
+Operation = 1
+Value = 0.0
+
+[resource]
+script = ExtResource("2_row")
+Kind = 5
+Duration = 1.0
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
+Id = "Freeze"
+Slot = 11
+DisplayName = "冰冻"
+Note = "[P5b 新增行] 文档第 176-177 行「冰晶:你的攻击会施加冰冻;（冰冻:无法动弹1秒,每10秒最多冰冻一次…）」。Kind=5 是 Stun（移速 + 攻速一起砍），两个修正都取 0 = 真的无法动弹与无法攻击（消费者：CharacterMovement 第 295 行读 MoveSpeedMultiplier，0 速即定身；0 不会产生除零）。挂它的增幅是 mut_freeze（每 10 秒最多一次由增幅行的 Cooldown 参数管，不在本行）。"

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_spirit_sword.tres" id="1_pool"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "DamageMultiplier"
+Operation = 1
+Value = 1.5
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "AbilityId"
+Value = "skl_b1_w1_2"
+Note = "改哪一条技能行（灵剑武技2 拔刀式）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "ProjectileSizeScale"
+Value = 2.0
+Note = "剑气体积 ×2"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "AbilityOverride"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1")]
+Modifiers = [SubResource("Resource_m0")]
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Pool = ExtResource("1_pool")
+Id = "evo_great_draw"
+DisplayName = "大拔刀术"
+DescriptionTemplate = "武技2 发射的剑气伤害更高、体积更大"
+Note = "[P5b 新增行] 文档第 126 行（进化池 <B1限定>）「大拔刀术:武技2现在发射一个伤害更高更大范围的剑气」。伤害走 DamageMultiplier（ArrowVolleyAbility.FireVolley 已经乘它）；体积走 AbilityOverride 覆盖 ArrowVolleyAbility.ProjectileSizeScale（P4 加的列，剑气大小等比攻击盒）。⚠️ 文档没给具体数值 → 预设 伤害 ×1.5 / 体积 ×2。"

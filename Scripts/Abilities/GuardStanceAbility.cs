@@ -135,6 +135,20 @@ public partial class GuardStanceAbility : Ability
 		GameLog.Write(
 			"Combat",
 			$"架：{AbilityId} **架住了**（挡下 {hit.Damage:0.##} 点，来源 {hit.Attacker?.Name ?? "（无）"}），规避这次攻击并退出架势（累计 {ParryCount} 次）");
+
+		// P5 第二批（只加）：把"架住了"这件事抛到事件总线上。
+		// 订阅方是两条**表驱动**的增幅：「招架反击」（刷新技能 2 冷却）、「能量护盾」（对周围敌人造成伤害）。
+		// 没有任何订阅者时这一句什么也不做（Raise 自己判 handlers == null）。
+		GameplayEventBus.Raise(new GameplayEvent
+		{
+			Kind = GameplayEventKind.Parried,
+			Source = OwnerUnit,
+			Target = hit.Attacker,
+			Value = hit.Damage,
+			Tag = AbilityId,
+			Position = OwnerUnit.GlobalPosition,
+		});
+
 		EndStance(exitStance: true);
 	}
 

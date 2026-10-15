@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
+using ActRoguelike.Core;
 using ActRoguelike.Weapons;
 using Godot;
 
@@ -225,5 +227,236 @@ public partial class SummonOnKillRule : TriggerRule
 		float angle = (float)GD.RandRange(0d, Mathf.Tau);
 		drone.GlobalPosition = _owner.GlobalPosition + new Vector3(Mathf.Cos(angle) * 2f, 0.6f, Mathf.Sin(angle) * 2f);
 		_summoned++;
+	}
+}
+
+/// <summary>
+/// **表驱动的「战斗事件 → 效果」规则**（P5 第二批新增，只加）：
+/// **一个类服务所有"订阅某种事件、按表里的数值出手"的增幅行**。
+///
+/// <list type="bullet">
+/// <item>`evo_stall_kill` 乱金柝：击杀时**刷新滞空**（`HoverSeconds` + `RequireHover`）；</item>
+/// <item>`evo_dash_reset` 闪身步：技能 1 击杀时**冷却缩短 80%**（`AbilityId` + `CooldownFraction`）；</item>
+/// <item>`evo_parry_refresh` 招架反击：架住时**刷新技能 2 冷却**（`Trigger=Parried` + `RefreshAbility`）；</item>
+/// <item>`evo_salvation` 普渡：击杀时**回血**（`Heal`）；</item>
+/// <item>`mut_stomp_kill` 践踏死亡：击杀时**获得额外空中跳跃次数**（`ExtraAirJumps` + `JumpCap`）；</item>
+/// <item>`mut_energy_shield` 能量护盾：架住时**对周围敌人造成伤害**（`Radius` + `Damage`）。</item>
+/// </list>
+///
+/// <para><b>为什么合成一个类</b>（`docs/upgrades.md` §2.3 那条"一个类服务所有同类行"）：这 6 条的差别**只有
+/// "订阅哪一种事件 + 出手时做什么 + 数值多少"**，三样全是行里的键值对。一条行一个类会让"再加一条这类增幅"
+/// 变成改 C#，与 `character-redesign.md` §1.5「加一条增幅 = 加一行表」冲突；
+/// 而 6 个几乎一样的类正是 `docs/refactor-survey.md` 点名的复制粘贴。</para>
+///
+/// <para>数值**没有一个字面量**：`Trigger` / `AbilityId` / `RequireHover` / `CooldownFraction` /
+/// `CooldownSeconds` / `RefreshAbility` / `Heal` / `HoverSeconds` / `ExtraAirJumps` / `JumpCap` /
+/// `Radius` / `Damage` 全部由 `RewardEffectRegistry` 从行里读出来赋进来。</para>
+///
+/// <para>冷却、每链次数上限、链深度上限由基类 <see cref="TriggerRule"/> 统一管（与连锁闪电同一套）。</para>
+/// </summary>
+public partial class TablePulseRule : TriggerRule
+{
+	/// <summary>订阅哪一种事件：`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`。</summary>
+	public string Trigger { get; set; } = "Kill";
+
+	/// <summary>一次性 CDR 的目标（**技能行 Id**，不是节点名）：走 `Ability.FindByAbilityId`。</summary>
+	public string AbilityId { get; set; } = string.Empty;
+
+	/// <summary>乱金柝：只有**当前有滞空**时才出手（"当角色有滞空时"是文档的条件）。</summary>
+	public bool RequireHover { get; set; }
+
+	/// <summary>一次性 CDR：剩余冷却 ×(1 - 本值)（闪身步 0.8）。</summary>
+	public float CooldownFraction { get; set; }
+
+	/// <summary>一次性 CDR：剩余冷却直接减这么多秒。</summary>
+	public float CooldownSeconds { get; set; }
+
+	/// <summary>一次性 CDR：冷却清零 + 层数补满（招架反击）。</summary>
+	public bool RefreshAbility { get; set; }
+
+	/// <summary>回血点数（普渡）。</summary>
+	public float Heal { get; set; }
+
+	/// <summary>刷新滞空到这么多秒（乱金柝）。</summary>
+	public float HoverSeconds { get; set; }
+
+	/// <summary>每次触发获得几次额外空中跳跃（践踏死亡）。</summary>
+	public int ExtraAirJumps { get; set; }
+
+	/// <summary>额外空中跳跃的**上限**（文档：最多 N 次）。</summary>
+	public int JumpCap { get; set; } = 3;
+
+	/// <summary>对周围敌人的作用半径（能量护盾；0 = 不做这一段）。</summary>
+	public float Radius { get; set; }
+
+	/// <summary>对周围敌人的伤害（能量护盾）。</summary>
+	public float Damage { get; set; }
+
+	/// <summary>践踏死亡累计触发了几次（= 拿到了几次额外空中跳跃）。</summary>
+	public int TriggerTally { get; private set; }
+
+	private Unit? _owner;
+
+	public override void _Ready()
+	{
+		base._Ready();
+		_owner = GetParent<Unit>();
+	}
+
+	public override bool Matches(GameplayEvent gameplayEvent)
+	{
+		if (_owner == null || !IsInstanceValid(_owner))
+		{
+			return false;
+		}
+
+		bool mine = gameplayEvent.Source == _owner;
+		switch (Trigger)
+		{
+			case "Kill":
+				if (gameplayEvent.Kind != GameplayEventKind.Kill || !mine)
+				{
+					return false;
+				}
+
+				break;
+
+			case "Parried":
+				if (gameplayEvent.Kind != GameplayEventKind.Parried || !mine)
+				{
+					return false;
+				}
+
+				break;
+
+			case "Critical":
+				if (gameplayEvent.Kind != GameplayEventKind.Critical || !mine)
+				{
+					return false;
+				}
+
+				break;
+
+			case "ArmorBroken":
+				if (gameplayEvent.Kind != GameplayEventKind.ArmorBroken
+					|| (!mine && gameplayEvent.Target != _owner))
+				{
+					return false;
+				}
+
+				break;
+
+			case "Damaged":
+				if (gameplayEvent.Kind != GameplayEventKind.Damaged || !mine)
+				{
+					return false;
+				}
+
+				break;
+
+			default:
+				return false;
+		}
+
+		// 「当角色有滞空时，击杀会刷新滞空时间」—— 条件放在 Matches 里（放 Execute 会白白吃掉一次冷却）。
+		return !RequireHover || (NodeSearch.FindInSubtree<AirHoverController>(_owner)?.HoverRemaining ?? 0f) > 0f;
+	}
+
+	public override void Execute(GameplayEvent gameplayEvent)
+	{
+		if (_owner == null || !IsInstanceValid(_owner))
+		{
+			return;
+		}
+
+		TriggerTally++;
+
+		// ① 一次性 CDR —— 走的正是 abilities.md §4 通路③ 那三个接口（比例 / 秒数 / 刷新）。
+		if (!string.IsNullOrEmpty(AbilityId)
+			&& (CooldownFraction > 0f || CooldownSeconds > 0f || RefreshAbility))
+		{
+			if (Ability.FindByAbilityId(_owner, AbilityId) is { } ability)
+			{
+				if (RefreshAbility)
+				{
+					ability.RefreshCooldown();
+				}
+
+				if (CooldownFraction > 0f)
+				{
+					ability.ReduceCooldownFraction(CooldownFraction);
+				}
+
+				if (CooldownSeconds > 0f)
+				{
+					ability.ReduceCooldown(CooldownSeconds);
+				}
+			}
+			else
+			{
+				GD.PushWarning($"[Reward] 增幅 {RewardId} 要改的技能行 {AbilityId} 不在这位玩家身上，这一次没有生效。");
+			}
+		}
+
+		// ② 回血（普渡）。
+		if (Heal > 0f)
+		{
+			_owner.Heal(Heal);
+		}
+
+		// ③ 刷新滞空（乱金柝）。
+		if (HoverSeconds > 0f && NodeSearch.FindInSubtree<AirHoverController>(_owner) is { } hover)
+		{
+			hover.Grant(HoverSeconds);
+		}
+
+		// ④ 额外空中跳跃（践踏死亡）：累计写入，上限来自表（SetExtraAirJumps 是幂等写入）。
+		if (ExtraAirJumps != 0)
+		{
+			_owner.Movement?.SetExtraAirJumps(TriggerTally * ExtraAirJumps, JumpCap);
+		}
+
+		// ⑤ 对周围敌人造成伤害（能量护盾）。
+		if (Radius > 0f && Damage > 0f)
+		{
+			PulseAroundOwner();
+		}
+
+		GameLog.Write("Reward", $"增幅·事件规则：{RewardId} 触发（{Trigger}，第 {TriggerTally} 次）");
+	}
+
+	private void PulseAroundOwner()
+	{
+		if (_owner == null)
+		{
+			return;
+		}
+
+		Vector3 from = _owner.GlobalPosition;
+		float best = Radius * Radius;
+		foreach (Node node in GetTree().GetNodesInGroup("enemy_units"))
+		{
+			if (node is not Unit candidate || !candidate.IsValidTarget)
+			{
+				continue;
+			}
+
+			Vector3 toCandidate = candidate.GlobalPosition - from;
+			if (toCandidate.LengthSquared() > best)
+			{
+				continue;
+			}
+
+			var attack = new AttackInstance
+			{
+				Attacker = _owner,
+				Ability = RewardId,
+				AbilityKind = RewardId,
+				BaseDamage = Damage,
+				Policy = HitPolicy.OncePerTarget,
+				Tags = new[] { "Pulse" },
+			};
+			candidate.ReceiveHit(attack.RollHit(candidate, toCandidate.Normalized(), candidate.GlobalPosition));
+		}
 	}
 }

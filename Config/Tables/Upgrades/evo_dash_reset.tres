@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "Trigger"
+Value = "Kill"
+Note = "订阅击杀"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "AbilityId"
+Value = "skl_b_skill_1"
+Note = "减谁的冷却（技能1 闪）"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "CooldownFraction"
+Value = 0.8
+Note = "剩余冷却 ×(1-0.8)"
+
+[sub_resource type="Resource" id="Resource_p3"]
+script = ExtResource("1_param")
+Key = "Cooldown"
+Value = 0.2
+Note = "本规则自己的触发间隔（防一次多杀重复触发）"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "TablePulse"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3")]
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Id = "evo_dash_reset"
+DisplayName = "闪身步"
+DescriptionTemplate = "技能1「闪」击杀敌人时冷却缩短 80%"
+Note = "[P5b 新增行] 文档第 121 行（进化池 <B限定>）「闪身步:当你的技能1闪击杀敌人时冷却缩短{80}%」。走 docs/abilities.md §4 通路③ 那次性接口 Ability.ReduceCooldownFraction(0.8)，数值从本行读。⚠️ 文档的限定是「闪击杀的」——事件里目前只带"击杀者是谁"，**没有校验"这一杀是不是闪造成的"**（Kill 事件的 Tag 还没被这条规则用），属预设；触发间隔 0.2s 也是预设（文档没写）。"

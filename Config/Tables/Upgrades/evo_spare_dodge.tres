@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "AbilityId"
+Value = "skl_a1_skill_1"
+Note = "改哪一条技能行（后撤）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "MaxCharges"
+Value = 3
+Note = "叠 3 层"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "RechargeSeconds"
+Value = 0.5
+Note = "每层回复间隔"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "AbilityOverride"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Id = "evo_spare_dodge"
+DisplayName = "有备无患"
+DescriptionTemplate = "后撤现在可以叠 3 层"
+Note = "[P5b 新增行] 文档第 54 行（进化池 <A限定>）「有备无患:后撤现在可叠3层」。层数机制是 P2 就备好的（Ability.MaxCharges / RechargeSeconds，见 docs/abilities.md §3）。消费者：P5b 新加的 AbilityOverride 处理器 —— 它按**技能行 Id** 找到能力，再按表里的键值对覆盖 [Export] 字段（不写死任何一个字段名与数值）。⚠️ 每层回复间隔文档没写 → 预设 0.5s（= 文档第 13 行「技能层数：每次使用技能消耗一层，间隔 0.5s」）。"

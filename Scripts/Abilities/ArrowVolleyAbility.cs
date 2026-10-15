@@ -139,6 +139,20 @@ public partial class ArrowVolleyAbility : Ability
 	/// <summary>最后一次齐射是不是完美时机。</summary>
 	public bool LastShotPerfect { get; private set; }
 
+	[ExportGroup("连续射击增强（<A3限定>「变奏」，P5b 新增：不填 = 一行都不进）")]
+	/// <summary>
+	/// 连续射击时**发数的下标上限**（0 = 不启用，= 改动前的行为）。
+	/// 文档第 92 行「变奏：武技1 的非蓄力射击在连续射击时会变得更强，第二箭变为二连发，第三箭变为三连发」
+	/// → 这一列填 3：第 1 箭 1 发、第 2 箭 2 发、第 3 箭 3 发（发数 = max(表里的发数, 连射序号)）。
+	/// </summary>
+	[Export] public int RampMaxCount { get; set; }
+
+	/// <summary>两次射击间隔超过它，连射序号归零（秒；≤0 = 不归零）。</summary>
+	[Export] public float RampWindowSeconds { get; set; }
+
+	private int _rampCount;
+	private float _rampTimer;
+
 	private bool _fired;
 	private bool _perfect;
 
@@ -218,6 +232,17 @@ public partial class ArrowVolleyAbility : Ability
 	/// <summary>事件帧没来时的兜底：**不发射**，只让技能超时结束（不做时间驱动兜底）。</summary>
 	protected override void Tick(float delta)
 	{
+		// 连续射击窗口：**不施法时也要走**（归零之后下一箭从第 1 发重新数）。
+		// RampWindowSeconds ≤ 0 → 这一段一行都不进（既有四把武器逐位不变）。
+		if (RampWindowSeconds > 0f)
+		{
+			_rampTimer -= delta;
+			if (_rampTimer <= 0f)
+			{
+				_rampCount = 0;
+			}
+		}
+
 		if (!IsBusy)
 		{
 			return;
@@ -280,6 +305,15 @@ public partial class ArrowVolleyAbility : Ability
 
 		// 发数 = 基础 + 档数 × 每档（文档：大射天下 3 + 2×档，最多 9）。
 		int count = Mathf.Max(1, Count + (ChargeSteps * CountPerChargeStep));
+
+		// **连续射击增强**（P5b `<A3限定>`「变奏」）：第 N 发连射时发数至少 N（文档：第二箭二连发、第三箭三连发）。
+		// RampMaxCount ≤ 0 → 一行都不进（既有四把武器逐位不变）。
+		if (RampMaxCount > 0)
+		{
+			_rampCount = Mathf.Min(_rampCount + 1, RampMaxCount);
+			_rampTimer = Mathf.Max(0.01f, RampWindowSeconds);
+			count = Mathf.Max(count, _rampCount);
+		}
 
 		// **发数覆盖**（P5 `<A2限定>`「专一」：只会射出一箭，但原先每多出一箭就 +80% 伤害）。
 		// 覆盖值 ≤ 0 → 一行都不进（既有四把武器逐位不变）；被"砍掉"的那几发按**每一发**乘一个倍率

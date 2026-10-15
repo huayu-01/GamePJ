@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "StatusId"
+Value = "Freeze"
+Note = "挂效果表新增的 Freeze 行"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "Duration"
+Value = 1.0
+Note = "文档：无法动弹 1 秒"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "Cooldown"
+Value = 10.0
+Note = "文档：每 10 秒最多冰冻一次"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+ApplyHandler = "BurnOnHit"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+Id = "mut_freeze"
+DisplayName = "冰晶"
+DescriptionTemplate = "你的攻击会施加冰冻（无法动弹 1 秒，每 10 秒最多一次）"
+Note = "[P5b 新增行] 文档第 176-177 行（异化池，全角色通用）「冰晶:你的攻击会施加冰冻;（冰冻:无法动弹1秒,每10秒最多冰冻一次;）」。落地：命中挂状态（复用 BurnOnHit 处理器）+ 本批新加的**效果行 eff_freeze（Freeze）**；「每 10 秒最多一次」走 TriggerRule 自带的 Cooldown —— P5b 给 BurnOnHit 处理器加了一个 Cooldown 参数（不填 = 0 = 改动前的行为）。"

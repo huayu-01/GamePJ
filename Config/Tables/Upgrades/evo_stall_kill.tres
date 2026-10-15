@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "Trigger"
+Value = "Kill"
+Note = "订阅哪一种事件"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "RequireHover"
+Value = true
+Note = "文档的条件：当角色有滞空时"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "HoverSeconds"
+Value = 3.0
+Note = "刷新到几秒"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "TablePulse"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Id = "evo_stall_kill"
+DisplayName = "乱金柝"
+DescriptionTemplate = "击杀敌人时刷新滞空时间"
+Note = "[P5b 新增行] 文档第 53 行（进化池 <A限定>）「乱金柝:当角色有滞空时,击杀敌人会刷新滞空时间」。<A限定> 的写法 = 只填 RequiredCharacterIds（角色行 Id chr_hunter），**不填** Pool —— 角色 A 的 3 把武器都能拿到。消费者：P5b 新加的 TablePulseRule（通用事件规则）→ AirHoverController.Grant。⚠️ 刷新到几秒文档没写（滞空本身是跃升的 3s）→ 预设 3s。"

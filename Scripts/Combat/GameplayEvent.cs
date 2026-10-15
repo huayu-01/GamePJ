@@ -16,6 +16,19 @@ public enum GameplayEventKind
 	ReloadStarted,
 	ReloadCompleted,
 	Critical,
+
+	/// <summary>
+	/// **格挡 / 架势成功**（P5 第二批新增，只加不删）：`GuardStanceAbility` 真的"架住"了那一次命中时抛。
+	///
+	/// <para>抛点只有一处（`GuardStanceAbility.OnOwnerHit` 里 <c>ParryCount++</c> 那里），
+	/// 订阅方是增幅行「招架反击」（刷新技能 2 冷却）与「能量护盾」（对周围敌人造成伤害）——
+	/// 两条都是**表驱动的** <c>TablePulseRule</c>。</para>
+	///
+	/// <para>⚠️ 在它之前这个枚举里 `ArmorBroken` / `ShieldBroken` / `Critical` 就已经存在，
+	/// 但**一个抛点都没有**（只有 `GameLog` 的 switch 认得它们）——「能量护盾」的"护甲破碎"那一路
+	/// 仍然没有事件可订，所以那一半**没接**（见 `docs/upgrades.md` §7）。</para>
+	/// </summary>
+	Parried,
 }
 
 /// <summary>

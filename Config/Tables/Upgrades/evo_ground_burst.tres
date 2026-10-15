@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "AbilityId"
+Value = "skl_b1_w1_3"
+Note = "改哪一条技能行（落剑式：下落攻击落地那一圈）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "Knockback"
+Value = 6.0
+Note = "那一圈的击退"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "AbilityOverride"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1")]
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Id = "evo_ground_burst"
+DisplayName = "地爆"
+DescriptionTemplate = "下落攻击落地时把命中的敌人击退"
+Note = "[P5b 新增行] 文档第 120 行（进化池 <B限定>）「地爆:下落攻击落地时将周围命中的敌人击退」。<B限定> = 只填 chr_weapon_master，不填 Pool。消费者：LandingBurstAbility.Knockback —— P4 建这个类时就写着这一列是给地爆留的（默认 0 = 不击退，既有行为逐位不变）。⚠️ 击退值文档没写 → 预设 6。"

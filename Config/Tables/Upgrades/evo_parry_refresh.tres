@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "Trigger"
+Value = "Parried"
+Note = "订阅架住（P5b 新增的事件种类）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "AbilityId"
+Value = "skl_b_skill_2"
+Note = "刷新谁的冷却（技能2 架）"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "RefreshAbility"
+Value = true
+Note = "冷却清零 + 层数补满"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "TablePulse"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Id = "evo_parry_refresh"
+DisplayName = "招架反击"
+DescriptionTemplate = "技能2「架」格挡成功时刷新冷却"
+Note = "[P5b 新增行] 文档第 122 行（进化池 <B限定>）「招架反击:当你的技能2架格挡成功时刷新冷却」。落地：P5b 给 GameplayEventKind 加了 Parried（**只加不删**），抛点只有 GuardStanceAbility 的 ParryCount++ 那一处；本行走 Ability.RefreshCooldown()（abilities.md §4 通路③）。"
