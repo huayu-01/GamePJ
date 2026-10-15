@@ -49,6 +49,44 @@ public partial class AbilitySeries : ConfigRow
 	/// <summary>值之间的分隔符（默认 <c>|</c>）。</summary>
 	[Export] public string ValueSeparatorText { get; set; } = "|";
 
+	// ─────────────────────────────────────────────────────────────────────────
+	// P8 第 0 步：**候选的"正规数组"列**（只加不删，探针见 docs/abilities.md §11.1）。
+	// 探针要回答的唯一问题：这些 `Godot.Collections.Array<T>` 列能不能**导出 + 读回来**。
+	// 结论：能（探针①②③ 全绿）→ 下一步（P8-A）就把上面那串 `Entries` 文本 + 解析器删掉。
+	// ─────────────────────────────────────────────────────────────────────────
+	[ExportGroup("连招 · 每一段一段动画（P8：正规数组列）")]
+	/// <summary>第 1..N 段的技能动画名（<c>Skill_B1_Sword1</c>…）。</summary>
+	[Export] public Godot.Collections.Array<string> ComboAnimations { get; set; } = new();
+
+	/// <summary>开输入窗口的那个事件帧名（默认 <c>ATK</c>；留空 = 不开窗口，退化成单段）。</summary>
+	[Export] public string ComboNextEvent { get; set; } = "ATK";
+
+	/// <summary>输入窗口时长（秒；<b>&lt;= 0 = 不覆盖</b>，保留能力节点上的值）。</summary>
+	[Export] public float ComboWindowSeconds { get; set; } = 0.45f;
+
+	/// <summary>打满最后一段之后是否回到第 0 段（长枪「横扫千军」= true）。</summary>
+	[Export] public bool ComboLoop { get; set; }
+
+	[ExportGroup("连招 · 每段的判定（一项对应一段；不足时用最后一项或场景基线）")]
+	/// <summary>第 i 段的伤害倍率（乘在命中盒的 <c>Damage</c> 上）。</summary>
+	[Export] public Godot.Collections.Array<float> StepDamageScales { get; set; } = new();
+
+	/// <summary>第 i 段的命中盒尺寸（米；x 宽 / y 高 / z 长；<c>z = 0</c> 且 <c>x == y</c> → 圆柱）。</summary>
+	[Export] public Godot.Collections.Array<Vector3> StepBoxSizes { get; set; } = new();
+
+	/// <summary>第 i 段的命中盒前伸（局部 Z 偏移，米）。</summary>
+	[Export] public Godot.Collections.Array<float> StepBoxOffsets { get; set; } = new();
+
+	/// <summary>第 i 段的判定持续（秒）。</summary>
+	[Export] public Godot.Collections.Array<float> StepActiveTimes { get; set; } = new();
+
+	[ExportGroup("连招 · 斩断子弹（按投射物的来源场景名匹配）")]
+	/// <summary>可以斩断的投射物来源场景名（<c>Bullet</c>）。</summary>
+	[Export] public Godot.Collections.Array<string> CutSceneNames { get; set; } = new();
+
+	/// <summary>斩不断的名单（<c>EnergyWave</c> —— 文档：「无法斩断能量波」，是数据不是代码分支）。</summary>
+	[Export] public Godot.Collections.Array<string> CutExcludeSceneNames { get; set; } = new();
+
 	/// <summary>把 <see cref="Entries"/> 解析成"名 → 原始值数组"。</summary>
 	public Dictionary<string, string[]> Parse()
 	{

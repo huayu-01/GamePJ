@@ -392,28 +392,32 @@ TryPress(第一次) → TryActivate → OnActivate：播 ComboAnimations[0]
 - ⚠️ **自测用 `DebugFireAnimEvent()` 模拟"事件帧到了"**（自测在同一帧里跑、推不出真实动画事件帧）——
   它只是 `OnAnimEvent(ComboNextEvent)` 的公开入口，**不参与任何正式流程**。
 
-### 8.2 ⚠️ 数组型表参数：Godot 的 C# 绑定读不回来 —— 整串落进**一个 string 字段**
+### 8.2 ⚠️ 数组型表参数：P4 当年走了「整串文本」—— **P8 已推翻并改回正规数组列（见 §11）**
 
-这是 P4 花时间最多的一处，**必须记下来，别再踩**（实测 Godot 4.7.2 + 本项目）：
+> ⚠️ **这一节原来写的东西有一半是误诊**：P4 把「编辑器加载了**旧的 C# 程序集**」记成了
+> 「Godot 的 C# 绑定限制」。P8 在**已重启的**编辑器/运行期下逐条实测（原始输出在 [§11.1](#111--第-0-步探针实测结论走-a-方案正规数组)）：
 
-| 写法 | 结果 |
+| P4 当年的说法 | P8 实测结论 |
 |---|---|
-| `[Export] float[]` / `string[]` | **编译不过**：`GD0102 The type of the exported member is not supported` |
-| `[Export] PackedFloat32Array` / `PackedStringArray` | **C# 侧没有公开类型**（`Variant.Type` 里有、`Godot` 命名空间里没有） |
-| `[Export] Godot.Collections.Array<T>` | 同 `GD0102` |
-| `[Export] T[]`（对象数组，例如 `ParamEntry[]`） | 写入能存下去，**读回来是空**（`Count` 有值、每一项 `null`） |
-| `[Export] Resource` 多个字段（`Items0..Items7`） | **子资源引用读不回来**（字段全是 `null`） |
-| ✅ `[Export] string`（一整串文本） | **任何情况下都能读** —— 走的就是这条 |
+| `[Export] float[]` / `string[]` 编译不过（`GD0102`） | 🔴 **不成立** —— `float[]` / `string[]` / `Vector3[]` 都编译得过（那两条 `GD0102` 出现在 `PackedFloat32Array` / `PackedStringArray` 上，而且它们先报的是 `CS0246` 未找到类型） |
+| `[Export] Godot.Collections.Array<T>` 同 `GD0102` | 🔴 **不成立** —— 编译通过；运行期属性表里带元素类型（`hintString="4/0:"` = `Array[String]`、`"3/0:"` = `Array[float]`、`"9/0:"` = `Array[Vector3]`） |
+| `Array<T>` / `T[]` 写下去**读回来是空**（`Count` 读得到、每一项 `null`） | 🔴 **不成立** —— 写盘 → 读回：项数对、**每一项非空**、值逐位对 ✅ |
+| 多个 `[Export] Resource`（`Items0..Items7`）读不回来 | 🔴 **不成立** —— 技能行的 `Params` 就是 `ParamEntry[]`（托管对象数组），P1 起一直在用（探针②：`Length=1 每项[StrikeActiveTime=0.1]`） |
+| ✅ `[Export] string`（一整串文本）任何情况下都能读 | ✅ **这条是真的**，但**「能读」不等于「该这么写」**（见下） |
 
-所以 P4 的规矩是：**"一串参数"落成 `Config/Tables/SkillSeries/<技能行Id>.tres` 的一行
-`AbilitySeries`（`Entries` 一个 string 字段装全部），格式 `名=值1|值2|值3;名2=…`**，
-由 `AbilitySeries.ParseFloats/ParseTexts/ParseVectors` 读成数组。
+**那个「读回来全是 null」的真身 = 编辑器加载的是旧程序集**：新加的 `[Export]` 属性在旧程序集里根本不存在，
+于是 `.tres` 里写着的那一列**读得到 `Count`、每一项却是 `null`**。**重启编辑器就好了**
+（P5/P6/P7 加的表列都正常）。P4 自己在同一轮里也写过「`Items0..7` 读回来全是 null（因为编辑器加载的是旧程序集）」，
+只是把它和「Godot 的限制」混成了一个。
 
-- **技能行不需要多一列指向它**：文件名就是技能行 Id，`MeleeComboAbility` 按
-  `res://Config/Tables/SkillSeries/<AbilityId>.tres` 约定读（读不到 → 明确日志 + 退化成单段，不静默）。
-  这样做还有一个副作用是好的：它**不依赖任何新表列**，所以"编辑器里的 C# 程序集是旧的"这种环境问题
-  （见 §8.6）也不会让它失效。
-- 数值本身仍然**只存在于表里**：代码里没有任何一个段数/尺寸/倍率的常数。
+**所以 P4 的两条绕行 —— ① `Entries` 一整串文本 + 运行期 `ParseFloats/ParseTexts/ParseVectors`、
+② 按技能行 Id 约定路径 `load` —— 已在 P8 全部删除**，改成：
+**正规数组列**（`Array<string>` / `Array<float>` / `Array<Vector3>`）+ 技能行上的**资源引用列**
+（`AbilityConfig.ComboSeries`）+ **连招表进 `ConfigIndex`**（三处同改）。
+
+为什么「宁可老老实实加一个列 / 改一次 C#」：约定路径 + 文本解析**坏了不吭声**
+（解析失败静默、编辑器里读不出内容、改一个值要数分隔符、路径改名要满地找），
+维护它的代价比改一次 C# 高得多 —— 用户本轮的原话见 [§11](#11-p8-接入记录把-p4-的string--约定路径绕过改造成正规表驱动2026-10-16) 开头。
 
 ### 8.3 基类与共用类这一轮多出来的东西（全部**只加不删**）
 
@@ -608,6 +612,85 @@ public float ZoomProgress { get; private set; }
 `build.ps1 --no-incremental` **0 warning / 0 error**；`--selftest`
 `=== 自测结束 ===`、**退出码 0**；硬指标逐位不变（见 §9.4 那串）。
 `ConfigIndex.tres` **动了 3 处**（如上），备份：`_refactor_backup/ConfigIndex.tres.p7before`。
+
+---
+
+## 11. P8 接入记录（把 P4 的"string + 约定路径"绕过改造成正规表驱动，2026-10-16）
+
+> ⭐ **用户本轮澄清的理念（本轮所有取舍都按它做）**：
+> 「我倒没要求"**加内容不改代码**"，而是要求**尽量避免后期增加内容时改代码，但该改的时候还是得改**」
+>
+> 所以：**表驱动是"让加内容变便宜"的手段，不是"禁止改代码"的教条**。
+> 如果为了维护"不改代码"而让数据变得难懂/脆弱（约定路径、字符串解析、按名字查属性写错才告警），
+> 那就是本末倒置 —— **宁可老老实实加一个表列 / 改一次 C#**。
+
+### 11.1 ⭐ 第 0 步：探针实测（**结论：走 A 方案「正规数组」**）
+
+**① 编译探针**（临时文件 `Scripts/Config/_CompileProbeTemp.cs`，探完即删；`build.ps1 --no-incremental` 原文）：
+
+```text
+error GD0102: The type of the exported member 'ActRoguelike.Config._CompileProbeTemp.PackedFloats' is not supported
+error GD0102: The type of the exported member 'ActRoguelike.Config._CompileProbeTemp.PackedStrings' is not supported
+error CS0246: 未能找到类型或命名空间名"PackedFloat32Array"(是否缺少 using 指令或程序集引用?)
+error CS0246: 未能找到类型或命名空间名"PackedStringArray"(是否缺少 using 指令或程序集引用?)
+    0 个警告
+    4 个错误
+```
+
+同一个文件里 `[Export] float[]` / `string[]` / `Vector3[]` / `Godot.Collections.Array<string|float|Vector3|ParamEntry>`
+**一条错都没有**（那 4 个错全是 `Packed*Array` 两条引出来的）。
+
+**② 运行期探针**（`Scripts/Testing/SeriesArrayProbe.cs`，由自测的"配置表比对"那一段触发；原文，只删了时间戳）：
+
+```text
+P8探针① 属性表（AbilitySeries 的数组列在 Godot 那边注册成了什么）：
+    GodotObject.GetPropertyList() 共 35 项；Script.GetScriptPropertyList() 共 27 项（后者就是编辑器 Inspector 的那一份）
+    ComboAnimations: Variant.Type=28 hint=TypeString hintString="4/0:"
+    StepDamageScales: Variant.Type=28 hint=TypeString hintString="3/0:"
+    StepBoxSizes: Variant.Type=28 hint=TypeString hintString="9/0:"
+    StepBoxOffsets: Variant.Type=28 hint=TypeString hintString="3/0:"
+    StepActiveTimes: Variant.Type=28 hint=TypeString hintString="3/0:"
+    CutSceneNames: Variant.Type=28 hint=TypeString hintString="4/0:"
+    CutExcludeSceneNames: Variant.Type=28 hint=TypeString hintString="4/0:"
+P8探针② 现有数据里的 ParamEntry[]（res://Config/Tables/Skills/skl_b1_w1_1.tres 的 Params）：Length=1 每项[StrikeActiveTime=0.1]
+P8探针③ 写盘 ResourceSaver.Save("user://p8_series_probe.tres") → Ok（Ok=0）
+P8探针③ 盘上原文（这就是「正规数组」在 .tres 里的样子）：
+    [gd_resource type="Resource" script_class="AbilitySeries" format=3]
+    [ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_w4e8e"]
+    [ext_resource type="Script" path="res://Scripts/Config/AbilitySeries.cs" id="2_gjxo5"]
+    [sub_resource type="Resource" id="Resource_uadwq"]
+    script = ExtResource("1_w4e8e")
+    Key = "P1"
+    Value = 1.0
+    [sub_resource type="Resource" id="Resource_yqf07"]
+    script = ExtResource("1_w4e8e")
+    Key = "P2"
+    Value = "text"
+    [resource]
+    script = ExtResource("2_gjxo5")
+    ComboAnimations = Array[String](["A1", "A2"])
+    ComboLoop = true
+    StepDamageScales = Array[float]([1.0, 1.15])
+    StepBoxSizes = Array[Vector3]([Vector3(2.2, 1.6, 2.8), Vector3(7.2, 1.8, 0)])
+    StepBoxOffsets = Array[float]([1.4])
+    StepActiveTimes = Array[float]([0.1])
+    CutSceneNames = Array[String](["Bullet"])
+    CutExcludeSceneNames = Array[String](["EnergyWave"])
+    Id = "p8_probe"
+    DisplayName = "P8 探针"
+    Params = [SubResource("Resource_uadwq"), SubResource("Resource_yqf07")]
+P8探针③ 读回：Variant.Type(ComboAnimations)=Array｜段动画 2 项 [A1,A2]｜伤害倍率 2 项 [1,1.15]｜盒子尺寸 2 项 [(2.2,1.6,2.8),(7.2,1.8,0)]｜前伸 1 项 [1.4]｜判定时长 1 项 [0.1]｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45 循环 True 事件帧 ATK
+P8探针③ 读回 Params（ParamEntry[]）：Length=2 每项[P1=1.0, P2=text]
+✅ P8探针·结论：项数对=True 每一项非空且键对=True 值逐位对=True（P4 的第 ③ 条说「Count 读得到、每一项都是 null」 —— 这条**不成立**）
+```
+
+**→ 判定：走 A 方案（正规数组）**。P4 的三条"实测限制"里，
+第 ① 条对托管数组**不成立**（只对 `Packed*Array` 成立）、
+第 ② 条**成立**（`Packed*Array` 在 C# 侧确实没有类型，`CS0246`）、
+第 ③ 条**不成立**（数组能读回来，那是"编辑器旧程序集"的症状）。
+
+> 📌 探针**保留**在 `Scripts/Testing/SeriesArrayProbe.cs`（自测里跑，只读 + 只写 `user://`）——
+> 以后 Godot 升级、或再有人怀疑"数组列读不回来"，这条会第一时间给出原始证据。
 
 
 

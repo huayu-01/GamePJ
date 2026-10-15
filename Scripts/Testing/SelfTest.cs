@@ -16,13 +16,16 @@ namespace ActRoguelike.Debug;
 /// <summary>
 /// 无 MCP 时的自动化验证入口（只在命令行带 ``--selftest`` 时激活，正常运行零影响）。
 ///
-/// 用法（Godot 可执行文件 + 项目路径）：
+/// 用法（Godot 可执行文件 + 项目路径 + **场景**）：
 /// <code>
-/// Godot_v4.7.2-stable_mono_win64.exe --path F:\Godot项目\项目a --headless --quit-after 900 -- --selftest
+/// Godot_v4.7.2-stable_mono_win64_console.exe --path F:\Godot项目\项目a --headless --quit-after 40000 res://Scenes/Main.tscn -- --selftest
 /// </code>
+/// ⚠️ **必须带场景参数**（`res://Scenes/Main.tscn`）：主场景是**基地**，
+/// 不带场景会进基地 → 自测找不到 `Stage` → 第 20 阶段起全是空值（`--quit-after` 的帧数只是兜底，别指望它当超时）。
+/// 也支持文件开关 `user://selftest.flag`（MCP 的 `run_project` 传不了命令行参数；**跑完必须删**）。
 ///
 /// 它会：跳过界面直接开局 → 打印节点布置（应为 10 个 / 2-5-3 分层）→ 强制开一场战斗
-/// → 打印波次生成结果（一次性刷出、波数）→ 退出。
+/// → 打印波次生成结果（一次性刷出、波数）→ 退出（`=== 自测结束 ===` + **退出码 0**）。
 /// </summary>
 public partial class SelfTest : Node
 {
@@ -1919,6 +1922,13 @@ public partial class SelfTest : Node
 	/// </summary>
 	private void ReportTables(StageController? stage)
 	{
+		// P8 第 0 步的**一次性探针**：数组型表参数能不能导出 + 读回来（结论见 docs/abilities.md §8.2）。
+		// 它只读 + 只往 user:// 写一个临时 .tres，不碰任何正式数据。
+		foreach (string probeLine in ActRoguelike.Testing.SeriesArrayProbe.Run())
+		{
+			GameLog.Write("SelfTest", probeLine);
+		}
+
 		var player = PlayerLocator.Player;
 		ActRoguelike.Weapons.Weapon? weapon = player == null ? null : NodeSearch.FindInSubtree<ActRoguelike.Weapons.Weapon>(player);
 
