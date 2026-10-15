@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ActRoguelike.Combat;
 using ActRoguelike.Core;
 using Godot;
@@ -83,6 +84,60 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	[Export] public bool HoldToCharge { get; set; }
 
+	[ExportGroup("冷却缩减（CDR）—— 数值全部来自表，代码里不写任何百分比")]
+	/// <summary>
+	/// **本技能的冷却倍率**（行级：`1` = 不变、`0.8` = 冷却 -20%、`0.5` = 减半）。
+	///
+	/// 与**单位级常驻 CDR**（<see cref="UnitCooldownMultiplier"/>，洞悉 / 速攻这类增幅挂
+	/// `StatSheet` 的 <c>CooldownMultiplier</c>）**相乘**，见 <see cref="EffectiveCooldown"/>。
+	///
+	/// ⚠️ 技能行里**留空 / 0 = 不覆盖**（保留场景里的 1），与 <see cref="Cooldown"/> 同一条纪律。
+	/// </summary>
+	[Export] public float CooldownMultiplier { get; set; } = 1f;
+
+	[ExportGroup("技能层数（charges）")]
+	/// <summary>
+	/// **技能层数**（设计文档第 13 行：「每次使用技能消耗一层」）。
+	/// **1 = 现在的行为**（单层，等价于纯冷却）；**&gt;1** 时每层按 <see cref="RechargeSeconds"/> 独立回复。
+	/// 技能行里**留空 / 0 = 不覆盖**（保留场景里的 1）。
+	/// </summary>
+	[Export] public int MaxCharges { get; set; } = 1;
+
+	/// <summary>
+	/// **每层回复间隔**（秒；≤0 = 退化成 <see cref="Cooldown"/>）。
+	/// 文档给的参考值是 0.5s（「间隔 0.5s」）—— 它是**表值**，别写死在代码里。
+	/// 只在 <see cref="MaxCharges"/> &gt; 1 时有意义。
+	/// </summary>
+	[Export] public float RechargeSeconds { get; set; }
+
+	[ExportGroup("蓄力（按住激活 → 抬起释放；四个武技共用这一套）")]
+	/// <summary>
+	/// **基础蓄力时长**（秒）。<see cref="HoldToCharge"/> 为 true 时：
+	/// **没蓄满就松手 = 不释放效果**（设计文档第 14 行）。0 = 按住即算蓄满（松手立刻释放）。
+	/// </summary>
+	[Export] public float ChargeBaseSeconds { get; set; }
+
+	/// <summary>
+	/// **后置蓄力**：基础蓄满之后**每多少秒升一档**（≤0 = 没有后置蓄力，只有基础蓄力这一段）。
+	/// 文档里的弓（0.1s / +30%）、短弩（0.2s / +2 支）、长枪（0.25s / +20%）都是这一段。
+	/// </summary>
+	[Export] public float ChargeStepSeconds { get; set; }
+
+	/// <summary>每档的威力倍率（1.3 = 每档 +30%，见 <see cref="ChargePowerScale"/>；≤0 视为 1 = 不增强）。</summary>
+	[Export] public float ChargeStepScale { get; set; } = 1f;
+
+	/// <summary>后置蓄力最多升几档（≤0 = 不限，由 <see cref="ChargeMaxSeconds"/> 封顶）。</summary>
+	[Export] public int ChargeMaxSteps { get; set; }
+
+	/// <summary>后置蓄力的**总时长上限**（秒；≤0 = 不限）。与 <see cref="ChargeMaxSteps"/> 谁先到听谁。</summary>
+	[Export] public float ChargeMaxSeconds { get; set; }
+
+	/// <summary>
+	/// **完美时机窗口**（秒；≤0 = 没有完美时机）：**刚蓄满**之后的这一段里松手 = 完美释放。
+	/// 文档（能量掌武技2）：0.2s。
+	/// </summary>
+	[Export] public float PerfectWindowSeconds { get; set; }
+
 	public Unit? OwnerUnit { get; private set; }
 
 	/// <summary>惰性读取：Unit.Movement 在父节点 _Ready 里才赋值，而子节点 _Ready 更早。</summary>
@@ -90,7 +145,92 @@ public abstract partial class Ability : Node3D
 	public Unit? Target { get; protected set; }
 	public bool IsBusy { get; private set; }
 	public float CooldownRemaining { get; private set; }
-	public bool IsReady => Enabled && !IsBusy && CooldownRemaining <= 0f;
+
+	/// <summary>
+	/// 能不能用。⚠️ <see cref="MaxCharges"/> ≤ 1 时**逐位等价于改动前**（只看 <see cref="CooldownRemaining"/>）。
+	/// </summary>
+	public bool IsReady => Enabled && !IsBusy && (MaxCharges > 1 ? ChargesRemaining > 0 : CooldownRemaining <= 0f);
+
+	/// <summary>
+	/// 剩余层数。单层技能（<see cref="MaxCharges"/> ≤ 1）退化成"冷却好了就是 1 层"，
+	/// 于是 UI 读同一个属性就能同时显示层数与冷却。
+	/// </summary>
+	public int ChargesRemaining => MaxCharges > 1
+		? (_charges < 0 ? MaxCharges : _charges)
+		: (CooldownRemaining <= 0f ? 1 : 0);
+
+	/// <summary>
+	/// **单位级常驻冷却缩减**（洞悉 / 速攻这类增幅挂 `StatSheet` 的 <c>CooldownMultiplier</c>，默认 1）。
+	/// ⚠️ 读到 0（键没有基础值）时按 1 算 —— 不能因为少一个基础值变成"零冷却"（architecture.md 第 8 条）。
+	/// </summary>
+	public float UnitCooldownMultiplier
+	{
+		get
+		{
+			float value = OwnerUnit?.Stats.Get("CooldownMultiplier") ?? 1f;
+			return value > 0f ? value : 1f;
+		}
+	}
+
+	/// <summary>行级 × 单位级的合成冷却倍率（1 = 一点没减）。</summary>
+	public float CooldownMultiplierEffective => Mathf.Max(0f, CooldownMultiplier) * UnitCooldownMultiplier;
+
+	/// <summary>这个技能**实际用到的冷却秒数**（<see cref="Finish"/> 写进 <see cref="CooldownRemaining"/> 的值）。</summary>
+	public float EffectiveCooldown => Cooldown * CooldownMultiplierEffective;
+
+	/// <summary>每层回复间隔（秒）：表里没给 <see cref="RechargeSeconds"/> 时退化成 <see cref="EffectiveCooldown"/>。</summary>
+	public float EffectiveRechargeSeconds => RechargeSeconds > 0f
+		? RechargeSeconds * CooldownMultiplierEffective
+		: EffectiveCooldown;
+
+	/// <summary>是否正在蓄力（按住期间为 true）。松手后立刻变 false，但 <see cref="ChargeTime"/> 保留最后一次的快照。</summary>
+	public bool IsCharging { get; private set; }
+
+	/// <summary>本次蓄力累计的秒数（松手之后保留最后一次的值，供 UI / 自测取证）。</summary>
+	public float ChargeTime { get; private set; }
+
+	/// <summary>后置蓄力已经升到第几档（0 = 只有基础蓄力那一段）。</summary>
+	public int ChargeSteps { get; private set; }
+
+	/// <summary>基础蓄力是否完成（**没完成就松手 = 不释放**）。</summary>
+	public bool ChargeBaseComplete => ChargeTime >= ChargeBaseSeconds;
+
+	/// <summary>蓄力进度（0~1，按**基础蓄力**算；UI 的"指示器往准星缩"读它）。</summary>
+	public float ChargeProgress => ChargeBaseSeconds <= 0f ? 1f : Mathf.Clamp(ChargeTime / ChargeBaseSeconds, 0f, 1f);
+
+	/// <summary>后置蓄力的总威力倍率（<see cref="ChargeStepScale"/> 的 <see cref="ChargeSteps"/> 次方）。</summary>
+	public float ChargePowerScale => ChargeStepScale > 0f ? Mathf.Pow(ChargeStepScale, ChargeSteps) : 1f;
+
+	/// <summary>是否处在**完美时机窗口**里（刚蓄满之后的 <see cref="PerfectWindowSeconds"/> 那一段）。</summary>
+	public bool IsPerfectWindow => PerfectWindowSeconds > 0f
+		&& ChargeTime >= ChargeBaseSeconds
+		&& ChargeTime <= ChargeBaseSeconds + PerfectWindowSeconds;
+
+	/// <summary>后置蓄力的档数上限（把 <see cref="ChargeMaxSteps"/> 与 <see cref="ChargeMaxSeconds"/> 合成一个数）。</summary>
+	public int ChargeMaxStepsEffective
+	{
+		get
+		{
+			if (ChargeStepSeconds <= 0f)
+			{
+				return 0;
+			}
+
+			int steps = ChargeMaxSteps > 0 ? ChargeMaxSteps : int.MaxValue;
+			if (ChargeMaxSeconds > ChargeBaseSeconds)
+			{
+				steps = Mathf.Min(steps, (int)Mathf.Floor((ChargeMaxSeconds - ChargeBaseSeconds) / ChargeStepSeconds));
+			}
+
+			return Mathf.Max(0, steps);
+		}
+	}
+
+	/// <summary>上一次**松手释放**是不是完美时机（表现层 / 自测读它）。</summary>
+	public bool LastReleasePerfect { get; private set; }
+
+	/// <summary>上一次**松手**是不是"基础蓄力没完成"而放弃（没有释放任何效果）。</summary>
+	public bool LastReleaseAborted { get; private set; }
 
 	/// <summary>阶段计时，OnActivate 后从 0 开始累计；子类切换阶段时自行归零。</summary>
 	protected float StateTime { get; set; }
@@ -108,6 +248,12 @@ public abstract partial class Ability : Node3D
 	private bool _initialized;
 	private bool _animEventHookedByMe;
 
+	/// <summary>剩余层数（<see cref="MaxCharges"/> &gt; 1 才用；&lt; 0 = 还没同步过）。</summary>
+	private int _charges = -1;
+
+	/// <summary>上一次同步时看到的 <see cref="MaxCharges"/>（行换了就重置成满层）。</summary>
+	private int _chargesForMaxCharges = -1;
+
 	public override void _PhysicsProcess(double delta)
 	{
 		EnsureInitialized();
@@ -120,10 +266,8 @@ public abstract partial class Ability : Node3D
 		EnsureAnimEventHooked();
 
 		float dt = (float)delta;
-		if (CooldownRemaining > 0f)
-		{
-			CooldownRemaining = Mathf.Max(0f, CooldownRemaining - dt);
-		}
+		SyncCharges();
+		TickCooldown(dt);
 
 		if (IsBusy)
 		{
@@ -131,6 +275,75 @@ public abstract partial class Ability : Node3D
 		}
 
 		Tick(dt);
+	}
+
+	/// <summary>
+	/// 层数状态跟着 <see cref="MaxCharges"/> 走：行被换掉（换角色 / 换武器 / 增幅改层数）就重置成满层。
+	/// <see cref="MaxCharges"/> ≤ 1 时它只是把 <c>_charges</c> 摆到 1，**不参与任何判定**。
+	/// </summary>
+	private void SyncCharges()
+	{
+		if (_chargesForMaxCharges == MaxCharges)
+		{
+			return;
+		}
+
+		_chargesForMaxCharges = MaxCharges;
+		_charges = Mathf.Max(1, MaxCharges);
+	}
+
+	/// <summary>
+	/// 冷却 / 层数回复。⚠️ **<see cref="MaxCharges"/> ≤ 1 时逐字等价于改动前的"冷却倒计时"那一小段**；
+	/// &gt;1 时改成"每 <see cref="EffectiveRechargeSeconds"/> 回一层"（每层独立回复，设计文档第 13 行）。
+	/// </summary>
+	private void TickCooldown(float dt)
+	{
+		if (MaxCharges > 1)
+		{
+			if (_charges >= MaxCharges)
+			{
+				return;
+			}
+
+			CooldownRemaining = Mathf.Max(0f, CooldownRemaining - dt);
+			if (CooldownRemaining <= 0f)
+			{
+				_charges++;
+				CooldownRemaining = _charges < MaxCharges ? EffectiveRechargeSeconds : 0f;
+			}
+
+			return;
+		}
+
+		if (CooldownRemaining > 0f)
+		{
+			CooldownRemaining = Mathf.Max(0f, CooldownRemaining - dt);
+		}
+	}
+
+	/// <summary>层数已经用掉时把"回层计时"跑起来（用掉第一层的那一刻调用）。</summary>
+	private void EnsureRechargeRunning()
+	{
+		if (MaxCharges > 1 && _charges < MaxCharges && CooldownRemaining <= 0f)
+		{
+			CooldownRemaining = EffectiveRechargeSeconds;
+		}
+	}
+
+	/// <summary>消耗一层（<see cref="MaxCharges"/> ≤ 1 时**什么都不做** —— 默认行为逐位不变）。</summary>
+	private void ConsumeCharge()
+	{
+		if (MaxCharges <= 1)
+		{
+			return;
+		}
+
+		SyncCharges();
+		_charges = Mathf.Max(0, _charges - 1);
+		if (CooldownRemaining <= 0f)
+		{
+			CooldownRemaining = EffectiveRechargeSeconds;
+		}
 	}
 
 	public bool TryActivate(Unit? target = null)
@@ -149,12 +362,65 @@ public abstract partial class Ability : Node3D
 		}
 
 		Target = target;
+		SyncCharges();
+		ResetChargeState();
+		ConsumeCharge();
 		IsBusy = true;
 		StateTime = 0f;
 		AnimEventReached = false;
 		OnActivate(target);
 		Activated?.Invoke(this);
 		return true;
+	}
+
+	/// <summary>
+	/// **一次性冷却缩减（按比例）** —— 供增幅在"事件触发"时调用
+	/// （闪身步：技能1 击杀 → 冷却 -80%）。**比例是表值**，代码里不写任何百分比。
+	/// </summary>
+	/// <param name="fraction">要减掉的比例（0.8 = 剩余冷却 ×0.2；夹在 0~1）。</param>
+	public void ReduceCooldownFraction(float fraction)
+	{
+		float clamped = Mathf.Clamp(fraction, 0f, 1f);
+		CooldownRemaining = Mathf.Max(0f, CooldownRemaining * (1f - clamped));
+	}
+
+	/// <summary>**一次性冷却缩减（按秒）**：把剩余冷却减去若干秒（增幅 / 词条用）。</summary>
+	public void ReduceCooldown(float seconds)
+		=> CooldownRemaining = Mathf.Max(0f, CooldownRemaining - Mathf.Max(0f, seconds));
+
+	/// <summary>
+	/// **刷新冷却**（招架反击：技能2 格挡成功 → 刷新冷却）：剩余冷却清零，且**层数补满**
+	/// （有层数的技能，"刷新"= 立刻又能用）。
+	/// </summary>
+	public void RefreshCooldown()
+	{
+		CooldownRemaining = 0f;
+		SyncCharges();
+		_charges = Mathf.Max(1, MaxCharges);
+	}
+
+	/// <summary>
+	/// 在单位子树里按**技能行 Id** 找能力（增幅要"改某个技能"时用它 ——
+	/// 与"按键 → 技能"那条路一样，都只认表里的标识，不认节点名 / C# 类名）。
+	/// </summary>
+	public static Ability? FindByAbilityId(Unit unit, string abilityId)
+	{
+		if (string.IsNullOrEmpty(abilityId))
+		{
+			return null;
+		}
+
+		var abilities = new List<Ability>();
+		NodeSearch.CollectInSubtree(unit, abilities);
+		foreach (Ability ability in abilities)
+		{
+			if (ability.AbilityId == abilityId)
+			{
+				return ability;
+			}
+		}
+
+		return null;
 	}
 
 	/// <summary>
@@ -175,8 +441,13 @@ public abstract partial class Ability : Node3D
 		}
 
 		bool canActivate = OwnerUnit is { IsDead: false } && CanActivate(target);
-		return $"{AbilityId}：启用={Enabled} 忙={IsBusy} 冷却剩余={CooldownRemaining:0.##} 拥有者={owner} "
-			+ $"动画={anim} 按键={InputAction} 可激活={canActivate}";
+		string charges = MaxCharges > 1 ? $"层数={ChargesRemaining}/{MaxCharges}（回层 {EffectiveRechargeSeconds:0.##}s） " : string.Empty;
+		string charge = HoldToCharge
+			? $"蓄力={ChargeTime:0.##}/{ChargeBaseSeconds:0.##}s 档={ChargeSteps}/{ChargeMaxStepsEffective} 威力×{ChargePowerScale:0.###} 完美窗口={IsPerfectWindow} "
+			: string.Empty;
+		return $"{AbilityId}：启用={Enabled} 忙={IsBusy} 冷却剩余={CooldownRemaining:0.##}/{EffectiveCooldown:0.##}"
+			+ $"（CDR 行×{CooldownMultiplier:0.##} 单位×{UnitCooldownMultiplier:0.##}） {charges}{charge}"
+			+ $"拥有者={owner} 动画={anim} 按键={InputAction} 可激活={canActivate}";
 	}
 
 	/// <summary>
@@ -266,15 +537,98 @@ public abstract partial class Ability : Node3D
 
 	/// <summary>
 	/// **按住期间每帧**（仅在 <see cref="HoldToCharge"/> 为 true 且按键仍被按住时由输入层调用）。
-	/// 蓄力类技能在这里累加蓄力量。
+	///
+	/// 基类在这里**只做通用的蓄力记账**（基础蓄力 + 后置蓄力档位），子类要读就通过
+	/// <see cref="ChargeTime"/> / <see cref="ChargeSteps"/> / <see cref="ChargePowerScale"/> /
+	/// <see cref="IsPerfectWindow"/> 读，**不要在子类里重新实现一遍计时**
+	/// （那正是"6 把武器各写一套、早晚对不齐"的来源，见 docs/abilities.md）。
 	/// </summary>
 	public virtual void OnInputHeld(float delta)
 	{
+		if (!HoldToCharge || !IsBusy)
+		{
+			return;
+		}
+
+		if (!IsCharging)
+		{
+			IsCharging = true;
+			ChargeTime = 0f;
+			ChargeSteps = 0;
+		}
+
+		// ⚠️ 这里**不封顶**：封了顶就永远"在完美时机窗口里"（松开也分不出"刚闭合"与"按住很久"）。
+		// 上限只作用在后置蓄力的**档数**上（ChargeMaxStepsEffective）。
+		ChargeTime += delta;
+		RecountChargeSteps();
 	}
 
-	/// <summary>**按键抬起**（仅在 <see cref="HoldToCharge"/> 为 true 时由输入层调用）。</summary>
+	/// <summary>
+	/// **按键抬起**（仅在 <see cref="HoldToCharge"/> 为 true 时由输入层调用）。
+	///
+	/// 两条路（设计文档第 14 行）：
+	/// <list type="bullet">
+	/// <item>**基础蓄力没完成** → 走 <see cref="OnChargeAborted"/>：**不释放效果**。</item>
+	/// <item>**蓄满了** → 走 <see cref="OnChargeReleased"/>，并带上"是不是完美时机 / 第几档 / 威力倍率"。</item>
+	/// </list>
+	/// </summary>
 	public virtual void OnInputReleased()
 	{
+		if (!HoldToCharge || !IsBusy)
+		{
+			return;
+		}
+
+		bool released = ChargeBaseComplete;
+		LastReleasePerfect = released && IsPerfectWindow;
+		LastReleaseAborted = !released;
+		int steps = ChargeSteps;
+		float power = ChargePowerScale;
+		IsCharging = false;
+
+		if (!released)
+		{
+			OnChargeAborted();
+			return;
+		}
+
+		OnChargeReleased(LastReleasePerfect, steps, power);
+	}
+
+	/// <summary>
+	/// **蓄满之后松手**（真正的释放）。三个入参就是那一刻的蓄力结果，子类照它算效果即可
+	/// （都不是"必须用"的 —— 子类也可以直接读那几个只读属性）。
+	/// </summary>
+	protected virtual void OnChargeReleased(bool perfect, int steps, float powerScale)
+	{
+	}
+
+	/// <summary>**基础蓄力没完成就松手**（设计文档：不释放）。默认什么都不做，子类通常在这里收尾。</summary>
+	protected virtual void OnChargeAborted()
+	{
+	}
+
+	/// <summary>把已蓄时长换算成"后置蓄力第几档"。</summary>
+	private void RecountChargeSteps()
+	{
+		if (ChargeStepSeconds <= 0f || ChargeTime <= ChargeBaseSeconds)
+		{
+			ChargeSteps = 0;
+			return;
+		}
+
+		int steps = (int)Mathf.Floor((ChargeTime - ChargeBaseSeconds) / ChargeStepSeconds);
+		ChargeSteps = Mathf.Max(0, Mathf.Min(steps, ChargeMaxStepsEffective));
+	}
+
+	/// <summary>下一次施法前把蓄力状态清干净（<see cref="TryActivate"/> 调用）。</summary>
+	private void ResetChargeState()
+	{
+		IsCharging = false;
+		ChargeTime = 0f;
+		ChargeSteps = 0;
+		LastReleasePerfect = false;
+		LastReleaseAborted = false;
 	}
 
 	/// <summary>
@@ -355,7 +709,17 @@ public abstract partial class Ability : Node3D
 	{
 		IsBusy = false;
 		StateTime = 0f;
-		CooldownRemaining = Cooldown;
+		if (MaxCharges > 1)
+		{
+			// 有层数的技能：回层计时从"用掉那一层"就开始跑了（见 ConsumeCharge），这里只兜底。
+			EnsureRechargeRunning();
+		}
+		else
+		{
+			// ⚠️ 没配 CDR 时 EffectiveCooldown == Cooldown（×1），与改动前逐位一致。
+			CooldownRemaining = EffectiveCooldown;
+		}
+
 		StopSkillAnimation();
 	}
 

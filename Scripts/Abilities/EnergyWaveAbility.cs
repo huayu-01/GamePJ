@@ -76,15 +76,25 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 	/// </summary>
 	[Export] public bool BypassBlock { get; set; } = true;
 
-	[ExportGroup("完美时机（蓄力类技能的第二档参数）")]
-	/// <summary>完美时机那一发的伤害倍率（文档：30 → 40，即 ×1.333…）。</summary>
-	[Export] public float PerfectDamageScale { get; set; } = 4f / 3f;
+	[ExportGroup("完美时机（蓄力类技能的另一档参数：**绝对值进表**）")]
+	/// <summary>完美时机那一发的**伤害绝对值**（文档 武技2：40）。≤0 = 用普通 <see cref="Damage"/>。</summary>
+	[Export] public float PerfectDamage { get; set; }
 
-	/// <summary>完美时机那一发的弹速倍率（文档：250 → 400，即 ×1.6）。</summary>
-	[Export] public float PerfectSpeedScale { get; set; } = 1.6f;
+	/// <summary>完美时机那一发的**弹速绝对值**（文档 武技2：400）。≤0 = 用普通 <see cref="Speed"/>。</summary>
+	[Export] public float PerfectSpeed { get; set; }
 
 	/// <summary>完美时机那一发的额外击退（文档："带略微的击退效果"）。</summary>
 	[Export] public float PerfectKnockback { get; set; } = 2f;
+
+	[ExportGroup("运行期可读状态（UI / 自测）")]
+	/// <summary>最后一次发射的伤害（含完美时机 / 后置蓄力档位的加工结果）。</summary>
+	public float LastShotDamage { get; private set; }
+
+	/// <summary>最后一次发射的弹速。</summary>
+	public float LastShotSpeed { get; private set; }
+
+	/// <summary>最后一次发射是不是完美时机那一发。</summary>
+	public bool LastShotPerfect { get; private set; }
 
 	private bool _fired;
 	private bool _perfect;
@@ -111,6 +121,8 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 			return;
 		}
 
+		// 蓄力类：动画只是"按住期间播的那一段"，**不在这里发射** —— 等松手（OnChargeReleased）。
+		// 非蓄力（武技1）：等动画事件帧 ATK（OnAnimEvent）。
 		PlaySkillAnimation();
 		if (ActRoguelike.Debug.SelfTest.DebugSkipSkillAnimation)
 		{
@@ -139,33 +151,46 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		return ProjectileScene != null;
 	}
 
-	/// <summary>**按住蓄力**：超过完美时机秒数之后就标记成"完美"（不自己发射）。</summary>
-	public override void OnInputHeld(float delta)
-	{
-		if (IsBusy && StateTime >= PerfectTime)
-		{
-			_perfect = true;
-		}
-	}
-
-	/// <summary>**松开按键**：按当前蓄力档位发射（<c>ATK</c> 帧到过之后才允许）。</summary>
-	public override void OnInputReleased()
+	/// <summary>
+	/// **蓄满之后松手 → 发射**。蓄力的计时/档位/完美窗口全部由 <see cref="Ability"/> 基类算好
+	/// （见 docs/abilities.md 的接入契约），这里只负责"按结果发射"。
+	/// </summary>
+	protected override void OnChargeReleased(bool perfect, int steps, float powerScale)
 	{
 		if (!IsBusy || _fired)
 		{
 			return;
 		}
 
+		_perfect = perfect;
 		FireShot();
 	}
 
-	/// <summary>**动画事件帧 <c>ATK</c>** —— 这就是"子弹在事件帧到 ATK 时发射"的那一行。</summary>
+	/// <summary>
+	/// **基础蓄力没完成就松手 → 什么都不发生**（设计文档第 14 行）。
+	/// 这里只收尾（停动画、退出施法态）并留一条日志；**不消耗冷却**（没打出去就没有冷却）。
+	/// </summary>
+	protected override void OnChargeAborted()
+	{
+		GameLog.Write(
+			"Combat",
+			$"能量波：{AbilityId} 基础蓄力未完成（{ChargeTime:0.##}s / {ChargeBaseSeconds:0.##}s）就松手，本次不释放。");
+		Cancel();
+	}
+
+	/// <summary>
+	/// **动画事件帧 <c>ATK</c>** —— 非蓄力技能（武技1）就是"子弹在事件帧到 ATK 时发射"那一行。
+	///
+	/// ⚠️ 蓄力技能（<see cref="Ability.HoldToCharge"/>）**不在这里发射**：文档说蓄力是"抬起释放"，
+	/// 而事件帧在"刚蓄满"那一刻就到达 —— 若在这里发射，就永远等于"一到点就打出去"，
+	/// 完美时机窗口（松手才算）就没有意义了。蓄力技能的事件帧仍然要求**存在且对齐**
+	/// （`AnimSpeedScale` 让 ATK 帧正好落在基础蓄力完成处），只是不当作触发点。
+	/// </summary>
 	protected override void OnAnimEvent(string name)
 	{
-		// 动画 ATK 帧正好落在完美时机的边界上：帧到了就说明蓄力已经完成（scale 由表按此反推）。
 		if (HoldToCharge)
 		{
-			_perfect = true;
+			return;
 		}
 
 		FireShot();
@@ -188,7 +213,9 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		// ⚠️ 这里**刻意不是**"到时间就发射"：用户裁定没有动画就不执行，也就不会有时间驱动的兜底。
 		// 只有一种情况会走到这儿 —— 动画里根本没有这个事件帧（生成表配错了），
 		// 那就放弃这次施法，并留一条日志说明原因。
-		if (StateTime > Windup + Recover + 1.5f)
+		//
+		// ⚠️ 蓄力技能**不看这个兜底**：它等的是"松手"，按住多久都是合法的（松开必定回调）。
+		if (!HoldToCharge && StateTime > Windup + Recover + 1.5f)
 		{
 			GameLog.Write("Combat", $"⚠ 技能 {AbilityId} 等不到动画事件帧「{AnimEvent}」，本次施法放弃（检查 SkillAnimations 表的事件帧名）。");
 			Cancel();
@@ -244,15 +271,22 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		Vector3 origin = OwnerUnit.GlobalPosition + (Vector3.Up * 0.9f) + (direction * 0.6f);
 
 		StatSheet stats = OwnerUnit.Stats;
-		// 表里的伤害是**绝对数值**（文档：武技1 伤害 10）。角色/增幅的攻击力倍率默认为 1，
+		// 表里的伤害是**绝对数值**（文档：武技1 伤害 10；武技2 蓄满 30 / 完美 40）。角色/增幅的攻击力倍率默认为 1，
 		// 所以这里照乘就行 —— 不改数值时"伤害 10"就是 10（自测硬指标可逐位核对）。
 		float damageMultiplier = stats.Get("DamageMultiplier");
+
+		// 完美时机：**绝对值优先**（表里的 PerfectDamage / PerfectSpeed）；没配才回落到普通值。
+		// 后置蓄力的档位倍率（弓 / 短弩 / 长枪那一段）与完美时机是**两件正交的事**，所以两者相乘
+		// （武技2 没有后置蓄力 → ChargePowerScale 恒为 1，于是 30 → 40、250 → 400 逐位精确）。
+		float power = ChargePowerScale;
+		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power;
+		float shotSpeed = (_perfect && PerfectSpeed > 0f ? PerfectSpeed : Speed) * power;
 
 		var attack = new AttackInstance
 		{
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
-			BaseDamage = Damage * damageMultiplier * (_perfect ? PerfectDamageScale : 1f),
+			BaseDamage = shotDamage * damageMultiplier,
 			CanCrit = true,
 			CritChance = Mathf.Clamp(CritChance + stats.Get("CritChanceAdd"), 0f, 1f),
 			CritMultiplier = CritMultiplier + stats.Get("CritMultiplierAdd"),
@@ -270,17 +304,19 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		var projectile = ProjectileScene.Instantiate<Projectile>();
 		parent.AddChild(projectile);
 		projectile.GlobalPosition = origin;
-		projectile.Speed = Speed * (_perfect ? PerfectSpeedScale : 1f);
+		projectile.Speed = shotSpeed;
 		projectile.GravityScale = 0f; // 直线子弹，无下坠（方向朝着准星世界点，见 ResolveShotDirection）
 		projectile.Launch(attack, direction);
+
+		LastShotDamage = attack.BaseDamage;
+		LastShotSpeed = projectile.Speed;
+		LastShotPerfect = _perfect;
 
 		GameLog.Write(
 			"Combat",
 			$"能量波发射：{AbilityId} 伤害 {attack.BaseDamage:0.##} 弹速 {projectile.Speed:0.##}"
-			+ $"（{( _perfect ? "完美时机" : "普通")}，无视格挡={BypassBlock}，穿透 {attack.Pierce}，方向 {direction}）");
+			+ $"（{(_perfect ? "完美时机" : "普通")}，蓄力 {ChargeTime:0.##}s/{ChargeBaseSeconds:0.##}s 档 {ChargeSteps} 威力 ×{power:0.###}，"
+			+ $"无视格挡={BypassBlock}，穿透 {attack.Pierce}，方向 {direction}）");
 	}
-
-	/// <summary>完美时机窗口（秒）——蓄到这个时长就算"闭合"。由技能行给（表是权威）。</summary>
-	[Export] public float PerfectTime { get; set; } = 0.5f;
 }
 

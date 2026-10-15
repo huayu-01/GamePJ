@@ -1,4 +1,5 @@
 using ActRoguelike.Combat;
+using ActRoguelike.Config;
 using Godot;
 
 namespace ActRoguelike.Boss;
@@ -96,9 +97,23 @@ public partial class BossPressure : Node
 		for (int i = 0; i < AddsPerLevel; i++)
 		{
 			var add = AddScene.Instantiate<Unit>();
+
+			// ⚠️ 与其它 4 处生成路径**同一条**：实例化 → **套单位表** → `AddChild`
+			// （见 `EncounterController.cs:571/383/856/895` 与 `SummonAbility.cs:61`）。
+			// 顺序不能反：`Unit._EnterTree` 在 `AddChild` 时捕获基础值。
+			//
+			// 改前这里**只 `AddChild`**，于是首领召唤的小怪用的是场景值（Chaser **60 血**），
+			// 既漏掉全局倍率（`enemy_global` 的 ×0.75 → **45 血**），也漏掉敌人行上的 AI 档案。
+			// → 现在与波次刷怪出来的同类小怪**完全一致**（45 血 + `ai_chaser`）。
+			ConfigRows.ByScenePath<EnemyConfig>(AddScene.ResourcePath)?.ApplyTo(add);
+
 			parent.AddChild(add);
 			float angle = (float)GD.RandRange(0d, Mathf.Tau);
 			add.GlobalPosition = _unit.GlobalPosition + new Vector3(Mathf.Cos(angle) * AddSpawnRadius, 0.6f, Mathf.Sin(angle) * AddSpawnRadius);
+
+			// 全局难度倍率：与 `EncounterController` 一样在**进树之后**套用（会回满生命）。
+			// ⚠️ 反过来（进树前套）会让 `_EnterTree` 把乘过倍率的生命捕获成基础值，`_Ready` 再乘一次。
+			ConfigIndex.ScaleEnemy(add, this, false);
 		}
 	}
 }

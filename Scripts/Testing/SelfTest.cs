@@ -439,7 +439,29 @@ public partial class SelfTest : Node
 				Next();
 				break;
 
-			case 28:
+			// ── P2 通用机制（冷却缩减 / 技能层数 / 蓄力 / 完美时机）的取证 ──
+			// 排在最小闭环之后：那几段的硬指标已经打印完了，这里的探针只在自己的节点上加/减数值。
+			case 28 when _timer > 0.4f:
+				BeginMechanismProbe();
+				Next();
+				break;
+
+			case 29 when _timer > 0.4f:
+				ReportMechanismProbe();
+				Next();
+				break;
+
+			case 30 when _timer > 0.3f:
+				ProbeChargeMechanism();
+				Next();
+				break;
+
+			case 31 when _timer > 0.3f:
+				ProbeBossAddsUnitTable();
+				Next();
+				break;
+
+			case 32:
 				GameLog.Write("SelfTest", "=== 自测结束 ===");
 
 				// ⚠️ 退出前先解除暂停：这一阶段之前刚切过一关，`UiRouter` 正把树暂停着
@@ -951,6 +973,369 @@ public partial class SelfTest : Node
 				$"投射物 {_loopProjectiles}",
 				_loopDamaged ? "命中掉血 ✓" : "命中掉血 ✗",
 			})));
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// ★ P2 通用机制探针（case 28–30）：冷却缩减 / 技能层数 / 蓄力 / 完美时机
+	//
+	// 全部在**玩家身上真的那两个技能节点**上做（`skl_a1_w1_1` 非蓄力 / `skl_a1_w1_2` 蓄力）：
+	// ① 先从**表**里读出数值核对（证明新增的列真的接上了）；
+	// ② 再做行为取证（真激活 / 真动画事件帧 / 真 Finish / 同步推蓄力）；
+	// ③ 探针用完把**行与节点都还原**（自测不该把改动留在正式流程里）。
+	// ─────────────────────────────────────────────────────────────────────────
+
+	private Unit? _mechPlayer;
+	private EnergyWaveAbility? _mechW1;
+	private EnergyWaveAbility? _mechW2;
+	private float _mechW1CooldownBefore;
+	private float _mechW1MultBefore;
+	private int _mechW1MaxChargesBefore;
+	private float _mechW1RechargeBefore;
+	private int _mechProjectilesBefore;
+	private float _mechShotDamageBefore;
+
+	private void BeginMechanismProbe()
+	{
+		GetTree().Paused = false;
+		Unit? player = PlayerLocator.Player;
+		if (player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 机制·冷却缩减：找不到玩家。");
+			return;
+		}
+
+		_mechPlayer = player;
+		_mechW1 = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") as EnergyWaveAbility;
+		_mechW2 = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_2") as EnergyWaveAbility;
+		if (_mechW1 == null || _mechW2 == null)
+		{
+			GameLog.Write("SelfTest", $"🔴 机制探针：左键技能={_mechW1?.AbilityId ?? "无"} 右键技能={_mechW2?.AbilityId ?? "无"}，两个都在才测得了。");
+			return;
+		}
+
+		// ① 默认值：必须还是改动前那一套（单层 / 无 CDR / 武技1 非蓄力 / 武技2 蓄力 0.5s + 完美窗口 0.2s）
+		GameLog.Write(
+			"SelfTest",
+			$"机制·默认值：武技1[{_mechW1.AbilityId}] 层数={_mechW1.MaxCharges}（期望 1） HoldToCharge={_mechW1.HoldToCharge}（期望 False） "
+			+ $"CDR 行×{_mechW1.CooldownMultiplier:0.##}（期望 1） 单位×{_mechW1.UnitCooldownMultiplier:0.##}（期望 1） "
+			+ $"实际冷却={_mechW1.EffectiveCooldown:0.###}（期望 = Cooldown {_mechW1.Cooldown:0.###}，×1 乘出来逐位相同）"
+			+ $"｜武技2[{_mechW2.AbilityId}] HoldToCharge={_mechW2.HoldToCharge}（期望 True） "
+			+ $"基础蓄力={_mechW2.ChargeBaseSeconds:0.##}s（表列，期望 0.5） 完美窗口={_mechW2.PerfectWindowSeconds:0.##}s（表列，期望 0.2） "
+			+ $"完美伤害={_mechW2.PerfectDamage:0} 完美弹速={_mechW2.PerfectSpeed:0}（两个绝对值来自 Params，代码里没有 40/400）");
+
+		// ② 冷却缩减（CDR）通路：**行级列**（AbilityConfig.CooldownMultiplier）+ **单位级常驻**（StatSheet）
+		AbilityConfig? row = ConfigRows.ById<AbilityConfig>(_mechW1.AbilityId);
+		_mechW1CooldownBefore = _mechW1.Cooldown;
+		_mechW1MaxChargesBefore = _mechW1.MaxCharges;
+		_mechW1RechargeBefore = _mechW1.RechargeSeconds;
+		_mechW1MultBefore = row?.CooldownMultiplier ?? 1f;
+
+		if (row != null)
+		{
+			row.CooldownMultiplier = 0.5f;
+			row.ApplyTo(_mechW1);
+		}
+
+		// 冷却拉长到 10s：下一段还读得到"没走完"的剩余冷却（0.5s 的话早就归零、看不出差别）。
+		_mechW1.Cooldown = 10f;
+		player.Stats.AddModifier(new StatModifier { Stat = "CooldownMultiplier", Operation = ModifierOperation.Multiply, Value = 0.5f, Source = this });
+		player.RefreshStats();
+
+		GameLog.Write(
+			"SelfTest",
+			$"机制·冷却缩减通路：行级列×{_mechW1.CooldownMultiplier:0.##}（写进技能行的 CooldownMultiplier 列） × 单位级×{_mechW1.UnitCooldownMultiplier:0.##}"
+			+ $"（StatSheet 的 CooldownMultiplier，洞悉/速攻那条路）= ×{_mechW1.CooldownMultiplierEffective:0.###} → 实际冷却 {_mechW1.Cooldown:0.##}×{_mechW1.CooldownMultiplierEffective:0.###} = {_mechW1.EffectiveCooldown:0.###}（期望 2.5）");
+
+		// ③ 真跑一次：激活 → 动画事件帧 → Finish()；下一段读它写下的冷却剩余
+		_mechW1.RefreshCooldown();
+		bool ok = _mechW1.TryActivate();
+		GameLog.Write("SelfTest", $"机制·真跑一次：TryActivate={ok}（期望 True）→ 下一段读 Finish() 之后写下的冷却剩余（期望 ≤ 2.5 且 > 0）");
+	}
+
+	private void ReportMechanismProbe()
+	{
+		if (_mechPlayer == null || _mechW1 == null || _mechW2 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 机制探针：上一段没准备好（找不到玩家或技能节点），本段跳过。");
+			return;
+		}
+
+		// ① Finish() 用的是不是"扣过 CDR 的冷却"（真激活、真动画事件帧、真 Finish 之后读）
+		float remaining = _mechW1.CooldownRemaining;
+		bool cdrWorked = remaining > 0f && remaining <= _mechW1.EffectiveCooldown + 0.001f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(cdrWorked ? "✅" : "🔴")} 机制·CDR 落在 Finish() 上：冷却剩余={remaining:0.###}（期望 ≤ {_mechW1.EffectiveCooldown:0.###} 且 > 0；没走 CDR 的话这里会是 10）");
+
+		// ② 一次性事件触发的 CDR / 刷新（闪身步 -80% / 招架反击 刷新冷却）——**比例由调用方按表值传**
+		float before = _mechW1.CooldownRemaining;
+		_mechW1.ReduceCooldownFraction(0.8f);
+		float afterFraction = _mechW1.CooldownRemaining;
+		_mechW1.ReduceCooldown(999f);
+		float afterSeconds = _mechW1.CooldownRemaining;
+		_mechW1.RefreshCooldown();
+		GameLog.Write(
+			"SelfTest",
+			$"机制·一次性 CDR 接口：剩余 {before:0.###} —ReduceCooldownFraction(0.8)→ {afterFraction:0.###}（期望 {before * 0.2f:0.###}）"
+			+ $" —ReduceCooldown(999)→ {afterSeconds:0.###}（期望 0） —RefreshCooldown()→ {_mechW1.CooldownRemaining:0.###}（期望 0） 层数={_mechW1.ChargesRemaining}");
+
+		// ③ 技能层数：3 层、每层 2s（×CDR 0.25 = 0.5s）——**同步手动推进**，不受帧率影响
+		_mechW1.MaxCharges = 3;
+		_mechW1.RechargeSeconds = 2f;
+		_mechW1.RefreshCooldown();
+		int full = _mechW1.ChargesRemaining;
+		bool fired = _mechW1.TryActivate();
+		int afterUse = _mechW1.ChargesRemaining;
+		GameLog.Write(
+			"SelfTest",
+			$"机制·技能层数：满层={full}（期望 3） TryActivate={fired}（期望 True）→ 用掉一次后 层数={afterUse}（期望 2）"
+			+ $" 回层计时={_mechW1.CooldownRemaining:0.###}（期望 {_mechW1.EffectiveRechargeSeconds:0.###} = 2 × CDR 0.25）"
+			+ $" IsReady={_mechW1.IsReady}（期望 False：正忙）");
+
+		_mechW1._PhysicsProcess(0.2d);
+		GameLog.Write("SelfTest", $"机制·技能层数·推 0.2s：层数={_mechW1.ChargesRemaining}（期望 2，还没到 0.5s） 计时={_mechW1.CooldownRemaining:0.###}（期望 0.3）");
+		_mechW1._PhysicsProcess(0.35d);
+		GameLog.Write("SelfTest", $"机制·技能层数·再推 0.35s（合计 0.55 > 0.5）：层数={_mechW1.ChargesRemaining}（期望 3） 计时={_mechW1.CooldownRemaining:0.###}（期望 0）");
+
+		// ④ 还原：技能行、单位修正器、节点上的探针值
+		if (ConfigRows.ById<AbilityConfig>(_mechW1.AbilityId) is { } row)
+		{
+			row.CooldownMultiplier = _mechW1MultBefore;
+		}
+
+		_mechPlayer.Stats.RemoveBySource(this);
+		_mechPlayer.RefreshStats();
+		_mechW1.Cooldown = _mechW1CooldownBefore;
+		_mechW1.MaxCharges = _mechW1MaxChargesBefore;
+		_mechW1.RechargeSeconds = _mechW1RechargeBefore;
+		_mechW1.RefreshCooldown();
+		GameLog.Write(
+			"SelfTest",
+			$"机制·还原：武技1 冷却={_mechW1.Cooldown:0.##} 层数={_mechW1.MaxCharges} CDR 行×{_mechW1.CooldownMultiplier:0.##} 单位×{_mechW1.UnitCooldownMultiplier:0.##}"
+			+ $"（都回到改动前的值；TotalCharges 也回到 {_mechW1.MaxCharges}）");
+	}
+
+	/// <summary>
+	/// 蓄力 / 完美时机：**同步驱动**（直接调 <see cref="Ability.OnInputHeld"/> /
+	/// <see cref="Ability.OnInputReleased"/>），所以与帧率无关、每次跑出来的数字都一样。
+	/// </summary>
+	private void ProbeChargeMechanism()
+	{
+		if (_mechPlayer == null || _mechW2 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 机制探针·蓄力：上一段没准备好，本段跳过。");
+			return;
+		}
+
+		EnergyWaveAbility w = _mechW2;
+		float damageMultiplier = _mechPlayer.Stats.Get("DamageMultiplier");
+
+		// ① **基础蓄力没完成就松手 = 不释放**（设计文档第 14 行）
+		_mechProjectilesBefore = _loopProjectiles;
+		_mechShotDamageBefore = w.LastShotDamage;
+		w.RefreshCooldown();
+		bool ok1 = w.TryActivate();
+		w.OnInputHeld(0.3f);
+		string held = $"蓄力={w.ChargeTime:0.##}s 进度={w.ChargeProgress:0.##} 基础完成={w.ChargeBaseComplete} 完美窗口={w.IsPerfectWindow}";
+		w.OnInputReleased();
+		int aborted = _loopProjectiles - _mechProjectilesBefore;
+		bool abortOk = ok1 && w.LastReleaseAborted && Mathf.IsEqualApprox(w.LastShotDamage, _mechShotDamageBefore) && !w.IsBusy;
+		GameLog.Write(
+			"SelfTest",
+			$"{(abortOk ? "✅" : "🔴")} 机制·蓄力未完成松手：TryActivate={ok1}（期望 True） {held}（期望 0.3s / 0.6 / False / False）"
+			+ $" → 松手：放弃={w.LastReleaseAborted}（期望 True） 伤害未变={Mathf.IsEqualApprox(w.LastShotDamage, _mechShotDamageBefore)}（期望 True）"
+			+ $" 仍在施法={w.IsBusy}（期望 False） 投射物 +{aborted}（期望 0；这一项只报数，别的单位也在打枪所以不作判据）");
+
+		// ② **完美时机**：蓄满 + 窗口内（0.2s）松手 → 更强的那一发（表值 40 / 400）
+		SettleShot(w);
+		_mechProjectilesBefore = _loopProjectiles;
+		w.RefreshCooldown();
+		bool ok2 = w.TryActivate();
+		w.OnInputHeld(w.ChargeBaseSeconds + 0.05f);
+		bool inWindow = w.IsPerfectWindow;
+		w.OnInputReleased();
+		int shotA = _loopProjectiles - _mechProjectilesBefore;
+		float expectPerfectDamage = w.PerfectDamage * damageMultiplier;
+		bool perfectOk = ok2 && inWindow && w.LastShotPerfect
+			&& Mathf.IsEqualApprox(w.LastShotDamage, expectPerfectDamage)
+			&& Mathf.IsEqualApprox(w.LastShotSpeed, w.PerfectSpeed);
+		GameLog.Write(
+			"SelfTest",
+			$"{(perfectOk ? "✅" : "🔴")} 机制·完美时机：TryActivate={ok2} 蓄力={w.ChargeTime:0.###}s（=基础 {w.ChargeBaseSeconds:0.##} + 0.05）窗口内={inWindow}（期望 True）"
+			+ $" → 松手：完美={w.LastShotPerfect}（期望 True） 伤害={w.LastShotDamage:0.###}（期望 表值 {w.PerfectDamage:0} ×玩家伤害倍率 {damageMultiplier:0.##} = {expectPerfectDamage:0.###}）"
+			+ $" 弹速={w.LastShotSpeed:0.###}（期望 表值 {w.PerfectSpeed:0}） 投射物 +{shotA}");
+
+		// ③ **窗口过了再松手** → 普通那一发（表值 30 / 250）
+		SettleShot(w);
+		_mechProjectilesBefore = _loopProjectiles;
+		w.RefreshCooldown();
+		bool ok3 = w.TryActivate();
+		w.OnInputHeld(1.2f);
+		bool overWindow = !w.IsPerfectWindow;
+		w.OnInputReleased();
+		int shotB = _loopProjectiles - _mechProjectilesBefore;
+		float expectNormalDamage = w.Damage * damageMultiplier;
+		bool normalOk = ok3 && overWindow && !w.LastShotPerfect
+			&& Mathf.IsEqualApprox(w.LastShotDamage, expectNormalDamage)
+			&& Mathf.IsEqualApprox(w.LastShotSpeed, w.Speed);
+		GameLog.Write(
+			"SelfTest",
+			$"{(normalOk ? "✅" : "🔴")} 机制·过完美窗口松手：TryActivate={ok3} 蓄力={w.ChargeTime:0.###}s（> 基础+窗口 {w.ChargeBaseSeconds + w.PerfectWindowSeconds:0.##}）窗口内={w.IsPerfectWindow}（期望 False）"
+			+ $" → 松手：完美={w.LastShotPerfect}（期望 False） 伤害={w.LastShotDamage:0.###}（期望 表值 {w.Damage:0} ×{damageMultiplier:0.##} = {expectNormalDamage:0.###}）"
+			+ $" 弹速={w.LastShotSpeed:0.###}（期望 表值 {w.Speed:0}） 投射物 +{shotB}");
+
+		// ④ **后置蓄力**（弓 0.1s/+30%、短弩 0.2s/+2 支、长枪 0.25s/+20% 都是这个结构）：
+		//    在真技能节点上现场配一段"弓式"参数，证明基类那套档位/上限是通用的、且全是表列。
+		SettleShot(w);
+		_mechProjectilesBefore = _loopProjectiles;
+		w.ChargeStepSeconds = 0.1f;
+		w.ChargeStepScale = 1.3f;
+		w.ChargeMaxSeconds = 1f;
+		w.RefreshCooldown();
+		bool ok4 = w.TryActivate();
+		w.OnInputHeld(0.85f);
+		int steps3 = w.ChargeSteps;
+		float power3 = w.ChargePowerScale;
+		w.OnInputHeld(2f);
+		int stepsMax = w.ChargeSteps;
+		int stepsCap = w.ChargeMaxStepsEffective;
+		float powerMax = w.ChargePowerScale;
+		w.OnInputReleased();
+		int shotC = _loopProjectiles - _mechProjectilesBefore;
+		float expectStepDamage = w.Damage * powerMax * damageMultiplier;
+		bool stepsOk = ok4 && steps3 == 3 && stepsMax == 5 && Mathf.IsEqualApprox(power3, 2.197f)
+			&& Mathf.IsEqualApprox(w.LastShotDamage, expectStepDamage)
+			&& Mathf.IsEqualApprox(w.LastShotSpeed, w.Speed * powerMax);
+		GameLog.Write(
+			"SelfTest",
+			$"{(stepsOk ? "✅" : "🔴")} 机制·后置蓄力（两段结构）：TryActivate={ok4} 基础 {w.ChargeBaseSeconds:0.##}s + 每 {w.ChargeStepSeconds:0.##}s ×{w.ChargeStepScale:0.##}，上限 {w.ChargeMaxSeconds:0.##}s"
+			+ $" → 蓄 0.85s：档={steps3}（期望 3）威力×{power3:0.###}（期望 1.3³=2.197）｜一直按住：档={stepsMax}（期望封顶 {stepsCap}=floor((1.0-0.5)/0.1)）威力×{powerMax:0.###}"
+			+ $" → 松手：伤害={w.LastShotDamage:0.###}（期望 30×{powerMax:0.###}×{damageMultiplier:0.##}={expectStepDamage:0.###}） 弹速={w.LastShotSpeed:0.###} 投射物 +{shotC}");
+
+		// ⑤ 还原（表里的样子：没有后置蓄力）
+		SettleShot(w);
+		w.ChargeStepSeconds = 0f;
+		w.ChargeStepScale = 1f;
+		w.ChargeMaxSeconds = 0f;
+		w.RefreshCooldown();
+		GameLog.Write(
+			"SelfTest",
+			$"机制·还原：武技2 基础蓄力={w.ChargeBaseSeconds:0.##}s 完美窗口={w.PerfectWindowSeconds:0.##}s 后置蓄力={w.ChargeStepSeconds:0.##}s"
+			+ $" 威力×{w.ChargeStepScale:0.##}（回到表里的样子）");
+	}
+
+	/// <summary>
+	/// 把"刚发射完"的那一次施法**同步收尾**（`Tick → Finish`）。
+	///
+	/// ⚠️ 必须有这一步：`Finish()` 只在 <see cref="Ability._PhysicsProcess"/> 里的 <c>Tick</c> 跑，
+	/// 而探针是**同一帧内同步**驱动松手的 —— 不收尾的话 `IsBusy` 还是 true，
+	/// 下一轮 `TryActivate` 直接返回 false，`_fired` 也还是 true（于是读到的是**上一轮**的
+	/// LastShotDamage / LastShotSpeed —— 实测踩到过：第三轮报"完美=True 伤害=40"其实是第二轮的值）。
+	/// </summary>
+	private static void SettleShot(Ability ability) => ability._PhysicsProcess(0.02d);
+
+	/// <summary>
+	/// **首领增援现在走单位表**（`docs/combat.md` 里那条"只 AddChild、完全不套单位表"的修正）。
+	///
+	/// 改前：`BossPressure.SpawnAdds()` 只 `AddChild` → 召唤出来的 Chaser 用**场景值 60 血**，
+	/// 既没有全局倍率（`enemy_global` ×0.75 → 45），也没有敌人行上的 AI 档案与技能行。
+	/// 改后与其它 4 处生成路径同一条（实例化 → `ApplyTo` → `AddChild` → `ScaleEnemy`）。
+	///
+	/// 期望值**全部从表/场景里读**（不写死 60/45）：行值 = `enemy_chaser.MaxHealth`、
+	/// 倍率 = `enemy_global.HealthMultiplier`、场景值 = 另起一个**没套表**的实例读。
+	/// </summary>
+	private void ProbeBossAddsUnitTable()
+	{
+		Unit? player = PlayerLocator.Player;
+		BossConfig? bossRow = ConfigRows.ById<BossConfig>("boss_final");
+		if (player == null || bossRow == null || string.IsNullOrEmpty(bossRow.ScenePath) || !ResourceLoader.Exists(bossRow.ScenePath))
+		{
+			GameLog.Write("SelfTest", $"🔴 机制·首领增援：读不到首领行或它的场景（boss_final ScenePath='{bossRow?.ScenePath}'）。");
+			return;
+		}
+
+		var before = new List<ulong>();
+
+		if (GD.Load<PackedScene>(bossRow.ScenePath).Instantiate() is not Unit boss)
+		{
+			GameLog.Write("SelfTest", $"🔴 机制·首领增援：{bossRow.ScenePath} 的根节点不是 Unit。");
+			return;
+		}
+
+		bossRow.ApplyTo(boss);
+		player.GetParent()?.AddChild(boss);
+		boss.GlobalPosition = player.GlobalPosition + new Vector3(0f, 0.6f, -10f);
+		ConfigIndex.ScaleEnemy(boss, this, true);
+
+		// ⚠️ 快照要在**首领自己进组之后**再拍：`AddChild` 会同步跑 `_Ready`，
+		// 首领这时已经进了 `enemy_units` —— 拍早了会把首领自己当成"新生成的增援"（实测踩到过）。
+		foreach (Node node in GetTree().GetNodesInGroup("enemy_units"))
+		{
+			before.Add(node.GetInstanceId());
+		}
+
+		if (boss.GetNodeOrNull<ActRoguelike.Boss.BossPressure>("Pressure") is not { } pressure)
+		{
+			GameLog.Write("SelfTest", "🔴 机制·首领增援：首领上没有 Pressure 节点。");
+			return;
+		}
+
+		// ⚠️ `Interval` 在 `BossPressure._PhysicsProcess` 里被 `Mathf.Max(1f, Interval)` 夹到 ≥1s，
+		// 所以把 Interval 设成 0.01 是没用的（实测：等级一动不动）——直接**推 3.05 秒**跨过 3 级。
+		pressure.Interval = 0.01f;
+		pressure.AddSpawnLevel = 3;
+		pressure.MaxLevel = 5;
+		pressure._PhysicsProcess(3.05d);
+
+		Unit? add = null;
+		foreach (Node node in GetTree().GetNodesInGroup("enemy_units"))
+		{
+			if (node is Unit unit && !before.Contains(unit.GetInstanceId()))
+			{
+				add = unit;
+				break;
+			}
+		}
+
+		if (add == null)
+		{
+			GameLog.Write("SelfTest", "🔴 机制·首领增援：Pressure 升级后没有生成增援（SpawnAdds 没跑？）。");
+			return;
+		}
+
+		// 对照值：同一个预制体"没套表"的另一份实例（场景值）
+		string addPath = pressure.AddScene?.ResourcePath ?? string.Empty;
+		float sceneHealth = -1f;
+		if (pressure.AddScene?.Instantiate() is Unit bare)
+		{
+			sceneHealth = bare.MaxHealth;
+			bare.Free();
+		}
+
+		EnemyConfig? addRow = ConfigRows.ByScenePath<EnemyConfig>(addPath);
+		float rowHealth = addRow?.MaxHealth ?? -1f;
+		float globalScale = ConfigRows.ById<EnemyConfig>("enemy_global")?.HealthMultiplier ?? 1f;
+		float expected = rowHealth * globalScale;
+
+		string rowSkill = addRow?.Skills is { Length: > 0 } skills ? skills[0].Id : "（行里没技能）";
+		string addSkill = "（没有技能）";
+		foreach (Node node in add.FindChildren("*", string.Empty, true, false))
+		{
+			if (node is Ability ability && !string.IsNullOrEmpty(ability.AbilityId))
+			{
+				addSkill = ability.AbilityId;
+				break;
+			}
+		}
+
+		bool ok = Mathf.IsEqualApprox(add.MaxHealth, expected)
+			&& Mathf.IsEqualApprox(add.Health, expected)
+			&& addSkill == rowSkill;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} 机制·首领增援走单位表：SpawnAdds 生成 {add.Name} 生命 {add.MaxHealth:0.##}（= 敌人行 {rowHealth:0.##} × 全局倍率 {globalScale:0.##} = {expected:0.##}）"
+			+ $" 当前生命 {add.Health:0.##}｜场景值（没套表的那一份）{sceneHealth:0.##}（改前就是这个值）"
+			+ $"｜标签 [{string.Join(",", add.Tags)}] 技能行 Id={addSkill}（期望 {rowSkill}；改前只会是类名）");
 	}
 
 	/// <summary>

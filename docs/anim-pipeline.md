@@ -44,8 +44,13 @@
 | `InputAction` | **按键动作名**（`weapon_skill_1` / `weapon_skill_2` / `skill_1` / `skill_2`）——**本轮推翻了"刻意没有 InputAction 列"的旧决定** |
 | `HoldToCharge` | 按住式输入（蓄力类技能）：按住每帧回调、松开回调一次 |
 | `AnimName` | 这个技能要播的技能动画（**填了就必须存在，否则技能不执行**） |
-| `AnimEvent` | 等哪个事件帧才释放效果（`ATK` / `Dodge` / `Release` …） |
+| `AnimEvent` | 等哪个事件帧才释放效果（`ATK` / `Dodge` / `Release` …）；⚠️ **蓄力技能里它只是"闭合"的动画标记，触发点是松手** |
 | `AnimSpeedScale` | 动画速度倍率（>1 加速释放；蓄力类 <1 拉长。写在**每单位自己的播放器**上） |
+
+> **P2 之后这一组还多了 9 列**（冷却缩减 / 层数 / 蓄力 / 完美时机：`CooldownMultiplier`、`MaxCharges`、
+> `RechargeSeconds`、`ChargeBaseSeconds`、`ChargeStepSeconds`、`ChargeStepScale`、`ChargeMaxSteps`、
+> `ChargeMaxSeconds`、`PerfectWindowSeconds`）—— 语义、默认值与"加一个蓄力技能要做什么"
+> **见 [abilities.md](abilities.md)**（本文件只管动画那一段）。
 
 ### 1.3 单位的动画库目录（`UnitConfig`）新增的列
 

@@ -65,6 +65,45 @@ public partial class AbilityConfig : ConfigRow
 	/// <summary>动画速度倍率（&gt;1 加速释放，蓄力类 &lt;1 拉长）。写在每个单位自己的播放器上。</summary>
 	[Export] public float AnimSpeedScale { get; set; } = 1f;
 
+	[ExportGroup("冷却缩减 / 技能层数（**0 = 不覆盖**）")]
+	/// <summary>
+	/// **本技能的冷却倍率**（`1` = 不变、`0.8` = 冷却 -20%、`0.5` = 减半）。
+	/// 与"单位级常驻 CDR"（`StatSheet` 的 <c>CooldownMultiplier</c>，洞悉 / 速攻这类增幅挂它）**相乘**。
+	/// **留空 / 0 = 不覆盖**（保留场景里的 1），与 <see cref="Cooldown"/> 同一条纪律。
+	/// </summary>
+	[Export] public float CooldownMultiplier { get; set; }
+
+	/// <summary>
+	/// **技能层数**（设计文档第 13 行「每次使用技能消耗一层」）。**留空 / 0 = 不覆盖**（保留场景里的 1 = 单层）。
+	/// 例：角色 A 技能1「后撤」的增幅「有备无患：后撤现在可叠 3 层」→ 这里填 3。
+	/// </summary>
+	[Export] public int MaxCharges { get; set; }
+
+	/// <summary>每层回复间隔（秒；**≤0 = 不覆盖**，退化成 <see cref="Cooldown"/>）。文档给的参考值是 0.5s。</summary>
+	[Export] public float RechargeSeconds { get; set; }
+
+	[ExportGroup("蓄力（按住激活 → 抬起释放；数值全在这一组，代码里没有硬编码）")]
+	/// <summary>
+	/// 基础蓄力时长（秒）：**没蓄满就松手 = 不释放效果**（设计文档第 14 行）。
+	/// 只在 <see cref="HoldToCharge"/> 为 true 时有意义；0 = 按住即算蓄满。
+	/// </summary>
+	[Export] public float ChargeBaseSeconds { get; set; }
+
+	/// <summary>后置蓄力：基础蓄满后每多少秒升一档（≤0 = 没有后置蓄力）。弓 0.1 / 短弩 0.2 / 长枪 0.25。</summary>
+	[Export] public float ChargeStepSeconds { get; set; }
+
+	/// <summary>每档的威力倍率（1.3 = 每档 +30%；**≤0 = 不覆盖**，保留 1 = 不增强）。</summary>
+	[Export] public float ChargeStepScale { get; set; }
+
+	/// <summary>后置蓄力最多几档（≤0 = 不限，由 <see cref="ChargeMaxSeconds"/> 封顶）。短弩 = 3（+6 支）。</summary>
+	[Export] public int ChargeMaxSteps { get; set; }
+
+	/// <summary>后置蓄力的总时长上限（秒；≤0 = 不限）。弓「最多蓄力 1 秒」→ 1。</summary>
+	[Export] public float ChargeMaxSeconds { get; set; }
+
+	/// <summary>完美时机窗口（秒；≤0 = 没有完美时机）。文档（能量掌武技2）：0.2s。</summary>
+	[Export] public float PerfectWindowSeconds { get; set; }
+
 	[ExportGroup("通用项（多数技能填这一组）")]
 	/// <summary>释放方向来源（行里给了就用行里的；所有行都会显式给出，与场景里的值一致）。</summary>
 	[Export] public Ability.AimSource Aim { get; set; } = Ability.AimSource.Facing;
@@ -134,6 +173,35 @@ public partial class AbilityConfig : ConfigRow
 		ability.AnimName = AnimName;
 		ability.AnimEvent = AnimEvent;
 		ability.AnimSpeedScale = AnimSpeedScale <= 0f ? 1f : AnimSpeedScale;
+
+		// 冷却缩减 / 层数 / 蓄力：**0 = 不覆盖**（保留场景值），与 Cooldown 同一条纪律。
+		if (CooldownMultiplier > 0f)
+		{
+			ability.CooldownMultiplier = CooldownMultiplier;
+		}
+
+		if (MaxCharges > 0)
+		{
+			ability.MaxCharges = MaxCharges;
+		}
+
+		if (RechargeSeconds > 0f)
+		{
+			ability.RechargeSeconds = RechargeSeconds;
+		}
+
+		// 蓄力这几个是"行了就是权威"（行里空着 = 0 = 没有基础蓄力/没有后置蓄力），
+		// 因为非蓄力技能根本不会读它们（HoldToCharge 才是开关）。
+		ability.ChargeBaseSeconds = ChargeBaseSeconds;
+		ability.ChargeStepSeconds = ChargeStepSeconds;
+		ability.ChargeMaxSteps = ChargeMaxSteps;
+		ability.ChargeMaxSeconds = ChargeMaxSeconds;
+		ability.PerfectWindowSeconds = PerfectWindowSeconds;
+		if (ChargeStepScale > 0f)
+		{
+			ability.ChargeStepScale = ChargeStepScale;
+		}
+
 		if (Cooldown > 0f)
 		{
 			ability.Cooldown = Cooldown;

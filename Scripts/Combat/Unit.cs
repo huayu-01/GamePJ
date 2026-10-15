@@ -221,6 +221,10 @@ public partial class Unit : CharacterBody3D
 		Stats.SetBase("MaxShieldAdd", 0f);
 		Stats.SetBase("DamageReductionAdd", 0f);
 		Stats.SetBase("KnockbackMultiplier", 1f);
+		// 冷却缩减（CDR）：**单位级常驻**那一路（洞悉 / 速攻这类增幅给单位挂这个修正器）。
+		// 它是乘法基数，所以必须有基础值 1 —— 少了会读到 0，变成"零冷却"（见上面那条注意）。
+		// 它**不改变任何既有键的语义**，也不参与 RefreshStats 的派生计算（能力在读取时才乘它）。
+		Stats.SetBase("CooldownMultiplier", 1f);
 	}
 
 	/// <summary>修正器变化后重算派生属性（增益/精英/状态效果都会调用）。</summary>

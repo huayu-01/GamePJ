@@ -84,6 +84,27 @@
 - 已有行为：`ChaseBehavior`、`KeepDistanceBehavior`、`RetreatBehavior`、`RepositionBehavior`、`MeleeAttackBehavior`、`RangedAttackBehavior`。
 - **能力与行为分离**：具备跳跃/冲刺能力不代表 AI 会使用，是否使用由 Behavior 与配置决定（执行文档 §4.4）。
 
+## 冷却缩减 / 技能层数 / 蓄力（P2 通用机制，2026-10-15）
+
+设计文档第 13/14 行的两个**通用机制** + 完美时机 + 冷却缩减（CDR）已经落在 `Ability` 基类上，
+**接入契约与"加一个蓄力技能要做什么"见 [abilities.md](abilities.md)**。这里只记战斗侧的要点：
+
+| 机制 | 代码位置 | 数据位置 | 默认行为 |
+|---|---|---|---|
+| **冷却缩减（CDR）** | `Ability.EffectiveCooldown`（`Finish()` 写的就是它）+ `ReduceCooldownFraction` / `ReduceCooldown` / `RefreshCooldown` | 技能行 `AbilityConfig.CooldownMultiplier`（0 = 不覆盖）+ `StatSheet` 的 `CooldownMultiplier`（单位级常驻，洞悉/速攻） | 两处都没配 → `Cooldown × 1 × 1`，**与改动前逐位相同** |
+| **技能层数** | `Ability.MaxCharges` / `RechargeSeconds` / `ChargesRemaining`（消耗在 `TryActivate`，回复在 `TickCooldown`） | 技能行 `MaxCharges` / `RechargeSeconds`（0 = 不覆盖） | `MaxCharges ≤ 1` 走改动前那条 `CooldownRemaining` 倒计时，层数代码**不参与判定** |
+| **蓄力 / 完美时机** | `Ability` 的三段状态机（`OnInputHeld` / `OnInputReleased` / `OnChargeReleased` / `OnChargeAborted`） | 技能行 `ChargeBaseSeconds` / `ChargeStepSeconds` / `ChargeStepScale` / `ChargeMaxSteps` / `ChargeMaxSeconds` / `PerfectWindowSeconds` | 非蓄力技能（`HoldToCharge = false`）**一行代码都不进** |
+
+**实现纪律**（用户点名要的那条）：**代码里没有任何百分比 / 秒数 / 伤害数字**。
+`0.2s 完美窗口`、`-80% 冷却`、`每次 +30%` 这类值全部来自技能行或增幅行；
+`StatSheet` 新增的 `CooldownMultiplier` 基础值 1 在 `Unit.SeedStats()` 里给
+（乘法基数没有基础值会静默变成"零冷却"，见 [architecture.md](architecture.md) 第 8 条）。
+
+**证据**（`--selftest`，`run_20261015_133715.log`，**退出码 0**）：自测里有一段专门的机制取证
+（`机制·默认值` / `机制·冷却缩减通路` / `机制·CDR 落在 Finish() 上` / `机制·一次性 CDR 接口` /
+`机制·技能层数…` / `机制·蓄力未完成松手` / `机制·完美时机` / `机制·过完美窗口松手` / `机制·后置蓄力` /
+`机制·首领增援走单位表`），全部 ✅；同一份日志里的旧硬指标逐位不变（见 [abilities.md](abilities.md) §5）。
+
 ## 敌人（阶段 4）
 
 8 种普通敌人全部由「Unit + Movement + Brain(行为) + Ability(能力)」组合而成，没有各自的专用脚本：
@@ -191,8 +212,15 @@
 - ⚠️ **一个已知的边界不一致**（本轮只记录、没改）：`ClearField` 只扫 `enemy_units` + `boss_units`，而
   `Unit._Ready` 把**带 `Summon` 标签**的单位放进 `summon_units`（`Unit.cs:143`）—— 也就是说**敌方**召唤物（若将来给了 `Summon` 标签）
   **不会**随关卡切换被清掉；目前 `Summon` 标签只有玩家无人机（`summon_drone.tres`），所以还看不出问题。
-- ⚠️ 另有一个**与本题无关**的生成点：`BossPressure.SpawnAdds()`（`Boss/BossPressure.cs:96-102`）只 `AddChild`、**完全不套单位表**
-  （用的是 `Chaser.tscn` 的场景值 60 血）—— 它既不会 0 血，也漏掉了全局倍率/AI 档案；要不要接表是后续决定。
+- ✅ **已修（2026-10-15，P2）**：`BossPressure.SpawnAdds()`（`Scripts/Boss/BossPressure.cs`）以前**只 `AddChild`、完全不套单位表**
+  （用的是 `Chaser.tscn` 的场景值 **60 血**）—— 既漏掉全局倍率（`enemy_global` 的 ×0.75），也漏掉敌人行上的 **AI 档案与技能行**。
+  现在它走**与其它 4 处生成路径同一条**：`ConfigRows.ByScenePath<EnemyConfig>(AddScene.ResourcePath)?.ApplyTo(add)` →
+  `AddChild` → `ConfigIndex.ScaleEnemy(add, this, false)`（`EncounterController.cs:571/383/856/895`、`SummonAbility.cs:61` 同序）。
+  ⚠️ **效果是血量下降，这是预期修正**：首领召唤的小怪 **60 → 45 血**（= 敌人行 60 × 全局倍率 0.75），
+  并且真的带上 `ai_chaser` 的行为与 `skl_enemy_chaser_melee` 技能行（技能 Id 不再是 C# 类名）。
+  自测取证（`run_20261015_133715.log`）：`✅ 机制·首领增援走单位表：SpawnAdds 生成 Chaser 生命 45（= 敌人行 60 × 全局倍率 0.75 = 45）｜场景值（没套表的那一份）60（改前就是这个值）｜标签 [Melee,Chaser] 技能行 Id=skl_enemy_chaser_melee`。
+  **旧硬指标没有漂**：`白板首领 315/甲 0`（走的是 `EncounterController` 那条路，本轮**一个字没改**）、节点布置 `10（2/5/3）`、
+  `pressure=3 pmods=3 bank=0`、玩家 `270/40/7`、端到端 `True/True`、索引 `4/4/10/1/1/27/7/9/8/6/3/11/8` 全部逐位一致。
 
 ### 修了吗
 
