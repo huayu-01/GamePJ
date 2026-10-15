@@ -20,6 +20,34 @@ public partial class CharacterMovement : Node
 	/// <summary>落地后可用的额外空中跳跃次数（0 = 不能二段跳）。</summary>
 	[Export] public int ExtraAirJumps { get; set; }
 
+	/// <summary>
+	/// 当前**还剩几次空中跳跃**（落地时会被重置成 <see cref="ExtraAirJumps"/>）。
+	/// 滞空（角色 A 技能 2「跃升」）要判"当有跳跃次数时会先执行跳跃"，读的就是它。
+	/// </summary>
+	public int AirJumpsLeft => _airJumpsLeft;
+
+	/// <summary>
+	/// **额外跳跃次数的接入点**（被动「灵动」/ 异化「践踏死亡」这类"在空中额外跳跃"的效果走这里）。
+	///
+	/// <para>用户的设计文档（角色 A 被动「灵动」）：「角色能在空中额外跳跃一次（正常情况下所有角色都
+	/// 只会有 1 次额外的获取方法，**上限最多 3 次**）」—— 所以上限是参数、不是常量：
+	/// 上限值由调用方（表驱动的那条被动/异化）传进来。</para>
+	///
+	/// <para>⚠️ 它是**幂等的写入**：调用方每帧算出的目标值一样时这里什么都不做（不会每次重置空中次数），
+	/// 落地时仍然由 <see cref="_PhysicsProcess"/> 那行按 <see cref="ExtraAirJumps"/> 回满。</para>
+	/// </summary>
+	public void SetExtraAirJumps(int value, int cap)
+	{
+		int wanted = Mathf.Clamp(value, 0, Mathf.Max(0, cap));
+		if (wanted == ExtraAirJumps)
+		{
+			return;
+		}
+
+		ExtraAirJumps = wanted;
+		_airJumpsLeft = Mathf.Min(_airJumpsLeft, wanted);
+	}
+
 	/// <summary>击退等外力的衰减速度（1/秒）。</summary>
 	[Export] public float ImpulseDamping { get; set; } = 6f;
 

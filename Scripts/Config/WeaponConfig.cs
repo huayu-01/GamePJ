@@ -93,6 +93,24 @@ public partial class WeaponConfig : ConfigRow
 	/// <summary>按住左键持续开火（决定"火力倾泻"走哪种模式）。</summary>
 	[Export] public bool Automatic { get; set; }
 
+	[ExportGroup("持有武技（指向 Config/Tables/Skills/ 的行；资源引用不是字符串）")]
+	/// <summary>
+	/// **这把武器的武技行**（`skl_*.tres`）。
+	///
+	/// <para>为什么是"武器 → 武技"而不是"角色 → 武技"（2026-10-15 本轮新增这一列的判据）：
+	/// 武技是**武器**的属性（能量掌的"波波"只可能配能量掌），而一个角色有 3 把武器、每把的
+	/// 武技 1/2 都绑在同样的两个按键上（<c>weapon_skill_1</c> / <c>weapon_skill_2</c>）。
+	/// 若把这些行挂在**角色行**上，换武器时上一把的武技行不会被清掉，两个技能会同时抢同一个按键。</para>
+	///
+	/// <para>套用时机：<c>RunController.ApplyBalance</c> 在**角色行的技能之后**套用当前武器行的这一列
+	/// （角色行放"技能 1 / 技能 2 / 被动"这类与武器无关的技能，武器行放"武技 1 / 武技 2"）。
+	/// 每一行用 <see cref="AbilityConfig.NodeName"/> 找能力节点，所以**同一把武器的两个武技要挂在
+	/// 两个不同的节点上**（`AbilityWeaponNSkill1` / `AbilityWeaponNSkill2`）。</para>
+	///
+	/// <para>留空 = 这把武器没有武技（旧 3 把枪就是这种：开火由 <c>Weapon</c> 组件负责）。</para>
+	/// </summary>
+	[Export] public AbilityConfig[] Skills { get; set; } = System.Array.Empty<AbilityConfig>();
+
 	/// <summary>把自己套到武器组件上。字段清单与 <c>RunController.EquipWeapon</c> 原来的逐项赋值一一对应。</summary>
 	public override void ApplyTo(Node target)
 	{

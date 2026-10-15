@@ -19,6 +19,12 @@
 [ext_resource type="PackedScene" uid="uid://b1ydnaxcewujj" path="res://Assets/Models/player/mesh_player_body.glb" id="18_playerbody"]
 [ext_resource type="Script" uid="uid://clctjjwe4dyw" path="res://Scripts/Abilities/EnergyWaveAbility.cs" id="19_energy_wave"]
 [ext_resource type="Script" uid="uid://7gcupr0uof6f" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
+[ext_resource type="Script" path="res://Scripts/Abilities/ArrowVolleyAbility.cs" id="20_arrow_volley"]
+[ext_resource type="Script" path="res://Scripts/Abilities/BackdashAbility.cs" id="21_backdash"]
+[ext_resource type="Script" path="res://Scripts/Abilities/LeapAbility.cs" id="22_leap"]
+[ext_resource type="Script" path="res://Scripts/Combat/AirHoverController.cs" id="23_hover"]
+[ext_resource type="Script" path="res://Scripts/Abilities/AirJumpPassiveAbility.cs" id="24_air_jump"]
+[ext_resource type="Script" path="res://Scripts/Abilities/HawkEyeAbility.cs" id="25_hawk_eye"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -145,3 +151,38 @@ script = ExtResource("90_anim")
 
 [node name="AbilityInput" type="Node3D" parent="." unique_id=94446761]
 script = ExtResource("9_ability_input")
+
+[node name="AirHover" type="Node3D" parent="."]
+script = ExtResource("23_hover")
+JumpAction = "jump"
+
+[node name="AbilityWeapon2Skill1" type="Node3D" parent="."]
+script = ExtResource("20_arrow_volley")
+Enabled = false
+ProjectileScenePath = "res://Scenes/Combat/Arrow.tscn"
+
+[node name="AbilityWeapon2Skill2" type="Node3D" parent="."]
+script = ExtResource("20_arrow_volley")
+Enabled = false
+ProjectileScenePath = "res://Scenes/Combat/Arrow.tscn"
+
+[node name="AbilityWeapon3Skill1" type="Node3D" parent="."]
+script = ExtResource("20_arrow_volley")
+Enabled = false
+ProjectileScenePath = "res://Scenes/Combat/Arrow.tscn"
+
+[node name="AbilityWeapon3Skill2" type="Node3D" parent="."]
+script = ExtResource("25_hawk_eye")
+Enabled = false
+
+[node name="AbilitySkill1" type="Node3D" parent="."]
+script = ExtResource("21_backdash")
+Enabled = false
+
+[node name="AbilitySkill2" type="Node3D" parent="."]
+script = ExtResource("22_leap")
+Enabled = false
+
+[node name="AbilityPassive" type="Node3D" parent="."]
+script = ExtResource("24_air_jump")
+Enabled = false

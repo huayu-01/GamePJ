@@ -428,7 +428,16 @@ public partial class Unit : CharacterBody3D
 		return ids;
 	}
 
-	/// <summary>施加状态效果；同名刷新时间，不叠加层数。</summary>
+	/// <summary>
+	/// 施加状态效果。
+	///
+	/// <para><b>默认（<see cref="StatusEffect.MaxStacks"/> ≤ 1）：同名刷新时间，不叠加层数</b> ——
+	/// 与改动前逐位一致。</para>
+	///
+	/// <para><b>可叠加（&gt; 1）</b>：每次施加 <b>+1 层</b>（封顶），时间同样刷新，并按层数重算修正器
+	/// （每层一份）。设计文档的「标记」是第一条这样的状态 ——「可叠加且不限定单个目标的 buff」，
+	/// 所以层数存在<b>每个单位自己身上</b>（`_statuses` 是单位级容器），天然"不限单个目标"。</para>
+	/// </summary>
 	public void ApplyStatus(StatusEffect effect)
 	{
 		if (IsDead)
@@ -438,28 +447,84 @@ public partial class Unit : CharacterBody3D
 
 		foreach (ActiveStatus existing in _statuses)
 		{
-			if (existing.Effect.Id == effect.Id)
+			if (existing.Effect.Id != effect.Id)
+			{
+				continue;
+			}
+
+			// ⚠️ 这一行就是"不叠加层数"那条老路径，一个字都没动（默认语义逐位不变）。
+			if (!effect.IsStackable)
 			{
 				existing.Remaining = Mathf.Max(existing.Remaining, effect.Duration);
 				return;
 			}
+
+			int capped = Mathf.Max(1, effect.MaxStacks);
+			int before = existing.Stacks;
+			existing.Stacks = Mathf.Min(capped, before + 1);
+			existing.Remaining = Mathf.Max(existing.Remaining, effect.Duration);
+			existing.Effect = effect;
+			if (existing.Stacks != before)
+			{
+				ApplyStatusModifiers(existing);
+			}
+
+			return;
 		}
 
-		var active = new ActiveStatus { Effect = effect, Remaining = effect.Duration };
+		var active = new ActiveStatus { Effect = effect, Remaining = effect.Duration, Stacks = 1 };
 		_statuses.Add(active);
-		foreach (StatModifier modifier in effect.Modifiers)
-		{
-			Stats.AddModifier(new StatModifier
-			{
-				Stat = modifier.Stat,
-				Operation = modifier.Operation,
-				Value = modifier.Value,
-				Source = active,
-			});
-		}
+		ApplyStatusModifiers(active);
 
 		RefreshStats();
 	}
+
+	/// <summary>
+	/// 把某条状态的修正器按**当前层数**写进 <see cref="Stats"/>（每层一份）。
+	///
+	/// 层数为 1 时与改动前的写法逐字等价（每个 Modifier 加一次，Source = 状态本身）；层数变化时
+	/// 先按 Source 撤掉旧的那一份再重加 —— 这就是"可叠加"的落地方式（不需要给 StatSheet 加层数概念）。
+	/// </summary>
+	private void ApplyStatusModifiers(ActiveStatus active)
+	{
+		Stats.RemoveBySource(active);
+		int stacks = Mathf.Max(1, active.Stacks);
+		foreach (StatModifier modifier in active.Effect.Modifiers)
+		{
+			for (int layer = 0; layer < stacks; layer++)
+			{
+				Stats.AddModifier(new StatModifier
+				{
+					Stat = modifier.Stat,
+					Operation = modifier.Operation,
+					Value = modifier.Value,
+					Source = active,
+				});
+			}
+		}
+	}
+
+	/// <summary>某个状态的**层数**（没有这条状态返回 0）。可叠加的「标记」靠它读。</summary>
+	public int GetStatusStacks(string statusId)
+	{
+		if (string.IsNullOrEmpty(statusId))
+		{
+			return 0;
+		}
+
+		foreach (ActiveStatus status in _statuses)
+		{
+			if (status.Effect.Id == statusId)
+			{
+				return Mathf.Max(1, status.Stacks);
+			}
+		}
+
+		return 0;
+	}
+
+	/// <summary>身上有没有这条状态。</summary>
+	public bool HasStatus(string statusId) => GetStatusStacks(statusId) > 0;
 
 	public float Heal(float amount)
 	{

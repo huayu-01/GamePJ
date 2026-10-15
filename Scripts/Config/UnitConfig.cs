@@ -288,9 +288,17 @@ public abstract partial class UnitConfig : ConfigRow
 	/// 行读不到 / 节点找不到时**跳过那一行**，能力保留场景里的值。
 	/// 玩家侧由 <c>RunController.ApplyBalance</c> 调用（角色行的"持有技能"指向技能表）。
 	/// </summary>
-	public void ApplySkillsTo(Unit unit)
+	public void ApplySkillsTo(Unit unit) => ApplySkills(unit, Skills, Id);
+
+	/// <summary>
+	/// 把一组技能行套到单位上（**与表种类无关**：单位行、角色行、武器行都走这一个函数）。
+	///
+	/// <para>拆出静态版是为了让**武器行**（<see cref="WeaponConfig.Skills"/>）也能用同一套逻辑：
+	/// 武技属于武器，而武器行不是 <see cref="UnitConfig"/> 的子类（2026-10-15 · P3）。</para>
+	/// </summary>
+	public static void ApplySkills(Unit unit, AbilityConfig[] skills, string ownerId)
 	{
-		foreach (AbilityConfig skill in Skills)
+		foreach (AbilityConfig skill in skills)
 		{
 			if (skill == null)
 			{
@@ -303,7 +311,7 @@ public abstract partial class UnitConfig : ConfigRow
 				continue;
 			}
 
-			GD.PushWarning($"[UnitConfig] {Id} 的持有技能 {skill.Id} 找不到节点 {skill.NodeName}，已跳过。");
+			GD.PushWarning($"[UnitConfig] {ownerId} 的持有技能 {skill.Id} 找不到节点 {skill.NodeName}，已跳过。");
 		}
 	}
 

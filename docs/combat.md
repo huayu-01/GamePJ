@@ -105,6 +105,71 @@
 `机制·技能层数…` / `机制·蓄力未完成松手` / `机制·完美时机` / `机制·过完美窗口松手` / `机制·后置蓄力` /
 `机制·首领增援走单位表`），全部 ✅；同一份日志里的旧硬指标逐位不变（见 [abilities.md](abilities.md) §5）。
 
+## 标记 · 无敌帧 · 滞空（P3 新机制，2026-10-15）
+
+角色 A［猎手］的武器 2/3 + 技能 1/2 + 被动带来了 10 条新机制，**全部"只加不改语义"**
+（每条都有"不配置时逐位等于改动前"的判据）。清单与触发点：
+
+| 机制 | 代码位置（唯一实现处） | 数据位置 | 不配置时 |
+|---|---|---|---|
+| **标记（可叠加、不限单目标）** | `Unit.ApplyStatus` 的 `MaxStacks` 路径（+ `ApplyStatusModifiers` 按层数重算修正器）+ `Unit.GetStatusStacks` | `Config/Tables/Effects/eff_mark.tres`（`MaxStacks` 列） | `MaxStacks ≤ 1` 走原来那一行"同名刷新时间、不叠加层数"，逐位不变 |
+| **无敌帧（按动画帧开关）** | `BackdashAbility`（读 `Ability.AnimEventEnd` → `Unit.IsInvulnerable`） | 技能行 `AnimEvent = Dodge` / `AnimEventEnd = Dodger` | 留空 `AnimEventEnd` → `OnAnimationEvent` 的过滤与改动前逐字等价 |
+| **"被击中则无效化"** | `HawkEyeAbility.OnOwnerHit`（订阅 `Unit.HitReceived` —— 它在 `ReceiveHit` 里**先于无敌判定**触发，所以置位 `IsInvulnerable` 就等价于"这一次无效化"，`Unit` 一行没改） | 技能行 `ChargeBaseSeconds` + `DodgeAbilityId` | 没有这个技能就没有订阅 |
+| **滞空（按住跳跃键减缓 90% + 脚底光环）** | `Scripts/Combat/AirHoverController.cs`（玩家场景里的常驻 `AirHover` 节点；`ProcessPhysicsPriority = 50` 保证在 `CharacterMovement` 之后跑） | `LeapAbility` 的 `HoverSeconds` / `HoverFallSlowPercent` / `Ring*` 四项（技能行 Params） | 没人 `Grant()` 时它每帧只做一次 `HoverRemaining <= 0` 早退 |
+| **额外跳跃次数（上限 3）** | `CharacterMovement.SetExtraAirJumps(value, cap)`（幂等写入 + 只抬高不压低） + `AirJumpPassiveAbility` | 技能行 `Grant` / `MaxExtraAirJumps` | 场景里 `ExtraAirJumps` 是 0，不接线就没有二段跳 |
+| **散射（多角度多弹）** | `ArrowVolleyAbility.FireVolley`（绕 `Vector3.Up` 旋转，按发数对称展开） | 技能行 `Count` / `SpreadStepDegrees` | `Count = 1` / `SpreadStepDegrees = 0` → 与单发完全相同 |
+| **下坠子弹（飞一段距离后才受重力）** | `Projectile.GravityStartDistance`（`TravelledDistance` 累加判断） | 技能行 `GravityStartDistance` / `GravityScale` | `GravityStartDistance ≤ 0` → 走改动前那条"一发射就受重力" |
+| **击退（射速较高时）** | `ArrowVolleyAbility.FireVolley`（`shotSpeed < KnockbackMinSpeed` 就不给击退） | 技能行 `Knockback` / `KnockbackMinSpeed` | `KnockbackMinSpeed = 0` → 永远给击退（= 旧行为） |
+| **追踪弹（飞向最近被标记目标）** | `Projectile.SteerTowardsMark`（Slerp 转向；`HomingStatusId` 空则整段不进） | 技能行 `HomingStatusId` / `HomingTurnRateDegrees` / `HomingRange` | 留空 `HomingStatusId` → 弹道与改动前逐位相同 |
+| **准星视角放大** | `HawkEyeAbility.StepZoom`（改当前 `Camera3D.Fov`，收招时还原到施法前的值） | 技能行 `ZoomFov` / `ZoomSharpness` | 没有这个技能就没有人碰 `Fov` |
+
+**两条实现纪律**（与 P2 同一条）：
+
+1. **数值全在表里**：上表右列的每一项都是 `AbilityConfig` 的列或 `Params` 条目，
+   代码里没有"12 m/s 的后撤力""90% 的减缓""5 层标记"这类字面量（`ArrowVolleyAbility` 的
+   `[Export]` 只是"表读不到时"的兜底，与项目其它组件同一条纪律）。
+2. **默认行为逐位不变**：上表最后一列就是判据 —— 每一条都能"什么都不配"地退化成改动前的样子。
+
+### 标记（Mark）为什么做成状态而不是新容器
+
+设计文档的定义是「**可叠加**且**不限定单个目标**的 buff」。`Unit` 的 `_statuses` 本来就是**单位级**容器
+（每个单位一份），所以"不限单个目标"是免费的；缺的只是"可叠加"（`refactor-survey.md` 硬编码审计第 6 条）。
+于是加一列 `EffectConfig.MaxStacks`：层数记在 `ActiveStatus.Stacks`，修正器按层数各加一份，
+读层数用 `Unit.GetStatusStacks(id)`。`eff_mark.tres` 是第一条这样的行（无任何数值修正，纯计数），
+所以 `EffectConfig.IsStatus` 额外认「`MaxStacks > 1`」。
+
+### 无敌帧为什么需要"第二个事件帧"
+
+设计文档（技能 1「后撤」）：「帧 `Dodge` 到 `Dodger` 期间无敌」—— 这是**一段区间**，
+而 `Ability` 原来只认一个 `AnimEvent`。新增列 `AnimEventEnd`（`Ability.AnimEventEnd`）后，
+两个帧都会送到 `OnAnimEvent`，子类按名字分支即可（`Dodge` 开、`Dodger` 关）。
+`BackdashAbility` 还带一条**安全时长**（`InvulnerableSafetySeconds`）：`Dodger` 帧没来也要把无敌关掉，
+否则生成表配错会让玩家永久无敌。
+
+### 证据（自测 + 真人输入）
+
+`--selftest`（**退出码 0**）新增 case 32–41，逐条打印 ✅/🔴：短弩武技1（3 发）·
+短弩武技2（0 档 3 发 / 3 档 9 发）· 弓武技1（每档 ×1.3 伤害、+30 弹速）·
+刹那之眼（蓄满后放大视角 78→32.4、每 0.5s 标记到真敌人、基础蓄力被击中 → 无效化 + 不消耗层数的后撤）·
+标记（3 层→封顶 5 层）· 追踪弹（与目标夹角逐帧 90.9°→47°）· 后撤（无敌期间挨 40 点掉血 0、朝向不变）·
+被动（`ExtraAirJumps` 0→1）· 跃升（起跳 16 m/s + 3s 滞空）· 滞空（垂直速度 -20→-2）。
+
+真人输入（自己起的进程 + 真鼠标 / 真键盘，日志原文）：
+
+```
+19:03:00 [Combat] 箭矢齐射：skl_a2_w1_1 发数 3（基础 3 + 档 0×0） 单发伤害 12 弹速 200 夹角 20°（… 击退 6 …）
+19:03:03 [Combat] 箭矢齐射：skl_a2_w1_2 发数 9（基础 3 + 档 3×2） 单发伤害 12 弹速 255 夹角 20°（蓄力松手，蓄力 1.51s 档 3 …，方向 (-0, -0, -1)）
+19:04:39 [Animation] 技能动画开播：Player → skills/Skill_A1_Backdash（… 事件帧 2 个：Dodge@0s、Dodger@0.35s）
+19:04:39 [Combat] 后撤：skl_a1_skill_1 后撤力 12（方向 (0, 0, 12)，**不改变朝向**）｜无敌帧开（Dodge）
+19:04:39 [Combat] 后撤：skl_a1_skill_1 无敌帧关（Dodger）
+19:05:06 [Animation] 技能动画开播：Player → skills/ATK_A3_HawkEye（… 事件帧 3 个：AimOn@0s、Mark@0.1s、ATK@0.18s）
+19:05:06 [Combat] 刹那之眼：skl_a3_w1_2 开始蓄力（基础 0.3s，蓄满后放宽视角到 FOV 32 …）
+```
+
+截图：`docs/screenshots/p3_hover_ring_airborne.png`（真按 E + 按住空格 → 角色悬空、脚底光环可见）、
+`p3_backdash_moment.png`（真按 Q 之后的一帧）、`p3_arena_crossbow.png`、`p3_hawkeye_charge_hud.png`、
+`p3_crossbow_volley3_log.png`（编辑器输出面板里的 `箭矢齐射 发数 3` 那一行）。
+
 ## 敌人（阶段 4）
 
 8 种普通敌人全部由「Unit + Movement + Brain(行为) + Ability(能力)」组合而成，没有各自的专用脚本：

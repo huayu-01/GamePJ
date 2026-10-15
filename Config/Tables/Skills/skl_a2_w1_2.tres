@@ -1,0 +1,106 @@
+[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_a2_w1_2_0"]
+script = ExtResource("2_param")
+Key = "ProjectileScenePath"
+Value = "res://Scenes/Combat/Arrow.tscn"
+Note = "箭的预制体"
+
+[sub_resource type="Resource" id="p_a2_w1_2_1"]
+script = ExtResource("2_param")
+Key = "Damage"
+Value = 12.0
+Note = "★ 文档为 n → 预设 12（每支箭的单发伤害）"
+
+[sub_resource type="Resource" id="p_a2_w1_2_2"]
+script = ExtResource("2_param")
+Key = "Speed"
+Value = 180.0
+Note = "★ 文档为 n → 预设 180（基础档的弹速）"
+
+[sub_resource type="Resource" id="p_a2_w1_2_3"]
+script = ExtResource("2_param")
+Key = "SpeedPerChargeStep"
+Value = 25.0
+Note = "★ 文档为 n（只写了每蓄力 0.2s 增加 2 支箭）→ 预设每档 +25 弹速，好让「射速较高时击退」在满蓄力时真的跨过门槛"
+
+[sub_resource type="Resource" id="p_a2_w1_2_4"]
+script = ExtResource("2_param")
+Key = "MaxLifetime"
+Value = 3.0
+Note = "存活时间（秒）"
+
+[sub_resource type="Resource" id="p_a2_w1_2_5"]
+script = ExtResource("2_param")
+Key = "Count"
+Value = 3.0
+Note = "★ 基础发数（文档：基础蓄力后散射出 3 支箭）"
+
+[sub_resource type="Resource" id="p_a2_w1_2_6"]
+script = ExtResource("2_param")
+Key = "CountPerChargeStep"
+Value = 2.0
+Note = "★ 后置蓄力**每档多发几支**（文档：每 0.2s 增加 2 支）—— 非倍率维度，所以是本单位自己的列（见 docs/abilities.md §1.3 第 4 条）"
+
+[sub_resource type="Resource" id="p_a2_w1_2_7"]
+script = ExtResource("2_param")
+Key = "SpreadStepDegrees"
+Value = 20.0
+Note = "★ 相邻两发的夹角（文档：角度 20）"
+
+[sub_resource type="Resource" id="p_a2_w1_2_8"]
+script = ExtResource("2_param")
+Key = "GravityStartDistance"
+Value = 10.0
+Note = "★ 子弹特性：飞行一段距离后下坠（预设 10m）"
+
+[sub_resource type="Resource" id="p_a2_w1_2_9"]
+script = ExtResource("2_param")
+Key = "GravityScale"
+Value = 0.9
+Note = "★ 下坠强度（预设 0.9）"
+
+[sub_resource type="Resource" id="p_a2_w1_2_10"]
+script = ExtResource("2_param")
+Key = "Knockback"
+Value = 6.0
+Note = "★ 射速较高时造成击退（预设 6）"
+
+[sub_resource type="Resource" id="p_a2_w1_2_11"]
+script = ExtResource("2_param")
+Key = "KnockbackMinSpeed"
+Value = 200.0
+Note = "★ 弹速门槛：基础档 180 不给击退，蓄到第 1 档（205）以后才有 —— 正是「射速较高的时候造成击退」"
+
+[sub_resource type="Resource" id="p_a2_w1_2_12"]
+script = ExtResource("2_param")
+Key = "AttackTags"
+Value = PackedStringArray("Projectile", "Arrow", "Physical")
+Note = "攻击标签（供增幅的武器标签匹配）"
+
+[resource]
+script = ExtResource("1_row")
+NodeName = "AbilityWeapon2Skill2"
+ClassHint = "ArrowVolleyAbility"
+InputAction = "weapon_skill_2"
+HoldToCharge = true
+AnimName = "ATK_A2_ChargedVolley"
+AnimEvent = "ATK"
+AnimSpeedScale = 0.3
+ChargeBaseSeconds = 0.4
+ChargeStepSeconds = 0.2
+ChargeMaxSteps = 3
+Aim = 0
+Cooldown = 0.5
+Windup = 0.6
+Recover = 0.1
+Enabled = true
+Params = [SubResource("p_a2_w1_2_0"), SubResource("p_a2_w1_2_1"), SubResource("p_a2_w1_2_2"), SubResource("p_a2_w1_2_3"), SubResource("p_a2_w1_2_4"), SubResource("p_a2_w1_2_5"), SubResource("p_a2_w1_2_6"), SubResource("p_a2_w1_2_7"), SubResource("p_a2_w1_2_8"), SubResource("p_a2_w1_2_9"), SubResource("p_a2_w1_2_10"), SubResource("p_a2_w1_2_11"), SubResource("p_a2_w1_2_12")]
+Id = "skl_a2_w1_2"
+Slot = 0
+DisplayName = "大射天下"
+DescriptionTemplate = "按住右键：基础蓄力 {ChargeBaseSeconds:0.##}s 后朝角色朝向散射 {Count:0} 支箭（夹角 {SpreadStepDegrees:0}°），之后每 {ChargeStepSeconds:0.##}s 再 +{CountPerChargeStep:0} 支（最多 {ChargeMaxSteps} 档 → 总 9 支）；没蓄满就松手不释放。"
+Note = "[新增行·P3] 角色 A 武器 2「短弩」武技2（文档 CD:0.5 / 基础蓄力 0.4s / 每 0.2s +2 支 / 最多 +6 支（总数 9））。★ 蓄力三段状态机在 **Ability 基类**（docs/abilities.md），本行只填列：ChargeBaseSeconds=0.4 / ChargeStepSeconds=0.2 / ChargeMaxSteps=3；「每档 +2 支」是**非倍率维度**，所以走 ArrowVolleyAbility 自己的列 CountPerChargeStep（文档 §1.3 第 4 条）。★ AnimSpeedScale = 0.3 = 源段 ATK 帧（0.12s）÷ 基础蓄力 0.4s，让「闭合帧」正好落在基础蓄力完成处。★ **方向口径**：文档这一行写的是「朝角色方向」（对比武技1 的「朝准星方向」），所以 Aim = Facing（角色朝向）—— 照文档原文的取法；实际手感要改就改这一格（不改代码）。★ 文档为 n 的弹速/伤害都填了最小预设值。"

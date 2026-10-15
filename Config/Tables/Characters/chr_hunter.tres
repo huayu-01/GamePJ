@@ -1,13 +1,14 @@
 [gd_resource type="Resource" script_class="CharacterConfig" format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/CharacterConfig.cs" id="1_row"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_1.tres" id="2_skl"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_2.tres" id="3_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_skill_1.tres" id="2_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_skill_2.tres" id="3_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_passive.tres" id="4_skl"]
 
 [resource]
 script = ExtResource("1_row")
 DisabledAbilityIds = PackedStringArray()
-EnabledAbilityIds = PackedStringArray("skl_a1_w1_1", "skl_a1_w1_2")
+EnabledAbilityIds = PackedStringArray("skl_a1_skill_1", "skl_a1_skill_2", "skl_a1_passive")
 WeaponEnabled = false
 MaxHealth = 200.0
 StartingArmor = 20.0
@@ -20,9 +21,9 @@ JumpVelocity = 13.0
 JumpGravityScale = 3.6
 AnimLibraryDir = "res://Assets/Animations/skills/"
 AnimLibraryName = "skills"
-Skills = [ExtResource("2_skl"), ExtResource("3_skl")]
+Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("4_skl")]
 Id = "chr_hunter"
 Slot = 4
 DisplayName = "猎手"
 DescriptionTemplate = "{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 移速 {MoveSpeed:0.#}"
-Note = "[新增行·本轮只加不删] 角色 A［猎手］。只落地了武器 1「能量掌」的两个武技（武技1 波波 / 武技2 憋个大的）；技能1[后撤]、技能2[跃升]、被动[灵动]、武器 2/3 还未实现 —— 所以这里没有指向它们的技能行（指向不存在的行会让 Godot 把引用置 null 并告警）。AnimLibraryDir 指向技能动画库目录（生成器的产物）；EnabledAbilityIds 按**技能行 Id** 匹配（同一个 EnergyWaveAbility 类的两个技能要能分开开关）。★ WeaponEnabled = false：能量掌的「武技」自己就是攻击方式，**不走 Weapon 组件的开火**（这一行 Note 的原意）；保持 true 会让每次左键除了能量波之外**再多打一发 0 伤害的手枪弹**（wpn_energy_palm.Damage=0 / ScenePath 暂用 Pistol.tscn，见 docs/anim-pipeline.md §6.4-3）。"
+Note = "[P1 新增行 · P3 扩充] 角色 A［猎手］。★ 本行只放**与武器无关**的技能：技能1[后撤]（skl_a1_skill_1）/ 技能2[跃升]（skl_a1_skill_2）/ 被动[灵动]（skl_a1_passive）；三把武器的**武技**改由武器行自己的 Skills 列指向（wpn_energy_palm → skl_a1_w1_*、wpn_crossbow → skl_a2_w1_*、wpn_bow → skl_a3_w1_*）—— 理由见 WeaponConfig.Skills 的注释：一个角色的 3 把武器都用同样的两个按键（weapon_skill_1/2），武技行挂在角色行上会让「换武器」时上一把的武技留在能力节点上抢同一个按键（正是 docs/anim-pipeline.md §6.4.6 那类残留）。★ EnabledAbilityIds 按**技能行 Id** 匹配（P3 起首选键是 AbilityId，其次才是类名）。★ WeaponEnabled = false：三把武器的「武技」自己就是攻击方式，**不走 Weapon 组件的开火**（组件那套有弹匣/装填）。★ AnimLibraryDir 指向技能动画库目录（生成器的产物）。"

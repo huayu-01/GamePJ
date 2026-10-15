@@ -461,7 +461,57 @@ public partial class SelfTest : Node
 				Next();
 				break;
 
-			case 32:
+			// ── P3：角色 A 武器 2/3 + 技能 1/2 + 被动（新机制的取证）──
+			// 全部在**真单位、真表行、真动画**上做（武器行换装走与基地同一个入口 BeginRunWithCharacter）。
+			case 32 when _timer > 0.4f:
+				BeginCrossbowProbe();
+				Next();
+				break;
+
+			case 33 when _timer > 0.9f:
+				ReportCrossbowProbe();
+				Next();
+				break;
+
+			case 34 when _timer > 0.5f:
+				BeginBowProbe();
+				Next();
+				break;
+
+			case 35 when _timer > 0.9f:
+				ReportBowProbe();
+				Next();
+				break;
+
+			case 36 when _timer > 0.4f:
+				BeginBackdashProbe();
+				Next();
+				break;
+
+			case 37 when _timer > 0.25f:
+				ReportBackdashInvulnerableOn();
+				Next();
+				break;
+
+			case 38 when _timer > 0.5f:
+				ReportBackdashInvulnerableOff();
+				Next();
+				break;
+
+			case 39 when _timer > 0.4f:
+				BeginLeapProbe();
+				Next();
+				break;
+
+			// 跃升结果 + 滞空减缓一起做：Action 帧之后 0.4s，玩家**一定还在空中**
+			// （起跳 16 m/s、重力 3.6×9.8 ≈ 35 m/s² → 滞空约 0.9s，所以两段必须紧挨着）。
+			case 40 when _timer > 0.4f:
+				ReportLeapProbe();
+				ReportHoverSlowFall();
+				Next();
+				break;
+
+			case 41:
 				GameLog.Write("SelfTest", "=== 自测结束 ===");
 
 				// ⚠️ 退出前先解除暂停：这一阶段之前刚切过一关，`UiRouter` 正把树暂停着
@@ -1798,7 +1848,7 @@ public partial class SelfTest : Node
 		// 期望值同步成"只加不删"之后的实际值：武器 4/角色 4（各 +1 新增行）、技能 27（+2 武技）＝
 		// 4/4/10/1/1/27/7/9/8/6/3/11/8（`docs/anim-pipeline.md` §6.4-5）。
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}（期望 4/4/10/1/1/27/7/9/8/6/3/11/8；只打印、不比对）");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}（期望 6/4/10/1/1/34/7/10/8/6/3/11/8；只打印、不比对。P3 之前是 4/4/10/1/1/27/7/9/8/6/3/11/8 —— 差额只来自**新增行**：武器 +2（短弩/弓）、技能 +7（A2/A3 各 2 + 技能1/2 + 被动）、效果 +1（标记））");
 
 		// 能力卡（局外装备层，`docs/ability-cards.md`）：卡表读数 + 状态层全流程
 		// （解锁 → 重复解锁 → 升级 → 上限 → 重置归还 → 激活额度记账 → 未解锁/额度不足/碎片不足 → 额度扩增）。
@@ -1939,7 +1989,7 @@ public partial class SelfTest : Node
 		// 技能表（阶段 3）：行数 + 首领强化的两套来源必须能分开。
 		ActRoguelike.Config.AbilityConfig? dashRow = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AbilityConfig>("skl_dash");
 		GameLog.Write("SelfTest",
-			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 27 = 7 玩家 + 16 单位 + 4 首领行为；只打印、不比对） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型（**技能**）{ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型（**词条**）{ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）");
+			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 34 = 14 玩家 + 16 单位 + 4 首领行为；只打印、不比对） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型（**技能**）{ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型（**词条**）{ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）");
 
 		// AI 行为表（阶段 5）：行数 + "敌人行 → 档案"的关联 + **真的写进去了**的硬证据。
 		ActRoguelike.Config.AiProfileConfig? chaserAi = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AiProfileConfig>("ai_chaser");
@@ -2377,6 +2427,544 @@ public partial class SelfTest : Node
 		}
 
 		return count;
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// ★ P3 探针：角色 A 武器 2/3 + 技能 1/2 + 被动
+	//
+	// 取证口径（与 P1/P2 同一条纪律）：
+	// ① 换装走**与基地同一个入口**（`RunController.BeginRunWithCharacter`），不手工赋值；
+	// ② 每个技能都先读**表行**（证明新列真的接上了），再做行为取证（真激活 / 真动画事件帧 / 真投射物）；
+	// ③ 结论行带 ✅/🔴 与"期望值"，方便一眼看出是不是真的对。
+	// ─────────────────────────────────────────────────────────────────────────
+
+	private Unit? _p3Player;
+	private ArrowVolleyAbility? _p3CrossbowW1;
+	private ArrowVolleyAbility? _p3CrossbowW2;
+	private ArrowVolleyAbility? _p3BowW1;
+	private HawkEyeAbility? _p3BowW2;
+	private BackdashAbility? _p3Backdash;
+	private LeapAbility? _p3Leap;
+	private AirJumpPassiveAbility? _p3Passive;
+	private AirHoverController? _p3Hover;
+	private Unit? _p3Target;
+	private int _p3MarkedTotal;
+
+	/// <summary>先清场（避免探针做到一半被怪打断/打死），再切到"角色 A + 短弩"。</summary>
+	private void BeginCrossbowProbe()
+	{
+		GetTree().Paused = false;
+		foreach (string group in new[] { "enemy_units", "boss_units" })
+		{
+			foreach (Node node in GetTree().GetNodesInGroup(group))
+			{
+				if (node is Unit unit)
+				{
+					unit.ApplyDirectDamage(99999f, null);
+				}
+			}
+		}
+
+		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.Hunter, WeaponPresetKind.Crossbow);
+
+		_p3Player = PlayerLocator.Player;
+		if (_p3Player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·短弩：找不到玩家。");
+			return;
+		}
+
+		_p3CrossbowW1 = PlayerAbilityInput.FindByInputAction(_p3Player, "weapon_skill_1") as ArrowVolleyAbility;
+		_p3CrossbowW2 = PlayerAbilityInput.FindByInputAction(_p3Player, "weapon_skill_2") as ArrowVolleyAbility;
+		_p3BowW1 = _p3Player.GetNodeOrNull<ArrowVolleyAbility>("AbilityWeapon3Skill1");
+		_p3BowW2 = _p3Player.GetNodeOrNull<HawkEyeAbility>("AbilityWeapon3Skill2");
+		_p3Backdash = _p3Player.GetNodeOrNull<BackdashAbility>("AbilitySkill1");
+		_p3Leap = _p3Player.GetNodeOrNull<LeapAbility>("AbilitySkill2");
+		_p3Passive = _p3Player.GetNodeOrNull<AirJumpPassiveAbility>("AbilityPassive");
+		_p3Hover = _p3Player.GetNodeOrNull<AirHoverController>("AirHover");
+
+		// 武器 1 的两个节点必须**被换装清干净**（docs/anim-pipeline.md §6.4.6 那条残留纪律，
+		// P3 把"武技归属武器行"之后，这里就是"换武器 = 换武技"的回归验证）。
+		Ability? staleW1 = _p3Player.GetNodeOrNull<Ability>("AbilityWeaponSkill1");
+		GameLog.Write(
+			"SelfTest",
+			$"P3·短弩换装：左键={_p3CrossbowW1?.AbilityId ?? "（找不到）"}（期望 skl_a2_w1_1） 右键={_p3CrossbowW2?.AbilityId ?? "（找不到）"}（期望 skl_a2_w1_2）"
+			+ $"｜上一把武器（能量掌）的两个节点应为空绑定：{staleW1?.AbilityId ?? ""} Enabled={staleW1?.Enabled} 按键=「{staleW1?.InputAction}」（期望：AbilityId 空 / Enabled False / 按键空）"
+			+ $"｜武器 3 的两个节点此时也不该绑上：{_p3BowW1?.AbilityId ?? ""}/{_p3BowW2?.AbilityId ?? ""}（期望都为空）");
+
+		if (_p3CrossbowW1 == null || _p3CrossbowW2 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·短弩：左键/右键技能不是 ArrowVolleyAbility —— 武器行的 Skills 列没接上？");
+			return;
+		}
+
+		// 真放一次武技1（散射三发）：动画 → ATK 事件帧 → 3 个投射物。
+		_p3CrossbowW1.RefreshCooldown();
+		bool ok1 = _p3CrossbowW1.TryActivate();
+		GameLog.Write(
+			"SelfTest",
+			$"P3·短弩武技1 射射射：TryActivate={ok1}（期望 True） 动画={_p3CrossbowW1.AnimName} 事件帧={_p3CrossbowW1.AnimEvent}｜表列：发数 {_p3CrossbowW1.Count}（期望 3） 夹角 {_p3CrossbowW1.SpreadStepDegrees:0.##}°（期望 20） 下坠起点 {_p3CrossbowW1.GravityStartDistance:0.##}m 重力 {_p3CrossbowW1.GravityScale:0.##} 击退 {_p3CrossbowW1.Knockback:0.##} 击退弹速门槛 {_p3CrossbowW1.KnockbackMinSpeed:0.##}｜下一段读结果（发数在事件帧那一帧才写）");
+	}
+
+	/// <summary>短弩结果 + 武技2 的"基础蓄力 + 每档 +2 支"（同步推蓄力，与帧率无关）。</summary>
+	private void ReportCrossbowProbe()
+	{
+		if (_p3CrossbowW1 == null || _p3CrossbowW2 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·短弩：上一段没准备好，本段跳过。");
+			return;
+		}
+
+		bool fired = _p3CrossbowW1.LastShotCount > 0;
+		GameLog.Write(
+			"SelfTest",
+			$"{(fired ? "✅" : "🔴")} P3·短弩武技1 结果：发数 {_p3CrossbowW1.LastShotCount}（期望 3） 单发伤害 {_p3CrossbowW1.LastShotDamage:0.##} 弹速 {_p3CrossbowW1.LastShotSpeed:0.##}｜链路：动画 {_p3CrossbowW1.AnimName} → 事件帧 {_p3CrossbowW1.AnimEvent} → 投射物 {_p3CrossbowW1.LastShotCount} 个");
+
+		// 武技2：基础蓄力 0.4s（此时 0 档 → 3 支），再蓄 0.2×3 → 3 档 → 3 + 2×3 = 9 支。
+		// ⚠️ 两次施法之间必须**推一帧**让上一次 Finish()（`IsReady` 要求 !IsBusy；同步推与帧率无关）。
+		ArrowVolleyAbility w2 = _p3CrossbowW2;
+		w2.RefreshCooldown();
+		bool okA = w2.TryActivate();
+		w2.OnInputHeld(w2.ChargeBaseSeconds);
+		int stepsAt0 = w2.ChargeSteps;
+		w2.OnInputReleased();
+		int countAt0 = w2.LastShotCount;
+		w2._PhysicsProcess(0.1d);
+
+		w2.RefreshCooldown();
+		bool okB = w2.TryActivate();
+		w2.OnInputHeld(w2.ChargeBaseSeconds + (0.2f * 3f) + 0.01f);
+		int stepsAt3 = w2.ChargeSteps;
+		float powerAt3 = w2.ChargePowerScale;
+		w2.OnInputReleased();
+		int countAt3 = w2.LastShotCount;
+		w2._PhysicsProcess(0.1d);
+
+		bool okAll = okA && okB && stepsAt0 == 0 && countAt0 == 3 && stepsAt3 == 3 && countAt3 == 9;
+		GameLog.Write(
+			"SelfTest",
+			$"{(okAll ? "✅" : "🔴")} P3·短弩武技2 大射天下：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 0.4）/ 每档 {w2.ChargeStepSeconds:0.##}s（期望 0.2）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 3） 每档 +{w2.CountPerChargeStep} 支（期望 2）"
+			+ $" → 蓄到基础（档 {stepsAt0}）松手：发数 {countAt0}（期望 3，= 基础 {w2.Count}）；蓄到 3 档（档 {stepsAt3}，威力 ×{powerAt3:0.###}）松手：发数 {countAt3}（期望 9 = 3 + 2×3）"
+			+ $"｜动画={w2.AnimName} 方向来源 Aim={w2.Aim}（0 = Facing：文档这一行写的是「朝角色方向」）");
+	}
+
+	/// <summary>切到"角色 A + 弓"，并造一个准星前的靶子（刹那之眼要标记它）。</summary>
+	private void BeginBowProbe()
+	{
+		GetTree().Paused = false;
+		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.Hunter, WeaponPresetKind.Bow);
+
+		_p3Player = PlayerLocator.Player;
+		if (_p3Player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·弓：找不到玩家。");
+			return;
+		}
+
+		_p3BowW1 = PlayerAbilityInput.FindByInputAction(_p3Player, "weapon_skill_1") as ArrowVolleyAbility;
+		_p3BowW2 = PlayerAbilityInput.FindByInputAction(_p3Player, "weapon_skill_2") as HawkEyeAbility;
+		GameLog.Write(
+			"SelfTest",
+			$"P3·弓换装：左键={_p3BowW1?.AbilityId ?? "（找不到）"}（期望 skl_a3_w1_1） 右键={_p3BowW2?.AbilityId ?? "（找不到）"}（期望 skl_a3_w1_2）｜短弩的节点已清：{_p3Player.GetNodeOrNull<Ability>("AbilityWeapon2Skill1")?.AbilityId ?? ""}（期望空）");
+
+		// 靶子：用真敌人 Chaser 的实例压在弹道上（与最小闭环同一套摆位），刹那之眼的标记要它。
+		EnemyConfig? chaserRow = ConfigRows.ById<EnemyConfig>("enemy_chaser");
+		if (chaserRow == null || string.IsNullOrEmpty(chaserRow.ScenePath) || !ResourceLoader.Exists(chaserRow.ScenePath))
+		{
+			GameLog.Write("SelfTest", "🔴 P3·弓：读不到 enemy_chaser 的场景，靶子造不出来。");
+			return;
+		}
+
+		if (GD.Load<PackedScene>(chaserRow.ScenePath).Instantiate() is not Unit chaser)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·弓：enemy_chaser 的根节点不是 Unit。");
+			return;
+		}
+
+		NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(chaser)?.SetPhysicsProcess(false);
+		if (_p3Player.GetParent() is { } arena)
+		{
+			arena.AddChild(chaser);
+		}
+
+		if (TryComputeShotLine(_p3Player, out Vector3 origin, out Vector3 direction))
+		{
+			PlaceOnShotLine(chaser, origin, direction, TargetDistanceOnLine);
+		}
+
+		_p3Target = chaser;
+		GameLog.Write("SelfTest", $"P3·弓：靶子 {chaser.Name} 生命 {chaser.Health:0.#} 已就位");
+
+		// 武技1：两个档位的伤害/弹速（0 档 = 基础；3 档 = ×1.3³ 伤害、+30×3 弹速）。
+		if (_p3BowW1 != null)
+		{
+			ArrowVolleyAbility w1 = _p3BowW1;
+			float dmgMul = _p3Player.Stats.Get("DamageMultiplier");
+			w1.RefreshCooldown();
+			w1.TryActivate();
+			w1.OnInputHeld(w1.ChargeBaseSeconds + 0.01f);
+			w1.OnInputReleased();
+			float dmg0 = w1.LastShotDamage;
+			float spd0 = w1.LastShotSpeed;
+			w1._PhysicsProcess(0.1d);
+
+			w1.RefreshCooldown();
+			w1.TryActivate();
+			w1.OnInputHeld(w1.ChargeBaseSeconds + (0.1f * 3f) + 0.01f);
+			int steps = w1.ChargeSteps;
+			w1.OnInputReleased();
+			float dmg3 = w1.LastShotDamage;
+			float spd3 = w1.LastShotSpeed;
+			w1._PhysicsProcess(0.1d);
+			float expectDmg3 = w1.Damage * Mathf.Pow(1.3f, steps) * dmgMul;
+			float expectSpd3 = w1.Speed + (30f * steps);
+
+			bool ok = steps == 3
+				&& Mathf.IsEqualApprox(dmg0, _p3BowW1.Damage * dmgMul)
+				&& Mathf.IsEqualApprox(spd0, _p3BowW1.Speed)
+				&& Mathf.IsEqualApprox(dmg3, expectDmg3)
+				&& Mathf.IsEqualApprox(spd3, expectSpd3);
+			GameLog.Write(
+				"SelfTest",
+				$"{(ok ? "✅" : "🔴")} P3·弓武技1 箭在弦上：基础蓄力 {w1.ChargeBaseSeconds:0.##}s（期望 0.5）/ 每 {w1.ChargeStepSeconds:0.##}s（期望 0.1）一档 / 每档伤害 ×{w1.ChargeStepScale:0.##}（期望 1.3）/ 每档弹速 +{w1.SpeedPerChargeStep:0.##}（期望 30）/ 最多 {w1.ChargeMaxSeconds:0.##}s（期望 1）"
+				+ $" → 基础档：伤害 {dmg0:0.###}（期望 表值 {w1.Damage:0} ×玩家倍率 {dmgMul:0.##}）弹速 {spd0:0.##}（期望 {w1.Speed:0}）；3 档：伤害 {dmg3:0.###}（期望 {expectDmg3:0.###} = 1.3³）弹速 {spd3:0.##}（期望 {expectSpd3:0.##}）");
+		}
+
+		// 武技2 刹那之眼：基础蓄力期间被击中 → 无效化 + 强制一次不消耗层数的「后撤」。
+		if (_p3Backdash == null)
+		{
+			_p3Backdash = _p3Player.GetNodeOrNull<BackdashAbility>("AbilitySkill1");
+		}
+
+		if (_p3BowW2 == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·弓武技2：右键技能不是 HawkEyeAbility。");
+			return;
+		}
+
+		// ── ① 放大视角 + 每 0.5s 标记（先做这一段：它要求"已经蓄满、正在瞄准"）──
+		// 标记的判据是"**准星世界点**附近 MarkRadius 米内最近的目标"，所以靶子必须搬到准星那条线上
+		// （上一段把它摆在"弹道"上，而弹道是从胸口朝准星世界点的一条线，终点可能在很远处）。
+		if (_p3Target != null)
+		{
+			Vector3 point = AimUtil.GetCrosshairPoint(
+				GetViewport(), _p3Player, 200f, CombatLayers.World | CombatLayers.UnitMask);
+			Vector3 aim = (point - (_p3Player.GlobalPosition + (Vector3.Up * 0.9f))).Normalized();
+			_p3Target.GlobalPosition = point - (aim * 1.5f);
+			GameLog.Write("SelfTest", $"P3·刹那之眼：靶子已搬到准星世界点 {Fmt(point)} 前 1.5m 处（标记半径内）");
+		}
+
+		WaitUntilIdle(_p3BowW2);
+		_p3BowW2.RefreshCooldown();
+		bool hawkOk = _p3BowW2.TryActivate();
+		_p3BowW2.OnInputHeld(_p3BowW2.ChargeBaseSeconds + 0.05f); // 蓄满 → IsAiming
+		bool aiming = _p3BowW2.IsAiming;
+		float fovBefore = GetViewport().GetCamera3D()?.Fov ?? 0f;
+		// 同步推一大帧：既让视角放大平滑到位，也让"每 0.5s 标记一次"到点（与帧率无关）。
+		_p3BowW2._PhysicsProcess(0.6d);
+		float fovAfter = GetViewport().GetCamera3D()?.Fov ?? 0f;
+		int markedAfterOneInterval = _p3BowW2.MarkedCount;
+		_p3MarkedTotal += markedAfterOneInterval;
+		GameLog.Write(
+			"SelfTest",
+			$"{(aiming && markedAfterOneInterval >= 1 ? "✅" : "🔴")} P3·刹那之眼·瞄准与标记：TryActivate={hawkOk}（期望 True） 蓄满后 IsAiming={aiming}（期望 True）"
+			+ $" → 推 0.6s：标记次数 {markedAfterOneInterval}（期望 ≥1） 相机 FOV {fovBefore:0.#} → {fovAfter:0.#}（期望向 ZoomFov {_p3BowW2.ZoomFov:0.#} 收缩） ZoomApplied={_p3BowW2.ZoomApplied}｜靶子 {_p3Target?.Name} 身上层数={_p3Target?.GetStatusStacks(_p3BowW2.MarkStatusId)}");
+
+		_p3BowW2.OnInputReleased();          // 松手 → 视角还原 → Finish
+		WaitUntilIdle(_p3BowW2);
+		float fovRestored = GetViewport().GetCamera3D()?.Fov ?? 0f;
+		GameLog.Write(
+			"SelfTest",
+			$"P3·刹那之眼·收招还原视角：FOV={fovRestored:0.#}（期望回到施法前的 {fovBefore:0.#} ± 0.5） 仍在施法={_p3BowW2.IsBusy}（期望 False）");
+
+		// ── ② 基础蓄力期间被击中 → 无效化 + 强制一次不消耗层数的「后撤」──
+		if (_p3Backdash == null)
+		{
+			_p3Backdash = _p3Player.GetNodeOrNull<BackdashAbility>("AbilitySkill1");
+		}
+
+		WaitUntilIdle(_p3Backdash);
+		_p3BowW2.RefreshCooldown();
+		bool hawkOk2 = _p3BowW2.TryActivate();
+		_p3BowW2.OnInputHeld(0.1f); // 基础蓄力 0.3s 还没完成 → 正是"基础蓄力期间"
+		int chargesBefore = _p3Backdash?.ChargesRemaining ?? -1;
+		float healthBefore = _p3Player.Health;
+		DamageResult result = _p3Player.ReceiveHit(new HitInstance
+		{
+			Target = _p3Player,
+			Attacker = _p3Target,
+			Context = EventContext.Create(_p3Target, _p3Player),
+			Damage = 40f,
+			Direction = Vector3.Forward,
+		});
+
+		GameLog.Write(
+			"SelfTest",
+			$"P3·弓武技2 刹那之眼：TryActivate={hawkOk2}（期望 True） 基础蓄力 {_p3BowW2.ChargeBaseSeconds:0.##}s 已蓄 {_p3BowW2.ChargeTime:0.###}s（期望 < 基础，处于「基础蓄力期间」）"
+			+ $"｜被 40 点命中：无效化={result.Invulnerable}（期望 True） 掉血 {result.HealthLost:0.#}（期望 0） 生命 {healthBefore:0.#} → {_p3Player.Health:0.#}（期望不变）"
+			+ $"｜强制后撤：{_p3Backdash?.AbilityId} 触发次数={_p3BowW2.ForcedDodgeCount}（期望 1） 层数（触发前 {chargesBefore} → 现在 {_p3Backdash?.ChargesRemaining}，期望不消耗）");
+	}
+
+	/// <summary>
+	/// 把技能推到"空闲"（自测里同步推物理帧，与帧率无关）：<c>IsReady</c> 要求 <c>!IsBusy</c>，
+	/// 而上一段的施法要等它的 <c>Finish()</c>（动画事件帧那一帧）才会收尾。
+	/// </summary>
+	private static void WaitUntilIdle(Ability? ability)
+	{
+		if (ability == null)
+		{
+			return;
+		}
+
+		for (int i = 0; i < 80 && ability.IsBusy; i++)
+		{
+			ability._PhysicsProcess(0.05d);
+		}
+	}
+
+	/// <summary>弓的结果：贴标记（可叠加）+ 追踪弹 + 视角放大。</summary>
+	private void ReportBowProbe()
+	{
+		if (_p3Player == null || _p3BowW2 == null || _p3Target == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·弓：上一段没准备好，本段跳过。");
+			return;
+		}
+
+		// ① 标记：可叠加（MaxStacks = 表值）、不限单目标（层数记在每个单位自己身上）。
+		if (StatusPresets.Create(_p3BowW2.MarkStatusId, _p3BowW2.MarkDuration) is { } mark)
+		{
+			// 刹那之眼自己可能已经贴过 1 层（上面那一段），所以判据看**增量**。
+			int before = _p3Target.GetStatusStacks(_p3BowW2.MarkStatusId);
+			for (int i = 0; i < 3; i++)
+			{
+				_p3Target.ApplyStatus(mark);
+			}
+
+			int stacksAfter3 = _p3Target.GetStatusStacks(_p3BowW2.MarkStatusId);
+			for (int i = 0; i < 10; i++)
+			{
+				_p3Target.ApplyStatus(mark);
+			}
+
+			int stacksCapped = _p3Target.GetStatusStacks(_p3BowW2.MarkStatusId);
+			bool markOk = stacksAfter3 == Mathf.Min(mark.MaxStacks, before + 3) && stacksCapped == Mathf.Max(1, mark.MaxStacks);
+			GameLog.Write(
+				"SelfTest",
+				$"{(markOk ? "✅" : "🔴")} P3·标记（可叠加、不限单目标）：{mark.Id} 上限 {mark.MaxStacks} 层（表列 MaxStacks）→ 贴之前已有 {before} 层（刹那之眼自己贴的）→ 连贴 3 次 = {stacksAfter3} 层（期望 {Mathf.Min(mark.MaxStacks, before + 3)}）→ 再贴 10 次 = {stacksCapped} 层（期望封顶 {mark.MaxStacks}）"
+				+ $"｜刹那之眼自己标记次数={_p3MarkedTotal}（≥1 期望：它在准星附近挑过目标）｜被标记的单位={_p3Target.Name} 身上状态 [{string.Join(",", _p3Target.GetStatusIds())}]");
+		}
+
+		// ② 追踪弹：箭的子弹特性（HomingStatusId = 表值）。造一支箭，朝**背对**靶子的方向发射，
+		//    推两个物理帧之后速度方向应该已经转向被标记的靶子。
+		string homing = _p3BowW1?.HomingStatusId ?? string.Empty;
+		if (!string.IsNullOrEmpty(homing))
+		{
+			if (GD.Load<PackedScene>("res://Scenes/Combat/Arrow.tscn").Instantiate<Projectile>() is not { } arrow)
+			{
+				GameLog.Write("SelfTest", "🔴 P3·追踪弹：读不到 Arrow.tscn。");
+				return;
+			}
+
+			var attack = new AttackInstance
+			{
+				Attacker = _p3Player,
+				Ability = "selftest_homing",
+				BaseDamage = 1f,
+				Lifetime = 3f,
+				Tags = new[] { "Projectile", "Arrow" },
+			};
+
+			Node parent = GetTree().CurrentScene ?? GetTree().Root;
+			parent.AddChild(arrow);
+			// 放到高空：射线打不到任何东西，不会中途自毁（弹道只受追踪转向影响）。
+			arrow.GlobalPosition = _p3Player.GlobalPosition + (Vector3.Up * 30f);
+			// ⚠️ 弹速取小值：这一段的判据是"**方向**在转"，而手动推帧一次走 `速度 × 0.05s` 米，
+			// 飞得太快会把"目标方向"本身甩开（实测 60 m/s 时几何变化比转向还大，量出来的角度不干净）。
+			arrow.Speed = 6f;
+			arrow.GravityScale = 0f;
+			arrow.HomingStatusId = homing;
+			arrow.HomingTurnRateDegrees = _p3BowW1?.HomingTurnRateDegrees ?? 360f;
+			arrow.HomingRange = _p3BowW1?.HomingRange ?? 0f;
+			arrow.Launch(attack, Vector3.Right);
+
+			Vector3 toward0 = (_p3Target.GlobalPosition - arrow.GlobalPosition).Normalized();
+			float angleBefore = Mathf.RadToDeg(arrow.VelocityDirection.AngleTo(toward0));
+			var progress = new List<string>();
+			for (int i = 0; i < 8; i++)
+			{
+				arrow._PhysicsProcess(0.05d);
+				Vector3 toward = (_p3Target.GlobalPosition - arrow.GlobalPosition).Normalized();
+				progress.Add($"{Mathf.RadToDeg(arrow.VelocityDirection.AngleTo(toward)):0.#}°");
+			}
+
+			Vector3 towardAfter = (_p3Target.GlobalPosition - arrow.GlobalPosition).Normalized();
+			float angleAfter = Mathf.RadToDeg(arrow.VelocityDirection.AngleTo(towardAfter));
+			bool homingOk = angleAfter < angleBefore - 1f;
+			GameLog.Write(
+				"SelfTest",
+				$"{(homingOk ? "✅" : "🔴")} P3·追踪弹：箭的子弹特性 HomingStatusId=「{homing}」（表列） 转向 {arrow.HomingTurnRateDegrees:0.#}°/s 锁定的目标={arrow.HomingTargetName}（期望 {_p3Target.Name}）"
+				+ $" → 从 (1,0,0) 起飞，与「指向被标记靶子」的夹角逐帧 {angleBefore:0.#}° → {string.Join(" → ", progress)}（期望单调变小 = 真的在转向它；不追踪时应当一直停在 {angleBefore:0.#}°）"
+				+ $"｜每帧插值权重 {arrow.LastHomingWeight:0.###}（= min(1, 转向速度×物理帧长 ÷ 夹角)） 最后一次夹角 {arrow.LastHomingAngleDegrees:0.#}°｜靶子={_p3Target.Name} 层数={_p3Target.GetStatusStacks(homing)}");
+			arrow.QueueFree();
+		}
+
+		// ③ 视角放大：施法期间 Camera3D.Fov 应当已经变小。
+		GameLog.Write(
+			"SelfTest",
+			$"P3·刹那之眼·放大视角：ZoomFov={_p3BowW2.ZoomFov:0.#}（表列） 当前相机 FOV={GetViewport().GetCamera3D()?.Fov:0.#} ZoomApplied={_p3BowW2.ZoomApplied} 标记间隔={_p3BowW2.MarkIntervalSeconds:0.##}s 标记半径={_p3BowW2.MarkRadius:0.##}m 后撤技能行={_p3BowW2.DodgeAbilityId}");
+	}
+
+	private BackdashAbility? _p3BackdashProbed;
+	private float _p3HealthBeforeDash;
+
+	/// <summary>技能 1「后撤」：起手（动画 + 无敌帧开）。</summary>
+	private void BeginBackdashProbe()
+	{
+		_p3Player = PlayerLocator.Player;
+		_p3BackdashProbed = _p3Player?.GetNodeOrNull<BackdashAbility>("AbilitySkill1");
+		if (_p3Player == null || _p3BackdashProbed == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·后撤：找不到玩家的技能节点。");
+			return;
+		}
+
+		Vector3 before = _p3Player.GlobalPosition;
+		_p3HealthBeforeDash = _p3Player.Health;
+		_p3FacingBeforeDash = _p3Player.Rotation.Y;
+		// 上一段（刹那之眼的强制后撤）刚用过它 → 等它收招，否则 IsReady 会因为"正忙"为 false。
+		WaitUntilIdle(_p3BackdashProbed);
+		_p3BackdashProbed.RefreshCooldown();
+		bool ok = _p3BackdashProbed.TryActivate();
+		GameLog.Write(
+			"SelfTest",
+			$"P3·后撤：TryActivate={ok}（期望 True） CD={_p3BackdashProbed.Cooldown:0.##}s（期望 10） 动画={_p3BackdashProbed.AnimName} 开无敌帧={_p3BackdashProbed.AnimEvent} 关无敌帧={_p3BackdashProbed.AnimEventEnd}"
+			+ $"｜位置 {Fmt(before)} 朝向 Y={_p3Player.Rotation.Y:0.###}（下一段比「没有改变朝向」） 朝向基准={_p3FacingBeforeDash:0.###}"
+			+ $"｜诊断：{_p3BackdashProbed.Diagnose()}");
+	}
+
+	private float _p3FacingBeforeDash;
+
+	/// <summary>后撤的"开无敌"那一帧（<c>Dodge</c>）。</summary>
+	private void ReportBackdashInvulnerableOn()
+	{
+		if (_p3Player == null || _p3BackdashProbed == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·后撤：上一段没准备好。");
+			return;
+		}
+
+		// 无敌帧必须**真的挡住伤害**：这一发 40 点在无敌期间应当完全无效。
+		DamageResult blocked = _p3Player.ReceiveHit(new HitInstance
+		{
+			Target = _p3Player,
+			Attacker = _p3Target,
+			Context = EventContext.Create(_p3Target, _p3Player),
+			Damage = 40f,
+			Direction = Vector3.Forward,
+		});
+
+		bool ok = _p3BackdashProbed.InvulnerableOwned && _p3Player.IsInvulnerable && blocked.Invulnerable && blocked.HealthLost <= 0f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P3·后撤·无敌帧开（帧 {_p3BackdashProbed.AnimEvent}）：IsInvulnerable={_p3Player.IsInvulnerable}（期望 True） 技能自报无敌={_p3BackdashProbed.InvulnerableOwned}（期望 True）"
+			+ $"｜无敌期间挨 40 点：无效化={blocked.Invulnerable}（期望 True） 掉血 {blocked.HealthLost:0.#}（期望 0） 生命 {_p3Player.Health:0.#}（应仍为 {_p3HealthBeforeDash:0.#}）"
+			+ $"｜后撤力 {Fmt(_p3BackdashProbed.LastImpulse)} 朝向 Y={_p3Player.Rotation.Y:0.###}（期望与起手时的 {_p3FacingBeforeDash:0.###} 相同 = 不改变朝向）");
+	}
+
+	/// <summary>后撤的"关无敌"那一帧（<c>Dodger</c>）。</summary>
+	private void ReportBackdashInvulnerableOff()
+	{
+		if (_p3Player == null || _p3BackdashProbed == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·后撤：上一段没准备好。");
+			return;
+		}
+
+		bool ok = !_p3Player.IsInvulnerable && !_p3BackdashProbed.InvulnerableOwned;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P3·后撤·无敌帧关（帧 {_p3BackdashProbed.AnimEventEnd}）：IsInvulnerable={_p3Player.IsInvulnerable}（期望 False） 技能自报无敌={_p3BackdashProbed.InvulnerableOwned}（期望 False） 仍在施法={_p3BackdashProbed.IsBusy}（期望 False） 朝向 Y={_p3Player.Rotation.Y:0.###}（期望仍未改变）");
+	}
+
+	/// <summary>技能 2「跃升」+ 被动「灵动」的静态读数与起手。</summary>
+	private void BeginLeapProbe()
+	{
+		_p3Player = PlayerLocator.Player;
+		if (_p3Player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·跃升：找不到玩家。");
+			return;
+		}
+
+		_p3Leap = _p3Player.GetNodeOrNull<LeapAbility>("AbilitySkill2");
+		_p3Passive = _p3Player.GetNodeOrNull<AirJumpPassiveAbility>("AbilityPassive");
+		_p3Hover = _p3Player.GetNodeOrNull<AirHoverController>("AirHover");
+
+		CharacterMovement? movement = _p3Player.Movement;
+		GameLog.Write(
+			"SelfTest",
+			$"P3·被动 灵动：节点={(_p3Passive == null ? "（找不到）" : _p3Passive.AbilityId)} Enabled={_p3Passive?.Enabled} 授予 {_p3Passive?.Grant} 次（期望 1） 上限 {_p3Passive?.MaxExtraAirJumps} 次（期望 3）"
+			+ $" → CharacterMovement.ExtraAirJumps={movement?.ExtraAirJumps}（期望 1，场景基线 0 + 授予 1）");
+
+		if (_p3Leap == null || _p3Hover == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·跃升：找不到技能节点或滞空组件。");
+			return;
+		}
+
+		WaitUntilIdle(_p3Leap);
+		_p3Leap.RefreshCooldown();
+		bool ok = _p3Leap.TryActivate();
+		GameLog.Write(
+			"SelfTest",
+			$"P3·跃升：TryActivate={ok}（期望 True） CD={_p3Leap.Cooldown:0.##}s（期望 20） 动画={_p3Leap.AnimName} 事件帧={_p3Leap.AnimEvent}（期望 Action）"
+			+ $"｜表列：起跳速度 {_p3Leap.LeapVelocity:0.##} m/s 滞空 {_p3Leap.HoverSeconds:0.##}s（期望 3） 减缓 {_p3Leap.HoverFallSlowPercent * 100f:0.#}%（期望 90） 光环半径 {_p3Leap.RingRadius:0.##}｜下一段读结果（效果在 Action 帧那一帧才写）");
+	}
+
+	/// <summary>跃升结果：真的跳了 + 真的授予了滞空。</summary>
+	private void ReportLeapProbe()
+	{
+		if (_p3Leap == null || _p3Hover == null || _p3Player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·跃升：上一段没准备好。");
+			return;
+		}
+
+		bool ok = _p3Leap.LastLeapVelocity > 0f && _p3Hover.GrantCount > 0 && _p3Hover.IsHovering;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P3·跃升结果：起跳速度 {_p3Leap.LastLeapVelocity:0.##} m/s（期望 = 表值 {_p3Leap.LeapVelocity:0.##}） 授予滞空 {_p3Leap.LastHoverSeconds:0.##}s（期望 3）"
+			+ $" → 滞空组件：授予次数 {_p3Hover.GrantCount}（期望 ≥1） 剩余 {_p3Hover.HoverRemaining:0.##}s（期望 > 0） 在空中={!_p3Player.IsOnFloor()} 减缓比例 {_p3Hover.FallSlowPercent:0.##}（期望 0.9） 光环节点存在={_p3Hover.GetNodeOrNull<MeshInstance3D>("HoverRing") != null}");
+	}
+
+	/// <summary>滞空的"按住跳跃键 → 下落减缓"（自测注入不了按键，用组件上的探针开关）。</summary>
+	private void ReportHoverSlowFall()
+	{
+		if (_p3Hover == null || _p3Player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 P3·滞空：上一段没准备好。");
+			return;
+		}
+
+		// 造一个"正在快速下落"的状态：直接给一个向下速度，然后开探针开关推几帧。
+		_p3Player.Velocity = _p3Player.Velocity with { Y = -20f };
+		float before = _p3Player.Velocity.Y;
+		_p3Hover.DebugForceJumpHeld = true;
+		bool hoveringBefore = _p3Hover.IsHovering;
+		_p3Hover._PhysicsProcess(0.05d);
+		float afterOne = _p3Player.Velocity.Y;
+		bool slow = _p3Hover.IsSlowFalling;
+		MeshInstance3D? ring = _p3Hover.GetNodeOrNull<MeshInstance3D>("HoverRing");
+		bool ringVisible = ring?.Visible ?? false;
+		_p3Hover.DebugForceJumpHeld = false;
+
+		bool ok = slow && Mathf.Abs(afterOne - (before * (1f - _p3Hover.FallSlowPercent))) < 0.001f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(ok ? "✅" : "🔴")} P3·滞空·按住跳跃键减缓下落：垂直速度 {before:0.##} → {afterOne:0.##}（期望 {before * (1f - _p3Hover.FallSlowPercent):0.##} = ×(1-{_p3Hover.FallSlowPercent:0.##})） 本帧在减缓={slow}（期望 True）"
+			+ $"｜脚底光环可见={ringVisible}（按住期间应有） 剩余滞空 {_p3Hover.HoverRemaining:0.##}s 推之前还在滞空={hoveringBefore}"
+			+ $"｜说明：自测注入不了按键（Input.ParseInputEvent 会崩），所以走 DebugForceJumpHeld 这一条探针；真人按键那一路由 MCP 手测 + 截图覆盖");
 	}
 
 	private static CollisionShape3D? BodyShapeOf(Unit unit)

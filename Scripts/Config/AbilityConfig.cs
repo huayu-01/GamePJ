@@ -62,6 +62,14 @@ public partial class AbilityConfig : ConfigRow
 	/// <summary>事件帧名（<c>ATK</c> / <c>Dodge</c> / <c>Release</c> …）：动画播到这一帧才释放效果。</summary>
 	[Export] public string AnimEvent { get; set; } = string.Empty;
 
+	/// <summary>
+	/// **第二个事件帧名**（空 = 不用）。用在"一段动画里夹出一个区间"的技能上 ——
+	/// 设计文档（角色 A 技能 1「后撤」）：「帧 <c>Dodge</c> 到 <c>Dodger</c> 期间无敌」，
+	/// 所以这一列填 <c>Dodger</c>：<c>Dodge</c> 开无敌、<c>Dodger</c> 关无敌。
+	/// 见 <see cref="Ability.AnimEventEnd"/>。
+	/// </summary>
+	[Export] public string AnimEventEnd { get; set; } = string.Empty;
+
 	/// <summary>动画速度倍率（&gt;1 加速释放，蓄力类 &lt;1 拉长）。写在每个单位自己的播放器上。</summary>
 	[Export] public float AnimSpeedScale { get; set; } = 1f;
 
@@ -172,6 +180,7 @@ public partial class AbilityConfig : ConfigRow
 		ability.HoldToCharge = HoldToCharge;
 		ability.AnimName = AnimName;
 		ability.AnimEvent = AnimEvent;
+		ability.AnimEventEnd = AnimEventEnd;
 		ability.AnimSpeedScale = AnimSpeedScale <= 0f ? 1f : AnimSpeedScale;
 
 		// 冷却缩减 / 层数 / 蓄力：**0 = 不覆盖**（保留场景值），与 Cooldown 同一条纪律。

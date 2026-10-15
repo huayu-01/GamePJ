@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillAnimationConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/SkillAnimationConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "anim_a1_backdash"
+DisplayName = "A1 技能1 后撤 · Dodge→Dodger 无敌区间"
+Note = "角色 A 技能1：源段 jump（0.5s）缩到 0.35s（scale = 0.7）。两个事件帧夹出无敌区间：Dodge @0.00（开无敌 + 给向后的力）、Dodger @0.35（关无敌 + 收招）。文档原话「帧 Dodge 到 Dodger 期间无敌」。"
+SourceModelPath = "res://Assets/Models/player/mesh_player_body.glb"
+SourceAnimation = "jump"
+SourcePlayerPath = "AnimationPlayer"
+TargetName = "Skill_A1_Backdash"
+Library = "skills"
+OutputDir = "res://Assets/Animations/skills/"
+Length = 0.35
+Loop = false
+EventNames = PackedStringArray("Dodge", "Dodger")
+EventTimes = PackedFloat32Array(0, 0.5)
+EventTargetPath = ".."
+EventMethod = "anim_event"

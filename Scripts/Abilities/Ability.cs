@@ -69,6 +69,20 @@ public abstract partial class Ability : Node3D
 	[Export] public float AnimSpeedScale { get; set; } = 1f;
 
 	/// <summary>
+	/// **第二个事件帧名**（"一段动画里夹出一个区间"的技能用；空 = 不用，行为与改动前逐位一致）。
+	///
+	/// <para>设计文档（角色 A 技能 1「后撤」）：「帧 <c>Dodge</c> 到 <c>Dodger</c> 期间无敌
+	/// （相当于 Dodge 开无敌、Dodger 关无敌）」—— 这就是**两个帧夹一个区间**。
+	/// 因为 <see cref="OnAnimationEvent"/> 的过滤只认 <see cref="AnimEvent"/> 一个名字，
+	/// 所以这里补一列：填了它之后，<b>这两个名字的事件帧都会送到</b> <see cref="OnAnimEvent"/>，
+	/// 子类按名字分支即可（`Dodge` → 开无敌，`Dodger` → 关无敌）。</para>
+	///
+	/// <para>它同样是"没有对应动画 → 不执行"那套的一部分：两个帧都必须真的在动画里
+	/// （`AnimEvent` / `AnimEventEnd` 两张生成表列）。</para>
+	/// </summary>
+	[Export] public string AnimEventEnd { get; set; } = string.Empty;
+
+	/// <summary>
 	/// **这个技能绑哪个按键动作**（`project.godot` 的 `[input]` 名，例如 <c>weapon_skill_1</c>）。
 	///
 	/// 留空 = 这个技能不由玩家按键直接触发（敌人技能、被动、由别的技能驱动）。
@@ -494,7 +508,7 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	private void EnsureAnimEventHooked()
 	{
-		if (_animEventHookedByMe || string.IsNullOrEmpty(AnimEvent))
+		if (_animEventHookedByMe || (string.IsNullOrEmpty(AnimEvent) && string.IsNullOrEmpty(AnimEventEnd)))
 		{
 			return;
 		}
@@ -513,12 +527,20 @@ public abstract partial class Ability : Node3D
 	}
 
 	/// <summary>
-	/// 动画事件帧的过滤与分发：**只认自己等的那一帧**（<see cref="AnimEvent"/>），
+	/// 动画事件帧的过滤与分发：**只认自己等的那一帧**（<see cref="AnimEvent"/>，以及
+	/// 第二帧 <see cref="AnimEventEnd"/>，见「后撤」的无敌区间），
 	/// 且只在自己正忙的时候认（否则别的单位的帧会打到没在放技能的能力上）。
 	/// </summary>
 	private void OnAnimationEvent(string name)
 	{
-		if (!IsBusy || string.IsNullOrEmpty(AnimEvent) || name != AnimEvent)
+		if (!IsBusy)
+		{
+			return;
+		}
+
+		bool first = !string.IsNullOrEmpty(AnimEvent) && name == AnimEvent;
+		bool second = !string.IsNullOrEmpty(AnimEventEnd) && name == AnimEventEnd;
+		if (!first && !second)
 		{
 			return;
 		}

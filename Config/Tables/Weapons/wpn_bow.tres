@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="WeaponConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a3_w1_1.tres" id="2_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a3_w1_2.tres" id="3_skl"]
+
+[resource]
+script = ExtResource("1_row")
+ScenePath = "res://Scenes/Weapons/Pistol.tscn"
+AttackTags = PackedStringArray("Projectile", "Arrow", "Physical")
+Damage = 0.0
+FireInterval = 0.5
+MagazineSize = 1
+ReloadTime = 0.1
+AutoReloadDelay = 999.0
+SpreadDegrees = 0.0
+AimSpreadScale = 0.0
+MultiShotSpreadDegrees = 0.0
+ProjectilesPerShot = 1
+BasePierce = 0
+Knockback = 0.0
+CritChance = 0.05
+CritMultiplier = 2.0
+ProjectileSpeed = 220.0
+MaxLifetime = 3.0
+AimFov = 45.0
+Automatic = false
+Skills = [ExtResource("2_skl"), ExtResource("3_skl")]
+Id = "wpn_bow"
+Slot = 6
+DisplayName = "弓"
+DescriptionTemplate = "发射箭矢：武技1 蓄力（每 0.1s +30% 伤害与 +30 弹速，最多 1 秒）/ 武技2 刹那之眼（放大视角 + 标记目标，箭会追踪被标记的最近目标）。"
+Note = "[新增行·P3] 角色 A 武器 3。与短弩同一条纪律：**不走 Weapon 组件的开火**，发射由本行 Skills 里那两个武技行完成。★ 文档只说「发射子弹:箭」，没给弓的子弹特性（下坠/击退是短弩的）→ 弓的箭在技能行里 GravityScale = 0（直线）+ 追踪标记目标（HomingStatusId = Mark）。ScenePath 暂用 Pistol.tscn（手上模型，后续换 mesh 即可）。"

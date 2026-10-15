@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SkillAnimationConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/SkillAnimationConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "anim_a1_leap"
+DisplayName = "A1 技能2 跃升 · Action 帧"
+Note = "角色 A 技能2：源段 jump（0.5s），事件帧 Action @0.15s —— 文档原话「帧 Action 时释放效果」，所以强力跳跃与滞空都在这一帧发生。"
+SourceModelPath = "res://Assets/Models/player/mesh_player_body.glb"
+SourceAnimation = "jump"
+SourcePlayerPath = "AnimationPlayer"
+TargetName = "Skill_A1_Leap"
+Library = "skills"
+OutputDir = "res://Assets/Animations/skills/"
+Loop = false
+EventNames = PackedStringArray("Action")
+EventTimes = PackedFloat32Array(0.15)
+EventTargetPath = ".."
+EventMethod = "anim_event"

@@ -4,7 +4,12 @@ namespace ActRoguelike.Combat;
 
 /// <summary>
 /// 状态效果（战斗规则说明 §20）：与伤害本体分离，通过 Modifier 改数值或按秒造成伤害。
-/// 同名状态刷新持续时间而不是叠加层数（原型阶段先这么定）。
+///
+/// <para><b>层数</b>：<see cref="MaxStacks"/> ≤ 1 时是原来的行为 —— <b>同名刷新持续时间、不叠加层数</b>
+/// （改动前后逐位一致）。&gt; 1 时变成"<b>可叠加</b>"：每次施加 +1 层（封顶），持续时间同样刷新，
+/// 且 <see cref="Modifiers"/> 按层数放大（每层一份）。
+/// 设计文档里的「标记」就是这一条 ——「可叠加且不限定单个目标的 buff」
+/// （`docs/refactor-survey.md` §硬编码审计第 6 条：`Unit.ApplyStatus` 原来"不叠加层数"）。</para>
 /// </summary>
 public sealed class StatusEffect
 {
@@ -12,14 +17,30 @@ public sealed class StatusEffect
 	public float Duration { get; init; }
 	public StatModifier[] Modifiers { get; init; } = Array.Empty<StatModifier>();
 	public float DamagePerSecond { get; init; }
+
+	/// <summary>
+	/// **最多叠几层**（1 = 原来的行为：同名只刷新时间）。数值来自效果表
+	/// （`Config/Tables/Effects/eff_*.tres` 的 `MaxStacks` 列），代码里没有硬编码层数。
+	/// </summary>
+	public int MaxStacks { get; init; } = 1;
+
+	/// <summary>这条状态是不是"可叠加"（&gt; 1 层）。</summary>
+	public bool IsStackable => MaxStacks > 1;
 }
 
 /// <summary>单位身上正在生效的状态。</summary>
 public sealed class ActiveStatus
 {
-	public required StatusEffect Effect { get; init; }
+	/// <summary>本层用的效果定义（可叠加时会被**最近一次施加**的那份替换，层数与修正器都按它算）。</summary>
+	public required StatusEffect Effect { get; set; }
 	public float Remaining { get; set; }
 	public float TickAccumulator { get; set; }
+
+	/// <summary>
+	/// 当前层数（<see cref="StatusEffect.MaxStacks"/> ≤ 1 时恒为 1，**不参与任何判定**）。
+	/// 「标记」这类可叠加 buff 靠它计数（表现层 / 增幅读 <c>Unit.GetStatusStacks</c>）。
+	/// </summary>
+	public int Stacks { get; set; } = 1;
 }
 
 /// <summary>

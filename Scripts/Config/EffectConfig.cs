@@ -79,8 +79,24 @@ public partial class EffectConfig : ConfigRow
 	/// <summary>每秒伤害（0 = 没有持续伤害）。等价于原来 <c>StatusEffect.DamagePerSecond</c>；燃烧当前 = 6 伤害/秒。</summary>
 	[Export] public float DamagePerSecond { get; set; }
 
-	/// <summary>本行是不是一条"可被挂到单位身上的状态"（有 Modifiers 或 DamagePerSecond 就是）。</summary>
-	public bool IsStatus => Modifiers.Length > 0 || DamagePerSecond > 0f;
+	/// <summary>
+	/// **最多叠几层**（1 = 原来的行为：同名只刷新时间、不叠加）。
+	///
+	/// <para>设计文档的「标记」：「可叠加且不限定单个目标的 buff」→ 这一列填 &gt; 1（例如 5）。
+	/// 层数由 <c>Unit.ApplyStatus</c> 记在单位自己身上（每个目标各一份），所以天然不限单个目标；
+	/// 修正器按层数放大（每层一份），层数也能被增幅读（`Unit.GetStatusStacks`）。</para>
+	///
+	/// <para>⚠️ 这一列的值是**表**里说了算，代码里没有层数上限。</para>
+	/// </summary>
+	[Export] public int MaxStacks { get; set; } = 1;
+
+	/// <summary>
+	/// 本行是不是一条"可被挂到单位身上的状态"（有 Modifiers / 有持续伤害 / 或**是可叠加的纯标记**）。
+	///
+	/// ⚠️ 第三个条件是「标记」这类**没有数值修正**的纯计数 buff 所需要的：它没有任何 Modifier，
+	/// 却必须能被挂上（心眼那条增幅读的就是层数）。
+	/// </summary>
+	public bool IsStatus => Modifiers.Length > 0 || DamagePerSecond > 0f || MaxStacks > 1;
 
 	/// <summary>
 	/// 转成运行期的 <see cref="StatusEffect"/>（状态类效果用）。
@@ -100,6 +116,7 @@ public partial class EffectConfig : ConfigRow
 			Duration = duration > 0f ? duration : Duration,
 			Modifiers = modifiers.ToArray(),
 			DamagePerSecond = DamagePerSecond,
+			MaxStacks = Mathf.Max(1, MaxStacks),
 		};
 	}
 }

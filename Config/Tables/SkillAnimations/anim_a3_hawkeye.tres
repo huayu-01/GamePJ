@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SkillAnimationConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/SkillAnimationConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "anim_a3_hawkeye"
+DisplayName = "A3 武技2 刹那之眼 · AimOn/Mark/ATK 帧"
+Note = "角色 A 武器 3（弓）武技2：源段单手射击（另一侧）。事件帧 AimOn @0.00（开镜 → 逻辑里紧接着做第一次标记尝试）、Mark @0.10、ATK @0.18。每 0.5s 的重复标记由逻辑循环（不是动画循环）。"
+SourceModelPath = "res://Assets/Models/player/mesh_player_body.glb"
+SourceAnimation = "holding-left-shoot"
+SourcePlayerPath = "AnimationPlayer"
+TargetName = "ATK_A3_HawkEye"
+Library = "skills"
+OutputDir = "res://Assets/Animations/skills/"
+Loop = false
+EventNames = PackedStringArray("AimOn", "Mark", "ATK")
+EventTimes = PackedFloat32Array(0, 0.1, 0.18)
+EventTargetPath = ".."
+EventMethod = "anim_event"

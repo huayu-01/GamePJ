@@ -127,6 +127,15 @@ public partial class RunController : Node
 			character.ApplyAnimationTo(_player);
 		}
 
+		// **当前武器自己的武技**（`Config/Tables/Weapons/wpn_*.tres` 的 `Skills` 列）：
+		// 武技属于武器，而一个角色的 3 把武器都用同样的两个按键（weapon_skill_1/2），
+		// 所以必须"换武器就换武技行"——挂在角色行上会让上一把的武技留在节点上抢同一个按键。
+		// 旧 3 把枪的 `Skills` 是空数组 → 这一行什么都不做（与改动前逐位一致）。
+		if (WeaponRow(_weaponKind) is { } weaponRow)
+		{
+			UnitConfig.ApplySkills(_player, weaponRow.Skills, weaponRow.Id);
+		}
+
 		// 能力卡（局外装备层）：激活的卡在这里套到玩家身上（数值修饰 + 授予技能）。
 		// 位置刻意放在**角色表的能力开关矩阵与技能行之后** —— 一张"授予技能"的卡要赢过角色的
 		// DisabledAbilityIds（卡 = 玩家花局外资源买的额外能力）。规则与存盘在 AbilityStore，见 docs/ability-cards.md。

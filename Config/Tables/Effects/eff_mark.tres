@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EffectConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Kind = 10
+Duration = 6.0
+MaxStacks = 5
+Modifiers = []
+Id = "Mark"
+Slot = 10
+DisplayName = "标记"
+Note = "[新增行·P3] 设计文档里的「标记」：「可叠加且**不限定单个目标**的 buff」（角色 A 武器 3 武技2 刹那之眼 / 武器 1 的 A1 限定增幅「发散」/ 武器 3 的 A3 限定增幅「心眼」都用它）。★ 它**没有任何数值修正**（所以 Modifiers 是空的）：这一行存在的意义是「层数」本身 —— MaxStacks = 5 是 `Unit.ApplyStatus` 的**可叠加**路径（P2 之前那里是「同名只刷新时间、不叠加层数」，见 docs/refactor-survey.md 硬编码审计第 6 条）。层数记在**每个单位自己身上**，所以天然不限单个目标；读层数用 Unit.GetStatusStacks(Mark)。★ 没有修正器也要能被挂上 → EffectConfig.IsStatus 额外认「MaxStacks > 1」（纯计数型状态）。★ 持续 6s（文档没写时长 = n → 预设；技能行 MarkDuration 会覆盖它）。"

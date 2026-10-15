@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="WeaponConfig" format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_1.tres" id="2_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_2.tres" id="3_skl"]
 
 [resource]
 script = ExtResource("1_row")
@@ -23,8 +25,9 @@ ProjectileSpeed = 150.0
 MaxLifetime = 1.6
 AimFov = 55.0
 Automatic = false
+Skills = [ExtResource("2_skl"), ExtResource("3_skl")]
 Id = "wpn_energy_palm"
 Slot = 4
 DisplayName = "能量掌"
 DescriptionTemplate = "发射能量波：直线、无下坠、能穿透格挡（无视格挡效果）。伤害/弹速由武技技能行给。"
-Note = "[新增行·本轮只加不删] 角色 A 武器 1。⚠️ 它**不走** Weapon 组件的开火（那套有弹匣/装填，能量掌没有）：发射由角色 A 的武技技能（skl_a1_w1_*）用 EnergyWave 投射物完成。这一行的作用是身份 + 攻击标签 + 暴击基准 + 弹速，以及给「武器限定池」一个可指向的行。ScenePath 暂用 Pistol.tscn（手上模型，后续换 mesh 即可）。"
+Note = "[P1 新增行 · P3 扩充] 角色 A 武器 1。⚠️ 它**不走** Weapon 组件的开火（那套有弹匣/装填，能量掌没有）：发射由本行 Skills 里那两个武技技能（skl_a1_w1_*）用 EnergyWave 投射物完成。这一行的作用是身份 + 攻击标签 + 暴击基准 + 弹速 + **指向自己的武技行**（P3 起武技归属武器行而不是角色行，理由见 WeaponConfig.Skills 的注释）。ScenePath 暂用 Pistol.tscn（手上模型，后续换 mesh 即可）。"

@@ -1,0 +1,36 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Projectile.cs" id="1_projectile"]
+[ext_resource type="Material" path="res://Assets/Materials/mat_combat_bullet.tres" id="2_mat"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_shaft"]
+material = ExtResource("2_mat")
+top_radius = 0.022
+bottom_radius = 0.022
+height = 0.62
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_tip"]
+material = ExtResource("2_mat")
+top_radius = 0.0
+bottom_radius = 0.05
+height = 0.14
+radial_segments = 6
+rings = 1
+
+[node name="Arrow" type="Node3D"]
+script = ExtResource("1_projectile")
+Speed = 220.0
+GravityScale = 0.0
+MaxLifetime = 3.0
+Pierce = 0
+HitMask = 5
+
+[node name="Shaft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
+mesh = SubResource("CylinderMesh_shaft")
+
+[node name="Tip" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, -0.37)
+mesh = SubResource("CylinderMesh_tip")

@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+
+[sub_resource type="Resource" id="p_a1_skill_1_0"]
+script = ExtResource("2_param")
+Key = "BackwardForce"
+Value = 12.0
+Note = "★ 向后的力。文档写的是 {100 或 N}，但这份工程的「力」是 AddImpulse 的 m/s 冲量（阻尼 6/s）：100 会让角色瞬间飞出地图，所以按**能跑起来的最小预设值 12** 填，实际手感开发后再调"
+
+[sub_resource type="Resource" id="p_a1_skill_1_1"]
+script = ExtResource("2_param")
+Key = "UpwardForce"
+Value = 0.0
+Note = "额外抬高的垂直分量（0 = 纯水平后撤；文档没写 → 预设 0）"
+
+[sub_resource type="Resource" id="p_a1_skill_1_2"]
+script = ExtResource("2_param")
+Key = "InvulnerableFromEvent"
+Value = "Dodge"
+Note = "★ 文档：帧 Dodge 开无敌"
+
+[sub_resource type="Resource" id="p_a1_skill_1_3"]
+script = ExtResource("2_param")
+Key = "InvulnerableToEvent"
+Value = "Dodger"
+Note = "★ 文档：帧 Dodger 关无敌"
+
+[sub_resource type="Resource" id="p_a1_skill_1_4"]
+script = ExtResource("2_param")
+Key = "InvulnerableSafetySeconds"
+Value = 3.0
+Note = "超时兜底：Dodger 帧没来也要把无敌关掉（否则玩家会永久无敌）"
+
+[resource]
+script = ExtResource("1_row")
+NodeName = "AbilitySkill1"
+ClassHint = "BackdashAbility"
+InputAction = "skill_1"
+HoldToCharge = false
+AnimName = "Skill_A1_Backdash"
+AnimEvent = "Dodge"
+AnimEventEnd = "Dodger"
+AnimSpeedScale = 1.0
+Aim = 0
+Cooldown = 10.0
+Windup = 0.0
+Recover = 0.4
+Enabled = true
+Params = [SubResource("p_a1_skill_1_0"), SubResource("p_a1_skill_1_1"), SubResource("p_a1_skill_1_2"), SubResource("p_a1_skill_1_3"), SubResource("p_a1_skill_1_4")]
+Id = "skl_a1_skill_1"
+Slot = 0
+DisplayName = "后撤"
+DescriptionTemplate = "按 Q：给角色一个向后的力 {BackwardForce:0.#}（**不改变朝向**，会被挡住/挤开），帧 Dodge 到 Dodger 期间无敌。CD {Cooldown:0}s。"
+Note = "[新增行·P3] 角色 A 技能1「后撤」（文档 CD:10 / 向后的力 {100 或 N} / 有无敌帧 / 帧 Dodge→Dodger 无敌）。★ 无敌帧是**按动画帧开关**的新机制：AnimEvent=Dodge 开、AnimEventEnd=Dodger 关（Ability 基类新增的第二事件帧列，理由见 BackdashAbility 的类注释）。★ 后撤用 AddImpulse（外力）而不是位移技能：这样「产生碰撞存在被挤开或停下的情况」是引擎的自然结果，而且**朝向完全不变**（转身只读输入速度）。★ 文档的 {100 或 N} 与这份工程的速度单位不同，先填最小预设值 12。"
