@@ -4,7 +4,6 @@ using ActRoguelike.Encounter;
 using ActRoguelike.Interaction;
 using ActRoguelike.Rewards;
 using ActRoguelike.Run;
-using ActRoguelike.Weapons;
 using ActRoguelike.Core;
 using System;
 using System.Collections.Generic;
@@ -37,7 +36,6 @@ public partial class PlayerHud : CanvasLayer
 		$"[{OS.GetKeycodeString(Key.O)} 设置]";
 
 	private Label _health = null!;
-	private Label _ammo = null!;
 	private Label _status = null!;
 	private Control _root = null!;
 	/// <summary>首领血条是否展开为完整形态（验证用只读状态）。</summary>
@@ -57,7 +55,6 @@ public partial class PlayerHud : CanvasLayer
 	private HBoxContainer _buildIcons = null!;
 	private HealthBarWidget _healthBar = null!;
 	private Unit? _player;
-	private Weapon? _weapon;
 	private EncounterController? _encounter;
 	private RunController? _run;
 	private StageController? _stage;
@@ -66,7 +63,6 @@ public partial class PlayerHud : CanvasLayer
 	public override void _Ready()
 	{
 		_health = GetNode<Label>("Root/Health");
-		_ammo = GetNode<Label>("Root/Ammo");
 		_status = GetNode<Label>("Root/Status");
 		_build = GetNode<Label>("Root/Build");
 		_buildIcons = GetNode<HBoxContainer>("Root/BuildIcons");
@@ -105,7 +101,6 @@ public partial class PlayerHud : CanvasLayer
 		if (_player == null || !IsInstanceValid(_player))
 		{
 			_player = PlayerLocator.Player;
-			_weapon = _player != null ? FindWeapon(_player) : null;
 			BindPlayer(_player);
 		}
 
@@ -147,14 +142,9 @@ public partial class PlayerHud : CanvasLayer
 		UpdateArmorBar(_player);
 		MaybeShowHealNumber(_player);
 
-		if (_weapon == null)
-		{
-			_ammo.Text = string.Empty;
-		}
-		else
-		{
-			_ammo.Text = _weapon.IsReloading ? "装填中…" : $"{_weapon.Ammo} / {_weapon.EffectiveMagazineSize}";
-		}
+		// ⚠️ P6b：**弹药显示整条删除**（用户 2026-10-12 裁定「没有弹匣的概念了」）——
+		// 原来这里写的是 `装填中…` / `Ammo / EffectiveMagazineSize`（屏幕右下角那个 `1 / 1`），
+		// 配套的 `Root/Ammo` Label 节点也已从 `Hud.tscn` 删除。
 
 		string prompt = PlayerInteractInput.Prompt;
 
@@ -197,25 +187,6 @@ public partial class PlayerHud : CanvasLayer
 			string summonInfo = summons > 0 ? $"召唤 {summons}   " : string.Empty;
 			_status.Text = $"{stageInfo}{summonInfo}敌人 {_encounter.AliveCount}";
 		}
-	}
-
-	private static Weapon? FindWeapon(Node root)
-	{
-		foreach (Node child in root.GetChildren())
-		{
-			if (child is Weapon weapon)
-			{
-				return weapon;
-			}
-
-			Weapon? nested = FindWeapon(child);
-			if (nested != null)
-			{
-				return nested;
-			}
-		}
-
-		return null;
 	}
 
 	// === 构筑图标条（用户需求：「构筑元素都用图标」「说明只在选取界面和鼠标悬停时显示」）===

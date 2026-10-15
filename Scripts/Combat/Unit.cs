@@ -200,12 +200,12 @@ public partial class Unit : CharacterBody3D
 	private void SeedStats()
 	{
 		// 注意：凡是会被当作除数或乘法基数的键都必须有基础值。
-		// 少了基础值就会读到 0，除下来变成「装填 7 秒」这种离谱结果（踩过一次）。
+		// 少了基础值就会读到 0，除下来会算出离谱结果（踩过一次：装填时间变成 7 秒）。
+		// ⚠️ P6b：`ReloadSpeedMultiplier` / `MagazineSizeAdd` 两个键**随弹匣/装填一起删除**
+		//（全项目已无读取端 —— `Weapon` 的装填逻辑、两张能力卡、`meta_reload`、局外加成都清了）。
 		Stats.SetBase("DamageMultiplier", 1f);
 		Stats.SetBase("AttackSpeedMultiplier", 1f);
 		Stats.SetBase("MoveSpeedMultiplier", 1f);
-		Stats.SetBase("ReloadSpeedMultiplier", 1f);
-		Stats.SetBase("MagazineSizeAdd", 0f);
 		Stats.SetBase("ProjectileCountAdd", 0f);
 		Stats.SetBase("PierceAdd", 0f);
 		Stats.SetBase("RicochetAdd", 0f);

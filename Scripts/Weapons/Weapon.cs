@@ -6,17 +6,20 @@ using Godot;
 namespace ActRoguelike.Weapons;
 
 /// <summary>
-/// 武器基类：定义攻击节奏、资源（弹匣/换弹）与攻击侧参数，攻击统一生成投射物。
+/// 武器基类：定义攻击节奏与攻击侧参数，攻击统一生成投射物。
 /// 具体武器只改参数与技能；敌人用同一套武器时由自己的 Behavior 调用 TryFire。
-/// “换弹事件”与“实际弹匣补充”分开：<see cref="ReloadStarted"/>/<see cref="ReloadCompleted"/>
-/// 是可供构筑监听的事件，弓箭这类没有弹匣的武器后续可以只触发事件。
+///
+/// <para>⚠️ <b>P6b：本类**不再有弹匣/装填的概念**</b>（用户 2026-10-12 裁定「没有弹匣的概念了」，
+/// 见 <c>docs/character-redesign.md</c> §五）。原来那一整套（<c>MagazineSize</c> / <c>ReloadTime</c> /
+/// <c>AutoReloadDelay</c> / <c>Ammo</c> / <c>IsReloading</c> / <c>EffectiveMagazineSize</c> /
+/// <c>TryReload</c> / <c>RefillMagazine</c> / <c>FireFullMagazine</c> / <c>BeginInfiniteFire</c> /
+/// <c>InfiniteAmmo</c> 与 <c>ReloadStarted</c>/<c>ReloadCompleted</c>/<c>AmmoChanged</c> 三个事件）**整组删除**。
+/// 开火的唯一门槛是 <c>Enabled</c> + 冷却 + 有投射物预制体（<see cref="CanFire"/>）。</para>
 /// </summary>
 public partial class Weapon : Node3D
 {
 	[Export] public float Damage { get; set; } = 22f;
 	[Export] public float FireInterval { get; set; } = 0.32f;
-	[Export] public int MagazineSize { get; set; } = 8;
-	[Export] public float ReloadTime { get; set; } = 1.15f;
 	[Export] public float ProjectileSpeed { get; set; } = 75f;
 	[Export] public float MaxLifetime { get; set; } = 2.2f;
 	[Export(PropertyHint.Range, "0,15,0.1")] public float SpreadDegrees { get; set; } = 0.6f;
@@ -38,13 +41,7 @@ public partial class Weapon : Node3D
 	/// <summary>一次击发的弹丸数（霰弹枪 &gt; 1；进化「双管齐下」在此之上再加）。</summary>
 	[Export] public int ProjectilesPerShot { get; set; } = 1;
 
-	/// <summary>装填是被动的：最后一次开火后超过这个秒数、且弹匣没满就自动装填（打空也会立刻装填）。</summary>
-	[Export] public float AutoReloadDelay { get; set; } = 3f;
-
 	public event Action? Fired;
-	public event Action? ReloadStarted;
-	public event Action? ReloadCompleted;
-	public event Action<int>? AmmoChanged;
 
 	/// <summary>关掉后这把武器不参与射击（近战角色用），左键改由近战能力接管。</summary>
 	[Export] public bool Enabled { get; set; } = true;
@@ -59,8 +56,6 @@ public partial class Weapon : Node3D
 
 	public Unit? OwnerUnit { get; private set; }
 	public bool IsAiming { get; private set; }
-	public bool IsReloading { get; private set; }
-	public int Ammo { get; private set; }
 
 	/// <summary>当前瞄准点，由驱动方（玩家输入 / 敌人能力）设置，射击时使用。</summary>
 	public Vector3 AimPoint { get; set; }
@@ -69,14 +64,13 @@ public partial class Weapon : Node3D
 	public float? FireIntervalOverride { get; set; }
 
 	private float _cooldown;
-	private float _reloadRemaining;
 	private float _sinceLastFire;
-	private float _infiniteFireRemaining;
 
 	/// <summary>枪口火光的 <c>VFXController</c>（Godot 侧脚本）。节点名固定为 <c>Muzzle/VFX</c>，缺失时为 null。</summary>
 	private Node? _muzzleVfx;
 
-	public bool CanFire => Enabled && !IsReloading && Ammo > 0 && _cooldown <= 0f && ProjectileScene != null;
+	/// <summary>能不能开火：启用 + 冷却走完 + 有投射物预制体（**P6b 起不再看弹药**）。</summary>
+	public bool CanFire => Enabled && _cooldown <= 0f && ProjectileScene != null;
 
 	/// <summary>距上次开火经过的秒数（HUD 与调参用）。</summary>
 	public float SinceLastFire => _sinceLastFire;
@@ -87,17 +81,9 @@ public partial class Weapon : Node3D
 	/// <summary>基础穿透数量（激光狙击枪 &gt; 0；进化「穿甲弹」在此之上再加）。</summary>
 	[Export] public int BasePierce { get; set; }
 
-	/// <summary>是否处在「不消耗子弹」的状态（火力倾泻的步枪模式）。</summary>
-	public bool InfiniteAmmo => _infiniteFireRemaining > 0f;
-
-	/// <summary>算上扩容弹匣等修正后的弹匣容量。</summary>
-	public int EffectiveMagazineSize => Mathf.Max(1, MagazineSize + (int)(OwnerUnit?.Stats.Get("MagazineSizeAdd") ?? 0f));
-
 	private float AttackSpeedMultiplier => OwnerUnit?.Stats.Get("AttackSpeedMultiplier") ?? 1f;
 
 	private float EffectiveFireInterval => (FireIntervalOverride ?? FireInterval) / Mathf.Max(0.05f, AttackSpeedMultiplier);
-
-	private float EffectiveReloadTime => ReloadTime / Mathf.Max(0.1f, OwnerUnit?.Stats.Get("ReloadSpeedMultiplier") ?? 1f);
 
 	public bool HasTag(string tag) => System.Array.IndexOf(AttackTags, tag) >= 0;
 
@@ -106,7 +92,6 @@ public partial class Weapon : Node3D
 		OwnerUnit = FindOwnerUnit();
 		Muzzle ??= GetNodeOrNull<Node3D>("Muzzle");
 		_muzzleVfx = Muzzle?.GetNodeOrNull<Node>("VFX");
-		Ammo = EffectiveMagazineSize;
 		AddToGroup("weapons");
 	}
 
@@ -119,39 +104,7 @@ public partial class Weapon : Node3D
 			_cooldown -= dt;
 		}
 
-		if (_reloadRemaining > 0f)
-		{
-			_reloadRemaining -= dt;
-			if (_reloadRemaining <= 0f)
-			{
-				IsReloading = false;
-				Ammo = EffectiveMagazineSize;
-				AmmoChanged?.Invoke(Ammo);
-				ReloadCompleted?.Invoke();
-			}
-		}
-
-		if (_infiniteFireRemaining > 0f)
-		{
-			_infiniteFireRemaining -= dt;
-			if (_infiniteFireRemaining <= 0f)
-			{
-				FireIntervalOverride = null;
-			}
-		}
-
-		// 火力倾泻期间自动连射（不需要玩家按住开火键）。
-		if (InfiniteAmmo && _cooldown <= 0f && OwnerUnit is { IsDead: false })
-		{
-			TryFire(AimPoint);
-		}
-
-		// 被动装填：一段时间没开火且弹匣不满就自动补满（打空的情况在 TryFire 里已经立即触发）。
 		_sinceLastFire += dt;
-		if (!IsReloading && Ammo < EffectiveMagazineSize && _sinceLastFire >= AutoReloadDelay)
-		{
-			TryReload();
-		}
 	}
 
 	public void SetAiming(bool aiming) => IsAiming = aiming;
@@ -163,14 +116,8 @@ public partial class Weapon : Node3D
 			return false;
 		}
 
-		if (IsReloading || _cooldown > 0f)
+		if (_cooldown > 0f)
 		{
-			return false;
-		}
-
-		if (Ammo <= 0 && !InfiniteAmmo)
-		{
-			TryReload();
 			return false;
 		}
 
@@ -216,74 +163,13 @@ public partial class Weapon : Node3D
 			PelletsFired++;
 		}
 
-		if (!InfiniteAmmo)
-		{
-			Ammo--;
-		}
-
 		_cooldown = EffectiveFireInterval;
 		_sinceLastFire = 0f;
-		AmmoChanged?.Invoke(Ammo);
 		_muzzleVfx?.Call("play");
 		AudioManager.PlaySfx(AudioIds.WeaponFire); // 开火音效：按 id 播，文件/音量/总线在音效表里（调用方不知道路径）
 		Fired?.Invoke();
 
-		if (Ammo <= 0)
-		{
-			TryReload();
-		}
-
 		return true;
-	}
-
-	/// <summary>火力倾泻（步枪）：一段时间内持续开火且不消耗子弹（弹匣为空也能用）。</summary>
-	public void BeginInfiniteFire(float duration, float interval)
-	{
-		_infiniteFireRemaining = Mathf.Max(0.1f, duration);
-		FireIntervalOverride = interval;
-		IsReloading = false;
-		_reloadRemaining = 0f;
-	}
-
-	/// <summary>火力倾泻（手枪 / 激光狙击枪）：无视当前弹药，直接打出一整个弹匣。</summary>
-	public void FireFullMagazine()
-	{
-		int total = EffectiveMagazineSize;
-		Ammo = total;
-		for (int i = 0; i < total; i++)
-		{
-			_cooldown = 0f;
-			if (!TryFire(AimPoint))
-			{
-				break;
-			}
-		}
-
-		Ammo = 0;
-		AmmoChanged?.Invoke(Ammo);
-		TryReload();
-	}
-
-	/// <summary>立即补满弹匣（战地补给等效果用）。</summary>
-	public void RefillMagazine()
-	{
-		IsReloading = false;
-		_reloadRemaining = 0f;
-		Ammo = EffectiveMagazineSize;
-		AmmoChanged?.Invoke(Ammo);
-		ReloadCompleted?.Invoke();
-	}
-
-	public void TryReload()
-	{
-		if (IsReloading || Ammo >= EffectiveMagazineSize)
-		{
-			return;
-		}
-
-		IsReloading = true;
-		_reloadRemaining = EffectiveReloadTime;
-		ReloadStarted?.Invoke();
 	}
 
 	private Unit? FindOwnerUnit()

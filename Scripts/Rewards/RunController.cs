@@ -97,7 +97,8 @@ public partial class RunController : Node
 		_player.Stats.AddModifier(new StatModifier { Stat = "DamageMultiplier", Operation = ModifierOperation.Multiply, Value = MetaProgress.BonusDamageMultiplier, Source = this });
 		_player.Stats.AddModifier(new StatModifier { Stat = "MoveSpeedMultiplier", Operation = ModifierOperation.Multiply, Value = MetaProgress.BonusMoveSpeedMultiplier, Source = this });
 		_player.Stats.AddModifier(new StatModifier { Stat = "CritChanceAdd", Operation = ModifierOperation.Add, Value = MetaProgress.BonusCritChance, Source = this });
-		_player.Stats.AddModifier(new StatModifier { Stat = "ReloadSpeedMultiplier", Operation = ModifierOperation.Multiply, Value = MetaProgress.BonusReloadSpeed, Source = this });
+		// ⚠️ P6b：这里原来还有一条 `ReloadSpeedMultiplier × MetaProgress.BonusReloadSpeed` ——
+		// 随"没有弹匣的概念了"整条下线（局外成长行 `meta_reload` 与 `Weapon` 的装填逻辑同时删除）。
 		_player.RefreshStats();
 		_player.DamageReduction = reduction;
 
@@ -491,7 +492,7 @@ public partial class RunController : Node
 		WeaponConfig? row = WeaponRow(kind);
 		if (row != null)
 		{
-			// 表是权威：一行 `.tres` 描述整把武器（含击退、暴击、弹速、装填延迟）。读不到行时才走下面的回退。
+			// 表是权威：一行 `.tres` 描述整把武器（含击退、暴击、弹速）。读不到行时才走下面的回退。
 			row.ApplyTo(_weapon);
 			return;
 		}
@@ -499,7 +500,6 @@ public partial class RunController : Node
 		// 回退（表为空 / 整份 ConfigIndex.tres 未加载）：保留"什么都没做"的语义 ——
 		// 武器组件自己的 [Export] 默认值就是这一把枪的数值。
 		GD.PushWarning($"[Config] 武器表里没有 {kind}（Slot {(int)kind + 1}）的行，保留武器组件自身的默认值。");
-		_weapon.RefillMagazine();
 	}
 
 	/// <summary>按 <see cref="WeaponPresetKind"/> 取武器表的行（Slot 从 1 开始，与枚举顺序一致）。</summary>

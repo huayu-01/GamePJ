@@ -175,25 +175,6 @@ public partial class BurnOnHitRule : TriggerRule
 	}
 }
 
-/// <summary>战地补给：击杀立刻补满弹匣。</summary>
-public partial class AmmoOnKillRule : TriggerRule
-{
-	private Unit? _owner;
-	private Weapon? _weapon;
-
-	public override void _Ready()
-	{
-		base._Ready();
-		_owner = GetParent<Unit>();
-		_weapon = _owner == null ? null : NodeSearch.FindInSubtree<Weapon>(_owner);
-	}
-
-	public override bool Matches(GameplayEvent gameplayEvent)
-		=> gameplayEvent.Kind == GameplayEventKind.Kill && gameplayEvent.Source == _owner;
-
-	public override void Execute(GameplayEvent gameplayEvent) => _weapon?.RefillMagazine();
-}
-
 /// <summary>亡者随从：击杀时召唤一架无人机（有数量上限）。</summary>
 public partial class SummonOnKillRule : TriggerRule
 {

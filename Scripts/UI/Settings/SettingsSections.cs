@@ -310,7 +310,8 @@ public sealed class ControlsSettingsSection : ISettingsSection
 		("skill_1", "技能 1", Key.Q),
 		("skill_2", "技能 2", Key.E),
 		("fall_attack", "下落攻击", Key.Ctrl),
-		("reload", "装填", Key.R),
+		// ⚠️ P6b：`reload`（装填 R）随"没有弹匣的概念了"从 `project.godot` 删除，这里同步移除 ——
+		// 与上面四条旧角色按键同一个道理：列一个不存在的动作会让重绑那一行读不到键。
 		("interact", "互动（节点 / Boss 门）", Key.F),
 	};
 

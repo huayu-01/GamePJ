@@ -1923,7 +1923,7 @@ public partial class SelfTest : Node
 		GameLog.Write("SelfTest",
 			weapon == null
 				? "配置表比对：找不到武器"
-				: $"配置表比对·武器：伤害 {weapon.Damage:0}（期望 0） 间隔 {weapon.FireInterval:0.##}（期望 0.5） 弹匣 {weapon.EffectiveMagazineSize}（期望 1） 装填 {weapon.ReloadTime:0.##}（期望 0.1） 散布 {weapon.SpreadDegrees:0.##}（期望 0） 击退 {weapon.Knockback:0.##}（期望 0） 暴击 {weapon.CritChance:0.##}（期望 0.05） 弹速 {weapon.ProjectileSpeed:0}（期望 150） 预瞄FOV {weapon.AimFov:0}（期望 55） 穿透 {weapon.BasePierce}（期望 0） 连发 {weapon.Automatic}（期望 False） ｜ 左键归 Weapon 组件 {weapon.Enabled}（期望 False —— 能量掌是**武技驱动**，弹匣/装填只是表里的占位字段）");
+				: $"配置表比对·武器：伤害 {weapon.Damage:0}（期望 0） 间隔 {weapon.FireInterval:0.##}（期望 0.5） 散布 {weapon.SpreadDegrees:0.##}（期望 0） 击退 {weapon.Knockback:0.##}（期望 0） 暴击 {weapon.CritChance:0.##}（期望 0.05） 弹速 {weapon.ProjectileSpeed:0}（期望 150） 预瞄FOV {weapon.AimFov:0}（期望 55） 穿透 {weapon.BasePierce}（期望 0） 连发 {weapon.Automatic}（期望 False） ｜ 左键归 Weapon 组件 {weapon.Enabled}（期望 False —— 能量掌是**武技驱动**）。⚠️ P6b：原来这一行还有「弹匣 N / 装填 X」两项，随「没有弹匣的概念了」整条删除（`Weapon` 已无 `MagazineSize`/`ReloadTime`/`Ammo`）");
 
 		// ⚠️ 这一行**只打印、不做比对**（`ConfigRows.Count<T>()` 的实际值 + 括号里的期望值都在同一条字符串里，
 		// 没有任何 if/断言）—— 所以期望串过期**不会**让自测失败，只会误导后来的人。

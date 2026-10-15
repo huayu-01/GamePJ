@@ -22,8 +22,7 @@ namespace ActRoguelike.Abilities;
 /// "子弹"只有一种实现。
 ///
 /// ⚠️ 继承 <see cref="ProjectileAttackAbility"/> 是为了复用它的 <c>MinRange/MaxRange</c> 语义
-/// （敌人远程兵那一套），但**覆写了全部行为**：不再走 <c>Weapon</c>（武器组件有弹匣/装填，
-/// 能量掌没有弹匣），也不再看 <c>Windup</c> 计时。
+/// （敌人远程兵那一套），但**覆写了全部行为**：不走 <c>Weapon</c>（自己发投射物），也不看 <c>Windup</c> 计时。
 /// </summary>
 public partial class EnergyWaveAbility : ProjectileAttackAbility
 {

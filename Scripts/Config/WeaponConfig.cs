@@ -33,7 +33,7 @@ public partial class WeaponConfig : ConfigRow
 	/// `WeaponEnabled`）。
 	///
 	/// <list type="bullet">
-	/// <item><c>true</c> = 传统枪械：左键 → <c>Weapon.TryFire</c>（有弹匣/装填）。</item>
+	/// <item><c>true</c> = 传统枪械：左键 → <c>Weapon.TryFire</c>。</item>
 	/// <item><c>false</c> = **武技驱动**：攻击全部由本行 <see cref="Skills"/> 里那几个技能完成，
 	///   <c>PlayerWeaponInput</c> 看到 <c>Weapon.Enabled == false</c> 就把左键交给
 	///   <c>InputAction = weapon_skill_1</c> 的那个技能（能量掌 / 短弩 / 弓 / 灵剑 / 镰刀 / 长枪 全是这种）。</item>
@@ -57,21 +57,12 @@ public partial class WeaponConfig : ConfigRow
 	/// </summary>
 	[Export] public UpgradePoolConfig? Pool { get; set; }
 
-	[ExportGroup("数值（伤害 / 射速 / 弹匣 / 散布 / 暴击 / 弹速 …）")]
+	[ExportGroup("数值（伤害 / 射速 / 散布 / 暴击 / 弹速 …）")]
 	/// <summary>单发伤害。</summary>
 	[Export] public float Damage { get; set; } = 24f;
 
 	/// <summary>射击间隔（秒）。</summary>
 	[Export] public float FireInterval { get; set; } = 0.26f;
-
-	/// <summary>弹匣容量。</summary>
-	[Export] public int MagazineSize { get; set; } = 12;
-
-	/// <summary>换弹时间（秒）。</summary>
-	[Export] public float ReloadTime { get; set; } = 0.7f;
-
-	/// <summary>被动装填：这么久没开火且弹匣不满就自动装填。</summary>
-	[Export] public float AutoReloadDelay { get; set; } = 3f;
 
 	/// <summary>基础散布（度）。腰射时的弹道随机偏移范围。</summary>
 	[Export(PropertyHint.Range, "0,15,0.1")] public float SpreadDegrees { get; set; } = 0.5f;
@@ -137,9 +128,6 @@ public partial class WeaponConfig : ConfigRow
 
 		weapon.Damage = Damage;
 		weapon.FireInterval = FireInterval;
-		weapon.MagazineSize = MagazineSize;
-		weapon.ReloadTime = ReloadTime;
-		weapon.AutoReloadDelay = AutoReloadDelay;
 		weapon.SpreadDegrees = SpreadDegrees;
 		weapon.AimSpreadScale = AimSpreadScale;
 		weapon.MultiShotSpreadDegrees = MultiShotSpreadDegrees;
@@ -159,6 +147,5 @@ public partial class WeaponConfig : ConfigRow
 		// 身份：本武器属于哪个升级池（`RewardDefinition.AllowsWeapon` 的第一层用它做精确匹配）。
 		// 池行被删 / 没填时 Pool 为 null → 留空 → 自动落到"标签匹配 → 通用"两层。
 		weapon.PoolId = Pool?.Id ?? string.Empty;
-		weapon.RefillMagazine();
 	}
 }

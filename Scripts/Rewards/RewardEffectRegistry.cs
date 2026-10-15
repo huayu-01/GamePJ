@@ -66,9 +66,10 @@ public static class RewardEffectRegistry
 				MaxSummons = (int)Param(row, "MaxSummons", 2f),
 			}),
 
-		// 异化：击杀补满弹匣（无参数）。
-		["AmmoOnKill"] = row => context =>
-			context.Player.AddChild(new AmmoOnKillRule { RewardId = row.Id }),
+		// ⚠️ P6b：这里原来还有一条 `["AmmoOnKill"]`（击杀补满弹匣 → `AmmoOnKillRule`）——
+		// 随"没有弹匣的概念了"整条删除：行文件（`mut_supply`）P6a 已删、`Weapon.RefillMagazine` 本批已删。
+		// `ChainLightningRule` / `LifestealRule` / `BurnOnHitRule` / `SummonOnKillRule` 四条**保留**
+		// （效果与弹匣无关，是可复用基础设施）。
 
 		// 强化「护甲」：护甲没有上限（用户 C1），所以**加甲**走 `Unit.GrantArmor` 这一条（不是 StatSheet 抬高上限）。
 		// 数值来自表（`Armor`），组件零个 —— 这是一条**纯表驱动**的处理器。

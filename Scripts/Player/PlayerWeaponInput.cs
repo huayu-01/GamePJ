@@ -120,11 +120,6 @@ public partial class PlayerWeaponInput : Node3D
 			_unit.Movement.SetFacing(direction);
 		}
 
-		if (Input.IsActionJustPressed("reload"))
-		{
-			_weapon.TryReload();
-		}
-
 		bool wantsFire = _weapon.Automatic ? Input.IsActionPressed("fire") : Input.IsActionJustPressed("fire");
 		if (wantsFire)
 		{

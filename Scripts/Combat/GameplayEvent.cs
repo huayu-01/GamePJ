@@ -23,8 +23,6 @@ public enum GameplayEventKind
 
 	AbilityActivated,
 	WeaponFired,
-	ReloadStarted,
-	ReloadCompleted,
 
 	/// <summary>
 	/// **暴击命中**（P6a 补上抛点）。抛点唯一：`Unit.ReceiveHit` 里结算完这次命中之后，判据是

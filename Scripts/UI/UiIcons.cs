@@ -155,8 +155,9 @@ public static class UiIcons
 		"ic_ui_node_shop", "ic_ui_node_portal", "ic_ui_build_holdings", "ic_ui_key_f",
 		"ic_ui_set_graphics", "ic_ui_set_controls", "ic_ui_set_audio",
 		// 能力卡（第三批）：一张卡一个图标，名字写在卡行的 IconName 列上。
+		// ⚠️ P6b：`ic_ui_card_reload` / `ic_ui_card_magazine` 随两张卡下线（svg 文件保留在 Assets 里）。
 		"ic_ui_card_vitality", "ic_ui_card_damage", "ic_ui_card_speed", "ic_ui_card_crit",
-		"ic_ui_card_reload", "ic_ui_card_magazine", "ic_ui_card_summon", "ic_ui_card_control",
+		"ic_ui_card_summon", "ic_ui_card_control",
 	};
 
 	private static readonly Dictionary<string, Texture2D?> _cache = new();

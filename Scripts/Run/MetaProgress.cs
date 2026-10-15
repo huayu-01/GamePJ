@@ -16,7 +16,6 @@ public static class MetaProgress
 	private static int _damageLevel;
 	private static int _speedLevel;
 	private static int _critLevel;
-	private static int _reloadLevel;
 	private static bool _loaded;
 
 	public static int Shards => _shards;
@@ -27,7 +26,8 @@ public static class MetaProgress
 	/// <summary>
 	/// 永久强化的效果（下局开局应用）。**系数优先读局外成长表**
 	/// （`Config/Tables/Meta/meta_*.tres`），读不到才用下面这些代码内置值 ——
-	/// 值逐条对应：血量 10 / 伤害 0.05 / 移速 0.03 / 暴击 0.03 / 装填 0.06。
+	/// 值逐条对应：血量 10 / 伤害 0.05 / 移速 0.03 / 暴击 0.03。
+	/// ⚠️ P6b：「装填」那一条（`meta_reload`，0.06）随"没有弹匣的概念了"整条下线。
 	/// </summary>
 	public static float PerLevel(string id, float fallback)
 		=> ConfigRows.ById<MetaUpgradeConfig>(id)?.PerLevel ?? fallback;
@@ -45,16 +45,11 @@ public static class MetaProgress
 	/// <summary>暴击率 +3%/级。</summary>
 	public static float BonusCritChance => _critLevel * PerLevel("meta_crit", 0.03f);
 
-	/// <summary>装弹速度 +6%/级。</summary>
-	public static float BonusReloadSpeed => 1f + (_reloadLevel * PerLevel("meta_reload", 0.06f));
-
 	public static int HealthCost => CostOf("meta_health", _healthLevel);
 	public static int DamageCost => CostOf("meta_damage", _damageLevel);
 	public static int SpeedCost => CostOf("meta_speed", _speedLevel);
 	public static int CritCost => CostOf("meta_crit", _critLevel);
-	public static int ReloadCost => CostOf("meta_reload", _reloadLevel);
 	public static int CritLevel => _critLevel;
-	public static int ReloadLevel => _reloadLevel;
 
 	public static void Load()
 	{
@@ -75,7 +70,6 @@ public static class MetaProgress
 		_damageLevel = (int)config.GetValue("meta", "damage_level", 0);
 		_speedLevel = (int)config.GetValue("meta", "speed_level", 0);
 		_critLevel = (int)config.GetValue("meta", "crit_level", 0);
-		_reloadLevel = (int)config.GetValue("meta", "reload_level", 0);
 	}
 
 	public static void Save()
@@ -86,7 +80,6 @@ public static class MetaProgress
 		config.SetValue("meta", "damage_level", _damageLevel);
 		config.SetValue("meta", "speed_level", _speedLevel);
 		config.SetValue("meta", "crit_level", _critLevel);
-		config.SetValue("meta", "reload_level", _reloadLevel);
 		config.Save(SavePath);
 	}
 
@@ -103,15 +96,15 @@ public static class MetaProgress
 		Save();
 	}
 
-	public static bool BuyHealth() => Buy("meta_health", ref _healthLevel);
-
-	public static bool BuyDamage() => Buy("meta_damage", ref _damageLevel);
-
-	public static bool BuySpeed() => Buy("meta_speed", ref _speedLevel);
-
-	public static bool BuyCrit() => Buy("meta_crit", ref _critLevel);
-
-	public static bool BuyReload() => Buy("meta_reload", ref _reloadLevel);
+	// ⚠️ P6b：`BuyHealth` / `BuyDamage` / `BuySpeed` / `BuyCrit` / `BuyReload` 五个方法**整组删除**
+	// （用户裁定：它们随 `BaseScreen`（旧的"永久强化"页）一起成了**死 API**，没有任何调用者）。
+	// 详细购买逻辑原来落在私有 `Buy(id, ref level)` 里，也一并删除 —— 现在局外消费碎片的唯一入口是
+	// `TrySpend`（能力卡界面走 `AbilityStore.Spend`）。
+	//
+	// ⚚ **`Bonus*` 必须留**：`RunController.ApplyBalance` 每局开局仍在读它们（`BonusMaxHealth` /
+	// `BonusDamageMultiplier` / `BonusMoveSpeedMultiplier` / `BonusCritChance`）。
+	// `*Cost` / `*Level` 这几个只读访问器本轮**没有调用者但也没被裁定删**，先留着（`_healthLevel` 等字段
+	// 仍由 `Load/Save` 维护）。
 
 	/// <summary>花掉碎片（商店节点用）。碎片不足返回 false 且不扣。</summary>
 	public static bool TrySpend(int cost)
@@ -123,21 +116,6 @@ public static class MetaProgress
 		}
 
 		_shards -= cost;
-		Save();
-		return true;
-	}
-
-	private static bool Buy(string id, ref int level)
-	{
-		Load();
-		int cost = CostOf(id, level);
-		if (_shards < cost)
-		{
-			return false;
-		}
-
-		_shards -= cost;
-		level++;
 		Save();
 		return true;
 	}
