@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillSeries/ser_b3_combo.tres" id="3_series"]
 
 [sub_resource type="Resource" id="p_StrikeActiveTime"]
 script = ExtResource("2_param")
@@ -14,6 +15,7 @@ script = ExtResource("1_row")
 NodeName = "AbilityWeapon6Skill1"
 ClassHint = "MeleeComboAbility"
 InputAction = "weapon_skill_1"
+ComboSeries = ExtResource("3_series")
 AnimName = "Skill_B3_Spear1"
 AnimEvent = "ATK"
 AnimEventEnd = "Combo"

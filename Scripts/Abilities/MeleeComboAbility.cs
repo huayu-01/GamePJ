@@ -40,40 +40,26 @@ namespace ActRoguelike.Abilities;
 /// 事件帧 <c>AnimEventEnd</c>（表列）是"窗口关"的动画标记；真到点时由 <see cref="Tick"/> 的
 /// <c>ComboWindowSeconds</c> 兜底 —— 两条路都指向同一个状态，不依赖引擎回调时序。</para>
 ///
-/// <para>⚠️ <b>默认行为不变</b>：不填 <c>ComboAnimations</c>（= 空数组）时，本类**退化成
+/// <para>⚠️ <b>默认行为不变</b>：没配连招行（<see cref="Series"/> 为空）时，本类**退化成
 /// "一段"**：<see cref="AnimName"/> 一个名字、<see cref="AnimEvent"/> 一个事件帧、
 /// <see cref="StrikeActiveTime"/> 一个判定窗口 —— 与既有 <c>MeleeAttackAbility</c> 的时间轴同形。</para>
 /// </summary>
 public partial class MeleeComboAbility : Ability
 {
-	/// <summary>
-	/// **连招串文件的目录**（默认 `Config/Tables/SkillSeries/`）：文件名 = 技能行 Id（`skl_b1_w1_1.tres`）。
-	///
-	/// <para>用"按技能行 Id 约定路径"而不是"技能行多一列指向它"，是因为连招与"某个技能"本来就是**一对一**的
-	/// —— 多一列只会让"新列在旧程序集里读不到"这种环境问题再拖一次；而按 Id 约定路径在任何情况下都能读到
-	/// （读不到就写明确日志并退化成单段，不静默）。</para>
-	/// </summary>
-	public const string SkillSeriesDir = "res://Config/Tables/SkillSeries/";
-
 	[ExportGroup("连招表（**每一段一段动画**：武技1 的三把武器共用这一组列）")]
 	/// <summary>
-	/// 第 1..N 段各自的**技能动画名**（表列 <c>ComboAnimations</c>，类型 <see cref="AbilitySeries"/>，
-	/// 每项一个字符串）。<b>空 = 单段</b>（退回到 <see cref="Ability.AnimName"/>，行为与既有近战同形）。
+	/// **这个技能的连招参数行**（表列 <c>AbilityConfig.ComboSeries</c>，类型 <see cref="AbilitySeries"/>）：
+	/// 每段动画名 / 每段命中盒 / 每段伤害倍率 / 斩断子弹的名单 + 窗口时长 / 循环 / 事件帧名。
 	///
-	/// <para>⚠️ 为什么不是 <c>string[]</c>：Godot 的 C# 绑定不把托管数组暴露成脚本属性
-	/// （编译期 <c>GD0102</c>，或运行期 `.tres` 那一列读不进来）。见 <see cref="AbilitySeries"/> 的说明。</para>
-	/// </summary>
-	[Export] public AbilitySeries? ComboAnimations { get; set; }
-
-	/// <summary>
-	/// **连招串文件路径**（表列 <c>ComboSeriesPath</c>）：指向 `Config/Tables/SkillSeries/` 下那一行
-	/// <see cref="AbilitySeries"/>（连招的每段动画名 / 每段命中盒 / 每段伤害倍率…）。
+	/// <para><b>空 = 单段模式</b>：用技能行的 <see cref="Ability.AnimName"/>、
+	/// <see cref="StrikeActiveTime"/> 与场景里那个命中盒 —— 行为与既有近战同形（默认路径逐位不变）。</para>
 	///
-	/// <para>与上面那六个 <see cref="AbilitySeries"/> 列是**两条路**：列里直接引用了就用列里的，
-	/// 没引用就按这个路径读串文件（见 <see cref="Ability.BindSeries"/> 的说明）。做成两条路是因为
-	/// "一串参数"要能独立成资源，而技能行本身不该被塞进一堆内联子资源。</para>
+	/// <para>⚠️ <b>P8 改造</b>：这里原来是 7 个各指一行 <see cref="AbilitySeries"/> 的 <c>[Export]</c> 字段
+	/// （<c>ComboAnimations</c> / <c>StepDamageScales</c> / … —— 两两组合成"半配"状态，实测**一个都没被填过**），
+	/// 外加一个 <c>ComboSeriesPath</c> 字符串路径。现在只剩**一个**引用：一行连招行就是全部数据，
+	/// 由技能行以资源引用指过来（`Config/Tables/SkillSeries/ser_*.tres`）。</para>
 	/// </summary>
-	[Export(PropertyHint.File, "*.tres")] public string ComboSeriesPath { get; set; } = string.Empty;
+	[Export] public AbilitySeries? Series { get; set; }
 
 	/// <summary>
 	/// **自测用**：不等真实动画事件帧，直接**模拟"事件帧到了"**（= 开窗口 + 本段判定 + 斩断子弹）。
@@ -92,54 +78,30 @@ public partial class MeleeComboAbility : Ability
 	}
 
 	/// <summary>
-	/// **开输入窗口的那个事件帧名**（表列 <c>AnimEventEnd</c>）。
-	/// 文档：武技1「**连续按键可连续释放**」—— 这一帧就是"可以接着按"的那一瞬间。
+	/// **开输入窗口的那个事件帧名**（默认 <c>ATK</c>）。文档：武技1「**连续按键可连续释放**」
+	/// —— 这一帧就是"可以接着按"的那一瞬间。连招行（<see cref="Series"/>）里填了就用行里的。
 	/// 留空 = 不开窗口（只能一段，退化成单段连招）。
 	/// </summary>
 	[Export] public string ComboNextEvent { get; set; } = string.Empty;
 
-	/// <summary>**输入窗口时长**（秒；表列 <c>ComboWindowSeconds</c>）。窗口没人按就收招进冷却。</summary>
+	/// <summary>
+	/// **输入窗口时长**（秒）。窗口没人按就收招进冷却。
+	/// 连招行（<see cref="Series"/>）里给了 &gt;0 的值就用行里的，否则用这里的场景值。
+	/// </summary>
 	[Export] public float ComboWindowSeconds { get; set; } = 0.35f;
 
 	/// <summary>
 	/// 打满最后一段之后**是否回到第 0 段**（长枪「横扫千军：挥砍&gt;上挑&gt;下劈&gt;突刺&gt;挥砍，这么循环」）。
-	/// 灵剑/镰刀是 false（连招打完就结束）。
+	/// 灵剑/镰刀是 false（连招打完就结束）。连招行里有这一列（bool：填了就是权威）。
 	/// </summary>
 	[Export] public bool ComboLoop { get; set; }
 
-	[ExportGroup("每段的判定（每一项对应一段；不足时用最后一项或场景基线）")]
-	/// <summary>第 i 段的**伤害倍率**（乘在命中盒的 <c>Damage</c> 上）。空 = 全部 1。</summary>
-	[Export] public AbilitySeries? StepDamageScales { get; set; }
-
-	/// <summary>第 i 段的**命中盒尺寸**（米；x 宽 / y 高 / z 长，文本写成 <c>2.2, 1.6, 2.8</c>）。空 = 用场景里那个盒子的尺寸。</summary>
-	[Export] public AbilitySeries? StepBoxSizes { get; set; }
-
-	/// <summary>第 i 段的**命中盒前伸**（局部 Z 偏移，米）。空 = 用场景里那个位置。</summary>
-	[Export] public AbilitySeries? StepBoxOffsets { get; set; }
-
-	/// <summary>第 i 段的**判定持续**（秒）。空 = 用 <see cref="StrikeActiveTime"/>。</summary>
-	[Export] public AbilitySeries? StepActiveTimes { get; set; }
-
-	[ExportGroup("判定与斩断子弹")]
-	/// <summary>一次判定的持续时间（秒；单段模式用它）。</summary>
+	[ExportGroup("判定与斩断子弹（每段的数值都在连招行里；这里只留单段模式与半径）")]
+	/// <summary>一次判定的持续时间（秒；单段模式用它；连招模式用行里的 <c>StepActiveTimes</c>）。</summary>
 	[Export] public float StrikeActiveTime { get; set; } = 0.12f;
-
-	/// <summary>
-	/// **可以斩断的投射物场景名单**（表列 <c>CutSceneNames</c>，每项一个场景基名）。
-	/// 文档：「每段都可以摧毁碰撞盒内的子弹（包括友军的，但**无法斩断能量波**）」——
-	/// 名单里写投射物的**来源场景名**（`Bullet`）；能量波的名字不写进来，所以它斩不断（数据，不是特例）。
-	/// 空 = 不斩断任何东西（默认：别的近战能力行为逐位不变）。
-	/// </summary>
-	[Export] public AbilitySeries? CutSceneNames { get; set; }
 
 	/// <summary>斩断的搜索半径（米）—— 以命中盒中心为球心。0 = 关掉斩断。</summary>
 	[Export] public float CutRadius { get; set; } = 2.4f;
-
-	/// <summary>
-	/// **斩不断的投射物名单**（表列 <c>CutExcludeSceneNames</c>）。文档：「**无法斩断能量波**」
-	/// → 名单里写 `EnergyWave`。**是表值，不是代码里的特例分支。**
-	/// </summary>
-	[Export] public AbilitySeries? CutExcludeSceneNames { get; set; }
 
 	[ExportGroup("运行期可读状态（自测 / UI / 剑气取尺寸）")]
 	/// <summary>当前/最后一次打到的段号（0 起）。</summary>
@@ -149,9 +111,8 @@ public partial class MeleeComboAbility : Ability
 	public int ComboChained { get; private set; }
 
 	/// <summary>
-	/// **连招一共几段**（= 表里那一串 <c>ComboAnimations</c> 的项数；0 = 单段模式）。
-	/// 自测与 UI 读它 —— 表里那一列是 <see cref="AbilitySeries"/>（整串落在一个 string 字段里），
-	/// 所以这里暴露一个数。
+	/// **连招一共几段**（= 连招行里 <c>ComboAnimations</c> 的项数；0 = 单段模式 / 还没读表）。
+	/// 自测与 UI 读它 —— 数组在行里（<see cref="AbilitySeries"/>），所以这里暴露一个数。
 	/// </summary>
 	public int ComboStepCount => _seriesRead ? _anims.Count : 0;
 
@@ -224,7 +185,7 @@ public partial class MeleeComboAbility : Ability
 	private bool _windowTimerRunning;
 	private bool _pressBuffered;
 
-	// ── 表里的"每一串"（读一次缓存起来；数组在表里是 AbilitySeries，见它的说明）──
+	// ── 连招行里的数组（读一次缓存起来，每帧读它会白白分配）──
 	private readonly List<string> _anims = new();
 	private readonly List<float> _damageScales = new();
 	private readonly List<Vector3> _boxSizes = new();
@@ -234,7 +195,16 @@ public partial class MeleeComboAbility : Ability
 	private readonly List<string> _cutExcludes = new();
 	private bool _seriesRead;
 
-	/// <summary>把表里的连招串读成 List（每帧读它会白白分配，所以每次开新施法时读一次）。</summary>
+	/// <summary>
+	/// 把连招行（<see cref="Series"/>）里的数组读成 List —— 每次开新施法时读一次，段与段之间的推进零开销。
+	///
+	/// <para>⚠️ <b>P8 改造</b>：这里原来按"技能行 Id → `res://Config/Tables/SkillSeries/&lt;AbilityId&gt;.tres`"
+	/// **约定路径**去 <c>GD.Load</c>，再把这七串**文本**解析成数组。现在数据是技能行以资源引用指过来的
+	/// <see cref="Series"/>（强类型、编辑器里看得见），**没有路径、没有解析**。</para>
+	///
+	/// <para><see cref="Series"/> 为空 = 单段模式（用技能行的 <c>AnimName</c>/<c>StrikeActiveTime</c>）。
+	/// 那时写一条明确日志（"这个技能行没填连招行"是表数据的问题，不该只表现为"连招只有一段"）。</para>
+	/// </summary>
 	private void ReadSeries()
 	{
 		_anims.Clear();
@@ -245,64 +215,44 @@ public partial class MeleeComboAbility : Ability
 		_cutNames.Clear();
 		_cutExcludes.Clear();
 
-		// 连招串文件：**按技能行 Id 约定路径**（Config/Tables/SkillSeries/<AbilityId>.tres）——
-		// 技能行不需要多一列（连招与"某个技能"是一对一），也就不会踩"新列在旧程序集里读不到/读到旧值"的坑。
-		// ⚠️ 注意顺序：**Id 优先**，节点上的 ComboSeriesPath 只在 Id 为空（还没套上表）时用。
-		// 反过来的话，同一个能力节点在上一次换装里留下的旧路径会赢（实测踩到：镰刀/长枪仍去读
-		// 上一版的文件名，于是"连招串读不到"）。
-		string seriesPath = !string.IsNullOrEmpty(AbilityId)
-			? SkillSeriesDir + AbilityId + ".tres"
-			: ComboSeriesPath;
-
-		AbilitySeries? series = BindSeries(null, seriesPath);
+		AbilitySeries? series = Series;
 		if (series == null)
 		{
-			if (!string.IsNullOrEmpty(seriesPath))
+			if (!string.IsNullOrEmpty(AbilityId))
 			{
-				GameLog.Write("Combat", $"⚠ 连招串读不到：{AbilityId} →「{seriesPath}」（连招会退化成单段）。");
+				GameLog.Write("Combat", $"⚠ 连招：{AbilityId} 的技能行没填 ComboSeries（连招行）→ 退化成单段模式（用 AnimName 那一段）。");
 			}
 
 			return;
 		}
 
-		_anims.AddRange(series.ParseTexts("ComboAnimations"));
-		_damageScales.AddRange(series.ParseFloats("StepDamageScales"));
-		_boxSizes.AddRange(series.ParseVectors("StepBoxSizes"));
-		_boxOffsets.AddRange(series.ParseFloats("StepBoxOffsets"));
-		_activeTimes.AddRange(series.ParseFloats("StepActiveTimes"));
-		_cutNames.AddRange(series.ParseTexts("CutSceneNames"));
-		_cutExcludes.AddRange(series.ParseTexts("CutExcludeSceneNames"));
+		_anims.AddRange(series.ComboAnimations);
+		_damageScales.AddRange(series.StepDamageScales);
+		_boxSizes.AddRange(series.StepBoxSizes);
+		_boxOffsets.AddRange(series.StepBoxOffsets);
+		_activeTimes.AddRange(series.StepActiveTimes);
+		_cutNames.AddRange(series.CutSceneNames);
+		_cutExcludes.AddRange(series.CutExcludeSceneNames);
 
-		// 这两条也放进串里（它们是"连招"自己的参数）：
-		// ⚠️ 不能让它们依赖技能行上**新加的列** —— 编辑器里的 C# 程序集是"打开编辑器那一刻"加载的，
-		// 外部 `dotnet build` 不会让它重载；那种情况下新列的默认值（ComboLoop=false / 窗口 0.35）会赢，
-		// 而表里写的值谁都看不到（实测踩到：长枪的 ComboLoop 一直是 false）。
-		// 串里给 0/空 = 不覆盖（保留场景/表里的值）。
-		foreach (float window in series.ParseFloats("ComboWindowSeconds"))
+		// 窗口/循环/事件帧也住在连招行里（它们本来就是"这一个连招"的参数）。
+		// 窗口给 0 = 不覆盖（保留能力节点上的值）；事件帧空 = 不覆盖。
+		// ⚠️ `ComboLoop` 是 bool 列：**填了就是权威**（false 就是"不循环"，没有"不覆盖"这一说）。
+		if (series.ComboWindowSeconds > 0f)
 		{
-			if (window > 0f)
-			{
-				ComboWindowSeconds = window;
-			}
+			ComboWindowSeconds = series.ComboWindowSeconds;
 		}
 
-		foreach (string loop in series.ParseTexts("ComboLoop"))
+		if (!string.IsNullOrEmpty(series.ComboNextEvent))
 		{
-			ComboLoop = loop.Equals("true", System.StringComparison.OrdinalIgnoreCase) || loop == "1";
+			ComboNextEvent = series.ComboNextEvent;
 		}
 
-		foreach (string next in series.ParseTexts("ComboNextEvent"))
-		{
-			if (!string.IsNullOrEmpty(next))
-			{
-				ComboNextEvent = next;
-			}
-		}
+		ComboLoop = series.ComboLoop;
 
 		_seriesRead = true;
 		GameLog.Write(
 			"Combat",
-			$"连招表读取：{AbilityId} 串=[{seriesPath}] 段动画 {_anims.Count} 个 [{string.Join(",", _anims)}]｜伤害倍率 {_damageScales.Count}｜盒子尺寸 {_boxSizes.Count}｜前伸 {_boxOffsets.Count}｜判定时长 {_activeTimes.Count}｜斩断名单 [{string.Join(",", _cutNames)}] 排除 [{string.Join(",", _cutExcludes)}]");
+			$"连招表读取：{AbilityId} 行=[{series.Id}] 段动画 {_anims.Count} 个 [{string.Join(",", _anims)}]｜伤害倍率 {_damageScales.Count}｜盒子尺寸 {_boxSizes.Count}｜前伸 {_boxOffsets.Count}｜判定时长 {_activeTimes.Count}｜斩断名单 [{string.Join(",", _cutNames)}] 排除 [{string.Join(",", _cutExcludes)}]｜窗口 {ComboWindowSeconds:0.##}s 循环 {ComboLoop} 事件帧 {ComboNextEvent}");
 	}
 
 	protected override void OnReady()
@@ -554,7 +504,7 @@ public partial class MeleeComboAbility : Ability
 
 	/// <summary>
 	/// 斩断命中盒范围内的子弹（**包括友军的** —— 判据是来源场景名，不是敌我）。
-	/// 单段模式默认 <see cref="CutSceneNames"/> 为空 → 一次都不查（性能与行为都不变）。
+	/// <see cref="AbilitySeries.CutSceneNames"/> 为空 → 一次都不查（性能与行为都不变）。
 	/// </summary>
 	private int CutBullets()
 	{
@@ -603,7 +553,7 @@ public partial class MeleeComboAbility : Ability
 
 	/// <summary>
 	/// 把第 i 段的命中盒尺寸/前伸写到碰撞形状上（**是表里的几何量，不是代码里的常数**）。
-	/// <see cref="StepBoxSizes"/> 的空项 = 保留场景基线；形状类型也随表切换
+	/// <see cref="AbilitySeries.StepBoxSizes"/> 的空项 = 保留场景基线；形状类型也随表切换
 	/// （<c>z</c> 为 0 且 <c>x == y</c> 时用圆柱 —— 镰刀最后那一刀"大回旋"就是 360°）。
 	///
 	/// <para>⚠️ P5：几何量上再乘一层单位级的 <c>AttackRangeMultiplier</c> —— 异化「大刀阔斧」

@@ -306,8 +306,8 @@
 
 | 机制 | 落点（文件 / 触发点） | 语义要点 | 表列 |
 |---|---|---|---|
-| **多段连招** | `Scripts/Abilities/MeleeComboAbility.cs`（**三把近战武器共用这一个类**） | 一次施法 = 打一段 + 开一个输入窗口；**事件帧 `ATK` 才判定**、`ATK` 同时开窗口；窗口内再按 → 段 +1（`TryPress`）；窗口超时 → `Finish()` 进冷却 | `Config/Tables/SkillSeries/<技能行Id>.tres` 的 `ComboAnimations` / `StepDamageScales` / `StepBoxSizes` / `StepBoxOffsets` / `StepActiveTimes` / `ComboWindowSeconds` / `ComboLoop` |
-| **近战斩断子弹** | `Projectile.CutBySceneName` ← `MeleeComboAbility.CutBullets`（`ATK` 帧） | 判据是"投射物的**来源场景名**"（`Bullet`），**不是敌我** → 友军的也清；**能量波在排除名单里 → 斩不断** | `CutSceneNames` / `CutExcludeSceneNames` / `CutRadius` |
+| **多段连招** | `Scripts/Abilities/MeleeComboAbility.cs`（**三把近战武器共用这一个类**） | 一次施法 = 打一段 + 开一个输入窗口；**事件帧 `ATK` 才判定**、`ATK` 同时开窗口；窗口内再按 → 段 +1（`TryPress`）；窗口超时 → `Finish()` 进冷却 | **技能行的 `ComboSeries`（资源引用）→** `Config/Tables/SkillSeries/ser_*.tres` 的 `ComboAnimations` / `StepDamageScales` / `StepBoxSizes` / `StepBoxOffsets` / `StepActiveTimes` / `ComboWindowSeconds` / `ComboLoop`（P8：真数组列 + 引用列，**没有**路径/文本解析） |
+| **近战斩断子弹** | `Projectile.CutBySceneName` ← `MeleeComboAbility.CutBullets`（`ATK` 帧） | 判据是"投射物的**来源场景名**"（`Bullet`），**不是敌我** → 友军的也清；**能量波在排除名单里 → 斩不断** | 连招行里的 `CutSceneNames` / `CutExcludeSceneNames`；半径是能力节点上的 `CutRadius` |
 | **下落攻击** | `Scripts/Abilities/FallAttackAbility.cs` | 空中 + 按键（`fall_attack` = Ctrl）才可用；`DiveSpeed` 直接写垂直速度；下落期间命中盒常开（`IntervalPerTarget`）；**高度取"这次离地后净下落多少米"**（`CharacterMovement.FallHeight`）；落地抛 `Landed` 事件 | `DiveSpeed` / `HeightStep` / `DamageBonusPerStep` / `MaxDamageBonus` / `HomingMode` / `MaxDiveAngleDegrees` |
 | **冲刺（穿透 + 可视化路径）** | `Scripts/Abilities/BlinkDashAbility.cs` + `Scripts/Combat/DashPathIndicator.cs` | 冲刺期间 `CollisionMask` 只留世界层（**穿透单位、仍撞地形**），结束后**一定还原**；方向保留 Y 分量（可冲至空中）；路径 = `ImmediateMesh` 折线 | `Distance` / `Duration` / `PierceUnits` / `ShowPath` / `PathColor` / `PathWidth` / `PathSteps` |
 | **架势（架）** | `Scripts/Abilities/GuardStanceAbility.cs` | 架势内被命中 → 把这次命中**无效化**（`Unit.IsInvulnerable`）并立刻收招；**每帧把"自己设的那次规避"清掉** → 下一次命中仍会被规避（"挡一下"而不是"无敌到架势结束"） | `StanceSeconds` / `GuardStartSeconds`（`0.75` 来自文档） |

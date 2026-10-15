@@ -63,6 +63,9 @@ public partial class ConfigIndex : Node
 		ConfigRows.Rebuild(Config.Summons);
 		ConfigRows.Rebuild(Config.AiProfiles);
 		ConfigRows.Rebuild(Config.Skills);
+		// 连招参数表（`Config/Tables/SkillSeries/ser_*.tres`）：技能行以资源引用指过来（P8）。
+		// 索引起来才能被自测/工具按 Id 取到，也才能在"引用还在、索引里查不到"时报出来。
+		ConfigRows.Rebuild(Config.SkillSeries);
 		// 技能动画表（生成器的配方表）：运行期不"播"它，但索引起来才能被自测/生成器按 Id 取到。
 		ConfigRows.Rebuild(Config.SkillAnimations);
 		ConfigRows.Rebuild(Config.PressureMods);
@@ -96,6 +99,9 @@ public partial class ConfigIndex : Node
 		// 单位行 → AI 档案（配置表阶段 5）：读不到表 / 单位行没挂档案也在这里留痕。
 		ReportAiProfiles();
 
+		// 技能行 → 连招参数行（P8）：读不到表 / 技能行没填也在这里留痕。
+		ReportSkillSeries();
+
 		// 能力卡（局外装备层）：卡表行数 + 额度上限公式 + "授予技能"卡指向的技能行在不在索引里。
 		ReportAbilityCards();
 
@@ -126,7 +132,7 @@ public partial class ConfigIndex : Node
 
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
-			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()} / AI 档案 {ConfigRows.Count<AiProfileConfig>()} / 能力卡 {ConfigRows.Count<AbilityCardConfig>()}（ConfigIndex.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
+			$"配置表：武器 {ConfigRows.Count<WeaponConfig>()} / 角色 {ConfigRows.Count<CharacterConfig>()} / 敌人 {ConfigRows.Count<EnemyConfig>()} / 首领 {ConfigRows.Count<BossConfig>()} / 召唤物 {ConfigRows.Count<SummonConfig>()} / 技能 {ConfigRows.Count<AbilityConfig>()} / 连招参数 {ConfigRows.Count<AbilitySeries>()} / Pressure {ConfigRows.Count<PressureModConfig>()} / 效果 {ConfigRows.Count<EffectConfig>()} / 节点 {ConfigRows.Count<NodeConfig>()} / 局外成长 {ConfigRows.Count<MetaUpgradeConfig>()} / AI 档案 {ConfigRows.Count<AiProfileConfig>()} / 能力卡 {ConfigRows.Count<AbilityCardConfig>()}（ConfigIndex.tres {(FileLoaded ? "已加载" : "未加载（全部数值回退到代码默认值）")}）");
 	}
 
 	/// <summary>
@@ -253,6 +259,58 @@ public partial class ConfigIndex : Node
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
 			$"AI 档案：{profileCount} 个（来源：{(profileCount > 0 ? "表 AiProfiles" : "代码默认值（表读不到）")}）—— 单位指向 [{links}]；有预制体但没挂档案的 {unlinked} 个");
+	}
+
+	/// <summary>
+	/// 把"技能行 → 连招参数行"的关联写进日志（P8 的"顺藤摸瓜"入口）。
+	///
+	/// **回退路径必须一眼看得出来**：连招表读不到、或技能行没填 <see cref="AbilityConfig.ComboSeries"/> 时，
+	/// 那些技能会退化成**单段**（用自己行里的 <c>AnimName</c>）—— 这是合法模式，但绝不能静默。
+	/// 与 <see cref="ReportUpgradePools"/> / <see cref="ReportAiProfiles"/> 同一条纪律：
+	/// 引用还在、索引里查不到也要报出来。
+	/// </summary>
+	private void ReportSkillSeries()
+	{
+		var links = new System.Text.StringBuilder();
+		int linked = 0;
+		int comboRows = 0;
+		foreach (AbilityConfig row in Config.Skills)
+		{
+			if (row == null)
+			{
+				continue;
+			}
+
+			if (string.Equals(row.ClassHint, "MeleeComboAbility", System.StringComparison.Ordinal))
+			{
+				comboRows++;
+			}
+
+			if (row.ComboSeries == null)
+			{
+				continue;
+			}
+
+			linked++;
+			if (links.Length > 0)
+			{
+				links.Append('、');
+			}
+
+			links.Append($"{row.Id}→{row.ComboSeries.Id}（{row.ComboSeries.StepCount} 段）");
+
+			if (ConfigRows.ById<AbilitySeries>(row.ComboSeries.Id) == null)
+			{
+				GD.PushWarning($"[ConfigIndex] 技能行 {row.Id} 的 ComboSeries 指向「{row.ComboSeries.Id}」，但这行连招不在 ConfigIndex.tres 的 SkillSeries 索引里。");
+				ActRoguelike.Core.GameLog.Write("Config", $"⚠ 技能行 {row.Id} 指向的连招行「{row.ComboSeries.Id}」不在 SkillSeries 索引里（引用还在，索引里查不到）。");
+			}
+		}
+
+		int seriesCount = ConfigRows.Count<AbilitySeries>();
+		ActRoguelike.Core.GameLog.Write(
+			"Config",
+			$"连招参数：{seriesCount} 行（来源：{(seriesCount > 0 ? "表 SkillSeries" : "代码默认值（表读不到）")}）—— 技能指向 [{links}]；"
+			+ $"ClassHint=MeleeComboAbility 的技能行 {comboRows} 条（其中填了连招行的 {linked} 条，其余走单段模式）");
 	}
 
 	/// <summary>

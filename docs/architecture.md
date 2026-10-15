@@ -45,6 +45,12 @@
     - 没开 `physics/common/physics_interpolation` 时，角色的**渲染变换**只在物理帧上更新：实测 301 帧里有 **150 帧位移为 0**（49.8%），其余帧位移 0.114（等于 2 帧的路程）。画面上就是「一顿一冲」，也就是用户说的"剧烈缓动 + 残影"。
     - **凡是每帧改 `Node3D` 变换的跟随逻辑，必须写在 `_PhysicsProcess` 里**，让引擎把物理状态插值到渲染帧。写在 `_Process` 里会和被跟随对象错拍：实测相机单帧位移在 `0 ↔ 0.1167` 之间交替（σ=0.057），角色/相机相对位置每帧抖 ±4cm。
     - 排查手段：`SelfTest` 的表现采样阶段会逐帧记录「物理位置位移 / 插值后位移 / 相机位移 / 角色↔相机相位差」并打日志；`Node3D.GetGlobalTransformInterpolated()` 拿到的才是渲染器真正使用的变换（`GlobalPosition` 始终是物理值，开不开插值都一样）。
+12. **数组型表参数一律用 `Godot.Collections.Array<T>` 列，不许"整串文本 + 运行期解析"、不许"按行 Id 约定路径 load"**（P8 立的规矩，实测与理由见 [abilities.md](abilities.md) §8.2 / §11）：
+    - `[Export] Godot.Collections.Array<string|float|Vector3|T:Resource>`：**能编译、能导出、能写盘、能读回**（P8 探针：项数/每一项非空/值逐位都对）。属性表里带元素类型（`hintString="4/0:"` = `Array[String]`）。
+    - `[Export] float[]` / `string[]` / `Vector3[]` 也**能编译**；**只有 `PackedFloat32Array` / `PackedStringArray` 没有 C# 类型**（`CS0246`）——别用。
+    - ⚠️ **"`Count` 读得到、每一项都是 `null`"= 编辑器加载了旧 C# 程序集**（新导出属性在旧程序集里根本不存在）。**重启编辑器**，不要据此推翻设计。
+    - 一张行需要"每项一份"的一串数据时：**要么加一个 `Array<T>` 列**，**要么老老实实加一行子表 + 一个资源引用列**（例如 `AbilityConfig.ComboSeries` → `Config/Tables/SkillSeries/ser_*.tres`）。**表里的东西要一眼看得懂**（用户本轮裁定：「该改代码的时候还是得改」，别为了"不改代码"把数据做脆）。
+    - **禁止**：`ability.Get("属性名")` / `Set("属性名", 值)` 这种**字符串反射设值**（属性名写错不报错，只是静默不生效）。要写强类型属性，就用类型判断（`ability is MeleeComboAbility combo`）。
 
 ## Unit 与表现的分工
 

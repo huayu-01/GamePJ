@@ -692,5 +692,112 @@ P8探针③ 读回 Params（ParamEntry[]）：Length=2 每项[P1=1.0, P2=text]
 > 📌 探针**保留**在 `Scripts/Testing/SeriesArrayProbe.cs`（自测里跑，只读 + 只写 `user://`）——
 > 以后 Godot 升级、或再有人怀疑"数组列读不回来"，这条会第一时间给出原始证据。
 
+### 11.2 A 方案落地：删了什么、换成什么
+
+| 文件 | 删掉 | 换成 |
+|---|---|---|
+| `Scripts/Config/AbilitySeries.cs` | `Entries`（整串文本）、`ItemType`、`ValueSeparatorText`、`PairSeparator` / `ValueSeparator`、`Parse` / `Raw` / `ParseFloats` / `ParseTexts` / `ParseVectors` / `ParseVector3` —— **全部删除** | **10 个正规列**：`ComboAnimations: Array<string>`、`StepDamageScales: Array<float>`、`StepBoxSizes: Array<Vector3>`、`StepBoxOffsets: Array<float>`、`StepActiveTimes: Array<float>`、`CutSceneNames: Array<string>`、`CutExcludeSceneNames: Array<string>` + `ComboNextEvent` / `ComboWindowSeconds` / `ComboLoop`（窗口/循环/事件帧也住这一行）+ `StepCount` |
+| `Scripts/Config/AbilityConfig.cs` | `ComboSeriesPath`（`[Export(PropertyHint.File,"*.tres")] string`，一个**路径字符串**）+ `ApplyTo` 里的 `ability.Get("ComboSeriesPath")` / `Set(...)` **字符串反射** | `ComboSeries`（`AbilitySeries?` **资源引用**）+ **强类型赋值**：`if (ComboSeries != null && ability is MeleeComboAbility combo) combo.Series = ComboSeries;` |
+| `Scripts/Abilities/Ability.cs` | `LoadSeries(path)` / `BindSeries(inline, path)`（**"按路径 load"这条路**） | 无（连招行由技能行直接给） |
+| `Scripts/Abilities/MeleeComboAbility.cs` | `SkillSeriesDir` 常量、`ComboSeriesPath` 字段、**7 个 `[Export] AbilitySeries?` 字段**（实测一个都没被填过）、`ReadSeries` 里的"按技能行 Id 约定路径 load + 七串文本解析" | 一个 `Series`（`AbilitySeries?`）+ `ReadSeries` 直接读 `Series.ComboAnimations/StepDamageScales/...`（不再 load、不再解析） |
+| `Scripts/Config/ConfigIndexData.cs` / `ConfigIndex.cs` | —— | `[Export] AbilitySeries[] SkillSeries` 索引数组 + `ConfigRows.Rebuild(Config.SkillSeries)` + `ReportSkillSeries()`（日志 `连招参数：…`）+ 总日志多一项 `连招参数 N` |
+
+**逗号后面的两条纪律没变**：① 数值仍然只存在于表里（代码里没有任何段数/尺寸/倍率常数）；
+② 读不到连招行时**写明确日志**并退化成单段（`⚠ 连招：{AbilityId} 的技能行没填 ComboSeries…`），不静默换挡。
+
+> ⚠️ 一个副产品：P4 那 7 个 `[Export] AbilitySeries?` 字段是"半配就能跑"的陷阱
+> （只填 `ComboAnimations` 不填 `StepDamageScales` 也能启动，段数对、数值全兜底）——
+> 删掉后**只有"一行全给"这一条路**。`Ability.AnyAnimationAvailable` 仍是**无调用点的死代码**，
+> 本轮没动它（见 §11.6）。
+
+### 11.3 数据与 `ConfigIndex`（**三处同改**）
+
+| 项 | 值 |
+|---|---|
+| 连招行（3 行） | `Config/Tables/SkillSeries/ser_b1_combo.tres`（5 段）/ `ser_b2_combo.tres`（3 段）/ `ser_b3_combo.tres`（5 段循环）—— 内容是**真数组列**（`Array[String]([…])` / `Array[float]([…])` / `Array[Vector3]([Vector3(…)])`），不是文本 |
+| 技能行（3 行） | `skl_b1_w1_1` / `skl_b2_w1_1` / `skl_b3_w1_1` 各加**一个引用列** `ComboSeries = ExtResource("3_series")` + 顶部一个 `[ext_resource type="Resource" path=…ser_b*_combo.tres]` |
+| `ConfigIndex.tres` 三处 | ① `[ext_resource]` 三条（id `280_ser_b1_combo` / `281_ser_b2_combo` / `282_ser_b3_combo` —— **取现有最大值 279 之后**，不动别人的编号）；② `[resource]` 里新增 `SkillSeries = [ExtResource("280…"), …]`；③ `load_steps 194 → 197` |
+| 备份 | `_refactor_backup/ConfigIndex.tres.p8before` |
+| 日志核对 | `连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（5 段）]` + `（ConfigIndex.tres 已加载）` |
+
+> ⚠️ 索引**不进**自测那条 13 个数的硬指标行（`6/2/10/1/1/39/7/14/8/5/6/11/4`）——
+> 那一行是"别的表的行数"，本轮**一个数都没动**；连招表的行数报在 `[Config] 配置表：… 连招参数 3 …` 那一行。
+
+### 11.4 ⭐ "`ser_b1_combo` 与 `skl_b1_w1_1` 是不是重复" —— 查清了，是"空壳 + 真数据"
+
+- `ser_b1_combo.tres`：**一个数据字段都没填**（只有 `Id` / `DisplayName` / `Note` + 一个 `uid`），
+  而且**全仓库零引用**（`grep -r ser_b1_combo` 只命中它自己那行 `Id`）——是 P4 第一次尝试
+  （`Items0..Items7` 固定列）留下的空壳。
+- `skl_b1_w1_1.tres`：**真数据**（七串全在里面），而且是运行期真正被读的那一份（按技能行 Id 约定路径）。
+- **合并方式**：保留 `ser_b1_combo.tres`（**uid 不变**）作为"灵剑武技1 的连招行"、把真数据搬进来；
+  `skl_b1_w1_1.tres` 删除。顺带把另外两行也改成 `ser_b2_combo.tres` / `ser_b3_combo.tres` ——
+  它们装的是**连招行（SkillSeries 表）**，不是技能行；"文件名 = 技能行 Id"这条约定本来就已删除，
+  留着这个名字只会让人以为它是技能行。**4 行 → 3 行，一行一个技能。**
+
+### 11.5 验证：连招逐位不变 + 硬指标逐位不变
+
+**① 构建**：`build.ps1 --no-incremental -v minimal` → **0 warning / 0 error**。
+
+**② 无头自测**（`=== 自测结束 ===`、**退出码 0**）：
+
+```powershell
+$godot='F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
+& $godot --path 'F:\Godot项目\项目a' --headless --quit-after 40000 res://Scenes/Main.tscn -- --selftest
+# → [log] 02:07:05 [SelfTest] === 自测结束 ===    EXIT=0
+```
+
+> ⚠️ **必须带场景参数**：主场景是**基地**，不带会进基地 → 找不到 `Stage` → 第 20 阶段起全是空值
+> （`--quit-after` 只是兜底帧数，别当超时用）。MCP 那条路（`run_project` + `user://selftest.flag`）
+> 同样要显式 `scene_path: res://Scenes/Main.tscn`。
+
+**③ 连招手感冒烟：逐位不变** —— 同一条自测链路上的**三条 `连招表读取`** 与**四条 P4 结论行**
+与改动前（P7 代码，`run_20261016_015117.log`）**逐字节相同**（除了 `串=[路径]` 变成 `行=[Id]`、
+以及新加的"窗口/循环/事件帧"尾巴）：
+
+```text
+# 改动前（串=路径）                                  → 改动后（行=资源引用）
+连招表读取：skl_b1_w1_1 串=[…/skl_b1_w1_1.tres] 段动画 5 个 [Skill_B1_Sword1…Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]
+连招表读取：skl_b2_w1_1 串=[…/skl_b2_w1_1.tres] 段动画 3 个 [Skill_B2_Scythe1…Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []
+连招表读取：skl_b3_w1_1 串=[…/skl_b3_w1_1.tres] 段动画 5 个 [Skill_B3_Spear1…Spear5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [] 排除 []
+```
+
+```text
+✅ P4·灵剑武技1 破剑式：TryPress(起手)=True 段数表=5 首段动画「Skill_B1_Sword1」 AnimEvent=ATK AnimEventEnd=Combo → 连续按键推进 4 次 最终段=5 累计连击=4 窗口=0.45s｜CD=0.3｜靶子 … 生命 60 → 60（期望下降）
+✅ P4·破剑式斩断子弹：名单 [Bullet] 排除名单 [EnergyWave]｜友军的 Bullet 被清=是 敌方的 Bullet 被清=是 能量波还在=是（斩不断）｜本段斩断计数=2 累计=2
+✅ P4·镰刀：武技1 憎恶 段数=3 CD 0.5 连续按键推进=2 最后一刀命中盒 (7.2, 1.8, 0)（= **圆柱 = 大回旋 360°**）｜武技2 … 门绑定=True 武技1 被锁=True 收回后武技1 解锁=True
+🔴 P4·长枪武技1 横扫千军：段数=5 循环=True CD 0.6 连续按键推进=10 循环后最大段号=5（期望 ≤5）｜武技2 长虹贯日 …（这一行的 🔴 是 P4 §8.6 就记下的"每档 +20% 没体现"，**与本轮无关、逐字未变**）
+```
+
+**④ 硬指标逐位不变**（同一次运行）：节点布置 `10（2/5/3）` · `pressure=3 pmods=3 bank=0` ·
+白板首领 `315/甲 0` · 端到端 `奖励界面打开=True` · 最小闭环链路 `✓`（`最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓`）·
+玩家 `220/20/6.5` · 索引 `6/2/10/1/1/39/7/14/8/5/6/11/4` · 增幅 **62（9/23/30）** · 音效 **14** · `（ConfigIndex.tres 已加载）`。
+
+**⑤ 控制实验（证明③④不是"我看漏了"）**：把两份日志归一化（去时间戳、去自动节点名
+`@CharacterBody3D@N`，只留 `[SelfTest]/[Config]/[Combat]/[Audio]` 行，剔除随机抽签/刷怪/表现采样那几类）
+后 `Compare-Object`：
+
+| 对比 | 差异行数 |
+|---|---|
+| **改动前 vs 改动前**（两跑基线，同类随机性） | **66** |
+| 改动前 vs 改动后 | **89** |
+
+多出来的 **23 行全部是**：P8 探针输出（26 行，属新增）与**我故意改的两行日志**
+（`配置表：… 连招参数 3 …` / 新增 `连招参数：3 行…`）—— 也就是说
+**所有硬指标行、四条 P4 结论行、`连招表读取` 的数据部分，在两跑之间是逐字节相同的**。
+
+### 11.6 没做 / 不确定（照实说）
+
+1. ⚠️ **`Ability.AnyAnimationAvailable` 仍是死代码**（P4 加、无调用点）。这轮**没碰它** ——
+   它不属于"string + 约定路径"那两条绕行；要删是另一次清理。
+2. ⚠️ **`ComboNextEvent` 与技能行的 `AnimEvent` 值重复**（三行都是 `ATK`）：
+   `MeleeComboAbility.OnAnimEvent` 判的是 `ComboNextEvent`，而基类的动画事件帧名来自技能行 `AnimEvent`。
+   合并成一个（直接用 `AnimEvent`）要动 `OnAnimEvent` 的判据，**收益小、回归面大**，本轮不动。
+3. ⚠️ 探针会往 `user://p8_series_probe.tres` 写一个临时文件（自测时覆盖一次），不进仓库、不影响玩法。
+4. ⚠️ **编辑器里那份 `ConfigIndex.tres` 的内存副本**：本轮是手改磁盘文件 + 无头自测验证的。
+   如果编辑器之后自己保存了它，请以仓库里的版本为准并重跑一次自测（日志里看 `连招参数 3 行` + `已加载`）。
+5. ⚠️ 我这轮开始时编辑器里**有一个 01:46 起的旧游戏实例**（跑的是改动前的 dll），
+   它挡住了 MCP 的 `run_project`（`Project is already running`）—— 我把它关掉了，
+   没有用全局的 `stop_project`。编辑器本身全程开着。
+
 
 

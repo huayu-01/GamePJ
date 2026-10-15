@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AbilitySeries" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilitySeries.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+ComboAnimations = Array[String](["Skill_B2_Scythe1", "Skill_B2_Scythe2", "Skill_B2_Scythe3"])
+ComboNextEvent = "ATK"
+ComboWindowSeconds = 0.5
+ComboLoop = false
+StepDamageScales = Array[float]([1.0, 1.2, 1.9])
+StepBoxSizes = Array[Vector3]([Vector3(3.2, 1.8, 3.4), Vector3(3.2, 1.8, 3.4), Vector3(7.2, 1.8, 0)])
+StepBoxOffsets = Array[float]([1.7, 1.7, 0.0])
+StepActiveTimes = Array[float]([0.12, 0.12, 0.2])
+Id = "ser_b2_combo"
+DisplayName = "角色 B 镰刀 武技1「憎恶」的连招行"
+Note = "[P8] 一行 = 一个技能的连招。本行 = 镰刀武技1「憎恶」（技能行 skl_b2_w1_1 用 ComboSeries 指过来）：3 段；前 2 刀半圆（盒子 z>0），最后一刀大回旋（z=0 → 命中盒切成圆柱 360°）。与灵剑的破剑式**共用 MeleeComboAbility**，差别只有这一行里的段数与数值（文档第 98 行：几个武器的武技1 应当是使用同一个技能或状态驱动）。文件名由 P4 的 skl_b2_w1_1.tres 改成 ser_b2_combo.tres —— 它装的是**连招行**（SkillSeries 表），不是技能行，按技能行 Id 命名的旧约定已经删了。"

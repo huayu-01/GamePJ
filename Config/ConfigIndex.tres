@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ConfigIndexData" load_steps=194 format=3]
+[gd_resource type="Resource" script_class="ConfigIndexData" load_steps=197 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/ConfigIndexData.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -224,6 +224,9 @@
 [ext_resource type="Resource" path="res://Config/Tables/Upgrades/evo_golden_road.tres" id="257_evo_golden_road"]
 [ext_resource type="Resource" path="res://Config/Tables/Upgrades/evo_light_leap.tres" id="258_evo_light_leap"]
 [ext_resource type="Resource" path="res://Config/Tables/Audio/audio_sfx_charge_complete.tres" id="279_audio_sfx_charge_complete"]
+[ext_resource type="Resource" uid="uid://cwriiq810bbqx" path="res://Config/Tables/SkillSeries/ser_b1_combo.tres" id="280_ser_b1_combo"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillSeries/ser_b2_combo.tres" id="281_ser_b2_combo"]
+[ext_resource type="Resource" path="res://Config/Tables/SkillSeries/ser_b3_combo.tres" id="282_ser_b3_combo"]
 
 [resource]
 script = ExtResource("1_balance")
@@ -279,6 +282,7 @@ FreeChallengeBaseQuota = 1
 FreeChallengeMaxQuota = 2
 Skills = [ExtResource("69_skl_enemy_chaser_melee"), ExtResource("70_skl_enemy_fast_melee_melee"), ExtResource("71_skl_enemy_exploder_blow"), ExtResource("72_skl_enemy_jumping_leap"), ExtResource("73_skl_enemy_ranged_shot"), ExtResource("74_skl_enemy_charger_charge"), ExtResource("75_skl_enemy_screamer_scream"), ExtResource("76_skl_enemy_guard_melee"), ExtResource("77_skl_enemy_elite_melee"), ExtResource("78_skl_enemy_elite_buff"), ExtResource("79_skl_enemy_elite_control"), ExtResource("80_skl_boss_melee"), ExtResource("81_skl_boss_scream"), ExtResource("82_skl_boss_charge"), ExtResource("83_skl_boss_summon"), ExtResource("84_skl_drone_melee"), ExtResource("85_bhv_awakened"), ExtResource("86_bhv_summoner"), ExtResource("87_bhv_screaming"), ExtResource("88_bhv_charging"), ExtResource("144_skl_a1_w1_1"), ExtResource("145_skl_a1_w1_2"), ExtResource("149_skl_a2_w1_1"), ExtResource("150_skl_a2_w1_2"), ExtResource("151_skl_a3_w1_1"), ExtResource("152_skl_a3_w1_2"), ExtResource("153_skl_a1_skill_1"), ExtResource("154_skl_a1_skill_2"), ExtResource("155_skl_a1_passive"), ExtResource("191_skl_b_skill_1"), ExtResource("192_skl_b_skill_2"), ExtResource("190_skl_b_fall"), ExtResource("183_skl_b1_w1_1"), ExtResource("184_skl_b1_w1_2"), ExtResource("185_skl_b1_w1_3"), ExtResource("186_skl_b2_w1_1"), ExtResource("187_skl_b2_w1_2"), ExtResource("188_skl_b3_w1_1"), ExtResource("189_skl_b3_w1_2")]
 PressureMods = [ExtResource("108_pmod_berserk_dmg"), ExtResource("109_pmod_berserk_speed"), ExtResource("110_pmod_fortress_hp"), ExtResource("91_pmod_swift"), ExtResource("112_pmod_scream_echo"), ExtResource("113_pmod_charge_impact"), ExtResource("114_pmod_summon_haste")]
+SkillSeries = [ExtResource("280_ser_b1_combo"), ExtResource("281_ser_b2_combo"), ExtResource("282_ser_b3_combo")]
 SkillAnimations = [ExtResource("140_anim_a1_atk1"), ExtResource("141_anim_a1_atk2"), ExtResource("156_anim_a1_backdash"), ExtResource("157_anim_a1_leap"), ExtResource("158_anim_a2_scatter"), ExtResource("159_anim_a2_charged_volley"), ExtResource("160_anim_a3_draw"), ExtResource("161_anim_a3_hawkeye"), ExtResource("162_anim_b1_sword1"), ExtResource("163_anim_b1_sword2"), ExtResource("164_anim_b1_sword3"), ExtResource("165_anim_b1_sword4"), ExtResource("166_anim_b1_sword5"), ExtResource("167_anim_b1_swordqi"), ExtResource("168_anim_b2_scythe1"), ExtResource("169_anim_b2_scythe2"), ExtResource("170_anim_b2_scythe3"), ExtResource("171_anim_b3_spear1"), ExtResource("172_anim_b3_spear2"), ExtResource("173_anim_b3_spear3"), ExtResource("174_anim_b3_spear4"), ExtResource("175_anim_b3_spear5"), ExtResource("176_anim_b_fall"), ExtResource("177_anim_b_skill1"), ExtResource("178_anim_b_skill2")]
 Bosses = [ExtResource("92_boss_final")]
 Summons = [ExtResource("93_summon_drone")]

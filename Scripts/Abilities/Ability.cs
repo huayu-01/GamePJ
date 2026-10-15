@@ -763,46 +763,10 @@ public abstract partial class Ability : Node3D
 	protected void StopSkillAnimation() => FindInOwner<UnitAnimator>()?.StopSkillAnimation();
 
 	/// <summary>
-	/// **按路径读一个 <c>AbilitySeries</c>**（P4 新增，**只加不删**）—— 技能行里"一串参数"（连招的每段
-	/// 动画名/命中盒/倍率）的标准入口。
-	///
-	/// <para>文件放 `Config/Tables/SkillSeries/*.tres`，技能行用**路径**（表列 <c>ComboSeriesPath</c>）
-	/// 指过来。用路径而不是"索引数组 + Id"，理由与 <c>ArrowVolleyAbility.ProjectileScenePath</c> 同一条：
-	/// **不需要给 ConfigIndex 加索引数组**（少一处"三处同改"的风险），而且行文件被删/改名时
-	/// <see cref="ResourceLoader.Exists"/> 直接返回 false（读不到就按"没配"处理，不静默换挡）。</para>
-	/// </summary>
-	protected static Config.AbilitySeries? LoadSeries(string path)
-	{
-		if (string.IsNullOrEmpty(path) || !ResourceLoader.Exists(path))
-		{
-			return null;
-		}
-
-		if (GD.Load<Config.AbilitySeries>(path) is { } row)
-		{
-			return row;
-		}
-
-		// 路径写错 / 文件不是 AbilitySeries 时**必须留痕**，否则只会表现为"连招只有一段"。
-		GameLog.Write("Config", $"⚠ 技能串「{path}」读不到或不是 AbilitySeries（连招会退化成单段）。");
-		return null;
-	}
-
-	/// <summary>
-	/// **把"一串表参数"绑到本能力上**（P4 新增，**只加不删**）。
-	///
-	/// <para>优先用**行里直接引用的那个资源**（<paramref name="inline"/>）；它为空时按
-	/// <paramref name="path"/> 去读技能串文件。两条路都不通就返回 null（调用方按"没配"处理，
-	/// 行为与改动前一致）。</para>
-	/// </summary>
-	protected static Config.AbilitySeries? BindSeries(Config.AbilitySeries? inline, string path)
-		=> inline ?? LoadSeries(path);
-
-	/// <summary>
 	/// **播一段"不是本行 <see cref="AnimName"/>"的技能动画**（P4 新增，**只加不删**）。
 	///
 	/// <para>存在的理由：角色 B 的三把近战武器，**武技1 的每一段连招都是一段独立的技能动画**
-	/// （见 `AbilityConfig.ComboAnimations`）—— "一段连招 = 一段动画"才是文档说的
+	/// （见 `AbilityConfig.ComboSeries`）—— "一段连招 = 一段动画"才是文档说的
 	/// 「武技1 基本是动画驱动碰撞和间隔的」。基类原来的 <see cref="PlaySkillAnimation"/> 只认
 	/// <see cref="AnimName"/> 这一个名字，所以这里补一个"按名播"的入口。</para>
 	///
@@ -828,7 +792,11 @@ public abstract partial class Ability : Node3D
 	///
 	/// <para>给"一段连招里每段是一段独立动画"的技能用：<see cref="TryActivate"/> 原来只校验
 	/// <see cref="AnimName"/> 一个名字，而连招的每一段名字不同。它只读不写，
-	/// **不填 <c>ComboAnimations</c> 的技能永远不会走到这里** → 默认行为逐位不变。</para>
+	/// **没有连招行（<c>AbilityConfig.ComboSeries</c>）的技能永远不会走到这里** → 默认行为逐位不变。</para>
+	///
+	/// <para>⚠️ 目前**没有调用点**（P8 照实记）：连招的每一段名字由连招行保证，
+	/// 那一段的存在性由 <c>UnitAnimator.ResolveSkillAnimation</c> 在播放时查。留着它是"只加不删"的纪律，
+	/// 不是"有一条激活路径在用它"。</para>
 	/// </summary>
 	protected bool AnyAnimationAvailable(string[] animationNames)
 	{

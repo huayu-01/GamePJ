@@ -263,6 +263,21 @@ public partial class ConfigIndexData : Resource
 	/// </summary>
 	[Export] public AbilityCardConfig[] AbilityCards { get; set; } = System.Array.Empty<AbilityCardConfig>();
 
+	[ExportGroup("表索引 · 技能的连招参数行（一行 = 一个技能的连招）")]
+	/// <summary>
+	/// **连招参数表**（`Config/Tables/SkillSeries/ser_*.tres`）：**一行 = 一个技能武技1 的连招**
+	/// （每段动画名 / 每段命中盒 / 每段伤害倍率 / 斩断子弹的名单）。
+	///
+	/// <para>技能行用 <see cref="AbilityConfig.ComboSeries"/> 以**资源引用**指过来 ——
+	/// 不是字符串路径、也不是"按技能行 Id 约定路径 load"（P8 删掉了那两条）。
+	/// 索引起来的作用与升级池 / AI 档案同一条纪律：**行文件被引用 ≠ 被索引**，
+	/// "引用还在、索引里查不到"要在日志里报出来。</para>
+	///
+	/// <para>空 = 三把近战武器的武技1 都退化成单段（每个技能用自己行里的 <c>AnimName</c>），
+	/// 并写明确日志（不静默换挡）。</para>
+	/// </summary>
+	[Export] public AbilitySeries[] SkillSeries { get; set; } = System.Array.Empty<AbilitySeries>();
+
 	[ExportGroup("能力卡 · 额度点数")]
 	/// <summary>
 	/// 额度点数的**初始上限**（激活一张卡就占用它的 <see cref="AbilityCardConfig.QuotaCost"/>，超过上限激活不了）。

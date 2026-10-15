@@ -52,19 +52,18 @@ public partial class AbilityConfig : ConfigRow
 
 	[ExportGroup("连招（P4：近战武技1 的「每段一段动画」；只有 MeleeComboAbility 读它）")]
 	/// <summary>
-	/// **连招的参数串文件路径**（`Config/Tables/SkillSeries/*.tres`，一个 <see cref="AbilitySeries"/>）：
-	/// 里面装着"每段动画名 / 每段命中盒尺寸 / 每段伤害倍率 / 斩断子弹的名单"。
+	/// **这个技能的连招参数行**（`Config/Tables/SkillSeries/*.tres` 里的一个 <see cref="AbilitySeries"/>）：
+	/// 每段动画名 / 每段命中盒 / 每段伤害倍率 / 斩断子弹的名单。**留空 = 这个技能不是连招**。
 	///
-	/// <para>⚠️ 为什么"一串参数"要落成**独立资源**而不是这里的一个数组列：Godot 的 C# 绑定
-	/// **导出不了托管数组**（`float[]` / `string[]` 编译期报 `GD0102`），而 <c>PackedFloat32Array</c> /
-	/// <c>PackedStringArray</c> 在 C# 侧**没有公开类型**（`Variant.Type` 里有、`Godot` 命名空间里没有）。
-	/// 所以"一串"只能走 <see cref="AbilitySeries"/>（每项一个 <c>ParamEntry</c> 子资源）。
-	/// 用**路径**而不是"索引数组 + Id"的理由与 <c>ArrowVolleyAbility.ProjectileScenePath</c> 同一条：
-	/// 不给 ConfigIndex 加索引数组（少一处"三处同改"的风险），读不到就按"没配"处理。</para>
+	/// <para>⚠️ <b>P8 改造</b>：这一列原来是 <c>[Export(PropertyHint.File,"*.tres")] string ComboSeriesPath</c>
+	/// （一个**路径字符串**），套用时靠 <c>ability.Get("ComboSeriesPath")</c> / <c>Set(...)</c> **字符串反射**写进能力
+	/// —— 属性名写错不报错、路径改了要满地找、`.tres` 里也看不出它指向谁。现在改成**资源引用**：
+	/// 编辑器里点得到、改名/移动文件会自动跟着走、类型不对（指到一个非 <see cref="AbilitySeries"/> 的行）
+	/// 在编辑器里就是红的。与单位表的 <c>Skills</c> / 武器的 <c>Pool</c> 是同一条纪律。</para>
 	///
-	/// <para>留空 = 这个技能不是连招（或只有一段，退回 <see cref="AnimName"/>）。</para>
+	/// <para>为什么"一串参数"要落成独立资源而不是这里的一堆数组列：见 <see cref="AbilitySeries"/> 的类注释。</para>
 	/// </summary>
-	[Export(PropertyHint.File, "*.tres")] public string ComboSeriesPath { get; set; } = string.Empty;
+	[Export] public AbilitySeries? ComboSeries { get; set; }
 
 	[ExportGroup("动画（「没有对应动画 → 技能不执行」，用户裁定）")]
 	/// <summary>
@@ -199,11 +198,13 @@ public partial class AbilityConfig : ConfigRow
 		ability.AnimEventEnd = AnimEventEnd;
 		ability.AnimSpeedScale = AnimSpeedScale <= 0f ? 1f : AnimSpeedScale;
 
-		// 连招串（P4）：只有"读得懂这个属性"的能力子类（MeleeComboAbility）会接住它；
-		// 别的子类没有这个属性 → 这里用 Get() 判一下，静默跳过（不写警告，它不是错配）。
-		if (!string.IsNullOrEmpty(ComboSeriesPath) && ability.Get("ComboSeriesPath").VariantType != Variant.Type.Nil)
+		// 连招参数行（P8）：**强类型赋值**。只有 `MeleeComboAbility` 有 `Series` 这一个字段，
+		// 所以这里用类型判断挑出来 —— 其它能力子类没有它，跳过它不是"错配"（不写警告）。
+		// ⚠️ 这里**不再走 Get()/Set() 字符串反射**：属性名写错时反射不报错、只是静默不生效
+		// （旧的 `ComboSeriesPath` 就是这么一条脆弱机制，P8 删掉了）。
+		if (ComboSeries != null && ability is MeleeComboAbility comboAbility)
 		{
-			ability.Set("ComboSeriesPath", ComboSeriesPath);
+			comboAbility.Series = ComboSeries;
 		}
 
 		// 冷却缩减 / 层数 / 蓄力：**0 = 不覆盖**（保留场景值），与 Cooldown 同一条纪律。

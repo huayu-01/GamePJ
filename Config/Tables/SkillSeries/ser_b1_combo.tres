@@ -4,7 +4,16 @@
 
 [resource]
 script = ExtResource("1_row")
-ItemType = "container"
+ComboAnimations = Array[String](["Skill_B1_Sword1", "Skill_B1_Sword2", "Skill_B1_Sword3", "Skill_B1_Sword4", "Skill_B1_Sword5"])
+ComboNextEvent = "ATK"
+ComboWindowSeconds = 0.45
+ComboLoop = false
+StepDamageScales = Array[float]([1.0, 1.15, 1.3, 1.45, 1.8])
+StepBoxSizes = Array[Vector3]([Vector3(2.2, 1.6, 2.8), Vector3(2.3, 1.6, 2.8), Vector3(2.4, 1.6, 3), Vector3(2.2, 1.6, 2.8), Vector3(2.8, 1.8, 3.2)])
+StepBoxOffsets = Array[float]([1.4, 1.4, 1.5, 1.4, 1.6])
+StepActiveTimes = Array[float]([0.1, 0.1, 0.12, 0.1, 0.14])
+CutSceneNames = Array[String](["Bullet"])
+CutExcludeSceneNames = Array[String](["EnergyWave"])
 Id = "ser_b1_combo"
-DisplayName = "角色 B 灵剑 破剑式（5 段连招的参数串）"
-Note = "一个 AbilitySeries = 技能行里的一串表参数（每项一个 ParamEntry 子资源，用 Items0..Items7 固定列引用 —— 数组在 .tres 里反序列化不回来，见 AbilitySeries 的说明）。本行装的是灵剑武技1（skl_b1_w1_1）破剑式的七串：ComboAnimations（5 段动画名）/ StepDamageScales / StepBoxSizes / StepBoxOffsets / StepActiveTimes / CutSceneNames / CutExcludeSceneNames（斩断子弹的名单与排除名单，能量波在排除名单里 → 斩不断）。技能行用 ComboSeriesPath 指过来。"
+DisplayName = "角色 B 灵剑 武技1「破剑式」的连招行"
+Note = "[P8] 一行 = 一个技能的连招（数组型表参数现在是真的数组列，见 AbilitySeries 的类注释与 docs/abilities.md §11）。本行 = 灵剑武技1「破剑式」（技能行 skl_b1_w1_1 用 ComboSeries 指过来）：5 段动画 / 每段伤害倍率 / 每段命中盒尺寸（x 宽 y 高 z 长）/ 每段前伸 / 每段判定时长 / 斩断名单（Bullet）/ 排除名单（EnergyWave —— 文档：无法斩断能量波）。★ 本行由 P4 的 ser_b1_combo.tres（空壳）与 Config/Tables/SkillSeries/skl_b1_w1_1.tres（真数据）合并而成，合并前 ser_b1_combo 一个字段都没填、也没有任何引用。"
