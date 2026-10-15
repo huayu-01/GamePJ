@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://Scripts/Interaction/BaseTerminal.cs" id="2_terminal"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/BuildScreen.tscn" id="9_build"]
 [ext_resource type="Script" path="res://Scripts/UI/LoadoutPreview.cs" id="10_loadout"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/ChooseScreen.tscn" id="11_choose"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/AbilityMatrixScreen.tscn" id="12_matrix"]
 
 [sub_resource type="BoxShape3D" id="Shape_ground"]
 size = Vector3(26, 1, 26)
@@ -116,4 +117,5 @@ surface_material_override/0 = SubResource("Mat_gate")
 [node name="SettingsScreen" parent="Screens" instance=ExtResource("8_settings")]
 [node name="BuildScreen" parent="Screens" instance=ExtResource("9_build")]
 [node name="ChooseScreen" parent="Screens" instance=ExtResource("11_choose")]
+[node name="AbilityMatrixScreen" parent="Screens" instance=ExtResource("12_matrix")]
 [node name="LoadingScreen" parent="." instance=ExtResource("6_loading")]
