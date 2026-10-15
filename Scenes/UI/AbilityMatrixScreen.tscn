@@ -11,8 +11,8 @@ ScreenLayer = 1
 CloseOnCancel = true
 ToggleKey = 75
 QuotaKey = 77
-Columns = 5
-Rows = 5
+Columns = 10
+Rows = 3
 
 [node name="Root" type="Control" parent="."]
 anchor_right = 1.0
@@ -33,63 +33,122 @@ color = Color(0.04, 0.05, 0.08, 0.94)
 [node name="Panel" type="PanelContainer" parent="Root"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 48.0
-offset_top = 32.0
-offset_right = -48.0
-offset_bottom = -96.0
+offset_left = 10.0
+offset_top = 6.0
+offset_right = -10.0
+offset_bottom = -46.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Root/Panel"]
-theme_override_constants/separation = 12
-
-[node name="Title" type="Label" parent="Root/Panel/VBox"]
+[node name="Title" type="Label" parent="Root"]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+anchors_preset = 10
+offset_top = 6.0
+offset_bottom = 44.0
+grow_horizontal = 2
+horizontal_alignment = 1
 theme_type_variation = &"UiTitle"
 text = "能力矩阵 · 局外装备"
 horizontal_alignment = 1
 
-[node name="Divider" type="NinePatchRect" parent="Root/Panel/VBox"]
-custom_minimum_size = Vector2(0, 16)
-texture = ExtResource("3_divider")
-patch_margin_left = 20
-patch_margin_top = 8
-patch_margin_right = 20
-patch_margin_bottom = 8
-modulate = Color(0.5, 0.82, 1, 0.9)
-
-[node name="Header" type="HBoxContainer" parent="Root/Panel/VBox"]
+[node name="Header" type="HBoxContainer" parent="Root"]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 16.0
+offset_top = 46.0
+offset_right = -16.0
+offset_bottom = 88.0
+anchors_preset = 10
+grow_horizontal = 2
 theme_override_constants/separation = 24
 
-[node name="Shards" type="Label" parent="Root/Panel/VBox/Header"]
+[node name="Shards" type="Label" parent="Root/Header"]
 theme_override_font_sizes/font_size = 20
 text = "碎片：0"
 vertical_alignment = 1
 
-[node name="Quota" type="Label" parent="Root/Panel/VBox/Header"]
+[node name="Quota" type="Label" parent="Root/Header"]
 theme_override_font_sizes/font_size = 20
 text = "额度：0 / 0"
 vertical_alignment = 1
 
-[node name="Spacer" type="Control" parent="Root/Panel/VBox/Header"]
+[node name="Spacer" type="Control" parent="Root/Header"]
 size_flags_horizontal = 3
 mouse_filter = 2
 
-[node name="QuotaUpgrade" type="Button" parent="Root/Panel/VBox/Header"]
+[node name="QuotaUpgrade" type="Button" parent="Root/Header"]
 theme_type_variation = &"UiPrimaryButton"
 text = "扩增额度"
 
-[node name="Matrix" type="GridContainer" parent="Root/Panel/VBox"]
+[node name="HBox" type="HBoxContainer" parent="Root/Panel"]
+theme_override_constants/separation = 16
+
+[node name="Matrix" type="GridContainer" parent="Root/Panel/HBox"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
-columns = 5
+columns = 10
 
-[node name="Legend" type="HBoxContainer" parent="Root/Panel/VBox"]
+
+[node name="RightPanel" type="VBoxContainer" parent="Root/Panel/HBox"]
+custom_minimum_size = Vector2(380, 0)
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="QuotaTitle" type="Label" parent="Root/Panel/HBox/RightPanel"]
+text = "额度占用"
+horizontal_alignment = 1
+
+[node name="QuotaBar" type="ProgressBar" parent="Root/Panel/HBox/RightPanel"]
+size_flags_vertical = 3
+fill_mode = 1
+show_percentage = false
+
+[node name="QuotaText" type="Label" parent="Root/Panel/HBox/RightPanel"]
+text = "0 / 0"
+horizontal_alignment = 1
+
+[node name="ShardsText" type="Label" parent="Root/Panel/HBox/RightPanel"]
+text = "碎片：0"
+horizontal_alignment = 1
+
+[node name="QuotaUpgradePanel" type="Button" parent="Root/Panel/HBox/RightPanel"]
+text = "扩增额度"
+[node name="Legend" type="HBoxContainer" parent="Root"]
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+anchors_preset = 12
+offset_left = 16.0
+offset_top = -108.0
+offset_right = -16.0
+offset_bottom = -76.0
+grow_horizontal = 2
+grow_vertical = 0
 theme_override_constants/separation = 18
 alignment = 1
 
-[node name="Footer" type="Label" parent="Root/Panel/VBox"]
+[node name="Footer" type="Label" parent="Root"]
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+anchors_preset = 12
+offset_left = 16.0
+offset_top = -74.0
+offset_right = -16.0
+offset_bottom = -42.0
+grow_horizontal = 2
+grow_vertical = 0
 theme_type_variation = &"UiCaption"
 text = ""
 horizontal_alignment = 1

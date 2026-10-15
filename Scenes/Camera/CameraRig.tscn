@@ -1,15 +1,15 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://vjdouy1kmco7"]
 
-[ext_resource type="Script" path="res://Scripts/Camera/CameraRig.cs" id="1_rig"]
+[ext_resource type="Script" uid="uid://da1ktxre1wj3j" path="res://Scripts/Camera/CameraRig.cs" id="1_rig"]
 
-[node name="CameraRig" type="Node3D"]
+[node name="CameraRig" type="Node3D" unique_id=1542923328]
 script = ExtResource("1_rig")
 
-[node name="SpringArm" type="SpringArm3D" parent="."]
+[node name="SpringArm" type="SpringArm3D" parent="." unique_id=228822760]
 transform = Transform3D(1, 0, 0, 0, 0.939693, -0.34202, 0, 0.34202, 0.939693, 0, 0, 0)
 spring_length = 8.0
 margin = 0.2
 
-[node name="Camera" type="Camera3D" parent="SpringArm"]
+[node name="Camera" type="Camera3D" parent="SpringArm" unique_id=1356548031]
 current = true
 fov = 78.0

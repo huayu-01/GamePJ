@@ -56,6 +56,11 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 	private HBoxContainer _legend = null!;
 	private Label _footer = null!;
 
+	// 右侧额度区（用户要求：右半屏显示额度占用 + 竖起进度条 + 资源）
+	private ProgressBar? _quotaBar;
+	private Label? _quotaText;
+	private Label? _shardsText;
+
 	private readonly List<AbilityCardTile> _tiles = new();
 
 	/// <summary>占位卡（真卡之后的所有格子）。与 <see cref="_tiles"/> 一起构成整屏矩阵，顺序 = 屏幕顺序。</summary>
@@ -94,15 +99,21 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 	{
 		_root = GetNode<Control>("Root");
 		InitializeOverlay();
-		_shards = GetNode<Label>("Root/Panel/VBox/Header/Shards");
-		_quota = GetNode<Label>("Root/Panel/VBox/Header/Quota");
-		_quotaUpgrade = GetNode<Button>("Root/Panel/VBox/Header/QuotaUpgrade");
-		_matrix = GetNode<GridContainer>("Root/Panel/VBox/Matrix");
-		_legend = GetNode<HBoxContainer>("Root/Panel/VBox/Legend");
-		_footer = GetNode<Label>("Root/Panel/VBox/Footer");
+		_shards = GetNode<Label>("Root/Header/Shards");
+		_quota = GetNode<Label>("Root/Header/Quota");
+		_quotaUpgrade = GetNode<Button>("Root/Header/QuotaUpgrade");
+		_matrix = GetNode<GridContainer>("Root/Panel/HBox/Matrix");
+		_legend = GetNode<HBoxContainer>("Root/Legend");
+		_footer = GetNode<Label>("Root/Footer");
+		_quotaBar = GetNodeOrNull<ProgressBar>("Root/Panel/HBox/RightPanel/QuotaBar");
+		_quotaText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/QuotaText");
+		_shardsText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/ShardsText");
+		_quotaBar = GetNodeOrNull<ProgressBar>("Root/Panel/HBox/RightPanel/QuotaBar");
+		_quotaText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/QuotaText");
+		_shardsText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/ShardsText");
 
 		_matrix.Columns = Columns;
-		_quotaUpgrade.Pressed += BuyQuota;
+		_matrix.Resized += OnMatrixResized;		_quotaUpgrade.Pressed += BuyQuota;
 		BuildLegend();
 	}
 
@@ -231,6 +242,34 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 	/// 做成公开静态方法是为了让探针能对任意卡数算一遍（**不动真表**）：加卡时行数自己长，
 	/// 格数 = 列 × 行 ≥ 卡数，所以最后一行不会缺角。
 	/// </summary>
+	/// <summary>
+	/// 按**可用宽度**算列数：卡宽 + 间隔 一组，铺得下几张就是几列。
+	/// 用户要求「不要求固定 n×n，但卡牌比例/大小不变 + 留间隔给光圈」，
+	/// 所以列数跟着容器宽度走，挤不下的卡自然流到下一行。
+	/// </summary>
+	/// <summary>容器尺寸变了就重算列数（卡牌大小与比例不变，挤不下的流到下一行）。</summary>
+	private void OnMatrixResized()
+	{
+		int cols = ColumnsFor(_matrix.Size.X, CardMinWidth, CardSeparation);
+		if (cols == _matrix.Columns)
+		{
+			return;
+		}
+
+		Columns = cols;
+		_builtRows = -1; // 强制重建
+		RebuildIfNeeded();
+	}
+
+	/// <summary>卡面最小宽 / 间隔（与 .tscn 的 custom_minimum_size 和 h_separation 对齐）。</summary>
+	private const float CardMinWidth = 110f;
+	private const float CardSeparation = 14f;
+	public static int ColumnsFor(float availWidth, float cardWidth, float separation)
+	{
+		float unit = Mathf.Max(1f, cardWidth + separation);
+		return Mathf.Max(2, Mathf.FloorToInt((availWidth + separation) / unit));
+	}
+
 	public static int RowsFor(int cardCount, int columns, int minRows)
 		=> Mathf.Max(minRows, Mathf.CeilToInt(cardCount / (float)Mathf.Max(1, columns)));
 
@@ -265,7 +304,7 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 
 		_tileScene ??= GD.Load<PackedScene>("res://Scenes/UI/AbilityCardTile.tscn");
 		_matrix.Columns = Columns;
-
+		_matrix.Resized += OnMatrixResized;
 		int slots = Columns * rows;
 		for (int i = 0; i < slots; i++)
 		{
@@ -288,7 +327,18 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 				_placeholders.Add(tile);
 			}
 
-			_matrix.AddChild(tile);
+			// 卡牌感的关键：用 AspectRatioContainer 把每格锁成 2.5:4（用户要求 2.5:4 或 3:4），
+			// 这样无论矩阵分到多大，卡面永远是竖长的（不会因为屏幕是 16:9 就变横）。
+			var holder = new AspectRatioContainer
+			{
+				Ratio = 0.625f, // 宽/高 = 2.5/4
+				CustomMinimumSize = new Vector2(CardMinWidth, CardMinWidth / 0.625f),
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				MouseFilter = Control.MouseFilterEnum.Ignore,
+			};
+			holder.AddChild(tile);
+			_matrix.AddChild(holder);
 		}
 	}
 
@@ -312,6 +362,21 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		_quota.Text = $"额度：{used} / {cap}　（扩增 Lv{AbilityStore.QuotaLevel}，剩余 {AbilityStore.QuotaLeft}）";
 		_quotaUpgrade.Text = $"扩增额度 +1（费用 {AbilityStore.QuotaUpgradeCost}）";
 		_quotaUpgrade.Disabled = AbilityStore.QuotaRow == null;
+
+		// 右侧竖进度条：填的是"已占用 / 总额度"，一眼看出还剩多少
+		if (_quotaBar != null)
+		{
+			_quotaBar.MaxValue = Mathf.Max(1, cap);
+			_quotaBar.Value = used;
+		}
+		if (_quotaText != null)
+		{
+			_quotaText.Text = $"{used} / {cap}　（剩余 {AbilityStore.QuotaLeft}）";
+		}
+		if (_shardsText != null)
+		{
+			_shardsText.Text = $"碎片：{MetaProgress.Shards}";
+		}
 
 		_footer.Text =
 			$"三状态：变暗 = 未解锁 ｜ 恢复颜色 = 解锁未激活 ｜ 边框外光圈 = 激活　·　"

@@ -1,157 +1,147 @@
-[gd_scene load_steps=24 format=3]
+[gd_scene format=3 uid="uid://2goeb0wrmdmo"]
 
-[ext_resource type="Script" path="res://Scripts/Player/PlayerController.cs" id="1_player"]
+[ext_resource type="Script" uid="uid://duc0wrjly51qb" path="res://Scripts/Player/PlayerController.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://Scenes/Camera/CameraRig.tscn" id="2_rig"]
-[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="3_movement"]
-[ext_resource type="Script" path="res://Scripts/Interaction/PlayerInteractInput.cs" id="10_interact"]
-[ext_resource type="Script" path="res://Scripts/Abilities/MeleeAttackAbility.cs" id="11_melee"]
-[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="12_hitbox"]
-[ext_resource type="Script" path="res://Scripts/Abilities/SummonAbility.cs" id="13_summon"]
-[ext_resource type="PackedScene" path="res://Scenes/Summons/Drone.tscn" id="14_drone"]
-[ext_resource type="Script" path="res://Scripts/Abilities/AreaAttackAbility.cs" id="15_area"]
-[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="16_hitbox2"]
-[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="4_presentation"]
-[ext_resource type="Script" path="res://Scripts/Combat/ChallengerMark.cs" id="17_mark"]
+[ext_resource type="Script" uid="uid://c1om2njjn4vp4" path="res://Scripts/Combat/CharacterMovement.cs" id="3_movement"]
+[ext_resource type="Script" uid="uid://dh01edm2bbmo8" path="res://Scripts/Combat/UnitPresentation.cs" id="4_presentation"]
 [ext_resource type="PackedScene" path="res://Scenes/Weapons/Pistol.tscn" id="5_pistol"]
-[ext_resource type="Script" path="res://Scripts/Player/PlayerWeaponInput.cs" id="6_weapon_input"]
-[ext_resource type="Script" path="res://Scripts/Abilities/DashAbility.cs" id="7_dash"]
-[ext_resource type="Script" path="res://Scripts/Abilities/BurstFireAbility.cs" id="8_burst"]
-[ext_resource type="Script" path="res://Scripts/Player/PlayerAbilityInput.cs" id="9_ability_input"]
-[ext_resource type="PackedScene" path="res://Assets/Models/player/mesh_player_body.glb" id="18_playerbody"]
-[ext_resource type="Script" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
-[ext_resource type="Script" path="res://Scripts/Abilities/EnergyWaveAbility.cs" id="19_energy_wave"]
+[ext_resource type="Script" uid="uid://c6hadi837nya7" path="res://Scripts/Player/PlayerWeaponInput.cs" id="6_weapon_input"]
+[ext_resource type="Script" uid="uid://chun0pq8miqvt" path="res://Scripts/Abilities/DashAbility.cs" id="7_dash"]
+[ext_resource type="Script" uid="uid://cy8vx6nw5meg6" path="res://Scripts/Abilities/BurstFireAbility.cs" id="8_burst"]
+[ext_resource type="Script" uid="uid://blkw4uuudvt8t" path="res://Scripts/Player/PlayerAbilityInput.cs" id="9_ability_input"]
+[ext_resource type="Script" uid="uid://cwcvtu5671n0i" path="res://Scripts/Interaction/PlayerInteractInput.cs" id="10_interact"]
+[ext_resource type="Script" uid="uid://2n50hst2bye7" path="res://Scripts/Abilities/MeleeAttackAbility.cs" id="11_melee"]
+[ext_resource type="Script" uid="uid://usqho0dxb2g" path="res://Scripts/Abilities/SummonAbility.cs" id="13_summon"]
+[ext_resource type="PackedScene" path="res://Scenes/Summons/Drone.tscn" id="14_drone"]
+[ext_resource type="Script" uid="uid://drp6ljmc11ow8" path="res://Scripts/Abilities/AreaAttackAbility.cs" id="15_area"]
+[ext_resource type="Script" uid="uid://clg5kunoi5nvh" path="res://Scripts/Combat/AttackHitbox.cs" id="16_hitbox2"]
+[ext_resource type="Script" uid="uid://c6yba478b1qas" path="res://Scripts/Combat/ChallengerMark.cs" id="17_mark"]
+[ext_resource type="PackedScene" uid="uid://b1ydnaxcewujj" path="res://Assets/Models/player/mesh_player_body.glb" id="18_playerbody"]
+[ext_resource type="Script" uid="uid://clctjjwe4dyw" path="res://Scripts/Abilities/EnergyWaveAbility.cs" id="19_energy_wave"]
+[ext_resource type="Script" uid="uid://7gcupr0uof6f" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
 height = 1.8
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_control"]
-radius = 8.0
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_playermelee"]
 size = Vector3(2.6, 1.8, 2.6)
 
-[node name="Player" type="CharacterBody3D"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_control"]
+radius = 8.0
+
+[node name="Player" type="CharacterBody3D" unique_id=2029295370]
 script = ExtResource("1_player")
 Faction = 0
 MaxHealth = 120.0
-MoveSpeed = 7.0
 Tags = PackedStringArray("Player", "Gun")
+MoveSpeed = 7.0
 
-
-[node name="Body" type="CollisionShape3D" parent="."]
+[node name="Body" type="CollisionShape3D" parent="." unique_id=590678833]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_body")
 
-[node name="Model" parent="." instance=ExtResource("18_playerbody")]
+[node name="Model" parent="." unique_id=1944366345 instance=ExtResource("18_playerbody")]
 transform = Transform3D(-2.6814, 0, 0, 0, 2.6814, 0, 0, 0, -2.6814, 0, 0, 0)
 
-[node name="AnimationPlayer" parent="Model" index="1"]
-autoplay = "idle"
-
-[node name="Movement" type="Node" parent="."]
+[node name="Movement" type="Node" parent="." unique_id=1724105735]
 script = ExtResource("3_movement")
 TurnSharpness = 16.0
 
-[node name="CameraRig" parent="." instance=ExtResource("2_rig")]
+[node name="CameraRig" parent="." unique_id=722181061 instance=ExtResource("2_rig")]
 
-[node name="WeaponMount" type="Node3D" parent="."]
+[node name="WeaponMount" type="Node3D" parent="." unique_id=5054249]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.7, -0.34)
 
-[node name="Pistol" parent="WeaponMount" instance=ExtResource("5_pistol")]
+[node name="Pistol" parent="WeaponMount" unique_id=1746375806 instance=ExtResource("5_pistol")]
 
-[node name="WeaponInput" type="Node3D" parent="WeaponMount/Pistol"]
+[node name="WeaponInput" type="Node3D" parent="WeaponMount/Pistol" unique_id=1507884742]
 script = ExtResource("6_weapon_input")
 
-[node name="AbilityDash" type="Node3D" parent="."]
+[node name="AbilityDash" type="Node3D" parent="." unique_id=661025185]
 script = ExtResource("7_dash")
-Aim = 0
 Cooldown = 1.2
-Distance = 6.0
-Duration = 0.22
-InvulnerableTime = 0.18
 
-[node name="AbilityBurst" type="Node3D" parent="."]
+[node name="AbilityBurst" type="Node3D" parent="." unique_id=1209345299]
 script = ExtResource("8_burst")
-Cooldown = 10.0
-BurstInterval = 0.06
-Duration = 2.5
 Aim = 2
+Cooldown = 10.0
 Windup = 0.0
 Recover = 0.1
 
-[node name="Presentation" type="Node" parent="."]
+[node name="Presentation" type="Node" parent="." unique_id=1706422609]
 script = ExtResource("4_presentation")
 
-[node name="InteractInput" type="Node" parent="."]
+[node name="InteractInput" type="Node" parent="." unique_id=800594803]
 script = ExtResource("10_interact")
-[node name="AbilityMelee" type="Node3D" parent="."]
+
+[node name="AbilityMelee" type="Node3D" parent="." unique_id=1479754891]
 script = ExtResource("11_melee")
-Enabled = false
+AttackRange = 2.4
 Cooldown = 0.75
 Windup = 0.18
 Recover = 0.25
-AttackRange = 2.4
+Enabled = false
 
-[node name="Attack" type="Area3D" parent="AbilityMelee"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -1.3)
+[node name="Attack" type="Area3D" parent="AbilityMelee" unique_id=1587616932]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1.3)
 collision_layer = 0
 collision_mask = 6
-script = ExtResource("12_hitbox")
+script = ExtResource("16_hitbox2")
 Damage = 32.0
 Knockback = 5.0
 AttackTags = PackedStringArray("Melee", "Heavy")
 
-[node name="Shape" type="CollisionShape3D" parent="AbilityMelee/Attack"]
+[node name="Shape" type="CollisionShape3D" parent="AbilityMelee/Attack" unique_id=125773340]
 shape = SubResource("BoxShape3D_playermelee")
-[node name="AbilitySummon" type="Node3D" parent="."]
+
+[node name="AbilitySummon" type="Node3D" parent="." unique_id=333612642]
 script = ExtResource("13_summon")
-Enabled = false
-Cooldown = 5.0
-Windup = 0.25
-Recover = 0.25
+SummonScene = ExtResource("14_drone")
 Count = 1
 Radius = 2.5
 MaxAlive = 3
-SummonScene = ExtResource("14_drone")
-[node name="AbilityControl" type="Node3D" parent="."]
-script = ExtResource("15_area")
+Cooldown = 5.0
+Windup = 0.25
+Recover = 0.25
 Enabled = false
+
+[node name="AbilityControl" type="Node3D" parent="." unique_id=247941874]
+script = ExtResource("15_area")
+TriggerRadius = 8.0
 Cooldown = 8.0
 Windup = 0.25
 Recover = 0.4
-ActiveTime = 0.15
-TriggerRadius = 8.0
-ApproachMinRange = 0.0
+Enabled = false
 ApproachMaxRange = 8.0
 
-[node name="Attack" type="Area3D" parent="AbilityControl"]
+[node name="Attack" type="Area3D" parent="AbilityControl" unique_id=1207874049]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 collision_layer = 0
 collision_mask = 6
 script = ExtResource("16_hitbox2")
 Damage = 4.0
 Knockback = 0.0
+AttackTags = PackedStringArray("Control", "AoE")
 StatusId = "Stun"
 StatusDuration = 2.0
-AttackTags = PackedStringArray("Control", "AoE")
 
-[node name="Shape" type="CollisionShape3D" parent="AbilityControl/Attack"]
+[node name="Shape" type="CollisionShape3D" parent="AbilityControl/Attack" unique_id=1959419806]
 shape = SubResource("SphereShape3D_control")
-[node name="ChallengerMark" type="Node3D" parent="."]
+
+[node name="ChallengerMark" type="Node3D" parent="." unique_id=727671397]
 script = ExtResource("17_mark")
 
-[node name="AbilityWeaponSkill1" type="Node3D" parent="."]
+[node name="AbilityWeaponSkill1" type="Node3D" parent="." unique_id=240113241]
 script = ExtResource("19_energy_wave")
 Enabled = false
 
-[node name="AbilityWeaponSkill2" type="Node3D" parent="."]
+[node name="AbilityWeaponSkill2" type="Node3D" parent="." unique_id=2105482942]
 script = ExtResource("19_energy_wave")
 Enabled = false
 
-[node name="Animator" type="Node" parent="."]
+[node name="Animator" type="Node" parent="." unique_id=97889498]
 script = ExtResource("90_anim")
-AnimLibraryDir = "res://Assets/Animations/skills/"
-AnimLibraryName = "skills"
-[node name="AbilityInput" type="Node3D" parent="."]
+
+[node name="AbilityInput" type="Node3D" parent="." unique_id=94446761]
 script = ExtResource("9_ability_input")

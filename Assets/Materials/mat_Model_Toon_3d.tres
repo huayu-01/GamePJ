@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dk5i8kvcbsod8"]
+
+[ext_resource type="Texture2D" uid="uid://b12wke16ga7sc" path="res://Assets/Models/player/Textures/colormap.png" id="1_7wri7"]
+
+[resource]
+diffuse_mode = 3
+specular_mode = 1
+albedo_texture = ExtResource("1_7wri7")
+roughness = 0.0

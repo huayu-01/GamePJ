@@ -218,7 +218,7 @@ public abstract partial class OverlayScreen : CanvasLayer
 			Name = KeyHintBarNodeName,
 			// 背景透明：这条栏自己没有任何 Panel / ColorRect，只有几个键帽。
 			MouseFilter = Control.MouseFilterEnum.Ignore,
-			Alignment = BoxContainer.AlignmentMode.Center,
+			Alignment = BoxContainer.AlignmentMode.End,
 			GrowHorizontal = Control.GrowDirection.Both,
 			GrowVertical = Control.GrowDirection.Begin,
 		};
@@ -229,9 +229,9 @@ public abstract partial class OverlayScreen : CanvasLayer
 		bar.AnchorTop = 1f;
 		bar.AnchorBottom = 1f;
 		bar.OffsetLeft = 24f;
-		bar.OffsetRight = -24f;
+		bar.OffsetRight = -14f;
 		bar.OffsetTop = -KeyHintBarHeight;
-		bar.OffsetBottom = -18f;
+		bar.OffsetBottom = -10f;
 		bar.AddThemeConstantOverride("separation", 22);
 		return bar;
 	}
