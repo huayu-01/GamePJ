@@ -17,7 +17,13 @@
 > **保留作历史、不逐条改写**；要看当前值与每一处差额的来由，见
 > [character-redesign.md](character-redesign.md) §六。
 
-> **`ConfigIndex`（原 `Balance`）不是"平衡参数表"** —— 它是**全局标量 + 17 张表的索引**。数值本体在各表的行文件里。
+> ⚠️ **2026-10-16 P8 之后**（连招参数从"整串文本 + 约定路径"改成正规表驱动，见
+> [abilities.md](abilities.md) §11）：**多了一张表 `SkillSeries`**（`Config/Tables/SkillSeries/ser_*.tres`，
+> **一行 = 一个技能的连招**，现有 3 行）；技能行多了一个**资源引用列** `AbilityConfig.ComboSeries`。
+> ⚠️ **索引那 13 个数（`6/2/10/1/1/39/7/14/8/5/6/11/4`）一个都没动** ——
+> 连招表的行数报在 `[Config] 配置表：… 连招参数 3 …` 那一行（与音效表同一条纪律：不进那 13 个数）。
+
+> **`ConfigIndex`（原 `Balance`）不是"平衡参数表"** —— 它是**全局标量 + 各张表的索引**。数值本体在各表的行文件里。
 > 换句话说：它**只回答"数值在哪"**（`Settings.Xxx` 指向哪一行），不回答"数值是多少"（那是 `Config/Tables/<分组>/*.tres` 里一行一个文件的事）。
 > 所以看见 `ConfigIndex.PlayerMaxHealth` 这类名字时不要以为数值写死在这里 —— 那只是**表读不到时的代码默认值**。
 

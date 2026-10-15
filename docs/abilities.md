@@ -369,7 +369,8 @@ P3 新增了 `WeaponConfig.Skills`（武器 → 它的武技行，资源引用�
 3. 那份"cd"本文档自己就写着"**只是参考值**"：段与段的间隔由**动画长度**决定（每段一段独立动画），
    CD 是**连招结束后的冷却**。
 
-差异全部落在 `Config/Tables/SkillSeries/<技能行Id>.tres`（见 §8.2）：
+差异全部落在 `Config/Tables/SkillSeries/ser_*.tres` 的**连招行**里（技能行用 `ComboSeries` 以资源引用指过来；
+⚠️ P8 之前是按"技能行 Id 约定路径"读的，见 §8.2 / §11）：
 
 | 武器 · 武技1 | `ComboAnimations` | `ComboLoop` | 备注 |
 |---|---|---|---|
@@ -428,7 +429,7 @@ TryPress(第一次) → TryActivate → OnActivate：播 ComboAnimations[0]
 | `Ability.OnFinishOrCancel()` | **收招钩子**（`Finish`/`Cancel` 都调）—— 连招用它把命中盒还原回场景基线 | 默认空实现 → 既有子类逐位不变 |
 | `Ability.TryPress(target)` | **"玩家按了这个键"**的入口；默认实现 = `TryActivate` | 同上 |
 | `Ability.BeginEventDrivenCast()` | 让"事件驱动的被动"进入施法态（`LandingBurstAbility` 用） | 同上 |
-| `Ability.LoadSeries/BindSeries` | 按路径读 `AbilitySeries` | 同上 |
+| `Ability.LoadSeries/BindSeries` | 按路径读 `AbilitySeries` —— ⚠️ **P8 已删**（"按路径 load"那条路） | 同上 |
 | `CharacterMovement.FallHeight` / `IsAirborne` | **本次离地后的净下落高度**（下落攻击的高度档） | 只多算两个浮点量，不参与 `MoveAndSlide` 输入 |
 | `Projectile.CutBySceneName(...)` / `SourceSceneName` / `_live` | 近战斩断子弹（按**来源场景名**匹配 + 半径过滤 + 排除名单） | 名单为空 → 一次都不查 |
 | `ArrowVolleyAbility.ProjectileSizeScale` | 投射物整体缩放（剑气"大小等比攻击盒大小"） | ≤0 → 一行不进 |
@@ -444,7 +445,7 @@ TryPress(第一次) → TryActivate → OnActivate：播 ComboAnimations[0]
 | 武器（3） | `wpn_spirit_sword`(7) · `wpn_scythe`(8) · `wpn_spear`(9) |
 | 技能（10） | `skl_b1_w1_1` 破剑式 · `skl_b1_w1_2` 拔刀式 · `skl_b1_w1_3` 落剑式 · `skl_b2_w1_1` 憎恶 · `skl_b2_w1_2` 无情 · `skl_b3_w1_1` 横扫千军 · `skl_b3_w1_2` 长虹贯日 · `skl_b_fall` 落 · `skl_b_skill_1` 闪 · `skl_b_skill_2` 架 |
 | 技能动画（17） | `anim_b1_sword1..5` / `anim_b1_swordqi` / `anim_b2_scythe1..3` / `anim_b3_spear1..5` / `anim_b_fall` / `anim_b_skill1` / `anim_b_skill2` |
-| 连招串（3） | `Config/Tables/SkillSeries/skl_b1_w1_1.tres` · `skl_b2_w1_1.tres` · `skl_b3_w1_1.tres` | ← **不进 ConfigIndex**（按技能行 Id 约定路径读，见 §8.2） |
+| 连招串（3） | `Config/Tables/SkillSeries/skl_b1_w1_1.tres` · `skl_b2_w1_1.tres` · `skl_b3_w1_1.tres` | ← **不进 ConfigIndex**（按技能行 Id 约定路径读，见 §8.2）<br>⚠️ **P8 已改**：现在叫 `ser_b1_combo.tres` / `ser_b2_combo.tres` / `ser_b3_combo.tres`，**已进 ConfigIndex** 的 `SkillSeries` 数组，技能行用 `ComboSeries` 引用指过来（见 §11） |
 | 场景（2） | `Scenes/Combat/MeleeStrike.tscn`（近战命中体复用件）· `Scenes/Combat/SwordQi.tscn`（剑气投射物） |
 
 `ConfigIndex.tres`：`load_steps 147 → 165`、31 个 `[ext_resource]`、四个数组各加项
@@ -507,8 +508,10 @@ TryPress(第一次) → TryActivate → OnActivate：播 ComboAnimations[0]
    P5 做池重构时一起加。
 7. ⚠️ **剑气的 `AnimSpeedScale = 0.35` 是"事件帧 ÷ 基础蓄力"的比值**（0.364 ÷ 1.0），
    与角色 A 那两条（能量掌 0.2 / 弓 0.7）同一个口径。
-8. ⚠️ **`AbilitySeries` 的整套写法（§8.2）是"绕过 Godot C# 绑定限制"的方案**，
+8. ✅ **`AbilitySeries` 的整套写法（§8.2）"是绕过 Godot C# 绑定限制"的方案** ——
    不是"漂亮做法"：以后 Godot 的 C# 绑定支持了 `PackedStringArray`，应当改回"技能行上的一个数组列"。
+   **→ P8 已经改回去了**（真相是"编辑器加载了旧程序集"，不是绑定限制）：现在是**真数组列 + 资源引用列 + 进 ConfigIndex**，
+   见 [§11](abilities.md) 与 `architecture.md` 第 12 条。
 
 ---
 
