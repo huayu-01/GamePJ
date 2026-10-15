@@ -906,6 +906,9 @@ public partial class SunsetSwordRule : TriggerRule
 	/// <summary>悬挂高度（米）。</summary>
 	public float HoverHeight { get; set; } = 3.2f;
 
+	/// <summary>**拍摄台用**：给"最近的敌人"挂剑时搜索多远（米）。正式流程不读它。</summary>
+	[Export] public float DebugPreviewRange { get; set; } = 60f;
+
 	/// <summary>本局一共施加了几次（自测取证）。</summary>
 	public int ApplyCount { get; private set; }
 
@@ -979,28 +982,61 @@ public partial class SunsetSwordRule : TriggerRule
 			return;
 		}
 
+		Attach(victim, holdForDebug: false);
+	}
+
+	/// <summary>
+	/// **拍摄台 / MCP 取证专用**：给**最近的敌人**挂一把落日剑，并把它**钉在悬挂状态**不落下
+	/// （`docs/vfx.md` §2.7 的 `DebugPreviewXxx` 那一类：判据与画法一个字都不变，只是"谁来触发、
+	/// 什么时候落"由拍摄台决定）。正式流程里没有任何调用点。
+	/// </summary>
+	public string DebugPreviewOnNearest()
+	{
+		Unit? owner = _owner;
+		if (owner == null || !GodotObject.IsInstanceValid(owner))
+		{
+			return "🔴 落日剑拍摄台：拿不到归属单位";
+		}
+
+		Unit? victim = Targeting.FindNearestHostile(owner, owner, DebugPreviewRange);
+		if (victim == null)
+		{
+			return $"🔴 落日剑拍摄台：{DebugPreviewRange:0.#}m 内没有敌人";
+		}
+
+		SunsetSwordMarker? marker = Attach(victim, holdForDebug: true);
+		return marker == null
+			? "🔴 落日剑拍摄台：挂不上去（目标身上已经有一把）"
+			: $"落日剑拍摄台：已挂到 {victim.Name} 头顶并钉住不落｜{marker.DebugState()}";
+	}
+
+	/// <summary>挂剑的**唯一实现**（真实命中与拍摄台都走它）。目标已经有剑就返回 null（不重复施加）。</summary>
+	private SunsetSwordMarker? Attach(Unit victim, bool holdForDebug)
+	{
 		if (victim.GetNodeOrNull<SunsetSwordMarker>(SunsetSwordMarker.NodeName) != null)
 		{
-			return;
+			return null;
 		}
 
 		var marker = new SunsetSwordMarker
 		{
 			Name = SunsetSwordMarker.NodeName,
-			Attacker = owner,
+			Attacker = _owner,
 			AbilityId = RewardId,
 			HoverSeconds = HoverSeconds,
 			FallSeconds = FallSeconds,
 			Radius = Radius,
 			Damage = Damage,
 			HoverHeight = HoverHeight,
+			HoldHoverForDebug = holdForDebug,
 		};
 		victim.AddChild(marker);
 		ApplyCount++;
 
 		GameLog.Write(
 			"Reward",
-			$"增幅·事件规则：{RewardId} 施加落日剑（第 {ApplyCount} 次，目标 {victim.Name}：悬挂 {HoverSeconds:0.##}s → 落下 {FallSeconds:0.##}s → 半径 {Radius:0.##}m / 伤害 {Damage:0.##}）");
+			$"增幅·事件规则：{RewardId} 施加落日剑（第 {ApplyCount} 次，目标 {victim.Name}：悬挂 {HoverSeconds:0.##}s → 落下 {FallSeconds:0.##}s → 半径 {Radius:0.##}m / 伤害 {Damage:0.##}{(holdForDebug ? "；拍摄台：钉住不落" : string.Empty)}）");
+		return marker;
 	}
 
 	/// <summary>探针用：一行的实际状态。</summary>
@@ -1043,6 +1079,9 @@ public partial class SoulHarvestRule : TriggerRule
 
 	/// <summary>掉出来之后多久允许被拾取（秒）。</summary>
 	public float PickupDelaySeconds { get; set; }
+
+	/// <summary>**拍摄台用**：在玩家正前方多少米掉灵魂。正式流程不读它。</summary>
+	[Export] public float DebugDropDistance { get; set; } = 3.2f;
 
 	/// <summary>掉了几个（自测取证）。</summary>
 	public int DropCount { get; private set; }
@@ -1087,6 +1126,33 @@ public partial class SoulHarvestRule : TriggerRule
 			? gameplayEvent.Position
 			: gameplayEvent.Target?.GlobalPosition ?? owner.GlobalPosition;
 
+		DropAt(where);
+	}
+
+	/// <summary>
+	/// **拍摄台 / MCP 取证专用**：在玩家**正前方** <see cref="DebugDropDistance"/> 米处掉一个灵魂
+	/// （不依赖真实击杀）。正式流程里没有任何调用点。
+	/// </summary>
+	public string DebugDropInFront()
+	{
+		Unit? owner = _owner;
+		if (owner == null || !GodotObject.IsInstanceValid(owner))
+		{
+			return "🔴 灵魂收割拍摄台：拿不到归属单位";
+		}
+
+		Vector3 forward = -owner.GlobalTransform.Basis.Z;
+		forward.Y = 0f;
+		forward = forward.LengthSquared() < 0.0001f ? Vector3.Forward : forward.Normalized();
+		SoulPickup soul = DropAt(owner.GlobalPosition + (forward * DebugDropDistance));
+		return $"灵魂收割拍摄台：已在玩家正前方 {DebugDropDistance:0.#}m 掉一个灵魂｜{soul.DebugState()}";
+	}
+
+	/// <summary>掉一个灵魂（真实击杀与拍摄台都走它）。</summary>
+	private SoulPickup DropAt(Vector3 where)
+	{
+		Unit? owner = _owner;
+
 		var soul = new SoulPickup
 		{
 			Name = SoulPickup.NodeName,
@@ -1103,6 +1169,7 @@ public partial class SoulHarvestRule : TriggerRule
 		GameLog.Write(
 			"Reward",
 			$"增幅·事件规则：{RewardId} 击杀掉了灵魂（第 {DropCount} 个，概率 {Chance:0.###}，掉落点 {where}；拾取半径 {PickupRadius:0.##}m / 回复 {Heal:0.##}）");
+		return soul;
 	}
 
 	/// <summary>探针用：一行的实际状态。</summary>

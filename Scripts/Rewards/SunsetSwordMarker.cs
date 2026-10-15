@@ -102,6 +102,12 @@ public partial class SunsetSwordMarker : Node3D
 	/// <summary>伤害归属用的技能/增幅 Id（日志与 <c>AttackInstance.Ability</c>）。</summary>
 	public string AbilityId { get; set; } = "mut_sunset_sword";
 
+	/// <summary>
+	/// **拍摄台专用**：钉在悬挂状态不落下（`docs/vfx.md` §2.7 的 `DebugPreviewXxx` 那一类）。
+	/// **判据与画法一个字都不变** —— 只是"什么时候落"由拍摄台决定；正式流程里永远是 false。
+	/// </summary>
+	public bool HoldHoverForDebug { get; set; }
+
 	[ExportGroup("运行期可读状态（自测 / 探针）")]
 	/// <summary>落下了几次（自测取证；正常只有 1）。</summary>
 	public int FallCount { get; private set; }
@@ -234,6 +240,12 @@ public partial class SunsetSwordMarker : Node3D
 			if (_pivot != null && SpinDegreesPerSecond != 0f)
 			{
 				_pivot.RotateY(Mathf.DegToRad(SpinDegreesPerSecond) * dt);
+			}
+
+			// ⚠️ 拍摄台（`HoldHoverForDebug`）只挡"计时 → 落下"这一步，画法一个字没变。
+			if (HoldHoverForDebug)
+			{
+				return;
 			}
 
 			_elapsed += dt;

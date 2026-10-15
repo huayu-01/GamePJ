@@ -82,7 +82,6 @@ public partial class SoulPickup : Node3D
 
 	/// <summary>地面那一圈的高度（米，避免埋进地面）。</summary>
 	[Export] public float RingGroundOffset { get; set; } = 0.05f;
-
 	[ExportGroup("运行期可读状态（自测 / 探针）")]
 	/// <summary>被拾取了吗。</summary>
 	public bool PickedUp { get; private set; }
@@ -110,9 +109,10 @@ public partial class SoulPickup : Node3D
 	{
 		Build();
 
-		// 掉在**地面上**：从掉落点起一点高度开始升起。
-		GlobalPosition += Vector3.Up * 0.15f;
-
+		// ⚠️ **不要在这里挪自己的位置**（曾经写过 `GlobalPosition += Vector3.Up * 0.15f`）：
+		// 生成方是 `AddChild` **之后**才写 `GlobalPosition` 的，那一句当场被覆盖 ——
+		// 结果是地面那圈被压到地板下面 0.1m，**看不见**（实拍截图查出来的）。
+		// 本节点的原点 = **掉落点（地面高度）**，所以圈只要抬 `RingGroundOffset` 就够。
 		GameLog.Write(
 			"Reward",
 			$"灵魂收割：掉落灵魂（拾取半径 {PickupRadius:0.##}m / 回复 {HealAmount:0.##} 点 / 存活 {LifetimeSeconds:0.##}s，位置 {GlobalPosition}）");
@@ -173,7 +173,7 @@ public partial class SoulPickup : Node3D
 			MaterialOverride = Unshaded(RingColor, EmissionEnergy),
 		};
 		AddChild(ring);
-		ring.Position = new Vector3(0f, -0.15f + RingGroundOffset, 0f);
+		ring.Position = new Vector3(0f, RingGroundOffset, 0f);
 	}
 
 	public override void _Process(double delta)

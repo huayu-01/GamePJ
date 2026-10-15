@@ -206,6 +206,8 @@
 ## 7. 边界（下一轮接着做）
 
 1. **通用异化：P6b 做了 2 / 5，P6d 把最后 3 条做完**（30 条**全建**）：
+   - 实机取证（真实按键 / 真实拾取 / 实拍截图）与**逐条偏差**见 [rewards.md](rewards.md) 的「P6d 实机取证」；
+     拍摄台与两个 MCP 手法见 [vfx.md](vfx.md) §5.1 / §6.1。
    - ✅ **杀戮践踏**（`mut_stomp`）—— `StompOnLandRule` 轮询落地边沿 + `PulseDamage.Around`；
      半径 3 米 / 伤害 15 / 最小落高 0 是**预设值**（文档只给了 `n`）。
    - ✅ **巡飞弹**（`mut_homing_missile`）—— `HomingMissileOnCritRule` 复用 P3 追踪弹通路；

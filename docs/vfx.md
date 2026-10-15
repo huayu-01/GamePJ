@@ -24,6 +24,7 @@
 | **剑气拖尾**（P6c） | `Scripts/Combat/ProjectileTrail.cs` | `Projectile.VelocityDirection`（P4 就有的只读属性） | `Scenes/Combat/SwordQi.tscn` → `SwordQi/Trail`（**挂在剑气本体上**） |
 | **落圈特效**（P6c） | `Scripts/Combat/LandingShockwave.cs` | `FallAttackAbility.Landed`（公开事件）+ `LandingBurstAbility.TriggerCount`（公开只读计数）+ 命中体 `Attack/Shape` 的 `SphereShape3D.Radius`；**P6d 新增** `PlayOnce(worldPosition, radius)` 外部入口（「落日剑」的落点用它，半径由调用方给） | `Player/AbilityFallAttack/Shockwave` 与 `Player/AbilityPassive2/ShockwaveBurst`；**P6d**：`SunsetSwordMarker`（异化「落日剑」的剑）的子节点 |
 | **落日剑的头顶那把剑**（P6d，**不是纯表现** —— 它自己会落下造成伤害） | `Scripts/Rewards/SunsetSwordMarker.cs` | 无（它就是"落日剑"这件事本身）；纯表现的部分是它内嵌的 `LandingShockwave` | 目标敌人子树 → `SunsetSword`（异化「落日剑」施加时按需建） |
+| **灵魂收割掉的"灵魂"**（P6d，**不是纯表现** —— 拾取会回血） | `Scripts/Combat/SoulPickup.cs` | 无（掉落物自己就是"事实"）；拾取是**每帧距离轮询** `player_units`，**没有 `Area3D`** | `CurrentScene` → `Soul`（异化「灵魂收割」击杀时掉） |
 | 滞空光环（P3，写在机制描述里的那条） | `Scripts/Combat/AirHoverController.cs` 的光环部分 | 滞空状态本身 | 玩家脚下 |
 | 破甲特效（更早） | `Scripts/UI/ArmorBreakFx.cs`（静态工具） | `Unit.ArmorBroke` 事件 | 一次性，挂 `CurrentScene` |
 
@@ -137,6 +138,8 @@ Afterimage_0.is_in_group("enemy_units")             = false
 | 在 `.tscn` 里加节点 | `parent` 引用了后面才定义的节点 → **节点被静默丢弃**（不报错、只是不显示）；同名节点冲突 | `parent` 必须引用**已定义过**的节点；改实例已有子节点用 `[node name="X" parent="…" index="0"]`（去掉 `type=`） |
 | 纯显示 `Control` | 默认 `mouse_filter = Stop` → 吃掉鼠标 → 镜头不能转 | `Ignore`（场景 + `_Ready` 双保险） |
 | "一次采样"的错觉 | 只看一帧截图就以为特效没问题 | 至少拍两张（起始 / 扩散中），并把 `DebugState()` 一起记下来 |
+| **在 `_Ready` 里改自己的 `GlobalPosition`** | 生成方的写法是 `AddChild` **之后**才写 `GlobalPosition` —— `_Ready` 里那一句**当场被覆盖**（P6d 实测：灵魂的"地面拾取圈"被压到地板下面 0.1m，**看不见**；代码、日志、自测全绿，只有截图能看出来） | 要么把偏移做进**子节点**的局部坐标（本批的改法：圈的 `Position.y = RingGroundOffset`），要么让生成方在 `AddChild` **之前**设位置 |
+| 用 `TorusMesh` 画"地面上的圈" | 默认躺在 XZ 平面，但 `Rings` / `RingSegments` 写反会画成多边形（见上面那条） | 环：`Rings = 64`、`RingSegments = 6` |
 
 ---
 
@@ -168,6 +171,16 @@ Afterimage_0.is_in_group("enemy_units")             = false
 
 自测：`user://selftest.flag`（**跑完必须删**）→ `=== 自测结束 ===` + 退出码 `0`。
 
+### 5.1 P6d 补的两条 MCP 手法（**下一个人一定会用到**）
+
+| 想做什么 | 怎么做 | 为什么 |
+|---|---|---|
+| **真的按一次键**（例如"按住 Shift 奔跑"） | `tool-call simulate_runtime_input_action --args-json '{"action_name":"sprint","pressed":true}'` | `run_project` **传不了 user args**（见 §5），而 `BeginRunWithCharacter` 只能换装、按不了键。这个工具走 `Input.parse_input_event(InputEventAction)`，`Input.IsActionPressed` 当场为真 —— **P6d 的「奔跑 → 护卫」就是靠它做实机取证的**。鼠标同理：`simulate_runtime_input_event` + `{"type":"mouse_button","button_index":1,"pressed":true}` |
+| **规则节点怎么寻址** | 增幅的 `TriggerRule` 是运行期 `new` 出来挂在 `Player` 下的，**自动名是 `@Node@N`**（不是类名！）。先用 `evaluate_runtime_expression` 数一遍：`get_node("Player").get_child(i).name`，再 `call_runtime_node_method {"node_path":"/root/Main/Player/@Node@N","method_name":"DebugState"}` | 名字里带 `@`，写死路径会失效；`GetNodeOrNull<GuardOnSprintRule>` 这种按类型的查找在 MCP 侧做不到（`call_runtime_node_method` 只吃路径） |
+| **拍摄台（把一瞬间钉住）** | `SunsetSwordRule.DebugPreviewOnNearest()`（给最近的敌人挂剑并**钉在悬挂状态不落**）· `SoulHarvestRule.DebugDropInFront()`（在玩家正前方掉一个灵魂） | 与 P6c 的 `DebugPreviewXxx` 同一条纪律：判据与画法一个字都不变，只是"谁来触发"。**正式流程里没有调用点** |
+| **重启游戏** | `stop_project` 要带 `--args-json '{"allow_window":true}'`（否则被 Vibe Coding 闸门拒掉：`This tool would open or control a runtime window`）；⚠️ 它**全局生效**，用之前先确认没有别人在跑自测 | 换了 C# 之后**必须重启**才生效（`.godot/mono/temp/bin` 的 dll 是启动时加载的） |
+| **`runtime info` 报的是哪个实例** | 看 `current_scene` + `process_frames`；实例回到基地（`/root/Base`）说明这一局已经结束 | 编辑器 `run_project` 起的实例与命令行 `--remote-debug` 的实例都会连 6007 |
+
 ---
 
 ## 6. 实拍（2026-10-16 · P6c）
@@ -178,6 +191,28 @@ Afterimage_0.is_in_group("enemy_units")             = false
 | `screenshots/p6c_afterimage.png` / `_zoom` | 技能1「后撤」无敌帧期间的 4 个青蓝残影 | `GhostLifetime` 0.34 → 3.0（只为把这一瞬间留在画面上） |
 | `screenshots/p6c_swordqi.png` / `_zoom` | 灵剑 武技2「拔刀式」的剑气拖尾（面向镜头的一条渐细光带） | `Speed` 60 → 25、`MaxLifetime` → 6、拖尾 `Lifetime` 0.18 → 0.6 |
 | `screenshots/p6c_landing.png` / `_zoom` | 落地那一圈（`TorusMesh` 环 + 薄盘）：下落攻击（青）与「落剑式」（金）各一圈，半径 3.2m = 命中体真实半径 | 两圈的 `Duration` 0.38 → 2.5 |
+
+## 6.1 实拍（2026-10-16 · P6d）
+
+| 图 | 是什么 | 拍摄时的手段（**默认值一个都没改**） |
+|---|---|---|
+| `screenshots/p6d_sword_soul.png` / `_zoom` | 「落日剑」悬在 `FastMelee` 头顶（金色剑刃 + 棕色护手，剑尖朝下）+ 「灵魂收割」的灵魂（青色球 + 地面**圆形**拾取圈） | `SunsetSwordRule.DebugPreviewOnNearest()`（钉住不落才会留在画面上）+ `SoulHarvestRule.DebugDropInFront()`（掉在正前方 3.2m） |
+| `screenshots/p6d_soul_ring_before_fix.png` / `_zoom` | **改前**：只剩一颗球，**地面上那圈看不见**（被 `_Ready` 里那句 `GlobalPosition += Up*0.15` 压到地板下面 0.1m，随后被生成方的赋值覆盖） | 同上 |
+| `screenshots/p6d_soul_ring_after_fix_zoom.png` | **改后**：圈回到地面上，形状是**正圆**（`Rings = 64` / `RingSegments = 6` 没写反） | 同上 |
+
+实机日志（同一次运行，`BeginRunWithCharacter(4,6)` = 武器大师 + 灵剑 + 三条增幅都 `GrantReward`）：
+
+```
+[Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5
+[Reward] 落日剑：施加于 FastMelee（头顶悬挂，1.5s 后落下；落地半径 2.5m 伤害 40 …）
+[Reward] 灵魂收割：掉落灵魂（拾取半径 1.2m / 回复 8 点 / 存活 15s …）
+[Reward] 灵魂收割：灵魂被 Player 拾取（回复 8 / 配置 8 点，生命 105.6/240）   ← 真的走过去碰到的
+```
+
+⚠️ 「奔跑」那一条在实机里是这样验的：`simulate_runtime_input_action` 按住 `sprint` + `move_forward`
+→ `SprintController.DebugState()` = `奔跑中=True 按键「sprint」按住=True 倍率=1.5 累计=1`
+→ `GuardOnSprintRule.DebugState()` = `手上有格挡=True 累计获得=1`，并且 `Player` 下**多出一个 `Block` 子节点**
+（不选这条增幅就没有它）。
 
 ---
 
