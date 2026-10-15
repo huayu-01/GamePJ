@@ -23,6 +23,14 @@ public partial class RunController : Node
 	private readonly RunBuild _build = new();
 	private readonly RewardPool _pool = new();
 	private readonly List<RewardDefinition> _current = new();
+
+	/// <summary>
+	/// 玩家能力节点的**场景基线**（第一次套用角色/武器时抓的那份 `Enabled` / `InputAction` / `AbilityId`）。
+	/// 换角色/换武器时先恢复它，再让表写一遍 —— 否则上一套技能的按键绑定会留在能力节点上
+	/// （"Gunner 左键还打出一发能量波"，见 <see cref="ResetAbilityBindings"/>）。
+	/// </summary>
+	private readonly Dictionary<Ability, (bool Enabled, string InputAction, string AbilityId)> _abilityBaseline = new();
+
 	private Unit? _player;
 	private Weapon? _weapon;
 	private RewardScreen? _screen;
@@ -605,6 +613,11 @@ public partial class RunController : Node
 		var abilities = new System.Collections.Generic.List<Ability>();
 		NodeSearch.CollectInSubtree(_player!, abilities);
 
+		// ⚠️ 先把能力恢复到**场景基线**再做矩阵：能力节点是 `Player.tscn` 的固定节点，而按键绑定/开关是
+		// **上一个角色/武器的技能行**写上去的，只套用"新角色列的那些行"清不掉它们（§6.4.6 的残留）。
+		// 这一步是幂等的：换回 Gunner 与一开局就是 Gunner 得到同一份状态。
+		ResetAbilityBindings(abilities);
+
 		foreach (Ability ability in abilities)
 		{
 			string classId = ability.GetType().Name;
@@ -635,6 +648,40 @@ public partial class RunController : Node
 		ActRoguelike.Core.GameLog.Write(
 			"Flow",
 			$"能力开关矩阵（角色 {character?.Id ?? "（表读不到，走代码默认值）"}）：{DescribeAbilities(abilities)}");
+	}
+
+	/// <summary>
+	/// 把玩家身上的能力**恢复到场景基线**（幂等）：每次套用角色/武器之前先做一次，之后由技能行、开关矩阵与
+	/// 能力卡重新写一遍。
+	///
+	/// <para><b>为什么需要它</b>（docs/anim-pipeline.md §6.4.6）：<c>Ability.InputAction</c> / <c>Ability.Enabled</c>
+	/// 是**技能行**写在 `Player.tscn` 那两个能力节点上的，而换角色只套用"新角色 <c>Skills</c> 里列的那些行" ——
+	/// 上一套写下的绑定不会自己消失。`weapon_skill_1` 与 `fire` 都是**鼠标左键**，所以残留表现为
+	/// "Gunner + 手枪的左键除了手枪还打出一发能量波"。正常流程（死亡 → 回基地 → 出击门）会重建整个 <c>Main</c>，
+	/// 只有"同一个场景里换角色/换武器"（自测与 MCP 调试）才会踩到。</para>
+	///
+	/// <para>基线在**第一次**调用时抓：那一刻玩家的能力节点还是 `Player.tscn` 的原始值（这个函数排在
+	/// <see cref="ApplyBalance"/> 里所有"行 → 能力"的写入之前，包括能力卡）。</para>
+	/// </summary>
+	private void ResetAbilityBindings(System.Collections.Generic.List<Ability> abilities)
+	{
+		foreach (Ability ability in abilities)
+		{
+			if (!IsInstanceValid(ability))
+			{
+				continue;
+			}
+
+			if (!_abilityBaseline.TryGetValue(ability, out (bool Enabled, string InputAction, string AbilityId) baseline))
+			{
+				baseline = (ability.Enabled, ability.InputAction, ability.AbilityId);
+				_abilityBaseline[ability] = baseline;
+			}
+
+			ability.Enabled = baseline.Enabled;
+			ability.InputAction = baseline.InputAction;
+			ability.AbilityId = baseline.AbilityId;
+		}
 	}
 
 	/// <summary>名单命中判定：技能行 Id 优先，其次脚本类名（旧写法）。</summary>

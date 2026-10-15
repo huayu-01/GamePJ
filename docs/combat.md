@@ -143,6 +143,66 @@
 `EventContext`（ChainId / Depth / Source / OriginalSource / Target / OriginalTarget）随每次命中传递，`MaxDepth = 4`，`Child()` 在超深度时返回 null。
 目前只有命中链使用；阶段 5 的 Trigger/Effect 会复用它来防递归。
 
+## 运行期新生成的单位「同帧就以 0 血死亡」（2026-10-15 追查结论）
+
+**现象**（上一轮调试时的原话）："在 run 刚重启后手动 `add_child(Chaser.tscn)` 的敌人**有时同帧就以 0 血死亡**"
+（`死亡 Chaser(0) 击杀者=-`），而定期刷怪出来的敌人正常（45 血）。
+
+**结论：不是 bug、也不是 `StatSheet` 那条老 bug 的另一种表现 —— 是"清场 + 两个读数口径"叠出来的错觉。**
+**稳定复现 12/12**（4 个进程 × 每进程 3 轮"同一帧里裸 add_child + 立刻重开一局"），根因由**托管调用栈**钉死：
+
+```
+[Combat] 死亡 Chaser(0) 击杀者=-
+      受伤调用栈（Chaser(60)：致命的一发 / 无来源伤害）:
+            at ActRoguelike.Combat.Unit.ForceKill(Unit killer) in Scripts/Combat/Unit.cs:line 538
+            at ActRoguelike.Run.StageController.ClearField() in Scripts/Run/StageController.cs:line 340
+```
+
+### 三条并列的原因（缺一条都拼不出这个现象）
+
+| # | 事实 | 代码位置 |
+|---|---|---|
+| ① **谁杀的** | `StageController.ClearField()` 把 `enemy_units`/`boss_units` 里**所有活着的单位** `ForceKill()`（**不传击杀者**）。它在**每次关卡建立/重置**（`RunController.BeginRunWithCharacter → ApplyStage → ResetStage`）与 **Boss 阵亡**时各跑一次，**一帧内扫完**。手动 `add_child` 的 Chaser 正好落在这个窗口里 → 它"没被任何攻击打中"就死了。注意它是**同步**调用：`add_child` 与"重开一局"同一帧发生时，死亡与生成就在同一帧（这正是"同帧"的来源） | `StageController.cs:326/332`（清场）、`:867`（Boss 阵亡）、`Unit.cs:525`（`ForceKill` → `Die`） |
+| ② **"0 血"是日志口径，不是血量** | `Unit.Die()` **先把 `Health = 0f` 再发 `Died`**，而 `GameLog` 的 `Describe(unit)` 打的就是 `unit.Health` → **任何**死亡日志都是 `(N)` 里的 0（`docs/logging.md` 的 `死亡 Boss(0) 击杀者=Player(260)` 是同一回事）。它**不能**用来说明"死的时候有多少血" | `Unit.cs:473-478`、`GameLog.cs:81/107` |
+| ③ **`Health` 在 `_Ready` 才有值** | `Unit.Health` 唯一被赋值的地方是 `_Ready`（`Health = MaxHealth`）→ **进树前**、以及 `NodeAdded`/`_EnterTree` 那一刻读它都是 **0**（探针实测 `进树前 生命=0 上限=60`；`Damage` 用 `Health` 当基数的读法在那一刻也会读到 0）。所以"刚生成的单位 0 血"往往只是**读早了** | `Unit.cs:134-148` |
+
+### 不是老 bug 的另一出口（逐条取证）
+
+- **上限没有被算成 1**：探针在 3 个时刻打印 `MaxHealth`：进树前 `60`、进树时 `60`、进树后 `60`（老 bug 的表现是 `45→1`）。
+  `SeedStats()` 仍在构造函数里，`_EnterTree` 捕获的就是 60。
+- **"先 AddChild、后 ApplyTo"也不会被 `_EnterTree` 的捕获吃掉**（这是最像"竞态"的一条路径，实测排除）：
+  `UnitConfig.ApplyTo → Unit.ApplyBaseStats` 会**重新写** `_baseMaxHealth`，所以晚套用得到的仍是 `60 → 60`，不是 1、也不是 0。
+  （⚠️ 生产代码里 4 处生成路径**本来就是"先 ApplyTo、再 AddChild"**：波次刷怪 `EncounterController.cs:571`、定期刷怪
+  `:383`、首领 `:856`、护卫 `:895`；`SummonAbility.cs:61` 召唤物同序。顺序没有被违反过。）
+- **生产路径不可能"生成即死"**：落点统一走 `MapManager.RingPoint/SpawnPoint`（导航网格不可用时是"随机环点 + 地面射线 + 球形避障"），
+  结果恒为"地面 +0.3"或"玩家 +0.3"，**落不进区域杀**（中心 Y=-38、厚 20）。实测游离怪 `Chaser(45)`（= 60×0.75 全局倍率）、
+  探针同序生成的 `@CharacterBody3D@54(60)` 观察 30 帧以上都不掉血。
+- **另一条会打出同一条日志的路径（但不是同帧）**：把单位裸 `add_child` 到**没有地板**的位置（探针用 `(60, 30, 60)`）——
+  它会掉下去，约 3 秒后 `落出地图（进入区域杀）→ 击杀` + `死亡 …(0) 击杀者=-`（`World/KillZone.cs:51-52`）。
+  判据：这条路径**一定会多一行 `落出地图（进入区域杀）→ 击杀`**；`ClearField` 那条**一行多余的都没有**。
+
+### 影响面判断
+
+- **只影响调试/自测里"手动 `add_child`"这条路径**（正常玩法里没有"绕过单位表的手动生成"）。
+  生产路径一个都没踩：波次/游离怪/首领/护卫/召唤物都是"先 ApplyTo、再 AddChild + 可行走落点"。
+- **但这条边界对"以后要做的动态生成"是真的**：任何**在关卡建立/重置窗口内**（`ApplyStage`/`ResetStage`/Boss 阵亡那一帧前后）
+  生成进 `enemy_units` 的单位，都会被 `ClearField` 静默扫掉（日志只有 `死亡 X(0) 击杀者=-`）。
+  将来做"首领召唤的小怪""堕落类机制"时，要么生成时避开这个窗口，要么把它登记进 Encounter 自己的名单（`ForceComplete` 只清自己那份）。
+- ⚠️ **一个已知的边界不一致**（本轮只记录、没改）：`ClearField` 只扫 `enemy_units` + `boss_units`，而
+  `Unit._Ready` 把**带 `Summon` 标签**的单位放进 `summon_units`（`Unit.cs:143`）—— 也就是说**敌方**召唤物（若将来给了 `Summon` 标签）
+  **不会**随关卡切换被清掉；目前 `Summon` 标签只有玩家无人机（`summon_drone.tres`），所以还看不出问题。
+- ⚠️ 另有一个**与本题无关**的生成点：`BossPressure.SpawnAdds()`（`Boss/BossPressure.cs:96-102`）只 `AddChild`、**完全不套单位表**
+  （用的是 `Chaser.tscn` 的场景值 60 血）—— 它既不会 0 血，也漏掉了全局倍率/AI 档案；要不要接表是后续决定。
+
+### 修了吗
+
+**没有改生产代码** —— 清场（`ClearField`）是**有意行为**（"清掉上一关残留的单位"），把它改掉会动到关卡流程语义，
+而本现象在玩法上无害。**建议的修法（要做再加，风险极低）**：给 `Unit.ForceKill`/`Die` 的日志带一个**来源标记**
+（`ClearField` / `SummonLifetime` / 自爆 / 区域杀），把 `击杀者=-` 换成"击杀者=（关卡清场）"之类 ——
+纯日志改动、只加一个可选参数，能让下一个人一眼分清来源。**复现脚本**（任务 1 用的临时探针）：
+挂 `SceneTree.NodeAdded` 观察每个 `Unit` 的进树生命 + 订阅 `Unit.Damaged`/`Died` 打印 `System.Environment.StackTrace`
+（只留 `ActRoguelike` 的帧），然后在同一帧里"裸 `add_child` + `RunController.BeginRunWithCharacter(...)`"。
+
 ## 已知限制
 
 - 格挡只有正面判定与破防阈值，没有格挡硬直、格挡反击与格挡资源。

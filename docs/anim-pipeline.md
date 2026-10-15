@@ -336,16 +336,39 @@ Godot_v4.7.2-stable_mono_win64.exe --path 'F:\Godot项目\项目a' res://Scenes/
 > 自测环境下玩家的 `DamageMultiplier = 2`（真人手测那局是 1，日志 `伤害 10`）。与本轮改动无关
 > （那条乘式一个字没动），只是**同一条链路在两种环境下的数值差**；判"掉血"只看 > 0。
 
-#### 6.4.6 本轮**新发现**、留给下一轮的（不在本轮范围）
+#### 6.4.6 同一个场景里换角色时的能力残留 ✅ **已修（2026-10-15 第三轮）**
 
-**在同一个 `Main` 场景里连续换角色**（`BeginRunWithCharacter` 被调两次以上：自测就是这样，MCP 调试也会踩到）时，
-**上一个角色挂的技能会残留在能力节点上** —— 表现是"Gunner + Pistol 的左键除了手枪还会打出一发能量波"
-（`12:30:15` 那条日志里同时有手枪 24 与能量波 20）。
-原因是 `AbilityConfig.ApplyTo` 把 `InputAction`/`AbilityId`/`Enabled` 写在**玩家场景里那两个能力节点**上，
-而换角色时只套用"新角色自己列的那些行"，**不会清掉**旧角色写上去的绑定。
-正常流程（死亡 → 回基地 → 从出击门进关卡）会**重建整个 `Main` 场景**，所以碰不到；
-只有"同场景内换角色"才会。**与本轮改动无关**（能力开关那条路本轮一个字没动），下一轮可以顺手把
-"换角色时先清空未列出的能力"补上。
+**现象**（上一轮留的）：在同一个 `Main` 场景里**连续换角色**（`BeginRunWithCharacter` 被调两次以上：自测就是这样，
+MCP 调试也会踩到）时，**上一个角色挂的技能会残留在能力节点上** —— 表现是"Gunner + Pistol 的左键除了手枪
+还会打出一发能量波"（`12:30:15` 那条日志里同时有手枪 24 与能量波 20）。
+
+**根因（一句话）**：`Ability.InputAction` / `Enabled` / `AbilityId` 是**技能行**写在 `Player.tscn` 那两个能力节点上的
+（`AbilityConfig.ApplyTo`），而换角色只套用"新角色 `Skills` 里列的那些行"——**上一套写下的绑定不会自己消失**。
+`weapon_skill_1` 与 `fire` 在 `project.godot` 里**都是鼠标左键**（`weapon_skill_2`/`aim` 都是右键），
+所以残留直接表现为"左键多打一发"。另外 `ApplyAbilityMatrix` 排在 `ApplySkillsTo` **之前**，它只看
+`EnabledAbilityIds`/`DisabledAbilityIds` 两个名单，本来就不负责清理没列到的能力。
+
+**本轮改法**（`Scripts/Rewards/RunController.cs`，+1 字段 +1 方法 +1 调用，**没有动** `PlayerAbilityInput` 的"只读表"那条路）：
+
+- 新增 `_abilityBaseline`：每个能力节点的**场景基线**（`Enabled` / `InputAction` / `AbilityId`），
+  **第一次** `ApplyBalance` 时抓 —— 那一刻玩家的能力节点还是 `Player.tscn` 的原始值（这个函数排在 `ApplyBalance`
+  里所有"行 → 能力"的写入之前，包括能力卡 `AbilityEffects.ApplyToPlayer`）。
+- 新增 `ResetAbilityBindings(abilities)`：每次套用角色/武器**先恢复到基线**，之后由技能行 + 开关矩阵 + 能力卡重新写一遍。
+  于是"换回 Gunner"与"一开局就是 Gunner"得到**同一份**状态（幂等）。
+
+**验证**（同一个 `Main` 场景，编辑器 + MCP，真按左键）：Hunter(3,3) → Gunner(0,0)：
+
+| 时刻 | 修前 | 修后 |
+|---|---|---|
+| Hunter 时 `AbilityWeaponSkill1` | `InputAction=weapon_skill_1` `Enabled=True` | 同（能量掌正常） |
+| 切到 Gunner 后同两个字段 | **`InputAction=weapon_skill_1` `Enabled=True`（残留）** | **`InputAction=""` `Enabled=False`** |
+| 日志的 `能力开关矩阵（角色 chr_gunner）` | `…、skl_a1_w1_1[weapon_skill_1]=开、skl_a1_w1_2[weapon_skill_2]=开` | `…、EnergyWaveAbility[-]=关、EnergyWaveAbility[-]=关` |
+| Gunner 左键（真点游戏窗口） | `能量波发射：skl_a1_w1_1 伤害 10`（手枪 **+** 能量波） | 整局日志 **`能量波` 0 行**；`PelletsFired 0→1`、`sfx_weapon_fire`（只有手枪） |
+| 切回 Hunter 再左键 | — | `技能动画开播 Skill_A1_ATK1` → `能量波发射：skl_a1_w1_1 伤害 10 弹速 150`（能量掌照旧正常） |
+
+> 注：`能力开关矩阵` 那一行写在 `ApplySkillsTo` **之前**（历史顺序），所以 Hunter 那几行会先显示 `[-]=关`，
+> 之后技能行才把 `weapon_skill_1/2` 绑上 —— 这一行的用处正是"看有没有上一套的残留"。
+
 
 ---
 
@@ -363,6 +386,12 @@ Godot_v4.7.2-stable_mono_win64.exe --path 'F:\Godot项目\项目a' res://Scenes/
 | 端到端 F | `奖励界面打开 = True  Paused = True` | 同 | 逐位一致（第二轮复测：**仍然 True/True**） |
 | 配置表比对·索引 | 3/3/10/1/1/25/7/9/8/6/3/11/8 | 4/4/10/1/1/27/7/9/8/6/3/11/8 | **只在新增行上变化（预期内）**，第二轮把**自测里的期望串同步成实际值**（§6.4.4；那条比对只打印、不校验） |
 | 最小闭环·链路的最后一环 | —（上一轮自测是 `命中掉血 ✗`） | **`命中掉血 ✓`（生命 60 → 40）** | 第二轮把靶子换成真敌人 `Chaser.tscn` 实例（§6.4.5） |
+
+**第三轮（2026-10-15，追查"新生成单位同帧 0 血死亡" + 修 §6.4.6 的能力残留）复测**：
+只改了 `Scripts/Rewards/RunController.cs`（+1 字段 +1 方法 +1 调用，**没碰任何表、没碰 `ConfigIndex.tres`**），
+全量自测（CLI `--selftest`，**退出码 0**，`run_20261015_131758.log`）逐位复现上表：节点布置 `10（2/5/3）`、
+`pressure=3 pmods=3 bank=0`、白板首领 `315/甲 0`、玩家 `270/40/7 减伤 0`、端到端 `打开=True Paused=True`、
+索引 `4/4/10/1/1/27/7/9/8/6/3/11/8`、`（ConfigIndex.tres 已加载）`、最小闭环链路 ✓、`=== 自测结束 ===`（无中断、无警告）。
 
 `ConfigIndex.tres` 同步方式（**三处一起改**）：`load_steps` 123→131、新增 6 个 `[ext_resource]`、
 `Weapons`/`Characters`/`Skills`/`SkillAnimations` 四个数组各加项。
@@ -422,5 +451,5 @@ $cli = 'F:\Godot项目\项目a\.gdmcp\bin\gdmcp.exe'
 ```
 
 ⚠️ 玩家会掉血死亡（一局约 2 分钟），**进关卡后要尽快按左键**。
-⚠️ **同一个 `Main` 场景里换角色**会让上一个角色的技能残留（§6.4.6）——要干净的旧武器回归测试，
-就**重开一个进程**再选 Gunner。
+⚠️ **同一个 `Main` 场景里换角色**曾经会让上一个角色的技能残留（§6.4.6）——**第三轮已修**（能力绑定每次套用前
+恢复到场景基线），所以现在不再需要"重开一个进程"来拿干净的旧武器回归测试；§6.4.6 同时补了"同名切换"的验证表。
