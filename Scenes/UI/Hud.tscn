@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://Scripts/UI/PlayerHud.cs" id="1_hud"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/Bars/BarPlayer.tscn" id="2_bar"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://Assets/UI/Textures/tex_ui_crosshair_dot.png" id="4_crosshair"]
 [ext_resource type="FontFile" path="res://Assets/UI/Fonts/font_ui_kenney_future.ttf" id="5_hud_digits"]
 [ext_resource type="Script" path="res://Scripts/UI/ChargeIndicator.cs" id="6_charge"]
+[ext_resource type="Script" path="res://Scripts/UI/ScopeOverlay.cs" id="7_scope"]
 
 [node name="Hud" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -18,6 +19,15 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("3_theme")
+
+[node name="ScopeOverlay" type="Control" parent="Root"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_scope")
 
 [node name="Health" type="Label" parent="Root"]
 offset_left = 24.0

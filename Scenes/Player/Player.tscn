@@ -29,6 +29,7 @@
 [ext_resource type="Script" path="res://Scripts/Combat/DashPathIndicator.cs" id="34_path"]
 [ext_resource type="Script" path="res://Scripts/Combat/WeaponGate.cs" id="35_weapon_gate"]
 [ext_resource type="PackedScene" path="res://Scenes/Combat/MeleeStrike.tscn" id="36_melee_strike"]
+[ext_resource type="Script" path="res://Scripts/Combat/AfterimageTrail.cs" id="37_afterimage"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -91,6 +92,9 @@ script = ExtResource("10_interact")
 
 [node name="ChallengerMark" type="Node3D" parent="." unique_id=727671397]
 script = ExtResource("17_mark")
+
+[node name="Afterimage" type="Node3D" parent="."]
+script = ExtResource("37_afterimage")
 
 [node name="AbilityWeaponSkill1" type="Node3D" parent="." unique_id=240113241]
 script = ExtResource("19_energy_wave")

@@ -75,8 +75,19 @@ public partial class HawkEyeAbility : Ability
 	/// <summary>当前视角是否已经被放大（自测取证用）。</summary>
 	public bool ZoomApplied { get; private set; }
 
+	/// <summary>
+	/// **放大视角的进度**（0 = 完全没放大，1 = 已经到 <see cref="ZoomFov"/>）—— **只读**，
+	/// 供表现层（`Scripts/UI/ScopeOverlay.cs` 开镜特效）消费。
+	///
+	/// <para>为什么加它而不是让表现层自己读相机：表现层拿不到"施法前那个 FOV"（<see cref="ZoomFov"/>
+	/// 只是目标值），所以进度只能由**知道基准的人**算。这里只是把那一次除法暴露出来，
+	/// **没有改任何行为**：FOV 的写入、平滑、还原、收招时机全部与 P3 逐字相同。</para>
+	/// </summary>
+	public float ZoomProgress { get; private set; }
+
 	private Camera3D? _camera;
 	private float _baseFov;
+	private float _zoomSpan;
 	private bool _baseFovCaptured;
 	private bool _restoring;
 	private bool _negateOwned;
@@ -114,6 +125,7 @@ public partial class HawkEyeAbility : Ability
 		_markTimer = 0f;
 		_restoring = false;
 		ZoomApplied = false;
+		ZoomProgress = 0f;
 		_dodge = Ability.FindByAbilityId(OwnerUnit!, DodgeAbilityId) as BackdashAbility;
 		CaptureBaseFov();
 		PlaySkillAnimation();
@@ -185,6 +197,9 @@ public partial class HawkEyeAbility : Ability
 			_baseFov = _camera.Fov;
 			_baseFovCaptured = true;
 		}
+
+		// 表现层读数用的"放大跨度"（>0 = 这一行真的是放大；≤0 表示 ZoomFov 没收紧，进度恒 0）。
+		_zoomSpan = _baseFov - ZoomFov;
 	}
 
 	/// <summary>平滑走近目标 FOV（放大 = 变小；还原 = 回到施法前那个值）。</summary>
@@ -204,11 +219,15 @@ public partial class HawkEyeAbility : Ability
 		float weight = ZoomSharpness <= 0f ? 1f : 1f - Mathf.Exp(-ZoomSharpness * delta);
 		_camera.Fov = Mathf.Lerp(_camera.Fov, target, weight);
 		ZoomApplied = Mathf.Abs(_camera.Fov - _baseFov) > 0.5f;
+		ZoomProgress = _zoomSpan <= 0.0001f
+			? 0f
+			: Mathf.Clamp((_baseFov - _camera.Fov) / _zoomSpan, 0f, 1f);
 
 		if (restoring && Mathf.Abs(_camera.Fov - _baseFov) < 0.05f)
 		{
 			_camera.Fov = _baseFov;
 			ZoomApplied = false;
+			ZoomProgress = 0f;
 			ConclusionReady();
 		}
 	}
@@ -246,6 +265,7 @@ public partial class HawkEyeAbility : Ability
 		}
 
 		ZoomApplied = false;
+		ZoomProgress = 0f;
 		_restoring = false;
 	}
 
