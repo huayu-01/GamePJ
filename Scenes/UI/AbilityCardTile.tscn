@@ -3,23 +3,24 @@
 [ext_resource type="Script" path="res://Scripts/UI/AbilityCardTile.cs" id="1_tile"]
 
 [node name="AbilityCardTile" type="Control"]
-custom_minimum_size = Vector2(120, 110)
+custom_minimum_size = Vector2(110, 140)
 size_flags_horizontal = 3
 size_flags_vertical = 3
-offset_right = 120.0
-offset_bottom = 110.0
+offset_right = 110.0
+offset_bottom = 140.0
 mouse_filter = 0
 script = ExtResource("1_tile")
 
 [node name="Glow" type="Panel" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -9.0
-offset_top = -9.0
-offset_right = 9.0
-offset_bottom = 9.0
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
 grow_horizontal = 2
 grow_vertical = 2
+z_index = 1
 mouse_filter = 2
 visible = false
 
@@ -42,7 +43,7 @@ mouse_filter = 2
 theme_override_constants/separation = 5
 
 [node name="Icon" type="TextureRect" parent="Frame/Pad/VBox"]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 34)
 size_flags_vertical = 3
 mouse_filter = 2
 expand_mode = 1

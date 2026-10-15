@@ -11,8 +11,8 @@ ScreenLayer = 1
 CloseOnCancel = true
 ToggleKey = 75
 QuotaKey = 77
-Columns = 6
-Rows = 3
+Columns = 5
+Rows = 5
 
 [node name="Root" type="Control" parent="."]
 anchor_right = 1.0
@@ -83,7 +83,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
-columns = 6
+columns = 5
 
 [node name="Legend" type="HBoxContainer" parent="Root/Panel/VBox"]
 theme_override_constants/separation = 18

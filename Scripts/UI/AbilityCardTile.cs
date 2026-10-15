@@ -226,17 +226,17 @@ public partial class AbilityCardTile : Control
 			{
 				BgColor = new Color(0, 0, 0, 0),
 				DrawCenter = false,
-				BorderColor = new Color(border.R, border.G, border.B, 0.85f),
-				ShadowColor = new Color(border.R, border.G, border.B, 0.55f),
-				ShadowSize = 10,
+				BorderColor = new Color(border.R, border.G, border.B, 1f),
+				ShadowColor = new Color(border.R, border.G, border.B, 0.75f),
+				ShadowSize = 16,
 				ShadowOffset = Vector2.Zero,
-				CornerRadiusTopLeft = 12,
-				CornerRadiusTopRight = 12,
-				CornerRadiusBottomLeft = 12,
-				CornerRadiusBottomRight = 12,
+				CornerRadiusTopLeft = 16,
+				CornerRadiusTopRight = 16,
+				CornerRadiusBottomLeft = 16,
+				CornerRadiusBottomRight = 16,
 				AntiAliasing = true,
 			};
-			glow.SetBorderWidthAll(3);
+			glow.SetBorderWidthAll(4);
 			_glow.AddThemeStyleboxOverride("panel", glow);
 			_glow.Visible = active;
 			_glow.Modulate = new Color(1, 1, 1, active ? 1f : 0f);
