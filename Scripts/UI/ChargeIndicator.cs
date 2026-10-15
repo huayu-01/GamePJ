@@ -25,13 +25,32 @@ namespace ActRoguelike.UI;
 /// <c>IsPerfectWindow</c> / <c>ChargeBaseComplete</c> / <c>IsCharging</c> 都是 P2 就做好的只读量
 /// （见 `docs/abilities.md` §7），所以这里一行战斗逻辑都没有 —— 表现改样式不影响手感。</para>
 ///
+/// <para><b>它是能量掌武技2 独有的</b>（P7 用户裁定）：数据源按**技能行 Id** 认（<see cref="AbilityId"/>，
+/// 默认 <c>skl_a1_w1_2</c>），不是"任何武器绑在右键上的技能"。见 <see cref="AbilityId"/> 的注释。</para>
+///
 /// <para>⚠️ **`mouse_filter` 必须是 <c>Ignore</c>**（场景里已设）：它是屏幕正中心的一个 Control，
 /// 默认的 <c>Stop</c> 会吃掉鼠标事件，而鼠标捕获时事件坐标恒为中心 → **镜头完全不能转**
 /// （`architecture.md` 第 7 条，踩过一次）。</para>
 /// </summary>
 public partial class ChargeIndicator : Control
 {
-	/// <summary>看哪个输入动作上的技能（默认右键 = 武技 2；能量掌的「憋个大的」就在那儿）。</summary>
+	/// <summary>
+	/// 哪一条技能行是"方形蓄力圈"的技能（**表里的技能行 Id**，默认 = 能量掌 武技2「憋个大的」）。
+	///
+	/// <para><b>P7 用户裁定</b>：「方形蓄力圈就是**能量掌武技2独有的**」—— 所以别的武器武技2
+	/// （弓「刹那之眼」/ 短弩「大射天下」/ 长枪）蓄力时**不该**出现这个圈。
+	/// 填了 <see cref="AbilityId"/> 就**只认它**：按行 Id 找不到（这一局没装那把武器）就当"没有这个技能"，
+	/// <b>不回退</b> —— 回退会让"别的武器武技2 又冒出方形圈"这个 bug 原样回来。
+	/// 与 <c>ScopeOverlay.AbilityId</c> / <c>AfterimageTrail.AbilityId</c> 同一条纪律
+	/// （**加武器不改代码**：换技能行只改这一个字段）。</para>
+	/// </summary>
+	[Export] public string AbilityId { get; set; } = "skl_a1_w1_2";
+
+	/// <summary>
+	/// **回退路径**：看哪个输入动作上的技能（默认右键 = 武技 2；能量掌的「憋个大的」就在那儿）。
+	/// ⚠️ 只在 <see cref="AbilityId"/> **留空**时生效（想临时回到 P6b 那种"任何武器的武技2 都画圈"的
+	/// 行为就清空它；正常游玩不要动）。
+	/// </summary>
 	[Export] public string AbilityInputAction { get; set; } = "weapon_skill_2";
 
 	/// <summary>正方形半边长（像素）。</summary>
@@ -112,7 +131,7 @@ public partial class ChargeIndicator : Control
 
 		if (_ability == null || !IsInstanceValid(_ability))
 		{
-			_ability = PlayerAbilityInput.FindByInputAction(_unit, AbilityInputAction);
+			_ability = ResolveAbility();
 		}
 
 		// 只有"按住蓄力"的技能才有这一段（`IsCharging` 只在 `HoldToCharge` 为真时被输入层置起）。
@@ -124,6 +143,31 @@ public partial class ChargeIndicator : Control
 		}
 
 		SetShown(true, _ability!.ChargeProgress, _ability.ChargeBaseComplete || _ability.IsPerfectWindow);
+	}
+
+	/// <summary>
+	/// 找"这个圈该看哪个技能"：**按技能行 Id**（<see cref="AbilityId"/>，默认能量掌武技2）。
+	///
+	/// <para>⚠️ 填了 <see cref="AbilityId"/> 就**只认它**：按行 Id 找不到就返回 null（= 不画圈），
+	/// **不**回退到 <see cref="AbilityInputAction"/>。理由见 <see cref="AbilityId"/> 的注释 ——
+	/// 回退 = "弓/短弩/长枪的武技2 蓄力时又冒出方形圈"（用户明确裁定过那是不对的）。</para>
+	///
+	/// <para>行 Id 是**表里的标识**，所以"哪一条技能行用这个圈 / 换一把武器"都是填表，不是改代码
+	/// （`docs/vfx.md` §2 第 5 条）。</para>
+	/// </summary>
+	private Ability? ResolveAbility()
+	{
+		if (_unit == null)
+		{
+			return null;
+		}
+
+		if (!string.IsNullOrEmpty(AbilityId))
+		{
+			return Ability.FindByAbilityId(_unit, AbilityId);
+		}
+
+		return PlayerAbilityInput.FindByInputAction(_unit, AbilityInputAction);
 	}
 
 	/// <summary>把"这一次应该画成什么样"落到节点上（可见性 + 变色 + 重绘）。</summary>
