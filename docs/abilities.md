@@ -506,3 +506,55 @@ TryPress(第一次) → TryActivate → OnActivate：播 ComboAnimations[0]
 8. ⚠️ **`AbilitySeries` 的整套写法（§8.2）是"绕过 Godot C# 绑定限制"的方案**，
    不是"漂亮做法"：以后 Godot 的 C# 绑定支持了 `PackedStringArray`，应当改回"技能行上的一个数组列"。
 
+---
+
+## 9. P6c 接入记录（表现层 4 项：开镜 / 后撤残影 / 剑气拖尾 / 落圈，2026-10-16）
+
+> 这一节是**给"以后再加特效"的人看的接入契约**：P6c **一行战斗逻辑都没改**（唯一的例外见 §9.2），
+> 只在 4 个技能已有的公开只读状态上各挂了一个表现层组件。逐条细节与坑见 [vfx.md](vfx.md)。
+
+### 9.1 四个特效读的是哪四个"已经存在的只读量"
+
+| 设计文档原文 | 表现层 | 读的只读量（**都是 P2/P3/P4 就有的**） |
+|---|---|---|
+| 第 87 行「基础蓄力 0.3 秒后**放大视角**」（弓 武技2 刹那之眼） | `Scripts/UI/ScopeOverlay.cs`（`Hud.tscn` → `Root/ScopeOverlay`） | `HawkEyeAbility.IsAiming` / `ZoomApplied` / **`ZoomProgress`（§9.2 新增）** |
+| 第 26 行「角色快速向后移动……**有无敌帧**」（技能1 后撤） | `Scripts/Combat/AfterimageTrail.cs`（`Player.tscn` → `Player/Afterimage`） | `BackdashAbility.InvulnerableOwned`（P3 就有） |
+| 第 110 / 114 行「发射**一发剑气**……能穿透 / 路径短 / 可被格挡」（灵剑 武技2 拔刀式） | `Scripts/Combat/ProjectileTrail.cs`（**挂在剑气本体** `Scenes/Combat/SwordQi.tscn` 上） | `Projectile.VelocityDirection`（P4 就有） |
+| 第 112 行「落地时会造成额外的大范围攻击（……**多一圈攻击判定 + 特效**）」+ 第 99 行被动「落」 | `Scripts/Combat/LandingShockwave.cs`（`Player/AbilityFallAttack/Shockwave` + `Player/AbilityPassive2/ShockwaveBurst`） | `FallAttackAbility.Landed`（公开事件）/ `LandingBurstAbility.TriggerCount`（公开只读计数）/ 命中体 `Attack/Shape` 的 `SphereShape3D.Radius` |
+
+**特别注意第 4 条**：圈的**半径不是写死的**，它读的就是 `AttackHitbox` 真正在用的那个
+`SphereShape3D.Radius`（`3.2`，也就是 `RewardCatalog.PulseDamage.Around` 口径的"范围"）。
+表/场景把范围调大，圈跟着变大 —— 表现层与判定**同一个几何量**，不可能漂移。
+
+### 9.2 唯一的战斗层改动：`HawkEyeAbility.ZoomProgress`（新增**只读**属性）
+
+```csharp
+/// 放大视角的进度（0 = 完全没放大，1 = 已经到 ZoomFov）—— 只读，供 ScopeOverlay 消费。
+public float ZoomProgress { get; private set; }
+```
+
+为什么加它：表现层**拿不到"施法前那个 FOV"**（`ZoomFov` 只是目标值），所以进度只能由知道基准的人算。
+它就是把 `(基准FOV − 当前FOV) / 跨度` 这一次除法暴露出来 ——
+**FOV 的写入、平滑速度、还原时机、收招条件一个字都没动**（`StepZoom` 里只多了 3 行赋值）。
+
+### 9.3 实拍与探针（四张图 + 四行 `DebugState()`）
+
+- `screenshots/p6c_scope.png`：`开镜特效：强度=1 镜筒半径=183.6px 渐变 24 档/256px｜只读源 技能行=skl_a3_w1_2
+  缩放进度=1 开镜中=True 视角已放大=True｜中心净空 167.6px｜页面鼠标穿透 = True`
+- `screenshots/p6c_afterimage.png`：`后撤残影：无敌帧=False 场上残影=4 累计=4｜只读源 技能行=skl_a1_skill_1
+  无敌帧拥有=False｜安全性 碰撞体=0 单位=0 分组=（无） 网格=2 抄骨骼=7`
+- `screenshots/p6c_swordqi.png`：`剑气拖尾：可见=True 采样点=32 头尾间距=12.917m（面向镜头=True）
+  ｜只读源 投射物=SwordQi 在飞=True｜纯表现 网格子节点=1 碰撞体=0 分组=0`
+- `screenshots/p6c_landing.png`：`落圈特效：挂=下落攻击（订阅 Landed 事件） 已画=1 圈 最近半径=3.2m
+  （命中体 Attack/Shape/SphereShape3D.Radius）｜纯表现 碰撞体=0 分组=0`（"落剑式"那一圈同样一行）
+
+### 9.4 自测与硬指标
+
+`build.ps1 --no-incremental` **0 warning / 0 error**；`--selftest`（`user://selftest.flag`，跑完即删）
+`=== 自测结束 ===`、**退出码 0**；硬指标逐位不变 ——
+节点布置 `10(2/5/3)` · `pressure=3 pmods=3 bank=0` · 白板首领 `315/甲 0` · 端到端 `奖励界面打开=True` ·
+玩家 `220/20/6.5` · 索引 `6/2/10/1/1/39/7/14/8/5/6/11/4` · 最小闭环链路 ✓ ·
+`（ConfigIndex.tres 已加载）`。**`ConfigIndex.tres` 一行没动**（表现层不该新增表行）。
+备份：`_refactor_backup/ConfigIndex.tres.p6cbefore`。
+
+

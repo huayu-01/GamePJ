@@ -116,7 +116,7 @@ UI（HUD 弹药显示 + `Hud.tscn` 的 `Root/Ammo` 节点 + 帮助页两行说�
 
 **③ 表现层：做了"准星处的蓄力指示器"**（用户描述最具体的那条；`Scripts/UI/ChargeIndicator.cs`）——
 缺口随 `Ability.ChargeProgress` 收缩到闭合，闭合/完美时机变色 + 准星本体染色。
-**没做**：开镜特效 / 后撤残影 / 剑气拖尾 / 落圈特效。
+**没做**：开镜特效 / 后撤残影 / 剑气拖尾 / 落圈特效。→ ✅ **4 项已在 P6c 做完，见下面「任务 J」**。
 
 **④ UI 两个尾巴：都做了，并查出两个真缺陷**：
 额度进度条配了 `StyleBoxFlat` + 三档变色（正常蓝 / ≥0.8 黄 / 满红）；
@@ -135,6 +135,52 @@ UI（HUD 弹药显示 + `Hud.tscn` 的 `Root/Ammo` 节点 + 帮助页两行说�
 > 端到端 奖励界面打开 True · 最小闭环链路 ✓ · 玩家 220/20/6.5 · 日志有 `（ConfigIndex.tres 已加载）`。
 > 备份：`_refactor_backup/ConfigIndex.tres.p6bbefore`。
 
+### 任务 J：P6c —— 补齐 4 项表现层特效 ✅ 已完成（2026-10-16）
+
+> ⭐ **本批的纪律：表现层只读运行期状态，战斗逻辑一行没改**
+> （唯一例外 = 给 `HawkEyeAbility` 加了一个**只读**属性 `ZoomProgress`）。
+> 加特效的完整清单 / 契约 / 踩过的坑见 **[vfx.md](vfx.md)**；逐条接入记录见
+> [abilities.md](abilities.md) §9。四张实拍图在 `docs/screenshots/p6c_*.png`（各带一张放大图）。
+
+**① 开镜特效**（弓 武技2「刹那之眼」，设计文档第 87 行「放大视角」）
+`Scripts/UI/ScopeOverlay.cs`，挂 `Scenes/UI/Hud.tscn` → `Root/ScopeOverlay`（Root 的**第一个**子节点）。
+一张径向渐变贴图（`GradientTexture2D`）= 暗角 + 圆形镜筒细亮环 + 环上 12 条朝内刻度；
+**镜筒半径以内一个像素都不画**（中心净空 167.6px）→ 不遮挡瞄准。只读 `HawkEyeAbility.ZoomProgress`
+→ 开镜淡入、还原视角淡出，与镜头完全同步。`mouse_filter = Ignore`（双保险）。
+
+**② 后撤残影**（技能1「后撤」，设计文档第 26 行「有无敌帧」）
+`Scripts/Combat/AfterimageTrail.cs`，挂 `Scenes/Player/Player.tscn` → `Player/Afterimage`。
+无敌帧期间每 0.09s 留一个角色模型的半透明副本（`GhostLifetime` 内淡出）。
+只读 `BackdashAbility.InvulnerableOwned`（P3 就有的只读属性）→ 起止与 `Dodge→Dodger` 同起同落。
+⚠️ **安全性（做减法 + 三个可数取证量）**：复制出来立刻把子树里**全部 `CollisionObject3D`（含 `Area3D`）
+/ `Unit` / `AnimationTree` / `AnimationPlayer`** 摘掉并 `QueueFree`，再把整棵子树**退出所有分组**；
+只 `AddChild` 到 `CurrentScene`。实测 4 个残影在场时：`碰撞体=0 单位=0 分组=（无）`，
+且 `enemy_units` / `player_units` / `projectiles` 三个分组计数**一位没变**。
+
+**③ 剑气拖尾**（灵剑 武技2「拔刀式」，设计文档第 110/114 行）
+`Scripts/Combat/ProjectileTrail.cs`，**挂在剑气本体** `Scenes/Combat/SwordQi.tscn` → `SwordQi/Trail`
+（不是另做一个特效实体）。每物理帧记一个采样点，用 `ImmediateMesh` 连成一条**面向镜头**的渐细光带。
+只读 `Projectile.VelocityDirection`。采样点用 `ToLocal` 换回局部空间 → 父节点的
+`ProjectileSizeScale`（"剑气大小等比攻击盒大小"）自动作用在拖尾宽度上。
+
+**④ 落圈特效**（灵剑 武技3「落剑式」+ 被动「落」，设计文档第 112/99 行）
+`Scripts/Combat/LandingShockwave.cs`，挂 `Player/AbilityFallAttack/Shockwave`（订阅公开的
+`FallAttackAbility.Landed` 事件）与 `Player/AbilityPassive2/ShockwaveBurst`（轮询公开只读的
+`LandingBurstAbility.TriggerCount` 上升沿）。**半径读战斗层真正的那个几何量** ——
+`Attack/Shape` 的 `SphereShape3D.Radius`（3.2m，= `PulseDamage.Around` / `AttackHitbox` 用的范围），
+读不到才用兜底值。
+
+> **三个实拍里发现并修掉的真问题**（都是截图看出来的，不是"我觉得"）：
+> ① 暗角用"一圈套一圈 `DrawArc`"→ 抗锯齿边缘叠出**一圈圈可见的同心细线** → 换 `GradientTexture2D`；
+> ② 残影 0.045s/8 个 → **糊成一片光晕**（后撤总共只走 ~1.8m）→ 改 0.09s/4 个 + 饱和一点的青蓝；
+> ③ `TorusMesh.Rings` / `RingSegments` **写反了 → 圆画成菱形**；顺带把加法混合默认关
+>    （白地板 + `Add` 会冲成一片白）。
+>
+> **硬指标逐位不变**：节点布置 `10(2/5/3)` · `pressure=3 pmods=3 bank=0` · 白板首领 `315/甲 0` ·
+> 端到端 `奖励界面打开=True` · 玩家 `220/20/6.5` · 索引 `6/2/10/1/1/39/7/14/8/5/6/11/4` ·
+> 最小闭环链路 ✓ · 自测 `=== 自测结束 ===` **退出码 0**。**`ConfigIndex.tres` 一行没动**
+> （表现层不该新增表行）。备份：`_refactor_backup/ConfigIndex.tres.p6cbefore`。
+
 ### 📌 P1→P6 整条线现在的状态（给下一位接手的人）
 
 | 阶段 | 内容 | 状态 |
@@ -147,13 +193,15 @@ UI（HUD 弹药显示 + `Hud.tscn` 的 `Root/Ammo` 节点 + 帮助页两行说�
 | **P5 / P5b** | 增幅接入 + 池重构（限定/互斥/前置三层判定 + 图鉴数据基础） | ✅ |
 | **P6a** | 清旧（旧角色/武器/技能/增幅/池/能力卡）+ 基地 UI 改造 | ✅ |
 | **P6b** | 弹匣横向清理 + 2 条异化 + 蓄力指示器 + UI 两个尾巴 + 两个可选清理 | ✅ |
+| **P6c** | **4 项表现层特效**（开镜 / 后撤残影 / 剑气拖尾 / 落圈）—— 只读运行期状态，战斗逻辑零改动 | ✅ |
 
-**P6b 之后仍然开着的口子**（都不阻塞玩法）：
+**P6c 之后仍然开着的口子**（都不阻塞玩法）：
 1. 通用异化 3 条没做（护卫 / 灵魂收割 / 落日剑）—— 见 [upgrades.md](upgrades.md) §7 第 1 条。
-2. 表现层 4 项没做（开镜特效 / 后撤残影 / 剑气拖尾 / 落圈特效）。
-3. 角色 A/B 的**生命 / 护甲 / 移速是预设值**（220/20/6.5 与 220/25/6.8），设计文档没写，**等用户确认**。
-4. `ApplyAbilityMatrix` 的时机要拆三步才修得对（见 P6b ⑤）。
-5. 3 条占位行 + 8 处"只接了一半"的增幅（[upgrades.md](upgrades.md) §7 第 2、3 条）。
+2. 角色 A/B 的**生命 / 护甲 / 移速是预设值**（220/20/6.5 与 220/25/6.8），设计文档没写，**等用户确认**。
+3. `ApplyAbilityMatrix` 的时机要拆三步才修得对（见 P6b ⑤）。
+4. 3 条占位行 + 8 处"只接了一半"的增幅（[upgrades.md](upgrades.md) §7 第 2、3 条）。
+5. `ArmorBreakFx`（破甲特效）的 `TorusMesh.Rings`/`RingSegments` 也是写反的（环是八边形），
+   修法 = 两个数字对调；本轮不在边界内，见 [vfx.md](vfx.md) §7。
 
 ### 任务 H：P6a —— 清旧 + 基地 UI 改造 + 三个遗留问题 ✅ 已完成（2026-10-15）
 
