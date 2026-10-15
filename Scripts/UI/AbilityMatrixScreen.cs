@@ -46,6 +46,24 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 	/// <summary>矩阵**最少**行数（默认 3 → 一共 18 格）。卡数超过列 × 行时行数会自己长（"永远是填满的矩阵、不翻页"）。</summary>
 	[Export(PropertyHint.Range, "1,8,1")] public int Rows { get; set; } = 3;
 
+	// ── 右侧额度进度条的配色（P6b）──
+	// 用户反馈：深色主题下**看不出已占用部分**（默认 ProgressBar 的填充与暗底几乎同色）。
+	// 两个 StyleBox 在场景里（`theme_override_styles/fill` 与 `/background`），填充底色写 **白**，
+	// 实际颜色由下面三个值在运行期写进 `StyleBoxFlat.BgColor`：
+	// 正常 / 快满 / 满。三个颜色与两个阈值都是**场景上的导出值**（改配色不用改代码）。
+
+	/// <summary>占用比例达到这个值 → 进度条填充换成 <see cref="QuotaWarnColor"/>。</summary>
+	[Export(PropertyHint.Range, "0,1,0.01")] public float QuotaWarnRatio { get; set; } = 0.8f;
+
+	/// <summary>正常（没快满）时的填充色。</summary>
+	[Export] public Color QuotaOkColor { get; set; } = new Color(0.36f, 0.72f, 0.95f);
+
+	/// <summary>快满（≥ <see cref="QuotaWarnRatio"/>）时的填充色。</summary>
+	[Export] public Color QuotaWarnColor { get; set; } = new Color(1f, 0.78f, 0.28f);
+
+	/// <summary>装不下更多（占用 ≥ 额度上限）时的填充色。</summary>
+	[Export] public Color QuotaFullColor { get; set; } = new Color(1f, 0.36f, 0.32f);
+
 	protected override Control Root => _root;
 
 	private Control _root = null!;
@@ -108,12 +126,16 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		_quotaBar = GetNodeOrNull<ProgressBar>("Root/Panel/HBox/RightPanel/QuotaBar");
 		_quotaText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/QuotaText");
 		_shardsText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/ShardsText");
-		_quotaBar = GetNodeOrNull<ProgressBar>("Root/Panel/HBox/RightPanel/QuotaBar");
-		_quotaText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/QuotaText");
-		_shardsText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/ShardsText");
 
 		_matrix.Columns = Columns;
-		_matrix.Resized += OnMatrixResized;		_quotaUpgrade.Pressed += BuyQuota;
+		// ⚠️ 只在这里订阅一次：`RebuildIfNeeded` 里原来又订阅了一遍 → 每次改尺寸回调会被调两次。
+		// ⚠️ 订阅的是 **Root**（跟着视口走）而不是 Matrix：矩阵自己的尺寸被最小尺寸顶住，
+		// 窗口变窄时它**根本不会发出 `Resized`** → 列数会卡在拉宽后的值（实测：拉宽到 19 列，
+		// 缩回 16:9 之后仍然是 19 列、矩阵区还报着 2342）。Root 是锚满视口的普通 Control，
+		// 视口一变它一定变，这个信号才是可靠的触发源。Matrix 那一路继续留着（右栏内容变化时也要重算）。
+		_root.Resized += OnMatrixResized;
+		_matrix.Resized += OnMatrixResized;
+		_quotaUpgrade.Pressed += BuyQuota;
 		BuildLegend();
 	}
 
@@ -250,7 +272,7 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 	/// <summary>容器尺寸变了就重算列数（卡牌大小与比例不变，挤不下的流到下一行）。</summary>
 	private void OnMatrixResized()
 	{
-		int cols = ColumnsFor(_matrix.Size.X, CardMinWidth, CardSeparation);
+		int cols = ColumnsFor(AvailableMatrixWidth(), CardMinWidth, CardSeparation);
 		if (cols == _matrix.Columns)
 		{
 			return;
@@ -259,6 +281,45 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		Columns = cols;
 		_builtRows = -1; // 强制重建
 		RebuildIfNeeded();
+		// ⚠️ 重建之后必须再刷一次文案：底部那一行写的是「矩阵 列×行 = 格数」，
+		// 它只在 `RefreshAll` 里生成 —— 不刷就会出现"矩阵真的变成 18 列、页脚还写着 10×3"。
+		RefreshAll();
+	}
+
+	/// <summary>
+	/// 本次布局里**矩阵区真正能用的宽度**（P6b 修的第二个自适应缺陷）。
+	///
+	/// <para>⚠️ <b>不能直接读 <c>_matrix.Size.X</c></b>：<see cref="GridContainer"/> 的尺寸被它自己的
+	/// 最小尺寸顶住，而最小尺寸 = 当前列数 × 卡宽 → **列数只会涨、不会跌**。实测（2026-10-16）：
+	/// 1920 宽 → 11 列；把窗口拉成 12:5（视口 2592）→ 18 列；再缩回 16:9，视口确实回到 1920，
+	/// 但矩阵区还是报 2218（= 18 列的最小宽），于是仍然 18 列 —— 窗口变窄后列数**卡住不下来**，
+	/// 矩阵还会溢出右栏。</para>
+	///
+	/// <para>改法：从**视口**算可用宽。`Root` 是锚满视口的普通 <see cref="Control"/>，
+	/// 它的尺寸只由锚点决定、**不受子节点最小尺寸影响**；Panel 的左右偏移与 HBox 的间隔都从场景读，
+	/// 右栏按它自己的最小尺寸扣掉。这样"宽 → 列多、窄 → 列少"两个方向都成立。</para>
+	/// </summary>
+	private float AvailableMatrixWidth()
+	{
+		if (_matrix.GetParent() is not BoxContainer box || box.GetParent() is not Control panel)
+		{
+			return _matrix.Size.X;   // 场景结构被改过：退回旧行为，不抛异常
+		}
+
+		// 不读 panel.Size.X（容器会被最小尺寸顶大），用它相对 Root 的锚点偏移还原"本应分配到的宽度"：
+		// 锚满左右时 `宽 = 父宽 + offset_right − offset_left`。
+		float panelWidth = _root.Size.X - panel.OffsetLeft + panel.OffsetRight;
+		float others = 0f;
+		foreach (Node child in box.GetChildren())
+		{
+			if (child != _matrix && child is Control control)
+			{
+				others += control.GetCombinedMinimumSize().X;
+			}
+		}
+
+		float separation = box.GetThemeConstant("separation") * Mathf.Max(0, box.GetChildCount() - 1);
+		return Mathf.Max(CardMinWidth, panelWidth - others - separation);
 	}
 
 	/// <summary>卡面最小宽 / 间隔（与 .tscn 的 custom_minimum_size 和 h_separation 对齐）。</summary>
@@ -304,7 +365,6 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 
 		_tileScene ??= GD.Load<PackedScene>("res://Scenes/UI/AbilityCardTile.tscn");
 		_matrix.Columns = Columns;
-		_matrix.Resized += OnMatrixResized;
 		int slots = Columns * rows;
 		for (int i = 0; i < slots; i++)
 		{
@@ -363,11 +423,13 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		_quotaUpgrade.Text = $"扩增额度 +1（费用 {AbilityStore.QuotaUpgradeCost}）";
 		_quotaUpgrade.Disabled = AbilityStore.QuotaRow == null;
 
-		// 右侧竖进度条：填的是"已占用 / 总额度"，一眼看出还剩多少
+		// 右侧竖进度条：填的是"已占用 / 总额度"，一眼看出还剩多少。
+		// ⚠️ P6b：填充色**由下面的 <see cref="ApplyQuotaBarColor"/> 决定**（正常 / 快满 / 满三档）。
 		if (_quotaBar != null)
 		{
 			_quotaBar.MaxValue = Mathf.Max(1, cap);
 			_quotaBar.Value = used;
+			ApplyQuotaBarColor(used, cap);
 		}
 		if (_quotaText != null)
 		{
@@ -384,6 +446,39 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 			+ $"矩阵 {Columns}×{_rows} = {SlotCount} 格（占位卡 {_placeholders.Count} 张：没有解锁条件，永远无法解锁）　·　"
 			+ "激活的能力在下局开局生效（额度不够就装不下，必须取舍）";
 	}
+
+	/// <summary>
+	/// 额度条填充色（P6b）：按"已占用 / 上限"分三档写进填充 <c>StyleBoxFlat.BgColor</c>
+	/// —— 正常蓝 / ≥<see cref="QuotaWarnRatio"/> 黄 / 满红。
+	///
+	/// <para>为什么改 <c>BgColor</c> 而不是 <c>Modulate</c>：Modulate 会连**背景槽**一起染色，
+	/// 暗底会被染成暗黄。改样式盒只动填充那一层。</para>
+	/// <para>⚠️ 只在**确实是我们自己的覆盖**（场景里的 <c>theme_override_styles/fill</c>）时才改：
+	/// 否则拿到的是主题默认的那一份共享 <c>StyleBoxFlat</c>，改它会波及其它所有 ProgressBar。</para>
+	/// </summary>
+	private void ApplyQuotaBarColor(int used, int cap)
+	{
+		if (_quotaBar == null || !IsInstanceValid(_quotaBar))
+		{
+			return;
+		}
+
+		float ratio = used / (float)Mathf.Max(1, cap);
+		Color color = ratio >= 1f ? QuotaFullColor : ratio >= QuotaWarnRatio ? QuotaWarnColor : QuotaOkColor;
+		_quotaBarFillColor = color;
+
+		if (!_quotaBar.HasThemeStyleboxOverride("fill") || _quotaBar.GetThemeStylebox("fill") is not StyleBoxFlat fill)
+		{
+			return;   // 场景里没配样式盒（例如被人删了）：不碰共享资源，保持默认外观
+		}
+
+		fill.BgColor = color;
+	}
+
+	/// <summary>额度条当前填充色（自检 / 探针用）。</summary>
+	public Color QuotaBarFillColor => _quotaBarFillColor;
+
+	private Color _quotaBarFillColor = new Color(1f, 1f, 1f);
 
 	/// <summary>等级色图例（"边框颜色表示等级：灰0 &gt; 白1 &gt; 绿2 &gt; 蓝3 &gt; 紫4 &gt; 红5"）。</summary>
 	private void BuildLegend()
@@ -617,4 +712,78 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 
 	/// <summary>探针用：额度栏那一行的实际文案（证明界面上的数字来自 AbilityStore）。</summary>
 	public string DebugHeaderText() => $"{_shards.Text} ／ {_quota.Text} ／ {_quotaUpgrade.Text}";
+
+	// ── 额度条配色与"自适应列数"的取证入口（P6b）──
+
+	/// <summary>
+	/// 探针用：额度条的**实际**读数 —— 格数/阈值/填充样式盒的真颜色，以及当前矩阵区尺寸与列数。
+	/// 判据不是"代码里写了这句话"，而是**样式盒上的 <c>BgColor</c> 真的被改掉了**。
+	/// </summary>
+	public string DebugQuotaBarReport()
+	{
+		if (_quotaBar == null || !IsInstanceValid(_quotaBar))
+		{
+			return "额度条：场景里没有 QuotaBar 节点";
+		}
+
+		bool overridden = _quotaBar.HasThemeStyleboxOverride("fill");
+		var fill = overridden ? _quotaBar.GetThemeStylebox("fill") as StyleBoxFlat : null;
+		string bg = _quotaBar.HasThemeStyleboxOverride("background")
+			? (_quotaBar.GetThemeStylebox("background") as StyleBoxFlat)?.BgColor.ToHtml(false) ?? "非 StyleBoxFlat"
+			: "（没配 background 样式盒）";
+		return $"额度条：{_quotaBar.Value:0}/{_quotaBar.MaxValue:0} 三档色 蓝={QuotaOkColor.ToHtml(false)}/"
+			+ $"黄={QuotaWarnColor.ToHtml(false)}/红={QuotaFullColor.ToHtml(false)}（快满阈值 {QuotaWarnRatio:0.##}）"
+			+ $" ｜ 场景 override: fill={overridden} background={_quotaBar.HasThemeStyleboxOverride("background")}"
+			+ $" ｜ fill.BgColor={(fill != null ? fill.BgColor.ToHtml(false) : "—")} background={bg}"
+			+ $" ｜ 列 {Columns} 行 {RowCount} 矩阵区 {_matrix.Size.X:0}×{_matrix.Size.Y:0}";
+	}
+
+	/// <summary>探针 / 拍摄台用：把额度占用摆成指定值（只改这一个控件的显示，不动存档）。</summary>
+	public string DebugSetQuotaOccupancy(int used, int cap)
+	{
+		if (_quotaBar == null || !IsInstanceValid(_quotaBar))
+		{
+			return "额度条：场景里没有 QuotaBar 节点";
+		}
+
+		_quotaBar.MaxValue = Mathf.Max(1, cap);
+		_quotaBar.Value = Mathf.Clamp(used, 0, Mathf.Max(1, cap));
+		ApplyQuotaBarColor(used, cap);
+		// 顶栏与右栏两个文本一起改，否则截图里会出现"进度条 5/6、文字 0/6"的错位。
+		if (_quotaText != null)
+		{
+			_quotaText.Text = $"{used} / {cap}　（剩余 {Mathf.Max(0, cap - used)}）";
+		}
+
+		if (_quota != null && IsInstanceValid(_quota))
+		{
+			_quota.Text = $"额度：{used} / {cap}　（扩增 Lv{AbilityStore.QuotaLevel}，剩余 {Mathf.Max(0, cap - used)}）";
+		}
+
+		return DebugQuotaBarReport();
+	}
+
+	/// <summary>
+	/// 探针用：**自适应列数**的算术核对 —— 给定矩阵区宽度，列数应当是"铺得下几张就是几列"，
+	/// 且每格的**宽高比恒定**（卡牌比例不变）。纯算式，不动真表、不动存档。
+	/// </summary>
+	public string DebugAdaptiveColumns()
+	{
+		var lines = new List<string>();
+		bool ok = true;
+		foreach (float width in new[] { 900f, 1200f, 1500f, 1900f, 2400f })
+		{
+			int cols = ColumnsFor(width, CardMinWidth, CardSeparation);
+			// 每格分到的宽度 = (可用宽 - 列间间隔) / 列数；高度由 AspectRatioContainer 锁 0.625 定。
+			float cell = (width - (CardSeparation * (cols - 1))) / cols;
+			float height = cell / 0.625f;
+			bool fits = cols >= 2 && cell >= CardMinWidth - 0.51f;
+			ok &= fits;
+			lines.Add($"{width:0}px → {cols} 列 · 每格 {cell:0}×{height:0}（比例 {(height > 0 ? cell / height : 0f):0.###}，"
+				+ $"最小宽 {CardMinWidth:0}）{(fits ? "✓" : "✗")}");
+		}
+
+		return $"自适应列数（每格最小宽 {CardMinWidth:0} + 间隔 {CardSeparation:0}）：{string.Join(" ｜ ", lines)}"
+			+ $"　→ 全部「铺得下 + 不小于最小宽」 = {ok}";
+	}
 }
