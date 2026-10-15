@@ -30,6 +30,7 @@
 [ext_resource type="Script" path="res://Scripts/Combat/WeaponGate.cs" id="35_weapon_gate"]
 [ext_resource type="PackedScene" path="res://Scenes/Combat/MeleeStrike.tscn" id="36_melee_strike"]
 [ext_resource type="Script" path="res://Scripts/Combat/AfterimageTrail.cs" id="37_afterimage"]
+[ext_resource type="Script" path="res://Scripts/Combat/LandingShockwave.cs" id="38_shockwave"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -160,6 +161,9 @@ AttackTags = PackedStringArray("Melee", "Fall")
 [node name="Shape" parent="AbilityFallAttack/Attack" index="0"]
 shape = SubResource("SphereShape3D_landing")
 
+[node name="Shockwave" type="Node3D" parent="AbilityFallAttack"]
+script = ExtResource("38_shockwave")
+
 [node name="AbilityWeapon4Skill1" type="Node3D" parent="."]
 script = ExtResource("26_melee_combo")
 Enabled = false
@@ -275,6 +279,12 @@ AttackTags = PackedStringArray("Melee", "Burst")
 
 [node name="Shape" parent="AbilityPassive2/Attack" index="0"]
 shape = SubResource("SphereShape3D_landing")
+
+[node name="ShockwaveBurst" type="Node3D" parent="AbilityPassive2"]
+script = ExtResource("38_shockwave")
+ExtraHeight = 0.06
+RingColor = Color(1, 0.86, 0.55, 0.95)
+DiscColor = Color(1, 0.78, 0.4, 0.22)
 
 [node name="WeaponGate5" type="Node3D" parent="."]
 script = ExtResource("35_weapon_gate")

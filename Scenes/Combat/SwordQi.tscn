@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/Projectile.cs" id="1_projectile"]
 [ext_resource type="Material" path="res://Assets/Materials/mat_energy_wave.tres" id="2_mat"]
+[ext_resource type="Script" path="res://Scripts/Combat/ProjectileTrail.cs" id="3_trail"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_qi"]
 material = ExtResource("2_mat")
@@ -26,3 +27,6 @@ mesh = SubResource("BoxMesh_qi")
 [node name="Tail" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
 mesh = SubResource("BoxMesh_qi_trail")
+
+[node name="Trail" type="Node3D" parent="."]
+script = ExtResource("3_trail")
