@@ -2433,7 +2433,17 @@ public partial class SelfTest : Node
 		}
 
 		livePlayer.Movement?.SetExtraAirJumps(jumpsBefore, 3);
+
+		// 探针单位身上的修正器要按 Source 成组摘掉**再**释放：`RunBuild` 是 Godot 的 `RefCounted`，
+		// 被 `StatModifier.Source` 引用着的话退出时会报「ObjectDB instance was leaked」
+		// （与上面「力量 / 攀高」那一段 `RemoveBySource` 同一个理由）。
+		probePlayer.Stats.RemoveBySource(overrideBuild);
+		probePlayer.RefreshStats();
 		probePlayer.Free();
+
+		// 探测武器也是 Godot 的 `Node3D`（`Weapon : Node3D`）—— 不 `Free()` 的话退出时 Godot 会报
+		// 「1 ObjectDB instance was leaked at exit」（上面三把探针武器都 `Free()` 了，这一把是本轮新加的）。
+		spiritSword.Free();
 	}
 
 	private static void ReportCombat(StageController? stage)
