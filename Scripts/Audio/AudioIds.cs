@@ -30,6 +30,18 @@ public static class AudioIds
 	public const string UiOpen = "ui_open";
 
 	/// <summary>
+	/// **蓄力完成**（触发点：<c>Scripts/Combat/ChargeBodyFx.cs</c> —— 任意蓄力技能的
+	/// <c>Ability.ChargeBaseComplete</c> 由 false 变 true 的那一帧，**每次完成基础蓄力都响一声**）。
+	///
+	/// <para>它是一条**独立的新表行**（P7 ③）：源文件目前是**临时借用**项目自制的
+	/// <c>ui_card_unlock.wav</c>（"能力卡·解锁"那一声，语义上最接近"蓄力就绪"），
+	/// 总线走 <c>SFX</c>（战斗音效，而不是 UI 总线）。美术出了专门的素材之后，
+	/// 把 <c>Config/Tables/Audio/audio_sfx_charge_complete.tres</c> 的 <c>Stream</c> 指过去即可 ——
+	/// **代码一个字都不用改**（调用方只认这个 id，永远不知道文件在哪）。</para>
+	/// </summary>
+	public const string ChargeComplete = "sfx_charge_complete";
+
+	/// <summary>
 	/// 交互物**失败响应**的音效（触发点：<c>Interactable`Failed</c>/<c>Rejected</c> → 表现层，
 	/// 用户需求 §五 #13「失败增加一个失败响应、抖动效果、音效、玩家被略微击退」）。
 	///

@@ -32,6 +32,7 @@
 [ext_resource type="Script" path="res://Scripts/Combat/AfterimageTrail.cs" id="37_afterimage"]
 [ext_resource type="Script" path="res://Scripts/Combat/LandingShockwave.cs" id="38_shockwave"]
 [ext_resource type="Script" path="res://Scripts/Combat/SprintController.cs" id="39_sprint"]
+[ext_resource type="Script" path="res://Scripts/Combat/ChargeBodyFx.cs" id="40_charge_body"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -100,6 +101,9 @@ script = ExtResource("37_afterimage")
 
 [node name="Sprint" type="Node" parent="."]
 script = ExtResource("39_sprint")
+
+[node name="ChargeBodyFx" type="Node3D" parent="."]
+script = ExtResource("40_charge_body")
 
 [node name="AbilityWeaponSkill1" type="Node3D" parent="." unique_id=240113241]
 script = ExtResource("19_energy_wave")

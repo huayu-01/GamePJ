@@ -46,6 +46,15 @@ public partial class LandingShockwave : Node3D
 	/// <summary>读不到形状时用的半径（米；只是兜底，正常路径走上面的形状）。</summary>
 	[Export] public float FallbackRadius { get; set; } = 3f;
 
+	/// <summary>
+	/// **走 <see cref="PlayOnce"/> 这条路时，日志里那一圈记成谁画的**（P7 加）。
+	///
+	/// <para>默认值就是 P6d 的第一个调用方（「落日剑」）—— 那个类的行为因此**逐字不变**；
+	/// 别的调用方（P7 的 <c>ChargeBodyFx</c> 蓄力完成那一圈）在自己的场景里覆盖它，
+	/// 日志就不会把"蓄力完成"误报成"落日剑"。</para>
+	/// </summary>
+	[Export] public string PlayOnceSourceLabel { get; set; } = "落日剑";
+
 	[ExportGroup("时长 / 几何")]
 	/// <summary>整圈扩散完的总时长（秒）。</summary>
 	[Export] public float Duration { get; set; } = 0.38f;
@@ -141,13 +150,17 @@ public partial class LandingShockwave : Node3D
 	/// （两者都来自增幅行）。**画法与判据一个字都没变** —— 环 / 盘 / 扩散 / 淡出 / 回收全走
 	/// <see cref="SpawnAt"/> 这一份实现。</para>
 	///
+	/// <para><b>P7 起的第二个调用方</b>：<c>ChargeBodyFx</c>（蓄力完成那一圈）。它的位置 / 半径 /
+	/// 颜色 / 时长由那个组件自己的 <c>[Export]</c> 给，日志里记成什么名字由
+	/// <see cref="PlayOnceSourceLabel"/> 决定。</para>
+	///
 	/// <para>⚠️ 纯表现：不开任何判定、不进任何分组、不碰战斗状态。</para>
 	/// </summary>
 	public void PlayOnce(Vector3 worldPosition, float radius)
 	{
 		LastRadius = Mathf.Max(0.1f, radius);
-		LastRadiusSource = "调用方给定（落日剑落点的半径，来自增幅行）";
-		_sourceLabel = "落日剑";
+		_sourceLabel = string.IsNullOrEmpty(PlayOnceSourceLabel) ? "（外部调用）" : PlayOnceSourceLabel;
+		LastRadiusSource = $"调用方给定（{_sourceLabel}）";
 		SpawnAt(worldPosition);
 	}
 
