@@ -69,17 +69,21 @@ public partial class LandingShockwave : Node3D
 	[Export] public float DiscHeight { get; set; } = 0.05f;
 
 	[ExportGroup("配色")]
-	/// <summary>环的颜色。</summary>
-	[Export] public Color RingColor { get; set; } = new(0.72f, 0.94f, 1f, 0.95f);
+	/// <summary>环的颜色（饱和一点的青蓝 —— 白地板上淡色看不见）。</summary>
+	[Export] public Color RingColor { get; set; } = new(0.42f, 0.86f, 1f, 0.95f);
 
 	/// <summary>盘的颜色（alpha 建议比环低）。</summary>
-	[Export] public Color DiscColor { get; set; } = new(0.55f, 0.85f, 1f, 0.28f);
+	[Export] public Color DiscColor { get; set; } = new(0.35f, 0.8f, 1f, 0.2f);
 
 	/// <summary>自发光强度。</summary>
 	[Export] public float EmissionEnergy { get; set; } = 2.4f;
 
-	/// <summary>加法混合（地面亮环/能量感）。</summary>
-	[Export] public bool AdditiveBlend { get; set; } = true;
+	/// <summary>
+	/// 加法混合。⚠️ **默认关**：竞技场地面是白的，加法混合会把环和盘一起冲成一片白
+	/// （实测截图里只剩一个发白的圆，看不出是"环"）。普通半透明才有颜色。
+	/// 深色地面想要发光感再打开。
+	/// </summary>
+	[Export] public bool AdditiveBlend { get; set; }
 
 	[ExportGroup("运行期可读状态（探针 / 自测）")]
 	/// <summary>一共画了几圈（自测取证）。</summary>
@@ -273,8 +277,10 @@ public partial class LandingShockwave : Node3D
 		{
 			OuterRadius = outer,
 			InnerRadius = Mathf.Max(0.01f, outer * (1f - thickness)),
-			Rings = 4,
-			RingSegments = 64,
+			// ⚠️ Godot 的 TorusMesh：`Rings` = **主圈切几段**（就是"圆不圆"），
+			// `RingSegments` = 管子横截面几段。**两个写反了就是菱形**（实测踩过：Rings=4 画出来是个方块）。
+			Rings = 64,
+			RingSegments = 6,
 		};
 
 		return new MeshInstance3D

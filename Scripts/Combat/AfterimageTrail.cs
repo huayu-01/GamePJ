@@ -48,17 +48,21 @@ public partial class AfterimageTrail : Node3D
 	[Export] public string ModelNodeName { get; set; } = "Model";
 
 	[ExportGroup("残影（几何 / 颜色 / 时长）")]
-	/// <summary>两次留影的间隔（秒）。0.045 ≈ 0.35s 的无敌帧里留 7–8 个。</summary>
-	[Export] public float SpawnInterval { get; set; } = 0.045f;
+	/// <summary>
+	/// 两次留影的间隔（秒）。0.09 ≈ 0.35s 的无敌帧里留 4 个 —— 后撤总共只走 ~1.8m，
+	/// 留太多会糊成一团（实测 0.045s / 8 个时 8 层轮廓叠在一起，看起来只是一片光晕）。
+	/// </summary>
+	[Export] public float SpawnInterval { get; set; } = 0.09f;
 
 	/// <summary>每个残影活多久（秒）—— 淡出的时长就是它。</summary>
 	[Export] public float GhostLifetime { get; set; } = 0.34f;
 
 	/// <summary>残影刚出现时的不透明度。</summary>
-	[Export(PropertyHint.Range, "0,1,0.01")] public float GhostStartAlpha { get; set; } = 0.55f;
+	[Export(PropertyHint.Range, "0,1,0.01")] public float GhostStartAlpha { get; set; } = 0.62f;
 
-	/// <summary>残影颜色（不受光的纯色剪影，明暗只由这个颜色 + alpha 决定）。</summary>
-	[Export] public Color GhostColor { get; set; } = new(0.62f, 0.88f, 1f, 1f);
+	/// <summary>残影颜色（不受光的纯色剪影，明暗只由这个颜色 + alpha 决定）。
+	/// 取饱和一点的青蓝 —— 竞技场地面很白，淡色会看不见。</summary>
+	[Export] public Color GhostColor { get; set; } = new(0.36f, 0.78f, 1f, 1f);
 
 	/// <summary>同时最多留几个（保险丝；平时永远到不了）。</summary>
 	[Export(PropertyHint.Range, "1,64,1")] public int MaxGhosts { get; set; } = 12;

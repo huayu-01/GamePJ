@@ -48,6 +48,12 @@ public partial class ProjectileTrail : Node3D
 	/// <summary>宽度从尾到头怎么长：<c>1</c> = 线性；<c>&gt;1</c> = 大部分宽度集中在头部（更像刀光）。</summary>
 	[Export(PropertyHint.Range, "0.2,4,0.1")] public float WidthCurve { get; set; } = 1.5f;
 
+	/// <summary>
+	/// 拖尾**面向镜头**（<c>cross(段方向, 到镜头)</c>）。**建议保持开启** ——
+	/// 剑气永远朝准星飞（= 沿视线飞），竖直的带会侧对镜头、屏幕上只剩一根细线。详见 <see cref="WidthAxis"/>。
+	/// </summary>
+	[Export] public bool FaceCamera { get; set; } = true;
+
 	/// <summary>拖尾离剑气中心往前多伸一点（米，局部；0 = 从剑气中心开始）。</summary>
 	[Export] public float HeadExtend { get; set; } = 0.35f;
 
@@ -153,24 +159,23 @@ public partial class ProjectileTrail : Node3D
 
 		// 头部先往前伸一点（拖尾从刀尖长出来，而不是从剑气中心）。
 		Vector3 headWorld = _points[0] + (Forward() * HeadExtend);
-		var local = new List<Vector3>(_points.Count + 1) { ToLocal(headWorld) };
-		for (int i = 0; i < _points.Count; i++)
-		{
-			local.Add(ToLocal(_points[i]));
-		}
+		var world = new List<Vector3>(_points.Count + 1) { headWorld };
+		world.AddRange(_points);
 
 		var ages = new List<float>(_ages.Count + 1) { 0f };
 		ages.AddRange(_ages);
 		float newest = Mathf.Max(Lifetime, 0.0001f);
 
+		// 采样点的世界位置 + 宽度方向（世界空间）→ 两个偏移点再各自换回局部空间
+		// （这样父节点的缩放/旋转都会被正确算进去）。
+		Vector3 camera = ResolveCameraPosition();
 		_geometry.SurfaceBegin(Mesh.PrimitiveType.TriangleStrip, _material);
-		for (int i = 0; i < local.Count; i++)
+		for (int i = 0; i < world.Count; i++)
 		{
-			// "上"方向：本节点局部 Y 去掉沿段方向的分量 → 一条竖直的带（与刀身同向）。
 			Vector3 along = i == 0
-				? (local[Mathf.Min(1, local.Count - 1)] - local[0])
-				: local[i] - local[i - 1];
-			Vector3 side = Perpendicular(along);
+				? world[Mathf.Min(1, world.Count - 1)] - world[0]
+				: world[i] - world[i - 1];
+			Vector3 side = WidthAxis(along, world[i], camera);
 
 			// `tail` = 0 在头（最新采样点）、1 在尾（最老）。宽度与颜色都按它插值：
 			// 头 = WidthHead/HeadColor，尾 = WidthTail/TailColor。
@@ -180,9 +185,9 @@ public partial class ProjectileTrail : Node3D
 
 			// TriangleStrip：每个采样点贡献左右两个顶点 —— 顺序必须一致（同一侧先）。
 			_geometry.SurfaceSetColor(color);
-			_geometry.SurfaceAddVertex(local[i] - (side * width));
+			_geometry.SurfaceAddVertex(ToLocal(world[i] - (side * width)));
 			_geometry.SurfaceSetColor(color);
-			_geometry.SurfaceAddVertex(local[i] + (side * width));
+			_geometry.SurfaceAddVertex(ToLocal(world[i] + (side * width)));
 		}
 
 		_geometry.SurfaceEnd();
@@ -190,17 +195,41 @@ public partial class ProjectileTrail : Node3D
 		_mesh.Visible = true;
 	}
 
-	/// <summary>垂直方向：局部 Y 去掉沿段方向的分量（退化时退回局部 X）。</summary>
-	private Vector3 Perpendicular(Vector3 along)
+	/// <summary>
+	/// 宽度方向（世界空间）。
+	///
+	/// <para><b>默认 <see cref="FaceCamera"/> = true：面向镜头</b>（<c>cross(段方向, 到镜头)</c>）。
+	/// 这是拖尾的标准做法，也是**必须**的做法 —— 试过"竖直带"（宽度取世界 Y 去掉段方向分量），
+	/// 而剑气永远朝**准星**飞、也就是沿镜头视线飞，于是那条竖直带正好**侧对着镜头**，
+	/// 屏幕上只剩一根 1px 的细线（实测截图里几乎看不见）。面向镜头之后任何角度都是一条可见的带。</para>
+	/// </summary>
+	private Vector3 WidthAxis(Vector3 along, Vector3 point, Vector3 camera)
 	{
-		Vector3 up = Vector3.Up;
-		if (along.LengthSquared() > 0.0000001f)
+		Vector3 dir = along.LengthSquared() > 0.0000001f ? along.Normalized() : Vector3.Forward;
+		if (FaceCamera)
 		{
-			Vector3 dir = along.Normalized();
-			up -= dir * up.Dot(dir);
+			Vector3 toCamera = camera - point;
+			if (toCamera.LengthSquared() > 0.000001f)
+			{
+				Vector3 side = dir.Cross(toCamera.Normalized());
+				if (side.LengthSquared() > 0.000001f)
+				{
+					return side.Normalized();
+				}
+			}
 		}
 
+		// 回退（FaceCamera 关 / 镜头正好在段方向上）：世界 Y 去掉段方向分量 → 一条竖直带。
+		Vector3 up = Vector3.Up;
+		up -= dir * up.Dot(dir);
 		return up.LengthSquared() > 0.0001f ? up.Normalized() : Vector3.Right;
+	}
+
+	/// <summary>当前镜头位置（拿不到就退回本节点上方 —— 回退成竖直带，不影响"有没有拖尾"）。</summary>
+	private Vector3 ResolveCameraPosition()
+	{
+		Camera3D? camera = GetViewport()?.GetCamera3D();
+		return camera != null && IsInstanceValid(camera) ? camera.GlobalPosition : GlobalPosition + (Vector3.Up * 10f);
 	}
 
 	/// <summary>剑气当前的朝向（局部 -Z 指向飞行方向，与 <see cref="Projectile"/> 的 <c>LookAt</c> 一致）。</summary>
@@ -247,7 +276,7 @@ public partial class ProjectileTrail : Node3D
 	/// <summary>探针用：一行的实际状态（截图与自检共用一份判据）。</summary>
 	public string DebugState()
 		=> $"剑气拖尾：可见={TrailVisible} 采样点={PointCount} 头尾间距={SampleSpan:0.###}m"
-			+ $"（存活 {Lifetime:0.###}s 头半宽 {WidthHead:0.##} 尾半宽 {WidthTail:0.##} 曲线 {WidthCurve:0.#} 前伸 {HeadExtend:0.##}）"
+			+ $"（存活 {Lifetime:0.###}s 头半宽 {WidthHead:0.##} 尾半宽 {WidthTail:0.##} 曲线 {WidthCurve:0.#} 前伸 {HeadExtend:0.##} 面向镜头={FaceCamera}）"
 			+ $"｜只读源 投射物={(IsInstanceValid(_projectile) ? _projectile!.SourceSceneName : "（没有父投射物）")}"
 			+ $" 在飞={Launching}"
 			+ $"｜纯表现 网格子节点={(_mesh != null ? 1 : 0)} 碰撞体=0 分组=0";

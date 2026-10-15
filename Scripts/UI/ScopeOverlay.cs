@@ -51,11 +51,17 @@ public partial class ScopeOverlay : Control
 	/// <summary>镜筒半径 = 屏幕较短边 × 这个比例（0.34 ≈ 1080p 下 367px）。</summary>
 	[Export(PropertyHint.Range, "0.05,0.6,0.01")] public float ScopeRadiusRatio { get; set; } = 0.34f;
 
-	/// <summary>暗角的圈数（越大过渡越细腻、开销越大）。</summary>
-	[Export(PropertyHint.Range, "4,80,1")] public int VignetteSteps { get; set; } = 26;
+	/// <summary>暗角渐变的档数（每档一个色标；越大过渡越细腻，开销几乎不变）。</summary>
+	[Export(PropertyHint.Range, "2,64,1")] public int VignetteSteps { get; set; } = 24;
+
+	/// <summary>暗角贴图的分辨率（正方形边长，像素；只影响径向渐变的采样细腻度）。</summary>
+	[Export(PropertyHint.Range, "32,1024,32")] public int VignetteResolution { get; set; } = 256;
 
 	/// <summary>暗角最深处（屏幕四角）的不透明度。</summary>
-	[Export(PropertyHint.Range, "0,1,0.01")] public float VignetteMaxAlpha { get; set; } = 0.72f;
+	[Export(PropertyHint.Range, "0,1,0.01")] public float VignetteMaxAlpha { get; set; } = 0.8f;
+
+	/// <summary>暗角从镜筒往外的加深曲线：<c>1</c> = 线性；<c>&gt;1</c> = 贴着镜筒几乎不压暗、越靠边越浓。</summary>
+	[Export(PropertyHint.Range, "0.4,4,0.05")] public float VignetteFalloff { get; set; } = 1.3f;
 
 	/// <summary>镜筒环的线宽（像素）。</summary>
 	[Export] public float RingWidth { get; set; } = 2.5f;
@@ -92,6 +98,11 @@ public partial class ScopeOverlay : Control
 	private Unit? _unit;
 	private HawkEyeAbility? _scope;
 	private float _intensity;
+	private GradientTexture2D? _vignette;
+	private int _vignetteSteps = -1;
+	private float _vignetteRatio = -1f;
+	private float _vignetteFalloff = -1f;
+	private float _vignetteInner = -1f;
 
 	// 拍摄台 / 探针用的强制状态（只为截图与取证，不依赖真的按住右键）。
 	private bool _previewActive;
@@ -188,8 +199,13 @@ public partial class ScopeOverlay : Control
 	}
 
 	/// <summary>
-	/// 画三样：外圈暗角（一圈套一圈的环，越远越浓）+ 镜筒细亮环 + 环上朝内的刻度。
+	/// 画三样：外圈暗角（一张径向渐变贴图，越远越浓）+ 镜筒细亮环 + 环上朝内的刻度。
 	/// **镜筒半径以内不画任何东西**（见类注释）。
+	///
+	/// <para>暗角为什么用 <see cref="GradientTexture2D"/> 而不是"一圈套一圈的 <c>DrawArc</c>"：
+	/// 后者每一圈的抗锯齿边缘会叠在前一圈的实心上，屏幕上会出现一圈圈**可见的同心细线**
+	/// （实测截图里非常明显）。一张径向渐变贴图是一次绘制、零接缝，而且 `VignetteSteps`
+	/// 变成"渐变的档数"——照样是导出属性。</para>
 	/// </summary>
 	public override void _Draw()
 	{
@@ -203,25 +219,22 @@ public partial class ScopeOverlay : Control
 		float radius = Mathf.Min(Size.X, Size.Y) * 0.5f * Mathf.Clamp(ScopeRadiusRatio, 0.02f, 0.95f);
 		ShownRadius = radius;
 
-		// ① 暗角：从镜筒半径往外铺 VignetteSteps 圈。半径越大 alpha 越高 → 越靠边越黑。
-		float outer = center.Length();                       // 中心到屏幕角的距离
-		if (VignetteSteps > 0 && outer > radius)
+		// ① 暗角：一张铺满"中心 → 屏幕角"的正方形径向渐变（正方形的内切圆就是屏幕中心的圆，
+		//    所以镜筒半径在不同窗口比例下恒为圆）。贴图里 0 = 中心、1 = 正方形边缘（屏幕边中点）。
+		float outer = Mathf.Max(radius + 1f, center.Length());
+		if (EnsureVignette(radius, outer) is { } vignette && VignetteMaxAlpha > 0f)
 		{
-			float step = (outer - radius) / VignetteSteps;
-			Color vignette = VignetteColor;
-			for (int i = 0; i < VignetteSteps; i++)
-			{
-				float t = (i + 1f) / VignetteSteps;          // 0…1，1 = 最边角
-				Color band = vignette;
-				band.A = VignetteMaxAlpha * intensity * t * t;   // 二次曲线：靠近镜筒处几乎透明
-				// 半径取每一圈的中线，线宽略大于步长 → 相邻圈首尾相接不留缝。
-				DrawArc(center, radius + (step * (i + 0.5f)), 0f, Mathf.Tau, 64, band, step * 1.8f, true);
-			}
+			vignette.Gradient.SetColor(VignetteStepCount, new Color(
+				VignetteColor.R, VignetteColor.G, VignetteColor.B, VignetteMaxAlpha * intensity));
+			DrawTextureRect(
+				vignette,
+				new Rect2(center - new Vector2(outer, outer), new Vector2(outer * 2f, outer * 2f)),
+				false);
 		}
 
 		// ② 镜筒环：主线 + 往内偏移一道更细的描边（"细描边框"）。
 		Color ring = RingColor;
-		ring.A = Mathf.Clamp(intensity, 0f, 1f);
+		ring.A = intensity;
 		DrawArc(center, radius, 0f, Mathf.Tau, 128, ring, RingWidth, true);
 
 		Color inner = ring;
@@ -247,6 +260,58 @@ public partial class ScopeOverlay : Control
 		}
 	}
 
+	/// <summary>渐变里一共几个台阶（<see cref="VignetteStepCount"/> = 步数）。</summary>
+	private int VignetteStepCount => Mathf.Clamp(VignetteSteps, 2, 64);
+
+	/// <summary>
+	/// 备好那张径向渐变贴图：从"镜筒半径 <paramref name="radius"/>"到"正方形半边长
+	/// <paramref name="outer"/>"按 <c>t²</c> 把 alpha 拉到 <see cref="VignetteMaxAlpha"/>
+	/// （每帧只改最后一个色标）。镜筒半径比例 / 档数 / 窗口尺寸变了就重建。
+	/// </summary>
+	private GradientTexture2D EnsureVignette(float radius, float outer)
+	{
+		int steps = VignetteStepCount;
+		float ratio = Mathf.Clamp(ScopeRadiusRatio, 0.02f, 0.95f);
+		float inner = outer > 0.001f ? Mathf.Clamp(radius / outer, 0f, 0.98f) : 0.2f;
+		if (_vignette != null && _vignetteSteps == steps
+			&& Mathf.Abs(_vignetteRatio - ratio) < 0.0001f
+			&& Mathf.Abs(_vignetteFalloff - VignetteFalloff) < 0.0001f
+			&& Mathf.Abs(_vignetteInner - inner) < 0.001f)
+		{
+			return _vignette;
+		}
+
+		var gradient = new Gradient();
+		var offsets = new float[steps + 1];
+		var colors = new Color[steps + 1];
+		for (int i = 0; i <= steps; i++)
+		{
+			float t = i / (float)steps;                             // 0 = 镜筒边缘，1 = 正方形边缘（屏幕边中点）
+			offsets[i] = Mathf.Lerp(inner, 1f, t);
+			float ramp = i == 0 ? 0f : Mathf.Pow(t, Mathf.Max(0.4f, VignetteFalloff));
+			colors[i] = new Color(VignetteColor.R, VignetteColor.G, VignetteColor.B, VignetteMaxAlpha * ramp);
+		}
+
+		gradient.Offsets = offsets;
+		gradient.Colors = colors;
+
+		_vignette = new GradientTexture2D
+		{
+			Gradient = gradient,
+			Width = Mathf.Max(32, VignetteResolution),
+			Height = Mathf.Max(32, VignetteResolution),
+			Fill = GradientTexture2D.FillEnum.Radial,
+			FillFrom = new Vector2(0.5f, 0.5f),
+			FillTo = new Vector2(0.5f, 0f),
+		};
+
+		_vignetteSteps = steps;
+		_vignetteRatio = ratio;
+		_vignetteFalloff = VignetteFalloff;
+		_vignetteInner = inner;
+		return _vignette;
+	}
+
 	// ───────────────── 拍摄台 / 探针（只摆视觉，不进战斗逻辑） ─────────────────
 
 	/// <summary>
@@ -270,9 +335,9 @@ public partial class ScopeOverlay : Control
 	/// <summary>探针用：一行的实际状态（截图与自检共用一份判据）。</summary>
 	public string DebugState()
 		=> $"开镜特效：强度={ShownIntensity:0.###} 镜筒半径={ShownRadius:0.#}px"
-			+ $"（比例 {ScopeRadiusRatio:0.##} 环宽 {RingWidth:0.#} 刻度 {TickCount}×{TickLength:0.#}px 最暗 {VignetteMaxAlpha:0.##}）"
+			+ $"（比例 {ScopeRadiusRatio:0.##} 环宽 {RingWidth:0.#} 刻度 {TickCount}×{TickLength:0.#}px 最暗 {VignetteMaxAlpha:0.##}×{VignetteFalloff:0.##} 渐变 {VignetteStepCount} 档/{VignetteResolution}px）"
 			+ $"｜只读源 技能行={AbilityId} 缩放进度={SourceZoomProgress:0.###}"
 			+ $" 开镜中={_scope?.IsAiming ?? false} 视角已放大={_scope?.ZoomApplied ?? false}"
-			+ $"｜中心净空 {ShownRadius - TickLength:0.#}px（>0 = 准星完全不被遮挡）"
+			+ $"｜中心净空 {(ShownRadius > 0f ? ShownRadius - TickLength : 0f):0.#}px（>0 = 准星完全不被遮挡；未开镜时不算）"
 			+ $"｜页面鼠标穿透 = {(MouseFilter == MouseFilterEnum.Ignore)}（必须 True，见 architecture.md 第 7 条）";
 }
