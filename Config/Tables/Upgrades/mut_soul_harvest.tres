@@ -1,0 +1,51 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "Chance"
+Value = 0.3
+Note = "掉落概率（0~1）。⚠️ 文档只说「有概率」，这是预设值"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "Heal"
+Value = 8.0
+Note = "拾取时回复的生命。⚠️ 文档只说「恢复一定血量」，这是预设值（与「普渡」那条行同一个量级）"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "PickupRadius"
+Value = 1.2
+Note = "拾取半径（米）—— 玩家进到这个距离内就拾取。⚠️ 预设值"
+
+[sub_resource type="Resource" id="Resource_p3"]
+script = ExtResource("1_param")
+Key = "LifetimeSeconds"
+Value = 15.0
+Note = "灵魂存活多久（秒）后自己消散。⚠️ 文档没写，预设值（0 = 永不消散）"
+
+[sub_resource type="Resource" id="Resource_p4"]
+script = ExtResource("1_param")
+Key = "PickupDelaySeconds"
+Value = 0.0
+Note = "掉出来之后多久允许被拾取（秒）。0 = 立刻可拾取"
+
+[sub_resource type="Resource" id="Resource_p5"]
+script = ExtResource("1_param")
+Key = "Cooldown"
+Value = 0.0
+Note = "本规则自己的触发间隔（0 = 不额外拦 —— 击杀本身就是触发条件）"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+ApplyHandler = "SoulHarvestOnKill"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3"), SubResource("Resource_p4"), SubResource("Resource_p5")]
+Id = "mut_soul_harvest"
+DisplayName = "灵魂收割"
+DescriptionTemplate = "击杀敌人时有概率掉出一个灵魂，玩家接触即拾取并恢复生命"
+Note = "[P6d 新增行] 文档第 184-185 行（异化池，全角色通用）「灵魂收割:击杀时敌人有概率掉落一个「灵魂」;(灵魂:玩家接触就拾取,恢复一定血量)」。★ 消费者：`SoulHarvestRule`（`Scripts/Rewards/RewardCatalog.cs`）—— 订阅 Kill 事件（击杀者是自己，与「连锁闪电」同一条判据）→ 按概率掷点 → 在死者位置生成 `SoulPickup`（`Scripts/Combat/SoulPickup.cs`，挂到 CurrentScene，**不是**敌人的子节点：敌人马上被回收）。★ **拾取判定 = 每帧距离轮询**（`player_units` 组里有没有单位进到 PickupRadius 米内），**不是** P5b 当时猜的 Area3D 方案 —— 理由：Area3D 仍然要进物理世界（会被命中体/区域逻辑看到），而轮询一个半径一点都不碰物理世界，还省掉一个 .tscn 与一列预制体路径；「接触就拾取」的「接触」本身就是一个半径。★ 灵魂是**掉落物，绝不是单位**：子树 0 个 CollisionObject3D / 0 个 Unit / 0 个分组 —— 清场（遍历 enemy_units）、伤害结算、单位计数都碰不到它（`DebugState()` 打这三个量）。★ 玩法数值全在行里：概率 0.3 / 回血 8 / 拾取半径 1.2m / 存活 15s / 延迟 0 —— ⚠️ **文档只写了「有概率」与「恢复一定血量」，这四个数全是预设值**。"

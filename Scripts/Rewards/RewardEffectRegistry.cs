@@ -201,6 +201,20 @@ public static class RewardEffectRegistry
 				Damage = Param(row, "Damage", 40f),
 				HoverHeight = Param(row, "HoverHeight", 3.2f),
 			}),
+
+		// ⭐ P6d：**击杀 → 有概率掉一个"灵魂"**（「灵魂收割」）。灵魂自己每帧轮询拾取半径
+		// （不建 Area3D、不进物理世界），拾取即 `Unit.Heal`。数值（概率 / 回血 / 半径 / 存活）全来自行。
+		["SoulHarvestOnKill"] = row => context =>
+			context.Player.AddChild(new SoulHarvestRule
+			{
+				RewardId = row.Id,
+				Cooldown = Param(row, "Cooldown", 0f),
+				Chance = Param(row, "Chance", 0.3f),
+				Heal = Param(row, "Heal", 8f),
+				PickupRadius = Param(row, "PickupRadius", 1.2f),
+				LifetimeSeconds = Param(row, "LifetimeSeconds", 15f),
+				PickupDelaySeconds = Param(row, "PickupDelaySeconds", 0f),
+			}),
 	};
 
 	/// <summary>这个 handler id 注册过吗（读表校验用）。</summary>

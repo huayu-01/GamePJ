@@ -218,8 +218,12 @@
      格挡本身落在 `GuardOnSprintRule`（`Scripts/Rewards/RewardCatalog.cs`）+ **既有**的 `BlockComponent`：
      获得 = `Blocking = true`，破碎 = `Unit.Damaged` 事件的 `DamageResult.Blocked`。
      `Cooldown 5` 来自文档 `{5}`；挡后剩伤 `0`（完全格挡）/ 正面阈值 `1`（不看正面）是**预设值**。
-   - ⬜ **灵魂收割**（击杀掉落"灵魂"、玩家接触拾取回血）：要一个**掉落物拾取**系统
-     （新 `.tscn` + Area3D 触发 + 回血），预制体路径进表。
+   - ✅ **灵魂收割**（`mut_soul_harvest`，**P6d 已做**）—— `SoulHarvestRule` 订阅 `Kill` → 按概率
+     在死者位置掉一个 `SoulPickup`（`Scripts/Combat/SoulPickup.cs`）。**比 P5b 当时登记的方案更省**：
+     不建 `.tscn`、不建 `Area3D`，拾取是**每帧距离轮询**（`player_units` 组里有没有单位进到
+     `PickupRadius` 内）—— 一点物理世界都不进，所以"不进单位列表"这条纪律天然成立
+     （`Unit` 0 个 / 碰撞体 0 个 / 分组 0 个，`DebugState()` 打这三个量）。
+     文档只写了"有概率 / 恢复一定血量" → 概率 0.3 / 回血 8 / 拾取半径 1.2m / 存活 15s 都是**预设值**。
    - ✅ **落日剑**（`mut_sunset_sword`，**P6d 已做**）—— 订阅 `Hit` 事件的 `SunsetSwordRule` +
      挂在敌人身上的 `SunsetSwordMarker`（头顶悬挂 → 延迟 → 落下 → 打一圈 + 画一圈）。
      **"武技1"不写死技能 Id**：拿行里的 `TriggerInputAction`（按键动作名）反查技能行的 `InputAction` 列，

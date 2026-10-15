@@ -1008,3 +1008,105 @@ public partial class SunsetSwordRule : TriggerRule
 		=> $"落日剑规则：施加={ApplyCount}｜触发按键「{TriggerInputAction}」｜悬挂={HoverSeconds:0.##}s 落下={FallSeconds:0.##}s"
 			+ $" 半径={Radius:0.##}m 伤害={Damage:0.##} 高度={HoverHeight:0.##}m 间隔={Cooldown:0.##}s";
 }
+
+/// <summary>
+/// 异化「灵魂收割」（**P6d 新增**）—— 文档 `角色设计.txt` 第 184-185 行：
+/// 「灵魂收割:击杀时敌人有概率掉落一个"灵魂";（灵魂:玩家接触就拾取,恢复一定血量）」。
+///
+/// <list type="bullet">
+/// <item><b>触发条件</b>：<see cref="GameplayEventKind.Kill"/> 且击杀者是**自己**
+///   （与「连锁闪电」同一条判据）→ 按 <see cref="Chance"/> 掷一次概率。</item>
+/// <item><b>掉落</b>：在死者位置生成一个 <see cref="SoulPickup"/>（挂到 <c>CurrentScene</c>，
+///   **不是**敌人的子节点 —— 敌人马上要被回收；也**不进任何分组**）。</item>
+/// <item><b>拾取</b>：那颗灵魂自己每帧轮询"有没有 <c>player_units</c> 进到
+///   <see cref="PickupRadius"/> 米内"，进到就 <c>Unit.Heal(Heal)</c> 并消失。</item>
+/// </list>
+///
+/// <para>⚠️ 文档只写了"有概率"与"恢复一定血量"：<c>Chance</c> / <c>Heal</c> /
+/// <c>PickupRadius</c> / <c>LifetimeSeconds</c> / <c>PickupDelaySeconds</c> 都是**预设值**（行 `Note` 里写明）。
+/// 掷概率用 <c>GD.Randf()</c>；自测探针**直接调 <c>Execute</c>** 并把 <c>Chance</c> 临时设成 1 / 0
+/// 来分别验证"必掉"与"必不掉"两条路，量完全部还原。</para>
+/// </summary>
+public partial class SoulHarvestRule : TriggerRule
+{
+	/// <summary>掉落概率（0~1）。</summary>
+	public float Chance { get; set; } = 0.3f;
+
+	/// <summary>拾取时回复的生命。</summary>
+	public float Heal { get; set; } = 8f;
+
+	/// <summary>拾取半径（米）。</summary>
+	public float PickupRadius { get; set; } = 1.2f;
+
+	/// <summary>灵魂存活多久（秒；0 = 不消失）。</summary>
+	public float LifetimeSeconds { get; set; } = 15f;
+
+	/// <summary>掉出来之后多久允许被拾取（秒）。</summary>
+	public float PickupDelaySeconds { get; set; }
+
+	/// <summary>掉了几个（自测取证）。</summary>
+	public int DropCount { get; private set; }
+
+	/// <summary>掷了几次概率（自测取证）。</summary>
+	public int RollCount { get; private set; }
+
+	/// <summary>最近一次掷点结果（自测取证）。</summary>
+	public bool LastRollHit { get; private set; }
+
+	private Unit? _owner;
+
+	public override void _Ready()
+	{
+		base._Ready();
+		_owner = GetParent<Unit>();
+	}
+
+	public override bool Matches(GameplayEvent gameplayEvent)
+		=> gameplayEvent.Kind == GameplayEventKind.Kill
+			&& gameplayEvent.Source != null
+			&& gameplayEvent.Source == _owner;
+
+	public override void Execute(GameplayEvent gameplayEvent)
+	{
+		Unit? owner = _owner;
+		if (owner == null || !GodotObject.IsInstanceValid(owner))
+		{
+			return;
+		}
+
+		RollCount++;
+		LastRollHit = Chance >= 1f || (Chance > 0f && GD.Randf() < Chance);
+		if (!LastRollHit)
+		{
+			GameLog.Write("Reward", $"增幅·事件规则：{RewardId} 击杀掉了点（概率 {Chance:0.###}，第 {RollCount} 次）—— 这一次没有灵魂。");
+			return;
+		}
+
+		// 掉落点：死者位置（事件里带着）；读不到就退到"击杀者脚下"。
+		Vector3 where = gameplayEvent.Position != Vector3.Zero
+			? gameplayEvent.Position
+			: gameplayEvent.Target?.GlobalPosition ?? owner.GlobalPosition;
+
+		var soul = new SoulPickup
+		{
+			Name = SoulPickup.NodeName,
+			SourceAbilityId = RewardId,
+			HealAmount = Heal,
+			PickupRadius = PickupRadius,
+			LifetimeSeconds = LifetimeSeconds,
+			PickupDelaySeconds = PickupDelaySeconds,
+		};
+		(GetTree().CurrentScene ?? GetTree().Root).AddChild(soul);
+		soul.GlobalPosition = where;
+		DropCount++;
+
+		GameLog.Write(
+			"Reward",
+			$"增幅·事件规则：{RewardId} 击杀掉了灵魂（第 {DropCount} 个，概率 {Chance:0.###}，掉落点 {where}；拾取半径 {PickupRadius:0.##}m / 回复 {Heal:0.##}）");
+	}
+
+	/// <summary>探针用：一行的实际状态。</summary>
+	public string DebugState()
+		=> $"灵魂收割规则：掉落={DropCount} 掷点={RollCount} 最近命中={LastRollHit}"
+			+ $"｜数值 概率={Chance:0.###} 回血={Heal:0.##} 拾取半径={PickupRadius:0.##}m 存活={LifetimeSeconds:0.##}s 延迟={PickupDelaySeconds:0.##}s";
+}

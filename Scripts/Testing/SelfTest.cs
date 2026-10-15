@@ -2011,7 +2011,7 @@ public partial class SelfTest : Node
 		string poolIds = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController")?.PoolPreview ?? string.Empty;
 		string poolSize = poolIds.Length == 0 ? "空" : $"{poolIds.Split(',').Length} 条";
 		GameLog.Write("SelfTest",
-			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望 **P6b 后 59 = 9/23/27**；P6a 后是 57 = 9/23/25；P6a 之前是 74 = 19/27/28） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，P6a 清旧后的实测值）");
+			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望 **P6d 后 62 = 9/23/30**（= 设计文档要求的 30 条异化**全建**）；P6b 后是 59 = 9/23/27；P6a 后是 57 = 9/23/25；P6a 之前是 74 = 19/27/28） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，P6d 后的实测值）");
 
 		// 武器 → 升级池 → 选项（配置表阶段 4）：三级回退各层的条数 + 武器实际带上的池 Id。
 		// 这是设计文档 §4.5.5 要求的"顺藤摸瓜"只读校验。回退路径（武器行没填 Pool / 池表读不到）时
@@ -4427,7 +4427,122 @@ public partial class SelfTest : Node
 			}
 		}
 
-		return line + "\n" + swordLine;
+		// ===================== 灵魂收割 =====================
+		if (RewardCatalog.Find("mut_soul_harvest") is { } soulRow)
+		{
+			build.Add(soulRow, context);
+		}
+
+		SoulHarvestRule? harvest = NodeSearch.FindInSubtree<SoulHarvestRule>(player);
+		SceneTree? tree = player.GetTree();
+		Node? scene2 = tree?.CurrentScene;
+		int soulsBefore = scene2 != null ? CountNodesNamed(scene2, SoulPickup.NodeName) : 0;
+
+		var killEvent = new GameplayEvent
+		{
+			Kind = GameplayEventKind.Kill,
+			Source = player,
+			Target = null,
+			Position = player.GlobalPosition + new Vector3(0.8f, 0f, 0f),
+		};
+
+		// ① 概率为 0 → 必不掉（同一条 Execute 入口）。
+		bool killMatches = harvest != null && harvest.Matches(killEvent);
+		bool otherKillIgnored = harvest != null && !harvest.Matches(new GameplayEvent { Kind = GameplayEventKind.Kill, Source = target2 });
+		float rowChance = harvest?.Chance ?? 0f;
+		float rowCooldown = harvest?.Cooldown ?? 0f;
+		if (harvest != null)
+		{
+			harvest.Chance = 0f;
+		}
+
+		harvest?.Execute(killEvent);
+		int soulsAfterZero = scene2 != null ? CountNodesNamed(scene2, SoulPickup.NodeName) : 0;
+
+		// ② 概率为 1 → 必掉。
+		if (harvest != null)
+		{
+			harvest.Chance = 1f;
+		}
+
+		harvest?.Execute(killEvent);
+		int soulsAfterOne = scene2 != null ? CountNodesNamed(scene2, SoulPickup.NodeName) : 0;
+
+		SoulPickup? soul = null;
+		if (scene2 != null)
+		{
+			foreach (Node node in scene2.FindChildren(SoulPickup.NodeName, string.Empty, true, false))
+			{
+				soul = node as SoulPickup;
+				if (soul != null)
+				{
+					break;
+				}
+			}
+		}
+
+		bool soulParamsOk = soul is { HealAmount: 8f, PickupRadius: 1.2f, LifetimeSeconds: 15f, PickupDelaySeconds: 0f };
+		bool notInUnitLists = soul != null
+			&& !soul.IsInGroup("enemy_units") && !soul.IsInGroup("player_units") && !soul.IsInGroup("summon_units")
+			&& soul.CountUnits() == 0 && soul.CountCollisions() == 0 && soul.GetGroups().Count == 0;
+
+		// ③ 拾取：把灵魂挪到玩家脚下，并保证"有血可回"（满血就先按统一命中入口掉一点）。
+		if (soul != null)
+		{
+			soul.GlobalPosition = player.GlobalPosition;
+			float missingBefore = player.MaxHealth - player.Health;
+			if (missingBefore < 1f)
+			{
+				player.ApplyDirectDamage(player.Armor + 60f);
+			}
+
+			float healthBeforePickup = player.Health;
+			float expectedHeal = Mathf.Min(soul.HealAmount, player.MaxHealth - healthBeforePickup);
+			soul._Process(0.02);
+
+			bool healOk = soul.PickedUp
+				&& Mathf.Abs(soul.HealedAmount - expectedHeal) < 0.01f
+				&& Mathf.Abs(player.Health - (healthBeforePickup + expectedHeal)) < 0.01f;
+
+			bool soulOk = soulParamsOk && notInUnitLists && healOk
+				&& soulsAfterZero == soulsBefore
+				&& soulsAfterOne == soulsBefore + 1
+				&& Mathf.Abs(rowChance - 0.3f) < 0.0001f
+				&& Mathf.Abs(rowCooldown) < 0.0001f
+				&& harvest is { DropCount: 1, RollCount: 2, PickupRadius: 1.2f, Heal: 8f, LifetimeSeconds: 15f }
+				&& killMatches && otherKillIgnored;
+
+			string soulLine = $"{(soulOk ? "✅" : "🔴")} P6d·灵魂收割行为取证（真实玩家 + 真实行 + 真实 RewardContext，量完还原）："
+				+ $"→ {(harvest == null ? "（规则没建出来）" : harvest.GetType().Name)} 概率 {rowChance:0.###}（期望 0.3 = 预设）回血 {harvest?.Heal:0.##}（期望 8，预设）拾取半径 {harvest?.PickupRadius:0.##}m（期望 1.2，预设）存活 {harvest?.LifetimeSeconds:0.##}s（期望 15，预设）延迟 {harvest?.PickupDelaySeconds:0.##}（期望 0）间隔 {rowCooldown:0.##}（期望 0）"
+				+ $"｜击杀匹配={killMatches}（期望 True）别人的击杀不算={otherKillIgnored}（期望 True）"
+				+ $"｜概率 0 → 灵魂数 {soulsBefore} → {soulsAfterZero}（期望不变）；概率 1 → {soulsAfterOne}（期望 +1）"
+				+ $"｜掉出来的灵魂：回血 {soul.HealAmount:0.##}（期望 8）拾取半径 {soul.PickupRadius:0.##}m（期望 1.2）存活 {soul.LifetimeSeconds:0.##}s（期望 15）"
+				+ $"｜不进单位列表={notInUnitLists}（enemy/player/summon 三个组都不是、子树 Unit 0 个、碰撞体 0 个、分组 0 个）"
+				+ $"｜拾取：已拾取={soul.PickedUp} 拾取者={soul.PickedByName} 实际回血 {soul.HealedAmount:0.##}（期望 min(配置 {soul.HealAmount:0.##}, 缺口) = {expectedHeal:0.##}）生命 {healthBeforePickup:0.#} → {player.Health:0.#}/{player.MaxHealth:0.#}"
+				+ $"｜{soul.DebugState()}";
+
+			// 还原：掉的灵魂清掉、规则节点摘掉、概率改回行里的值。
+			if (scene2 != null)
+			{
+				foreach (Node node in scene2.FindChildren(SoulPickup.NodeName, string.Empty, true, false))
+				{
+					node.Free();
+				}
+			}
+
+			foreach (TriggerRule rule in CollectRules(player))
+			{
+				if (rule is SoulHarvestRule)
+				{
+					player.RemoveChild(rule);
+					rule.Free();
+				}
+			}
+
+			return line + "\n" + swordLine + "\n" + soulLine;
+		}
+
+		return line + "\n" + swordLine + "\n🔴 P6d·灵魂收割：灵魂没掉出来（检查 ApplyHandler 拼写与行是否在表里）";
 	}
 
 	/// <summary>按节点名数个数（探针用；只数，不改）。</summary>
