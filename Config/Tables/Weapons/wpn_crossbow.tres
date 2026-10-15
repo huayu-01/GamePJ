@@ -33,4 +33,4 @@ Id = "wpn_crossbow"
 Slot = 5
 DisplayName = "短弩"
 DescriptionTemplate = "发射弩箭：飞行一段距离后下坠（射速决定什么时候开始下坠），射速较高时造成击退。武技1 散射三发 / 武技2 蓄力散射（最多 9 支）。"
-Note = "[新增行·P3] 角色 A 武器 2。⚠️ 与能量掌同一条纪律：**不走 Weapon 组件的开火**（那套有弹匣/装填），发射由本行 Skills 里那两个武技行完成；角色行 chr_hunter 的 WeaponEnabled = false 已经关掉了组件开火。这一行的作用是身份 + 攻击标签 + 暴击基准 + 弹速 + **指向自己的武技行**（Skills 列 = 武器 → 武技的正向引用，见 WeaponConfig.Skills 的注释：武技属于武器，挂在角色行上会让换武器时上一把的武技留在按键上）。ScenePath 暂用 Pistol.tscn（手上模型，后续换 mesh 即可）。"
+Note = "[新增行·P3 · P6a 清理] 角色 A 武器 2。⚠️ 与能量掌同一条纪律：**不走 Weapon 组件的开火**（那套有弹匣/装填），发射由本行 Skills 里那两个武技行完成 —— 这件事现在由**本行自己的** `UsesWeaponComponent = false` 表达（P6a 起；原来靠角色行的 `WeaponEnabled`，那一列已删，用户说他没设计过"出征时按角色行把枪收起来"）。这一行的作用是身份 + 攻击标签 + 暴击基准 + 弹速 + **指向自己的武技行**（Skills 列 = 武器 → 武技的正向引用，见 WeaponConfig.Skills 的注释：武技属于武器，挂在角色行上会让换武器时上一把的武技留在按键上）。ScenePath 暂用 Pistol.tscn（手上模型，后续换 mesh 即可）。"

@@ -1,5 +1,12 @@
 # 能力卡（局外装备层）：怎么加一张卡、效果怎么挂、矩阵怎么扩
 
+> ⚠️ **2026-10-15 P6a**：两张 `GrantSkill` 卡 `card_summon` / `card_control` **已删除**
+> （它们指向的 `skl_summon` / `skl_control` 随旧角色一起清掉了 —— 用户 Q10-a 的裁定就是"删"）。
+> 所以**现在 6 张卡全是数值卡**，本文件里提到那两张卡的地方（含"能力卡与技能表唯一的接触点"
+> 那一段的实例）读作**历史**；`AbilityCardConfig.Skill` 那一列本身**还在**（以后要加授予技能型卡照用）。
+> 另外基地那页旧的「永久强化」（`BaseScreen`）也整份删除了 —— 局外成长台现在直接开**能力卡界面**。
+> 见 [character-redesign.md](character-redesign.md) §六。
+
 > **给"要加一张能力卡 / 改额度 / 改矩阵布局"的人看。** 读完这一篇你不需要看别的文档。
 > 需求来源：[requirements-ability-system.md](requirements-ability-system.md) **§一（能力系统）** 与 **§二（矩阵 UI 与交互）**。
 > 相关：[config.md](config.md)（配置表体系与纪律）、[ui.md](ui.md)（界面外观唯一入口，**§10 按键提示栏**）、

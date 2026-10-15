@@ -25,9 +25,10 @@ namespace ActRoguelike.Abilities;
 ///   颜色/线宽/抬升全来自表列。</item>
 /// </list>
 ///
-/// <para>与既有 <c>DashAbility</c>（角色 1 的战术滑铲）的差别只在**数据**：那一条是
+/// <para>与角色 A 的「后撤」（<c>BackdashAbility</c>，走外力 + 帧无敌）的差别只在**数据**：那一条是
 /// <c>Aim=Facing</c> + 无敌帧 + 不摘碰撞层；这一条是 <c>Aim=Crosshair</c> + 穿透 + 路径线。
 /// 所以它是**新类**而不是改既有类（既有类的语义一个字没动）。</para>
+/// <para>⚠️ P6a：原来这里拿来对照的 <c>DashAbility</c>（旧角色 1 的战术滑铲）已随旧角色删除。</para>
 /// </summary>
 public partial class BlinkDashAbility : Ability
 {

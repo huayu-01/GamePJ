@@ -448,6 +448,10 @@ TryPress(第一次) → TryActivate → OnActivate：播 ComboAnimations[0]
 日志核对：`（ConfigIndex.tres 已加载）`，索引从 `6/4/10/1/1/34/7/10/8/6/3/11/8`
 → **`9/5/10/1/1/44/7/10/8/6/3/11/8`**（差额只来自新增行）。
 
+> ⚠️ **2026-10-15 P6a 清旧之后**：索引是 **`6/2/10/1/1/39/7/13/8/6/6/11/6`**
+> （旧 3 角色 / 3 武器 / 5 条旧技能行 / 3 个旧池 / 2 张旧卡已删；效果 10 → 13 是 P5b 的三条状态行）。
+> 见 [character-redesign.md](character-redesign.md) §六。
+
 **动画对齐**（`AnimSpeedScale` 逐条算过：事件帧绝对时刻 = 目标长度 × 源时刻/源长）：
 
 | 技能 | `AnimSpeedScale` | 事件帧落在 |

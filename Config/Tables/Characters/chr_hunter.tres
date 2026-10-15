@@ -9,7 +9,6 @@
 script = ExtResource("1_row")
 DisabledAbilityIds = PackedStringArray()
 EnabledAbilityIds = PackedStringArray("skl_a1_skill_1", "skl_a1_skill_2", "skl_a1_passive")
-WeaponEnabled = false
 MaxHealth = 200.0
 StartingArmor = 20.0
 MoveSpeed = 6.5
@@ -26,4 +25,4 @@ Id = "chr_hunter"
 Slot = 4
 DisplayName = "猎手"
 DescriptionTemplate = "{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 移速 {MoveSpeed:0.#}"
-Note = "[P1 新增行 · P3 扩充] 角色 A［猎手］。★ 本行只放**与武器无关**的技能：技能1[后撤]（skl_a1_skill_1）/ 技能2[跃升]（skl_a1_skill_2）/ 被动[灵动]（skl_a1_passive）；三把武器的**武技**改由武器行自己的 Skills 列指向（wpn_energy_palm → skl_a1_w1_*、wpn_crossbow → skl_a2_w1_*、wpn_bow → skl_a3_w1_*）—— 理由见 WeaponConfig.Skills 的注释：一个角色的 3 把武器都用同样的两个按键（weapon_skill_1/2），武技行挂在角色行上会让「换武器」时上一把的武技留在能力节点上抢同一个按键（正是 docs/anim-pipeline.md §6.4.6 那类残留）。★ EnabledAbilityIds 按**技能行 Id** 匹配（P3 起首选键是 AbilityId，其次才是类名）。★ WeaponEnabled = false：三把武器的「武技」自己就是攻击方式，**不走 Weapon 组件的开火**（组件那套有弹匣/装填）。★ AnimLibraryDir 指向技能动画库目录（生成器的产物）。"
+Note = "[P1 新增行 · P3 扩充 · P6a 清理] 角色 A［猎手］。★★ **生命 200 / 护甲 20 / 移速 6.5 是 P3 代理自拟的预设值** —— 设计文档（3d肉鸽雨中哈迪斯/角色设计.txt）**没有写**角色 A 的这三项，**等用户确认**；在那之前不要当成经过设计的平衡值。★ 本行只放**与武器无关**的技能：技能1[后撤]（skl_a1_skill_1）/ 技能2[跃升]（skl_a1_skill_2）/ 被动[灵动]（skl_a1_passive）；三把武器的**武技**改由武器行自己的 Skills 列指向（wpn_energy_palm → skl_a1_w1_*、wpn_crossbow → skl_a2_w1_*、wpn_bow → skl_a3_w1_*）—— 理由见 WeaponConfig.Skills 的注释：一个角色的 3 把武器都用同样的两个按键（weapon_skill_1/2），武技行挂在角色行上会让「换武器」时上一把的武技留在能力节点上抢同一个按键（正是 docs/anim-pipeline.md §6.4.6 那类残留）。★ EnabledAbilityIds 按**技能行 Id** 匹配（P3 起首选键是 AbilityId，其次才是类名）。★ 这里原来有一列 `WeaponEnabled = false`（「角色行决定收不收枪」）—— **P6a 已删**：用户 2026-10-15 说他没设计过"出征时按角色行把枪收起来"，而且进关卡"相当于只是切场景"。现在"左键归谁"由**武器行**的 `WeaponConfig.UsesWeaponComponent` 决定（6 把新武器都是 false = 武技驱动），基地预览与关卡同源。★ AnimLibraryDir 指向技能动画库目录（生成器的产物）。"

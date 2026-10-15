@@ -148,3 +148,85 @@
 | **文档** | `docs/config.md` / `docs/combat.md` / `docs/rewards.md` 等提到弹匣装填的地方 |
 
 ⚠️ **注意**：本清单**只在 P6 执行**。P1（动画管线 + 最小闭环）**只加不删**，旧武器与旧卡暂时保留作参照。
+**✅ P6a 已执行**（2026-10-15）—— 见下面 §六；**弹匣/装填那一条横向清理还没做**（本批明令不许碰 `Weapon.cs`）。
+
+---
+
+## 六、P6a 清旧记录（2026-10-15 执行完毕）
+
+> "只加不删"是 **P1→P5 的阶段纪律**；**P6 起解禁**。本批把攒下的旧内容一次清完，并收尾三个遗留问题。
+> 提交：`feat(P6a): 清旧（角色/武器/技能/增幅/池/能力卡）+ 基地 UI 改造 + 三个遗留问题`
+
+### 6.1 删掉了什么（每个都先 grep 确认"没有别的引用"）
+
+| 类别 | 数量 | 具体 |
+|---|---|---|
+| 旧角色 | 3 | `chr_gunner` / `chr_heavy` / `chr_summoner` |
+| 旧武器 | 3 | `wpn_pistol` / `wpn_sniper` / `wpn_rifle` |
+| 旧技能行 | 5 | `skl_dash` / `skl_burst` / `skl_melee` / `skl_summon` / `skl_control` |
+| 旧增幅行 | 17 | 强化 10 + 进化 4（`evo_twin` / `evo_ap` / `evo_ricochet` / `evo_blast`）+ 异化 3（`mut_lifesteal` / `mut_summon` / `mut_supply`） |
+| 旧升级池 | 3 | `pool_pistol` / `pool_sniper` / `pool_rifle`（旧武器删掉后**无人引用**才删） |
+| 能力卡 | 2 | `card_summon` / `card_control`（Q10-a；它们是 `skl_summon` / `skl_control` 的唯一引用者） |
+| 能力类 | 2 | `DashAbility` / `BurstFireAbility`（`P0` 判定的"仅旧角色"两个） |
+| 场景节点 | 5 | `Player.tscn` 的 AbilityDash / AbilityBurst / AbilityMelee / AbilitySummon / AbilityControl |
+| 按键动作 | 4 | `project.godot` 的 `dash` / `burst` / `control` / `summon` |
+
+**没删的（容易误删）**：`Pistol.tscn`（6 把新武器的 `ScenePath` 全指着它）· 7 个共用 `Ability` 子类 ·
+敌人/首领/召唤物的数据行与技能行 · `Weapon.cs` · 角色 A/B 与所有新武器/新技能/新增幅/6 个新池。
+
+**`ConfigIndex.tres` 三处同改**（`[ext_resource]` + 数组项 + `load_steps`），每批改完都实跑验证
+`（ConfigIndex.tres 已加载）`。索引 **9/5/10/1/1/44/7/13/8/6/9/11/8 → 6/2/10/1/1/39/7/13/8/6/6/11/6**
+（差额只有：武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；其余**一条没动**）。
+增幅项 **74 → 57**（= 强化 9 / 进化 23 / 异化 25）。
+
+### 6.2 ⚠️ 角色 A 的生命 / 护甲 / 移速 **是预设值，不是设计值**
+
+设计文档（`3d肉鸽雨中哈迪斯/角色设计.txt`）**没有**写角色 A［猎手］的生命 / 护甲 / 移速，
+现在表里的 **200 / 20 / 6.5 是 P3 代理自拟的预设值**（角色 B 的 220 / 25 / 6.8 同理）。
+**等用户后续确认** —— 在那之前不要把它们当成"经过设计的平衡值"，
+也不要拿"换了角色所以读数变了"当成平衡结论。自测那一行已经把这个口径写进去了。
+
+### 6.3 连带改动（漏一处就会静默坏掉）
+
+- `ConfigIndexData` 的 `WeaponPresetKind` / `PlayerCharacterKind`：删掉旧成员，剩下 6 个武器 / 2 个角色
+  **显式写死数值**（= 表行的 `Slot - 1`）→ **删旧武器没有让其余武器的序号位移**，武器行与升级池行的
+  `Slot`（4…9）一个都不用改。
+- 选人/选武器界面改成**遍历表行**（不再遍历枚举、也不再写死三把旧枪）→ 以后加一把武器 = 加一行 `.tres`。
+- `RunController`：删掉 `BeginConfigure` / `ChooseCharacter` / `DefaultCharacterTitle`（手写角色中文标题
+  那张"写死角色名"的映射表）与"没选过就先弹基地面板"那条路；开局一律按 `RunSetup` 直接开。
+- `CharacterConfig.WeaponEnabled` → 删；"左键归谁"归到 **`WeaponConfig.UsesWeaponComponent`**（见 §6.4）。
+- `RewardConfig.RequiresSummoner` / `RewardDefinition.RequiresSummoner` / `RewardPool.SummonerAllowed` → 删
+  （唯一用户 `mut_summon` 已清；角色限定统一走 `RequiredCharacterIds`）。
+- `SelfTest` / `_FeelProbe` / `SettingsSections` / `UiIcons` 里引用旧角色的地方全部同步。
+
+### 6.4 用户 2026-10-15 的两条澄清（本批已落地）
+
+1. **「开始探索」按钮删掉** —— 用户原话：「那个本身按了没意义……后来要求的进关卡就是去交互一个对象来进关卡，
+   基地里是有做了一个的」。**交互对象已核实能进关卡**：`Base.tscn` 的 `TerminalGate`
+   （`BaseTerminal.Kind = Gate`，`TargetScene = res://Scenes/Main.tscn`）→ 按 **F** →
+   写 `RunSetup` → `LoadingScreen.BeginLoad` → `RunController` 直接开局。
+2. **「出征时按角色行把枪收起来」删掉** —— 用户原话：「我并没有这么设计过……**相当于只是切场景**」。
+   归属改成**武器行**（`UsesWeaponComponent`）：6 把新武器都是"武技驱动"（不走 `Weapon` 组件的开火），
+   基地预览与关卡用**同一个来源**，所以不再是"出征时另做一步"。
+   ⚠️ 顺带修掉一处不一致：原来基地按角色行把枪模型藏起来、关卡里又出现。
+
+### 6.5 「永久强化」旧页 → 能力卡
+
+基地里那页旧的局外强化（`BaseScreen`：碎片 + `Health/Damage/Speed/Crit/Reload` + `Key1~5`）
+**整份删除**，局外成长台现在直接开**能力卡界面**（`AbilityMatrixScreen`，K 键同一个界面）。
+`meta_quota`（额度扩增）与 `MetaProgress.Shards` 一行没动。
+
+### 6.6 三个遗留问题的结论
+
+| # | 问题 | 结论 |
+|---|---|---|
+| 1 | `MaxAimDistance` 表/类不一致（3 条 `已跳过` 警告） | **删参数项**（`MeleeComboAbility` 根本没有瞄准射线，补一列就是死配置） |
+| 2 | `ArmorBroken` / `ShieldBroken` / `Critical` 全项目无抛点 | **补上了**，都唯一：`Unit.ReceiveHit` 里护甲/护盾归零那两处 + 结算后的暴击那一处。顺手把「能量护盾」的"护甲破碎"那一路接上（`Trigger` 支持逗号分隔 → `Parried,ArmorBroken`） |
+| 3 | `VFXControllerBB` 加载失败 | **复现不出来**：`class_name` 存在、全局类缓存里有它、整轮自测 stdout/stderr 一行都没有。属"全局类缓存过期"，已自愈；删缓存可强制重建，**不需要改代码或场景** |
+
+### 6.7 顺手修掉一个被暴露出来的真 bug
+
+`践踏死亡` 原来是 `SetExtraAirJumps(TriggerTally * ExtraAirJumps, …)` —— **覆盖**而不是累加，
+会把角色 A 被动「灵动」已经授予的 1 次空中跳跃**吃掉**。旧 3 个角色都没有这个被动，所以一直没显形；
+自测基准换成猎手后立刻暴露（`1 → 1`）。改成按**当前值**累加（文档原话：「每次击杀都会获得额外跳跃的次数
+（额外跳跃次数最多 N 次）」），自测回到 `1 → 2`。

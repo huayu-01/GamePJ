@@ -80,7 +80,11 @@
 
 - `Ability`：`Cooldown / Windup / Recover` + 阶段机。挂在 Unit 下，**不读输入**；由 Behavior（敌人）或 PlayerAbilityInput（玩家）触发。
 - `Behavior` + `EnemyBrain`：Brain 每物理帧刷新目标，按 `Priority` 取第一个 `CanRun()` 的行为执行；能力执行期间不做新决策（保持站桩与朝向）。
-- 已有能力：`MeleeAttackAbility`、`ProjectileAttackAbility`、`AreaAttackAbility`（可自爆）、`DashAbility`（位移+无敌帧）、`BurstFireAbility`（火力倾泻）。
+- 已有能力：`MeleeAttackAbility`、`ProjectileAttackAbility`、`AreaAttackAbility`（可自爆）。
+  ⚠️ **2026-10-15 P6a**：`DashAbility`（位移+无敌帧）与 `BurstFireAbility`（火力倾泻）**已随旧角色删除**
+  —— 前者的替代品是角色 A 的「后撤」`BackdashAbility` / 角色 B 的「闪」`BlinkDashAbility`，
+  "火力倾泻"在新设计里没有对应物。其余共用子类（含 `MeleeComboAbility` / `EnergyWaveAbility` /
+  `ArrowVolleyAbility` / `GuardStanceAbility` / `FallAttackAbility` 等）**都在**。
 - 已有行为：`ChaseBehavior`、`KeepDistanceBehavior`、`RetreatBehavior`、`RepositionBehavior`、`MeleeAttackBehavior`、`RangedAttackBehavior`。
 - **能力与行为分离**：具备跳跃/冲刺能力不代表 AI 会使用，是否使用由 Behavior 与配置决定（执行文档 §4.4）。
 

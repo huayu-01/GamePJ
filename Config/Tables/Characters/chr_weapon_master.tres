@@ -10,7 +10,6 @@
 script = ExtResource("1_row")
 DisabledAbilityIds = PackedStringArray()
 EnabledAbilityIds = PackedStringArray("skl_b_skill_1", "skl_b_skill_2", "skl_b_fall", "skl_b1_w1_3")
-WeaponEnabled = false
 MaxHealth = 220.0
 StartingArmor = 25.0
 MoveSpeed = 6.8
@@ -27,4 +26,4 @@ Id = "chr_weapon_master"
 Slot = 5
 DisplayName = "武器大师"
 DescriptionTemplate = "{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 移速 {MoveSpeed:0.#}"
-Note = "[P4 新增行] 角色 B［武器大师］（设计文档第 98-163 行）。★ 本行只放**与武器无关**的技能：技能1[闪]（skl_b_skill_1）/ 技能2[架]（skl_b_skill_2）/ 被动[落]（skl_b_fall，三把武器共用的下落攻击）/ （默认武器的武技3 落剑式 —— 因为角色的 EnabledAbilityIds 名单只能列出「这一行指向的技能行」，而那三个被动分属三把武器、各自由武器行以覆盖行套用）。★ 三把近战武器的**武技1/武技2** 由武器行自己的 Skills 列指向（wpn_spirit_sword → skl_b1_*、wpn_scythe → skl_b2_*、wpn_spear → skl_b3_*）—— 理由见 WeaponConfig.Skills 的注释（同一个角色 3 把武器共用两个按键）。★ WeaponEnabled = false：近战武器不走 Weapon 组件的开火（那套有弹匣/装填）。★ 跳跃两列是固定值（用户需求 A2 的口径）。"
+Note = "[P4 新增行 · P6a 清理] 角色 B［武器大师］（设计文档第 98-163 行）。★★ **生命 220 / 护甲 25 / 移速 6.8 是 P4 代理自拟的预设值** —— 设计文档**没有写**角色 B 的这三项，**等用户确认**。★ 本行只放**与武器无关**的技能：技能1[闪]（skl_b_skill_1）/ 技能2[架]（skl_b_skill_2）/ 被动[落]（skl_b_fall，三把武器共用的下落攻击）/ （默认武器的武技3 落剑式 —— 因为角色的 EnabledAbilityIds 名单只能列出「这一行指向的技能行」，而那三个被动分属三把武器、各自由武器行以覆盖行套用）。★ 三把近战武器的**武技1/武技2** 由武器行自己的 Skills 列指向（wpn_spirit_sword → skl_b1_*、wpn_scythe → skl_b2_*、wpn_spear → skl_b3_*）—— 理由见 WeaponConfig.Skills 的注释（同一个角色 3 把武器共用两个按键）。★ 这里原来有一列 `WeaponEnabled = false`（「角色行决定收不收枪」）—— **P6a 已删**（用户说他没设计过"出征时按角色行把枪收起来"；现在归武器行的 `UsesWeaponComponent`）。★ 跳跃两列是固定值（用户需求 A2 的口径）。"

@@ -82,7 +82,7 @@
 | **`ChargeBaseSecondsOverride` / `ChargeStepSecondsOverride` / `ChargeStepSecondsMultiplier`**（P5 新增） | `Ability.ChargeBaseSecondsEffective` / `ChargeStepSecondsEffective` | 0 / 0 / 1 |
 | **`VolleyCountOverride` / `VolleyDamagePerLostArrow`**（P5 新增） | `ArrowVolleyAbility.FireVolley` | 0 / 0 |
 | **`AbilityOverride` 处理器**（P5b 新增） | HandlerParams 里除 `AbilityId` 外每一条 = `Ability` 上的一个 `[Export]` 属性名 → 值，用 Godot 的 `Set()` 套用（属性名写错按 `GetPropertyList()` 查出并告警，**不静默**）；行上若带 `Modifiers` 则先按 `StatSet` 的语义套上 | 服务 7 条进化 |
-| **`TablePulse` 处理器 + `TablePulseRule`**（P5b 新增） | 事件 → 效果：`Trigger`（`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`）+ 一次性 CDR（`AbilityId` + `CooldownFraction` / `CooldownSeconds` / `RefreshAbility`）/ `Heal` / `HoverSeconds` / `RequireHover` / `ExtraAirJumps` + `JumpCap` / `Radius` + `Damage` | **一个类服务 6 条行** |
+| **`TablePulse` 处理器 + `TablePulseRule`**（P5b 新增；P6a 支持多事件） | 事件 → 效果：`Trigger`（`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`，**可以逗号分隔多个，任一命中即出手**）+ 一次性 CDR（`AbilityId` + `CooldownFraction` / `CooldownSeconds` / `RefreshAbility`）/ `Heal` / `HoverSeconds` / `RequireHover` / `ExtraAirJumps` + `JumpCap` / `Radius` + `Damage` | **一个类服务 6 条行** |
 | **`BurnOnHit` 的 `Cooldown`**（P5b 新增） | 命中挂状态那条规则自己的触发间隔（「冰晶」的"每 10 秒最多一次"） | 0（= 不拦，改动前行为） |
 | **`RampMaxCount` / `RampWindowSeconds`**（P5b 新增） | `ArrowVolleyAbility.FireVolley`：连续射击第 N 发时发数至少 N（「变奏」） | 0 / 0（= 一行不进） |
 | **`GameplayEventKind.Parried`**（P5b 新增的事件种类） | 抛点唯一：`GuardStanceAbility.OnOwnerHit`（架住那一刻）。订阅方：招架反击 / 能量护盾 | 没有订阅者时 `Raise` 什么也不做 |
@@ -180,11 +180,14 @@
 
 ## 6. 本批（P5 + P5b）建了什么 / 没建什么
 
+> ⚠️ **2026-10-15 P6a 已清旧**：下面的"现有行"是 P5b 当时的读数；清旧后的实际行数见第三列括号里的注。
+> 全表 **74 → 57 行**（强化 9 / 进化 23 / 异化 25）。
+
 | 池 | 设计文档要求 | 现有行 | 状态 |
 |---|---|---|---|
-| **进化** | 23 条（A 2+3+3+3 / B 3+3+3+3） | **27 行** = 设计文档 23 条**全建** + 4 条旧进化行（双管齐下 / 穿甲弹 / 跳弹 / 爆裂弹头，P6 清旧前保留） | ✅ 条数齐 |
-| **异化** | 文档 30 条（通用 12 + A 9 + B 9） | **28 行** = 通用 8 + A 9 + B 9 + 旧行 2（吸血 / 亡者随从 / 战地补给里通用那几条） | 🟡 通用还差 5 条 |
-| **强化** | 文档 9 条（+ 旧 10 条） | 19 行 | ✅ |
+| **进化** | 23 条（A 2+3+3+3 / B 3+3+3+3） | **27 行** = 设计文档 23 条**全建** + 4 条旧进化行（双管齐下 / 穿甲弹 / 跳弹 / 爆裂弹头，P6 清旧前保留）→ **P6a 后 23 行** | ✅ 条数齐 |
+| **异化** | 文档 30 条（通用 12 + A 9 + B 9） | **28 行** = 通用 8 + A 9 + B 9 + 旧行 3（吸血 / 亡者随从 / 战地补给）→ **P6a 后 25 行 = 通用 7 + A 9 + B 9** | 🟡 通用还差 5 条 |
+| **强化** | 文档 9 条（+ 旧 10 条） | 19 行 → **P6a 后 9 行**（旧 10 条全删） | ✅ |
 
 逐条偏差（效果只接了一半、或整条没接的）见 [rewards.md](rewards.md) 的「P5b 落地记录」。
 
@@ -193,7 +196,8 @@
 ## 7. 边界（下一轮接着做）
 
 1. **通用异化还差 5 条**：杀戮践踏（要"跳跃事件"，现在没有）/ 护卫（奔跑态 + 格挡授予）/
-   巡飞弹（暴击事件**枚举有、全项目没有抛点**）/ 灵魂收割（要掉落物拾取系统）/ 落日剑（延迟落剑的新机制）。
+   巡飞弹（✅ 暴击事件**已经有抛点了**，见下面第 4 条 —— 只差"发射一枚追踪飞弹"这个效果）/
+   灵魂收割（要掉落物拾取系统）/ 落日剑（延迟落剑的新机制）。
 2. **3 条占位行没有任何效果**（行 `Note` 里都写了"⚠️ 占位行"）：
    `evo_golden_qi` 金光术（要 `MeleeComboAbility` 每段额外生成一道剑气）、
    `evo_affection` 喜爱（要飞行中的武器每 2 秒索敌转向）、
@@ -202,8 +206,15 @@
    龙之箭（蓄力 2 秒后箭变大 + 全穿透）、怜悯（"只释放最后一刀"）、气贯长虹（"不再能收回 / 落地立刻收回"）、
    神降术（"范围更大"——半径在命中体上，不在那个能力的 `[Export]` 列里）、浮光跃金（"闪现至目标高度"）、
    闪身步（没校验"这一杀是闪造成的"）、普渡（没校验"是最后一刀杀的"）。
-4. ⚠️ **`ArmorBroken` / `ShieldBroken` / `Critical` 三个枚举值全项目一个抛点都没有**（只有 `GameLog` 的
-   `switch` 认得它们）—— 凡是要订这三类事件的增幅（能量护盾的"护甲破碎"那一路、巡飞弹）**都得先补抛点**。
+4. ✅ **P6a 已修**：`ArmorBroken` / `ShieldBroken` / `Critical` 原来**一个抛点都没有**（只有 `GameLog` 的
+   `switch` 认得它们）。现在三者各有**唯一**抛点，都在 `Unit.ReceiveHit`：
+   - `ArmorBroken` ← 扣甲后 `Armor <= 0` 那一刻（`ArmorBroke?.Invoke()` 旁边）
+   - `ShieldBroken` ← 相邻分支（扣盾后 `Shield <= 0`）
+   - `Critical` ← 结算完这次命中、`HitInstance.Critical` 且真的打出了伤害
+   顺手把「能量护盾」的"护甲破碎"那一路接上了：`TablePulseRule.Trigger` 现在**支持逗号分隔**
+   （任一命中即出手），`mut_energy_shield` 填的是 `Parried,ArmorBroken`。
 5. ⚠️ **状态的"升级"语义缺失**：烈阳+ / 冰晶+ 与它们的前置同时持有时会**叠加**（文档语义是"变得更强"）；
    而且 `EffectConfig` 没有跳伤间隔（`TickSeconds`）那一列 → 烈阳+ 现在用 `DamagePerSecond 6 → 12` 表达。
 6. 表现层（准星蓄力指示器 / 剑气拖尾 / 刀光缩放）属 P6。
+7. ⚠️ **弹匣/装填那条横向清理还没做**（`card_magazine` / `card_reload` / `meta_reload` + `Weapon.cs` 的
+   装填逻辑 + HUD 的弹药显示）：P6a 明令不许碰 `Weapon.cs`，整条留给 P6b。
