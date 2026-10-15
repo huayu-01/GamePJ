@@ -195,6 +195,12 @@ public partial class ChargeBodyFx : Node3D
 	private float _flashShown;
 	private Color _flashColor = Colors.White;
 
+	// 拍摄台 / 探针用的强制状态（只为截图与取证，不依赖真的按住右键）。
+	private bool _previewActive;
+	private float _previewRim;
+	private float _previewFlash;
+	private Color _previewFlashColor = Colors.White;
+
 	/// <summary>代码里的**内联兜底着色器**：`RimShaderPath` 读不到时用它（效果相同，只是不便于美术替换）。</summary>
 	private const string FallbackShaderCode = @"
 shader_type spatial;
@@ -234,6 +240,14 @@ void fragment() {
 	public override void _Process(double delta)
 	{
 		float dt = (float)delta;
+		EnsureBindings();
+
+		// 拍摄台：钉住不动（只摆视觉，判据与画法一个字都不变）。
+		if (_previewActive)
+		{
+			ApplyPreview();
+			return;
+		}
 
 		if (_unit == null || !IsInstanceValid(_unit))
 		{
@@ -242,10 +256,9 @@ void fragment() {
 			_wasComplete.Clear();
 		}
 
-		EnsureBindings();
 		EnsureAbilities();
 
-		bool charging = ScanCharging(dt);
+		bool charging = ScanCharging();
 		Charging = charging;
 
 		// ── 描边（第 ④ 条）：蓄力期间亮、结束就淡出；**它只是"叠加"**，不改任何原有材质。
@@ -269,7 +282,7 @@ void fragment() {
 	/// 每帧扫一遍单位的全部能力，返回"有没有人在蓄力"，并在
 	/// <see cref="Ability.ChargeBaseComplete"/> 的**上升沿**上发一次反馈（见类注释）。
 	/// </summary>
-	private bool ScanCharging(float dt)
+	private bool ScanCharging()
 	{
 		bool charging = false;
 		for (int i = 0; i < _abilities.Count; i++)
@@ -496,14 +509,31 @@ void fragment() {
 
 	// ───────────────── 拍摄台 / 探针（只摆视觉，不进战斗逻辑） ─────────────────
 
-	/// <summary>拍摄台用：强制把描边 / 闪光摆成给定强度（不依赖真的按住右键）。传 0/0 = 撤掉。</summary>
+	/// <summary>拍摄台用：**把描边 / 闪光钉住**成给定强度（不依赖真的按住右键，也不会被 `_Process` 一帧冲掉）。
+	/// <paramref name="perfect"/> 只影响用哪一档的闪光颜色。撤掉用 <see cref="DebugClearChargeFxPreview"/>。</summary>
 	public void DebugPreviewChargeFx(float rim, float flash, bool perfect = false)
 	{
-		_rimShown = Mathf.Clamp(rim, 0f, 4f);
-		_flashShown = Mathf.Clamp(flash, 0f, 2f);
-		_flashColor = perfect ? PerfectFlashColor : FlashColor;
-		RimShown = _rimShown;
-		FlashShown = _flashShown;
+		_previewActive = true;
+		_previewRim = Mathf.Clamp(rim, 0f, 4f);
+		_previewFlash = Mathf.Clamp(flash, 0f, 2f);
+		_previewFlashColor = perfect ? PerfectFlashColor : FlashColor;
+		ApplyPreview();
+	}
+
+	/// <summary>拍摄台用：撤掉强制状态，回到"跟着真实蓄力状态走"。</summary>
+	public void DebugClearChargeFxPreview()
+	{
+		_previewActive = false;
+		_previewRim = 0f;
+		_previewFlash = 0f;
+		ApplyPreview();
+	}
+
+	/// <summary>把强制状态写进材质（**判据与画法一个字都不变，只是"谁来触发"**）。</summary>
+	private void ApplyPreview()
+	{
+		RimShown = _previewRim;
+		FlashShown = _previewFlash;
 		ApplyUniforms();
 	}
 

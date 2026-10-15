@@ -76,6 +76,12 @@
      `evaluate_runtime_expression`（**单表达式**）。
      ⚠️ **C# 方法带可选参数时，`call_runtime_node_method` 的 0 参数调用会报
      `Method not found`** —— 用 `evaluate_runtime_expression` 写 `node.TryActivate(null)` 绕过。
+     ⚠️ **P7 补的同一条坑的另一半**：`evaluate_runtime_expression` 里调**带默认值**的 C# 方法，
+     **必须把参数填满**（默认值在 MCP 这条路上不生效）——
+     实测 `node.DebugPreviewChargeFx(3.0, 1.0)` 报 `Expression execution failed`，
+     写成 `node.DebugPreviewChargeFx(3.0, 1.0, false)` 就成功（那个方法签名是
+     `(float rim, float flash, bool perfect = false)`）。**结论：探针方法别依赖默认值**，
+     要不就把参数写全，要不就别给那个参数默认值。
 8. **实拍**：`runtime screenshot --format png --save-path 'user://x.png'`（干净的游戏视口截图，
    1920×1080），拷进 `docs/screenshots/`。桌面截图（`mcp__windows__Screenshot`）在游戏窗口
    不可见时拍不到东西 —— P6b 当时拍得到是因为窗口在前台。
@@ -248,7 +254,7 @@ Afterimage_0.is_in_group("enemy_units")             = false
 | `screenshots/p7_charge_tinted.png` / `_zoom` | 能量掌武技2 蓄力到 0.5s：方形圈**闭合**（缺口 0px）+ **金色变色 + 光晕 + 准星本体也染色** |
 | `screenshots/p7_charge_closed_reverted.png` / `_zoom` | **0.5s + 0.3s 之后**（还按着右键）：颜色回到蓄力色（青）、光晕收起，**形状依旧是闭合的**，缺口还是 0px |
 | `screenshots/p7_charge_burst.png` | 「基础蓄力完成」那一瞬间：角色被**金色闪光**罩住（满身加亮）+ 一圈**金色**扩大圈（完美档 ×1.8 半径）+ 音效 `sfx_charge_complete` |
-| `screenshots/p7_charge_rim_off.png` / `_zoom` | 对照组：**松手之后**同一个角色 —— 边缘光消失（与 `_rim_on_zoom` 逐像素不同） |
+| `screenshots/p7_charge_rim_off.png` / `_zoom` | 对照组：**松手之后**同一个角色 —— 边缘光消失；拿它与上一条的 `_zoom`（`p7_charge_rim_on_zoom.png` = 蓄力中那个角色的裁切）并排看，就是"描边随蓄力开关"的 A/B |
 | `screenshots/p7_charge_bow_nocircle.png` / `_zoom` | **反例**：弓 武技2「刹那之眼」蓄力中（`skl_a3_w1_2 蓄力中=true 基础蓄满=true`），**屏幕中心只有一个小点，没有方形圈** —— ① 的判据 |
 
 **③ 的时间线取证**（同一次按住右键，`Ability.ChargeTime` 当锚点；MCP 一次往返 ~0.1–0.2s，
@@ -278,7 +284,7 @@ ChargeTime=1.19 … 2.09 同上
 [Combat] 蓄力身体表现：模型「Model」上挂了 2 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader）
 ```
 
-**⑤ 安全性读数**（`ChargeBodyFx.DebugState()` 末尾的固定三项）：
+**安全性读数**（`ChargeBodyFx.DebugState()` 末尾的固定三项）：
 `纯表现 不改 MaterialOverride / 无碰撞体 / 不进任何分组`；那一圈由 `LandingShockwave` 生成在
 `CurrentScene` 下的临时节点（**不是**单位子树），`LandingShockwave.DebugState()` 自带
 `纯表现 碰撞体=0 分组=0` 的那一行。
