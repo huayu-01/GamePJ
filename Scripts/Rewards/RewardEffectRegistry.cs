@@ -78,6 +78,10 @@ public static class RewardEffectRegistry
 		// 异化：击杀补满弹匣（无参数）。
 		["AmmoOnKill"] = row => context =>
 			context.Player.AddChild(new AmmoOnKillRule { RewardId = row.Id }),
+
+		// 强化「护甲」：护甲没有上限（用户 C1），所以**加甲**走 `Unit.GrantArmor` 这一条（不是 StatSheet 抬高上限）。
+		// 数值来自表（`Armor`），组件零个 —— 这是一条**纯表驱动**的处理器。
+		["GrantArmor"] = row => context => context.Player.GrantArmor(Param(row, "Armor", 0f)),
 	};
 
 	/// <summary>这个 handler id 注册过吗（读表校验用）。</summary>
@@ -107,6 +111,8 @@ public static class RewardEffectRegistry
 			Kind = row.RewardKind,
 			ApplicablePoolIds = PoolIdsOf(row),
 			RequiredWeaponTags = row.RequiredWeaponTags,
+			RequiredCharacterIds = row.RequiredCharacterIds,
+			Requires = row.Requires,
 			ConflictsWith = row.ConflictsWith,
 			Excludes = row.Excludes,
 			Weight = row.Weight,

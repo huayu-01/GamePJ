@@ -319,7 +319,7 @@ script = ExtResource("34_path")
 script = ExtResource("30_blink_dash")
 Enabled = false
 
-[node name="Attack" parent="AbilitySkill1" instance=ExtResource("36_melee_strike")]
+[node name="Attack" parent="AbilityBSkill1" instance=ExtResource("36_melee_strike")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 Damage = 14.0
 Knockback = 2.0
@@ -330,7 +330,7 @@ AttackTags = PackedStringArray("Melee", "Dash")
 [node name="Shape" parent="AbilityBSkill1/Attack" index="0"]
 shape = SubResource("SphereShape3D_landing")
 
-[node name="Path" type="Node3D" parent="AbilitySkill1"]
+[node name="Path" type="Node3D" parent="AbilityBSkill1"]
 script = ExtResource("34_path")
 
 [node name="AbilityBSkill2" type="Node3D" parent="."]

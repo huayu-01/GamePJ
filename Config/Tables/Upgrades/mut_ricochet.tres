@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "RicochetAdd"
+Operation = 0
+Value = 1
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Excludes = PackedStringArray("mut_pierce")
+Id = "mut_ricochet"
+DisplayName = "弹射"
+DescriptionTemplate = "子弹会额外弹射 1 次"
+Note = "[P5 新增行] 文档第 194 行（异化池 <A限定>）「弹射:子弹会额外弹射N次,互斥:穿透」—— 参数 n → 预设 1。★ 三层判定示例：限定 = RequiredCharacterIds(chr_hunter) 且不填 Pool（<A限定> = 限定角色、不限其 3 把武器）；互斥 = Excludes(mut_pierce，双向)。消费者：EnergyWaveAbility / ArrowVolleyAbility 的 Ricochet。"

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "CooldownMultiplier"
+Operation = 1
+Value = 0.9
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Id = "mut_haste"
+DisplayName = "速攻"
+DescriptionTemplate = "近战武技冷却 -10%"
+Note = "[P5 新增行] 文档第 219 行「速攻:你的近战攻击攻速更快(缩短cd和加快动画速度)」。★ 只落地\"缩短 cd\"（CooldownMultiplier，消费者 Ability.UnitCooldownMultiplier）；「加快动画速度」**没有实现**（M38：全项目没有\"动画速度\"通路，加快动画速度等于改 AnimationPlayer.SpeedScale，属 P6）。"

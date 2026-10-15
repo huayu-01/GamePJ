@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "PierceAdd"
+Operation = 0
+Value = 1
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Excludes = PackedStringArray("mut_ricochet")
+Id = "mut_pierce"
+DisplayName = "穿透"
+DescriptionTemplate = "子弹可以穿透 1 个目标"
+Note = "[P5 新增行] 文档第 198 行「穿透:子弹可以穿透n个目标,互斥:弹射」—— n → 预设 1。互斥是**双向**的：先拿了穿透，弹射也不会出现（RewardPool.IsExcluded 两个方向都查）。"

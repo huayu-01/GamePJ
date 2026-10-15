@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="UpgradePoolConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/UpgradePoolConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "pool_spear"
+Slot = 9
+DisplayName = "长枪升级池"
+Note = "[P5 新增行] 角色 B 武器 3 wpn_spear 的升级池（<B3限定> 的落点）。"

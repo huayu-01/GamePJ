@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="WeaponConfig" format=3]
+[gd_resource type="Resource" script_class="WeaponConfig" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b3_w1_1.tres" id="2_skl"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b3_w1_2.tres" id="3_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_spear.tres" id="4_pool"]
 
 [resource]
 script = ExtResource("1_row")
+Pool = ExtResource("4_pool")
 ScenePath = "res://Scenes/Weapons/Pistol.tscn"
 AttackTags = PackedStringArray("Melee", "Spear", "Physical")
 Damage = 0.0

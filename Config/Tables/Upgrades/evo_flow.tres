@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_crossbow.tres" id="1_pool"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "ChargeBaseSecondsOverride"
+Operation = 2
+Value = 0.1
+
+[sub_resource type="Resource" id="Resource_m1"]
+script = ExtResource("1_stat")
+Stat = "ChargeStepSecondsOverride"
+Operation = 2
+Value = 0.1
+
+[sub_resource type="Resource" id="Resource_m2"]
+script = ExtResource("1_stat")
+Stat = "VolleyCountOverride"
+Operation = 2
+Value = 1
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1"), SubResource("Resource_m2")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Pool = ExtResource("1_pool")
+Id = "evo_flow"
+DisplayName = "心流"
+DescriptionTemplate = "武技2所有蓄力时间变为 0.1s，且蓄力完成立刻射出 1 箭"
+Note = "[P5 新增行] 文档第 80 行（进化池 <A2限定>）「心流:武技2所有蓄力时间变为{0.1},且蓄力完成变成立刻射出1箭」。基础与后置蓄力都覆盖成 0.1s（ChargeSecondsOverride 两个键），发数覆盖成 1（\"立刻射出1箭\"）。消费者：Ability.ChargeBaseSecondsEffective / ChargeStepSecondsEffective + ArrowVolleyAbility.FireVolley。"

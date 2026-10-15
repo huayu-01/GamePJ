@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="UpgradePoolConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/UpgradePoolConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "pool_crossbow"
+Slot = 5
+DisplayName = "短弩升级池"
+Note = "[P5 新增行] 角色 A 武器 2 wpn_crossbow 的升级池（<A2限定> 的落点）。"

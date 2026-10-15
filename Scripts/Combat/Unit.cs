@@ -221,6 +221,22 @@ public partial class Unit : CharacterBody3D
 		Stats.SetBase("MaxShieldAdd", 0f);
 		Stats.SetBase("DamageReductionAdd", 0f);
 		Stats.SetBase("KnockbackMultiplier", 1f);
+		// 跳跃高度倍率（强化「攀高」）：1 = 不变。它是乘法基数，必须有基础值。
+		// 消费者是 `CharacterMovement.EffectiveJumpVelocity`（只作用在玩家/单位的 `TryJump` 上，
+		// 不改敌人扑击那些各自场景上的固定值）。
+		Stats.SetBase("JumpVelocityMultiplier", 1f);
+		// 近战攻击范围倍率（异化「大刀阔斧」）——消费者是 `MeleeComboAbility.MeleeRangeMultiplier`。
+		Stats.SetBase("AttackRangeMultiplier", 1f);
+		// 近战突进距离（异化「剑突」）——消费者是 `MeleeComboAbility.BeginLunge`；0 = 不突进（默认）。
+		Stats.SetBase("MeleeLungeAdd", 0f);
+		// 蓄力时间的单位级覆盖（`<A2限定>`「心流」/「花心」）——0 = 不覆盖（默认），
+		// 消费者是 `Ability.ChargeBaseSecondsEffective` / `ChargeStepSecondsEffective`。
+		Stats.SetBase("ChargeBaseSecondsOverride", 0f);
+		Stats.SetBase("ChargeStepSecondsOverride", 0f);
+		Stats.SetBase("ChargeStepSecondsMultiplier", 1f);
+		// 齐射发数覆盖（`<A2限定>`「专一」）——0 = 不覆盖（默认）；消费者是 `ArrowVolleyAbility.FireVolley`。
+		Stats.SetBase("VolleyCountOverride", 0f);
+		Stats.SetBase("VolleyDamagePerLostArrow", 0f);
 		// 冷却缩减（CDR）：**单位级常驻**那一路（洞悉 / 速攻这类增幅给单位挂这个修正器）。
 		// 它是乘法基数，所以必须有基础值 1 —— 少了会读到 0，变成"零冷却"（见上面那条注意）。
 		// 它**不改变任何既有键的语义**，也不参与 RefreshStats 的派生计算（能力在读取时才乘它）。

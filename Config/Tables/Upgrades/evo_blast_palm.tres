@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_energy_palm.tres" id="1_pool"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "ExplosionRadiusAdd"
+Operation = 2
+Value = 3.5
+
+[sub_resource type="Resource" id="Resource_m1"]
+script = ExtResource("1_stat")
+Stat = "ExplosionDamageScale"
+Operation = 2
+Value = 0.6
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Pool = ExtResource("1_pool")
+Id = "evo_blast_palm"
+DisplayName = "爆裂火球"
+DescriptionTemplate = "你发射的能量波现在会在命中时产生范围伤害"
+Note = "[P5 新增行] 文档第 59 行（进化池 <A1限定>）「爆裂火球:你发射的能量波现在会在命中时产生范围伤害,对一定区域的敌人造成伤害」。范围/倍率文档没给数（n）→ 预设沿用既有进化「爆裂弹头」的 3.5m / 60%。★ 这是 <A1限定> 的写法示范：RequiredCharacterIds = chr_hunter（角色 A）+ Pool = pool_energy_palm（角色 A 的武器 1）——两者都满足才进池。消费者：EnergyWaveAbility.FireShot（与 Weapon.cs 同一套 ExplosionRadiusAdd / ExplosionDamageScale 键）。"

@@ -211,18 +211,34 @@ public partial class CharacterMovement : Node
 		_hasFacing = direction.LengthSquared() > 0.0001f;
 	}
 
+	/// <summary>
+	/// **实际起跳速度** = 表里的固定值 × 单位级 <c>JumpVelocityMultiplier</c>（强化「攀高」给单位挂这个修正器）。
+	///
+	/// <para>⚠️ 键没有基础值时按 **1** 算（`Unit.SeedStats` 里已经给了基础值 1；这里再兜一层，
+	/// 免得少一个基础值就变成"跳不起来"）—— 这是 `architecture.md` 第 8 条那条纪律。
+	/// 没人配置时逐位等于 <see cref="JumpVelocity"/>，所以 P6 之前的跳跃行为一位没变。</para>
+	/// </summary>
+	public float EffectiveJumpVelocity
+	{
+		get
+		{
+			float multiplier = _unit?.Stats.Get("JumpVelocityMultiplier") ?? 1f;
+			return JumpVelocity * (multiplier > 0f ? multiplier : 1f);
+		}
+	}
+
 	public bool TryJump()
 	{
 		if (_body.IsOnFloor())
 		{
-			_body.Velocity = _body.Velocity with { Y = JumpVelocity };
+			_body.Velocity = _body.Velocity with { Y = EffectiveJumpVelocity };
 			return true;
 		}
 
 		if (_airJumpsLeft > 0)
 		{
 			_airJumpsLeft--;
-			_body.Velocity = _body.Velocity with { Y = JumpVelocity };
+			_body.Velocity = _body.Velocity with { Y = EffectiveJumpVelocity };
 			return true;
 		}
 

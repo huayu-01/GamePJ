@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "ProjectileCountAdd"
+Operation = 0
+Value = 1
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Requires = PackedStringArray("mut_growth_plus")
+Id = "mut_growth_plus2"
+DisplayName = "增生++"
+DescriptionTemplate = "额外子弹再 +1 发"
+Note = "[P5 新增行] 文档第 204 行「增生++:再多发射n个子弹,前置:增生+」—— n → 预设 1。"

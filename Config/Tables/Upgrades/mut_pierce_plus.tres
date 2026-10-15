@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "PierceAdd"
+Operation = 0
+Value = 2
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Requires = PackedStringArray("mut_pierce")
+Id = "mut_pierce_plus"
+DisplayName = "穿透+"
+DescriptionTemplate = "穿透数再 +2"
+Note = "[P5 新增行] 文档第 199 行「穿透+:n+2,每穿透一个目标当前子弹额外增加{n}%伤害,前置:穿透」。★ 后半句（每穿透 +n% 伤害）**没有实现**：Projectile 里没有\"按已穿透数加伤\"的通路（调研报告 M23），本行只落地前半句；数值列里的 n 已按\"能跑起来的最小预设\"填。"

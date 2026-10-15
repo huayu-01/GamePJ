@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "DamageMultiplier"
+Operation = 1
+Value = 1.15
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 3
+Modifiers = [SubResource("Resource_m0")]
+Id = "upg_power"
+DisplayName = "力量"
+DescriptionTemplate = "攻击力 +15%"
+Note = "[P5 新增行] 文档第 229 行「力量:加攻击力」，参数 n → 预设 +15%/层。数值全在表里（StatSheet 的 DamageMultiplier），消费者：Weapon 开火 / EnergyWaveAbility / ArrowVolleyAbility / MeleeComboAbility.Strike。"

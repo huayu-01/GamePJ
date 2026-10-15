@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "AttackRangeMultiplier"
+Operation = 1
+Value = 1.3
+
+[sub_resource type="Resource" id="Resource_m1"]
+script = ExtResource("1_stat")
+Stat = "DamageMultiplier"
+Operation = 1
+Value = 1.2
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Id = "mut_cleave"
+DisplayName = "大刀阔斧"
+DescriptionTemplate = "近战攻击范围 +30%、伤害 +20%"
+Note = "[P5 新增行] 文档第 210 行（异化池 <B限定>）「大刀阔斧:近战攻击的攻击范围增加{30}%,伤害增加{20}%」。范围乘在**表里那串命中盒几何量**上（MeleeComboAbility.ApplyStepShape × AttackRangeMultiplier），伤害走 DamageMultiplier（MeleeComboAbility.Strike）。⚠️ 只乘命中盒，不缩放武器/角色模型 —— 与文档\"角色模型本身不会扩大\"一致；显示物（刀光）随命中盒那条属 P6 表现层。"

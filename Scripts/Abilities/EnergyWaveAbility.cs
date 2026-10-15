@@ -296,6 +296,11 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 			Tags = AttackTags,
 			Pierce = Pierce + (int)stats.Get("PierceAdd"),
 			Ricochet = (int)stats.Get("RicochetAdd"),
+			// 命中爆炸（P5 `<A1限定>`「爆裂火球」：能量波命中时产生范围伤害）。
+			// 与 `Weapon.cs` 同一套键：半径 = `ExplosionRadiusAdd`（0 = 不爆炸），伤害 = 本次伤害 × `ExplosionDamageScale`。
+			// 没配置时两个键都是 0 → **逐位不变**（不发散、不加行）。
+			ExplosionRadius = stats.Get("ExplosionRadiusAdd"),
+			ExplosionDamage = shotDamage * damageMultiplier * stats.Get("ExplosionDamageScale"),
 			BypassBlock = BypassBlock,
 			AbilityKind = AbilityId,
 		};

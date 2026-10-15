@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "PierceAdd"
+Operation = 0
+Value = 2
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Requires = PackedStringArray("mut_pierce_plus")
+Id = "mut_pierce_plus2"
+DisplayName = "穿透++"
+DescriptionTemplate = "穿透数再 +2"
+Note = "[P5 新增行] 文档第 200 行「穿透++:子弹现在全程穿透,弹速增加{n}%,前置:穿透+」。★ 「全程穿透」（无限穿透标记）与「弹速 +n%」**没有实现**（M23：没有全程穿透标记；弹速乘区也没有键），本行只落地穿透数 +2。"

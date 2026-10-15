@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "RicochetAdd"
+Operation = 0
+Value = 2
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Requires = PackedStringArray("mut_ricochet_plus")
+Id = "mut_ricochet_plus2"
+DisplayName = "弹射++"
+DescriptionTemplate = "子弹额外弹射次数再 +2"
+Note = "[P5 新增行] 文档第 196 行「弹射++:n+4,前置:弹射+」—— 三级链的第三级：Requires 的是**弹射+**（不是弹射），所以跳级拿不到。"

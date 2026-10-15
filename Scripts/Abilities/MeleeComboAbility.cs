@@ -181,6 +181,34 @@ public partial class MeleeComboAbility : Ability
 	/// <summary>外部封锁的开关（武器飞出去 → true；收回 → false）。</summary>
 	public void SetExternallyBlocked(bool blocked) => ExternallyBlocked = blocked;
 
+	/// <summary>
+	/// **近战攻击力乘区**（P5）：`StatSheet` 的 <c>DamageMultiplier</c>（强化「力量」、异化「大刀阔斧」都挂它）。
+	/// 没配置时是 1（`Unit.SeedStats` 给了基础值），所以这一乘**逐位不变**；读到 0 也按 1 算
+	/// （`architecture.md` 第 8 条：少一个基础值不能变成"打不出伤害"）。
+	/// </summary>
+	public float MeleeDamageMultiplier
+	{
+		get
+		{
+			float value = OwnerUnit?.Stats.Get("DamageMultiplier") ?? 1f;
+			return value > 0f ? value : 1f;
+		}
+	}
+
+	/// <summary>
+	/// **近战攻击范围乘区**（P5）：`StatSheet` 的 <c>AttackRangeMultiplier</c>
+	/// （异化「大刀阔斧」：范围 +30% / +70% / +150%）。乘在**表里那串命中盒几何量**上（见 <see cref="ApplyStepShape"/>），
+	/// 默认 1 → 逐位不变。
+	/// </summary>
+	public float MeleeRangeMultiplier
+	{
+		get
+		{
+			float value = OwnerUnit?.Stats.Get("AttackRangeMultiplier") ?? 1f;
+			return value > 0f ? value : 1f;
+		}
+	}
+
 	private AttackHitbox? _hitbox;
 	private CollisionShape3D? _hitboxShape;
 	private BoxShape3D? _baseBox;
@@ -192,6 +220,7 @@ public partial class MeleeComboAbility : Ability
 	private float _stepTimer;
 	private float _activeTimer;
 	private bool _striking;
+	private bool _lunging;
 	private bool _windowTimerRunning;
 	private bool _pressBuffered;
 
@@ -453,6 +482,7 @@ public partial class MeleeComboAbility : Ability
 			{
 				_hitbox?.Deactivate();
 				_striking = false;
+				EndLunge();
 			}
 		}
 
@@ -494,7 +524,11 @@ public partial class MeleeComboAbility : Ability
 		{
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
-			BaseDamage = _hitbox.Damage * scale,
+			// **攻击力乘区**（P5）：`StatSheet` 的 `DamageMultiplier` —— 强化「力量」与小刀阔斧的"+20% 伤害"
+			// 都挂这个键。没配置时它是 1（`Unit.SeedStats` 有基础值），所以这一乘**逐位不变**。
+			// ⚠️ 只加在连招这一路（近战武技 = 玩家专属）；`AttackHitbox` 的默认路径一个字没动 ——
+			// 首领/敌人的伤害走那条，那里乘一次会改动"白板首领 315"这类硬指标。
+			BaseDamage = _hitbox.Damage * scale * MeleeDamageMultiplier,
 			CritChance = _hitbox.CritChance,
 			CritMultiplier = _hitbox.CritMultiplier,
 			Knockback = _hitbox.Knockback,
@@ -507,6 +541,7 @@ public partial class MeleeComboAbility : Ability
 		_hitbox.Activate(OwnerUnit, attack);
 		_striking = true;
 		_activeTimer = Mathf.Max(0.02f, StepValue(_activeTimes, ComboStep, StrikeActiveTime));
+		BeginLunge(_activeTimer);
 
 		LastCutCount = CutBullets();
 		TotalCutCount += LastCutCount;
@@ -570,6 +605,11 @@ public partial class MeleeComboAbility : Ability
 	/// 把第 i 段的命中盒尺寸/前伸写到碰撞形状上（**是表里的几何量，不是代码里的常数**）。
 	/// <see cref="StepBoxSizes"/> 的空项 = 保留场景基线；形状类型也随表切换
 	/// （<c>z</c> 为 0 且 <c>x == y</c> 时用圆柱 —— 镰刀最后那一刀"大回旋"就是 360°）。
+	///
+	/// <para>⚠️ P5：几何量上再乘一层单位级的 <c>AttackRangeMultiplier</c> —— 异化「大刀阔斧」
+	/// 就是给单位挂这个键（文档第 210-213 行：「近战攻击的攻击范围增加 30%…具体增幅哪个位置的范围
+	/// 由其武器本身决定，一般是**伤害碰撞**和显示物」）。**只有这里乘**：近战武技是玩家专属，
+	/// 敌人/首领的命中盒一个字节没动；没配置时是 1 → 逐位不变。</para>
 	/// </summary>
 	private void ApplyStepShape(int step)
 	{
@@ -578,7 +618,7 @@ public partial class MeleeComboAbility : Ability
 			return;
 		}
 
-		Vector3 size = StepValue(_boxSizes, step, _sceneBoxSize);
+		Vector3 size = StepValue(_boxSizes, step, _sceneBoxSize) * MeleeRangeMultiplier;
 		CurrentStepBoxSize = size;
 
 		float offset = StepValue(_boxOffsets, step, float.NaN);
@@ -640,9 +680,47 @@ public partial class MeleeComboAbility : Ability
 		_hitbox?.Deactivate();
 	}
 
+	/// <summary>
+	/// **近战突进**（P5 异化「剑突」：文档第 215-217 行「你的近战攻击在攻击时附带突进效果
+	/// （**开启碰撞的同时移动**）」）。
+	///
+	/// <para>突进距离来自 <c>StatSheet.MeleeLungeAdd</c>（表里填），按本段的判定持续时长换成速度，
+	/// 走 <see cref="CharacterMovement.BeginDash"/>（绕开常规加速度，与闪避/冲刺同一条路），
+	/// 判定结束就 <see cref="EndLunge"/> 收回来。方向交给 <c>BeginDash</c> 自己取"当前朝向前方"
+	/// （传零向量就是它文档里那条回退）。</para>
+	///
+	/// <para>⚠️ 没配置（<c>MeleeLungeAdd</c> ≤ 0）时**一次都不调用** —— 逐位不变。</para>
+	/// </summary>
+	private void BeginLunge(float activeSeconds)
+	{
+		float distance = OwnerUnit?.Stats.Get("MeleeLungeAdd") ?? 0f;
+		if (distance <= 0f || Movement == null)
+		{
+			return;
+		}
+
+		float speed = distance / Mathf.Max(0.02f, activeSeconds);
+		Movement.BeginDash(Vector3.Zero, speed);
+		_lunging = true;
+		GameLog.Write("Combat", $"剑突：{AbilityId} 第 {ComboStep + 1} 段附带突进 {distance:0.##}m（本段判定 {activeSeconds:0.##}s → 速度 {speed:0.##} m/s）");
+	}
+
+	/// <summary>突进结束（判定结束 / 技能退出时都走这里，幂等）。</summary>
+	private void EndLunge()
+	{
+		if (!_lunging)
+		{
+			return;
+		}
+
+		_lunging = false;
+		Movement?.EndDash();
+	}
+
 	/// <summary>把"上一段的尺寸/位置"清掉（技能结束时调用）。</summary>
 	public override void _ExitTree()
 	{
+		EndLunge();
 		_hitbox?.Deactivate();
 		base._ExitTree();
 	}

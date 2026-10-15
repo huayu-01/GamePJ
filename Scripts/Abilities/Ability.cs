@@ -206,34 +206,70 @@ public abstract partial class Ability : Node3D
 	/// <summary>后置蓄力已经升到第几档（0 = 只有基础蓄力那一段）。</summary>
 	public int ChargeSteps { get; private set; }
 
+	/// <summary>
+	/// **实际基础蓄力** —— 表的 <see cref="ChargeBaseSeconds"/> 可以被单位级修正器覆盖
+	/// （<c>StatSheet.ChargeBaseSecondsOverride</c> &gt; 0 才覆盖）。异化/进化里的"蓄力时间变为 X"
+	/// 走的就是这一条（例如 <c>&lt;A2限定&gt;</c>「心流」：所有蓄力时间变为 0.1）。
+	/// 没有修正器时**逐位等于** <see cref="ChargeBaseSeconds"/>。
+	/// </summary>
+	public float ChargeBaseSecondsEffective
+	{
+		get
+		{
+			float over = OwnerUnit?.Stats.Get("ChargeBaseSecondsOverride") ?? 0f;
+			if (over > 0f)
+			{
+				return over;
+			}
+
+			return ChargeBaseSeconds;
+		}
+	}
+
+	/// <summary>
+	/// **实际后置蓄力间隔** = （单位级覆盖 &gt; 0 ? 覆盖 : 表的 <see cref="ChargeStepSeconds"/>）× 倍率。
+	/// 「花心」（后置蓄力时间减半）挂 <c>ChargeStepSecondsMultiplier = 0.5</c>，没有修正器时逐位不变。
+	/// </summary>
+	public float ChargeStepSecondsEffective
+	{
+		get
+		{
+			float over = OwnerUnit?.Stats.Get("ChargeStepSecondsOverride") ?? 0f;
+			float mult = OwnerUnit?.Stats.Get("ChargeStepSecondsMultiplier") ?? 1f;
+			return (over > 0f ? over : ChargeStepSeconds) * (mult > 0f ? mult : 1f);
+		}
+	}
+
 	/// <summary>基础蓄力是否完成（**没完成就松手 = 不释放**）。</summary>
-	public bool ChargeBaseComplete => ChargeTime >= ChargeBaseSeconds;
+	public bool ChargeBaseComplete => ChargeTime >= ChargeBaseSecondsEffective;
 
 	/// <summary>蓄力进度（0~1，按**基础蓄力**算；UI 的"指示器往准星缩"读它）。</summary>
-	public float ChargeProgress => ChargeBaseSeconds <= 0f ? 1f : Mathf.Clamp(ChargeTime / ChargeBaseSeconds, 0f, 1f);
+	public float ChargeProgress => ChargeBaseSecondsEffective <= 0f ? 1f : Mathf.Clamp(ChargeTime / ChargeBaseSecondsEffective, 0f, 1f);
 
 	/// <summary>后置蓄力的总威力倍率（<see cref="ChargeStepScale"/> 的 <see cref="ChargeSteps"/> 次方）。</summary>
 	public float ChargePowerScale => ChargeStepScale > 0f ? Mathf.Pow(ChargeStepScale, ChargeSteps) : 1f;
 
 	/// <summary>是否处在**完美时机窗口**里（刚蓄满之后的 <see cref="PerfectWindowSeconds"/> 那一段）。</summary>
 	public bool IsPerfectWindow => PerfectWindowSeconds > 0f
-		&& ChargeTime >= ChargeBaseSeconds
-		&& ChargeTime <= ChargeBaseSeconds + PerfectWindowSeconds;
+		&& ChargeTime >= ChargeBaseSecondsEffective
+		&& ChargeTime <= ChargeBaseSecondsEffective + PerfectWindowSeconds;
 
 	/// <summary>后置蓄力的档数上限（把 <see cref="ChargeMaxSteps"/> 与 <see cref="ChargeMaxSeconds"/> 合成一个数）。</summary>
 	public int ChargeMaxStepsEffective
 	{
 		get
 		{
-			if (ChargeStepSeconds <= 0f)
+			float baseSeconds = ChargeBaseSecondsEffective;
+			float stepSeconds = ChargeStepSecondsEffective;
+			if (stepSeconds <= 0f)
 			{
 				return 0;
 			}
 
 			int steps = ChargeMaxSteps > 0 ? ChargeMaxSteps : int.MaxValue;
-			if (ChargeMaxSeconds > ChargeBaseSeconds)
+			if (ChargeMaxSeconds > baseSeconds)
 			{
-				steps = Mathf.Min(steps, (int)Mathf.Floor((ChargeMaxSeconds - ChargeBaseSeconds) / ChargeStepSeconds));
+				steps = Mathf.Min(steps, (int)Mathf.Floor((ChargeMaxSeconds - baseSeconds) / stepSeconds));
 			}
 
 			return Mathf.Max(0, steps);
@@ -661,13 +697,15 @@ public abstract partial class Ability : Node3D
 	/// <summary>把已蓄时长换算成"后置蓄力第几档"。</summary>
 	private void RecountChargeSteps()
 	{
-		if (ChargeStepSeconds <= 0f || ChargeTime <= ChargeBaseSeconds)
+		float baseSeconds = ChargeBaseSecondsEffective;
+		float stepSeconds = ChargeStepSecondsEffective;
+		if (stepSeconds <= 0f || ChargeTime <= baseSeconds)
 		{
 			ChargeSteps = 0;
 			return;
 		}
 
-		int steps = (int)Mathf.Floor((ChargeTime - ChargeBaseSeconds) / ChargeStepSeconds);
+		int steps = (int)Mathf.Floor((ChargeTime - baseSeconds) / stepSeconds);
 		ChargeSteps = Mathf.Max(0, Mathf.Min(steps, ChargeMaxStepsEffective));
 	}
 

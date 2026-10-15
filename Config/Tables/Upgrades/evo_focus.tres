@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_crossbow.tres" id="1_pool"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "VolleyCountOverride"
+Operation = 2
+Value = 1
+
+[sub_resource type="Resource" id="Resource_m1"]
+script = ExtResource("1_stat")
+Stat = "VolleyDamagePerLostArrow"
+Operation = 0
+Value = 0.8
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 1
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Pool = ExtResource("1_pool")
+Excludes = PackedStringArray("evo_philander")
+Id = "evo_focus"
+DisplayName = "专一"
+DescriptionTemplate = "武技2只会射出一箭，但原先每多出一箭这一箭伤害 +80%"
+Note = "[P5 新增行] 文档第 78 行（进化池 <A2限定>）「专一:现在只会射出一箭,但原先每多出一箭就增加这一箭{80}%的伤害,互斥:花心」。★ 这是**平衡型互斥**那一类（用户 §1.3：「有的互斥也可能是为了不太强而考虑的」）——互斥字段与逻辑冲突用的是同一个 Excludes。消费者：ArrowVolleyAbility.FireVolley（发数覆盖 + 每一发按被砍掉的数量乘倍率）。"

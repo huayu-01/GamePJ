@@ -52,6 +52,23 @@ public sealed partial class RunBuild : RefCounted
 		}
 	}
 
+	/// <summary>
+	/// **自测专用**：只记层数、**不套用效果**。
+	///
+	/// <para>P5 的三层判定探针要造出"已经拥有 X"的构筑，但 <see cref="Add"/> 会把 X 的效果真的挂到玩家身上
+	/// （改 StatSheet / 加 TriggerRule），那一局的数值就被探针污染了。所以单开这一条路：
+	/// 与 <c>AbilityStore.DebugSelfTestLines</c> 同一类"只给自测用的口子"（不进任何正式流程）。</para>
+	/// </summary>
+	public void DebugGrantWithoutApplying(RewardDefinition definition)
+	{
+		int next = StacksOf(definition.Id) + 1;
+		_stacks[definition.Id] = next;
+		if (next == 1)
+		{
+			_acquired.Add(definition);
+		}
+	}
+
 	/// <summary>当前构筑的简要列表，供 HUD 显示。</summary>
 	public string Describe()
 	{

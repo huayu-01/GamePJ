@@ -74,8 +74,13 @@
 |---|---|---|
 | **互斥** | `RewardDefinition.Excludes` | **双向**：候选排斥已拥有的，或已拥有的奖励排斥候选，都不会进池 |
 | **单向互斥** | `RewardDefinition.ConflictsWith` | 已拥有列表里任一 Id → 本项不进池（**阶段 4 才接上**：表里现在有 `RewardConfig.ConflictsWith` 列与 `Compile` 填充入口；默认空） |
-| **角色限定** | `RewardDefinition.RequiresSummoner` | 只有召唤控制角色（`PlayerCharacterKind.Summoner`）才会出现 |
+| **角色限定（旧）** | `RewardDefinition.RequiresSummoner` | 只有召唤控制角色（`PlayerCharacterKind.Summoner`）才会出现 |
 | **武器限定（三级回退）** | `RewardDefinition.ApplicablePoolIds` / `RequiredWeaponTags` | ① 选项行填了 `Pool` → 只有 `Weapon.PoolId` 等于它的武器能拿到；② 没填池但填了武器标签 → 按 `weapon.AttackTags` 匹配；③ 两者都空 → 所有武器。**阶段 4 新增第①层**（表：`Config/Tables/UpgradePools/pool_*.tres`，武器行 `Pool` 正向指过去） |
+| **🆕 角色限定（P5）** | `RewardDefinition.RequiredCharacterIds` | 当前**角色行 Id**（`chr_hunter` …）不在名单里 → **根本不进池**。空 = 不限角色（既有 19 行逐位不变）。`<A限定>` = 只填这一列；`<A1限定>` = 这一列 **+** `Pool` |
+| **🆕 前置（P5）** | `RewardDefinition.Requires` | `Requires` 里的 Id **全部**已拥有才进池（`RewardPool.HasPrerequisites`，抽取时判）。空 = 无前置 |
+
+> 🆕 **P5：三层判定的完整接入契约见 [upgrades.md](upgrades.md)**（哪张表哪一列、哪个文件、判定时机、
+> "加一条增幅要做什么"、以及 19 条兜底硬编码为什么被删）。
 
 当前配置：
 
@@ -104,7 +109,6 @@
 ⚠ 互斥对的**运行时采样**还没跑出来（需要在同一局先拿到跳弹、再看穿透是否消失，靠随机抽到该组合，本轮没碰上）；配置与双向判定逻辑都已就位，下一次游玩时可以顺带观察。
 
 ## 进化池语义澄清（用户 2026-01 反馈；⚠️ 2026-10-12 术语更新见文末）
-
 > ⚠️ **2026-10-12 术语更新（用户拍板 A3）**：**没有"武器池"这个东西** ——
 > 「没有定义武器池，只是一个说法，确切来说是**进化池**，是**武器**（本质是**角色的攻击方式**）的**限定池**，
 > 而**进化池算高价值**，因为**攻击方式的改动巨大**」。

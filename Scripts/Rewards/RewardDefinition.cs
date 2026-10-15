@@ -44,6 +44,19 @@ public sealed class RewardDefinition
 	/// <summary>要求武器具备的标签；为空表示不限武器。</summary>
 	public string[] RequiredWeaponTags { get; init; } = Array.Empty<string>();
 
+	/// <summary>
+	/// **限定（角色层）**：只有当前角色的**行 Id** 在这里面时才进池；空 = 不限角色。
+	/// 与 <see cref="ApplicablePoolIds"/>（武器层）/ <see cref="RequiredWeaponTags"/> 一起构成"限定"这一层 ——
+	/// 由 <c>RewardConfig.RequiredCharacterIds</c> 填进来，见那里的注释（含 `&lt;A限定&gt;` vs `&lt;A1限定&gt;` 的写法）。
+	/// </summary>
+	public string[] RequiredCharacterIds { get; init; } = Array.Empty<string>();
+
+	/// <summary>
+	/// **前置**：必须**全部**已拥有，本项才进池（不满足 = 根本不出现）。空 = 无前置。
+	/// 读取点是 <c>RewardPool.HasPrerequisites</c>（抽取时判，因为"你现在有什么"是每局的）。
+	/// </summary>
+	public string[] Requires { get; init; } = Array.Empty<string>();
+
 	/// <summary>与这些 Id 互斥（**单向**：已拥有 → 本项不进池；由 <c>RewardConfig.ConflictsWith</c> 填入口）。</summary>
 	public string[] ConflictsWith { get; init; } = Array.Empty<string>();
 
@@ -89,5 +102,25 @@ public sealed class RewardDefinition
 		}
 
 		return true;
+	}
+
+	/// <summary>
+	/// **限定 · 角色层**：当前角色行 Id 是否被本项接受。
+	///
+	/// <list type="bullet">
+	/// <item>本项没填 <see cref="RequiredCharacterIds"/> → <b>恒真</b>（既有 19 行都在这一支，逐位不变）；</item>
+	/// <item>填了而 <paramref name="characterId"/> 为空（角色表读不到 / 还没定角色）→ <b>false</b>
+	///   —— "不知道你是谁就不给限定项"，而不是"给了没效果"（用户 2026-10-12 §1.3）。</item>
+	/// </list>
+	/// </summary>
+	public bool AllowsCharacter(string? characterId)
+	{
+		if (RequiredCharacterIds.Length == 0)
+		{
+			return true;
+		}
+
+		return !string.IsNullOrEmpty(characterId)
+			&& Array.IndexOf(RequiredCharacterIds, characterId) >= 0;
 	}
 }

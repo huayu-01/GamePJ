@@ -281,6 +281,18 @@ public partial class ArrowVolleyAbility : Ability
 		// 发数 = 基础 + 档数 × 每档（文档：大射天下 3 + 2×档，最多 9）。
 		int count = Mathf.Max(1, Count + (ChargeSteps * CountPerChargeStep));
 
+		// **发数覆盖**（P5 `<A2限定>`「专一」：只会射出一箭，但原先每多出一箭就 +80% 伤害）。
+		// 覆盖值 ≤ 0 → 一行都不进（既有四把武器逐位不变）；被"砍掉"的那几发按**每一发**乘一个倍率
+		// （`VolleyDamagePerLostArrow`，默认 0 → 不乘）。
+		float lostArrowDamageMultiplier = 1f;
+		float countOverride = stats.Get("VolleyCountOverride");
+		if (countOverride > 0f && countOverride < count)
+		{
+			int lost = count - Mathf.RoundToInt(countOverride);
+			lostArrowDamageMultiplier = 1f + (lost * Mathf.Max(0f, stats.Get("VolleyDamagePerLostArrow")));
+			count = Mathf.Max(1, Mathf.RoundToInt(countOverride));
+		}
+
 		// 伤害：绝对值 × 档位倍率（A2 的 ChargeStepScale = 1 → 不变；A3 = 1.3^档）。
 		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power;
 		// 弹速：绝对值 + 档数 × 每档（文档写的是**加** 30 射速，不是乘 1.3）。
@@ -294,7 +306,7 @@ public partial class ArrowVolleyAbility : Ability
 		{
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
-			BaseDamage = shotDamage * damageMultiplier,
+			BaseDamage = shotDamage * damageMultiplier * lostArrowDamageMultiplier,
 			CanCrit = true,
 			CritChance = Mathf.Clamp(CritChance + stats.Get("CritChanceAdd"), 0f, 1f),
 			CritMultiplier = CritMultiplier + stats.Get("CritMultiplierAdd"),

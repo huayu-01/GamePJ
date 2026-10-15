@@ -758,20 +758,23 @@ public partial class RunController : Node
 			return;
 		}
 
-		// ① 武器限定层：专属池（ApplicablePoolIds）→ 武器标签（RequiredWeaponTags）→ 通用。
-		_pool.Initialize(_weapon);
-		// ② 角色限定层：只有召唤控制角色才有召唤类奖励（RequiresSummoner）。
+		// ① 限定（角色层）：**当前角色的表行 Id**（`chr_hunter` …）。`<A限定>` 就是不填 Pool、只填这一列；
+		//    `<A1限定>` = 这一列 + 选项行 Pool 指向该武器行的 Pool（资源引用，见 RewardConfig.RequiredCharacterIds）。
+		string characterId = CharacterRow(_character)?.Id ?? string.Empty;
+		// ② 限定（武器层）：专属池（ApplicablePoolIds）→ 武器标签（RequiredWeaponTags）→ 通用。
+		_pool.Initialize(_weapon, characterId);
+		// ③ 老的角色限定：只有召唤控制角色才有召唤类奖励（RequiresSummoner，P5 之前唯一的那一个布尔）。
 		_pool.SummonerAllowed = _character == PlayerCharacterKind.Summoner;
 		_poolReady = true;
 
 		// 留痕（用户 C2 问的就是"池是什么时候定的"）：这一行只在进关卡初始化时出现，
-		// 之后每次交互只从这份池里抽（抽取时仍然要按当前构筑过滤互斥/层数/节点类型）。
-		// ⚠️ 条数是**武器层过滤后**的候选数；角色限定项（RequiresSummoner）在抽取时按 SummonerAllowed 再筛，
-		// 所以枪手这里会是 19 条、实际抽得到 18 条（`docs/rewards.md` 的硬指标）。
+		// 之后每次交互只从这份池里抽（抽取时仍然要按当前构筑过滤互斥/前置/层数/节点类型）。
+		// ⚠️ 条数是**限定两层过滤后**的候选数；`RequiresSummoner` 项在抽取时再筛，
+		// 所以枪手这里会比候选数少（`docs/rewards.md` 的硬指标）。
 		string poolId = string.IsNullOrEmpty(_weapon.PoolId) ? "留空（走标签匹配 → 通用）" : _weapon.PoolId;
 		ActRoguelike.Core.GameLog.Write(
 			"Reward",
-			$"奖励池按当前角色/武器定下来了（进关卡初始化）：角色 {_character} · 武器 {_weaponKind}（PoolId {poolId}）→ 候选 {_pool.CandidateCount} 条（武器层之后；角色限定项在抽取时再筛 SummonerAllowed={_pool.SummonerAllowed}）");
+			$"奖励池按当前角色/武器定下来了（进关卡初始化）：角色 {_character}（行 Id「{(characterId.Length == 0 ? "（角色表读不到）" : characterId)}」）· 武器 {_weaponKind}（PoolId {poolId}）→ 候选 {_pool.CandidateCount} 条（限定两层之后；RequiresSummoner 项在抽取时再筛 SummonerAllowed={_pool.SummonerAllowed}）");
 	}
 
 	/// <summary>兜底：池子还没定就先定一次（正常路径一定在进关卡时已经定过）。</summary>

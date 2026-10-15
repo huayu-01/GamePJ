@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "CooldownMultiplier"
+Operation = 1
+Value = 0.9
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 3
+Modifiers = [SubResource("Resource_m0")]
+Id = "upg_insight"
+DisplayName = "洞悉"
+DescriptionTemplate = "角色技能冷却 -10%"
+Note = "[P5 新增行] 文档第 236 行「洞悉:缩短角色技能冷却」。消费者：Ability.UnitCooldownMultiplier（P2 就已经把这条键接好了，本条是它第一个真正的数据来源）。"

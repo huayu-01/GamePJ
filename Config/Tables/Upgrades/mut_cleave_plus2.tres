@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "AttackRangeMultiplier"
+Operation = 1
+Value = 1.47
+
+[sub_resource type="Resource" id="Resource_m1"]
+script = ExtResource("1_stat")
+Stat = "DamageMultiplier"
+Operation = 1
+Value = 1.15
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Requires = PackedStringArray("mut_cleave_plus")
+Id = "mut_cleave_plus2"
+DisplayName = "大刀阔斧++"
+DescriptionTemplate = "近战攻击范围 +150%、伤害 +50%"
+Note = "[P5 新增行] 文档第 212 行「大刀阔斧++:范围增加至{150}%,伤害至{50}%,前置:大刀阔斧+」。乘法链：1.69×1.47=2.48（+148%≈150%）、1.296×1.15=1.49（+49%≈50%）。"

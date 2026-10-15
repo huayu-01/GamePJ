@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "CritChanceAdd"
+Operation = 0
+Value = 0.05
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 3
+Modifiers = [SubResource("Resource_m0")]
+Id = "upg_crit"
+DisplayName = "暴击"
+DescriptionTemplate = "暴击率 +5%"
+Note = "[P5 新增行] 文档第 233 行「暴击:获得暴击率(角色基础:5%)」—— 基础 5% 在武器/技能行上已经如此（wpn_bow 等 CritChance=0.05），这条只是加成。"

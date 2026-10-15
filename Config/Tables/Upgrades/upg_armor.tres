@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "Armor"
+Value = 15
+Note = "每次获得的护甲"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 3
+ApplyHandler = "GrantArmor"
+HandlerParams = [SubResource("Resource_p0")]
+Id = "upg_armor"
+DisplayName = "护甲"
+DescriptionTemplate = "护甲 +15"
+Note = "[P5 新增行] 文档第 238 行「护甲:加护甲」。⚠️ 护甲**没有上限**（用户 C1），所以走 Unit.GrantArmor 这条既有的加甲路径，不经 StatSheet 抬上限（那条路 P4 已删）。"

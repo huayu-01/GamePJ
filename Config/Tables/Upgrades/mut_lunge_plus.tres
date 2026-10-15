@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "MeleeLungeAdd"
+Operation = 0
+Value = 1.5
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Requires = PackedStringArray("mut_lunge")
+Id = "mut_lunge_plus"
+DisplayName = "剑突+"
+DescriptionTemplate = "近战突进距离再 +1.5m"
+Note = "[P5 新增行] 文档第 216 行「剑突+:再次提升突进距离,前置:剑突」。叠加后 3.0m。"

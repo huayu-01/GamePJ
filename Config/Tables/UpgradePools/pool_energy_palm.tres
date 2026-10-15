@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="UpgradePoolConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/UpgradePoolConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Id = "pool_energy_palm"
+Slot = 4
+DisplayName = "能量掌升级池"
+Note = "[P5 新增行] 角色 A 武器 1 wpn_energy_palm 的升级池。它是\"武器身份锚点\"：<A1限定> 的选项行把 Pool 指向本行，武器行也指向本行 —— 两边都是资源引用（改名/删文件会被 Godot 置 null，能检测），不是拼字符串。"
