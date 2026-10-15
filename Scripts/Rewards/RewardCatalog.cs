@@ -412,22 +412,35 @@ public partial class TablePulseRule : TriggerRule
 		// ⑤ 对周围敌人造成伤害（能量护盾）。
 		if (Radius > 0f && Damage > 0f)
 		{
-			PulseAroundOwner();
+			PulseDamage.Around(this, _owner, Radius, Damage, RewardId);
 		}
 
 		GameLog.Write("Reward", $"增幅·事件规则：{RewardId} 触发（{Trigger}，第 {TriggerTally} 次）");
 	}
+}
 
-	private void PulseAroundOwner()
+/// <summary>
+/// 「以自己为圆心、对半径内所有敌人各造成一次伤害」—— 能量护盾（<see cref="TablePulseRule"/>）与
+/// 杀戮践踏（<see cref="StompOnLandRule"/>，P6b 新增）**共用这一份实现**。
+///
+/// <para>抽出来的理由：这是"命中规则"，两条增幅各写一遍迟早会漂移（一个改半径判据、另一个忘改）。
+/// 行为与 P5b 落地时逐位一致（组 `enemy_units` / <see cref="Unit.IsValidTarget"/> / 平方距离比较 /
+/// `HitPolicy.OncePerTarget` / 标签 `Pulse`）。</para>
+/// </summary>
+internal static class PulseDamage
+{
+	/// <summary>返回打到了几个敌人（自测取证用）。</summary>
+	public static int Around(Node tree, Unit owner, float radius, float damage, string abilityId)
 	{
-		if (_owner == null)
+		if (radius <= 0f || damage <= 0f || !GodotObject.IsInstanceValid(owner) || tree?.GetTree() is not { } sceneTree)
 		{
-			return;
+			return 0;
 		}
 
-		Vector3 from = _owner.GlobalPosition;
-		float best = Radius * Radius;
-		foreach (Node node in GetTree().GetNodesInGroup("enemy_units"))
+		int hits = 0;
+		Vector3 from = owner.GlobalPosition;
+		float best = radius * radius;
+		foreach (Node node in sceneTree.GetNodesInGroup("enemy_units"))
 		{
 			if (node is not Unit candidate || !candidate.IsValidTarget)
 			{
@@ -442,14 +455,210 @@ public partial class TablePulseRule : TriggerRule
 
 			var attack = new AttackInstance
 			{
-				Attacker = _owner,
-				Ability = RewardId,
-				AbilityKind = RewardId,
-				BaseDamage = Damage,
+				Attacker = owner,
+				Ability = abilityId,
+				AbilityKind = abilityId,
+				BaseDamage = damage,
 				Policy = HitPolicy.OncePerTarget,
 				Tags = new[] { "Pulse" },
 			};
 			candidate.ReceiveHit(attack.RollHit(candidate, toCandidate.Normalized(), candidate.GlobalPosition));
+			hits++;
 		}
+
+		return hits;
+	}
+}
+
+/// <summary>
+/// 异化「杀戮践踏」（**P6b 新增**）—— 文档 `角色设计.txt` 第 169 行：
+/// 「杀戮践踏:跳跃时会对周围{n}码敌人造成{n}伤害,空中跳跃同样享受这个效果;」。
+///
+/// <para><b>判据取的是"落地那一刻"</b>（行名就是"践踏"）：<see cref="CharacterMovement"/> 里
+/// "空中跳跃"与"地面跳跃"共用同一条 <c>TryJump</c>，落地判据天然把两者都覆盖到 ——
+/// 正是文档那句「空中跳跃同样享受这个效果」。</para>
+///
+/// <para><b>为什么是轮询、不是订阅事件</b>：<c>CharacterMovement</c> 是**共用战斗类**（P6b 硬约束：
+/// 本批不许碰），它没有抛"起跳 / 落地"事件。这里改为每帧读它**已经公开**的
+/// <see cref="CharacterMovement.IsGrounded"/> / <see cref="CharacterMovement.FallHeight"/> 做边沿检测，
+/// 一行共用代码都不用动。⚠️ 文档只写了 `n`（码数 / 伤害都没给），表里填的是**预设值**。</para>
+/// </summary>
+public partial class StompOnLandRule : TriggerRule
+{
+	/// <summary>作用半径（米）。</summary>
+	public float Radius { get; set; } = 3f;
+
+	/// <summary>对半径内每个敌人的伤害。</summary>
+	public float Damage { get; set; } = 15f;
+
+	/// <summary>要从多高落下才算（米；0 = 任何落地都算）。</summary>
+	public float MinFallHeight { get; set; }
+
+	/// <summary>触发几次（自测取证）。</summary>
+	public int TriggerTally { get; private set; }
+
+	private Unit? _owner;
+	private bool _initialized;
+	private bool _wasGrounded = true;
+	private float _sinceTrigger;
+
+	/// <summary>本规则**不是事件驱动**的（跳跃/落地在共用战斗类里没有事件，见类注释）——
+	/// 永远不匹配任何 <see cref="GameplayEvent"/>，出手完全由 <see cref="_Process"/> 的边沿检测发起。</summary>
+	public override bool Matches(GameplayEvent gameplayEvent) => false;
+
+	public override void _Ready()
+	{
+		base._Ready();
+		_owner = GetParent<Unit>();
+	}
+
+	public override void _Process(double delta)
+	{
+		if (!GodotObject.IsInstanceValid(_owner) || _owner.Movement is not { } movement)
+		{
+			return;
+		}
+
+		_sinceTrigger += (float)delta;
+		bool grounded = movement.IsGrounded;
+		if (!_initialized)
+		{
+			// 第一帧只记基线：出生就站在地上不算"落地"。
+			_initialized = true;
+			_wasGrounded = grounded;
+			return;
+		}
+
+		bool landed = grounded && !_wasGrounded;
+		_wasGrounded = grounded;
+		if (!landed || _sinceTrigger < Cooldown || movement.FallHeight < MinFallHeight)
+		{
+			return;
+		}
+
+		_sinceTrigger = 0f;
+		Execute(default);
+	}
+
+	public override void Execute(GameplayEvent gameplayEvent)
+	{
+		if (!GodotObject.IsInstanceValid(_owner))
+		{
+			return;
+		}
+
+		TriggerTally++;
+		int hits = PulseDamage.Around(this, _owner!, Radius, Damage, RewardId);
+		GameLog.Write(
+			"Reward",
+			$"增幅·事件规则：{RewardId} 触发（落地践踏，第 {TriggerTally} 次，半径 {Radius:0.#} 伤害 {Damage:0.#} → 命中 {hits} 个）");
+	}
+}
+
+/// <summary>
+/// 异化「巡飞弹」（**P6b 新增**）—— 文档 `角色设计.txt` 第 182 行：
+/// 「巡飞弹:你的暴击伤害会使你发射一发追踪附近敌人的飞弹,伤害{50};」。
+///
+/// <para>复用的是 **P3 已经做好并自测过的追踪弹通路**（<c>Projectile.HomingStatusId</c> +
+/// <c>HomingTurnRateDegrees</c>，见 <c>ArrowVolleyAbility</c> 与 <c>docs/abilities.md</c> §7）：
+/// 这里只是把"锁定目标"换成"先给最近的敌人挂一个**专用信标状态**，再让飞弹追这个状态"。</para>
+///
+/// <para>⚠️ 信标**故意不复用「标记」**（<c>Mark</c>）：那样会和「心眼」（对被标记目标 +50% 伤害）、
+/// 「发散」（每层标记加技能 1 伤害）产生非预期的联动。所以另立一行效果表
+/// （`Config/Tables/Effects/eff_missile_beacon.tres`，无任何数值修正的纯信标）。</para>
+///
+/// <para>暴击事件的抛点在 P6a 已补（唯一）：`Unit.ReceiveHit` 结算完这次命中、`HitInstance.Critical`
+/// 且真的打出了伤害。这里再按 <c>Source == 自己</c> 过滤，所以"敌人的暴击"不会触发。</para>
+/// </summary>
+public partial class HomingMissileOnCritRule : TriggerRule
+{
+	/// <summary>飞弹预制体（表列 `ProjectileScene`，路径字符串）。</summary>
+	public PackedScene? MissileScene { get; set; }
+
+	/// <summary>飞弹伤害（文档 50）。</summary>
+	public float Damage { get; set; } = 50f;
+
+	/// <summary>飞弹速度（米/秒）。</summary>
+	public float Speed { get; set; } = 60f;
+
+	/// <summary>索敌 / 追踪半径（米）。</summary>
+	public float SeekRange { get; set; } = 18f;
+
+	/// <summary>飞弹存活时间（秒）。</summary>
+	public float Lifetime { get; set; } = 4f;
+
+	/// <summary>信标状态 Id（表列 `BeaconStatusId`）。</summary>
+	public string BeaconStatusId { get; set; } = string.Empty;
+
+	/// <summary>信标持续时间（秒）。</summary>
+	public float BeaconSeconds { get; set; } = 1.5f;
+
+	/// <summary>追踪转向速度（度/秒）。</summary>
+	public float TurnRateDegrees { get; set; } = 360f;
+
+	/// <summary>发射几发（自测取证）。</summary>
+	public int FireCount { get; private set; }
+
+	private Unit? _owner;
+
+	public override void _Ready()
+	{
+		base._Ready();
+		_owner = GetParent<Unit>();
+	}
+
+	public override bool Matches(GameplayEvent gameplayEvent)
+		=> gameplayEvent.Kind == GameplayEventKind.Critical && gameplayEvent.Source == _owner;
+
+	public override void Execute(GameplayEvent gameplayEvent)
+	{
+		if (!GodotObject.IsInstanceValid(_owner) || MissileScene == null || _owner!.IsDead)
+		{
+			return;
+		}
+
+		Unit? target = Targeting.FindNearestHostile(_owner, _owner, SeekRange);
+		if (target == null)
+		{
+			return;   // 附近没有敌人 → 这一发不发射（不空放，也不吃掉冷却以外的东西）
+		}
+
+		// 信标：让飞弹"追得到"（Projectile 的追踪判据是"目标身上有这个状态"）。
+		if (!string.IsNullOrEmpty(BeaconStatusId)
+			&& StatusPresets.Create(BeaconStatusId, BeaconSeconds) is { } beacon)
+		{
+			target.ApplyStatus(beacon);
+		}
+
+		Vector3 origin = _owner.GlobalPosition + (Vector3.Up * 1.2f);
+		Vector3 toTarget = (target.GlobalPosition + (Vector3.Up * 0.9f)) - origin;
+		Vector3 direction = toTarget.LengthSquared() < 0.0001f ? -_owner.GlobalTransform.Basis.Z : toTarget.Normalized();
+
+		var attack = new AttackInstance
+		{
+			Attacker = _owner,
+			Ability = RewardId,
+			AbilityKind = RewardId,
+			BaseDamage = Damage,
+			CanCrit = false,
+			Policy = HitPolicy.OncePerTarget,
+			Lifetime = Lifetime,
+			Tags = new[] { "Projectile", "Missile" },
+		};
+
+		var missile = MissileScene.Instantiate<Projectile>();
+		(GetTree().CurrentScene ?? GetTree().Root).AddChild(missile);
+		missile.GlobalPosition = origin;
+		missile.Speed = Speed;
+		missile.MaxLifetime = Lifetime;
+		missile.HomingStatusId = BeaconStatusId;
+		missile.HomingTurnRateDegrees = TurnRateDegrees;
+		missile.HomingRange = SeekRange;
+		missile.Launch(attack, direction);
+		FireCount++;
+
+		GameLog.Write(
+			"Reward",
+			$"增幅·事件规则：{RewardId} 触发（暴击 → 巡飞弹，第 {FireCount} 发，追 {target.Name}，伤害 {Damage:0.#} 弹速 {Speed:0.#}）");
 	}
 }

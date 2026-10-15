@@ -1,0 +1,69 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "ProjectileScene"
+Value = "res://Scenes/Combat/Bullet.tscn"
+Note = "飞弹预制体（追踪弹那套：Projectile 一行预制体就够）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "Damage"
+Value = 50.0
+Note = "飞弹伤害（文档给的是 50）"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "Speed"
+Value = 60.0
+Note = "飞弹速度（米/秒）"
+
+[sub_resource type="Resource" id="Resource_p3"]
+script = ExtResource("1_param")
+Key = "SeekRange"
+Value = 18.0
+Note = "索敌 / 追踪半径（米）"
+
+[sub_resource type="Resource" id="Resource_p4"]
+script = ExtResource("1_param")
+Key = "Lifetime"
+Value = 4.0
+Note = "飞弹存活时间（秒）"
+
+[sub_resource type="Resource" id="Resource_p5"]
+script = ExtResource("1_param")
+Key = "BeaconStatusId"
+Value = "MissileBeacon"
+Note = "信标状态 Id（效果表 Config/Tables/Effects/eff_missile_beacon.tres）"
+
+[sub_resource type="Resource" id="Resource_p6"]
+script = ExtResource("1_param")
+Key = "BeaconSeconds"
+Value = 1.5
+Note = "信标持续（秒）"
+
+[sub_resource type="Resource" id="Resource_p7"]
+script = ExtResource("1_param")
+Key = "TurnRateDegrees"
+Value = 360.0
+Note = "追踪转向速度（度/秒，与弓的追踪弹同一列语义）"
+
+[sub_resource type="Resource" id="Resource_p8"]
+script = ExtResource("1_param")
+Key = "Cooldown"
+Value = 0.0
+Note = "本规则自己的触发间隔（0 = 不额外拦，暴击本身就有频率）"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+ApplyHandler = "HomingMissileOnCrit"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3"), SubResource("Resource_p4"), SubResource("Resource_p5"), SubResource("Resource_p6"), SubResource("Resource_p7"), SubResource("Resource_p8")]
+Id = "mut_homing_missile"
+DisplayName = "巡飞弹"
+DescriptionTemplate = "暴击命中时朝附近敌人发射一枚追踪飞弹（伤害 50）"
+Note = "[P6b 新增行] 文档第 182 行（异化池，全角色通用）「巡飞弹:你的暴击伤害会使你发射一发追踪附近敌人的飞弹,伤害{50};」。★ 消费者：`HomingMissileOnCritRule`（`Scripts/Rewards/RewardCatalog.cs`）。**复用的是 P3 已经做好并自测过的追踪弹通路**（`Projectile.HomingStatusId` + `HomingTurnRateDegrees`，见 `ArrowVolleyAbility` / docs/abilities.md §7）：规则先给最近的敌人挂上**专用信标状态** `MissileBeacon`，再发一枚 `HomingStatusId` = 它的飞弹。★ 暴击事件的抛点 P6a 已补（唯一：`Unit.ReceiveHit` 结算后 `HitInstance.Critical` 且真的打出伤害），这里再按 Source == 自己 过滤。★ **文档给了伤害 50**；弹速 60 / 索敌 18 米 / 存活 4 秒 / 信标 1.5 秒 / 转向 360°/s 都是**预设值**（文档没写）。★ 信标**故意不复用「标记」`Mark`**：那会和「心眼」「发散」产生非预期联动，所以另立一行效果表（无任何数值修正的纯信标）。"

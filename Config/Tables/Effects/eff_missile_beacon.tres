@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EffectConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+Kind = 10
+Duration = 1.5
+MaxStacks = 2
+Modifiers = []
+Id = "MissileBeacon"
+Slot = 10
+DisplayName = "飞弹信标"
+Note = "[P6b 新增行] 专供异化「巡飞弹」：`HomingMissileOnCritRule` 先给最近的敌人挂上它，再发一枚 `Projectile.HomingStatusId = MissileBeacon` 的飞弹 —— 追踪弹那套（P3 做好的 `Projectile` 追踪通路）要求「目标身上带某个状态」才锁得住。★ 它和「标记」（`Mark`）**故意分成两行**：复用 Mark 会让「心眼」（对被标记目标 +50% 伤害）与「发散」（每层标记加伤）被巡飞弹非预期地触发。★ 本行**没有任何数值修正**（Modifiers 空），靠 `MaxStacks > 1` 满足 `EffectConfig.IsStatus`（与 `eff_mark` 同一条路）。★ 持续 1.5s 是**预设**：文档没写信标时长，只要"飞弹飞到之前别掉"即可。★ 没有图标、没有表现 —— 它只是索敌用的隐形信标。"

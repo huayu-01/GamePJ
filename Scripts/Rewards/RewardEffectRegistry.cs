@@ -144,6 +144,35 @@ public static class RewardEffectRegistry
 				Radius = Param(row, "Radius", 0f),
 				Damage = Param(row, "Damage", 0f),
 			}),
+
+		// ⭐ P6b：**落地践踏**（「杀戮践踏」）。走的是"轮询落地边沿"而不是事件 ——
+		// `CharacterMovement` 是共用战斗类（本批不许碰），没有起跳/落地事件。
+		["StompOnLand"] = row => context =>
+			context.Player.AddChild(new StompOnLandRule
+			{
+				RewardId = row.Id,
+				Cooldown = Param(row, "Cooldown", 0.2f),
+				Radius = Param(row, "Radius", 3f),
+				Damage = Param(row, "Damage", 15f),
+				MinFallHeight = Param(row, "MinFallHeight", 0f),
+			}),
+
+		// ⭐ P6b：**暴击 → 巡飞弹**（「巡飞弹」）。复用 P3 的追踪弹通路：给最近的敌人挂一个
+		// **专用信标状态**，再发一枚 `HomingStatusId` = 那个状态的飞弹。
+		["HomingMissileOnCrit"] = row => context =>
+			context.Player.AddChild(new HomingMissileOnCritRule
+			{
+				RewardId = row.Id,
+				Cooldown = Param(row, "Cooldown", 0f),
+				MissileScene = LoadScene(ParamText(row, "ProjectileScene", "res://Scenes/Combat/Bullet.tscn")),
+				Damage = Param(row, "Damage", 50f),
+				Speed = Param(row, "Speed", 60f),
+				SeekRange = Param(row, "SeekRange", 18f),
+				Lifetime = Param(row, "Lifetime", 4f),
+				BeaconStatusId = ParamText(row, "BeaconStatusId", "MissileBeacon"),
+				BeaconSeconds = Param(row, "BeaconSeconds", 1.5f),
+				TurnRateDegrees = Param(row, "TurnRateDegrees", 360f),
+			}),
 	};
 
 	/// <summary>这个 handler id 注册过吗（读表校验用）。</summary>

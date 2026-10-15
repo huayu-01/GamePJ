@@ -569,6 +569,10 @@ public partial class SelfTest : Node
 				break;
 
 			case 52:
+				// ⚠️ P6b：这一段**必须排在所有硬指标之后**（它是最后一个阶段）——
+				// 它会往事件总线上抛 `Damaged`（践踏真的打了一下临时靶子），放在前面会污染
+				// 「敌人 N 活着 / 清场 / 碎片」那一批读数。
+				GameLog.Write("SelfTest", DebugP6bMutationProbe());
 				GameLog.Write("SelfTest", "=== 自测结束 ===");
 
 				// ⚠️ 退出前先解除暂停：这一阶段之前刚切过一关，`UiRouter` 正把树暂停着
@@ -4059,6 +4063,144 @@ public partial class SelfTest : Node
 
 	/// <summary>当前角色（供验证读取）。</summary>
 	public static bool Active { get; private set; }
+
+	/// <summary>
+	/// **P6b 两条新异化的行为取证**（杀戮践踏 `mut_stomp` / 巡飞弹 `mut_homing_missile`）。
+	///
+	/// <para>走的是**真实链路**：真实玩家 + 真实 <see cref="RewardContext"/> → `RunBuild.Add(行)` →
+	/// 真实 handler 建出规则 → 在玩家旁边**临时造一个真敌人** `Chaser.tscn`（AI 关掉）→
+	/// 两条规则各**真的出手一次**，量出实际结果：</para>
+	/// <list type="bullet">
+	/// <item>杀戮践踏：半径 / 伤害 / 触发间隔 / 最小落高四个参数逐位来自行；`Matches` 恒为 false
+	///   （证明它**不是事件驱动**，出手完全由 `_Process` 的落地边沿发起）；出手一次后靶子掉血 = 行里的伤害。</item>
+	/// <item>巡飞弹：暴击事件匹配 → 出手一次 → `FireCount` +1、靶子身上挂上信标状态、场上多一枚投射物。</item>
+	/// </list>
+	///
+	/// <para>⚠️ 量完**全部还原**（靶子 / 新生成的投射物 / 两条规则节点全部 `Free()`），
+	/// 但因为中途真的打了一下靶子（会抛 `Damaged`），调用点必须是**自测最后一个阶段**。</para>
+	/// </summary>
+	public string DebugP6bMutationProbe()
+	{
+		Unit? player = PlayerLocator.Player;
+		if (player == null || !IsInstanceValid(player))
+		{
+			return "🔴 P6b·新异化行为取证：找不到玩家";
+		}
+
+		var build = new RunBuild();
+		// `RewardContext.Weapon` 是 `required` 成员，所以这里必须给一个 —— 这两条异化的 handler 都不读它，
+		// 找不到就退到一个**不进树**的空武器（与其它探针"new 出来、用完 Free"的做法一致）。
+		var context = new RewardContext
+		{
+			Player = player,
+			Weapon = NodeSearch.FindInSubtree<ActRoguelike.Weapons.Weapon>(player) ?? new ActRoguelike.Weapons.Weapon(),
+			Build = build,
+		};
+		foreach (string id in new[] { "mut_stomp", "mut_homing_missile" })
+		{
+			if (RewardCatalog.Find(id) is { } row)
+			{
+				build.Add(row, context);
+			}
+		}
+
+		var rules = new List<TriggerRule>();
+		NodeSearch.CollectInSubtree(player, rules);
+		StompOnLandRule? stomp = null;
+		HomingMissileOnCritRule? missile = null;
+		foreach (TriggerRule rule in rules)
+		{
+			stomp ??= rule as StompOnLandRule;
+			missile ??= rule as HomingMissileOnCritRule;
+		}
+
+		if (stomp == null || missile == null)
+		{
+			return $"🔴 P6b·新异化行为取证：规则没建出来（践踏={(stomp != null)} 巡飞弹={(missile != null)}）—— 检查 ApplyHandler 拼写与行是否在表里";
+		}
+
+		// 信标状态那一行必须真的能建出 StatusEffect（`HomingMissileOnCritRule` 靠它锁目标）。
+		StatusEffect? beacon = StatusPresets.Create(missile.BeaconStatusId, missile.BeaconSeconds);
+
+		// 临时靶子：真敌人 Chaser，AI 关掉，摆在玩家右手边 2 米（在践踏半径 3 与索敌 18 之内）。
+		Unit? target = null;
+		Node? arena = player.GetParent();
+		if (arena != null && GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate() is Unit chaser)
+		{
+			NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(chaser)?.SetPhysicsProcess(false);
+			arena.AddChild(chaser);
+			chaser.GlobalPosition = player.GlobalPosition + new Vector3(2f, 0f, 0f);
+			target = chaser;
+		}
+
+		// 场上已有的投射物（量完只 Free **新增**的那些，不动关卡自己的）。
+		var projectilesBefore = new List<ActRoguelike.Combat.Projectile>();
+		if (arena != null)
+		{
+			NodeSearch.CollectInSubtree(arena, projectilesBefore);
+		}
+
+		float targetHealthBefore = target?.Health ?? 0f;
+		bool stompNotEventDriven = !stomp.Matches(new GameplayEvent { Kind = GameplayEventKind.Kill, Source = player });
+		stomp.Execute(default);
+		float stompDamageDealt = targetHealthBefore - (target?.Health ?? 0f);
+
+		var crit = new GameplayEvent { Kind = GameplayEventKind.Critical, Source = player };
+		bool critMatches = missile.Matches(crit);
+		bool enemyCritIgnored = !missile.Matches(new GameplayEvent { Kind = GameplayEventKind.Critical, Source = target });
+		missile.Execute(crit);
+
+		int beaconStacks = target?.GetStatusStacks(missile.BeaconStatusId) ?? 0;
+		var projectilesAfter = new List<ActRoguelike.Combat.Projectile>();
+		if (arena != null)
+		{
+			NodeSearch.CollectInSubtree(arena, projectilesAfter);
+		}
+
+		int spawned = projectilesAfter.Count - projectilesBefore.Count;
+
+		bool stompOk = stomp is { Radius: 3f, Damage: 15f, Cooldown: 0.2f, MinFallHeight: 0f }
+			&& stompNotEventDriven
+			&& Mathf.Abs(stompDamageDealt - 15f) < 0.51f;
+		bool missileOk = missile is { Damage: 50f, BeaconStatusId: "MissileBeacon" }
+			&& critMatches && enemyCritIgnored
+			&& missile.FireCount == 1
+			&& beaconStacks >= 1
+			&& spawned == 1
+			&& beacon is { MaxStacks: 2 } && beacon.Modifiers.Length == 0;
+
+		string line = $"{(stompOk && missileOk ? "✅" : "🔴")} P6b·新异化行为取证（真实玩家 + 真敌人靶子，量完还原）："
+			+ $"杀戮践踏 → {stomp.GetType().Name} 半径 {stomp.Radius:0.#}（期望 3）伤害 {stomp.Damage:0.#}（期望 15）间隔 {stomp.Cooldown:0.##}（期望 0.2）最小落高 {stomp.MinFallHeight:0.#}（期望 0）"
+			+ $"｜事件匹配恒 false={stompNotEventDriven}（期望 True —— 它不是事件驱动，出手由落地边沿发起）"
+			+ $"｜出手一次：靶子 {targetHealthBefore:0.#} → {target?.Health ?? 0f:0.#}（掉 {stompDamageDealt:0.#}，期望 15）"
+			+ $"｜巡飞弹 → {missile.GetType().Name} 伤害 {missile.Damage:0.#}（期望 50 —— 文档给的就是 50）弹速 {missile.Speed:0.#} 索敌 {missile.SeekRange:0.#}m 信标「{missile.BeaconStatusId}」{missile.BeaconSeconds:0.#}s 转向 {missile.TurnRateDegrees:0.#}°/s"
+			+ $"｜暴击匹配={critMatches}（期望 True）敌人暴击被忽略={enemyCritIgnored}（期望 True）"
+			+ $"｜出手一次：FireCount={missile.FireCount}（期望 1）靶子信标层数={beaconStacks}（期望 ≥1）新生成投射物={spawned}（期望 1）"
+			+ $"｜信标行 StatusPresets.Create → {(beacon == null ? "null（🔴 表里没有这一行）" : $"MaxStacks {beacon.MaxStacks} Modifiers {beacon.Modifiers.Length} 条")}"
+			+ "｜⚠️ 这一段是**直接调 Execute**（与落地轮询/事件总线走的是同一个入口）；"
+			+ "真实按键/落地那一路的端到端留给人手 MCP 验证，免得污染前面的硬指标";
+
+		// 还原：新生成的投射物、靶子、两条规则节点全部清掉。
+		foreach (ActRoguelike.Combat.Projectile projectile in projectilesAfter)
+		{
+			if (!projectilesBefore.Contains(projectile))
+			{
+				projectile.Free();
+			}
+		}
+
+		target?.Free();
+		foreach (TriggerRule rule in rules)
+		{
+			if (rule is StompOnLandRule or HomingMissileOnCritRule)
+			{
+				player.RemoveChild(rule);
+				rule.Free();
+			}
+		}
+
+		return line;
+	}
 #endif
 }
 

@@ -111,6 +111,16 @@ public partial class RunController : Node
 
 		// 角色表的能力开关矩阵：取代原来三段硬编码的 `melee.Enabled = heavy` / `summon/control.Enabled = summoner`。
 		// 读不到角色行时回退到与分表前逐位一致的那套规则。
+		//
+		// ⚠️ P6b 核对（**只改注释，没动顺序**）：这一行跑在下面 `character.ApplySkillsTo(_player)` **之前**，
+		// 而矩阵的首选匹配键是 `Ability.AbilityId`，那个字段正是 `ApplySkillsTo` 写进去的 ——
+		// 于是**第一次套用**（刚进关卡）时 `AbilityId` 还是空串，矩阵只能退到"类名匹配"，
+		// 而角色行的两个名单里写的是**技能行 Id**（`skl_a1_skill_1` …），所以这一趟实际匹配不到任何东西。
+		// 真正决定开关的是**技能行自己的 `AbilityConfig.Enabled`**，所以现状无害（自测逐位一致）。
+		// **为什么不改成"先 ApplySkillsTo 再矩阵"**：矩阵内部的 `ResetAbilityBindings` 会把能力恢复到
+		// 场景基线（InputAction 也要恢复）—— 它必须排在**所有**"行 → 能力"的写入之前；挪到技能行之后
+		// 会把技能行刚写上的 `InputAction`（后撤的 Q、武技的左右键）一起清掉，是实打实的回归。
+		// 真要修得拆成三步（先 reset → 再技能行 → 再矩阵），超出 P6b 范围，留给后续。
 		ApplyAbilityMatrix(character);
 
 		if (character != null)
@@ -545,8 +555,14 @@ public partial class RunController : Node
 	///
 	/// ⚠️ 按类名匹配有个硬伤：**同一个类的两个技能没法分开开关**（角色 A 的两个武技都是
 	/// <c>EnergyWaveAbility</c>）。所以本轮把首选键改成 <c>Ability.AbilityId</c>：它在
-	/// <c>AbilityConfig.ApplyTo</c> 里被写成技能行的 Id，时机在 <see cref="ApplyAbilityMatrix"/>
-	/// 之前（先 <c>ApplySkillsTo</c> 再矩阵）。
+	/// <c>AbilityConfig.ApplyTo</c> 里被写成技能行的 Id。
+	///
+	/// <para>⚠️ <b>P6b 核对（2026-10-16）：这里原来写的是"时机在矩阵之前（先 ApplySkillsTo 再矩阵）"，
+	/// 与代码相反 —— 实际是矩阵先跑、技能行后跑</b>（见 <c>ApplyBalance</c> 里那一大段说明）。
+	/// 所以在**第一次**套用（刚进关卡）时 <c>AbilityId</c> 还是空串 → 只能退到类名匹配 →
+	/// 与角色行里按**技能行 Id** 写的名单对不上 → 这一趟矩阵**实际什么都没改**。
+	/// 真正决定开关的是技能行自己的 <c>AbilityConfig.Enabled</c>，所以现状无害（自测逐位一致）。
+	/// 修法见 <c>ApplyBalance</c> 的注释：要拆成"先 reset → 再技能行 → 再矩阵"三步，本轮不做。</para>
 	///
 	/// 读不到角色行时**只恢复场景基线**（不再有 `melee.Enabled = heavy` / `summon = summoner` 那套
 	/// 旧角色的硬编码规则 —— 那些角色已在 P6a 删除，`heavy` / `summoner` 两个变量也随之消失）。
