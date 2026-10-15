@@ -4330,8 +4330,109 @@ public partial class SelfTest : Node
 			}
 		}
 
-		return line;
+		// ===================== 落日剑 =====================
+		if (RewardCatalog.Find("mut_sunset_sword") is { } swordRow)
+		{
+			build.Add(swordRow, context);
+		}
+
+		SunsetSwordRule? sword = NodeSearch.FindInSubtree<SunsetSwordRule>(player);
+		Node? arena2 = player.GetParent();
+		Unit? target2 = null;
+		if (arena2 != null && GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate() is Unit chaser2)
+		{
+			NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(chaser2)?.SetPhysicsProcess(false);
+			arena2.AddChild(chaser2);
+			chaser2.GlobalPosition = player.GlobalPosition + new Vector3(2f, 0f, 0f);
+			target2 = chaser2;
+		}
+
+		// 「武技1」是哪一个技能行？**由按键动作反查**（与规则内部同一条路），所以探针也不写死技能 Id。
+		string skill1Id = sword == null
+			? string.Empty
+			: ActRoguelike.Player.PlayerAbilityInput.FindByInputAction(player, sword.TriggerInputAction)?.AbilityId ?? string.Empty;
+
+		var weapon1Hit = new GameplayEvent { Kind = GameplayEventKind.Hit, Source = player, Target = target2, Tag = skill1Id };
+		bool swordMatches = sword != null && target2 != null && skill1Id.Length > 0 && sword.Matches(weapon1Hit);
+		bool otherAbilityIgnored = sword != null && target2 != null
+			&& !sword.Matches(new GameplayEvent { Kind = GameplayEventKind.Hit, Source = player, Target = target2, Tag = "skl_a1_skill_1" });
+		bool selfTargetIgnored = sword != null && !sword.Matches(new GameplayEvent { Kind = GameplayEventKind.Hit, Source = player, Target = player, Tag = skill1Id });
+
+		float targetHealthBefore = target2?.Health ?? 0f;
+		float playerHealthBeforeSword = player.Health;
+		Node? scene = player.GetTree()?.CurrentScene;
+		int ringsBefore = scene != null ? CountNodesNamed(scene, "LandingShockwaveFx") : 0;
+
+		sword?.Execute(weapon1Hit);
+
+		SunsetSwordMarker? marker = target2?.GetNodeOrNull<SunsetSwordMarker>(SunsetSwordMarker.NodeName);
+		bool markerParamsOk = marker is { Radius: 2.5f, Damage: 40f, HoverSeconds: 1.5f, FallSeconds: 0.35f, HoverHeight: 3.2f };
+		bool attached = marker != null && marker.Attacker == player && marker.Target == target2;
+		float hoverOffset = marker != null && target2 != null ? marker.GlobalPosition.Y - target2.GlobalPosition.Y : 0f;
+
+		// 「对**没有**落日剑的敌人施加」：挂上之后再问一次 → 不该再匹配。
+		bool noSecondSword = sword != null && target2 != null && !sword.Matches(weapon1Hit);
+
+		// 真的让它落下来 —— 走的是**同一个 `_Process` 入口**，只是推两下大步长（悬挂 → 落下）。
+		marker?._Process(10.0);
+		marker?._Process(10.0);
+
+		float targetHealthAfter = target2?.Health ?? 0f;
+		float swordDamageDealt = targetHealthBefore - targetHealthAfter;
+		float playerHealthAfterSword = player.Health;
+		int ringsAfter = scene != null ? CountNodesNamed(scene, "LandingShockwaveFx") : 0;
+		int hits = marker?.LastHits ?? 0;
+		bool fell = marker is { HasFallen: true, FallCount: 1 };
+		bool noCollisionOrUnit = marker != null && marker.CountCollisions() == 0 && marker.CountUnits() == 0 && marker.GetGroups().Count == 0;
+		string markerState = marker?.DebugState() ?? "（没挂上）";
+
+		bool swordOk = sword is { TriggerInputAction: "weapon_skill_1", HoverSeconds: 1.5f, FallSeconds: 0.35f, Radius: 2.5f, Damage: 40f, HoverHeight: 3.2f, Cooldown: 0f }
+			&& swordMatches && otherAbilityIgnored && selfTargetIgnored
+			&& markerParamsOk && attached && noSecondSword
+			&& Mathf.Abs(hoverOffset - 3.2f) < 0.05f
+			&& fell && hits >= 1
+			&& Mathf.Abs(swordDamageDealt - 40f) < 0.51f
+			&& Mathf.Abs(playerHealthAfterSword - playerHealthBeforeSword) < 0.001f
+			&& ringsAfter > ringsBefore
+			&& noCollisionOrUnit;
+
+		string swordLine = $"{(swordOk ? "✅" : "🔴")} P6d·落日剑行为取证（真实玩家 + 真实行 + 真实敌人靶子，量完还原）："
+			+ $"→ {(sword == null ? "（规则没建出来）" : sword.GetType().Name)} 触发按键「{sword?.TriggerInputAction}」"
+			+ $"（反查到的武技1 技能行 =「{(skill1Id.Length == 0 ? "（没找到）" : skill1Id)}」）"
+			+ $"｜悬挂 {sword?.HoverSeconds:0.##}s（期望 1.5，预设）落下 {sword?.FallSeconds:0.##}s（期望 0.35，预设）半径 {sword?.Radius:0.##}m（期望 2.5，预设）伤害 {sword?.Damage:0.##}（期望 40，预设）高度 {sword?.HoverHeight:0.##}m（期望 3.2，预设）间隔 {sword?.Cooldown:0.##}（期望 0）"
+			+ $"｜武技1 命中匹配={swordMatches}（期望 True）别的技能不匹配={otherAbilityIgnored}（期望 True）打自己不算={selfTargetIgnored}（期望 True）"
+			+ $"｜施加后目标身上有剑={attached}（期望 True；节点名 {SunsetSwordMarker.NodeName}）悬挂高度实测={hoverOffset:0.##}m（期望 3.2）重复施加被拦={noSecondSword}（期望 True —— 文档「对**没有**落日剑的敌人施加」）"
+			+ $"｜剑自己落下：已落下={fell} 落点命中={hits}（期望 ≥1）靶子 {targetHealthBefore:0.#} → {targetHealthAfter:0.#}（掉 {swordDamageDealt:0.#}，期望 40）"
+			+ $"｜玩家自己没被自己的剑打到：{playerHealthBeforeSword:0.#} → {playerHealthAfterSword:0.#}（期望不变）"
+			+ $"｜落圈（复用 P6c LandingShockwave）：{ringsBefore} → {ringsAfter}（期望 +1）"
+			+ $"｜纯表现安全性：碰撞体/单位/分组 全 0 = {noCollisionOrUnit}"
+			+ $"｜{markerState}";
+
+		// 还原：靶子（连着剑）、落日剑规则节点、这一波新画的圈。
+		if (scene != null)
+		{
+			foreach (Node node in scene.FindChildren("LandingShockwaveFx", string.Empty, true, false))
+			{
+				node.Free();
+			}
+		}
+
+		target2?.Free();
+		foreach (TriggerRule rule in CollectRules(player))
+		{
+			if (rule is SunsetSwordRule)
+			{
+				player.RemoveChild(rule);
+				rule.Free();
+			}
+		}
+
+		return line + "\n" + swordLine;
 	}
+
+	/// <summary>按节点名数个数（探针用；只数，不改）。</summary>
+	private static int CountNodesNamed(Node root, string name)
+		=> root.FindChildren(name, string.Empty, true, false).Count;
 
 	private static List<TriggerRule> CollectRules(Node root)
 	{

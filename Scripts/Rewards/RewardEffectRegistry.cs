@@ -185,6 +185,22 @@ public static class RewardEffectRegistry
 				BlockDamageMultiplier = Param(row, "BlockDamageMultiplier", 0f),
 				FrontDotThreshold = Param(row, "FrontDotThreshold", 1f),
 			}),
+
+		// ⭐ P6d：**武技1 命中 → 给敌人挂"落日剑"**（P6d 新增的那条异化）。
+		// "哪个技能算武技1"由 `TriggerInputAction`（按键动作名）反查技能行的 InputAction 列决定 ——
+		// 换武器 / 加武器都不用改代码；数值（悬挂 / 落下 / 半径 / 伤害 / 高度）全来自行。
+		["SunsetSword"] = row => context =>
+			context.Player.AddChild(new SunsetSwordRule
+			{
+				RewardId = row.Id,
+				Cooldown = Param(row, "Cooldown", 0f),
+				TriggerInputAction = ParamText(row, "TriggerInputAction", "weapon_skill_1"),
+				HoverSeconds = Param(row, "HoverSeconds", 1.5f),
+				FallSeconds = Param(row, "FallSeconds", 0.35f),
+				Radius = Param(row, "Radius", 2.5f),
+				Damage = Param(row, "Damage", 40f),
+				HoverHeight = Param(row, "HoverHeight", 3.2f),
+			}),
 	};
 
 	/// <summary>这个 handler id 注册过吗（读表校验用）。</summary>

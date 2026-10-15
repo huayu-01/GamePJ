@@ -429,8 +429,20 @@ public partial class TablePulseRule : TriggerRule
 /// </summary>
 internal static class PulseDamage
 {
-	/// <summary>返回打到了几个敌人（自测取证用）。</summary>
+	/// <summary>围绕 <paramref name="owner"/> 自己（= 它的位置）打一圈。</summary>
 	public static int Around(Node tree, Unit owner, float radius, float damage, string abilityId)
+		=> Around(tree, owner, owner?.GlobalPosition ?? Vector3.Zero, radius, damage, abilityId);
+
+	/// <summary>
+	/// 围绕**给定的世界点**打一圈（返回打到了几个敌人，自测取证用）。
+	///
+	/// <para>P6d 新增的只是"圆心可以不是施法者自己"这一点：「落日剑」的剑是落在**目标头上**
+	/// 掉下来的，圆心是那个敌人当时的位置，而归属（<c>Attacker</c>）仍然是玩家 ——
+	/// 用原来那个签名会把圆心算成玩家的位置，等于在玩家脚下打一圈（错的）。</para>
+	///
+	/// <para>旧签名的行为**逐位不变**（它只是把 <c>owner.GlobalPosition</c> 转交给这一个）。</para>
+	/// </summary>
+	public static int Around(Node tree, Unit owner, Vector3 center, float radius, float damage, string abilityId)
 	{
 		if (radius <= 0f || damage <= 0f || !GodotObject.IsInstanceValid(owner) || tree?.GetTree() is not { } sceneTree)
 		{
@@ -438,7 +450,7 @@ internal static class PulseDamage
 		}
 
 		int hits = 0;
-		Vector3 from = owner.GlobalPosition;
+		Vector3 from = center;
 		float best = radius * radius;
 		foreach (Node node in sceneTree.GetNodesInGroup("enemy_units"))
 		{
@@ -851,4 +863,148 @@ public partial class GuardOnSprintRule : TriggerRule
 	public string DebugState()
 		=> $"护卫：手上有格挡={HasGuard} 累计获得={GuardGranted} 被打碎={BlockedCount} 重取剩余={RechargeRemaining:0.##}s"
 			+ $"｜数值 挡后剩伤={BlockDamageMultiplier:0.##} 正面阈值={FrontDotThreshold:0.##} 间隔={Cooldown:0.##}s";
+}
+
+/// <summary>
+/// 异化「落日剑」（**P6d 新增**）—— 文档 `角色设计.txt` 第 187-188 行：
+/// 「落日剑:武技1会对没有落日剑的敌人施加落日剑;（落日剑:为目标头顶悬挂一柄剑,一段时间后剑会落下造成伤害）」。
+///
+/// <list type="bullet">
+/// <item><b>触发条件</b>：一次 <see cref="GameplayEventKind.Hit"/>，且 ① 来源是自己、
+///   ② 目标是敌对单位、③ **这一击来自"武技1"**、④ 目标身上**还没有**落日剑
+///   （<see cref="SunsetSwordMarker.NodeName"/> 那个子节点不存在 —— 这正是文档那句
+///   「对**没有**落日剑的敌人施加」）。</item>
+/// <item><b>"武技1"怎么判</b>（不写死技能 Id）：拿**按键动作**（<see cref="TriggerInputAction"/>，来自行）去问
+///   <c>PlayerAbilityInput.FindByInputAction</c> —— 它读的是技能行的 <c>InputAction</c> 列，
+///   所以"哪个技能在武技1 上"是**配置**；再把这**一次命中**的 <c>Tag</c>（= <c>AttackInstance.Ability</c>，
+///   在 <c>Unit.ReceiveHit</c> 里写进事件）与它比。换武器 / 加武器都不用改代码。</item>
+/// <item><b>效果</b>：给目标挂一个 <see cref="SunsetSwordMarker"/> 子节点（头顶一把剑），
+///   它自己在 <c>HoverSeconds</c> 后落下，落地按 <c>Radius</c>/<c>Damage</c> 打一圈 + 画一圈
+///   （复用 P6c 的 <c>LandingShockwave</c>）。</item>
+/// </list>
+///
+/// <para>⚠️ 文档只写了"一段时间后"与"造成伤害"：<c>HoverSeconds</c> / <c>FallSeconds</c> /
+/// <c>Radius</c> / <c>Damage</c> / <c>HoverHeight</c> 全是**预设值**（行 `Note` 里逐条写明）。</para>
+/// </summary>
+public partial class SunsetSwordRule : TriggerRule
+{
+	/// <summary>哪个按键动作算"武技1"（来自行；空 = 这一条永远不会出手）。</summary>
+	public string TriggerInputAction { get; set; } = "weapon_skill_1";
+
+	/// <summary>头顶悬挂多久之后落下（秒）。</summary>
+	public float HoverSeconds { get; set; } = 1.5f;
+
+	/// <summary>下落耗时（秒）。</summary>
+	public float FallSeconds { get; set; } = 0.35f;
+
+	/// <summary>落地伤害的作用半径（米）。</summary>
+	public float Radius { get; set; } = 2.5f;
+
+	/// <summary>落地伤害。</summary>
+	public float Damage { get; set; } = 40f;
+
+	/// <summary>悬挂高度（米）。</summary>
+	public float HoverHeight { get; set; } = 3.2f;
+
+	/// <summary>本局一共施加了几次（自测取证）。</summary>
+	public int ApplyCount { get; private set; }
+
+	private Unit? _owner;
+	private bool _warnedNoAbility;
+
+	public override void _Ready()
+	{
+		base._Ready();
+		_owner = GetParent<Unit>();
+	}
+
+	public override bool Matches(GameplayEvent gameplayEvent)
+	{
+		Unit? owner = _owner;
+		if (gameplayEvent.Kind != GameplayEventKind.Hit
+			|| owner == null
+			|| !GodotObject.IsInstanceValid(owner)
+			|| gameplayEvent.Source != owner
+			|| gameplayEvent.Target is not Unit victim
+			|| victim == owner
+			|| victim.IsDead
+			|| !victim.IsHostileTo(owner))
+		{
+			return false;
+		}
+
+		// 「对**没有**落日剑的敌人施加」—— 已经有了就不再施加（剑在头顶挂着）。
+		if (victim.GetNodeOrNull<SunsetSwordMarker>(SunsetSwordMarker.NodeName) != null)
+		{
+			return false;
+		}
+
+		return IsWeaponSkill1(gameplayEvent.Tag);
+	}
+
+	/// <summary>这一击是不是"武技1"打出来的（按**按键动作**反查技能行，不写死技能 Id）。</summary>
+	private bool IsWeaponSkill1(string? abilityId)
+	{
+		Unit? owner = _owner;
+		if (owner == null || string.IsNullOrEmpty(abilityId) || string.IsNullOrEmpty(TriggerInputAction))
+		{
+			return false;
+		}
+
+		Ability? weaponSkill1 = ActRoguelike.Player.PlayerAbilityInput.FindByInputAction(owner, TriggerInputAction);
+		if (weaponSkill1 == null)
+		{
+			if (!_warnedNoAbility)
+			{
+				_warnedNoAbility = true;
+				GameLog.Write(
+					"Reward",
+					$"⚠ 增幅 {RewardId}（落日剑）：这位玩家身上没有绑在「{TriggerInputAction}」上的技能 → 这一条不会生效（检查武器行的武技1 技能行与它的 InputAction 列）。");
+			}
+
+			return false;
+		}
+
+		return weaponSkill1.AbilityId == abilityId;
+	}
+
+	public override void Execute(GameplayEvent gameplayEvent)
+	{
+		Unit? owner = _owner;
+		if (owner == null
+			|| !GodotObject.IsInstanceValid(owner)
+			|| gameplayEvent.Target is not Unit victim
+			|| !GodotObject.IsInstanceValid(victim))
+		{
+			return;
+		}
+
+		if (victim.GetNodeOrNull<SunsetSwordMarker>(SunsetSwordMarker.NodeName) != null)
+		{
+			return;
+		}
+
+		var marker = new SunsetSwordMarker
+		{
+			Name = SunsetSwordMarker.NodeName,
+			Attacker = owner,
+			AbilityId = RewardId,
+			HoverSeconds = HoverSeconds,
+			FallSeconds = FallSeconds,
+			Radius = Radius,
+			Damage = Damage,
+			HoverHeight = HoverHeight,
+		};
+		victim.AddChild(marker);
+		ApplyCount++;
+
+		GameLog.Write(
+			"Reward",
+			$"增幅·事件规则：{RewardId} 施加落日剑（第 {ApplyCount} 次，目标 {victim.Name}：悬挂 {HoverSeconds:0.##}s → 落下 {FallSeconds:0.##}s → 半径 {Radius:0.##}m / 伤害 {Damage:0.##}）");
+	}
+
+	/// <summary>探针用：一行的实际状态。</summary>
+	public string DebugState()
+		=> $"落日剑规则：施加={ApplyCount}｜触发按键「{TriggerInputAction}」｜悬挂={HoverSeconds:0.##}s 落下={FallSeconds:0.##}s"
+			+ $" 半径={Radius:0.##}m 伤害={Damage:0.##} 高度={HoverHeight:0.##}m 间隔={Cooldown:0.##}s";
 }

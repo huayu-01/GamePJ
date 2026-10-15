@@ -104,6 +104,9 @@ public partial class LandingShockwave : Node3D
 	private bool _warnedNoShape;
 	private bool _hooked;
 
+	/// <summary>这一次是谁让圈出现的（日志用；空 = 按父节点推断，P6d 的「落日剑」会显式写）。</summary>
+	private string? _sourceLabel;
+
 	public override void _Ready()
 	{
 		_fall = GetParentOrNull<FallAttackAbility>();
@@ -129,6 +132,24 @@ public partial class LandingShockwave : Node3D
 
 	/// <summary>下落攻击落地（<see cref="FallAttackAbility.Landed"/>）。</summary>
 	private void OnLanded() => Spawn();
+
+	/// <summary>
+	/// **按给定的世界位置与半径画一圈**（P6d 新增的入口，「落日剑」的落点用）。
+	///
+	/// <para>与 <see cref="Spawn"/> 的区别只有**谁是触发者**：那个分支的上游是"玩家的下落攻击落地"，
+	/// 位置与半径都从上游读；这个分支的调用方（<c>SunsetSwordMarker</c>）自己带着落点与半径
+	/// （两者都来自增幅行）。**画法与判据一个字都没变** —— 环 / 盘 / 扩散 / 淡出 / 回收全走
+	/// <see cref="SpawnAt"/> 这一份实现。</para>
+	///
+	/// <para>⚠️ 纯表现：不开任何判定、不进任何分组、不碰战斗状态。</para>
+	/// </summary>
+	public void PlayOnce(Vector3 worldPosition, float radius)
+	{
+		LastRadius = Mathf.Max(0.1f, radius);
+		LastRadiusSource = "调用方给定（落日剑落点的半径，来自增幅行）";
+		_sourceLabel = "落日剑";
+		SpawnAt(worldPosition);
+	}
 
 	public override void _Process(double delta)
 	{
@@ -161,18 +182,29 @@ public partial class LandingShockwave : Node3D
 			return;
 		}
 
+		LastRadius = ResolveRadius();
+		SpawnAt(owner.GlobalPosition);
+	}
+
+	/// <summary>
+	/// 画一圈的**唯一实现**：<paramref name="center"/> 是地面上的落点（高度由
+	/// <see cref="GroundOffset"/> + <see cref="ExtraHeight"/> 自己抬）。
+	/// 半径取 <see cref="LastRadius"/>（调用方先算好：要么读上游命中体，要么自己给）。
+	/// </summary>
+	private void SpawnAt(Vector3 center)
+	{
 		Node? host = GetTree()?.CurrentScene;
 		if (host == null || !IsInstanceValid(host))
 		{
 			return;
 		}
 
-		float radius = ResolveRadius();
+		float radius = Mathf.Max(0.1f, LastRadius);
 		LastRadius = radius;
 
 		var holder = new Node3D { Name = "LandingShockwaveFx" };
 		host.AddChild(holder);
-		holder.GlobalPosition = owner.GlobalPosition + (Vector3.Up * (GroundOffset + ExtraHeight));
+		holder.GlobalPosition = center + (Vector3.Up * (GroundOffset + ExtraHeight));
 		holder.Scale = Vector3.One * Mathf.Clamp(StartScale, 0.01f, 1f);
 
 		StandardMaterial3D ringMaterial = Unshaded(RingColor);
@@ -210,7 +242,7 @@ public partial class LandingShockwave : Node3D
 		SpawnCount++;
 		GameLog.Write(
 			"Combat",
-			$"落圈特效：{(_fall != null ? "下落攻击" : "落剑式")} 落地画一圈 —— 半径 {radius:0.##}m（{LastRadiusSource}），"
+			$"落圈特效：{_sourceLabel ?? (_fall != null ? "下落攻击" : "落剑式")} 落地画一圈 —— 半径 {radius:0.##}m（{LastRadiusSource}），"
 			+ $"扩散 {Duration:0.##}s（第 {SpawnCount} 次；纯视觉，不改判定）");
 	}
 

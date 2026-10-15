@@ -263,3 +263,47 @@ True）掉血 0（期望 0 = 完全格挡）护甲 25 → 25（期望不变）�
 ⚠️ 这一段**直接调 `PollOnce` / `ReceiveHit`**（与 `_Process`、真实命中走的是**同一个入口**），
 真实按键（按住 Shift 跑起来）那一路留给人手 MCP 验证 —— 与 P6b 探针同一条纪律（不污染前面的硬指标）。
 
+### 2「落日剑」`mut_sunset_sword`（文档第 187-188 行）
+
+| 文档原文 | 落成了什么 | 在哪 |
+|---|---|---|
+| 「落日剑:**武技1**会对**没有落日剑**的敌人施加落日剑;(落日剑:为目标**头顶悬挂一柄剑**,**一段时间后剑会落下**造成伤害)」 | `SunsetSwordRule`（订阅 `Hit` 事件：来源是自己 / 敌对目标 / 这一击来自武技1 / 目标还没有落日剑 → 给目标挂一把剑）+ `SunsetSwordMarker`（头顶悬挂 → 延迟 → 落下 → 打一圈 + 画一圈） | `Scripts/Rewards/RewardCatalog.cs` + `Scripts/Rewards/SunsetSwordMarker.cs` + handler `SunsetSword` |
+
+**"武技1"怎么判（不写死技能 Id）**：规则拿行里的 `TriggerInputAction`（按键动作名 `weapon_skill_1`）
+去问 `PlayerAbilityInput.FindByInputAction` —— 它读的是**技能行的 `InputAction` 列**，
+再把这一次命中的 `Tag`（= `AttackInstance.Ability`，在 `Unit.ReceiveHit` 里写进事件）与它比。
+所以 6 把武器的武技1 **自动适用**，换武器 / 加武器**不改代码**（自测实测反查到的正是当前武器的
+`skl_b3_w1_1`）。
+
+**"没有落日剑"怎么判（没有新增效果表行）**：目标身上没有名为 `SunsetSword` 的
+`SunsetSwordMarker` 子节点 —— 按名 O(1) 查。**因此 `ConfigIndex.tres` 的索引逐位不变**
+（效果表没动，只动了 `load_steps` 与 `Upgrades` 数组）。
+
+**复用了什么**：① 落地的范围伤害走**同一份** `PulseDamage.Around`（P6d 给它加了一个
+"圆心可以不是施法者"的重载 —— 剑落在**目标头上**，圆心是敌人不是玩家）；
+② 落圈直接复用 **P6c 的** `LandingShockwave`（给它加了 `PlayOnce(位置, 半径)` 这个外部入口，
+环 / 盘 / 扩散 / 淡出**一份实现**）。
+⚠️ **没有**复用 P4 的 `FallAttackAbility`：那是"玩家按键触发的技能"（共用 `Ability` 子类，本批硬约束不许碰），
+落日剑是"敌人身上延迟落下的一次性物件"，两者的上游与归属都不同 —— 硬套会把技能的状态机
+（`CanActivate` 的"空中才能用"、命中盒 `IntervalPerTarget`、冷却/层数）一起带进来。
+**只借了它的"下落 + 落地"形态与落地时机**。
+
+**预设值**：文档只写了"一段时间后"与"造成伤害"，**五个数都是拍的**：
+`HoverSeconds 1.5` / `FallSeconds 0.35` / `Radius 2.5m` / `Damage 40` / `HoverHeight 3.2m`
+（`Cooldown 0` = 不额外拦，因为"目标没有落日剑"本身已经限了频率）。
+
+**行为取证**（同一次 `--selftest`，退出码 0）：
+
+```
+✅ P6d·落日剑行为取证（真实玩家 + 真实行 + 真实敌人靶子，量完还原）：→ SunsetSwordRule 触发按键
+「weapon_skill_1」（反查到的武技1 技能行 =「skl_b3_w1_1」）｜悬挂 1.5s 落下 0.35s 半径 2.5m 伤害 40
+高度 3.2m 间隔 0（全部逐位来自行）｜武技1 命中匹配=True 别的技能不匹配=True 打自己不算=True
+｜施加后目标身上有剑=True（节点名 SunsetSword）悬挂高度实测=3.2m 重复施加被拦=True
+（文档「对**没有**落日剑的敌人施加」）｜剑自己落下：已落下=True 落点命中=1 靶子 60 → 20（掉 40，期望 40）
+｜玩家自己没被自己的剑打到：240 → 240（期望不变）｜落圈（复用 P6c LandingShockwave）：0 → 1（期望 +1）
+｜纯表现安全性：碰撞体/单位/分组 全 0 = True
+```
+
+⚠️ 「剑自己落下」那一步也是**同一个 `_Process` 入口**（探针只是推两下大步长把 1.5s + 0.35s 走完），
+真实观感（悬挂 1.5 秒 → 落下）要与截图一起看。
+

@@ -1,0 +1,57 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "TriggerInputAction"
+Value = "weapon_skill_1"
+Note = "★ 哪个按键动作算「武技1」—— 规则拿它去反查技能行的 InputAction 列（不写死技能 Id，换武器/加武器都不用改代码）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "HoverSeconds"
+Value = 1.5
+Note = "为目标头顶悬挂多久之后剑落下（秒）。⚠️ 文档只说「一段时间后」，这是预设值"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "FallSeconds"
+Value = 0.35
+Note = "剑下落过程的耗时（秒）。⚠️ 预设值"
+
+[sub_resource type="Resource" id="Resource_p3"]
+script = ExtResource("1_param")
+Key = "Radius"
+Value = 2.5
+Note = "剑落下时对周围敌人的作用半径（米）。⚠️ 文档只说「造成伤害」，这是预设值"
+
+[sub_resource type="Resource" id="Resource_p4"]
+script = ExtResource("1_param")
+Key = "Damage"
+Value = 40.0
+Note = "剑落下的伤害。⚠️ 文档没给数字，这是预设值"
+
+[sub_resource type="Resource" id="Resource_p5"]
+script = ExtResource("1_param")
+Key = "HoverHeight"
+Value = 3.2
+Note = "剑悬挂在目标头顶多高（米）。⚠️ 预设值"
+
+[sub_resource type="Resource" id="Resource_p6"]
+script = ExtResource("1_param")
+Key = "Cooldown"
+Value = 0.0
+Note = "本规则自己的触发间隔（0 = 不额外拦 —— 文档的条件是「目标没有落日剑」，那本身就限了频率）"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 2
+MaxStacks = 1
+ApplyHandler = "SunsetSword"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3"), SubResource("Resource_p4"), SubResource("Resource_p5"), SubResource("Resource_p6")]
+Id = "mut_sunset_sword"
+DisplayName = "落日剑"
+DescriptionTemplate = "武技1 会对没有落日剑的敌人施加落日剑（头顶悬挂一柄剑，一段时间后落下造成范围伤害）"
+Note = "[P6d 新增行] 文档第 187-188 行（异化池，全角色通用）「落日剑:武技1会对没有落日剑的敌人施加落日剑;(落日剑:为目标头顶悬挂一柄剑,一段时间后剑会落下造成伤害)」。★ 消费者：`SunsetSwordRule`（`Scripts/Rewards/RewardCatalog.cs`）—— 订阅 Hit 事件，判据四条：来源是自己 / 目标是敌对单位 / 这一击来自「武技1」/ 目标身上**还没有**落日剑。★ 「武技1」不写死技能 Id：拿行里的 `TriggerInputAction`（按键动作名）去问 `PlayerAbilityInput.FindByInputAction`（它读技能行的 InputAction 列），再与这一次命中的 Tag（= AttackInstance.Ability）比 —— 所以 6 把武器的武技1 都自动适用，换武器/加武器不改代码。★ 「没有落日剑」= 目标身上没有名为 `SunsetSword` 的 `SunsetSwordMarker` 子节点（按名 O(1) 查；**没有新增效果表行**，所以 ConfigIndex 的索引逐位不变）。★ 落下的剑 = `SunsetSwordMarker`（`Scripts/Rewards/SunsetSwordMarker.cs`）：悬挂期间跟着目标头顶走，`HoverSeconds` 后从当前位置加速砸到**施放时冻结的落点**，落地按半径/伤害对周围敌人打一圈（复用 `PulseDamage.Around` 的"圆心可指定"重载，归属仍是玩家），并复用 **P6c 的** `LandingShockwave` 画落圈（P6d 给它加了 `PlayOnce(位置, 半径)` 这个外部入口）。★ ⚠️ **文档只写了"一段时间后"与"造成伤害"**：HoverSeconds 1.5 / FallSeconds 0.35 / Radius 2.5 / Damage 40 / HoverHeight 3.2 **全是预设值**。★ 剑是**纯表现 + 一次性逻辑**：子树里 0 个碰撞体、0 个 Unit、0 个分组（不进任何单位列表；`DebugState()` 打这三个量）。"
