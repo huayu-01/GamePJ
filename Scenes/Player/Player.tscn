@@ -231,7 +231,7 @@ Policy = 1
 HitInterval = 0.25
 AttackTags = PackedStringArray("Melee", "Fall")
 
-[node name="Shape" type="CollisionShape3D" parent="AbilityFallAttack/Attack"]
+[node name="Shape" parent="AbilityFallAttack/Attack" index="0"]
 shape = SubResource("SphereShape3D_landing")
 
 [node name="AbilityWeapon4Skill1" type="Node3D" parent="."]
@@ -240,7 +240,7 @@ Enabled = false
 
 [node name="Attack" parent="AbilityWeapon4Skill1" instance=ExtResource("36_melee_strike")]
 
-[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon4Skill1/Attack"]
+[node name="Shape" parent="AbilityWeapon4Skill1/Attack" index="0"]
 shape = SubResource("BoxShape3D_sword")
 
 [node name="AbilityWeapon4Skill2" type="Node3D" parent="."]
@@ -259,7 +259,7 @@ Enabled = false
 Damage = 26.0
 Knockback = 4.0
 
-[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon5Skill1/Attack"]
+[node name="Shape" parent="AbilityWeapon5Skill1/Attack" index="0"]
 shape = SubResource("BoxShape3D_scythe")
 
 [node name="AbilityWeapon5Skill2" type="Node3D" parent="."]
@@ -274,7 +274,7 @@ Policy = 0
 HitInterval = 0.5
 AttackTags = PackedStringArray("Melee", "Spin")
 
-[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon5Skill2/Attack"]
+[node name="Shape" parent="AbilityWeapon5Skill2/Attack" index="0"]
 shape = SubResource("BoxShape3D_scythe_spin")
 
 [node name="WeaponVisual" type="MeshInstance3D" parent="AbilityWeapon5Skill2"]
@@ -292,7 +292,7 @@ Enabled = false
 Damage = 22.0
 Knockback = 3.5
 
-[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon6Skill1/Attack"]
+[node name="Shape" parent="AbilityWeapon6Skill1/Attack" index="0"]
 shape = SubResource("BoxShape3D_spear")
 
 [node name="AbilityWeapon6Skill2" type="Node3D" parent="."]
@@ -305,7 +305,7 @@ Damage = 24.0
 Knockback = 3.0
 AttackTags = PackedStringArray("Melee", "Thrown")
 
-[node name="Shape" type="CollisionShape3D" parent="AbilityWeapon6Skill2/Attack"]
+[node name="Shape" parent="AbilityWeapon6Skill2/Attack" index="0"]
 shape = SubResource("BoxShape3D_lance")
 
 [node name="WeaponVisual" type="MeshInstance3D" parent="AbilityWeapon6Skill2"]
@@ -315,7 +315,7 @@ mesh = SubResource("BoxMesh_scythe_blade")
 [node name="Path" type="Node3D" parent="AbilityWeapon6Skill2"]
 script = ExtResource("34_path")
 
-[node name="AbilitySkill1" type="Node3D" parent="."]
+[node name="AbilityBSkill1" type="Node3D" parent="."]
 script = ExtResource("30_blink_dash")
 Enabled = false
 
@@ -327,13 +327,13 @@ Policy = 1
 HitInterval = 0.12
 AttackTags = PackedStringArray("Melee", "Dash")
 
-[node name="Shape" type="CollisionShape3D" parent="AbilitySkill1/Attack"]
+[node name="Shape" parent="AbilityBSkill1/Attack" index="0"]
 shape = SubResource("SphereShape3D_landing")
 
 [node name="Path" type="Node3D" parent="AbilitySkill1"]
 script = ExtResource("34_path")
 
-[node name="AbilitySkill2" type="Node3D" parent="."]
+[node name="AbilityBSkill2" type="Node3D" parent="."]
 script = ExtResource("31_guard")
 Enabled = false
 
@@ -347,7 +347,7 @@ Damage = 18.0
 Knockback = 3.0
 AttackTags = PackedStringArray("Melee", "Burst")
 
-[node name="Shape" type="CollisionShape3D" parent="AbilityPassive2/Attack"]
+[node name="Shape" parent="AbilityPassive2/Attack" index="0"]
 shape = SubResource("SphereShape3D_landing")
 
 [node name="WeaponGate5" type="Node3D" parent="."]
@@ -355,4 +355,3 @@ script = ExtResource("35_weapon_gate")
 
 [node name="WeaponGate6" type="Node3D" parent="."]
 script = ExtResource("35_weapon_gate")
-

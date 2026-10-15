@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AbilitySeries" format=3 uid="uid://cwriiq810bbqx"]
+
+[ext_resource type="Script" uid="uid://bendavb55ldon" path="res://Scripts/Config/AbilitySeries.cs" id="1_row"]
+
+[resource]
+script = ExtResource("1_row")
+ItemType = "container"
+Id = "ser_b1_combo"
+DisplayName = "角色 B 灵剑 破剑式（5 段连招的参数串）"
+Note = "一个 AbilitySeries = 技能行里的一串表参数（每项一个 ParamEntry 子资源，用 Items0..Items7 固定列引用 —— 数组在 .tres 里反序列化不回来，见 AbilitySeries 的说明）。本行装的是灵剑武技1（skl_b1_w1_1）破剑式的七串：ComboAnimations（5 段动画名）/ StepDamageScales / StepBoxSizes / StepBoxOffsets / StepActiveTimes / CutSceneNames / CutExcludeSceneNames（斩断子弹的名单与排除名单，能量波在排除名单里 → 斩不断）。技能行用 ComboSeriesPath 指过来。"

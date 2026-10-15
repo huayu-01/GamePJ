@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://crnwfxnlab3ca"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_a1_passive_0"]
 script = ExtResource("2_param")
@@ -19,13 +19,8 @@ Note = "★ 文档：正常情况下所有角色都只会有 1 次额外的获�
 script = ExtResource("1_row")
 NodeName = "AbilityPassive"
 ClassHint = "AirJumpPassiveAbility"
-AnimName = ""
-AnimEvent = ""
-Aim = 0
-Enabled = true
-Params = [SubResource("p_a1_passive_0"), SubResource("p_a1_passive_1")]
 Id = "skl_a1_passive"
-Slot = 0
 DisplayName = "灵动"
 DescriptionTemplate = "被动：空中可以额外跳跃 {Grant:0} 次（额外跳跃次数上限 {MaxExtraAirJumps:0} 次）。"
 Note = "[新增行·P3] 角色 A 被动「灵动」（文档第 24 行）。★ 没写按键 = 被动（用户裁定：被动可以有 CD，也可以没有按键）→ InputAction 留空，AirJumpPassiveAbility 不靠 TryActivate，而是每帧把「场景基线 + 授予次数」幂等写进 CharacterMovement.SetExtraAirJumps（只有 Enabled=true 时才生效，而 Enabled 由**本行**写进来）。★ 上限 3 是**表里的参数**，不是代码常量（未来异化「践踏死亡」共用它）。★ 被动不需要动画（AnimName 留空 = 这个技能不需要动画），所以不受「没有动画就不执行」那条闸门影响。"
+Params = [SubResource("p_a1_passive_0"), SubResource("p_a1_passive_1")]

@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://cukkands5i0ti"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_a1_skill_2_0"]
 script = ExtResource("2_param")
@@ -62,18 +62,13 @@ script = ExtResource("1_row")
 NodeName = "AbilitySkill2"
 ClassHint = "LeapAbility"
 InputAction = "skill_2"
-HoldToCharge = false
 AnimName = "Skill_A1_Leap"
 AnimEvent = "Action"
-AnimSpeedScale = 1.0
-Aim = 0
 Cooldown = 20.0
 Windup = 0.15
 Recover = 0.35
-Enabled = true
-Params = [SubResource("p_a1_skill_2_0"), SubResource("p_a1_skill_2_1"), SubResource("p_a1_skill_2_2"), SubResource("p_a1_skill_2_3"), SubResource("p_a1_skill_2_4"), SubResource("p_a1_skill_2_5"), SubResource("p_a1_skill_2_6"), SubResource("p_a1_skill_2_7"), SubResource("p_a1_skill_2_8")]
 Id = "skl_a1_skill_2"
-Slot = 0
 DisplayName = "跃升"
 DescriptionTemplate = "按 E：强力跳跃（起跳速度 {LeapVelocity:0.#} m/s）并获得 {HoverSeconds:0.#}s 滞空 —— 空中按住跳跃键下落减缓 {HoverFallSlowPercent:0.##}×100%（脚底出现光环），还有跳跃次数时会先执行跳跃。CD {Cooldown:0}s。"
 Note = "[新增行·P3] 角色 A 技能2「跃升」（文档 CD:20 / 强力跳跃 / 3s 滞空 / 按住跳跃减缓 90% / 有按住特效脚底光环 / 帧 Action 释放效果）。★ 效果挂在动画事件帧 Action 上（用户裁定：效果随动画帧走）。★ 滞空是一个**独立常驻组件** AirHoverController（玩家场景里的 AirHover 节点）：本技能在 Action 帧就收招了，而 3s 滞空必须活在技能之外；组件按表值（HoverSeconds / HoverFallSlowPercent / 光环四项）工作。★ Ring* 四项与 LeapVelocity 是文档为 n 的预设值。"
+Params = [SubResource("p_a1_skill_2_0"), SubResource("p_a1_skill_2_1"), SubResource("p_a1_skill_2_2"), SubResource("p_a1_skill_2_3"), SubResource("p_a1_skill_2_4"), SubResource("p_a1_skill_2_5"), SubResource("p_a1_skill_2_6"), SubResource("p_a1_skill_2_7"), SubResource("p_a1_skill_2_8")]

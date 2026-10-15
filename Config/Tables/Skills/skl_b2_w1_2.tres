@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://ccmhfq22aou0"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_ThrowSpeed"]
 script = ExtResource("2_param")
@@ -60,7 +60,6 @@ Note = "收回途中是否也造成伤害（镰刀文档没写；长枪写了，
 [sub_resource type="Resource" id="p_UpwardSpeed"]
 script = ExtResource("2_param")
 Key = "UpwardSpeed"
-Value = 0
 Note = "垂直初速（0 = 纯水平，「扔向前方」）"
 
 [sub_resource type="Resource" id="p_ShowPath"]
@@ -74,17 +73,11 @@ script = ExtResource("1_row")
 NodeName = "AbilityWeapon5Skill2"
 ClassHint = "ScytheThrowAbility"
 InputAction = "weapon_skill_2"
-HoldToCharge = false
-AnimName = ""
-AnimSpeedScale = 1.0
-Aim = 0
 Cooldown = 1.0
 Windup = 0.0
 Recover = 0.05
-Enabled = true
-Params = [SubResource("p_ThrowSpeed"), SubResource("p_ReturnSpeed"), SubResource("p_MaxThrowDistance"), SubResource("p_RecallOnSecondPress"), SubResource("p_RecallDistance"), SubResource("p_SpinDegreesPerSecond"), SubResource("p_DamageInterval"), SubResource("p_DamageActiveTime"), SubResource("p_DamageOnReturn"), SubResource("p_UpwardSpeed"), SubResource("p_ShowPath")]
 Id = "skl_b2_w1_2"
-Slot = 0
 DisplayName = "无情"
 DescriptionTemplate = "将武器扔向前方，武器会不断旋转并周期性 {DamageInterval:0.##} 秒对武器内的敌人造成伤害；武器飞出去这期间武技1无法使用；再次使用或靠近武器时收回武器。"
 Note = "[P4 新增行] 角色 B 武器2 镰刀 武技2（文档 CD:1 / 周期 0.5s）。★ 抛出/收回/旋转/周期伤害全在 WeaponThrowAbility 这一段（与长枪的武技2 共用）。★ 「飞出去这期间武技1无法使用」由场景里的 WeaponGate5 把 InFlight 连到 MeleeComboAbility.ExternallyBlocked。★ n（伤害）= 预设 22。"
+Params = [SubResource("p_ThrowSpeed"), SubResource("p_ReturnSpeed"), SubResource("p_MaxThrowDistance"), SubResource("p_RecallOnSecondPress"), SubResource("p_RecallDistance"), SubResource("p_SpinDegreesPerSecond"), SubResource("p_DamageInterval"), SubResource("p_DamageActiveTime"), SubResource("p_DamageOnReturn"), SubResource("p_UpwardSpeed"), SubResource("p_ShowPath")]

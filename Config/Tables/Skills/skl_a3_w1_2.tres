@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://b0bh8c674p7ia"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_a3_w1_2_0"]
 script = ExtResource("2_param")
@@ -59,16 +59,11 @@ InputAction = "weapon_skill_2"
 HoldToCharge = true
 AnimName = "ATK_A3_HawkEye"
 AnimEvent = "AimOn"
-AnimSpeedScale = 1.0
 ChargeBaseSeconds = 0.3
-Aim = 0
 Cooldown = 2.0
-Windup = 0.3
 Recover = 0.2
-Enabled = true
-Params = [SubResource("p_a3_w1_2_0"), SubResource("p_a3_w1_2_1"), SubResource("p_a3_w1_2_2"), SubResource("p_a3_w1_2_3"), SubResource("p_a3_w1_2_4"), SubResource("p_a3_w1_2_5"), SubResource("p_a3_w1_2_6"), SubResource("p_a3_w1_2_7")]
 Id = "skl_a3_w1_2"
-Slot = 0
 DisplayName = "刹那之眼"
 DescriptionTemplate = "按住右键：基础蓄力 {ChargeBaseSeconds:0.##}s 后放大视角（FOV {ZoomFov:0.#}），之后每 {MarkIntervalSeconds:0.##}s 给准星 {MarkRadius:0.#}m 内最近的目标施加一层「标记」，持续 {MarkDuration:0.##}s；你射出的箭会追踪被打标记的最近目标。基础蓄力期间被击中会无效化这次伤害并强制触发一次不消耗层数的「后撤」。"
 Note = "[新增行·P3] 角色 A 武器 3「弓」武技2（文档 CD:2 / 基础蓄力 0.3s / 每 0.5s 标记 / 箭追踪标记目标 / 基础蓄力被击中则无效化 + 强制免费后撤）。★ 四件事的落点：① 基础蓄力走 Ability 基类；② 放大视角 = 改 Camera3D.Fov（ZoomFov）；③ 标记 = 效果表的 eff_mark（**可叠加、不限单目标**：Unit.ApplyStatus 的 MaxStacks 路径）；④ 无效化 = 订阅 Unit.HitReceived（它在 ReceiveHit 里先于无敌判定触发）把 IsInvulnerable 置位，然后按 DodgeAbilityId 找「后撤」强制触发（RefreshCooldown→TryActivate→RefreshCooldown = 不消耗层数）。★ 文档为 n 的（FOV / 标记时长 / 准星半径）都填了最小预设值。★ 本技能**不发射箭**（文档没让它发），追踪在弓的两个武技行上（HomingStatusId = Mark）。"
+Params = [SubResource("p_a3_w1_2_0"), SubResource("p_a3_w1_2_1"), SubResource("p_a3_w1_2_2"), SubResource("p_a3_w1_2_3"), SubResource("p_a3_w1_2_4"), SubResource("p_a3_w1_2_5"), SubResource("p_a3_w1_2_6"), SubResource("p_a3_w1_2_7")]

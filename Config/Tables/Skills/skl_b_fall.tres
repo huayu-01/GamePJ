@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://fblwg0hytn5o"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_DiveSpeed"]
 script = ExtResource("2_param")
@@ -42,7 +42,6 @@ Note = "★ 文档 最高 100%"
 [sub_resource type="Resource" id="p_HomingMode"]
 script = ExtResource("2_param")
 Key = "HomingMode"
-Value = 0.0
 Note = "0 = Straight 直直下落（落日余晖那一行改成 1 = Crosshair）"
 
 [sub_resource type="Resource" id="p_MaxDiveAngleDegrees"]
@@ -62,18 +61,13 @@ script = ExtResource("1_row")
 NodeName = "AbilityFallAttack"
 ClassHint = "FallAttackAbility"
 InputAction = "fall_attack"
-HoldToCharge = false
 AnimName = "Skill_B_Fall"
 AnimEvent = "Action"
-AnimSpeedScale = 1.0
-Aim = 0
 Cooldown = 1.0
 Windup = 0.0
 Recover = 0.08
-Enabled = true
-Params = [SubResource("p_DiveSpeed"), SubResource("p_MaxDiveSeconds"), SubResource("p_LandRecoverSeconds"), SubResource("p_HeightStep"), SubResource("p_DamageBonusPerStep"), SubResource("p_MaxDamageBonus"), SubResource("p_HomingMode"), SubResource("p_MaxDiveAngleDegrees"), SubResource("p_MaxAimDistance")]
 Id = "skl_b_fall"
-Slot = 0
 DisplayName = "落"
 DescriptionTemplate = "被动：在空中按下奔跑键或 Ctrl 使用下落攻击；大幅提高下落速度，下落过程中碰到的敌人受伤，高度越高伤害越高（每 {HeightStep:0.##} 米 +20%，最高 +100%）。"
 Note = "[P4 新增行] 角色 B 被动「落」（文档 CD:1）。★ 它是**三把武器共用的下落攻击能力**：玩法差异靠行参数（例如落日余晖把 HomingMode 改成 1 + 放宽 MaxDiveAngleDegrees）。★ 高度越高伤害越高：高度取 CharacterMovement.FallHeight（这次离地后**净下落**了多少米，是物理量），每满 HeightStep 米加 DamageBonusPerStep（0.2），封顶 MaxDamageBonus（1.0）。★ 文档里的 n（参数）→ 预设：每 2 米一档。★ 触发键是 project.godot 新增的 fall_attack（Ctrl + 左 Ctrl）。"
+Params = [SubResource("p_DiveSpeed"), SubResource("p_MaxDiveSeconds"), SubResource("p_LandRecoverSeconds"), SubResource("p_HeightStep"), SubResource("p_DamageBonusPerStep"), SubResource("p_MaxDamageBonus"), SubResource("p_HomingMode"), SubResource("p_MaxDiveAngleDegrees"), SubResource("p_MaxAimDistance")]
