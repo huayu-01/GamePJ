@@ -529,6 +529,12 @@ public partial class SelfTest : Node
 	private string _loopAbilityId = string.Empty;
 	private int _loopProjectiles;
 
+	/// <summary>
+	/// 靶子摆在哪：**子弹出生点沿弹道往前多少米**。投射物每物理帧走 <c>速度 × dt</c>（弹速 150 → 2.5m），
+	/// 摆在 0.9m 处就一定落在**第一帧那一段射线**里；真敌人（Chaser）的胶囊半径 0.45m，几度的角度误差也容得下。
+	/// </summary>
+	private const float TargetDistanceOnLine = 0.9f;
+
 
 	private void BeginSkillLoopProbe()
 	{
@@ -560,60 +566,49 @@ public partial class SelfTest : Node
 		// ② 挂在玩家身上的 UnitAnimator 必须真的拿到了技能动画库（技能"没动画不执行"的前提）。
 		ReportPlayerAnimator();
 
-		// ③ 造一个靶子：摆在**技能真的会打出去的那个方向**上、出生点往前约 2m（见下）。
-		// ⚠️ 刻意用**最朴素的 Unit**而不是 Chaser.tscn：目标只是"一个能结算伤害的敌人"，
-		// 带 AI/导航/模型的敌人会把无关系统（导航网格、Jolt、行为树）拉进来，出问题时归因不清。
-		var chaser = new Unit
-		{
-			Name = "SelfTestDummy",
-			Faction = Faction.Enemy,
-			MaxHealth = 60f,
-			MoveSpeed = 0f,
-			Tags = new[] { "Melee", "SelfTest" },
-		};
-		// ⚠️ 靶子**必须有碰撞体**：投射物是靠 `IntersectRay` 命中的，而一个光秃秃的 `Unit`
-		// （`new Unit{}` 没有任何子节点）在物理世界里**根本没有形状** —— 射线直接穿过去，
-		// 于是"子弹飞出去、命中结算"这一段在自测里永远验不到（实测踩到：投射物生成=1 但掉血 ✗）。
+		// ③ 造一个靶子：**用真敌人 `Chaser.tscn` 的实例**（`docs/anim-pipeline.md` §6.4-1 的建议）。
 		//
-		// ⚠️ 而且必须**在进树之前**就挂上：物理体是在 `_EnterTree` 那一刻按"当时已有的形状"
-		// 建出来的，进树之后再 `AddChild` 一个 `CollisionShape3D`，实测射线**打不到**它
-		// （靶子摆在弹道上、半径 1.2 的胶囊、弹道穿过靶子原点，`IntersectRay` 依然什么都打不到）。
-		chaser.AddChild(new CollisionShape3D
+		// ⚠️ 上一轮用的是"自造 `Unit` + 手工挂 `CollisionShape3D`"：几何逐点核对过（靶子摆在弹道上、
+		// 胶囊中心就在线上），但投射物的射线**依然打不到它**，而**同一份射线打真敌人是能中的** ——
+		// 也就是"自造靶子"这条路本身有问题（运行期手工挂的形状进物理空间的方式与场景自带的不是一回事）。
+		// 换成真敌人之后，碰撞体是场景里带的，物理空间一定会认；靶子到底能不能被射线打到，
+		// 下面还有一条**自测射线**独立取证（不靠"有没有掉血"倒推）。
+		EnemyConfig? chaserRow = ConfigRows.ById<EnemyConfig>("enemy_chaser");
+		if (chaserRow == null || string.IsNullOrEmpty(chaserRow.ScenePath) || !ResourceLoader.Exists(chaserRow.ScenePath))
 		{
-			Name = "SelfTestDummyShape",
-			Shape = new CapsuleShape3D { Radius = 1.2f, Height = 3f },
-		});
+			GameLog.Write("SelfTest", $"🔴 最小闭环：敌人表里读不到 enemy_chaser 的场景（ScenePath='{chaserRow?.ScenePath}'），靶子造不出来。");
+			return;
+		}
+
+		if (GD.Load<PackedScene>(chaserRow.ScenePath).Instantiate() is not Unit chaser)
+		{
+			GameLog.Write("SelfTest", $"🔴 最小闭环：{chaserRow.ScenePath} 的根节点不是 Unit，靶子造不出来。");
+			return;
+		}
+
+		// 靶子的 AI 必须停掉：真敌人会朝玩家跑（4.2 m/s），跑出弹道就变成"随机能不能中"。
+		// 只关这个自测实例的 AI 处理，`EnemyBrain` 的生产行为一个字没改。
+		NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(chaser)?.SetPhysicsProcess(false);
 
 		if (player.GetParent() is { } arena)
 		{
 			arena.AddChild(chaser);
 		}
 
-		// ⚠️ 靶子必须摆在**技能真的会打出去的那个方向**上。能量掌 `Aim = Crosshair`，方向来自
-		// 「相机屏幕中心射线」（`AimUtil.GetCrosshairDirection`）—— 自测里没有鼠标输入，
-		// 这条射线是**斜向下**的（实测 ≈ (0, -0.34, -0.94)），**不是**玩家的水平朝向。
-		// 上一轮把靶子摆在"玩家正前方水平 6m"，子弹在 ~3m 处就落地了，永远打不着（实测踩到）。
-		Vector3 forward = -player.GlobalTransform.Basis.Z;
-		forward.Y = 0f;
-		forward = forward.Normalized();
-		Vector3 aim = AimUtil.GetCrosshairDirection(player.GetViewport(), forward).Normalized();
-		if (aim.LengthSquared() < 0.5f)
+		// 第一遍摆位：先按"当前这一帧的弹道"摆上（扣扳机那一刻会按同一套公式重摆，见 OnLoopNodeAdded）。
+		if (TryComputeShotLine(player, out Vector3 firstOrigin, out Vector3 firstDirection))
 		{
-			aim = forward;
+			PlaceOnShotLine(chaser, firstOrigin, firstDirection, TargetDistanceOnLine);
 		}
 
-		// 摆在射线**出生点往前 2m**处：能量波从 `玩家 + 上0.9 + 方向0.6` 出发，
-		// 2m 处高度还有 ~0.15m（不会先落地），且 0.45m 半径的胶囊能容下几度的角度误差。
-		chaser.GlobalPosition = player.GlobalPosition + (Vector3.Up * 0.9f) + (aim * 2.1f);
-		GameLog.Write(
-			"SelfTest",
-			$"最小闭环·靶子落点：准星方向={aim}（水平朝向={forward}）→ 靶子放在 {chaser.GlobalPosition}"
-			+ $"（距玩家 {player.GlobalPosition.DistanceTo(chaser.GlobalPosition):0.##}m，带 0.45/1.8 胶囊碰撞体）");
 		_loopEnemy = chaser;
 		_loopEnemyHealthBefore = chaser.Health;
 		_loopEnemyArmorBefore = chaser.Armor;
 		chaser.Damaged += OnLoopDamage;
-		GameLog.Write("SelfTest", "最小闭环·造靶子：完成（朴素 Unit 靶子）");
+		GameLog.Write(
+			"SelfTest",
+			$"最小闭环·造靶子：完成（真敌人 {chaserRow.ScenePath} 的实例，AI 已停）"
+			+ $"｜靶子={chaser.Name} 生命 {chaser.Health:0.#} 护甲 {chaser.Armor:0.#} 位置 {chaser.GlobalPosition}");
 
 		// ④ 盯住动画事件帧与投射物。
 		UnitAnimator.AnimationEvent += OnLoopAnimationEvent;
@@ -645,7 +640,8 @@ public partial class SelfTest : Node
 		// ⚠️ 靶子必须在**投射物出生的这一帧**才挪到弹道上 —— 这是唯一"一定对得上"的时刻。
 		// 提前摆（哪怕只提前 0.08s、摆在"扣扳机那一刻"的正确位置上）也不行：自测走到这一段时
 		// 关卡装配还在挪玩家（实测两次位置都不一样），弹道是从**发射那一帧**的玩家位置出发的，
-		// 先摆好的靶子会被甩开。这里直接问投射物自己的出生点。
+		// 先摆好的靶子会被甩开。这里用与 `EnergyWaveAbility.FireShot` **同一套公式**重算弹道
+		// （见 TryComputeShotLine），不读 `shot.GlobalPosition`（那一刻它还在世界原点）。
 		Unit? dummy = _loopEnemy;
 		Unit? player = PlayerLocator.Player;
 		if (dummy == null || player == null)
@@ -653,25 +649,110 @@ public partial class SelfTest : Node
 			return;
 		}
 
-		Vector3 face = -player.GlobalTransform.Basis.Z;
-		face.Y = 0f;
-		Vector3 aim = AimUtil.GetCrosshairDirection(player.GetViewport(), face.Normalized()).Normalized();
-		if (aim.LengthSquared() < 0.5f)
+		if (!TryComputeShotLine(player, out Vector3 origin, out Vector3 direction))
 		{
-			aim = face.Normalized();
+			GameLog.Write("SelfTest", "🔴 最小闭环·靶子上弹道：算不出弹道（没有相机？），靶子保持原位。");
+			return;
 		}
 
-		// 摆在出生点沿弹道 0.8m 处：投射物下一物理帧从出生点走 2.5m，必然穿过它。
-		//
-		// ⚠️ 不能用 `shot.GlobalPosition`：`NodeAdded` 是 `AddChild` 里触发的，而 `FireShot`
-		// 是**先 AddChild、后设位置**，所以这一刻投射物还在世界原点 (0,0,0)（实测踩到）。
-		// 这里按 `FireShot` 的同一个公式自己算出生点 —— 同一个物理帧、同一个玩家位置、同一个方向。
-		Vector3 origin = player.GlobalPosition + (Vector3.Up * 0.9f) + (aim * 0.6f);
-		dummy.GlobalPosition = origin + (aim * 0.8f);
+		Vector3 onLine = PlaceOnShotLine(dummy, origin, direction, TargetDistanceOnLine);
+
+		// ★ 独立取证：从**子弹出生点**沿弹道打一条射线（参数与 `Projectile._PhysicsProcess` 一致：
+		// 长度取它一个物理帧的位移、mask 就用这个投射物自己的 HitMask）—— 直接回答
+		// "靶子到底在不在弹道上、射线能不能打到它"，而不是只靠"有没有掉血"倒推。
 		GameLog.Write(
 			"SelfTest",
-			$"最小闭环·靶子上弹道：算出出生点={origin}（投射物自带位置此刻还是 {shot.GlobalPosition}）"
-			+ $" 方向={aim} → 靶子={dummy.GlobalPosition}");
+			$"最小闭环·靶子上弹道：出生点={origin} 方向={direction} → 靶子={dummy.Name} 体心={onLine}"
+			+ $"（离出生点 {TargetDistanceOnLine:0.##}m，距玩家 {player.GlobalPosition.DistanceTo(onLine):0.##}m）"
+			+ $"｜自测射线（{TargetDistanceOnLine:0.##}→{(TargetDistanceOnLine + 2.5f):0.##}m，mask={shot.HitMask}）打到的第一个东西："
+			+ DescribeShotRay(player, origin, direction, shot.HitMask));
+	}
+
+	/// <summary>
+	/// **弹道**：与 <c>EnergyWaveAbility.FireShot</c> 同一套公式 ——
+	/// ①「准星打到的世界点」走 <see cref="AimUtil.GetCrosshairPoint"/>（**与枪械 `PlayerWeaponInput`
+	/// 同一个函数**，§6.4-4 统一口径）；
+	/// ② 方向 = 胸口 → 世界点；③ 出生点 = 胸口 + 方向 × 0.6（两个偏移 0.9 / 0.6 与 `FireShot` 一致）。
+	/// 求交距离从**技能自己**读（表里的 <c>MaxAimDistance</c>），自测不另写一份常量。
+	/// </summary>
+	private static bool TryComputeShotLine(Unit player, out Vector3 origin, out Vector3 direction)
+	{
+		origin = default;
+		direction = default;
+		Viewport? viewport = player.GetViewport();
+		if (viewport?.GetCamera3D() == null)
+		{
+			return false;
+		}
+
+		float maxAim = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") is EnergyWaveAbility wave
+			? wave.MaxAimDistance
+			: 200f;
+
+		Vector3 chest = player.GlobalPosition + (Vector3.Up * 0.9f);
+		Vector3 point = AimUtil.GetCrosshairPoint(viewport, player, maxAim, CombatLayers.World | CombatLayers.UnitMask);
+		Vector3 toPoint = point - chest;
+		if (toPoint.LengthSquared() <= 0.0001f)
+		{
+			return false;
+		}
+
+		direction = toPoint.Normalized();
+		origin = chest + (direction * 0.6f);
+		return true;
+	}
+
+	/// <summary>
+	/// 把靶子摆到**弹道上**、离出生点 <paramref name="distance"/> 米处：把它的**碰撞体中心**压在那条线上。
+	/// 敌人场景的碰撞体挂在脚底往上 0.9m（`Chaser.tscn` 的 `Body`），所以先按"体心与根节点的差"反推根节点位置。
+	/// 返回摆好之后的体心（= 线上的那个点），供日志用。
+	/// </summary>
+	private static Vector3 PlaceOnShotLine(Unit target, Vector3 origin, Vector3 direction, float distance)
+	{
+		Vector3 point = origin + (direction * distance);
+		CollisionShape3D? body = FindBodyShape(target);
+		if (body == null)
+		{
+			target.GlobalPosition = point;
+			return point;
+		}
+
+		Vector3 rootToBody = target.GlobalPosition - body.GlobalPosition;
+		target.GlobalPosition = point + rootToBody;
+		return point;
+	}
+
+	/// <summary>单位**自己**的碰撞体：直接挂在单位根节点下的那个 <c>CollisionShape3D</c>（不写节点名）。</summary>
+	private static CollisionShape3D? FindBodyShape(Unit unit)
+	{
+		foreach (Node child in unit.GetChildren())
+		{
+			if (child is CollisionShape3D shape)
+			{
+				return shape;
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// 自测射线：从子弹出生点沿弹道打一发（与 `Projectile._PhysicsProcess` 同一组参数 ——
+	/// 线段长度取"一个物理帧的位移"，mask 用投射物自己的），返回"打到的第一个东西"的文字描述。
+	/// 用来独立证明靶子在弹道上，而不是靠掉血倒推。
+	/// </summary>
+	private static string DescribeShotRay(Unit player, Vector3 origin, Vector3 direction, uint mask)
+	{
+		var query = PhysicsRayQueryParameters3D.Create(origin, origin + (direction * 2.5f), mask);
+		query.Exclude = new Godot.Collections.Array<Rid> { player.GetRid() };
+		Godot.Collections.Dictionary hit = player.GetWorld3D().DirectSpaceState.IntersectRay(query);
+		if (hit.Count == 0)
+		{
+			return "（什么都打不到）";
+		}
+
+		var collider = hit["collider"].As<GodotObject>();
+		return $"{collider?.GetType().Name} '{(collider as Node)?.Name}' @ {hit["position"].AsVector3()}";
 	}
 
 	private void OnLoopDamage(DamageResult result, HitInstance hit)
@@ -792,27 +873,18 @@ public partial class SelfTest : Node
 
 		if (PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") is { } ability)
 		{
-			// ⚠️ 激活**之前**把靶子重新摆一次：玩家在 `BeginSkillLoopProbe` 之后还在往下落
-			// （实测 y 从 0.8 掉到地面），而"准星方向"是**从相机出发的射线** —— 玩家的高度一变，
-			// 射线就整体平移，先前按旧高度摆好的靶子会落到弹道下方 0.8m，直接漏掉。
-			// 所以靶子的位置必须以"扣扳机这一刻"的射线为准（两行，纯自测代码）。
+			// ⚠️ 激活**之前**把靶子重新摆一次：玩家在 `BeginSkillLoopProbe` 之后还在被关卡装配挪动
+			// （实测 y 一路涨上去），而"准星世界点"是**从相机出发的射线** —— 玩家一动就整体平移，
+			// 先前按旧位置摆好的靶子会落到弹道之外，直接漏掉。
+			// 所以靶子的位置必须以"扣扳机这一刻"的弹道为准（同一套公式，见 TryComputeShotLine）。
 			Unit? dummy = _loopEnemy;
-			if (dummy != null)
+			if (dummy != null && TryComputeShotLine(player, out Vector3 origin, out Vector3 direction))
 			{
-				Vector3 face = -player.GlobalTransform.Basis.Z;
-				face.Y = 0f;
-				face = face.Normalized();
-				Vector3 aim = AimUtil.GetCrosshairDirection(player.GetViewport(), face).Normalized();
-				if (aim.LengthSquared() < 0.5f)
-				{
-					aim = face;
-				}
-
-				dummy.GlobalPosition = player.GlobalPosition + (Vector3.Up * 0.9f) + (aim * 2.1f);
+				Vector3 onLine = PlaceOnShotLine(dummy, origin, direction, TargetDistanceOnLine);
 				GameLog.Write(
 					"SelfTest",
-					$"最小闭环·靶子重摆（扣扳机前）：玩家={player.GlobalPosition} 方向={aim} → 靶子={dummy.GlobalPosition} "
-					+ $"（距玩家 {player.GlobalPosition.DistanceTo(dummy.GlobalPosition):0.##}m）");
+					$"最小闭环·靶子重摆（扣扳机前）：玩家={player.GlobalPosition} 出生点={origin} 方向={direction}"
+					+ $" → 靶子体心={onLine}（距玩家 {player.GlobalPosition.DistanceTo(onLine):0.##}m）");
 			}
 
 			GameLog.Write("SelfTest", $"最小闭环·兜底前：技能={ability.AbilityId} IsReady={ability.IsReady} 即将 TryActivate");
@@ -863,13 +935,11 @@ public partial class SelfTest : Node
 		float healthAfter = _loopEnemy?.Health ?? -1f;
 		string damageText = _loopDamaged
 			? $"生命 {_loopEnemyHealthBefore:0.#} → {healthAfter:0.#}（扣 {_loopEnemyHealthBefore - healthAfter:0.##}）"
-			: $"🔴 没有收到伤害（靶子生命 {_loopEnemyHealthBefore:0.#} → {healthAfter:0.#} 未变）" +
-				"；自测探针的靶子只有 `Unit` 自己 + 手工加的胶囊，实测投射物的射线打不到它 —— " +
-				"所以『动画→事件帧→发射』自测覆盖，『命中掉血』由真人手测取证（docs/anim-pipeline.md §6.4）";
+			: $"🔴 没有收到伤害（靶子生命 {_loopEnemyHealthBefore:0.#} → {healthAfter:0.#} 未变）";
 
 		GameLog.Write(
 			"SelfTest",
-			$"🔴 最小闭环·结果：动画事件帧收到={_loopAnimEvents} 次 投射物生成={_loopProjectiles} 个｜"
+			$"{(_loopDamaged ? "✅" : "🔴")} 最小闭环·结果：动画事件帧收到={_loopAnimEvents} 次 投射物生成={_loopProjectiles} 个｜"
 			+ $"{damageText} ｜技能={_loopAbilityId} 动画={animator?.CurrentAnimation}");
 		GameLog.Write(
 			"SelfTest",
@@ -1338,8 +1408,12 @@ public partial class SelfTest : Node
 				? "配置表比对：找不到武器"
 				: $"配置表比对·武器：伤害 {weapon.Damage:0}（期望 24） 间隔 {weapon.FireInterval:0.##}（期望 0.26） 弹匣 {weapon.EffectiveMagazineSize}（期望 12） 装填 {weapon.ReloadTime:0.##}（期望 0.7） 散布 {weapon.SpreadDegrees:0.##}（期望 0.5） 击退 {weapon.Knockback:0.##}（期望 2.5） 暴击 {weapon.CritChance:0.##}（期望 0.15） 弹速 {weapon.ProjectileSpeed:0}（期望 90） 预瞄FOV {weapon.AimFov:0}（期望 55） 穿透 {weapon.BasePierce}（期望 0） 连发 {weapon.Automatic}（期望 False）");
 
+		// ⚠️ 这一行**只打印、不做比对**（`ConfigRows.Count<T>()` 的实际值 + 括号里的期望值都在同一条字符串里，
+		// 没有任何 if/断言）—— 所以期望串过期**不会**让自测失败，只会误导后来的人。
+		// 期望值同步成"只加不删"之后的实际值：武器 4/角色 4（各 +1 新增行）、技能 27（+2 武技）＝
+		// 4/4/10/1/1/27/7/9/8/6/3/11/8（`docs/anim-pipeline.md` §6.4-5）。
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}（期望 3/3/10/1/1/25/7/9/8/6/3/11/8）");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}（期望 4/4/10/1/1/27/7/9/8/6/3/11/8；只打印、不比对）");
 
 		// 能力卡（局外装备层，`docs/ability-cards.md`）：卡表读数 + 状态层全流程
 		// （解锁 → 重复解锁 → 升级 → 上限 → 重置归还 → 激活额度记账 → 未解锁/额度不足/碎片不足 → 额度扩增）。
@@ -1480,7 +1554,7 @@ public partial class SelfTest : Node
 		// 技能表（阶段 3）：行数 + 首领强化的两套来源必须能分开。
 		ActRoguelike.Config.AbilityConfig? dashRow = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AbilityConfig>("skl_dash");
 		GameLog.Write("SelfTest",
-			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 25 = 5 玩家 + 16 单位 + 4 首领行为） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型（**技能**）{ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型（**词条**）{ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）");
+			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 27 = 7 玩家 + 16 单位 + 4 首领行为；只打印、不比对） dash 行：冷却 {dashRow?.Cooldown:0.##}（期望 1.2） 前摇 {dashRow?.Windup:0.##}（期望 0.3） 节点 {dashRow?.NodeName}（期望 AbilityDash） ｜ 首领强化来源：Boss Build 行为型（**技能**）{ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型（**词条**）{ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）");
 
 		// AI 行为表（阶段 5）：行数 + "敌人行 → 档案"的关联 + **真的写进去了**的硬证据。
 		ActRoguelike.Config.AiProfileConfig? chaserAi = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AiProfileConfig>("ai_chaser");

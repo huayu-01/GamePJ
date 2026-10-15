@@ -47,6 +47,13 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 	/// <summary>存活时间（秒）。</summary>
 	[Export] public float MaxLifetime { get; set; } = 1.6f;
 
+	/// <summary>
+	/// 「求准星世界点」时射线的**最大长度**（准星什么都没打到时，就用这个距离上的点定方向）。
+	/// 与枪械的 <c>PlayerWeaponInput.MaxAimDistance</c> 同一个默认值 200 —— 口径一致；
+	/// 表也能改它（技能行 <c>Params</c> 里的 <c>MaxAimDistance</c>）。
+	/// </summary>
+	[Export] public float MaxAimDistance { get; set; } = 200f;
+
 	/// <summary>可穿透的目标数量（0 = 命中即消失；「穿透」类增幅经 StatSheet 的 PierceAdd 叠加）。</summary>
 	[Export] public int Pierce { get; set; }
 
@@ -188,6 +195,36 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		}
 	}
 
+	/// <summary>
+	/// **口径与既有枪械完全一致**（`docs/anim-pipeline.md` §6.4-4）：先求「准星打到的世界点」
+	/// （<see cref="AimUtil.GetCrosshairPoint"/> —— **与 <c>PlayerWeaponInput</c> 同一个函数**），
+	/// 再从**子弹出生点**朝那个世界点发射（枪械的 `Weapon.TryFire` 也是"枪口 → 准星世界点"）。
+	///
+	/// ⚠️ 以前这里走 `ResolveAimDirection()`（相机屏幕中心射线的**方向**）：斜向下 20° 从胸口射出，
+	/// 约 3m 就落地 —— 近身能中、远距离打不到（§6.4-4 的实测）。改成"求世界点"之后，
+	/// 子弹朝着**准星真正指着的那个点**飞。
+	///
+	/// ⚠️ 这不与「直线子弹无下坠」矛盾：变的是**方向**（朝着准星世界点），**飞行中**仍然是
+	/// `GravityScale = 0`（见 <see cref="FireShot"/> 里那一行）。文档说的"直线子弹"是弹道不下坠。
+	/// </summary>
+	private Vector3 ResolveShotDirection()
+	{
+		if (OwnerUnit == null)
+		{
+			return ResolveAimDirection();
+		}
+
+		// 从「胸口」起算 —— 与 FireShot 的出生点在同一条线上：出生点 = 胸口 + 方向 × 0.6，
+		// 所以"从出生点朝世界点"与"从胸口朝世界点"是同一个方向（不再有相机↔角色的视差）。
+		Vector3 chest = OwnerUnit.GlobalPosition + (Vector3.Up * 0.9f);
+		Vector3 point = AimUtil.GetCrosshairPoint(
+			GetViewport(), OwnerUnit, MaxAimDistance, CombatLayers.World | CombatLayers.UnitMask);
+
+		Vector3 direction = point - chest;
+		// 退化（准星点正好压在胸口）时退回原来的解析：没有相机时它给的是"角色前方"。
+		return direction.LengthSquared() > 0.0001f ? direction.Normalized() : ResolveAimDirection();
+	}
+
 	private void FireShot()
 	{
 		if (_fired || OwnerUnit == null || ProjectileScene == null)
@@ -203,7 +240,7 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		}
 
 		_fired = true;
-		Vector3 direction = ResolveAimDirection();
+		Vector3 direction = ResolveShotDirection();
 		Vector3 origin = OwnerUnit.GlobalPosition + (Vector3.Up * 0.9f) + (direction * 0.6f);
 
 		StatSheet stats = OwnerUnit.Stats;
@@ -234,7 +271,7 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		parent.AddChild(projectile);
 		projectile.GlobalPosition = origin;
 		projectile.Speed = Speed * (_perfect ? PerfectSpeedScale : 1f);
-		projectile.GravityScale = 0f; // 直线子弹，无下坠
+		projectile.GravityScale = 0f; // 直线子弹，无下坠（方向朝着准星世界点，见 ResolveShotDirection）
 		projectile.Launch(attack, direction);
 
 		GameLog.Write(

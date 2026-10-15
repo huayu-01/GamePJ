@@ -63,6 +63,12 @@ Key = "AttackTags"
 Value = PackedStringArray("Projectile", "Energy", "Physical")
 Note = "攻击标签（供增幅的武器标签匹配）"
 
+[sub_resource type="Resource" id="p_a1_w1_2_10"]
+script = ExtResource("2_param")
+Key = "MaxAimDistance"
+Value = 200.0
+Note = "求「准星打到的世界点」时射线的最大长度（无命中时用它定方向）—— 与枪械 PlayerWeaponInput.MaxAimDistance 同一个 200，口径一致"
+
 [resource]
 script = ExtResource("1_row")
 NodeName = "AbilityWeaponSkill2"
@@ -77,7 +83,7 @@ Cooldown = 1.0
 Windup = 1.7
 Recover = 0.1
 Enabled = true
-Params = [SubResource("p_a1_w1_2_0"), SubResource("p_a1_w1_2_1"), SubResource("p_a1_w1_2_2"), SubResource("p_a1_w1_2_3"), SubResource("p_a1_w1_2_4"), SubResource("p_a1_w1_2_5"), SubResource("p_a1_w1_2_6"), SubResource("p_a1_w1_2_7"), SubResource("p_a1_w1_2_8"), SubResource("p_a1_w1_2_9")]
+Params = [SubResource("p_a1_w1_2_0"), SubResource("p_a1_w1_2_1"), SubResource("p_a1_w1_2_2"), SubResource("p_a1_w1_2_3"), SubResource("p_a1_w1_2_4"), SubResource("p_a1_w1_2_5"), SubResource("p_a1_w1_2_6"), SubResource("p_a1_w1_2_7"), SubResource("p_a1_w1_2_8"), SubResource("p_a1_w1_2_9"), SubResource("p_a1_w1_2_10")]
 Id = "skl_a1_w1_2"
 Slot = 0
 DisplayName = "憋个大的"

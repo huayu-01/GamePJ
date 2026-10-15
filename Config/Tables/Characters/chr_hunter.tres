@@ -8,7 +8,7 @@
 script = ExtResource("1_row")
 DisabledAbilityIds = PackedStringArray()
 EnabledAbilityIds = PackedStringArray("skl_a1_w1_1", "skl_a1_w1_2")
-WeaponEnabled = true
+WeaponEnabled = false
 MaxHealth = 200.0
 StartingArmor = 20.0
 MoveSpeed = 6.5
@@ -25,4 +25,4 @@ Id = "chr_hunter"
 Slot = 4
 DisplayName = "猎手"
 DescriptionTemplate = "{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 移速 {MoveSpeed:0.#}"
-Note = "[新增行·本轮只加不删] 角色 A［猎手］。只落地了武器 1「能量掌」的两个武技（武技1 波波 / 武技2 憋个大的）；技能1[后撤]、技能2[跃升]、被动[灵动]、武器 2/3 还未实现 —— 所以这里没有指向它们的技能行（指向不存在的行会让 Godot 把引用置 null 并告警）。AnimLibraryDir 指向技能动画库目录（生成器的产物）；EnabledAbilityIds 按**技能行 Id** 匹配（同一个 EnergyWaveAbility 类的两个技能要能分开开关）。"
+Note = "[新增行·本轮只加不删] 角色 A［猎手］。只落地了武器 1「能量掌」的两个武技（武技1 波波 / 武技2 憋个大的）；技能1[后撤]、技能2[跃升]、被动[灵动]、武器 2/3 还未实现 —— 所以这里没有指向它们的技能行（指向不存在的行会让 Godot 把引用置 null 并告警）。AnimLibraryDir 指向技能动画库目录（生成器的产物）；EnabledAbilityIds 按**技能行 Id** 匹配（同一个 EnergyWaveAbility 类的两个技能要能分开开关）。★ WeaponEnabled = false：能量掌的「武技」自己就是攻击方式，**不走 Weapon 组件的开火**（这一行 Note 的原意）；保持 true 会让每次左键除了能量波之外**再多打一发 0 伤害的手枪弹**（wpn_energy_palm.Damage=0 / ScenePath 暂用 Pistol.tscn，见 docs/anim-pipeline.md §6.4-3）。"

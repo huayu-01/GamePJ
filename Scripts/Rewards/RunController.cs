@@ -190,18 +190,32 @@ public partial class RunController : Node
 			_startScreen = UiService.Instance?.Screen<StartScreen>();
 			_baseScreen = UiService.Instance?.Screen<BaseScreen>();
 			MetaProgress.Load();
+
+			// ⚠️ **命令行旁路必须判在「基地已经选过一局」之前**（`docs/anim-pipeline.md` §6.4-2）：
+			// `RunSetup.HasSelection` 是**静态**的，基地里选过一局之后就一直是 true，
+			// 而它下面那条分支会 `return`，于是 `BeginConfigure`（只有它读命令行）永远轮不到 ——
+			// `--char/--weapon` 就"静默失效"了。放在这里，两边都成立：
+			//   ① 给了参数 → 直接按参数开局（跳过基地/选人界面）；
+			//   ② 没给参数 → 完全走原来的流程（基地已配置过就直接开局，否则开基地界面）。
+			if (TryApplyLoadoutOverride())
+			{
+				_boot = 2;
+				return;
+			}
+
 			if (_baseScreen != null)
 			{
 				// 主循环起点：Base（局外强化）→ Configure（选武器）→ Stage。
 				// 从基地场景出发时已经配置过，直接开局（见 BaseTerminal 的出击门）。
-		if (RunSetup.HasSelection)
-		{
-			ActRoguelike.Core.GameLog.Write("Flow", $"来自基地的配置：角色 {RunSetup.Character} / 武器 {RunSetup.Weapon}");
-			BeginRunWithCharacter(RunSetup.Character, RunSetup.Weapon);
-			return;
-		}
+				if (RunSetup.HasSelection)
+				{
+					ActRoguelike.Core.GameLog.Write("Flow", $"来自基地的配置：角色 {RunSetup.Character} / 武器 {RunSetup.Weapon}");
+					BeginRunWithCharacter(RunSetup.Character, RunSetup.Weapon);
+					_boot = 2;
+					return;
+				}
 
-		_baseScreen.Open(BeginConfigure);
+				_baseScreen.Open(BeginConfigure);
 			}
 			else
 			{

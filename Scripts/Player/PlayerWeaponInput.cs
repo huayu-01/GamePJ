@@ -77,17 +77,15 @@ public partial class PlayerWeaponInput : Node3D
 		if (camera != null)
 		{
 			Vector2 center = GetViewport().GetVisibleRect().Size * 0.5f;
-			Vector3 origin = camera.ProjectRayOrigin(center);
 			direction = camera.ProjectRayNormal(center);
-			aimPoint = origin + direction * MaxAimDistance;
 
-			var query = PhysicsRayQueryParameters3D.Create(origin, aimPoint, CombatLayers.World | CombatLayers.UnitMask);
-			query.Exclude = new Godot.Collections.Array<Rid> { _unit.GetRid() };
-			Godot.Collections.Dictionary hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
-			if (hit.Count > 0)
-			{
-				aimPoint = hit["position"].AsVector3();
-			}
+			// 「准星打到的世界点」**只有一份实现**：`AimUtil.GetCrosshairPoint`。
+			// 这里和表驱动的技能（能量掌 `EnergyWaveAbility.ResolveShotDirection`）共用它 ——
+			// 以前两处各写一遍，能量掌那边用的是"屏幕中心射线的**方向**"，于是斜向下 20°、
+			// 3m 就落地，与枪械口径不一致（`docs/anim-pipeline.md` §6.4-4）。
+			// 求交参数与改前逐字一致：mask = World|UnitMask、排除自己、无命中时取最大距离处。
+			aimPoint = AimUtil.GetCrosshairPoint(
+				GetViewport(), _unit, MaxAimDistance, CombatLayers.World | CombatLayers.UnitMask);
 		}
 		else
 		{
