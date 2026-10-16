@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" path="res://Assets/Textures/tex_weapon_muzzle_side.png" id="2_tqhb0"]
 
 [resource]
+resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("1_l6hwg")
 shader_parameter/main_texture = ExtResource("2_tqhb0")

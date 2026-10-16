@@ -1,0 +1,48 @@
+[
+  {
+    "package": "battle-fx",
+    "bytes": 1009313,
+    "sha256": "ab59a829ff06e2e71935975d563d009d3999beddde27a6b2dcf08800e54c9b84",
+    "licence_files": [
+      "BattleFXFree/assets/BinbunVFX_Vol2/BattleFX/license.txt"
+    ]
+  },
+  {
+    "package": "explosion-fx",
+    "bytes": 999784,
+    "sha256": "96e9b75b83a327aca4ee747deb2d7dc1190a157b53c942838952c8926e6c0980",
+    "licence_files": [
+      "ExplosionFXFree/assets/BinbunVFX_Vol2/ExplosionFX/license.txt"
+    ]
+  },
+  {
+    "package": "hit-fx",
+    "bytes": 40460,
+    "sha256": "65ddccb28c77c53d1e196e6fc86cff58e60811e2ce1783875332aef7581f584b",
+    "licence_files": [
+      "HitFXFree/assets/BinbunVFX_Vol2/StylizedHitFX/license.txt"
+    ]
+  },
+  {
+    "package": "loot-vfx",
+    "bytes": 60904,
+    "sha256": "17fa873ae726d252b380086f2538be5534b1e2fbe1d35c88e843082a27d60a68",
+    "licence_files": []
+  },
+  {
+    "package": "muzzle-flash-vfx",
+    "bytes": 1875967,
+    "sha256": "58349d3f578caa5e9723b21b2ccf30f07a7913b9c3c2d47891cac722b942ca31",
+    "licence_files": []
+  },
+  {
+    "package": "toon-nature",
+    "bytes": 1306643,
+    "sha256": "4e73025063630c753e09059644679b9f17093c58f2d9e180c41e578b4496fce8",
+    "licence_files": [
+      "toon-trees-lite-1.0.1/CREDITS.txt",
+      "toon-trees-lite-1.0.1/addons/toon_trees_lite/LICENSE.md",
+      "toon-trees-lite-1.0.1/addons/toon_wind/LICENSE.md"
+    ]
+  }
+]

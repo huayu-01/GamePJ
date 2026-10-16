@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://Scripts/Interaction/BaseTerminal.cs" id="2_terminal"]
@@ -10,6 +10,9 @@
 [ext_resource type="Script" path="res://Scripts/UI/LoadoutPreview.cs" id="10_loadout"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/ChooseScreen.tscn" id="11_choose"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/AbilityMatrixScreen.tscn" id="12_matrix"]
+[ext_resource type="Environment" path="res://Assets/ArtRefresh/env_level_garden.tres" id="20_env"]
+[ext_resource type="Material" path="res://Assets/ArtRefresh/mat_level_ground.tres" id="21_ground"]
+[ext_resource type="PackedScene" path="res://Scenes/ArtRefresh/GardenDressing.tscn" id="22_garden"]
 
 [sub_resource type="BoxShape3D" id="Shape_ground"]
 size = Vector3(26, 1, 26)
@@ -18,7 +21,7 @@ size = Vector3(26, 1, 26)
 albedo_color = Color(0.22, 0.24, 0.28, 1)
 
 [sub_resource type="BoxMesh" id="Mesh_ground"]
-material = SubResource("Mat_ground")
+material = ExtResource("21_ground")
 size = Vector3(26, 1, 26)
 
 [sub_resource type="StandardMaterial3D" id="Mat_upgrade"]
@@ -55,11 +58,27 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("Shape_ground")
 
 [node name="Mesh" type="MeshInstance3D" parent="Ground"]
+position = Vector3(0, -0.5, 0)
 mesh = SubResource("Mesh_ground")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.86, -0.35, 0.36, 0, 0.71, 0.7, -0.5, -0.6, 0.61, 0, 12, 0)
 light_energy = 1.1
+light_color = Color(1, 0.88, 0.70, 1)
+shadow_enabled = true
+directional_shadow_max_distance = 80.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("20_env")
+
+[node name="GardenDressing" parent="." instance=ExtResource("22_garden")]
+base_mode = true
+tree_count = 24
+perimeter_radius = 18.0
+tree_height = 6.5
+rock_count = 18
+rock_scale = 2.6
+distant_radius = 65.0
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 9)
@@ -74,7 +93,7 @@ Kind = 0
 
 [node name="Mesh" type="MeshInstance3D" parent="TerminalUpgrades"]
 mesh = SubResource("Mesh_terminal")
-surface_material_override/0 = SubResource("Mat_upgrade")
+material_override = SubResource("Mat_upgrade")
 
 [node name="TerminalLoadout" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 1.1, 0)
@@ -83,7 +102,7 @@ Kind = 1
 
 [node name="Mesh" type="MeshInstance3D" parent="TerminalLoadout"]
 mesh = SubResource("Mesh_terminal")
-surface_material_override/0 = SubResource("Mat_loadout")
+material_override = SubResource("Mat_loadout")
 
 [node name="TerminalHelp" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 1.1, 0)
@@ -92,7 +111,7 @@ Kind = 2
 
 [node name="Mesh" type="MeshInstance3D" parent="TerminalHelp"]
 mesh = SubResource("Mesh_terminal")
-surface_material_override/0 = SubResource("Mat_help")
+material_override = SubResource("Mat_help")
 
 [node name="TerminalGate" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.1, 0)
@@ -102,7 +121,7 @@ TargetScene = "res://Scenes/Main.tscn"
 
 [node name="Mesh" type="MeshInstance3D" parent="TerminalGate"]
 mesh = SubResource("Mesh_terminal")
-surface_material_override/0 = SubResource("Mat_gate")
+material_override = SubResource("Mat_gate")
 
 [node name="Screens" type="Node" parent="."]
 

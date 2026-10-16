@@ -1,0 +1,58 @@
+build.ps1 --no-incremental -v minimal：0 warning / 0 error
+probe 退出码=0
+[ArtRefresh] PASS 环境子树：碰撞/单位/分组均为0
+[ArtRefresh] PASS 竞技场原7个碰撞形状保持
+[ArtRefresh] PASS 竞技场地面物理80x1x80保持
+[ArtRefresh] 庭院装饰：子节点=237 树=32 外圈=36.0 碰撞=0 单位=0 分组=0
+[ArtRefresh] PASS 真实渲染截图 arena 1920x1080
+[ArtRefresh] PASS 真实渲染截图 readability 1920x1080
+[ArtRefresh] PASS fx_combat_hit.tscn 材质逐项实例隔离
+[ArtRefresh] PASS fx_combat_hit.tscn 无物理/单位/分组
+[ArtRefresh] PASS fx_combat_hit.tscn 修改A不会污染B
+[ArtRefresh] PASS fx_combat_explosion.tscn 材质逐项实例隔离
+[ArtRefresh] PASS fx_combat_explosion.tscn 无物理/单位/分组
+[ArtRefresh] PASS fx_combat_explosion.tscn 修改A不会污染B
+[ArtRefresh] PASS fx_weapon_muzzle.tscn 材质逐项实例隔离
+[ArtRefresh] PASS fx_weapon_muzzle.tscn 无物理/单位/分组
+[ArtRefresh] PASS fx_weapon_muzzle.tscn 修改A不会污染B
+[ArtRefresh] PASS FxLootBeacon.tscn 材质逐项实例隔离
+[ArtRefresh] PASS FxLootBeacon.tscn 无物理/单位/分组
+[ArtRefresh] PASS FxLootBeacon.tscn 修改A不会污染B
+[ArtRefresh] PASS FxBattleSwing.tscn 材质逐项实例隔离
+[ArtRefresh] PASS FxBattleSwing.tscn 无物理/单位/分组
+[ArtRefresh] PASS FxBattleSwing.tscn 修改A不会污染B
+[ArtRefresh] PASS 真实渲染截图 fx_early 1920x1080
+[ArtRefresh] PASS 真实渲染截图 fx_late 1920x1080
+[ArtRefresh] PASS 基地装饰无物理/单位/分组
+[ArtRefresh] PASS 基地地面物理26x1x26保持
+[ArtRefresh] PASS 真实渲染截图 base 1920x1080
+[ArtRefresh] PASS 可选像素滤镜不拦截输入
+[ArtRefresh] PASS 真实渲染截图 pixel_optional 1920x1080
+[ArtRefresh] PASS 像素滤镜移除即消失，生产场景默认未挂载
+[ArtRefresh] 验收结束：通过 28，失败 0
+gameplay 退出码=0
+[ArtRefresh] 正式Main：1920x1080截图结果=0 当前相机=/root/Main/Player/CameraRig/SpringArm/Camera
+[范围说明] 本次仅隐藏并行B批AbilityHud绘制；原Main的绘制错误保存在art-refresh-verification.md，不能视为B批回归通过。
+selftest 退出码=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+存档不变 settings.cfg=不存在
+存档不变 ability_cards.cfg=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档不变 meta.cfg=DD0CB8EAFCDF2858016870B8ED2A65874FD55ED0620A743BE55A483059BD10C4
+截图 art_refresh_arena.png SHA256=0D18BF4517D02F5DEB545D3BFA26DF3A4793CACE5D90882E88F6CA6E82E4465C
+截图 art_refresh_base.png SHA256=546EA44FEEFC14E560A2BFBB569822B07A1D8AAAFA354A5AA6F8DBEA9F057921
+截图 art_refresh_before_arena.png SHA256=C21B1CE3B1B61DE29C6E1036242925671254BEA5F4D874974DFDE2EB0C644D5C
+截图 art_refresh_before_base.png SHA256=2CA1FD398AD61110397993A030638D248C130B35617B680A431E7B9A750CB475
+截图 art_refresh_before_readability.png SHA256=A3911A6F667C96BA440CFE6D7E77DF132AE7E5946408ABD22AF540C21CFCEE77
+截图 art_refresh_fx_early.png SHA256=E39DA5B68B64BAA1BE88B2D1B9667E66F49BE1E6F22FF7D248FFF5FD3B7C7370
+截图 art_refresh_fx_late.png SHA256=1FC35579C6DC796BDD648AC1952D42A79C5C2A0F7791DDC980244527F05CAC54
+截图 art_refresh_gameplay.png SHA256=421D34CE21D753FFF506A944008D19A5D42CADDA08944E413C0C3029A42D7485
+截图 art_refresh_pixel_optional.png SHA256=2F0CAFB9B4D836773243226C6C76658D096757E0130E68E1E5E8C56C53426908
+截图 art_refresh_readability.png SHA256=265735A9ED103DA77756EC2B5C946165F3EC5A96648C0CABF756F99CB8C4CED3
+selftest.flag 不存在=True

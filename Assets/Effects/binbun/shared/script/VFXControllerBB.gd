@@ -63,9 +63,6 @@ signal stopped
 func _ready() -> void:
 	if autoplay: play()
 
-func _enter_tree() -> void:
-	if autoplay: play()
-
 func play() -> void:
 	anim.play("main")
 	anim.seek(0.0)

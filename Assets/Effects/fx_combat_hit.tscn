@@ -230,6 +230,7 @@ _data = {
 }
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fm4iy"]
+resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("1_3ytvb")
 shader_parameter/primary_color = Color(1, 1, 1, 1)
@@ -245,6 +246,7 @@ point_count = 2
 curve = SubResource("Curve_fm4iy")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vj1h5"]
+resource_local_to_scene = true
 spread = 180.0
 initial_velocity_min = 4.0
 initial_velocity_max = 7.0
@@ -258,6 +260,7 @@ radius = 0.05
 height = 0.6
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3ytvb"]
+resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("1_3ytvb")
 shader_parameter/primary_color = Color(1, 1, 1, 1)
@@ -268,6 +271,7 @@ shader_parameter/emission_mult = 1.0
 [sub_resource type="SphereMesh" id="SphereMesh_fm4iy"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vj1h5"]
+resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("2_fm4iy")
 shader_parameter/primary_color = Color(1, 1, 1, 1)
@@ -299,6 +303,7 @@ point_count = 2
 curve = SubResource("Curve_3jdin")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_gmgti"]
+resource_local_to_scene = true
 gravity = Vector3(0, 0, 0)
 scale_curve = SubResource("CurveTexture_vj1h5")
 alpha_curve = SubResource("CurveTexture_fm4iy")
@@ -307,6 +312,7 @@ alpha_curve = SubResource("CurveTexture_fm4iy")
 size = Vector2(2, 2)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_e48sq"]
+resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("5_3jdin")
 shader_parameter/primary_color = Color(1, 1, 1, 1)
@@ -333,6 +339,7 @@ point_count = 5
 curve = SubResource("Curve_4cx5s")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vwmd1"]
+resource_local_to_scene = true
 spread = 180.0
 initial_velocity_min = 0.01
 initial_velocity_max = 0.01

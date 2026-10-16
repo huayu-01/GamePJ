@@ -1,38 +1,38 @@
-[gd_scene load_steps=14 format=3 uid="uid://c8vnyi8h6o2u8"]
+[gd_scene load_steps=16 format=3 uid="uid://c8vnyi8h6o2u8"]
 
-[ext_resource type="Texture2D" path="res://Assets/Textures/tex_level_sky_space.png" id="1_sky"]
-[ext_resource type="PackedScene" path="res://Assets/Models/level/mesh_level_floor.glb" id="2_floor"]
-[ext_resource type="PackedScene" path="res://Assets/Models/level/mesh_level_wall.glb" id="3_wall"]
-[ext_resource type="PackedScene" path="res://Assets/Models/level/mesh_level_pillar.glb" id="4_pillar"]
+[ext_resource type="Environment" path="res://Assets/ArtRefresh/env_level_garden.tres" id="1_env"]
+[ext_resource type="Material" path="res://Assets/ArtRefresh/mat_level_ground.tres" id="2_ground"]
+[ext_resource type="PackedScene" path="res://Scenes/ArtRefresh/GardenDressing.tscn" id="3_garden"]
 
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_arena"]
-panorama = ExtResource("1_sky")
+[sub_resource type="StandardMaterial3D" id="Mat_stone"]
+albedo_color = Color(0.34, 0.42, 0.38, 1)
+diffuse_mode = 1
+specular_mode = 2
+roughness = 0.95
 
-[sub_resource type="Sky" id="Sky_arena"]
-sky_material = SubResource("PanoramaSkyMaterial_arena")
+[sub_resource type="BoxMesh" id="Mesh_ground"]
+material = ExtResource("2_ground")
+size = Vector3(80, 1, 80)
 
-[sub_resource type="Environment" id="Environment_arena"]
-background_mode = 2
-sky = SubResource("Sky_arena")
-ambient_light_source = 3
-ambient_light_energy = 0.55
-tonemap_mode = 2
-glow_enabled = true
-glow_normalized = true
-glow_intensity = 0.5
-glow_strength = 1.0
-glow_bloom = 0.0
-glow_blend_mode = 1
-glow_hdr_threshold = 2.0
-glow_hdr_scale = 2.0
-glow_hdr_luminance_cap = 12.0
-glow_levels/1 = 0.0
-glow_levels/2 = 0.0
-glow_levels/3 = 0.0
-glow_levels/4 = 0.8
-glow_levels/5 = 0.6
-glow_levels/6 = 0.4
-glow_levels/7 = 0.0
+[sub_resource type="CylinderMesh" id="Mesh_pillar"]
+material = SubResource("Mat_stone")
+top_radius = 0.72
+bottom_radius = 0.8
+height = 6.0
+radial_segments = 8
+rings = 1
+
+[sub_resource type="BoxMesh" id="Mesh_wall"]
+material = SubResource("Mat_stone")
+size = Vector3(12, 5, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_ramp"]
+material = ExtResource("2_ground")
+size = Vector3(6, 0.6, 8)
+
+[sub_resource type="BoxMesh" id="Mesh_rampbase"]
+material = SubResource("Mat_stone")
+size = Vector3(6, 2.4, 8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(80, 1, 80)
@@ -54,11 +54,15 @@ size = Vector3(6, 2.4, 8)
 [node name="TestArena" type="Node3D" unique_id=1313686624 groups=["nav_geometry"]]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1692882627]
-environment = SubResource("Environment_arena")
+environment = ExtResource("1_env")
 
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=516345260]
 transform = Transform3D(0.8660254, 0.38302222, -0.32139382, 0, 0.64278764, 0.76604444, 0.5, -0.66341394, 0.5566704, 0, 0, 0)
 shadow_enabled = true
+light_color = Color(1, 0.88, 0.70, 1)
+light_energy = 1.25
+directional_shadow_max_distance = 110.0
+shadow_bias = 0.035
 
 [node name="Ground" type="StaticBody3D" parent="." unique_id=1837660854]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
@@ -66,8 +70,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 [node name="Collision" type="CollisionShape3D" parent="Ground" unique_id=1783894702]
 shape = SubResource("BoxShape3D_ground")
 
-[node name="Mesh" parent="Ground" instance=ExtResource("2_floor")]
-transform = Transform3D(80, 0, 0, 0, 3.3333333, 0, 0, 0, 80, 0, -0.5, 0)
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("Mesh_ground")
 
 [node name="Pillar1" type="StaticBody3D" parent="." unique_id=575424147]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3, -6)
@@ -75,8 +79,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3, -6)
 [node name="Collision" type="CollisionShape3D" parent="Pillar1" unique_id=1475063449]
 shape = SubResource("BoxShape3D_pillar")
 
-[node name="Mesh" parent="Pillar1" instance=ExtResource("4_pillar")]
-transform = Transform3D(1.6, 0, 0, 0, 6, 0, 0, 0, 3.2, 0, -3, 0)
+[node name="Mesh" type="MeshInstance3D" parent="Pillar1"]
+mesh = SubResource("Mesh_pillar")
 
 [node name="Pillar2" type="StaticBody3D" parent="." unique_id=17350756]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 3, -9)
@@ -84,8 +88,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 3, -9)
 [node name="Collision" type="CollisionShape3D" parent="Pillar2" unique_id=880576810]
 shape = SubResource("BoxShape3D_pillar")
 
-[node name="Mesh" parent="Pillar2" instance=ExtResource("4_pillar")]
-transform = Transform3D(1.6, 0, 0, 0, 6, 0, 0, 0, 3.2, 0, -3, 0)
+[node name="Mesh" type="MeshInstance3D" parent="Pillar2"]
+mesh = SubResource("Mesh_pillar")
 
 [node name="Pillar3" type="StaticBody3D" parent="." unique_id=1305851287]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, 5)
@@ -93,8 +97,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, 5)
 [node name="Collision" type="CollisionShape3D" parent="Pillar3" unique_id=799428230]
 shape = SubResource("BoxShape3D_pillar")
 
-[node name="Mesh" parent="Pillar3" instance=ExtResource("4_pillar")]
-transform = Transform3D(1.6, 0, 0, 0, 6, 0, 0, 0, 3.2, 0, -3, 0)
+[node name="Mesh" type="MeshInstance3D" parent="Pillar3"]
+mesh = SubResource("Mesh_pillar")
 
 [node name="Wall" type="StaticBody3D" parent="." unique_id=375258552]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -16)
@@ -102,8 +106,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -16)
 [node name="Collision" type="CollisionShape3D" parent="Wall" unique_id=1082098808]
 shape = SubResource("BoxShape3D_wall")
 
-[node name="Mesh" parent="Wall" instance=ExtResource("3_wall")]
-transform = Transform3D(12, 0, 0, 0, 5, 0, 0, 0, 3.3333333, 0, -2.5, 0)
+[node name="Mesh" type="MeshInstance3D" parent="Wall"]
+mesh = SubResource("Mesh_wall")
 
 [node name="Ramp" type="StaticBody3D" parent="." unique_id=1949310716]
 transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, -8, 1.3, -5)
@@ -111,8 +115,8 @@ transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 
 [node name="Collision" type="CollisionShape3D" parent="Ramp" unique_id=251034434]
 shape = SubResource("BoxShape3D_ramp")
 
-[node name="Mesh" parent="Ramp" instance=ExtResource("2_floor")]
-transform = Transform3D(6, 0, 0, 0, 2, 0, 0, 0, 8, 0, -0.3, 0)
+[node name="Mesh" type="MeshInstance3D" parent="Ramp"]
+mesh = SubResource("Mesh_ramp")
 
 [node name="RampBase" type="StaticBody3D" parent="." unique_id=598142732]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.2, -5)
@@ -120,8 +124,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.2, -5)
 [node name="Collision" type="CollisionShape3D" parent="RampBase" unique_id=1048182362]
 shape = SubResource("BoxShape3D_rampbase")
 
-[node name="Mesh" parent="RampBase" instance=ExtResource("2_floor")]
-transform = Transform3D(6, 0, 0, 0, 8, 0, 0, 0, 8, 0, -1.2, 0)
+[node name="Mesh" type="MeshInstance3D" parent="RampBase"]
+mesh = SubResource("Mesh_rampbase")
+
+[node name="GardenDressing" parent="." instance=ExtResource("3_garden")]
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1047289119]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7432747, 0)
