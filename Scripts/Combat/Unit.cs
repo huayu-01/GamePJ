@@ -136,8 +136,8 @@ public partial class Unit : CharacterBody3D
 		SeedStats();
 		Movement = GetNodeOrNull<CharacterMovement>("Movement");
 		CollisionLayer = CombatLayers.Of(Faction);
-		// 玩家会被敌人挡住；敌人之间不互相阻挡，避免成堆卡死。
-		CollisionMask = Faction == Faction.Player ? CombatLayers.World | CombatLayers.UnitMask : CombatLayers.World;
+		// 所有阵营的身体只检测地形；命中体和弹道独立检测单位，移动不会被单位堵住。
+		CollisionMask = CombatLayers.World;
 		// 召唤物单独归组：避免被当成玩家（ResolvePlayer 之类只认 player_units），
 		// 也不会被敌人的目标选择盯上（Targeting 按阵营选组）。
 		AddToGroup(HasTag("Summon") ? "summon_units" : Faction == Faction.Player ? "player_units" : "enemy_units");

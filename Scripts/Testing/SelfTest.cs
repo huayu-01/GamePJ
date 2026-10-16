@@ -9,6 +9,7 @@ using ActRoguelike.Player;
 using ActRoguelike.Run;
 using ActRoguelike.UI;
 using ActRoguelike.Rewards;
+using ActRoguelike.Visual;
 using Godot;
 
 namespace ActRoguelike.Debug;
@@ -594,6 +595,14 @@ public partial class SelfTest : Node
 	}
 
 
+	/// <summary>角色可替换模型后，取当前可见的播放器；旧Model只是缓存，不能再固定读它。</summary>
+	private static AnimationPlayer? ResolvePlayerAnimation(Unit? player)
+	{
+		Node? model = player?.GetNodeOrNull<CharacterDisplay>("Appearance")?.ActiveModel
+			?? player?.GetNodeOrNull<Node>("Model");
+		return model == null ? null : NodeSearch.FindInSubtree<AnimationPlayer>(model);
+	}
+
 	/// <summary>玩家的 UnitAnimator 接线 + 三个坑的静态核对（技能要靠它）。</summary>
 	private void ReportPlayerAnimator()
 	{
@@ -605,9 +614,7 @@ public partial class SelfTest : Node
 		}
 
 		UnitAnimator? animator = player.GetNodeOrNull<UnitAnimator>(UnitAnimator.NodeName);
-		AnimationPlayer? ap = player.GetNodeOrNull<Node>("Model") is { } model
-			? NodeSearch.FindInSubtree<AnimationPlayer>(model)
-			: null;
+		AnimationPlayer? ap = ResolvePlayerAnimation(player);
 		if (animator == null || ap == null)
 		{
 			GameLog.Write("SelfTest", "🔴 动画管线·玩家接线：玩家上没有 UnitAnimator 或 AnimationPlayer。");
@@ -955,7 +962,7 @@ public partial class SelfTest : Node
 	{
 		Unit? player = PlayerLocator.Player;
 		UnitAnimator? animator = player?.GetNodeOrNull<UnitAnimator>(UnitAnimator.NodeName);
-		AnimationPlayer? ap = player?.GetNode("Model") is { } model ? NodeSearch.FindInSubtree<AnimationPlayer>(model) : null;
+		AnimationPlayer? ap = ResolvePlayerAnimation(player);
 		if (ap == null)
 		{
 			GameLog.Write("SelfTest", "🔴 最小闭环·动画状态：拿不到玩家的 AnimationPlayer。");
@@ -1072,7 +1079,7 @@ public partial class SelfTest : Node
 		}
 
 		_loopTraceLeft--;
-		AnimationPlayer? ap = PlayerLocator.Player?.GetNode("Model") is { } model ? NodeSearch.FindInSubtree<AnimationPlayer>(model) : null;
+		AnimationPlayer? ap = ResolvePlayerAnimation(PlayerLocator.Player);
 		GameLog.Write(
 			"Combat",
 			$"逐帧·技能动画：当前={ap?.CurrentAnimation} pos={ap?.CurrentAnimationPosition:0.0000} 播放中={ap?.IsPlaying()} "
@@ -1084,7 +1091,7 @@ public partial class SelfTest : Node
 	private void ReportSkillLoop()
 	{
 		UnitAnimator? animator = PlayerLocator.Player?.GetNodeOrNull<UnitAnimator>(UnitAnimator.NodeName);
-		AnimationPlayer? ap = PlayerLocator.Player?.GetNode("Model") is { } model ? NodeSearch.FindInSubtree<AnimationPlayer>(model) : null;
+		AnimationPlayer? ap = ResolvePlayerAnimation(PlayerLocator.Player);
 		if (ap != null)
 		{
 			Animation? a = ap.GetAnimation("skills/Skill_A1_ATK1");

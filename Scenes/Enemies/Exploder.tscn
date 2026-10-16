@@ -66,8 +66,8 @@ ApproachMaxRange = 2.4
 
 [node name="Attack" type="Area3D" parent="AbilityExplode"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
-collision_layer = 0
-collision_mask = 6
+collision_layer = 16
+collision_mask = 2
 script = ExtResource("8_hitbox")
 Damage = 22.0
 Knockback = 5.0

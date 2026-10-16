@@ -84,7 +84,7 @@ public partial class BatchCProbe : Node
 			GetTree().CurrentScene = freshBase;
 			await Wait(0.6);
 			Check(RunSetup.Character == PlayerCharacterKind.WeaponMaster && RunSetup.Weapon == WeaponPresetKind.SpiritSword, "新进程基地启动自动恢复保存的选择");
-			Check(freshBase.GetNode<CharacterDisplay>("Player/Appearance").CurrentModelPath.EndsWith("heavy.glb"), "新进程基地实际玩家模型与存档一致");
+			Check(freshBase.GetNode<CharacterDisplay>("Player/Appearance").CurrentModelPath == ConfigRows.ById<CharacterConfig>("chr_weapon_master")!.ModelPath, "新进程基地实际玩家模型与存档一致");
 			return;
 		}
 		RunSetup.Character = PlayerCharacterKind.Hunter;
@@ -153,7 +153,7 @@ public partial class BatchCProbe : Node
 		await Wait(0.3);
 		await SwitchAtStand("chr_weapon_master");
 		Check(RunSetup.Weapon == WeaponPresetKind.Scythe && choices.SelectedIndex == 1 && choices.SelectedCardDisabled, "A交互B：切换B，恢复镰刀并高亮");
-		Check(_player.GetNode<CharacterDisplay>("Appearance").CurrentModelPath.EndsWith("mesh_player_body_heavy.glb"), "玩家真实换成武器大师模型");
+		Check(_player.GetNode<CharacterDisplay>("Appearance").CurrentModelPath == ConfigRows.ById<CharacterConfig>("chr_weapon_master")!.ModelPath, "玩家真实换成武器大师模型");
 		await Shot("c_scythe_selected");
 		await KeyPress(Key.Key1);
 		await Wait(0.35);
@@ -225,7 +225,7 @@ public partial class BatchCProbe : Node
 		await Wait(1.5);
 		Node level = GetTree().CurrentScene;
 		Check(level.SceneFilePath == "res://Scenes/Main.tscn" && RunController.Instance?.CurrentWeapon == WeaponPresetKind.SpiritSword && RunController.Instance.CurrentCharacter == PlayerCharacterKind.WeaponMaster, "真实F出击门带B+灵剑进入关卡");
-		Check(level.GetNode<CharacterDisplay>("Player/Appearance").CurrentModelPath.EndsWith("heavy.glb"), "基地与关卡使用相同角色模型");
+		Check(level.GetNode<CharacterDisplay>("Player/Appearance").CurrentModelPath == ConfigRows.ById<CharacterConfig>("chr_weapon_master")!.ModelPath, "基地与关卡使用相同角色模型");
 		await Shot("c_enter_level");
 		GmConsole levelGm = level.GetNode<GmConsole>("GmConsole");
 		levelGm.ExecuteCommand("run chr_hunter wpn_spirit_sword");

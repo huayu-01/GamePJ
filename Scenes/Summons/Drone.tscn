@@ -71,8 +71,8 @@ AttackRange = 1.8
 
 [node name="Attack" type="Area3D" parent="AbilityMelee"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.7)
-collision_layer = 0
-collision_mask = 6
+collision_layer = 8
+collision_mask = 4
 script = ExtResource("8_hitbox")
 Damage = 6.0
 Knockback = 1.5

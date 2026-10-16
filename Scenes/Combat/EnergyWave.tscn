@@ -18,13 +18,16 @@ height = 0.5
 radial_segments = 10
 rings = 1
 
-[node name="EnergyWave" type="Node3D"]
+[node name="EnergyWave" type="Area3D"]
+collision_layer = 32
+collision_mask = 7
+monitoring = false
+monitorable = false
 script = ExtResource("1_projectile")
 Speed = 150.0
 GravityScale = 0.0
 MaxLifetime = 1.6
 Pierce = 0
-HitMask = 5
 
 [node name="Head" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_wave")

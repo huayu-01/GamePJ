@@ -52,6 +52,7 @@ public partial class CameraRig : Node3D
 	{
 		TopLevel = true;
 		_springArm = GetNode<SpringArm3D>("SpringArm");
+		_springArm.CollisionMask = ActRoguelike.Combat.CombatLayers.World;
 		Target ??= GetParent() as Node3D;
 		if (Target is CollisionObject3D body)
 		{

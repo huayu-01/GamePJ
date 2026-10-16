@@ -1,3 +1,4 @@
+using ActRoguelike.Combat;
 using Godot;
 
 namespace ActRoguelike.World;
@@ -27,7 +28,7 @@ public partial class MapManager : Node3D
 	[Export] public string GeometryGroupName { get; set; } = "nav_geometry";
 
 	/// <summary>参与烘焙的物理层（默认只吃 World 层）。</summary>
-	[Export] public uint GeometryMask { get; set; } = 1;
+	[Export] public uint GeometryMask { get; set; } = CombatLayers.World;
 
 	/// <summary>烘焙延迟：等关卡几何体都进入场景树。</summary>
 	[Export] public float BakeDelaySeconds { get; set; } = 0.3f;
@@ -232,7 +233,7 @@ public partial class MapManager : Node3D
 				center.Z + (Mathf.Sin(angle) * radius));
 
 			// ① 找脚下地面（World 层 = 1）；够不着就换一个方向。
-			var ray = PhysicsRayQueryParameters3D.Create(probe, probe + (Vector3.Down * 12f), 1);
+			var ray = PhysicsRayQueryParameters3D.Create(probe, probe + (Vector3.Down * 12f), CombatLayers.World);
 			Godot.Collections.Dictionary hit = space.IntersectRay(ray);
 			if (hit.Count == 0)
 			{
@@ -250,7 +251,7 @@ public partial class MapManager : Node3D
 			{
 				Shape = new SphereShape3D { Radius = 1.3f },
 				Transform = new Transform3D(Basis.Identity, ground + (Vector3.Up * 1.65f)),
-				CollisionMask = 1,
+				CollisionMask = CombatLayers.World,
 			};
 
 			if (space.IntersectShape(shape, 1).Count == 0)

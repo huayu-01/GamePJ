@@ -19,13 +19,16 @@ height = 0.14
 radial_segments = 6
 rings = 1
 
-[node name="Arrow" type="Node3D"]
+[node name="Arrow" type="Area3D"]
+collision_layer = 32
+collision_mask = 7
+monitoring = false
+monitorable = false
 script = ExtResource("1_projectile")
 Speed = 220.0
 GravityScale = 0.0
 MaxLifetime = 3.0
 Pierce = 0
-HitMask = 5
 
 [node name="Shaft" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)

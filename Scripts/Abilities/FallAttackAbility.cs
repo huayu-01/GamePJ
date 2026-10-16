@@ -217,7 +217,7 @@ public partial class FallAttackAbility : Ability
 			GetViewport(),
 			OwnerUnit,
 			MaxAimDistance,
-			CombatLayers.World | CombatLayers.UnitMask);
+			CombatLayers.World | CombatLayers.HostileTo(OwnerUnit.Faction));
 	}
 
 	private void ActivateDiveHitbox()

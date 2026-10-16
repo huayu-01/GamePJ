@@ -1,5 +1,6 @@
 using ActRoguelike.Config;
 using ActRoguelike.Interaction;
+using ActRoguelike.Combat;
 using Godot;
 
 namespace ActRoguelike.Run;
@@ -100,7 +101,7 @@ public static class NodePlacement
 		Vector3 origin = node.GlobalPosition;
 
 		// 1) 找脚下地面（World 层 = 1）。射线起点只抬高 2 米，避免打到上层平台/斜坡顶面。
-		var ray = PhysicsRayQueryParameters3D.Create(origin + (Vector3.Up * 2f), origin + (Vector3.Down * 10f), 1);
+		var ray = PhysicsRayQueryParameters3D.Create(origin + (Vector3.Up * 2f), origin + (Vector3.Down * 10f), CombatLayers.World);
 		Godot.Collections.Dictionary hit = space.IntersectRay(ray);
 		float groundY = hit.Count > 0 ? ((Vector3)hit["position"]).Y : origin.Y;
 
@@ -125,7 +126,7 @@ public static class NodePlacement
 			{
 				Shape = new SphereShape3D { Radius = 1.3f },
 				Transform = new Transform3D(Basis.Identity, candidate + (Vector3.Up * 1.65f)),
-				CollisionMask = 1,
+				CollisionMask = CombatLayers.World,
 			};
 
 			if (space.IntersectShape(probe, 1).Count == 0)

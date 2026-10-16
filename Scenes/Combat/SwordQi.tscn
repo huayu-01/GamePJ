@@ -12,13 +12,16 @@ size = Vector3(0.22, 0.9, 1.1)
 material = ExtResource("2_mat")
 size = Vector3(0.1, 0.5, 0.5)
 
-[node name="SwordQi" type="Node3D"]
+[node name="SwordQi" type="Area3D"]
+collision_layer = 32
+collision_mask = 7
+monitoring = false
+monitorable = false
 script = ExtResource("1_projectile")
 Speed = 60.0
 GravityScale = 0.0
 MaxLifetime = 0.45
 Pierce = 8
-HitMask = 5
 
 [node name="Blade" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.35)

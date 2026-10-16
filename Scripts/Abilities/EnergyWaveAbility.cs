@@ -244,7 +244,7 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		// 所以"从出生点朝世界点"与"从胸口朝世界点"是同一个方向（不再有相机↔角色的视差）。
 		Vector3 chest = OwnerUnit.GlobalPosition + (Vector3.Up * 0.9f);
 		Vector3 point = AimUtil.GetCrosshairPoint(
-			GetViewport(), OwnerUnit, MaxAimDistance, CombatLayers.World | CombatLayers.UnitMask);
+			GetViewport(), OwnerUnit, MaxAimDistance, CombatLayers.World | CombatLayers.HostileTo(OwnerUnit.Faction));
 
 		Vector3 direction = point - chest;
 		// 退化（准星点正好压在胸口）时退回原来的解析：没有相机时它给的是"角色前方"。

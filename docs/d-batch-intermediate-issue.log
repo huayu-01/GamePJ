@@ -1,0 +1,42 @@
+D批中间完整自测（2026-10-17；未计为通过）
+进程退出码0，但验收脚本因两条ERROR拒绝本次结果。
+原因：并行角色美术替换后，旧SelfTest固定读取隐藏的Model播放器。
+修复：四个动画取证入口统一读取CharacterDisplay.ActiveModel，保留正式动画与战斗流程。
+最终结果以d-batch-evidence.log为准；没有将此错误加入豁免列表。
+以下是该次stderr原文：
+
+WARNING: [MapManager] 导航网格为空：检查地面是否是 World 层（collision_layer 含 1）的 StaticBody3D。
+   at: void ActRoguelike.World.MapManager.Bake() (res://Scripts/World/MapManager.cs:126)
+   C# backtrace (most recent call first):
+       [0] void Godot.GD.PushWarning(string) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GD.cs:396)
+       [1] void ActRoguelike.World.MapManager.Bake() (F:\Godot项目\项目a\Scripts\World\MapManager.cs:126)
+       [2] void Godot.Callable.<From>g__Trampoline|1_0(object, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/Callable.generics.cs:39)
+       [3] void Godot.DelegateUtils.InvokeWithVariantArgs(nint, System.Void*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant*) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/DelegateUtils.cs:86)
+WARNING: A navigation mesh that uses a `cell_height` of 0.15000000596046 was assigned to a navigation map set to a larger `cell_height` of 0.25.
+This mismatch in cell height can cause rasterization errors with navigation mesh edges on the navigation map.
+The cell height for navigation maps can be changed by using the NavigationServer map_set_cell_height() function.
+The cell height for default navigation maps can also be changed in the project settings.
+This warning can be toggled under 'navigation/3d/warnings/navmesh_cell_size_mismatch' in the project settings.
+   at: set_navigation_mesh (modules/navigation_3d/nav_region_3d.cpp:113)
+ERROR: Animation not found: "skills/Skill_A1_ATK1".
+   at: get_animation (scene/animation/animation_mixer.cpp:411)
+   C# backtrace (most recent call first):
+       [0] Godot.GodotObject Godot.NativeCalls.godot_icall_1_145(nint, nint, Godot.NativeInterop.godot_string_name) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Generated/NativeCalls.cs:1308)
+       [1] Godot.Animation Godot.AnimationMixer.GetAnimation(Godot.StringName) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Generated/GodotObjects/AnimationMixer.cs:351)
+       [2] string ActRoguelike.Debug.SelfTest.SkillAnimationConfigEventPath(Godot.AnimationPlayer) (F:\Godot项目\项目a\Scripts\Testing\SelfTest.cs:636)
+       [3] void ActRoguelike.Debug.SelfTest.ReportPlayerAnimator() (F:\Godot项目\项目a\Scripts\Testing\SelfTest.cs:623)
+       [4] void ActRoguelike.Debug.SelfTest.BeginSkillLoopProbe() (F:\Godot项目\项目a\Scripts\Testing\SelfTest.cs:709)
+       [5] void ActRoguelike.Debug.SelfTest._Process(double) (F:\Godot项目\项目a\Scripts\Testing\SelfTest.cs:412)
+       [6] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Generated/GodotObjects/Node.cs:2654)
+       [7] bool ActRoguelike.Debug.SelfTest.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&) (F:\Godot项目\项目a\.godot\mono\temp\obj\Debug\Godot.SourceGenerators\Godot.SourceGenerators.ScriptMethodsGenerator\ActRoguelike.Debug.SelfTest_ScriptMethods.generated.cs:820)
+       [8] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/Bridge/CSharpInstanceBridge.cs:24)
+ERROR: Animation not found: "skills/Skill_A1_ATK1".
+   at: get_animation (scene/animation/animation_mixer.cpp:411)
+   C# backtrace (most recent call first):
+       [0] Godot.GodotObject Godot.NativeCalls.godot_icall_1_145(nint, nint, Godot.NativeInterop.godot_string_name) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Generated/NativeCalls.cs:1308)
+       [1] Godot.Animation Godot.AnimationMixer.GetAnimation(Godot.StringName) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Generated/GodotObjects/AnimationMixer.cs:351)
+       [2] void ActRoguelike.Debug.SelfTest.ReportSkillLoop() (F:\Godot项目\项目a\Scripts\Testing\SelfTest.cs:1090)
+       [3] void ActRoguelike.Debug.SelfTest._Process(double) (F:\Godot项目\项目a\Scripts\Testing\SelfTest.cs:441)
+       [4] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Generated/GodotObjects/Node.cs:2654)
+       [5] bool ActRoguelike.Debug.SelfTest.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&) (F:\Godot项目\项目a\.godot\mono\temp\obj\Debug\Godot.SourceGenerators\Godot.SourceGenerators.ScriptMethodsGenerator\ActRoguelike.Debug.SelfTest_ScriptMethods.generated.cs:820)
+       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/Bridge/CSharpInstanceBridge.cs:24)

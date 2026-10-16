@@ -52,6 +52,34 @@
     - 一张行需要"每项一份"的一串数据时：**要么加一个 `Array<T>` 列**，**要么老老实实加一行子表 + 一个资源引用列**（例如 `AbilityConfig.ComboSeries` → `Config/Tables/SkillSeries/ser_*.tres`）。**表里的东西要一眼看得懂**（用户本轮裁定：「该改代码的时候还是得改」，别为了"不改代码"把数据做脆）。
     - **禁止**：`ability.Get("属性名")` / `Set("属性名", 值)` 这种**字符串反射设值**（属性名写错不报错，只是静默不生效）。要写强类型属性，就用类型判断（`ability is MeleeComboAbility combo`）。
 
+## 碰撞层与查询（第二轮 D 批）
+
+`project.godot` 的层号从1开始；`CombatLayers` 常量与 `.tscn` 中的数值是位值。
+实现位于 `Scripts/Combat/CombatTypes.cs`，不是历史交接里误写的 `CombatLayers.cs`。
+`layer` 表示自身类别，`mask` 表示检测对象；单位身体的mask与战斗查询的mask分别配置。
+
+| 层号 | 编辑器名 | 位值 | 当前用途与mask |
+|---|---|---:|---|
+| 1 | World | 1 | 地面、墙、坡；单位移动、镜头遮挡、AI避障、刷怪/节点落点只查此层 |
+| 2 | PlayerUnit | 2 | 玩家及玩家阵营召唤物身体；mask=1 |
+| 3 | EnemyUnit | 4 | 普通敌人、精英、Boss身体；mask=1 |
+| 4 | PlayerHitbox | 8 | 玩家/友方攻击Area；mask=4 |
+| 5 | EnemyHitbox | 16 | 敌方攻击Area；mask=2 |
+| 6 | Projectile | 32 | 四种弹体Area根的类别；mask=5（玩家弹）或3（敌方弹） |
+| 7 | Interactable | 64 | 预留；当前交互物是Node3D+距离判定，不人为添加物理体 |
+| 8 | Pickup | 128 | 预留；当前拾取用距离判定，不人为添加物理体 |
+| 9 | VfxOnly | 256 | 仅预留名字；生产纯特效不创建CollisionObject3D，不分配此层 |
+
+- 所有 `Unit` 的CharacterBody3D只撞World，同阵营和敌阵营均可穿过；不加软推挤，不依赖身体挡住来凑近战距离。
+- `AttackHitbox` 在Ready按祖先Unit预配置，在Activate按真实来源刷新；常开Monitoring，仅切换激活态。
+  独立生成的Explosion也由Detonate的来源配置。保留IsHostileTo与HitTracker两道结算校验。
+- `Projectile` 仍用每物理帧的扫线结算，Area根不设形状、Monitoring/Monitorable均关闭，避免重复重叠结算。
+  Launch统一配置阵营mask，`HitMask`兼容旧导出列；命中起点在体内也有效，已命中的RID加入排除列表，防止重复消耗穿透次数。
+  弹射与追踪均按敌对阵营索敌，斩弹仍用既有场景名单与运行期弹体列表。
+- `KillZone` 是Area，layer=0、mask=6，只检测单位身体；死亡Unit的layer归零。
+- 近战身体完全重叠、闪/剑突穿单位、地形阻挡、双阵营四种弹体与全部敌人AI必须用真实物理帧验收。
+  复现及证据见 [d-batch-verification.md](d-batch-verification.md)。
+
 ## Unit 与表现的分工
 
 **第二轮 C 批补充**：PlayerLoadout是基地/关卡共用的装备应用器，不创建关卡上下文。
@@ -128,15 +156,12 @@ ESC 菜单回调由 `SettingsScreen` 注册并在退树时解除，帮助由 `He
 - **数值增强**：给 `Unit.Stats` 加 `StatModifier`，再 `RefreshStats()`；不要在具体脚本里写特例。
 - **新镜头行为**：扩 CameraRig 的导出参数，不要在玩家脚本里直接改 Camera3D。
 
-## 已知限制与待办
+## 已知限制与后续专项
 
-- 阶段 6~7 待办：Boss 与 Boss Skill Elite / Boss Pressure、Stage/Node 流程、死亡结算与重开。
-- 三选一目前手动触发（Tab），阶段 7 由 Node 结算自动发放。
-- 敌人偏猛（无构筑时约 30 秒打死玩家），拿到构筑后再调；数值曲线属待确认项。
-- 没有寻路，只有射线避障，凹形地形仍可能绕远。
-- 状态效果只有 Slow / Weaken / Burn；格挡只有正面判定。
-- 减伤公式与 Armor/Shield 顺序属待策划确认项，当前按 战斗规则说明 §12 的推荐值实现。
-- 角色模型为占位胶囊体。
+- 阶段1~7及第二轮A/E/B/C/D的当前状态以HANDOFF顶部与逐批证据为准，不再把历史快照当待办。
+- 角色数值曲线、整体终版美术和自带中文字体仍需专项推进；占位资源允许继续替换。
+- 导航仍有空网格与cell_height不一致告警，局部避障不能覆盖全部凹形地形；D批未改变导航算法。
+- 破甲环八边形、旧P4探针期望偏差、退出资源告警及偶发GCHandle异常见各批验收记录。
 
 ## 单例与初始化顺序（踩过坑，必须遵守）
 

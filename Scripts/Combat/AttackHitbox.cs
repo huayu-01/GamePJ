@@ -55,8 +55,18 @@ public partial class AttackHitbox : Area3D
 
 	public override void _Ready()
 	{
+		Node? ancestor = GetParent();
+		while (ancestor != null && ancestor is not Unit) ancestor = ancestor.GetParent();
+		ConfigureCollision(ancestor as Unit);
+		Monitorable = false;
 		// 常开监测：反复切换 monitoring 会让“一直静止在范围内”的单位不进重叠列表。
 		Monitoring = true;
+	}
+
+	private void ConfigureCollision(Unit? owner)
+	{
+		CollisionLayer = owner == null ? 0 : CombatLayers.HitboxOf(owner.Faction);
+		CollisionMask = owner == null ? CombatLayers.UnitMask : CombatLayers.HostileTo(owner.Faction);
 	}
 
 	private float ComputeReach()
@@ -100,6 +110,7 @@ public partial class AttackHitbox : Area3D
 	public void Activate(Unit? owner, AttackInstance? attack = null, int phase = 0)
 	{
 		OwnerUnit = owner;
+		ConfigureCollision(owner);
 		_phase = phase;
 		_attack = attack ?? new AttackInstance
 		{

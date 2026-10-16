@@ -5,7 +5,11 @@
 [ext_resource type="Material" path="res://Assets/Particles/ps_combat_trail.tres" id="3_trail"]
 [ext_resource type="Mesh" path="res://Assets/Models/mesh_combat_trail.tres" id="4_trail_quad"]
 
-[node name="Bullet" type="Node3D"]
+[node name="Bullet" type="Area3D"]
+collision_layer = 32
+collision_mask = 7
+monitoring = false
+monitorable = false
 script = ExtResource("1_projectile")
 Speed = 75.0
 MaxLifetime = 2.2

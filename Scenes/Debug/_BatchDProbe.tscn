@@ -1,0 +1,15 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Testing/BatchDProbe.cs" id="1_probe"]
+[ext_resource type="PackedScene" path="res://Scenes/Levels/TestArena.tscn" id="2_arena"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/WorldOverlay.tscn" id="4_overlay"]
+
+[node name="BatchDProbe" type="Node3D"]
+script = ExtResource("1_probe")
+
+[node name="Arena" parent="." instance=ExtResource("2_arena")]
+
+[node name="Hud" parent="." instance=ExtResource("3_hud")]
+
+[node name="WorldOverlay" parent="." instance=ExtResource("4_overlay")]

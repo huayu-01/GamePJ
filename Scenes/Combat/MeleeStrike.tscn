@@ -7,8 +7,8 @@ size = Vector3(2.2, 1.6, 3.0)
 
 [node name="Attack" type="Area3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -1.4)
-collision_layer = 0
-collision_mask = 6
+collision_layer = 8
+collision_mask = 4
 script = ExtResource("1_hitbox")
 Damage = 20.0
 Knockback = 3.0

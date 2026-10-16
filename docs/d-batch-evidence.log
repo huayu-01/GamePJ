@@ -1,0 +1,126 @@
+Debug 编译：0 warning / 0 error
+selftest_final 退出码=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+probe_final 退出码=0
+[BatchD] PASS 层1命名=World
+[BatchD] PASS 层2命名=PlayerUnit
+[BatchD] PASS 层3命名=EnemyUnit
+[BatchD] PASS 层4命名=PlayerHitbox
+[BatchD] PASS 层5命名=EnemyHitbox
+[BatchD] PASS 层6命名=Projectile
+[BatchD] PASS 层7命名=Interactable
+[BatchD] PASS 层8命名=Pickup
+[BatchD] PASS 层9命名=VfxOnly
+[BatchD] PASS 玩家身体2/1且真实落地
+[BatchD] PASS 镜头遮挡只检测地形
+[BatchD] PASS Chaser身体4/1
+[BatchD] PASS Chaser身体重叠时攻击盒仍命中玩家、层16/2
+[BatchD] PASS FastMelee身体4/1
+[BatchD] PASS FastMelee身体重叠时攻击盒仍命中玩家、层16/2
+[BatchD] PASS Guard身体4/1
+[BatchD] PASS Guard身体重叠时攻击盒仍命中玩家、层16/2
+[BatchD] PASS RangedEnemy身体4/1
+[BatchD] PASS Charger身体4/1
+[BatchD] PASS Charger身体重叠时攻击盒仍命中玩家、层16/2
+[BatchD] PASS Exploder身体4/1
+[BatchD] PASS Exploder身体重叠时攻击盒仍命中玩家、层16/2
+[BatchD] PASS Screamer身体4/1
+[BatchD] PASS Screamer身体重叠时攻击盒仍命中玩家、层16/2
+[BatchD] PASS JumpingMelee身体4/1
+[BatchD] PASS JumpingMelee身体重叠时攻击盒仍命中玩家、层16/2
+[BatchD] PASS SkillElite身体4/1
+[BatchD] PASS SkillElite身体重叠时攻击盒仍命中玩家、层16/2
+[BatchD] PASS Boss身体4/1
+[BatchD] PASS Boss身体重叠时攻击盒仍命中玩家、层16/2
+[BatchD] PASS 真实MoveAndSlide穿过Player身体，x=4.3
+[BatchD] PASS 真实MoveAndSlide穿过Enemy身体，x=4.3
+[BatchD] PASS 真实高速位移被关卡墙挡住，z=-15.099
+[BatchD] PASS 截图 d_world_blocks
+[BatchD] PASS 灵剑真实技能激活
+[BatchD] PASS 重叠灵剑真实动画事件造成伤害、同位置队友不受伤
+[BatchD] PASS 截图 d_overlap_melee
+[BatchD] PASS 剑突由真实灵剑动画事件启动
+[BatchD] PASS 剑突穿过目标且命中，z=-8.783
+[BatchD] PASS 闪真实技能激活
+[BatchD] PASS 闪穿过敌人并造成路径伤害，结束mask=1，z=-10.039
+[BatchD] PASS 截图 d_blink_through
+[BatchD] PASS 闪撞墙测试激活
+[BatchD] PASS 闪不能穿过地形，z=-15.1
+[BatchD] PASS 换装取消闪不残留位移或错误mask
+[BatchD] PASS Scythe真实武技激活
+[BatchD] PASS Scythe重叠时真实动画事件命中且友军无伤
+[BatchD] PASS Spear真实武技激活
+[BatchD] PASS Spear重叠时真实动画事件命中且友军无伤
+[BatchD] PASS Player/Bullet投射物layer32与阵营mask正确、无重叠结算
+[BatchD] PASS Player/Bullet真实弹道穿队友并命中敌人
+[BatchD] PASS Player/Arrow投射物layer32与阵营mask正确、无重叠结算
+[BatchD] PASS Player/Arrow真实弹道穿队友并命中敌人
+[BatchD] PASS Player/SwordQi投射物layer32与阵营mask正确、无重叠结算
+[BatchD] PASS Player/SwordQi真实弹道穿队友并命中敌人
+[BatchD] PASS Player/EnergyWave投射物layer32与阵营mask正确、无重叠结算
+[BatchD] PASS Player/EnergyWave真实弹道穿队友并命中敌人
+[BatchD] PASS Enemy/Bullet投射物layer32与阵营mask正确、无重叠结算
+[BatchD] PASS Enemy/Bullet真实弹道穿队友并命中敌人
+[BatchD] PASS Enemy/Arrow投射物layer32与阵营mask正确、无重叠结算
+[BatchD] PASS Enemy/Arrow真实弹道穿队友并命中敌人
+[BatchD] PASS Enemy/SwordQi投射物layer32与阵营mask正确、无重叠结算
+[BatchD] PASS Enemy/SwordQi真实弹道穿队友并命中敌人
+[BatchD] PASS Enemy/EnergyWave投射物layer32与阵营mask正确、无重叠结算
+[BatchD] PASS Enemy/EnergyWave真实弹道穿队友并命中敌人
+[BatchD] PASS 弹道起点在敌人身体内仍真实命中
+[BatchD] PASS 真实子弹被地形消除，墙后目标无伤
+[BatchD] PASS Player穿透次数只消耗一次、两个目标各受击一次：1/1
+[BatchD] PASS Player真实弹射只选择敌对目标
+[BatchD] PASS Player离树生成爆炸按来源配置命中层
+[BatchD] PASS Player真实爆炸仅伤敌方，友军无伤
+[BatchD] PASS Enemy穿透次数只消耗一次、两个目标各受击一次：1/1
+[BatchD] PASS Enemy真实弹射只选择敌对目标
+[BatchD] PASS Enemy离树生成爆炸按来源配置命中层
+[BatchD] PASS Enemy真实爆炸仅伤敌方，友军无伤
+[BatchD] PASS Chaser真实AI索敌并移动/攻击，位移=5.075，施法=1
+[BatchD] PASS FastMelee真实AI索敌并移动/攻击，位移=5.55，施法=1
+[BatchD] PASS Guard真实AI索敌并移动/攻击，位移=3.195，施法=0
+[BatchD] PASS RangedEnemy真实AI索敌并移动/攻击，位移=0.049，施法=1
+[BatchD] PASS Charger真实AI索敌并移动/攻击，位移=7.067，施法=1
+[BatchD] PASS Exploder真实AI索敌并移动/攻击，位移=4.884，施法=1
+[BatchD] PASS Screamer真实AI索敌并移动/攻击，位移=0.049，施法=1
+[BatchD] PASS JumpingMelee真实AI索敌并移动/攻击，位移=9.158，施法=1
+[BatchD] PASS SkillElite真实AI索敌并移动/攻击，位移=3.532，施法=1
+[BatchD] PASS Boss真实AI索敌并移动/攻击，位移=3.985，施法=1
+[BatchD] PASS 玩家召唤物身体只撞地形且真实索敌
+[BatchD] PASS 截图 d_ai_summon
+[BatchD] PASS 纯特效子树无单位/碰撞/分组：fx_combat_hit.tscn
+[BatchD] PASS 纯特效子树无单位/碰撞/分组：fx_combat_explosion.tscn
+[BatchD] PASS 纯特效子树无单位/碰撞/分组：fx_weapon_muzzle.tscn
+[BatchD] PASS 纯特效子树无单位/碰撞/分组：FxLootBeacon.tscn
+[BatchD] PASS 纯特效子树无单位/碰撞/分组：FxBattleSwing.tscn
+[BatchD] PASS 残影与下落风线不进物理世界或单位组
+[BatchD] PASS 真实区域杀仍检测召唤物，死亡身体退层
+[BatchD] === D批验收结束：通过 94，失败 0 ===
+c_regression 退出码=0
+[BatchC] === C批验收结束：通过 52，失败 0 ===
+memory 退出码=0
+[BatchC] === C批验收结束：通过 5，失败 0 ===
+b_regression 退出码=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a_regression 退出码=0
+A批回归：23 PASS / 0 FAIL
+e_regression 退出码=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+ExportRelease 编译：0 warning / 0 error
+存档恢复 meta.cfg=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档恢复 ability_cards.cfg=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档恢复 settings.cfg=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档恢复 loadout.cfg=不存在
+截图 d_world_blocks.png SHA256=139C55F225292EF0A8DE58F8FCDF42744E48431713F66B3C24BE2750C7DA568F
+截图 d_overlap_melee.png SHA256=9ED6B3658D396F7EB9EDED202CD1AF728759CC9017FE6CE0203523F3D5D1C1A1
+截图 d_blink_through.png SHA256=8076A88B86B502D0A8BF7D2B8DE9A3A3FEF9CFEFD6F146119A776CAB07E444D9
+截图 d_ai_summon.png SHA256=7CE74A1D8732DED3FF65740074E0AA5AAC88BB13CE0A9EAC7F518389F922C648
+selftest.flag 不存在=True

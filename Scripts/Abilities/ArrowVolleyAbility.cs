@@ -278,7 +278,7 @@ public partial class ArrowVolleyAbility : Ability
 
 		Vector3 chest = OwnerUnit.GlobalPosition + (Vector3.Up * 0.9f);
 		Vector3 point = AimUtil.GetCrosshairPoint(
-			GetViewport(), OwnerUnit, MaxAimDistance, CombatLayers.World | CombatLayers.UnitMask);
+			GetViewport(), OwnerUnit, MaxAimDistance, CombatLayers.World | CombatLayers.HostileTo(OwnerUnit.Faction));
 		Vector3 direction = point - chest;
 		return direction.LengthSquared() > 0.0001f ? direction.Normalized() : ResolveAimDirection();
 	}

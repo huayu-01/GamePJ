@@ -273,7 +273,7 @@ public partial class HawkEyeAbility : Ability
 		}
 
 		Vector3 point = AimUtil.GetCrosshairPoint(
-			GetViewport(), OwnerUnit, MaxAimDistance, CombatLayers.World | CombatLayers.UnitMask);
+			GetViewport(), OwnerUnit, MaxAimDistance, CombatLayers.World | CombatLayers.HostileTo(OwnerUnit.Faction));
 
 		Unit? best = null;
 		float bestDistance = MarkRadius * MarkRadius;

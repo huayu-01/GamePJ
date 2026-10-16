@@ -24,7 +24,7 @@ public partial class KillZone : Area3D
 	public override void _Ready()
 	{
 		CollisionLayer = 0;                 // 自己不参与碰撞
-		CollisionMask = 2 | 4;              // 只关心单位层：Player(2) / Enemy(4)
+		CollisionMask = CombatLayers.UnitMask; // 只关心身体，攻击盒和投射物不触发区域杀。
 		Monitoring = true;
 		Monitorable = false;
 

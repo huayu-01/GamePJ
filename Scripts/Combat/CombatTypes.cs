@@ -19,12 +19,18 @@ public enum HitPolicy
 	MultiHit,
 }
 
-/// <summary>物理层约定，Unit 在 _Ready 里按阵营自动设置。</summary>
+/// <summary>层号与位值见 architecture.md；身体只撞地形，战斗查询只检测敌对单位。</summary>
 public static class CombatLayers
 {
 	public const uint World = 1 << 0;
 	public const uint Player = 1 << 1;
 	public const uint Enemy = 1 << 2;
+	public const uint PlayerHitbox = 1 << 3;
+	public const uint EnemyHitbox = 1 << 4;
+	public const uint Projectile = 1 << 5;
+	public const uint Interactable = 1 << 6;
+	public const uint Pickup = 1 << 7;
+	public const uint VfxOnly = 1 << 8;
 	public const uint UnitMask = Player | Enemy;
 
 	public static uint Of(Faction faction) => faction switch
@@ -32,6 +38,20 @@ public static class CombatLayers
 		Faction.Player => Player,
 		Faction.Enemy => Enemy,
 		_ => UnitMask,
+	};
+
+	public static uint HostileTo(Faction faction) => faction switch
+	{
+		Faction.Player => Enemy,
+		Faction.Enemy => Player,
+		_ => 0,
+	};
+
+	public static uint HitboxOf(Faction faction) => faction switch
+	{
+		Faction.Player => PlayerHitbox,
+		Faction.Enemy => EnemyHitbox,
+		_ => 0,
 	};
 }
 

@@ -66,8 +66,8 @@ ApproachMaxRange = 9.0
 
 [node name="Attack" type="Area3D" parent="AbilityLeap"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.4)
-collision_layer = 0
-collision_mask = 6
+collision_layer = 16
+collision_mask = 2
 script = ExtResource("8_hitbox")
 Damage = 14.0
 Knockback = 4.0

@@ -89,8 +89,8 @@ AttackRange = 3.4
 
 [node name="Attack" type="Area3D" parent="AbilityMelee"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -1.6)
-collision_layer = 0
-collision_mask = 6
+collision_layer = 16
+collision_mask = 2
 script = ExtResource("12_hitbox")
 Damage = 24.0
 Knockback = 6.0
@@ -112,8 +112,8 @@ ApproachMaxRange = 8.0
 
 [node name="Attack" type="Area3D" parent="AbilityScream"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
-collision_layer = 0
-collision_mask = 6
+collision_layer = 16
+collision_mask = 2
 script = ExtResource("12_hitbox")
 Damage = 14.0
 Knockback = 8.0
@@ -137,8 +137,8 @@ ApproachMaxRange = 16.0
 
 [node name="Attack" type="Area3D" parent="AbilityCharge"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -1.8)
-collision_layer = 0
-collision_mask = 6
+collision_layer = 16
+collision_mask = 2
 script = ExtResource("12_hitbox")
 Damage = 20.0
 Knockback = 10.0

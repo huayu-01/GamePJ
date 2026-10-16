@@ -9,7 +9,7 @@ namespace ActRoguelike.Combat;
 /// 命中后建立 HitInstance 交给目标 Unit 结算，并按 Hit Policy 决定是否继续飞行（穿透）。
 /// 弹道下坠只需把 <see cref="GravityScale"/> 设为非 0。
 /// </summary>
-public partial class Projectile : Node3D
+public partial class Projectile : Area3D
 {
 	[Export] public float Speed { get; set; } = 70f;
 	[Export] public float GravityScale { get; set; }
@@ -43,7 +43,8 @@ public partial class Projectile : Node3D
 	/// <summary>可穿透的目标数量，0 = 命中即消失。</summary>
 	[Export] public int Pierce { get; set; }
 
-	[Export] public uint HitMask { get; set; } = CombatLayers.World | CombatLayers.UnitMask;
+	/// <summary>兼容场景表列；Launch按来源阵营配置实际查询掩码。</summary>
+	[Export] public uint HitMask { get => CollisionMask; set => CollisionMask = value; }
 
 	/// <summary>弹射时搜索下一个目标的半径。</summary>
 	[Export] public float RicochetRange { get; set; } = 9f;
@@ -65,6 +66,7 @@ public partial class Projectile : Node3D
 
 	private readonly HitTracker _tracker = new();
 	private readonly System.Collections.Generic.HashSet<ulong> _hitTargets = new();
+	private readonly Godot.Collections.Array<Rid> _excludedBodies = new();
 	private AttackInstance? _attack;
 	private Vector3 _velocity;
 	private float _lifetime;
@@ -187,6 +189,10 @@ public partial class Projectile : Node3D
 
 	public override void _Ready()
 	{
+		// Area只承担投射物层的分类；不建形状、不监测重叠，射线仍是唯一命中来源。
+		CollisionLayer = CombatLayers.Projectile;
+		Monitoring = false;
+		Monitorable = false;
 		AddToGroup("projectiles");
 		_live.Add(this);
 
@@ -197,10 +203,14 @@ public partial class Projectile : Node3D
 	public void Launch(AttackInstance attack, Vector3 direction)
 	{
 		_attack = attack;
+		CollisionLayer = CombatLayers.Projectile;
+		HitMask = CombatLayers.World | (attack.Attacker == null ? CombatLayers.UnitMask : CombatLayers.HostileTo(attack.Attacker.Faction));
 		_velocity = direction.Normalized() * Speed;
 		_pierceLeft = Pierce + attack.Pierce;
 		_ricochetLeft = attack.Ricochet;
 		_ownerRid = attack.Attacker?.GetRid() ?? default;
+		_excludedBodies.Clear();
+		if (_ownerRid.IsValid) _excludedBodies.Add(_ownerRid);
 		TravelledDistance = 0f;
 	}
 
@@ -237,10 +247,10 @@ public partial class Projectile : Node3D
 		Vector3 to = from + _velocity * dt;
 
 		var query = PhysicsRayQueryParameters3D.Create(from, to, HitMask);
-		if (_ownerRid.IsValid)
-		{
-			query.Exclude = new Godot.Collections.Array<Rid> { _ownerRid };
-		}
+		// 枪口或敌人可以在彼此身体内；射线起点在形状内部也必须能命中。
+		query.HitFromInside = true;
+		// 穿透后排除已命中的身体，避免从体内再次检测并重复消耗穿透次数。
+		query.Exclude = _excludedBodies;
 
 		Godot.Collections.Dictionary hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
 		if (hit.Count > 0)
@@ -322,10 +332,11 @@ public partial class Projectile : Node3D
 
 		if (collider is Unit target && _attack.Attacker != null && _attack.Attacker.IsHostileTo(target))
 		{
-		float now = Time.GetTicksMsec() / 1000f;
+			float now = Time.GetTicksMsec() / 1000f;
 			if (target.IsValidTarget && _tracker.TryRegister(target, _attack.Policy, _attack.HitInterval, now, 0))
 			{
 				_hitTargets.Add(target.GetInstanceId());
+				_excludedBodies.Add(target.GetRid());
 				target.ReceiveHit(_attack.RollHit(target, _velocity.Normalized(), position));
 
 				// 命中特效（Binbun Hit FX）：用**射线命中点**，子弹打在身上哪就炸在哪。
@@ -359,9 +370,11 @@ public partial class Projectile : Node3D
 		Unit? next = null;
 		float bestDistance = RicochetRange * RicochetRange;
 
-		foreach (Node node in GetTree().GetNodesInGroup("enemy_units"))
+		string group = _attack?.Attacker?.Faction == Faction.Enemy ? "player_units" : "enemy_units";
+		foreach (Node node in GetTree().GetNodesInGroup(group))
 		{
-			if (node is not Unit candidate || candidate == justHit || !candidate.IsValidTarget)
+			if (node is not Unit candidate || candidate == justHit || !candidate.IsValidTarget
+				|| _attack?.Attacker == null || !_attack.Attacker.IsHostileTo(candidate))
 			{
 				continue;
 			}
