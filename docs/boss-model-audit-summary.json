@@ -1,0 +1,146 @@
+[
+  {
+    "name": "DRIZZEL",
+    "meshes": 4,
+    "vertices": 3488,
+    "triangles": 4098,
+    "surfaces": 16,
+    "animations": [],
+    "bounds_min": [
+      -0.9206,
+      0.0004,
+      -0.4433
+    ],
+    "bounds_size": [
+      1.8412,
+      2.1153,
+      0.9715
+    ],
+    "zero_weight_vertices": 0,
+    "weight_sum_outliers": 0,
+    "collision_objects": 0,
+    "right_arm_pose_hand_displacement_m": 0.309718430042267,
+    "bone_count": 69,
+    "source_sha256": "9e4de608359b47a10e4f782eed79a0b0bef879b19f8078277d6324b6d6b46504"
+  },
+  {
+    "name": "GEKKOU",
+    "meshes": 5,
+    "vertices": 3683,
+    "triangles": 4652,
+    "surfaces": 20,
+    "animations": [],
+    "bounds_min": [
+      -0.8223,
+      -1.3135,
+      -1.2151
+    ],
+    "bounds_size": [
+      1.6447,
+      3.5143,
+      1.7878
+    ],
+    "zero_weight_vertices": 0,
+    "weight_sum_outliers": 0,
+    "collision_objects": 0,
+    "right_arm_pose_hand_displacement_m": 0.268353015184402,
+    "bone_count": 83,
+    "source_sha256": "7e0b940a139eb1e5aa426a7f1986a3c817cdc2c8326b6b7eedc55a467afeda8d"
+  },
+  {
+    "name": "KASA",
+    "meshes": 7,
+    "vertices": 4948,
+    "triangles": 4706,
+    "surfaces": 25,
+    "animations": [],
+    "bounds_min": [
+      -1.2046,
+      -0.0012,
+      -3.2768
+    ],
+    "bounds_size": [
+      2.7291,
+      2.1455,
+      4.3014
+    ],
+    "zero_weight_vertices": 0,
+    "weight_sum_outliers": 0,
+    "collision_objects": 0,
+    "right_arm_pose_hand_displacement_m": 0.213084489107132,
+    "bone_count": 82,
+    "source_sha256": "6958c20c68da735b20abb5b6360f6453fd6e70e4f38698bcdefc1bc346efcfad"
+  },
+  {
+    "name": "KURENAI",
+    "meshes": 5,
+    "vertices": 3062,
+    "triangles": 2646,
+    "surfaces": 15,
+    "animations": [],
+    "bounds_min": [
+      -0.7106,
+      -0.0015,
+      -0.745
+    ],
+    "bounds_size": [
+      1.4209,
+      2.2099,
+      1.4209
+    ],
+    "zero_weight_vertices": 0,
+    "weight_sum_outliers": 0,
+    "collision_objects": 0,
+    "right_arm_pose_hand_displacement_m": 0.303081303834915,
+    "bone_count": 65,
+    "source_sha256": "171d347f0c4f3125dce5fdb96676dd9618648ab23d7f84ce6e015e42eaf3062d"
+  },
+  {
+    "name": "SAMIDALE",
+    "meshes": 4,
+    "vertices": 3829,
+    "triangles": 4028,
+    "surfaces": 14,
+    "animations": [],
+    "bounds_min": [
+      -0.6106,
+      -0.0057,
+      -0.312
+    ],
+    "bounds_size": [
+      1.2418,
+      1.6636,
+      0.7534
+    ],
+    "zero_weight_vertices": 0,
+    "weight_sum_outliers": 0,
+    "collision_objects": 0,
+    "right_arm_pose_hand_displacement_m": 0.242645800113678,
+    "bone_count": 75,
+    "source_sha256": "84c4aa7989fb0febde3e610525a02e4f692312cfdca75df9aa6945d1c3d26436"
+  },
+  {
+    "name": "SHOGUN",
+    "meshes": 3,
+    "vertices": 3406,
+    "triangles": 3792,
+    "surfaces": 13,
+    "animations": [],
+    "bounds_min": [
+      -0.6632,
+      -1.0089,
+      -0.3572
+    ],
+    "bounds_size": [
+      1.3264,
+      2.6241,
+      0.6071
+    ],
+    "zero_weight_vertices": 0,
+    "weight_sum_outliers": 0,
+    "collision_objects": 0,
+    "right_arm_pose_hand_displacement_m": 0.258077055215836,
+    "bone_count": 64,
+    "source_sha256": "4256688b7d2f8c9ba7ca786d9a067227cf0039812fcd83892bc29effd224eb72"
+  }
+]
