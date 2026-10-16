@@ -1,0 +1,92 @@
+角色替换验收 2026-10-17；Godot 4.7.2 mono / D3D12 Forward+ / RTX 4070 Ti
+Debug / ExportRelease --no-incremental：0 warning / 0 error
+[CharacterReplacement] PASS 玩家根尺度1，1.8米胶囊碰撞保留
+[CharacterReplacement] PASS 新角色经真实物理移动被World墙体阻挡
+[CharacterReplacement] PASS 敌方真实Area命中玩家身体胶囊并扣除生命/护甲
+[CharacterReplacement] PASS EnergyPalm实际可见模型=/Lyra/lyra.glb
+[CharacterReplacement] PASS EnergyPalm武器挂在新骨架右手
+[CharacterReplacement] PASS EnergyPalm全部25段技能绑定真实骨架，事件资源齐全
+[CharacterReplacement] PASS Lyra/EnergyPalm真实输入→动画事件→投射物命中掉血 10000→9980
+[CharacterReplacement] PASS Crossbow实际可见模型=/Lyra/lyra.glb
+[CharacterReplacement] PASS Crossbow武器挂在新骨架右手
+[CharacterReplacement] PASS Crossbow全部25段技能绑定真实骨架，事件资源齐全
+[CharacterReplacement] PASS Lyra/Crossbow真实输入→动画事件→投射物命中掉血 9980→9968
+[CharacterReplacement] PASS Bow实际可见模型=/Lyra/lyra.glb
+[CharacterReplacement] PASS Bow武器挂在新骨架右手
+[CharacterReplacement] PASS Bow全部25段技能绑定真实骨架，事件资源齐全
+[CharacterReplacement] PASS 实拍 characters_lyra_bow
+[CharacterReplacement] PASS Lyra/Bow真实输入→动画事件→投射物命中掉血 9968→9936.8
+[CharacterReplacement] PASS SpiritSword实际可见模型=/Samurai/samurai.glb
+[CharacterReplacement] PASS SpiritSword武器挂在新骨架右手
+[CharacterReplacement] PASS SpiritSword全部25段技能绑定真实骨架，事件资源齐全
+[CharacterReplacement] PASS 实拍 characters_samurai_sword
+[CharacterReplacement] PASS Scythe实际可见模型=/Samurai/samurai.glb
+[CharacterReplacement] PASS Scythe武器挂在新骨架右手
+[CharacterReplacement] PASS Scythe全部25段技能绑定真实骨架，事件资源齐全
+[CharacterReplacement] PASS Spear实际可见模型=/Samurai/samurai.glb
+[CharacterReplacement] PASS Spear武器挂在新骨架右手
+[CharacterReplacement] PASS Spear全部25段技能绑定真实骨架，事件资源齐全
+[CharacterReplacement] PASS SpiritSword前摇无伤害
+[CharacterReplacement] PASS SpiritSword第1段由真实动画事件命中，累计=1
+[CharacterReplacement] PASS SpiritSword攻击时实际右手骨骼发生运动
+[CharacterReplacement] PASS 实拍 characters_combo_SpiritSword
+[CharacterReplacement] PASS SpiritSword第1段同目标不重复伤害
+[CharacterReplacement] PASS SpiritSword第2段由真实动画事件命中，累计=2
+[CharacterReplacement] PASS SpiritSword第2段同目标不重复伤害
+[CharacterReplacement] PASS SpiritSword第3段由真实动画事件命中，累计=3
+[CharacterReplacement] PASS SpiritSword第3段同目标不重复伤害
+[CharacterReplacement] PASS SpiritSword第4段由真实动画事件命中，累计=4
+[CharacterReplacement] PASS SpiritSword第4段同目标不重复伤害
+[CharacterReplacement] PASS SpiritSword第5段由真实动画事件命中，累计=5
+[CharacterReplacement] PASS SpiritSword第5段同目标不重复伤害
+[CharacterReplacement] PASS SpiritSword换装清理后伤害盒关闭
+[CharacterReplacement] PASS Scythe前摇无伤害
+[CharacterReplacement] PASS Scythe第1段由真实动画事件命中，累计=1
+[CharacterReplacement] PASS Scythe攻击时实际右手骨骼发生运动
+[CharacterReplacement] PASS 实拍 characters_combo_Scythe
+[CharacterReplacement] PASS Scythe第1段同目标不重复伤害
+[CharacterReplacement] PASS Scythe第2段由真实动画事件命中，累计=2
+[CharacterReplacement] PASS Scythe第2段同目标不重复伤害
+[CharacterReplacement] PASS Scythe第3段由真实动画事件命中，累计=3
+[CharacterReplacement] PASS Scythe第3段同目标不重复伤害
+[CharacterReplacement] PASS Scythe换装清理后伤害盒关闭
+[CharacterReplacement] PASS Spear前摇无伤害
+[CharacterReplacement] PASS Spear第1段由真实动画事件命中，累计=1
+[CharacterReplacement] PASS Spear攻击时实际右手骨骼发生运动
+[CharacterReplacement] PASS 实拍 characters_combo_Spear
+[CharacterReplacement] PASS Spear第1段同目标不重复伤害
+[CharacterReplacement] PASS Spear第2段由真实动画事件命中，累计=2
+[CharacterReplacement] PASS Spear第2段同目标不重复伤害
+[CharacterReplacement] PASS Spear第3段由真实动画事件命中，累计=3
+[CharacterReplacement] PASS Spear第3段同目标不重复伤害
+[CharacterReplacement] PASS Spear第4段由真实动画事件命中，累计=4
+[CharacterReplacement] PASS Spear第4段同目标不重复伤害
+[CharacterReplacement] PASS Spear第5段由真实动画事件命中，累计=5
+[CharacterReplacement] PASS Spear第5段同目标不重复伤害
+[CharacterReplacement] PASS 长枪第5段之后真实回到第1段并再次命中
+[CharacterReplacement] PASS Spear换装清理后伤害盒关闭
+[CharacterReplacement] PASS chr_hunter基地展台同步替换
+[CharacterReplacement] PASS chr_weapon_master基地展台同步替换
+[CharacterReplacement] PASS 正式关卡同样使用武士模型
+[CharacterReplacement] 完成：通过 68，失败 0
+[BatchC] === C批验收结束：通过 52，失败 0 ===
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+所有验收运行已比较四份正式存档：哈希不变；C回归只写独立测试存档并恢复。
+selftest.flag 不存在=True
+截图 characters_combo_Scythe.png SHA256=19828EDA99C5D066FF2D22BB3E1B630320B01FAC7F4E1C1D19BAAE415EDF4DD9
+截图 characters_combo_Spear.png SHA256=C9B44CED4271BFACE4D3B648999CD82820AE1B9E69FFDE2581192458310FF49C
+截图 characters_combo_SpiritSword.png SHA256=F2830D6271999A73914B82C9F7D786F31F639EA8C5FA3597F0439429FF5B78E5
+截图 characters_lyra_bow.png SHA256=3FA4552114F3343E33C750B0545381222257F7AE328386CCEDA15399BDB4E43C
+截图 characters_native_attack.png SHA256=D8E53F8833A73B07C0DA4F7ACD86E8BE7F9B2ABBECB434003B79101F198CBC8D
+截图 characters_native_double_attack.png SHA256=E9A7C5ED94E9A28B25EE40E86EDC54D3651D5875E09C7CC5D9710BDC2614C6ED
+截图 characters_native_idle.png SHA256=1CA83EB4DD978F77697C75F20329DB4FAED9807C67AB380E4AC0B2C94B47200E
+截图 characters_samurai_sword.png SHA256=0C86C157C1596076080A76170316D0329A30EE177720809CF55D230E773D32BA
+原生GLB资源去重后：Lyra GLB 1519032字节，Samurai GLB 1720768字节，颜色PNG各一份，保持源像素。
+已保留环境问题：headless编辑器导入MCP9080冲突；recovery导入GodotTools计时器错误。实际战斗/基地/原生姿态验收均无ERROR或未绑定轨道。

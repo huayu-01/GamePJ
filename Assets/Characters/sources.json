@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Lyra",
+    "source": "https://grigory-petrov.itch.io/elf-archer-lyra",
+    "zip_sha256": "30f76f0b68a6df6ae82ee393c97c5e51de8e01e7f42eb0a30e58e081ea765deb",
+    "animations": [
+      "block",
+      "idle",
+      "jump",
+      "sprint",
+      "die",
+      "walk"
+    ],
+    "triangles": 20596,
+    "bones": 24
+  },
+  {
+    "name": "Samurai",
+    "source": "https://grigory-petrov.itch.io/samurai-warrior-pack",
+    "zip_sha256": "85b84a79056fef7928f92df71567a65e1d7fe35d614afd6da75e30c256a351d9",
+    "animations": [
+      "attack",
+      "block",
+      "double_attack",
+      "idle",
+      "push",
+      "sprint",
+      "die",
+      "walk"
+    ],
+    "triangles": 20044,
+    "bones": 24
+  }
+]

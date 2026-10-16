@@ -16,6 +16,12 @@ namespace ActRoguelike.Config;
 [GlobalClass]
 public partial class CharacterConfig : UnitConfig
 {
+	[ExportGroup("角色模型与握持挂点")]
+	/// <summary>模型局部变换；角色根节点和身体碰撞不缩放。展台额外保留原模型的底座高度。</summary>
+	[Export] public Transform3D ModelTransform { get; set; } = Transform3D.Identity;
+	/// <summary>该骨架专用的武器挂点；留空沿用场景默认挂点。</summary>
+	[Export] public PackedScene? WeaponGripScene { get; set; }
+
 	// ⚠️ P6a **删掉了** `WeaponEnabled`（"这个角色拿不拿枪 / 近战重装收起枪"）：用户 2026-10-15 明确
 	// 「"出征时按角色行把枪收起来"，**我并没有这么设计过**，因为流程定的就是：在基地 > 默认配置/选好配置 >
 	// 进关卡 > 完成最终首领/esc 点重开 > 回基地，**相当于只是切场景**」。

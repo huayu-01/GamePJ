@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[node name="WeaponGrip" type="BoneAttachment3D"]
+bone_name = "RightHand"
+
+[node name="Socket" type="Node3D" parent="."]
+rotation_degrees = Vector3(0, 0, 90)
+scale = Vector3(100, 100, 100)

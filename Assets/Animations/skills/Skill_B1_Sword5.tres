@@ -87,9 +87,12 @@ tracks/11/path = NodePath("..")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
-"times": PackedFloat32Array(0.5044),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0.423696, 0.484224),
+"transitions": PackedFloat32Array(1, 1),
 "values": [{
+"args": ["ATK"],
+"method": &"anim_event"
+}, {
 "args": ["Combo"],
 "method": &"anim_event"
 }]

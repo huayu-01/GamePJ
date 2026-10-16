@@ -4,10 +4,13 @@
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_skill_1.tres" id="2_skl"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_skill_2.tres" id="3_skl"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_passive.tres" id="4_skl"]
+[ext_resource type="PackedScene" path="res://Scenes/Visual/MeshyWeaponGrip.tscn" id="6_grip"]
 
 [resource]
 script = ExtResource("1_row")
-ModelPath = "res://Assets/Models/player/mesh_player_body.glb"
+ModelPath = "res://Assets/Characters/Lyra/lyra.glb"
+ModelTransform = Transform3D(-1.0588235, 0, 0, 0, 1.0588235, 0, 0, 0, -1.0588235, 0, 0, 0)
+WeaponGripScene = ExtResource("6_grip")
 DisabledAbilityIds = PackedStringArray()
 EnabledAbilityIds = PackedStringArray("skl_a1_skill_1", "skl_a1_skill_2", "skl_a1_passive")
 MaxHealth = 200.0
@@ -21,7 +24,7 @@ JumpVelocity = 13.0
 JumpGravityScale = 3.6
 SprintInputAction = "sprint"
 SprintSpeedMultiplier = 1.5
-AnimLibraryDir = "res://Assets/Animations/skills/"
+AnimLibraryDir = "res://Assets/Characters/Lyra/skills/"
 AnimLibraryName = "skills"
 Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("4_skl")]
 Id = "chr_hunter"

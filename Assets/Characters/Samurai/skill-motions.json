@@ -1,0 +1,7 @@
+{
+  "Skill_B1_Sword1": {"clip": "attack", "start": 0.25, "impact": 0.85, "end": 1.2},
+  "Skill_B1_Sword2": {"clip": "double_attack", "start": 0.2, "impact": 0.8, "end": 1.1},
+  "Skill_B1_Sword3": {"clip": "double_attack", "start": 1.1, "impact": 1.65, "end": 2.1},
+  "Skill_B1_Sword4": {"clip": "double_attack", "start": 0.2, "impact": 0.8, "end": 1.1},
+  "Skill_B1_Sword5": {"clip": "attack", "start": 0.3, "impact": 0.9, "end": 1.35}
+}

@@ -36,12 +36,14 @@ GM临时配置和自动化测试不改玩家的正式选择记忆。
 ## 可替换的角色表现
 
 `CharacterDisplay`是纯表现组件，玩家与CharacterStand共用。角色行ModelPath决定身体，武器行ModelPath决定握持场景；
-当前两角色使用已有Kenney模型，六个握持场景为本项目自建的低模几何，仍是可替换的阶段性素材。
-角色模型缓存并切换Visible，武器挂在WeaponGrip的arm-right骨骼Socket上；不创建碰撞、单位或分组。
+当前猎手使用Grigory_Petrov的Lyra，武器大师使用Samurai；六个握持场景仍为本项目自建低模几何。
+角色行ModelTransform单独配置模型缩放/转向，身体碰撞与单位根节点保持原尺寸；展台保留底座高度。
+角色模型缓存并切换Visible，WeaponGripScene按骨架配置握持场景；新角色挂RightHand，旧骨架默认挂arm-right，不创建碰撞、单位或分组。
 替换骨架时需同时配置兼容的握持骨骼/Socket和对应技能动画库，不能只换路径后假定任意骨架都兼容。
 
 实际UnitAnimator绑定当前可见模型。技能动画在私有副本中把同名骨骼轨道重定向到实际Skeleton路径，
 关键帧和方法事件不变，不改磁盘动画或共享缓存；预热在播放之前完成。
+两套新骨架各自使用离线生成的技能库，灵剑5段使用作者原生攻击片段并对齐事件，其余技能按全局rest差值适配。详见[角色替换验收](character-replacement.md)。
 受击闪色、蓄力身体表现与后撤残影跟随当前可见模型，旧材质通道在切换时归还。
 
 验收、截图和未解决问题见 [c-batch-verification.md](c-batch-verification.md)。

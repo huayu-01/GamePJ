@@ -31,7 +31,8 @@ public partial class CharacterDisplay : Node3D
 			if (!string.IsNullOrEmpty(row.ModelPath) && !_models.TryGetValue(row.ModelPath, out model!))
 			{
 				model = GD.Load<PackedScene>(row.ModelPath).Instantiate<Node3D>();
-				model.Transform = _original.Transform;
+				model.Transform = row.ModelTransform;
+				model.Position += _original.Position;
 				model.Visible = false;
 				// 提前预热技能库；不在第一次出招时向已经运行的播放器临时加库。
 				if (NodeSearch.FindInSubtree<AnimationPlayer>(model) is { } player)
@@ -43,13 +44,13 @@ public partial class CharacterDisplay : Node3D
 					SkillAnimationLibrary.LoadInto(prepared, row.AnimLibraryName, row.AnimLibraryDir);
 				_models[row.ModelPath] = model;
 			}
-			EnsureHand(model);
+			EnsureHand(model, row.WeaponGripScene);
 		}
 	}
-	private Node3D EnsureHand(Node3D model)
+	private Node3D EnsureHand(Node3D model, PackedScene? configuredGrip = null)
 	{
 		if (_hands.TryGetValue(model, out var hand)) return hand;
-		var grip = GripScene.Instantiate<BoneAttachment3D>();
+		var grip = (configuredGrip ?? GripScene).Instantiate<BoneAttachment3D>();
 		if (NodeSearch.FindInSubtree<Skeleton3D>(model) is { } skeleton && skeleton.FindBone(grip.BoneName) >= 0)
 			skeleton.AddChild(grip);
 		else { grip.Free(); throw new System.InvalidOperationException($"角色模型缺少武器挂点：{model.SceneFilePath}"); }
