@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Metal"]
+albedo_color = Color(0.72, 0.94, 0.94, 1)
+roughness = 0.48
+
+[sub_resource type="StandardMaterial3D" id="Grip"]
+albedo_color = Color(0.13, 0.24, 0.29, 1)
+
+[sub_resource type="StandardMaterial3D" id="Gold"]
+albedo_color = Color(0.95, 0.67, 0.28, 1)
+
+[sub_resource type="BoxMesh" id="Mesh0"]
+material = SubResource("Gold")
+size = Vector3(0.09, 0.9, 0.09)
+
+[sub_resource type="BoxMesh" id="Mesh1"]
+material = SubResource("Gold")
+size = Vector3(0.09, 0.9, 0.09)
+
+[sub_resource type="CylinderMesh" id="Mesh2"]
+material = SubResource("Metal")
+top_radius = 0.009
+bottom_radius = 0.009
+height = 1.58
+radial_segments = 8
+
+[sub_resource type="BoxMesh" id="Mesh3"]
+material = SubResource("Grip")
+size = Vector3(0.14, 0.26, 0.12)
+
+[node name="bow" type="Node3D"]
+
+[node name="Part0" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh0")
+position = Vector3(-0.2, 0.37, 0)
+rotation_degrees = Vector3(0, 0, 28)
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh1")
+position = Vector3(-0.2, -0.37, 0)
+rotation_degrees = Vector3(0, 0, -28)
+
+[node name="Part2" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh2")
+position = Vector3(0.02, 0, 0)
+
+[node name="Part3" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh3")
+position = Vector3(-0.38, 0, 0)

@@ -247,6 +247,14 @@ public partial class GuardStanceAbility : Ability
 		_subscribed = false;
 	}
 
+	protected override void OnLoadoutReset()
+	{
+		if (_parryInvulnerable && OwnerUnit != null) OwnerUnit.IsInvulnerable = false;
+		_parryInvulnerable = false;
+		StanceActive = false;
+		Unsubscribe();
+	}
+
 	public override void _ExitTree()
 	{
 		Unsubscribe();

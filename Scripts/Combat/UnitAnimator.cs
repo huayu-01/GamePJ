@@ -325,9 +325,19 @@ public partial class UnitAnimator : Node
 	/// 所以走 <see cref="RequireAnimation"/> 惰性加载。同样地，这里只给**本实例自己的播放器**设属性，
 	/// 不再去改 `.glb` 的共享 <c>Animation</c> 资源。
 	/// </summary>
-	private void Bind()
+	/// <summary>换角色时把真实动画事件驱动切到可见模型，不释放旧播放器。</summary>
+	public void BindVisual(Node model)
 	{
-		if (GetParent().GetNodeOrNull<Node>(ModelNodeName) is { } model)
+		if (_player == NodeSearch.FindInSubtree<AnimationPlayer>(model)) return;
+		StopSkillAnimation();
+		_player = null;
+		_skillLibraryLoaded = false;
+		Bind(model);
+	}
+
+	private void Bind(Node? visual = null)
+	{
+		if ((visual ?? GetParent().GetNodeOrNull<Node>(ModelNodeName)) is { } model)
 		{
 			_player = NodeSearch.FindInSubtree<AnimationPlayer>(model);
 		}

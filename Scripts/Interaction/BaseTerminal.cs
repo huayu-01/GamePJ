@@ -3,7 +3,6 @@ using ActRoguelike.Core;
 using ActRoguelike.Rewards;
 using ActRoguelike.Run;
 using ActRoguelike.UI;
-using System.Collections.Generic;
 using Godot;
 
 namespace ActRoguelike.Interaction;
@@ -91,72 +90,11 @@ public partial class BaseTerminal : Interactable
 		}
 	}
 
-	/// <summary>
-	/// 装备配置台：**先选角色、再选武器**，两步都在选定的那一刻写进 <see cref="RunSetup"/>，
-	/// 基地里的玩家立刻换成对应的目标（用户需求 §五 #4：方便进关卡前熟悉角色）。
-	///
-	/// <list type="bullet">
-	/// <item>角色文案与关卡里的 Configure 步**同一套来源**（<c>RunController.CharacterCardText</c> +
-	///   角色表的 <c>DescriptionTemplate</c>），不在这里抄第二份数字；</item>
-	/// <item>真正"换人"的是常驻基地的 <c>Scripts/UI/LoadoutPreview.cs</c>（模型 + 数值 + 枪械开关），
-	///   它盯着 <see cref="RunSetup"/> 变化 —— 所以这里只负责"选了什么"。</item>
-	/// </list>
-	/// </summary>
+	/// <summary>兼容旧配置台预制体；角色由独立交互对象决定，这里只选当前角色的武器。</summary>
 	private static bool OpenLoadoutFlow(UiService ui)
 	{
-		// ⚠️ 列表**遍历角色表**（不是遍历 `PlayerCharacterKind` 枚举）：加一个角色 = 加一行 `.tres`，
-		// 这里一行都不用改（用户 §1.5「界面要能容纳任意数量」）。枚举值 = 行 `Slot - 1`。
-		var kinds = new List<PlayerCharacterKind>();
-		var options = new List<string>();
-		foreach (CharacterConfig? row in ConfigIndex.Settings.Characters)
-		{
-			if (row == null)
-			{
-				continue;
-			}
-
-			var kind = (PlayerCharacterKind)(row.Slot - 1);
-			kinds.Add(kind);
-			options.Add(RunController.CharacterCardText(kind));
-		}
-
-		// 整张角色表都读不到（`ConfigIndex.tres` 没加载）时才退回枚举本身，至少界面不空。
-		if (kinds.Count == 0)
-		{
-			foreach (PlayerCharacterKind kind in System.Enum.GetValues<PlayerCharacterKind>())
-			{
-				kinds.Add(kind);
-				options.Add(RunController.CharacterCardText(kind));
-			}
-		}
-
-		return ui.OpenChoose(
-			"选择角色（基地里可以直接看到换人）",
-			options,
-			index =>
-			{
-				if (index < 0 || index >= kinds.Count)
-				{
-					return;
-				}
-
-				RunSetup.Character = kinds[index];
-				RunSetup.HasSelection = true;
-				GameLog.Write("Flow", $"基地：选定角色 {RunSetup.Character}（基地玩家已切换）");
-
-				// 第二步：武器。**这里不再有"按角色行把枪收起来"那套说法** —— 用户 2026-10-15：
-				// 「"出征时按角色行把枪收起来"，我并没有这么设计过，因为流程定的就是：在基地 > 默认配置/
-				// 选好配置 > 进关卡 > 完成最终首领/esc 点重开 > 回基地，相当于只是切场景」。
-				// 现在"左键归谁"由**武器行**的 `UsesWeaponComponent` 决定（武技驱动的武器不会去开火），
-				// 基地预览与关卡用的是同一个来源，所以选定即所见、出征只是切场景。
-				ui.OpenLoadout(kind =>
-				{
-					RunSetup.Weapon = kind;
-					RunSetup.HasSelection = true;
-					GameLog.Write("Flow", $"基地：选定武器 {kind}（基地玩家已切换）");
-				});
-			},
-			allowCancel: true,
-			hint: "按数字键或点击选择角色；选定后接着选武器");
+		CharacterConfig? character = RunController.CharacterRow(RunSetup.Character);
+		if (character == null || !LoadoutSelection.SelectCharacter(character)) return false;
+		return ui.OpenLoadout(kind => LoadoutSelection.SelectWeapon(RunSetup.Character, kind));
 	}
 }

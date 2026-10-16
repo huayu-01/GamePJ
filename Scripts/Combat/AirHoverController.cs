@@ -102,6 +102,14 @@ public partial class AirHoverController : Node3D
 		GrantCount++;
 	}
 
+	/// <summary>更换装备时移除旧角色授予的滞空。</summary>
+	public void ResetForLoadout()
+	{
+		HoverRemaining = 0;
+		IsSlowFalling = false;
+		SetRingVisible(false);
+	}
+
 	/// <summary>
 	/// 用**表值**重设光环样式（半径 / 粗细 / 高度 / 颜色）。由授予滞空的技能行在那一刻调一次
 	/// （技能行的 Params 是权威；组件上的默认值只是"没人配时"的兜底）。

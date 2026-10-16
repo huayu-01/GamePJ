@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using ActRoguelike.Config;
 using ActRoguelike.Rewards;
+using ActRoguelike.Run;
 using Godot;
 
 namespace ActRoguelike.UI;
@@ -27,15 +28,21 @@ public partial class StartScreen : OverlayScreen
 
 	/// <summary>这一次列出来的武器；顺序 = 卡片顺序 = 数字键 <c>1..N</c> 的下标 + 1。</summary>
 	private readonly List<WeaponPresetKind> _options = new();
+	public int OptionCount => _options.Count;
+	public string OptionIds => string.Join(",", _options.ConvertAll(kind => RunController.WeaponRow(kind)?.Id ?? string.Empty));
+	public int SelectedIndex => _options.IndexOf(RunSetup.Weapon);
+	public bool SelectedCardDisabled => SelectedIndex >= 0 && _cards.GetChild<Button>(SelectedIndex + 1).Disabled;
+	[Export] public Color SelectionColor { get; set; } = new(0.46f, 0.93f, 0.78f);
 
 	public override void _Ready()
 	{
 		CloseOnCancel = false;
 		_root = GetNode<Control>("Root");
 		InitializeOverlay();
-		_cards = GetNode<VBoxContainer>("Root/Panel/VBox/Cards");
+		_cards = GetNode<VBoxContainer>("Root/Panel/VBox/Scroll/Cards");
 		_template = _cards.GetNode<Button>("CardTemplate");
 		_hint = GetNode<Label>("Root/Panel/VBox/Hint");
+		GetNode<Button>("Root/Panel/VBox/Return").Pressed += Close;
 	}
 
 	/// <summary>打开选武器界面；选完武器后回调。</summary>
@@ -47,13 +54,14 @@ public partial class StartScreen : OverlayScreen
 		}
 
 		_onChosen = onChosen;
+		GetNode<Label>("Root/Panel/VBox/Title").Text = $"{RunController.CharacterRow(RunSetup.Character)?.DisplayName} · 选择武器";
 		ClearCards();
 		_options.Clear();
 
 		// 表是唯一真源：数量 / 顺序 / 文案全部来自武器表（`Config/Tables/Weapons/wpn_*.tres`）。
 		foreach (WeaponConfig? row in ConfigIndex.Settings.Weapons)
 		{
-			if (row == null)
+			if (!LoadoutSelection.Allows(RunController.CharacterRow(RunSetup.Character), row))
 			{
 				continue;
 			}
@@ -67,7 +75,7 @@ public partial class StartScreen : OverlayScreen
 
 		_hint.Text = _options.Count == 0
 			? "武器表读不到（ConfigIndex.tres 的 Weapons 索引为空）—— 这一局用玩家场景自带的武器数值。"
-			: $"按 1 ~ {_options.Count} 或点击选择（悬停看武器数值）";
+			: $"按 1 ~ {_options.Count} 或点击切换 · ✓ 为当前装备 · 各角色分别记住武器";
 
 		SetKeyHints(
 			KeyHint.Text(_options.Count == 0 ? "—" : $"1 ~ {_options.Count}", "选择武器"),
@@ -105,10 +113,19 @@ public partial class StartScreen : OverlayScreen
 		var card = (Button)_template.Duplicate();
 		card.Visible = true;
 		card.Text = text;
+		if (kind == RunSetup.Weapon)
+		{
+			card.Text = "✓ 当前装备　" + text;
+			card.Disabled = true;
+			card.AddThemeColorOverride("font_disabled_color", SelectionColor);
+		}
 		card.Alignment = HorizontalAlignment.Left;
 
 		// 图标代替文字：武器用图标，具体数值留在文字里（选择界面允许有说明）。
-		card.Icon = UiIcons.ForWeapon(kind);
+		WeaponConfig? row = RunController.WeaponRow(kind);
+		card.Icon = !string.IsNullOrEmpty(row?.IconPath) ? GD.Load<Texture2D>(row.IconPath) : UiIcons.ForWeapon(kind);
+		card.ExpandIcon = true;
+		card.AddThemeConstantOverride("icon_max_width", 42);
 
 		card.Pressed += () => Choose(index);
 		_cards.AddChild(card);
@@ -120,6 +137,7 @@ public partial class StartScreen : OverlayScreen
 		{
 			if (child != _template)
 			{
+				_cards.RemoveChild(child);
 				child.QueueFree();
 			}
 		}
@@ -127,12 +145,13 @@ public partial class StartScreen : OverlayScreen
 
 	private void Choose(int index)
 	{
-		if (InputBlocked || index < 0 || index >= _options.Count)
+		if (InputBlocked || index < 0 || index >= _options.Count || index == SelectedIndex)
 		{
 			return;
 		}
 
 		WeaponPresetKind weapon = _options[index];
+		if (!LoadoutSelection.Allows(RunController.CharacterRow(RunSetup.Character), RunController.WeaponRow(weapon))) return;
 		Action<WeaponPresetKind>? callback = _onChosen;
 		_onChosen = null;
 		Close();

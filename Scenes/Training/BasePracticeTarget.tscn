@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Run/PracticeTarget.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://Scenes/Training/TrainingDummy.tscn" id="2_target"]
+
+[node name="PracticeTarget" type="Node3D"]
+script = ExtResource("1_script")
+TargetScene = ExtResource("2_target")
+
+[node name="Sign" type="Label3D" parent="."]
+position = Vector3(0, 3.5, 0)
+billboard = 1
+text = "练习区 · 伤害真实结算\n木桩击破后自动复原"
+font_size = 40
+outline_size = 9

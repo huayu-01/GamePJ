@@ -1,0 +1,37 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Interaction/CharacterStand.cs" id="1_stand"]
+[ext_resource type="Script" path="res://Scripts/Visual/CharacterDisplay.cs" id="2_display"]
+[ext_resource type="PackedScene" path="res://Assets/Models/player/mesh_player_body.glb" id="3_body"]
+[ext_resource type="PackedScene" path="res://Scenes/Visual/WeaponGrip.tscn" id="4_grip"]
+
+[sub_resource type="StandardMaterial3D" id="Mat"]
+albedo_color = Color(0.26, 0.65, 0.66, 1)
+
+[sub_resource type="CylinderMesh" id="Base"]
+material = SubResource("Mat")
+top_radius = 1.05
+bottom_radius = 1.12
+height = 0.16
+radial_segments = 12
+
+[node name="CharacterStand" type="Node3D"]
+script = ExtResource("1_stand")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.08, 0)
+mesh = SubResource("Base")
+
+[node name="Visual" type="Node3D" parent="."]
+rotation_degrees = Vector3(0, 180, 0)
+script = ExtResource("2_display")
+GripScene = ExtResource("4_grip")
+
+[node name="Model" parent="Visual" instance=ExtResource("3_body")]
+transform = Transform3D(-2.6814, 0, 0, 0, 2.6814, 0, 0, 0, -2.6814, 0, 0.15, 0)
+
+[node name="Name" type="Label3D" parent="."]
+position = Vector3(0, 3, 0)
+billboard = 1
+font_size = 48
+outline_size = 10

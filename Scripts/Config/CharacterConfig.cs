@@ -28,14 +28,12 @@ public partial class CharacterConfig : UnitConfig
 
 	[ExportGroup("能力开关矩阵（取代硬编码的 if/else）")]
 	/// <summary>
-	/// 要让哪些 <c>Ability</c> 处于**启用**状态的名单。匹配的是**脚本类名**
-	/// （`MeleeAttackAbility` / `SummonAbility` / `AreaAttackAbility`）——
-	/// `RunController.ApplyAbilityMatrix` 按 <c>ability.GetType().Name</c> 比对，因为技能表落地后
-	/// <c>Ability.AbilityId</c> 会变成技能行的 Id（`skl_melee` 这种）。用类名在"表在/表不在"两种情况下都成立。
+	/// 启用名单按技能行Id匹配，同时兼容脚本类名。PlayerLoadout先恢复场景绑定，
+	/// 再套技能行，最后执行名单；名单外保持场景/技能行状态，能力卡随后覆盖。
 	/// </summary>
 	[Export] public string[] EnabledAbilityIds { get; set; } = System.Array.Empty<string>();
 
-	/// <summary>要让哪些 <c>Ability</c> 处于**关闭**状态的名单（同样写类名）。两个名单之外的保持场景里的原状。</summary>
+	/// <summary>关闭名单也写技能行Id或类名；同时出现在启用名单时以启用为准。</summary>
 	[Export] public string[] DisabledAbilityIds { get; set; } = System.Array.Empty<string>();
 
 	[ExportGroup("跳跃（只有玩家读这两列，见 CharacterMovement.ApplyJumpConfigDeferred）")]

@@ -8,6 +8,7 @@
 
 [resource]
 script = ExtResource("1_row")
+ModelPath = "res://Assets/Models/player/mesh_player_body_heavy.glb"
 DisabledAbilityIds = PackedStringArray()
 EnabledAbilityIds = PackedStringArray("skl_b_skill_1", "skl_b_skill_2", "skl_b_fall", "skl_b1_w1_3")
 MaxHealth = 220.0

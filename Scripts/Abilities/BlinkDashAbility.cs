@@ -235,6 +235,13 @@ public partial class BlinkDashAbility : Ability
 		_hitbox?.Deactivate();
 	}
 
+	protected override void OnLoadoutReset()
+	{
+		EndDash();
+		_linger = 0;
+		_path?.HidePath();
+	}
+
 	public override void _ExitTree()
 	{
 		RestorePierce();

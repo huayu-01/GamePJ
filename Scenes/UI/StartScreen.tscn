@@ -45,16 +45,24 @@ theme_type_variation = &"UiTitle"
 text = "配置 · 选择本局武器"
 horizontal_alignment = 1
 
-[node name="Cards" type="VBoxContainer" parent="Root/Panel/VBox"]
-size_flags_horizontal = 4
+[node name="Scroll" type="ScrollContainer" parent="Root/Panel/VBox"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Cards" type="VBoxContainer" parent="Root/Panel/VBox/Scroll"]
+size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
-[node name="CardTemplate" type="Button" parent="Root/Panel/VBox/Cards"]
+[node name="CardTemplate" type="Button" parent="Root/Panel/VBox/Scroll/Cards"]
 visible = false
-custom_minimum_size = Vector2(1000, 96)
+custom_minimum_size = Vector2(0, 96)
 alignment = 0
 
 [node name="Hint" type="Label" parent="Root/Panel/VBox"]
 theme_type_variation = &"UiCaption"
 text = "按数字键或点击选择武器"
 horizontal_alignment = 1
+
+[node name="Return" type="Button" parent="Root/Panel/VBox"]
+size_flags_horizontal = 4
+text = "返回基地  Esc"

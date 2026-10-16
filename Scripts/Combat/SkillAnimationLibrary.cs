@@ -92,7 +92,7 @@ public static class SkillAnimationLibrary
 				continue;
 			}
 
-			lib.AddAnimation(animation.ResourceName, PrepareForRuntime(animation, path));
+			lib.AddAnimation(animation.ResourceName, PrepareForRuntime(animation, path, player));
 		}
 
 		if (lib.GetAnimationList().Count == 0)
@@ -127,11 +127,20 @@ public static class SkillAnimationLibrary
 	/// 复制一份再禁用（不动 `ResourceLoader` 缓存里的那份），所以自测里那套"靠引擎回调触发"的
 	/// 验证路径照样成立 —— 两条路都被覆盖到。
 	/// </summary>
-	private static Animation PrepareForRuntime(Animation source, string path)
+	private static Animation PrepareForRuntime(Animation source, string path, AnimationPlayer player)
 	{
 		var copy = (Animation)source.Duplicate(true);
+		Node root = player.GetNodeOrNull(player.RootNode) ?? player.GetParent();
+		Skeleton3D? skeleton = NodeSearch.FindInSubtree<Skeleton3D>(root);
 		for (int track = 0; track < copy.GetTrackCount(); track++)
 		{
+			// 角色模型的导入根名不同；仅在私有副本中重定向同名骨骼，关键帧和方法事件不变。
+			if (skeleton != null && copy.TrackGetType(track) is Animation.TrackType.Position3D or Animation.TrackType.Rotation3D or Animation.TrackType.Scale3D)
+			{
+				NodePath target = copy.TrackGetPath(track);
+				if (target.GetSubNameCount() == 1 && skeleton.FindBone(target.GetSubName(0)) >= 0)
+					copy.TrackSetPath(track, new NodePath($"{root.GetPathTo(skeleton)}:{target.GetSubName(0)}"));
+			}
 			if (copy.TrackGetType(track) == Animation.TrackType.Method && copy.TrackIsEnabled(track))
 			{
 				copy.TrackSetEnabled(track, false);

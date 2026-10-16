@@ -1,0 +1,43 @@
+[gd_scene load_steps=7 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Metal"]
+albedo_color = Color(0.72, 0.94, 0.94, 1)
+roughness = 0.48
+
+[sub_resource type="StandardMaterial3D" id="Grip"]
+albedo_color = Color(0.13, 0.24, 0.29, 1)
+
+[sub_resource type="StandardMaterial3D" id="Gold"]
+albedo_color = Color(0.95, 0.67, 0.28, 1)
+
+[sub_resource type="CylinderMesh" id="Mesh0"]
+material = SubResource("Grip")
+top_radius = 0.045
+bottom_radius = 0.045
+height = 1.9
+radial_segments = 8
+
+[sub_resource type="PrismMesh" id="Mesh1"]
+material = SubResource("Metal")
+size = Vector3(0.3, 0.55, 0.08)
+
+[sub_resource type="CylinderMesh" id="Mesh2"]
+material = SubResource("Gold")
+top_radius = 0.08
+bottom_radius = 0.08
+height = 0.12
+radial_segments = 8
+
+[node name="spear" type="Node3D"]
+
+[node name="Part0" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh0")
+position = Vector3(0, 0.4, 0)
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh1")
+position = Vector3(0, 1.55, 0)
+
+[node name="Part2" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh2")
+position = Vector3(0, 1.27, 0)

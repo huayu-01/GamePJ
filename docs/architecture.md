@@ -54,6 +54,11 @@
 
 ## Unit 与表现的分工
 
+**第二轮 C 批补充**：PlayerLoadout是基地/关卡共用的装备应用器，不创建关卡上下文。
+角色交互通过表内OwnerCharacter归属校验，LoadoutMemory只负责偏好文件，未新增autoload。
+CharacterDisplay只切换表现模型/握持场景；UnitAnimator把真实动画驱动绑定当前可见模型，骨骼路径只改私有副本。
+基地练习生命周期独立，不生成RunController/StageController或结算。接入见 [base-loadout.md](base-loadout.md)。
+
 **第二轮 B 批补充**：`AbilityHud` 仅消费技能只读量、当前配装身份和表内表现列，
 不会通过界面改CD、层数或伤害；HUD CanvasLayer=3，高于可选像素滤镜层1，低于弹窗。
 GM是独立开发工具预制体，使用公开接口主动调用系统；不作为autoload，也不留下InputMap绑定。

@@ -1,5 +1,8 @@
 # 能力机制：蓄力 · 完美时机 · 技能层数 · 冷却缩减（P2 通用地基）
 
+> **第二轮 C批**：基地和关卡共用PlayerLoadout，先恢复绑定再套技能/矩阵/能力卡；换角色会释放旧能力持有的状态。
+> 技能事件由当前可见模型的UnitAnimator驱动，未改事件时刻、伤害或冷却。存档与接入见 [base-loadout.md](base-loadout.md)。
+
 > **第二轮 B-1**：`AbilityConfig.HudIcon:Texture2D` / `HudColor:Color` / `HudOrder:int` 是纯表现列，
 > 19条玩家技能行已配置统一线稿图标。`Hud/Root/Abilities` 交叉读取当前角色/武器表的Skills与启用能力，
 > 右下角显示图标、名称、真实InputMap按键、扇形CD、充能层数、蓄力进度与后台维持状态；鼠标完全穿透。

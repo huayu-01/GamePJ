@@ -16,6 +16,8 @@ namespace ActRoguelike.Config;
 public partial class WeaponConfig : ConfigRow
 {
 	[ExportGroup("身份 · 预制体与标签")]
+	/// <summary>武器归属角色，选择列表和实际装备共同校验，空值不作为可选装备。</summary>
+	[Export] public CharacterConfig? OwnerCharacter { get; set; }
 	/// <summary>武器预制体。当前三把武器共用一个预制体，只换数值（不重建节点，避免弄丢输入组件）。</summary>
 	[Export(PropertyHint.File, "*.tscn")] public string ScenePath { get; set; } = "res://Scenes/Weapons/Pistol.tscn";
 

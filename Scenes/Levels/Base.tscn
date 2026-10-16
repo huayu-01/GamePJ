@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://Scripts/Interaction/BaseTerminal.cs" id="2_terminal"]
@@ -14,6 +14,12 @@
 [ext_resource type="Material" path="res://Assets/ArtRefresh/mat_level_ground.tres" id="21_ground"]
 [ext_resource type="PackedScene" path="res://Scenes/ArtRefresh/GardenDressing.tscn" id="22_garden"]
 [ext_resource type="PackedScene" path="res://Scenes/Debug/GmConsole.tscn" id="23_gm"]
+[ext_resource type="Script" path="res://Scripts/Run/BaseCamp.cs" id="24_camp"]
+[ext_resource type="PackedScene" path="res://Scenes/Training/BasePracticeTarget.tscn" id="25_target"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="26_hud"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/WorldOverlay.tscn" id="27_world"]
+[ext_resource type="Script" path="res://Scripts/Run/CharacterRoster.cs" id="28_roster"]
+[ext_resource type="PackedScene" path="res://Scenes/Interactables/CharacterStand.tscn" id="29_stand"]
 
 [sub_resource type="BoxShape3D" id="Shape_ground"]
 size = Vector3(26, 1, 26)
@@ -49,6 +55,16 @@ emission = Color(0.4, 0.12, 0.12, 1)
 size = Vector3(1.6, 2.2, 1.6)
 
 [node name="Base" type="Node3D"]
+
+[node name="BaseCamp" type="Node" parent="."]
+script = ExtResource("24_camp")
+
+[node name="PracticeTarget" parent="." instance=ExtResource("25_target")]
+position = Vector3(0, 0, -7)
+
+[node name="Hud" parent="." instance=ExtResource("26_hud")]
+
+[node name="WorldOverlay" parent="." instance=ExtResource("27_world")]
 
 [node name="Ground" type="StaticBody3D" parent="."]
 collision_layer = 1
@@ -96,17 +112,12 @@ Kind = 0
 mesh = SubResource("Mesh_terminal")
 material_override = SubResource("Mat_upgrade")
 
-[node name="TerminalLoadout" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 1.1, 0)
-script = ExtResource("2_terminal")
-Kind = 1
-
-[node name="Mesh" type="MeshInstance3D" parent="TerminalLoadout"]
-mesh = SubResource("Mesh_terminal")
-material_override = SubResource("Mat_loadout")
+[node name="CharacterRoster" type="Node3D" parent="."]
+script = ExtResource("28_roster")
+StandScene = ExtResource("29_stand")
 
 [node name="TerminalHelp" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 1.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.1, 4)
 script = ExtResource("2_terminal")
 Kind = 2
 

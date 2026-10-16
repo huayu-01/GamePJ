@@ -1,0 +1,32 @@
+2026-10-16 22:13 最终复跑前的一次完整自测：到达结束标记、进程退出0，但stderr新增GCHandle终结器错误；验收脚本按失败处理，没有计为通过。
+下方保留该次stderr原文，后续最终结果另见c-batch-evidence.log。
+
+WARNING: [MapManager] 导航网格为空：检查地面是否是 World 层（collision_layer 含 1）的 StaticBody3D。
+   at: void ActRoguelike.World.MapManager.Bake() (res://Scripts/World/MapManager.cs:125)
+   C# backtrace (most recent call first):
+       [0] void Godot.GD.PushWarning(string) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GD.cs:396)
+       [1] void ActRoguelike.World.MapManager.Bake() (F:\Godot项目\项目a\Scripts\World\MapManager.cs:125)
+       [2] void Godot.Callable.<From>g__Trampoline|1_0(object, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/Callable.generics.cs:39)
+       [3] void Godot.DelegateUtils.InvokeWithVariantArgs(nint, System.Void*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant*) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/DelegateUtils.cs:86)
+WARNING: A navigation mesh that uses a `cell_height` of 0.15000000596046 was assigned to a navigation map set to a larger `cell_height` of 0.25.
+This mismatch in cell height can cause rasterization errors with navigation mesh edges on the navigation map.
+The cell height for navigation maps can be changed by using the NavigationServer map_set_cell_height() function.
+The cell height for default navigation maps can also be changed in the project settings.
+This warning can be toggled under 'navigation/3d/warnings/navmesh_cell_size_mismatch' in the project settings.
+   at: set_navigation_mesh (modules/navigation_3d/nav_region_3d.cpp:113)
+ERROR: System.InvalidOperationException: Handle is not initialized.
+   at System.Runtime.InteropServices.GCHandle.FromIntPtr(IntPtr value)
+   at Godot.Bridge.ScriptManagerBridge.SetGodotObjectPtr(IntPtr gcHandlePtr, IntPtr newPtr) in /root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/Bridge/ScriptManagerBridge.cs:line 288
+   at: void Godot.NativeInterop.ExceptionUtils.LogException(System.Exception) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/NativeInterop/ExceptionUtils.cs:113)
+   C# backtrace (most recent call first):
+       [0] void Godot.GD.PushError(string) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GD.cs:366)
+       [1] void Godot.NativeInterop.ExceptionUtils.LogException(System.Exception) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/NativeInterop/ExceptionUtils.cs:113)
+       [2] void Godot.Bridge.ScriptManagerBridge.SetGodotObjectPtr(nint, nint) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/Bridge/ScriptManagerBridge.cs:288)
+       [3] void Godot.NativeInterop.NativeFuncs.godotsharp_internal_refcounted_disposed(nint, nint, Godot.NativeInterop.godot_bool) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Godot.SourceGenerators.Internal/Godot.SourceGenerators.Internal.UnmanagedCallbacksGenerator/Godot.NativeInterop.NativeFuncs.generated.cs:109)
+       [4] void Godot.GodotObject.Dispose(bool) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GodotObject.base.cs:137)
+       [5] void Godot.GodotObject.Finalize() (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GodotObject.base.cs:100)
+       [6] uint System.GC.RunFinalizers()
+WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 2 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

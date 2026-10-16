@@ -910,6 +910,15 @@ public abstract partial class Ability : Node3D
 		OnFinishOrCancel();
 	}
 
+	/// <summary>换装前释放本能力持有的状态，保留正常技能的取消生命周期。</summary>
+	public void ResetForLoadout()
+	{
+		if (IsActive) Cancel();
+		OnLoadoutReset();
+		RefreshCooldown();
+	}
+	protected virtual void OnLoadoutReset() { }
+
 	protected void Cancel()
 	{
 		IsActive = false;

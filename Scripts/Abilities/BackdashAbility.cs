@@ -150,4 +150,6 @@ public partial class BackdashAbility : Ability
 		EndInvulnerable();
 		base._ExitTree();
 	}
+
+	protected override void OnLoadoutReset() => EndInvulnerable();
 }

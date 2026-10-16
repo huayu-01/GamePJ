@@ -1,5 +1,8 @@
 [gd_scene format=3 uid="uid://2goeb0wrmdmo"]
 
+[ext_resource type="Script" path="res://Scripts/Visual/CharacterDisplay.cs" id="50_display"]
+[ext_resource type="PackedScene" path="res://Scenes/Visual/WeaponGrip.tscn" id="51_grip"]
+
 [ext_resource type="Script" uid="uid://duc0wrjly51qb" path="res://Scripts/Player/PlayerController.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://Scenes/Camera/CameraRig.tscn" id="2_rig"]
 [ext_resource type="Script" uid="uid://c1om2njjn4vp4" path="res://Scripts/Combat/CharacterMovement.cs" id="3_movement"]
@@ -77,6 +80,11 @@ transform = Transform3D(-2.6814, 0, 0, 0, 2.6814, 0, 0, 0, -2.6814, 0, 0, 0)
 [node name="Movement" type="Node" parent="." unique_id=1724105735]
 script = ExtResource("3_movement")
 TurnSharpness = 16.0
+
+[node name="Appearance" type="Node3D" parent="."]
+script = ExtResource("50_display")
+OriginalModelPath = NodePath("../Model")
+GripScene = ExtResource("51_grip")
 
 [node name="CameraRig" parent="." unique_id=722181061 instance=ExtResource("2_rig")]
 

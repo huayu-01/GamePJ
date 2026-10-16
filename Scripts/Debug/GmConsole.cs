@@ -283,6 +283,8 @@ public partial class GmConsole : OverlayScreen
 					if (!RunController.TryResolveCharacter(p[1], out var character) || RunController.CharacterRow(character) == null
 						|| !RunController.TryResolveWeapon(p[2], out var weapon) || RunController.WeaponRow(weapon) == null)
 						throw new ArgumentException("角色或武器ID不存在。");
+					if (!LoadoutSelection.Allows(RunController.CharacterRow(character), RunController.WeaponRow(weapon)))
+						throw new ArgumentException("武器不属于该角色；请按角色选择其自己的武器。");
 					RunSetup.Character = character;
 					RunSetup.Weapon = weapon;
 				}

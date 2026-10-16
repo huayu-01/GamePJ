@@ -237,6 +237,16 @@ void fragment() {
 		_bindings.Clear();
 	}
 
+	/// <summary>换角色时归还旧模型的叠加通道，下一帧绑定当前可见模型。</summary>
+	public void BindVisual(Node3D model)
+	{
+		if (_model == model) return;
+		foreach (MeshBinding binding in _bindings)
+			if (IsInstanceValid(binding.Mesh)) binding.Mesh.MaterialOverlay = binding.PreviousOverlay;
+		_bindings.Clear();
+		_model = model;
+	}
+
 	public override void _Process(double delta)
 	{
 		float dt = (float)delta;

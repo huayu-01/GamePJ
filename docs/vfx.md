@@ -1,5 +1,8 @@
 # 表现层（VFX）契约与清单
 
+> **第二轮 C批**：CharacterDisplay切换角色与握持场景，真实UnitAnimator、受击闪色、蓄力身体表现与残影跟随当前可见模型。
+> 骨骼轨道只在动画私有副本中重定向，关键帧及事件不变；展示子树不创建单位、碰撞或分组。[接入契约](base-loadout.md)。
+
 > **第二轮 E-2（2026-10-16）状态表现接入**：`UnitPresentation` 在收集模型网格后调用
 > `StatusEffectFx.Ensure(unit)`，延后挂载 `Scenes/Combat/StatusEffectFx.tscn`，避免父节点就绪期间新增兄弟失败。
 > 它只读 `GetStatusIds()` / `GetStatusStacks()` / `IsDead`，不改 Unit、状态结算、模型材质或动画。

@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[node name="WeaponGrip" type="BoneAttachment3D"]
+bone_name = "arm-right"
+
+[node name="Socket" type="Node3D" parent="."]
+position = Vector3(0, -0.17, 0)
+scale = Vector3(0.37294, 0.37294, 0.37294)

@@ -24,12 +24,7 @@ public partial class RunController : Node
 	private readonly RewardPool _pool = new();
 	private readonly List<RewardDefinition> _current = new();
 
-	/// <summary>
-	/// 玩家能力节点的**场景基线**（第一次套用角色/武器时抓的那份 `Enabled` / `InputAction` / `AbilityId`）。
-	/// 换角色/换武器时先恢复它，再让表写一遍 —— 否则上一套技能的按键绑定会留在能力节点上
-	/// （"上一把武器的左键武技还留在节点上"，见 <see cref="ResetAbilityBindings"/>）。
-	/// </summary>
-	private readonly Dictionary<Ability, (bool Enabled, string InputAction, string AbilityId)> _abilityBaseline = new();
+	private readonly ActRoguelike.Player.PlayerLoadout _loadout = new();
 
 	private Unit? _player;
 	private Weapon? _weapon;
@@ -88,67 +83,13 @@ public partial class RunController : Node
 	private void ApplyBalance()
 	{
 		ConfigIndexData config = ConfigIndex.Settings;
-
-		// 角色数值来自角色表（`Config/Tables/Characters/chr_*.tres`）；读不到行就用玩家场景里的原始数值。
-		CharacterConfig? character = CharacterRow(_character);
-		float maxHealth = character?.MaxHealth ?? _player!.MaxHealth;
-		float armor = character?.StartingArmor ?? _player!.StartingArmor;
-		float moveSpeed = character?.MoveSpeed ?? _player!.MoveSpeed;
-		float reduction = character?.DamageReduction ?? _player!.DamageReduction;
-
-		_player!.ApplyBaseStats(maxHealth + MetaProgress.BonusMaxHealth, armor, character?.MaxShield ?? _player.MaxShield, moveSpeed);
-		_player.Stats.AddModifier(new StatModifier { Stat = "DamageMultiplier", Operation = ModifierOperation.Multiply, Value = MetaProgress.BonusDamageMultiplier, Source = this });
-		_player.Stats.AddModifier(new StatModifier { Stat = "MoveSpeedMultiplier", Operation = ModifierOperation.Multiply, Value = MetaProgress.BonusMoveSpeedMultiplier, Source = this });
-		_player.Stats.AddModifier(new StatModifier { Stat = "CritChanceAdd", Operation = ModifierOperation.Add, Value = MetaProgress.BonusCritChance, Source = this });
-		// ⚠️ P6b：这里原来还有一条 `ReloadSpeedMultiplier × MetaProgress.BonusReloadSpeed` ——
-		// 随"没有弹匣的概念了"整条下线（局外成长行 `meta_reload` 与 `Weapon` 的装填逻辑同时删除）。
-		_player.RefreshStats();
-		_player.DamageReduction = reduction;
-
-		if (_weapon != null)
+		if (CharacterRow(_character) is { } selected && !LoadoutSelection.Allows(selected, WeaponRow(_weaponKind))
+			&& LoadoutSelection.FirstWeapon(selected) is { } fallback)
 		{
-			// 武器行的数值（含 `UsesWeaponComponent` → `Weapon.Enabled`）都在 `WeaponConfig.ApplyTo` 里。
-			// ⚠️ P6a 起**不再**在这里按角色行把枪收起来（用户 2026-10-15：他没设计过这个，进关卡"只是切场景"）。
-			EquipWeapon(_weaponKind);
+			_weaponKind = (WeaponPresetKind)(fallback.Slot - 1);
 		}
 
-		// 角色表的能力开关矩阵：取代原来三段硬编码的 `melee.Enabled = heavy` / `summon/control.Enabled = summoner`。
-		// 读不到角色行时回退到与分表前逐位一致的那套规则。
-		//
-		// ⚠️ P6b 核对（**只改注释，没动顺序**）：这一行跑在下面 `character.ApplySkillsTo(_player)` **之前**，
-		// 而矩阵的首选匹配键是 `Ability.AbilityId`，那个字段正是 `ApplySkillsTo` 写进去的 ——
-		// 于是**第一次套用**（刚进关卡）时 `AbilityId` 还是空串，矩阵只能退到"类名匹配"，
-		// 而角色行的两个名单里写的是**技能行 Id**（`skl_a1_skill_1` …），所以这一趟实际匹配不到任何东西。
-		// 真正决定开关的是**技能行自己的 `AbilityConfig.Enabled`**，所以现状无害（自测逐位一致）。
-		// **为什么不改成"先 ApplySkillsTo 再矩阵"**：矩阵内部的 `ResetAbilityBindings` 会把能力恢复到
-		// 场景基线（InputAction 也要恢复）—— 它必须排在**所有**"行 → 能力"的写入之前；挪到技能行之后
-		// 会把技能行刚写上的 `InputAction`（后撤的 Q、武技的左右键）一起清掉，是实打实的回归。
-		// 真要修得拆成三步（先 reset → 再技能行 → 再矩阵），超出 P6b 范围，留给后续。
-		ApplyAbilityMatrix(character);
-
-		if (character != null)
-		{
-			// ⚠️ 顺序：先技能表（前摇/后摇/朝向/命中体细节/子类参数），再单位的攻击组（伤害/间隔/范围/击退）。
-			// 主攻击的这四个数以**单位行**为准，所以角色行写在技能行之后 —— 只留一个真源。
-			character.ApplySkillsTo(_player);
-			character.ApplyAttackTo(_player);
-			// 角色的「表现 · 动画」6 列也要应用 —— 否则表里填了动画名/阈值对玩家无效（死配置）。
-			character.ApplyAnimationTo(_player);
-		}
-
-		// **当前武器自己的武技**（`Config/Tables/Weapons/wpn_*.tres` 的 `Skills` 列）：
-		// 武技属于武器，而一个角色的 3 把武器都用同样的两个按键（weapon_skill_1/2），
-		// 所以必须"换武器就换武技行"——挂在角色行上会让上一把的武技留在节点上抢同一个按键。
-		// 旧 3 把枪的 `Skills` 是空数组 → 这一行什么都不做（与改动前逐位一致）。
-		if (WeaponRow(_weaponKind) is { } weaponRow)
-		{
-			UnitConfig.ApplySkills(_player, weaponRow.Skills, weaponRow.Id);
-		}
-
-		// 能力卡（局外装备层）：激活的卡在这里套到玩家身上（数值修饰 + 授予技能）。
-		// 位置刻意放在**角色表的能力开关矩阵与技能行之后** —— 一张"授予技能"的卡要赢过角色的
-		// DisabledAbilityIds（卡 = 玩家花局外资源买的额外能力）。规则与存盘在 AbilityStore，见 docs/ability-cards.md。
-		AbilityEffects.ApplyToPlayer(_player, this);
+		_loadout.Apply(_player!, this, _character, _weaponKind);
 
 		// 奖励候选池：**进关卡初始化时**就按"当前角色 + 当前武器"把池内容定下来（用户 2026-10-12 C2：
 		// 「进化池里会出什么选项是根据交互的角色持有的攻击方式（武器）……池里一开始有什么，
@@ -552,122 +493,6 @@ public partial class RunController : Node
 		return $"{title}（{detail}）";
 	}
 
-	/// <summary>
-	/// 角色表的能力开关矩阵。两个名单里写 <b>技能行 Id</b>（`skl_a1_w1_1` —— 可读、稳定、一个技能一个名字）
-	/// **或**脚本类名（`MeleeAttackAbility` —— 旧写法，仍然认）。
-	///
-	/// ⚠️ 按类名匹配有个硬伤：**同一个类的两个技能没法分开开关**（角色 A 的两个武技都是
-	/// <c>EnergyWaveAbility</c>）。所以本轮把首选键改成 <c>Ability.AbilityId</c>：它在
-	/// <c>AbilityConfig.ApplyTo</c> 里被写成技能行的 Id。
-	///
-	/// <para>⚠️ <b>P6b 核对（2026-10-16）：这里原来写的是"时机在矩阵之前（先 ApplySkillsTo 再矩阵）"，
-	/// 与代码相反 —— 实际是矩阵先跑、技能行后跑</b>（见 <c>ApplyBalance</c> 里那一大段说明）。
-	/// 所以在**第一次**套用（刚进关卡）时 <c>AbilityId</c> 还是空串 → 只能退到类名匹配 →
-	/// 与角色行里按**技能行 Id** 写的名单对不上 → 这一趟矩阵**实际什么都没改**。
-	/// 真正决定开关的是技能行自己的 <c>AbilityConfig.Enabled</c>，所以现状无害（自测逐位一致）。
-	/// 修法见 <c>ApplyBalance</c> 的注释：要拆成"先 reset → 再技能行 → 再矩阵"三步，本轮不做。</para>
-	///
-	/// 读不到角色行时**只恢复场景基线**（不再有 `melee.Enabled = heavy` / `summon = summoner` 那套
-	/// 旧角色的硬编码规则 —— 那些角色已在 P6a 删除，`heavy` / `summoner` 两个变量也随之消失）。
-	/// </summary>
-	private void ApplyAbilityMatrix(CharacterConfig? character)
-	{
-		var abilities = new System.Collections.Generic.List<Ability>();
-		NodeSearch.CollectInSubtree(_player!, abilities);
-
-		// ⚠️ 先把能力恢复到**场景基线**再做矩阵：能力节点是 `Player.tscn` 的固定节点，而按键绑定/开关是
-		// **上一个角色/武器的技能行**写上去的，只套用"新角色列的那些行"清不掉它们（§6.4.6 的残留）。
-		// 这一步是幂等的：换回同一个角色与一开局就是它得到同一份状态。
-		ResetAbilityBindings(abilities);
-
-		foreach (Ability ability in abilities)
-		{
-			if (character == null)
-			{
-				continue;
-			}
-
-			string classId = ability.GetType().Name;
-			string rowId = ability.AbilityId;
-
-			if (Matches(character.EnabledAbilityIds, rowId, classId))
-			{
-				ability.Enabled = true;
-			}
-			else if (Matches(character.DisabledAbilityIds, rowId, classId))
-			{
-				ability.Enabled = false;
-			}
-		}
-
-		ActRoguelike.Core.GameLog.Write(
-			"Flow",
-			$"能力开关矩阵（角色 {character?.Id ?? "（表读不到，走代码默认值）"}）：{DescribeAbilities(abilities)}");
-	}
-
-	/// <summary>
-	/// 把玩家身上的能力**恢复到场景基线**（幂等）：每次套用角色/武器之前先做一次，之后由技能行、开关矩阵与
-	/// 能力卡重新写一遍。
-	///
-	/// <para><b>为什么需要它</b>（docs/anim-pipeline.md §6.4.6）：<c>Ability.InputAction</c> / <c>Ability.Enabled</c>
-	/// 是**技能行**写在 `Player.tscn` 那两个能力节点上的，而换角色只套用"新角色 <c>Skills</c> 里列的那些行" ——
-	/// 上一套写下的绑定不会自己消失。`weapon_skill_1` 与 `fire` 都是**鼠标左键**，所以残留表现为
-	/// "Gunner + 手枪的左键除了手枪还打出一发能量波"。正常流程（死亡 → 回基地 → 出击门）会重建整个 <c>Main</c>，
-	/// 只有"同一个场景里换角色/换武器"（自测与 MCP 调试）才会踩到。</para>
-	///
-	/// <para>基线在**第一次**调用时抓：那一刻玩家的能力节点还是 `Player.tscn` 的原始值（这个函数排在
-	/// <see cref="ApplyBalance"/> 里所有"行 → 能力"的写入之前，包括能力卡）。</para>
-	/// </summary>
-	private void ResetAbilityBindings(System.Collections.Generic.List<Ability> abilities)
-	{
-		foreach (Ability ability in abilities)
-		{
-			if (!IsInstanceValid(ability))
-			{
-				continue;
-			}
-
-			if (!_abilityBaseline.TryGetValue(ability, out (bool Enabled, string InputAction, string AbilityId) baseline))
-			{
-				baseline = (ability.Enabled, ability.InputAction, ability.AbilityId);
-				_abilityBaseline[ability] = baseline;
-			}
-
-			ability.Enabled = baseline.Enabled;
-			ability.InputAction = baseline.InputAction;
-			ability.AbilityId = baseline.AbilityId;
-		}
-	}
-
-	/// <summary>名单命中判定：技能行 Id 优先，其次脚本类名（旧写法）。</summary>
-	private static bool Matches(string[] names, string rowId, string classId)
-	{
-		if (names.Length == 0)
-		{
-			return false;
-		}
-
-		return (!string.IsNullOrEmpty(rowId) && System.Array.IndexOf(names, rowId) >= 0)
-			|| System.Array.IndexOf(names, classId) >= 0;
-	}
-
-	/// <summary>把"哪个技能开、哪个关"写进日志 —— 加技能后"按了没反应"最常见的原因就是这一行没配对。</summary>
-	private static string DescribeAbilities(System.Collections.Generic.List<Ability> abilities)
-	{
-		var text = new System.Text.StringBuilder();
-		foreach (Ability ability in abilities)
-		{
-			if (text.Length > 0)
-			{
-				text.Append('、');
-			}
-
-			string key = string.IsNullOrEmpty(ability.InputAction) ? "-" : ability.InputAction;
-			text.Append($"{ability.AbilityId}[{key}]={(ability.Enabled ? "开" : "关")}");
-		}
-
-		return text.ToString();
-	}
 
 	/// <summary>选好角色与武器 → 套用数值并进入第一关。</summary>
 	public void BeginRunWithCharacter(PlayerCharacterKind character, WeaponPresetKind kind)

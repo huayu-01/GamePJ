@@ -222,10 +222,8 @@ public partial class AfterimageTrail : Node3D
 			return;
 		}
 
-		if (_model == null || !IsInstanceValid(_model))
-		{
-			_model = _unit?.GetNodeOrNull<Node3D>(ModelNodeName);
-		}
+		_model = _unit?.GetNodeOrNull<ActRoguelike.Visual.CharacterDisplay>("Appearance")?.ActiveModel
+			?? _unit?.GetNodeOrNull<Node3D>(ModelNodeName);
 
 		if (_model == null)
 		{

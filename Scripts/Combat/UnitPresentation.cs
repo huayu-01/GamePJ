@@ -74,6 +74,15 @@ public partial class UnitPresentation : Node
 		}
 	}
 
+	/// <summary>换模型后只收集该模型及其握持武器，排除单位状态特效。</summary>
+	public void BindVisual(Node model)
+	{
+		if (_flashing) foreach (var mesh in _meshes) if (IsInstanceValid(mesh)) mesh.MaterialOverride = null;
+		_flashing = false;
+		_meshes.Clear();
+		CollectMeshes(model);
+	}
+
 	private void CollectMeshes(Node node)
 	{
 		foreach (Node child in node.GetChildren())
