@@ -4,15 +4,21 @@ $ErrorActionPreference = 'Stop'
 $projectDir = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
 $enginePath = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
 $evidence = [System.Collections.Generic.List[string]]::new()
+$script:validationStarted = $false
 $saveDir = Join-Path $env:APPDATA 'Godot/app_userdata/ACT Roguelike'
 $saveHashes = @{}
+$comparisonScenes = [System.Collections.Generic.List[string]]::new()
 foreach ($name in @('meta.cfg', 'ability_cards.cfg', 'settings.cfg')) {
     $path = Join-Path $saveDir $name
     $saveHashes[$name] = if (Test-Path -LiteralPath $path) { (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash } else { '不存在' }
 }
 
 function Open-ValidationLock {
-    try { return [System.IO.File]::Open((Join-Path $projectDir '.ai_validation.lock'), 'OpenOrCreate', 'ReadWrite', 'None') }
+    try {
+        $handle = [System.IO.File]::Open((Join-Path $projectDir '.ai_validation.lock'), 'OpenOrCreate', 'ReadWrite', 'None')
+        $script:validationStarted = $true
+        return $handle
+    }
     catch [System.IO.IOException] { throw '验证锁正被其他任务占用；本轮不启动构建或Godot，请稍后重试。' }
 }
 
@@ -58,14 +64,6 @@ try {
         finally { $validationLock.Dispose() }
         if (-not $SkipImport) { Invoke-OwnedProcess 'import' @('--headless', '--path', $projectDir, '--import', '--mcp-port=19081') }
     }
-    if ($Before) {
-        foreach ($pair in @(@('TestArena', 'arena'), @('Base', 'base'))) {
-            $source = ((& git show "d4270fc:Scenes/Levels/$($pair[0]).tscn") -join "`n") -replace ' uid="[^"]+"', ''
-            if ($LASTEXITCODE -ne 0) { throw '无法读取比较基线d4270fc' }
-            [System.IO.File]::WriteAllText((Join-Path $projectDir ".ai_art_before_$($pair[1]).tscn"), $source + "`n", [System.Text.UTF8Encoding]::new($false))
-        }
-        Invoke-OwnedProcess 'before' @('--path', $projectDir, '--resolution', '1920x1080', '--quit-after', '2400', 'res://Scenes/ArtRefresh/ArtRefreshProbe.tscn', '--', '--before')
-    }
     Invoke-OwnedProcess 'probe' @('--path', $projectDir, '--resolution', '1920x1080', '--quit-after', '2400', 'res://Scenes/ArtRefresh/ArtRefreshProbe.tscn')
     $lines = Get-Content '.ai_art_probe.log'
     if (($lines -join "`n") -notmatch '验收结束：通过 \d+，失败 0') { throw '美术探针未完整通过' }
@@ -84,6 +82,20 @@ try {
             $evidence.Add("[基线逐字一致] $after")
         }
     }
+    # 正式验证全部完成后才加载历史场景；随机文件名和移除UID同时避免复用编辑器旧UID映射。
+    if ($Before) {
+        $comparisonId = [Guid]::NewGuid().ToString('N')
+        foreach ($pair in @(@('TestArena', 'arena'), @('Base', 'base'))) {
+            $source = ((& git show "d4270fc:Scenes/Levels/$($pair[0]).tscn") -join "`n") -replace ' uid="[^"]+"', ''
+            if ($LASTEXITCODE -ne 0) { throw '无法读取比较基线d4270fc' }
+            $comparisonName = ".ai_art_before_$($pair[1])_$comparisonId.tscn"
+            $comparisonScenes.Add((Join-Path $projectDir $comparisonName))
+            [System.IO.File]::WriteAllText($comparisonScenes[$comparisonScenes.Count - 1], $source + "`n", [System.Text.UTF8Encoding]::new($false))
+        }
+        $arenaArg = '--before-arena=res://' + [System.IO.Path]::GetFileName($comparisonScenes[0])
+        $baseArg = '--before-base=res://' + [System.IO.Path]::GetFileName($comparisonScenes[1])
+        Invoke-OwnedProcess 'before' @('--path', $projectDir, '--resolution', '1920x1080', '--quit-after', '2400', 'res://Scenes/ArtRefresh/ArtRefreshProbe.tscn', '--', '--before', $arenaArg, $baseArg)
+    }
     foreach ($name in $saveHashes.Keys) {
         $path = Join-Path $saveDir $name
         $afterHash = if (Test-Path -LiteralPath $path) { (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash } else { '不存在' }
@@ -95,11 +107,12 @@ try {
     }
 }
 finally {
-    foreach ($name in @('.ai_art_before_arena.tscn', '.ai_art_before_base.tscn')) {
-        $temporaryScene = Join-Path $projectDir $name
+    foreach ($temporaryScene in $comparisonScenes) {
         if (Test-Path -LiteralPath $temporaryScene) { Remove-Item -LiteralPath $temporaryScene }
     }
     $evidence.Add("selftest.flag 不存在=$(-not (Test-Path -LiteralPath (Join-Path $saveDir 'selftest.flag')))")
-    [System.IO.File]::WriteAllText((Join-Path $projectDir 'docs/art-refresh-evidence.log'), ($evidence -join "`n") + "`n", [System.Text.UTF8Encoding]::new($false))
+    if ($script:validationStarted) {
+        [System.IO.File]::WriteAllText((Join-Path $projectDir 'docs/art-refresh-evidence.log'), ($evidence -join "`n") + "`n", [System.Text.UTF8Encoding]::new($false))
+    }
     Pop-Location
 }

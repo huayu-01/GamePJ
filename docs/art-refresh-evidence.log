@@ -1,5 +1,4 @@
 build.ps1 --no-incremental -v minimal：0 warning / 0 error
-before 退出码=0
 probe 退出码=0
 [ArtRefresh] PASS 环境子树：碰撞/单位/分组均为0
 [ArtRefresh] PASS 竞技场原7个碰撞形状保持
@@ -32,6 +31,7 @@ probe 退出码=0
 [ArtRefresh] PASS 像素滤镜移除即消失，生产场景默认未挂载
 [ArtRefresh] 验收结束：通过 28，失败 0
 gameplay 退出码=0
+[ArtRefresh] 正式Main环境=res://Assets/ArtRefresh/env_level_garden.tres 新装饰=true
 [ArtRefresh] 正式Main：1920x1080截图结果=0 当前相机=/root/Main/Player/CameraRig/SpringArm/Camera
 selftest 退出码=0
 [基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
@@ -42,17 +42,18 @@ selftest 退出码=0
 [基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
 [基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
 [基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+before 退出码=0
 存档不变 meta.cfg=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
-存档不变 settings.cfg=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
 存档不变 ability_cards.cfg=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档不变 settings.cfg=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
 截图 art_refresh_arena.png SHA256=0D18BF4517D02F5DEB545D3BFA26DF3A4793CACE5D90882E88F6CA6E82E4465C
 截图 art_refresh_base.png SHA256=546EA44FEEFC14E560A2BFBB569822B07A1D8AAAFA354A5AA6F8DBEA9F057921
 截图 art_refresh_before_arena.png SHA256=C21B1CE3B1B61DE29C6E1036242925671254BEA5F4D874974DFDE2EB0C644D5C
 截图 art_refresh_before_base.png SHA256=2CA1FD398AD61110397993A030638D248C130B35617B680A431E7B9A750CB475
 截图 art_refresh_before_readability.png SHA256=A3911A6F667C96BA440CFE6D7E77DF132AE7E5946408ABD22AF540C21CFCEE77
-截图 art_refresh_fx_early.png SHA256=78130B90955A52D61787A9873CA0A056DEEA22FF4DDD9ABB321C671BE9FFD918
-截图 art_refresh_fx_late.png SHA256=6AB13112060425A3913841CD307E1C63DC943BF840C76CEE60856FA70C4D8B32
-截图 art_refresh_gameplay.png SHA256=7018E5089117F27F60817E3724B104456D33192D7D7165C324BFE3BD25809C1A
+截图 art_refresh_fx_early.png SHA256=366812B68BF34565CB4E67EC350356D683766E20C45434AC8B99FC436FF8A825
+截图 art_refresh_fx_late.png SHA256=94D6B50DC30EDE91BC600C0C9C9A2C2D4DB6D273D744962765B61195EC770CB3
+截图 art_refresh_gameplay.png SHA256=73AB37F54E881FC754B526F936E68A598CA6D31DAD7474EFDB7B731376F105F1
 截图 art_refresh_pixel_optional.png SHA256=2F0CAFB9B4D836773243226C6C76658D096757E0130E68E1E5E8C56C53426908
 截图 art_refresh_readability.png SHA256=265735A9ED103DA77756EC2B5C946165F3EC5A96648C0CABF756F99CB8C4CED3
 selftest.flag 不存在=True

@@ -9,6 +9,14 @@ func _run() -> void:
 	var controller := get_parent().get_node("RunController")
 	controller.call("BeginRunWithCharacter", 3, 5)
 	await get_tree().create_timer(0.8, true).timeout
+	var arena := get_parent().get_node("TestArena")
+	var environment: Environment = arena.get_node("WorldEnvironment").environment
+	var correct_environment := arena.has_node("GardenDressing") and environment.resource_path == "res://Assets/ArtRefresh/env_level_garden.tres"
+	print("[ArtRefresh] 正式Main环境=", environment.resource_path, " 新装饰=", arena.has_node("GardenDressing"))
+	if not correct_environment:
+		push_error("正式Main未加载新环境，拒绝将旧场地截图计入验收。")
+		get_tree().quit(1)
+		return
 	get_window().content_scale_size = Vector2i(1920, 1080)
 	get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
 	await get_tree().process_frame

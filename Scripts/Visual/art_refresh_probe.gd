@@ -158,7 +158,14 @@ func _before() -> void:
 	_camera = Camera3D.new()
 	_camera.fov = 68.0
 	add_child(_camera)
-	var arena := _add_scene("res://.ai_art_before_arena.tscn", Vector3.ZERO)
+	var arena_path := ""
+	var base_path := ""
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--before-arena="):
+			arena_path = argument.trim_prefix("--before-arena=")
+		if argument.begins_with("--before-base="):
+			base_path = argument.trim_prefix("--before-base=")
+	var arena := _add_scene(arena_path, Vector3.ZERO)
 	_point(Vector3(22, 14, 26), Vector3(0, 2, -8))
 	var player := _add_scene("res://Assets/Models/player/mesh_player_body.glb", Vector3(0, 0, 4))
 	player.rotation.y = PI
@@ -175,7 +182,7 @@ func _before() -> void:
 	player.queue_free()
 	enemy.queue_free()
 	await get_tree().process_frame
-	var base := _add_scene("res://.ai_art_before_base.tscn", Vector3.ZERO)
+	var base := _add_scene(base_path, Vector3.ZERO)
 	base.get_node("Player").process_mode = Node.PROCESS_MODE_DISABLED
 	await _wait(1.0)
 	_point(Vector3(10, 10, 12), Vector3(0, 1, -2))
