@@ -36,11 +36,11 @@
 
 ## 验收入口
 
-`Assets/ArtRefresh/tools/verify_art_refresh.ps1 -SkipImport -Before -ScopedSelfTest`：每个构建/运行均独占 `.ai_validation.lock`，进程结束立即释放；只退出自己启动的进程。
+`Assets/ArtRefresh/tools/verify_art_refresh.ps1 -SkipImport -Before`：每个构建/运行均独占 `.ai_validation.lock`，进程结束立即释放；只退出自己启动的进程。
 `-Before` 从 d4270fc 临时读取两处原场景，同机位拍前后对比；资源首次导入应由现有 Godot 编辑器完成，避免另起编辑器抢占9080。
 脚本日志 `.ai_art_*` 留本地，交付证据见 `docs/art-refresh-evidence.log`，图片为 `docs/screenshots/art_refresh_*.png`。
 完整自测使用 `-- --selftest`，未创建flag，保留用户存档并核对SHA-256。
-`ScopedSelfTest` 仅隐藏并行B批技能栏绘制；未隔离的Main曾出现AbilityHud三角化错误，完整经过与边界见 `art-refresh-verification.md`。
+最终已使用未隔离的正式Main完整回归；并行B批修正其三角化问题后，重新构建与八条基线比对均通过，临时隔离场景已移除。
 
 ## 仍需注意
 

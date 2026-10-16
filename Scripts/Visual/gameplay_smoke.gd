@@ -9,6 +9,9 @@ func _run() -> void:
 	var controller := get_parent().get_node("RunController")
 	controller.call("BeginRunWithCharacter", 3, 5)
 	await get_tree().create_timer(0.8, true).timeout
+	get_window().content_scale_size = Vector2i(1920, 1080)
+	get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+	await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	var image := get_viewport().get_texture().get_image()
 	var result := image.save_png("res://docs/screenshots/art_refresh_gameplay.png")

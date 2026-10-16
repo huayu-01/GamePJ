@@ -1,5 +1,5 @@
 # 只管理本脚本的验证进程，每个构建/运行期间独占工作区验证锁。
-param([switch]$ProbeOnly, [switch]$SkipImport, [switch]$Before, [switch]$ScopedSelfTest)
+param([switch]$ProbeOnly, [switch]$SkipImport, [switch]$Before)
 $ErrorActionPreference = 'Stop'
 $projectDir = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
 $enginePath = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
@@ -73,9 +73,7 @@ try {
     Invoke-OwnedProcess 'gameplay' @('--path', $projectDir, '--resolution', '1920x1080', '--quit-after', '1200', 'res://Scenes/ArtRefresh/GameplaySmoke.tscn')
     foreach ($line in Get-Content '.ai_art_gameplay.log' | Where-Object { $_.StartsWith('[ArtRefresh]') }) { $evidence.Add($line) }
     if (-not $ProbeOnly) {
-        $testScene = if ($ScopedSelfTest) { 'res://Scenes/ArtRefresh/ScopedSelfTest.tscn' } else { 'res://Scenes/Main.tscn' }
-        if ($ScopedSelfTest) { $evidence.Add('[范围说明] 本次仅隐藏并行B批AbilityHud绘制；原Main的绘制错误保存在art-refresh-verification.md，不能视为B批回归通过。') }
-        Invoke-OwnedProcess 'selftest' @('--headless', '--path', $projectDir, '--quit-after', '40000', $testScene, '--', '--selftest')
+        Invoke-OwnedProcess 'selftest' @('--headless', '--path', $projectDir, '--quit-after', '40000', 'res://Scenes/Main.tscn', '--', '--selftest')
         $lines = Get-Content '.ai_art_selftest.log'
         if (($lines -join "`n") -notmatch '=== 自测结束 ===') { throw '自测缺少结束标记' }
         $baseline = Get-Content 'docs/e-batch-evidence.log'

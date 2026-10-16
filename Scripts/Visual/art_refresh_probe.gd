@@ -20,6 +20,10 @@ func _wait(seconds: float) -> void:
 	await get_tree().create_timer(seconds).timeout
 
 func _shot(name: String) -> void:
+	# 只调整拍摄台的运行期渲染尺寸，兼容用户已保存的窗口分辨率，不写设置文件。
+	get_window().content_scale_size = Vector2i(1920, 1080)
+	get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+	await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	var image := get_viewport().get_texture().get_image()
 	var path := "res://docs/screenshots/art_refresh_%s.png" % name
