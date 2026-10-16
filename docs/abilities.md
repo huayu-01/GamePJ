@@ -1,5 +1,11 @@
 # 能力机制：蓄力 · 完美时机 · 技能层数 · 冷却缩减（P2 通用地基）
 
+> **第二轮 B-1**：`AbilityConfig.HudIcon:Texture2D` / `HudColor:Color` / `HudOrder:int` 是纯表现列，
+> 19条玩家技能行已配置统一线稿图标。`Hud/Root/Abilities` 交叉读取当前角色/武器表的Skills与启用能力，
+> 右下角显示图标、名称、真实InputMap按键、扇形CD、充能层数、蓄力进度与后台维持状态；鼠标完全穿透。
+> `RunController.CurrentCharacter/CurrentWeapon` 只读属性仅提供配装身份，不改战斗机制。
+> 当前角色B表把落剑式列在角色Skills中，因此三把武器均显示6格；本批不改这项既有战斗配置。
+
 > **第二轮 E-1（2026-10-16）**：刹那之眼已切换为 `IsBackground=true`、`HoldToMaintain=true`，
 > `MaintainStartupSeconds=0.3`。用户确认保留软启动期间的免伤与免费后撤，不播放动画、不进入蓄力。
 > `IsActive` 表示效果生命周期，`IsBusy = IsActive && !IsBackground` 表示占用动作；`IsReady` 仍防重复激活。

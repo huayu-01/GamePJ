@@ -47,6 +47,11 @@ public partial class AbilityConfig : ConfigRow
 	/// </summary>
 	[Export] public string InputAction { get; set; } = string.Empty;
 
+	[ExportGroup("技能栏（只供HUD读取，不参与战斗）")]
+	[Export] public Texture2D? HudIcon { get; set; }
+	[Export] public Color HudColor { get; set; } = new(0.45f, 0.88f, 0.85f);
+	[Export] public int HudOrder { get; set; }
+
 	/// <summary>按住式输入（蓄力类技能用）：按住期间每帧回调，松开时回调一次"释放"。</summary>
 	[Export] public bool HoldToCharge { get; set; }
 	[Export] public bool IsBackground { get; set; }

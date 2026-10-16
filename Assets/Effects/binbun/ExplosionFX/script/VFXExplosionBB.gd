@@ -1,5 +1,5 @@
 @tool
-extends VFXControllerBB
+extends "res://Assets/Effects/binbun/shared/script/VFXControllerBB.gd"
 class_name VFXExplosionBB
 
 

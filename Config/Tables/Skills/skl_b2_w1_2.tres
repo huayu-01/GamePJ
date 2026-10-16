@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://ccmhfq22aou0"]
 
 [ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_spin.svg" id="e_hud_icon"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_ThrowSpeed"]
@@ -70,6 +71,9 @@ Note = "镰刀不画路径（文档只给长枪写了路径可视化）"
 
 [resource]
 script = ExtResource("1_row")
+HudIcon = ExtResource("e_hud_icon")
+HudColor = Color(1, 0.76, 0.4, 1)
+HudOrder = 40
 NodeName = "AbilityWeapon5Skill2"
 ClassHint = "ScytheThrowAbility"
 InputAction = "weapon_skill_2"

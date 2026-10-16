@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://3p1b3w788w57"]
 
-[ext_resource type="PackedScene" uid="uid://c8vnyi8h6o2u8" path="res://Scenes/Levels/TestArena.tscn" id="1_arena"]
+[ext_resource type="PackedScene" path="res://Scenes/Levels/TestArena.tscn" id="1_arena"]
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/WorldOverlay.tscn" id="4_overlay"]
@@ -29,6 +29,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/BuildScreen.tscn" id="29_build"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/DeathScreen.tscn" id="31_death"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/AbilityMatrixScreen.tscn" id="32_matrix"]
+[ext_resource type="PackedScene" path="res://Scenes/Debug/GmConsole.tscn" id="33_gm"]
 
 [node name="Main" type="Node3D" unique_id=218913370]
 
@@ -49,6 +50,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 [node name="SettingsScreen" parent="." instance=ExtResource("28_settings")]
 
 [node name="AbilityMatrixScreen" parent="." instance=ExtResource("32_matrix")]
+
+[node name="GmConsole" parent="." instance=ExtResource("33_gm")]
 
 [node name="BuildScreen" parent="." instance=ExtResource("29_build")]
 

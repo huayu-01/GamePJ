@@ -54,6 +54,12 @@
 
 ## Unit 与表现的分工
 
+**第二轮 B 批补充**：`AbilityHud` 仅消费技能只读量、当前配装身份和表内表现列，
+不会通过界面改CD、层数或伤害；HUD CanvasLayer=3，高于可选像素滤镜层1，低于弹窗。
+GM是独立开发工具预制体，使用公开接口主动调用系统；不作为autoload，也不留下InputMap绑定。
+主动切场景通过 `UiRouter.ResetForSceneChange()` 清空旧界面引用，防止模态页面卸载后残留暂停。
+详见 [gm-console.md](gm-console.md)。
+
 **第二轮 E 批补充**：技能的 `IsActive` 与占动作的 `IsBusy` 分离，默认配置仍等价；
 后台维持类不参与角色动画驱动，收尾不会停止别的技能动画。状态表现由 `StatusEffectFx` 只读状态，
 用 `EffectConfig` 的强类型形态列与 `Texture2D` 资源引用配置，不按状态 Id 写分支，不进入碰撞或单位列表。

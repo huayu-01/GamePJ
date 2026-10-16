@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://bqnq3362kk45d"]
 
 [ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_nova.svg" id="e_hud_icon"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_a1_w1_2_0"]
@@ -65,6 +66,9 @@ Note = "求「准星打到的世界点」时射线的最大长度（无命中时
 
 [resource]
 script = ExtResource("1_row")
+HudIcon = ExtResource("e_hud_icon")
+HudColor = Color(1, 0.76, 0.4, 1)
+HudOrder = 40
 NodeName = "AbilityWeaponSkill2"
 ClassHint = "EnergyWaveAbility"
 InputAction = "weapon_skill_2"

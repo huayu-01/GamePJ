@@ -57,6 +57,13 @@ public partial class UiRouter : Node
 		Sync();
 	}
 
+	/// <summary>主动切场景前清掉旧场景界面引用，避免模态节点退树后仍保持全局暂停。</summary>
+	public void ResetForSceneChange()
+	{
+		_stack.Clear();
+		Sync();
+	}
+
 	public bool TryCloseTop()
 	{
 		for (int i = _stack.Count - 1; i >= 0; i--)

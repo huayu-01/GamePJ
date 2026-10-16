@@ -1,3 +1,4 @@
+#if TOOLS
 using System.Text;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
@@ -122,3 +123,4 @@ public partial class GenerateSkillAnimations : EditorScript
 		GD.Print($"[SkillAnimation] 事件帧路径标定：Model 往上 {upLevels} 级到事件接收节点 → 轨道 path = '{string.Join("/", System.Linq.Enumerable.Repeat("..", upLevels))}'");
 	}
 }
+#endif

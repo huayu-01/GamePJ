@@ -30,7 +30,7 @@ namespace ActRoguelike.Debug;
 public partial class SelfTest : Node
 {
 #if DEBUG
-	// 仅在 Debug 构建里存在：Release 下这个类退化成空 Node，autoload 仍然有效但什么都不做。
+	// 仅在Debug构建执行探针；发行配置只保留始终为false的兼容读取接口。
 
 	private int _phase;
 	private float _timer;
@@ -4565,6 +4565,10 @@ public partial class SelfTest : Node
 		NodeSearch.CollectInSubtree(root, rules);
 		return rules;
 	}
+#else
+	// 生产技能读取这些排障开关；发行版禁止跳过真实动画和发射。
+	public static bool DebugSkipFireShot => false;
+	public static bool DebugSkipSkillAnimation => false;
 #endif
 }
 

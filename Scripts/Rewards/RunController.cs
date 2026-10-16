@@ -48,6 +48,9 @@ public partial class RunController : Node
 	private int _boot;
 
 	public RunBuild Build => _build;
+	/// <summary>当前装备的只读身份，供HUD按表筛选技能；不暴露可变的配装状态。</summary>
+	public PlayerCharacterKind CurrentCharacter => _character;
+	public WeaponPresetKind CurrentWeapon => _weaponKind;
 	public int CandidateCount => _pool.CandidateCount;
 	public bool RunEnded => _runEnded;
 

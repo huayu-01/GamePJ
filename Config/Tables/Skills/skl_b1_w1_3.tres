@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://bcspawjdjrio"]
 
 [ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_shock.svg" id="e_hud_icon"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_TriggerAbilityId"]
@@ -29,6 +30,9 @@ Note = "额外那一圈的击退"
 
 [resource]
 script = ExtResource("1_row")
+HudIcon = ExtResource("e_hud_icon")
+HudColor = Color(0.64, 0.74, 0.88, 1)
+HudOrder = 110
 NodeName = "AbilityPassive2"
 ClassHint = "LandingBurstAbility"
 Cooldown = 5.0

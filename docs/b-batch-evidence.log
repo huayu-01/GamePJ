@@ -1,0 +1,112 @@
+Debug 编译：0 warning / 0 error
+selftest_final 退出码=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+probe_final 退出码=0
+[BatchB] PASS 技能栏5格 [skl_a1_skill_1,skl_a1_skill_2,skl_a1_w1_1,skl_a1_w1_2,skl_a1_passive] 鼠标穿透=True
+[BatchB] PASS HUD图标读取技能行Texture2D引用
+[BatchB] PASS 按键提示来自InputMap
+[BatchB] PASS 视口截图 b_hud_ready.png
+[BatchB] PASS 真实Q后冷却扇形比例=0.977 CD=9.77
+[BatchB] PASS 视口截图 b_hud_cooldown.png
+[BatchB] PASS 冷却扇形随真实时间递减
+[BatchB] PASS 真实冷却推进至半程，扇形面积与剩余时间一致
+[BatchB] PASS 视口截图 b_hud_mid_cooldown.png
+[BatchB] PASS 真实右键蓄力与技能栏进度一致
+[BatchB] PASS 视口截图 b_hud_charging.png
+[BatchB] PASS GM节点已启用，无常驻InputMap绑定
+[BatchB] PASS 真实G打开GM、暂停并聚焦输入框
+[BatchB] PASS GUI命令 resource 17 → 碎片 +17 → 37（已保存）。
+[BatchB] PASS 真实资源命令：碎片20→37（脚本结束精确恢复原存档）
+[BatchB] PASS 资源命令真实落盘
+[BatchB] PASS GUI命令 list skills → skl_a1_w1_1 · 波波 · 左键 · CD 0.5 · 1/1
+[BatchB] PASS 技能目录来自当前启用技能
+[BatchB] PASS GUI命令 list upgrades → mut_chain · 连锁闪电 · Mutation
+[BatchB] PASS 增幅目录来自当前表
+[BatchB] PASS GUI命令 give upg_power → 已发放 upg_power，当前 1 层（GM直接发放）。
+[BatchB] PASS 指定增幅进入真实RunBuild
+[BatchB] PASS GUI命令 cdr 0.5 → 基础CD倍率=0.5，增幅修正保留；下次技能收尾时生效。
+[BatchB] PASS GM的CD倍率进入原有计算管线
+[BatchB] PASS GUI命令 charges skl_a1_skill_1 3 → skl_a1_skill_1 最大层数=3，已补满。
+[BatchB] PASS 一次Esc关闭GM并恢复游戏，不打开设置页
+[BatchB] PASS 层数命令补满3层
+[BatchB] PASS 真实Q消耗一层，技能栏显示2/3及回层弧
+[BatchB] PASS 视口截图 b_hud_charges.png
+[BatchB] PASS GUI命令 refill skl_a1_skill_1 → 已补满/清除冷却：1 个启用技能。
+[BatchB] PASS 补满命令清CD并恢复层数
+[BatchB] PASS GUI命令 invincible on → GM无敌：开启。移除控制台会清理GM持有的无敌。
+[BatchB] PASS GM无敌确实阻止伤害
+[BatchB] PASS GUI命令 invincible off → GM无敌：关闭。移除控制台会清理GM持有的无敌。
+[BatchB] PASS 关闭无敌还原原状态
+[BatchB] PASS GUI命令 heal → 生命、护甲、护盾已按当前属性补满。
+[BatchB] PASS 恢复状态命令回满生命与护甲
+[BatchB] PASS GUI命令 spawn enemy_chaser 2 → 已召唤 基础近战 ×2（基表数值，未计入挑战波次）。
+[BatchB] PASS 召唤命令真实增加两个敌人
+[BatchB] PASS GUI命令 list enemies chaser → enemy_chaser · 基础近战 · 生命60
+[BatchB] PASS 敌人目录可按ID或名称过滤
+[BatchB] PASS GUI命令 resource -1 → 未执行：参数1须为 1～1000000 的整数。
+[BatchB] PASS GUI命令 resource 3 extra → 未执行：用法：resource 数量
+[BatchB] PASS GUI命令 give __missing__ → 未执行：增幅不存在或当前不在局内；list upgrades 可查ID。
+[BatchB] PASS GUI命令 cdr NaN → 未执行：用法：cdr 倍率，范围0.01～10。
+[BatchB] PASS GUI命令 charges __missing__ 3 → 未执行：当前装备没有启用技能 __missing__；输入 list skills 查询。
+[BatchB] PASS GUI命令 spawn __missing__ → 未执行：敌人ID不存在；list enemies可查询。
+[BatchB] PASS GUI命令 spawn enemy_chaser 0 → 未执行：参数2须为 1～20 的整数。
+[BatchB] PASS GUI命令 __unknown__ → 未执行：未知命令 __unknown__。输入 help 查看命令。
+[BatchB] PASS 错误命令不改变资源与技能层数
+[BatchB] PASS Tab通过真实GUI输入补全命令
+[BatchB] PASS ↑通过真实GUI输入读取历史
+[BatchB] PASS GUI命令 help → list skills/upgrades/enemies/interactions [搜索词]
+[BatchB] PASS 视口截图 b_gm_console.png
+[BatchB] PASS GUI命令 invincible on → GM无敌：开启。移除控制台会清理GM持有的无敌。
+[BatchB] PASS 开着GM直接拔除：出栈、恢复暂停和GM持有的无敌
+[BatchB] PASS 拔除节点后G键毫无反应
+[BatchB] PASS 重新挂载预制体即恢复G快捷键
+[BatchB] PASS 换装3/3：技能栏5格 [skl_a1_skill_1,skl_a1_skill_2,skl_a1_w1_1,skl_a1_w1_2,skl_a1_passive] 鼠标穿透=True
+[BatchB] PASS 换装3/4：技能栏5格 [skl_a1_skill_1,skl_a1_skill_2,skl_a2_w1_1,skl_a2_w1_2,skl_a1_passive] 鼠标穿透=True
+[BatchB] PASS 换装3/5：技能栏5格 [skl_a1_skill_1,skl_a1_skill_2,skl_a3_w1_1,skl_a3_w1_2,skl_a1_passive] 鼠标穿透=True
+[BatchB] PASS 换装4/6：技能栏6格 [skl_b_skill_1,skl_b_skill_2,skl_b1_w1_1,skl_b1_w1_2,skl_b_fall,skl_b1_w1_3] 鼠标穿透=True
+[BatchB] PASS 换装4/7：技能栏6格 [skl_b_skill_1,skl_b_skill_2,skl_b2_w1_1,skl_b2_w1_2,skl_b_fall,skl_b1_w1_3] 鼠标穿透=True
+[BatchB] PASS 换装4/8：技能栏6格 [skl_b_skill_1,skl_b_skill_2,skl_b3_w1_1,skl_b3_w1_2,skl_b_fall,skl_b1_w1_3] 鼠标穿透=True
+[BatchB] PASS 视口截图 b_hud_weapon_master.png
+[BatchB] PASS 400×300可用区域内自动换行，技能格无越界
+[BatchB] PASS GUI命令 list interactions → 0 · Door · Boss 之门（放弃剩余节点直接挑战）
+[BatchB] PASS 交互列表提供真实可用节点及序号
+[BatchB] PASS 存在可测试的真实奖励节点
+[BatchB] PASS GUI命令 interact 1 → 已传送并交互：NodeEnhance。
+[BatchB] 交互取证：NodeEnhance 就绪=False 范围=False 距离=1.6 关卡=pending=True running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=0 freeQuota=1 free=True node=- boss=False pressure=0 pmods=0 bank=0 victory=False all=11
+[BatchB] PASS 调用真实奖励节点链路产生节点/界面/挑战结果
+[BatchB] PASS GUI命令 base → 返回基地。
+[BatchB] PASS base命令真实切换基地场景
+[BatchB] PASS 从奖励模态返回基地后没有旧界面引用与残留暂停
+[BatchB] PASS 同一GM预制体可直接挂进基地使用
+[BatchB] PASS GUI命令 run chr_hunter wpn_bow → 按所选角色/武器进入关卡。
+[BatchB] PASS run命令真实出征为猎手+弓
+[BatchB] PASS GUI命令 list skills → skl_a3_w1_1 · 箭在弦上 · 左键 · CD 0.3 · 1/1
+[BatchB] PASS 视口截图 b_gm_after_travel.png
+[BatchB] PASS 设置页暂停期间仍能G打开GM，形成两层界面栈
+[BatchB] PASS 拔除GM保留原设置页及其暂停状态
+[BatchB] PASS Enabled=false预制体自行移除，G不响应且不遗留暂停
+[BatchB] === B 批验收结束：通过 82，失败 0 ===
+a_regression 退出码=0
+A批回归：23 PASS / 0 FAIL
+e_regression 退出码=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+ExportRelease 编译：0 warning / 0 error
+存档恢复 meta.cfg=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档恢复 ability_cards.cfg=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档恢复 settings.cfg=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+截图 b_hud_ready.png SHA256=78F10608CFE3A9679BCFF5D1BFE1DDDB756691AFDE4BB9ED99153163BEA14EB6
+截图 b_hud_cooldown.png SHA256=ADE446EB8BD85E59658E4EF9257598D58897CF96F8F0FF424B2D83A4343EC25A
+截图 b_hud_mid_cooldown.png SHA256=F920A168A89ADF160DDF45576485C63920EE8EFA57FC056C79F3DCC761CDC11F
+截图 b_hud_charging.png SHA256=C087F5A2AAABE6BFB8E43B8183C6E5857BFC585F6DE838789EC3329A3124E6F5
+截图 b_hud_charges.png SHA256=CCA84E5905C9067C1258A974A8B7795FD69ACC19C470BCB2FD47974C93E557E9
+截图 b_gm_console.png SHA256=5E4402C863EA589B2540B898AC1A42E41272F22F29F290CB9B9606D5487FCA95
+截图 b_hud_weapon_master.png SHA256=31B3AB63DB14E07DE2A6A3BB295B0047BE59077398A35A20D26BF4C392E45C17
+截图 b_gm_after_travel.png SHA256=6253C9B1E7B2413860F2A221A8C49E0347275E63CB53DCEAA5D24811590EA651
+selftest.flag 不存在=True
