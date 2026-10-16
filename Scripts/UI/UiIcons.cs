@@ -68,6 +68,7 @@ public static class UiIcons
 		// 控制分类的 id 是 "input"（= settings.cfg 的节名，与 project.godot 的 [input] 同名）。
 		"input" or "controls" => Named("ic_ui_set_controls"),
 		"audio" => Named("ic_ui_set_audio"),
+		"help" => Named("ic_ui_set_help"),
 		_ => Holdings,
 	};
 

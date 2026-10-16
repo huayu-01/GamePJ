@@ -10,6 +10,7 @@ obj/
 
 # --- 工具与本地残留 ---
 .gdmcp/
+.codegraph/
 NVIDIA Corporation/
 %SystemDrive%/
 

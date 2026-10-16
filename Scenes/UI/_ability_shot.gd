@@ -18,7 +18,7 @@ const SHOT_DIR := "res://docs/screenshots/"
 const SCREEN_SCENE := "res://Scenes/UI/AbilityMatrixScreen.tscn"
 
 ## 示例状态里"未解锁"的那一格（用来拍长按解锁）；与 AbilityMatrixScreen.DebugShowSampleStates 的顺序一致。
-const LOCKED_INDEX := 6
+const LOCKED_INDEX := 3
 
 var _screen: Node = null
 var _tile: Object = null
@@ -88,16 +88,16 @@ func _run() -> void:
 	print("[AbilityShot] 满屏矩阵算式：", _screen.call("DebugSlotPlan"))
 	await _shot("ability_01_matrix_states.png")
 
-	# ── 占位卡（用户 A5）：不可解锁 / 激活 / 升级，但**点它照常有反馈**（震动 + 失败音效）──
-	print("[AbilityShot] ", _screen.call("DebugRunPlaceholderFeedback"))
-	var placeholder: Object = _screen.call("PlaceholderAt", 0)
-	if placeholder != null:
-		placeholder.call("DebugRunAction", 0)          # 再点一次，抓"正在震动"的那一帧
-		await _frames(3)
-		await _shot("ability_08_placeholder_feedback.png")
-		print("[AbilityShot] 占位卡点一下之后：", placeholder.call("DebugState"))
-	else:
-		print("[AbilityShot] 拿不到占位卡（期望 ≥ 1：默认 6×3 = 18 格 / 8 张卡）")
+	# 空位留白，卡多了翻页；沙箱样本不改变正式卡表。
+	_screen.call("DebugSetCardCount", 19)
+	await _frames(4)
+	print("[AbilityShot] 19 张首屏：", _screen.call("DebugMatrixReport"))
+	_screen.call("ChangePage", 1)
+	await _frames(4)
+	print("[AbilityShot] 19 张末页：", _screen.call("DebugMatrixReport"))
+	_screen.call("DebugEndSandbox")
+	_screen.call("DebugBeginSandbox")
+	_screen.call("DebugShowSampleStates")
 
 	# ── 交互①②：左键长按读条 → 解锁（拍一张读条中的，再拍一张解锁后的）──
 	_tile = _screen.call("TileAt", LOCKED_INDEX)

@@ -42,6 +42,7 @@ public static class SettingsSections
 		Register(() => new GraphicsSettingsSection());
 		Register(() => new ControlsSettingsSection());
 		Register(() => new AudioSettingsSection());
+		Register(() => new HelpSettingsSection());
 	}
 
 	/// <summary>注册一个分类（重复注册同一个 id 会覆盖旧的，避免热重载时冒出两页）。</summary>
@@ -304,6 +305,7 @@ public sealed class ControlsSettingsSection : ISettingsSection
 		("move_left", "左移", Key.A),
 		("move_right", "右移", Key.D),
 		("jump", "跳跃", Key.Space),
+		("sprint", "奔跑", Key.Shift),
 		// ⚠️ P6a：`dash`（战术滑铲 Q）/ `burst`（火力倾泻 E）/ `control`（操控召唤物 V）/ `summon`（召唤 G）
 		// 四条旧角色的按键动作已随旧角色从 `project.godot` 的 [input] 里删除 —— 列在这里会让
 		// "重绑"那一行去读一个不存在的动作（`CurrentKeys` 会显示"InputMap 里没有这个动作"）。

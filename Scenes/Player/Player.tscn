@@ -33,6 +33,7 @@
 [ext_resource type="Script" path="res://Scripts/Combat/LandingShockwave.cs" id="38_shockwave"]
 [ext_resource type="Script" path="res://Scripts/Combat/SprintController.cs" id="39_sprint"]
 [ext_resource type="Script" path="res://Scripts/Combat/ChargeBodyFx.cs" id="40_charge_body"]
+[ext_resource type="Script" path="res://Scripts/Combat/DiveWindFx.cs" id="41_dive_wind"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -171,6 +172,9 @@ shape = SubResource("SphereShape3D_landing")
 
 [node name="Shockwave" type="Node3D" parent="AbilityFallAttack"]
 script = ExtResource("38_shockwave")
+
+[node name="DiveWind" type="Node3D" parent="AbilityFallAttack"]
+script = ExtResource("41_dive_wind")
 
 [node name="AbilityWeapon4Skill1" type="Node3D" parent="."]
 script = ExtResource("26_melee_combo")

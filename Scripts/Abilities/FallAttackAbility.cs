@@ -92,6 +92,9 @@ public partial class FallAttackAbility : Ability
 	/// <summary>落地了（自测取证）。</summary>
 	public bool HasLanded { get; private set; }
 
+	/// <summary>只读的下落阶段，供风效读取；不含落地后的收招。</summary>
+	public bool IsDiving => _diving;
+
 	/// <summary>**落地事件**：「落剑式」的额外范围攻击挂它。</summary>
 	public event Action? Landed;
 

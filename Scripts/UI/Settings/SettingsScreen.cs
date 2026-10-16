@@ -19,8 +19,9 @@ namespace ActRoguelike.UI;
 /// </summary>
 public partial class SettingsScreen : OverlayScreen
 {
-	/// <summary>开关快捷键（与 HelpScreen 的 H、BossPreviewScreen 的 B 同一套写法）。</summary>
+	/// <summary>设置快捷键；Esc 的路由入口也打开本页。</summary>
 	[Export] public Key ToggleKey { get; set; } = Key.O;
+	[Export] public Key HelpKey { get; set; } = Key.H;
 
 	protected override Control Root => _root;
 
@@ -33,6 +34,7 @@ public partial class SettingsScreen : OverlayScreen
 	private readonly List<Button> _tabButtons = new();
 	private int _active = -1;
 	private bool _keyHeld;
+	private bool _helpHeld;
 
 	/// <summary>正在等待按键的动作（重绑中）；null = 不在重绑。</summary>
 	private string? _awaitAction;
@@ -72,6 +74,10 @@ public partial class SettingsScreen : OverlayScreen
 		_page = GetNode<VBoxContainer>("Root/Panel/VBox/Body/PageScroll/Page");
 
 		BuildSections();
+		if (UiRouter.Instance != null)
+		{
+			UiRouter.Instance.OpenMenu = Open;
+		}
 
 		// 画质 / glow 是**场景里的东西**（WorldEnvironment），只能在进场景后套用；
 		// 设置界面在每个场景里都有一份，所以放这里最省事、也最不容易漏（切场景自动跟上）。
@@ -93,6 +99,39 @@ public partial class SettingsScreen : OverlayScreen
 		}
 
 		_keyHeld = held;
+		bool help = Input.IsPhysicalKeyPressed(HelpKey);
+		if (help && !_helpHeld)
+		{
+			if (IsOpen && _active >= 0 && _sections[_active].Id == "help")
+			{
+				Close();
+			}
+			else
+			{
+				OpenHelp();
+			}
+		}
+		_helpHeld = help;
+	}
+
+	public override void _ExitTree()
+	{
+		// 菜单回调属于当前场景，切场景时不可保留已销毁的界面。
+		if (UiRouter.Instance is { } router && router.OpenMenu == Open)
+		{
+			router.OpenMenu = null;
+		}
+	}
+
+	/// <summary>旧帮助入口兼容到设置的帮助分页，不再叠一个独立弹层。</summary>
+	public void OpenHelp()
+	{
+		Open();
+		int helpIndex = _sections.FindIndex(section => section.Id == "help");
+		if (helpIndex >= 0)
+		{
+			ShowSection(helpIndex);
+		}
 	}
 
 	private void Toggle()
@@ -194,6 +233,7 @@ public partial class SettingsScreen : OverlayScreen
 
 		ISettingsSection section = _sections[index];
 		_title.Text = $"设置 · {section.Title}";
+		((ScrollContainer)_page.GetParent()).ScrollVertical = 0;
 		section.Build(_page, this);
 	}
 

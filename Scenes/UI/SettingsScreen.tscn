@@ -76,6 +76,6 @@ theme_override_constants/separation = 8
 
 [node name="Hint" type="Label" parent="Root/Panel/VBox"]
 theme_type_variation = &"UiCaption"
-text = "分类与总线都从注册表读：分类在 SettingsSections，音量直接读 AudioServer —— 加一个不用改界面。改动立刻生效并保存到 user://settings.cfg（项目文件不动）。"
+text = "设置会自动保存。操作说明与探索流程请查看「帮助」分页。"
 horizontal_alignment = 1
 autowrap_mode = 2

@@ -20,8 +20,8 @@
 | glow 开了吗？ | 开了：`Scenes/Levels/TestArena.tscn` 的 `WorldEnvironment` → **`glow_enabled = true`、`glow_hdr_threshold = 2.0`、`glow_intensity = 0.5`、`glow_blend_mode = 1`（Screen）、只开 4/5/6 三档半径**。为什么阈值这么高见 §7。 |
 | 改了几个界面？ | **外观全部 9 个（主题级）+ 2 个新界面**（`SettingsScreen` 全屏设置菜单、`BuildScreen` 角色持有面板）。**7 个旧界面已全部改成"全屏类界面"**（面板铺满、内容居中），见 §11。 |
 | 按键提示栏在哪？ | **在 UI 基类里**：`OverlayScreen.SetKeyHints(...)`，屏幕底部一栏「键 + 说明」。**结构永远存在**（`Root/KeyHintBar`），界面可以不填、不显示。**第三批写能力矩阵界面时照 §10 抄。** |
-| 能力矩阵（局外卡牌）长什么样？ | `Scenes/UI/AbilityMatrixScreen.tscn`（快捷键 **K**，**满屏 6×3 = 18 格**矩阵，格子尺寸随容器自适应、**不翻页**）。元素是**基类组件** `AbilityCardTile.tscn`：三状态（变暗/恢复颜色/边框外光圈）+ 六档等级色的边框 + 四种交互（左键长按解锁 / 左键激活 / 右键升级 / 右键长按重置）；**空位由"占位卡"填满**（卡表里没有对应行 → 永不解锁，但点它照常震动 + 失败音效）。见 **§15**。 |
-| 设置菜单？ | `SettingsScreen`（快捷键 **O** / 基地界面的「设置」按钮）：画面 / 控制 / 音量，**分类来自注册表**（加一页 = 注册一行），存 `user://settings.cfg`。见 §12。 |
+| 能力矩阵（局外卡牌）长什么样？ | `AbilityMatrixScreen.tscn`，**K** 打开。每页最多 **6×3**、只铺真实卡、空位留白；按钮或 **PgUp / PgDn** 翻页。卡面比例 0.625、间隔 28px、左侧额度条 64px 自下向上。三状态与四种交互继续由 `AbilityCardTile` 负责。当前实拍见 [A 批验收](a-batch-verification.md)。 |
+| 设置菜单？ | **Esc / O** 打开 `SettingsScreen`；画面 / 控制 / 音量 / **帮助** 四页，分类来自注册表。**H** 直达帮助分页，`UiService.OpenHelp()` 兼容到这里。见 §12。 |
 | 图标？ | `Assets/UI/Icons/ic_ui_*.svg`（13 张，**项目自制 SVG**，Godot 原生导入）+ `Scripts/UI/UiIcons.cs`（**唯一映射表**）。构筑元素 / 奖励卡片 / 设置分类 Tab 都用图标；说明只在**选取界面**与**鼠标悬停**（`tooltip_text`）。见 §13。 |
 | 场景里的节点还写名字吗？ | **不写了**：`RewardNode.tscn` 的 `Label3D` 名牌已删，基类 `Interactable` 还会无条件把任何 `Label3D` 子孙藏掉。见 §13。 |
 | 想一次看全部证据？ | [art-integration-log.md](art-integration-log.md) 的 **第五轮** 一节：逐项改动 + 全部截图 + 自测输出。**本轮（第六轮）的证据在 §10~§13 各自的表里**（截图 `ui_10` ~ `ui_17`、探针输出、自测硬指标）。 |
@@ -398,7 +398,7 @@ public void Open()
 | `StartScreen` | `1 / 2 / 3` 选择武器 ｜ `Enter` 默认手枪 ｜ `悬停` 看武器数值 |
 | `RewardScreen` | `1 / 2 / 3` 选择奖励 ｜ `悬停` 看说明（结算提示时是 `Enter` 确定） |
 | `ChooseScreen` | `1 ~ 4` 选择（允许放弃时多一条 `Escape` 放弃） |
-| `HelpScreen` | `H` 关闭 ｜ `Escape` 关闭 ｜ `B` 首领状况 ｜ `C` 角色持有 ｜ `O` 设置 |
+| 帮助分页 | `H` 直达设置的帮助分页或关闭本页 ｜ `Escape` 关闭设置 ｜ `Q / E` 切换分类 |
 | `BossPreviewScreen` | `B` 关闭 ｜ `Escape` 关闭 |
 | `SettingsScreen` | `O` 关闭 ｜ `Escape` 关闭 ｜ `Q` 上一类 ｜ `E` 下一类 |
 | `BuildScreen` | `C` 关闭 ｜ `Escape` 关闭 ｜ `悬停` 看说明 |
@@ -445,7 +445,7 @@ public void Open()
 | 项 | 做法 |
 |---|---|
 | 界面 | `Scenes/UI/SettingsScreen.tscn` + `Scripts/UI/Settings/SettingsScreen.cs`（继承 `OverlayScreen`，`UiLayer.Panel`） |
-| 打开 | 快捷键 **O**（`ToggleKey`，`_Process` 里做边沿检测）｜ 基地界面的「设置」按钮 ｜ `UiService.Instance.OpenSettings()` |
+| 打开 | **Esc / O** ｜ `UiService.Instance.OpenSettings()`；H / `OpenHelp()` 直达帮助分页。无界面时 Esc 的 `OpenMenu` 回调由设置页注册，退树时成对清理。 |
 | 结构 | 面板铺满 → 左 `Tabs`（分类） + 右 `PageScroll/Page`（内容，**带滚动**：控制页 13 行在 1080p 下正好装不下） |
 | 分类 | **注册表驱动**，见下 |
 | 存哪 | `user://settings.cfg`（`ConfigFile`，**玩家机器上的东西不进仓库**）；启动时由 `UiRouter._Ready → SettingsStore.ApplyOnStartup()` 套用音量 / 窗口 / 按键重绑；**画质与 glow 由 `SettingsScreen._Ready → ApplySceneQuality()` 每次进场景套一次**（glow 在 `WorldEnvironment` 上，autoload 阶段还没有场景） |
@@ -625,6 +625,10 @@ SetKeyHints(
 两个都是**留在仓库里**的工具，"以后改能力矩阵再跑一次"即可。
 
 ### 15.6 占位卡与自适应（用户 A5）
+
+> **历史规格，已由第二轮 A 批取代**：当前空位不生成节点、每页上限 6×3 并支持翻页。
+> `PlaceholderAt` / `PlaceholderCount` / `DebugRunPlaceholderFeedback` 已删除，旧拍摄台也已改用分页测试。
+> `AbilityCardTile` 的空行防御仍保留，正常矩阵不会绑定空行。
 
 用户原话：「直接做**满屏矩阵不翻页**，**空的位置也有卡牌占着**，但是会**因为没有设定解锁条件而处于一直无法解锁**，
 **自适应大小**，保证后续**永远是填满的矩阵**」。

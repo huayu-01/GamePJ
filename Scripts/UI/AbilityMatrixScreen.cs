@@ -8,22 +8,16 @@ using Godot;
 namespace ActRoguelike.UI;
 
 /// <summary>
-/// **能力矩阵界面**（需求 §二）：全屏铺开一整个矩阵，一格 = 一张能力卡。
+/// 能力卡画布：只铺真实卡，左到右换行，每页最多六列三行。
 ///
 /// <list type="bullet">
-/// <item><b>为什么是全屏矩阵</b>：需求原话"像卡牌一样展开矩阵排序，比如 5×5 / 6×6 / 3×6 / 6×4 这样的全屏矩阵，
-///   这样每个元素视觉上都比较大"。所以这里不写死行列：<see cref="Columns"/> / <see cref="Rows"/> 是导出属性，
-///   默认 <b>6 × 3 = 18 格</b>。矩阵铺满可用区域，格子尺寸由 <c>GridContainer</c> 随屏幕/容器大小分配
-///   （每一格都是 Expand，见 <c>AbilityCardTile.tscn</c>）—— 也就是"自适应大小"。</item>
-/// <item><b>空位也有卡</b>（用户 A5 拍板："直接做满屏矩阵不翻页，空的位置也有卡牌占着，但是会因为没有设定解锁条件而处于一直无法解锁"）：
-///   不足的格子放的是 <b>占位卡</b>（<see cref="AbilityCardTile.IsPlaceholder"/>，卡表里没有对应行）
-///   —— 它**永远无法解锁 / 激活 / 升级**，但点它 / 长按它的**读条、震动、失败音效照旧**。
-///   行数 = <c>max(Rows, ceil(卡数 / Columns))</c>，格数 = 列 × 行 → **永远是一个填满的矩形、不翻页**。</item>
+/// <item>卡面宽高比固定，宽度由横向空间与三行高度共同决定；卡少时保持尺寸，不拉伸铺满。</item>
+/// <item>新需求取代旧占位卡：空位留白，超过当前页面容量就翻页，窗口缩小时列数可减少。</item>
 /// <item><b>元素是基类组件</b>：每一格都是 <see cref="AbilityCardTile"/>（三状态 + 四种交互 + 读条 + 震动 + 音效），
 ///   本界面只做三件事：建格子、<b>判定规则</b>（<see cref="IAbilityCardHost"/>）、以及额度栏 / 图例 / 文案。
 ///   换一个界面（比如以后要塞进基地界面）只要复用那个 .tscn + 实现一个宿主，交互一行都不用重写。</item>
 /// <item><b>数据从哪来</b>：`ConfigIndex.tres → AbilityCards` 数组（顺序就是矩阵顺序），
-///   **加一张卡 = 加一行 .tres + 加进那个数组**，本文件一个字都不用改（占位卡会自动少一张）。</item>
+///   加一张卡 = 加一行 .tres + 挂进索引三处；页面数量自动增加。</item>
 /// </list>
 ///
 /// 状态存盘与额度记账都在 <see cref="AbilityStore"/>；激活的效果在 <c>RunController.ApplyBalance</c> 里
@@ -41,12 +35,16 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 	[Export] public Key QuotaKey { get; set; } = Key.M;
 
 	/// <summary>矩阵列数（默认 6 —— 需求点名过的 3×6 的横向版本，矩阵铺满时每格够大）。</summary>
-	[Export(PropertyHint.Range, "2,10,1")] public int Columns { get; set; } = 6;
+	[Export(PropertyHint.Range, "1,6,1")] public int Columns { get; set; } = 6;
 
-	/// <summary>矩阵**最少**行数（默认 3 → 一共 18 格）。卡数超过列 × 行时行数会自己长（"永远是填满的矩阵、不翻页"）。</summary>
-	[Export(PropertyHint.Range, "1,8,1")] public int Rows { get; set; } = 3;
+	/// <summary>每页行数上限；超出容量的卡进入下一页。</summary>
+	[Export(PropertyHint.Range, "1,3,1")] public int Rows { get; set; } = 3;
+	[Export] public float CardMinWidth { get; set; } = 128f;
+	[Export] public float CardMaxWidth { get; set; } = 200f;
+	[Export] public float CardSeparation { get; set; } = 28f;
+	[Export] public float CardAspect { get; set; } = 0.625f;
 
-	// ── 右侧额度进度条的配色（P6b）──
+	// ── 左侧额度进度条的配色 ──
 	// 用户反馈：深色主题下**看不出已占用部分**（默认 ProgressBar 的填充与暗底几乎同色）。
 	// 两个 StyleBox 在场景里（`theme_override_styles/fill` 与 `/background`），填充底色写 **白**，
 	// 实际颜色由下面三个值在运行期写进 `StyleBoxFlat.BgColor`：
@@ -73,45 +71,50 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 	private GridContainer _matrix = null!;
 	private HBoxContainer _legend = null!;
 	private Label _footer = null!;
+	private Button _previous = null!;
+	private Button _next = null!;
+	private Label _pageLabel = null!;
 
-	// 右侧额度区（用户要求：右半屏显示额度占用 + 竖起进度条 + 资源）
+	// 左侧窄额度条；资源和扩增操作统一留在顶栏。
 	private ProgressBar? _quotaBar;
 	private Label? _quotaText;
-	private Label? _shardsText;
 
 	private readonly List<AbilityCardTile> _tiles = new();
-
-	/// <summary>占位卡（真卡之后的所有格子）。与 <see cref="_tiles"/> 一起构成整屏矩阵，顺序 = 屏幕顺序。</summary>
-	private readonly List<AbilityCardTile> _placeholders = new();
 
 	private PackedScene? _tileScene;
 	private bool _toggleHeld;
 	private bool _quotaHeld;
 	private int _builtCardCount = -1;
 	private int _builtRows = -1;
+	private int _builtPage = -1;
+	private int _builtColumns = -1;
+	private int _pageIndex;
+	private int _pageRowLimit = 3;
+	private float _cardWidth = 144f;
+	private readonly List<AbilityCardConfig> _debugCards = new();
+	private bool _debugCardList;
 	private int _rows = 3;
 	private bool _debugSample;
 
-	/// <summary>矩阵里一共几格（真卡 + 占位卡）。</summary>
+	/// <summary>本页实际生成的卡牌节点数，不含任何空位。</summary>
 	public int SlotCount => _matrix.GetChildCount();
 
 	/// <summary>其中真正的卡有几格。</summary>
 	public int TileCount => _tiles.Count;
 
-	/// <summary>占位卡有几格（永不解锁，但交互反馈照旧）。</summary>
-	public int PlaceholderCount => _placeholders.Count;
+	public int PageIndex => _pageIndex;
+	public int PageCapacity => Mathf.Clamp(Columns, 1, 6) * _pageRowLimit;
+	public int PageCount => PagesFor(CardRowCount, PageCapacity);
 
-	/// <summary>矩阵现在实际几行（= <c>max(Rows, ceil(卡数 / Columns))</c>）。</summary>
+	/// <summary>本页实际行数，空页为零。</summary>
 	public int RowCount => _rows;
 
 	/// <summary>按顺序取第 <paramref name="index"/> 个元素（自检 / 探针用）。</summary>
 	public AbilityCardTile? TileAt(int index) => index >= 0 && index < _tiles.Count ? _tiles[index] : null;
 
-	/// <summary>按顺序取第 <paramref name="index"/> 张占位卡（自检 / 探针用）。</summary>
-	public AbilityCardTile? PlaceholderAt(int index) => index >= 0 && index < _placeholders.Count ? _placeholders[index] : null;
-
 	/// <summary>本界面读到的卡表行数（探针用）。</summary>
-	public int CardRowCount => AbilityStore.Rows.Count;
+	public int CardRowCount => CardRows.Count;
+	private IReadOnlyList<AbilityCardConfig> CardRows => _debugCardList ? _debugCards : AbilityStore.Rows;
 
 	public override void _Ready()
 	{
@@ -123,20 +126,24 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		_matrix = GetNode<GridContainer>("Root/Panel/HBox/Matrix");
 		_legend = GetNode<HBoxContainer>("Root/Legend");
 		_footer = GetNode<Label>("Root/Footer");
-		_quotaBar = GetNodeOrNull<ProgressBar>("Root/Panel/HBox/RightPanel/QuotaBar");
-		_quotaText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/QuotaText");
-		_shardsText = GetNodeOrNull<Label>("Root/Panel/HBox/RightPanel/ShardsText");
+		_quotaBar = GetNode<ProgressBar>("Root/Panel/HBox/QuotaRail/QuotaBar");
+		_quotaText = GetNode<Label>("Root/Panel/HBox/QuotaRail/QuotaText");
+		_previous = GetNode<Button>("Root/Pagination/Previous");
+		_next = GetNode<Button>("Root/Pagination/Next");
+		_pageLabel = GetNode<Label>("Root/Pagination/Page");
+		_previous.Pressed += () => ChangePage(-1);
+		_next.Pressed += () => ChangePage(1);
 
 		_matrix.Columns = Columns;
 		// ⚠️ 只在这里订阅一次：`RebuildIfNeeded` 里原来又订阅了一遍 → 每次改尺寸回调会被调两次。
 		// ⚠️ 订阅的是 **Root**（跟着视口走）而不是 Matrix：矩阵自己的尺寸被最小尺寸顶住，
 		// 窗口变窄时它**根本不会发出 `Resized`** → 列数会卡在拉宽后的值（实测：拉宽到 19 列，
 		// 缩回 16:9 之后仍然是 19 列、矩阵区还报着 2342）。Root 是锚满视口的普通 Control，
-		// 视口一变它一定变，这个信号才是可靠的触发源。Matrix 那一路继续留着（右栏内容变化时也要重算）。
+		// 视口一变它一定变，只订阅 Root，避免矩阵重排引起重复重建。
 		_root.Resized += OnMatrixResized;
-		_matrix.Resized += OnMatrixResized;
 		_quotaUpgrade.Pressed += BuyQuota;
 		BuildLegend();
+		CallDeferred(nameof(OnMatrixResized));
 	}
 
 	public override void _Process(double delta)
@@ -189,9 +196,11 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 			KeyHint.Mouse(MouseButton.Right, "升级 / 长按重置升级"),
 			KeyHint.Of(QuotaKey, "扩增额度"),
 			KeyHint.Text("鼠标悬停", "看效果与价格"),
+			KeyHint.Text("PgUp / PgDn", "翻页"),
 			(Key.Escape, "关闭"));
 
 		BeginOpen();
+		OnMatrixResized();
 		RebuildIfNeeded();
 		RefreshAll();
 	}
@@ -259,30 +268,32 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 
 	// ───────────────────────── 矩阵搭建与刷新 ─────────────────────────
 
-	/// <summary>
-	/// 行数 = <c>max(最少行数, ceil(卡数 / 列数))</c> —— **"永远是填满的矩形、不翻页"** 的那条算式。
-	/// 做成公开静态方法是为了让探针能对任意卡数算一遍（**不动真表**）：加卡时行数自己长，
-	/// 格数 = 列 × 行 ≥ 卡数，所以最后一行不会缺角。
-	/// </summary>
-	/// <summary>
-	/// 按**可用宽度**算列数：卡宽 + 间隔 一组，铺得下几张就是几列。
-	/// 用户要求「不要求固定 n×n，但卡牌比例/大小不变 + 留间隔给光圈」，
-	/// 所以列数跟着容器宽度走，挤不下的卡自然流到下一行。
-	/// </summary>
-	/// <summary>容器尺寸变了就重算列数（卡牌大小与比例不变，挤不下的流到下一行）。</summary>
+	/// <summary>视口变化时重算页容量，保持原先首张可见卡仍在当前页。</summary>
 	private void OnMatrixResized()
 	{
-		int cols = ColumnsFor(AvailableMatrixWidth(), CardMinWidth, CardSeparation);
-		if (cols == _matrix.Columns)
+		if (_matrix == null)
 		{
 			return;
 		}
 
-		Columns = cols;
-		_builtRows = -1; // 强制重建
+		// 从视口推导预算，避免 GridContainer 的最小尺寸反过来顶大窗口。
+		int firstVisible = _pageIndex * PageCapacity;
+		Columns = ColumnsFor(AvailableMatrixWidth(), CardMinWidth, CardSeparation);
+		Rows = Mathf.Clamp(Rows, 1, 3);
+		float width = (AvailableMatrixWidth() - CardSeparation * (Columns - 1)) / Columns;
+		var panel = (Control)_matrix.GetParent().GetParent();
+		float height = _root.Size.Y + panel.OffsetBottom - panel.OffsetTop;
+		_pageRowLimit = Mathf.Clamp(Mathf.FloorToInt((height + CardSeparation) / (CardMinWidth / CardAspect + CardSeparation)), 1, Rows);
+		_pageIndex = firstVisible / PageCapacity;
+		float heightWidth = (height - CardSeparation * (_pageRowLimit - 1)) / _pageRowLimit * CardAspect;
+		_cardWidth = Mathf.Max(CardMinWidth, Mathf.Min(CardMaxWidth, Mathf.Min(width, heightWidth)));
+		_matrix.AddThemeConstantOverride("h_separation", Mathf.RoundToInt(CardSeparation));
+		_matrix.AddThemeConstantOverride("v_separation", Mathf.RoundToInt(CardSeparation));
 		RebuildIfNeeded();
-		// ⚠️ 重建之后必须再刷一次文案：底部那一行写的是「矩阵 列×行 = 格数」，
-		// 它只在 `RefreshAll` 里生成 —— 不刷就会出现"矩阵真的变成 18 列、页脚还写着 10×3"。
+		foreach (Node child in _matrix.GetChildren())
+		{
+			((Control)child).CustomMinimumSize = new Vector2(_cardWidth, _cardWidth / CardAspect);
+		}
 		RefreshAll();
 	}
 
@@ -322,41 +333,69 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		return Mathf.Max(CardMinWidth, panelWidth - others - separation);
 	}
 
-	/// <summary>卡面最小宽 / 间隔（与 .tscn 的 custom_minimum_size 和 h_separation 对齐）。</summary>
-	private const float CardMinWidth = 110f;
-	private const float CardSeparation = 14f;
 	public static int ColumnsFor(float availWidth, float cardWidth, float separation)
 	{
 		float unit = Mathf.Max(1f, cardWidth + separation);
-		return Mathf.Max(2, Mathf.FloorToInt((availWidth + separation) / unit));
+		return Mathf.Clamp(Mathf.FloorToInt((availWidth + separation) / unit), 1, 6);
 	}
 
-	public static int RowsFor(int cardCount, int columns, int minRows)
-		=> Mathf.Max(minRows, Mathf.CeilToInt(cardCount / (float)Mathf.Max(1, columns)));
+	public static int RowsFor(int cardCount, int columns, int maxRows)
+		=> Mathf.Min(Mathf.Clamp(maxRows, 1, 3), Mathf.CeilToInt(cardCount / (float)Mathf.Max(1, columns)));
+
+	public static int PagesFor(int cardCount, int capacity)
+		=> Mathf.Max(1, Mathf.CeilToInt(cardCount / (float)Mathf.Max(1, capacity)));
+
+	/// <summary>按钮与键盘共用同一翻页入口；首尾夹紧，卡牌状态由 AbilityStore 保留。</summary>
+	public void ChangePage(int direction)
+	{
+		int page = Mathf.Clamp(_pageIndex + direction, 0, PageCount - 1);
+		if (page == _pageIndex)
+		{
+			return;
+		}
+		_pageIndex = page;
+		RebuildIfNeeded();
+		RefreshAll();
+	}
+
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (!IsOpen || InputBlocked || @event is not InputEventKey { Pressed: true, Echo: false } key)
+		{
+			return;
+		}
+		if (key.Keycode is Key.Pageup or Key.Pagedown)
+		{
+			ChangePage(key.Keycode == Key.Pageup ? -1 : 1);
+			GetViewport().SetInputAsHandled();
+		}
+	}
 
 	/// <summary>
-	/// 建矩阵。**只有卡表行数 / 行数配置变了才重建**（平时只 <see cref="RefreshAll"/> 刷状态），
+	/// 只有卡数、行列或页码变化时重建（平时只 <see cref="RefreshAll"/> 刷状态），
 	/// 所以点卡片不会重建节点、不会打断缓动动画。
 	///
-	/// <para>格数 = <see cref="Columns"/> × 行数，行数 = <see cref="RowsFor"/>（见它的注释）——
-	/// **永远是一个填满的矩形、不翻页**：不足的格子由**占位卡**占住（用户 A5），卡多了就把行数往下长。
-	/// 每一格的尺寸不由这里决定：矩阵铺满可用区域、每格都是 Expand，
-	/// 由 <c>GridContainer</c> 按屏幕/容器的实际大小等比分配 —— 这就是"自适应大小"。</para>
+	/// <para>只遍历当前页真实行；卡与卡保留间距，其余画布留白。</para>
 	/// </summary>
 	private void RebuildIfNeeded()
 	{
-		int cardCount = AbilityStore.Rows.Count;
-		int rows = RowsFor(cardCount, Columns, Rows);
-		if (_builtCardCount == cardCount && _builtRows == rows && _matrix.GetChildCount() > 0)
+		Columns = Mathf.Clamp(Columns, 1, 6);
+		int cardCount = CardRowCount;
+		_pageIndex = Mathf.Clamp(_pageIndex, 0, PageCount - 1);
+		int start = _pageIndex * PageCapacity;
+		int visible = Mathf.Min(PageCapacity, cardCount - start);
+		int rows = RowsFor(visible, Columns, Rows);
+		if (_builtCardCount == cardCount && _builtRows == rows && _builtPage == _pageIndex && _builtColumns == Columns)
 		{
 			return;
 		}
 
 		_builtCardCount = cardCount;
 		_builtRows = rows;
+		_builtPage = _pageIndex;
+		_builtColumns = Columns;
 		_rows = rows;
 		_tiles.Clear();
-		_placeholders.Clear();
 		foreach (Node child in _matrix.GetChildren())
 		{
 			_matrix.RemoveChild(child);
@@ -365,8 +404,7 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 
 		_tileScene ??= GD.Load<PackedScene>("res://Scenes/UI/AbilityCardTile.tscn");
 		_matrix.Columns = Columns;
-		int slots = Columns * rows;
-		for (int i = 0; i < slots; i++)
+		for (int i = 0; i < visible; i++)
 		{
 			if (_tileScene?.Instantiate() is not AbilityCardTile tile)
 			{
@@ -374,27 +412,17 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 				break;
 			}
 
-			if (i < cardCount)
-			{
-				tile.Bind(AbilityStore.Rows[i], this);
-				_tiles.Add(tile);
-			}
-			else
-			{
-				// 空位 = **占位卡**：卡表里没有对应行 → 没有解锁条件 → 永远无法解锁 / 激活 / 升级。
-				// 但它是真的元素（不是空框）：点它 / 长按它照常读条、震动、失败音效。
-				tile.Bind(null, this);
-				_placeholders.Add(tile);
-			}
+			tile.Bind(CardRows[start + i], this);
+			_tiles.Add(tile);
 
 			// 卡牌感的关键：用 AspectRatioContainer 把每格锁成 2.5:4（用户要求 2.5:4 或 3:4），
 			// 这样无论矩阵分到多大，卡面永远是竖长的（不会因为屏幕是 16:9 就变横）。
 			var holder = new AspectRatioContainer
 			{
-				Ratio = 0.625f, // 宽/高 = 2.5/4
-				CustomMinimumSize = new Vector2(CardMinWidth, CardMinWidth / 0.625f),
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				Ratio = CardAspect,
+				CustomMinimumSize = new Vector2(_cardWidth, _cardWidth / CardAspect),
+				SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin,
+				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				MouseFilter = Control.MouseFilterEnum.Ignore,
 			};
 			holder.AddChild(tile);
@@ -411,11 +439,6 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 			tile.RefreshVisual();
 		}
 
-		foreach (AbilityCardTile placeholder in _placeholders)
-		{
-			placeholder.RefreshVisual();
-		}
-
 		int used = AbilityStore.QuotaUsed;
 		int cap = AbilityStore.QuotaCap;
 		_shards.Text = $"碎片：{MetaProgress.Shards}";
@@ -423,7 +446,7 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		_quotaUpgrade.Text = $"扩增额度 +1（费用 {AbilityStore.QuotaUpgradeCost}）";
 		_quotaUpgrade.Disabled = AbilityStore.QuotaRow == null;
 
-		// 右侧竖进度条：填的是"已占用 / 总额度"，一眼看出还剩多少。
+		// 左侧竖进度条：填的是"已占用 / 总额度"。
 		// ⚠️ P6b：填充色**由下面的 <see cref="ApplyQuotaBarColor"/> 决定**（正常 / 快满 / 满三档）。
 		if (_quotaBar != null)
 		{
@@ -433,18 +456,15 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		}
 		if (_quotaText != null)
 		{
-			_quotaText.Text = $"{used} / {cap}　（剩余 {AbilityStore.QuotaLeft}）";
+			_quotaText.Text = $"{used}/{cap}";
 		}
-		if (_shardsText != null)
-		{
-			_shardsText.Text = $"碎片：{MetaProgress.Shards}";
-		}
+		_previous.Disabled = _pageIndex == 0;
+		_next.Disabled = _pageIndex >= PageCount - 1;
+		_pageLabel.Text = $"{_pageIndex + 1:00} / {PageCount:00}";
 
 		_footer.Text =
-			$"三状态：变暗 = 未解锁 ｜ 恢复颜色 = 解锁未激活 ｜ 边框外光圈 = 激活　·　"
-			+ $"解锁 {AbilityStore.UnlockedCount} 张 / 激活 {AbilityStore.ActiveCount} 张 / 共 {_tiles.Count} 张　·　"
-			+ $"矩阵 {Columns}×{_rows} = {SlotCount} 格（占位卡 {_placeholders.Count} 张：没有解锁条件，永远无法解锁）　·　"
-			+ "激活的能力在下局开局生效（额度不够就装不下，必须取舍）";
+			$"解锁 {AbilityStore.UnlockedCount} · 激活 {AbilityStore.ActiveCount} · 共 {CardRowCount} 张　｜　"
+			+ "激活的能力在下局开局生效";
 	}
 
 	/// <summary>
@@ -543,8 +563,7 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 
 	/// <summary>
 	/// 拍摄台用：把整屏摆成"看得出三状态 + 六档等级色"的样子（**只在内存里改，不写存档**）。
-	/// 前 4 张激活（亮光圈：白 1 / 绿 2 / 蓝 3 / 紫 4）、第 5 张红 5 未激活、第 6 张白 1 未激活、
-	/// 第 7 张**未解锁**（变暗的灰 0）、第 8 张绿 2 未激活 —— 一张图里六个等级色 + 三种状态全齐。
+	/// 前三张激活，第四张未解锁；以后追加的卡可展示更多等级色。
 	/// </summary>
 	public void DebugShowSampleStates()
 	{
@@ -559,13 +578,13 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 				0 => 1,
 				1 => 2,
 				2 => 3,
-				3 => 4,
+				3 => 0,
 				4 => 5,
 				5 => 1,
 				6 => 0,
 				_ => 2,
 			};
-			bool active = i < 4;
+			bool active = i < 3;
 			if (active)
 			{
 				used += card.QuotaCost;
@@ -627,12 +646,41 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 	public void DebugBeginSandboxWithSave() => AbilityStore.DebugBeginSandbox(1000, allowSave: true);
 
 	/// <summary>探针用：关沙箱。</summary>
-	public void DebugEndSandbox() => AbilityStore.DebugEndSandbox();
+	public void DebugEndSandbox()
+	{
+		_debugCardList = false;
+		_debugCards.Clear();
+		_debugSample = false;
+		_builtCardCount = -1;
+		AbilityStore.DebugEndSandbox();
+		OnMatrixResized();
+	}
+
+	/// <summary>沙箱内生成分页样本，复制真实行但使用独立 Id；绝不改索引与玩家存档。</summary>
+	public void DebugSetCardCount(int count)
+	{
+		if (!AbilityStore.SandboxActive || AbilityStore.Rows.Count == 0)
+		{
+			return;
+		}
+		_debugCards.Clear();
+		_debugCardList = true;
+		for (int i = 0; i < Mathf.Clamp(count, 0, 100); i++)
+		{
+			var card = (AbilityCardConfig)AbilityStore.Rows[i % AbilityStore.Rows.Count].Duplicate();
+			card.Id = $"debug_page_card_{i:00}";
+			card.DisplayName = $"{card.DisplayName} {i + 1:00}";
+			_debugCards.Add(card);
+		}
+		_pageIndex = 0;
+		_builtCardCount = -1;
+		OnMatrixResized();
+	}
 
 	/// <summary>探针用：一行状态（碎片 / 额度 / 每张卡的等级与激活）。</summary>
 	public string DebugSummary() => AbilityStore.Summary();
 
-	/// <summary>探针用：整屏每个元素的逐格状态（真卡 + 占位卡），以及矩阵/格子的**实际像素尺寸**（自适应）。</summary>
+	/// <summary>探针用：本页卡牌状态、页容量与实际像素尺寸。</summary>
 	public string DebugMatrixReport()
 	{
 		var lines = new List<string>();
@@ -641,25 +689,19 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 			lines.Add(tile.DebugState());
 		}
 
-		string placeholder = _placeholders.Count == 0
-			? "占位卡 0 张（矩阵被真卡填满）"
-			: $"占位卡 {_placeholders.Count} 张（第 1 张：{_placeholders[0].DebugState()}）";
-
 		string size = _tiles.Count > 0
 			? $"视口 {GetViewport().GetVisibleRect().Size.X:0}×{GetViewport().GetVisibleRect().Size.Y:0}"
 				+ $" → 矩阵区 {_matrix.Size.X:0}×{_matrix.Size.Y:0} → 每格 {_tiles[0].Size.X:0}×{_tiles[0].Size.Y:0}px"
-				+ "（自适应：格子尺寸 = 矩阵区 ÷ 行列，跟着容器走，场景里不再写死尺寸）"
+				+ "（宽高比固定，尺寸同时受可用宽高限制）"
 			: $"视口 {GetViewport().GetVisibleRect().Size.X:0}×{GetViewport().GetVisibleRect().Size.Y:0}"
 				+ $" → 矩阵区 {_matrix.Size.X:0}×{_matrix.Size.Y:0}（没有真卡）";
 
-		return $"列 {Columns} × 行 {RowCount} → {SlotCount} 格（真卡 {TileCount} + 占位卡 {PlaceholderCount}）｜{size}"
-			+ $"｜{placeholder}｜" + string.Join(" ｜ ", lines);
+		return $"列 {Columns} × 行 {RowCount} → {SlotCount} 张真卡｜页 {_pageIndex + 1}/{PageCount} 容量 {PageCapacity}｜{size}"
+			+ "｜" + string.Join(" ｜ ", lines);
 	}
 
 	/// <summary>
-	/// 探针用：**"永远是一个填满的矩阵、不翻页"** 的算式自检 —— 对任意卡数算出行数 / 格数，
-	/// 并断言"格数 ≥ 卡数"且"格数 % 列数 == 0"（没有缺角的最后一行，也就不需要翻页）。
-	/// **不动真表**：这里只是纯算式，玩家存档与卡表一个字节都不碰。
+	/// 对边界卡数检查分页容量与六列三行上限，不改卡表或存档。
 	/// </summary>
 	public string DebugSlotPlan()
 	{
@@ -667,47 +709,15 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		bool ok = true;
 		foreach (int count in new[] { 0, 1, 8, 17, 18, 19, 24, 25, 37, 60 })
 		{
-			int rows = RowsFor(count, Columns, Rows);
-			int slots = Columns * rows;
-			bool filled = slots >= count && slots % Columns == 0;
-			ok &= filled;
-			lines.Add($"{count} 张 → {Columns}×{rows} = {slots} 格（占位卡 {slots - count}）{(filled ? "✓" : "✗")}");
+			int pages = PagesFor(count, PageCapacity);
+			int visible = Mathf.Min(count, PageCapacity);
+			int rows = RowsFor(visible, Columns, Rows);
+			bool fits = rows <= 3 && Columns <= 6 && pages * PageCapacity >= count;
+			ok &= fits;
+			lines.Add($"{count} 张 → {pages} 页 / 首屏 {visible} 张 / {rows} 行{(fits ? "✓" : "✗")}");
 		}
 
-		return $"满屏矩阵算式（列 {Columns}、最少行 {Rows}，行数 = max(最少行, ceil(卡数/列))）："
-			+ string.Join(" ｜ ", lines) + $"　→ 全部满足「填满矩形、不翻页」 = {ok}";
-	}
-
-	/// <summary>
-	/// 探针用：**占位卡的交互反馈**（用户 A5：「占位卡不可解锁、不可激活、不可升级 —— 但交互反馈仍然要有」）。
-	/// 四种操作各跑一次，每一次都必须：① 判定 = <see cref="AbilityCardResult.NoCard"/>；
-	/// ② 走失败分支（<c>FailCount</c> +1 = 震动 + 失败音效）；③ 状态一个字节都不变。
-	/// 走的是**同一条** <see cref="AbilityCardTile.RunAction"/>，所以这里证明的就是玩家点它时发生的事。
-	/// </summary>
-	public string DebugRunPlaceholderFeedback()
-	{
-		if (_placeholders.Count == 0)
-		{
-			return "占位卡：0 张（矩阵被真卡填满，没有空位）—— 期望 ≥ 1（默认 6×3 = 18 格 / 8 张卡）";
-		}
-
-		AbilityCardTile tile = _placeholders[0];
-		int failBefore = tile.FailCount;
-		int successBefore = tile.SuccessCount;
-		var lines = new List<string>();
-		foreach (AbilityCardAction action in new[]
-			{
-				AbilityCardAction.Unlock, AbilityCardAction.ToggleActive,
-				AbilityCardAction.Upgrade, AbilityCardAction.ResetUpgrades,
-			})
-		{
-			lines.Add($"{action} → {tile.DebugRunAction(action)}（期望 NoCard）");
-		}
-
-		lines.Add($"反馈：失败（震动 + 失败音效）{tile.FailCount - failBefore} 次 / 成功 {tile.SuccessCount - successBefore} 次（期望 4 / 0）");
-		lines.Add($"失败音效 last={AudioManager.Instance?.DebugLastId} 缺失 id=[{AudioManager.Instance?.DebugMissingIds}]（期望 ui_card_fail）");
-		lines.Add($"状态：{tile.DebugState()}");
-		return "占位卡交互：" + string.Join(" ｜ ", lines);
+		return "分页算式：" + string.Join(" ｜ ", lines) + $"　→ 全部满足「最多六列三行、空位留白」 = {ok}";
 	}
 
 	/// <summary>探针用：额度栏那一行的实际文案（证明界面上的数字来自 AbilityStore）。</summary>
@@ -735,6 +745,7 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 			+ $"黄={QuotaWarnColor.ToHtml(false)}/红={QuotaFullColor.ToHtml(false)}（快满阈值 {QuotaWarnRatio:0.##}）"
 			+ $" ｜ 场景 override: fill={overridden} background={_quotaBar.HasThemeStyleboxOverride("background")}"
 			+ $" ｜ fill.BgColor={(fill != null ? fill.BgColor.ToHtml(false) : "—")} background={bg}"
+			+ $" ｜ 宽 {_quotaBar.Size.X:0}px 填充方向={_quotaBar.FillMode} 左贴卡区={_quotaBar.GlobalPosition.X < _matrix.GlobalPosition.X}"
 			+ $" ｜ 列 {Columns} 行 {RowCount} 矩阵区 {_matrix.Size.X:0}×{_matrix.Size.Y:0}";
 	}
 
@@ -749,10 +760,10 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 		_quotaBar.MaxValue = Mathf.Max(1, cap);
 		_quotaBar.Value = Mathf.Clamp(used, 0, Mathf.Max(1, cap));
 		ApplyQuotaBarColor(used, cap);
-		// 顶栏与右栏两个文本一起改，否则截图里会出现"进度条 5/6、文字 0/6"的错位。
+		// 顶栏与条旁文本同步，避免拍摄时数字错位。
 		if (_quotaText != null)
 		{
-			_quotaText.Text = $"{used} / {cap}　（剩余 {Mathf.Max(0, cap - used)}）";
+			_quotaText.Text = $"{used}/{cap}";
 		}
 
 		if (_quota != null && IsInstanceValid(_quota))

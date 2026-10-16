@@ -4,7 +4,6 @@
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/WorldOverlay.tscn" id="4_overlay"]
-[ext_resource type="PackedScene" path="res://Scenes/UI/HelpScreen.tscn" id="5_help"]
 [ext_resource type="Script" uid="uid://d4auf6aghoerc" path="res://Scripts/Run/StageController.cs" id="6_stage"]
 [ext_resource type="Script" uid="uid://b83orxiwjo5mp" path="res://Scripts/Encounter/EncounterController.cs" id="7_encounter"]
 [ext_resource type="Script" uid="uid://ca3lp2kx1pfwd" path="res://Scripts/Encounter/EnemySpawnEntry.cs" id="8_entry"]
@@ -29,6 +28,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/SettingsScreen.tscn" id="28_settings"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/BuildScreen.tscn" id="29_build"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/DeathScreen.tscn" id="31_death"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/AbilityMatrixScreen.tscn" id="32_matrix"]
 
 [node name="Main" type="Node3D" unique_id=218913370]
 
@@ -44,11 +44,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
 [node name="WorldOverlay" parent="." unique_id=1100632517 instance=ExtResource("4_overlay")]
 
-[node name="HelpScreen" parent="." unique_id=2044361750 instance=ExtResource("5_help")]
-
 [node name="BossPreviewScreen" parent="." instance=ExtResource("27_preview")]
 
 [node name="SettingsScreen" parent="." instance=ExtResource("28_settings")]
+
+[node name="AbilityMatrixScreen" parent="." instance=ExtResource("32_matrix")]
 
 [node name="BuildScreen" parent="." instance=ExtResource("29_build")]
 

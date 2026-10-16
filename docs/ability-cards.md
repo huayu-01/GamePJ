@@ -1,5 +1,12 @@
 # 能力卡（局外装备层）：怎么加一张卡、效果怎么挂、矩阵怎么扩
 
+> **2026-10-16 第二轮 A 批的新契约**：当前 **4 张数值卡**；只生成真实卡、空位留白。
+> 每页最多 **6 列 × 3 行 = 18 张**，超过容量用按钮或 **PgUp / PgDn** 翻页。
+> 窄画布会减少列数，矮画布会减少每页行数，始终不超过 6×3；卡面比例保持 **0.625**。
+> 左侧额度条宽 **64px**，从下至上填充，资源和扩增按钮集中在顶栏。
+> `Base.tscn` 与 `Main.tscn` 均挂此界面。旧 A5 的「占位卡填满、不翻页」需求已被取代，
+> 下文中旧占位卡行为与旧实测图仅供历史查阅。当前证据与复现命令见 [a-batch-verification.md](a-batch-verification.md)。
+
 > ⚠️ **2026-10-15 P6a**：两张 `GrantSkill` 卡 `card_summon` / `card_control` **已删除**
 > （它们指向的 `skl_summon` / `skl_control` 随旧角色一起清掉了 —— 用户 Q10-a 的裁定就是"删"）。
 > 所以**现在 6 张卡全是数值卡**，本文件里提到那两张卡的地方（含"能力卡与技能表唯一的接触点"
@@ -14,7 +21,7 @@
 >
 > 一句话：**能力卡 = 局外的卡牌**（可解锁 → 可用局外碎片多次升级 → 可激活/关闭，
 > **激活时占用"额度点数"**，玩家总额度有限（**上限本身也能用局外资源扩增**），
-> 界面是**满屏矩阵**（默认 6×3 = 18 格，格子尺寸随容器自适应，**卡不够时用占位卡填满、不翻页**）。
+> 界面是**卡牌画布**（每页上限 6×3，卡少留白、超过容量分页，卡面尺寸受可用宽高共同限制）。
 > 状态存 `user://ability_cards.cfg`，激活的效果在**本局开局**由 `RunController.ApplyBalance` 套到玩家身上。
 
 ---
@@ -29,11 +36,11 @@
 | 花什么资源？ | **碎片**（`MetaProgress`）—— 需求里的"局外资源"就是它，本系统**没有另建货币**。 |
 | 额度上限怎么算？ | `ConfigIndex.tres → AbilityQuotaBase`（基础 6）+ 局外成长行 **`Config/Tables/Meta/meta_quota.tres`** 的 `PerLevel` × 扩增等级。 |
 | 界面在哪？ | `Scenes/UI/AbilityMatrixScreen.tscn` + `Scripts/UI/AbilityMatrixScreen.cs`，**挂 `Scenes/Main.tscn`**，快捷键 **K**（`UiService.OpenAbilityMatrix()` 也能开）。 |
-| 空位怎么办？ | **空位也是一张卡**（**占位卡**，用户 A5）：卡表里没有对应行的那一格就是它 —— **没有解锁条件 → 永远无法解锁 / 激活 / 升级**，但点它 / 长按它的**读条、震动、失败音效照旧**（见 §5.6）。矩阵**永远是填满的矩形、不翻页**，格子尺寸随容器自适应。 |
+| 空位怎么办？ | **留白，不生成节点**。本页不足 18 张时不会拉大卡牌填满画布；超过容量自动增加页数。 |
 | 元素（基类）在哪？ | `Scenes/UI/AbilityCardTile.tscn` + `Scripts/UI/AbilityCardTile.cs` —— 三状态 + 四种交互 + 读条 + 震动 + 音效**全在它里面**（占位卡走的是**同一条**代码路径）。 |
 | 激活后真的生效吗？ | 生效。`AbilityEffects.ApplyToPlayer` 在 `RunController.ApplyBalance` 末尾被调 1 行；实测"最大生命 250 → 290"、"`AbilitySummon.Enabled` False → True"。 |
 | 加一张卡要改几个文件？ | **2 个**（加一行 `.tres` + 挂进 `ConfigIndex.tres` 的数组）—— **零 C#**。详见 §8。 |
-| 表读不到会怎样？ | 矩阵全是**占位卡**、本局没有任何卡效果，**玩法其余部分完全不受影响**（与"表读不到就用自身默认值"同一条纪律）。 |
+| 表读不到会怎样？ | 空画布、页码 01/01、两个翻页按钮禁用；本局没有卡效果，其余玩法走原有回退。 |
 
 ---
 
@@ -559,7 +566,7 @@ Remove-Item "$env:APPDATA\Godot\app_userdata\ACT Roguelike\ability_cards.cfg"
 
 **不需要改的**：`AbilityCardTile.cs`、`AbilityMatrixScreen.cs`、`AbilityStore.cs`、`AbilityEffects.cs`、
 任何 `.tscn`、任何别的表。矩阵会自动多一格（**占位卡自动少一张**），图标按 `IconName` 自动找；
-如果加满到超过 `列 × 最少行`，矩阵会**自己多长一行**（永远填满、不翻页）。
+如果超过当前页容量，矩阵会**增加页数**；每页最多三行、每行最多六张。
 
 **加一种新效果**（第三步，才需要 C#）：
 `AbilityCardEffectKind` 加一个 enum 值 → `AbilityEffects.ApplyCore` 加一个 `case` → 加一行卡。

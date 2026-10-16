@@ -2,40 +2,42 @@
 
 [ext_resource type="Script" path="res://Scripts/UI/AbilityMatrixScreen.cs" id="1_matrix"]
 [ext_resource type="Theme" path="res://Assets/UI/Themes/ui_theme.tres" id="2_theme"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Textures/tex_ui_bar_frame.png" id="3_divider"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quota_bg"]
-bg_color = Color(0.09, 0.1, 0.14, 1)
+[sub_resource type="StyleBoxFlat" id="Canvas"]
+bg_color = Color(0.055, 0.075, 0.105, 0.88)
+border_width_top = 1
+border_color = Color(0.27, 0.39, 0.48, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="QuotaBg"]
+bg_color = Color(0.025, 0.04, 0.06, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.26, 0.29, 0.36, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+border_color = Color(0.25, 0.4, 0.48, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quota_fill"]
+[sub_resource type="StyleBoxFlat" id="QuotaFill"]
+resource_local_to_scene = true
 bg_color = Color(1, 1, 1, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_left = 3
+corner_radius_bottom_right = 3
 
 [node name="AbilityMatrixScreen" type="CanvasLayer"]
 layer = 16
 script = ExtResource("1_matrix")
 ScreenLayer = 1
 CloseOnCancel = true
-ToggleKey = 75
-QuotaKey = 77
-Columns = 10
+Columns = 6
 Rows = 3
-QuotaWarnRatio = 0.8
-QuotaOkColor = Color(0.36, 0.72, 0.95, 1)
-QuotaWarnColor = Color(1, 0.78, 0.28, 1)
-QuotaFullColor = Color(1, 0.36, 0.32, 1)
+CardMinWidth = 128.0
+CardMaxWidth = 200.0
+CardSeparation = 28.0
 
 [node name="Root" type="Control" parent="."]
 anchor_right = 1.0
@@ -48,55 +50,32 @@ theme = ExtResource("2_theme")
 [node name="Dim" type="ColorRect" parent="Root"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 mouse_filter = 2
-color = Color(0.04, 0.05, 0.08, 0.94)
-
-[node name="Panel" type="PanelContainer" parent="Root"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 6.0
-offset_right = -10.0
-offset_bottom = -46.0
-grow_horizontal = 2
-grow_vertical = 2
+color = Color(0.018, 0.027, 0.045, 0.96)
 
 [node name="Title" type="Label" parent="Root"]
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 1.0
-anchor_bottom = 0.0
-anchors_preset = 10
-offset_top = 6.0
-offset_bottom = 44.0
-grow_horizontal = 2
-horizontal_alignment = 1
-theme_type_variation = &"UiTitle"
-text = "能力矩阵 · 局外装备"
-horizontal_alignment = 1
+offset_left = 48.0
+offset_top = 28.0
+offset_right = 650.0
+offset_bottom = 80.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.88, 0.94, 0.98, 1)
+theme_override_font_sizes/font_size = 34
+text = "能力矩阵"
 
 [node name="Header" type="HBoxContainer" parent="Root"]
-anchor_left = 0.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.0
-offset_left = 16.0
-offset_top = 46.0
-offset_right = -16.0
-offset_bottom = 88.0
-anchors_preset = 10
-grow_horizontal = 2
-theme_override_constants/separation = 24
+offset_left = 48.0
+offset_top = 90.0
+offset_right = -48.0
+offset_bottom = 136.0
+theme_override_constants/separation = 28
 
 [node name="Shards" type="Label" parent="Root/Header"]
-theme_override_font_sizes/font_size = 20
 text = "碎片：0"
 vertical_alignment = 1
 
 [node name="Quota" type="Label" parent="Root/Header"]
-theme_override_font_sizes/font_size = 20
 text = "额度：0 / 0"
 vertical_alignment = 1
 
@@ -105,76 +84,90 @@ size_flags_horizontal = 3
 mouse_filter = 2
 
 [node name="QuotaUpgrade" type="Button" parent="Root/Header"]
-theme_type_variation = &"UiPrimaryButton"
 text = "扩增额度"
 
+[node name="Panel" type="PanelContainer" parent="Root"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 158.0
+offset_right = -48.0
+offset_bottom = -224.0
+theme_override_styles/panel = SubResource("Canvas")
+
 [node name="HBox" type="HBoxContainer" parent="Root/Panel"]
-theme_override_constants/separation = 16
+theme_override_constants/separation = 28
+
+[node name="QuotaRail" type="VBoxContainer" parent="Root/Panel/HBox"]
+custom_minimum_size = Vector2(64, 0)
+size_flags_horizontal = 0
+theme_override_constants/separation = 12
+
+[node name="QuotaTitle" type="Label" parent="Root/Panel/HBox/QuotaRail"]
+theme_override_font_sizes/font_size = 16
+text = "额度"
+horizontal_alignment = 1
+
+[node name="QuotaBar" type="ProgressBar" parent="Root/Panel/HBox/QuotaRail"]
+custom_minimum_size = Vector2(64, 0)
+size_flags_vertical = 3
+mouse_filter = 2
+fill_mode = 3
+show_percentage = false
+theme_override_styles/background = SubResource("QuotaBg")
+theme_override_styles/fill = SubResource("QuotaFill")
+
+[node name="QuotaText" type="Label" parent="Root/Panel/HBox/QuotaRail"]
+theme_override_font_sizes/font_size = 16
+text = "0/0"
+horizontal_alignment = 1
 
 [node name="Matrix" type="GridContainer" parent="Root/Panel/HBox"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/h_separation = 14
-theme_override_constants/v_separation = 14
-columns = 10
+theme_override_constants/h_separation = 28
+theme_override_constants/v_separation = 28
+columns = 6
 
-
-[node name="RightPanel" type="VBoxContainer" parent="Root/Panel/HBox"]
-custom_minimum_size = Vector2(380, 0)
-size_flags_horizontal = 1
-theme_override_constants/separation = 10
-
-[node name="QuotaTitle" type="Label" parent="Root/Panel/HBox/RightPanel"]
-text = "额度占用"
-horizontal_alignment = 1
-
-[node name="QuotaBar" type="ProgressBar" parent="Root/Panel/HBox/RightPanel"]
-size_flags_vertical = 3
-fill_mode = 1
-show_percentage = false
-theme_override_styles/background = SubResource("StyleBoxFlat_quota_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_quota_fill")
-
-[node name="QuotaText" type="Label" parent="Root/Panel/HBox/RightPanel"]
-text = "0 / 0"
-horizontal_alignment = 1
-
-[node name="ShardsText" type="Label" parent="Root/Panel/HBox/RightPanel"]
-text = "碎片：0"
-horizontal_alignment = 1
-
-[node name="QuotaUpgradePanel" type="Button" parent="Root/Panel/HBox/RightPanel"]
-text = "扩增额度"
-[node name="Legend" type="HBoxContainer" parent="Root"]
-anchor_left = 0.0
+[node name="Pagination" type="HBoxContainer" parent="Root"]
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-anchors_preset = 12
-offset_left = 16.0
-offset_top = -108.0
-offset_right = -16.0
-offset_bottom = -76.0
-grow_horizontal = 2
-grow_vertical = 0
+offset_left = 48.0
+offset_top = -210.0
+offset_right = -48.0
+offset_bottom = -160.0
+theme_override_constants/separation = 24
+alignment = 2
+
+[node name="Previous" type="Button" parent="Root/Pagination"]
+text = "上一页"
+
+[node name="Page" type="Label" parent="Root/Pagination"]
+custom_minimum_size = Vector2(112, 0)
+text = "01 / 01"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Next" type="Button" parent="Root/Pagination"]
+text = "下一页"
+
+[node name="Legend" type="HBoxContainer" parent="Root"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = -152.0
+offset_right = -48.0
+offset_bottom = -124.0
 theme_override_constants/separation = 18
-alignment = 1
 
 [node name="Footer" type="Label" parent="Root"]
-anchor_left = 0.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-anchors_preset = 12
-offset_left = 16.0
-offset_top = -74.0
-offset_right = -16.0
-offset_bottom = -42.0
-grow_horizontal = 2
-grow_vertical = 0
+offset_left = 48.0
+offset_top = -116.0
+offset_right = -48.0
+offset_bottom = -88.0
 theme_type_variation = &"UiCaption"
-text = ""
-horizontal_alignment = 1
-autowrap_mode = 2

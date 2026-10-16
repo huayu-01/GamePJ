@@ -17,7 +17,6 @@ const ARENA_ENV := "Arena/WorldEnvironment"
 ## 界面截图清单：节点路径 -> 输出文件。setup 由 _setup_screen 按名字分支。
 const SCREENS := [
 	{"name": "BaseScreen", "file": "ui_01_basescreen.png"},
-	{"name": "HelpScreen", "file": "ui_02_helpscreen.png"},
 	{"name": "StartScreen", "file": "ui_03_startscreen.png"},
 	{"name": "RewardScreen", "file": "ui_04_rewardscreen.png"},
 	{"name": "ChooseScreen", "file": "ui_05_choosescreen.png"},

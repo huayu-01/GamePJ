@@ -54,6 +54,11 @@
 
 ## Unit 与表现的分工
 
+**第二轮 A 批补充**：`DiveWindFx` 只读 `FallAttackAbility.IsDiving` / `Unit.Velocity`，
+只创建 `MeshInstance3D`，不创建单位、物理体或分组。玩家血条的 `Vitals` 为内嵌富文本；
+ESC 菜单回调由 `SettingsScreen` 注册并在退树时解除，帮助由 `HelpSettingsSection` 注册为第四页。
+能力页以最多 6×3 分页、空位留白；基地与关卡均挂相同预制体。
+
 `Unit` 只产生 Gameplay 事实（受伤、死亡、破甲）并抛 C# 事件；`UnitPresentation` 订阅事件做闪色/销毁，不参与结算。
 `CharacterMovement` 订阅 `Unit.KnockbackReceived` 施加外力，因此 Unit 不需要知道移动组件的存在。
 

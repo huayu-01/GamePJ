@@ -99,13 +99,13 @@ public partial class UiService : Node
 	/// <summary>打开操作说明。</summary>
 	public bool OpenHelp()
 	{
-		if (Screen<HelpScreen>() is not { } screen)
+		if (Screen<SettingsScreen>() is not { } screen)
 		{
 			return false;
 		}
 
 		screen.CloseOnCancel = true;
-		screen.Open();
+		screen.OpenHelp();
 		return true;
 	}
 

@@ -11,7 +11,7 @@ using Godot;
 
 namespace ActRoguelike.UI;
 
-/// <summary>最小 HUD：玩家生命条/数值、准星、弹药、节点进度与构筑。只读 Gameplay 状态。</summary>
+/// <summary>玩家生命条/数值、准星、节点进度与构筑。只读 Gameplay 状态。</summary>
 public partial class PlayerHud : CanvasLayer
 {
 	/// <summary>玩家血条预制体：由 Hud.tscn 实例化（节点名 PlayerBar），代码不建它。</summary>
@@ -35,7 +35,10 @@ public partial class PlayerHud : CanvasLayer
 		$"[{OS.GetKeycodeString(BuildScreen.DefaultToggleKey)} 角色持有] " +
 		$"[{OS.GetKeycodeString(Key.O)} 设置]";
 
-	private Label _health = null!;
+	[Export] public Color ArmorTextColor { get; set; } = new(0.52f, 0.82f, 1f);
+	[Export] public Color ShieldTextColor { get; set; } = new(0.7f, 0.6f, 1f);
+
+	private RichTextLabel _health = null!;
 	private Label _status = null!;
 	private Control _root = null!;
 	/// <summary>首领血条是否展开为完整形态（验证用只读状态）。</summary>
@@ -62,7 +65,7 @@ public partial class PlayerHud : CanvasLayer
 
 	public override void _Ready()
 	{
-		_health = GetNode<Label>("Root/Health");
+		_health = GetNode<RichTextLabel>("Root/PlayerBar/Vitals");
 		_status = GetNode<Label>("Root/Status");
 		_build = GetNode<Label>("Root/Build");
 		_buildIcons = GetNode<HBoxContainer>("Root/BuildIcons");
@@ -123,18 +126,19 @@ public partial class PlayerHud : CanvasLayer
 
 		UpdateBossPanel();
 
-		string extra = string.Empty;
-		if (_player.Armor > 0f)
-		{
-			extra += $"  甲 {_player.Armor:0}";
-		}
+		string extra = $" [color=#{ArmorTextColor.ToHtml(false)}]+{_player.Armor:0}[/color]";
 
 		if (_player.Shield > 0f)
 		{
-			extra += $"  盾 {_player.Shield:0}";
+			extra += $" [color=#{ShieldTextColor.ToHtml(false)}]盾 {_player.Shield:0}[/color]";
 		}
 
-		_health.Text = $"HP {_player.Health:0}/{_player.MaxHealth:0}{extra}";
+		string vitals = $"[center]{_player.Health:0}/{_player.MaxHealth:0}{extra}[/center]";
+		if (vitals != _lastVitals)
+		{
+			_health.Text = vitals;
+			_lastVitals = vitals;
+		}
 
 		UpdateHealthBar(Mathf.Clamp(_player.Health / Mathf.Max(1f, _player.MaxHealth), 0f, 1f));
 

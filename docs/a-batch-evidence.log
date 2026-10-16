@@ -1,0 +1,47 @@
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+[log] 17:06:34 [SelfTest] === 自测结束 ===
+[BatchA] PASS 真实 Esc → 设置打开、暂停=True；分类=graphics / input / audio / help
+[BatchA] PASS 四个设置分页、独立帮助页已移除
+[BatchA] PASS 视口截图 a_settings_esc.png
+[BatchA] PASS H → 帮助分页
+[BatchA] PASS 视口截图 a_settings_help.png
+[BatchA] PASS Esc 关闭设置并恢复游戏
+[BatchA] PASS 血条内异色护甲：220/220 +20
+[BatchA] PASS 独立血量文本已移除
+[BatchA] PASS 视口截图 a_hud_vitals.png
+[BatchA] PASS Main 中 K 打开能力页，真实卡 4 / 节点 4
+[BatchA] PASS 额度条宽度=64.0；从下至上
+[BatchA] PASS 视口截图 a_matrix_four.png
+[BatchA] 额度条：5/6 三档色 蓝=5cb8f2/黄=ffc747/红=ff5c52（快满阈值 0.8） ｜ 场景 override: fill=True background=True ｜ fill.BgColor=ffc747 background=060a0f ｜ 宽 64px 填充方向=3 左贴卡区=True ｜ 列 6 行 1 矩阵区 1732×697
+[BatchA] PASS 0 张：首屏=0 页数=1
+[BatchA] PASS 1 张：首屏=1 页数=1
+[BatchA] PASS 18 张：首屏=18 页数=1
+[BatchA] PASS 19 张：首屏=18 页数=2
+[BatchA] PASS 37 张：首屏=18 页数=3
+[BatchA] PASS 视口截图 a_matrix_page1.png
+[BatchA] PASS 下一页：第 19 张单独铺在末页
+[BatchA] PASS 视口截图 a_matrix_page2.png
+[BatchA] PASS 末页继续下一页不越界
+[BatchA] PASS PgUp 回首页，升级状态 Lv2 保持
+[BatchA] PASS 缩窄画布：列=3 行=3 容量=9
+[BatchA] PASS 还原宽度 → 六列 / 容量18
+[BatchA] 分页算式：0 张 → 1 页 / 首屏 0 张 / 0 行✓ ｜ 1 张 → 1 页 / 首屏 1 张 / 1 行✓ ｜ 8 张 → 1 页 / 首屏 8 张 / 2 行✓ ｜ 17 张 → 1 页 / 首屏 17 张 / 3 行✓ ｜ 18 张 → 1 页 / 首屏 18 张 / 3 行✓ ｜ 19 张 → 2 页 / 首屏 18 张 / 3 行✓ ｜ 24 张 → 2 页 / 首屏 18 张 / 3 行✓ ｜ 25 张 → 2 页 / 首屏 18 张 / 3 行✓ ｜ 37 张 → 3 页 / 首屏 18 张 / 3 行✓ ｜ 60 张 → 4 页 / 首屏 18 张 / 3 行✓　→ 全部满足「最多六列三行、空位留白」 = True
+[BatchA] 真实下落帧 4 y=9.62553405761719 下落风线：只读源=True 真实下落帧=4 强度=1 可见=True 速度=(0, -36.352005, 0) 预演剩余=0s 光带=10｜碰撞体=0 单位=0 分组=0
+[BatchA] PASS 视口截图 a_dive_00.png
+[BatchA] 真实下落帧 8 y=7.1040678024292 下落风线：只读源=True 真实下落帧=8 强度=1 可见=True 速度=(0, -38.70401, 0) 预演剩余=0s 光带=10｜碰撞体=0 单位=0 分组=0
+[BatchA] PASS 视口截图 a_dive_01.png
+[BatchA] PASS 真实 Ctrl 下落期间风线出现，未用预演
+[BatchA] PASS 落地事件与既有落圈继续生效
+[BatchA] PASS 视口截图 a_dive_landed.png
+[BatchA] PASS 落地后风线收起
+[BatchA] PASS 风效碰撞体=0、分组=0
+[BatchA] PASS 特效前后单位分组计数不变：[1, 0, 0]
+[BatchA] 下落风线：只读源=False 真实下落帧=18 强度=0 可见=False 速度=(0, 0, 0) 预演剩余=0s 光带=10｜碰撞体=0 单位=0 分组=0
+[BatchA] === A 批验收结束：失败 0 ===

@@ -23,6 +23,7 @@
 | **蓄力时的描边**（P7 ④，**占位版**，与 ③ 同一个组件） | 同上 + `Assets/Effects/charge_rim_placeholder.gdshader` | 同上（只读 `IsCharging`） | 同上（运行期叠加在 `Player/Model` 的每个 `MeshInstance3D.MaterialOverlay` 上，**不改模型资源本身**） |
 | **开镜特效**（P6c） | `Scripts/UI/ScopeOverlay.cs` | `HawkEyeAbility.ZoomProgress`（**P6c 新增的只读属性**）/ `IsAiming` / `ZoomApplied` | `Scenes/UI/Hud.tscn` → `Root/ScopeOverlay`（Root 的**第一个**子节点） |
 | **后撤残影**（P6c） | `Scripts/Combat/AfterimageTrail.cs` | `BackdashAbility.InvulnerableOwned`（P3 就有的只读属性） | `Scenes/Player/Player.tscn` → `Player/Afterimage` |
+| **下落攻击风线**（第二轮 A-5） | `Scripts/Combat/DiveWindFx.cs` | `FallAttackAbility.IsDiving`（本批只新增只读属性）/ `Enabled`、`Unit.Velocity` / `IsDead` | `Player/AbilityFallAttack/DiveWind`；青蓝色细长光带逆速度方向向上掠过，落地后 0.09s 淡出 |
 | **剑气拖尾**（P6c） | `Scripts/Combat/ProjectileTrail.cs` | `Projectile.VelocityDirection`（P4 就有的只读属性） | `Scenes/Combat/SwordQi.tscn` → `SwordQi/Trail`（**挂在剑气本体上**） |
 | **落圈特效**（P6c） | `Scripts/Combat/LandingShockwave.cs` | `FallAttackAbility.Landed`（公开事件）+ `LandingBurstAbility.TriggerCount`（公开只读计数）+ 命中体 `Attack/Shape` 的 `SphereShape3D.Radius`；**P6d 新增** `PlayOnce(worldPosition, radius)` 外部入口（「落日剑」的落点用它，半径由调用方给） | `Player/AbilityFallAttack/Shockwave` 与 `Player/AbilityPassive2/ShockwaveBurst`；**P6d**：`SunsetSwordMarker`（异化「落日剑」的剑）的子节点 |
 | **落日剑的头顶那把剑**（P6d，**不是纯表现** —— 它自己会落下造成伤害） | `Scripts/Rewards/SunsetSwordMarker.cs` | 无（它就是"落日剑"这件事本身）；纯表现的部分是它内嵌的 `LandingShockwave` | 目标敌人子树 → `SunsetSword`（异化「落日剑」施加时按需建） |
