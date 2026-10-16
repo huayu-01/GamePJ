@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://Scripts/Interaction/BaseTerminal.cs" id="2_terminal"]
@@ -13,7 +13,6 @@
 [ext_resource type="Environment" path="res://Assets/ArtRefresh/env_level_garden.tres" id="20_env"]
 [ext_resource type="Material" path="res://Assets/ArtRefresh/mat_level_ground.tres" id="21_ground"]
 [ext_resource type="PackedScene" path="res://Scenes/ArtRefresh/GardenDressing.tscn" id="22_garden"]
-[ext_resource type="PackedScene" path="res://Scenes/Debug/GmConsole.tscn" id="23_gm"]
 
 [sub_resource type="BoxShape3D" id="Shape_ground"]
 size = Vector3(26, 1, 26)
@@ -134,5 +133,3 @@ material_override = SubResource("Mat_gate")
 [node name="ChooseScreen" parent="Screens" instance=ExtResource("11_choose")]
 [node name="AbilityMatrixScreen" parent="Screens" instance=ExtResource("12_matrix")]
 [node name="LoadingScreen" parent="." instance=ExtResource("6_loading")]
-
-[node name="GmConsole" parent="." instance=ExtResource("23_gm")]
