@@ -15,10 +15,11 @@ namespace ActRoguelike.Player;
 /// 原来的写法是 <c>switch (child) { case BackdashAbility a: ... Input.IsActionJustPressed("skill_1") }</c>，
 /// 于是"加一个技能"必然要动 C#，且 <c>AbilityConfig</c> 里连一列按键都没有（那条注释就是本轮推翻的决定）。
 ///
-/// 支持两种按下方式（同一列 <c>HoldToCharge</c> 决定）：
+/// 支持点按、按住蓄力与按住维持（由技能行的强类型列决定）：
 /// <list type="bullet">
 /// <item>点按：<c>IsActionJustPressed</c> → <c>TryActivate()</c>。</item>
 /// <item>按住蓄力：按下 → <c>TryActivate()</c>；按住期间每帧 <c>OnInputHeld(dt)</c>；松开 → <c>OnInputReleased()</c>。</item>
+/// <item>按住维持：同样转发输入，由 <c>HoldToMaintain</c> 驱动独立效果，不进入蓄力状态。</item>
 /// </list>
 /// </summary>
 public partial class PlayerAbilityInput : Node
@@ -80,7 +81,7 @@ public partial class PlayerAbilityInput : Node
 				continue;
 			}
 
-			if (!ability.HoldToCharge)
+			if (!ability.HoldToCharge && !ability.HoldToMaintain)
 			{
 				if (Input.IsActionJustPressed(action))
 				{
@@ -96,12 +97,14 @@ public partial class PlayerAbilityInput : Node
 				Activate(ability);
 			}
 
-			if (ability.IsBusy && Input.IsActionPressed(action))
+			if (ability.IsActive && Input.IsActionPressed(action))
 			{
 				ability.OnInputHeld(dt);
 			}
 
-			if (ability.IsBusy && Input.IsActionJustReleased(action))
+			// 维持类也检测当前按键状态，避免暂停期间松手后恢复时漏掉释放沿。
+			if (ability.IsActive && (Input.IsActionJustReleased(action)
+				|| (ability.IsMaintaining && !Input.IsActionPressed(action))))
 			{
 				ability.OnInputReleased();
 			}

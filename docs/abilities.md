@@ -1,5 +1,12 @@
 # 能力机制：蓄力 · 完美时机 · 技能层数 · 冷却缩减（P2 通用地基）
 
+> **第二轮 E-1（2026-10-16）**：刹那之眼已切换为 `IsBackground=true`、`HoldToMaintain=true`，
+> `MaintainStartupSeconds=0.3`。用户确认保留软启动期间的免伤与免费后撤，不播放动画、不进入蓄力。
+> `IsActive` 表示效果生命周期，`IsBusy = IsActive && !IsBackground` 表示占用动作；`IsReady` 仍防重复激活。
+> 输入按住累加 `HeldTime`，松开走 `OnMaintainReleased()`，停标记并平滑恢复 FOV，然后进入原 2s 冷却。
+> 后台效果不订阅角色技能动画事件，也不播放或停止技能动画；禁用、死亡、退树会还原相机。
+> 默认三列均为 false/0，其余技能仍使用原蓄力、档位、完美窗口和动画链路。详见 [E 批验收](e-batch-verification.md)。
+
 > **第二轮 A-5（2026-10-16）**：下落攻击增加 `IsDiving` 只读属性，表现组件
 > `DiveWindFx` 挂在 `Player/AbilityFallAttack/DiveWind`，只读该属性和真实速度来画向上的青蓝风线。
 > 起手速度、伤害、高度加成、CD、命中体和落地事件均未改。真实 Ctrl 下落、落圈、退出淡出及安全性实测见

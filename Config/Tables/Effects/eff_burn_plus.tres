@@ -1,10 +1,17 @@
 [gd_resource type="Resource" script_class="EffectConfig" format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="2_row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/ic_status_burn.svg" id="e_visual_icon"]
 
 [resource]
 script = ExtResource("2_row")
 Kind = 1
+VisualStyle = 3
+VisualIcon = ExtResource("e_visual_icon")
+VisualColor = Color(1, 0.12, 0.045, 1)
+VisualSize = 0.22
+VisualSpeed = 3.6
+VisualCount = 12
 Duration = 3.0
 DamagePerSecond = 12.0
 Id = "BurnPlus"

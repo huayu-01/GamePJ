@@ -1,10 +1,18 @@
 [gd_resource type="Resource" script_class="EffectConfig" format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="1_row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/ic_status_mark.svg" id="e_visual_icon"]
 
 [resource]
 script = ExtResource("1_row")
 Kind = 10
+VisualStyle = 1
+VisualIcon = ExtResource("e_visual_icon")
+VisualColor = Color(1, 0.68, 0.18, 0.95)
+VisualRadius = 0.43
+VisualSize = 0.12
+VisualCount = 5
+VisualShowStacks = true
 Duration = 6.0
 MaxStacks = 5
 Modifiers = []

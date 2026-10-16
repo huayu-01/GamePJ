@@ -41,6 +41,16 @@ public enum EffectKind
 	Other,
 }
 
+/// <summary>通用状态表现形态；按效果行选择，不按状态 Id 写分支。</summary>
+public enum StatusVisualStyle
+{
+	None,
+	Sigil,
+	Frost,
+	Embers,
+	Orbit,
+}
+
 /// <summary>
 /// **效果参数表**的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Effects/eff_*.tres`）。
 /// 索引用 <see cref="ConfigIndexData.Effects"/>。
@@ -64,6 +74,17 @@ public partial class EffectConfig : ConfigRow
 
 	/// <summary>图标（界面/Debug 用；空 = 无图标）。</summary>
 	[Export(PropertyHint.File, "*.png,*.svg")] public string IconPath { get; set; } = string.Empty;
+
+	[ExportGroup("状态表现（只供表现层读取，不参与结算）")]
+	[Export] public StatusVisualStyle VisualStyle { get; set; }
+	[Export] public Texture2D? VisualIcon { get; set; }
+	[Export] public Color VisualColor { get; set; } = Colors.White;
+	[Export] public float VisualRadius { get; set; } = 0.7f;
+	[Export] public float VisualHeight { get; set; } = 2.3f;
+	[Export] public float VisualSize { get; set; } = 0.18f;
+	[Export] public float VisualSpeed { get; set; } = 1.5f;
+	[Export] public int VisualCount { get; set; } = 6;
+	[Export] public bool VisualShowStacks { get; set; }
 
 	[ExportGroup("通用数值（按 Kind 选用，用不到的就留默认值）")]
 	/// <summary>

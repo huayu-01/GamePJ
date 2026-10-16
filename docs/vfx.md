@@ -1,5 +1,15 @@
 # 表现层（VFX）契约与清单
 
+> **第二轮 E-2（2026-10-16）状态表现接入**：`UnitPresentation` 在收集模型网格后调用
+> `StatusEffectFx.Ensure(unit)`，延后挂载 `Scenes/Combat/StatusEffectFx.tscn`，避免父节点就绪期间新增兄弟失败。
+> 它只读 `GetStatusIds()` / `GetStatusStacks()` / `IsDead`，不改 Unit、状态结算、模型材质或动画。
+> 效果行的 `VisualStyle`（None / Sigil / Frost / Embers / Orbit）、`VisualIcon:Texture2D`、`VisualColor`、
+> `VisualRadius/Height/Size/Speed/Count` 和 `VisualShowStacks` 控制表现；新状态使用既有形态只需填行。
+> `Mark` 用金色标记、数字层数及逐层填亮的五枚菱形；冻结用蓝色冰晶与细环，燃烧用升腾火星与亮色火芯。
+> 9 条现有状态有表现，索敌用 `MissileBeacon` 按原定义保持隐形。状态过期至多 `PollSeconds=0.08s`
+> 后清理，死亡在下一物理帧清理，退树随父节点回收；子树仅含 Node3D/Sprite3D/Label3D/MeshInstance3D，
+> 没有物理体、Unit 或分组。图标始终朝向镜头，多状态横排。截图和生命周期验收见 [E 批验收](e-batch-verification.md)。
+
 > 给接手的人看：**加一个新的特效要做什么**、**表现层凭什么"不改战斗逻辑"**、以及本项目在
 > 特效这一层踩过的坑。代码在 `Scripts/UI/`（屏幕/2D）与 `Scripts/Combat/`（世界里的一次性特效），
 > 全部按 **P6b 的 `Scripts/UI/ChargeIndicator.cs`** 立的标准写。
@@ -18,6 +28,7 @@
 
 | 特效 | 脚本 | ⭐ 只读来源（谁提供的） | 挂在哪 |
 |---|---|---|---|
+| **状态图标、层数与世界特效（E-2）** | `Scripts/Combat/StatusEffectFx.cs` | `Unit.GetStatusIds()` / `GetStatusStacks()` / `IsDead`；纯表现列来自 `EffectConfig` | `Unit/StatusEffects`，由 `UnitPresentation` 延后挂载 |
 | 准星蓄力指示器（P6b；**P7 收窄到能量掌武技2 独有 + 补全时序**） | `Scripts/UI/ChargeIndicator.cs` | `Ability.ChargeProgress` / `IsPerfectWindow` / `ChargeBaseComplete` / `IsCharging`（P2 基类）；**P7：数据源按技能行 Id `AbilityId` 认，不再按输入动作认** | `Scenes/UI/Hud.tscn` → `Root/ChargeIndicator` |
 | **蓄力完成反馈**（P7 ③，**所有蓄力技能通用**） | `Scripts/Combat/ChargeBodyFx.cs` | `Ability.IsCharging` / `ChargeBaseComplete`（**上升沿**）/ `IsPerfectWindow`（全是 P2 就有的只读量，**没有新增任何属性**） | `Scenes/Player/Player.tscn` → `Player/ChargeBodyFx` |
 | **蓄力时的描边**（P7 ④，**占位版**，与 ③ 同一个组件） | 同上 + `Assets/Effects/charge_rim_placeholder.gdshader` | 同上（只读 `IsCharging`） | 同上（运行期叠加在 `Player/Model` 的每个 `MeshInstance3D.MaterialOverlay` 上，**不改模型资源本身**） |

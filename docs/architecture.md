@@ -54,6 +54,11 @@
 
 ## Unit 与表现的分工
 
+**第二轮 E 批补充**：技能的 `IsActive` 与占动作的 `IsBusy` 分离，默认配置仍等价；
+后台维持类不参与角色动画驱动，收尾不会停止别的技能动画。状态表现由 `StatusEffectFx` 只读状态，
+用 `EffectConfig` 的强类型形态列与 `Texture2D` 资源引用配置，不按状态 Id 写分支，不进入碰撞或单位列表。
+从单位子节点 `_Ready` 添加兄弟组件须延后执行；详见 [abilities.md](abilities.md) 与 [vfx.md](vfx.md)。
+
 **第二轮 A 批补充**：`DiveWindFx` 只读 `FallAttackAbility.IsDiving` / `Unit.Velocity`，
 只创建 `MeshInstance3D`，不创建单位、物理体或分组。玩家血条的 `Vitals` 为内嵌富文本；
 ESC 菜单回调由 `SettingsScreen` 注册并在退树时解除，帮助由 `HelpSettingsSection` 注册为第四页。

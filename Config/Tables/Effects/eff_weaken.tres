@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://da28h1nkpc5p6" path="res://Scripts/Config/StatOverride.cs" id="1_dexd5"]
 [ext_resource type="Script" uid="uid://dyiou3pe6um14" path="res://Scripts/Config/EffectConfig.cs" id="2_i363q"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/ic_status_aura.svg" id="e_visual_icon"]
 
 [sub_resource type="Resource" id="Resource_dexd5"]
 script = ExtResource("1_dexd5")
@@ -11,6 +12,10 @@ Value = 0.75
 [resource]
 script = ExtResource("2_i363q")
 Kind = 3
+VisualStyle = 4
+VisualIcon = ExtResource("e_visual_icon")
+VisualColor = Color(0.65, 0.4, 0.78, 0.8)
+VisualSpeed = 0.8
 Duration = 3.0
 Modifiers = [SubResource("Resource_dexd5")]
 Id = "Weaken"

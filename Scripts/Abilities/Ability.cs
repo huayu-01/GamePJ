@@ -98,6 +98,19 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	[Export] public bool HoldToCharge { get; set; }
 
+	/// <summary>纯效果在后台运行：不占动作、不播放或停止角色技能动画。默认 false，原技能语义不变。</summary>
+	[Export] public bool IsBackground { get; set; }
+
+	/// <summary>按住维持效果，松开结束；与蓄力释放分开配置。</summary>
+	[Export] public bool HoldToMaintain { get; set; }
+
+	/// <summary>维持效果的无动画软启动时长，不参与蓄力档位或完美窗口。</summary>
+	[Export] public float MaintainStartupSeconds { get; set; }
+	public float HeldTime { get; private set; }
+	public bool IsMaintaining => IsActive && HoldToMaintain && _maintainHeld;
+	public bool MaintainStartupComplete => HeldTime >= Mathf.Max(0f, MaintainStartupSeconds);
+	private bool _maintainHeld;
+
 	[ExportGroup("冷却缩减（CDR）—— 数值全部来自表，代码里不写任何百分比")]
 	/// <summary>
 	/// **本技能的冷却倍率**（行级：`1` = 不变、`0.8` = 冷却 -20%、`0.5` = 减半）。
@@ -157,13 +170,14 @@ public abstract partial class Ability : Node3D
 	/// <summary>惰性读取：Unit.Movement 在父节点 _Ready 里才赋值，而子节点 _Ready 更早。</summary>
 	public CharacterMovement? Movement => OwnerUnit?.Movement;
 	public Unit? Target { get; protected set; }
-	public bool IsBusy { get; private set; }
+	public bool IsActive { get; private set; }
+	public bool IsBusy => IsActive && !IsBackground;
 	public float CooldownRemaining { get; private set; }
 
 	/// <summary>
 	/// 能不能用。⚠️ <see cref="MaxCharges"/> ≤ 1 时**逐位等价于改动前**（只看 <see cref="CooldownRemaining"/>）。
 	/// </summary>
-	public bool IsReady => Enabled && !IsBusy && (MaxCharges > 1 ? ChargesRemaining > 0 : CooldownRemaining <= 0f);
+	public bool IsReady => Enabled && !IsActive && (MaxCharges > 1 ? ChargesRemaining > 0 : CooldownRemaining <= 0f);
 
 	/// <summary>
 	/// 剩余层数。单层技能（<see cref="MaxCharges"/> ≤ 1）退化成"冷却好了就是 1 层"，
@@ -325,7 +339,7 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	protected void BeginEventDrivenCast()
 	{
-		IsBusy = true;
+		IsActive = true;
 		StateTime = 0f;
 	}
 
@@ -344,10 +358,14 @@ public abstract partial class Ability : Node3D
 		EnsureAnimEventHooked();
 
 		float dt = (float)delta;
+		if (IsBackground && IsActive && (!Enabled || OwnerUnit.IsDead))
+		{
+			Cancel();
+		}
 		SyncCharges();
 		TickCooldown(dt);
 
-		if (IsBusy)
+		if (IsActive)
 		{
 			StateTime += dt;
 		}
@@ -434,7 +452,7 @@ public abstract partial class Ability : Node3D
 		}
 
 		// ⚠️ 用户裁定：**没有对应动画 → 不执行**（不做时间驱动兜底）。这里就是那条闸门。
-		if (!string.IsNullOrEmpty(AnimName) && !EnsureAnimationAvailable())
+		if (!IsBackground && !string.IsNullOrEmpty(AnimName) && !EnsureAnimationAvailable())
 		{
 			return false;
 		}
@@ -443,7 +461,9 @@ public abstract partial class Ability : Node3D
 		SyncCharges();
 		ResetChargeState();
 		ConsumeCharge();
-		IsBusy = true;
+		IsActive = true;
+		_maintainHeld = HoldToMaintain;
+		HeldTime = 0f;
 		StateTime = 0f;
 		AnimEventReached = false;
 		OnActivate(target);
@@ -572,6 +592,10 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	private void EnsureAnimEventHooked()
 	{
+		if (IsBackground)
+		{
+			return;
+		}
 		if (_animEventHookedByMe || (string.IsNullOrEmpty(AnimEvent) && string.IsNullOrEmpty(AnimEventEnd)))
 		{
 			return;
@@ -597,7 +621,7 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	private void OnAnimationEvent(string name)
 	{
-		if (!IsBusy)
+		if (!IsActive || IsBackground)
 		{
 			return;
 		}
@@ -631,6 +655,11 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	public virtual void OnInputHeld(float delta)
 	{
+		if (IsMaintaining)
+		{
+			HeldTime += Mathf.Max(0f, delta);
+			return;
+		}
 		if (!HoldToCharge || !IsBusy)
 		{
 			return;
@@ -660,6 +689,12 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	public virtual void OnInputReleased()
 	{
+		if (IsMaintaining)
+		{
+			_maintainHeld = false;
+			OnMaintainReleased();
+			return;
+		}
 		if (!HoldToCharge || !IsBusy)
 		{
 			return;
@@ -751,7 +786,7 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	protected string PlaySkillAnimation()
 	{
-		if (string.IsNullOrEmpty(AnimName))
+		if (IsBackground || string.IsNullOrEmpty(AnimName))
 		{
 			return string.Empty;
 		}
@@ -760,7 +795,13 @@ public abstract partial class Ability : Node3D
 	}
 
 	/// <summary>停掉技能动画（技能结束/取消时调用，把控制权交还"按移速切"）。</summary>
-	protected void StopSkillAnimation() => FindInOwner<UnitAnimator>()?.StopSkillAnimation();
+	protected void StopSkillAnimation()
+	{
+		if (!IsBackground)
+		{
+			FindInOwner<UnitAnimator>()?.StopSkillAnimation();
+		}
+	}
 
 	/// <summary>
 	/// **播一段"不是本行 <see cref="AnimName"/>"的技能动画**（P4 新增，**只加不删**）。
@@ -778,7 +819,7 @@ public abstract partial class Ability : Node3D
 	/// <returns>真正播出去的动画全名；空 = 没播成。</returns>
 	protected string PlaySkillAnimationNamed(string animationName, float speedScale = 0f)
 	{
-		if (string.IsNullOrEmpty(animationName))
+		if (IsBackground || string.IsNullOrEmpty(animationName))
 		{
 			return string.Empty;
 		}
@@ -851,7 +892,8 @@ public abstract partial class Ability : Node3D
 
 	protected void Finish()
 	{
-		IsBusy = false;
+		IsActive = false;
+		_maintainHeld = false;
 		StateTime = 0f;
 		if (MaxCharges > 1)
 		{
@@ -870,7 +912,8 @@ public abstract partial class Ability : Node3D
 
 	protected void Cancel()
 	{
-		IsBusy = false;
+		IsActive = false;
+		_maintainHeld = false;
 		StateTime = 0f;
 		StopSkillAnimation();
 		OnFinishOrCancel();
@@ -889,6 +932,9 @@ public abstract partial class Ability : Node3D
 	protected virtual void OnFinishOrCancel()
 	{
 	}
+
+	/// <summary>维持类效果松手时的收尾；可覆写为独立的淡出，不占用角色动作。</summary>
+	protected virtual void OnMaintainReleased() => Finish();
 
 	/// <summary>在拥有者子树里找组件（武器、命中体等），避免依赖节点名。</summary>
 	protected T? FindInOwner<T>() where T : class

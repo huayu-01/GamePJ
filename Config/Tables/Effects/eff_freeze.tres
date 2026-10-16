@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="2_row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/ic_status_frost.svg" id="e_visual_icon"]
 
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
@@ -18,6 +19,12 @@ Value = 0.0
 [resource]
 script = ExtResource("2_row")
 Kind = 5
+VisualStyle = 2
+VisualIcon = ExtResource("e_visual_icon")
+VisualColor = Color(0.18, 0.65, 1, 0.85)
+VisualRadius = 0.68
+VisualSize = 0.2
+VisualCount = 6
 Duration = 1.0
 Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
 Id = "Freeze"

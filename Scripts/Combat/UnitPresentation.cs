@@ -40,6 +40,8 @@ public partial class UnitPresentation : Node
 		// 动画组件：场景里挂了就用那个，**没挂就补一个** —— 这样"新增一个敌人"不需要手动挂节点，
 		// 只要有 `Model/…/AnimationPlayer` 就自动按移速切 idle/walk/跑（读不到配置表也成立）。
 		UnitAnimator.Ensure(_unit);
+		// 收集模型之后再挂状态特效，避免受击闪色覆盖纯视觉节点。
+		StatusEffectFx.Ensure(_unit);
 	}
 
 	public override void _ExitTree()

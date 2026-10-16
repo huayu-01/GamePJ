@@ -3121,7 +3121,7 @@ public partial class SelfTest : Node
 				+ $" → 基础档：伤害 {dmg0:0.###}（期望 表值 {w1.Damage:0} ×玩家倍率 {dmgMul:0.##}）弹速 {spd0:0.##}（期望 {w1.Speed:0}）；3 档：伤害 {dmg3:0.###}（期望 {expectDmg3:0.###} = 1.3³）弹速 {spd3:0.##}（期望 {expectSpd3:0.##}）");
 		}
 
-		// 武技2 刹那之眼：基础蓄力期间被击中 → 无效化 + 强制一次不消耗层数的「后撤」。
+		// 武技2 刹那之眼：无动画软启动期间被击中 → 无效化 + 强制一次不消耗层数的「后撤」。
 		if (_p3Backdash == null)
 		{
 			_p3Backdash = _p3Player.GetNodeOrNull<BackdashAbility>("AbilitySkill1");
@@ -3133,7 +3133,7 @@ public partial class SelfTest : Node
 			return;
 		}
 
-		// ── ① 放大视角 + 每 0.5s 标记（先做这一段：它要求"已经蓄满、正在瞄准"）──
+		// ── ① 放大视角 + 每 0.5s 标记（先完成软启动、进入瞄准）──
 		// 标记的判据是"**准星世界点**附近 MarkRadius 米内最近的目标"，所以靶子必须搬到准星那条线上
 		// （上一段把它摆在"弹道"上，而弹道是从胸口朝准星世界点的一条线，终点可能在很远处）。
 		if (_p3Target != null)
@@ -3148,7 +3148,7 @@ public partial class SelfTest : Node
 		WaitUntilIdle(_p3BowW2);
 		_p3BowW2.RefreshCooldown();
 		bool hawkOk = _p3BowW2.TryActivate();
-		_p3BowW2.OnInputHeld(_p3BowW2.ChargeBaseSeconds + 0.05f); // 蓄满 → IsAiming
+		_p3BowW2.OnInputHeld(_p3BowW2.MaintainStartupSeconds + 0.05f); // 无动画软启动完成
 		bool aiming = _p3BowW2.IsAiming;
 		float fovBefore = GetViewport().GetCamera3D()?.Fov ?? 0f;
 		// 同步推一大帧：既让视角放大平滑到位，也让"每 0.5s 标记一次"到点（与帧率无关）。
@@ -3158,7 +3158,7 @@ public partial class SelfTest : Node
 		_p3MarkedTotal += markedAfterOneInterval;
 		GameLog.Write(
 			"SelfTest",
-			$"{(aiming && markedAfterOneInterval >= 1 ? "✅" : "🔴")} P3·刹那之眼·瞄准与标记：TryActivate={hawkOk}（期望 True） 蓄满后 IsAiming={aiming}（期望 True）"
+			$"{(aiming && markedAfterOneInterval >= 1 ? "✅" : "🔴")} P3·刹那之眼·瞄准与标记：TryActivate={hawkOk}（期望 True） 软启动后 IsAiming={aiming}（期望 True） 后台={_p3BowW2.IsBackground} 占动作={_p3BowW2.IsBusy} 蓄力={_p3BowW2.IsCharging}（期望 True/False/False）"
 			+ $" → 推 0.6s：标记次数 {markedAfterOneInterval}（期望 ≥1） 相机 FOV {fovBefore:0.#} → {fovAfter:0.#}（期望向 ZoomFov {_p3BowW2.ZoomFov:0.#} 收缩） ZoomApplied={_p3BowW2.ZoomApplied}｜靶子 {_p3Target?.Name} 身上层数={_p3Target?.GetStatusStacks(_p3BowW2.MarkStatusId)}");
 
 		_p3BowW2.OnInputReleased();          // 松手 → 视角还原 → Finish
@@ -3166,9 +3166,9 @@ public partial class SelfTest : Node
 		float fovRestored = GetViewport().GetCamera3D()?.Fov ?? 0f;
 		GameLog.Write(
 			"SelfTest",
-			$"P3·刹那之眼·收招还原视角：FOV={fovRestored:0.#}（期望回到施法前的 {fovBefore:0.#} ± 0.5） 仍在施法={_p3BowW2.IsBusy}（期望 False）");
+			$"P3·刹那之眼·收招还原视角：FOV={fovRestored:0.#}（期望回到施法前的 {fovBefore:0.#} ± 0.5） 效果仍活动={_p3BowW2.IsActive}（期望 False）");
 
-		// ── ② 基础蓄力期间被击中 → 无效化 + 强制一次不消耗层数的「后撤」──
+		// ── ② 无动画软启动期间被击中 → 无效化 + 强制一次不消耗层数的「后撤」──
 		if (_p3Backdash == null)
 		{
 			_p3Backdash = _p3Player.GetNodeOrNull<BackdashAbility>("AbilitySkill1");
@@ -3177,7 +3177,7 @@ public partial class SelfTest : Node
 		WaitUntilIdle(_p3Backdash);
 		_p3BowW2.RefreshCooldown();
 		bool hawkOk2 = _p3BowW2.TryActivate();
-		_p3BowW2.OnInputHeld(0.1f); // 基础蓄力 0.3s 还没完成 → 正是"基础蓄力期间"
+		_p3BowW2.OnInputHeld(0.1f); // 0.3s 软启动还没完成，处于防御窗口
 		int chargesBefore = _p3Backdash?.ChargesRemaining ?? -1;
 		float healthBefore = _p3Player.Health;
 		DamageResult result = _p3Player.ReceiveHit(new HitInstance
@@ -3191,13 +3191,13 @@ public partial class SelfTest : Node
 
 		GameLog.Write(
 			"SelfTest",
-			$"P3·弓武技2 刹那之眼：TryActivate={hawkOk2}（期望 True） 基础蓄力 {_p3BowW2.ChargeBaseSeconds:0.##}s 已蓄 {_p3BowW2.ChargeTime:0.###}s（期望 < 基础，处于「基础蓄力期间」）"
+			$"P3·弓武技2 刹那之眼：TryActivate={hawkOk2}（期望 True） 无动画软启动 {_p3BowW2.MaintainStartupSeconds:0.##}s 已维持 {_p3BowW2.HeldTime:0.###}s 防御窗口={_p3BowW2.StartupProtectionActive}（受击后结束该次维持）"
 			+ $"｜被 40 点命中：无效化={result.Invulnerable}（期望 True） 掉血 {result.HealthLost:0.#}（期望 0） 生命 {healthBefore:0.#} → {_p3Player.Health:0.#}（期望不变）"
 			+ $"｜强制后撤：{_p3Backdash?.AbilityId} 触发次数={_p3BowW2.ForcedDodgeCount}（期望 1） 层数（触发前 {chargesBefore} → 现在 {_p3Backdash?.ChargesRemaining}，期望不消耗）");
 	}
 
 	/// <summary>
-	/// 把技能推到"空闲"（自测里同步推物理帧，与帧率无关）：<c>IsReady</c> 要求 <c>!IsBusy</c>，
+	/// 把技能推到"空闲"（自测里同步推物理帧，与帧率无关）：<c>IsReady</c> 要求 <c>!IsActive</c>，
 	/// 而上一段的施法要等它的 <c>Finish()</c>（动画事件帧那一帧）才会收尾。
 	/// </summary>
 	private static void WaitUntilIdle(Ability? ability)
@@ -3207,7 +3207,7 @@ public partial class SelfTest : Node
 			return;
 		}
 
-		for (int i = 0; i < 80 && ability.IsBusy; i++)
+		for (int i = 0; i < 80 && ability.IsActive; i++)
 		{
 			ability._PhysicsProcess(0.05d);
 		}

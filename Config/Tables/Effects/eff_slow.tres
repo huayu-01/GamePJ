@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://da28h1nkpc5p6" path="res://Scripts/Config/StatOverride.cs" id="1_vtuu6"]
 [ext_resource type="Script" uid="uid://dyiou3pe6um14" path="res://Scripts/Config/EffectConfig.cs" id="2_bxpiw"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/ic_status_aura.svg" id="e_visual_icon"]
 
 [sub_resource type="Resource" id="Resource_vtuu6"]
 script = ExtResource("1_vtuu6")
@@ -11,6 +12,10 @@ Value = 0.55
 [resource]
 script = ExtResource("2_bxpiw")
 Kind = 2
+VisualStyle = 4
+VisualIcon = ExtResource("e_visual_icon")
+VisualColor = Color(0.12, 0.78, 0.7, 0.85)
+VisualSpeed = 0.7
 Duration = 3.0
 Modifiers = [SubResource("Resource_vtuu6")]
 Id = "Slow"

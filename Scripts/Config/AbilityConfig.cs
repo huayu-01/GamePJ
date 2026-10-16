@@ -49,6 +49,9 @@ public partial class AbilityConfig : ConfigRow
 
 	/// <summary>按住式输入（蓄力类技能用）：按住期间每帧回调，松开时回调一次"释放"。</summary>
 	[Export] public bool HoldToCharge { get; set; }
+	[Export] public bool IsBackground { get; set; }
+	[Export] public bool HoldToMaintain { get; set; }
+	[Export] public float MaintainStartupSeconds { get; set; }
 
 	[ExportGroup("连招（P4：近战武技1 的「每段一段动画」；只有 MeleeComboAbility 读它）")]
 	/// <summary>
@@ -193,6 +196,9 @@ public partial class AbilityConfig : ConfigRow
 		// 按键与动画：**逐条照写**（空 = 不绑按键 / 不需要动画），因为它们决定"这个技能能不能被按出来"。
 		ability.InputAction = InputAction;
 		ability.HoldToCharge = HoldToCharge;
+		ability.IsBackground = IsBackground;
+		ability.HoldToMaintain = HoldToMaintain;
+		ability.MaintainStartupSeconds = MaintainStartupSeconds;
 		ability.AnimName = AnimName;
 		ability.AnimEvent = AnimEvent;
 		ability.AnimEventEnd = AnimEventEnd;
