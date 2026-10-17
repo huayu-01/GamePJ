@@ -306,7 +306,12 @@ public partial class CharacterMovement : Node
 		}
 		else
 		{
-			velocity.Y = Mathf.Max(velocity.Y - _gravity * GravityScale * dt, -MaxFallSpeed);
+			// ⭐ J11：正常下落速度上限的单位级倍率（符文「飞翼」= 降低正常下落速度）。
+			// 基础值 1（`Unit.SeedStats`），`-MaxFallSpeed × 1.0f` 与改动前逐位相等；
+			// 只在**正常下落**这一段生效 —— 下落攻击 / 冲刺那些走 VelocityOverride，不受它影响。
+			float fallScale = _unit?.Stats.Get("MaxFallSpeedMultiplier") ?? 1f;
+			float fallCap = fallScale > 0f ? MaxFallSpeed * fallScale : MaxFallSpeed;
+			velocity.Y = Mathf.Max(velocity.Y - _gravity * GravityScale * dt, -fallCap);
 			// P4：滞空期间维护"最高点"（离地即开始，落地结束）。
 			float nowY = _body.GlobalPosition.Y;
 			if (!_apexTracking)

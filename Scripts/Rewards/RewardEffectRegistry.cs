@@ -269,7 +269,132 @@ public static class RewardEffectRegistry
 				LifetimeSeconds = Param(row, "LifetimeSeconds", 15f),
 				PickupDelaySeconds = Param(row, "PickupDelaySeconds", 0f),
 			}),
+
+		// ⭐ J11：**符文**（开局携带一件的信物）。服务 5 枚"需要一个行为"的符文行，
+		// 具体做哪几件事完全由行上的 HandlerParams 决定 —— 见 ApplyRuneEffect 的注释。
+		["RuneEffect"] = row => context => ApplyRuneEffect(row, context),
 	};
+
+	/// <summary>
+	/// ⭐ **J11：符文**（开局携带一件的信物）—— 一个处理器服务**全部**"需要一个行为"的符文行，
+	/// 与 <c>TablePulse</c> 一个类服务 6 条行是同一条纪律：**差别全在数据里**。
+	///
+	/// <list type="number">
+	/// <item><b>Modifiers</b>（先套）：符文的纯数值部分（`MaxHealthCap` / `IncomingDamageMultiplier` /
+	///   `CooldownMultiplier` / `MoveSpeedMultiplier` / `DamageMultiplier` / `JumpVelocityMultiplier` /
+	///   `MaxFallSpeedMultiplier` / `HealMultiplier`）—— 与 `StatSet` **同一段代码**，不是第二份实现；</item>
+	/// <item><c>Armor</c>：立刻 <c>Unit.GrantArmor</c>（「死铠」的初始护甲）；</item>
+	/// <item><c>ArmorPerKills</c> + <c>ArmorPerTrigger</c>：<see cref="RuneArmorOnKillRule"/>（每 N 杀 +甲）；</item>
+	/// <item><c>DeathAvoid</c> + <c>DeathAvoidHealFraction</c>：<see cref="RuneDeathAvoidRule"/>（「生死」）；</item>
+	/// <item><c>NearRange</c> / <c>NearScale</c> / <c>FarRange</c> / <c>FarScale</c>：
+	///   <see cref="RuneDistanceDamageRule"/>（「狙神」）；</item>
+	/// <item><c>MaxHealthDamageRatio</c>：<see cref="RuneMaxHealthDamageRule"/>（「巨人」）；</item>
+	/// <item><c>PixieIntervalSeconds</c> / <c>PixieRadius</c> / <c>PixieDamage</c> / …：
+	///   <see cref="PixieCompanion"/>（「小精灵」）。</item>
+	/// </list>
+	///
+	/// <para>⚠️ **缺哪个参数就不建哪个**（`Param(row, 键, 0)` 的兜底是 0 / 空），所以一行只写它自己要的键；
+	/// 也给不出"表里写了但代码没读"的静默状态 —— 每个键都在上面这张清单里有名字。</para>
+	///
+	/// <para>⚠️ 建出来的节点都挂了 <c>Rune_</c> 前缀 + 符文 Id，由 `RunController` 在换符文 /
+	/// 重新开局时按名字摘掉（`FreeRuneNodes`），不会重复叠加。</para>
+	/// </summary>
+	private static void ApplyRuneEffect(RewardConfig row, RewardContext context)
+	{
+		// ① 纯数值部分先套（与 `StatSet` 共用同一份实现，所以 `Source` 语义也一致）。
+		ApplyModifiers(row, context);
+
+		Unit player = context.Player;
+		var applied = new List<string>();
+
+		// ② 立刻加甲（「死铠」的初始护甲）。
+		float armor = Param(row, "Armor", 0f);
+		if (armor > 0f)
+		{
+			player.GrantArmor(armor);
+			applied.Add($"护甲 +{armor:0.##}");
+		}
+
+		// ③ 每 N 杀加甲。
+		float armorPerKills = Param(row, "ArmorPerKills", 0f);
+		if (armorPerKills > 0f)
+		{
+			var rule = new RuneArmorOnKillRule
+			{
+				Name = $"Rune_{row.Id}_ArmorOnKill",
+				RewardId = row.Id,
+				KillsPerTrigger = (int)armorPerKills,
+				ArmorPerTrigger = Param(row, "ArmorPerTrigger", 1f),
+			};
+			player.AddChild(rule);
+			applied.Add($"每 {rule.KillsPerTrigger} 杀 +{rule.ArmorPerTrigger:0.##} 甲");
+		}
+
+		// ④ 死亡避免。
+		float deathAvoid = Param(row, "DeathAvoid", 0f);
+		if (deathAvoid > 0f)
+		{
+			var rule = new RuneDeathAvoidRule
+			{
+				Name = $"Rune_{row.Id}_DeathAvoid",
+				Charges = (int)deathAvoid,
+				HealFraction = Param(row, "DeathAvoidHealFraction", 0.3f),
+			};
+			player.AddChild(rule);
+			applied.Add($"{rule.Charges} 次死亡避免（恢复 {rule.HealFraction:0.##} 生命）");
+		}
+
+		// ⑤ 按距离加伤（「狙神」）。
+		float farRange = Param(row, "FarRange", 0f);
+		if (farRange > 0f)
+		{
+			var rule = new RuneDistanceDamageRule
+			{
+				Name = $"Rune_{row.Id}_DistanceDamage",
+				NearRange = Param(row, "NearRange", 0f),
+				NearScale = Param(row, "NearScale", 1f),
+				FarRange = farRange,
+				FarScale = Param(row, "FarScale", 1f),
+			};
+			player.AddChild(rule);
+			applied.Add($"{rule.NearRange:0.##}m ×{rule.NearScale:0.##} → {rule.FarRange:0.##}m ×{rule.FarScale:0.##}（按距离）");
+		}
+
+		// ⑥ 按最大生命值加伤（「巨人」）。
+		float healthRatio = Param(row, "MaxHealthDamageRatio", 0f);
+		if (healthRatio > 0f)
+		{
+			var rule = new RuneMaxHealthDamageRule
+			{
+				Name = $"Rune_{row.Id}_MaxHealthDamage",
+				Ratio = healthRatio,
+			};
+			player.AddChild(rule);
+			applied.Add($"每次攻击额外 {healthRatio:0.###}×最大生命值");
+		}
+
+		// ⑦ 轨道小精灵（「小精灵」）。
+		float pixieInterval = Param(row, "PixieIntervalSeconds", 0f);
+		if (pixieInterval > 0f)
+		{
+			var pixie = new PixieCompanion
+			{
+				Name = $"Rune_{row.Id}_Pixie",
+				IntervalSeconds = pixieInterval,
+				SearchRadius = Param(row, "PixieRadius", 8f),
+				Damage = Param(row, "PixieDamage", 20f),
+				OrbitRadius = Param(row, "PixieOrbitRadius", 1.6f),
+				OrbitDegreesPerSecond = Param(row, "PixieOrbitSpeed", 90f),
+				AbilityId = row.Id,
+			};
+			player.AddChild(pixie);
+			applied.Add($"每 {pixie.IntervalSeconds:0.##}s 打 {pixie.SearchRadius:0.##}m 内一个敌人（{pixie.Damage:0.##}）");
+		}
+
+		GameLog.Write(
+			"Rune",
+			$"符文·生效：{row.Id}（{row.DisplayName}）→ {player.Name}｜{(applied.Count == 0 ? "只有 StatSheet 修正（见上一行）" : string.Join(" / ", applied))}");
+	}
 
 	/// <summary>这个 handler id 注册过吗（读表校验用）。</summary>
 	public static bool IsRegistered(string handler)

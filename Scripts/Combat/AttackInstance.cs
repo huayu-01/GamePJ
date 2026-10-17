@@ -72,13 +72,21 @@ public sealed class AttackInstance
 			? attacker.OutgoingDamageScaleAgainst(target, this)
 			: 1f;
 
+		// ⭐ J11：**扁平加伤**（「巨人」符文 = 每次攻击额外造成玩家最大生命值 10% 的伤害）。
+		// 与上面那个倍率分成两个口子，是因为它是一笔"与本次伤害无关的固定量"：
+		// 走倍率会被暴击倍率一起放大（见 `IOutgoingDamageBonus` 的注释）。
+		// 没有任何规则登记时恒为 0，而 `x + 0f == x`（浮点逐位相等）→ 改动前行为逐位不变。
+		float flatBonus = Attacker is { } bonusAttacker && GodotObject.IsInstanceValid(bonusAttacker)
+			? bonusAttacker.OutgoingDamageBonusAgainst(target, this)
+			: 0f;
+
 		return new HitInstance
 		{
 			Target = target,
 			Attacker = Attacker,
 			Attack = this,
 			Context = EventContext.Create(Attacker, target),
-			Damage = BaseDamage * (critical ? CritMultiplier : 1f) * marked,
+			Damage = (BaseDamage * (critical ? CritMultiplier : 1f) * marked) + flatBonus,
 			Critical = critical,
 			Direction = direction,
 			Position = position,

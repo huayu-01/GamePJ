@@ -241,12 +241,38 @@ public partial class Unit : CharacterBody3D
 		// 它是乘法基数，所以必须有基础值 1 —— 少了会读到 0，变成"零冷却"（见上面那条注意）。
 		// 它**不改变任何既有键的语义**，也不参与 RefreshStats 的派生计算（能力在读取时才乘它）。
 		Stats.SetBase("CooldownMultiplier", 1f);
+
+		// ── J11（符文系统）新增的四个键。**全部是"只加不改"的键**：
+		//    基础值取中性值，没有任何符文时读取端得到的就是改动前的那个数（见每条的说明）。
+		// ① 生命上限**硬夹**（符文「雷之印」：最大生命值限制为 30）。
+		//    0 = 不夹（默认）。>0 时 RefreshStats 把 MaxHealth 夹到该值。
+		Stats.SetBase("MaxHealthCap", 0f);
+		// ② 受到伤害的倍率（符文「战神印」：受到伤害 +300% → 填 4 = 承受 4 倍）。
+		//    1 = 不变（默认）；乘法基数，所以必须有基础值。消费者：ReceiveHit。
+		Stats.SetBase("IncomingDamageMultiplier", 1f);
+		// ③ 正常下落速度上限的倍率（符文「飞翼」：降低正常下落速度 → 填 0.8）。
+		//    1 = 不变（默认）；消费者：CharacterMovement 的下落夹速。
+		Stats.SetBase("MaxFallSpeedMultiplier", 1f);
+		// ④ 治疗量的倍率（符文「死铠」：无法恢复生命值 → 填 0）。
+		//    1 = 不变（默认）；≤0 = 完全禁疗。消费者：Heal。
+		//    ⚠️ 因为"0"在这里是**有意义的值**（禁疗）而不是"没配"，所以基础值必须在构造函数里就位
+		//    （SeedStats 在 `Unit()` 里无条件跑一次），读取端不能再用"读到 0 就按 1 算"那套兜底。
+		Stats.SetBase("HealMultiplier", 1f);
 	}
 
 	/// <summary>修正器变化后重算派生属性（增益/精英/状态效果都会调用）。</summary>
 	public void RefreshStats()
 	{
 		MaxHealth = Mathf.Max(1f, (_baseMaxHealth * Stats.Get("MaxHealthMultiplier")) + Stats.Get("MaxHealthAdd"));
+
+		// ⭐ J11：**生命上限硬夹**（符文「雷之印」= 最大生命值限制为 30）。
+		// `MaxHealthCap` 的基础值是 0 = 不夹；没有任何符文时这一段不进，
+		// 上面那行表达式原样保留（逐位不变）。
+		float healthCap = Stats.Get("MaxHealthCap");
+		if (healthCap > 0f)
+		{
+			MaxHealth = Mathf.Max(1f, Mathf.Min(MaxHealth, healthCap));
+		}
 
 		// 护甲**不在这里重算**（用户 C1：它是累加值、没有上限）—— 被打掉的甲不会被 RefreshStats 补回来，
 		// 加甲只走 GrantArmor。这里只保证不出现负甲。
@@ -298,7 +324,9 @@ public partial class Unit : CharacterBody3D
 		}
 
 		float blocked = ResolveBlock(hit);
-		float damage = Mathf.Max(0f, hit.Damage * blocked * (1f - CombinedDamageReduction()));
+		// ⭐ J11：「战神印」的"受到的伤害 +300%"（= 承受 4 倍）。基础值 1，`x × 1.0f` 与改动前逐位相等。
+		float incoming = Stats.Get("IncomingDamageMultiplier");
+		float damage = Mathf.Max(0f, hit.Damage * blocked * (1f - CombinedDamageReduction()) * (incoming > 0f ? incoming : 1f));
 
 		float remaining = damage;
 		float armorLost = 0f;
@@ -358,6 +386,25 @@ public partial class Unit : CharacterBody3D
 		}
 
 		bool killed = Health <= 0f;
+
+		// ⭐ J11：**死亡避免**（符文「生死」= 无效化这次致命伤并恢复 30% 生命）。
+		// 钩子必须落在 `killed` 判定之后、`result` 构造之前 —— 见 IDeathAvoid 的注释
+		// （`Damaged` 事件是在 `killed` 算完之后才抛的，那时已经拦不住 `Die`）。
+		// 没有登记任何规则时 `_deathAvoids.Count == 0`，这一段不进（改动前逐位不变）。
+		if (killed && _deathAvoids.Count > 0)
+		{
+			foreach (IDeathAvoid avoid in _deathAvoids.ToArray())
+			{
+				if (!avoid.TryAvoidDeath(this))
+				{
+					continue;
+				}
+
+				killed = false;
+				break;
+			}
+		}
+
 		var result = new DamageResult
 		{
 			Hit = true,
@@ -604,6 +651,85 @@ public partial class Unit : CharacterBody3D
 	public void RemoveOutgoingDamageScale(IOutgoingDamageScale scale) => _outgoingDamageScales.Remove(scale);
 
 	/// <summary>
+	/// 这个单位作为**攻击者**登记的"扁平加伤"规则（J11：「巨人」符文）。
+	/// 与 <see cref="_outgoingDamageScales"/> 同一条纪律：只由规则节点自己在 `_Ready` / `_ExitTree`
+	/// 成对登记/注销。**没有任何登记时恒为 0**（改动前逐位不变）。
+	/// </summary>
+	private readonly List<IOutgoingDamageBonus> _outgoingDamageBonuses = new();
+
+	/// <summary>登记一条攻击者侧扁平加伤（幂等：同一实例不会进两次）。</summary>
+	public void AddOutgoingDamageBonus(IOutgoingDamageBonus bonus)
+	{
+		if (!_outgoingDamageBonuses.Contains(bonus))
+		{
+			_outgoingDamageBonuses.Add(bonus);
+		}
+	}
+
+	/// <summary>注销（规则退树时调用）。</summary>
+	public void RemoveOutgoingDamageBonus(IOutgoingDamageBonus bonus) => _outgoingDamageBonuses.Remove(bonus);
+
+	/// <summary>
+	/// 本次命中的**额外伤害**（0 = 不变；多条规则相加）。
+	/// 调用点只有 <see cref="AttackInstance.RollHit"/> 一处，位置在既有的倍率结算之后。
+	/// </summary>
+	public float OutgoingDamageBonusAgainst(Unit target, AttackInstance attack)
+	{
+		if (_outgoingDamageBonuses.Count == 0)
+		{
+			return 0f;
+		}
+
+		float bonus = 0f;
+		foreach (IOutgoingDamageBonus rule in _outgoingDamageBonuses)
+		{
+			bonus += rule.BonusAgainst(target, attack);
+		}
+
+		return bonus;
+	}
+
+	/// <summary>
+	/// 这个单位登记的**死亡避免**规则（J11：「生死」符文）。
+	/// **没有登记时 <c>ReceiveHit</c> 里那一段整段不进** —— 改动前"血量归零即死"逐位不变。
+	/// </summary>
+	private readonly List<IDeathAvoid> _deathAvoids = new();
+
+	/// <summary>登记一条死亡避免（幂等）。</summary>
+	public void AddDeathAvoid(IDeathAvoid avoid)
+	{
+		if (!_deathAvoids.Contains(avoid))
+		{
+			_deathAvoids.Add(avoid);
+		}
+	}
+
+	/// <summary>注销死亡避免（规则退树时调用）。</summary>
+	public void RemoveDeathAvoid(IDeathAvoid avoid) => _deathAvoids.Remove(avoid);
+
+	/// <summary>
+	/// **把生命值直接设成某个数**（J11：「生死」符文在致命伤那一刻恢复到最大生命值的 30%）。
+	///
+	/// <para>为什么需要它：<see cref="Health"/> 的 setter 是私有的（外部只能通过
+	/// <see cref="Heal"/> / <see cref="ApplyDirectDamage"/> 改），而"死亡避免"要把生命**从 0 拉回**一个值 ——
+	/// <see cref="Heal"/> 在那一刻算得出 <c>MaxHealth - Health</c>，但它读的是 <c>HealMultiplier</c>
+	/// （「死铠」的禁疗也会拦住它，那是错的：死亡避免不是治疗）。所以单开一个受控的口子，并且
+	/// **只在 <see cref="IDeathAvoid"/> 的实现里用**（其它地方请继续走 Heal / ReceiveHit）。</para>
+	/// </summary>
+	public void RestoreHealthForDeathAvoid(float health)
+	{
+		if (IsDead)
+		{
+			return;
+		}
+
+		Health = Mathf.Clamp(health, 0f, Mathf.Max(0f, MaxHealth));
+	}
+
+	/// <summary>当前还剩几条死亡避免规则登记着（自测/日志用）。</summary>
+	public int DeathAvoidRuleCount => _deathAvoids.Count;
+
+	/// <summary>
 	/// 本次命中对 <paramref name="target"/> 的伤害倍率（1 = 不变；多条规则相乘）。
 	///
 	/// <para>调用点**只有一个**：<see cref="AttackInstance.RollHit"/> —— 它在
@@ -633,6 +759,15 @@ public partial class Unit : CharacterBody3D
 			return 0f;
 		}
 
+		// ⭐ J11：治疗量倍率（符文「死铠」= 无法恢复生命值 → 0 = 完全禁疗）。
+		// 基础值 1 在 `SeedStats` 里无条件就位，`amount × 1.0f` 与改动前逐位相等。
+		float scale = Stats.Get("HealMultiplier");
+		if (scale <= 0f)
+		{
+			return 0f;
+		}
+
+		amount *= scale;
 		float healed = Mathf.Min(amount, MaxHealth - Health);
 		Health += healed;
 		return healed;
