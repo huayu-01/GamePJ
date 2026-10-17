@@ -47,8 +47,8 @@
 ## 验收
 
 - `build.ps1 --no-incremental -v minimal` → 0 warning / 0 error；`dotnet build -c ExportRelease --no-incremental` → 0 warning / 0 error。
-- Main：`--headless --quit-after 40000 res://Scenes/Main.tscn -- --selftest` → **退出码 0**，连续两次（58.4s / 58.3s），
-  日志到 `=== 自测结束 ===`，红色行只剩改前就有、且内容写"期望=实际"的 5 条基线读数标记。
+- Main：`--headless --quit-after 40000 res://Scenes/Main.tscn -- --selftest` → **退出码 0**，连续三次（58.4s / 58.3s / 58.2s，
+  第三次单独抓 stderr = **0 字节**），日志到 `=== 自测结束 ===`，红色行只剩改前就有、且内容写"期望=实际"的 5 条基线读数标记。
 - 8 硬指标逐字一致（配置计数 · 10 节点 2/5/3 · 猎手 220/20/6.5 · 索引 `6/2/10/1/1/39/7/14/8/5/6/11/4` · Pressure 3/3/0 · 白板 boss 315/0 · 奖励 UI True/Paused True · 最小链路 1 动画事件→1 弹体→命中）。
 - 独立 `_ChargeReleaseProbe.tscn --headless` 复跑：退出码 0，`通过 80，失败 0`。
 - 四存档 SHA256 与交接点逐字相同；`selftest.flag` 不存在。
