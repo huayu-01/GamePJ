@@ -30,6 +30,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/DeathScreen.tscn" id="31_death"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/AbilityMatrixScreen.tscn" id="32_matrix"]
 [ext_resource type="PackedScene" path="res://Scenes/Debug/GmConsole.tscn" id="33_gm"]
+[ext_resource type="PackedScene" path="res://Scenes/Combat/SkillIndicator.tscn" id="34_skill_indicator"]
 
 [node name="Main" type="Node3D" unique_id=218913370]
 
@@ -197,3 +198,5 @@ Prompt = "特殊奖励"
 
 [node name="Door" parent="Stage" unique_id=1913413718 instance=ExtResource("12_door")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+
+[node name="SkillIndicator" parent="." instance=ExtResource("34_skill_indicator")]

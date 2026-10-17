@@ -1,0 +1,95 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/SkillIndicator.cs" id="1_skill"]
+
+[sub_resource type="StandardMaterial3D" id="mat_band"]
+shading_mode = 0
+transparency = 1
+cull_mode = 2
+albedo_color = Color(0.35, 0.88, 1, 0.45)
+emission_enabled = true
+emission = Color(0.35, 0.88, 1, 1)
+emission_energy_multiplier = 1.8
+
+[sub_resource type="StandardMaterial3D" id="mat_ring"]
+shading_mode = 0
+transparency = 1
+cull_mode = 2
+albedo_color = Color(0.35, 0.88, 1, 0.45)
+emission_enabled = true
+emission = Color(0.35, 0.88, 1, 1)
+emission_energy_multiplier = 1.8
+
+[sub_resource type="StandardMaterial3D" id="mat_fill"]
+shading_mode = 0
+transparency = 1
+cull_mode = 2
+albedo_color = Color(0.35, 0.88, 1, 0.1575)
+emission_enabled = true
+emission = Color(0.35, 0.88, 1, 1)
+emission_energy_multiplier = 1.8
+
+[sub_resource type="StandardMaterial3D" id="mat_line"]
+shading_mode = 0
+transparency = 1
+cull_mode = 2
+albedo_color = Color(0.35, 0.88, 1, 0.1575)
+emission_enabled = true
+emission = Color(0.35, 0.88, 1, 1)
+emission_energy_multiplier = 1.8
+
+[sub_resource type="ImmediateMesh" id="mesh_band"]
+
+[sub_resource type="ImmediateMesh" id="mesh_edge"]
+
+[sub_resource type="TorusMesh" id="mesh_ring"]
+outer_radius = 1.0
+inner_radius = 0.88
+rings = 64
+ring_segments = 6
+
+[sub_resource type="CylinderMesh" id="mesh_disc"]
+top_radius = 1.0
+bottom_radius = 1.0
+height = 0.02
+radial_segments = 48
+rings = 0
+
+[sub_resource type="BoxMesh" id="mesh_line"]
+size = Vector3(1, 0.02, 1)
+
+[node name="SkillIndicator" type="Node3D"]
+script = ExtResource("1_skill")
+
+[node name="DrawRoot" type="Node3D" parent="."]
+
+[node name="Curve" type="MeshInstance3D" parent="DrawRoot"]
+visible = false
+cast_shadow = 0
+mesh = SubResource("mesh_band")
+material_override = SubResource("mat_band")
+
+[node name="Edge" type="MeshInstance3D" parent="DrawRoot"]
+visible = false
+cast_shadow = 0
+mesh = SubResource("mesh_edge")
+material_override = SubResource("mat_band")
+
+[node name="Area" type="Node3D" parent="DrawRoot"]
+visible = false
+
+[node name="Ring" type="MeshInstance3D" parent="DrawRoot/Area"]
+cast_shadow = 0
+mesh = SubResource("mesh_ring")
+material_override = SubResource("mat_ring")
+
+[node name="Fill" type="MeshInstance3D" parent="DrawRoot/Area"]
+cast_shadow = 0
+mesh = SubResource("mesh_disc")
+material_override = SubResource("mat_fill")
+
+[node name="LineFill" type="MeshInstance3D" parent="DrawRoot"]
+visible = false
+cast_shadow = 0
+mesh = SubResource("mesh_line")
+material_override = SubResource("mat_line")
