@@ -6,36 +6,10 @@ using Godot;
 namespace ActRoguelike.Abilities;
 
 /// <summary>
-/// **下落攻击**（角色 B 被动「落」/ 三把武器共用的那条"空中攻击"，设计文档第 99 行）：
-///
-/// <code>
-/// 被动技能[落]{cd:1}:当角色在空中时按下奔跑键或ctrl键可以使用下落攻击,
-///   会大幅提高下落速度并在下落过程中碰到的敌人造成伤害,
-///   高度越高时伤害越高,每{n}增加{20}%,最高增加{100}%
-/// </code>
-///
-/// <list type="bullet">
-/// <item><b>触发</b>：空中 + 按键（表列 <c>InputAction</c> = `fall_attack`）。
-///   不满足（在地面 / 冷却没好）→ <see cref="CanActivate"/> 返回 false，技能根本不执行。</item>
-/// <item><b>下落速度</b>：<see cref="DiveSpeed"/> 直接写垂直速度（"大幅提高下落速度"）。</item>
-/// <item><b>下落途中伤害</b>：命中盒在**下落期间一直开着**（<see cref="HitPolicy.IntervalPerTarget"/> 配
-///   <c>HitInterval</c>，同一目标按间隔反复吃伤）。</item>
-/// <item><b>高度越高伤害越高</b>：高度取 <see cref="CharacterMovement.FallHeight"/>（"这次离地后
-///   **净下落**了多少米"，物理量、不是"离地高度"），每满 <see cref="HeightStep"/> 米加
-///   <see cref="DamageBonusPerStep"/>（文档 20%），封顶 <see cref="MaxDamageBonus"/>（文档 100%）。</item>
-/// <item><b>落地那一帧</b>：命中盒的最后一次判定 + 触发 <see cref="Landed"/> 事件 +
-///   <see cref="OnLanded"/> 钩子 —— 「落剑式」（落地额外一圈范围攻击）与「落日余晖」
-///   （朝准星方位冲下）都挂在这一个事件上，见 <see cref="LandingBurstAbility"/> 与
-///   <see cref="BlinkDashAbility"/> 的说明。</item>
-/// </list>
-///
-/// <para><b>「落日余晖」的"朝准星指向的最近方位冲下"</b>：<see cref="HomingMode"/> 是**表驱动的枚举**
-/// （<c>None</c> = 直直下落、<c>Crosshair</c> = 朝准星方位冲下）。超出指向范围时（夹角大于
-/// <see cref="MaxDiveAngleDegrees"/>）就夹到最大范围的**同方向**上；准星没指向地面
-/// （射线没打到地面 / 打到的点在单位上方）时回落成直直下落 —— 与文档第 155 行逐条对应。</para>
-///
-/// <para>所有数值（一个都没有硬编码）来自技能行 `skl_b*_passive.tres` 与
-/// `skl_b*_w*_fall.tres` 的列与 Params。</para>
+/// 武器大师共通「落」：按下记录脚下真实World高度，Action事件才下冲并打开命中体。
+/// 2026-10-17用户更新：倍率=起手高度/普通单跳高度×垂直速度/标准速度，有表配置上限。
+/// 标准单跳为1倍；额外空中跳高50%时同速为1.5倍，不额外再加1。
+/// 长枪由武器资源覆盖准星定向；只有真实落地派发Landed，超时与打断均取消。
 /// </summary>
 public partial class FallAttackAbility : Ability
 {
@@ -50,7 +24,7 @@ public partial class FallAttackAbility : Ability
 	}
 
 	[ExportGroup("下落攻击（被动「落」）")]
-	/// <summary>下落速度（m/s，写垂直速度）。文档："大幅提高下落速度"。</summary>
+	/// <summary>下冲总速度（m/s）；伤害只取该方向的垂直向下分量。</summary>
 	[Export] public float DiveSpeed { get; set; } = 34f;
 
 	/// <summary>下落期间命中盒的开启时长上限（秒；落地会提前结束）。</summary>
@@ -59,15 +33,12 @@ public partial class FallAttackAbility : Ability
 	/// <summary>落地后收招的延迟（秒）—— 给表现层留一点时间。</summary>
 	[Export] public float LandRecoverSeconds { get; set; } = 0.08f;
 
-	[ExportGroup("高度越高伤害越高（文档：每 n 米 +20%，最高 +100%）")]
-	/// <summary>**每多少米加一档**（文档里的 `n`；表里填"能跑起来的最小预设值" 2m）。</summary>
-	[Export] public float HeightStep { get; set; } = 2f;
-
-	/// <summary>每档增加的伤害比例（文档 20% → 0.2）。</summary>
-	[Export] public float DamageBonusPerStep { get; set; } = 0.2f;
-
-	/// <summary>伤害加成上限（文档 100% → 1.0）。</summary>
-	[Export] public float MaxDamageBonus { get; set; } = 1f;
+	[ExportGroup("高度与垂直速度倍率（2026-10-17用户更新）")]
+	[Export] public float StandardDiveSpeed { get; set; } = 34f;
+	[Export] public float MaxDamageMultiplier { get; set; } = 2f;
+	[Export] public float EventWaitSeconds { get; set; } = 2f;
+	[Export] public float GroundProbeDistance { get; set; } = 512f;
+	[Export] public float GroundMinNormalY { get; set; } = 0.6f;
 
 	[ExportGroup("「落日余晖」：朝准星指向的最近方位冲下")]
 	/// <summary>冲下模式（表列 <c>HomingMode</c>；0 = Straight / 1 = Crosshair）。</summary>
@@ -85,6 +56,12 @@ public partial class FallAttackAbility : Ability
 
 	/// <summary>本次下落攻击的**伤害加成比例**（0.2 = +20%）。</summary>
 	public float LastDamageBonus { get; private set; }
+	public float LastDamageMultiplier => 1 + LastDamageBonus;
+	public float LastReferenceFallTime { get; private set; }
+	public float LastDownwardSpeed { get; private set; }
+	public Vector3 LastDiveDirection { get; private set; } = Vector3.Down;
+	public Vector3 LastAimPoint { get; private set; }
+	public bool HasGroundAim { get; private set; }
 
 	/// <summary>本次下落攻击实际用的伤害（表值 ×(1+加成)）——「落剑式」的额外范围攻击读它做基准。</summary>
 	public float LastDamage { get; private set; }
@@ -101,14 +78,14 @@ public partial class FallAttackAbility : Ability
 	/// <summary>下落期间每次判定额外加成的比例（自测取一档看得到）。</summary>
 	public float DamageMultiplierForHeight(float height)
 	{
-		if (HeightStep <= 0f)
-		{
-			return 1f;
-		}
-
-		int steps = Mathf.FloorToInt(Mathf.Max(0f, height) / HeightStep);
-		float bonus = Mathf.Min(MaxDamageBonus, steps * DamageBonusPerStep);
-		return 1f + Mathf.Max(0f, bonus);
+		return DamageMultiplierForDive(height, StandardDiveSpeed);
+	}
+	/// <summary>标准速度求参考耗时，避免实际速度乘实际耗时退化成纯高度。</summary>
+	public float DamageMultiplierForDive(float height, float downwardSpeed)
+	{
+		float referenceTime = Mathf.Max(0, height) / Mathf.Max(0.001f, StandardDiveSpeed);
+		float heightReference = Movement?.StandardJumpHeight ?? 1;
+		return Mathf.Clamp(Mathf.Max(0, downwardSpeed) * referenceTime / Mathf.Max(0.001f, heightReference), 0, Mathf.Max(0, MaxDamageMultiplier));
 	}
 
 	private AttackHitbox? _hitbox;
@@ -116,6 +93,7 @@ public partial class FallAttackAbility : Ability
 	private bool _landed;
 	private float _diveTime;
 	private float _landTimer;
+	private Vector3 _previousPosition;
 
 	protected override void OnReady()
 	{
@@ -123,7 +101,19 @@ public partial class FallAttackAbility : Ability
 	}
 
 	/// <summary>**只有在空中才能用**（文档：「当角色在空中时…可以使用下落攻击」）。</summary>
-	protected override bool CanActivate(Unit? target) => Movement is { IsGrounded: false };
+	protected override bool CanActivate(Unit? target) => Movement is { IsGrounded: false } && TryGroundHeight(out _);
+	private bool TryGroundHeight(out float height)
+	{
+		height = 0;
+		if (OwnerUnit == null) return false;
+		Vector3 feet = OwnerUnit.GlobalPosition;
+		var query = PhysicsRayQueryParameters3D.Create(feet + Vector3.Up * 0.02f, feet + Vector3.Down * GroundProbeDistance, CombatLayers.World);
+		query.Exclude = new Godot.Collections.Array<Rid> { OwnerUnit.GetRid() };
+		var hit = OwnerUnit.GetWorld3D().DirectSpaceState.IntersectRay(query);
+		if (hit.Count == 0 || hit["normal"].AsVector3().Y < GroundMinNormalY) return false;
+		height = Mathf.Max(0, feet.Y - hit["position"].AsVector3().Y);
+		return height > 0.001f;
+	}
 
 	/// <summary>自测用：把 <see cref="CanActivate"/> 的结果暴露出来（它就是那条"空中才能用"的闸门）。</summary>
 	public bool CanActivateForTest() => CanActivate(null);
@@ -136,61 +126,36 @@ public partial class FallAttackAbility : Ability
 			return;
 		}
 
-		_diving = true;
+		_diving = false;
 		_landed = false;
 		_diveTime = 0f;
 		_landTimer = 0f;
 		HasLanded = false;
 
-		LastFallHeight = Movement.FallHeight;
-		LastDamageBonus = DamageMultiplierForHeight(LastFallHeight) - 1f;
-		LastDamage = (_hitbox?.Damage ?? 0f) * (1f + LastDamageBonus);
-
-		PlaySkillAnimation();
-
-		// 大幅提高下落速度（"落下攻击"的本体）。
-		Movement.SetVerticalVelocity(-Mathf.Abs(DiveSpeed));
-		ApplyDiveDirection();
-
-		// 下落期间命中盒一直开着（同一目标按 HitInterval 反复吃伤）。
-		ActivateDiveHitbox();
-
-		GameLog.Write(
-			"Combat",
-			$"下落攻击：{AbilityId} 起手高度 {LastFallHeight:0.##}m（每 {HeightStep:0.##}m +{DamageBonusPerStep * 100f:0.#}%，上限 +{MaxDamageBonus * 100f:0.#}%）"
-			+ $" → 加成 +{LastDamageBonus * 100f:0.#}% 伤害 {LastDamage:0.##}｜下落速度 {-Mathf.Abs(DiveSpeed):0.##} m/s 模式 {HomingMode}");
+		TryGroundHeight(out float height);
+		LastFallHeight = height;
+		LastReferenceFallTime = height / Mathf.Max(0.001f, StandardDiveSpeed);
+		LastDamageBonus = -1;
+		LastDamage = 0;
+		HasGroundAim = false;
+		if (string.IsNullOrEmpty(AnimName) || string.IsNullOrEmpty(AnimEvent) || PlaySkillAnimation().Length == 0) Cancel();
 	}
 
 	/// <summary>「落日余晖」：把下落方向拨到准星方位（夹在指向范围内）。</summary>
-	private void ApplyDiveDirection()
+	protected override void OnAnimEvent(string name)
 	{
-		if (HomingMode != DiveMode.Crosshair || OwnerUnit == null || Movement == null)
-		{
-			return;
-		}
-
-		Vector3 direction = ResolveDiveDirection();
-		Vector3 planar = new(direction.X, 0f, direction.Z);
-		float horizontal = planar.Length();
-		if (horizontal < 0.001f)
-		{
-			GameLog.Write("Combat", $"落日余晖：{AbilityId} 准星没有指向地面（或指向不出去）→ 直直下落。");
-			return;
-		}
-
-		// 水平分量以 DiveSpeed 的分量给出：夹角越大水平越快（夹在 MaxDiveAngleDegrees 内）。
-		float angle = Mathf.Clamp(Mathf.RadToDeg(Mathf.Atan2(horizontal, Mathf.Abs(direction.Y))), 0f, MaxDiveAngleDegrees);
-		Vector3 flat = planar.Normalized();
-		float vertical = -Mathf.Abs(DiveSpeed) * Mathf.Cos(Mathf.DegToRad(angle));
-		float lateral = Mathf.Abs(DiveSpeed) * Mathf.Sin(Mathf.DegToRad(angle));
-
-		Movement.SetVerticalVelocity(vertical);
-		Movement.AddImpulse(flat * lateral);
-
-		GameLog.Write(
-			"Combat",
-			$"落日余晖：{AbilityId} 朝准星方位冲下（方位 {flat}，夹角 {angle:0.#}° ≤ 指向范围 {MaxDiveAngleDegrees:0.#}°，垂直 {vertical:0.##} 水平 {lateral:0.##}）"
-			+ $"｜准星世界点 {AimPoint()}");
+		if (name != AnimEvent || _diving || _landed || OwnerUnit == null || Movement == null) return;
+		if (Movement.IsGrounded) { Cancel(); return; }
+		LastDiveDirection = ResolveDiveDirection();
+		Vector3 velocity = LastDiveDirection * Mathf.Abs(DiveSpeed);
+		if (!Movement.BeginVelocityOverride(this, velocity)) { Cancel(); return; }
+		LastDownwardSpeed = Mathf.Max(0, -velocity.Y);
+		LastDamageBonus = DamageMultiplierForDive(LastFallHeight, LastDownwardSpeed) - 1;
+		LastDamage = (_hitbox?.Damage ?? 0) * LastDamageMultiplier * OwnerUnit.Stats.Get("DamageMultiplier");
+		_previousPosition = OwnerUnit.GlobalPosition;
+		_diving = true;
+		ActivateDiveHitbox();
+		GameLog.Write("Combat", $"下落攻击：{AbilityId} Action起动，起手离地{LastFallHeight:0.####}m，参考耗时{LastReferenceFallTime:0.####}s，垂直速{LastDownwardSpeed:0.####}m/s，倍率{LastDamageMultiplier:0.####}，伤害{LastDamage:0.####}，方向{LastDiveDirection}");
 	}
 
 	/// <summary>准星打到的东西（判断"有没有指向地面"）→ 朝那个点的方向；没打到地面就返回向下。</summary>
@@ -201,23 +166,17 @@ public partial class FallAttackAbility : Ability
 			return Vector3.Down;
 		}
 
-		Vector3 point = AimPoint();
-		Vector3 delta = point - OwnerUnit.GlobalPosition;
-		return delta.LengthSquared() > 0.0001f ? delta.Normalized() : Vector3.Down;
-	}
-
-	private Vector3 AimPoint()
-	{
-		if (OwnerUnit == null)
-		{
-			return Vector3.Zero;
-		}
-
-		return AimUtil.GetCrosshairPoint(
-			GetViewport(),
-			OwnerUnit,
-			MaxAimDistance,
-			CombatLayers.World | CombatLayers.HostileTo(OwnerUnit.Faction));
+		if (HomingMode != DiveMode.Crosshair) return Vector3.Down;
+		HasGroundAim = AimUtil.TryGetCrosshairGroundPoint(GetViewport(), OwnerUnit, MaxAimDistance, GroundMinNormalY, out Vector3 target);
+		if (!HasGroundAim) return Vector3.Down;
+		// 目标须低于角色；超出角度时仍保留同一水平方向。
+		Vector3 delta = target - OwnerUnit.GlobalPosition;
+		if (delta.Y >= -0.001f) { HasGroundAim = false; return Vector3.Down; }
+		Vector3 planar = new(delta.X, 0, delta.Z);
+		float maxRange = -delta.Y * Mathf.Tan(Mathf.DegToRad(Mathf.Clamp(MaxDiveAngleDegrees, 0, 85)));
+		if (planar.Length() > maxRange) planar = planar.Normalized() * maxRange;
+		LastAimPoint = OwnerUnit.GlobalPosition + new Vector3(planar.X, delta.Y, planar.Z);
+		return (LastAimPoint - OwnerUnit.GlobalPosition).Normalized();
 	}
 
 	private void ActivateDiveHitbox()
@@ -254,6 +213,11 @@ public partial class FallAttackAbility : Ability
 		if (_diving)
 		{
 			_diveTime += delta;
+			if (OwnerUnit != null)
+			{
+				_hitbox?.SweepSphere(_previousPosition, OwnerUnit.GlobalPosition);
+				_previousPosition = OwnerUnit.GlobalPosition;
+			}
 			// 落地判定：物理帧里 IsOnFloor 为真（下落攻击把垂直速度压到 -DiveSpeed，一碰地就为真）。
 			if (Movement is { IsGrounded: true })
 			{
@@ -264,9 +228,15 @@ public partial class FallAttackAbility : Ability
 			if (_diveTime > MaxDiveSeconds)
 			{
 				GameLog.Write("Combat", $"⚠ 下落攻击 {AbilityId} 超过 {MaxDiveSeconds:0.##}s 还没落地，收招（命中盒关掉）。");
-				Land();
+				Cancel();
 			}
 
+			return;
+		}
+		if (!_landed && (Movement is { IsGrounded: true } || StateTime > EventWaitSeconds / Mathf.Max(0.01f, AnimSpeedScale)))
+		{
+			GameLog.Write("Combat", $"下落攻击：{AbilityId} 未等到Action或起动前已落地，取消，不派发落地伤害。");
+			Cancel();
 			return;
 		}
 
@@ -288,6 +258,7 @@ public partial class FallAttackAbility : Ability
 		HasLanded = true;
 		_landTimer = Mathf.Max(0.02f, LandRecoverSeconds);
 		_hitbox?.Deactivate();
+		Movement?.EndVelocityOverride(this);
 
 		GameLog.Write("Combat", $"下落攻击：{AbilityId} 落地（起手高度 {LastFallHeight:0.##}m，伤害 {LastDamage:0.##}）—— 触发落地事件给「落剑式/落日余晖」这类被动。");
 		Landed?.Invoke();
@@ -304,6 +275,7 @@ public partial class FallAttackAbility : Ability
 	public override void _ExitTree()
 	{
 		_hitbox?.Deactivate();
+		Movement?.EndVelocityOverride(this);
 		base._ExitTree();
 	}
 
@@ -311,5 +283,6 @@ public partial class FallAttackAbility : Ability
 	{
 		_diving = false;
 		_hitbox?.Deactivate();
+		Movement?.EndVelocityOverride(this);
 	}
 }

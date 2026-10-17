@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="WeaponConfig" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="WeaponConfig" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b3_w1_1.tres" id="2_skl"]
@@ -6,10 +6,22 @@
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_spear.tres" id="4_pool"]
 
 [ext_resource type="Resource" path="res://Config/Tables/Characters/chr_weapon_master.tres" id="10_owner"]
+[ext_resource type="Script" path="res://Scripts/Config/FallAttackTuning.cs" id="11_fall_aim"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_fall.tres" id="12_fall"]
+
+[sub_resource type="Resource" id="fall_aim"]
+script = ExtResource("11_fall_aim")
+TargetAbility = ExtResource("12_fall")
+Mode = 1
+MaxDiveAngleDegrees = 35.0
+MaxAimDistance = 60.0
+GroundProbeDistance = 512.0
+GroundMinNormalY = 0.6
 
 [resource]
 script = ExtResource("1_row")
 OwnerCharacter = ExtResource("10_owner")
+FallAttackAim = SubResource("fall_aim")
 ModelPath = "res://Scenes/Weapons/Visuals/spear.tscn"
 IconPath = "res://Assets/UI/Icons/Skills/ic_skill_spear.svg"
 Pool = ExtResource("4_pool")

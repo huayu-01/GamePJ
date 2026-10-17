@@ -184,7 +184,15 @@ public partial class BatchCProbe : Node
 		Check(_player.GlobalPosition.Y > startY + 0.5f, "基地真实空格起跳");
 		Input.ParseInputEvent(new InputEventAction { Action = "fall_attack", Pressed = true });
 		await Wait(0.02);
-		Check(_player.GetNode<FallAttackAbility>("AbilityFallAttack").IsDiving && _player.Velocity.Y < -20, "基地真实下落攻击加速");
+		var fall = _player.GetNode<FallAttackAbility>("AbilityFallAttack");
+		Check(fall.IsActive && !fall.IsDiving, "基地下落起手等待真实Action");
+		double fallWait = 0;
+		while ((!fall.IsDiving || _player.Velocity.Y >= -20) && fall.IsActive && fallWait < 1)
+		{
+			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+			fallWait += GetProcessDeltaTime();
+		}
+		Check(fall.IsDiving && _player.Velocity.Y < -20, "基地真实Action后下落攻击加速");
 		await Shot("c_base_dive");
 		Input.ParseInputEvent(new InputEventAction { Action = "fall_attack", Pressed = false });
 		await Wait(0.4);

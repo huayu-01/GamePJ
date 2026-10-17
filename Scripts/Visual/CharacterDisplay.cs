@@ -22,11 +22,19 @@ public partial class CharacterDisplay : Node3D
 	public Node3D? ActiveModel { get; private set; }
 	public Node3D? EquippedWeapon { get; private set; }
 	private readonly List<WeaponThrowAbility> _throws = new();
+	private FallAttackAbility? _fall;
+	private Transform3D _weaponRestTransform;
+	public bool DivePoseActive { get; private set; }
+	[Export] public Vector3 DiveGripOffset { get; set; } = new(0.25f, 0.9f, -0.2f);
 	public int ModelCount => _models.Count;
 	public override void _Ready()
 	{
 		_original = GetNode<Node3D>(OriginalModelPath);
-		if (GetParent() is Unit unit) NodeSearch.CollectInSubtree(unit, _throws);
+		if (GetParent() is Unit unit)
+		{
+			NodeSearch.CollectInSubtree(unit, _throws);
+			_fall = NodeSearch.FindInSubtree<FallAttackAbility>(unit);
+		}
 		_models[_original.SceneFilePath] = _original;
 		foreach (CharacterConfig row in FixedCharacter != null ? new[] { FixedCharacter } : ConfigIndex.Settings.Characters)
 		{
@@ -64,6 +72,12 @@ public partial class CharacterDisplay : Node3D
 	}
 	public void Apply(CharacterConfig character, WeaponConfig weapon)
 	{
+		if (EquippedWeapon != null && IsInstanceValid(EquippedWeapon))
+		{
+			EquippedWeapon.TopLevel = false;
+			EquippedWeapon.Transform = _weaponRestTransform;
+		}
+		DivePoseActive = false;
 		CurrentModelPath = string.IsNullOrEmpty(character.ModelPath) ? _original.SceneFilePath : character.ModelPath;
 		if (!_models.TryGetValue(CurrentModelPath, out var model)) return;
 		foreach (var cached in _models.Values) cached.Visible = cached == model;
@@ -82,6 +96,7 @@ public partial class CharacterDisplay : Node3D
 			}
 			visual.Visible = true;
 			EquippedWeapon = visual;
+			_weaponRestTransform = visual.Transform;
 		}
 		if (GetParent() is Unit unit)
 		{
@@ -104,5 +119,17 @@ public partial class CharacterDisplay : Node3D
 		foreach (var ability in _throws)
 			if (IsInstanceValid(ability) && ability.Enabled && ability.InFlight) { away = true; break; }
 		EquippedWeapon.Visible = !away;
+		DivePoseActive = !away && _fall is { Enabled: true, IsDiving: true, HomingMode: FallAttackAbility.DiveMode.Crosshair };
+		Vector3 worldScale = EquippedWeapon.GlobalBasis.Scale.Abs();
+		EquippedWeapon.TopLevel = DivePoseActive;
+		if (DivePoseActive)
+		{
+			// 只读真实下冲方向，把占位长枪的+Y枪尖朝向落点，不改骨架、速度或命中体。
+			// 临时解除骨骼父变换，避免同帧稍后的骨骼更新再次转偏枪尖。
+			Unit unit = _fall!.OwnerUnit!;
+			EquippedWeapon.GlobalTransform = new Transform3D(new Basis(new Quaternion(Vector3.Up, _fall.LastDiveDirection)) * Basis.FromScale(worldScale),
+				unit.GlobalPosition + unit.GlobalBasis * DiveGripOffset);
+		}
+		else EquippedWeapon.Transform = _weaponRestTransform;
 	}
 }

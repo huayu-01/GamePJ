@@ -61,8 +61,7 @@ public sealed class PlayerLoadout
 			character.ApplyAnimationTo(player);
 			if (player.Movement is { } movement)
 			{
-				movement.JumpVelocity = character.JumpVelocity;
-				if (character.JumpGravityScale > 0) movement.GravityScale = character.JumpGravityScale;
+				character.ApplyJumpTo(movement);
 			}
 			if (player.GetNodeOrNull<SprintController>("Sprint") is { } sprint)
 			{
@@ -71,6 +70,8 @@ public sealed class PlayerLoadout
 			}
 		}
 		if (weaponRow != null) UnitConfig.ApplySkills(player, weaponRow.Skills, weaponRow.Id);
+		if (weaponRow?.FallAttackAim is { TargetAbility: { } fallRow } aim
+			&& Ability.FindByAbilityId(player, fallRow.Id) is FallAttackAbility fall) aim.ApplyAimTo(fall);
 
 		// 先恢复绑定、再套技能行、最后执行矩阵；不能把新技能的按键再次清空。
 		foreach (Ability ability in abilities)

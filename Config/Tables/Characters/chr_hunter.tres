@@ -22,6 +22,7 @@ AttackRange = 0.0
 AttackKnockback = 0.0
 JumpVelocity = 13.0
 JumpGravityScale = 3.6
+AirJumpHeightRatio = 0.5
 SprintInputAction = "sprint"
 SprintSpeedMultiplier = 1.5
 AnimLibraryDir = "res://Assets/Characters/Lyra/skills/"

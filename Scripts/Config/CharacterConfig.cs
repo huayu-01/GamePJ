@@ -1,3 +1,4 @@
+using ActRoguelike.Combat;
 using Godot;
 
 namespace ActRoguelike.Config;
@@ -64,6 +65,14 @@ public partial class CharacterConfig : UnitConfig
 	/// （用户抱怨的就是"过程太漫长"）。两列都是固定值，没有任何倍率运算。
 	/// </summary>
 	[Export(PropertyHint.Range, "0,10,0.05")] public float JumpGravityScale { get; set; } = 1.8f;
+	/// <summary>普通额外空中跳相对地面跳的高度比例；速度按平方根换算。</summary>
+	[Export(PropertyHint.Range, "0,2,0.05")] public float AirJumpHeightRatio { get; set; } = 0.5f;
+	public void ApplyJumpTo(CharacterMovement movement)
+	{
+		movement.JumpVelocity = JumpVelocity;
+		movement.AirJumpHeightRatio = Mathf.Max(0, AirJumpHeightRatio);
+		if (JumpGravityScale > 0) movement.GravityScale = JumpGravityScale;
+	}
 
 	[ExportGroup("奔跑（P6d 新增；只有玩家读这两列，见 SprintController）")]
 	/// <summary>

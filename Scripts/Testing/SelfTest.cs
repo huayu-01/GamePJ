@@ -3848,34 +3848,32 @@ public partial class SelfTest : Node
 		fall.RefreshCooldown();
 		bool pressedOnGround = fall.TryPress();
 
-		// ② 举到空中（离地 6m）再按 → 起跳高度记进 FallHeight。
+		// ② 举到空中（离地6m）再按，记录脚下真实World高度，等待动画Action。
 		Vector3 start = _p4Player.GlobalPosition;
 		_p4Player.GlobalPosition = start with { Y = start.Y + 6f };
 		_p4Player.Velocity = new Vector3(0f, -1f, 0f);
 		MovementOf(_p4Player)?._PhysicsProcess(0.02d);
-		float fallHeight = MovementOf(_p4Player)?.FallHeight ?? 0f;
 
 		fall.RefreshCooldown();
 		bool pressedInAir = fall.TryPress();
-		float diveSpeed = _p4Player.Velocity.Y;
 		_p4FallHeight = fall.LastFallHeight;
 		_p4FallDamage = fall.LastDamage;
 		float bonusLow = fall.DamageMultiplierForHeight(0f);
-		float bonusMid = fall.DamageMultiplierForHeight(fall.HeightStep * 2f);
-		float bonusHigh = fall.DamageMultiplierForHeight(fall.HeightStep * 20f);
+		float referenceHeight = MovementOf(_p4Player)?.StandardJumpHeight ?? 1;
+		float bonusMid = fall.DamageMultiplierForHeight(referenceHeight * 1.5f);
+		float bonusHigh = fall.DamageMultiplierForHeight(referenceHeight * 20f);
 
 		bool ok = blockedOnGround && !pressedOnGround && pressedInAir
-			&& diveSpeed <= -fall.DiveSpeed + 0.01f
-			&& Mathf.IsEqualApprox(bonusLow, 1f)
-			&& Mathf.IsEqualApprox(bonusMid, 1f + (2f * fall.DamageBonusPerStep))
-			&& Mathf.IsEqualApprox(bonusHigh, 1f + fall.MaxDamageBonus);
+			&& !fall.IsDiving && fall.LastFallHeight > 5
+			&& Mathf.IsEqualApprox(bonusLow, 0)
+			&& Mathf.IsEqualApprox(bonusMid, 1.5f)
+			&& Mathf.IsEqualApprox(bonusHigh, fall.MaxDamageMultiplier);
 		GameLog.Write(
 			"SelfTest",
 			$"{(ok ? "✅" : "🔴")} P4·被动 落（下落攻击）：CD {fall.Cooldown:0.##}（期望 1） 触发键 {fall.InputAction}（期望 fall_attack）"
 			+ $"｜地面时：在地面={grounded}（期望 True） 可按={!blockedOnGround}（期望 False） TryPress={pressedOnGround}（期望 False）"
-			+ $"｜空中时：TryPress={pressedInAir}（期望 True） 下落速度 {diveSpeed:0.##} m/s（期望 ≤ -{fall.DiveSpeed:0.##}） 起手高度（净下落）{_p4FallHeight:0.##}m 伤害 {_p4FallDamage:0.##}"
-			+ $"｜高度→伤害：每 {fall.HeightStep:0.##}m +{fall.DamageBonusPerStep * 100f:0.#}%（文档 n=预设 2m），封顶 +{fall.MaxDamageBonus * 100f:0.#}%（文档 100%）"
-			+ $" → 0m ×{bonusLow:0.##}（期望 ×1） 2 档 ×{bonusMid:0.##}（期望 ×{1f + (2f * fall.DamageBonusPerStep):0.##}） 20 档 ×{bonusHigh:0.##}（期望 ×{1f + fall.MaxDamageBonus:0.##} = 封顶）");
+			+ $"｜空中时：TryPress={pressedInAir}（期望 True） 等待Action={!fall.IsDiving} 起手真实离地高度{_p4FallHeight:0.##}m"
+			+ $"｜同标准速度：0高度×{bonusLow:0.##}，1.5份基础跳高×{bonusMid:0.##}，高处封顶×{bonusHigh:0.##}（表上限{fall.MaxDamageMultiplier:0.##}）");
 	}
 
 	/// <summary>落地：上游伤害不变，额外一圈（落剑式）+ 落剑式的 CD 间隔。</summary>

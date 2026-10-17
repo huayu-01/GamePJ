@@ -17,6 +17,10 @@ public partial class CharacterMovement : Node
 	[Export] public float GroundAcceleration { get; set; } = 60f;
 	[Export] public float AirAcceleration { get; set; } = 15f;
 	[Export] public float JumpVelocity { get; set; } = 6.5f;
+	/// <summary>额外空中跳的高度比例，玩家从角色表覆盖；其它单位保留原跳高。</summary>
+	[Export] public float AirJumpHeightRatio { get; set; } = 1f;
+	public float StandardJumpHeight => JumpVelocity * JumpVelocity / (2 * Mathf.Max(0.001f, _gravity * GravityScale));
+	public float EffectiveAirJumpVelocity => EffectiveJumpVelocity * Mathf.Sqrt(Mathf.Max(0, AirJumpHeightRatio));
 
 	/// <summary>落地后可用的额外空中跳跃次数（0 = 不能二段跳）。</summary>
 	[Export] public int ExtraAirJumps { get; set; }
@@ -68,6 +72,26 @@ public partial class CharacterMovement : Node
 	private int _airJumpsLeft;
 	private Vector3 _dashDirection;
 	private float _dashSpeed;
+	private object? _velocityOverrideSource;
+	private Vector3 _overrideVelocity;
+	public bool HasVelocityOverride => _velocityOverrideSource != null;
+
+	/// <summary>动作持有完整三维速度；结束时只能释放自己持有的覆盖。</summary>
+	public bool BeginVelocityOverride(object source, Vector3 velocity)
+	{
+		if (_velocityOverrideSource != null && !ReferenceEquals(_velocityOverrideSource, source)) return false;
+		_velocityOverrideSource = source;
+		_overrideVelocity = velocity;
+		return true;
+	}
+	public void EndVelocityOverride(object source)
+	{
+		if (!ReferenceEquals(_velocityOverrideSource, source)) return;
+		_velocityOverrideSource = null;
+		_overrideVelocity = Vector3.Zero;
+		_inputVelocity = Vector3.Zero;
+		if (IsInstanceValid(_body)) _body.Velocity = Vector3.Zero;
+	}
 
 	public bool IsGrounded => _body.IsOnFloor();
 	public Vector3 PlanarVelocity { get { Vector3 v = _body.Velocity; v.Y = 0f; return v; } }
@@ -77,9 +101,7 @@ public partial class CharacterMovement : Node
 	/// 之后每帧算 <c>最高点.Y - 当前.Y</c>（夹在 ≥0）。落到地面时最后一次 <see cref="_PhysicsProcess"/>
 	/// 里仍然是"落地前那一帧"的值，所以"落地时的下落高度"读得到。
 	///
-	/// <para>用它的是角色 B 的下落攻击：设计文档第 99 行「**高度越高时伤害越高**，每 n 增加 20%，
-	/// 最高增加 100%」—— 高度必须是**量出来的**，不能靠"离地高度"近似（起跳后先升后降，
-	/// 离地高度会在上升到最高点时最大，那与"下落了多少"完全是两回事）。</para>
+	/// <para>该量保留给实际下落距离的观察者；共通落已按用户裁定改读起手脚下到World地面高度。</para>
 	///
 	/// <para>⚠️ 默认（没有任何技能读它）行为逐位不变：它只在一处多算了两个浮点量，
 	/// 不参与 <c>MoveAndSlide</c> 的任何输入。</para>
@@ -185,11 +207,7 @@ public partial class CharacterMovement : Node
 		}
 
 		// 直接改固定值（用户需求 A2：不要倍率、不要"逻辑运算"）。
-		JumpVelocity = row.JumpVelocity;
-		if (row.JumpGravityScale > 0f)
-		{
-			GravityScale = row.JumpGravityScale;
-		}
+		row.ApplyJumpTo(this);
 
 		ActRoguelike.Core.GameLog.Write(
 			"Config",
@@ -242,6 +260,7 @@ public partial class CharacterMovement : Node
 
 	public bool TryJump()
 	{
+		if (HasVelocityOverride) return false;
 		if (_body.IsOnFloor())
 		{
 			_body.Velocity = _body.Velocity with { Y = EffectiveJumpVelocity };
@@ -251,7 +270,7 @@ public partial class CharacterMovement : Node
 		if (_airJumpsLeft > 0)
 		{
 			_airJumpsLeft--;
-			_body.Velocity = _body.Velocity with { Y = EffectiveJumpVelocity };
+			_body.Velocity = _body.Velocity with { Y = EffectiveAirJumpVelocity };
 			return true;
 		}
 
@@ -294,6 +313,15 @@ public partial class CharacterMovement : Node
 			}
 
 			FallHeight = Mathf.Max(0f, _apexY - nowY);
+		}
+
+		if (HasVelocityOverride)
+		{
+			_externalVelocity *= Mathf.Max(0, 1 - ImpulseDamping * dt);
+			_body.Velocity = _overrideVelocity;
+			_body.MoveAndSlide();
+			if (FaceMovementDirection) FaceDirection(_hasFacing ? _facing : _overrideVelocity, dt);
+			return;
 		}
 
 		// 输入速度单独维护：不能从刚体速度里读回来，否则击退会叠加上一帧的击退形成正反馈。

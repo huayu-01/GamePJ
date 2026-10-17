@@ -119,6 +119,8 @@ public partial class WeaponConfig : ConfigRow
 	/// <para>留空 = 这把武器没有武技（旧 3 把枪就是这种：开火由 <c>Weapon</c> 组件负责）。</para>
 	/// </summary>
 	[Export] public AbilityConfig[] Skills { get; set; } = System.Array.Empty<AbilityConfig>();
+	/// <summary>武器专属下冲方向覆盖；指向共通技能行，不增加隐藏技能或重复行Id。</summary>
+	[Export] public FallAttackTuning? FallAttackAim { get; set; }
 
 	/// <summary>把自己套到武器组件上。字段清单与 <c>RunController.EquipWeapon</c> 原来的逐项赋值一一对应。</summary>
 	public override void ApplyTo(Node target)

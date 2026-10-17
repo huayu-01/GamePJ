@@ -1,5 +1,7 @@
 # 能力机制：蓄力 · 完美时机 · 技能层数 · 冷却缩减（P2 通用地基）
 
+> **原文纠偏J4**：共通落在按下时记录脚下到World地面的高度，真实Action才下冲；倍率改为`min(上限, 起手高度/普通单跳高度 × 垂直速度/标准速度)`。标准单跳1倍、二段跳额外50%高度时同速1.5倍，不额外加1；默认上限2倍，可在强类型`FallAttackTuning`配置。普通空中跳高比例独立进角色表，默认0.5。长枪从武器行引用共通技能并覆盖准星方向，墙／天空回落直下，超范围同向截断；镰刀／灵剑直落，只有灵剑有额外落剑式。只有真实落地发Landed，超时取消；高速球体胶囊扫掠与Area共用命中追踪。[接线与实测](character-design-j4.md)。
+
 > **原文纠偏J3**：前台动作默认后按打断前一个。`CanBeInterrupted=false`为全程例外，`InterruptLockSeconds`为起手锁定的动画秒数，默认0；不用旧Windup代替。每单位实例事件加播放序号隔离，旧技能不能消费新动画的ATK，也不能在收尾时停止新动画。被打断进入原有CD／回层，未触发效果不补发；后台、离手武器和落地附加圈不占前台动作。真实同帧输入按事件顺序交接。[配置和证据](character-design-j3.md)。
 
 > **原文纠偏J1/J2（2026-10-17，覆盖下方历史接入记录）**：长枪四段循环；落剑式只归灵剑，镰刀／长枪技能栏五格。投掷在真实ATK出手，合格松手重播释放动画等待ATK，取消不兜底发伤害。
@@ -462,7 +464,7 @@ TryPress(第一次) → TryActivate → OnActivate：播 ComboAnimations[0]
 | `Ability.TryPress(target)` | **"玩家按了这个键"**的入口；默认实现 = `TryActivate` | 同上 |
 | `Ability.BeginEventDrivenCast()` | 让"事件驱动的被动"进入施法态（`LandingBurstAbility` 用） | 同上 |
 | `Ability.LoadSeries/BindSeries` | 按路径读 `AbilitySeries` —— ⚠️ **P8 已删**（"按路径 load"那条路） | 同上 |
-| `CharacterMovement.FallHeight` / `IsAirborne` | **本次离地后的净下落高度**（下落攻击的高度档） | 只多算两个浮点量，不参与 `MoveAndSlide` 输入 |
+| `CharacterMovement.FallHeight` / `IsAirborne` | 本次离地后的净下落高度，保留给落地观测；共通落J4已改读起手真实离地高度 | 不作为共通落的伤害分母或高度来源 |
 | `Projectile.CutBySceneName(...)` / `SourceSceneName` / `_live` | 近战斩断子弹（按**来源场景名**匹配 + 半径过滤 + 排除名单） | 名单为空 → 一次都不查 |
 | `ArrowVolleyAbility.ProjectileSizeScale` | 投射物整体缩放（剑气"大小等比攻击盒大小"） | ≤0 → 一行不进 |
 

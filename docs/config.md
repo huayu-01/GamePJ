@@ -1,5 +1,7 @@
 # 数值配置（调参唯一入口）
 
+> **2026-10-17 J4下落与空中跳**：两条角色行新增`AirJumpHeightRatio=0.5`，表示额外空中跳的高度为地面跳的一半，按平方根换算速度。`Skills/skl_b_fall.tres → FallAttack`子资源中配置实际`DiveSpeed=34`、参考`StandardDiveSpeed=34`和`MaxDamageMultiplier=2`；倍率为起手脚下离地高度／基础单跳高度×垂直速度／参考速度。长枪行`FallAttackAim`只覆盖准星方向与35°范围，资源引用共通技能；不新增隐藏技能行或ConfigIndex项。旧阶梯`HeightStep/DamageBonusPerStep/MaxDamageBonus`已删除。[配置、实测和边界](character-design-j4.md)。
+
 > ⚠️ **2026-10-15 P6a 清旧之后的当前状态**：旧 3 角色 / 3 武器 / 5 条旧技能行 / 17 条旧增幅 /
 > 3 个旧升级池 / 2 张旧能力卡**已删除**；`BaseScreen`（旧「永久强化」页）**整份删除**，
 > 局外成长台现在开**能力卡界面**；「左键归谁」由**武器行**的 `WeaponConfig.UsesWeaponComponent` 决定

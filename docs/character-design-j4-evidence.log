@@ -1,0 +1,277 @@
+Debug 编译：0 warning / 0 error
+design_headless 退出码=0
+design_headless stderr字节=0
+design_render 退出码=0
+design_render stderr字节=0
+[Fall] PASS 普通单跳基准高度2.2959m为1倍，实际1
+[Fall] PASS 二段跳多50%高度为1.5倍，实际1.5
+[Fall] PASS 按下后等待真实Action，不提前下冲
+[Fall] PASS 记录起手脚下真实离地高度，实际7.9913m
+[Fall] PASS 真实World落地
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 1份高度/34m/s等待真实Action起动
+[Fall] PASS 实际倍率0.9962，目标1（起手2.2872m，参考0.0673s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害17.9317，生命9982.068
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 1.5份高度/34m/s等待真实Action起动
+[Fall] PASS 实际倍率1.4962，目标1.5（起手3.4352m，参考0.101s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害26.9317，生命9973.068
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 1.5份高度/17m/s等待真实Action起动
+[Fall] PASS 实际倍率0.7481，目标0.75（起手3.4352m，参考0.101s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害13.4659，生命9986.534
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 1份高度/17m/s等待真实Action起动
+[Fall] PASS 实际倍率0.4981，目标0.5（起手2.2872m，参考0.0673s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害8.9659，生命9991.034
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 5份高度/34m/s等待真实Action起动
+[Fall] PASS 实际倍率2，目标2（起手11.4709m，参考0.3374s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害36，生命9964
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 600m/s仍真实落地
+[Fall] PASS 600m/s两帧之间窄目标扫掠命中一次：1
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 全局增伤样本真实起动
+[Fall] PASS 全局增伤只乘一次：37.7044
+[Fall] PASS 长枪从武器表接定向覆盖
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 长枪真实Action开始斜冲
+[Fall] PASS 同方向选地面，夹角17.958°，落点(22, 0, 20)
+[Fall] PASS 伤害仅取垂直速度32.3436，总速34
+[Fall] PASS 握持长枪枪尖对齐真实下冲方向，表现只读：活动=True，点积=1
+[Fall] PASS 斜冲真实落地
+[Fall] PASS 实际落点接近目标：(22.096601, 0.0008763452, 20)
+[Fall] PASS 长枪从武器表接定向覆盖
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 长枪真实Action开始斜冲
+[Fall] PASS 同方向选地面，夹角35°，落点(24.320747, 0, 20)
+[Fall] PASS 伤害仅取垂直速度27.8512，总速34
+[Fall] PASS 超范围按最大角度截到同方向
+[Fall] PASS 握持长枪枪尖对齐真实下冲方向，表现只读：活动=True，点积=1
+[Fall] PASS 斜冲真实落地
+[Fall] PASS 实际落点接近目标：(24.550383, 0.0008836665, 20)
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 准星指天空时垂直下落
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 准星命中World墙面不误作地面
+[Fall] PASS 换Scythe恢复共通直落，无长枪方向残留
+[Fall] PASS 换装恢复握持姿态
+[Fall] PASS 换SpiritSword恢复共通直落，无长枪方向残留
+[Fall] PASS 换装恢复握持姿态
+[Fall] PASS 普通二段跳样本从真实地面开始
+[Fall] PASS 角色表额外跳高50%，速度比例0.70711
+[Fall] PASS 普通单跳经过真实重力到最高点
+[Fall] PASS 额外跳经过真实重力到最高点
+[Fall] PASS 实际单跳高2.4461m，额外高1.1185m，比值0.4573（含物理帧离散误差）
+[Fall] PASS 真实二段跳总高度折算标准下落倍率1.4883
+[Fall] PASS 强类型下落参数可保存成表资源
+[Fall] PASS 实际读回表资源改变速度与倍率上限，无字符串反射
+[Fall] PASS 角色表空中跳高比例可写盘
+[Fall] PASS 真实读回0.25跳高比例，经生产接线得到0.5起跳速度比例
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 武器大师真实二段跳后按Ctrl：起手3.4689m，倍率1.5109
+[Fall] PASS 二段跳后真实下冲落地
+[Fall] PASS 二段跳下落伤害实际进入目标：27.1963
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 缺少Action时取消，不以计时兜底下冲
+[Fall] PASS 缺事件无伤害、无落地附加圈、无速度残留
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 下冲超时正确取消
+[Fall] PASS 超时不能伪造落地事件
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 其他来源不能释放本次下冲速度
+[Fall] PASS 后来架势打断下冲，释放速度且不派发落地
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 换装清理下冲速度与命中体
+[Fall] PASS 脚下无真实World地面时拒绝下落攻击，不用空点编造高度
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 死亡释放下冲速度和命中状态
+[Fall] === 下落专项验收结束：通过 104，失败 0 ===
+[Fall] PASS 普通单跳基准高度2.2959m为1倍，实际1
+[Fall] PASS 二段跳多50%高度为1.5倍，实际1.5
+[Fall] PASS 按下后等待真实Action，不提前下冲
+[Fall] PASS 记录起手脚下真实离地高度，实际7.9913m
+[Fall] PASS 真实World落地
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 1份高度/34m/s等待真实Action起动
+[Fall] PASS 实际倍率0.9962，目标1（起手2.2872m，参考0.0673s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害17.9317，生命9982.068
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 1.5份高度/34m/s等待真实Action起动
+[Fall] PASS 实际倍率1.4962，目标1.5（起手3.4352m，参考0.101s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害26.9317，生命9973.068
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 1.5份高度/17m/s等待真实Action起动
+[Fall] PASS 实际倍率0.7481，目标0.75（起手3.4352m，参考0.101s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害13.4659，生命9986.534
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 1份高度/17m/s等待真实Action起动
+[Fall] PASS 实际倍率0.4981，目标0.5（起手2.2872m，参考0.0673s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害8.9659，生命9991.034
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 5份高度/34m/s等待真实Action起动
+[Fall] PASS 实际倍率2，目标2（起手11.4709m，参考0.3374s）
+[Fall] PASS 伤害保留按下时高度，未改用前摇结束后高度
+[Fall] PASS 真实落地派发事件
+[Fall] PASS 落地事件仅一次并释放速度覆盖
+[Fall] PASS Area与扫掠共享间隔：命中1次，伤害36，生命9964
+[Fall] PASS 下冲扫掠不伤同阵营
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 600m/s仍真实落地
+[Fall] PASS 600m/s两帧之间窄目标扫掠命中一次：1
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 全局增伤样本真实起动
+[Fall] PASS 全局增伤只乘一次：37.7044
+[Fall] PASS 长枪从武器表接定向覆盖
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 长枪真实Action开始斜冲
+[Fall] PASS 同方向选地面，夹角18.47°，落点(22, 0, 20)
+[Fall] PASS 伤害仅取垂直速度32.2486，总速34
+[Fall] PASS 握持长枪枪尖对齐真实下冲方向，表现只读：活动=True，点积=1
+[Fall] PASS 截图j4_spear_dive
+[Fall] PASS 斜冲真实落地
+[Fall] PASS 实际落点接近目标：(22.154306, 0.0008967346, 20)
+[Fall] PASS 长枪从武器表接定向覆盖
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 长枪真实Action开始斜冲
+[Fall] PASS 同方向选地面，夹角35°，落点(24.320747, 0, 20)
+[Fall] PASS 伤害仅取垂直速度27.8512，总速34
+[Fall] PASS 超范围按最大角度截到同方向
+[Fall] PASS 握持长枪枪尖对齐真实下冲方向，表现只读：活动=True，点积=1
+[Fall] PASS 截图j4_spear_dive
+[Fall] PASS 斜冲真实落地
+[Fall] PASS 实际落点接近目标：(24.550383, 0.00088366645, 20)
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 准星指天空时垂直下落
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 准星命中World墙面不误作地面
+[Fall] PASS 换Scythe恢复共通直落，无长枪方向残留
+[Fall] PASS 换装恢复握持姿态
+[Fall] PASS 换SpiritSword恢复共通直落，无长枪方向残留
+[Fall] PASS 换装恢复握持姿态
+[Fall] PASS 普通二段跳样本从真实地面开始
+[Fall] PASS 角色表额外跳高50%，速度比例0.70711
+[Fall] PASS 普通单跳经过真实重力到最高点
+[Fall] PASS 额外跳经过真实重力到最高点
+[Fall] PASS 实际单跳高2.4461m，额外高1.1185m，比值0.4573（含物理帧离散误差）
+[Fall] PASS 真实二段跳总高度折算标准下落倍率1.4883
+[Fall] PASS 截图j4_double_jump
+[Fall] PASS 强类型下落参数可保存成表资源
+[Fall] PASS 实际读回表资源改变速度与倍率上限，无字符串反射
+[Fall] PASS 角色表空中跳高比例可写盘
+[Fall] PASS 真实读回0.25跳高比例，经生产接线得到0.5起跳速度比例
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 武器大师真实二段跳后按Ctrl：起手3.4689m，倍率1.5109
+[Fall] PASS 截图j4_double_jump_fall
+[Fall] PASS 二段跳后真实下冲落地
+[Fall] PASS 二段跳下落伤害实际进入目标：27.1963
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 缺少Action时取消，不以计时兜底下冲
+[Fall] PASS 缺事件无伤害、无落地附加圈、无速度残留
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 下冲超时正确取消
+[Fall] PASS 超时不能伪造落地事件
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 其他来源不能释放本次下冲速度
+[Fall] PASS 后来架势打断下冲，释放速度且不派发落地
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 换装清理下冲速度与命中体
+[Fall] PASS 脚下无真实World地面时拒绝下落攻击，不用空点编造高度
+[Fall] PASS 本次真实按键已进入下落起手
+[Fall] PASS 死亡释放下冲速度和命中状态
+[Fall] === 下落专项验收结束：通过 108，失败 0 ===
+actions_headless 退出码=0
+actions_headless stderr字节=0
+actions_render 退出码=0
+actions_render stderr字节=0
+[Action] === 动作交接验收结束：通过 38，失败 0 ===
+[Action] === 动作交接验收结束：通过 40，失败 0 ===
+original_headless 退出码=0
+original_headless stderr字节=0
+original_render 退出码=0
+original_render stderr字节=0
+[Design] === 原始设计验收结束：通过 115，失败 0 ===
+[Design] === 原始设计验收结束：通过 120，失败 0 ===
+selftest 退出码=0
+selftest stderr字节=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+f 退出码=0
+f stderr字节=0
+[Followup] === F专项验收结束：通过 33，失败 0 ===
+c 退出码=0
+c stderr字节=0
+[BatchC] === C批验收结束：通过 53，失败 0 ===
+d 退出码=0
+d stderr字节=0
+[BatchD] === D批验收结束：通过 90，失败 0 ===
+g 退出码=0
+g stderr字节=0
+[Feedback] === G专项验收结束：通过 51，失败 0 ===
+characters 退出码=0
+characters stderr字节=0
+[CharacterReplacement] 完成：通过 61，失败 0
+b 退出码=0
+b stderr字节=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a 退出码=0
+a stderr字节=0
+[BatchA] === A 批验收结束：失败 0 ===
+e 退出码=0
+e stderr字节=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+memory 退出码=0
+memory stderr字节=0
+跨进程读档5/0
+ExportRelease 编译：0 warning / 0 error
+截图 docs/screenshots/j4_spear_dive.png SHA256=BE9EEA2ABB13CE094A5C3C3F435BE6162C6E986EC6961CD16E34153CBACC7DB1
+截图 docs/screenshots/j4_double_jump.png SHA256=CD0BE60A314A4C2ED490E95A93755E78446516FC2AB8F01E15FBD7FE7B939037
+截图 docs/screenshots/j4_double_jump_fall.png SHA256=261B5DF8EA832895A9D6896F9CBEFE8E38844464EB70BF5F9435D37A172A0B67
+存档 meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+selftest.flag 不存在=True

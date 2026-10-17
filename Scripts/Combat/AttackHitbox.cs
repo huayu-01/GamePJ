@@ -163,6 +163,32 @@ public partial class AttackHitbox : Area3D
 		}
 	}
 
+	private CapsuleShape3D? _sphereSweep;
+	/// <summary>球体平移的精确胶囊扫掠，覆盖高速下冲的两帧间隙；与Area共用命中间隔。</summary>
+	public void SweepSphere(Vector3 from, Vector3 to)
+	{
+		if (!_active || _attack == null) return;
+		Vector3 travel = to - from;
+		float length = travel.Length();
+		foreach (Node child in GetChildren())
+		{
+			if (child is not CollisionShape3D { Shape: SphereShape3D sphere, Disabled: false } shape) continue;
+			Vector3 scale = shape.GlobalBasis.Scale.Abs();
+			float radius = sphere.Radius * Mathf.Max(scale.X, Mathf.Max(scale.Y, scale.Z));
+			_sphereSweep ??= new CapsuleShape3D();
+			_sphereSweep.Radius = radius;
+			_sphereSweep.Height = length + 2 * radius;
+			Basis basis = length > 0.00001f ? new Basis(new Quaternion(Vector3.Up, travel / length)) : Basis.Identity;
+			var query = new PhysicsShapeQueryParameters3D
+			{
+				Shape = _sphereSweep, Transform = new Transform3D(basis, shape.GlobalPosition - travel * 0.5f),
+				CollisionMask = CollisionMask, CollideWithAreas = false, CollideWithBodies = true
+			};
+			foreach (var hit in GetWorld3D().DirectSpaceState.IntersectShape(query, 128))
+				if (hit["collider"].AsGodotObject() is Unit target) HitTarget(target);
+		}
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
 		if (!_active || _attack == null) return;
