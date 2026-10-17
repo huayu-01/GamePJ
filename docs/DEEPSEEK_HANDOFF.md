@@ -20,6 +20,8 @@
 | J5 | 7b020fb | 闪真实Action才三维冲刺；架真实GuardOn开窗、单次命中无效化；闪身步来源过滤及收招CD1、招架反击CD0 |
 | J6 | 包含本文的提交 | 松手冻结结果后真实释放ATK出弹；变奏快射1→2→3循环、逐箭表内间隔、打断取消待发箭 |
 | J7 | 本批提交 | Main 旧同步蓄力探针跨帧迁移（等释放段真ATK与自然收招再读数）；生产代码零改动 |
+| J8 | 包含本文的提交 | 发散／心眼按**命中前**标记结算：攻击者侧`IOutgoingDamageScale`＋`MarkedBonus`处理器；一个类服务两条行，加标/加伤来源都进表 |
+| J9 | 本批提交 | 龙之箭：松手蓄力≥2秒的大箭（尺寸×2）＋全穿透（额外99个），阈值/尺寸/穿透全进**强类型资源列**，**按松手快照冻结**、**真实释放ATK发射**；一箭穿3靶与撞World停下均有实测 |
 
 各批`docs/character-design-j*.md`、`*-evidence.log`、`*-failures.log`和截图均保留。更早A/E/B/C/D和F/G/H只代表当轮范围，仍有原文遗漏。
 
@@ -31,7 +33,7 @@ J6最终：专项无头80/0、渲染82/0；完整20进程回归后仅扩展探�
 
 1. **✅（2026-10-17 J7 已完成，见[character-design-j7.md](character-design-j7.md)）先迁移Main旧同步蓄力探针**。文件`Scripts/Testing/SelfTest.cs`：`ProbeChargeMechanism`、`ReportCrossbowProbe`、`BeginBowProbe`里的武技1段、`ReportSwordQiProbe`。对应状态机case30、33、34、44。旧`SettleShot`/`WaitUntilIdle`只是手动Tick，不推进动画。可把这些段改成Task或分帧小状态，等真实ATK／自然收招后读结果，状态机必须等任务结束再Next，缺事件用明确超时失败；不要伪造ATK、不要给生产能力加计时出弹兜底。J5的`ProbeBlinkDash`/`ProbeGuardStance`已是分帧范例。独立`ChargeReleaseProbe`是真实输入范例。然后Main退出0、8指标、这6条新检查逐项核验，双构建0/0。→ **实际做法**：4个探针改成`async Task`＋每帧真实delta的`OnInputHeld`＋`WaitSettle`等自然收招＋`ReleaseAtkFired`（`Finish`写冷却/`Cancel`不写）作为"真ATK到达"判据；删`SettleShot`；状态机`ProbeTaskDone`后才`Next`。仍🔴的只剩改前就有的5条历史读数标记。
 2. **✅（2026-10-17 J8 已完成，见[character-design-j8.md](character-design-j8.md)与[证据](character-design-j8-evidence.log)）发散／心眼**：旧`evo_divergence`和`evo_mindseye`复用BurnOnHit只加Mark，未实现按目标标记增伤；甚至来源过滤尚不完整。发散必须只由能量掌武技1波波加标，并仅提高波波；心眼只由箭加标，玩家对已标记目标的各种伤害提高50%。用户刚确认按本次命中前已有标记结算，第一次加标这次不加伤。必须走真实奖励获取与命中，覆盖其他技能／其他单位／多个目标／层数及过期，不直接Execute冒充接入。发散原文N未定，可配置预设并明确标注。新参数用强类型资源／列，不再增加Godot.Get/Set字符串反射。→ **实际做法**：新增攻击者侧查询口`IOutgoingDamageScale` + `Unit.OutgoingDamageScaleAgainst`，在`AttackInstance.RollHit`（**生成HitInstance之前**，所以这一击自己加的标不算）读目标层数；新handler`MarkedBonus` + `MarkedBonusRule`（一个类服务两条行），加标来源=`RequiredEventAbility`、加伤来源=新强类型资源列`BonusAgainstAbility`；发散预设每层10%（文档N未定，表行Note写明）。自测`RunMarkedBonusProbe`（case54/55，P6d退出挪到55）三段23条读数全绿：同目标连打10/11/12（0/1/2层）、心眼54→36（×1→×1.5）、多目标、封顶5层、过期、后撤0命中、敌方单位打标记目标×1、能量掌武技2×1.5。双构建0/0、Main退出0、stderr 0字节、8硬指标逐字一致、四存档SAME。
-3. **龙之箭**：`evo_dragon_arrow`当前只把ChargeMaxSeconds设3，未实现蓄力≥2秒更大＋全穿透。用表配置阈值／尺寸／穿透行为，按松手结果冻结，真实释放ATK发射；射向多靶及World验证。注意当前延长3秒会继续每0.1秒加档，这一上限解释如有歧义及时告知用户。
+3. **✅（2026-10-17 J9 已完成，见[character-design-j9.md](character-design-j9.md)与[证据](character-design-j9-evidence.log)）龙之箭**：`evo_dragon_arrow`原来只把`ChargeMaxSeconds`设3、没实现"蓄力≥2秒更大＋全穿透"。已改成：新增强类型资源列`RewardConfig.ChargedShot`（`ChargedShotTuning`：目标技能／蓄力上限3s／档数上限／阈值2s／尺寸×2／穿透99）＋新处理器`ChargedShot`→公开强类型方法`ArrowVolleyAbility.ConfigureChargedShot`（**没有`Godot.Get/Set`字符串反射**）；`OnChargeReleased`把蓄力秒数**快照一次**，`FireVolley`只读快照判定"大箭"，发射仍只由释放段**真实ATK**触发；不配阈值时逐字退化成改动前表达式。探针`_DragonArrowProbe`42/0：**一箭穿3靶**（同一`AttackInstance`，帧390/392/393，132/264暴击/132，尺寸×2、穿透99）、**射墙**（墙前132、墙后100000/100000、箭停在墙内z=8.2339后消失、场上投射物0）、**阈值边界**（0.6s/1.9s小箭、2.05s大箭）、**不锁存**（大箭后0.6s又小箭）；独立`_ChargeReleaseProbe`80/0逐字不变；双构建0/0、Main退出0且8硬指标逐字一致、四存档SAME、flag不存在。⚠️ **口径待用户裁定**：`floor((3-0.5)/0.1)=`**25档**——每0.1秒仍在加档，2.0s=15档×5.5(670弹速)、3.0s=25档×8.5(970弹速)，即**"可以蓄力3秒"确实让伤害继续长到3秒**。本批按解释A落地（3秒=能按多久，2秒=叠加的离散大箭门槛）；若用户认为×8.5过大→解释B：表里`ChargedShot.MaxSteps=15`即可（2秒封顶），**不改C#**。另两条**既有**行为未动、供裁定：①穿透预算被算两遍（`FireProjectile`写`arrow.Pierce`＋`Launch`再加`attack.Pierce`→实际2×）；②单帧11.17m内间距小于它的两个目标一箭只结算最近1个。
 4. **逐项补其余进化并实测，不能只改Note**：
    - 金光术`evo_golden_qi`：灵剑武技1每段真实ATK额外剑气，当前无handler。
    - 大拔刀术：先核实真实表行Id，审计临时写`evo_big_draw`不是可靠文件名。收窄到拔刀式自身，不能全局伤害。

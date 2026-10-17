@@ -2,6 +2,15 @@
 
 > **原文纠偏J6已验80/0、82/0**：能量掌／短弩／弓／剑气松手只冻结完美结果、档位与威力，随后重播释放段，在该轮真实ATK发射。`ChargeReleased`阻止同次释放再次蓄力／重复松手；`ChargeReleaseAnimSpeedScale`独立于蓄力慢放速度。变奏点按免基础蓄力，按1→2→3循环，第一箭必须经ATK，后续按强类型`VolleyRampTuning.ShotIntervalSeconds`逐箭发射；打断取消待发箭，长按仍是蓄力单箭。[本批证据与边界](character-design-j6.md)。
 
+> **原文纠偏J9（龙之箭，"蓄力阈值弹"）**：③ 引入**第三种蓄力结果**（前两种是"档位倍率"与"完美时机"）——
+> **松手时蓄力 ≥ 阈值**这一发换弹型（更大 + 额外穿透 N 个）。判据在 `Ability.OnInputReleased` →
+> `ArrowVolleyAbility.OnChargeReleased` **把 `ChargeTime` 快照一次**（`_releasedChargeSeconds`），
+> `FireVolley` **只读快照**、不读此刻的 `ChargeTime`；发射仍只由释放段真实 `ATK` 事件帧触发。
+> 参数全在强类型 `ChargedShotTuning`（阈值／尺寸／穿透数／蓄力上限／档数上限），**0 = 整条逻辑不启用**。
+> ⚠️ 口径：`ChargeMaxSeconds` 只决定"能按多久"，档数照旧每 `ChargeStepSeconds` 加一档（弓改 3 秒 = 25 档 ×8.5）；
+> 要"阈值后不再加档"就填 `ChargeMaxSteps`。**不锁存**：每一发都按它自己松手那一刻判定。
+> [证据](character-design-j9.md)。
+
 > **原文纠偏J5**：闪仅真实Action后启动完整三维冲刺，缺事件只取消；架由真实GuardOn开启0.75游戏秒窗口，命中只无效化该HitInstance，同帧下一击不共享无敌。用户已确认架能规避能量波，普通格挡仍被穿透。Kill携带真实技能Id，闪身步经资源引用只匹配闪的击杀；施法期间冷却操作保留到收招。架收招后派发Parried，招架反击实际刷新为0。[实测与配置](character-design-j5.md)。
 
 > **原文纠偏J4**：共通落在按下时记录脚下到World地面的高度，真实Action才下冲；倍率改为`min(上限, 起手高度/普通单跳高度 × 垂直速度/标准速度)`。标准单跳1倍、二段跳额外50%高度时同速1.5倍，不额外加1；默认上限2倍，可在强类型`FallAttackTuning`配置。普通空中跳高比例独立进角色表，默认0.5。长枪从武器行引用共通技能并覆盖准星方向，墙／天空回落直下，超范围同向截断；镰刀／灵剑直落，只有灵剑有额外落剑式。只有真实落地发Landed，超时取消；高速球体胶囊扫掠与Area共用命中追踪。[接线与实测](character-design-j4.md)。

@@ -1,0 +1,86 @@
+# J9 · 龙之箭（蓄力阈值大箭 + 全穿透，真实释放 ATK 发射）证据日志
+# 生成时间：2026-10-17
+# 来源：.ai_j9_probe.log（专项探针，stdout）、.ai_j9_selftest.log（最后一遍 Main 自测）、.ai_j9_charge_release.log（独立回归）
+# 命令：
+#   & 'F:\Godot项目\项目a\build.ps1' --no-incremental -v minimal            -> 0 个警告 / 0 个错误
+#   dotnet build ActRoguelike.csproj --no-incremental -v minimal -c ExportRelease -> 0 个警告 / 0 个错误（已成功生成）
+#   & '...\Godot_v4.7.2-stable_mono_win64_console.exe' --headless --path 'F:\Godot项目\项目a' res://Scenes/Debug/_DragonArrowProbe.tscn -> 退出码 0 / stderr 0 字节 / 通过 42 失败 0
+#   & '...\Godot_v4.7.2-stable_mono_win64_console.exe' --headless --path 'F:\Godot项目\项目a' res://Scenes/Debug/_ChargeReleaseProbe.tscn -> 退出码 0 / stderr 0 字节 / 通过 80 失败 0（与 J6/J7/J8 基线逐字一致）
+#   & '...\Godot_v4.7.2-stable_mono_win64_console.exe' --path 'F:\Godot项目\项目a' --headless --quit-after 40000 res://Scenes/Main.tscn -- --selftest -> 退出码 0 / stderr 0 字节 / 68.9s
+#
+# 存档（跑前 = 跑后，与交接点逐字相同）：
+#   meta.cfg          6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+#   ability_cards.cfg 594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+#   settings.cfg      3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+#   loadout.cfg       CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+#   selftest.flag 跑前不存在、跑后不存在
+
+## 一、8 条硬指标（与 docs/e-batch-evidence.log 基线逐字一致，SAME=True ×8）
+[log] 00:13:04 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 00:13:06 [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[log] 00:13:06 [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[log] 00:13:06 [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[log] 00:13:06 [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[log] 00:13:17 [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[log] 00:13:26 [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[log] 00:13:36 [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+
+## 二、J9·龙之箭专项（真实按键蓄力 → 真实释放 ATK → 真实命中；读数来自 Unit.Damaged / 真实 Projectile）
+[DragonArrow] PASS 改前默认：蓄力上限 1s（5 档）阈值 0 尺寸 0 穿透 0（期望 1s/5档/0/0/0）
+[DragonArrow] PASS 表行 evo_dragon_arrow 已加载
+[DragonArrow] PASS 行上的强类型 ChargedShot 指向弓武技1：skl_a3_w1_1
+[DragonArrow] PASS 表里的数字：蓄力上限 3s 阈值 2s 尺寸 ×2 穿透 99 档数上限 0（0=不限）
+[DragonArrow] PASS RewardCatalog 编译出了这一行（ApplyHandler=ChargedShot 已注册）
+[DragonArrow] PASS 通过真实 RunBuild.Add（生产里抽中后入构筑的同一条路）拿到龙之箭
+[DragonArrow] PASS 拿到之后技能节点：蓄力上限 3s（25 档）阈值 2s 尺寸 ×2 穿透 99
+[DragonArrow] INFO 口径（交接单点名的歧义）：上限 3s → 满蓄 25 档 = ×8.5（每 0.1s 仍加一档）；2.0s 处 = 15 档 ×5.5。→ 现在是「继续加档到 3 秒」，2 秒只是大箭阈值；要改成「2 秒后不再加档」把 MaxSteps 填 15 即可（不改 C#）。
+[DragonArrow] PASS ① 蓄 0.6s：真实按键蓄到 0.60s（实际 0.601s）
+[DragonArrow] PASS ① 蓄 0.6s：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ① 蓄 0.6s：真实释放 ATK 才发射
+[DragonArrow] PASS ① 蓄 0.6s：这一发的判据是**松手快照** 0.608s（松手冻结值 0.608s，按住期间 0.601s）
+[DragonArrow] PASS ① 小箭：不是大箭=True 尺寸 ×1 穿透预算 0（期望 False/×1/0）
+[DragonArrow] PASS ① 小箭只中最近 1 个靶：命中顺序 T1，伤害 31.2
+[DragonArrow] PASS ② 蓄 1.9s：真实按键蓄到 1.90s（实际 1.903s）
+[DragonArrow] PASS ② 蓄 1.9s：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ② 蓄 1.9s：真实释放 ATK 才发射
+[DragonArrow] PASS ② 蓄 1.9s：这一发的判据是**松手快照** 1.91s（松手冻结值 1.91s，按住期间 1.903s）
+[DragonArrow] PASS ② 1.9s < 阈值：仍不是大箭=True 尺寸 ×1 穿透预算 0（期望 False/×1/0）
+[DragonArrow] PASS ② 1.9s 只中最近 1 个靶：命中顺序 T1，伤害 124.8
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：真实按键蓄到 2.05s（实际 2.054s）
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：真实释放 ATK 才发射
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：这一发的判据是**松手快照** 2.06s（松手冻结值 2.06s，按住期间 2.054s）
+[DragonArrow] PASS ③ 大箭：是大箭=True 尺寸 ×2 穿透预算 99（期望 True/×2/99）
+[DragonArrow] PASS ③ 一箭穿三个靶：命中顺序 T1 → T2 → T3，伤害 132 / 264 / 132
+[DragonArrow] PASS ③ 三次命中是**同一个 AttackInstance**（同一发箭），不是三箭
+[DragonArrow] PASS ③ 三次命中分布在不同物理帧（扫掠逐帧推进，不是同一帧重复结算）（帧间隔 2/1）
+[DragonArrow] INFO ③ 第三个靶之后箭还活着=True（MaxLifetime 3s，说明它没在最后一个靶上消失）
+[DragonArrow] INFO ③ 命中#1 靶 T1 伤害 132 暴击快照 132 帧 390
+[DragonArrow] INFO ③ 命中#2 靶 T2 伤害 264 暴击快照 132 帧 392
+[DragonArrow] INFO ③ 命中#3 靶 T3 伤害 132 暴击快照 132 帧 393
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：真实按键蓄到 0.60s（实际 0.6s）
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：真实释放 ATK 才发射
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：这一发的判据是**松手快照** 0.607s（松手冻结值 0.607s，按住期间 0.6s）
+[DragonArrow] PASS ④ 不锁存：大箭之后 0.6s 又回到小箭=True 尺寸 ×1 穿透预算 0（期望 False/×1/0）
+[DragonArrow] PASS ④ 小箭只中最近 1 个靶：命中顺序 T1，伤害 31.2
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：真实按键蓄到 2.05s（实际 2.052s）
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：真实释放 ATK 才发射
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：这一发的判据是**松手快照** 2.058s（松手冻结值 2.058s，按住期间 2.052s）
+[DragonArrow] PASS ⑤ 这一发确实是全穿透的大箭（穿透预算 99）
+[DragonArrow] PASS ⑤ 只打中墙**前**的靶：命中顺序 W_Front，伤害 132
+[DragonArrow] PASS ⑤ 墙**后**的靶一次都没被打到：生命 100000/100000（穿透没有穿过地形）
+[DragonArrow] PASS ⑤ 箭停在墙里：最后位置 (20, 1.0171072, 8.233912)（墙 z∈[7.5,8.5]，墙后靶 z=2）
+[DragonArrow] PASS ⑤ 箭撞墙后消失（不是穿墙继续飞）
+[DragonArrow] INFO ⑤ 场上存活投射物 0
+[DragonArrow] === 龙之箭验收结束：通过 42，失败 0 ===
+
+## 三、独立回归：默认（不拿龙之箭）行为逐位不变
+[ChargeRelease] === 蓄力释放验收结束：通过 80，失败 0 ===
+
+## 四、P5b 那一条"表参数落到机制上"仍然绿（本批把龙之箭从 AbilityOverride 换成强类型 ChargedShot，蓄力上限 3s 仍由表给）
+[log] 00:13:06 [SelfTest] ✅ P5b·实测表参数落到机制上（探测技能节点，不进树）：有备无患 → 后撤 MaxCharges 3（期望 3）Recharge 0.5s（期望 0.5）｜气贯长虹 → 长枪武技2 基础蓄力 0.5s（期望 0.5）每档 0.125s（期望 0.125）｜变奏 + 龙之箭 → 弓武技1 RampMaxCount 3（期望 3）RampWindow 1.2s（期望 1.2）蓄力上限 3s（期望 3）｜大拔刀术 → 拔刀式剑气体积 ×2（期望 2）+ 伤害乘区 1.5（期望 1.5）｜地爆 / 神降术 → 落剑式 Knockback 6（期望 6）Cooldown 2s（期望 2）DamageScale 1.6（期望 1.6）
+
+## 五、红色行计数
+# 本批 Main 自测里 🔴 行数 = 5 条（与改前同一批历史读数标记，内容都是「期望=实际」，本批没有新增红灯）

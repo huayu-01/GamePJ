@@ -81,12 +81,13 @@
 | **`MeleeLungeAdd`**（P5 新增） | `MeleeComboAbility.BeginLunge`（近战突进距离，米） | 0 |
 | **`ChargeBaseSecondsOverride` / `ChargeStepSecondsOverride` / `ChargeStepSecondsMultiplier`**（P5 新增） | `Ability.ChargeBaseSecondsEffective` / `ChargeStepSecondsEffective` | 0 / 0 / 1 |
 | **`VolleyCountOverride` / `VolleyDamagePerLostArrow`**（P5 新增） | `ArrowVolleyAbility.FireVolley` | 0 / 0 |
-| **`AbilityOverride` 处理器**（P5b 新增） | HandlerParams 里除 `AbilityId` 外每一条 = `Ability` 上的一个 `[Export]` 属性名 → 值，用 Godot 的 `Set()` 套用（属性名写错按 `GetPropertyList()` 查出并告警，**不静默**）；行上若带 `Modifiers` 则先按 `StatSet` 的语义套上 | 服务 7 条进化 |
+| **`AbilityOverride` 处理器**（P5b 新增） | HandlerParams 里除 `AbilityId` 外每一条 = `Ability` 上的一个 `[Export]` 属性名 → 值，用 Godot 的 `Set()` 套用（属性名写错按 `GetPropertyList()` 查出并告警，**不静默**）；行上若带 `Modifiers` 则先按 `StatSet` 的语义套上 | 服务 **6** 条进化（J9 起「龙之箭」改用 `ChargedShot` 强类型资源） |
 | **`TablePulse` 处理器 + `TablePulseRule`**（P5b 新增；P6a 支持多事件） | 事件 → 效果：`Trigger`（`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`，**可以逗号分隔多个，任一命中即出手**）+ 一次性 CDR（`AbilityId` + `CooldownFraction` / `CooldownSeconds` / `RefreshAbility`）/ `Heal` / `HoverSeconds` / `RequireHover` / `ExtraAirJumps` + `JumpCap` / `Radius` + `Damage` | **一个类服务 6 条行** |
 | **`StompOnLand` 处理器 + `StompOnLandRule`**（**P6b 新增**，服务「杀戮践踏」） | **落地那一刻**对周围敌人造成一次范围伤害：`Radius` / `Damage` / `MinFallHeight` / `Cooldown`（触发间隔）。⚠️ 它是**轮询落地边沿**而不是订阅事件 —— `CharacterMovement` 是共用战斗类（P6b 不许碰），没有抛起跳/落地事件；规则自己每帧读它**已公开**的 `IsGrounded` / `FallHeight`。范围伤害与「能量护盾」共用 `PulseDamage.Around` | 1 条 |
 | **`HomingMissileOnCrit` 处理器 + `HomingMissileOnCritRule`**（**P6b 新增**，服务「巡飞弹」） | 暴击 → 发射一枚**追踪飞弹**：`ProjectileScene` / `Damage` / `Speed` / `SeekRange` / `Lifetime` / `BeaconStatusId` / `BeaconSeconds` / `TurnRateDegrees` / `Cooldown`。复用的是 **P3 的追踪弹通路**（`Projectile.HomingStatusId` + 转向速度）：先给最近的敌人挂**专用信标状态**（`eff_missile_beacon`），再发一枚追这个状态的飞弹 | 1 条 |
 | **`BurnOnHit` 的 `Cooldown`**（P5b 新增） | 命中挂状态那条规则自己的触发间隔（「冰晶」的"每 10 秒最多一次"） | 0（= 不拦，改动前行为） |
 | **`MarkedBonus` 处理器 + `MarkedBonusRule`**（**J8 新增**，服务「发散」「心眼」两条行） | 命中给目标叠「标记」，并按**这一击命中之前**目标身上已有的层数放大**自己**造成的伤害：`StatusId` / `Duration` / `FlatBonus`（心眼 0.5）/ `PerStackBonus`（发散 0.1 = 预设 N）。来源过滤全在表上：**加标来源** = `RequiredEventAbility`（「发散」=<c>skl_a1_w1_1</c>、「心眼」=<c>skl_a3_w1_1</c>），**加伤来源** = 新列 `BonusAgainstAbility`（「发散」只提高波波；「心眼」留空 = 玩家的各种伤害）。消费者是 **`AttackInstance.RollHit` 里那次 `IOutgoingDamageScale` 查询**（所以"第一次加标这一击不加伤"是顺序保证的，不是特例判断） | 2 条 |
+| **`ChargedShot` 处理器 + `ChargedShotTuning` 资源列**（**J9 新增**，服务「龙之箭」） | **松手时蓄力 ≥ 阈值 → 这一发更大 + 额外穿透 N 个**（判定在`ArrowVolleyAbility.OnChargeReleased`**冻结**，`FireVolley` 只读快照；发射仍只由释放段的真实 `ATK` 事件帧触发）。参数全在强类型资源里：`TargetAbility`（资源引用）/ `MaxChargeSeconds` / `MaxSteps`（0=不限，填 15 = "2 秒后不再加档"）/ `ThresholdSeconds` / `SizeScale` / `PierceCount`。接线走公开强类型方法 `ArrowVolleyAbility.ConfigureChargedShot`，**没有 `Godot.Set` 字符串反射** | 1 条 |
 | **`RampMaxCount` / `RampWindowSeconds`**（P5b 新增） | `ArrowVolleyAbility.FireVolley`：连续射击第 N 发时发数至少 N（「变奏」） | 0 / 0（= 一行不进） |
 | **`GameplayEventKind.Parried`**（P5b 新增的事件种类） | 抛点唯一：`GuardStanceAbility.OnOwnerHit`（架住那一刻）。订阅方：招架反击 / 能量护盾 | 没有订阅者时 `Raise` 什么也不做 |
 
@@ -104,7 +105,7 @@
 
 | 新东西 | 服务几条行 | 做法 |
 |---|---|---|
-| `AbilityOverride` 处理器 | **7 条**（有备无患 / 专注 / 龙之箭 / 气贯长虹 / 地爆 / 大拔刀术 / 神降术） | 不写 7 个特例：HandlerParams 里**除 `AbilityId` 外每一条都是"属性名 = 值"**，用 Godot 的 `Set()` 套到 `Ability.FindByAbilityId` 找到的那个节点上 |
+| `AbilityOverride` 处理器 | **6 条**（有备无患 / 专注 / 气贯长虹 / 地爆 / 大拔刀术 / 神降术；**J9 起「龙之箭」改用 `ChargedShot`**） | 不写特例：HandlerParams 里**除 `AbilityId` 外每一条都是"属性名 = 值"**，用 Godot 的 `Set()` 套到 `Ability.FindByAbilityId` 找到的那个节点上 |
 | `TablePulse` 处理器 + `TablePulseRule` | **6 条**（乱金柝 / 闪身步 / 招架反击 / 普渡 / 践踏死亡 / 能量护盾） | 一个类带 `Trigger` + 一组效果参数；差别只是"订哪种事件、出手做什么、数值多少" |
 
 ---
@@ -239,7 +240,7 @@
    `evo_golden_qi` 金光术（要 `MeleeComboAbility` 每段额外生成一道剑气）、
    `evo_affection` 喜爱（要飞行中的武器每 2 秒索敌转向）、
    `evo_variation` 变奏（只接了"发数按连射序号"，"变得更强"那一半没接）。
-3. **各有一半没接**（都在行 `Note` 里逐条写明）：龙之箭（蓄力 2 秒后箭变大 + 全穿透）、怜悯（"只释放最后一刀"）、气贯长虹（"不再能收回 / 落地立刻收回"）、
+3. **各有一半没接**（都在行 `Note` 里逐条写明）：怜悯（"只释放最后一刀"）、气贯长虹（"不再能收回 / 落地立刻收回"）、
    神降术（"范围更大"——半径在命中体上，不在那个能力的 `[Export]` 列里）、浮光跃金（"闪现至目标高度"）、
    闪身步（没校验"这一杀是闪造成的"）、普渡（没校验"是最后一刀杀的"）。
    → ⚠️ **2026-10-17 J8 已把「心眼 / 发散」那一条从本文里划掉**：两条行不再复用 `BurnOnHit`，
@@ -247,6 +248,11 @@
    `RewardConfig.BonusAgainstAbility`；加标来源与加伤来源都进表（`RequiredEventAbility` / `BonusAgainstAbility`），
    按**命中前**目标层数结算（`AttackInstance.RollHit` → `IOutgoingDamageScale`）。
    发散**预设每层 10%**（文档 `{N}` 未定，行 `Note` 写明）。见 [character-design-j8.md](character-design-j8.md)。
+   → ⚠️ **2026-10-17 J9 已把「龙之箭」那一条从本文里划掉（两半都接了）**：处理器 **`ChargedShot`** +
+   强类型资源列 `RewardConfig.ChargedShot`（`ChargedShotTuning`）；**松手时蓄力 ≥ 2 秒**这一发才更大（`SizeScale 2`）
+   且额外穿透 `PierceCount 99` 个，判定在松手时**冻结**、发射仍由释放段的真实 `ATK` 驱动。
+   ⚠️ 口径仍是"**档位继续加到 3 秒**（满蓄 ×8.5）"，2 秒只是大箭门槛；要"2 秒后不再加档"把 `MaxSteps` 填 15（不改 C#）。
+   见 [character-design-j9.md](character-design-j9.md)。
 4. ✅ **P6a 已修**：`ArmorBroken` / `ShieldBroken` / `Critical` 原来**一个抛点都没有**（只有 `GameLog` 的
    `switch` 认得它们）。现在三者各有**唯一**抛点，都在 `Unit.ReceiveHit`：
    - `ArmorBroken` ← 扣甲后 `Armor <= 0` 那一刻（`ArmorBroke?.Invoke()` 旁边）

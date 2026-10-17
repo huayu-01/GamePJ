@@ -1,5 +1,21 @@
 # 交接文档：待办任务与项目约定
 
+## J9：龙之箭蓄力阈值大箭 + 全穿透（2026-10-17，已完成）
+
+交接单「下一步顺序」第3条已兑现：[J9验收与边界](character-design-j9.md)、[完整输出](character-design-j9-evidence.log)。`Weapon.cs`／7个共用`Ability`子类／敌人·首领·召唤物行与技能行**一个字没动**；`ConfigIndex.tres`**没有改**（不增删行）。
+
+病根：`evo_dragon_arrow` 的`ApplyHandler`是`AbilityOverride`，参数只有`AbilityId=skl_a3_w1_1`＋`ChargeMaxSeconds=3.0`——原文后半「蓄力2秒后射出的箭更大且附带全穿透」**代码里不存在**，而且它不是纯数据能表达的（要按松手时长切换弹型=新行为），旧处理器还走`Godot.Set`字符串反射。
+
+改法（三件）：① 新增强类型资源列`RewardConfig.ChargedShot`（`ChargedShotTuning`：`TargetAbility`目标技能／`MaxChargeSeconds`上限／`MaxSteps`档数上限／`ThresholdSeconds`阈值／`SizeScale`尺寸／`PierceCount`穿透数，全在表里）；② 新handler `ChargedShot`→公开强类型方法`ArrowVolleyAbility.ConfigureChargedShot(...)`，**没有`Godot.Get/Set`字符串反射**；③ `ArrowVolleyAbility`新增三个`[Export]`（阈值/尺寸/穿透）＋`_releasedChargeSeconds`：松手那一刻在`OnChargeReleased`**快照一次**，`FireVolley`只读快照判定`chargedShot`→穿透预算=表值+99、尺寸=×2；阈值≤0时逐字退化成改动前表达式（**默认行为逐位不变**）。发射入口一个没加，仍是释放段真实`ATK`。
+
+表行（`evo_dragon_arrow.tres`）：`ApplyHandler="ChargedShot"`，`ChargedShot={skl_a3_w1_1, 上限3s, MaxSteps 0, 阈值2s, 尺寸×2, 穿透99}`。
+
+自测（新`Scenes/Debug/_DragonArrowProbe.tscn`＋`Scripts/Testing/DragonArrowProbe.cs`）**42/0**，全走真实链路（`ConfigRows`读表→`RewardCatalog.Find`→`RunBuild.Add`真实入构筑→真实按键`Input.ParseInputEvent`→释放段真实`ATK`→`Projectile`每物理帧射线→`Unit.Damaged`读数）：**一箭穿3靶** T1(帧390,132)→T2(帧392,264暴击)→T3(帧393,132)，三次命中是**同一个`AttackInstance`**（`Pierce==99`，同一发箭），尺寸实测×2、穿透预算99；**射向World**：墙前靶132、墙**后**靶100000/100000一次没被打到、箭最后位置z=8.2339（墙∈[7.5,8.5]）、箭消失、场上投射物0；**阈值边界**：0.6s→小箭(31.2)、1.9s→小箭(124.8)、2.05s→大箭；**不锁存**：大箭后0.6s又回小箭(31.2)。冻结证据：`LastShotChargeSeconds`＝松手冻结值（0.608/1.91/2.06/0.607/2.058）。
+
+验收：Debug／ExportRelease均0警告0错误；Main退出码0、耗时68.9s、**stderr 0字节**、到`=== 自测结束 ===`；8硬指标逐字一致（含`（ConfigIndex.tres 已加载）`与索引`6/2/10/1/1/39/7/14/8/5/6/11/4`）；红色行仍是改前就有的5条历史读数标记、P5b覆盖行仍✅；独立`_ChargeReleaseProbe`复跑**80/0**（与J6/J7/J8逐字一致=默认行为不变）；四存档SHA256跑前=跑后=交接点；`selftest.flag`不存在；编辑器未关（`gdmcp doctor` editor_connected=true）。**本批无截图**。第一版探针有窗口缺陷（上一发的箭飞进下一段命中列表）→首轮32/10，加`Settle`后42/0，机制侧当时已全绿。
+
+⚠️ 待用户裁定：「**3秒上限 vs 2秒阈值**」。实测`ChargeMaxStepsEffective=floor((3-0.5)/0.1)=`**25档**：2.0s=15档×5.5(670弹速)、3.0s=25档×8.5(970弹速)——**每0.1秒仍在加档，2秒不是上限**。本批按**解释A**落地（3秒只是"能按多久"，2秒是叠加的离散大箭门槛；原文明写"可以蓄力3秒"）。若认为×8.5过大→**解释B**：表里`ChargedShot.MaxSteps=15`（2秒封顶），**不用改C#**。另记两条**既有**行为未动、供裁定：穿透预算被算两遍（`FireProjectile`写`arrow.Pierce`＋`Launch`再加`attack.Pierce`→实际2×）；单帧11.17m内间距<它的两个目标一箭只会结算最近1个。下一项回交接单第4条：逐项补其余进化。
+
 ## J8：发散／心眼按命中前标记结算（2026-10-17，已完成）
 
 交接单「下一步顺序」第2条已兑现：[J8验收与边界](character-design-j8.md)、[完整输出](character-design-j8-evidence.log)。`Weapon.cs`／7个`Ability`子类／敌人·首领·召唤物行与技能行**一个字没动**；`ConfigIndex.tres` **没有改**（两条行本来就在表里，本批不增删行，所以没有三处同改的风险）。
