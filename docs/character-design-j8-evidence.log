@@ -77,3 +77,10 @@
 ## 四、自测收尾
 [log] 23:57:52 [SelfTest] J8·还原：两条规则节点已摘（攻击者侧登记随之注销）｜场上剩余敌人 0 个｜配置表计数不受影响（本次没有新增表行）
 [log] 23:57:52 [SelfTest] === 自测结束 ===
+
+## 五、独立回归（不是 Main 那套，走 J6 的真实输入探针）
+# 命令：& Godot_v4.7.2-stable_mono_win64_console.exe --headless --path 'F:\Godot项目\项目a' res://Scenes/Debug/_ChargeReleaseProbe.tscn
+# 结果：退出码 0 · stderr 0 字节 · 通过 80，失败 0（与 J6/J7 基线逐字一致）
+# 四存档 SHA256 跑前跑后 same=True（meta / ability_cards / settings / loadout 全部逐字不变）
+[log] 00:00:31 [ChargeRelease] === 蓄力释放验收结束：通过 80，失败 0 ===
+

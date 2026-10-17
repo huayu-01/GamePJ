@@ -135,6 +135,8 @@ Kind == GameplayEventKind.Hit && Source == _owner && Target != null && Target !=
 - Main：`--headless --quit-after 40000 res://Scenes/Main.tscn -- --selftest` → **退出码 0**，耗时 68.1s，**stderr 0 字节**，日志到 `=== 自测结束 ===`。
 - 8 硬指标逐字一致：配置计数（**`（ConfigIndex.tres 已加载）`** 在）· 10 节点 2/5/3 · 猎手 **220/20/6.5** · 索引 `6/2/10/1/1/39/7/14/8/5/6/11/4` · Pressure **3/3/0** · 白板 boss **315/0** · 奖励 UI **True/Paused True** · 最小链路 **1 动画事件→1 弹体→命中**。
 - 红色行仍是改前就有的 **5 条**历史读数标记（内容写的是"期望=实际"），**没有新增红灯**。
+- **独立回归**（与 Main 无关的另一套真实输入探针）：`_ChargeReleaseProbe.tscn --headless` → 退出码 0、stderr 0 字节、
+  **`通过 80，失败 0`**（与 J6/J7 基线逐字一致）—— 说明 `AttackInstance.RollHit` 那一行改动在"没有规则登记"时确实逐位不变。
 - 四存档 SHA256 与交接点逐字相同（跑前＝跑后）；`selftest.flag` 跑前不存在、跑后不存在。
 - 本批**没有**新增/删除表行 → `ConfigIndex.tres` 不需要三处同改，索引与 `load_steps` 逐位不变。
 
