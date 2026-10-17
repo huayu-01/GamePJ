@@ -118,12 +118,17 @@ public sealed partial class RewardPool : RefCounted
 	/// <summary>
 	/// **前置判定**（P5 三层判定的第三层）：<c>Requires</c> 里的 Id **全部**已拥有才放行。
 	/// 与互斥是**镜像**的：互斥是"有了 X 就不能有本项"，前置是"没有 X 就不能有本项"。
+	///
+	/// <para>⭐ **J11：前置现在有两个来源** —— ① 已经拥有的增幅（改动前的唯一来源）；
+	/// ② **当前携带的符文**（用户：「携带了这个雷之印等于满足它们的前置要求」）。
+	/// 判定本身收在 <see cref="RunBuild.SatisfiesPrerequisite"/> 一个入口上；
+	/// 不携带任何符文时它退化成 `StacksOf(id) > 0`，**逐位不变**。</para>
 	/// </summary>
 	private static bool HasPrerequisites(RunBuild build, RewardDefinition candidate)
 	{
 		foreach (string required in candidate.Requires)
 		{
-			if (build.StacksOf(required) <= 0)
+			if (!build.SatisfiesPrerequisite(required))
 			{
 				return false;
 			}

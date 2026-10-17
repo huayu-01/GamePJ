@@ -23,6 +23,56 @@ public sealed partial class RunBuild : RefCounted
 
 	public bool Has(string id) => _stacks.ContainsKey(id);
 
+	// ─────────────────────────────────────────────────────────────────────────
+	// ⭐ J11：**符文 → 增幅前置** 的那一条通路（用户原话：「携带了这个雷之印等于满足它们的前置要求」）
+	//
+	// 设计上刻意**不进 `_stacks`**：符文不是"已经拥有的增幅"，不能让它出现在
+	// `Acquired`（HUD 构筑列表）、也不能让它满足互斥（`Excludes`）—— 它只影响**前置**这一层。
+	// 所以这里是一份独立的"被满足的前置字符串"小集合，读取点只有 `SatisfiesPrerequisite`，
+	// 而 `SatisfiesPrerequisite` 的调用点只有 `RewardPool.HasPrerequisites`。
+	//
+	// 默认（不携带任何符文）→ 集合为空 → `SatisfiesPrerequisite` 退化成改动前的
+	// `StacksOf(id) > 0`，判定行为**逐位不变**。
+	// ─────────────────────────────────────────────────────────────────────────
+	private readonly HashSet<string> _runeUnlocks = new();
+
+	/// <summary>当前被符文满足的前置字符串（日志 / 自测取证用，顺序不保证）。</summary>
+	public IReadOnlyCollection<string> RuneUnlocks => _runeUnlocks;
+
+	/// <summary>
+	/// **前置判定本体**：`id` 这个前置条件满足了吗。
+	/// 两条来源：① 已经拥有该 Id 的增幅（改动前的唯一来源）；② 当前携带的符文把它满足了。
+	/// </summary>
+	public bool SatisfiesPrerequisite(string id)
+		=> StacksOf(id) > 0 || _runeUnlocks.Contains(id);
+
+	/// <summary>
+	/// 换掉"当前携带的符文带来的前置满足名单"。传空 / null = 没有符文（回到逐位不变的判定）。
+	///
+	/// <para>名单里通常同时含**符文行 Id**（`rune_lei_seal`）与 `RuneConfig.UnlocksRequires` 里的
+	/// 派系名（`雷之印`）—— 前者让"表里按符文行 Id 写前置"也能用，后者对应文档里的写法。</para>
+	/// </summary>
+	public void SetRuneUnlocks(IEnumerable<string>? tokens)
+	{
+		_runeUnlocks.Clear();
+		if (tokens == null)
+		{
+			return;
+		}
+
+		foreach (string token in tokens)
+		{
+			if (!string.IsNullOrEmpty(token))
+			{
+				_runeUnlocks.Add(token);
+			}
+		}
+	}
+
+	/// <summary>当前符文解锁了哪些前置（一行可读串，日志/自测用）。</summary>
+	public string DescribeRuneUnlocks()
+		=> _runeUnlocks.Count == 0 ? "（没有携带符文）" : "[" + string.Join("、", _runeUnlocks) + "]";
+
 	public void Add(RewardDefinition definition, RewardContext context)
 	{
 		int next = StacksOf(definition.Id) + 1;
