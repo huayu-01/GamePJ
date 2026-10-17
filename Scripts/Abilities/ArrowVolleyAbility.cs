@@ -88,6 +88,19 @@ public partial class ArrowVolleyAbility : Ability
 	/// <summary>可穿透的目标数量（0 = 命中即消失）。</summary>
 	[Export] public int Pierce { get; set; }
 
+	/// <summary>
+	/// **每帧线段多命中扫掠**（J10；≤0 = 不启用 = 改动前的行为）。表列 = 技能行 Params 的
+	/// <c>SweepMaxHits</c>（一帧最多结算几个，真正的命中数另受穿透预算限制）。
+	///
+	/// <para>病根：弹速一快，一物理帧的线段里可能同时有两个怪，而既有投射物每帧只结算最近那一个、
+	/// 直接把位置推到帧末 —— 后面那只就被跳过了（J9 探针记录的既有行为）。这里把表值原样传给
+	/// <see cref="ActRoguelike.Combat.Projectile.SweepMaxHits"/>；线段长度由投射物按"当时的真实弹速 ×
+	/// 物理帧时长"逐帧重算。</para>
+	///
+	/// <para>只有配了这一列的技能行会启用；短弩/灵剑/能量掌等行不配 → 逐位不变。</para>
+	/// </summary>
+	[Export] public int SweepMaxHits { get; set; }
+
 	/// <summary>暴击率（角色/武器表给基准，这里只是本技能自己的兜底）。</summary>
 	[Export(PropertyHint.Range, "0,1,0.01")] public float CritChance { get; set; }
 
@@ -498,6 +511,7 @@ public partial class ArrowVolleyAbility : Ability
 		arrow.Speed = speed; arrow.GravityScale = GravityScale; arrow.GravityStartDistance = GravityStartDistance;
 		arrow.HomingStatusId = HomingStatusId; arrow.HomingTurnRateDegrees = HomingTurnRateDegrees; arrow.HomingRange = HomingRange;
 		arrow.Pierce = attack.Pierce; arrow.MaxLifetime = MaxLifetime;
+		arrow.SweepMaxHits = SweepMaxHits;
 		arrow.Launch(attack, dir);
 	}
 }
