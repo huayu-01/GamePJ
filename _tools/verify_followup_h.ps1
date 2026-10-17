@@ -146,6 +146,6 @@ finally {
     if ($null -eq $probeSaveBackup) { if (Test-Path -LiteralPath $probeSavePath) { Remove-Item -LiteralPath $probeSavePath } }
     else { [IO.File]::WriteAllBytes($probeSavePath, $probeSaveBackup) }
     $evidence.Add("selftest.flag 不存在=$(-not (Test-Path -LiteralPath (Join-Path $profileDir 'selftest.flag')))")
-    [IO.File]::WriteAllText((Join-Path $projectDir 'docs/followup-h-evidence.log'), ($evidence -join "`n") + "`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $projectDir 'docs/followup-h-evidence.log'), (($evidence -join "`n") + "`n").Replace("`r", ''), [Text.UTF8Encoding]::new($false))
     Pop-Location
 }
