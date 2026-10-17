@@ -1,0 +1,79 @@
+# J8 · 发散／心眼（真实奖励获取 + 真实命中）证据日志
+# 生成时间：2026-10-17
+# 来源：.ai_j8_final.log（本次唯一的最后一遍 Main 自测，stdout 143001B / stderr 0B）
+# 命令：
+#   & 'F:\Godot项目\项目a\build.ps1' --no-incremental -v minimal
+#   dotnet build ActRoguelike.csproj --no-incremental -v minimal -c ExportRelease
+#   & 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe' --path 'F:\Godot项目\项目a' --headless --quit-after 40000 res://Scenes/Main.tscn -- --selftest
+# 结果：Debug 0 警告 0 错误 · ExportRelease 0 警告 0 错误 · Main 退出码 0 · stderr 0 字节 · 耗时 68.1s
+# 存档（跑前 = 跑后，与交接点逐字相同）：
+#   meta.cfg          6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+#   ability_cards.cfg 594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+#   settings.cfg      3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+#   loadout.cfg       CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+#   selftest.flag 跑前不存在、跑后不存在
+
+## 一、8 条硬指标（与 docs/e-batch-evidence.log 基线逐字一致）
+[log] 23:56:46 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 23:56:48 [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[log] 23:56:48 [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[log] 23:56:48 [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[log] 23:56:48 [SelfTest] 配置表比对·增幅项：共 62 条（强化 9 / 进化 23 / 异化 30，期望 **P6d 后 62 = 9/23/30**（= 设计文档要求的 30 条异化**全建**）；P6b 后是 59 = 9/23/27；P6a 后是 57 = 9/23/25；P6a 之前是 74 = 19/27/28） 表已接上=True（新行在、旧行已清） 当前池子=27 条（猎手+能量掌，P6d 后的实测值）
+[log] 23:56:48 [SelfTest] Pressure 测试（再加一次中价值，应不变）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3）
+[log] 23:56:59 [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[log] 23:57:08 [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[log] 23:57:19 [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+
+## 二、J8·发散／心眼（⚠️ 本节是本批唯一新增的读数；全部走真实奖励 + 真实按键 + 真投射物 + 真命中）
+[log] 23:57:42 [SelfTest] ✅ J8·真实候选池（表 → RewardPool.Initialize/Roll）：猎手+能量掌 含「发散」=True（期望 True，<A1限定>）含「心眼」=False（期望 False，<A3限定>）｜猎手+弓 含「心眼」=True（期望 True）含「发散」=False（期望 False）
+[log] 23:57:42 [SelfTest] J8·发散换装：左键=skl_a1_w1_1（期望 skl_a1_w1_1「波波」） 右键=skl_a1_w1_2（期望 skl_a1_w1_2「憋个大的」）｜锚点 (0, 0.7, -7)（距胸口 7.06m）
+[log] 23:57:42 [SelfTest] ✅ J8·发散·真实奖励获取：RunController.GrantReward(evo_divergence)=True（走 RunBuild.Add + 真实 RewardContext → 真实 handler） → 玩家身上 MarkedBonusRule｜标记规则：状态「Mark」时长 6s 加标来源「skl_a1_w1_1」 加伤来源「skl_a1_w1_1」 固定 +0 每层 +0.1 已加标 0 次｜最近一次：读层数 0 → ×1
+[log] 23:57:42 [Combat] 伤害 Player(220) → J8MarkA(4990) 10
+[log] 23:57:43 [Combat] 伤害 Player(220) → J8MarkA(4979) 11
+[log] 23:57:43 [Combat] 伤害 Player(220) → J8MarkA(4967) 12
+[log] 23:57:43 [SelfTest] ✅ J8·发散·第 1 击（同一目标连打）：命中前层数 0 → 实测伤害读数 10（攻击快照 10）→ **实际倍率 ×1**（期望 ×1）｜命中后层数 1（期望 1）技能=skl_a1_w1_1 ← **第一次加标这一击不加伤**（那时目标身上还是 0 层）
+[log] 23:57:43 [SelfTest] ✅ J8·发散·第 2 击（同一目标连打）：命中前层数 1 → 实测伤害读数 11（攻击快照 10）→ **实际倍率 ×1.1**（期望 ×1.1）｜命中后层数 2（期望 2）技能=skl_a1_w1_1 ← **从下一击起才加**（层数来自上一次命中）
+[log] 23:57:43 [SelfTest] ✅ J8·发散·第 3 击（同一目标连打）：命中前层数 2 → 实测伤害读数 12（攻击快照 10）→ **实际倍率 ×1.2**（期望 ×1.2）｜命中后层数 3（期望 3）技能=skl_a1_w1_1
+[log] 23:57:44 [Combat] 伤害 Player(220) → J8MarkB(4977.5) 22.5
+[log] 23:57:44 [Combat] 暴击 Player(220) → J8MarkB(4977.5) 22.5
+[log] 23:57:44 [SelfTest] ✅ J8·发散·多目标（B 单独计层）：A 已 3 层、B 还没被标记（0 层）→ 打 B 时读数 22.5（快照 10）= ×1（期望 ×1 = 用 **B 自己**的层数，不是 A 的 3 层）｜命中后 B 层数 1（期望 1）
+[log] 23:57:44 [Combat] 伤害 Player(220) → J8MarkA(4954) 13
+[log] 23:57:44 [SelfTest] ✅ J8·发散·多目标（两条都带层数）：A 有 3 层、B 有 1 层 → 打 A 读数 13（快照 10）= ×1.3（期望 ×1.3 = 用 A 自己的层数）｜命中后 A 层数 4
+[log] 23:57:45 [Combat] 伤害 Player(220) → J8MarkB(4887.5) 90
+[log] 23:57:45 [Combat] 暴击 Player(220) → J8MarkB(4887.5) 90
+[log] 23:57:45 [SelfTest] ✅ J8·发散·其它技能不触发：能量掌武技2（skl_a1_w1_2）打已标记的 B → 伤害读数 90（快照 40）= ×1（期望 ×1 —— 发散**只提高波波**）｜B 的层数 1 → 1（期望不变 —— 波波以外的命中**不加标**，这就是旧 BurnOnHit 那条来源过滤缺失）
+[log] 23:57:45 [Combat] 伤害 Player(220) → J8MarkA(4940) 14
+[log] 23:57:45 [Combat] 伤害 Player(220) → J8MarkA(4925) 15
+[log] 23:57:45 [Combat] 伤害 Player(220) → J8MarkA(4910) 15
+[log] 23:57:45 [SelfTest] ✅ J8·发散·层数封顶：效果表 eff_mark.MaxStacks=5 → A 命中前 5 层、打完仍 5 层（期望都不超过 5）伤害读数 15（快照 10）= ×1.5（期望 ×1.5 = 1+5×0.1）
+[log] 23:57:46 [Combat] 伤害 Player(220) → J8MarkA(4887.5) 22.5
+[log] 23:57:46 [Combat] 暴击 Player(220) → J8MarkA(4887.5) 22.5
+[log] 23:57:46 [SelfTest] ✅ J8·发散·标记过期：推过 6.1s（`Unit._PhysicsProcess` 的真实状态倒计时）→ 层数 5 → 0（期望 0）→ 这一发读数 22.5（快照 10）= ×1（期望 ×1，加成消失）
+[log] 23:57:47 [SelfTest] ✅ J8·发散·「后撤」不触发：真实按 skill_1 一次 → 靶子 A 的层数 1 → 1（期望不变）新增命中 0 次（期望 0 —— 后撤没有伤害盒；用户裁定也明确发散不提高后撤）
+[log] 23:57:47 [SelfTest] ✅ J8·心眼·真实奖励获取：RunController.GrantReward(evo_mindseye)=True → 玩家身上 MarkedBonusRule｜标记规则：状态「Mark」时长 6s 加标来源「skl_a3_w1_1」 加伤来源「（各种伤害）」 固定 +0.5 每层 +0 已加标 0 次｜最近一次：读层数 0 → ×1｜弓武技1=skl_a3_w1_1（期望 skl_a3_w1_1「箭在弦上」，它才是这张行加标的箭）
+[log] 23:57:48 [Combat] 伤害 Player(220) → J8MarkC(4946) 54
+[log] 23:57:48 [Combat] 暴击 Player(220) → J8MarkC(4946) 54
+[log] 23:57:49 [Combat] 伤害 Player(220) → J8MarkC(4910) 36
+[log] 23:57:49 [SelfTest] ✅ J8·心眼·第 1 击（同一目标连射真箭）：命中前层数 0 → 伤害读数 54（快照 24 ×暴击 2.25）→ **实际倍率 ×1**（期望 ×1）｜命中后层数 1（期望 1）技能=skl_a3_w1_1 ← 第一次加标那一击不加伤
+[log] 23:57:49 [SelfTest] ✅ J8·心眼·第 2 击（同一目标连射真箭）：命中前层数 1 → 伤害读数 36（快照 24）→ **实际倍率 ×1.5**（期望 ×1.5）｜命中后层数 2（期望 2）技能=skl_a3_w1_1 ← 从下一击起 +50%
+[log] 23:57:49 [SelfTest] ✅ J8·心眼·其它单位不吃加成：靶子 C 身上有 2 层标记，由**另一个单位**（J8OtherUnit，走同一条真实 `AttackInstance.RollHit`→`Unit.ReceiveHit`）打 20 点 → 实际结算 20（期望 20，×1 而不是 ×1.5）｜C 的层数仍是 2（敌方命中也**不加标**）
+[log] 23:57:49 [Combat] 伤害 Player(220) → J8MarkD(4990) 10
+[log] 23:57:49 [Combat] 伤害 Player(220) → J8MarkD(4973.5) 16.5
+[log] 23:57:49 [SelfTest] ✅ J8·发散×心眼（同一位玩家同时拥有两条，规则按乘法叠加，全部来自表）：D 身上 0 层时波波读数 ×1（期望 ×1）→ 命中后 1 层；再打一发读数 16.5（快照 10）= ×1.65（期望 发散 1.1 × 心眼 1.5 = ×1.65）｜命中后 2 层
+[log] 23:57:50 [Combat] 伤害 Player(220) → J8MarkD(4913.5) 60
+[log] 23:57:50 [SelfTest] ✅ J8·心眼·**各种伤害**（不是只对箭）：能量掌武技2（skl_a1_w1_2）打带 2 层标记的目标 → 伤害读数 60（快照 40）= ×1.5（期望 ×1.5 = 心眼 50%，而发散对它不生效）｜命中后层数 2（期望不变 —— 非箭伤害**不加**心眼的标）
+[log] 23:57:52 [Combat] 伤害 Player(220) → J8MarkE(4910) 90
+[log] 23:57:52 [Combat] 暴击 Player(220) → J8MarkE(4910) 90
+[log] 23:57:52 [SelfTest] ✅ J8·心眼·非箭伤害不加标：能量掌武技2 打**没有**标记的目标 E → 层数 0 → 0（期望 0 → 0）伤害读数 ×1（期望 ×1）
+[log] 23:57:52 [SelfTest] J8·还原：两条规则节点已摘（攻击者侧登记随之注销）｜场上剩余敌人 0 个｜配置表计数不受影响（本次没有新增表行）
+
+## 三、仍然存在的 🔴 行（改前就在：内容写的是"期望=实际"的历史读数标记，不是失败）
+[log] 23:57:08 [SelfTest] 🔴 白板首领闸门·正向：本场第 1 波后降临=True（期望 True）场上存活=1（期望 1）
+[log] 23:57:08 [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[log] 23:57:15 [SelfTest] 🔴 Boss 阵亡 → 挑战者状态=False（期望 False，这就是 bug #12 的修复点） 已通关=False（期望 False） 玩家存活=True
+[log] 23:57:17 [SelfTest] 🔴 互动降临节点：接受=True（期望 True）→ 本关通关=False（切关后会被下一关复位，所以这里只看它当场为 True：True）关卡 1→2（期望 +1）已挑战 5→0 挑战者状态=False（期望 False）
+[log] 23:57:19 [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+
+## 四、自测收尾
+[log] 23:57:52 [SelfTest] J8·还原：两条规则节点已摘（攻击者侧登记随之注销）｜场上剩余敌人 0 个｜配置表计数不受影响（本次没有新增表行）
+[log] 23:57:52 [SelfTest] === 自测结束 ===

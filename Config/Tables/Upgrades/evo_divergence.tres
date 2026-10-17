@@ -3,28 +3,42 @@
 [ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_energy_palm.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_1.tres" id="3_mark"]
 
 [sub_resource type="Resource" id="Resource_p0"]
 script = ExtResource("1_param")
 Key = "StatusId"
 Value = "Mark"
-Note = "挂哪一条状态（效果表的 Mark 行，可叠加 5 层）"
+Note = "挂哪一条状态（效果表的 Mark 行，可叠加 5 层 = 满层 +50%）"
 
 [sub_resource type="Resource" id="Resource_p1"]
 script = ExtResource("1_param")
 Key = "Duration"
 Value = 6.0
-Note = "标记时长"
+Note = "标记时长（文档没写 → 预设 6s，与 eff_mark 的 Duration 一致）"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "PerStackBonus"
+Value = 0.1
+Note = "⚠️ 文档为 {N}%（未定）→ 此处是**预设 10%/层**；层数上限来自效果表 MaxStacks=5，所以满层 +50%"
+
+[sub_resource type="Resource" id="Resource_p3"]
+script = ExtResource("1_param")
+Key = "FlatBonus"
+Note = "发散没有固定加成（它按层数算），留 0"
 
 [resource]
 script = ExtResource("2_row")
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "BurnOnHit"
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1")]
+ApplyHandler = "MarkedBonus"
+RequiredEventAbility = ExtResource("3_mark")
+BonusAgainstAbility = ExtResource("3_mark")
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3")]
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Id = "evo_divergence"
 DisplayName = "发散"
-DescriptionTemplate = "武技1 命中时会对目标施加一层标记"
-Note = "[P5b 新增行] 文档第 58 行（进化池 <A1限定>）「发散:武技1命中时会对目标施加一层标记,每层标记额外提升技能1的伤害{N}%」。**只接了前半**（命中挂标记，复用既有的 BurnOnHit 处理器 + 效果表的 Mark 行：可叠加、不限定单个目标）。⚠️ 后半「每层标记额外提升技能 1 的伤害 N%」需要一条新的伤害通路（按**目标身上的标记层数**加伤），P5b **未接** —— 见 docs/upgrades.md §7。⚠️ 标记时长文档没写 → 预设 6s（沿用 eff_mark 的 Duration）。"
+DescriptionTemplate = "武技1「波波」命中时给目标叠一层标记；你的「波波」对带标记的目标每层标记提高 10% 伤害"
+Note = "[J8 重做行] 文档第 58 行（进化池 <A1限定>）「发散:武技1命中时会对目标施加一层标记,每层标记额外提升技能1的伤害{N}%」。★ 旧实现的病根：复用 `BurnOnHit` 处理器，判据只有「来源是自己」→ 后撤／能量掌武技2／其它武器的命中**也会**挂标记（交接单说的「来源过滤尚不完整」）。★ 现在两件事都收在数据里：① 加标来源 = `RequiredEventAbility`（强类型资源引用 `skl_a1_w1_1`，只有「波波」会挂标记）；② 加伤只对「波波」= `BonusAgainstAbility`（同一个资源引用）—— 用户 2026-10-17 裁定：发散提高的是「波波」，原文漏了「武」字，不提高后撤。★ 结算顺序：按**本次命中之前**目标身上已有的层数（`AttackInstance.RollHit` 那一刻读、`Unit.ReceiveHit` 还没进）→ 第一次加标那一击不加伤，从下一击起才加。★ ⚠️ **文档的 N 未定 → 这里预设每层 10%**（HandlerParams 的 `PerStackBonus`，要改就改那一项）；层数上限来自效果表 `eff_mark.MaxStacks = 5` → 满层 +50%。★ 标记时长文档没写 → 预设 6s。★ 层数存在**目标自己身上**（`Unit.ApplyStatus` 的可叠加路径），所以多个目标各记各的、到期由 `Unit._PhysicsProcess` 清掉后加成自然消失。"

@@ -624,6 +624,23 @@ public partial class SelfTest : Node
 			case 53:
 				// ⚠️ P6d：与上面同一条纪律（它也会真的打一下玩家 —— 那一下**应该被护卫完全挡掉**）。
 				GameLog.Write("SelfTest", DebugP6dMutationProbe());
+				Next();
+				break;
+
+			case 54 when _timer > 0.4f:
+				// ⚠️ J8：发散／心眼 —— **真实奖励获取 + 真实按键 + 真投射物 + 真命中**，
+				// 跨帧（等真实动画事件帧与自然收招），任务没结束就不 Next。
+				// 也必须排在所有硬指标之后：它会真的打死临时靶子、并抛 `Damaged` 事件。
+				_j8ProbeTask ??= RunMarkedBonusProbe();
+				if (ProbeTaskDone(_j8ProbeTask, "J8·发散/心眼"))
+				{
+					_j8ProbeTask = null;
+					Next();
+				}
+
+				break;
+
+			case 55:
 				GameLog.Write("SelfTest", "=== 自测结束 ===");
 
 				// ⚠️ 退出前先解除暂停：这一阶段之前刚切过一关，`UiRouter` 正把树暂停着
@@ -1569,6 +1586,681 @@ public partial class SelfTest : Node
 			"SelfTest",
 			$"机制·还原：武技2 基础蓄力={w.ChargeBaseSeconds:0.##}s 完美窗口={w.PerfectWindowSeconds:0.##}s 后置蓄力={w.ChargeStepSeconds:0.##}s"
 			+ $" 威力×{w.ChargeStepScale:0.##}（回到表里的样子）");
+	}
+
+	// ═══════════════════════ J8：发散／心眼（标记来源过滤 + 按命中前层数加伤） ═══════════════════════
+
+	/// <summary>J8 的一次**真命中**读数（订阅 <see cref="Unit.Damaged"/> 得到，不是手动构造）。</summary>
+	private readonly struct J8Hit
+	{
+		public Unit? Target { get; init; }
+		public float Final { get; init; }
+		public float Lost { get; init; }
+		public float Base { get; init; }
+		public bool Crit { get; init; }
+		public float CritMul { get; init; }
+		public string Ability { get; init; }
+
+		/// <summary>
+		/// 实际倍率 = 结算伤害 ÷（攻击快照 × 暴击倍率）。暴击是随机量，所以按**这一条命中记录到的**
+		/// <see cref="Crit"/> / <see cref="CritMul"/> 折算 —— 读数与增伤倍率解耦，暴击不会把判据搞脆。
+		/// </summary>
+		public float Scale
+		{
+			get
+			{
+				float denom = Base * (Crit ? Mathf.Max(1f, CritMul) : 1f);
+				return denom > 0.0001f ? Final / denom : 0f;
+			}
+		}
+	}
+
+	private readonly List<J8Hit> _j8Hits = new();
+	private Task? _j8ProbeTask;
+	private Vector3 _j8Anchor;
+	private float _j8AnchorDistance;
+	private Vector3 _j8Park;
+
+	/// <summary>J8 探针的按键注入：走 <see cref="Input.ParseInputEvent"/> 的真实输入映射通路（与 `ChargeReleaseProbe` 同一套）。</summary>
+	private static void PressProbeAction(string action, bool pressed)
+		=> Input.ParseInputEvent(new InputEventAction { Action = action, Pressed = pressed });
+
+	/// <summary>J8：跨帧等一个条件成立（真实帧，不手动 Tick 物理回调）。</summary>
+	private async Task<bool> UntilProbe(Func<bool> predicate, double timeout = 4.0)
+	{
+		double spent = 0.0;
+		while (!predicate())
+		{
+			if (spent > timeout)
+			{
+				return false;
+			}
+
+			await Frame();
+			spent += FrameDelta();
+		}
+
+		return true;
+	}
+
+	/// <summary>J8：等一段真实时间（按帧累加，不用引擎计时器 —— 无头环境下计时器与帧的关系不必依赖）。</summary>
+	private async Task WaitFrames(float seconds)
+	{
+		double spent = 0.0;
+		while (spent < seconds)
+		{
+			await Frame();
+			spent += FrameDelta();
+		}
+	}
+
+	private void OnJ8Hit(DamageResult result, HitInstance hit)		=> _j8Hits.Add(new J8Hit
+		{
+			Target = hit.Target,
+			Final = result.FinalDamage,
+			Lost = result.HealthLost,
+			Base = hit.Attack?.BaseDamage ?? 0f,
+			Crit = hit.Critical,
+			CritMul = hit.Attack?.CritMultiplier ?? 1f,
+			Ability = hit.Attack?.Ability ?? string.Empty,
+		});
+
+	private J8Hit? J8LastHitOn(Unit target, int fromIndex = 0)
+	{
+		for (int i = _j8Hits.Count - 1; i >= fromIndex; i--)
+		{
+			if (ReferenceEquals(_j8Hits[i].Target, target))
+			{
+				return _j8Hits[i];
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// J8：靶子 = **真实敌人**（`Chaser.tscn` 的实例，AI 关掉、生命抬高）+ 一个 1.2m 的球体命中体。
+	/// 加大命中体只是为了"射线一定穿过它"（探针不靠敌人自己动），不改任何生产数值。
+	/// </summary>
+	private Unit? J8SpawnTarget(Unit player, string label)
+	{
+		if (RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate() is not Unit chaser)
+		{
+			return null;
+		}
+
+		chaser.MaxHealth = 5000f;
+		NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(chaser)?.SetPhysicsProcess(false);
+		chaser.Name = label;
+		if (player.GetParent() is not { } arena)
+		{
+			chaser.Free();
+			return null;
+		}
+
+		arena.AddChild(chaser);
+		chaser.AddChild(new CollisionShape3D
+		{
+			Name = "J8ProbeShape",
+			Shape = new SphereShape3D { Radius = 1.2f },
+			Position = new Vector3(0f, 0.9f, 0f),
+		});
+		chaser.Damaged += OnJ8Hit;
+		chaser.GlobalPosition = _j8Park;
+		return chaser;
+	}
+
+	private void J8FreeTargets(params Unit?[] targets)
+	{
+		foreach (Unit? target in targets)
+		{
+			if (target == null || !GodotObject.IsInstanceValid(target))
+			{
+				continue;
+			}
+
+			target.Damaged -= OnJ8Hit;
+			target.Free();
+		}
+
+		_j8Hits.Clear();
+	}
+
+	/// <summary>
+	/// J8：把除 `<paramref name="keep"/>` 以外的敌人全部清掉 —— 免得关卡自己的怪挡在弹道上吃了这一发
+	/// （只清**探针自己看到的**单位，不动关卡流程）。
+	/// </summary>
+	private void J8ClearField(params Unit?[] keep)
+	{
+		foreach (string group in new[] { "enemy_units", "boss_units" })
+		{
+			foreach (Node node in GetTree().GetNodesInGroup(group))
+			{
+				if (node is not Unit unit || !GodotObject.IsInstanceValid(unit))
+				{
+					continue;
+				}
+
+				bool kept = false;
+				foreach (Unit? candidate in keep)
+				{
+					if (candidate != null && ReferenceEquals(candidate, unit))
+					{
+						kept = true;
+						break;
+					}
+				}
+
+				if (!kept)
+				{
+					unit.ForceKill(null);
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// J8：求这一次的"弹道锚点" —— 靶子就摆在这个点上（正好在「准星世界点」那条射线上），
+	/// 于是**真实**能量波/箭会从胸口朝它飞并命中它。
+	///
+	/// <para>裁两条：① 准星打到很远（射线没碰到东西 → 200m）时把靶子收到 8m 内；
+	/// ② 准星压得很低时按地面高度反算距离，别把靶子摆到地下。</para>
+	/// </summary>
+	private bool J8ResolveAnchor(Unit player)
+	{
+		Vector3 chest = player.GlobalPosition + (Vector3.Up * 0.9f);
+		Vector3 point = AimUtil.GetCrosshairPoint(GetViewport(), player, 200f, CombatLayers.World | CombatLayers.Enemy);
+		float distance = point.DistanceTo(chest);
+		if (distance < 1f)
+		{
+			return false;
+		}
+
+		Vector3 aim = (point - chest) / distance;
+		float along = Mathf.Clamp(Mathf.Min(distance * 0.85f, 8f), 2f, 8f);
+		if (aim.Y < -0.05f)
+		{
+			along = Mathf.Min(along, (chest.Y - 0.7f) / -aim.Y);
+		}
+
+		along = Mathf.Max(1.2f, along);
+		_j8AnchorDistance = along;
+		_j8Anchor = chest + (aim * along);
+		_j8Park = player.GlobalPosition + new Vector3(9f, 0.5f, 9f);
+		return true;
+	}
+
+	/// <summary>J8：把 `<paramref name="target"/>` 摆到弹道上，其余靶子挪到 <see cref="_j8Park"/>。</summary>
+	private void J8Place(Unit target, params Unit?[] others)
+	{
+		foreach (Unit? other in others)
+		{
+			if (other != null && GodotObject.IsInstanceValid(other) && !ReferenceEquals(other, target))
+			{
+				other.GlobalPosition = _j8Park;
+				other.Velocity = Vector3.Zero;
+			}
+		}
+
+		target.GlobalPosition = _j8Anchor;
+		target.Velocity = Vector3.Zero;
+
+		// 每一发之前都把探针靶以外的敌人清掉：中途刷出来的关卡怪不能挡在弹道上冒充"这一发没打出加成"。
+		var keep = new List<Unit?> { target };
+		keep.AddRange(others);
+		J8ClearField(keep.ToArray());
+	}
+
+	/// <summary>
+	/// J8：发一发**非蓄力**技能 —— 真实按键（`Input.ParseInputEvent`）→ 真实动画事件帧 → 真投射物 → 真命中，
+	/// 然后等技能**自己收招**（`Finish`）。返回值 = 按键落地 & 自然收招 & 真的收到命中事件。
+	/// </summary>
+	private async Task<bool> J8FirePress(Ability ability, int hitsBefore)
+	{
+		if (!await WaitAbilityReady(ability))
+		{
+			GameLog.Write("SelfTest", $"🔴 J8·按键：{ability.AbilityId} 等不到可用（忙={ability.IsActive} 冷却={ability.CooldownRemaining:0.###}）。");
+			return false;
+		}
+
+		PressProbeAction(ability.InputAction, true);
+		bool started = await UntilProbe(() => ability.IsActive, 1.5);
+		PressProbeAction(ability.InputAction, false);
+		bool settled = await WaitSettle(ability, 5.0);
+		bool arrived = await UntilProbe(() => _j8Hits.Count > hitsBefore, 4.0);
+		if (!(started && settled && arrived))
+		{
+			GameLog.Write("SelfTest", $"🔴 J8·按键：{ability.AbilityId}（按键「{ability.InputAction}」）按键={started} 自然收招={settled} 命中={arrived} 命中数 {hitsBefore} → {_j8Hits.Count}。");
+		}
+
+		return started && settled && arrived;
+	}
+
+	/// <summary>J8：发一发**蓄力**技能 —— 真实按住到基础蓄力完成再松手，等释放段真 ATK。</summary>
+	private async Task<bool> J8FireCharge(Ability ability, int hitsBefore)
+	{
+		if (!await WaitAbilityReady(ability))
+		{
+			GameLog.Write("SelfTest", $"🔴 J8·蓄力：{ability.AbilityId} 等不到可用（忙={ability.IsActive}）。");
+			return false;
+		}
+
+		PressProbeAction(ability.InputAction, true);
+		bool charging = await UntilProbe(() => ability.IsActive && ability.IsCharging, 1.5);
+		bool baseDone = charging && await UntilProbe(() => ability.ChargeBaseComplete, 3.0);
+		PressProbeAction(ability.InputAction, false);
+		bool settled = await WaitSettle(ability, 5.0);
+		bool arrived = await UntilProbe(() => _j8Hits.Count > hitsBefore, 4.0);
+		if (!(baseDone && settled && arrived))
+		{
+			GameLog.Write("SelfTest", $"🔴 J8·蓄力：{ability.AbilityId}（按键「{ability.InputAction}」）蓄力={charging} 基础完成={baseDone} 自然收招={settled} 命中={arrived} 命中数 {hitsBefore} → {_j8Hits.Count}。");
+		}
+
+		return baseDone && settled && arrived;
+	}
+
+	private static MarkedBonusRule? FindMarkRule(Unit player, string rewardId)
+	{
+		foreach (TriggerRule rule in CollectRules(player))
+		{
+			if (rule is MarkedBonusRule mark && mark.RewardId == rewardId)
+			{
+				return mark;
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// **J8·发散／心眼：真实奖励获取 + 真实命中**（交接单「下一步顺序」第 2 条）。
+	///
+	/// <para>三段，全部跨帧（真实按键 → 真实动画事件帧 → 真投射物 → 真命中 → 订阅 <c>Unit.Damaged</c> 读数）：</para>
+	/// <list type="number">
+	/// <item><b>A·发散</b>（角色 A + 能量掌）：`RunController.GrantReward` 走**真实奖励链路**
+	///   （`RunBuild.Add` + 真实 `RewardContext`）→ 真实「波波」连打同一个目标，量出
+	///   "第 1 击不加伤（那时 0 层）、第 2 击起按层数加伤"；再覆盖多目标 / 层数封顶 / 过期 / 其它技能。</item>
+	/// <item><b>B·心眼</b>（角色 A + 弓）：同上拿「心眼」→ 真实箭两连发，量出 +50% 从第二击起；
+	///   再让**另一个单位**打这个被标记的目标，读数必须不吃加成。</item>
+	/// <item><b>C·两种伤害与组合</b>（换回能量掌，规则仍在玩家身上）：能量掌**武技2**（不是箭）打被标记目标
+	///   = ×1.5（心眼对"各种伤害"生效、而发散只提高波波）→ 证明加伤不是写死在箭上；
+	///   同时量出「发散 × 心眼」的相乘组合。</item>
+	/// </list>
+	///
+	/// <para>⚠️ 全程**没有**直接 `Execute` 某个 handler、没有手动造 `HitInstance` 冒充命中
+	/// （唯一的"非玩家攻击者"那一条走的是同一个真实 `AttackInstance.RollHit` → `Unit.ReceiveHit`，
+	/// 并在日志里写明）；量完把靶子/规则摘掉。</para>
+	/// </summary>
+	private async Task RunMarkedBonusProbe()
+	{
+		// ── 0. 表 → 真实候选池：两条行是不是真的在"当前角色 + 当前武器"的池子里 ──
+		var palmWeapon = new ActRoguelike.Weapons.Weapon { PoolId = "pool_energy_palm", AttackTags = new[] { "Projectile", "Energy", "Physical" } };
+		var bowWeapon = new ActRoguelike.Weapons.Weapon { PoolId = "pool_bow", AttackTags = new[] { "Projectile", "Arrow", "Physical" } };
+		var fresh = new RunBuild();
+
+		static string WholePool(RewardPool pool, RunBuild build)
+			=> "," + string.Join(",", pool.Roll(build, 400).ConvertAll(definition => definition.Id)) + ",";
+
+		var palmPool = new RewardPool();
+		palmPool.Initialize(palmWeapon, "chr_hunter");
+		var bowPool = new RewardPool();
+		bowPool.Initialize(bowWeapon, "chr_hunter");
+		string palmIds = WholePool(palmPool, fresh);
+		string bowIds = WholePool(bowPool, fresh);
+		palmWeapon.Free();
+		bowWeapon.Free();
+
+		bool poolOk = palmIds.Contains(",evo_divergence,") && !palmIds.Contains(",evo_mindseye,")
+			&& bowIds.Contains(",evo_mindseye,") && !bowIds.Contains(",evo_divergence,");
+		GameLog.Write(
+			"SelfTest",
+			$"{(poolOk ? "✅" : "🔴")} J8·真实候选池（表 → RewardPool.Initialize/Roll）：猎手+能量掌 含「发散」={palmIds.Contains(",evo_divergence,")}（期望 True，<A1限定>）含「心眼」={palmIds.Contains(",evo_mindseye,")}（期望 False，<A3限定>）"
+			+ $"｜猎手+弓 含「心眼」={bowIds.Contains(",evo_mindseye,")}（期望 True）含「发散」={bowIds.Contains(",evo_divergence,")}（期望 False）");
+
+		// ── A. 角色 A + 能量掌：「发散」 ──
+		GetTree().Paused = false;
+		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.Hunter, WeaponPresetKind.EnergyPalm);
+		for (int i = 0; i < 12; i++)
+		{
+			await Frame();
+		}
+
+		Unit? player = PlayerLocator.Player;
+		if (player == null)
+		{
+			GameLog.Write("SelfTest", "🔴 J8·发散：找不到玩家。");
+			return;
+		}
+
+		if (!J8ResolveAnchor(player))
+		{
+			GameLog.Write("SelfTest", "🔴 J8·发散：求不出弹道锚点（准星射线退化），本段跳过。");
+			return;
+		}
+
+		J8ClearField();
+		EnergyWaveAbility? wave = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") as EnergyWaveAbility;
+		EnergyWaveAbility? bigWave = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_2") as EnergyWaveAbility;
+		string waveDamageNote = $"锚点 {Fmt(_j8Anchor)}（距胸口 {_j8AnchorDistance:0.##}m）";
+		GameLog.Write(
+			"SelfTest",
+			$"J8·发散换装：左键={wave?.AbilityId ?? "（找不到）"}（期望 skl_a1_w1_1「波波」） 右键={bigWave?.AbilityId ?? "（找不到）"}（期望 skl_a1_w1_2「憋个大的」）｜{waveDamageNote}");
+
+		bool grantedA = RunController.Instance?.GrantReward("evo_divergence") ?? false;
+		MarkedBonusRule? divergence = FindMarkRule(player, "evo_divergence");
+		GameLog.Write(
+			"SelfTest",
+			$"{(grantedA && divergence != null ? "✅" : "🔴")} J8·发散·真实奖励获取：RunController.GrantReward(evo_divergence)={grantedA}（走 RunBuild.Add + 真实 RewardContext → 真实 handler）"
+			+ $" → 玩家身上 {divergence?.GetType().Name ?? "（没有规则节点）"}｜{(divergence?.DebugState() ?? "")}");
+
+		Unit? targetA = J8SpawnTarget(player, "J8MarkA");
+		Unit? targetB = J8SpawnTarget(player, "J8MarkB");
+		if (targetA == null || targetB == null)
+		{
+			GameLog.Write("SelfTest", "🔴 J8·发散：靶子造不出来（enemy_chaser 场景读不到？）。");
+			J8FreeTargets(targetA, targetB);
+			return;
+		}
+
+		J8ClearField(targetA, targetB);
+		float perStack = divergence?.PerStackBonus ?? 0f;
+		const string Mark = "Mark";
+		var divergenceLines = new List<string>();
+
+		// A①②③：同一个目标连打三发 —— 「第一次加标这一击不加伤，从下一击起才加」
+		for (int shot = 1; shot <= 3; shot++)
+		{
+			J8Place(targetA, targetB);
+			int stacksBefore = targetA.GetStatusStacks(Mark);
+			int hitsBefore = _j8Hits.Count;
+			bool fired = await J8FirePress(wave!, hitsBefore);
+			J8Hit hit = J8LastHitOn(targetA, hitsBefore) ?? default;
+			int stacksAfter = targetA.GetStatusStacks(Mark);
+			float expected = 1f + (perStack * stacksBefore);
+			bool ok = fired
+				&& Mathf.Abs(hit.Scale - expected) < 0.005f
+				&& stacksAfter == Mathf.Min(5, stacksBefore + 1)
+				&& hit.Ability == "skl_a1_w1_1";
+			divergenceLines.Add(
+				$"{(ok ? "✅" : "🔴")} J8·发散·第 {shot} 击（同一目标连打）：命中前层数 {stacksBefore} → 实测伤害读数 {hit.Final:0.###}（攻击快照 {hit.Base:0.###}{((hit.Crit) ? $" ×暴击 {hit.CritMul:0.##}" : "")}）→ **实际倍率 ×{hit.Scale:0.####}**（期望 ×{expected:0.####}）"
+				+ $"｜命中后层数 {stacksAfter}（期望 {(stacksBefore < 5 ? stacksBefore + 1 : 5)}）技能={hit.Ability}");
+		}
+
+		GameLog.Write("SelfTest", divergenceLines[0] + " ← **第一次加标这一击不加伤**（那时目标身上还是 0 层）");
+		GameLog.Write("SelfTest", divergenceLines[1] + " ← **从下一击起才加**（层数来自上一次命中）");
+		GameLog.Write("SelfTest", divergenceLines[2]);
+
+		// A④ 多目标：B 自己叠一层（与 A 无关），同一发打在 B 上用的是 B 的层数
+		J8Place(targetB, targetA);
+		int bStacksBefore = targetB.GetStatusStacks(Mark);
+		int aStacksNow = targetA.GetStatusStacks(Mark);
+		int bHitsBefore = _j8Hits.Count;
+		bool bFired = await J8FirePress(wave!, bHitsBefore);
+		J8Hit bHit = J8LastHitOn(targetB, bHitsBefore) ?? default;
+		int bStacksAfter = targetB.GetStatusStacks(Mark);
+		bool bOk = bFired && Mathf.Abs(bHit.Scale - (1f + (perStack * bStacksBefore))) < 0.005f && bStacksAfter == 1;
+		GameLog.Write(
+			"SelfTest",
+			$"{(bOk ? "✅" : "🔴")} J8·发散·多目标（B 单独计层）：A 已 {aStacksNow} 层、B 还没被标记（{bStacksBefore} 层）→ 打 B 时读数 {bHit.Final:0.###}（快照 {bHit.Base:0.###}）= ×{bHit.Scale:0.####}（期望 ×{1f + (perStack * bStacksBefore):0.####} = 用 **B 自己**的层数，不是 A 的 {aStacksNow} 层）"
+			+ $"｜命中后 B 层数 {bStacksAfter}（期望 1）");
+
+		// A⑤ 打 A 时仍然用 A 的层数（B 的层数不串台）
+		J8Place(targetA, targetB);
+		int aStacksBefore5 = targetA.GetStatusStacks(Mark);
+		int aHitsBefore5 = _j8Hits.Count;
+		bool a5Fired = await J8FirePress(wave!, aHitsBefore5);
+		J8Hit a5Hit = J8LastHitOn(targetA, aHitsBefore5) ?? default;
+		int aStacksAfter5 = targetA.GetStatusStacks(Mark);
+		bool a5Ok = a5Fired && Mathf.Abs(a5Hit.Scale - (1f + (perStack * aStacksBefore5))) < 0.005f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(a5Ok ? "✅" : "🔴")} J8·发散·多目标（两条都带层数）：A 有 {aStacksBefore5} 层、B 有 {bStacksAfter} 层 → 打 A 读数 {a5Hit.Final:0.###}（快照 {a5Hit.Base:0.###}）= ×{a5Hit.Scale:0.####}（期望 ×{1f + (perStack * aStacksBefore5):0.####} = 用 A 自己的层数）｜命中后 A 层数 {aStacksAfter5}");
+
+		// A⑥ 其它技能（能量掌武技2「憋个大的」）：既**不加标**（层数不变）也**不吃**发散加成
+		J8Place(targetB, targetA);
+		int otherStacksBefore = targetB.GetStatusStacks(Mark);
+		int otherHitsBefore = _j8Hits.Count;
+		bool bigFired = await J8FireCharge(bigWave!, otherHitsBefore);
+		J8Hit bigHit = J8LastHitOn(targetB, otherHitsBefore) ?? default;
+		int otherStacksAfter = targetB.GetStatusStacks(Mark);
+		bool otherAbilityOk = bigFired
+			&& otherStacksAfter == otherStacksBefore
+			&& Mathf.Abs(bigHit.Scale - 1f) < 0.005f
+			&& bigHit.Ability == "skl_a1_w1_2";
+		GameLog.Write(
+			"SelfTest",
+			$"{(otherAbilityOk ? "✅" : "🔴")} J8·发散·其它技能不触发：能量掌武技2（{bigHit.Ability}）打已标记的 B → 伤害读数 {bigHit.Final:0.###}（快照 {bigHit.Base:0.###}）= ×{bigHit.Scale:0.####}（期望 ×1 —— 发散**只提高波波**）"
+			+ $"｜B 的层数 {otherStacksBefore} → {otherStacksAfter}（期望不变 —— 波波以外的命中**不加标**，这就是旧 BurnOnHit 那条来源过滤缺失）");
+
+		// A⑦ 层数：把 A 叠到封顶 5 层，再打一发 → 倍率停在 1+5N（不会继续涨）
+		for (int shot = 0; shot < 2; shot++)
+		{
+			J8Place(targetA, targetB);
+			int hitsBefore = _j8Hits.Count;
+			await J8FirePress(wave!, hitsBefore);
+		}
+
+		J8Place(targetA, targetB);
+		int cappedBefore = targetA.GetStatusStacks(Mark);
+		int cappedHitsBefore = _j8Hits.Count;
+		bool cappedFired = await J8FirePress(wave!, cappedHitsBefore);
+		J8Hit cappedHit = J8LastHitOn(targetA, cappedHitsBefore) ?? default;
+		int cappedAfter = targetA.GetStatusStacks(Mark);
+		int markCap = StatusPresets.Create(Mark, 1f)?.MaxStacks ?? 1;
+		bool capOk = cappedFired
+			&& cappedBefore == markCap
+			&& cappedAfter == markCap
+			&& Mathf.Abs(cappedHit.Scale - (1f + (perStack * markCap))) < 0.005f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(capOk ? "✅" : "🔴")} J8·发散·层数封顶：效果表 eff_mark.MaxStacks={markCap} → A 命中前 {cappedBefore} 层、打完仍 {cappedAfter} 层（期望都不超过 {markCap}）伤害读数 {cappedHit.Final:0.###}（快照 {cappedHit.Base:0.###}）= ×{cappedHit.Scale:0.####}（期望 ×{1f + (perStack * markCap):0.####} = 1+{markCap}×{perStack:0.##}）");
+
+		// A⑧ 过期：走**真实的单位物理回调**把标记推过期，再打一发 → 加成消失
+		targetA._PhysicsProcess(6.1d);
+		int expiredStacks = targetA.GetStatusStacks(Mark);
+		J8Place(targetA, targetB);
+		int expireHitsBefore = _j8Hits.Count;
+		bool expireFired = await J8FirePress(wave!, expireHitsBefore);
+		J8Hit expireHit = J8LastHitOn(targetA, expireHitsBefore) ?? default;
+		bool expireOk = expireFired && expiredStacks == 0 && Mathf.Abs(expireHit.Scale - 1f) < 0.005f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(expireOk ? "✅" : "🔴")} J8·发散·标记过期：推过 {6.1:0.#}s（`Unit._PhysicsProcess` 的真实状态倒计时）→ 层数 {cappedAfter} → {expiredStacks}（期望 0）→ 这一发读数 {expireHit.Final:0.###}（快照 {expireHit.Base:0.###}）= ×{expireHit.Scale:0.####}（期望 ×1，加成消失）");
+
+		// A⑨ 后撤（用户裁定里点名的那一条）：真实按 skill_1 → 既不加标也不产生伤害
+		J8Place(targetA, targetB);
+		int dodgeStacksBefore = targetA.GetStatusStacks(Mark);
+		int dodgeHitsBefore = _j8Hits.Count;
+		PressProbeAction("skill_1", true);
+		await Frame();
+		PressProbeAction("skill_1", false);
+		await WaitFrames(0.9f);
+		int dodgeStacksAfter = targetA.GetStatusStacks(Mark);
+		int dodgeHits = _j8Hits.Count - dodgeHitsBefore;
+		bool dodgeOk = dodgeStacksAfter == dodgeStacksBefore && dodgeHits == 0;
+		GameLog.Write(
+			"SelfTest",
+			$"{(dodgeOk ? "✅" : "🔴")} J8·发散·「后撤」不触发：真实按 skill_1 一次 → 靶子 A 的层数 {dodgeStacksBefore} → {dodgeStacksAfter}（期望不变）新增命中 {dodgeHits} 次（期望 0 —— 后撤没有伤害盒；用户裁定也明确发散不提高后撤）");
+
+		J8FreeTargets(targetA, targetB);
+
+		// ── B. 角色 A + 弓：「心眼」 ──
+		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.Hunter, WeaponPresetKind.Bow);
+		for (int i = 0; i < 12; i++)
+		{
+			await Frame();
+		}
+
+		player = PlayerLocator.Player;
+		if (player == null || !J8ResolveAnchor(player))
+		{
+			GameLog.Write("SelfTest", "🔴 J8·心眼：换弓后找不到玩家或求不出弹道锚点。");
+			return;
+		}
+
+		J8ClearField();
+		ArrowVolleyAbility? arrow = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") as ArrowVolleyAbility;
+		bool grantedB = RunController.Instance?.GrantReward("evo_mindseye") ?? false;
+		MarkedBonusRule? mindseye = FindMarkRule(player, "evo_mindseye");
+		float flat = mindseye?.FlatBonus ?? 0f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(grantedB && mindseye != null ? "✅" : "🔴")} J8·心眼·真实奖励获取：RunController.GrantReward(evo_mindseye)={grantedB} → 玩家身上 {mindseye?.GetType().Name ?? "（没有规则节点）"}｜{(mindseye?.DebugState() ?? "")}"
+			+ $"｜弓武技1={arrow?.AbilityId ?? "（找不到）"}（期望 skl_a3_w1_1「箭在弦上」，它才是这张行加标的箭）");
+
+		Unit? targetC = J8SpawnTarget(player, "J8MarkC");
+		if (targetC == null || arrow == null)
+		{
+			GameLog.Write("SelfTest", "🔴 J8·心眼：靶子或箭技能没有就绪。");
+			J8FreeTargets(targetC);
+			return;
+		}
+
+		J8ClearField(targetC);
+		var mindLines = new List<string>();
+		for (int shot = 1; shot <= 2; shot++)
+		{
+			J8Place(targetC);
+			int stacksBefore = targetC.GetStatusStacks(Mark);
+			int hitsBefore = _j8Hits.Count;
+			bool fired = await J8FireCharge(arrow, hitsBefore);
+			J8Hit hit = J8LastHitOn(targetC, hitsBefore) ?? default;
+			int stacksAfter = targetC.GetStatusStacks(Mark);
+			float expected = 1f + (stacksBefore > 0 ? flat : 0f);
+			bool ok = fired && Mathf.Abs(hit.Scale - expected) < 0.005f && hit.Ability == "skl_a3_w1_1";
+			mindLines.Add(
+				$"{(ok ? "✅" : "🔴")} J8·心眼·第 {shot} 击（同一目标连射真箭）：命中前层数 {stacksBefore} → 伤害读数 {hit.Final:0.###}（快照 {hit.Base:0.###}{((hit.Crit) ? $" ×暴击 {hit.CritMul:0.##}" : "")}）→ **实际倍率 ×{hit.Scale:0.####}**（期望 ×{expected:0.####}）"
+				+ $"｜命中后层数 {stacksAfter}（期望 {Mathf.Min(5, stacksBefore + 1)}）技能={hit.Ability}");
+		}
+
+		GameLog.Write("SelfTest", mindLines[0] + " ← 第一次加标那一击不加伤");
+		GameLog.Write("SelfTest", mindLines[1] + " ← 从下一击起 +50%");
+
+		// B③ 其它单位：另一个单位打**同一个**被标记目标 → 不吃玩家的心眼加成（规则挂在攻击者身上）
+		int cStacks = targetC.GetStatusStacks(Mark);
+		Unit? otherUnit = J8SpawnTarget(player, "J8OtherUnit");
+		float otherFinal = 0f;
+		bool otherAttacked = false;
+		if (otherUnit != null)
+		{
+			J8ClearField(targetC, otherUnit);
+			var enemyAttack = new AttackInstance
+			{
+				Attacker = otherUnit,
+				Ability = "skl_enemy_chaser_melee",
+				AbilityKind = "skl_enemy_chaser_melee",
+				BaseDamage = 20f,
+				Policy = HitPolicy.OncePerTarget,
+				Tags = new[] { "Melee", "Physical" },
+			};
+			int hitsBefore = _j8Hits.Count;
+			DamageResult otherResult = targetC.ReceiveHit(enemyAttack.RollHit(targetC, Vector3.Forward, targetC.GlobalPosition));
+			otherFinal = otherResult.FinalDamage;
+			otherAttacked = _j8Hits.Count > hitsBefore;
+			bool otherUnitOk = otherAttacked && Mathf.Abs(otherFinal - 20f) < 0.005f && targetC.GetStatusStacks(Mark) == cStacks;
+			GameLog.Write(
+				"SelfTest",
+				$"{(otherUnitOk ? "✅" : "🔴")} J8·心眼·其它单位不吃加成：靶子 C 身上有 {cStacks} 层标记，由**另一个单位**（{otherUnit.Name}，走同一条真实 `AttackInstance.RollHit`→`Unit.ReceiveHit`）打 20 点 → 实际结算 {otherFinal:0.###}（期望 20，×1 而不是 ×{1f + flat:0.##}）"
+				+ $"｜C 的层数仍是 {targetC.GetStatusStacks(Mark)}（敌方命中也**不加标**）");
+		}
+
+		J8FreeTargets(targetC, otherUnit);
+
+		// ── C. 换回能量掌：心眼对**各种伤害**都生效（不是只对箭）＋ 发散×心眼相乘 ──
+		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.Hunter, WeaponPresetKind.EnergyPalm);
+		for (int i = 0; i < 12; i++)
+		{
+			await Frame();
+		}
+
+		player = PlayerLocator.Player;
+		if (player == null || !J8ResolveAnchor(player))
+		{
+			GameLog.Write("SelfTest", "🔴 J8·心眼·各种伤害：换回能量掌后找不到玩家或求不出锚点。");
+			return;
+		}
+
+		J8ClearField();
+		wave = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") as EnergyWaveAbility;
+		bigWave = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_2") as EnergyWaveAbility;
+		divergence = FindMarkRule(player, "evo_divergence");
+		mindseye = FindMarkRule(player, "evo_mindseye");
+		Unit? targetD = J8SpawnTarget(player, "J8MarkD");
+		Unit? targetE = J8SpawnTarget(player, "J8MarkE");
+		if (targetD == null || targetE == null || wave == null || bigWave == null)
+		{
+			GameLog.Write("SelfTest", $"🔴 J8·心眼·各种伤害：靶子/技能没就绪（D={targetD != null} E={targetE != null} 波波={wave != null} 武技2={bigWave != null}）。");
+			J8FreeTargets(targetD, targetE);
+			return;
+		}
+
+		J8ClearField(targetD, targetE);
+
+		// C① 波波第 1 发：D 身上 0 层 → 两条规则都不加伤（心眼也要求"有标记"）
+		J8Place(targetD, targetE);
+		int dHits1 = _j8Hits.Count;
+		bool dFired1 = await J8FirePress(wave, dHits1);
+		J8Hit dHit1 = J8LastHitOn(targetD, dHits1) ?? default;
+		int dStacks1 = targetD.GetStatusStacks(Mark);
+
+		// C② 波波第 2 发：D 有 1 层 → 发散 (1+N) × 心眼 (1+50%)
+		J8Place(targetD, targetE);
+		int dHits2 = _j8Hits.Count;
+		bool dFired2 = await J8FirePress(wave, dHits2);
+		J8Hit dHit2 = J8LastHitOn(targetD, dHits2) ?? default;
+		int dStacks2 = targetD.GetStatusStacks(Mark);
+		float expectCompose = (1f + (perStack * 1f)) * (1f + flat);
+		bool composeOk = dFired1 && dFired2
+			&& Mathf.Abs(dHit1.Scale - 1f) < 0.005f
+			&& Mathf.Abs(dHit2.Scale - expectCompose) < 0.005f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(composeOk ? "✅" : "🔴")} J8·发散×心眼（同一位玩家同时拥有两条，规则按乘法叠加，全部来自表）：D 身上 0 层时波波读数 ×{dHit1.Scale:0.####}（期望 ×1）→ 命中后 {dStacks1} 层；再打一发读数 {dHit2.Final:0.###}（快照 {dHit2.Base:0.###}）= ×{dHit2.Scale:0.####}（期望 发散 {1f + perStack:0.###} × 心眼 {1f + flat:0.###} = ×{expectCompose:0.####}）｜命中后 {dStacks2} 层");
+
+		// C③ 能量掌武技2（**不是箭**）打被标记的目标 → 只有心眼那一份 ×1.5
+		J8Place(targetD, targetE);
+		int dStacksBeforeBig = targetD.GetStatusStacks(Mark);
+		int dHits3 = _j8Hits.Count;
+		bool dFired3 = await J8FireCharge(bigWave, dHits3);
+		J8Hit dHit3 = J8LastHitOn(targetD, dHits3) ?? default;
+		int dStacksAfterBig = targetD.GetStatusStacks(Mark);
+		bool manyOk = dFired3
+			&& Mathf.Abs(dHit3.Scale - (1f + flat)) < 0.005f
+			&& dStacksAfterBig == dStacksBeforeBig
+			&& dHit3.Ability == "skl_a1_w1_2";
+		GameLog.Write(
+			"SelfTest",
+			$"{(manyOk ? "✅" : "🔴")} J8·心眼·**各种伤害**（不是只对箭）：能量掌武技2（{dHit3.Ability}）打带 {dStacksBeforeBig} 层标记的目标 → 伤害读数 {dHit3.Final:0.###}（快照 {dHit3.Base:0.###}）= ×{dHit3.Scale:0.####}（期望 ×{1f + flat:0.####} = 心眼 50%，而发散对它不生效）"
+			+ $"｜命中后层数 {dStacksAfterBig}（期望不变 —— 非箭伤害**不加**心眼的标）");
+
+		// C④ 能量波打**没有**标记的目标 → ×1，且不会给它加标（心眼的标只由箭加）
+		J8Place(targetE, targetD);
+		int eStacksBefore = targetE.GetStatusStacks(Mark);
+		int eHits = _j8Hits.Count;
+		bool eFired = await J8FireCharge(bigWave, eHits);
+		J8Hit eHit = J8LastHitOn(targetE, eHits) ?? default;
+		int eStacksAfter = targetE.GetStatusStacks(Mark);
+		bool cleanOk = eFired && eStacksBefore == 0 && eStacksAfter == 0 && Mathf.Abs(eHit.Scale - 1f) < 0.005f;
+		GameLog.Write(
+			"SelfTest",
+			$"{(cleanOk ? "✅" : "🔴")} J8·心眼·非箭伤害不加标：能量掌武技2 打**没有**标记的目标 E → 层数 {eStacksBefore} → {eStacksAfter}（期望 0 → 0）伤害读数 ×{eHit.Scale:0.####}（期望 ×1）");
+
+		J8FreeTargets(targetD, targetE);
+
+		// 还原：把两条规则节点摘掉（`_ExitTree` 会注销攻击者侧登记），把场上清干净。
+		foreach (TriggerRule rule in CollectRules(player))
+		{
+			if (rule is MarkedBonusRule)
+			{
+				player.RemoveChild(rule);
+				rule.Free();
+			}
+		}
+
+		J8ClearField();
+		GameLog.Write(
+			"SelfTest",
+			$"J8·还原：两条规则节点已摘（攻击者侧登记随之注销）｜场上剩余敌人 {GetTree().GetNodesInGroup("enemy_units").Count} 个｜配置表计数不受影响（本次没有新增表行）");
 	}
 
 	// ⚠️ 旧的 `SettleShot(ability) => ability._PhysicsProcess(0.02d)`（"同帧手动 Tick 收尾"）**已删除**：

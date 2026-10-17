@@ -60,13 +60,25 @@ public sealed class AttackInstance
 	public HitInstance RollHit(Unit target, Vector3 direction, Vector3 position)
 	{
 		bool critical = CanCrit && GD.Randf() < CritChance;
+
+		// ⭐ J8：**命中时再读**的那一项 —— 目标身上"这一击之前"已有的「标记」层数所对应的伤害倍率
+		// （增幅「心眼」/「发散」，由攻击者侧登记的 `IOutgoingDamageScale` 提供）。
+		//
+		// ⚠️ 顺序就是语义（用户 2026-10-17 裁定「按本次命中前已有标记结算，第一次加标这次不加伤」）：
+		//    这里在 `HitInstance` 生成**之前**问，而"这一击加的标记"是在之后 `Unit.ReceiveHit` 抛
+		//    `Hit` 事件时由规则施加的（`MarkedBonusRule.Execute`）—— 所以这一击自己的标记**不可能**被算进来。
+		//    攻击者没有登记任何规则（敌人 / 召唤物 / 其他单位 / 没拿增幅的玩家）→ 恒为 1，改动前行为逐位不变。
+		float marked = Attacker is { } attacker && GodotObject.IsInstanceValid(attacker)
+			? attacker.OutgoingDamageScaleAgainst(target, this)
+			: 1f;
+
 		return new HitInstance
 		{
 			Target = target,
 			Attacker = Attacker,
 			Attack = this,
 			Context = EventContext.Create(Attacker, target),
-			Damage = BaseDamage * (critical ? CritMultiplier : 1f),
+			Damage = BaseDamage * (critical ? CritMultiplier : 1f) * marked,
 			Critical = critical,
 			Direction = direction,
 			Position = position,

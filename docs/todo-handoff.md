@@ -1,5 +1,19 @@
 # 交接文档：待办任务与项目约定
 
+## J8：发散／心眼按命中前标记结算（2026-10-17，已完成）
+
+交接单「下一步顺序」第2条已兑现：[J8验收与边界](character-design-j8.md)、[完整输出](character-design-j8-evidence.log)。`Weapon.cs`／7个`Ability`子类／敌人·首领·召唤物行与技能行**一个字没动**；`ConfigIndex.tres` **没有改**（两条行本来就在表里，本批不增删行，所以没有三处同改的风险）。
+
+病根：两条行的`ApplyHandler`都是`BurnOnHit`，而那条规则的判据只有「来源是自己＋目标不是自己」→ **任何命中都挂标记**（后撤/灵剑/能量掌武技2都算，这就是交接单说的「来源过滤尚不完整」），而「按标记加伤」那一半代码里根本不存在。
+
+改法（四件）：① 新增`Scripts/Combat/IOutgoingDamageScale.cs`＋`Unit.OutgoingDamageScaleAgainst`（攻击者侧登记，无登记恒为1）＋`AttackInstance.RollHit`里**生成`HitInstance`之前**读目标层数——所以「第一次加标这一击不加伤」是**顺序保证**的，不是特例判断；② 新handler `MarkedBonus`＋`MarkedBonusRule`（**一个类服务两条行**）：加标来源=`RequiredEventAbility`资源引用，加伤来源=新加强类型资源列`RewardConfig.BonusAgainstAbility`，数值`FlatBonus`／`PerStackBonus`；③ 发散`PerStackBonus=0.1`（**文档{N}未定→预设10%/层**，行`Note`与`ParamEntry.Note`都写明）；心眼`FlatBonus=0.5`且`BonusAgainstAbility`留空=**玩家的各种伤害**；④ **没有新增任何`Godot.Get/Set`字符串反射**。
+
+自测（`RunMarkedBonusProbe`，case54/55，P6d的退出挪到case55）三段23条读数全✅，全部走**真实奖励获取**（`RewardPool`确认在池＋`RunController.GrantReward`→`RunBuild.Add`→真实handler）+**真实按键/真实动画事件帧/真投射物/真命中**（读数来自`Unit.Damaged`）：同目标连打 **10／11／12 = ×1／×1.1／×1.2**（0/1/2层）、心眼真箭 **54→36 = ×1→×1.5**；边界逐项——其它技能（武技2不加标不加伤、层数1→1）、后撤（0次命中）、其它单位（敌方打带2层标记目标结算20=×1）、多目标（A 3层/B 1层各记各的）、封顶5层（×1.5不再涨）、过期（推6.1s→0层→×1）、两条同时拥有（1.1×1.5=×1.65）、"各种伤害"（武技2对已标记目标×1.5）。
+
+验收：Debug／ExportRelease均0警告0错误；Main退出码0、耗时68.1s、**stderr 0字节**、到`=== 自测结束 ===`；8硬指标逐字一致（含`（ConfigIndex.tres 已加载）`与索引`6/2/10/1/1/39/7/14/8/5/6/11/4`）；红色行仍是改前就有的5条历史读数标记、**没有新增**；四存档SHA256跑前=跑后=交接点；`selftest.flag`跑前跑后都不存在。**本批无截图**（证据是文本读数＋存档哈希）。
+
+边界：发散N是预设10%；心眼的"箭"=弓武技1`skl_a3_w1_1`（资源引用；将来要"任何箭类武器都算"应改成攻击标签`Array<string>`列）；标记层数不区分施加者；DoT与`ApplyDirectDamage`不走`RollHit`所以不吃加成（本批未接，也不需要）。下一项回交接单第3条：龙之箭。
+
 ## J7：Main 旧同步蓄力探针跨帧迁移（2026-10-17，已完成）
 
 交接单「下一步顺序」第1条已兑现：[J7验收与边界](character-design-j7.md)、[完整输出](character-design-j7-evidence.log)。只改`Scripts/Testing/SelfTest.cs`，**生产代码零改动**（`Ability.cs`／7个`Ability`子类／`Weapon.cs`／敌人·首领·召唤物行都没动），J6的"Main六条红灯"边界不再是边界。
@@ -737,7 +751,7 @@ Remove-Item 'C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\sel
 
 - 终版美术持续内容：角色、敌人、武器、终端、场景的统一风格与替换，当前庭院/角色/免费特效是阶段性交付。
 - GC缓存竞态已稳定复现并接入项目侧规避（I专项）；旧SetGodotObjectPtr堆栈未单独复现，继续保留，不能宣称引擎级永久修复。
-- 原始角色设计纠偏：J1～J6范围已验，J7已把Main旧同步蓄力探针迁移成跨帧；继续其余进化、统一暴击、独立动作及各武器逐条证据，详细交接见DEEPSEEK_HANDOFF.md。
+- 原始角色设计纠偏：J1～J6范围已验，J7已把Main旧同步蓄力探针迁移成跨帧，**J8已把发散／心眼改成「加标来源进表＋按命中前层数加伤」并逐项取证**；继续龙之箭、其余进化、统一暴击、独立动作及各武器逐条证据，详细交接见DEEPSEEK_HANDOFF.md。
 - 全局暴击对近战的适用范围：现有近战快照只读命中体自身CritChance，未合入元进度暴击；H已公开实际0暴击和源码边界，未擅改规则。
 - 平衡扩展验证：移动目标、散射全弹/远距离、群怪、完整构筑、两角色主动防御与整局胜率。
 

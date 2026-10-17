@@ -1,5 +1,7 @@
 # 架构说明
 
+J8「按目标标记加伤」的唯一读点放在`AttackInstance.RollHit`：生成`HitInstance`之前问攻击者一次`IOutgoingDamageScale`（`Unit.OutgoingDamageScaleAgainst`），所以"这一击自己刚加的标记"不会算进这一击；规则挂在攻击者身上（增幅是玩家的），敌人／召唤物天然不吃。来源过滤与数值全在表里（`RequiredEventAbility` + 新强类型资源列`BonusAgainstAbility`），不新增`Godot.Get/Set`字符串反射。[标记加伤契约](character-design-j8.md)。
+
 J6蓄力松手为一次性提交：基类冻结输入状态，能力保存释放结果，真实释放动画事件才起动投射物。变奏的强类型参数资源引用目标技能，不新增字符串反射赋值；真实ATK后进入可中断的逐发连射过程。表现层继续只读状态。[蓄力释放契约](character-design-j6.md)。
 
 J5防御以`HitInstance.Negated`标记单次命中，不修改单位级无敌来代替架势；伤害入口仍先派发命中事实再执行无敌／单次无效化／普通格挡。真实Kill事件携带攻击技能Id，表中的`RewardConfig.RequiredEventAbility`资源引用编译为运行期来源限制。闪复用来源持有的三维速度覆盖和球体扫掠；收招保留施法期间已发生的冷却修正，不丢失闪击杀／招架事实。见[闪架契约](character-design-j5.md)。

@@ -584,6 +584,48 @@ public partial class Unit : CharacterBody3D
 	/// <summary>身上有没有这条状态。</summary>
 	public bool HasStatus(string statusId) => GetStatusStacks(statusId) > 0;
 
+	/// <summary>
+	/// 这个单位作为**攻击者**登记的"按目标状态加伤"规则（J8：增幅「心眼」「发散」）。
+	/// 只由规则节点自己在 <c>_Ready</c> / <c>_ExitTree</c> 成对登记/注销 —— 不做子树扫描（免扫描开销、
+	/// 也不会因为"规则比第一次命中晚挂上"而读到过期缓存）。
+	/// </summary>
+	private readonly List<IOutgoingDamageScale> _outgoingDamageScales = new();
+
+	/// <summary>登记一条攻击者侧伤害缩放（幂等：同一实例不会进两次）。</summary>
+	public void AddOutgoingDamageScale(IOutgoingDamageScale scale)
+	{
+		if (!_outgoingDamageScales.Contains(scale))
+		{
+			_outgoingDamageScales.Add(scale);
+		}
+	}
+
+	/// <summary>注销（规则退树时调用；不注销会让已释放的节点留在表里）。</summary>
+	public void RemoveOutgoingDamageScale(IOutgoingDamageScale scale) => _outgoingDamageScales.Remove(scale);
+
+	/// <summary>
+	/// 本次命中对 <paramref name="target"/> 的伤害倍率（1 = 不变；多条规则相乘）。
+	///
+	/// <para>调用点**只有一个**：<see cref="AttackInstance.RollHit"/> —— 它在
+	/// <see cref="HitInstance"/> 生成（= <c>Hit</c> 事件抛出、状态施加）**之前**跑，
+	/// 所以读到的层数就是"这一击之前已有"的层数。没有任何规则登记时恒为 1（改动前逐位不变）。</para>
+	/// </summary>
+	public float OutgoingDamageScaleAgainst(Unit target, AttackInstance attack)
+	{
+		if (_outgoingDamageScales.Count == 0)
+		{
+			return 1f;
+		}
+
+		float scale = 1f;
+		foreach (IOutgoingDamageScale rule in _outgoingDamageScales)
+		{
+			scale *= Mathf.Max(0f, rule.ScaleAgainst(target, attack));
+		}
+
+		return scale;
+	}
+
 	public float Heal(float amount)
 	{
 		if (IsDead || amount <= 0f)

@@ -86,6 +86,7 @@
 | **`StompOnLand` 处理器 + `StompOnLandRule`**（**P6b 新增**，服务「杀戮践踏」） | **落地那一刻**对周围敌人造成一次范围伤害：`Radius` / `Damage` / `MinFallHeight` / `Cooldown`（触发间隔）。⚠️ 它是**轮询落地边沿**而不是订阅事件 —— `CharacterMovement` 是共用战斗类（P6b 不许碰），没有抛起跳/落地事件；规则自己每帧读它**已公开**的 `IsGrounded` / `FallHeight`。范围伤害与「能量护盾」共用 `PulseDamage.Around` | 1 条 |
 | **`HomingMissileOnCrit` 处理器 + `HomingMissileOnCritRule`**（**P6b 新增**，服务「巡飞弹」） | 暴击 → 发射一枚**追踪飞弹**：`ProjectileScene` / `Damage` / `Speed` / `SeekRange` / `Lifetime` / `BeaconStatusId` / `BeaconSeconds` / `TurnRateDegrees` / `Cooldown`。复用的是 **P3 的追踪弹通路**（`Projectile.HomingStatusId` + 转向速度）：先给最近的敌人挂**专用信标状态**（`eff_missile_beacon`），再发一枚追这个状态的飞弹 | 1 条 |
 | **`BurnOnHit` 的 `Cooldown`**（P5b 新增） | 命中挂状态那条规则自己的触发间隔（「冰晶」的"每 10 秒最多一次"） | 0（= 不拦，改动前行为） |
+| **`MarkedBonus` 处理器 + `MarkedBonusRule`**（**J8 新增**，服务「发散」「心眼」两条行） | 命中给目标叠「标记」，并按**这一击命中之前**目标身上已有的层数放大**自己**造成的伤害：`StatusId` / `Duration` / `FlatBonus`（心眼 0.5）/ `PerStackBonus`（发散 0.1 = 预设 N）。来源过滤全在表上：**加标来源** = `RequiredEventAbility`（「发散」=<c>skl_a1_w1_1</c>、「心眼」=<c>skl_a3_w1_1</c>），**加伤来源** = 新列 `BonusAgainstAbility`（「发散」只提高波波；「心眼」留空 = 玩家的各种伤害）。消费者是 **`AttackInstance.RollHit` 里那次 `IOutgoingDamageScale` 查询**（所以"第一次加标这一击不加伤"是顺序保证的，不是特例判断） | 2 条 |
 | **`RampMaxCount` / `RampWindowSeconds`**（P5b 新增） | `ArrowVolleyAbility.FireVolley`：连续射击第 N 发时发数至少 N（「变奏」） | 0 / 0（= 一行不进） |
 | **`GameplayEventKind.Parried`**（P5b 新增的事件种类） | 抛点唯一：`GuardStanceAbility.OnOwnerHit`（架住那一刻）。订阅方：招架反击 / 能量护盾 | 没有订阅者时 `Raise` 什么也不做 |
 
@@ -238,10 +239,14 @@
    `evo_golden_qi` 金光术（要 `MeleeComboAbility` 每段额外生成一道剑气）、
    `evo_affection` 喜爱（要飞行中的武器每 2 秒索敌转向）、
    `evo_variation` 变奏（只接了"发数按连射序号"，"变得更强"那一半没接）。
-3. **各有一半没接**（都在行 `Note` 里逐条写明）：心眼 / 发散（按**目标身上的标记层数**加伤）、
-   龙之箭（蓄力 2 秒后箭变大 + 全穿透）、怜悯（"只释放最后一刀"）、气贯长虹（"不再能收回 / 落地立刻收回"）、
+3. **各有一半没接**（都在行 `Note` 里逐条写明）：龙之箭（蓄力 2 秒后箭变大 + 全穿透）、怜悯（"只释放最后一刀"）、气贯长虹（"不再能收回 / 落地立刻收回"）、
    神降术（"范围更大"——半径在命中体上，不在那个能力的 `[Export]` 列里）、浮光跃金（"闪现至目标高度"）、
    闪身步（没校验"这一杀是闪造成的"）、普渡（没校验"是最后一刀杀的"）。
+   → ⚠️ **2026-10-17 J8 已把「心眼 / 发散」那一条从本文里划掉**：两条行不再复用 `BurnOnHit`，
+   改成新处理器 **`MarkedBonus`**（`MarkedBonusRule`，一个类服务两条行）+ 新增强类型资源列
+   `RewardConfig.BonusAgainstAbility`；加标来源与加伤来源都进表（`RequiredEventAbility` / `BonusAgainstAbility`），
+   按**命中前**目标层数结算（`AttackInstance.RollHit` → `IOutgoingDamageScale`）。
+   发散**预设每层 10%**（文档 `{N}` 未定，行 `Note` 写明）。见 [character-design-j8.md](character-design-j8.md)。
 4. ✅ **P6a 已修**：`ArmorBroken` / `ShieldBroken` / `Critical` 原来**一个抛点都没有**（只有 `GameLog` 的
    `switch` 认得它们）。现在三者各有**唯一**抛点，都在 `Unit.ReceiveHit`：
    - `ArmorBroken` ← 扣甲后 `Armor <= 0` 那一刻（`ArmorBroke?.Invoke()` 旁边）

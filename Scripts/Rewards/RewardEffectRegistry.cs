@@ -76,6 +76,24 @@ public static class RewardEffectRegistry
 				MaxSummons = (int)Param(row, "MaxSummons", 2f),
 			}),
 
+		// ⭐ J8：**「标记」类增幅**（「发散」/「心眼」）。与上面的 `BurnOnHit` 的区别是两件事都收在数据里：
+		//   ① 挂标记的来源 = 行上的 `RequiredEventAbility`（强类型资源引用 → 技能行 Id）——
+		//      旧实现复用 `BurnOnHit` 只有"来源是自己"，于是后撤/其它武技的命中也会挂标记（来源过滤不完整）；
+		//   ② 加伤只对哪个技能生效 = 行上的 `BonusAgainstAbility`（空 = 玩家的各种伤害），
+		//      按**命中前**目标身上的层数结算（`AttackInstance.RollHit` 那一刻问，见 `IOutgoingDamageScale`）。
+		["MarkedBonus"] = row => context =>
+			context.Player.AddChild(new MarkedBonusRule
+			{
+				RewardId = row.Id,
+				Cooldown = Param(row, "Cooldown", 0f),
+				StatusId = ParamText(row, "StatusId", "Mark"),
+				Duration = Param(row, "Duration", 6f),
+				MarkAbilityId = row.RequiredEventAbility?.Id ?? string.Empty,
+				BonusAbilityId = row.BonusAgainstAbility?.Id ?? string.Empty,
+				FlatBonus = Param(row, "FlatBonus", 0f),
+				PerStackBonus = Param(row, "PerStackBonus", 0f),
+			}),
+
 		// ⚠️ P6b：这里原来还有一条 `["AmmoOnKill"]`（击杀补满弹匣 → `AmmoOnKillRule`）——
 		// 随"没有弹匣的概念了"整条删除：行文件（`mut_supply`）P6a 已删、`Weapon.RefillMagazine` 本批已删。
 		// `ChainLightningRule` / `LifestealRule` / `BurnOnHitRule` / `SummonOnKillRule` 四条**保留**

@@ -31,6 +31,12 @@ public partial class RewardConfig : ConfigRow
 	[Export] public string ApplyHandler { get; set; } = "StatSet";
 	/// <summary>只接受该技能造成的事件；资源引用在编译时转为运行期技能Id。</summary>
 	[Export] public AbilityConfig? RequiredEventAbility { get; set; }
+	/// <summary>
+	/// **只对这个技能的伤害加成**（J8：「发散」只提高「波波」而「心眼」提高玩家的各种伤害）。
+	/// 留空 = 不按技能过滤。与 <see cref="RequiredEventAbility"/> 分工：
+	/// 那个管「哪一击才加标」，这个管「加伤只算哪些技能」—— 两条都是**强类型资源引用**，不是字符串反射。
+	/// </summary>
+	[Export] public AbilityConfig? BonusAgainstAbility { get; set; }
 	/// <summary>点按连射进化；参数及目标技能均为强类型资源。</summary>
 	[Export] public VolleyRampTuning? VolleyRamp { get; set; }
 
