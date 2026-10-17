@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RuneConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "DeathAvoid"
+Value = 1
+Note = "死亡避免次数（文档为 {n}）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "DeathAvoidHealFraction"
+Value = 0.3
+Note = "触发时恢复的生命比例（文档给了 30%）"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+ApplyHandler = "RuneEffect"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1")]
+Slot = 6
+UnlocksRequires = Array[String]([])
+Id = "rune_life_death"
+DisplayName = "生死"
+DescriptionTemplate = "获得 1 次死亡避免：致命伤被无效化，并恢复 30% 最大生命值。"
+Note = "[J11 新增行·符文] 文档第 8 行「生死:获得{n}次死亡避免,在死亡时无效化这次伤害并恢复{30}%血量」——**恢复 30% 文档给了**，**次数 {n} 没给** → 预设 **1 次**（「能跑通的最小可用值」：一次就足以改变一局的生死判断，且不会把风险完全抹掉）。实现 = 新规则 `RuneDeathAvoidRule` + `Unit` 里「致命那一下先问一遍登记过 `IDeathAvoid` 的规则」这一个钩子（没有登记时 `if` 整段不执行，默认逐位不变）。"

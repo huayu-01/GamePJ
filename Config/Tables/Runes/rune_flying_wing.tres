@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RuneConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "JumpVelocityMultiplier"
+Operation = 1
+Value = 1.3
+
+[sub_resource type="Resource" id="Resource_m1"]
+script = ExtResource("1_stat")
+Stat = "MaxFallSpeedMultiplier"
+Operation = 1
+Value = 0.8
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
+Slot = 8
+UnlocksRequires = Array[String]([])
+Id = "rune_flying_wing"
+DisplayName = "飞翼"
+DescriptionTemplate = "跳跃高度与上升速度 +30%；正常下落速度 −20%。"
+Note = "[J11 新增行·符文] 文档第 10 行「飞翼:跳跃高度更高,提高上升速度,降低正常下落速度,下落攻击的下落速度更快」——**文档一个数都没给**（全是描述）。预设 **起跳速度 ×1.3**（跳跃高度按平方关系 ≈ +69%，「更高」这条一次给足）+ **正常下落上限 ×0.8**（「降低正常下落速度」）+「提高上升速度」与起跳同一条（起跳速度就是上升初速）。⚠️ **「下落攻击的下落速度更快」这一半没有实现**：它要改 `FallAttackAbility.DiveSpeed`，而 `FallAttackAbility` 属于本批硬约束里不许碰的共用 `Ability` 子类；将来只需给它加一个读 `DiveSpeedMultiplier` 的入口，然后本行加一条 Modifier 即可（不用改符文系统的任何代码）。"

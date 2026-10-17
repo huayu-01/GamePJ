@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RuneConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "DamageMultiplier"
+Operation = 1
+Value = 1.2
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+Slot = 7
+UnlocksRequires = Array[String]([])
+Id = "rune_strength_talisman"
+DisplayName = "大力符"
+DescriptionTemplate = "造成的伤害 +20%。"
+Note = "[J11 新增行·符文] 文档第 9 行「大力符:造成的伤害提高{20}%」——**文档给了 20%**。实现 = 既有键 `DamageMultiplier`（消费者：`Weapon` 开火 / `EnergyWaveAbility` / `ArrowVolleyAbility` / `MeleeComboAbility.Strike`），×1.2，纯表驱动、零处理器。不解锁任何前置。"

@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="RuneConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "PixieIntervalSeconds"
+Value = 5.0
+Note = "攻击间隔（秒，文档给了 5）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "PixieRadius"
+Value = 8.0
+Note = "索敌半径（米，预设）"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "PixieDamage"
+Value = 20.0
+Note = "每次攻击的伤害（文档为 {n}）"
+
+[sub_resource type="Resource" id="Resource_p3"]
+script = ExtResource("1_param")
+Key = "PixieOrbitRadius"
+Value = 1.6
+Note = "绕着玩家转的半径（米，预设）"
+
+[sub_resource type="Resource" id="Resource_p4"]
+script = ExtResource("1_param")
+Key = "PixieOrbitSpeed"
+Value = 90.0
+Note = "绕行角速度（度/秒，预设）"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+ApplyHandler = "RuneEffect"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3"), SubResource("Resource_p4")]
+Slot = 11
+UnlocksRequires = Array[String]([])
+Id = "rune_pixie"
+DisplayName = "小精灵"
+DescriptionTemplate = "获得一只围着玩家转的小精灵，每 5 秒攻击 8 米内的一个敌人。"
+Note = "[J11 新增行·符文] 文档第 14 行「小精灵:获得一个围着转的小精灵,小精灵每{5}秒的攻击周围的某个敌人」——**5 秒文档给了**，**每次伤害与索敌半径都没给**（「周围的某个敌人」连半径都没写）→ 预设 **伤害 20**（≈ 一次普通近战命中，5 秒一次不会喧宾夺主）+ **半径 8 米** + 绕行半径 1.6 米 + 90°/秒。实现 = `PixieCompanion`（挂玩家下的 `Node3D`，**不进物理世界、不进任何单位分组**，与「灵魂收割」的 `SoulPickup` 同一条纪律）：每帧按相位摆到玩家身侧，到点挑一个半径内最近的 `IsValidTarget` 敌人，走 `AttackInstance.RollHit` + `Unit.ReceiveHit` 统一结算（所以它吃玩家的伤害/暴击/狙神/巨人等全部修正，不自成一套）。⚠️ 没有模型/动画资源，本批用一个自发光小球当占位表现（`Note` 如实登记）。"

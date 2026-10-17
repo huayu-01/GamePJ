@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RuneConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "CooldownMultiplier"
+Operation = 1
+Value = 1.5
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+Slot = 3
+UnlocksRequires = Array[String](["风之印"])
+Id = "rune_wind_seal"
+DisplayName = "风之印"
+DescriptionTemplate = "技能冷却时间 +50%；携带时「风之印」派系的增幅可以被抽到。"
+Note = "[J11 新增行·符文] 文档第 5 行「风之印:获得 风之印,技能冷却时间增加{50}%」——**文档给了 50%**（与雷之印/战神印同为「负面效果」那一类，用户 2026-10-17 确认）。实现 = 既有键 `CooldownMultiplier`（`Unit.SeedStats` 里基础值 1，消费者 `Ability.UnitCooldownMultiplier` → `EffectiveCooldown = Cooldown × 行级 × 单位级`），×1.5 = 冷却变长 50%，纯表驱动、零处理器。前置解锁 = `UnlocksRequires` 里填「风之印」。"

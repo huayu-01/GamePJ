@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RuneConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "MaxHealthCap"
+Operation = 0
+Value = 30.0
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+Slot = 1
+UnlocksRequires = Array[String](["雷之印"])
+Id = "rune_lei_seal"
+DisplayName = "雷之印"
+DescriptionTemplate = "最大生命值限制为 30；携带时「雷之印」派系的增幅（前置要求雷之印的那些）可以被抽到。"
+Note = "[J11 新增行·符文] 文档《后续构筑.txt》第 3 行「雷之印:装备后获得 雷之印 的增幅(雷之印:最大生命值限制为{30},在获得增幅时能发现雷系特化增幅,也就是那些需要雷之印前置的增幅)」。**文档给了 30**（不是「减 30%」），用户 2026-10-17 再次确认「雷之印的构筑本身就很强，带来的限制必然也要够大才能平衡」。实现 = StatSheet 新键 `MaxHealthCap`（0 = 不限；>0 = `Unit.RefreshStats` 把生命上限硬夹到该值），纯表驱动、零新处理器。前置解锁 = `UnlocksRequires` 里填「雷之印」（携带后 `RewardPool.HasPrerequisites` 认这一项）。"

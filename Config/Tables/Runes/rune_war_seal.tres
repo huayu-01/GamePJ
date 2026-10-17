@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RuneConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "CritChanceAdd"
+Operation = 0
+Value = 0.1
+
+[sub_resource type="Resource" id="Resource_m1"]
+script = ExtResource("1_stat")
+Stat = "IncomingDamageMultiplier"
+Operation = 1
+Value = 4.0
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
+Slot = 2
+UnlocksRequires = Array[String](["战神刻印"])
+Id = "rune_war_seal"
+DisplayName = "战神印"
+DescriptionTemplate = "暴击率 +10%；受到的伤害 +300%（= 承受 4 倍伤害）；携带时「战神刻印」派系的增幅可以被抽到。"
+Note = "[J11 新增行·符文] 文档第 4 行「战神印:装备后获得 战神刻印 的增幅(战神刻印:获得10%暴击率,受到的伤害增加{300}%,在获得增幅时能发现战神特化增幅)」。**300% 是「再增加 300%」= 承受 4 倍伤害**（用户 2026-10-17 确认「战神印也是」，与雷之印同一个「限制要够大」的口径）。暴击率走既有键 `CritChanceAdd`；受伤倍率走 StatSheet 新键 `IncomingDamageMultiplier`（基础值 1，`Unit.ReceiveHit` 里乘在既有的格挡/减伤之后），纯表驱动、零新处理器。前置解锁 = `UnlocksRequires` 里填「战神刻印」。"

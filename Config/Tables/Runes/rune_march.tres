@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RuneConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "MoveSpeedMultiplier"
+Operation = 1
+Value = 2.0
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+Slot = 5
+UnlocksRequires = Array[String]([])
+Id = "rune_march"
+DisplayName = "行军"
+DescriptionTemplate = "移动速度 +100%。"
+Note = "[J11 新增行·符文] 文档第 7 行「行军:移速增加{100}%」——**文档给了 100%**。实现 = 既有键 `MoveSpeedMultiplier`（消费者 `CharacterMovement`），×2.0，纯表驱动、零处理器。不解锁任何前置（`UnlocksRequires` 空）。"

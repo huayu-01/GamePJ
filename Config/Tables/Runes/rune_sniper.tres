@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="RuneConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_p0"]
+script = ExtResource("1_param")
+Key = "NearRange"
+Value = 3.0
+Note = "近距离判定的距离（米）"
+
+[sub_resource type="Resource" id="Resource_p1"]
+script = ExtResource("1_param")
+Key = "NearScale"
+Value = 0.5
+Note = "近距离伤害倍率（文档给了 50%）"
+
+[sub_resource type="Resource" id="Resource_p2"]
+script = ExtResource("1_param")
+Key = "FarRange"
+Value = 15.0
+Note = "远端判定的距离（米）"
+
+[sub_resource type="Resource" id="Resource_p3"]
+script = ExtResource("1_param")
+Key = "FarScale"
+Value = 1.5
+Note = "远端伤害倍率（预设）"
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+ApplyHandler = "RuneEffect"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3")]
+Slot = 9
+UnlocksRequires = Array[String]([])
+Id = "rune_sniper"
+DisplayName = "狙神"
+DescriptionTemplate = "近处（≤3 米）伤害 ×0.5，越远越高，到 ≥15 米时 ×1.5。"
+Note = "[J11 新增行·符文] 文档第 11 行「狙神:对离得越远的敌人其造成的伤害越高,近距离的伤害只有{50}%」——**近端 50% 文档给了**，**远端倍率与两个距离阈值都没给** → 预设 **≥15 米 ×1.5**（+50% 而不是翻倍：与近端 −50% 对称）+ **3 米 / 15 米**（3 米约等于近战贴身距离、15 米约等于弓的常见作战距离）。实现 = 复用 J8 建的攻击者侧查询口 `IOutgoingDamageScale` + `Unit.AddOutgoingDamageScale`（**与「心眼」「发散」同一套机制，零新增战斗钩子**）：新规则 `RuneDistanceDamageRule` 按「命中那一刻玩家与目标的水平距离」线性插值，命中在 `AttackInstance.RollHit` 里结算。"
