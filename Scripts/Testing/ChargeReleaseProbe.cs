@@ -197,9 +197,11 @@ public partial class ChargeReleaseProbe : Node3D
 		}
 		await Until(() => bow.CooldownRemaining <= 0.0001f);
 		int chargedBefore = _spawnTimes.Count;
-		Press(bow.InputAction, true); await Until(() => bow.IsCharging && bow.ChargeTime >= 1.05f); Press(bow.InputAction, false);
+		int fullTiers = bow.ChargeMaxStepsEffective;
+		float fullHold = bow.ChargeBaseSecondsEffective + (bow.ChargeStepSecondsEffective * fullTiers) + 0.02f;
+		Press(bow.InputAction, true); await Until(() => bow.IsCharging && bow.ChargeTime >= fullHold); Press(bow.InputAction, false);
 		await Until(() => !bow.IsActive);
-		Check(_spawnTimes.Count - chargedBefore == 1 && Mathf.IsEqualApprox(bow.LastShotSpeed, bow.Speed + 150), "获得变奏后长按仍为满五档单箭，不吃快射连发");
+		Check(_spawnTimes.Count - chargedBefore == 1 && Mathf.IsEqualApprox(bow.LastShotSpeed, bow.Speed + (bow.SpeedPerChargeStep * fullTiers)), $"获得变奏后长按仍为满档单箭（{bow.ChargeSteps}/{fullTiers} 档，弹速 {bow.LastShotSpeed:0.##}），不吃快射连发");
 		await Wait(1.3); await Until(() => bow.CooldownRemaining <= 0.0001f);
 		int resetBefore = _spawnTimes.Count;
 		Press(bow.InputAction, true); await Wait(0.04); Press(bow.InputAction, false); await Until(() => !bow.IsActive);

@@ -280,11 +280,15 @@ public partial class CharacterDesignProbe : Node3D
 	{
 		await Equip(PlayerCharacterKind.Hunter, WeaponPresetKind.Bow);
 		var bow = _player.GetNode<ArrowVolleyAbility>("AbilityWeapon3Skill1");
+		// 蓄到**表里能蓄的最长**（J10：基础 0.5s + 3 个后置档 × 0.3s = 1.4s，共 4 个威力档）。
+		float full = bow.ChargeBaseSecondsEffective + (bow.ChargeStepSecondsEffective * bow.ChargeMaxStepsEffective);
 		Press("weapon_skill_1", true);
-		Check(await Until(() => bow.ChargeTime >= 1.05f), "弓真实输入蓄满五档");
+		Check(await Until(() => bow.ChargeTime >= full + 0.02f), $"弓真实输入蓄满（{full:0.##}s = 基础 {bow.ChargeBaseSecondsEffective:0.##}s + {bow.ChargeMaxStepsEffective} 档 × {bow.ChargeStepSecondsEffective:0.##}s）");
 		Press("weapon_skill_1", false);
 		await Wait(0.25);
-		Check(bow.ChargeSteps == 5 && Mathf.IsEqualApprox(bow.ChargePowerScale, 2.5f), $"弓五档按基础加算：{bow.ChargePowerScale:0.###}倍");
-		Check(Mathf.IsEqualApprox(bow.LastShotDamage, bow.Damage * 2.5f * _player.Stats.Get("DamageMultiplier")) && Mathf.IsEqualApprox(bow.LastShotSpeed, bow.Speed + 150), $"弓真实发射快照：伤害={bow.LastShotDamage}、弹速={bow.LastShotSpeed}");
+		int tiers = bow.ChargeMaxStepsEffective;
+		float power = 1f + (bow.ChargeStepScale - 1f) * tiers;
+		Check(bow.ChargeSteps == tiers && Mathf.IsEqualApprox(bow.ChargePowerScale, power), $"弓满档按基础加算：{tiers} 个后置档 → ×{bow.ChargePowerScale:0.###} 倍（1 + {bow.ChargeStepScale - 1f:0.##}×{tiers}）");
+		Check(Mathf.IsEqualApprox(bow.LastShotDamage, bow.Damage * power * _player.Stats.Get("DamageMultiplier")) && Mathf.IsEqualApprox(bow.LastShotSpeed, bow.Speed + (bow.SpeedPerChargeStep * tiers)), $"弓真实发射快照：伤害={bow.LastShotDamage}、弹速={bow.LastShotSpeed}");
 	}
 }

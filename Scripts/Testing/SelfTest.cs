@@ -4024,18 +4024,21 @@ public partial class SelfTest : Node
 			float dmg3 = w1.LastShotDamage;
 			float spd3 = w1.LastShotSpeed;
 			float expectDmg3 = w1.Damage * (1 + 0.3f * steps) * dmgMul;
-			float expectSpd3 = w1.Speed + (30f * steps);
+			float expectSpd3 = w1.Speed + (w1.SpeedPerChargeStep * steps);
 
 			bool ok = baseCast && baseHeld && baseFired && stepsAtBase == 0 && stepCast && stepHeld && stepFired && steps == 3
+				&& Mathf.IsEqualApprox(w1.ChargeStepSeconds, 0.3f)
+				&& Mathf.IsEqualApprox(w1.ChargeMaxSeconds, 1.4f)
+				&& w1.ChargeMaxStepsEffective == 3
 				&& Mathf.IsEqualApprox(dmg0, _p3BowW1.Damage * dmgMul)
 				&& Mathf.IsEqualApprox(spd0, _p3BowW1.Speed)
 				&& Mathf.IsEqualApprox(dmg3, expectDmg3)
 				&& Mathf.IsEqualApprox(spd3, expectSpd3);
 			GameLog.Write(
 				"SelfTest",
-				$"{(ok ? "✅" : "🔴")} P3·弓武技1 箭在弦上：基础蓄力 {w1.ChargeBaseSeconds:0.##}s（期望 0.5）/ 每 {w1.ChargeStepSeconds:0.##}s（期望 0.1）一档 / 每档伤害 ×{w1.ChargeStepScale:0.##}（期望 1.3）/ 每档弹速 +{w1.SpeedPerChargeStep:0.##}（期望 30）/ 最多 {w1.ChargeMaxSeconds:0.##}s（期望 1）"
-				+ $" → 基础档：释放段真ATK到达={baseFired}（档 {stepsAtBase}，自然收招={baseSettled}）伤害 {dmg0:0.###}（期望 表值 {w1.Damage:0} ×玩家倍率 {dmgMul:0.##}）弹速 {spd0:0.##}（期望 {w1.Speed:0}）"
-				+ $"；3 档：释放段真ATK到达={stepFired}（自然收招={stepSettled}）伤害 {dmg3:0.###}（期望 {expectDmg3:0.###} = 1+0.3×3）弹速 {spd3:0.##}（期望 {expectSpd3:0.##}）");
+				$"{(ok ? "✅" : "🔴")} P3·弓武技1 箭在弦上：基础蓄力 {w1.ChargeBaseSeconds:0.##}s（期望 0.5）/ 每 {w1.ChargeStepSeconds:0.##}s（J10 期望 0.3）一档 / 每档伤害 ×{w1.ChargeStepScale:0.##}（期望 1.3）/ 每档弹速 +{w1.SpeedPerChargeStep:0.##} / 最多 {w1.ChargeMaxSeconds:0.##}s（J10 期望 1.4 → {w1.ChargeMaxStepsEffective} 个后置档，基础 1 + 后置 {w1.ChargeMaxStepsEffective} = {w1.ChargeMaxStepsEffective + 1} 个威力档）"
+				+ $" → 基础档：释放段真ATK到达={baseFired}（档 {stepsAtBase}，自然收招={baseSettled}）伤害 {dmg0:0.###}（期望 表值 {w1.Damage:0} ×玩家倍率 {dmgMul:0.##}，**基础蓄力期间不加档**）弹速 {spd0:0.##}（期望 {w1.Speed:0}）"
+				+ $"；{steps} 档：释放段真ATK到达={stepFired}（自然收招={stepSettled}）伤害 {dmg3:0.###}（期望 {expectDmg3:0.###} = 1+0.3×{steps}）弹速 {spd3:0.##}（期望 {expectSpd3:0.##}）");
 		}
 
 		// 靶子：用真敌人 Chaser 的实例（刹那之眼的标记要它）。

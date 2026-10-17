@@ -303,7 +303,11 @@ public abstract partial class Ability : Node3D
 			int steps = ChargeMaxSteps > 0 ? ChargeMaxSteps : int.MaxValue;
 			if (ChargeMaxSeconds > baseSeconds)
 			{
-				steps = Mathf.Min(steps, (int)Mathf.Floor((ChargeMaxSeconds - baseSeconds) / stepSeconds));
+				// ⚠️ 浮点容差（J10）：表里的 (1.4-0.5)/0.3 在 float 下是 2.9999998，Floor 会少算一档
+				// ——「基础 1 档 + 后置 3 档 = 4 个威力档」就变成 2 档。这里加一个远小于任何真实档位的
+				// epsilon（1e-4 档），只影响"表值正好落在整数档边界"的行；既有行（长枪 (2.0-1.0)/0.25 = 4
+				// 精确、短弩用 ChargeMaxSteps 封顶、其余 step ≤ 0 直接返回 0）的结果一个都不变。
+				steps = Mathf.Min(steps, (int)Mathf.Floor(((ChargeMaxSeconds - baseSeconds) / stepSeconds) + 0.0001f));
 			}
 
 			return Mathf.Max(0, steps);

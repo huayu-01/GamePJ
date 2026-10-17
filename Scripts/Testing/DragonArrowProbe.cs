@@ -198,14 +198,14 @@ public partial class DragonArrowProbe : Node3D
 	/// <summary>① 表 → 机制：强类型资源里的四个数字真的接到了这个技能节点上。</summary>
 	private async Task TableAndGrant()
 	{
-		// 改前的默认值（不配这条进化时行为必须逐位不变）：上限 1s = 5 档、阈值/尺寸/穿透全 0。
+		// 改前的默认值（不配这条进化时行为必须逐位不变）：上限 1.4s = 3 档（J10 裁定后）、阈值/尺寸/穿透全 0。
 		Check(
-			Mathf.IsEqualApprox(_bow.ChargeMaxSeconds, 1f)
-				&& _bow.ChargeMaxStepsEffective == 5
+			Mathf.IsEqualApprox(_bow.ChargeMaxSeconds, 1.4f)
+				&& _bow.ChargeMaxStepsEffective == 3
 				&& Mathf.IsEqualApprox(_bow.ChargedShotThresholdSeconds, 0f)
 				&& Mathf.IsEqualApprox(_bow.ChargedShotSizeScale, 0f)
 				&& _bow.ChargedShotPierce == 0,
-			$"改前默认：蓄力上限 {_bow.ChargeMaxSeconds}s（{_bow.ChargeMaxStepsEffective} 档）阈值 {_bow.ChargedShotThresholdSeconds} 尺寸 {_bow.ChargedShotSizeScale} 穿透 {_bow.ChargedShotPierce}（期望 1s/5档/0/0/0）");
+			$"改前默认：蓄力上限 {_bow.ChargeMaxSeconds}s（{_bow.ChargeMaxStepsEffective} 档）阈值 {_bow.ChargedShotThresholdSeconds} 尺寸 {_bow.ChargedShotSizeScale} 穿透 {_bow.ChargedShotPierce}（期望 1.4s/3档/0/0/0）");
 
 		RewardConfig? row = ConfigRows.ById<RewardConfig>("evo_dragon_arrow");
 		Check(row != null, "表行 evo_dragon_arrow 已加载");
@@ -237,7 +237,7 @@ public partial class DragonArrowProbe : Node3D
 		Check(_build.Has("evo_dragon_arrow"), "通过真实 RunBuild.Add（生产里抽中后入构筑的同一条路）拿到龙之箭");
 		Check(
 			Mathf.IsEqualApprox(_bow.ChargeMaxSeconds, 3f)
-				&& _bow.ChargeMaxStepsEffective == 25
+				&& _bow.ChargeMaxStepsEffective == 8
 				&& Mathf.IsEqualApprox(_bow.ChargedShotThresholdSeconds, 2f)
 				&& Mathf.IsEqualApprox(_bow.ChargedShotSizeScale, 2f)
 				&& _bow.ChargedShotPierce == 99,
@@ -249,7 +249,7 @@ public partial class DragonArrowProbe : Node3D
 			$"[DragonArrow] INFO 口径（交接单点名的歧义）：上限 {_bow.ChargeMaxSeconds:0.##}s → 满蓄 {_bow.ChargeMaxStepsEffective} 档 = ×{fullPower:0.##}"
 			+ $"（每 {_bow.ChargeStepSecondsEffective:0.##}s 仍加一档）；2.0s 处 = {TiersAt(2f)} 档 ×{atTwo:0.##}。"
 			+ (Mathf.Abs(atTwo - fullPower) > 0.001f
-				? "→ 现在是「继续加档到 3 秒」，2 秒只是大箭阈值；要改成「2 秒后不再加档」把 MaxSteps 填 15 即可（不改 C#）。"
+				? "→ 现在是「继续加档到 3 秒」，2 秒只是大箭阈值；要改成「2 秒后不再加档」把 MaxSteps 填 5 即可（不改 C#）。"
 				: "→ 现在是「2 秒后不再加档」。"));
 		await Wait(0.05);
 	}
@@ -288,7 +288,7 @@ public partial class DragonArrowProbe : Node3D
 
 	/// <summary>
 	/// 等这一发该结算的都结算完（或投射物自己消失）再关掉本段窗口 ——
-	/// 否则上一发的箭会飞进下一段的命中列表（大箭 670m/s ≈ 11m/物理帧，到第二个靶要好几帧）。
+	/// 否则上一发的箭会飞进下一段的命中列表（弹速 ≈ 4.3m/物理帧，到第二个靶要好几帧）。
 	/// </summary>
 	private async Task Settle(int expectedHits, int hitStart)
 	{
@@ -307,7 +307,7 @@ public partial class DragonArrowProbe : Node3D
 	/// <summary>②③④ 阈值边界 + 全穿透 + 不锁存。</summary>
 	private async Task PiercingShots()
 	{
-		// 三个靶在 x=20 这条直线上；间距 18m 远大于"一帧飞行距离"（2s 大箭 670m/s ≈ 11.2m/帧），
+		// 三个靶在 x=20 这条直线上；间距 18m 远大于"一帧飞行距离"（大箭几 m/物理帧），
 		// 这样每个靶都必然落在**不同**的一帧扫掠里（穿透的真实语义：一箭连续命中多个目标）。
 		var t1 = MakeTarget("T1", new Vector3(20f, 0.9f, 11.4f));
 		var t2 = MakeTarget("T2", new Vector3(20f, 0.9f, -6.6f));
@@ -432,10 +432,12 @@ public partial class DragonArrowProbe : Node3D
 			$"⑤ 墙**后**的靶一次都没被打到：生命 {behind.Health:0.##}/{behind.MaxHealth:0.##}（穿透没有穿过地形）");
 		float wallNear = 7.5f;
 		float wallFar = 8.5f;
+		// ⚠️ 这条读数与**弹速**有关（J10 把弹速降下来之后就露出来了）：探针每帧在投射物**之前**读位置，
+		// 所以"最后读数"是撞击前一物理帧的落点，它必然在墙的**近侧**（≥ 墙的近面）；J9 当年 670m/s
+		// 一帧跳 11.2m 正好跳进墙体里，才读到 8.2339。这里断言的是真正的性质：**没有穿到墙后面**。
 		Check(
-			_watchedLastPosition.Z >= wallNear - 0.01f && _watchedLastPosition.Z <= wallFar + 0.01f
-				&& _watchedLastPosition.Z > behind.GlobalPosition.Z,
-			$"⑤ 箭停在墙里：最后位置 {_watchedLastPosition}（墙 z∈[{wallNear:0.##},{wallFar:0.##}]，墙后靶 z={behind.GlobalPosition.Z:0.##}）");
+			_watchedLastPosition.Z >= wallNear - 0.01f && _watchedLastPosition.Z > behind.GlobalPosition.Z,
+			$"⑤ 箭的最后一帧读数在墙的**近侧**：{_watchedLastPosition}（墙 z∈[{wallNear:0.##},{wallFar:0.##}]，墙后靶 z={behind.GlobalPosition.Z:0.##}）—— 没有穿到墙后");
 		Check(!IsInstanceValid(_watched), "⑤ 箭撞墙后消失（不是穿墙继续飞）");
 		GD.Print($"[DragonArrow] INFO ⑤ 场上存活投射物 {Projectile.LiveCount}");
 		front.QueueFree();
