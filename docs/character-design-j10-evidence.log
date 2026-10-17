@@ -1,0 +1,327 @@
+# J10 · 弓：蓄力档位（0.3s / 基础1+后置3=4档）· 弹速下调 · 快弹不漏怪（每帧线段多命中扫掠）证据日志
+# 生成时间：2026-10-17
+# 来源：.ai_j10__BowSweepProbe_final.log / .ai_j10__DragonArrowProbe_final.log / .ai_j10__ChargeReleaseProbe_final.log / .ai_j10__CharacterDesignProbe_final.log / .ai_j10_selftest.log
+# 命令：
+#   & 'F:\Godot项目\项目a\build.ps1' --no-incremental -v minimal                                  -> 0 个警告 / 0 个错误
+#   dotnet build ActRoguelike.csproj --no-incremental -v minimal -c ExportRelease                  -> 0 个警告 / 0 个错误（已成功生成）
+#   & '...console.exe' --headless --path 'F:\Godot项目\项目a' res://Scenes/Debug/_BowSweepProbe.tscn        -> 退出码 0 / stderr 0 字节 / 通过 23 失败 0
+#   & '...console.exe' --headless --path 'F:\Godot项目\项目a' res://Scenes/Debug/_DragonArrowProbe.tscn      -> 退出码 0 / stderr 0 字节 / 通过 42 失败 0
+#   & '...console.exe' --headless --path 'F:\Godot项目\项目a' res://Scenes/Debug/_ChargeReleaseProbe.tscn     -> 退出码 0 / stderr 0 字节 / 通过 80 失败 0
+#   & '...console.exe' --headless --path 'F:\Godot项目\项目a' res://Scenes/Debug/_CharacterDesignProbe.tscn   -> 退出码 0 / stderr 0 字节 / 通过 115 失败 0
+#   & '...console.exe' --path 'F:\Godot项目\项目a' --headless --quit-after 40000 res://Scenes/Main.tscn -- --selftest -> 退出码 0 / stderr 0 字节 / 68.6s
+#
+# 存档（跑前 = 跑后，与交接点逐字相同）：
+#   meta.cfg          6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+#   ability_cards.cfg 594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+#   settings.cfg      3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+#   loadout.cfg       CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+#   selftest.flag 跑前不存在、跑后不存在
+
+## 一、8 条硬指标（与 docs/e-batch-evidence.log 基线逐字一致）
+[log] 00:45:12 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 00:45:14 [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[log] 00:45:14 [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[log] 00:45:14 [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[log] 00:45:14 [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[log] 00:45:24 [SelfTest] 端到端：按 F（当前交互提示 = 按 F 使用：强化池）
+[log] 00:45:25 [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[log] 00:45:34 [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[log] 00:45:44 [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+
+## 二、J10 专项 _BowSweepProbe（真实按键蓄力 → 真实释放 ATK → 真实命中）23/0
+[BowSweep] PASS 表→机制·蓄力：基础 0.5s / 每 0.3s 一档 / 每档 ×1.3（**加算**：1 + 0.3×档）/ 上限 1.4s → 3 个后置档（基础 1 + 后置 3 = 4 个威力档）
+[BowSweep] PASS 表→机制·弹速：基础 160 m/s / 每档 +20 → 满档 220（J10 预设值，等用户确认）
+[BowSweep] PASS 表→机制·扫掠：技能行 SweepMaxHits=8（期望 8）已套到技能节点上
+[BowSweep] INFO 威力阶梯：后置 0 档（蓄 0.5s）→ 威力 ×1 单发伤害 24 弹速 160
+[BowSweep] INFO 威力阶梯：后置 1 档（蓄 0.8s）→ 威力 ×1.3 单发伤害 31.2 弹速 180
+[BowSweep] INFO 威力阶梯：后置 2 档（蓄 1.1s）→ 威力 ×1.6 单发伤害 38.4 弹速 200
+[BowSweep] INFO 威力阶梯：后置 3 档（蓄 1.4s）→ 威力 ×1.9 单发伤害 45.6 弹速 220
+[BowSweep] PASS ② 基础蓄力期间不加档：按到 0.352s（< 基础 0.5s）→ ChargeSteps 0（期望 0）ChargePowerScale ×1（期望 1）进度 0.704（期望 <1）
+[BowSweep] PASS ② 没蓄满就松手：不释放（LastReleaseAborted=True）场上新弹体 0 个（期望 0）
+[BowSweep] PASS ② 刚过基础就松手（真实按键 0.52s，档 0）：伤害 24（期望 24 = 表值 24 ×玩家倍率 1，**不含档位加成**）弹速 160（期望 160）
+[BowSweep] PASS ③ 过了第 1 个后置档（真实按键 0.814s）：伤害 31.2（期望 ×1.3 = 31.2）弹速 180（期望 180）→ 增长从**基础蓄力之后**才开始
+[BowSweep] PASS 表行 skl_a2_w1_2（短弩武技2）已加载
+[BowSweep] PASS 表行 skl_b3_w1_2（长枪武技2）已加载
+[BowSweep] PASS 短弩武技2：基础 0.4s + 每 0.2s × 3 个后置档（ChargeMaxSteps=3）→ 基础 1 + 后置 3 = 4 个**发数**档（每档 +2 支）；行里没填 ChargeStepScale（节点上保持 1）→ 不分伤害档，**与用户口径一致、不需要改**
+[BowSweep] PASS 长枪武技2：基础 1s + (上限 2s − 基础)/0.25s = 4 个后置档 → 基础 1 + 后置 4 = 5 档，威力 ×1.8（它自己的 ChargeStepScale=1.2，加算）；⚠️ 比用户新口径「基础+后置3=4档」多 1 档，**本批没改**，等用户确认
+[BowSweep] INFO 档数口径：弓（本批）基础 1 + 后置 3 = 4 档；短弩武技2 基础 1 + 后置 3 = 4 档（发数档）；长枪武技2 基础 1 + 后置 4 = 5 档（原裁定「额外每.25四档」）
+[BowSweep] PASS 龙之箭表行：指向 skl_a3_w1_1 上限 3s 阈值 2s 穿透 99
+[BowSweep] PASS RewardCatalog 编译出了这一行（ApplyHandler=ChargedShot 已注册）
+[BowSweep] PASS 通过 RunBuild.Add 拿到龙之箭后：上限 3s → 8 个后置档（威力 ×3.4，大箭穿透 99）
+[BowSweep] INFO 龙之箭满蓄：现在 8 档 ×3.4 伤害 81.6 弹速 320（J9 交付时 25 档 ×8.5 伤害 204 弹速 970；把 step 改成 0.3 之后它自己就降下来了）
+[BowSweep] INFO 贴脸双怪几何：蓄 2.05s 的大箭弹速 260 m/s → 单帧线段 4.333m；T1 z=17.6 / T2 z=16.0（半径 0.5，跨 z∈[15.5, 18.1]）都完整落在同一条线段里（枪口 z≈19.4 → 帧末 z≈15.067）
+[BowSweep] PASS ⑤ 对照组：真实投射物上的扫掠预算 0（期望 0 = 不扫掠，既有路径）
+[BowSweep] PASS ⑤ 关掉扫掠（= 改动前）：贴脸双怪只结算**最近那只** → 命中 T1，T2 一点血都没掉（100000/100000）
+[BowSweep] PASS ⑤ 真实投射物上的扫掠预算 8（期望表值 8）
+[BowSweep] PASS ⑤⭐ 开扫掠：贴脸双怪**都打到了** → 命中顺序 T1 → T2，伤害 60 / 120
+[BowSweep] PASS ⑤⭐ 两次命中在**同一物理帧**（帧 695 / 695）：不是漏怪后靠下一帧补打
+[BowSweep] PASS ⑤ 不重复结算：这一发里 T1 正好 1 次、T2 正好 1 次（各 1 次）
+[BowSweep] PASS ⑤ 扫掠撞到 World 就停下：墙**前**的靶被结算、墙后的靶没被打到 → 命中 T1，伤害 120
+[BowSweep] PASS ⑤ 墙后靶生命 99880（打前 99880）—— 扫掠没有穿地形
+[BowSweep] PASS ⑤ 箭撞墙后消失（场上存活投射物 0）
+[BowSweep] INFO ⑤ 按靶统计命中次数：T1=3 T2=1（T2 只在扫掠那发/墙后那发里没被打到，见上面的断言）
+[BowSweep] === J10 弓·档位/弹速/扫掠 验收结束：通过 23，失败 0 ===
+
+## 三、龙之箭回归 _DragonArrowProbe 42/0（期望已按 J10 新表值更新：默认 3 档 / 拿了龙之箭 8 档）
+[DragonArrow] PASS 改前默认：蓄力上限 1.4s（3 档）阈值 0 尺寸 0 穿透 0（期望 1.4s/3档/0/0/0）
+[DragonArrow] PASS 表行 evo_dragon_arrow 已加载
+[DragonArrow] PASS 行上的强类型 ChargedShot 指向弓武技1：skl_a3_w1_1
+[DragonArrow] PASS 表里的数字：蓄力上限 3s 阈值 2s 尺寸 ×2 穿透 99 档数上限 0（0=不限）
+[DragonArrow] PASS RewardCatalog 编译出了这一行（ApplyHandler=ChargedShot 已注册）
+[DragonArrow] PASS 通过真实 RunBuild.Add（生产里抽中后入构筑的同一条路）拿到龙之箭
+[DragonArrow] PASS 拿到之后技能节点：蓄力上限 3s（8 档）阈值 2s 尺寸 ×2 穿透 99
+[DragonArrow] INFO 口径（交接单点名的歧义）：上限 3s → 满蓄 8 档 = ×3.4（每 0.3s 仍加一档）；2.0s 处 = 5 档 ×2.5。→ 现在是「继续加档到 3 秒」，2 秒只是大箭阈值；要改成「2 秒后不再加档」把 MaxSteps 填 5 即可（不改 C#）。
+[DragonArrow] PASS ① 蓄 0.6s：真实按键蓄到 0.60s（实际 0.6s）
+[DragonArrow] PASS ① 蓄 0.6s：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ① 蓄 0.6s：真实释放 ATK 才发射
+[DragonArrow] PASS ① 蓄 0.6s：这一发的判据是**松手快照** 0.607s（松手冻结值 0.607s，按住期间 0.6s）
+[DragonArrow] PASS ① 小箭：不是大箭=True 尺寸 ×1 穿透预算 0（期望 False/×1/0）
+[DragonArrow] PASS ① 小箭只中最近 1 个靶：命中顺序 T1，伤害 24
+[DragonArrow] PASS ② 蓄 1.9s：真实按键蓄到 1.90s（实际 1.902s）
+[DragonArrow] PASS ② 蓄 1.9s：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ② 蓄 1.9s：真实释放 ATK 才发射
+[DragonArrow] PASS ② 蓄 1.9s：这一发的判据是**松手快照** 1.909s（松手冻结值 1.909s，按住期间 1.902s）
+[DragonArrow] PASS ② 1.9s < 阈值：仍不是大箭=True 尺寸 ×1 穿透预算 0（期望 False/×1/0）
+[DragonArrow] PASS ② 1.9s 只中最近 1 个靶：命中顺序 T1，伤害 52.8
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：真实按键蓄到 2.05s（实际 2.055s）
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：真实释放 ATK 才发射
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：这一发的判据是**松手快照** 2.062s（松手冻结值 2.062s，按住期间 2.055s）
+[DragonArrow] PASS ③ 大箭：是大箭=True 尺寸 ×2 穿透预算 99（期望 True/×2/99）
+[DragonArrow] PASS ③ 一箭穿三个靶：命中顺序 T1 → T2 → T3，伤害 60 / 120 / 60
+[DragonArrow] PASS ③ 三次命中是**同一个 AttackInstance**（同一发箭），不是三箭
+[DragonArrow] PASS ③ 三次命中分布在不同物理帧（扫掠逐帧推进，不是同一帧重复结算）（帧间隔 4/4）
+[DragonArrow] INFO ③ 第三个靶之后箭还活着=True（MaxLifetime 3s，说明它没在最后一个靶上消失）
+[DragonArrow] INFO ③ 命中#1 靶 T1 伤害 60 暴击快照 60 帧 391
+[DragonArrow] INFO ③ 命中#2 靶 T2 伤害 120 暴击快照 60 帧 395
+[DragonArrow] INFO ③ 命中#3 靶 T3 伤害 60 暴击快照 60 帧 399
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：真实按键蓄到 0.60s（实际 0.607s）
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：真实释放 ATK 才发射
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：这一发的判据是**松手快照** 0.614s（松手冻结值 0.614s，按住期间 0.607s）
+[DragonArrow] PASS ④ 不锁存：大箭之后 0.6s 又回到小箭=True 尺寸 ×1 穿透预算 0（期望 False/×1/0）
+[DragonArrow] PASS ④ 小箭只中最近 1 个靶：命中顺序 T1，伤害 24
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：真实按键蓄到 2.05s（实际 2.055s）
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：松手后仍等释放段 ATK，不立即出弹
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：真实释放 ATK 才发射
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：这一发的判据是**松手快照** 2.062s（松手冻结值 2.062s，按住期间 2.055s）
+[DragonArrow] PASS ⑤ 这一发确实是全穿透的大箭（穿透预算 99）
+[DragonArrow] PASS ⑤ 只打中墙**前**的靶：命中顺序 W_Front，伤害 60
+[DragonArrow] PASS ⑤ 墙**后**的靶一次都没被打到：生命 100000/100000（穿透没有穿过地形）
+[DragonArrow] PASS ⑤ 箭的最后一帧读数在墙的**近侧**：(20, 0.9923085, 10.733789)（墙 z∈[7.5,8.5]，墙后靶 z=2）—— 没有穿到墙后
+[DragonArrow] PASS ⑤ 箭撞墙后消失（不是穿墙继续飞）
+[DragonArrow] INFO ⑤ 场上存活投射物 0
+[DragonArrow] === 龙之箭验收结束：通过 42，失败 0 ===
+
+## 四、蓄力释放回归 _ChargeReleaseProbe 80/0（与 J6/J7/J8/J9 同基线）
+[ChargeRelease] PASS EnergyPalm真实输入蓄力完成
+[ChargeRelease] PASS EnergyPalm按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS EnergyPalm松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS EnergyPalm松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS EnergyPalm等待释放时再次按住不重置蓄力快照：0.5629→0.5629
+[ChargeRelease] PASS EnergyPalm真实释放ATK才生成投射物
+[ChargeRelease] PASS EnergyPalm本次释放发数正确且不重复：1
+[ChargeRelease] PASS EnergyPalm真实释放投射物命中物理靶
+[ChargeRelease] PASS EnergyPalm真实命中快照与已报告伤害一致：40
+[ChargeRelease] PASS EnergyPalm缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS EnergyPalm缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS EnergyPalm未获变奏时提前松手不释放
+[ChargeRelease] PASS Crossbow真实输入蓄力完成
+[ChargeRelease] PASS Crossbow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Crossbow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Crossbow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Crossbow等待释放时再次按住不重置蓄力快照：0.4623→0.4623
+[ChargeRelease] PASS Crossbow真实释放ATK才生成投射物
+[ChargeRelease] PASS Crossbow本次释放发数正确且不重复：3
+[ChargeRelease] PASS Crossbow真实释放投射物命中物理靶
+[ChargeRelease] PASS Crossbow真实命中快照与已报告伤害一致：12
+[ChargeRelease] PASS Crossbow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Crossbow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Crossbow未获变奏时提前松手不释放
+[ChargeRelease] PASS Bow真实输入蓄力完成
+[ChargeRelease] PASS Bow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Bow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Bow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Bow等待释放时再次按住不重置蓄力快照：0.5587→0.5587
+[ChargeRelease] PASS Bow真实释放ATK才生成投射物
+[ChargeRelease] PASS Bow本次释放发数正确且不重复：1
+[ChargeRelease] PASS Bow真实释放投射物命中物理靶
+[ChargeRelease] PASS Bow真实命中快照与已报告伤害一致：24
+[ChargeRelease] PASS Bow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Bow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Bow未获变奏时提前松手不释放
+[ChargeRelease] PASS SpiritSword真实输入蓄力完成
+[ChargeRelease] PASS SpiritSword按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS SpiritSword松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS SpiritSword松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS SpiritSword等待释放时再次按住不重置蓄力快照：1.062→1.062
+[ChargeRelease] PASS SpiritSword真实释放ATK才生成投射物
+[ChargeRelease] PASS SpiritSword本次释放发数正确且不重复：1
+[ChargeRelease] PASS SpiritSword真实释放投射物命中物理靶
+[ChargeRelease] PASS SpiritSword真实命中快照与已报告伤害一致：26
+[ChargeRelease] PASS SpiritSword缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS SpiritSword缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS SpiritSword未获变奏时提前松手不释放
+[ChargeRelease] PASS 完美时机夹具完成本次真实蓄力
+[ChargeRelease] PASS 能量掌按松手时刻冻结完美结果
+[ChargeRelease] PASS 完美结果实际发射仍保留：True，弹速400
+[ChargeRelease] PASS 普通能量波夹具实际经过完美窗口
+[ChargeRelease] PASS 经过完美窗口松手冻结为普通释放
+[ChargeRelease] PASS 普通释放实际伤害30／弹速250
+[ChargeRelease] PASS 短弩后置蓄力三档确实完成
+[ChargeRelease] PASS 短弩三档释放快照实际生成9箭，仍保持散射
+[ChargeRelease] PASS 打断夹具完成本次真实蓄力
+[ChargeRelease] PASS 释放ATK前被后撤打断，不补发旧箭
+[ChargeRelease] PASS 通过真实RewardCatalog→RunBuild.Add获得变奏
+[ChargeRelease] PASS 强类型资源的循环上限与逐发间隔实际接入
+[ChargeRelease] PASS 变奏第1次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第1次实际1箭，期望1
+[ChargeRelease] PASS 变奏第2次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第2次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第3次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第3次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第4次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第4次实际1箭，期望1
+[ChargeRelease] PASS 变奏第5次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第5次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第6次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第6次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 获得变奏后长按仍为满档单箭（3/3 档，弹速 220），不吃快射连发
+[ChargeRelease] PASS 超出连续射击窗口后点按回到第一箭
+[ChargeRelease] PASS 二连发第一箭已由真实ATK射出
+[ChargeRelease] PASS 连发中被后撤打断，已出箭保留，待发第二箭取消
+[ChargeRelease] === 蓄力释放验收结束：通过 80，失败 0 ===
+
+## 五、原文设计回归 _CharacterDesignProbe 115/0（历史基线）
+[Design] PASS 爆炸特效已脱离短寿命战斗判定节点
+[Design] PASS 场景深度重载后，旧特效仍由原生Timer按时回收
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS EnergyPalm 仅灵剑有落剑式，实际启用=False
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Crossbow 仅灵剑有落剑式，实际启用=False
+[Design] PASS Bow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Bow 仅灵剑有落剑式，实际启用=False
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS SpiritSword 仅灵剑有落剑式，实际启用=True
+[Design] PASS Scythe 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Scythe 仅灵剑有落剑式，实际启用=False
+[Design] PASS Spear 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Spear 仅灵剑有落剑式，实际启用=False
+[Design] PASS 后撤过程中转镜头，起手朝向保持不变
+[Design] PASS 真实Dodge动画事件向起手方向后方施力：(0.0063236468, 0, 11.999998)
+[Design] PASS 后撤结束释放自身朝向锁，恢复准星朝向
+[Design] PASS 长枪由表配置四段循环：段数=4
+[Design] PASS 真实输入→动画ATK→连续命中两轮四连，段索引=0,1,2,3,0,1,2,3
+[Design] PASS 两轮四连实际扣血：10000→9804.199
+[Design] PASS 镰刀起手未到ATK不会提前抛出
+[Design] PASS 镰刀真实动画ATK出手
+[Design] PASS 镰刀真实向前飞行，武技1锁定
+[Design] PASS 投出后释放动作占用，手中模型隐藏
+[Design] PASS 镰刀到射程后悬停
+[Design] PASS 飞镰刀与手持使用同一武器模型资源
+[Design] PASS 镰刀默认停留而不自动回收：(-20, 0.9, 1.3999996)
+[Design] PASS 镰刀停留时真实周期命中，次数=2，间隔=504ms
+[Design] PASS 镰刀回程尚未到手时仍锁武技1
+[Design] PASS 镰刀实际回手后才解锁
+[Design] PASS 回手恢复同源手持模型
+[Design] PASS 第二次飞镰刀到前方停留
+[Design] PASS 角色靠近飞镰刀触发召回
+[Design] PASS 长枪蓄至0档，时间=1.062，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 0档基础加算：倍率=1、射程=12
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, 2)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至1档，时间=1.31，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 1档基础加算：倍率=1.2、射程=14.4
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -5.000001)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至2档，时间=1.565，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 2档基础加算：倍率=1.4、射程=16.8
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -7.4000015)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至3档，时间=1.814，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 3档基础加算：倍率=1.6、射程=19.2
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -9.800001)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至4档，时间=2.062，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 4档基础加算：倍率=1.8、射程=21.6
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -12.200003)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 弓真实输入蓄满（1.4s = 基础 0.5s + 3 档 × 0.3s）
+[Design] PASS 弓满档按基础加算：3 个后置档 → ×1.9 倍（1 + 0.3×3）
+[Design] PASS 弓真实发射快照：伤害=45.6、弹速=220
+[Design] === 原始设计验收结束：通过 115，失败 0 ===
+
+## 六、Main 自测里与本批直接相关的行（都 ✅）
+[log] 00:45:14 [SelfTest] ✅ P5b·实测表参数落到机制上（探测技能节点，不进树）：有备无患 → 后撤 MaxCharges 3（期望 3）Recharge 0.5s（期望 0.5）｜气贯长虹 → 长枪武技2 基础蓄力 0.5s（期望 0.5）每档 0.125s（期望 0.125）｜变奏 + 龙之箭 → 弓武技1 RampMaxCount 3（期望 3）RampWindow 1.2s（期望 1.2）蓄力上限 3s（期望 3）｜大拔刀术 → 拔刀式剑气体积 ×2（期望 2）+ 伤害乘区 1.5（期望 1.5）｜地爆 / 神降术 → 落剑式 Knockback 6（期望 6）Cooldown 2s（期望 2）DamageScale 1.6（期望 1.6）
+[log] 00:45:55 [SelfTest] ✅ P3·短弩武技2 大射天下：基础蓄力 0.4s（期望 0.4）/ 每档 0.2s（期望 0.2）/ 上限 3 档（期望 3） 每档 +2 支（期望 2） → 蓄到基础（档 0）松手：释放段真ATK到达=True（自然收招=True）发数 3（期望 3，= 基础 3）投射物 +3；蓄到 3 档（档 3，威力 ×1）松手：释放段真ATK到达=True（自然收招=True）发数 9（期望 9 = 3 + 2×3）投射物 +9｜动画=ATK_A2_ChargedVolley 方向来源 Aim=Facing（0 = Facing：文档这一行写的是「朝角色方向」）
+[log] 00:45:58 [SelfTest] ✅ P3·弓武技1 箭在弦上：基础蓄力 0.5s（期望 0.5）/ 每 0.3s（J10 期望 0.3）一档 / 每档伤害 ×1.3（期望 1.3）/ 每档弹速 +20 / 最多 1.4s（J10 期望 1.4 → 3 个后置档，基础 1 + 后置 3 = 4 个威力档） → 基础档：释放段真ATK到达=True（档 0，自然收招=True）伤害 24（期望 表值 24 ×玩家倍率 1，**基础蓄力期间不加档**）弹速 160（期望 160）；3 档：释放段真ATK到达=True（自然收招=True）伤害 45.6（期望 45.6 = 1+0.3×3）弹速 220（期望 220）
+
+## 七、Main 自测的红色行 = 改前就有的 5 条历史读数标记（内容写的是"期望=实际"），本批没有新增
+[log] 00:45:34 [SelfTest] 🔴 白板首领闸门·正向：本场第 1 波后降临=True（期望 True）场上存活=1（期望 1）
+[log] 00:45:34 [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[log] 00:45:41 [SelfTest] 🔴 Boss 阵亡 → 挑战者状态=False（期望 False，这就是 bug #12 的修复点） 已通关=False（期望 False） 玩家存活=True
+[log] 00:45:42 [SelfTest] 🔴 互动降临节点：接受=True（期望 True）→ 本关通关=False（切关后会被下一关复位，所以这里只看它当场为 True：True）关卡 1→2（期望 +1）已挑战 5→0 挑战者状态=False（期望 False）
+[log] 00:45:44 [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
