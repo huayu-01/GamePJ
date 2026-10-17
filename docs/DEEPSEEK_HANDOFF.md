@@ -19,16 +19,17 @@
 | J4 | 2d34771 | 下落按起手高度与垂直速度倍率、空中跳高比例0.5、长枪定向突击、真实落地、高速球体扫掠与枪尖只读对齐 |
 | J5 | 7b020fb | 闪真实Action才三维冲刺；架真实GuardOn开窗、单次命中无效化；闪身步来源过滤及收招CD1、招架反击CD0 |
 | J6 | 包含本文的提交 | 松手冻结结果后真实释放ATK出弹；变奏快射1→2→3循环、逐箭表内间隔、打断取消待发箭 |
+| J7 | 本批提交 | Main 旧同步蓄力探针跨帧迁移（等释放段真ATK与自然收招再读数）；生产代码零改动 |
 
 各批`docs/character-design-j*.md`、`*-evidence.log`、`*-failures.log`和截图均保留。更早A/E/B/C/D和F/G/H只代表当轮范围，仍有原文遗漏。
 
 J6最终：专项无头80/0、渲染82/0；完整20进程回归后仅扩展探针再跑2进程，22进程均退出0且stderr空，Debug／ExportRelease均0警告0错误，Main八条硬指标逐字一致，四存档保持，selftest.flag不存在。实测普通波30/250、完美波40/400、短弩九箭；变奏两轮1,2,3,1,2,3，表内0.08秒在60Hz物理下为0.0833秒。详细输出见J6证据。
 
-**J6边界：Main仍有6条旧同步蓄力探针红色输出**，不是已全绿。独立新探针的真实输入／动画／物理验证通过；旧探针同帧手动Tick，无法等待真实释放ATK，需迁移。原始红色行已附J6证据，不能删日志伪装通过。
+**J6边界（已被J7关闭）：Main原有6条旧同步蓄力探针红色输出**，当时不是已全绿。独立新探针的真实输入／动画／物理验证通过；旧探针同帧手动Tick，无法等待真实释放ATK，需迁移。原始红色行已附J6证据，不能删日志伪装通过。→ **2026-10-17 J7 已迁移成跨帧**：6条转✅（完美40/400、过窗30/250、后置蓄力75/625、短弩3/9、弓24-45.6、剑气≥1），Main连续两次退出0、8硬指标逐字一致、双构建0/0、四存档保持；生产代码零改动。见[J7验收](character-design-j7.md)与[证据](character-design-j7-evidence.log)。
 
 ## 下一步顺序
 
-1. **先迁移Main旧同步蓄力探针**。文件`Scripts/Testing/SelfTest.cs`：`ProbeChargeMechanism`、`ReportCrossbowProbe`、`BeginBowProbe`里的武技1段、`ReportSwordQiProbe`。对应状态机case30、33、34、44。旧`SettleShot`/`WaitUntilIdle`只是手动Tick，不推进动画。可把这些段改成Task或分帧小状态，等真实ATK／自然收招后读结果，状态机必须等任务结束再Next，缺事件用明确超时失败；不要伪造ATK、不要给生产能力加计时出弹兜底。J5的`ProbeBlinkDash`/`ProbeGuardStance`已是分帧范例。独立`ChargeReleaseProbe`是真实输入范例。然后Main退出0、8指标、这6条新检查逐项核验，双构建0/0。
+1. **✅（2026-10-17 J7 已完成，见[character-design-j7.md](character-design-j7.md)）先迁移Main旧同步蓄力探针**。文件`Scripts/Testing/SelfTest.cs`：`ProbeChargeMechanism`、`ReportCrossbowProbe`、`BeginBowProbe`里的武技1段、`ReportSwordQiProbe`。对应状态机case30、33、34、44。旧`SettleShot`/`WaitUntilIdle`只是手动Tick，不推进动画。可把这些段改成Task或分帧小状态，等真实ATK／自然收招后读结果，状态机必须等任务结束再Next，缺事件用明确超时失败；不要伪造ATK、不要给生产能力加计时出弹兜底。J5的`ProbeBlinkDash`/`ProbeGuardStance`已是分帧范例。独立`ChargeReleaseProbe`是真实输入范例。然后Main退出0、8指标、这6条新检查逐项核验，双构建0/0。→ **实际做法**：4个探针改成`async Task`＋每帧真实delta的`OnInputHeld`＋`WaitSettle`等自然收招＋`ReleaseAtkFired`（`Finish`写冷却/`Cancel`不写）作为"真ATK到达"判据；删`SettleShot`；状态机`ProbeTaskDone`后才`Next`。仍🔴的只剩改前就有的5条历史读数标记。
 2. **发散／心眼**：旧`evo_divergence`和`evo_mindseye`复用BurnOnHit只加Mark，未实现按目标标记增伤；甚至来源过滤尚不完整。发散必须只由能量掌武技1波波加标，并仅提高波波；心眼只由箭加标，玩家对已标记目标的各种伤害提高50%。用户刚确认按本次命中前已有标记结算，第一次加标这次不加伤。必须走真实奖励获取与命中，覆盖其他技能／其他单位／多个目标／层数及过期，不直接Execute冒充接入。发散原文N未定，可配置预设并明确标注。新参数用强类型资源／列，不再增加Godot.Get/Set字符串反射。
 3. **龙之箭**：`evo_dragon_arrow`当前只把ChargeMaxSeconds设3，未实现蓄力≥2秒更大＋全穿透。用表配置阈值／尺寸／穿透行为，按松手结果冻结，真实释放ATK发射；射向多靶及World验证。注意当前延长3秒会继续每0.1秒加档，这一上限解释如有歧义及时告知用户。
 4. **逐项补其余进化并实测，不能只改Note**：

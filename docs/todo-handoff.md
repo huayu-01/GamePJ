@@ -1,8 +1,20 @@
 # 交接文档：待办任务与项目约定
 
+## J7：Main 旧同步蓄力探针跨帧迁移（2026-10-17，已完成）
+
+交接单「下一步顺序」第1条已兑现：[J7验收与边界](character-design-j7.md)、[完整输出](character-design-j7-evidence.log)。只改`Scripts/Testing/SelfTest.cs`，**生产代码零改动**（`Ability.cs`／7个`Ability`子类／`Weapon.cs`／敌人·首领·召唤物行都没动），J6的"Main六条红灯"边界不再是边界。
+
+改法：`ProbeChargeMechanism`／`ReportCrossbowProbe`／`BeginBowProbe`的武技1段／`ReportSwordQiProbe`全部从"同帧灌蓄力+同帧读结果"改成`async Task`跨帧——`HoldCharge`每帧把**真实帧delta**交给`OnInputHeld`，松手后`WaitSettle`等技能**自己收招**（释放段真ATK→`Tick`里的`Finish`），状态机判`ProbeTaskDone`才`Next()`。删除`SettleShot`（同帧手动Tick=假象来源）。绿行判据新增`释放段真ATK到达 = settled && CooldownRemaining>0`（只有`Finish`写冷却、缺事件的`Cancel`不写），**没伪造ATK、没给生产能力加计时出弹兜底**；缺事件=明确超时红灯。
+
+6条从🔴变✅（逐项）：机制·完美时机40/400、机制·过完美窗口30/250、机制·后置蓄力档3×1.9与封顶5×2.5→75/625、P3·短弩武技2（0档3支/3档9支）、P3·弓武技1（24/220与45.6/310）、P4·灵剑武技2拔刀式（未蓄满0个/蓄满1个）。第7条「机制·蓄力未完成松手」改前就是绿，现在也走真实帧按住0.3s仍绿。**仍🔴的没有新增**：只剩改前就在、内容写"期望=实际"的5条历史读数标记（白板首领闸门／白板首领实例／Boss阵亡／互动降临节点／最小闭环链路）。
+
+连带夹具修正（也在SelfTest.cs内）：武技1现在真的射箭，原来摆在弹道0.9m的60血Chaser测试靶会被打死（`Unit.ApplyStatus`对`IsDead`直接return）→ case35标记层数／追踪弹会跟着红。改成两支真箭打完再建靶、`MaxHealth`抬到4000当纯靶；修后这两条恢复✅。
+
+验收：Debug／ExportRelease均0警告0错误；Main退出0连续两次（58.4s／58.3s）且到`=== 自测结束 ===`；8硬指标逐字一致；独立`_ChargeReleaseProbe`复跑80/0；四存档SHA256保持；`selftest.flag`不存在；`.ai_*`遗留0字节锁文件已删未重建。**本批无截图**，证据是文本读数＋独立探针计数＋存档哈希。`WaitUntilIdle`（14处）与其余探针仍是手动推物理回调，不涉及"松手→释放段ATK"，留给新批次。下一项回交接单第2条：发散／心眼按命中前标记结算。
+
 ## 原始设计重新核验（2026-10-17，当前任务）
 
-用户因额度将尽要求当前测试结束后交接DeepSeek，Codex停止新开发；入口为[DEEPSEEK_HANDOFF.md](DEEPSEEK_HANDOFF.md)。J6最终80/0、82/0，完整20进程＋扩展2进程均退出0且stderr空，双构建0/0、Main8指标一致、四存档保持、flag不存在。⚠️ Main六条旧同步蓄力探针仍需跨帧迁移，不能把退出0描述成全绿。
+用户因额度将尽要求当前测试结束后交接DeepSeek，Codex停止新开发；入口为[DEEPSEEK_HANDOFF.md](DEEPSEEK_HANDOFF.md)。J6最终80/0、82/0，完整20进程＋扩展2进程均退出0且stderr空，双构建0/0、Main8指标一致、四存档保持、flag不存在。Main六条旧同步蓄力探针已在**J7**迁移成跨帧（见上），不能再把Main退出0跟"旧探针全绿"混为一谈。
 
 J3已完成：动作默认打断、可配置前摇／全程例外、实例事件与播放序号隔离、真实同帧输入顺序。闪中断后残留位移3.672m/0.1s修到0，同名重播归零、按住重复事件不重新出招。专项无头38/0、渲染40/0；原文回归115/0、120/0，双构建0/0、Main退出0且8条指标一致，F33/0、C52/0、D90/0、G51/0、角色61/0、B74/0、A失败0、E39/0、读档5/0。14进程stderr为空，四存档保持，flag不存在。见[J3完整证据](character-design-j3.md)。
 
@@ -725,7 +737,7 @@ Remove-Item 'C:\Users\huayu\AppData\Roaming\Godot\app_userdata\ACT Roguelike\sel
 
 - 终版美术持续内容：角色、敌人、武器、终端、场景的统一风格与替换，当前庭院/角色/免费特效是阶段性交付。
 - GC缓存竞态已稳定复现并接入项目侧规避（I专项）；旧SetGodotObjectPtr堆栈未单独复现，继续保留，不能宣称引擎级永久修复。
-- 原始角色设计纠偏：J1～J6范围已验；继续Main同步蓄力探针迁移、其余进化、独立动作及各武器逐条证据，详细交接见DEEPSEEK_HANDOFF.md。
+- 原始角色设计纠偏：J1～J6范围已验，J7已把Main旧同步蓄力探针迁移成跨帧；继续其余进化、统一暴击、独立动作及各武器逐条证据，详细交接见DEEPSEEK_HANDOFF.md。
 - 全局暴击对近战的适用范围：现有近战快照只读命中体自身CritChance，未合入元进度暴击；H已公开实际0暴击和源码边界，未擅改规则。
 - 平衡扩展验证：移动目标、散射全弹/远距离、群怪、完整构筑、两角色主动防御与整局胜率。
 
