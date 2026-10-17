@@ -44,6 +44,20 @@ public partial class Projectile : Area3D
 	/// <summary>可穿透的目标数量，0 = 命中即消失。</summary>
 	[Export] public int Pierce { get; set; }
 
+	/// <summary>
+	/// **每个物理帧把"本帧线段"上的所有敌对单位都结算掉**（J10；≤0 = 不启用 = 改动前的行为）。
+	///
+	/// <para>为什么要有它：既有路径每帧只做**一次** <c>IntersectRay</c>（只返回最近的一个命中），
+	/// 穿透之后直接把位置推到**帧末** —— 于是"这一帧线段上还有别的单位"就再也检测不到了，
+	/// 弹速一快，贴脸的几只怪只会结算最近那只（J9 探针记下的既有行为）。</para>
+	///
+	/// <para>线段长度**不是静态加长**：每帧都是 <c>|velocity| × delta</c>（弹速 × 本帧物理时长），
+	/// 在 <see cref="SweepFrame"/> 里按当时的真实速度重算。撞到非敌对碰撞体（World / 地形）立刻停下。</para>
+	///
+	/// <para>值 = 一帧最多结算几个（循环保险丝）；真正的命中数另受穿透预算限制。</para>
+	/// </summary>
+	[Export] public int SweepMaxHits { get; set; }
+
 	/// <summary>兼容场景表列；Launch按来源阵营配置实际查询掩码。</summary>
 	[Export] public uint HitMask { get => CollisionMask; set => CollisionMask = value; }
 
@@ -247,6 +261,14 @@ public partial class Projectile : Area3D
 		Vector3 from = GlobalPosition;
 		Vector3 to = from + _velocity * dt;
 
+		// J10「快弹不漏怪」：把本帧线段上的**全部**命中结算掉。
+		// SweepMaxHits ≤ 0 → 这一段一行都不进，下面那条既有单命中路径逐位不变。
+		if (SweepMaxHits > 0)
+		{
+			SweepFrame(from, to);
+			return;
+		}
+
 		var query = PhysicsRayQueryParameters3D.Create(from, to, HitMask);
 		// 枪口或敌人可以在彼此身体内；射线起点在形状内部也必须能命中。
 		query.HitFromInside = true;
@@ -363,6 +385,90 @@ public partial class Projectile : Area3D
 		}
 
 		QueueFree();
+	}
+
+	/// <summary>
+	/// **本帧线段上的全部命中**（J10；只在 <see cref="SweepMaxHits"/> &gt; 0 时进入）。
+	///
+	/// <para>做法：把 <paramref name="from"/>→<paramref name="to"/> 这一帧的线段**按命中顺序逐段重扫** ——
+	/// 每次拿最近的命中、结算它、把"已经打过的 body"排进 <see cref="_excludedBodies"/>（与既有穿透排除
+	/// 同一套），再从命中点继续扫到帧末。于是"一帧里线段上所有单位"都会被结算，而不会像既有路径那样
+	/// 命中一个就跳到帧末、把线段上后面的单位跳过。</para>
+	///
+	/// <para>三条边界：① 线段长度 = <c>|velocity| × delta</c>，每帧按当时的真实速度重算（不是静态加长）；
+	/// ② 命中过一次的单位不会重复结算（RID 进排除表 + <see cref="HitTracker"/> 策略双保险）；
+	/// ③ 撞到**非敌对碰撞体**（World / 地形）立刻 <c>QueueFree</c> 停下 —— 不像单位那样继续穿。</para>
+	/// </summary>
+	private void SweepFrame(Vector3 from, Vector3 to)
+	{
+		Vector3 cursor = from;
+		int budget = SweepMaxHits;
+		while (budget-- > 0 && _attack != null)
+		{
+			var query = PhysicsRayQueryParameters3D.Create(cursor, to, HitMask);
+			// 与既有路径同一个口径：起点在形状内部也必须能命中；穿透后排除已命中的身体。
+			query.HitFromInside = true;
+			query.Exclude = _excludedBodies;
+
+			Godot.Collections.Dictionary hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
+			if (hit.Count == 0)
+			{
+				cursor = to;
+				break;
+			}
+
+			var collider = hit["collider"].As<GodotObject>();
+			Vector3 position = hit["position"].AsVector3();
+
+			if (_attack!.ExplosionRadius > 0f && !_exploded)
+			{
+				_exploded = true;
+				Detonate(position);
+			}
+
+			// 非敌对单位（World / 地形）：**不穿墙**，就地消失。
+			if (collider is not Unit target || _attack.Attacker == null || !_attack.Attacker.IsHostileTo(target))
+			{
+				QueueFree();
+				return;
+			}
+
+			float now = Time.GetTicksMsec() / 1000f;
+			bool registered = target.IsValidTarget
+				&& _tracker.TryRegister(target, _attack.Policy, _attack.HitInterval, now, 0);
+			if (registered)
+			{
+				_hitTargets.Add(target.GetInstanceId());
+				target.ReceiveHit(_attack.RollHit(target, _velocity.Normalized(), position));
+				HitEffect.Spawn(this, position);
+				AudioManager.PlaySfx(AudioIds.CombatHit);
+			}
+
+			// 打过（或按策略不许再结算）的单位：只排进后续扫掠的排除表，**不重复结算**。
+			if (!_excludedBodies.Contains(target.GetRid()))
+			{
+				_excludedBodies.Add(target.GetRid());
+			}
+
+			if (_pierceLeft <= 0)
+			{
+				if (_ricochetLeft > 0 && TryRicochet(target))
+				{
+					return;
+				}
+
+				QueueFree();
+				return;
+			}
+
+			_pierceLeft--;
+			cursor = position;
+		}
+
+		// 走到帧末（或预算用完 → 停在最后一个命中点，剩下的线段留给下一帧接着扫，不跳过）。
+		GlobalPosition = cursor;
+		TravelledDistance += from.DistanceTo(cursor);
+		Orient();
 	}
 
 	/// <summary>弹射：转向附近还没命中过的敌人继续飞。</summary>
