@@ -43,12 +43,32 @@ public partial class RunController : Node
 	private PlayerCharacterKind _character = PlayerCharacterKind.Hunter;
 	private int _boot;
 
+	// ── J11：符文（开局携带一件的信物）────────────────────────────────────────────
+	/// <summary>当前携带的符文行 Id（空 = 不携带，默认）。来源：`RuneCarry`（`user://rune.cfg`）。</summary>
+	private string _carriedRuneId = string.Empty;
+
+	/// <summary>
+	/// 符文效果的修正器**专用 Source**（一个 `RunBuild` 实例）。用独立实例而不是 `_build` 的原因：
+	/// 换符文 / 重新开局时要能 `Stats.RemoveBySource(它)` 一次摘干净，而不碰 `_build` 挂的增幅修正器
+	/// （`_build` 的修正器由 `PlayerLoadout.Apply` 里的 `RemoveBySource(owner)` 管，两者互不干扰）。
+	/// </summary>
+	private readonly RunBuild _runeBuild = new();
+
+	/// <summary>这枚符文建出来的规则节点（击杀加甲 / 死亡避免 / 小精灵…）—— 换符文时按清单摘掉。</summary>
+	private readonly List<Node> _runeNodes = new();
+
 	public RunBuild Build => _build;
 	/// <summary>当前装备的只读身份，供HUD按表筛选技能；不暴露可变的配装状态。</summary>
 	public PlayerCharacterKind CurrentCharacter => _character;
 	public WeaponPresetKind CurrentWeapon => _weaponKind;
 	public int CandidateCount => _pool.CandidateCount;
 	public bool RunEnded => _runEnded;
+
+	/// <summary>当前携带的符文行 Id（空 = 不携带；J11 第 ⑤ 步的运行期字段）。</summary>
+	public string CarriedRuneId => _carriedRuneId;
+
+	/// <summary>当前携带的符文行（读不到 = null）。</summary>
+	public RuneConfig? CarriedRune => ConfigRows.ById<RuneConfig>(_carriedRuneId);
 
 	/// <summary>本局控制器单例（地面节点通过它领奖励）。</summary>
 	public static RunController? Instance { get; private set; }
@@ -91,6 +111,11 @@ public partial class RunController : Node
 		}
 
 		_loadout.Apply(_player!, this, _character, _weaponKind);
+
+		// ⭐ J11 第 ⑤ 步：**开局把携带的符文应用到玩家**（顺手把"上一枚符文"的残留摘掉）。
+		// 位置在 `_loadout.Apply` 之后：那时角色/武器的数值已经套好、生命也回满了，
+		// 「雷之印」的 30 上限才是在 220 之上夹下来的（顺序反了会被后面的回满覆盖）。
+		ApplyCarriedRune();
 
 		// 奖励候选池：**进关卡初始化时**就按"当前角色 + 当前武器"把池内容定下来（用户 2026-10-12 C2：
 		// 「进化池里会出什么选项是根据交互的角色持有的攻击方式（武器）……池里一开始有什么，
@@ -153,6 +178,9 @@ public partial class RunController : Node
 		if (_boot == 0 && _player != null && _weapon != null && _stage != null)
 		{
 			_boot = 1;
+			// J11：**先**读"当前携带的符文"（`user://rune.cfg`），再套配置 —— 这样第一次 `ApplyBalance`
+			// 就已经带着符文了。读不到 = 不携带，与加符文之前逐位一致。
+			_carriedRuneId = RuneCarry.Current;
 			ApplyBalance();
 			_stages = ResolveStages();
 			MetaProgress.Load();
@@ -547,6 +575,128 @@ public partial class RunController : Node
 		{
 			InitializePool();
 		}
+	}
+
+	/// <summary>
+	/// ⭐ **J11 第 ⑤ 步：设置"当前携带的符文"**（本批唯一的写入口，C# / 自测可驱动）。
+	///
+	/// <para>做三件事：① 记进本局字段并**落盘**（`user://rune.cfg`，`RuneCarry`）；
+	/// ② 如果本局已经在跑（玩家已就位），**立刻**摘掉旧符文的残留并套上新符文；
+	/// ③ 写一行日志留痕（符文 Id / 读不到行时的警告 / 解锁了哪些前置）。</para>
+	///
+	/// <para>⚠️ **本批不做符文选择 UI**（用户划定范围）—— 下一批的基地选择台直接调这个方法即可，
+	/// 不需要再碰任何判定代码。空 Id = 摘下符文，回到"没带符文"的逐位不变状态。</para>
+	/// </summary>
+	/// <returns>真正生效的符文行；口令为空或读不到那一行时返回 null（此时玩家身上没有符文效果）。</returns>
+	public RuneConfig? SetCarriedRune(string? runeId)
+	{
+		_carriedRuneId = runeId ?? string.Empty;
+		RuneCarry.Set(_carriedRuneId);
+
+		if (_player == null || !IsInstanceValid(_player))
+		{
+			GameLog.Write(
+				"Rune",
+				$"携带符文设为「{(_carriedRuneId.Length == 0 ? "（无）" : _carriedRuneId)}」（本局还没开局，进关卡时再套到玩家身上）");
+			return CarriedRune;
+		}
+
+		ApplyCarriedRune();
+		return CarriedRune;
+	}
+
+	/// <summary>
+	/// 把 <see cref="_carriedRuneId"/> 指向的那枚符文**应用到当前玩家**，并刷新它解锁的前置条件。
+	///
+	/// <para>两条通路缺一不可：</para>
+	/// <list type="number">
+	/// <item><b>效果</b>：走**既有的**处理器注册表（`RewardEffectRegistry.Compile` → `RewardDefinition.Apply`），
+	///   与增幅项完全同一条路 —— 所以"符文"不需要第二套效果系统，
+	///   `StatSet` / `GrantArmor` / `RuneEffect` 三类处理器都直接可用；</item>
+	/// <item><b>前置解锁</b>：把符文行 Id + `UnlocksRequires` 里的派系名写进
+	///   `RunBuild.SetRuneUnlocks`（读取点是 `RewardPool.HasPrerequisites`）。</item>
+	/// </list>
+	///
+	/// <para>不携带任何符文时：修正器与节点清单都被清空、解锁名单为空 →
+	/// **前置判定退化成改动前的 `StacksOf(id) > 0`**，玩家身上也没有任何符文修正器（逐位不变）。</para>
+	/// </summary>
+	private void ApplyCarriedRune()
+	{
+		if (_player == null || !IsInstanceValid(_player))
+		{
+			return;
+		}
+
+		// ① 先摘掉上一枚符文留下的一切（修正器按 Source 摘、规则节点按清单摘、前置名单清空）。
+		_player.Stats.RemoveBySource(_runeBuild);
+		FreeRuneNodes();
+		_build.SetRuneUnlocks(null);
+
+		RuneConfig? row = ConfigRows.ById<RuneConfig>(_carriedRuneId);
+		if (row == null)
+		{
+			_player.RefreshStats();
+			GameLog.Write(
+				"Rune",
+				$"符文：不携带（CarriedRuneId「{_carriedRuneId}」{(string.IsNullOrEmpty(_carriedRuneId) ? "，默认" : " 在符文表里读不到")}）"
+				+ " —— 前置判定只有「已拥有」一个来源，与加符文之前逐位一致；玩家没有任何符文修正器。");
+			return;
+		}
+
+		if (_weapon == null || !IsInstanceValid(_weapon))
+		{
+			GD.PushWarning($"[Rune] 符文 {row.Id} 要套到玩家身上，但这一局还没有武器组件 —— 已跳过（下次 ApplyBalance 会重试）。");
+			return;
+		}
+
+		// ② 前置解锁名单：符文行 Id（表里按 Id 写前置也能用）+ UnlocksRequires 里的派系名（文档写法）。
+		var unlocks = new List<string> { row.Id };
+		unlocks.AddRange(row.UnlockList());
+		_build.SetRuneUnlocks(unlocks);
+
+		// ③ 效果：复用既有的处理器通路（handler 拼错会在 Compile 里被点名并跳过这一行）。
+		RewardDefinition? compiled = RewardEffectRegistry.Compile(row);
+		if (compiled == null)
+		{
+			GD.PushWarning($"[Rune] 符文 {row.Id} 的 ApplyHandler「{row.ApplyHandler}」编译不出来，这一条不会生效。");
+			return;
+		}
+
+		compiled.Apply(new RewardContext { Player = _player, Weapon = _weapon, Build = _runeBuild });
+
+		// ④ 把这次建出来的规则节点记下来（换符文时按清单摘掉，避免重复叠加）。
+		string prefix = $"Rune_{row.Id}";
+		foreach (Node child in _player.GetChildren())
+		{
+			if (child.Name.ToString().StartsWith(prefix, StringComparison.Ordinal))
+			{
+				_runeNodes.Add(child);
+			}
+		}
+
+		_player.RefreshStats();
+		GameLog.Write(
+			"Rune",
+			$"符文·携带：{row.Id}（{row.DisplayName}）→ 玩家生命上限 {_player.MaxHealth:0.##} / 攻击 {_player.Stats.Get("DamageMultiplier"):0.###}"
+			+ $" / 受伤 ×{_player.Stats.Get("IncomingDamageMultiplier"):0.###} / 移速 ×{_player.Stats.Get("MoveSpeedMultiplier"):0.###}"
+			+ $"｜解锁前置 {_build.DescribeRuneUnlocks()}");
+	}
+
+	/// <summary>把上一枚符文建出来的规则节点全部摘掉（先 `RemoveChild` 再 `QueueFree`：这一帧就不再 tick）。</summary>
+	private void FreeRuneNodes()
+	{
+		foreach (Node node in _runeNodes)
+		{
+			if (!IsInstanceValid(node))
+			{
+				continue;
+			}
+
+			node.GetParent()?.RemoveChild(node);
+			node.QueueFree();
+		}
+
+		_runeNodes.Clear();
 	}
 
 	/// <summary>稀有池三选一（特殊奖励节点）：只出进化与异化。</summary>
