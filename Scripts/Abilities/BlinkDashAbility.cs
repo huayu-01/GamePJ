@@ -19,8 +19,8 @@ namespace ActRoguelike.Abilities;
 ///   单位层被摘掉 —— 于是"穿过敌人但撞得到地形"这件事由**物理配置**表达，
 ///   而 <c>MoveAndSlide</c> 仍然会沿地形滑（"无法穿透地形"）。</item>
 /// <item><b>对路径上的敌人造成伤害</b>：冲刺期间命中盒一直开着（<see cref="HitPolicy.IntervalPerTarget"/>）。</item>
-/// <item><b>可以冲至空中</b>：冲刺方向保留 Y 分量（准星朝上就往上冲），且**完全不动重力**
-///   （不代替 <c>CharacterMovement</c> 的垂直速度，冲刺结束后自然下落）。</item>
+/// <item><b>可以冲至空中</b>：真实Action后由CharacterMovement持有完整三维速度，
+///   结束归还普通重力。最后不足一物理步的距离按剩余时长缩短，避免超出配置距离。</item>
 /// <item><b>可视化的路径</b>：<see cref="DashPathIndicator"/> 沿冲刺方向采样一条线，
 ///   颜色/线宽/抬升全来自表列。</item>
 /// </list>
@@ -80,6 +80,8 @@ public partial class BlinkDashAbility : Ability
 	private bool _maskSaved;
 	private float _linger;
 	private bool _invulnerableOwned;
+	private bool _started;
+	private Vector3 _previousPosition;
 
 	protected override void OnReady()
 	{
@@ -96,12 +98,19 @@ public partial class BlinkDashAbility : Ability
 	protected override void OnActivate(Unit? target)
 	{
 		_linger = 0;
+		_started = false;
+		LastPathPoints = 0;
 		if (OwnerUnit == null || Movement == null)
 		{
 			Cancel();
 			return;
 		}
 
+		if (string.IsNullOrEmpty(AnimName) || string.IsNullOrEmpty(AnimEvent) || PlaySkillAnimation().Length == 0) Cancel();
+	}
+	protected override void OnAnimEvent(string name)
+	{
+		if (name != AnimEvent || _started || OwnerUnit == null || Movement == null) return;
 		Vector3 direction = ResolveAimDirection();
 		if (direction.LengthSquared() < 0.04f)
 		{
@@ -113,7 +122,9 @@ public partial class BlinkDashAbility : Ability
 		LastDirection = direction;
 
 		float speed = Distance / Mathf.Max(0.05f, Duration);
-		Movement.BeginDash(direction, speed);
+		if (!Movement.BeginVelocityOverride(this, direction * speed, Mathf.Max(0.05f, Duration), isDash: true)) { Cancel(); return; }
+		_previousPosition = OwnerUnit.GlobalPosition;
+		_started = true;
 		PierceApplied = false;
 
 		if (PierceUnits)
@@ -125,7 +136,7 @@ public partial class BlinkDashAbility : Ability
 			PierceApplied = true;
 		}
 
-		if (GrantInvulnerability)
+		if (GrantInvulnerability && !OwnerUnit.IsInvulnerable)
 		{
 			OwnerUnit.IsInvulnerable = true;
 			_invulnerableOwned = true;
@@ -135,7 +146,7 @@ public partial class BlinkDashAbility : Ability
 		{
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
-			BaseDamage = _hitbox.Damage,
+			BaseDamage = _hitbox.Damage * OwnerUnit.Stats.Get("DamageMultiplier"),
 			CritChance = _hitbox.CritChance,
 			CritMultiplier = _hitbox.CritMultiplier,
 			Knockback = _hitbox.Knockback,
@@ -164,6 +175,7 @@ public partial class BlinkDashAbility : Ability
 		}
 
 		Vector3 origin = OwnerUnit.GlobalPosition + (Vector3.Up * PathGroundOffset);
+		_path.Configure(PathColor, PathWidth, PathGroundOffset);
 		var points = DashPathIndicator.SampleLine(origin, LastDirection, Distance, PathSteps);
 		_path.Show(points);
 		LastPathPoints = points.Count;
@@ -186,7 +198,17 @@ public partial class BlinkDashAbility : Ability
 			return;
 		}
 
-		if (StateTime >= Duration)
+		if (!_started)
+		{
+			if (StateTime > AnimationEventTimeout / Mathf.Max(0.01f, AnimSpeedScale)) Cancel();
+			return;
+		}
+		if (OwnerUnit != null)
+		{
+			_hitbox?.SweepSphere(_previousPosition, OwnerUnit.GlobalPosition);
+			_previousPosition = OwnerUnit.GlobalPosition;
+		}
+		if (Movement != null && Movement.VelocityOverrideFinished(this))
 		{
 			EndDash();
 			if (PathLingerSeconds > 0f)
@@ -204,7 +226,8 @@ public partial class BlinkDashAbility : Ability
 
 	private void EndDash()
 	{
-		Movement?.EndDash();
+		Movement?.EndVelocityOverride(this);
+		_started = false;
 		RestorePierce();
 
 		if (_invulnerableOwned && OwnerUnit != null && IsInstanceValid(OwnerUnit))

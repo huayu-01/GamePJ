@@ -551,14 +551,15 @@ public partial class SelfTest : Node
 				break;
 
 			case 45 when _timer > 0.3f:
-				ProbeBlinkDash();
-				Next();
+				if (ProbeBlinkDash()) Next();
 				break;
 
 			case 46 when _timer > 0.3f:
-				ProbeGuardStance();
-				ProbeFallAttack();
-				Next();
+				if (ProbeGuardStance())
+				{
+					ProbeFallAttack();
+					Next();
+				}
 				break;
 
 			case 47 when _timer > 0.5f:
@@ -3749,58 +3750,69 @@ public partial class SelfTest : Node
 	}
 
 	/// <summary>技能1「闪」：朝准星冲刺 + 全程穿透（碰撞层摘到只剩世界层）+ 可视化路径。</summary>
-	private void ProbeBlinkDash()
+	private int _p4BlinkStage;
+	private uint _p4BlinkMaskBefore, _p4BlinkMaskDuring;
+	private bool _p4BlinkSawDash;
+	private int _p4BlinkPathPoints;
+	private bool ProbeBlinkDash()
 	{
 		if (_p4Player == null || _p4Blink == null)
 		{
 			GameLog.Write("SelfTest", "🔴 P4·闪：上一段没准备好。");
-			return;
+			return true;
 		}
 
 		BlinkDashAbility dash = _p4Blink;
-		uint maskBefore = _p4Player.CollisionMask;
-		Vector3 positionBefore = _p4Player.GlobalPosition;
-
-		WaitUntilIdle(dash);
-		dash.RefreshCooldown();
-		bool started = dash.TryPress();
-		uint maskDuring = _p4Player.CollisionMask;
-		bool pierceDuring = dash.PierceApplied;
-		int pathPoints = dash.LastPathPoints;
-
-		// 推完整个冲刺时长（物理帧是引擎在推，这里同步推让状态机收尾）。
-		for (int i = 0; i < 20 && dash.IsBusy; i++)
+		if (_p4BlinkStage == 0)
 		{
-			dash._PhysicsProcess(0.03d);
+			_p4BlinkMaskBefore = _p4Player.CollisionMask;
+			dash.RefreshCooldown();
+			if (!dash.TryPress()) { GameLog.Write("SelfTest", "🔴 P4·闪：真实起手请求失败。"); return true; }
+			_p4BlinkStage = 1;
+			return false;
 		}
+		if (_p4Player.Movement is { IsDashing: true } && dash.PierceApplied)
+		{
+			_p4BlinkSawDash = true;
+			_p4BlinkMaskDuring = _p4Player.CollisionMask;
+			_p4BlinkPathPoints = dash.LastPathPoints;
+		}
+		if (dash.IsActive && _timer < 3) return false;
 
 		uint maskAfter = _p4Player.CollisionMask;
-		bool ok = started && pierceDuring && maskDuring == CombatLayers.World && maskAfter == maskBefore && pathPoints >= 2;
+		bool ok = _p4BlinkSawDash && !dash.IsActive && _p4BlinkMaskDuring == CombatLayers.World && maskAfter == _p4BlinkMaskBefore && _p4BlinkPathPoints >= 2;
 		GameLog.Write(
 			"SelfTest",
-			$"{(ok ? "✅" : "🔴")} P4·技能1 闪：TryPress={started}（期望 True） 方向 {Fmt(dash.LastDirection)}（朝准星） 距离 {dash.Distance:0.##}m / {dash.Duration:0.##}s CD {dash.Cooldown:0.##}（期望 5）"
-			+ $"｜全程穿透：冲刺期间碰撞层 {maskBefore} → {maskDuring}（期望 {CombatLayers.World} = 只剩世界层，穿透单位/仍撞地形） 冲刺后还原 → {maskAfter}（期望 {maskBefore}）"
-			+ $"｜可视化路径：{pathPoints} 点（期望 ≥2） 显示中={dash.GetNodeOrNull<DashPathIndicator>("Path")?.IsShowing}");
+			$"{(ok ? "✅" : "🔴")} P4·技能1 闪：真实动画Action后观察冲刺={_p4BlinkSawDash} 方向 {Fmt(dash.LastDirection)} 距离 {dash.Distance:0.##}m / {dash.Duration:0.##}s CD {dash.Cooldown:0.##}"
+			+ $"｜碰撞层 {_p4BlinkMaskBefore}→{_p4BlinkMaskDuring}→{maskAfter}；实际路径{_p4BlinkPathPoints}点，已自然收招={!dash.IsActive}");
+		return true;
 	}
 
 	/// <summary>技能2「架」：0.75s 架势内被命中 → 规避这次 + 退出架势。</summary>
-	private void ProbeGuardStance()
+	private bool _p4GuardStarted;
+	private bool ProbeGuardStance()
 	{
 		if (_p4Player == null || _p4Guard == null)
 		{
 			GameLog.Write("SelfTest", "🔴 P4·架：上一段没准备好。");
-			return;
+			return true;
 		}
 
 		GuardStanceAbility guard = _p4Guard;
-		WaitUntilIdle(guard);
-		guard.RefreshCooldown();
-		bool started = guard.TryPress();
-		guard._PhysicsProcess(0.2d);            // 过 GuardStartSeconds(0.15) → 进入架势
+		if (!_p4GuardStarted)
+		{
+			guard.RefreshCooldown();
+			if (!guard.TryPress()) { GameLog.Write("SelfTest", "🔴 P4·架：真实起手请求失败。"); return true; }
+			_p4GuardStarted = true;
+			return false;
+		}
+		if (!guard.StanceActive && guard.IsActive && _timer < 3) return false;
 		bool stanceActive = guard.StanceActive;
 		int parriesBefore = guard.ParryCount;
 
 		float healthBefore = _p4Player.Health;
+		if (_p4Victim == null || !IsInstanceValid(_p4Victim) || _p4Victim.IsDead)
+			_p4Victim = SpawnVictim(_p4Player.GlobalPosition + Vector3.Forward * 4);
 		DamageResult result = _p4Player.ReceiveHit(new HitInstance
 		{
 			Target = _p4Player,
@@ -3813,16 +3825,14 @@ public partial class SelfTest : Node
 		float healthAfter = _p4Player.Health;
 		bool exited = !guard.StanceActive;
 		int parriesAfter = guard.ParryCount;
-		guard._PhysicsProcess(0.05d);           // 下一帧把"本技能自己设的规避"清掉
-
-		bool ok = started && stanceActive && result.Invulnerable && Mathf.IsEqualApprox(healthBefore, healthAfter)
+		bool ok = stanceActive && result.Invulnerable && Mathf.IsEqualApprox(healthBefore, healthAfter)
 			&& parriesAfter == parriesBefore + 1 && exited;
 		GameLog.Write(
 			"SelfTest",
-			$"{(ok ? "✅" : "🔴")} P4·技能2 架：TryPress={started}（期望 True） 架势 {guard.StanceSeconds:0.##}s（期望 0.75） CD {guard.Cooldown:0.##}（期望 3）"
-			+ $" → 推 0.2s 后在架势中={stanceActive}（期望 True）"
+			$"{(ok ? "✅" : "🔴")} P4·技能2 架：真实GuardOn后架势中={stanceActive} 窗口{guard.StanceSeconds:0.##}s CD {guard.Cooldown:0.##}"
 			+ $"｜架势内挨 40 点：无效化={result.Invulnerable}（期望 True） 掉血 {healthBefore - healthAfter:0.#}（期望 0） 生命 {healthBefore:0.#} → {healthAfter:0.#}"
 			+ $"｜退出架势={exited}（期望 True） 架住计数 {parriesBefore} → {parriesAfter}（期望 +1） 挡下的伤害={guard.LastParriedDamage:0.##}（期望 40）");
+		return true;
 	}
 
 	/// <summary>被动「落」：空中才能用 + 大幅提高下落速度 + 高度越高伤害越高。</summary>

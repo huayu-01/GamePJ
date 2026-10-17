@@ -133,6 +133,7 @@ public static class RewardEffectRegistry
 				Cooldown = Param(row, "Cooldown", 0f),
 				Trigger = ParamText(row, "Trigger", "Kill"),
 				AbilityId = ParamText(row, "AbilityId", string.Empty),
+				RequiredAbilityId = row.RequiredEventAbility?.Id ?? string.Empty,
 				RequireHover = ParamBool(row, "RequireHover", false),
 				CooldownFraction = Param(row, "CooldownFraction", 0f),
 				CooldownSeconds = Param(row, "CooldownSeconds", 0f),

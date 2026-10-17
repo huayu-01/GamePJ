@@ -1,5 +1,7 @@
 # 动画管线（技能动画：生成 → 加载 → 事件帧 → 技能）
 
+> **J5修正**：同一方法轨道的两个事件不能放在同一时刻，否则后写入者覆盖前一个。旧架的GuardOn/GuardOff均在0.75秒，实际只剩GuardOff；源配置现分开，原始／Lyra／Samurai资源同步为GuardOn@0.15、GuardOff@0.9。闪已接真实Action后才开始三维位移，架已移除时间兜底开窗；缺事件只取消。[实测与边界](character-design-j5.md)。
+
 > **本轮范围**：动画管线地基 + 角色 A［猎手］武器 1「能量掌」的最小闭环。
 > **总纲**：`docs/refactor-survey.md`（§1 动画普查 / §5 阶段划分）；**需求权威**：`docs/character-redesign.md`；
 > **设计权威**：`F:\Godot项目\3d肉鸽雨中哈迪斯\角色设计.txt`。

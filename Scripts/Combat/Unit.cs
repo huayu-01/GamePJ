@@ -292,7 +292,7 @@ public partial class Unit : CharacterBody3D
 			Context = hit.Context,
 		});
 
-		if (IsInvulnerable)
+		if (IsInvulnerable || hit.Negated)
 		{
 			return new DamageResult { Hit = true, Invulnerable = true };
 		}
@@ -620,6 +620,7 @@ public partial class Unit : CharacterBody3D
 				Kind = GameplayEventKind.Kill,
 				Source = hit.Attacker,
 				Target = this,
+				Tag = hit.Attack?.Ability ?? string.Empty,
 				Position = GlobalPosition,
 				Context = hit.Context,
 			});

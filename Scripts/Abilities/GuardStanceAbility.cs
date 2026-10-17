@@ -5,26 +5,10 @@ using Godot;
 namespace ActRoguelike.Abilities;
 
 /// <summary>
-/// **技能 2「架」**（角色 B，设计文档第 103 行）：
-///
-/// <code>
-/// 技能2[架]{cd:3}:角色短暂的进入架势{0.75}秒,如果这期间被敌人命中则规避这次攻击并退出架势;
-/// </code>
-///
-/// <list type="bullet">
-/// <item><b>进入架势 0.75s</b>：<c>Windup</c> 之后（动画事件帧 <c>GuardOn</c> 也算，两条路都指向同一个状态）。</item>
-/// <item><b>被命中则规避这次攻击并退出架势</b>：挨打时把这次伤害**整个规避掉**
-///   （<c>Unit.IsInvulnerable</c> 是既有的"这次命中不算"通路，见 <c>Unit.ReceiveHit</c> 的
-///   无敌分支 → 返回 <c>Invulnerable = true</c>、一点血都不掉），然后立刻收招。</item>
-/// <item><b>逐帧复位</b>：规避只对"打进来的那一次"生效 —— 每帧开始时把上一帧设的无敌清掉，
-///   这样架势的剩余时间里**下一次命中仍会被规避**（而不是"无敌到架势结束"）。
-///   这就是"架势 = 挡一下"与"无敌帧 = 一段时间免伤"的区别。</item>
-/// </list>
-///
-/// <para>为什么不动 <c>BlockComponent</c>：既有格挡是**部分格挡**（保留
-/// <c>BlockDamageMultiplier</c> 比例的伤害），而文档这一条要求的是"**规避这次攻击**"
-/// （0 伤害）。两者语义不同，所以这一条走"无效化"而不是把既有的格挡改成 0 伤害
-/// （改既有语义会连带影响守卫类敌人与"护卫"那条异化）。</para>
+/// 技能2「架」：只有真实GuardOn开启0.75游戏秒的窗口；缺事件只取消。
+/// 第一次敌方命中仅标记该HitInstance无效并退出，不能扩散成同帧无敌。
+/// 用户已确认可以规避能量波；普通BlockComponent仍遵守穿透格挡规则。
+/// 收招后派发Parried，招架反击的冷却刷新不再被收招写回覆盖。
 /// </summary>
 public partial class GuardStanceAbility : Ability
 {
@@ -32,10 +16,7 @@ public partial class GuardStanceAbility : Ability
 	/// <summary>架势总时长（秒）。文档：0.75。</summary>
 	[Export] public float StanceSeconds { get; set; } = 0.75f;
 
-	/// <summary>架势从哪一帧开始算（秒）—— 通常 = <see cref="Ability.Windup"/>（举刀那一刻）。</summary>
-	[Export] public float GuardStartSeconds { get; set; } = 0.15f;
-
-	/// <summary>开架势的那个动画事件帧名（表列 <c>AnimEvent</c>；留空 = 纯时间轴）。</summary>
+	/// <summary>开架势的真实动画事件名；留空拒绝，不以时间代替。</summary>
 	[Export] public string GuardOnEvent { get; set; } = "GuardOn";
 
 	/// <summary>收架势的那个动画事件帧名（表列 <c>AnimEventEnd</c>；留空 = 不用）。</summary>
@@ -55,14 +36,8 @@ public partial class GuardStanceAbility : Ability
 	public int StanceCount { get; private set; }
 
 	private bool _subscribed;
-	private bool _parryInvulnerable;
-
-	protected override void OnReady()
-	{
-		// "被命中"的订阅点：Unit.ReceiveHit 里 HitReceived 在**无敌判定之前**派发，
-		// 所以在这里把这次命中的伤害规避掉（把 IsInvulnerable 置位）就能挡住它。
-		// ⚠️ 只在 <see cref="Enabled"/> 时生效（Enabled 来自技能行：能力开关矩阵/角色行决定谁有「架」）。
-	}
+	private float _stanceElapsed;
+	private ulong _stanceOpenedFrame;
 
 	protected override void OnActivate(Unit? target)
 	{
@@ -73,12 +48,13 @@ public partial class GuardStanceAbility : Ability
 		}
 
 		StanceActive = false;
+		_stanceElapsed = 0;
 		EnsureSubscribed();
-		PlaySkillAnimation();
+		if (string.IsNullOrEmpty(AnimName) || string.IsNullOrEmpty(GuardOnEvent) || PlaySkillAnimation().Length == 0) { Cancel(); return; }
 
 		GameLog.Write(
 			"Combat",
-			$"架：{AbilityId} 进入架势（{GuardStartSeconds:0.##}s 后开始，持续 {StanceSeconds:0.##}s，事件帧 {GuardOnEvent}/{GuardOffEvent}）");
+			$"架：{AbilityId} 等待真实{GuardOnEvent}，随后持续{StanceSeconds:0.##}游戏秒。");
 	}
 
 	private void EnsureSubscribed()
@@ -92,43 +68,21 @@ public partial class GuardStanceAbility : Ability
 		_subscribed = true;
 	}
 
-	/// <summary>
-	/// **每帧把上一帧"架住"那次设的规避清掉** —— 这样架势的剩余时间里下一次命中仍会被规避
-	/// （这才是"架势档一下"，而不是"无敌到架势结束"）。
-	///
-	/// <para>⚠️ 只清**本技能自己设的**那一个（<see cref="_parryInvulnerable"/>）：
-	/// 别人的无敌帧（后撤 / 冲刺）**一点都不碰**。</para>
-	/// </summary>
-	public override void _PhysicsProcess(double delta)
-	{
-		if (_parryInvulnerable)
-		{
-			_parryInvulnerable = false;
-			if (OwnerUnit != null && IsInstanceValid(OwnerUnit))
-			{
-				OwnerUnit.IsInvulnerable = false;
-			}
-		}
-
-		base._PhysicsProcess(delta);
-	}
-
 	/// <summary>被命中：架势内 → 规避这次 + 退出架势。</summary>
 	private void OnOwnerHit(HitInstance hit)
 	{
-		if (!Enabled || !StanceActive || OwnerUnit == null)
+		if (!Enabled || !IsBusy || !StanceActive || OwnerUnit == null || hit.Attacker == null || !OwnerUnit.IsHostileTo(hit.Attacker))
 		{
 			return;
 		}
 
 		// ⚠️ 已经在无敌里（别的技能给的无敌帧）就**不要**算成"架"住了 —— 那不是这次架势挡的。
-		if (OwnerUnit.IsInvulnerable)
+		if (OwnerUnit.IsInvulnerable || hit.Negated)
 		{
 			return;
 		}
 
-		OwnerUnit.IsInvulnerable = true;
-		_parryInvulnerable = true;
+		hit.Negated = true;
 		ParryCount++;
 		LastParriedDamage = hit.Damage;
 
@@ -139,6 +93,7 @@ public partial class GuardStanceAbility : Ability
 		// P5 第二批（只加）：把"架住了"这件事抛到事件总线上。
 		// 订阅方是两条**表驱动**的增幅：「招架反击」（刷新技能 2 冷却）、「能量护盾」（对周围敌人造成伤害）。
 		// 没有任何订阅者时这一句什么也不做（Raise 自己判 handlers == null）。
+		EndStance(exitStance: true);
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Parried,
@@ -147,12 +102,11 @@ public partial class GuardStanceAbility : Ability
 			Value = hit.Damage,
 			Tag = AbilityId,
 			Position = OwnerUnit.GlobalPosition,
+			Context = hit.Context,
 		});
-
-		EndStance(exitStance: true);
 	}
 
-	/// <summary>动画事件帧：GuardOn 进架势 / GuardOff 出架势。</summary>
+	/// <summary>GuardOn开窗口；GuardOff不得提前截短表内0.75游戏秒。</summary>
 	protected override void OnAnimEvent(string name)
 	{
 		if (!string.IsNullOrEmpty(GuardOnEvent) && name == GuardOnEvent)
@@ -161,7 +115,7 @@ public partial class GuardStanceAbility : Ability
 			return;
 		}
 
-		if (!string.IsNullOrEmpty(GuardOffEvent) && name == GuardOffEvent)
+		if (!string.IsNullOrEmpty(GuardOffEvent) && name == GuardOffEvent && _stanceElapsed + 0.000001f >= StanceSeconds)
 		{
 			EndStance(exitStance: true);
 		}
@@ -175,6 +129,8 @@ public partial class GuardStanceAbility : Ability
 		}
 
 		StanceActive = true;
+		_stanceElapsed = 0;
+		_stanceOpenedFrame = Engine.GetPhysicsFrames();
 		StanceCount++;
 		GameLog.Write("Combat", $"架：{AbilityId} 架势开始（{StanceSeconds:0.##}s，期间被命中则规避并退出）");
 	}
@@ -208,22 +164,18 @@ public partial class GuardStanceAbility : Ability
 
 		if (!StanceActive)
 		{
-			if (StateTime >= GuardStartSeconds)
-			{
-				BeginStance();
-			}
-
-			if (StateTime > GuardStartSeconds + StanceSeconds + 1.5f)
+			if (StateTime > AnimationEventTimeout / Mathf.Max(0.01f, AnimSpeedScale))
 			{
 				// 事件帧一直没来（表配错）→ 明确收招，不静默卡住。
-				GameLog.Write("Combat", $"⚠ 技能 {AbilityId} 的架势超过 {GuardStartSeconds + StanceSeconds + 1.5f:0.##}s 仍没收招（检查事件帧「{GuardOffEvent}」）。");
-				Finish();
+				GameLog.Write("Combat", $"架：{AbilityId} 缺少{GuardOnEvent}，取消且不开架。");
+				Cancel();
 			}
 
 			return;
 		}
 
-		if (StateTime >= GuardStartSeconds + StanceSeconds)
+		if (Engine.GetPhysicsFrames() != _stanceOpenedFrame) _stanceElapsed += delta;
+		if (_stanceElapsed + 0.000001f >= StanceSeconds)
 		{
 			EndStance(exitStance: true);
 		}
@@ -249,8 +201,6 @@ public partial class GuardStanceAbility : Ability
 
 	protected override void OnLoadoutReset()
 	{
-		if (_parryInvulnerable && OwnerUnit != null) OwnerUnit.IsInvulnerable = false;
-		_parryInvulnerable = false;
 		StanceActive = false;
 		Unsubscribe();
 	}

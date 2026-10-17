@@ -18,6 +18,8 @@ public sealed class HitInstance
 	public Vector3 Direction { get; init; }
 	public Vector3 Position { get; init; }
 	public float Knockback { get; init; }
+	/// <summary>防御能力只无效化本次命中，不把规避扩散成一帧内的所有攻击无敌。</summary>
+	public bool Negated { get; set; }
 
 	/// <summary>
 	/// **无视格挡**（文档：能量波"能穿透格挡（无视格挡效果）"，而剑气"可被格挡"）。

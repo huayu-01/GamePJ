@@ -60,6 +60,7 @@ public partial class AbilityConfig : ConfigRow
 	[ExportGroup("动作打断（前摇锁定使用动画时间轴）")]
 	[Export] public bool CanBeInterrupted { get; set; } = true;
 	[Export] public float InterruptLockSeconds { get; set; }
+	[Export] public float AnimationEventTimeout { get; set; } = 2f;
 	[ExportGroup("下落攻击（强类型参数）")]
 	[Export] public FallAttackTuning? FallAttack { get; set; }
 
@@ -211,6 +212,7 @@ public partial class AbilityConfig : ConfigRow
 		ability.MaintainStartupSeconds = MaintainStartupSeconds;
 		ability.CanBeInterrupted = CanBeInterrupted;
 		ability.InterruptLockSeconds = Mathf.Max(0, InterruptLockSeconds);
+		ability.AnimationEventTimeout = Mathf.Max(0.01f, AnimationEventTimeout);
 		ability.AnimName = AnimName;
 		ability.AnimEvent = AnimEvent;
 		ability.AnimEventEnd = AnimEventEnd;

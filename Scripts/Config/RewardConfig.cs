@@ -29,6 +29,8 @@ public partial class RewardConfig : ConfigRow
 	[ExportGroup("效果")]
 	/// <summary>处理器 id（见 <c>Rewards.RewardEffectRegistry</c> 的注册表）。未注册会在读表时警告并跳过这一行。</summary>
 	[Export] public string ApplyHandler { get; set; } = "StatSet";
+	/// <summary>只接受该技能造成的事件；资源引用在编译时转为运行期技能Id。</summary>
+	[Export] public AbilityConfig? RequiredEventAbility { get; set; }
 
 	/// <summary>
 	/// 处理器参数：<c>StatSet</c> 用 <c>Modifiers</c>；其余处理器用这里的键值对

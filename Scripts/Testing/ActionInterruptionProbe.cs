@@ -211,6 +211,12 @@ public partial class ActionInterruptionProbe : Node3D
 		dash.GrantInvulnerability = true;
 		uint beforeMask = _player.CollisionMask;
 		Press("skill_1", true); await Wait(0.03); Press("skill_1", false);
+		double blinkWait = 0;
+		while (!_player.Movement!.IsDashing && dash.IsActive && blinkWait < 1)
+		{
+			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+			blinkWait += GetProcessDeltaTime();
+		}
 		Check(dash.IsActive && _player.Movement!.IsDashing && _player.IsInvulnerable, "真实闪已进入冲刺与配置的无敌");
 		Press("skill_2", true); await Wait(0.03); Press("skill_2", false);
 		Check(!dash.IsActive && !_player.Movement!.IsDashing && !_player.IsInvulnerable && _player.CollisionMask == beforeMask,

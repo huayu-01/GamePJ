@@ -2,6 +2,9 @@
 extends "res://Assets/Effects/binbun/shared/script/VFXControllerBB.gd"
 class_name VFXExplosionBB
 
+# 显式预载灯光脚本，深度重载时不依赖全局类缓存的加载顺序。
+const OmniLightScript = preload("res://Assets/Effects/binbun/shared/script/VFXOmniLightBB.gd")
+
 
 
 var audio_stream_player : AudioStreamPlayer3D:
@@ -33,7 +36,7 @@ var smoke : GPUParticles3D:
 
 
 
-var light : VFXOmniLightBB:
+var light : OmniLightScript:
 	get():
 		if light:
 			return light

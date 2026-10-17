@@ -1,0 +1,38 @@
+J5有效修前基线（Debug 0 warning / 0 error，stderr空，退出1）：
+[BlinkGuard] FAIL 闪起手实际播放对应动画
+[BlinkGuard] FAIL 闪未到Action不能提前冲刺
+[BlinkGuard] FAIL 准星朝空中，闪实际升空：y=0.0003
+[BlinkGuard] FAIL 缺少GuardOn不能按时间兜底开架
+[BlinkGuard] PASS 真实GuardOn开启架势
+[BlinkGuard] PASS 架可规避无视普通格挡的能量波
+[BlinkGuard] FAIL 只规避一次，同帧第二次命中正常结算
+[BlinkGuard] PASS 真实奖励链获得evo_parry_refresh
+[BlinkGuard] FAIL 招架反击真实架住后立即可再用，CD=3
+[BlinkGuard] PASS 真实奖励链获得evo_dash_reset
+[BlinkGuard] FAIL 其他技能击杀不触发闪身步：5→1
+[BlinkGuard] PASS 闪真实命中击杀目标
+[BlinkGuard] FAIL 闪施法中击杀的80%减CD保留到收招：5
+[BlinkGuard] === 闪架专项验收结束：通过 5，失败 8 ===
+
+移除开架时间兜底后，补真实动画事件：旧动画两个方法事件写在相同0.75秒，Godot只保留GuardOff。源配置改为不同源时刻，原始／Lyra／Samurai资源均补GuardOn@0.15与GuardOff@0.9，长度0.9。
+
+第一次修后12/1（stderr空）：
+[BlinkGuard] FAIL 闪施法中击杀的80%减CD保留到收招：5
+[BlinkGuard] === 闪架专项验收结束：通过 12，失败 1 ===
+查明Kill事件原先没有携带攻击技能Id；给真实Unit.Kill事件补Tag=hit.Attack.Ability，按资源引用编译的来源限制才可执行。其余技能击杀不触发，闪自身击杀在收招后保留80%减CD。
+
+扩展验收28/0及30/0；随后增加持续时间浮点容差，避免0.75或0.05秒残余小数导致额外一帧。正式全量结果见character-design-j5-evidence.log。
+
+Main旧同步探针改为真实动画等待后，闪／架均为✅，但额外命中暴露一次特效脚本依赖解析错误（退出0，stderr非空，拒绝交付）：
+SCRIPT ERROR: Parse Error: Could not find type "VFXOmniLightBB" in the current scope.
+at: GDScript::reload (res://Assets/Effects/binbun/StylizedHitFX/script/VFXImpactBB.gd:17)
+ERROR: Failed to load script "res://Assets/Effects/binbun/StylizedHitFX/script/VFXImpactBB.gd" with error "Parse error".
+修正：命中与爆炸两份脚本用本地const preload声明共享灯光类型，避免依赖全局类缓存重载顺序；不是修改GC开关或掩盖错误。追加两类脚本各3次IgnoreDeep载入＋强制GC后可实例化的覆盖，并重跑完整验收。
+
+两份脚本重载检查与Main闪架均通过后，完整Main退出0但出现音频退出告警，仍未交付：
+WARNING: 6 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+Leaked instance: OggPacketSequence / AudioStreamOggVorbis / AudioStreamWAV / AudioStreamPlaybackWAV / OggPacketSequencePlayback / AudioStreamPlaybackOggVorbis
+旧退出等待使用SceneTree游戏计时器0.08秒，无头不限帧时不能保证混音线程经过同等真实时间。保留先停淡出、卸载流、提前释放声部的顺序，改用主线程同步上下文上的Task.Delay(80)真实异步等待并记录实际毫秒，再重新验收。
+
+隔离实测（同一Godot版本、--headless，持验证锁）：旧create_timer(0.08, true, false, true)实际仅经过1.693ms；证明游戏时间等待不能充当混音线程回收的真实等待。
+修后连续三轮完整Main：退出均0、stderr均0字节；音频回收真实等待分别89/87/88ms，真实Action／GuardOn断言均✅。随后重新跑整批18进程验收。

@@ -2,6 +2,9 @@
 extends "res://Assets/Effects/binbun/shared/script/VFXControllerBB.gd"
 class_name VFXImpactBB
 
+# 深度重载时显式声明依赖，避免全局类缓存的重载顺序使自定义类型暂时不可见。
+const OmniLightScript = preload("res://Assets/Effects/binbun/shared/script/VFXOmniLightBB.gd")
+
 var audio_stream_player : AudioStreamPlayer3D:
 	get():
 		if audio_stream_player:
@@ -14,7 +17,7 @@ var audio_stream_player : AudioStreamPlayer3D:
 		
 		return result
 
-var light : VFXOmniLightBB:
+var light : OmniLightScript:
 	get():
 		if light:
 			return light

@@ -43,6 +43,8 @@ public abstract partial class Ability : Node3D
 	[Export] public bool CanBeInterrupted { get; set; } = true;
 	/// <summary>起手锁定的动画时间（秒）；0表示立即可打断，随动画加速同步。</summary>
 	[Export] public float InterruptLockSeconds { get; set; }
+	/// <summary>动画事件缺失时只取消；此值不用于计时兜底执行效果。</summary>
+	[Export] public float AnimationEventTimeout { get; set; } = 2f;
 	[ExportGroup("行为提示")]
 
 	/// <summary>行为提示：目标进入这个距离区间时适合触发本能力（UseAbilityBehavior 读取）。</summary>
@@ -328,6 +330,8 @@ public abstract partial class Ability : Node3D
 	private UnitAnimator? _playedAnimator;
 	private ulong _animationPlaybackId;
 	private readonly List<Ability> _actionCandidates = new();
+	private float _finishCooldownScale = 1;
+	private float _finishCooldownSubtract;
 
 	/// <summary>剩余层数（<see cref="MaxCharges"/> &gt; 1 才用；&lt; 0 = 还没同步过）。</summary>
 	private int _charges = -1;
@@ -356,6 +360,8 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	protected void BeginEventDrivenCast()
 	{
+		_finishCooldownScale = 1;
+		_finishCooldownSubtract = 0;
 		IsActive = true;
 		StateTime = 0f;
 	}
@@ -479,6 +485,8 @@ public abstract partial class Ability : Node3D
 		SyncCharges();
 		ResetChargeState();
 		ConsumeCharge();
+		_finishCooldownScale = 1;
+		_finishCooldownSubtract = 0;
 		IsActive = true;
 		_maintainHeld = HoldToMaintain;
 		HeldTime = 0f;
@@ -516,11 +524,20 @@ public abstract partial class Ability : Node3D
 	{
 		float clamped = Mathf.Clamp(fraction, 0f, 1f);
 		CooldownRemaining = Mathf.Max(0f, CooldownRemaining * (1f - clamped));
+		if (IsActive && MaxCharges <= 1)
+		{
+			_finishCooldownScale *= 1 - clamped;
+			_finishCooldownSubtract *= 1 - clamped;
+		}
 	}
 
 	/// <summary>**一次性冷却缩减（按秒）**：把剩余冷却减去若干秒（增幅 / 词条用）。</summary>
 	public void ReduceCooldown(float seconds)
-		=> CooldownRemaining = Mathf.Max(0f, CooldownRemaining - Mathf.Max(0f, seconds));
+	{
+		float amount = Mathf.Max(0, seconds);
+		CooldownRemaining = Mathf.Max(0, CooldownRemaining - amount);
+		if (IsActive && MaxCharges <= 1) _finishCooldownSubtract += amount;
+	}
 
 	/// <summary>
 	/// **刷新冷却**（招架反击：技能2 格挡成功 → 刷新冷却）：剩余冷却清零，且**层数补满**
@@ -529,6 +546,8 @@ public abstract partial class Ability : Node3D
 	public void RefreshCooldown()
 	{
 		CooldownRemaining = 0f;
+		_finishCooldownScale = IsActive && MaxCharges <= 1 ? 0 : 1;
+		_finishCooldownSubtract = 0;
 		SyncCharges();
 		_charges = Mathf.Max(1, MaxCharges);
 	}
@@ -941,8 +960,10 @@ public abstract partial class Ability : Node3D
 		else
 		{
 			// ⚠️ 没配 CDR 时 EffectiveCooldown == Cooldown（×1），与改动前逐位一致。
-			CooldownRemaining = EffectiveCooldown;
+			CooldownRemaining = Mathf.Max(0, EffectiveCooldown * _finishCooldownScale - _finishCooldownSubtract);
 		}
+		_finishCooldownScale = 1;
+		_finishCooldownSubtract = 0;
 
 		StopSkillAnimation();
 		OnFinishOrCancel();
@@ -960,6 +981,8 @@ public abstract partial class Ability : Node3D
 	protected void Cancel()
 	{
 		IsActive = false;
+		_finishCooldownScale = 1;
+		_finishCooldownSubtract = 0;
 		_maintainHeld = false;
 		StateTime = 0f;
 		StopSkillAnimation();

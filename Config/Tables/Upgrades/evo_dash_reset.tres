@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_skill_1.tres" id="3_source"]
 
 [sub_resource type="Resource" id="Resource_p0"]
 script = ExtResource("1_param")
@@ -32,9 +33,10 @@ script = ExtResource("2_row")
 RewardKind = 1
 MaxStacks = 1
 ApplyHandler = "TablePulse"
+RequiredEventAbility = ExtResource("3_source")
 HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3")]
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Id = "evo_dash_reset"
 DisplayName = "闪身步"
 DescriptionTemplate = "技能1「闪」击杀敌人时冷却缩短 80%"
-Note = "[P5b 新增行] 文档第 121 行（进化池 <B限定>）「闪身步:当你的技能1闪击杀敌人时冷却缩短{80}%」。走 docs/abilities.md §4 通路③ 那次性接口 Ability.ReduceCooldownFraction(0.8)，数值从本行读。⚠️ 文档的限定是「闪击杀的」——事件里目前只带"击杀者是谁"，**没有校验"这一杀是不是闪造成的"**（Kill 事件的 Tag 还没被这条规则用），属预设；触发间隔 0.2s 也是预设（文档没写）。"
+Note = "J5：RequiredEventAbility资源引用闪，仅其实际击杀触发80%减CD；施法期间触发会保留到收招，不能被完整CD覆盖。规则0.2秒间隔沿用既有预设，避免一次群杀重复触发。"

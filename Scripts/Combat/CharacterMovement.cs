@@ -74,14 +74,19 @@ public partial class CharacterMovement : Node
 	private float _dashSpeed;
 	private object? _velocityOverrideSource;
 	private Vector3 _overrideVelocity;
+	private float _overrideTimeLeft = -1;
+	private bool _overrideIsDash;
 	public bool HasVelocityOverride => _velocityOverrideSource != null;
+	public bool VelocityOverrideFinished(object source) => ReferenceEquals(source, _velocityOverrideSource) && _overrideTimeLeft == 0;
 
 	/// <summary>动作持有完整三维速度；结束时只能释放自己持有的覆盖。</summary>
-	public bool BeginVelocityOverride(object source, Vector3 velocity)
+	public bool BeginVelocityOverride(object source, Vector3 velocity, float duration = -1, bool isDash = false)
 	{
 		if (_velocityOverrideSource != null && !ReferenceEquals(_velocityOverrideSource, source)) return false;
 		_velocityOverrideSource = source;
 		_overrideVelocity = velocity;
+		_overrideTimeLeft = duration;
+		_overrideIsDash = isDash;
 		return true;
 	}
 	public void EndVelocityOverride(object source)
@@ -89,6 +94,8 @@ public partial class CharacterMovement : Node
 		if (!ReferenceEquals(_velocityOverrideSource, source)) return;
 		_velocityOverrideSource = null;
 		_overrideVelocity = Vector3.Zero;
+		_overrideTimeLeft = -1;
+		_overrideIsDash = false;
 		_inputVelocity = Vector3.Zero;
 		if (IsInstanceValid(_body)) _body.Velocity = Vector3.Zero;
 	}
@@ -116,7 +123,7 @@ public partial class CharacterMovement : Node
 	/// <summary>当前的移动意图方向（未归一化前的原样），位移技能用它决定冲刺方向。</summary>
 	public Vector3 IntentDirection => _intentDirection;
 
-	public bool IsDashing => _dashSpeed > 0f;
+	public bool IsDashing => _dashSpeed > 0f || (HasVelocityOverride && _overrideIsDash);
 
 	private readonly HashSet<object> _facingLocks = new(ReferenceEqualityComparer.Instance);
 	/// <summary>技能按自身所有权锁定转身；例如后撤期间转镜头也不改变起手朝向。</summary>
@@ -318,8 +325,14 @@ public partial class CharacterMovement : Node
 		if (HasVelocityOverride)
 		{
 			_externalVelocity *= Mathf.Max(0, 1 - ImpulseDamping * dt);
-			_body.Velocity = _overrideVelocity;
+			float fraction = _overrideTimeLeft < 0 ? 1 : Mathf.Clamp(_overrideTimeLeft / Mathf.Max(0.000001f, dt), 0, 1);
+			_body.Velocity = _overrideVelocity * fraction;
 			_body.MoveAndSlide();
+			if (_overrideTimeLeft >= 0)
+			{
+				_overrideTimeLeft = Mathf.Max(0, _overrideTimeLeft - dt);
+				if (_overrideTimeLeft < 0.000001f) _overrideTimeLeft = 0;
+			}
 			if (FaceMovementDirection) FaceDirection(_hasFacing ? _facing : _overrideVelocity, dt);
 			return;
 		}

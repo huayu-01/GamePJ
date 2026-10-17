@@ -1,0 +1,139 @@
+Debug 编译：0 warning / 0 error
+design_headless 退出码=0
+design_headless stderr字节=0
+design_render 退出码=0
+design_render stderr字节=0
+[BlinkGuard] PASS 闪起手实际播放对应动画
+[BlinkGuard] PASS 闪未到Action不能提前冲刺
+[BlinkGuard] PASS 真实Action后闪进入三维冲刺
+[BlinkGuard] PASS 准星朝空中，闪实际升空：y=3.7586
+[BlinkGuard] PASS 闪自然结束归还普通移动与重力
+[BlinkGuard] PASS 最后不足一帧按剩余时长移动，实际水平距离7m，表值7
+[BlinkGuard] PASS 三维闪仍被World地形阻挡：z=16.501
+[BlinkGuard] PASS 600m/s闪扫过帧间窄目标只命中一次：1
+[BlinkGuard] PASS 闪缺少Action只取消
+[BlinkGuard] PASS 缺事件无位移、无命中体或路径残留
+[BlinkGuard] PASS 缺少GuardOn不能按时间兜底开架
+[BlinkGuard] PASS 真实GuardOn开启架势
+[BlinkGuard] PASS 架可规避无视普通格挡的能量波
+[BlinkGuard] PASS 只规避一次，同帧第二次命中正常结算
+[BlinkGuard] PASS 0.5倍动画前摇内尚未开架
+[BlinkGuard] PASS 倍速动画的真实GuardOn仍可开架
+[BlinkGuard] PASS 开架后窗口独立保持0.7667游戏秒，不因动画倍速截短
+[BlinkGuard] PASS 2倍动画前摇内尚未开架
+[BlinkGuard] PASS 倍速动画的真实GuardOn仍可开架
+[BlinkGuard] PASS 开架后窗口独立保持0.7667游戏秒，不因动画倍速截短
+[BlinkGuard] PASS 已有其他来源无敌时不消耗架势，也不清除该无敌
+[BlinkGuard] PASS 架势取消仍不清除其他来源无敌
+[BlinkGuard] PASS 真实奖励链获得evo_parry_refresh
+[BlinkGuard] PASS 招架反击真实架住后立即可再用，CD=0
+[BlinkGuard] PASS 真实奖励链获得evo_dash_reset
+[BlinkGuard] PASS 其他技能击杀不触发闪身步：5→5
+[BlinkGuard] PASS 闪真实命中击杀目标
+[BlinkGuard] PASS 闪施法中击杀的80%减CD保留到收招：1
+[BlinkGuard] PASS 特效脚本显式依赖经三次深载／强制GC仍可实例化：res://Assets/Effects/binbun/StylizedHitFX/script/VFXImpactBB.gd
+[BlinkGuard] PASS 特效脚本显式依赖经三次深载／强制GC仍可实例化：res://Assets/Effects/binbun/ExplosionFX/script/VFXExplosionBB.gd
+[BlinkGuard] === 闪架专项验收结束：通过 30，失败 0 ===
+[BlinkGuard] PASS 闪起手实际播放对应动画
+[BlinkGuard] PASS 闪未到Action不能提前冲刺
+[BlinkGuard] PASS 真实Action后闪进入三维冲刺
+[BlinkGuard] PASS 截图j5_blink_air
+[BlinkGuard] PASS 准星朝空中，闪实际升空：y=3.7586
+[BlinkGuard] PASS 闪自然结束归还普通移动与重力
+[BlinkGuard] PASS 最后不足一帧按剩余时长移动，实际水平距离7m，表值7
+[BlinkGuard] PASS 三维闪仍被World地形阻挡：z=16.501
+[BlinkGuard] PASS 600m/s闪扫过帧间窄目标只命中一次：1
+[BlinkGuard] PASS 闪缺少Action只取消
+[BlinkGuard] PASS 缺事件无位移、无命中体或路径残留
+[BlinkGuard] PASS 缺少GuardOn不能按时间兜底开架
+[BlinkGuard] PASS 真实GuardOn开启架势
+[BlinkGuard] PASS 截图j5_guard_window
+[BlinkGuard] PASS 架可规避无视普通格挡的能量波
+[BlinkGuard] PASS 只规避一次，同帧第二次命中正常结算
+[BlinkGuard] PASS 0.5倍动画前摇内尚未开架
+[BlinkGuard] PASS 倍速动画的真实GuardOn仍可开架
+[BlinkGuard] PASS 开架后窗口独立保持0.7667游戏秒，不因动画倍速截短
+[BlinkGuard] PASS 2倍动画前摇内尚未开架
+[BlinkGuard] PASS 倍速动画的真实GuardOn仍可开架
+[BlinkGuard] PASS 开架后窗口独立保持0.7667游戏秒，不因动画倍速截短
+[BlinkGuard] PASS 已有其他来源无敌时不消耗架势，也不清除该无敌
+[BlinkGuard] PASS 架势取消仍不清除其他来源无敌
+[BlinkGuard] PASS 真实奖励链获得evo_parry_refresh
+[BlinkGuard] PASS 招架反击真实架住后立即可再用，CD=0
+[BlinkGuard] PASS 真实奖励链获得evo_dash_reset
+[BlinkGuard] PASS 其他技能击杀不触发闪身步：5→5
+[BlinkGuard] PASS 闪真实命中击杀目标
+[BlinkGuard] PASS 闪施法中击杀的80%减CD保留到收招：1
+[BlinkGuard] PASS 特效脚本显式依赖经三次深载／强制GC仍可实例化：res://Assets/Effects/binbun/StylizedHitFX/script/VFXImpactBB.gd
+[BlinkGuard] PASS 特效脚本显式依赖经三次深载／强制GC仍可实例化：res://Assets/Effects/binbun/ExplosionFX/script/VFXExplosionBB.gd
+[BlinkGuard] === 闪架专项验收结束：通过 32，失败 0 ===
+fall_headless 退出码=0
+fall_headless stderr字节=0
+fall_render 退出码=0
+fall_render stderr字节=0
+[Fall] === 下落专项验收结束：通过 104，失败 0 ===
+[Fall] === 下落专项验收结束：通过 108，失败 0 ===
+actions_headless 退出码=0
+actions_headless stderr字节=0
+actions_render 退出码=0
+actions_render stderr字节=0
+[Action] === 动作交接验收结束：通过 38，失败 0 ===
+[Action] === 动作交接验收结束：通过 40，失败 0 ===
+original_headless 退出码=0
+original_headless stderr字节=0
+original_render 退出码=0
+original_render stderr字节=0
+[Design] === 原始设计验收结束：通过 115，失败 0 ===
+[Design] === 原始设计验收结束：通过 120，失败 0 ===
+selftest 退出码=0
+selftest stderr字节=0
+[log] 22:30:33 [SelfTest] ✅ P4·技能1 闪：真实动画Action后观察冲刺=True 方向 (0, -0.34, -0.94) 距离 7m / 0.18s CD 5｜碰撞层 1→1→1；实际路径17点，已自然收招=True
+[log] 22:30:33 [SelfTest] ✅ P4·技能2 架：真实GuardOn后架势中=True 窗口0.75s CD 3｜架势内挨 40 点：无效化=True（期望 True） 掉血 0（期望 0） 生命 240 → 240｜退出架势=True（期望 True） 架住计数 0 → 1（期望 +1） 挡下的伤害=40（期望 40）
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+f 退出码=0
+f stderr字节=0
+[Followup] === F专项验收结束：通过 33，失败 0 ===
+c 退出码=0
+c stderr字节=0
+[BatchC] === C批验收结束：通过 53，失败 0 ===
+d 退出码=0
+d stderr字节=0
+[BatchD] === D批验收结束：通过 90，失败 0 ===
+g 退出码=0
+g stderr字节=0
+[Feedback] === G专项验收结束：通过 51，失败 0 ===
+characters 退出码=0
+characters stderr字节=0
+[CharacterReplacement] 完成：通过 61，失败 0
+b 退出码=0
+b stderr字节=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a 退出码=0
+a stderr字节=0
+[BatchA] === A 批验收结束：失败 0 ===
+e 退出码=0
+e stderr字节=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+memory 退出码=0
+memory stderr字节=0
+跨进程读档5/0
+ExportRelease 编译：0 warning / 0 error
+截图 docs/screenshots/j5_blink_air.png SHA256=197FE5F9C30CE0B9A2ECAAD9BF22A95C8A41548C755BB44011E3BE14CD8CDC57
+截图 docs/screenshots/j5_guard_window.png SHA256=C28BC2B3C657FEAA77547EA005132973500F19231B89774B3A81BC0417870954
+存档 meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+selftest.flag 不存在=True
+[exit_real_1 退出0/stderr0] [log] 22:25:03 [Exit] 音频退出回收：真实等待89ms。
+[exit_real_2 退出0/stderr0] [log] 22:25:51 [Exit] 音频退出回收：真实等待87ms。
+[exit_real_3 退出0/stderr0] [log] 22:26:39 [Exit] 音频退出回收：真实等待88ms。
+[selftest 退出0/stderr0] [log] 22:30:36 [Exit] 音频退出回收：真实等待87ms。
+[ExitClock] 旧游戏计时器0.08秒实际经过=1.693ms
