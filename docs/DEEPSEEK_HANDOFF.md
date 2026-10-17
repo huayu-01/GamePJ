@@ -102,3 +102,11 @@ J5修复两个特效GDScript深载时找不到VFXOmniLightBB：改为显式prelo
 用户专用Harness会话：`session-f70b9230-26cc-42e8-bda1-189470dab697`。本机桥接在仓库外`F:\Godot项目\.codex-dsh-bridge`，是原生`dsh headless --session-id`，不是已经注册的Codex Worker。桥接只输出公开final，不输出模型thinking、不读取／复制host.lock凭据。
 
 用户现在授权该专用对话执行项目任务。先读本单和四份权威文档，检查git状态和锁，先处理Main旧同步探针，再逐项兑现剩余计划。每批给真实输出和截图、更新文档、提交推送；有歧义立即告知用户。不要等待Codex继续指挥，也不要把“已接管”当成任务已完成。
+
+## 实际接管回执与环境阻塞
+
+J6源码已推送`ef9bad5`。DeepSeek原专用对话实际读到本交接单并返回`ACK ef9bad5`，正确复述Main四处方法与case30/33/34/44。随后发现DeepSeek自己的pwsh工具在真正执行git前被Windows沙箱初始化阻断：`SetNamedSecurityInfoW failed (Win32 5): grantWrite(F:\Godot项目)`。收窄工作目录需新会话（旧会话绑定父目录）；临时项目目录诊断会话同样报`grantWrite(F:\Godot项目\项目a)`，因此不是git命令失败或代码构建失败。
+
+两次只读接管检查均未改代码、未运行构建，也未修改ACL或全局沙箱配置。**首个执行前置项改为在DeepSeek侧只读诊断这个沙箱权限问题；不能宣称它已经能编译或跑测试。** 可按其已有`diagnose-windows-sandbox-acl`流程只读查原因；若需要用户设置／提升权限，直接在DeepSeek对话向用户报告，不绕过限制、不擅自改ACL或全局安全策略。权限恢复后从Main探针迁移接着执行上述计划。
+
+Codex已停止新开发。接管确认及续做派发记录在仓库外`F:\Godot项目\.codex-dsh-bridge`；临时项目目录检查会话`session-c93fc9a5-df0d-4292-8648-25f4b1ddcc89`仅用于诊断，正式联络仍用上面的原专用会话，避免两边并发改代码。
