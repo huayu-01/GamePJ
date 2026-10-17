@@ -147,7 +147,7 @@ public partial class CharacterReplacementProbe : Node
 				Check(await Until(() => _target.Health < priorHealth), $"Lyra/{pair.Item2}真实输入→动画事件→投射物命中掉血 {priorHealth}→{_target.Health}");
 			}
 		}
-		foreach (var test in new[] { (WeaponPresetKind.SpiritSword, "AbilityWeapon4Skill1", 5), (WeaponPresetKind.Scythe, "AbilityWeapon5Skill1", 3), (WeaponPresetKind.Spear, "AbilityWeapon6Skill1", 5) })
+		foreach (var test in new[] { (WeaponPresetKind.SpiritSword, "AbilityWeapon4Skill1", 5), (WeaponPresetKind.Scythe, "AbilityWeapon5Skill1", 3), (WeaponPresetKind.Spear, "AbilityWeapon6Skill1", 4) })
 		{
 			await Equip(PlayerCharacterKind.WeaponMaster, test.Item1);
 			var combo = _player.GetNode<MeleeComboAbility>(test.Item2);
@@ -175,7 +175,7 @@ public partial class CharacterReplacementProbe : Node
 			{
 				int prior = Count(id);
 				await Press("weapon_skill_1");
-				Check(await Until(() => Count(id) > prior) && combo.ComboStep == 0, "长枪第5段之后真实回到第1段并再次命中");
+				Check(await Until(() => Count(id) > prior) && combo.ComboStep == 0, "长枪第4段之后真实回到第1段并再次命中");
 			}
 			int ended = Count(id);
 			RunSetup.Weapon = test.Item1 == WeaponPresetKind.Spear ? WeaponPresetKind.SpiritSword : WeaponPresetKind.Spear;

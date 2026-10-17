@@ -29,6 +29,6 @@ Windup = 0.05
 Recover = 0.05
 Id = "skl_b3_w1_1"
 DisplayName = "横扫千军"
-DescriptionTemplate = "挥砍 > 上挑 > 下劈 > 突刺 > 挥砍，这么循环（连续按键推进，打满第 5 段后回到第 1 段）。"
-Note = "[P4 新增行] 角色 B 武器3 长枪 武技1（文档 CD:0.6）。★ 与灵剑/镰刀的武技1 共用 MeleeComboAbility；「这么循环」由 ComboLoop=true 表达（打满 5 段回到第 0 段），五段各自一段动画。"
+DescriptionTemplate = "挥砍 > 上挑 > 下劈 > 突刺，四段循环（连续按键推进，第四段后回到第一段）。"
+Note = "原始设计与用户确认：四段循环；共用MeleeComboAbility，ComboLoop=true。CD0.6仅作参考，实际判定与连段由动画事件驱动。"
 Params = [SubResource("p_StrikeActiveTime")]

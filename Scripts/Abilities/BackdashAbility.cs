@@ -56,6 +56,7 @@ public partial class BackdashAbility : Ability
 		InvulnerableOwned = false;
 		_invulnerableTime = 0f;
 		LastImpulse = Vector3.Zero;
+		Movement?.LockFacing(this);
 
 		// 动画必须存在（基类 TryActivate 已经查过），这里开播；效果等 Dodge 事件帧（= 动画开头那一帧）。
 		PlaySkillAnimation();
@@ -148,8 +149,15 @@ public partial class BackdashAbility : Ability
 	public override void _ExitTree()
 	{
 		EndInvulnerable();
+		Movement?.UnlockFacing(this);
 		base._ExitTree();
 	}
 
-	protected override void OnLoadoutReset() => EndInvulnerable();
+	protected override void OnFinishOrCancel()
+	{
+		EndInvulnerable();
+		Movement?.UnlockFacing(this);
+	}
+
+	protected override void OnLoadoutReset() => OnFinishOrCancel();
 }

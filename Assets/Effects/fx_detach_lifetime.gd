@@ -42,5 +42,9 @@ func _self_destruct() -> void:
 	var ap := find_child("AnimationPlayer", true, false)
 	if ap is AnimationPlayer and ap.has_animation("main"):
 		life = (ap as AnimationPlayer).get_animation("main").length
-	await get_tree().create_timer(life + extra_life).timeout
-	queue_free()
+	# 原生信号调用原生 queue_free，不保留会被深度资源重载取消的脚本协程。
+	var cleanup := Timer.new()
+	cleanup.one_shot = true
+	add_child(cleanup)
+	cleanup.timeout.connect(Callable(self, "queue_free"), CONNECT_ONE_SHOT)
+	cleanup.start(maxf(0.001, life + extra_life))

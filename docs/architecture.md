@@ -84,6 +84,8 @@
 
 ## Unit 与表现的分工
 
+**原始设计J1**：玩家朝向在武器输入分流前统一更新；`CharacterMovement`按来源持有朝向锁，后撤负责成对获取／释放。落剑式属于灵剑武器技能列表，角色共通列表仅保留闪／架／落。一次性爆炸视觉脱离短寿命攻击节点后，用原生Timer信号回收，不持有会被深度资源重载取消的GDScript等待协程。
+
 **后续F专项**：导航只采`nav_geometry`组内递归子节点的World静态碰撞，网格单元尺寸服从NavigationMap；烘焙计时器退树解绑，重建只管理自有区域。
 正常退出统一走`GameExit.Request`，先卸载音频流并异步等待混音回收，再退出SceneTree；UI/GDScript可调用`UiRouter.RequestQuit(exitCode)`。不新增autoload。
 项目默认字体与界面Theme共用自带FontVariation，禁系统回退；字重以TextServer原生坐标验收。

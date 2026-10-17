@@ -3985,7 +3985,7 @@ public partial class SelfTest : Node
 			+ $"｜再次使用收回={secondPress}（期望 True） 收回后武技1 解锁={comboUnlocked}（期望 True） 累计收回 {w2.RecallCount} 次");
 	}
 
-	/// <summary>长枪：5 段循环连招 + 武技2 蓄力抛掷（抛物线 / 路径可视化 / 每档 +20% / 收回）。</summary>
+	/// <summary>长枪：4 段循环连招 + 武技2 蓄力抛掷（抛物线 / 路径可视化 / 每档 +20% / 收回）。</summary>
 	private void BeginSpearProbe()
 	{
 		ClearHostiles();
@@ -4006,12 +4006,12 @@ public partial class SelfTest : Node
 		MeleeComboAbility w1 = _p4SpearW1;
 		SpearThrowAbility w2 = _p4SpearW2;
 
-		// ① 5 段循环连招：连按 6 次应当回到第 1 段（ComboLoop）。
+		// ① 四段循环连招；真实输入和命中顺序另由 CharacterDesignProbe 覆盖。
 		WaitUntilIdle(w1);
 		w1.RefreshCooldown();
 		bool started = w1.TryPress();
 		int advanced = 0;
-		// 5 段循环：连按 10 次应当"打满 5 段后回到第 1 段"（ComboStep 永远 ≤ 4）。
+		// 连续推进覆盖循环，四段的索引始终在0到3之间。
 		int maxStepSeen = 0;
 		for (int i = 0; i < 10 && w1.IsBusy; i++)
 		{
@@ -4054,13 +4054,13 @@ public partial class SelfTest : Node
 		}
 
 		float maxDist = w2.MaxThrowDistance * Mathf.Pow(w2.ChargeStepScale, 3f);
-		bool ok = started && advanced >= 5 && maxStepSeen <= 4 && charged && charged3 && steps == 3
+		bool ok = started && w1.ComboStepCount == 4 && advanced >= 5 && maxStepSeen <= 3 && charged && charged3 && steps == 3
 			&& Mathf.IsEqualApprox(speedAt3 / Mathf.Max(0.01f, speedAt0), power)
 			&& Mathf.IsEqualApprox(distAt0, baseDist) && Mathf.IsEqualApprox(distAt3, maxDist)
 			&& distAt3 > distAt0 && pathPoints >= 2 && inFlight && recall;
 		GameLog.Write(
 			"SelfTest",
-			$"{(ok ? "✅" : "🔴")} P4·长枪武技1 横扫千军：段数={w1.ComboStepCount}（期望 5） 循环={w1.ComboLoop}（期望 True，文档「这么循环」） CD {w1.Cooldown:0.##}（期望 0.6） 连续按键推进={advanced}（期望 ≥5） 循环后最大段号={maxStepSeen + 1}（期望 ≤5 = 打满就回到第 1 段）"
+			$"{(ok ? "✅" : "🔴")} P4·长枪武技1 横扫千军：段数={w1.ComboStepCount}（期望 4） 循环={w1.ComboLoop}（期望 True，文档「这么循环」） CD {w1.Cooldown:0.##}（期望 0.6） 连续按键推进={advanced}（期望 ≥5） 循环后最大段号={maxStepSeen + 1}（期望 ≤4 = 打满就回到第 1 段）"
 			+ $"｜武技2 长虹贯日：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 1）/ 每 {w2.ChargeStepSeconds:0.##}s 一档（期望 0.25）/ 每档 ×{w2.ChargeStepScale:0.##}（期望 1.2 = +20%）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 4，最多蓄力 {w2.ChargeMaxSeconds:0.##}s）"
 			+ $"｜抛物线：重力 {w2.ArcGravity:0.##} 飞行 {w2.FlightSeconds:0.##}s 路径可视化 {pathPoints} 点（期望 ≥2） 在飞={inFlight}（期望 True）"
 			+ $"｜基础档：水平速度 {speedAt0:0.##} 路径中线 {distAt0:0.##}m ／ 3 档：速度 {speedAt3:0.##} 路径中线 {distAt3:0.##}m（期望 {maxDist:0.##} ≈ 12×1.2³）"

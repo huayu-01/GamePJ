@@ -39,6 +39,10 @@ public partial class PlayerWeaponInput : Node3D
 			return;
 		}
 
+		// 六把武技驱动武器也必须对齐准星；不能放在旧枪械分支的提前返回之后。
+		Vector3 bodyAim = AimUtil.GetCrosshairDirection(GetViewport(), -_unit.GlobalTransform.Basis.Z);
+		_unit.Movement?.SetFacing(bodyAim);
+
 		// 近战角色（武器 Enabled=false）：左键改为触发近战重击，不走枪械逻辑。
 		if (!_weapon.Enabled)
 		{
@@ -49,7 +53,7 @@ public partial class PlayerWeaponInput : Node3D
 				Ability? bound = PlayerAbilityInput.FindByInputAction(_unit, "weapon_skill_1");
 				if (bound != null)
 				{
-					// 方向不用在这里算：本组件的 `_Process` 末尾会把角色朝向持续对齐准星，
+					// 方向不用在这里算：进入武器分流之前已经更新了准星朝向，
 					// 而技能的 `Ability.Aim = Crosshair` 自己会解析屏幕中心射线（与枪械同一条路）。
 					bound.TryActivate();
 					return;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ActRoguelike.Config;
 using ActRoguelike.Run;
 using Godot;
@@ -94,6 +95,12 @@ public partial class CharacterMovement : Node
 	public Vector3 IntentDirection => _intentDirection;
 
 	public bool IsDashing => _dashSpeed > 0f;
+
+	private readonly HashSet<object> _facingLocks = new(ReferenceEqualityComparer.Instance);
+	/// <summary>技能按自身所有权锁定转身；例如后撤期间转镜头也不改变起手朝向。</summary>
+	public bool IsFacingLocked => _facingLocks.Count > 0;
+	public void LockFacing(object source) => _facingLocks.Add(source);
+	public void UnlockFacing(object source) => _facingLocks.Remove(source);
 
 	/// <summary>位移技能用：在持续时间内以固定速度沿方向移动，忽略常规加速度。</summary>
 	public void BeginDash(Vector3 direction, float speed)
@@ -318,6 +325,7 @@ public partial class CharacterMovement : Node
 
 	public void FaceDirection(Vector3 direction, float dt)
 	{
+		if (IsFacingLocked) return;
 		direction.Y = 0f;
 		if (direction.LengthSquared() < 0.04f)
 		{

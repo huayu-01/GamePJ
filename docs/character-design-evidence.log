@@ -1,0 +1,130 @@
+Debug 编译：0 warning / 0 error
+design_headless 退出码=0
+design_render 退出码=0
+[Design] PASS 爆炸特效已脱离短寿命战斗判定节点
+[Design] PASS 场景深度重载后，旧特效仍由原生Timer按时回收
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS EnergyPalm 仅灵剑有落剑式，实际启用=False
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Crossbow 仅灵剑有落剑式，实际启用=False
+[Design] PASS Bow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Bow 仅灵剑有落剑式，实际启用=False
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS SpiritSword 仅灵剑有落剑式，实际启用=True
+[Design] PASS Scythe 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Scythe 仅灵剑有落剑式，实际启用=False
+[Design] PASS Spear 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Spear 仅灵剑有落剑式，实际启用=False
+[Design] PASS 后撤过程中转镜头，起手朝向保持不变
+[Design] PASS 真实Dodge动画事件向起手方向后方施力：(0.006323748, 0, 11.999998)
+[Design] PASS 后撤结束释放自身朝向锁，恢复准星朝向
+[Design] PASS 长枪由表配置四段循环：段数=4
+[Design] PASS 真实输入→动画ATK→连续命中两轮四连，段索引=0,1,2,3,0,1,2,3
+[Design] PASS 两轮四连实际扣血：10000→9804.199
+[Design] === 原始设计验收结束：通过 44，失败 0 ===
+[Design] PASS 爆炸特效已脱离短寿命战斗判定节点
+[Design] PASS 场景深度重载后，旧特效仍由原生Timer按时回收
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS EnergyPalm 仅灵剑有落剑式，实际启用=False
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Crossbow 仅灵剑有落剑式，实际启用=False
+[Design] PASS Bow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Bow 仅灵剑有落剑式，实际启用=False
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS SpiritSword 仅灵剑有落剑式，实际启用=True
+[Design] PASS Scythe 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Scythe 仅灵剑有落剑式，实际启用=False
+[Design] PASS 截图 j_scythe_facing_passive
+[Design] PASS Spear 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Spear 仅灵剑有落剑式，实际启用=False
+[Design] PASS 后撤过程中转镜头，起手朝向保持不变
+[Design] PASS 真实Dodge动画事件向起手方向后方施力：(0.004843537, 0, 11.999999)
+[Design] PASS 后撤结束释放自身朝向锁，恢复准星朝向
+[Design] PASS 长枪由表配置四段循环：段数=4
+[Design] PASS 真实输入→动画ATK→连续命中两轮四连，段索引=0,1,2,3,0,1,2,3
+[Design] PASS 两轮四连实际扣血：10000→9804.199
+[Design] PASS 截图 j_spear_four_cycle
+[Design] === 原始设计验收结束：通过 46，失败 0 ===
+selftest 退出码=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+f 退出码=0
+[Followup] === F专项验收结束：通过 33，失败 0 ===
+c 退出码=0
+[BatchC] === C批验收结束：通过 52，失败 0 ===
+d 退出码=0
+[BatchD] === D批验收结束：通过 90，失败 0 ===
+g 退出码=0
+[Feedback] === G专项验收结束：通过 50，失败 0 ===
+characters 退出码=0
+[CharacterReplacement] 完成：通过 61，失败 0
+b 退出码=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a 退出码=0
+[BatchA] === A 批验收结束：失败 0 ===
+e 退出码=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+memory 退出码=0
+跨进程读档5/0
+ExportRelease 编译：0 warning / 0 error
+截图 docs/screenshots/j_scythe_facing_passive.png SHA256=ABA425CD54A99E8D62508EE60C760743F0648BD0B80A0FC239115B81E642BE6E
+截图 docs/screenshots/j_spear_four_cycle.png SHA256=D47B75A35FB9CB87B883ABEBB64A1DCECD635E4B874F4AAA83C3C94F08F9ABD8
+存档 meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+selftest.flag 不存在=True

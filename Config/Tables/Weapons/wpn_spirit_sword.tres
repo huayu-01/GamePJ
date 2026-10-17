@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="WeaponConfig" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="WeaponConfig" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/WeaponConfig.cs" id="1_row"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_1.tres" id="2_skl"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_2.tres" id="3_skl"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_3.tres" id="11_passive"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_spirit_sword.tres" id="4_pool"]
 
 [ext_resource type="Resource" path="res://Config/Tables/Characters/chr_weapon_master.tres" id="10_owner"]
@@ -33,7 +34,7 @@ ProjectileSpeed = 150.0
 MaxLifetime = 1.6
 AimFov = 55.0
 Automatic = false
-Skills = [ExtResource("2_skl"), ExtResource("3_skl")]
+Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("11_passive")]
 Id = "wpn_spirit_sword"
 Slot = 7
 DisplayName = "灵剑"

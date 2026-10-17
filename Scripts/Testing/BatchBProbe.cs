@@ -177,7 +177,7 @@ public partial class BatchBProbe : Node
 		Check(_gm.IsOpen, "重新挂载预制体即恢复G快捷键");
 		await KeyPress(Key.Escape);
 		await Wait(0.2);
-		foreach ((int character, int weapon, string weaponId, int count) in new[] { (3, 3, "skl_a1_w1_1", 5), (3, 4, "skl_a2_w1_1", 5), (3, 5, "skl_a3_w1_1", 5), (4, 6, "skl_b1_w1_1", 6), (4, 7, "skl_b2_w1_1", 6), (4, 8, "skl_b3_w1_1", 6) })
+		foreach ((int character, int weapon, string weaponId, int count) in new[] { (3, 3, "skl_a1_w1_1", 5), (3, 4, "skl_a2_w1_1", 5), (3, 5, "skl_a3_w1_1", 5), (4, 6, "skl_b1_w1_1", 6), (4, 7, "skl_b2_w1_1", 5), (4, 8, "skl_b3_w1_1", 5) })
 		{
 			_run.Call("BeginRunWithCharacter", character, weapon);
 			await Wait(0.2);

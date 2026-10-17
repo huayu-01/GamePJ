@@ -37,5 +37,5 @@ Skills = [ExtResource("2_skl"), ExtResource("3_skl")]
 Id = "wpn_spear"
 Slot = 9
 DisplayName = "长枪"
-DescriptionTemplate = "中距离武器：武技1 横扫千军（挥砍>上挑>下劈>突刺>挥砍，循环）/ 武技2 长虹贯日（蓄力抛掷，抛物线 + 路径可视化，可收回再伤害）。武技3 落日余晖是被动。"
+DescriptionTemplate = "中距离武器：武技1 横扫千军（挥砍>上挑>下劈>突刺，四段循环）/ 武技2 长虹贯日（蓄力抛掷，抛物线 + 路径可视化，可收回再伤害）。专属被动落日余晖改变共通下落方向。"
 Note = "[P4 新增行] 角色 B 武器3 长枪（中距离范围）。攻击全部由本行 Skills 里那两个武技技能完成（Weapon 组件不开火）。"

@@ -19,7 +19,7 @@ namespace ActRoguelike.Abilities;
 /// <list type="bullet">
 /// <item>灵剑「破剑式」：5 段（<c>ComboAnimations</c> 5 个名字）；</item>
 /// <item>镰刀「憎恶」：3 段；</item>
-/// <item>长枪「横扫千军」：5 段（挥砍→上挑→下劈→突刺→挥砍，靠**动画链**循环；表的 <c>ComboLoop</c>
+/// <item>长枪「横扫千军」：4 段（挥砍→上挑→下劈→突刺，靠**动画链**循环；表的 <c>ComboLoop</c>
 ///   只是"打满之后回到第 0 段"这一条）。</item>
 /// </list>
 /// <para>差别**全在表里**（`Config/Tables/Skills/skl_b*_w*_1.tres` 的列）：每段的动画名、每段的

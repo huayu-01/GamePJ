@@ -1,0 +1,55 @@
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] FAIL EnergyPalm 静止转镜头朝向(1, 0, 0)，根前向点积=-0.0000
+[Design] FAIL EnergyPalm 静止转镜头朝向(0, 0, 1)，根前向点积=-1.0000
+[Design] FAIL EnergyPalm 静止转镜头朝向(-1, 0, 0)，根前向点积=0.0000
+[Design] PASS EnergyPalm 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS EnergyPalm 仅灵剑有落剑式，实际启用=False
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] FAIL Crossbow 静止转镜头朝向(1, 0, 0)，根前向点积=-0.0000
+[Design] FAIL Crossbow 静止转镜头朝向(0, 0, 1)，根前向点积=-1.0000
+[Design] FAIL Crossbow 静止转镜头朝向(-1, 0, 0)，根前向点积=0.0000
+[Design] PASS Crossbow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Crossbow 仅灵剑有落剑式，实际启用=False
+[Design] PASS Bow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] FAIL Bow 静止转镜头朝向(1, 0, 0)，根前向点积=-0.0000
+[Design] FAIL Bow 静止转镜头朝向(0, 0, 1)，根前向点积=-1.0000
+[Design] FAIL Bow 静止转镜头朝向(-1, 0, 0)，根前向点积=0.0000
+[Design] PASS Bow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Bow 仅灵剑有落剑式，实际启用=False
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] FAIL SpiritSword 静止转镜头朝向(1, 0, 0)，根前向点积=-0.0000
+[Design] FAIL SpiritSword 静止转镜头朝向(0, 0, 1)，根前向点积=-1.0000
+[Design] FAIL SpiritSword 静止转镜头朝向(-1, 0, 0)，根前向点积=0.0000
+[Design] PASS SpiritSword 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS SpiritSword 仅灵剑有落剑式，实际启用=True
+[Design] PASS Scythe 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] FAIL Scythe 静止转镜头朝向(1, 0, 0)，根前向点积=-0.0000
+[Design] FAIL Scythe 静止转镜头朝向(0, 0, 1)，根前向点积=-1.0000
+[Design] FAIL Scythe 静止转镜头朝向(-1, 0, 0)，根前向点积=0.0000
+[Design] PASS Scythe 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] FAIL Scythe 仅灵剑有落剑式，实际启用=True
+[Design] PASS Spear 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] FAIL Spear 静止转镜头朝向(1, 0, 0)，根前向点积=-0.0000
+[Design] FAIL Spear 静止转镜头朝向(0, 0, 1)，根前向点积=-1.0000
+[Design] FAIL Spear 静止转镜头朝向(-1, 0, 0)，根前向点积=0.0000
+[Design] PASS Spear 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] FAIL Spear 仅灵剑有落剑式，实际启用=True
+[Design] === 原始设计验收结束：通过 16，失败 20 ===
+
+首次完整回归：D90/0、退出0，但stderr出现特效协程重载告警，未作为通过。
+WARNING: Canceling suspended execution of "_self_destruct" due to a script reload.
+   at: cancel_pending_functions (modules/gdscript/gdscript.cpp:1497)
+   C# backtrace (most recent call first):
+       [0] Godot.GodotObject Godot.NativeCalls.godot_icall_3_1268(nint, nint, string, string, int) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Generated/NativeCalls.cs:11611)
+       [1] Godot.Resource Godot.ResourceLoader.Load(string, string, Godot.ResourceLoader+CacheMode) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Generated/GodotObjects/ResourceLoader.cs:120)
+       [2] T Godot.ResourceLoader.Load<T>(string, string, Godot.ResourceLoader+CacheMode) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/Extensions/ResourceLoaderExtensions.cs:27)
+       [3] T ActRoguelike.Core.RuntimeResources.Load<T>(string) (F:\Godot项目\项目a\Scripts\Core\RuntimeResources.cs:34)
+       [4] void ActRoguelike.Testing.BatchDProbe+<Projectiles>d__19.MoveNext() (F:\Godot项目\项目a\Scripts\Testing\BatchDProbe.cs:306)
+       [5] void System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, object)
+       [6] void System.Threading.Tasks.AwaitTaskContinuation.RunCallback(System.Threading.ContextCallback, object, System.Threading.Tasks.Task&)
+       [7] void System.Threading.Tasks.Task.RunContinuations(object)
+       [8] void System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult()
+       [9] void ActRoguelike.Testing.BatchDProbe+<Wait>d__8.MoveNext() (F:\Godot项目\项目a\Scripts\Testing\BatchDProbe.cs:37)
+       [10] void System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, object)
+       [11] void System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1.MoveNext()
+       [12] void Godot.SignalAwaiter.SignalCallback(nint, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_bool*) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/SignalAwaiter.cs:65)
