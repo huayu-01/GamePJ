@@ -231,6 +231,11 @@ public abstract partial class Ability : Node3D
 
 	/// <summary>本次蓄力累计的秒数（松手之后保留最后一次的值，供 UI / 自测取证）。</summary>
 	public float ChargeTime { get; private set; }
+	/// <summary>本次已经松手；等待释放动画期间不能再次蓄力或重复提交释放。</summary>
+	public bool ChargeReleased { get; private set; }
+	/// <summary>释放动画的播放速度，独立于蓄力期间的拉伸速度。</summary>
+	[Export] public float ChargeReleaseAnimSpeedScale { get; set; } = 1f;
+	protected virtual bool CanReleaseBeforeBase => false;
 
 	/// <summary>后置蓄力已经升到第几档（0 = 只有基础蓄力那一段）。</summary>
 	public int ChargeSteps { get; private set; }
@@ -717,7 +722,7 @@ public abstract partial class Ability : Node3D
 			HeldTime += Mathf.Max(0f, delta);
 			return;
 		}
-		if (!HoldToCharge || !IsBusy)
+		if (!HoldToCharge || !IsBusy || ChargeReleased)
 		{
 			return;
 		}
@@ -752,13 +757,14 @@ public abstract partial class Ability : Node3D
 			OnMaintainReleased();
 			return;
 		}
-		if (!HoldToCharge || !IsBusy)
+		if (!HoldToCharge || !IsBusy || ChargeReleased)
 		{
 			return;
 		}
 
-		bool released = ChargeBaseComplete;
-		LastReleasePerfect = released && IsPerfectWindow;
+		ChargeReleased = true;
+		bool released = ChargeBaseComplete || CanReleaseBeforeBase;
+		LastReleasePerfect = ChargeBaseComplete && IsPerfectWindow;
 		LastReleaseAborted = !released;
 		int steps = ChargeSteps;
 		float power = ChargePowerScale;
@@ -804,6 +810,7 @@ public abstract partial class Ability : Node3D
 	/// <summary>下一次施法前把蓄力状态清干净（<see cref="TryActivate"/> 调用）。</summary>
 	private void ResetChargeState()
 	{
+		ChargeReleased = false;
 		IsCharging = false;
 		ChargeTime = 0f;
 		ChargeSteps = 0;
@@ -844,6 +851,13 @@ public abstract partial class Ability : Node3D
 	protected string PlaySkillAnimation()
 	{
 		return PlaySkillAnimationNamed(AnimName);
+	}
+	/// <summary>松手冻结结果后重播释放段，事件仍由本单位的本轮动画派发。</summary>
+	protected bool PlayChargeReleaseAnimation()
+	{
+		StateTime = 0;
+		return !string.IsNullOrEmpty(AnimName) && !string.IsNullOrEmpty(AnimEvent)
+			&& PlaySkillAnimationNamed(AnimName, Mathf.Max(0.01f, ChargeReleaseAnimSpeedScale)).Length > 0;
 	}
 
 	/// <summary>停掉技能动画（技能结束/取消时调用，把控制权交还"按移速切"）。</summary>
@@ -950,6 +964,7 @@ public abstract partial class Ability : Node3D
 	protected void Finish()
 	{
 		IsActive = false;
+		IsCharging = false;
 		_maintainHeld = false;
 		StateTime = 0f;
 		if (MaxCharges > 1)
@@ -974,6 +989,7 @@ public abstract partial class Ability : Node3D
 	{
 		if (IsActive) Cancel();
 		OnLoadoutReset();
+		ResetChargeState();
 		RefreshCooldown();
 	}
 	protected virtual void OnLoadoutReset() { }
@@ -981,6 +997,7 @@ public abstract partial class Ability : Node3D
 	protected void Cancel()
 	{
 		IsActive = false;
+		IsCharging = false;
 		_finishCooldownScale = 1;
 		_finishCooldownSubtract = 0;
 		_maintainHeld = false;

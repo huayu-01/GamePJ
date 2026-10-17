@@ -97,6 +97,8 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 
 	private bool _fired;
 	private bool _perfect;
+	private bool _releasePending;
+	private float _releasedPower = 1;
 
 	/// <summary>
 	/// **不需要目标**：能量波朝准星发射（`Aim = Crosshair`），有没有敌人都能放。
@@ -111,6 +113,8 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 	{
 		_fired = false;
 		_perfect = false;
+		_releasePending = false;
+		_releasedPower = 1;
 
 		if (!ResolveProjectileScene())
 		{
@@ -120,9 +124,8 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 			return;
 		}
 
-		// 蓄力类：动画只是"按住期间播的那一段"，**不在这里发射** —— 等松手（OnChargeReleased）。
-		// 非蓄力（武技1）：等动画事件帧 ATK（OnAnimEvent）。
-		PlaySkillAnimation();
+		// 蓄力期的ATK不出弹；松手后重播释放段并等待那一轮真实ATK。
+		if (PlaySkillAnimation().Length == 0) { Cancel(); return; }
 		if (ActRoguelike.Debug.SelfTest.DebugSkipSkillAnimation)
 		{
 			// 排障开关：跳过"等动画事件帧"这一段，直接在激活时发射。
@@ -151,8 +154,7 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 	}
 
 	/// <summary>
-	/// **蓄满之后松手 → 发射**。蓄力的计时/档位/完美窗口全部由 <see cref="Ability"/> 基类算好
-	/// （见 docs/abilities.md 的接入契约），这里只负责"按结果发射"。
+	/// 松手冻结完美结果与威力，释放段真实ATK才生成投射物。
 	/// </summary>
 	protected override void OnChargeReleased(bool perfect, int steps, float powerScale)
 	{
@@ -162,7 +164,9 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		}
 
 		_perfect = perfect;
-		FireShot();
+		_releasedPower = powerScale;
+		_releasePending = true;
+		if (!PlayChargeReleaseAnimation()) Cancel();
 	}
 
 	/// <summary>
@@ -178,20 +182,16 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 	}
 
 	/// <summary>
-	/// **动画事件帧 <c>ATK</c>** —— 非蓄力技能（武技1）就是"子弹在事件帧到 ATK 时发射"那一行。
-	///
-	/// ⚠️ 蓄力技能（<see cref="Ability.HoldToCharge"/>）**不在这里发射**：文档说蓄力是"抬起释放"，
-	/// 而事件帧在"刚蓄满"那一刻就到达 —— 若在这里发射，就永远等于"一到点就打出去"，
-	/// 完美时机窗口（松手才算）就没有意义了。蓄力技能的事件帧仍然要求**存在且对齐**
-	/// （`AnimSpeedScale` 让 ATK 帧正好落在基础蓄力完成处），只是不当作触发点。
+	/// 非蓄力直接响应ATK；蓄力只响应松手后重播的释放段ATK。
 	/// </summary>
 	protected override void OnAnimEvent(string name)
 	{
-		if (HoldToCharge)
+		if (name != AnimEvent || (HoldToCharge && !_releasePending))
 		{
 			return;
 		}
 
+		_releasePending = false;
 		FireShot();
 	}
 
@@ -209,17 +209,14 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 			return;
 		}
 
-		// ⚠️ 这里**刻意不是**"到时间就发射"：用户裁定没有动画就不执行，也就不会有时间驱动的兜底。
-		// 只有一种情况会走到这儿 —— 动画里根本没有这个事件帧（生成表配错了），
-		// 那就放弃这次施法，并留一条日志说明原因。
-		//
-		// ⚠️ 蓄力技能**不看这个兜底**：它等的是"松手"，按住多久都是合法的（松开必定回调）。
-		if (!HoldToCharge && StateTime > Windup + Recover + 1.5f)
+		float eventSpeed = HoldToCharge ? ChargeReleaseAnimSpeedScale : AnimSpeedScale;
+		if ((!HoldToCharge || _releasePending) && StateTime > AnimationEventTimeout / Mathf.Max(0.01f, eventSpeed))
 		{
 			GameLog.Write("Combat", $"⚠ 技能 {AbilityId} 等不到动画事件帧「{AnimEvent}」，本次施法放弃（检查 SkillAnimations 表的事件帧名）。");
 			Cancel();
 		}
 	}
+	protected override void OnFinishOrCancel() => _releasePending = false;
 
 	/// <summary>
 	/// **口径与既有枪械完全一致**（`docs/anim-pipeline.md` §6.4-4）：先求「准星打到的世界点」
@@ -277,7 +274,7 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		// 完美时机：**绝对值优先**（表里的 PerfectDamage / PerfectSpeed）；没配才回落到普通值。
 		// 后置蓄力的档位倍率（弓 / 短弩 / 长枪那一段）与完美时机是**两件正交的事**，所以两者相乘
 		// （武技2 没有后置蓄力 → ChargePowerScale 恒为 1，于是 30 → 40、250 → 400 逐位精确）。
-		float power = ChargePowerScale;
+		float power = HoldToCharge ? _releasedPower : 1;
 		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power;
 		float shotSpeed = (_perfect && PerfectSpeed > 0f ? PerfectSpeed : Speed) * power;
 

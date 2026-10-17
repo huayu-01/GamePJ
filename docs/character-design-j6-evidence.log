@@ -1,0 +1,419 @@
+J6验收：生产代码完整20进程回归；随后仅扩展探针，额外2进程专项80/0、82/0。全部22进程退出0、stderr0。
+
+[完整回归原始证据]
+Debug 编译：0 warning / 0 error
+design_headless 退出码=0
+design_headless stderr字节=0
+design_render 退出码=0
+design_render stderr字节=0
+[ChargeRelease] PASS EnergyPalm真实输入蓄力完成
+[ChargeRelease] PASS EnergyPalm按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS EnergyPalm松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS EnergyPalm松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS EnergyPalm等待释放时再次按住不重置蓄力快照：0.557→0.557
+[ChargeRelease] PASS EnergyPalm真实释放ATK才生成投射物
+[ChargeRelease] PASS EnergyPalm本次释放发数正确且不重复：1
+[ChargeRelease] PASS EnergyPalm真实释放投射物命中物理靶
+[ChargeRelease] PASS EnergyPalm真实命中快照与已报告伤害一致：40
+[ChargeRelease] PASS EnergyPalm缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS EnergyPalm缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS EnergyPalm未获变奏时提前松手不释放
+[ChargeRelease] PASS Crossbow真实输入蓄力完成
+[ChargeRelease] PASS Crossbow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Crossbow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Crossbow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Crossbow等待释放时再次按住不重置蓄力快照：0.4623→0.4623
+[ChargeRelease] PASS Crossbow真实释放ATK才生成投射物
+[ChargeRelease] PASS Crossbow本次释放发数正确且不重复：3
+[ChargeRelease] PASS Crossbow真实释放投射物命中物理靶
+[ChargeRelease] PASS Crossbow真实命中快照与已报告伤害一致：12
+[ChargeRelease] PASS Crossbow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Crossbow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Crossbow未获变奏时提前松手不释放
+[ChargeRelease] PASS Bow真实输入蓄力完成
+[ChargeRelease] PASS Bow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Bow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Bow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Bow等待释放时再次按住不重置蓄力快照：0.5586→0.5586
+[ChargeRelease] PASS Bow真实释放ATK才生成投射物
+[ChargeRelease] PASS Bow本次释放发数正确且不重复：1
+[ChargeRelease] PASS Bow真实释放投射物命中物理靶
+[ChargeRelease] PASS Bow真实命中快照与已报告伤害一致：24
+[ChargeRelease] PASS Bow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Bow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Bow未获变奏时提前松手不释放
+[ChargeRelease] PASS SpiritSword真实输入蓄力完成
+[ChargeRelease] PASS SpiritSword按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS SpiritSword松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS SpiritSword松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS SpiritSword等待释放时再次按住不重置蓄力快照：1.062→1.062
+[ChargeRelease] PASS SpiritSword真实释放ATK才生成投射物
+[ChargeRelease] PASS SpiritSword本次释放发数正确且不重复：1
+[ChargeRelease] PASS SpiritSword真实释放投射物命中物理靶
+[ChargeRelease] PASS SpiritSword真实命中快照与已报告伤害一致：26
+[ChargeRelease] PASS SpiritSword缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS SpiritSword缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS SpiritSword未获变奏时提前松手不释放
+[ChargeRelease] PASS 完美时机夹具完成本次真实蓄力
+[ChargeRelease] PASS 能量掌按松手时刻冻结完美结果
+[ChargeRelease] PASS 完美结果实际发射仍保留：True，弹速400
+[ChargeRelease] PASS 打断夹具完成本次真实蓄力
+[ChargeRelease] PASS 释放ATK前被后撤打断，不补发旧箭
+[ChargeRelease] PASS 通过真实RewardCatalog→RunBuild.Add获得变奏
+[ChargeRelease] PASS 强类型资源的循环上限与逐发间隔实际接入
+[ChargeRelease] PASS 变奏第1次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第1次实际1箭，期望1
+[ChargeRelease] PASS 变奏第2次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第2次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第3次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第3次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第4次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第4次实际1箭，期望1
+[ChargeRelease] PASS 变奏第5次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第5次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第6次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第6次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 获得变奏后长按仍为满五档单箭，不吃快射连发
+[ChargeRelease] PASS 超出连续射击窗口后点按回到第一箭
+[ChargeRelease] PASS 二连发第一箭已由真实ATK射出
+[ChargeRelease] PASS 连发中被后撤打断，已出箭保留，待发第二箭取消
+[ChargeRelease] === 蓄力释放验收结束：通过 75，失败 0 ===
+[ChargeRelease] PASS EnergyPalm真实输入蓄力完成
+[ChargeRelease] PASS EnergyPalm按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS EnergyPalm松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS EnergyPalm松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS EnergyPalm等待释放时再次按住不重置蓄力快照：0.559→0.559
+[ChargeRelease] PASS EnergyPalm真实释放ATK才生成投射物
+[ChargeRelease] PASS EnergyPalm本次释放发数正确且不重复：1
+[ChargeRelease] PASS EnergyPalm真实释放投射物命中物理靶
+[ChargeRelease] PASS EnergyPalm真实命中快照与已报告伤害一致：40
+[ChargeRelease] PASS EnergyPalm缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS EnergyPalm缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS EnergyPalm未获变奏时提前松手不释放
+[ChargeRelease] PASS Crossbow真实输入蓄力完成
+[ChargeRelease] PASS Crossbow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Crossbow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Crossbow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Crossbow等待释放时再次按住不重置蓄力快照：0.4624→0.4624
+[ChargeRelease] PASS Crossbow真实释放ATK才生成投射物
+[ChargeRelease] PASS Crossbow本次释放发数正确且不重复：3
+[ChargeRelease] PASS Crossbow真实释放投射物命中物理靶
+[ChargeRelease] PASS Crossbow真实命中快照与已报告伤害一致：12
+[ChargeRelease] PASS Crossbow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Crossbow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Crossbow未获变奏时提前松手不释放
+[ChargeRelease] PASS Bow真实输入蓄力完成
+[ChargeRelease] PASS Bow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Bow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Bow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Bow等待释放时再次按住不重置蓄力快照：0.5625→0.5625
+[ChargeRelease] PASS Bow真实释放ATK才生成投射物
+[ChargeRelease] PASS Bow本次释放发数正确且不重复：1
+[ChargeRelease] PASS Bow真实释放投射物命中物理靶
+[ChargeRelease] PASS Bow真实命中快照与已报告伤害一致：24
+[ChargeRelease] PASS Bow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Bow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Bow未获变奏时提前松手不释放
+[ChargeRelease] PASS SpiritSword真实输入蓄力完成
+[ChargeRelease] PASS SpiritSword按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS SpiritSword松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS SpiritSword松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS SpiritSword等待释放时再次按住不重置蓄力快照：1.0688→1.0688
+[ChargeRelease] PASS SpiritSword真实释放ATK才生成投射物
+[ChargeRelease] PASS SpiritSword本次释放发数正确且不重复：1
+[ChargeRelease] PASS SpiritSword真实释放投射物命中物理靶
+[ChargeRelease] PASS SpiritSword真实命中快照与已报告伤害一致：26
+[ChargeRelease] PASS SpiritSword缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS SpiritSword缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS SpiritSword未获变奏时提前松手不释放
+[ChargeRelease] PASS 完美时机夹具完成本次真实蓄力
+[ChargeRelease] PASS 能量掌按松手时刻冻结完美结果
+[ChargeRelease] PASS 完美结果实际发射仍保留：True，弹速400
+[ChargeRelease] PASS 截图j6_energy_release
+[ChargeRelease] PASS 打断夹具完成本次真实蓄力
+[ChargeRelease] PASS 释放ATK前被后撤打断，不补发旧箭
+[ChargeRelease] PASS 通过真实RewardCatalog→RunBuild.Add获得变奏
+[ChargeRelease] PASS 强类型资源的循环上限与逐发间隔实际接入
+[ChargeRelease] PASS 变奏第1次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第1次实际1箭，期望1
+[ChargeRelease] PASS 变奏第2次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第2次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第3次点按仍经真实释放ATK
+[ChargeRelease] PASS 截图j6_variation_burst
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第3次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第4次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第4次实际1箭，期望1
+[ChargeRelease] PASS 变奏第5次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第5次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第6次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第6次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 获得变奏后长按仍为满五档单箭，不吃快射连发
+[ChargeRelease] PASS 超出连续射击窗口后点按回到第一箭
+[ChargeRelease] PASS 二连发第一箭已由真实ATK射出
+[ChargeRelease] PASS 连发中被后撤打断，已出箭保留，待发第二箭取消
+[ChargeRelease] === 蓄力释放验收结束：通过 77，失败 0 ===
+blink_headless 退出码=0
+blink_headless stderr字节=0
+blink_render 退出码=0
+blink_render stderr字节=0
+[BlinkGuard] === 闪架专项验收结束：通过 30，失败 0 ===
+[BlinkGuard] === 闪架专项验收结束：通过 32，失败 0 ===
+fall_headless 退出码=0
+fall_headless stderr字节=0
+fall_render 退出码=0
+fall_render stderr字节=0
+[Fall] === 下落专项验收结束：通过 104，失败 0 ===
+[Fall] === 下落专项验收结束：通过 108，失败 0 ===
+actions_headless 退出码=0
+actions_headless stderr字节=0
+actions_render 退出码=0
+actions_render stderr字节=0
+[Action] === 动作交接验收结束：通过 38，失败 0 ===
+[Action] === 动作交接验收结束：通过 40，失败 0 ===
+original_headless 退出码=0
+original_headless stderr字节=0
+original_render 退出码=0
+original_render stderr字节=0
+[Design] === 原始设计验收结束：通过 115，失败 0 ===
+[Design] === 原始设计验收结束：通过 120，失败 0 ===
+selftest 退出码=0
+selftest stderr字节=0
+[log] 22:44:41 [SelfTest] ✅ P4·技能1 闪：真实动画Action后观察冲刺=True 方向 (0, -0.34, -0.94) 距离 7m / 0.18s CD 5｜碰撞层 1→1→1；实际路径17点，已自然收招=True
+[log] 22:44:42 [SelfTest] ✅ P4·技能2 架：真实GuardOn后架势中=True 窗口0.75s CD 3｜架势内挨 40 点：无效化=True（期望 True） 掉血 0（期望 0） 生命 260 → 260｜退出架势=True（期望 True） 架住计数 0 → 1（期望 +1） 挡下的伤害=40（期望 40）
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+f 退出码=0
+f stderr字节=0
+[Followup] === F专项验收结束：通过 33，失败 0 ===
+c 退出码=0
+c stderr字节=0
+[BatchC] === C批验收结束：通过 53，失败 0 ===
+d 退出码=0
+d stderr字节=0
+[BatchD] === D批验收结束：通过 90，失败 0 ===
+g 退出码=0
+g stderr字节=0
+[Feedback] === G专项验收结束：通过 51，失败 0 ===
+characters 退出码=0
+characters stderr字节=0
+[CharacterReplacement] 完成：通过 61，失败 0
+b 退出码=0
+b stderr字节=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a 退出码=0
+a stderr字节=0
+[BatchA] === A 批验收结束：失败 0 ===
+e 退出码=0
+e stderr字节=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+memory 退出码=0
+memory stderr字节=0
+跨进程读档5/0
+ExportRelease 编译：0 warning / 0 error
+截图 docs/screenshots/j6_energy_release.png SHA256=CFBD91D76DA673CA475BD26EA5AE3FD2900D55A8158D0EDB7B598B0A62769C7F
+截图 docs/screenshots/j6_variation_burst.png SHA256=A341F92E4270250CDFBA854E5D12235DBD632BCBA3D32C9FF471F4B47FF97DF8
+存档 meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+selftest.flag 不存在=True
+
+[扩展专项最终证据]
+Debug 编译：0 warning / 0 error
+design_headless 退出码=0
+design_headless stderr字节=0
+design_render 退出码=0
+design_render stderr字节=0
+[ChargeRelease] PASS EnergyPalm真实输入蓄力完成
+[ChargeRelease] PASS EnergyPalm按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS EnergyPalm松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS EnergyPalm松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS EnergyPalm等待释放时再次按住不重置蓄力快照：0.5603→0.5603
+[ChargeRelease] PASS EnergyPalm真实释放ATK才生成投射物
+[ChargeRelease] PASS EnergyPalm本次释放发数正确且不重复：1
+[ChargeRelease] PASS EnergyPalm真实释放投射物命中物理靶
+[ChargeRelease] PASS EnergyPalm真实命中快照与已报告伤害一致：40
+[ChargeRelease] PASS EnergyPalm缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS EnergyPalm缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS EnergyPalm未获变奏时提前松手不释放
+[ChargeRelease] PASS Crossbow真实输入蓄力完成
+[ChargeRelease] PASS Crossbow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Crossbow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Crossbow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Crossbow等待释放时再次按住不重置蓄力快照：0.4623→0.4623
+[ChargeRelease] PASS Crossbow真实释放ATK才生成投射物
+[ChargeRelease] PASS Crossbow本次释放发数正确且不重复：3
+[ChargeRelease] PASS Crossbow真实释放投射物命中物理靶
+[ChargeRelease] PASS Crossbow真实命中快照与已报告伤害一致：12
+[ChargeRelease] PASS Crossbow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Crossbow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Crossbow未获变奏时提前松手不释放
+[ChargeRelease] PASS Bow真实输入蓄力完成
+[ChargeRelease] PASS Bow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Bow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Bow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Bow等待释放时再次按住不重置蓄力快照：0.5614→0.5614
+[ChargeRelease] PASS Bow真实释放ATK才生成投射物
+[ChargeRelease] PASS Bow本次释放发数正确且不重复：1
+[ChargeRelease] PASS Bow真实释放投射物命中物理靶
+[ChargeRelease] PASS Bow真实命中快照与已报告伤害一致：24
+[ChargeRelease] PASS Bow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Bow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Bow未获变奏时提前松手不释放
+[ChargeRelease] PASS SpiritSword真实输入蓄力完成
+[ChargeRelease] PASS SpiritSword按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS SpiritSword松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS SpiritSword松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS SpiritSword等待释放时再次按住不重置蓄力快照：1.062→1.062
+[ChargeRelease] PASS SpiritSword真实释放ATK才生成投射物
+[ChargeRelease] PASS SpiritSword本次释放发数正确且不重复：1
+[ChargeRelease] PASS SpiritSword真实释放投射物命中物理靶
+[ChargeRelease] PASS SpiritSword真实命中快照与已报告伤害一致：26
+[ChargeRelease] PASS SpiritSword缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS SpiritSword缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS SpiritSword未获变奏时提前松手不释放
+[ChargeRelease] PASS 完美时机夹具完成本次真实蓄力
+[ChargeRelease] PASS 能量掌按松手时刻冻结完美结果
+[ChargeRelease] PASS 完美结果实际发射仍保留：True，弹速400
+[ChargeRelease] PASS 普通能量波夹具实际经过完美窗口
+[ChargeRelease] PASS 经过完美窗口松手冻结为普通释放
+[ChargeRelease] PASS 普通释放实际伤害30／弹速250
+[ChargeRelease] PASS 短弩后置蓄力三档确实完成
+[ChargeRelease] PASS 短弩三档释放快照实际生成9箭，仍保持散射
+[ChargeRelease] PASS 打断夹具完成本次真实蓄力
+[ChargeRelease] PASS 释放ATK前被后撤打断，不补发旧箭
+[ChargeRelease] PASS 通过真实RewardCatalog→RunBuild.Add获得变奏
+[ChargeRelease] PASS 强类型资源的循环上限与逐发间隔实际接入
+[ChargeRelease] PASS 变奏第1次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第1次实际1箭，期望1
+[ChargeRelease] PASS 变奏第2次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第2次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第3次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第3次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第4次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第4次实际1箭，期望1
+[ChargeRelease] PASS 变奏第5次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第5次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第6次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第6次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 获得变奏后长按仍为满五档单箭，不吃快射连发
+[ChargeRelease] PASS 超出连续射击窗口后点按回到第一箭
+[ChargeRelease] PASS 二连发第一箭已由真实ATK射出
+[ChargeRelease] PASS 连发中被后撤打断，已出箭保留，待发第二箭取消
+[ChargeRelease] === 蓄力释放验收结束：通过 80，失败 0 ===
+[ChargeRelease] PASS EnergyPalm真实输入蓄力完成
+[ChargeRelease] PASS EnergyPalm按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS EnergyPalm松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS EnergyPalm松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS EnergyPalm等待释放时再次按住不重置蓄力快照：0.561→0.561
+[ChargeRelease] PASS EnergyPalm真实释放ATK才生成投射物
+[ChargeRelease] PASS EnergyPalm本次释放发数正确且不重复：1
+[ChargeRelease] PASS EnergyPalm真实释放投射物命中物理靶
+[ChargeRelease] PASS EnergyPalm真实命中快照与已报告伤害一致：40
+[ChargeRelease] PASS EnergyPalm缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS EnergyPalm缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS EnergyPalm未获变奏时提前松手不释放
+[ChargeRelease] PASS Crossbow真实输入蓄力完成
+[ChargeRelease] PASS Crossbow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Crossbow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Crossbow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Crossbow等待释放时再次按住不重置蓄力快照：0.4625→0.4625
+[ChargeRelease] PASS Crossbow真实释放ATK才生成投射物
+[ChargeRelease] PASS Crossbow本次释放发数正确且不重复：3
+[ChargeRelease] PASS Crossbow真实释放投射物命中物理靶
+[ChargeRelease] PASS Crossbow真实命中快照与已报告伤害一致：12
+[ChargeRelease] PASS Crossbow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Crossbow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Crossbow未获变奏时提前松手不释放
+[ChargeRelease] PASS Bow真实输入蓄力完成
+[ChargeRelease] PASS Bow按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS Bow松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS Bow松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS Bow等待释放时再次按住不重置蓄力快照：0.5625→0.5625
+[ChargeRelease] PASS Bow真实释放ATK才生成投射物
+[ChargeRelease] PASS Bow本次释放发数正确且不重复：1
+[ChargeRelease] PASS Bow真实释放投射物命中物理靶
+[ChargeRelease] PASS Bow真实命中快照与已报告伤害一致：24
+[ChargeRelease] PASS Bow缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS Bow缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS Bow未获变奏时提前松手不释放
+[ChargeRelease] PASS SpiritSword真实输入蓄力完成
+[ChargeRelease] PASS SpiritSword按住越过起手ATK仍不提前出弹
+[ChargeRelease] PASS SpiritSword松手后仍等待释放ATK，不立即出弹
+[ChargeRelease] PASS SpiritSword松手启动独立的一轮真实释放动画
+[ChargeRelease] PASS SpiritSword等待释放时再次按住不重置蓄力快照：1.0593→1.0593
+[ChargeRelease] PASS SpiritSword真实释放ATK才生成投射物
+[ChargeRelease] PASS SpiritSword本次释放发数正确且不重复：1
+[ChargeRelease] PASS SpiritSword真实释放投射物命中物理靶
+[ChargeRelease] PASS SpiritSword真实命中快照与已报告伤害一致：26
+[ChargeRelease] PASS SpiritSword缺事件夹具确实完成本次蓄力
+[ChargeRelease] PASS SpiritSword缺释放ATK只取消，不补发或卡住
+[ChargeRelease] PASS SpiritSword未获变奏时提前松手不释放
+[ChargeRelease] PASS 完美时机夹具完成本次真实蓄力
+[ChargeRelease] PASS 能量掌按松手时刻冻结完美结果
+[ChargeRelease] PASS 完美结果实际发射仍保留：True，弹速400
+[ChargeRelease] PASS 截图j6_energy_release
+[ChargeRelease] PASS 普通能量波夹具实际经过完美窗口
+[ChargeRelease] PASS 经过完美窗口松手冻结为普通释放
+[ChargeRelease] PASS 普通释放实际伤害30／弹速250
+[ChargeRelease] PASS 短弩后置蓄力三档确实完成
+[ChargeRelease] PASS 短弩三档释放快照实际生成9箭，仍保持散射
+[ChargeRelease] PASS 打断夹具完成本次真实蓄力
+[ChargeRelease] PASS 释放ATK前被后撤打断，不补发旧箭
+[ChargeRelease] PASS 通过真实RewardCatalog→RunBuild.Add获得变奏
+[ChargeRelease] PASS 强类型资源的循环上限与逐发间隔实际接入
+[ChargeRelease] PASS 变奏第1次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第1次实际1箭，期望1
+[ChargeRelease] PASS 变奏第2次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第2次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第3次点按仍经真实释放ATK
+[ChargeRelease] PASS 截图j6_variation_burst
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第3次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第4次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第4次实际1箭，期望1
+[ChargeRelease] PASS 变奏第5次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第5次实际2箭，期望2
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 变奏第6次点按仍经真实释放ATK
+[ChargeRelease] PASS 变奏点按两轮1→2→3循环，第6次实际3箭，期望3
+[ChargeRelease] PASS 变奏逐箭物理间隔0.0833秒，表值0.08
+[ChargeRelease] PASS 获得变奏后长按仍为满五档单箭，不吃快射连发
+[ChargeRelease] PASS 超出连续射击窗口后点按回到第一箭
+[ChargeRelease] PASS 二连发第一箭已由真实ATK射出
+[ChargeRelease] PASS 连发中被后撤打断，已出箭保留，待发第二箭取消
+[ChargeRelease] === 蓄力释放验收结束：通过 82，失败 0 ===
+截图 docs/screenshots/j6_energy_release.png SHA256=F1DF1B55E7BC46B4C66FED488E974E5E5A9756F2FD42A37ED4FA0BAE6DA0ECD0
+截图 docs/screenshots/j6_variation_burst.png SHA256=19F48896BCE27ABC5803A46D362A2C6D338E3891D134EC132C5AC7C3DF92513A
+存档 meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+selftest.flag 不存在=True
+
+[Main历史同步蓄力探针边界：仍需迁移，不代表所有旧断言全绿]
+[log] 22:44:34 [SelfTest] 🔴 机制·完美时机：TryActivate=True 蓄力=0.55s（=基础 0.5 + 0.05）窗口内=True（期望 True） → 松手：完美=False（期望 True） 伤害=0（期望 表值 40 ×玩家伤害倍率 1 = 40） 弹速=0（期望 表值 400） 投射物 +0
+[log] 22:44:34 [SelfTest] 🔴 机制·过完美窗口松手：TryActivate=False 蓄力=0.55s（> 基础+窗口 0.7）窗口内=True（期望 False） → 松手：完美=False（期望 False） 伤害=0（期望 表值 30 ×1 = 30） 弹速=0（期望 表值 250） 投射物 +0
+[log] 22:44:34 [SelfTest] 🔴 机制·后置蓄力（两段结构）：TryActivate=False 基础 0.5s + 每 0.1s ×1.3，上限 1s → 蓄 0.85s：档=0（期望 3）威力×1（期望 1+0.3×3=1.9）｜一直按住：档=0（期望封顶 5=floor((1.0-0.5)/0.1)）威力×1 → 松手：伤害=0（期望 30×1×1=30） 弹速=0 投射物 +0
+[log] 22:44:36 [SelfTest] 🔴 P3·短弩武技2 大射天下：基础蓄力 0.4s（期望 0.4）/ 每档 0.2s（期望 0.2）/ 上限 3 档（期望 3） 每档 +2 支（期望 2） → 蓄到基础（档 0）松手：发数 0（期望 3，= 基础 3）；蓄到 3 档（档 0，威力 ×1）松手：发数 0（期望 9 = 3 + 2×3）｜动画=ATK_A2_ChargedVolley 方向来源 Aim=Facing（0 = Facing：文档这一行写的是「朝角色方向」）
+[log] 22:44:36 [SelfTest] 🔴 P3·弓武技1 箭在弦上：基础蓄力 0.5s（期望 0.5）/ 每 0.1s（期望 0.1）一档 / 每档伤害 ×1.3（期望 1.3）/ 每档弹速 +30（期望 30）/ 最多 1s（期望 1） → 基础档：伤害 0（期望 表值 24 ×玩家倍率 1）弹速 0（期望 220）；3 档：伤害 0（期望 24 = 1+0.3×3）弹速 0（期望 220）
+[log] 22:44:40 [SelfTest] 🔴 P4·灵剑武技2 拔刀式：TryPress=True（期望 True） 基础蓄力 1s（期望 1）/ CD 2（期望 2）｜没蓄满就松手：基础完成=False（期望 False）→ 剑气生成 0 个（期望 0，设计文档「未完成不释放」）｜蓄满松手：生成 0 个（期望 ≥1）｜剑气属性 —— 穿透 8（期望 ≥1，能穿透路径上的敌人） 可被格挡=True（期望 True） 存活 0.45s（期望 ≤0.6 = 飞行路径短）｜大小等比攻击盒：剑气尺寸 1.4（来源：武技1 skl_b1_w1_1 当前第 1 段的命中盒 (2.2, 1.6, 2.8)）

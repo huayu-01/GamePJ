@@ -45,6 +45,7 @@ public partial class SwordQiAbility : ArrowVolleyAbility
 		base.OnActivate(target);
 	}
 
+	protected override void PrepareShot() => ResolveSize();
 	private void ResolveSize()
 	{
 		Vector3 source = Vector3.Zero;

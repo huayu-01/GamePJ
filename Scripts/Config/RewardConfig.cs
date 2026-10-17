@@ -31,6 +31,8 @@ public partial class RewardConfig : ConfigRow
 	[Export] public string ApplyHandler { get; set; } = "StatSet";
 	/// <summary>只接受该技能造成的事件；资源引用在编译时转为运行期技能Id。</summary>
 	[Export] public AbilityConfig? RequiredEventAbility { get; set; }
+	/// <summary>点按连射进化；参数及目标技能均为强类型资源。</summary>
+	[Export] public VolleyRampTuning? VolleyRamp { get; set; }
 
 	/// <summary>
 	/// 处理器参数：<c>StatSet</c> 用 <c>Modifiers</c>；其余处理器用这里的键值对

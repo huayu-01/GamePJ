@@ -1,5 +1,7 @@
 # 数值配置（调参唯一入口）
 
+> **2026-10-17 J6已验80/0、82/0**：`AbilityConfig.ChargeReleaseAnimSpeedScale`为松手释放段独立速度，默认1、弓2。变奏改用强类型`RewardConfig.VolleyRamp`子资源，目标技能资源引用、循环上限3、连续窗口1.2秒、逐箭间隔0.08秒；删除该行旧的字符串属性反射参数。技能39、增幅62及ConfigIndex未增删。[J6接线与证据](character-design-j6.md)。
+
 > **2026-10-17 J5**：`RewardConfig.RequiredEventAbility`为事件来源限制的技能资源引用；闪身步只接受所引用闪技能的实际Kill。`AbilityConfig.AnimationEventTimeout`默认2秒，只负责缺事件取消。架的0.75秒窗口从真实GuardOn开始，旧`GuardStartSeconds`已移除；源动画配置与三份生成资源的GuardOn/GuardOff已分开，避免同刻覆盖。技能／增幅数量及ConfigIndex不变。[J5接线](character-design-j5.md)。
 
 > **2026-10-17 J4下落与空中跳**：两条角色行新增`AirJumpHeightRatio=0.5`，表示额外空中跳的高度为地面跳的一半，按平方根换算速度。`Skills/skl_b_fall.tres → FallAttack`子资源中配置实际`DiveSpeed=34`、参考`StandardDiveSpeed=34`和`MaxDamageMultiplier=2`；倍率为起手脚下离地高度／基础单跳高度×垂直速度／参考速度。长枪行`FallAttackAim`只覆盖准星方向与35°范围，资源引用共通技能；不新增隐藏技能行或ConfigIndex项。旧阶梯`HeightStep/DamageBonusPerStep/MaxDamageBonus`已删除。[配置、实测和边界](character-design-j4.md)。

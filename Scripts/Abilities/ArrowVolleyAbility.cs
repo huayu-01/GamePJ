@@ -24,8 +24,7 @@ namespace ActRoguelike.Abilities;
 ///
 /// <para><b>动画驱动</b>（用户裁定"没有对应动画 → 技能不执行"）：
 /// 非蓄力技（短弩武技1）在事件帧（<c>ATK</c>）里一次把整排箭发完；
-/// 蓄力技（短弩武技2 / 弓武技1）在**松手**时按档位发（事件帧只是"闭合"的动画标记，
-/// 与 <see cref="EnergyWaveAbility"/> 同一条纪律，见 docs/abilities.md §1.3）。</para>
+	/// 蓄力技松手冻结档位，重播释放段，只有该轮真实ATK才发射；变奏从ATK开始逐箭连发。</para>
 /// </summary>
 public partial class ArrowVolleyAbility : Ability
 {
@@ -149,12 +148,29 @@ public partial class ArrowVolleyAbility : Ability
 
 	/// <summary>两次射击间隔超过它，连射序号归零（秒；≤0 = 不归零）。</summary>
 	[Export] public float RampWindowSeconds { get; set; }
+	/// <summary>变奏逐箭发射的间隔；第一箭必须由真实ATK启动，后续可被动作交接取消。</summary>
+	[Export] public float RampShotIntervalSeconds { get; set; } = 0.08f;
+	public void ConfigureRamp(int maxCount, float window, float interval)
+	{
+		RampMaxCount = Mathf.Max(1, maxCount);
+		RampWindowSeconds = Mathf.Max(0.01f, window);
+		RampShotIntervalSeconds = Mathf.Max(0.01f, interval);
+		_rampCount = 0; _rampTimer = 0;
+	}
+	protected override bool CanReleaseBeforeBase => RampMaxCount > 0;
 
 	private int _rampCount;
 	private float _rampTimer;
 
 	private bool _fired;
 	private bool _perfect;
+	private bool _releasePending, _quickRelease;
+	private float _releasedPower = 1;
+	private int _releasedSteps;
+	private AttackInstance? _burstAttack;
+	private int _burstRemaining;
+	private float _burstTimer, _burstSpeed, _burstSize, _burstInterval;
+	private ulong _burstFrame;
 
 	/// <summary>不需要目标（朝准星/朝角色朝向都能放）。</summary>
 	protected override bool CanActivate(Unit? target) => true;
@@ -163,6 +179,9 @@ public partial class ArrowVolleyAbility : Ability
 	{
 		_fired = false;
 		_perfect = false;
+		_releasePending = false; _quickRelease = false;
+		_releasedPower = 1; _releasedSteps = 0;
+		_burstRemaining = 0; _burstAttack = null;
 
 		if (!ResolveProjectileScene())
 		{
@@ -172,7 +191,7 @@ public partial class ArrowVolleyAbility : Ability
 			return;
 		}
 
-		PlaySkillAnimation();
+		if (PlaySkillAnimation().Length == 0) { Cancel(); return; }
 		if (ActRoguelike.Debug.SelfTest.DebugSkipSkillAnimation)
 		{
 			GameLog.Write("Combat", $"⚠ 技能 {AbilityId} 按排障开关跳过了动画事件帧，直接发射。");
@@ -197,7 +216,7 @@ public partial class ArrowVolleyAbility : Ability
 		return ProjectileScene != null;
 	}
 
-	/// <summary>蓄满之后松手 → 按档位发（发数 = 基础 + 档数 × 每档；伤害 × 档位倍率；弹速 + 档数 × 每档）。</summary>
+	/// <summary>松手冻结档位；变奏允许基础蓄力前快射，二者均等待释放段真实ATK。</summary>
 	protected override void OnChargeReleased(bool perfect, int steps, float powerScale)
 	{
 		if (!IsBusy || _fired)
@@ -206,7 +225,10 @@ public partial class ArrowVolleyAbility : Ability
 		}
 
 		_perfect = perfect;
-		FireVolley();
+		_releasedPower = powerScale; _releasedSteps = steps;
+		_quickRelease = !ChargeBaseComplete;
+		_releasePending = true;
+		if (!PlayChargeReleaseAnimation()) Cancel();
 	}
 
 	/// <summary>基础蓄力没完成就松手 → 不释放（设计文档第 14 行）。</summary>
@@ -218,14 +240,15 @@ public partial class ArrowVolleyAbility : Ability
 		Cancel();
 	}
 
-	/// <summary>非蓄力技：动画播到事件帧（<c>ATK</c>）时整排箭一起发。蓄力技不在事件帧发射（等松手）。</summary>
+	/// <summary>仅释放阶段的真实ATK发射；蓄力期间越过ATK不能提前出弹。</summary>
 	protected override void OnAnimEvent(string name)
 	{
-		if (HoldToCharge)
+		if (name != AnimEvent || (HoldToCharge && !_releasePending))
 		{
 			return;
 		}
 
+		_releasePending = false;
 		FireVolley();
 	}
 
@@ -250,16 +273,33 @@ public partial class ArrowVolleyAbility : Ability
 
 		if (_fired)
 		{
+			if (_burstRemaining > 0 && _burstAttack != null)
+			{
+				if (Engine.GetPhysicsFrames() == _burstFrame) return;
+				_burstTimer -= delta;
+				if (_burstTimer > 0.000001f) return;
+				FireProjectile(_burstAttack, ResolveShotDirection(), _burstSpeed, _burstSize, 0);
+				_burstRemaining--;
+				_burstTimer += _burstInterval;
+				if (_burstRemaining > 0) return;
+			}
 			Finish();
 			return;
 		}
 
-		if (!HoldToCharge && StateTime > Windup + Recover + 1.5f)
+		float eventSpeed = HoldToCharge ? ChargeReleaseAnimSpeedScale : AnimSpeedScale;
+		if ((!HoldToCharge || _releasePending) && StateTime > AnimationEventTimeout / Mathf.Max(0.01f, eventSpeed))
 		{
 			GameLog.Write("Combat", $"⚠ 技能 {AbilityId} 等不到动画事件帧「{AnimEvent}」，本次施法放弃（检查 SkillAnimations 表的事件帧名）。");
 			Cancel();
 		}
 	}
+	protected override void OnFinishOrCancel()
+	{
+		_releasePending = false; _burstRemaining = 0; _burstAttack = null;
+	}
+	protected override void OnLoadoutReset() { _rampCount = 0; _rampTimer = 0; }
+	protected virtual void PrepareShot() { }
 
 	/// <summary>
 	/// 释放方向。
@@ -297,23 +337,27 @@ public partial class ArrowVolleyAbility : Ability
 		}
 
 		_fired = true;
+		PrepareShot();
 
 		Vector3 direction = ResolveShotDirection();
 		StatSheet stats = OwnerUnit.Stats;
 		float damageMultiplier = stats.Get("DamageMultiplier");
-		float power = ChargePowerScale;
+		float power = HoldToCharge ? _releasedPower : 1;
+		int steps = HoldToCharge ? _releasedSteps : 0;
 
 		// 发数 = 基础 + 档数 × 每档（文档：大射天下 3 + 2×档，最多 9）。
-		int count = Mathf.Max(1, Count + (ChargeSteps * CountPerChargeStep));
+		int count = Mathf.Max(1, Count + (steps * CountPerChargeStep));
 
 		// **连续射击增强**（P5b `<A3限定>`「变奏」）：第 N 发连射时发数至少 N（文档：第二箭二连发、第三箭三连发）。
 		// RampMaxCount ≤ 0 → 一行都不进（既有四把武器逐位不变）。
-		if (RampMaxCount > 0)
+		bool burst = RampMaxCount > 0 && (!HoldToCharge || _quickRelease);
+		if (burst)
 		{
-			_rampCount = Mathf.Min(_rampCount + 1, RampMaxCount);
+			_rampCount = (_rampCount % RampMaxCount) + 1;
 			_rampTimer = Mathf.Max(0.01f, RampWindowSeconds);
 			count = Mathf.Max(count, _rampCount);
 		}
+		else if (RampMaxCount > 0) { _rampCount = 0; _rampTimer = 0; }
 
 		// **发数覆盖**（P5 `<A2限定>`「专一」：只会射出一箭，但原先每多出一箭就 +80% 伤害）。
 		// 覆盖值 ≤ 0 → 一行都不进（既有四把武器逐位不变）；被"砍掉"的那几发按**每一发**乘一个倍率
@@ -330,7 +374,7 @@ public partial class ArrowVolleyAbility : Ability
 		// 伤害：绝对值 × 档位倍率（A2 的 ChargeStepScale = 1 → 不变；A3 = 1.3^档）。
 		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power;
 		// 弹速：绝对值 + 档数 × 每档（文档写的是**加** 30 射速，不是乘 1.3）。
-		float shotSpeed = (_perfect && PerfectSpeed > 0f ? PerfectSpeed : Speed) + (ChargeSteps * SpeedPerChargeStep);
+		float shotSpeed = (_perfect && PerfectSpeed > 0f ? PerfectSpeed : Speed) + (steps * SpeedPerChargeStep);
 		// 击退：只有"弹速较高"时才给（文档：射速较高的时候造成击退）。
 		float knockback = KnockbackMinSpeed > 0f && shotSpeed < KnockbackMinSpeed
 			? 0f
@@ -354,35 +398,18 @@ public partial class ArrowVolleyAbility : Ability
 			AbilityKind = AbilityId,
 		};
 
-		Vector3 origin = OwnerUnit.GlobalPosition + (Vector3.Up * 0.9f) + (direction * 0.6f);
-		Node parent = GetTree().CurrentScene ?? GetTree().Root;
-
 		// 散射：发数在准星轴上对称展开（3 发 / 20° → -20° / 0° / +20°）。
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < (burst ? 1 : count); i++)
 		{
-			float offset = (i - ((count - 1) * 0.5f)) * SpreadStepDegrees;
-			Vector3 dir = Mathf.Abs(offset) < 0.0001f
-				? direction
-				: direction.Rotated(Vector3.Up, Mathf.DegToRad(offset));
-
-			var arrow = ProjectileScene.Instantiate<Projectile>();
-			parent.AddChild(arrow);
-			arrow.GlobalPosition = origin;
-			// 剑气（P4）：投射物整体缩放；默认 ≤0 → 一行都不进（既有四把武器逐位不变）。
-			if (ProjectileSizeScale > 0f)
-			{
-				arrow.Scale = Vector3.One * ProjectileSizeScale;
-			}
-
-			arrow.Speed = shotSpeed;
-			arrow.GravityScale = GravityScale;
-			arrow.GravityStartDistance = GravityStartDistance;
-			arrow.HomingStatusId = HomingStatusId;
-			arrow.HomingTurnRateDegrees = HomingTurnRateDegrees;
-			arrow.HomingRange = HomingRange;
-			arrow.Pierce = attack.Pierce;
-			arrow.MaxLifetime = MaxLifetime;
-			arrow.Launch(attack, dir);
+			float offset = burst ? 0 : (i - ((count - 1) * 0.5f)) * SpreadStepDegrees;
+			FireProjectile(attack, direction, shotSpeed, ProjectileSizeScale, offset);
+		}
+		if (burst && count > 1)
+		{
+			_burstAttack = attack; _burstRemaining = count - 1;
+			_burstSpeed = shotSpeed; _burstSize = ProjectileSizeScale;
+			_burstInterval = Mathf.Max(0.01f, RampShotIntervalSeconds); _burstTimer = _burstInterval;
+			_burstFrame = Engine.GetPhysicsFrames();
 		}
 
 		LastShotDamage = attack.BaseDamage;
@@ -397,5 +424,19 @@ public partial class ArrowVolleyAbility : Ability
 			+ $" 单发伤害 {attack.BaseDamage:0.##} 弹速 {shotSpeed:0.##} 夹角 {SpreadStepDegrees:0.##}°"
 			+ $"（{(_perfect ? "完美时机" : (HoldToCharge ? "蓄力松手" : "事件帧"))}，蓄力 {ChargeTime:0.##}s 档 {ChargeSteps} 威力 ×{power:0.###}，"
 			+ $"下坠起点 {GravityStartDistance:0.##}m 重力 {GravityScale:0.##} 击退 {knockback:0.##} 追踪 [{HomingStatusId}]，方向 {direction}）");
+	}
+	private void FireProjectile(AttackInstance attack, Vector3 direction, float speed, float size, float offset)
+	{
+		if (OwnerUnit == null || ProjectileScene == null) return;
+		Vector3 origin = OwnerUnit.GlobalPosition + Vector3.Up * 0.9f + direction * 0.6f;
+		Vector3 dir = Mathf.Abs(offset) < 0.0001f ? direction : direction.Rotated(Vector3.Up, Mathf.DegToRad(offset));
+		var arrow = ProjectileScene.Instantiate<Projectile>();
+		(GetTree().CurrentScene ?? GetTree().Root).AddChild(arrow);
+		arrow.GlobalPosition = origin;
+		if (size > 0) arrow.Scale = Vector3.One * size;
+		arrow.Speed = speed; arrow.GravityScale = GravityScale; arrow.GravityStartDistance = GravityStartDistance;
+		arrow.HomingStatusId = HomingStatusId; arrow.HomingTurnRateDegrees = HomingTurnRateDegrees; arrow.HomingRange = HomingRange;
+		arrow.Pierce = attack.Pierce; arrow.MaxLifetime = MaxLifetime;
+		arrow.Launch(attack, dir);
 	}
 }

@@ -25,6 +25,16 @@ public static class RewardEffectRegistry
 	{
 		// 通用的"改 StatSheet"—— 19 条里有 14 条走它，只靠 Modifiers 里的数据表达，不需要新代码。
 		["StatSet"] = row => context => ApplyModifiers(row, context),
+		["VolleyRamp"] = row => context =>
+		{
+			if (row.VolleyRamp is not { TargetAbility: { } target } tuning
+				|| Ability.FindByAbilityId(context.Player, target.Id) is not ArrowVolleyAbility volley)
+			{
+				GD.PushWarning($"[Reward] {row.Id}缺少有效的连射参数或目标技能。");
+				return;
+			}
+			volley.ConfigureRamp(tuning.MaxCount, tuning.WindowSeconds, tuning.ShotIntervalSeconds);
+		},
 
 		// 异化：击杀触发连锁闪电（数值全部来自表的 HandlerParams）。
 		["ChainLightning"] = row => context =>

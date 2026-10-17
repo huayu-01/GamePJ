@@ -101,6 +101,8 @@ public partial class AbilityConfig : ConfigRow
 
 	/// <summary>动画速度倍率（&gt;1 加速释放，蓄力类 &lt;1 拉长）。写在每个单位自己的播放器上。</summary>
 	[Export] public float AnimSpeedScale { get; set; } = 1f;
+	/// <summary>松手释放段的独立速度；不能沿用蓄力期的慢放倍率。</summary>
+	[Export] public float ChargeReleaseAnimSpeedScale { get; set; } = 1f;
 
 	[ExportGroup("冷却缩减 / 技能层数（**0 = 不覆盖**）")]
 	/// <summary>
@@ -217,6 +219,7 @@ public partial class AbilityConfig : ConfigRow
 		ability.AnimEvent = AnimEvent;
 		ability.AnimEventEnd = AnimEventEnd;
 		ability.AnimSpeedScale = AnimSpeedScale <= 0f ? 1f : AnimSpeedScale;
+		ability.ChargeReleaseAnimSpeedScale = Mathf.Max(0.01f, ChargeReleaseAnimSpeedScale);
 
 		// 连招参数行（P8）：**强类型赋值**。只有 `MeleeComboAbility` 有 `Series` 这一个字段，
 		// 所以这里用类型判断挑出来 —— 其它能力子类没有它，跳过它不是"错配"（不写警告）。

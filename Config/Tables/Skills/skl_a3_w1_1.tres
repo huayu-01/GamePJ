@@ -98,6 +98,7 @@ HoldToCharge = true
 AnimName = "ATK_A3_Draw"
 AnimEvent = "ATK"
 AnimSpeedScale = 0.7
+ChargeReleaseAnimSpeedScale = 2.0
 ChargeBaseSeconds = 0.5
 ChargeStepSeconds = 0.1
 ChargeStepScale = 1.3

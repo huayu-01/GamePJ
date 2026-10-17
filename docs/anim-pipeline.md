@@ -49,7 +49,8 @@
 | `InputAction` | **按键动作名**（`weapon_skill_1` / `weapon_skill_2` / `skill_1` / `skill_2`）——**本轮推翻了"刻意没有 InputAction 列"的旧决定** |
 | `HoldToCharge` | 按住式输入（蓄力类技能）：按住每帧回调、松开回调一次 |
 | `AnimName` | 这个技能要播的技能动画（**填了就必须存在，否则技能不执行**） |
-| `AnimEvent` | 等哪个事件帧才释放效果（`ATK` / `Dodge` / `Release` …）；⚠️ **蓄力技能里它只是"闭合"的动画标记，触发点是松手** |
+| `AnimEvent` | 等哪个真实事件帧才释放效果（`ATK` / `Dodge` / `Release` …）；蓄力期间不出弹，松手重播释放段后才消费该轮ATK |
+| `ChargeReleaseAnimSpeedScale` | 松手释放段的独立速度，默认1；弓表内2，不能沿用蓄力慢放速度 |
 | `AnimSpeedScale` | 动画速度倍率（>1 加速释放；蓄力类 <1 拉长。写在**每单位自己的播放器**上） |
 
 > **P2 之后这一组还多了 9 列**（冷却缩减 / 层数 / 蓄力 / 完美时机：`CooldownMultiplier`、`MaxCharges`、

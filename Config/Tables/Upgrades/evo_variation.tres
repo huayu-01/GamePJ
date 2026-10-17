@@ -1,36 +1,26 @@
-[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_bow.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" path="res://Scripts/Config/VolleyRampTuning.cs" id="3_ramp"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a3_w1_1.tres" id="4_ability"]
 
-[sub_resource type="Resource" id="Resource_p0"]
-script = ExtResource("1_param")
-Key = "AbilityId"
-Value = "skl_a3_w1_1"
-Note = "改哪一条技能行（弓武技1 箭在弦上）"
-
-[sub_resource type="Resource" id="Resource_p1"]
-script = ExtResource("1_param")
-Key = "RampMaxCount"
-Value = 3
-Note = "连射到第几发封顶（3 = 第三箭三连发）"
-
-[sub_resource type="Resource" id="Resource_p2"]
-script = ExtResource("1_param")
-Key = "RampWindowSeconds"
-Value = 1.2
-Note = "两次射击间隔超过它就重新从第 1 发数"
+[sub_resource type="Resource" id="Resource_ramp"]
+script = ExtResource("3_ramp")
+TargetAbility = ExtResource("4_ability")
+MaxCount = 3
+WindowSeconds = 1.2
+ShotIntervalSeconds = 0.08
 
 [resource]
 script = ExtResource("2_row")
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "AbilityOverride"
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+ApplyHandler = "VolleyRamp"
+VolleyRamp = SubResource("Resource_ramp")
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Id = "evo_variation"
 DisplayName = "变奏"
-DescriptionTemplate = "武技1 连续射击时第二箭二连发、第三箭三连发"
-Note = "[P5b 新增行] 文档第 92 行（进化池 <A3限定>）「变奏:武技1的非蓄力射击在连续射击时会变得更强,第二箭变为二连发,第三箭变为三连发」。落地：ArrowVolleyAbility 上 P5b 新加的两列 RampMaxCount / RampWindowSeconds（默认 0 = 一行都不进，既有四把武器逐位不变）；发数 = max(表里的发数, 连射序号)。⚠️ 窗口时长文档没写 → 预设 1.2s。"
+DescriptionTemplate = "武技1点按快射按1→2→3箭循环，逐箭间隔0.08秒；长按仍可蓄力。连续射击窗口1.2秒。"
+Note = "J6按用户确认：点按不用先蓄满0.5秒，1→2→3循环；二／三连发按表内短间隔逐箭射出。首箭必须到释放动画真实ATK，未发出的后续箭可被打断取消。强类型VolleyRamp资源引用目标技能；窗口1.2s、间隔0.08s是可配预设。"
