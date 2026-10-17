@@ -46,6 +46,6 @@ public partial class LoadingScreen : CanvasLayer
 		_target = string.Empty;
 		GetTree().Paused = false;
 		GameLog.Write("Flow", $"加载页面：切换到 {target}");
-		GetTree().ChangeSceneToFile(target);
+		RuntimeResources.ChangeScene(GetTree(), target);
 	}
 }

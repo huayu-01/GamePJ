@@ -361,5 +361,5 @@ public static class RewardEffectRegistry
 	}
 
 	private static PackedScene? LoadScene(string path)
-		=> string.IsNullOrEmpty(path) ? null : GD.Load<PackedScene>(path);
+		=> string.IsNullOrEmpty(path) ? null : RuntimeResources.Load<PackedScene>(path);
 }

@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System.Collections.Generic;
 using System.Globalization;
 using ActRoguelike.Config;
@@ -62,7 +63,7 @@ public static class SeriesArrayProbe
 
 		// ② 现有铁证：技能行里的 `Params` 就是 ParamEntry[]（托管对象数组），P1 起一直在用。
 		const string skillRowPath = "res://Config/Tables/Skills/skl_b1_w1_1.tres";
-		AbilityConfig? skillRow = ResourceLoader.Exists(skillRowPath) ? GD.Load<AbilityConfig>(skillRowPath) : null;
+		AbilityConfig? skillRow = ResourceLoader.Exists(skillRowPath) ? RuntimeResources.Load<AbilityConfig>(skillRowPath) : null;
 		if (skillRow == null)
 		{
 			lines.Add($"P8探针② 🔴 {skillRowPath} 读不到（下面的判断失去参照）。");
@@ -115,7 +116,7 @@ public static class SeriesArrayProbe
 			}
 		}
 
-		AbilitySeries? back = GD.Load<AbilitySeries>(ProbePath);
+		AbilitySeries? back = RuntimeResources.Load<AbilitySeries>(ProbePath);
 		if (back == null)
 		{
 			lines.Add("P8探针③ 🔴 写下去的 .tres 读不回来。");

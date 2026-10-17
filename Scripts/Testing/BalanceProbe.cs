@@ -58,7 +58,7 @@ public partial class BalanceProbe : Node3D
 	private async Task Run()
 	{
 		await Wait(0.25);
-		_player = GD.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>();
+		_player = RuntimeResources.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>();
 		AddChild(_player);
 		_player.GetNode<Node3D>("CameraRig").SetPhysicsProcess(false);
 		_camera = new Camera3D { Current = true, Fov = 50 };

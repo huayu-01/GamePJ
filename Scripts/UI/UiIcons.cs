@@ -122,7 +122,7 @@ public static class UiIcons
 		}
 
 		string path = Dir + name + ".svg";
-		Texture2D? texture = ResourceLoader.Exists(path) ? GD.Load<Texture2D>(path) : null;
+		Texture2D? texture = ResourceLoader.Exists(path) ? RuntimeResources.Load<Texture2D>(path) : null;
 		_cache[name] = texture;
 
 		if (texture == null)

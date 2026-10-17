@@ -76,7 +76,7 @@ public partial class BatchBProbe : Node
 	private async Task Run()
 	{
 		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-		_main = GD.Load<PackedScene>("res://Scenes/Main.tscn").Instantiate();
+		_main = RuntimeResources.Load<PackedScene>("res://Scenes/Main.tscn").Instantiate();
 		GetTree().Root.AddChild(_main);
 		GetTree().CurrentScene = _main;
 		await Wait(1.3);
@@ -170,7 +170,7 @@ public partial class BatchBProbe : Node
 		await KeyPress(Key.G);
 		await Wait(0.1);
 		Check(!UiRouter.Instance.AnyOpen && !_main.HasNode("GmConsole"), "拔除节点后G键毫无反应");
-		_gm = GD.Load<PackedScene>("res://Scenes/Debug/GmConsole.tscn").Instantiate<GmConsole>();
+		_gm = RuntimeResources.Load<PackedScene>("res://Scenes/Debug/GmConsole.tscn").Instantiate<GmConsole>();
 		_main.AddChild(_gm);
 		await KeyPress(Key.G);
 		await Wait(0.35);
@@ -236,7 +236,7 @@ public partial class BatchBProbe : Node
 		Check(settings.IsOpen && GetTree().Paused && UiRouter.Instance.StackDepth == 1, "拔除GM保留原设置页及其暂停状态");
 		settings.Close();
 		await Wait(0.2);
-		var disabled = GD.Load<PackedScene>("res://Scenes/Debug/GmConsole.tscn").Instantiate<GmConsole>();
+		var disabled = RuntimeResources.Load<PackedScene>("res://Scenes/Debug/GmConsole.tscn").Instantiate<GmConsole>();
 		disabled.Enabled = false;
 		_main.AddChild(disabled);
 		await Wait(0.1);

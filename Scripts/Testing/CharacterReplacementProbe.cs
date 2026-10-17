@@ -79,7 +79,7 @@ public partial class CharacterReplacementProbe : Node
 		RunSetup.Character = PlayerCharacterKind.Hunter;
 		RunSetup.Weapon = WeaponPresetKind.EnergyPalm;
 		RunSetup.HasSelection = true;
-		_base = GD.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate();
+		_base = RuntimeResources.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate();
 		GetTree().Root.AddChild(_base);
 		GetTree().CurrentScene = _base;
 		await Wait(0.8);
@@ -129,7 +129,7 @@ public partial class CharacterReplacementProbe : Node
 			int valid = 0;
 			foreach (string file in SkillAnimationLibrary.ListAnimationFiles(pair.Item1 == PlayerCharacterKind.Hunter ? "res://Assets/Characters/Lyra/skills" : "res://Assets/Characters/Samurai/skills"))
 			{
-				Animation animation = GD.Load<Animation>(file);
+				Animation animation = RuntimeResources.Load<Animation>(file);
 				bool bound = player.HasAnimation("skills/" + animation.ResourceName);
 				for (int track = 0; track < animation.GetTrackCount(); track++)
 				{
@@ -185,7 +185,7 @@ public partial class CharacterReplacementProbe : Node
 		// 基地展台与关卡使用同一配置；不写入正式装备记忆。
 		foreach (string id in new[] { "chr_hunter", "chr_weapon_master" })
 			Check(_base.GetNode<CharacterDisplay>($"CharacterRoster/{id}/Visual").CurrentModelPath.Contains("/Characters/"), $"{id}基地展台同步替换");
-		var level = GD.Load<PackedScene>("res://Scenes/Main.tscn").Instantiate();
+		var level = RuntimeResources.Load<PackedScene>("res://Scenes/Main.tscn").Instantiate();
 		_base.QueueFree();
 		await Wait(0.1);
 		GetTree().Root.AddChild(level);

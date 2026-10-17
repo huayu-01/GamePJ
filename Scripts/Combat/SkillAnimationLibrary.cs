@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System.Collections.Generic;
 using ActRoguelike.Config;
 using Godot;
@@ -85,7 +86,7 @@ public static class SkillAnimationLibrary
 		var lib = new AnimationLibrary();
 		foreach (string path in files)
 		{
-			var animation = ResourceLoader.Load<Animation>(path);
+			var animation = RuntimeResources.Load<Animation>(path);
 			if (animation == null)
 			{
 				GD.PushWarning($"[SkillAnimation] {path} 不是 Animation，已跳过。");

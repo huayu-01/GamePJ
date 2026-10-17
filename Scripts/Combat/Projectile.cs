@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using ActRoguelike.Audio;
 using Godot;
 
@@ -408,7 +409,7 @@ public partial class Projectile : Area3D
 
 	private void Detonate(Vector3 position)
 	{
-		var scene = GD.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn");
+		var scene = RuntimeResources.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn");
 		if (scene?.Instantiate<Explosion>() is not { } explosion)
 		{
 			return;

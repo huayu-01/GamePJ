@@ -1,4 +1,5 @@
 using System;
+using ActRoguelike.Core;
 using System.Collections.Generic;
 using ActRoguelike.Abilities;
 using ActRoguelike.AbilityCards;
@@ -412,7 +413,7 @@ public partial class RunController : Node
 		// 结算后回基地场景（主场景是基地：出征 → 关卡 → 回基地）。
 		RunSetup.Clear();
 		ActRoguelike.Core.GameLog.Write("Flow", "本局结束 → 返回基地场景");
-		GetTree().ChangeSceneToFile("res://Scenes/Levels/Base.tscn");
+		RuntimeResources.ChangeScene(GetTree(), "res://Scenes/Levels/Base.tscn");
 	}
 
 	/// <summary>直接发放指定奖励（保底奖励、脚本奖励与自动化验证用）。</summary>

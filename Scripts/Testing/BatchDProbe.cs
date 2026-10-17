@@ -43,7 +43,7 @@ public partial class BatchDProbe : Node3D
 	}
 	private Unit Spawn(string path, Vector3 position, Faction? faction = null, bool frozen = true)
 	{
-		Unit unit = GD.Load<PackedScene>(path).Instantiate<Unit>();
+		Unit unit = RuntimeResources.Load<PackedScene>(path).Instantiate<Unit>();
 		if (faction.HasValue) unit.Faction = faction.Value;
 		UnitAnimator.Ensure(unit);
 		AddChild(unit);
@@ -96,7 +96,7 @@ public partial class BatchDProbe : Node3D
 		RunSetup.Character = PlayerCharacterKind.WeaponMaster;
 		RunSetup.Weapon = WeaponPresetKind.SpiritSword;
 		RunSetup.HasSelection = true;
-		_player = GD.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>();
+		_player = RuntimeResources.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>();
 		AddChild(_player);
 		_player.SetPhysicsProcess(false);
 		_player.GetNode("AbilityInput").ProcessMode = ProcessModeEnum.Disabled;
@@ -211,7 +211,7 @@ public partial class BatchDProbe : Node3D
 	}
 	private Projectile Fire(string name, Unit owner, Vector3 from)
 	{
-		Projectile projectile = GD.Load<PackedScene>($"res://Scenes/Combat/{name}.tscn").Instantiate<Projectile>();
+		Projectile projectile = RuntimeResources.Load<PackedScene>($"res://Scenes/Combat/{name}.tscn").Instantiate<Projectile>();
 		AddChild(projectile);
 		projectile.GlobalPosition = from;
 		projectile.Speed = 60;
@@ -303,7 +303,7 @@ public partial class BatchDProbe : Node3D
 			await Wait(0.3);
 			Check(Vitals(second) < nextHealth && Vitals(friend) == friendHealth, $"{faction}真实弹射只选择敌对目标");
 			float enemyHealth = Vitals(first);
-			Explosion blast = GD.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn").Instantiate<Explosion>();
+			Explosion blast = RuntimeResources.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn").Instantiate<Explosion>();
 			AddChild(blast);
 			blast.GlobalPosition = first.GlobalPosition + Vector3.Up;
 			blast.Detonate(owner, 5, 3, Array.Empty<string>());
@@ -338,7 +338,7 @@ public partial class BatchDProbe : Node3D
 		string[] fxPaths = { "res://Assets/Effects/fx_combat_hit.tscn", "res://Assets/Effects/fx_combat_explosion.tscn", "res://Assets/Effects/fx_weapon_muzzle.tscn", "res://Scenes/ArtRefresh/FxLootBeacon.tscn", "res://Scenes/ArtRefresh/FxBattleSwing.tscn" };
 		foreach (string path in fxPaths)
 		{
-			Node fx = GD.Load<PackedScene>(path).Instantiate();
+			Node fx = RuntimeResources.Load<PackedScene>(path).Instantiate();
 			Check(SafeFx(fx), $"纯特效子树无单位/碰撞/分组：{path.GetFile()}");
 			fx.Free();
 		}

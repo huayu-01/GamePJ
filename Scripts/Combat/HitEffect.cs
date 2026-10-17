@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System.Collections.Generic;
 using ActRoguelike.Config;
 using Godot;
@@ -128,7 +129,7 @@ public static class HitEffect
 
 		_resolved = true;
 		_cachedPath = path;
-		_cached = ResourceLoader.Exists(path) ? GD.Load<PackedScene>(path) : null;
+		_cached = ResourceLoader.Exists(path) ? RuntimeResources.Load<PackedScene>(path) : null;
 		if (_cached == null)
 		{
 			GD.PushWarning($"[HitEffect] 命中特效 {path} 读不到，本次跳过（只警告一次）。");

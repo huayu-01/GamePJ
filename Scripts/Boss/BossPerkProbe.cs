@@ -133,7 +133,7 @@ public static class BossPerkProbe
 			$"Pressure 词条池（数值型 = 界面上的**词条**）：{BossPerkCatalog.PressureOnly.Count} 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）｜ 带限定词的 {withQualifier} 条（期望 3 = 3 技能参数）｜ 明细：[{string.Join(" · ", perPerk)}]");
 		GameLog.Write("SelfTest", $"Pressure 词条池·出率（权重真进分母）：{BossPerkCatalog.DescribePressurePool(null)}");
 
-		if (GD.Load<PackedScene>("res://Scenes/Enemies/Boss.tscn") is not { } bossScene)
+		if (RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Boss.tscn") is not { } bossScene)
 		{
 			GameLog.Write("SelfTest", "Pressure 词条探针：读不到 Boss.tscn，跳过。");
 			return;
@@ -179,7 +179,7 @@ public static class BossPerkProbe
 			"SelfTest",
 			$"限定词刷新判定·基准：当前 Boss 身份「{PerkQualifier.BossIdentityOf(boss)}」（期望 boss_final = 单位行 Id）· 当前关卡「{PerkQualifier.CurrentStageText()}」");
 
-		if (GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn") is { } chaserScene)
+		if (RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn") is { } chaserScene)
 		{
 			var chaser = chaserScene.Instantiate<Unit>();
 

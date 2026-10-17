@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System;
 using System.Collections.Generic;
 using ActRoguelike.Combat;
@@ -210,7 +211,7 @@ internal sealed class HealthBarWidget
 public partial class WorldOverlay : CanvasLayer
 {
 	/// <summary>敌人血条预制体（外观改这里，代码不碰）。</summary>
-	private static readonly PackedScene EnemyBarScene = GD.Load<PackedScene>("res://Scenes/UI/Bars/BarEnemy.tscn");
+	private static readonly PackedScene EnemyBarScene = RuntimeResources.Load<PackedScene>("res://Scenes/UI/Bars/BarEnemy.tscn");
 
 	/// <summary>延迟条跟随速度（比例/秒）：受伤后残影条慢慢缩到真实血量。</summary>
 	private const float DelayFollowSpeed = 0.6f;

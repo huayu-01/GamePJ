@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System.Collections.Generic;
 using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
@@ -320,7 +321,7 @@ public abstract partial class UnitConfig : ConfigRow
 	{
 		if (!string.IsNullOrEmpty(ModelPath))
 		{
-			if (ResourceLoader.Exists(ModelPath) && GD.Load<PackedScene>(ModelPath) is { } model)
+			if (ResourceLoader.Exists(ModelPath) && RuntimeResources.Load<PackedScene>(ModelPath) is { } model)
 			{
 				// 单位这时还没进场景树，占位模型可以直接 Free（QueueFree 要等进树才生效）。
 				unit.GetNodeOrNull<Node>("Model")?.Free();

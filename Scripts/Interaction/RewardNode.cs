@@ -284,7 +284,7 @@ public partial class RewardNode : Interactable
 		foreach (RewardNodeKind kind in Enum.GetValues<RewardNodeKind>())
 		{
 			string path = $"res://Assets/Materials/mat_node_{kind.ToString().ToLowerInvariant()}.tres";
-			if (ResourceLoader.Exists(path) && GD.Load<Material>(path) is { } material)
+			if (ResourceLoader.Exists(path) && RuntimeResources.Load<Material>(path) is { } material)
 			{
 				palette[kind] = material;
 			}
@@ -311,7 +311,7 @@ public partial class RewardNode : Interactable
 		foreach (RewardNodeKind kind in Enum.GetValues<RewardNodeKind>())
 		{
 			string path = $"res://Assets/Models/nodes/mesh_node_{kind.ToString().ToLowerInvariant()}.tres";
-			if (ResourceLoader.Exists(path) && GD.Load<Mesh>(path) is { } mesh)
+			if (ResourceLoader.Exists(path) && RuntimeResources.Load<Mesh>(path) is { } mesh)
 			{
 				shapes[kind] = mesh;
 			}

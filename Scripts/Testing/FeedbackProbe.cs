@@ -72,7 +72,7 @@ public partial class FeedbackProbe : Node
 		RunSetup.HasSelection = true;
 		RunSetup.Character = PlayerCharacterKind.WeaponMaster;
 		RunSetup.Weapon = WeaponPresetKind.Spear;
-		_base = GD.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate();
+		_base = RuntimeResources.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate();
 		GetTree().Root.AddChild(_base);
 		GetTree().CurrentScene = _base;
 		await Wait(0.7);
@@ -203,7 +203,7 @@ public partial class FeedbackProbe : Node
 		Aim();
 		RewardNode Make(RewardNodeKind kind, Vector3 position)
 		{
-			var node = GD.Load<PackedScene>("res://Scenes/Interactables/RewardNode.tscn").Instantiate<RewardNode>();
+			var node = RuntimeResources.Load<PackedScene>("res://Scenes/Interactables/RewardNode.tscn").Instantiate<RewardNode>();
 			node.Kind = kind;
 			_base.AddChild(node);
 			node.GlobalPosition = position;

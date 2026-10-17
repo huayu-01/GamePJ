@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System.Collections.Generic;
 using ActRoguelike.AbilityCards;
 using ActRoguelike.Audio;
@@ -402,7 +403,7 @@ public partial class AbilityMatrixScreen : OverlayScreen, IAbilityCardHost
 			child.QueueFree();
 		}
 
-		_tileScene ??= GD.Load<PackedScene>("res://Scenes/UI/AbilityCardTile.tscn");
+		_tileScene ??= RuntimeResources.Load<PackedScene>("res://Scenes/UI/AbilityCardTile.tscn");
 		_matrix.Columns = Columns;
 		for (int i = 0; i < visible; i++)
 		{

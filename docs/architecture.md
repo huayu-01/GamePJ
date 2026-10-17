@@ -4,6 +4,8 @@
 
 ## 模块总览
 
+运行期磁盘资源与场景切换统一经`Core/RuntimeResources`：存活托管包装器用弱引用复用，失效时用`IgnoreDeep`创建独立资源图，避免Godot 4.7.2缓存复活GC竞态。不得另加无限强引用池或禁用GC；详见[生命周期依据与验收](resource-lifetime.md)。编辑器生成器不适用这一运行期入口。
+
 | 层 | 内容 | 位置 |
 |---|---|---|
 | 战斗核心 | Unit / AttackInstance / HitInstance / HitTracker / AttackHitbox / Projectile / Explosion / Targeting / BlockComponent / EliteModifier | `Scripts/Combat/` |

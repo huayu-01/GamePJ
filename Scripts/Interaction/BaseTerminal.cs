@@ -83,7 +83,7 @@ public partial class BaseTerminal : Interactable
 				}
 				else
 				{
-					GetTree().ChangeSceneToFile(TargetScene);
+						RuntimeResources.ChangeScene(GetTree(), TargetScene);
 				}
 
 				return true;

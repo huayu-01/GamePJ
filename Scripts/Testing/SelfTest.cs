@@ -729,7 +729,7 @@ public partial class SelfTest : Node
 			return;
 		}
 
-		if (GD.Load<PackedScene>(chaserRow.ScenePath).Instantiate() is not Unit chaser)
+		if (RuntimeResources.Load<PackedScene>(chaserRow.ScenePath).Instantiate() is not Unit chaser)
 		{
 			GameLog.Write("SelfTest", $"🔴 最小闭环：{chaserRow.ScenePath} 的根节点不是 Unit，靶子造不出来。");
 			return;
@@ -1405,7 +1405,7 @@ public partial class SelfTest : Node
 
 		var before = new List<ulong>();
 
-		if (GD.Load<PackedScene>(bossRow.ScenePath).Instantiate() is not Unit boss)
+		if (RuntimeResources.Load<PackedScene>(bossRow.ScenePath).Instantiate() is not Unit boss)
 		{
 			GameLog.Write("SelfTest", $"🔴 机制·首领增援：{bossRow.ScenePath} 的根节点不是 Unit。");
 			return;
@@ -2113,7 +2113,7 @@ public partial class SelfTest : Node
 		ActRoguelike.Config.AiProfileConfig? chaserAi = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AiProfileConfig>("ai_chaser");
 		GameLog.Write("SelfTest",
 			$"配置表比对·AI 档案表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()} 行（期望 11 = 9 敌种 + 首领 + 召唤物） 敌人行 enemy_chaser 挂的档案「{chaser?.AiProfile?.Id}」（期望 ai_chaser） 档案行 SearchRange {chaserAi?.SearchRange:0.##}（期望 40）");
-		if (chaser != null && GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn") is { } chaserScene)
+		if (chaser != null && RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn") is { } chaserScene)
 		{
 			// 探针：先把预制体上的 AI 值改成 -1（伪造"错的值"）再 ApplyTo ——
 			// 值回到档案里的数才能证明档案**确实写进了** Brain / 行为节点，而不是"碰巧与场景相等"。
@@ -3073,7 +3073,7 @@ public partial class SelfTest : Node
 			return;
 		}
 
-		if (GD.Load<PackedScene>(chaserRow.ScenePath).Instantiate() is not Unit chaser)
+		if (RuntimeResources.Load<PackedScene>(chaserRow.ScenePath).Instantiate() is not Unit chaser)
 		{
 			GameLog.Write("SelfTest", "🔴 P3·弓：enemy_chaser 的根节点不是 Unit。");
 			return;
@@ -3258,7 +3258,7 @@ public partial class SelfTest : Node
 		string homing = _p3BowW1?.HomingStatusId ?? string.Empty;
 		if (!string.IsNullOrEmpty(homing))
 		{
-			if (GD.Load<PackedScene>("res://Scenes/Combat/Arrow.tscn").Instantiate<Projectile>() is not { } arrow)
+			if (RuntimeResources.Load<PackedScene>("res://Scenes/Combat/Arrow.tscn").Instantiate<Projectile>() is not { } arrow)
 			{
 				GameLog.Write("SelfTest", "🔴 P3·追踪弹：读不到 Arrow.tscn。");
 				return;
@@ -3561,7 +3561,7 @@ public partial class SelfTest : Node
 			return null;
 		}
 
-		if (GD.Load<PackedScene>(chaserRow.ScenePath).Instantiate() is not Unit victim)
+		if (RuntimeResources.Load<PackedScene>(chaserRow.ScenePath).Instantiate() is not Unit victim)
 		{
 			return null;
 		}
@@ -3668,7 +3668,7 @@ public partial class SelfTest : Node
 			return null;
 		}
 
-		if (GD.Load<PackedScene>(scenePath).Instantiate() is not Projectile projectile)
+		if (RuntimeResources.Load<PackedScene>(scenePath).Instantiate() is not Projectile projectile)
 		{
 			return null;
 		}
@@ -4153,7 +4153,7 @@ public partial class SelfTest : Node
 		// 临时靶子：真敌人 Chaser，AI 关掉，摆在玩家右手边 2 米（在践踏半径 3 与索敌 18 之内）。
 		Unit? target = null;
 		Node? arena = player.GetParent();
-		if (arena != null && GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate() is Unit chaser)
+		if (arena != null && RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate() is Unit chaser)
 		{
 			NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(chaser)?.SetPhysicsProcess(false);
 			arena.AddChild(chaser);
@@ -4361,7 +4361,7 @@ public partial class SelfTest : Node
 		SunsetSwordRule? sword = NodeSearch.FindInSubtree<SunsetSwordRule>(player);
 		Node? arena2 = player.GetParent();
 		Unit? target2 = null;
-		if (arena2 != null && GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate() is Unit chaser2)
+		if (arena2 != null && RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate() is Unit chaser2)
 		{
 			NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(chaser2)?.SetPhysicsProcess(false);
 			arena2.AddChild(chaser2);

@@ -184,7 +184,7 @@ public partial class ArrowVolleyAbility : Ability
 	{
 		if (!string.IsNullOrEmpty(ProjectileScenePath))
 		{
-			if (ResourceLoader.Exists(ProjectileScenePath) && GD.Load<PackedScene>(ProjectileScenePath) is { } scene)
+			if (ResourceLoader.Exists(ProjectileScenePath) && RuntimeResources.Load<PackedScene>(ProjectileScenePath) is { } scene)
 			{
 				ProjectileScene = scene;
 			}

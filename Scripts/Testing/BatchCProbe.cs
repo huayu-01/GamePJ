@@ -68,6 +68,8 @@ public partial class BatchCProbe : Node
 	}
 	private async Task Run()
 	{
+		if (Array.IndexOf(OS.GetCmdlineUserArgs(), "--loadout-test") < 0)
+			throw new InvalidOperationException("C探针必须传 --loadout-test；禁止写入玩家装备偏好。");
 		// 主场景Ready可能早于配置索引的延后建表。
 		await Wait(0.25);
 		if (Array.IndexOf(OS.GetCmdlineUserArgs(), "--memory-check") >= 0)
@@ -79,7 +81,7 @@ public partial class BatchCProbe : Node
 			RunSetup.Character = PlayerCharacterKind.Hunter;
 			RunSetup.Weapon = WeaponPresetKind.EnergyPalm;
 			RunSetup.Clear();
-			Node freshBase = GD.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate();
+			Node freshBase = RuntimeResources.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate();
 			GetTree().Root.AddChild(freshBase);
 			GetTree().CurrentScene = freshBase;
 			await Wait(0.6);
@@ -91,7 +93,7 @@ public partial class BatchCProbe : Node
 		RunSetup.Weapon = WeaponPresetKind.EnergyPalm;
 		RunSetup.HasSelection = true;
 		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-		_base = GD.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate();
+		_base = RuntimeResources.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate();
 		GetTree().Root.AddChild(_base);
 		GetTree().CurrentScene = _base;
 		await Wait(1.2);

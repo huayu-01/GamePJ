@@ -162,13 +162,13 @@ public partial class _FeelProbe : Node3D
 
 	private void BuildArena()
 	{
-		_player = GD.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>();
+		_player = RuntimeResources.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>();
 		AddChild(_player);
 		_player.GlobalPosition = new Vector3(0f, 0.6f, 4f);
 
-		_hud = GD.Load<PackedScene>("res://Scenes/UI/Hud.tscn").Instantiate();
+		_hud = RuntimeResources.Load<PackedScene>("res://Scenes/UI/Hud.tscn").Instantiate();
 		AddChild(_hud);
-		_overlay = GD.Load<PackedScene>("res://Scenes/UI/WorldOverlay.tscn").Instantiate<CanvasLayer>();
+		_overlay = RuntimeResources.Load<PackedScene>("res://Scenes/UI/WorldOverlay.tscn").Instantiate<CanvasLayer>();
 		AddChild(_overlay);
 
 		// 自己的机位（能精确取景；HUD/血条是 CanvasLayer，与谁当相机无关）。
@@ -177,7 +177,7 @@ public partial class _FeelProbe : Node3D
 		Later(0.6f, () =>
 		{
 			// 带甲的木桩（600 生命 / 60 甲 / 护甲减伤 0.25）——用来验"护甲进度"与"碎甲"。
-			_dummy = GD.Load<PackedScene>("res://Scenes/Training/TrainingDummy.tscn").Instantiate<Unit>();
+			_dummy = RuntimeResources.Load<PackedScene>("res://Scenes/Training/TrainingDummy.tscn").Instantiate<Unit>();
 			// ⚠️ 木桩场景里没有 Animator 节点，而 UnitPresentation 会在 _Ready 里 `new` 一个补上 ——
 			// 运行期在 _Ready 里 add_child 会命中 Godot 的 "Parent node is busy setting up children"（既有问题，与本轮无关）。
 			// 先在**进树之前**补一个，避开那条报错。
@@ -187,7 +187,7 @@ public partial class _FeelProbe : Node3D
 			GD.Print($"[Feel] 木桩：生命 {_dummy.MaxHealth:0} 甲 {_dummy.Armor:0}/{_dummy.ArmorPeak:0} 减伤 {_dummy.ArmorDamageReduction:0.##}");
 
 			// 守卫（正面格挡 0.25）：把 AI 与技能停掉，只当"会格挡的靶子"。
-			_guard = GD.Load<PackedScene>("res://Scenes/Enemies/Guard.tscn").Instantiate<Unit>();
+			_guard = RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Guard.tscn").Instantiate<Unit>();
 			AddChild(_guard);
 			_guard.GlobalPosition = new Vector3(2.4f, 0f, 1.2f);
 			foreach (Node child in _guard.GetChildren())
@@ -202,7 +202,7 @@ public partial class _FeelProbe : Node3D
 			GD.Print($"[Feel] 守卫：生命 {_guard.MaxHealth:0} 甲 {_guard.Armor:0}/{_guard.ArmorPeak:0} 格挡倍率 {_guard.Block?.BlockDamageMultiplier}");
 
 			// 无甲单位（A6 的对照）：**一条护甲视觉都不该有** —— 连"塑料壳"都不给。
-			_plain = GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate<Unit>();
+			_plain = RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate<Unit>();
 			if (_plain.GetNodeOrNull<UnitAnimator>(UnitAnimator.NodeName) == null)
 			{
 				_plain.AddChild(new UnitAnimator { Name = UnitAnimator.NodeName });
@@ -306,7 +306,7 @@ public partial class _FeelProbe : Node3D
 		// ④ 交互表现（#13）：真的 RewardNode + 真的 PlayerInteractInput 选目标。
 		Later(0.6f, () =>
 		{
-			_node = GD.Load<PackedScene>("res://Scenes/Interactables/RewardNode.tscn").Instantiate<Interactable>();
+			_node = RuntimeResources.Load<PackedScene>("res://Scenes/Interactables/RewardNode.tscn").Instantiate<Interactable>();
 			AddChild(_node);
 			_node.GlobalPosition = new Vector3(0f, 0f, 2.0f);
 			GD.Print($"[Feel] 交互物：{_node.Name} 提示「{_node.CurrentPrompt}」半径 {_node.InteractRadius:0.#}");
@@ -544,7 +544,7 @@ public partial class _FeelProbe : Node3D
 
 	private void BuildBase()
 	{
-		AddChild(GD.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate());
+		AddChild(RuntimeResources.Load<PackedScene>("res://Scenes/Levels/Base.tscn").Instantiate());
 
 		Later(0.8f, () =>
 		{

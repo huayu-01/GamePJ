@@ -178,6 +178,6 @@ public partial class DeathScreen : CanvasLayer
 		GetTree().Paused = false;
 		RunSetup.Clear();
 		GameLog.Write("Flow", $"死亡流程：演示过渡结束 → 回到基地场景 {TargetScene}");
-		GetTree().ChangeSceneToFile(TargetScene);
+			RuntimeResources.ChangeScene(GetTree(), TargetScene);
 	}
 }

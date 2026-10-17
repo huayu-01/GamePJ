@@ -47,7 +47,7 @@ public partial class FollowupProbe : Node3D
 	{
 		foreach (Node child in GetChildren()) child.QueueFree();
 		await Wait(0.1);
-		Node main = GD.Load<PackedScene>("res://Scenes/Main.tscn").Instantiate();
+		Node main = RuntimeResources.Load<PackedScene>("res://Scenes/Main.tscn").Instantiate();
 		GetTree().Root.AddChild(main);
 		GetTree().CurrentScene = main;
 		await Wait(1.2);
@@ -59,7 +59,7 @@ public partial class FollowupProbe : Node3D
 		RunSetup.Character = PlayerCharacterKind.Hunter;
 		RunSetup.Weapon = WeaponPresetKind.EnergyPalm;
 		RunSetup.HasSelection = true;
-		Unit player = GD.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>();
+		Unit player = RuntimeResources.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>();
 		AddChild(player);
 		player.GlobalPosition = new Vector3(0, 0.05f, 4);
 		new PlayerLoadout().Apply(player, this, RunSetup.Character, RunSetup.Weapon);
@@ -94,15 +94,16 @@ public partial class FollowupProbe : Node3D
 		foreach (Node node in GetChildren()) if (node is NavigationRegion3D) regions++;
 		Check(regions == 1 && GetNodeOrNull<KillZone>("KillZone") != null, "重烘不叠加区域且区域杀仍存在");
 
-		var font = GD.Load<FontVariation>("res://Assets/UI/Themes/ui_font.tres");
+		var label = new Label { Text = "猎手 武器大师 长虹贯日 灵魂收割 设置 帮助" };
+		AddChild(label);
+		var font = (FontVariation)label.GetThemeFont("font");
 		var textServer = TextServerManager.GetPrimaryInterface();
 		var coordinates = textServer.FontGetVariationCoordinates(font.GetRids()[0]);
 		Check(coordinates.TryGetValue(textServer.NameToTag("wght"), out Variant weight) && Mathf.IsEqualApprox(weight.AsSingle(), 500), $"字体实际500字重：{coordinates}");
 		Check(font.BaseFont is FontFile file && !file.AllowSystemFallback && file.ResourcePath.EndsWith("NotoSansSC.ttf"), "内置FontFile且禁用系统字体回退");
-		var label = new Label { Text = "猎手 武器大师 长虹贯日 灵魂收割 设置 帮助" };
-		AddChild(label);
-		Check(label.GetThemeFont("font") == font, "未指定主题的控件也使用项目内置字体");
-		Check(GD.Load<Theme>("res://Assets/UI/Themes/ui_theme.tres").DefaultFont == font, "现有界面主题共用同一内置字体");
+		Check(font.ResourcePath == "res://Assets/UI/Themes/ui_font.tres", "实际控件使用项目内置字体");
+		var themeFont = (FontVariation)RuntimeResources.Load<Theme>("res://Assets/UI/Themes/ui_theme.tres").DefaultFont;
+		Check(themeFont.ResourcePath == font.ResourcePath && themeFont.BaseFont.ResourcePath == font.BaseFont.ResourcePath, "独立主题资源图仍指向同一内置字体文件");
 		string corpus = FileAccess.GetFileAsString("res://.ai_font_corpus.txt");
 		var missing = new List<char>();
 		foreach (char character in corpus) if (!font.HasChar(character)) missing.Add(character);
@@ -125,7 +126,7 @@ public partial class FollowupProbe : Node3D
 		for (int i = 0; i < 12; i++)
 		{
 			string path = i % 2 == 0 ? "res://Scenes/Levels/Base.tscn" : "res://Scenes/Main.tscn";
-			Node scene = GD.Load<PackedScene>(path).Instantiate();
+			Node scene = RuntimeResources.Load<PackedScene>(path).Instantiate();
 			GetTree().Root.AddChild(scene);
 			GetTree().CurrentScene = scene;
 			bool early = i % 4 == 1;

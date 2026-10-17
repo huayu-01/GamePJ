@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System.Collections.Generic;
 using Godot;
 
@@ -19,7 +20,7 @@ public interface IConfigRow
 /// </summary>
 public static class ConfigTable
 {
-	/// <summary>表文件不存在 / 类型不符 / 加载失败 → 返回 null。运行时吃引擎缓存（不读盘）。</summary>
+	/// <summary>表文件不存在 / 类型不符 / 加载失败 → 返回 null。复用存活包装器，失效时重新读取独立资源图。</summary>
 	public static T? TryLoad<T>(string path) where T : Resource
 	{
 		if (string.IsNullOrEmpty(path) || !ResourceLoader.Exists(path))
@@ -28,7 +29,7 @@ public static class ConfigTable
 			return null;
 		}
 
-		T? loaded = ResourceLoader.Load<T>(path);
+		T? loaded = RuntimeResources.Load<T>(path);
 		if (loaded == null)
 		{
 			GD.PushWarning($"[Config] {path} 存在但不是 {typeof(T).Name}，使用代码默认值。");

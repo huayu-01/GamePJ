@@ -18,7 +18,7 @@ public partial class PlayerHud : CanvasLayer
 	private const string PlayerBarNode = "Root/PlayerBar";
 
 	/// <summary>首领血条预制体：代码实例化一份挂到 HUD 层上。</summary>
-	private static readonly PackedScene BossBarScene = GD.Load<PackedScene>("res://Scenes/UI/Bars/BarBoss.tscn");
+	private static readonly PackedScene BossBarScene = RuntimeResources.Load<PackedScene>("res://Scenes/UI/Bars/BarBoss.tscn");
 
 	/// <summary>延迟条跟随速度（比例/秒）。</summary>
 	private const float DelayFollowSpeed = 0.6f;

@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System.Collections.Generic;
 using ActRoguelike.Config;
 using Godot;
@@ -49,7 +50,7 @@ public partial class StatusEffectFx : Node3D
 				return;
 			}
 		}
-		_scene ??= GD.Load<PackedScene>("res://Scenes/Combat/StatusEffectFx.tscn");
+		_scene ??= RuntimeResources.Load<PackedScene>("res://Scenes/Combat/StatusEffectFx.tscn");
 		if (_scene?.Instantiate() is StatusEffectFx fx)
 		{
 			// 本方法由单位的子节点 _Ready 调用，此时父节点仍在遍历子树，必须延后挂载兄弟节点。

@@ -31,7 +31,7 @@ public partial class BaseCamp : Node
 			{
 				SetProcess(false);
 				UiRouter.Instance?.ResetForSceneChange();
-				GetTree().ReloadCurrentScene();
+				RuntimeResources.ChangeScene(GetTree(), GetTree().CurrentScene.SceneFilePath);
 			}
 			return;
 		}

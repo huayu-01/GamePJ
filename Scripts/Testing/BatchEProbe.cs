@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -48,7 +49,7 @@ public partial class BatchEProbe : Node
 
 	private Unit Target(string name, Vector3 position)
 	{
-		Unit unit = GD.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate<Unit>();
+		Unit unit = RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate<Unit>();
 		unit.Name = name;
 		_main.AddChild(unit);
 		unit.GlobalPosition = position;

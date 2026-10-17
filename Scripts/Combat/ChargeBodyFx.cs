@@ -439,7 +439,7 @@ void fragment() {
 	{
 		if (!string.IsNullOrEmpty(RimShaderPath))
 		{
-			if (ResourceLoader.Exists(RimShaderPath) && GD.Load<Shader>(RimShaderPath) is { } fromFile)
+			if (ResourceLoader.Exists(RimShaderPath) && RuntimeResources.Load<Shader>(RimShaderPath) is { } fromFile)
 			{
 				ShaderSource = $"文件 {RimShaderPath}";
 				return fromFile;

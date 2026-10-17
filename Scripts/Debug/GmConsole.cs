@@ -299,7 +299,7 @@ public partial class GmConsole : OverlayScreen
 		Close();
 		UiRouter.Instance?.ResetForSceneChange();
 		SceneTree tree = GetTree();
-		Callable.From(() => tree.ChangeSceneToFile(path)).CallDeferred();
+		Callable.From(() => RuntimeResources.ChangeScene(tree, path)).CallDeferred();
 	}
 	private string Catalogue(string[] p)
 	{
@@ -329,7 +329,7 @@ public partial class GmConsole : OverlayScreen
 		EnemyConfig row = ConfigRows.ById<EnemyConfig>(p[1]) ?? throw new ArgumentException("敌人ID不存在；list enemies可查询。");
 		if (row.IsGlobal || string.IsNullOrEmpty(row.ScenePath)) throw new ArgumentException("这不是可召唤的敌人行。");
 		int count = p.Length == 3 ? Integer(p, 2, 1, 20) : 1;
-		PackedScene scene = GD.Load<PackedScene>(row.ScenePath) ?? throw new InvalidOperationException("敌人场景读取失败。");
+		PackedScene scene = RuntimeResources.Load<PackedScene>(row.ScenePath) ?? throw new InvalidOperationException("敌人场景读取失败。");
 		Unit player = Player();
 		Vector3 forward = -(GetViewport().GetCamera3D()?.GlobalBasis.Z ?? player.GlobalBasis.Z);
 		forward.Y = 0;

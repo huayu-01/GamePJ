@@ -30,7 +30,7 @@ public partial class CharacterDisplay : Node3D
 			Node3D model = _original;
 			if (!string.IsNullOrEmpty(row.ModelPath) && !_models.TryGetValue(row.ModelPath, out model!))
 			{
-				model = GD.Load<PackedScene>(row.ModelPath).Instantiate<Node3D>();
+				model = RuntimeResources.Load<PackedScene>(row.ModelPath).Instantiate<Node3D>();
 				model.Transform = row.ModelTransform;
 				model.Position += _original.Position;
 				model.Visible = false;
@@ -71,7 +71,7 @@ public partial class CharacterDisplay : Node3D
 			var key = (model, weapon.ModelPath);
 			if (!_weapons.TryGetValue(key, out var visual))
 			{
-				visual = GD.Load<PackedScene>(weapon.ModelPath).Instantiate<Node3D>();
+				visual = RuntimeResources.Load<PackedScene>(weapon.ModelPath).Instantiate<Node3D>();
 				EnsureHand(model).AddChild(visual);
 				_weapons[key] = visual;
 			}

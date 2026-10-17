@@ -1,0 +1,48 @@
+默认缓存负例1，退出码=-1073741795
+[Lifetime] 首次加载 LifetimeProbe=37.0 id=9223372192262129380 unsafe=True path=res://Scenes/Debug/resource_lifetime_fixture.tres 存活包装器已复用
+[Lifetime] 托管对象存活=False；终结器阻塞期间再次加载 unsafe=True
+[Lifetime] FAIL System.NullReferenceException: Object reference not set to an instance of an object.
+ERROR: FATAL: Condition "gchandle.is_released()" is true.
+   at: mono_object_disposed_baseref (modules/mono/csharp_script.cpp:1788)
+   C# backtrace (most recent call first):
+       [0] void Godot.GodotObject.Dispose(bool) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GodotObject.base.cs:137)
+       [1] void Godot.GodotObject.Finalize() (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GodotObject.base.cs:100)
+       [2] uint System.GC.RunFinalizers()
+Fatal error.
+0xC000001D
+   at Godot.NativeInterop.NativeFuncs.godotsharp_internal_refcounted_disposed(IntPtr, IntPtr, Godot.NativeInterop.godot_bool)
+   at Godot.GodotObject.Dispose(Boolean)
+   at Godot.GodotObject.Finalize()
+   at System.GC.RunFinalizers()
+默认缓存负例2，退出码=-1073741795
+[Lifetime] 首次加载 LifetimeProbe=37.0 id=9223372192262129380 unsafe=True path=res://Scenes/Debug/resource_lifetime_fixture.tres 存活包装器已复用
+[Lifetime] 托管对象存活=False；终结器阻塞期间再次加载 unsafe=True
+[Lifetime] FAIL System.NullReferenceException: Object reference not set to an instance of an object.
+ERROR: FATAL: Condition "gchandle.is_released()" is true.
+   at: mono_object_disposed_baseref (modules/mono/csharp_script.cpp:1788)
+   C# backtrace (most recent call first):
+       [0] void Godot.GodotObject.Dispose(bool) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GodotObject.base.cs:137)
+       [1] void Godot.GodotObject.Finalize() (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GodotObject.base.cs:100)
+       [2] uint System.GC.RunFinalizers()
+Fatal error.
+0xC000001D
+   at Godot.NativeInterop.NativeFuncs.godotsharp_internal_refcounted_disposed(IntPtr, IntPtr, Godot.NativeInterop.godot_bool)
+   at Godot.GodotObject.Dispose(Boolean)
+   at Godot.GodotObject.Finalize()
+   at System.GC.RunFinalizers()
+默认缓存负例3，退出码=-1073741795
+[Lifetime] 首次加载 LifetimeProbe=37.0 id=9223372192262129380 unsafe=True path=res://Scenes/Debug/resource_lifetime_fixture.tres 存活包装器已复用
+[Lifetime] 托管对象存活=False；终结器阻塞期间再次加载 unsafe=True
+[Lifetime] FAIL System.NullReferenceException: Object reference not set to an instance of an object.
+ERROR: FATAL: Condition "gchandle.is_released()" is true.
+   at: mono_object_disposed_baseref (modules/mono/csharp_script.cpp:1788)
+   C# backtrace (most recent call first):
+       [0] void Godot.GodotObject.Dispose(bool) (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GodotObject.base.cs:137)
+       [1] void Godot.GodotObject.Finalize() (/root/godot/modules/mono/glue/GodotSharp/GodotSharp/Core/GodotObject.base.cs:100)
+       [2] uint System.GC.RunFinalizers()
+Fatal error.
+0xC000001D
+   at Godot.NativeInterop.NativeFuncs.godotsharp_internal_refcounted_disposed(IntPtr, IntPtr, Godot.NativeInterop.godot_bool)
+   at Godot.GodotObject.Dispose(Boolean)
+   at Godot.GodotObject.Finalize()
+   at System.GC.RunFinalizers()

@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using System;
 using System.Collections.Generic;
 using ActRoguelike.Config;
@@ -123,7 +124,7 @@ public partial class StartScreen : OverlayScreen
 
 		// 图标代替文字：武器用图标，具体数值留在文字里（选择界面允许有说明）。
 		WeaponConfig? row = RunController.WeaponRow(kind);
-		card.Icon = !string.IsNullOrEmpty(row?.IconPath) ? GD.Load<Texture2D>(row.IconPath) : UiIcons.ForWeapon(kind);
+		card.Icon = !string.IsNullOrEmpty(row?.IconPath) ? RuntimeResources.Load<Texture2D>(row.IconPath) : UiIcons.ForWeapon(kind);
 		card.ExpandIcon = true;
 		card.AddThemeConstantOverride("icon_max_width", 42);
 

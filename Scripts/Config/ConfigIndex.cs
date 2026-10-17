@@ -1,3 +1,4 @@
+using ActRoguelike.Core;
 using ActRoguelike.Combat;
 using Godot;
 
@@ -31,7 +32,7 @@ public partial class ConfigIndex : Node
 	public override void _Ready()
 	{
 		Instance = this;
-		if (ResourceLoader.Exists(ConfigPath) && GD.Load<ConfigIndexData>(ConfigPath) is { } loaded)
+		if (ResourceLoader.Exists(ConfigPath) && RuntimeResources.Load<ConfigIndexData>(ConfigPath) is { } loaded)
 		{
 			Config = loaded;
 			FileLoaded = true;
