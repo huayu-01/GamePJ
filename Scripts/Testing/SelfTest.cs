@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
@@ -470,8 +472,14 @@ public partial class SelfTest : Node
 				break;
 
 			case 30 when _timer > 0.3f:
-				ProbeChargeMechanism();
-				Next();
+				// 跨帧探针：按住/松手都走真实帧，等**释放段真 ATK + 自然收招**再读结果；任务结束才 Next。
+				_chargeProbeTask ??= RunChargeMechanismProbe();
+				if (ProbeTaskDone(_chargeProbeTask, "机制·蓄力"))
+				{
+					_chargeProbeTask = null;
+					Next();
+				}
+
 				break;
 
 			case 31 when _timer > 0.3f:
@@ -487,13 +495,25 @@ public partial class SelfTest : Node
 				break;
 
 			case 33 when _timer > 0.9f:
-				ReportCrossbowProbe();
-				Next();
+				// 跨帧探针：武技2 两轮都要等释放段真 ATK；任务结束才 Next。
+				_crossbowProbeTask ??= RunCrossbowProbe();
+				if (ProbeTaskDone(_crossbowProbeTask, "P3·短弩"))
+				{
+					_crossbowProbeTask = null;
+					Next();
+				}
+
 				break;
 
 			case 34 when _timer > 0.5f:
-				BeginBowProbe();
-				Next();
+				// 跨帧探针：换装 + 靶子 + 弓武技1 两档（等释放段真 ATK）+ 刹那之眼；任务结束才 Next。
+				_bowProbeTask ??= BeginBowProbe();
+				if (ProbeTaskDone(_bowProbeTask, "P3·弓"))
+				{
+					_bowProbeTask = null;
+					Next();
+				}
+
 				break;
 
 			case 35 when _timer > 0.9f:
@@ -546,8 +566,14 @@ public partial class SelfTest : Node
 				break;
 
 			case 44 when _timer > 0.3f:
-				ReportSwordQiProbe();
-				Next();
+				// 跨帧探针：拔刀式两段（没蓄满不释放 / 蓄满等释放段真 ATK）；任务结束才 Next。
+				_swordQiProbeTask ??= RunSwordQiProbe();
+				if (ProbeTaskDone(_swordQiProbeTask, "P4·剑气"))
+				{
+					_swordQiProbeTask = null;
+					Next();
+				}
+
 				break;
 
 			case 45 when _timer > 0.3f:
@@ -1279,11 +1305,127 @@ public partial class SelfTest : Node
 			+ $"（都回到改动前的值；TotalCharges 也回到 {_mechW1.MaxCharges}）");
 	}
 
+	// ─────────────────────────────────────────────────────────────────────────
+	// 分帧工具（蓄力探针共用）：让"按住 → 松手 → 释放段真 ATK → 自然收招"**跨帧**发生。
+	//
+	// ⚠️ 这一组的存在理由（J6 边界）：输入层 `PlayerAbilityInput._Process` 是"按住期间每帧
+	// `OnInputHeld(dt)`，松手那一帧 `OnInputReleased()`"，而**真正的发射发生在松手后重播的
+	// 释放段动画的 `ATK` 事件帧上**（`docs/abilities.md` §1.3）。旧探针在**同一帧**里把整段蓄力
+	// 时长一次性灌进去、松手后立刻读 `LastShotDamage` —— 那时释放动画还没播、ATK 帧还没到，
+	// 于是探针永远读 0（亮红灯但不是真实链路坏了）。现在改成按进程帧推进：
+	// **不伪造 ATK（不调 `OnAnimEvent`）、不手动 Tick 技能的 `_PhysicsProcess`、不给生产能力加计时出弹兜底**；
+	// 缺事件只超时报红。
+	// ─────────────────────────────────────────────────────────────────────────
+
+	/// <summary>跨帧探针任务（状态机必须等它结束再 <see cref="Next"/>）。</summary>
+	private Task? _chargeProbeTask;
+	private Task? _crossbowProbeTask;
+	private Task? _bowProbeTask;
+	private Task? _swordQiProbeTask;
+
+	/// <summary>推进跨帧探针：任务结束时（含异常）返回 true，让状态机 <see cref="Next"/>。</summary>
+	private bool ProbeTaskDone(Task? task, string label)
+	{
+		if (task == null || !task.IsCompleted)
+		{
+			return false;
+		}
+
+		if (task.IsFaulted)
+		{
+			GameLog.Write("SelfTest", $"🔴 {label}：跨帧探针抛异常 {task.Exception?.GetBaseException()}");
+		}
+
+		return true;
+	}
+
+	/// <summary>等一个进程帧（与 <see cref="ActRoguelike.Testing.ChargeReleaseProbe"/> 同一套）。</summary>
+	private async Task Frame() => await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+	/// <summary>本帧的真实 delta —— 输入层交给技能的也是它。</summary>
+	private float FrameDelta()
+	{
+		double dt = GetProcessDeltaTime();
+		return dt > 0.0 ? (float)dt : 1f / 60f;
+	}
+
+	/// <summary>等技能可用（上一个动作真的收招了）；超时返回 false。</summary>
+	private async Task<bool> WaitAbilityReady(Ability ability, double timeout = 3.0)
+	{
+		double spent = 0.0;
+		while (!ability.IsReady)
+		{
+			if (spent > timeout)
+			{
+				return false;
+			}
+
+			float dt = FrameDelta();
+			await Frame();
+			spent += dt;
+		}
+
+		return true;
+	}
+
 	/// <summary>
-	/// 蓄力 / 完美时机：**同步驱动**（直接调 <see cref="Ability.OnInputHeld"/> /
-	/// <see cref="Ability.OnInputReleased"/>），所以与帧率无关、每次跑出来的数字都一样。
+	/// 像输入层那样**每帧**把真实 delta 交给技能，把蓄力推到目标秒数。
+	/// 中途被打断（技能不再活动）或超时返回 false。
 	/// </summary>
-	private void ProbeChargeMechanism()
+	private async Task<bool> HoldCharge(Ability ability, float targetSeconds, double timeout = 8.0)
+	{
+		double spent = 0.0;
+		while (ability.ChargeTime < targetSeconds)
+		{
+			if (!ability.IsActive || spent > timeout)
+			{
+				return false;
+			}
+
+			float dt = FrameDelta();
+			ability.OnInputHeld(dt);
+			await Frame();
+			spent += dt;
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// 等技能**自己收招**：释放段动画播到 `ATK` → 真发射 → `Tick` 里的 `Finish()`。
+	/// 超时 = 缺事件帧 / 卡住（返回 false，由调用方写明确原因）。
+	/// </summary>
+	private async Task<bool> WaitSettle(Ability ability, double timeout = 4.0)
+	{
+		double spent = 0.0;
+		while (ability.IsActive)
+		{
+			if (spent > timeout)
+			{
+				return false;
+			}
+
+			float dt = FrameDelta();
+			await Frame();
+			spent += dt;
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// 释放段**真 ATK 到达**的判据：`Finish()` 才会写冷却，`Cancel()`（缺事件帧那条路）不写。
+	/// 于是"自然收招 + 冷却 &gt; 0"= 本次发射确实由动画事件帧触发，而不是任何兜底。
+	/// </summary>
+	private static bool ReleaseAtkFired(Ability ability, bool settled) => settled && ability.CooldownRemaining > 0f;
+
+	/// <summary>
+	/// 蓄力 / 完美时机 / 后置蓄力：**跨帧驱动**（每帧 `OnInputHeld(dt)`，松手那一帧
+	/// `OnInputReleased()`），松手后等**真实释放段 ATK + 自然收招**再读结果。
+	///
+	/// 与旧版的行为差异只在"帧"：旧版同帧灌时间、同帧读结果，永远读不到释放 ATK 写下的数字。
+	/// </summary>
+	private async Task RunChargeMechanismProbe()
 	{
 		if (_mechPlayer == null || _mechW2 == null)
 		{
@@ -1295,108 +1437,144 @@ public partial class SelfTest : Node
 		float damageMultiplier = _mechPlayer.Stats.Get("DamageMultiplier");
 
 		// ① **基础蓄力没完成就松手 = 不释放**（设计文档第 14 行）
+		//    按住走真实帧（每帧把帧 delta 交给技能），0.3s < 基础 0.5s → 松手走 OnChargeAborted。
+		if (!await WaitAbilityReady(w))
+		{
+			GameLog.Write("SelfTest", $"🔴 机制·蓄力未完成松手：技能等不到可用（忙={w.IsActive} 冷却={w.CooldownRemaining:0.###}），本段跳过。");
+			return;
+		}
+
 		_mechProjectilesBefore = _loopProjectiles;
 		_mechShotDamageBefore = w.LastShotDamage;
 		w.RefreshCooldown();
 		bool ok1 = w.TryActivate();
-		w.OnInputHeld(0.3f);
+		bool heldOk1 = await HoldCharge(w, 0.3f);
 		string held = $"蓄力={w.ChargeTime:0.##}s 进度={w.ChargeProgress:0.##} 基础完成={w.ChargeBaseComplete} 完美窗口={w.IsPerfectWindow}";
 		w.OnInputReleased();
 		int aborted = _loopProjectiles - _mechProjectilesBefore;
-		bool abortOk = ok1 && w.LastReleaseAborted && Mathf.IsEqualApprox(w.LastShotDamage, _mechShotDamageBefore) && !w.IsBusy;
+		bool abortOk = ok1 && heldOk1 && w.LastReleaseAborted && Mathf.IsEqualApprox(w.LastShotDamage, _mechShotDamageBefore) && !w.IsBusy;
 		GameLog.Write(
 			"SelfTest",
-			$"{(abortOk ? "✅" : "🔴")} 机制·蓄力未完成松手：TryActivate={ok1}（期望 True） {held}（期望 0.3s / 0.6 / False / False）"
+			$"{(abortOk ? "✅" : "🔴")} 机制·蓄力未完成松手：TryActivate={ok1}（期望 True） 按住到 0.3s={heldOk1}（期望 True，真实帧） {held}（期望 0.3s / 0.6 / False / False）"
 			+ $" → 松手：放弃={w.LastReleaseAborted}（期望 True） 伤害未变={Mathf.IsEqualApprox(w.LastShotDamage, _mechShotDamageBefore)}（期望 True）"
 			+ $" 仍在施法={w.IsBusy}（期望 False） 投射物 +{aborted}（期望 0；这一项只报数，别的单位也在打枪所以不作判据）");
 
+		// ⚠️ 这条路**没有释放 ATK**（松手即 Cancel），所以"还在施法"必须当场为 false。
+		//    万一没走取消分支，先把技能复位，免得 ②③④ 级联红灯掩盖真正的原因。
+		if (w.IsActive)
+		{
+			w.ResetForLoadout();
+		}
+
 		// ② **完美时机**：蓄满 + 窗口内（0.2s）松手 → 更强的那一发（表值 40 / 400）
-		SettleShot(w);
+		//    松手那一帧**不读**结果：等释放段真实 ATK 播完、技能自然收招，才读 LastShot*。
+		if (!await WaitAbilityReady(w))
+		{
+			GameLog.Write("SelfTest", $"🔴 机制·完美时机：技能等不到可用（忙={w.IsActive} 冷却={w.CooldownRemaining:0.###}），本段跳过。");
+			return;
+		}
+
 		_mechProjectilesBefore = _loopProjectiles;
 		w.RefreshCooldown();
 		bool ok2 = w.TryActivate();
-		w.OnInputHeld(w.ChargeBaseSeconds + 0.05f);
+		bool heldOk2 = await HoldCharge(w, w.ChargeBaseSecondsEffective + 0.02f);
 		bool inWindow = w.IsPerfectWindow;
+		float perfectCharge = w.ChargeTime;
 		w.OnInputReleased();
+		bool perfectFrozen = w.LastReleasePerfect;
+		bool settled2 = await WaitSettle(w);
+		bool fired2 = ReleaseAtkFired(w, settled2);
 		int shotA = _loopProjectiles - _mechProjectilesBefore;
 		float expectPerfectDamage = w.PerfectDamage * damageMultiplier;
-		bool perfectOk = ok2 && inWindow && w.LastShotPerfect
+		bool perfectOk = ok2 && heldOk2 && inWindow && perfectFrozen && fired2 && w.LastShotPerfect
 			&& Mathf.IsEqualApprox(w.LastShotDamage, expectPerfectDamage)
 			&& Mathf.IsEqualApprox(w.LastShotSpeed, w.PerfectSpeed);
 		GameLog.Write(
 			"SelfTest",
-			$"{(perfectOk ? "✅" : "🔴")} 机制·完美时机：TryActivate={ok2} 蓄力={w.ChargeTime:0.###}s（=基础 {w.ChargeBaseSeconds:0.##} + 0.05）窗口内={inWindow}（期望 True）"
-			+ $" → 松手：完美={w.LastShotPerfect}（期望 True） 伤害={w.LastShotDamage:0.###}（期望 表值 {w.PerfectDamage:0} ×玩家伤害倍率 {damageMultiplier:0.##} = {expectPerfectDamage:0.###}）"
+			$"{(perfectOk ? "✅" : "🔴")} 机制·完美时机：TryActivate={ok2} 蓄力={perfectCharge:0.###}s（基础 {w.ChargeBaseSeconds:0.##}，按真实帧推进）窗口内={inWindow}（期望 True）"
+			+ $" → 松手冻结：完美={perfectFrozen}（期望 True）｜释放段真ATK到达={fired2}（期望 True：自然收招={settled2}，冷却 {w.CooldownRemaining:0.###}>0 —— 只有 Finish 会写，Cancel 不写）"
+			+ $" 完美={w.LastShotPerfect}（期望 True） 伤害={w.LastShotDamage:0.###}（期望 表值 {w.PerfectDamage:0} ×玩家伤害倍率 {damageMultiplier:0.##} = {expectPerfectDamage:0.###}）"
 			+ $" 弹速={w.LastShotSpeed:0.###}（期望 表值 {w.PerfectSpeed:0}） 投射物 +{shotA}");
 
 		// ③ **窗口过了再松手** → 普通那一发（表值 30 / 250）
-		SettleShot(w);
+		if (!await WaitAbilityReady(w))
+		{
+			GameLog.Write("SelfTest", $"🔴 机制·过完美窗口松手：技能等不到可用（忙={w.IsActive} 冷却={w.CooldownRemaining:0.###}），本段跳过。");
+			return;
+		}
+
 		_mechProjectilesBefore = _loopProjectiles;
 		w.RefreshCooldown();
 		bool ok3 = w.TryActivate();
-		w.OnInputHeld(1.2f);
+		bool heldOk3 = await HoldCharge(w, w.ChargeBaseSecondsEffective + w.PerfectWindowSeconds + 0.05f);
 		bool overWindow = !w.IsPerfectWindow;
+		float overCharge = w.ChargeTime;
 		w.OnInputReleased();
+		bool settled3 = await WaitSettle(w);
+		bool fired3 = ReleaseAtkFired(w, settled3);
 		int shotB = _loopProjectiles - _mechProjectilesBefore;
 		float expectNormalDamage = w.Damage * damageMultiplier;
-		bool normalOk = ok3 && overWindow && !w.LastShotPerfect
+		bool normalOk = ok3 && heldOk3 && overWindow && settled3 && !w.LastShotPerfect
 			&& Mathf.IsEqualApprox(w.LastShotDamage, expectNormalDamage)
 			&& Mathf.IsEqualApprox(w.LastShotSpeed, w.Speed);
 		GameLog.Write(
 			"SelfTest",
-			$"{(normalOk ? "✅" : "🔴")} 机制·过完美窗口松手：TryActivate={ok3} 蓄力={w.ChargeTime:0.###}s（> 基础+窗口 {w.ChargeBaseSeconds + w.PerfectWindowSeconds:0.##}）窗口内={w.IsPerfectWindow}（期望 False）"
-			+ $" → 松手：完美={w.LastShotPerfect}（期望 False） 伤害={w.LastShotDamage:0.###}（期望 表值 {w.Damage:0} ×{damageMultiplier:0.##} = {expectNormalDamage:0.###}）"
+			$"{(normalOk ? "✅" : "🔴")} 机制·过完美窗口松手：TryActivate={ok3} 蓄力={overCharge:0.###}s（> 基础+窗口 {w.ChargeBaseSeconds + w.PerfectWindowSeconds:0.##}）窗口内={!overWindow}（期望 False）"
+			+ $" → 松手后释放段真ATK到达={fired3}（期望 True：自然收招={settled3}） 完美={w.LastShotPerfect}（期望 False）"
+			+ $" 伤害={w.LastShotDamage:0.###}（期望 表值 {w.Damage:0} ×{damageMultiplier:0.##} = {expectNormalDamage:0.###}）"
 			+ $" 弹速={w.LastShotSpeed:0.###}（期望 表值 {w.Speed:0}） 投射物 +{shotB}");
 
 		// ④ **后置蓄力**（弓 0.1s/+30%、短弩 0.2s/+2 支、长枪 0.25s/+20% 都是这个结构）：
 		//    在真技能节点上现场配一段"弓式"参数，证明基类那套档位/上限是通用的、且全是表列。
-		SettleShot(w);
+		if (!await WaitAbilityReady(w))
+		{
+			GameLog.Write("SelfTest", $"🔴 机制·后置蓄力：技能等不到可用（忙={w.IsActive} 冷却={w.CooldownRemaining:0.###}），本段跳过。");
+			return;
+		}
+
 		_mechProjectilesBefore = _loopProjectiles;
 		w.ChargeStepSeconds = 0.1f;
 		w.ChargeStepScale = 1.3f;
 		w.ChargeMaxSeconds = 1f;
 		w.RefreshCooldown();
 		bool ok4 = w.TryActivate();
-		w.OnInputHeld(0.85f);
+		bool heldOk4A = await HoldCharge(w, w.ChargeBaseSecondsEffective + 0.35f);
 		int steps3 = w.ChargeSteps;
 		float power3 = w.ChargePowerScale;
-		w.OnInputHeld(2f);
+		bool heldOk4B = await HoldCharge(w, 2f);
 		int stepsMax = w.ChargeSteps;
 		int stepsCap = w.ChargeMaxStepsEffective;
 		float powerMax = w.ChargePowerScale;
 		w.OnInputReleased();
+		bool settled4 = await WaitSettle(w);
+		bool fired4 = ReleaseAtkFired(w, settled4);
 		int shotC = _loopProjectiles - _mechProjectilesBefore;
 		float expectStepDamage = w.Damage * powerMax * damageMultiplier;
-		bool stepsOk = ok4 && steps3 == 3 && stepsMax == 5 && Mathf.IsEqualApprox(power3, 1.9f)
+		bool stepsOk = ok4 && heldOk4A && heldOk4B && steps3 == 3 && stepsMax == 5 && fired4
+			&& Mathf.IsEqualApprox(power3, 1.9f)
 			&& Mathf.IsEqualApprox(w.LastShotDamage, expectStepDamage)
 			&& Mathf.IsEqualApprox(w.LastShotSpeed, w.Speed * powerMax);
 		GameLog.Write(
 			"SelfTest",
 			$"{(stepsOk ? "✅" : "🔴")} 机制·后置蓄力（两段结构）：TryActivate={ok4} 基础 {w.ChargeBaseSeconds:0.##}s + 每 {w.ChargeStepSeconds:0.##}s ×{w.ChargeStepScale:0.##}，上限 {w.ChargeMaxSeconds:0.##}s"
 			+ $" → 蓄 0.85s：档={steps3}（期望 3）威力×{power3:0.###}（期望 1+0.3×3=1.9）｜一直按住：档={stepsMax}（期望封顶 {stepsCap}=floor((1.0-0.5)/0.1)）威力×{powerMax:0.###}"
-			+ $" → 松手：伤害={w.LastShotDamage:0.###}（期望 30×{powerMax:0.###}×{damageMultiplier:0.##}={expectStepDamage:0.###}） 弹速={w.LastShotSpeed:0.###} 投射物 +{shotC}");
+			+ $" → 松手后释放段真ATK到达={fired4}（期望 True：自然收招={settled4}） 伤害={w.LastShotDamage:0.###}（期望 30×{powerMax:0.###}×{damageMultiplier:0.##}={expectStepDamage:0.###}） 弹速={w.LastShotSpeed:0.###} 投射物 +{shotC}");
 
 		// ⑤ 还原（表里的样子：没有后置蓄力）
-		SettleShot(w);
 		w.ChargeStepSeconds = 0f;
 		w.ChargeStepScale = 1f;
 		w.ChargeMaxSeconds = 0f;
-		w.RefreshCooldown();
+		w.ResetForLoadout();
 		GameLog.Write(
 			"SelfTest",
 			$"机制·还原：武技2 基础蓄力={w.ChargeBaseSeconds:0.##}s 完美窗口={w.PerfectWindowSeconds:0.##}s 后置蓄力={w.ChargeStepSeconds:0.##}s"
 			+ $" 威力×{w.ChargeStepScale:0.##}（回到表里的样子）");
 	}
 
-	/// <summary>
-	/// 把"刚发射完"的那一次施法**同步收尾**（`Tick → Finish`）。
-	///
-	/// ⚠️ 必须有这一步：`Finish()` 只在 <see cref="Ability._PhysicsProcess"/> 里的 <c>Tick</c> 跑，
-	/// 而探针是**同一帧内同步**驱动松手的 —— 不收尾的话 `IsBusy` 还是 true，
-	/// 下一轮 `TryActivate` 直接返回 false，`_fired` 也还是 true（于是读到的是**上一轮**的
-	/// LastShotDamage / LastShotSpeed —— 实测踩到过：第三轮报"完美=True 伤害=40"其实是第二轮的值）。
-	/// </summary>
-	private static void SettleShot(Ability ability) => ability._PhysicsProcess(0.02d);
+	// ⚠️ 旧的 `SettleShot(ability) => ability._PhysicsProcess(0.02d)`（"同帧手动 Tick 收尾"）**已删除**：
+	//    它**不推进动画**，只能把 `IsBusy` 拍平，于是"松手 → 释放段 ATK"这段永远走不到，
+	//    读出来的是上一轮/0 的值（J6 边界那 6 条红色输出就是它造成的假象）。
+	//    现在由 `WaitSettle` 等技能**自己**收招（释放段真 ATK → `Tick` 里的 `Finish`）。
 
 	/// <summary>
 	/// **首领增援现在走单位表**（`docs/combat.md` 里那条"只 AddChild、完全不套单位表"的修正）。
@@ -3019,8 +3197,11 @@ public partial class SelfTest : Node
 			$"P3·短弩武技1 射射射：TryActivate={ok1}（期望 True） 动画={_p3CrossbowW1.AnimName} 事件帧={_p3CrossbowW1.AnimEvent}｜表列：发数 {_p3CrossbowW1.Count}（期望 3） 夹角 {_p3CrossbowW1.SpreadStepDegrees:0.##}°（期望 20） 下坠起点 {_p3CrossbowW1.GravityStartDistance:0.##}m 重力 {_p3CrossbowW1.GravityScale:0.##} 击退 {_p3CrossbowW1.Knockback:0.##} 击退弹速门槛 {_p3CrossbowW1.KnockbackMinSpeed:0.##}｜下一段读结果（发数在事件帧那一帧才写）");
 	}
 
-	/// <summary>短弩结果 + 武技2 的"基础蓄力 + 每档 +2 支"（同步推蓄力，与帧率无关）。</summary>
-	private void ReportCrossbowProbe()
+	/// <summary>
+	/// 短弩结果 + 武技2 的"基础蓄力 + 每档 +2 支"。
+	/// 武技2 两轮都**跨帧**：按住按真实帧推进 → 松手 → 等释放段真 ATK + 自然收招 → 再读发数。
+	/// </summary>
+	private async Task RunCrossbowProbe()
 	{
 		if (_p3CrossbowW1 == null || _p3CrossbowW2 == null)
 		{
@@ -3034,35 +3215,61 @@ public partial class SelfTest : Node
 			$"{(fired ? "✅" : "🔴")} P3·短弩武技1 结果：发数 {_p3CrossbowW1.LastShotCount}（期望 3） 单发伤害 {_p3CrossbowW1.LastShotDamage:0.##} 弹速 {_p3CrossbowW1.LastShotSpeed:0.##}｜链路：动画 {_p3CrossbowW1.AnimName} → 事件帧 {_p3CrossbowW1.AnimEvent} → 投射物 {_p3CrossbowW1.LastShotCount} 个");
 
 		// 武技2：基础蓄力 0.4s（此时 0 档 → 3 支），再蓄 0.2×3 → 3 档 → 3 + 2×3 = 9 支。
-		// ⚠️ 两次施法之间必须**推一帧**让上一次 Finish()（`IsReady` 要求 !IsBusy；同步推与帧率无关）。
+		// ⚠️ 每轮之间等技能**自己收招**（`IsReady` 要求 !IsActive）；绝不同帧硬拍 `_PhysicsProcess`。
 		ArrowVolleyAbility w2 = _p3CrossbowW2;
+
+		if (!await WaitAbilityReady(w2))
+		{
+			GameLog.Write("SelfTest", $"🔴 P3·短弩武技2：技能等不到可用（忙={w2.IsActive} 冷却={w2.CooldownRemaining:0.###}），本段跳过。");
+			return;
+		}
+
+		int beforeA = _loopProjectiles;
 		w2.RefreshCooldown();
 		bool okA = w2.TryActivate();
-		w2.OnInputHeld(w2.ChargeBaseSeconds);
+		bool heldA = await HoldCharge(w2, w2.ChargeBaseSecondsEffective + 0.02f);
 		int stepsAt0 = w2.ChargeSteps;
 		w2.OnInputReleased();
+		bool settledA = await WaitSettle(w2);
+		bool firedA = ReleaseAtkFired(w2, settledA);
 		int countAt0 = w2.LastShotCount;
-		w2._PhysicsProcess(0.1d);
+		int shotsA = _loopProjectiles - beforeA;
 
+		if (!await WaitAbilityReady(w2))
+		{
+			GameLog.Write("SelfTest", $"🔴 P3·短弩武技2：第二轮开始前技能还没收招（忙={w2.IsActive}），本段跳过。");
+			return;
+		}
+
+		int beforeB = _loopProjectiles;
 		w2.RefreshCooldown();
 		bool okB = w2.TryActivate();
-		w2.OnInputHeld(w2.ChargeBaseSeconds + (0.2f * 3f) + 0.01f);
+		bool heldB = await HoldCharge(w2, w2.ChargeBaseSecondsEffective + (w2.ChargeStepSecondsEffective * 3f) + 0.02f);
 		int stepsAt3 = w2.ChargeSteps;
 		float powerAt3 = w2.ChargePowerScale;
 		w2.OnInputReleased();
+		bool settledB = await WaitSettle(w2);
+		bool firedB = ReleaseAtkFired(w2, settledB);
 		int countAt3 = w2.LastShotCount;
-		w2._PhysicsProcess(0.1d);
+		int shotsB = _loopProjectiles - beforeB;
 
-		bool okAll = okA && okB && stepsAt0 == 0 && countAt0 == 3 && stepsAt3 == 3 && countAt3 == 9;
+		bool okAll = okA && heldA && firedA && okB && heldB && firedB
+			&& stepsAt0 == 0 && countAt0 == 3 && stepsAt3 == 3 && countAt3 == 9;
 		GameLog.Write(
 			"SelfTest",
 			$"{(okAll ? "✅" : "🔴")} P3·短弩武技2 大射天下：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 0.4）/ 每档 {w2.ChargeStepSeconds:0.##}s（期望 0.2）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 3） 每档 +{w2.CountPerChargeStep} 支（期望 2）"
-			+ $" → 蓄到基础（档 {stepsAt0}）松手：发数 {countAt0}（期望 3，= 基础 {w2.Count}）；蓄到 3 档（档 {stepsAt3}，威力 ×{powerAt3:0.###}）松手：发数 {countAt3}（期望 9 = 3 + 2×3）"
+			+ $" → 蓄到基础（档 {stepsAt0}）松手：释放段真ATK到达={firedA}（自然收招={settledA}）发数 {countAt0}（期望 3，= 基础 {w2.Count}）投射物 +{shotsA}"
+			+ $"；蓄到 3 档（档 {stepsAt3}，威力 ×{powerAt3:0.###}）松手：释放段真ATK到达={firedB}（自然收招={settledB}）发数 {countAt3}（期望 9 = 3 + 2×3）投射物 +{shotsB}"
 			+ $"｜动画={w2.AnimName} 方向来源 Aim={w2.Aim}（0 = Facing：文档这一行写的是「朝角色方向」）");
 	}
 
-	/// <summary>切到"角色 A + 弓"，并造一个准星前的靶子（刹那之眼要标记它）。</summary>
-	private void BeginBowProbe()
+	/// <summary>
+	/// 切到"角色 A + 弓"，并造一个准星前的靶子（刹那之眼要标记它）。
+	///
+	/// ⚠️ 是 <see cref="Task"/>：武技1 的两个档位要**跨帧**蓄力、等释放段真 ATK 与自然收招。
+	/// 状态机在任务结束前不 <see cref="Next"/>（case 34 用 <see cref="ProbeTaskDone"/> 判）。
+	/// </summary>
+	private async Task BeginBowProbe()
 	{
 		GetTree().Paused = false;
 		RunController.Instance?.BeginRunWithCharacter(PlayerCharacterKind.Hunter, WeaponPresetKind.Bow);
@@ -3080,7 +3287,68 @@ public partial class SelfTest : Node
 			"SelfTest",
 			$"P3·弓换装：左键={_p3BowW1?.AbilityId ?? "（找不到）"}（期望 skl_a3_w1_1） 右键={_p3BowW2?.AbilityId ?? "（找不到）"}（期望 skl_a3_w1_2）｜短弩的节点已清：{_p3Player.GetNodeOrNull<Ability>("AbilityWeapon2Skill1")?.AbilityId ?? ""}（期望空）");
 
-		// 靶子：用真敌人 Chaser 的实例压在弹道上（与最小闭环同一套摆位），刹那之眼的标记要它。
+		// ⚠️ 靶子**必须等武技1 打完再出现**：武技1 现在是真的走释放段 ATK（真箭）——
+		//    上一版它只是同帧空算、一支箭都不发，所以把 60 血的 Chaser 摆在弹道 0.9m 处也无所谓。
+		//    实测（迁移后第一版）：两支真箭 24 + 45.6 直接把它打死 → 后面刹那之眼贴不上标记
+		//    （`Unit.ApplyStatus` 对 `IsDead` 直接 return）、追踪弹也找不到被标记目标。
+		//    所以靶子挪到武技1 之后造（它只服务于刹那之眼与标记/追踪弹那两段）。
+
+		// 武技1：两个档位的伤害/弹速（3档按基础加算+90%伤害、+90弹速）。
+		// 跨帧：按住按真实帧推进（目标秒数从表列算），松手后等**释放段真 ATK + 自然收招**再读 LastShot*。
+		if (_p3BowW1 != null)
+		{
+			ArrowVolleyAbility w1 = _p3BowW1;
+			float dmgMul = _p3Player.Stats.Get("DamageMultiplier");
+
+			if (!await WaitAbilityReady(w1))
+			{
+				GameLog.Write("SelfTest", $"🔴 P3·弓武技1：技能等不到可用（忙={w1.IsActive} 冷却={w1.CooldownRemaining:0.###}），本段跳过。");
+				return;
+			}
+
+			w1.RefreshCooldown();
+			bool baseCast = w1.TryActivate();
+			bool baseHeld = await HoldCharge(w1, w1.ChargeBaseSecondsEffective + 0.01f);
+			int stepsAtBase = w1.ChargeSteps;
+			w1.OnInputReleased();
+			bool baseSettled = await WaitSettle(w1);
+			bool baseFired = ReleaseAtkFired(w1, baseSettled);
+			float dmg0 = w1.LastShotDamage;
+			float spd0 = w1.LastShotSpeed;
+
+			if (!await WaitAbilityReady(w1))
+			{
+				GameLog.Write("SelfTest", $"🔴 P3·弓武技1：第二轮开始前技能还没收招（忙={w1.IsActive}），本段跳过。");
+				return;
+			}
+
+			w1.RefreshCooldown();
+			bool stepCast = w1.TryActivate();
+			bool stepHeld = await HoldCharge(w1, w1.ChargeBaseSecondsEffective + (w1.ChargeStepSecondsEffective * 3f) + 0.02f);
+			int steps = w1.ChargeSteps;
+			w1.OnInputReleased();
+			bool stepSettled = await WaitSettle(w1);
+			bool stepFired = ReleaseAtkFired(w1, stepSettled);
+			float dmg3 = w1.LastShotDamage;
+			float spd3 = w1.LastShotSpeed;
+			float expectDmg3 = w1.Damage * (1 + 0.3f * steps) * dmgMul;
+			float expectSpd3 = w1.Speed + (30f * steps);
+
+			bool ok = baseCast && baseHeld && baseFired && stepsAtBase == 0 && stepCast && stepHeld && stepFired && steps == 3
+				&& Mathf.IsEqualApprox(dmg0, _p3BowW1.Damage * dmgMul)
+				&& Mathf.IsEqualApprox(spd0, _p3BowW1.Speed)
+				&& Mathf.IsEqualApprox(dmg3, expectDmg3)
+				&& Mathf.IsEqualApprox(spd3, expectSpd3);
+			GameLog.Write(
+				"SelfTest",
+				$"{(ok ? "✅" : "🔴")} P3·弓武技1 箭在弦上：基础蓄力 {w1.ChargeBaseSeconds:0.##}s（期望 0.5）/ 每 {w1.ChargeStepSeconds:0.##}s（期望 0.1）一档 / 每档伤害 ×{w1.ChargeStepScale:0.##}（期望 1.3）/ 每档弹速 +{w1.SpeedPerChargeStep:0.##}（期望 30）/ 最多 {w1.ChargeMaxSeconds:0.##}s（期望 1）"
+				+ $" → 基础档：释放段真ATK到达={baseFired}（档 {stepsAtBase}，自然收招={baseSettled}）伤害 {dmg0:0.###}（期望 表值 {w1.Damage:0} ×玩家倍率 {dmgMul:0.##}）弹速 {spd0:0.##}（期望 {w1.Speed:0}）"
+				+ $"；3 档：释放段真ATK到达={stepFired}（自然收招={stepSettled}）伤害 {dmg3:0.###}（期望 {expectDmg3:0.###} = 1+0.3×3）弹速 {spd3:0.##}（期望 {expectSpd3:0.##}）");
+		}
+
+		// 靶子：用真敌人 Chaser 的实例（刹那之眼的标记要它）。
+		// ⚠️ 摆位**不再压在"弹道 0.9m"上**：武技1 已经打完真箭了，这里再造就没必要当活靶；
+		//    下一段的刹那之眼会把它搬到"准星世界点前 1.5m"（标记的判据是准星附近最近目标）。
 		EnemyConfig? chaserRow = ConfigRows.ById<EnemyConfig>("enemy_chaser");
 		if (chaserRow == null || string.IsNullOrEmpty(chaserRow.ScenePath) || !ResourceLoader.Exists(chaserRow.ScenePath))
 		{
@@ -3094,54 +3362,20 @@ public partial class SelfTest : Node
 			return;
 		}
 
+		// ⚠️ 标记 / 追踪弹的**测试靶**必须打不死：武技1 现在是真的走释放段 ATK（真箭），
+		//    实测 3 轮里有 1 轮这 60 血的 Chaser 被路过的真箭打死 —— `Unit.ApplyStatus` 对
+		//    `IsDead` 直接 return → 标记层数永远停在 1 层、追踪弹锁定目标为空（case 35 两条红灯）。
+		//    这里只把 MaxHealth 抬高（走正常的 `_Ready` → `Health = MaxHealth`），**不改任何生产规则**。
+		chaser.MaxHealth = 4000f;
+
 		NodeSearch.FindInSubtree<ActRoguelike.AI.EnemyBrain>(chaser)?.SetPhysicsProcess(false);
 		if (_p3Player.GetParent() is { } arena)
 		{
 			arena.AddChild(chaser);
 		}
 
-		if (TryComputeShotLine(_p3Player, out Vector3 origin, out Vector3 direction))
-		{
-			PlaceOnShotLine(chaser, origin, direction, TargetDistanceOnLine);
-		}
-
 		_p3Target = chaser;
-		GameLog.Write("SelfTest", $"P3·弓：靶子 {chaser.Name} 生命 {chaser.Health:0.#} 已就位");
-
-		// 武技1：两个档位的伤害/弹速（3档按基础加算+90%伤害、+90弹速）。
-		if (_p3BowW1 != null)
-		{
-			ArrowVolleyAbility w1 = _p3BowW1;
-			float dmgMul = _p3Player.Stats.Get("DamageMultiplier");
-			w1.RefreshCooldown();
-			w1.TryActivate();
-			w1.OnInputHeld(w1.ChargeBaseSeconds + 0.01f);
-			w1.OnInputReleased();
-			float dmg0 = w1.LastShotDamage;
-			float spd0 = w1.LastShotSpeed;
-			w1._PhysicsProcess(0.1d);
-
-			w1.RefreshCooldown();
-			w1.TryActivate();
-			w1.OnInputHeld(w1.ChargeBaseSeconds + (0.1f * 3f) + 0.01f);
-			int steps = w1.ChargeSteps;
-			w1.OnInputReleased();
-			float dmg3 = w1.LastShotDamage;
-			float spd3 = w1.LastShotSpeed;
-			w1._PhysicsProcess(0.1d);
-			float expectDmg3 = w1.Damage * (1 + 0.3f * steps) * dmgMul;
-			float expectSpd3 = w1.Speed + (30f * steps);
-
-			bool ok = steps == 3
-				&& Mathf.IsEqualApprox(dmg0, _p3BowW1.Damage * dmgMul)
-				&& Mathf.IsEqualApprox(spd0, _p3BowW1.Speed)
-				&& Mathf.IsEqualApprox(dmg3, expectDmg3)
-				&& Mathf.IsEqualApprox(spd3, expectSpd3);
-			GameLog.Write(
-				"SelfTest",
-				$"{(ok ? "✅" : "🔴")} P3·弓武技1 箭在弦上：基础蓄力 {w1.ChargeBaseSeconds:0.##}s（期望 0.5）/ 每 {w1.ChargeStepSeconds:0.##}s（期望 0.1）一档 / 每档伤害 ×{w1.ChargeStepScale:0.##}（期望 1.3）/ 每档弹速 +{w1.SpeedPerChargeStep:0.##}（期望 30）/ 最多 {w1.ChargeMaxSeconds:0.##}s（期望 1）"
-				+ $" → 基础档：伤害 {dmg0:0.###}（期望 表值 {w1.Damage:0} ×玩家倍率 {dmgMul:0.##}）弹速 {spd0:0.##}（期望 {w1.Speed:0}）；3 档：伤害 {dmg3:0.###}（期望 {expectDmg3:0.###} = 1+0.3×3）弹速 {spd3:0.##}（期望 {expectSpd3:0.##}）");
-		}
+		GameLog.Write("SelfTest", $"P3·弓：靶子 {chaser.Name} 生命 {chaser.Health:0.#}（探针把 MaxHealth 抬到 4000：它只当标记 / 追踪弹的靶子，不能被路过流弹打死）已就位；下一段把它搬到准星世界点");
 
 		// 武技2 刹那之眼：无动画软启动期间被击中 → 无效化 + 强制一次不消耗层数的「后撤」。
 		if (_p3Backdash == null)
@@ -3697,8 +3931,13 @@ public partial class SelfTest : Node
 		return projectile;
 	}
 
-	/// <summary>灵剑武技2「拔刀式」：基础蓄力 1s + 剑气属性（穿透 / 可格挡 / 路径短 / 大小等比攻击盒）。</summary>
-	private void ReportSwordQiProbe()
+	/// <summary>
+	/// 灵剑武技2「拔刀式」：基础蓄力 1s + 剑气属性（穿透 / 可格挡 / 路径短 / 大小等比攻击盒）。
+	///
+	/// 两段都**跨帧**：没蓄满松手 → 走 <c>OnChargeAborted</c>（不释放）；蓄满松手 → 等**释放段真 ATK**
+	/// 播完、技能自然收招，再去数剑气。旧版同帧灌满 + 同帧数，永远数到 0。
+	/// </summary>
+	private async Task RunSwordQiProbe()
 	{
 		if (_p4Player == null || _p4SwordW2 == null || _p4SwordW1 == null)
 		{
@@ -3707,31 +3946,48 @@ public partial class SelfTest : Node
 		}
 
 		SwordQiAbility w2 = _p4SwordW2;
-		WaitUntilIdle(w2);
-		w2.RefreshCooldown();
+
+		// ① 基础蓄力 1s 还没满就松手 → 不释放（按真实帧按住 0.4s）
+		if (!await WaitAbilityReady(w2))
+		{
+			GameLog.Write("SelfTest", $"🔴 P4·剑气：技能等不到可用（忙={w2.IsActive} 冷却={w2.CooldownRemaining:0.###}），本段跳过。");
+			return;
+		}
+
+		int projectilesBefore = CountProjectiles("SwordQi");
 		bool started = w2.TryPress();                       // 按下（进入蓄力）
-		w2.OnInputHeld(0.4f);                               // 基础蓄力 1s 还没满
+		bool heldAbort = await HoldCharge(w2, 0.4f);        // 基础蓄力 1s 还没满
 		bool aborted = w2.ChargeBaseComplete;               // 期望 False
 		w2.OnInputReleased();                               // 没蓄满就松手 → 不释放
-		int projectilesAfterAbort = CountProjectiles("SwordQi");
+		bool abortSettled = await WaitSettle(w2, 2.0);
+		int projectilesAfterAbort = CountProjectiles("SwordQi") - projectilesBefore;
 
-		WaitUntilIdle(w2);
-		w2.RefreshCooldown();
+		// ② 蓄满 → 松手 → 等释放段真 ATK + 自然收招 → 数剑气
+		if (!await WaitAbilityReady(w2))
+		{
+			GameLog.Write("SelfTest", $"🔴 P4·剑气：蓄满那一轮开始前技能还没收招（忙={w2.IsActive}），本段跳过。");
+			return;
+		}
+
+		int beforeFull = CountProjectiles("SwordQi");
 		bool started2 = w2.TryPress();
-		w2.OnInputHeld(w2.ChargeBaseSeconds + 0.05f);       // 蓄满 → 松手释放
+		bool heldFull = await HoldCharge(w2, w2.ChargeBaseSecondsEffective + 0.05f);
 		GameLog.Write(
 			"SelfTest",
 			$"P4·剑气尺寸基准：武技1 当前第 {_p4SwordW1.ComboStep + 1} 段命中盒 {Fmt(_p4SwordW1.CurrentStepBoxSize)}");
 		w2.OnInputReleased();
-		int projectiles = CountProjectiles("SwordQi");
+		bool fullSettled = await WaitSettle(w2);
+		bool fired = ReleaseAtkFired(w2, fullSettled);
+		int projectiles = CountProjectiles("SwordQi") - beforeFull;
 
-		bool ok = started && !aborted && projectilesAfterAbort == 0 && started2 && projectiles >= 1
+		bool ok = started && heldAbort && !aborted && abortSettled && projectilesAfterAbort == 0
+			&& started2 && heldFull && fired && projectiles >= 1
 			&& w2.Pierce >= 1 && !w2.BypassBlock && w2.MaxLifetime <= 0.6f && w2.LastSize > 0f;
 		GameLog.Write(
 			"SelfTest",
 			$"{(ok ? "✅" : "🔴")} P4·灵剑武技2 拔刀式：TryPress={started}（期望 True） 基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 1）/ CD {w2.Cooldown:0.##}（期望 2）"
-			+ $"｜没蓄满就松手：基础完成={aborted}（期望 False）→ 剑气生成 {projectilesAfterAbort} 个（期望 0，设计文档「未完成不释放」）"
-			+ $"｜蓄满松手：生成 {projectiles} 个（期望 ≥1）｜剑气属性 —— 穿透 {w2.Pierce}（期望 ≥1，能穿透路径上的敌人） 可被格挡={!w2.BypassBlock}（期望 True） 存活 {w2.MaxLifetime:0.##}s（期望 ≤0.6 = 飞行路径短）"
+			+ $"｜没蓄满就松手：基础完成={aborted}（期望 False）→ 剑气生成 {projectilesAfterAbort} 个（期望 0，设计文档「未完成不释放」；已收招={abortSettled}）"
+			+ $"｜蓄满松手：释放段真ATK到达={fired}（自然收招={fullSettled}）生成 {projectiles} 个（期望 ≥1）｜剑气属性 —— 穿透 {w2.Pierce}（期望 ≥1，能穿透路径上的敌人） 可被格挡={!w2.BypassBlock}（期望 True） 存活 {w2.MaxLifetime:0.##}s（期望 ≤0.6 = 飞行路径短）"
 			+ $"｜大小等比攻击盒：剑气尺寸 {w2.LastSize:0.###}（来源：{w2.LastSizeSource}）");
 	}
 
