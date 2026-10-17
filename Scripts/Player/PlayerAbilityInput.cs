@@ -103,8 +103,9 @@ public partial class PlayerAbilityInput : Node
 			}
 
 			// 维持类也检测当前按键状态，避免暂停期间松手后恢复时漏掉释放沿。
-			if (ability.IsActive && (Input.IsActionJustReleased(action)
-				|| (ability.IsMaintaining && !Input.IsActionPressed(action))))
+			// 同一渲染帧内松开又按下时，两个边沿均可能为真；最终仍按住不能被旧释放沿取消。
+			if (ability.IsActive && !Input.IsActionPressed(action)
+				&& (Input.IsActionJustReleased(action) || ability.IsMaintaining))
 			{
 				ability.OnInputReleased();
 			}

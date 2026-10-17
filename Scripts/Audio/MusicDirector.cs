@@ -88,12 +88,21 @@ public partial class MusicDirector : Node
 
 	public override void _ExitTree()
 	{
-		_fade?.Kill();
+		StopForShutdown();
 
 		if (AudioManager.Instance is { } manager)
 		{
 			manager.MusicEnded -= OnMusicEnded;
 		}
+	}
+	/// <summary>声部提前释放前撤销淡出及回调，避免回调访问已销毁的播放器。</summary>
+	internal void StopForShutdown()
+	{
+		_fade?.Kill();
+		_fade = null;
+		_fading = false;
+		_pendingId = null;
+		SetProcess(false);
 	}
 
 	public override void _Process(double delta)
@@ -259,7 +268,7 @@ public partial class MusicDirector : Node
 		_fade.TweenCallback(Callable.From(() =>
 		{
 			_fading = false;
-			voice.Stop();
+			if (IsInstanceValid(voice)) voice.Stop();
 		}));
 	}
 

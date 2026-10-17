@@ -1,0 +1,51 @@
+J2 中间失败摘录（均未计为最终通过，2026-10-17）
+
+1. 完整自测随机死亡，切回基地后超时。
+[log] 13:33:40 [Combat] 伤害 @CharacterBody3D@395(18.8) → Player(0) 21.2
+[log] 13:33:40 [Combat] 死亡 Player(0) 击杀者=@CharacterBody3D@395(18.8)
+[log] 13:33:40 [Flow] 死亡流程：进死亡动画（1.4s，期间不暂停）→ 演示过渡面板（占位 3.2s）→ res://Scenes/Levels/Base.tscn
+[log] 13:33:46 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 35 —— 本局没有激活的卡（全部效果为空）
+该次碎片20→35已按落盘字节备份恢复；最终meta哈希见证据日志。
+修正：交互流程阶段临时无敌；自测收益和消费只在内存生效。
+
+2. Main退出0，但6个音频对象泄漏。
+WARNING: 6 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+Leaked instance: OggPacketSequence:9223372168740474131 - Reference count: 3
+Leaked instance: AudioStreamOggVorbis:9223372168757251348 - Reference count: 1
+Leaked instance: AudioStreamWAV:9223372258532135170 - Reference count: 1
+Leaked instance: AudioStreamPlaybackWAV:9223372488413549123 - Reference count: 1
+Leaked instance: AudioStreamPlaybackOggVorbis:9223372403873158910 - Reference count: 1
+Leaked instance: OggPacketSequencePlayback:9223372403889936127 - Reference count: 1
+
+3. 提前释放声部的初版漏取消淡出回调；F33/0但stderr有错误。
+ERROR: System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'Godot.AudioStreamPlayer'.
+   at Godot.AudioStreamPlayer.Stop() in /root/godot/modules/mono/glue/GodotSharp/GodotSharp/Generated/GodotObjects/AudioStreamPlayer.cs:line 329
+   at ActRoguelike.Audio.MusicDirector.<>c__DisplayClass23_0.<Stop>b__0() in F:\Godot项目\项目a\Scripts\Audio\MusicDirector.cs:line 262
+修正：先Kill音乐淡出Tween，再停播／释放声部；退出继续等待混音回收。
+
+4. 渲染探针同帧松开再按下，旧释放沿取消新蓄力。
+[Design] FAIL 长枪蓄至1档
+[Design] FAIL 合格松手后等待真实ATK抛出
+[Design] FAIL 1档基础加算：倍率=1、射程=12
+[Design] FAIL 准星落点／超射程同向截断：(-20, -2.3841858E-07, 2)
+[Design] FAIL 长枪与真实World地面碰撞落地
+[Design] FAIL 飞出路径窄目标只命中一次：0
+[Design] FAIL 长枪落地静止、保持在外，不靠近收回
+[Design] FAIL 600m/s回程扫过窄目标仍命中一次：0
+[Design] FAIL 往返同一窄目标各受击一次：0
+[Design] === 原始设计验收结束：通过 111，失败 9 ===
+修正：最终按住状态为真时不转发旧释放沿；探针刻意复现这一输入边沿。
+
+5. E旧击杀断言依赖旧乘方倍率。
+[log] 17:01:57 [Combat] 伤害 Player(220) → EyeTarget(0) 60
+[BatchE] PASS 松开左键真实发箭：1支，伤害=60
+[BatchE] FAIL 左键箭命中标记靶子并造成击杀
+[BatchE] === E 批验收结束：通过 38，失败 1 ===
+实际快照59.999992，60血靶子留微量生命，日志四舍五入为0。
+修正：1000血靶比较真实扣血与箭快照，误差小于0.01；不修改正式伤害迁就旧测试。
+下一次随机暴击暴露探针缺少暴击因子：
+[log] 17:08:32 [Combat] 伤害 Player(220) → EyeTarget(880) 120
+[log] 17:08:32 [Combat] 暴击 Player(220) → EyeTarget(880) 120
+[BatchE] FAIL 左键箭命中标记靶子：实扣=120，快照=59.99999
+最终修正：订阅真实HitReceived，按命中Critical及攻击快照CritMultiplier计算期望，验证技能身份与真实扣血，成对退订。

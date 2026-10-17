@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
 using ActRoguelike.Core;
@@ -19,10 +20,13 @@ public partial class CharacterDisplay : Node3D
 	public string CurrentModelPath { get; private set; } = string.Empty;
 	public string CurrentWeaponPath { get; private set; } = string.Empty;
 	public Node3D? ActiveModel { get; private set; }
+	public Node3D? EquippedWeapon { get; private set; }
+	private readonly List<WeaponThrowAbility> _throws = new();
 	public int ModelCount => _models.Count;
 	public override void _Ready()
 	{
 		_original = GetNode<Node3D>(OriginalModelPath);
+		if (GetParent() is Unit unit) NodeSearch.CollectInSubtree(unit, _throws);
 		_models[_original.SceneFilePath] = _original;
 		foreach (CharacterConfig row in FixedCharacter != null ? new[] { FixedCharacter } : ConfigIndex.Settings.Characters)
 		{
@@ -65,6 +69,7 @@ public partial class CharacterDisplay : Node3D
 		foreach (var cached in _models.Values) cached.Visible = cached == model;
 		ActiveModel = model;
 		CurrentWeaponPath = weapon.ModelPath;
+		EquippedWeapon = null;
 		foreach (var cached in _weapons.Values) cached.Visible = false;
 		if (!string.IsNullOrEmpty(weapon.ModelPath))
 		{
@@ -76,6 +81,7 @@ public partial class CharacterDisplay : Node3D
 				_weapons[key] = visual;
 			}
 			visual.Visible = true;
+			EquippedWeapon = visual;
 		}
 		if (GetParent() is Unit unit)
 		{
@@ -90,5 +96,13 @@ public partial class CharacterDisplay : Node3D
 			player.GetAnimation("idle").LoopMode = Animation.LoopModeEnum.Linear;
 			player.Play("idle");
 		}
+	}
+	public override void _PhysicsProcess(double delta)
+	{
+		if (EquippedWeapon == null) return;
+		bool away = false;
+		foreach (var ability in _throws)
+			if (IsInstanceValid(ability) && ability.Enabled && ability.InFlight) { away = true; break; }
+		EquippedWeapon.Visible = !away;
 	}
 }

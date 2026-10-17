@@ -4,12 +4,6 @@
 [ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_throw.svg" id="e_hud_icon"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
-[sub_resource type="Resource" id="p_ThrowSpeed"]
-script = ExtResource("2_param")
-Key = "ThrowSpeed"
-Value = 14
-Note = "基准水平速度（m/s；蓄力按 ChargePowerScale 放大）"
-
 [sub_resource type="Resource" id="p_ReturnSpeed"]
 script = ExtResource("2_param")
 Key = "ReturnSpeed"
@@ -43,8 +37,8 @@ Note = "路径采样段数"
 [sub_resource type="Resource" id="p_SpinDegreesPerSecond"]
 script = ExtResource("2_param")
 Key = "SpinDegreesPerSecond"
-Value = 1080
-Note = "飞行自转（度/秒）"
+Value = 0
+Note = "长枪沿速度方向飞行，落地后静止"
 
 [sub_resource type="Resource" id="p_DamageInterval"]
 script = ExtResource("2_param")
@@ -67,8 +61,8 @@ Note = "★ 丢出去后可再次使用技能收回（文档）"
 [sub_resource type="Resource" id="p_RecallDistance"]
 script = ExtResource("2_param")
 Key = "RecallDistance"
-Value = 1.8
-Note = "靠近也收回"
+Value = 0
+Note = "默认只在再次使用时收回，不靠近自动收回"
 
 [sub_resource type="Resource" id="p_DamageOnReturn"]
 script = ExtResource("2_param")
@@ -82,6 +76,12 @@ Key = "ShowPath"
 Value = true
 Note = "★ 路径可视化指示器（文档第 151 行）"
 
+[sub_resource type="Resource" id="p_ContinuousPathDamage"]
+script = ExtResource("2_param")
+Key = "ContinuousPathDamage"
+Value = true
+Note = "飞出／回手各对沿途目标命中一次，静止时不持续刺伤"
+
 [resource]
 script = ExtResource("1_row")
 HudIcon = ExtResource("e_hud_icon")
@@ -91,6 +91,8 @@ NodeName = "AbilityWeapon6Skill2"
 ClassHint = "SpearThrowAbility"
 InputAction = "weapon_skill_2"
 HoldToCharge = true
+AnimName = "Skill_B3_Spear4"
+AnimEvent = "ATK"
 ChargeBaseSeconds = 1.0
 ChargeStepSeconds = 0.25
 ChargeStepScale = 1.2
@@ -101,6 +103,6 @@ Windup = 0.0
 Recover = 0.05
 Id = "skl_b3_w1_2"
 DisplayName = "长虹贯日"
-DescriptionTemplate = "基础蓄力 {ChargeBaseSeconds:0.##}s，朝准星方向抛掷长枪，路径呈现抛物线（有路径可视化指示器）；每蓄力 {ChargeStepSeconds:0.##}s 增强伤害 {ChargeStepScale:0.##} 倍、弹速与路径中线同样 +20%，最多蓄力 {ChargeMaxSeconds:0.##}s；丢出去后可再次使用技能收回，回来时能再次对路径中的敌人造成伤害。"
-Note = "[P4 新增行] 角色 B 武器3 长枪 武技2（文档 CD:0.5 / 基础蓄力 1s / 每 0.25s +20% 伤害·弹速·路径中线 / 最多蓄力 1 秒）。★ ChargeStepScale=1.2 → 每档 ×1.2（= +20%）。★ 「路径中线延长 20%」 是**非倍率维度**（它是长度）：水平速度按同一个倍率放大、飞行时间不变（见 SpearThrowAbility.Launch 的注释与 docs/abilities.md §8）。★ 抛物线形状与画出来的那条线**同源**（同一组参数调 DashPathIndicator.SampleArcToDistance）。"
-Params = [SubResource("p_ThrowSpeed"), SubResource("p_ReturnSpeed"), SubResource("p_MaxThrowDistance"), SubResource("p_FlightSeconds"), SubResource("p_ArcGravity"), SubResource("p_ArcPathSteps"), SubResource("p_SpinDegreesPerSecond"), SubResource("p_DamageInterval"), SubResource("p_DamageActiveTime"), SubResource("p_RecallOnSecondPress"), SubResource("p_RecallDistance"), SubResource("p_DamageOnReturn"), SubResource("p_ShowPath")]
+DescriptionTemplate = "基础蓄力1秒，额外最多1秒，每0.25秒增强20%基础伤害、弹速和射程，最多1.8倍；朝准星落点抛出，超射程截到最远，落地静止，再次使用收回，回程再次造成路径伤害。"
+Note = "用户确认：基础1秒＋额外最多1秒，每0.25秒按基础值加算20%，四档1.8倍；准星选地面落点，超水平射程截到最远。预览和真实飞行同源，碰World后静止，默认仅再次使用收回；往返各命中一次。临时复用突刺作为释放动作，独立动作待后续适配。"
+Params = [SubResource("p_ReturnSpeed"), SubResource("p_MaxThrowDistance"), SubResource("p_FlightSeconds"), SubResource("p_ArcGravity"), SubResource("p_ArcPathSteps"), SubResource("p_SpinDegreesPerSecond"), SubResource("p_DamageInterval"), SubResource("p_DamageActiveTime"), SubResource("p_RecallOnSecondPress"), SubResource("p_RecallDistance"), SubResource("p_DamageOnReturn"), SubResource("p_ShowPath"), SubResource("p_ContinuousPathDamage")]

@@ -5,27 +5,7 @@ using Godot;
 
 namespace ActRoguelike.Abilities;
 
-/// <summary>
-/// **武器抛出 / 收回的公共地基**（P4 新增）—— 镰刀「无情」与长枪「长虹贯日」共用这一段：
-/// "手上那把武器飞出去 → 对它范围内的敌人造成伤害 → 收回"。
-///
-/// <list type="bullet">
-/// <item><b>飞出/收回两个速度</b>（<see cref="ThrowSpeed"/> / <see cref="ReturnSpeed"/>）；</item>
-/// <item><b>旋转</b>（<see cref="SpinDegreesPerSecond"/>，"武器会不断旋转"）；</item>
-/// <item><b>周期性伤害</b>（<see cref="DamageInterval"/> = 文档写的 0.5s，"周期性对武器内的敌人
-///   造成伤害"）：只有一个计时器，每个间隔开一次命中盒；</item>
-/// <item><b>收回条件</b>：再次按键（<see cref="TryPress"/>）/ 玩家靠近武器（<see cref="RecallDistance"/>）
-///   / 飞太远（<see cref="MaxThrowDistance"/>）—— 文档写的是前两条，第三条是"别把武器丢出地图"的兜底。</item>
-/// </list>
-///
-/// <para><b>"武器飞出去这期间武技1无法使用"</b>：本类把"飞出中"这个状态通过
-/// <see cref="InFlightChanged"/> 广播出去，<c>ComboGate</c>（同一把武器的武技1 节点）订阅它 ——
-/// 于是"能不能用武技1"由**武器在不在手上**决定，而不是各写一份开关。</para>
-///
-/// <para>视觉由 <see cref="WeaponVisual"/> 承担（场景里那个可选的 <c>WeaponVisual</c> 子节点）：
-/// 抛出期间它被摆到武器的位置上、按 <see cref="SpinDegreesPerSecond"/> 自转；收回后放回手上。
-/// 没有这个子节点时逻辑照常（只是没有模型）。</para>
-/// </summary>
+/// <summary>投掷共用状态机：动画事件出手、飞出、真实地形／射程停留、回手。视觉独立只读。</summary>
 public abstract partial class WeaponThrowAbility : Ability
 {
 	[ExportGroup("抛出 / 收回")]
@@ -35,7 +15,7 @@ public abstract partial class WeaponThrowAbility : Ability
 	/// <summary>收回速度（m/s）。</summary>
 	[Export] public float ReturnSpeed { get; set; } = 26f;
 
-	/// <summary>**最远抛出距离**（米；到点自动收回，兜底防止武器丢出地图）。</summary>
+	/// <summary>**最远抛出距离**（米；到点停留）。</summary>
 	[Export] public float MaxThrowDistance { get; set; } = 12f;
 
 	/// <summary>**再次按键就收回**（文档：「再次使用…时收回武器」）。</summary>
@@ -56,6 +36,10 @@ public abstract partial class WeaponThrowAbility : Ability
 
 	/// <summary>收回途中是否**再一次**对路径中的敌人造成伤害（文档：长枪「回来时能再次对路径中的敌人造成伤害」）。</summary>
 	[Export] public bool DamageOnReturn { get; set; } = true;
+	/// <summary>飞出与回程各持续判定一次路径；关闭时使用周期伤害。</summary>
+	[Export] public bool ContinuousPathDamage { get; set; }
+	[Export] public bool AutoRecallOnSettle { get; set; }
+	[Export] public float ThrowEventTimeout { get; set; } = 2f;
 
 	[ExportGroup("可视化路径（可选）")]
 	/// <summary>抛出时画不画路径线。</summary>
@@ -70,6 +54,12 @@ public abstract partial class WeaponThrowAbility : Ability
 	[ExportGroup("运行期可读状态（自测 / UI / 武技1 的门）")]
 	/// <summary>武器现在在飞吗（"飞出去这期间武技1无法使用"读的就是它）。</summary>
 	public bool InFlight { get; private set; }
+	/// <summary>InFlight表示尚未回手，包含停留与回程，供武技1锁门使用。</summary>
+	public bool IsReturning { get; private set; }
+	public bool HasSettled { get; private set; }
+	public Vector3 WeaponVelocity => FlightVelocity;
+	public Vector3 LastFlightDirection { get; private set; } = Vector3.Forward;
+	protected override bool OccupiesAction => !InFlight;
 
 	/// <summary>武器现在的世界坐标（自测 / 表现）。</summary>
 	public Vector3 WeaponPosition { get; private set; }
@@ -85,15 +75,12 @@ public abstract partial class WeaponThrowAbility : Ability
 
 	protected AttackHitbox? Hitbox { get; private set; }
 
-	/// <summary>场景里那个可选的武器模型（抛出去时摆到武器位置上自转）。</summary>
-	protected Node3D? WeaponVisual { get; private set; }
 
 	private DashPathIndicator? _path;
-	private float _spin;
 	private float _intervalTimer;
 	private float _activeTimer;
 	private bool _damageWindowOpen;
-	private bool _wasPressed;
+	private bool _waitingForThrowEvent;
 	private bool _waitingForCharge;
 	private bool _leftRecallRange;
 
@@ -103,7 +90,6 @@ public abstract partial class WeaponThrowAbility : Ability
 	protected override void OnReady()
 	{
 		Hitbox = GetNodeOrNull<AttackHitbox>("Attack");
-		WeaponVisual = GetNodeOrNull<Node3D>("WeaponVisual");
 		_path = GetNodeOrNull<DashPathIndicator>("Path");
 		if (_path != null)
 		{
@@ -133,7 +119,7 @@ public abstract partial class WeaponThrowAbility : Ability
 	{
 	}
 
-	protected override bool CanActivate(Unit? target) => OwnerUnit != null;
+	protected override bool CanActivate(Unit? target) => OwnerUnit != null && !string.IsNullOrEmpty(AnimName) && !string.IsNullOrEmpty(AnimEvent);
 
 	protected override void OnActivate(Unit? target)
 	{
@@ -143,28 +129,37 @@ public abstract partial class WeaponThrowAbility : Ability
 			return;
 		}
 
-		_wasPressed = false;
+		_waitingForThrowEvent = !HoldToCharge;
 		_intervalTimer = 0f;
 		_activeTimer = 0f;
 		_damageWindowOpen = false;
-		_spin = 0f;
 		DamageTickCount = 0;
 		_leftRecallRange = false;
 		_waitingForCharge = HoldToCharge;
-		if (_waitingForCharge)
-		{
-			PlaySkillAnimation();
-			return;
-		}
-		BeginThrow();
+		IsReturning = false;
+		HasSettled = false;
+		PlaySkillAnimation();
 	}
 
 	protected override void OnChargeReleased(bool perfect, int steps, float powerScale)
 	{
 		if (!_waitingForCharge) return;
 		_waitingForCharge = false;
+		_waitingForThrowEvent = true;
+		StateTime = 0f;
+		PlaySkillAnimation();
+	}
+	protected override void OnAnimEvent(string name)
+	{
+		if (!_waitingForThrowEvent || _waitingForCharge || InFlight) return;
+		_waitingForThrowEvent = false;
 		BeginThrow();
 	}
+	public override void OnInputHeld(float delta)
+	{
+		if (_waitingForCharge) base.OnInputHeld(delta);
+	}
+	protected virtual void PreviewPath() { }
 
 	protected override void OnChargeAborted() => Cancel();
 
@@ -183,10 +178,14 @@ public abstract partial class WeaponThrowAbility : Ability
 		direction = direction.Normalized();
 		HomePosition = OwnerUnit.GlobalPosition + (Vector3.Up * 0.9f) + (direction * 0.6f);
 		WeaponPosition = HomePosition;
+		// 只在自身仍占动作时交还动画；回手收尾不能停止其他技能的动画。
+		StopSkillAnimation();
 		SetInFlight(true);
 		OnThrowStarted();
 
 		Launch(direction);
+		LastFlightDirection = FlightVelocity.Normalized();
+		if (ContinuousPathDamage) OpenDamageWindow();
 
 		GameLog.Write(
 			"Combat",
@@ -203,129 +202,100 @@ public abstract partial class WeaponThrowAbility : Ability
 	/// <summary>飞行重力（0 = 直线）。</summary>
 	protected float FlightGravity { get; set; }
 
-	/// <summary>落到这个高度以下就算"落地"（0 = 不判落地）。</summary>
-	protected float SettleHeight { get; set; }
-
 	protected override void Tick(float delta)
 	{
-		if (!IsBusy || _waitingForCharge)
+		if (!IsActive) return;
+		if (_waitingForCharge) { PreviewPath(); return; }
+		if (_waitingForThrowEvent)
 		{
+			if (StateTime > ThrowEventTimeout) Cancel();
 			return;
 		}
-
-		if (InFlight)
-		{
-			TickFlight(delta);
-			return;
-		}
-
-		TickReturning(delta);
+		if (!InFlight || OwnerUnit == null) return;
+		if (IsReturning) TickReturning(delta);
+		else TickFlight(delta);
 	}
 
-	/// <summary>飞出阶段：直线/抛物线 + 旋转 + 周期性伤害 + 收回判定。</summary>
 	private void TickFlight(float delta)
 	{
-		if (OwnerUnit == null)
+		Vector3 previous = WeaponPosition;
+		if (!HasSettled)
 		{
-			Cancel();
+			Vector3 next = previous + FlightVelocity * delta + Vector3.Down * (0.5f * FlightGravity * delta * delta);
+			FlightVelocity += Vector3.Down * (FlightGravity * delta);
+			var query = PhysicsRayQueryParameters3D.Create(previous, next, CombatLayers.World);
+			var hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
+			if (hit.Count > 0)
+			{
+				WeaponPosition = hit["position"].AsVector3();
+				Settle();
+			}
+			else
+			{
+				Vector3 flat = next - HomePosition;
+				flat.Y = 0;
+				if (EffectiveMaxDistance > 0 && flat.Length() >= EffectiveMaxDistance)
+				{
+					Vector3 limited = HomePosition + flat.Normalized() * EffectiveMaxDistance;
+					WeaponPosition = new Vector3(limited.X, next.Y, limited.Z);
+					// 镰刀在前方悬停；抛物线武器到水平上限后仍须落到真实World。
+					if (FlightGravity <= 0) Settle();
+					else FlightVelocity = new Vector3(0, FlightVelocity.Y, 0);
+				}
+				else WeaponPosition = next;
+			}
+			if (FlightVelocity.LengthSquared() > 0.001f) LastFlightDirection = FlightVelocity.Normalized();
+		}
+		TickDamage(delta, previous);
+		if (HasSettled && ContinuousPathDamage) Hitbox?.Deactivate();
+		float nearOwner = OwnerUnit!.GlobalPosition.DistanceTo(WeaponPosition);
+		if (nearOwner > RecallDistance) _leftRecallRange = true;
+		if ((AutoRecallOnSettle && HasSettled)
+			|| (RecallDistance > 0 && _leftRecallRange && nearOwner <= RecallDistance)) BeginReturn();
+	}
+
+	private void Settle()
+	{
+		if (HasSettled) return;
+		HasSettled = true;
+		FlightVelocity = Vector3.Zero;
+		OnThrowSettled(WeaponPosition);
+	}
+
+	private void TickDamage(float delta, Vector3 previous)
+	{
+		if (Hitbox == null) return;
+		Hitbox.GlobalPosition = WeaponPosition;
+		if (ContinuousPathDamage)
+		{
+			if (!HasSettled || IsReturning || previous != WeaponPosition) Hitbox.SweepBox(previous, WeaponPosition);
 			return;
 		}
-
-		if (FlightGravity != 0f)
-		{
-			FlightVelocity = FlightVelocity with { Y = FlightVelocity.Y - (FlightGravity * delta) };
-		}
-
-		WeaponPosition += FlightVelocity * delta;
-		_spin += SpinDegreesPerSecond * delta;
-
-		// 落地（抛物线打完）→ 停下旋转，等收回。
-		if (SettleHeight > 0f && WeaponPosition.Y <= SettleHeight)
-		{
-			WeaponPosition = WeaponPosition with { Y = SettleHeight };
-			FlightVelocity = Vector3.Zero;
-			OnThrowSettled(WeaponPosition);
-		}
-
-		PushVisual();
-
-		// 周期性伤害（文档：每隔 DamageInterval 秒对武器内的敌人造成伤害）。
 		_intervalTimer += delta;
-		bool window = _intervalTimer >= DamageInterval;
-		if (window && !_damageWindowOpen)
+		if (_intervalTimer >= Mathf.Max(0.01f, DamageInterval))
 		{
+			_intervalTimer = 0;
 			OpenDamageWindow();
-			_intervalTimer = 0f;
 		}
-
 		if (_damageWindowOpen)
 		{
+			Hitbox.SweepBox(previous, WeaponPosition);
 			_activeTimer -= delta;
-			if (_activeTimer <= 0f)
-			{
-				_damageWindowOpen = false;
-				Hitbox?.Deactivate();
-			}
-		}
-
-		float travelled = HomePosition.DistanceTo(WeaponPosition);
-		float nearOwner = OwnerUnit.GlobalPosition.DistanceTo(WeaponPosition);
-		if (nearOwner > RecallDistance) _leftRecallRange = true;
-		if ((RecallOnSecondPress && _wasPressed)
-			|| (RecallDistance > 0f && _leftRecallRange && nearOwner <= RecallDistance)
-			|| (EffectiveMaxDistance > 0f && travelled >= EffectiveMaxDistance))
-		{
-			BeginReturn();
+			if (_activeTimer <= 0) { Hitbox.Deactivate(); _damageWindowOpen = false; }
 		}
 	}
 
-	/// <summary>收回阶段：朝玩家飞 + （可选）路径伤害 + 到手上就收招。</summary>
 	private void TickReturning(float delta)
 	{
-		if (OwnerUnit == null)
-		{
-			Cancel();
-			return;
-		}
-
+		if (OwnerUnit == null) { Cancel(); return; }
+		Vector3 previous = WeaponPosition;
 		Vector3 hand = HandPosition();
-		Vector3 toHand = hand - WeaponPosition;
-		float step = ReturnSpeed * delta;
-		if (toHand.Length() <= step)
-		{
-			WeaponPosition = hand;
-			PushVisual();
-			FinishReturn();
-			return;
-		}
-
-		Vector3 direction = toHand.Normalized();
-		WeaponPosition += direction * step;
-		_spin += SpinDegreesPerSecond * delta;
-		PushVisual();
-
-		if (DamageOnReturn)
-		{
-			// 回来途中也开一次伤害（文档：长枪「回来时能再次对路径中的敌人造成伤害」）。
-			_intervalTimer += delta;
-			if (_intervalTimer >= DamageInterval)
-			{
-				_intervalTimer = 0f;
-				OpenDamageWindow();
-			}
-
-			if (_damageWindowOpen)
-			{
-				_activeTimer -= delta;
-				if (_activeTimer <= 0f)
-				{
-					_damageWindowOpen = false;
-					Hitbox?.Deactivate();
-				}
-			}
-		}
+		Vector3 direction = hand - previous;
+		WeaponPosition = previous.MoveToward(hand, ReturnSpeed * delta);
+		if (direction.LengthSquared() > 0.001f) LastFlightDirection = direction.Normalized();
+		if (DamageOnReturn) TickDamage(delta, previous);
+		if (WeaponPosition.IsEqualApprox(hand)) FinishReturn();
 	}
-
 	private void OpenDamageWindow()
 	{
 		if (Hitbox == null || OwnerUnit == null)
@@ -357,15 +327,15 @@ public abstract partial class WeaponThrowAbility : Ability
 	/// <summary>伤害倍率（子类按蓄力/档位改）。</summary>
 	protected float DamageScale { get; set; } = 1f;
 
-	/// <summary>开始收回（再次按键 / 靠近 / 到最远距离）。</summary>
+	/// <summary>开始回手；锁门直到实际到手才解除。</summary>
 	protected void BeginReturn()
 	{
-		if (!InFlight)
+		if (!InFlight || IsReturning)
 		{
 			return;
 		}
 
-		SetInFlight(false);
+		IsReturning = true;
 		FlightVelocity = Vector3.Zero;
 		_intervalTimer = 0f;
 		if (Hitbox != null)
@@ -374,6 +344,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		}
 
 		_damageWindowOpen = false;
+		if (DamageOnReturn && ContinuousPathDamage) OpenDamageWindow();
 		GameLog.Write("Combat", $"抛掷：{AbilityId} 开始收回（累计周期伤害 {DamageTickCount} 次）");
 	}
 
@@ -382,7 +353,6 @@ public abstract partial class WeaponThrowAbility : Ability
 		RecallCount++;
 		Hitbox?.Deactivate();
 		_damageWindowOpen = false;
-		ReturnVisualToHand();
 		GameLog.Write("Combat", $"抛掷：{AbilityId} 武器已回到手上（第 {RecallCount} 次收回，累计周期伤害 {DamageTickCount} 次）");
 		Finish();
 	}
@@ -400,29 +370,6 @@ public abstract partial class WeaponThrowAbility : Ability
 		return OwnerUnit.GlobalPosition + (Vector3.Up * 0.9f) + (forward.Normalized() * 0.35f);
 	}
 
-	private void PushVisual()
-	{
-		if (WeaponVisual == null || !IsInstanceValid(WeaponVisual))
-		{
-			return;
-		}
-
-		WeaponVisual.Visible = true;
-		WeaponVisual.GlobalPosition = WeaponPosition;
-		WeaponVisual.RotationDegrees = new Vector3(0f, 0f, _spin);
-	}
-
-	private void ReturnVisualToHand()
-	{
-		if (WeaponVisual == null || !IsInstanceValid(WeaponVisual))
-		{
-			return;
-		}
-
-		WeaponVisual.Visible = false;
-		WeaponVisual.RotationDegrees = Vector3.Zero;
-	}
-
 	private void SetInFlight(bool inFlight)
 	{
 		if (InFlight == inFlight)
@@ -436,13 +383,14 @@ public abstract partial class WeaponThrowAbility : Ability
 
 	/// <summary>
 	/// **再次按键**（文档：「再次使用…时收回武器」）。
-	/// 在飞 → 记一个"这一帧按过了"（下一个 Tick 里收回）；不在飞 → 走基类的默认（新的一次施法）。
+	/// 武器在外时尊重手动召回配置；已回手时走基类启动新施法。
 	/// </summary>
 	public override bool TryPress(Unit? target = null)
 	{
-		if (IsBusy && InFlight)
+		if (IsActive && InFlight)
 		{
-			_wasPressed = true;
+			if (!Enabled || IsReturning || !RecallOnSecondPress) return false;
+			BeginReturn();
 			return true;
 		}
 
@@ -463,10 +411,12 @@ public abstract partial class WeaponThrowAbility : Ability
 	protected override void OnFinishOrCancel()
 	{
 		_waitingForCharge = false;
+		_waitingForThrowEvent = false;
 		Hitbox?.Deactivate();
 		_damageWindowOpen = false;
 		SetInFlight(false);
-		ReturnVisualToHand();
+		IsReturning = false;
+		HasSettled = false;
 		_path?.HidePath();
 	}
 

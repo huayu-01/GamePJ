@@ -135,49 +135,76 @@ public partial class AttackHitbox : Area3D
 		_active = false;
 	}
 
+	private ConvexPolygonShape3D? _sweepShape;
+	/// <summary>平移Box的凸包扫掠，覆盖高速往返两帧之间的整个攻击体积；共享命中追踪。</summary>
+	public void SweepBox(Vector3 from, Vector3 to)
+	{
+		if (!_active || _attack == null) return;
+		foreach (Node child in GetChildren())
+		{
+			if (child is not CollisionShape3D { Shape: BoxShape3D box, Disabled: false } shape) continue;
+			var points = new Vector3[16];
+			Vector3 half = box.Size * 0.5f;
+			for (int i = 0; i < 8; i++)
+			{
+				Vector3 corner = shape.GlobalBasis * new Vector3((i & 1) == 0 ? -half.X : half.X, (i & 2) == 0 ? -half.Y : half.Y, (i & 4) == 0 ? -half.Z : half.Z);
+				points[i] = corner;
+				points[i + 8] = corner + to - from;
+			}
+			_sweepShape ??= new ConvexPolygonShape3D();
+			_sweepShape.Points = points;
+			var query = new PhysicsShapeQueryParameters3D
+			{
+				Shape = _sweepShape, Transform = new Transform3D(Basis.Identity, shape.GlobalPosition + from - to),
+				CollisionMask = CollisionMask, CollideWithAreas = false, CollideWithBodies = true
+			};
+			foreach (var hit in GetWorld3D().DirectSpaceState.IntersectShape(query, 128))
+				if (hit["collider"].AsGodotObject() is Unit target) HitTarget(target);
+		}
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
-		if (!_active || _attack == null)
+		if (!_active || _attack == null) return;
+		foreach (Node3D node in GetOverlappingBodies())
+			if (node is Unit target) HitTarget(target);
+	}
+
+	private void HitTarget(Unit target)
+	{
+		if (_attack == null) return;
+		float now = Time.GetTicksMsec() / 1000f;
+		if (!target.IsValidTarget)
 		{
 			return;
 		}
 
-		float now = Time.GetTicksMsec() / 1000f;
-		foreach (Node3D node in GetOverlappingBodies())
+		if (OwnerUnit != null && (target == OwnerUnit || !OwnerUnit.IsHostileTo(target)))
 		{
-			if (node is not Unit target || !target.IsValidTarget)
-			{
-				continue;
-			}
-
-			if (OwnerUnit != null && (target == OwnerUnit || !OwnerUnit.IsHostileTo(target)))
-			{
-				continue;
-			}
-
-			if (!_tracker.TryRegister(target, _attack.Policy, _attack.HitInterval, now, _phase))
-			{
-				continue;
-			}
-
-			// 命中点先算、再结算：一击致死时 `Unit.Die()` 会把 `CollisionLayer` 归零，顺序反了容易踩到
-			// "目标已经进入死亡态"这类边界（本方法不读层，但先算后打更符合直觉）。
-			Vector3 hitPoint = ResolveHitPoint(target);
-
-			Vector3 direction = target.GlobalPosition - GlobalPosition;
-			direction.Y = 0f;
-			target.ReceiveHit(_attack.RollHit(target, direction.Normalized(), target.GlobalPosition));
-
-			// 击中特效（Binbun Hit FX）：**打在哪就炸在哪**（用户要求：「实际应该在命中的位置发生特效」）。
-			HitEffect.Spawn(this, hitPoint);
-
-			// 命中音效：与命中特效**同一个位置、同一个判定**，按 id 播（表里说了算）。
-			AudioManager.PlaySfx(AudioIds.CombatHit);
-
-			HitLanded?.Invoke(target);
+			return;
 		}
-	}
 
+		if (!_tracker.TryRegister(target, _attack.Policy, _attack.HitInterval, now, _phase))
+		{
+			return;
+		}
+
+		// 命中点先算、再结算：一击致死时 `Unit.Die()` 会把 `CollisionLayer` 归零，顺序反了容易踩到
+		// "目标已经进入死亡态"这类边界（本方法不读层，但先算后打更符合直觉）。
+		Vector3 hitPoint = ResolveHitPoint(target);
+
+		Vector3 direction = target.GlobalPosition - GlobalPosition;
+		direction.Y = 0f;
+		target.ReceiveHit(_attack.RollHit(target, direction.Normalized(), target.GlobalPosition));
+
+		// 击中特效（Binbun Hit FX）：**打在哪就炸在哪**（用户要求：「实际应该在命中的位置发生特效」）。
+		HitEffect.Spawn(this, hitPoint);
+
+		// 命中音效：与命中特效**同一个位置、同一个判定**，按 id 播（表里说了算）。
+		AudioManager.PlaySfx(AudioIds.CombatHit);
+
+		HitLanded?.Invoke(target);
+	}
 	/// <summary>
 	/// **实际命中点** = 目标碰撞体表面上**离命中体最近**的那一点
 	/// （用户要求：「实际应该在命中的位置发生特效」）。

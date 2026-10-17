@@ -4,29 +4,7 @@ using Godot;
 
 namespace ActRoguelike.Abilities;
 
-/// <summary>
-/// **武器 3「长枪」武技2「长虹贯日」**（设计文档第 151–153 行）：
-///
-/// <code>
-/// 武技2[长虹贯日]{cd:0.5}:基础蓄力{1}s,朝准星方向抛掷长枪,路径呈现抛物线(有路径可视化指示器),
-///   每蓄力{0.25}秒增强伤害{20%},弹速{20}%路径中线延长{20}%,最多蓄力1秒;
-///   当长枪丢出去后可再次使用技能将长枪收回,回来时能再次对路径中的敌人造成伤害;
-/// </code>
-///
-/// <list type="bullet">
-/// <item><b>基础蓄力 1s + 后置蓄力每 0.25s 一档</b>：基类的三段状态机（
-///   <c>ChargeBaseSeconds = 1</c> / <c>ChargeStepSeconds = 0.25</c> / <c>ChargeMaxSeconds = 2</c>）；
-///   <b>松手才发射</b>（与角色 A 的能量掌武技2 同一条纪律，见 `docs/abilities.md` §1.3）。</item>
-/// <item><b>每档 +20% 伤害 / +20% 弹速 / +20% 路径中线</b>：伤害与弹速走
-///   <see cref="Ability.ChargePowerScale"/>（<c>ChargeStepScale = 1.2</c>）；
-///   **"路径中线延长"是"非倍率维度"** —— 它是**距离**，所以水平速度按同一个倍率放大、
-///   飞行时间不变（见 <see cref="ResolveFlightTime"/> 与注释），于是抛物线整体被拉长同样的比例。</item>
-/// <item><b>抛物线 + 路径可视化</b>：<see cref="DashPathIndicator.SampleArcToDistance"/> 按
-///   "到落点的抛物线"采样，画的线与真正飞的那条完全同源（同一组参数）。</item>
-/// <item><b>收回再打一次</b>：<see cref="WeaponThrowAbility.DamageOnReturn"/> = true
-///   （文档："回来时能再次对路径中的敌人造成伤害"）。</item>
-/// </list>
-/// </summary>
+/// <summary>长虹贯日：准星选择地面落点，按蓄力射程截断；预览与飞行共用弹道求解，真实World碰撞停留。</summary>
 public partial class SpearThrowAbility : WeaponThrowAbility
 {
 	[ExportGroup("长虹贯日（抛物线抛掷 + 蓄力放大路径）")]
@@ -35,7 +13,7 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 
 	/// <summary>
 	/// **基准飞行时间**（秒）：水平距离 ÷ 这个时间 = 水平速度。
-	/// "路径中线延长 20%/档"就是"同一个飞行时间里水平速度 ×1.2"。
+	/// 满射程速度与距离同倍率放大；选择较近落点时缩短飞行时间。
 	/// </summary>
 	[Export] public float FlightSeconds { get; set; } = 0.8f;
 
@@ -55,51 +33,75 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 	/// <summary>画出路径时用了几点。</summary>
 	public int LastPathPoints { get; private set; }
 
-	private Vector3 _flatDirection;
+	[Export] public float MaxAimDistance { get; set; } = 120f;
+	public Vector3 TargetPoint { get; private set; }
+	public float LastMaxDistance { get; private set; }
 	private float _referenceDistance;
+
+	private Vector3 PickLandingPoint(Vector3 start, Vector3 flat)
+	{
+		float range = MaxThrowDistance * ChargePowerScale;
+		Vector3 point = AimUtil.TryGetCrosshairPoint(GetViewport(), OwnerUnit!, MaxAimDistance, CombatLayers.World, out var aimed)
+			? aimed : start + flat * range;
+		Vector3 planar = point - start;
+		planar.Y = 0;
+		if (planar.Length() > range) planar = planar.Normalized() * range;
+		Vector3 target = start + planar;
+		float top = Mathf.Max(start.Y, point.Y) + 1f;
+		var query = PhysicsRayQueryParameters3D.Create(new Vector3(target.X, top, target.Z), new Vector3(target.X, top - MaxAimDistance, target.Z), CombatLayers.World);
+		var hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
+		return hit.Count > 0 ? hit["position"].AsVector3() : target + Vector3.Down;
+	}
+
+	private Vector3 Solve(Vector3 start, Vector3 target, out float seconds)
+	{
+		Vector3 planar = target - start;
+		planar.Y = 0;
+		float speed = MaxThrowDistance / Mathf.Max(0.05f, FlightSeconds) * ChargePowerScale;
+		seconds = Mathf.Max(0.05f, planar.Length() / Mathf.Max(0.01f, speed));
+		return planar / seconds + Vector3.Up * ((target.Y - start.Y) / seconds + 0.5f * ArcGravity * seconds);
+	}
+
+	private void Path(Vector3 start, Vector3 velocity, float seconds)
+	{
+		var points = new System.Collections.Generic.List<Vector3> { start };
+		for (int i = 1; i <= Mathf.Max(2, ArcPathSteps); i++)
+		{
+			float time = seconds * i / Mathf.Max(2, ArcPathSteps);
+			Vector3 next = start + velocity * time + Vector3.Down * (0.5f * ArcGravity * time * time);
+			var hit = GetWorld3D().DirectSpaceState.IntersectRay(PhysicsRayQueryParameters3D.Create(points[^1], next, CombatLayers.World));
+			if (hit.Count > 0) { points.Add(hit["position"].AsVector3()); break; }
+			points.Add(next);
+		}
+		LastPathPoints = points.Count;
+		DrawPath(points);
+	}
+
+	protected override void PreviewPath()
+	{
+		if (OwnerUnit == null) return;
+		Vector3 flat = ResolveThrowDirection(); flat.Y = 0;
+		flat = flat.LengthSquared() > 0.001f ? flat.Normalized() : Vector3.Forward;
+		Vector3 start = OwnerUnit.GlobalPosition + Vector3.Up * 0.9f + flat * 0.6f;
+		Vector3 target = PickLandingPoint(start, flat);
+		Path(start, Solve(start, target, out float seconds), seconds);
+	}
 
 	protected override void Launch(Vector3 flatDirection)
 	{
-		_flatDirection = flatDirection;
 		LastPowerScale = ChargePowerScale;
 		DamageScale = LastPowerScale;
-
-		// 基准距离 = 行里的"最远抛出距离"；蓄力把**路径中线**按同一个倍率延长。
 		_referenceDistance = MaxThrowDistance * LastPowerScale;
-		LastHorizontalDistance = _referenceDistance;
-		LastHorizontalSpeed = _referenceDistance / Mathf.Max(0.05f, FlightSeconds);
+		LastMaxDistance = _referenceDistance;
+		TargetPoint = PickLandingPoint(HomePosition, flatDirection);
+		FlightVelocity = Solve(HomePosition, TargetPoint, out float seconds);
+		LastHorizontalDistance = new Vector2(TargetPoint.X - HomePosition.X, TargetPoint.Z - HomePosition.Z).Length();
+		LastHorizontalSpeed = new Vector2(FlightVelocity.X, FlightVelocity.Z).Length();
 		FlightGravity = ArcGravity;
-
-		// 抛物线：水平速度 × 飞行时间 = 距离；垂直初速让它在飞行时间末回到起点高度（对称抛物线）。
-		float vertical = 0.5f * ArcGravity * FlightSeconds;
-		FlightVelocity = (flatDirection * LastHorizontalSpeed) + (Vector3.Up * vertical);
-		SettleHeight = HomePosition.Y - 0.05f;
-
-		var points = DashPathIndicator.SampleArcToDistance(
-			HomePosition,
-			flatDirection,
-			ArcGravity,
-			LastHorizontalSpeed,
-			FlightSeconds,
-			ArcPathSteps);
-		LastPathPoints = points.Count;
-		DrawPath(points);
-
-		GameLog.Write(
-			"Combat",
-			$"长虹贯日：{AbilityId} 蓄力 {ChargeTime:0.##}s（档 {ChargeSteps}/上限 {ChargeMaxStepsEffective}）"
-			+ $" → 伤害 ×{LastPowerScale:0.###} 水平速度 {LastHorizontalSpeed:0.##}（基准 {ThrowSpeed:0.##}）"
-			+ $" 路径中线 {LastHorizontalDistance:0.##}m（基准 {MaxThrowDistance:0.##}）｜抛物线重力 {ArcGravity:0.##} 飞行 {FlightSeconds:0.##}s 路径 {LastPathPoints} 点");
+		Path(HomePosition, FlightVelocity, seconds);
+		GameLog.Write("Combat", $"长虹贯日：{ChargeSteps}档 加算倍率{LastPowerScale:0.###}，准星落点{TargetPoint}，水平距离{LastHorizontalDistance:0.###}/{LastMaxDistance:0.###}m，水平速度{LastHorizontalSpeed:0.###}");
 	}
 
-	/// <summary>初始速度（≥ 基准）：基准速度本身也要走抛物线（表里 ThrowSpeed 是"水平速度"）。</summary>
 	protected override float EffectiveThrowSpeed => LastHorizontalSpeed;
-
 	protected override float EffectiveMaxDistance => _referenceDistance;
-
-	/// <summary>蓄力标定：每档 +20% 的那一档位由基类给，本类只把它换算成"速度/距离"。</summary>
-	protected override void OnThrowStarted()
-	{
-		// 蓄力放大在 Launch 里算（那时 ChargeSteps 还在 —— ChargeTime/ChargeSteps 在 Finish 之前不会被清）。
-	}
 }

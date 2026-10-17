@@ -171,7 +171,9 @@ public abstract partial class Ability : Node3D
 	public CharacterMovement? Movement => OwnerUnit?.Movement;
 	public Unit? Target { get; protected set; }
 	public bool IsActive { get; private set; }
-	public bool IsBusy => IsActive && !IsBackground;
+	public bool IsBusy => IsActive && !IsBackground && OccupiesAction;
+	/// <summary>持续实体在出手后可释放动作占用；默认技能保持原语义。</summary>
+	protected virtual bool OccupiesAction => true;
 	public float CooldownRemaining { get; private set; }
 
 	/// <summary>
@@ -260,8 +262,8 @@ public abstract partial class Ability : Node3D
 	/// <summary>蓄力进度（0~1，按**基础蓄力**算；UI 的"指示器往准星缩"读它）。</summary>
 	public float ChargeProgress => ChargeBaseSecondsEffective <= 0f ? 1f : Mathf.Clamp(ChargeTime / ChargeBaseSecondsEffective, 0f, 1f);
 
-	/// <summary>后置蓄力的总威力倍率（<see cref="ChargeStepScale"/> 的 <see cref="ChargeSteps"/> 次方）。</summary>
-	public float ChargePowerScale => ChargeStepScale > 0f ? Mathf.Pow(ChargeStepScale, ChargeSteps) : 1f;
+	/// <summary>每档按基础值加算；例如1.2的四档为1.8倍。</summary>
+	public float ChargePowerScale => ChargeStepScale > 0f ? Mathf.Max(0f, 1f + (ChargeStepScale - 1f) * ChargeSteps) : 1f;
 
 	/// <summary>是否处在**完美时机窗口**里（刚蓄满之后的 <see cref="PerfectWindowSeconds"/> 那一段）。</summary>
 	public bool IsPerfectWindow => PerfectWindowSeconds > 0f
@@ -797,7 +799,7 @@ public abstract partial class Ability : Node3D
 	/// <summary>停掉技能动画（技能结束/取消时调用，把控制权交还"按移速切"）。</summary>
 	protected void StopSkillAnimation()
 	{
-		if (!IsBackground)
+		if (!IsBackground && OccupiesAction)
 		{
 			FindInOwner<UnitAnimator>()?.StopSkillAnimation();
 		}

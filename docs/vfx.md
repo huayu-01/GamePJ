@@ -1,5 +1,7 @@
 # 表现层（VFX）契约与清单
 
+> **原文纠偏J2**：`ThrownWeaponDisplay`只读投掷位置／方向／阶段和当前武器模型路径，飞出模型复用手持资源；`CharacterDisplay`只读尚未回手状态隐藏握持物，回手恢复。长枪沿弹道朝向、尖端锚定落点，落地不旋转；镰刀水平旋转。姿态／模型偏移用Export配置；两个显示分支都不含单位或碰撞，逻辑不读取显示结果。
+
 > **后续G专项**：MeleeSwingFx只读真实StrikeCount，RewardBeaconFx只读奖励可用态与价值色；通过PackedScene替换。私有材质必须在Battle进树播放前准备，否则动画轨道可能缓存旧材质。动画结束自毁，禁用/消耗停粒子，无单位/碰撞/分组。接线见followup-g-verification.md。
 
 > **第二轮 C批**：CharacterDisplay切换角色与握持场景，真实UnitAnimator、受击闪色、蓄力身体表现与残影跟随当前可见模型。

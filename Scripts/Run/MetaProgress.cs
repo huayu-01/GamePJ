@@ -17,6 +17,11 @@ public static class MetaProgress
 	private static int _speedLevel;
 	private static int _critLevel;
 	private static bool _loaded;
+#if DEBUG
+	private static bool _selfTestMemoryOnly;
+	/// <summary>完整自测沿用玩家数值，但收益／消费只在本进程内生效。</summary>
+	internal static void UseInMemoryStoreForSelfTest() { Load(); _selfTestMemoryOnly = true; }
+#endif
 
 	public static int Shards => _shards;
 	public static int HealthLevel => _healthLevel;
@@ -74,6 +79,9 @@ public static class MetaProgress
 
 	public static void Save()
 	{
+#if DEBUG
+		if (_selfTestMemoryOnly) return;
+#endif
 		var config = new ConfigFile();
 		config.SetValue("meta", "shards", _shards);
 		config.SetValue("meta", "health_level", _healthLevel);

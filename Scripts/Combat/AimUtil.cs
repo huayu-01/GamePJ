@@ -7,6 +7,21 @@ namespace ActRoguelike.Combat;
 /// </summary>
 public static class AimUtil
 {
+	/// <summary>仅在准星射线真实命中指定物理层时返回目标；不把远端空点当作地面。</summary>
+	public static bool TryGetCrosshairPoint(Viewport viewport, Node3D owner, float maxDistance, uint mask, out Vector3 point)
+	{
+		point = Vector3.Zero;
+		Camera3D? camera = viewport.GetCamera3D();
+		if (camera == null) return false;
+		Vector2 center = viewport.GetVisibleRect().Size * 0.5f;
+		Vector3 origin = camera.ProjectRayOrigin(center);
+		var query = PhysicsRayQueryParameters3D.Create(origin, origin + camera.ProjectRayNormal(center) * maxDistance, mask);
+		if (owner is CollisionObject3D body) query.Exclude = new Godot.Collections.Array<Rid> { body.GetRid() };
+		var hit = owner.GetWorld3D().DirectSpaceState.IntersectRay(query);
+		if (hit.Count == 0) return false;
+		point = hit["position"].AsVector3();
+		return true;
+	}
 	/// <summary>屏幕中心射线方向；没有相机时返回 fallback。</summary>
 	public static Vector3 GetCrosshairDirection(Viewport viewport, Vector3 fallback)
 	{

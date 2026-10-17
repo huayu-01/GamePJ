@@ -21,6 +21,13 @@ public partial class CharacterDesignProbe : Node3D
 	private Camera3D _camera = null!;
 	private readonly PlayerLoadout _loadout = new();
 	private async Task Wait(double seconds) => await ToSignal(GetTree().CreateTimer(seconds), SceneTreeTimer.SignalName.Timeout);
+	private void Press(string action, bool pressed) => Input.ParseInputEvent(new InputEventAction { Action = action, Pressed = pressed });
+	private async Task<bool> Until(Func<bool> predicate, double seconds = 2)
+	{
+		ulong deadline = Time.GetTicksMsec() + (ulong)(seconds * 1000);
+		while (!predicate() && Time.GetTicksMsec() < deadline) await Wait(0.01);
+		return predicate();
+	}
 	private void Check(bool ok, string message) { if (ok) _pass++; else _fail++; GD.Print($"[Design] {(ok ? "PASS" : "FAIL")} {message}"); }
 	private async Task Shot(string name)
 	{
@@ -61,6 +68,8 @@ public partial class CharacterDesignProbe : Node3D
 			await DetachedFxLifetime();
 			await Facing();
 			await SpearCycle();
+			await Throws();
+			await BowCharge();
 		}
 		catch (Exception ex) { Check(false, ex.ToString()); }
 		GD.Print($"[Design] === 原始设计验收结束：通过 {_pass}，失败 {_fail} ===");
@@ -149,5 +158,128 @@ public partial class CharacterDesignProbe : Node3D
 		Check(victim.Health < 10000, $"两轮四连实际扣血：10000→{victim.Health}");
 		await Shot("j_spear_four_cycle");
 		victim.QueueFree();
+	}
+	private void AimAt(Vector3 point)
+	{
+		_camera.GlobalPosition = _player.GlobalPosition + new Vector3(0, 5, 7);
+		_camera.LookAt(point);
+		_camera.ResetPhysicsInterpolation();
+	}
+	private Unit TargetAt(Vector3 position)
+	{
+		var target = new Unit { Faction = Faction.Enemy, MaxHealth = 10000, KnockbackResistance = 1 };
+		target.AddChild(new CollisionShape3D { Position = Vector3.Up * 0.9f, Shape = new CapsuleShape3D { Height = 1.8f, Radius = 0.12f } });
+		AddChild(target);
+		target.GlobalPosition = position;
+		return target;
+	}
+	private async Task Throws()
+	{
+		await Equip(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.Scythe);
+		_player.GlobalPosition = new Vector3(-20, 0.05f, 10);
+		_player.Velocity = Vector3.Zero;
+		AimAt(new Vector3(-20, 0, 2));
+		await Wait(0.5);
+		var scythe = _player.GetNode<ScytheThrowAbility>("AbilityWeapon5Skill2");
+		var scytheCombo = _player.GetNode<MeleeComboAbility>("AbilityWeapon5Skill1");
+		var display = _player.GetNode<CharacterDisplay>("Appearance");
+		Press("weapon_skill_2", true);
+		await Wait(0.025);
+		Check(!scythe.InFlight, "镰刀起手未到ATK不会提前抛出");
+		Press("weapon_skill_2", false);
+		Check(await Until(() => scythe.InFlight), "镰刀真实动画ATK出手");
+		Vector3 start = scythe.WeaponPosition;
+		await Wait(0.2);
+		Check(scythe.WeaponPosition.DistanceTo(start) > 2 && scytheCombo.ExternallyBlocked, "镰刀真实向前飞行，武技1锁定");
+		Check(!scythe.IsBusy && !display.EquippedWeapon!.Visible, "投出后释放动作占用，手中模型隐藏");
+		Check(await Until(() => scythe.HasSettled), "镰刀到射程后悬停");
+		Node3D flyingModel = scythe.GetNode<Node3D>("WeaponVisual");
+		Check(flyingModel.GetChildCount() == 1 && flyingModel.GetChild<Node3D>(0).SceneFilePath == display.CurrentWeaponPath, "飞镰刀与手持使用同一武器模型资源");
+		Vector3 settled = scythe.WeaponPosition;
+		await Wait(0.8);
+		Check(scythe.InFlight && !scythe.IsReturning && scythe.WeaponPosition.IsEqualApprox(settled), $"镰刀默认停留而不自动回收：{settled}");
+		Unit spinTarget = TargetAt(settled - Vector3.Up * 0.9f);
+		var spinTimes = new List<ulong>();
+		spinTarget.HitReceived += hit => { if (hit.Attack?.Ability == scythe.AbilityId) spinTimes.Add(Time.GetTicksMsec()); };
+		await Wait(1.15);
+		Check(spinTimes.Count >= 2 && spinTimes[1] - spinTimes[0] >= 450, $"镰刀停留时真实周期命中，次数={spinTimes.Count}，间隔={(spinTimes.Count > 1 ? spinTimes[1] - spinTimes[0] : 0)}ms");
+		await Shot("j2_scythe_stays");
+		Press("weapon_skill_2", true);
+		await Wait(0.04);
+		Press("weapon_skill_2", false);
+		Check(scythe.IsReturning && scythe.InFlight && scytheCombo.ExternallyBlocked, "镰刀回程尚未到手时仍锁武技1");
+		Check(await Until(() => !scythe.IsActive) && !scytheCombo.ExternallyBlocked, "镰刀实际回手后才解锁");
+		await Wait(0.04);
+		Check(display.EquippedWeapon!.Visible, "回手恢复同源手持模型");
+		spinTarget.QueueFree();
+		scythe.ResetForLoadout();
+		Press("weapon_skill_2", true); await Wait(0.04); Press("weapon_skill_2", false);
+		Check(await Until(() => scythe.HasSettled), "第二次飞镰刀到前方停留");
+		_player.GlobalPosition = scythe.WeaponPosition + new Vector3(0.7f, -0.9f, 0);
+		Check(await Until(() => !scythe.IsActive), "角色靠近飞镰刀触发召回");
+		await Equip(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.Spear);
+		var spear = _player.GetNode<SpearThrowAbility>("AbilityWeapon6Skill2");
+		var combo = _player.GetNode<MeleeComboAbility>("AbilityWeapon6Skill1");
+		for (int steps = 0; steps <= 4; steps++)
+		{
+			spear.ResetForLoadout();
+			_player.GlobalPosition = new Vector3(-20, 0.05f, 10);
+			_player.Velocity = Vector3.Zero;
+			Vector3 target = new(-20, 0, steps == 0 ? 2 : -30);
+			Unit roundTripTarget = TargetAt(new Vector3(-20, 0, 7));
+			int roundTripHits = 0;
+			roundTripTarget.HitReceived += hit => { if (hit.Attack?.Ability == spear.AbilityId) roundTripHits++; };
+			AimAt(target);
+			await Wait(0.15);
+			Press("weapon_skill_2", true);
+			if (steps == 1) { Press("weapon_skill_2", false); Press("weapon_skill_2", true); }
+			Check(await Until(() => spear.ChargeTime >= 1.06f + steps * 0.25f, 3), $"长枪蓄至{steps}档，时间={spear.ChargeTime:0.###}，同帧再按时以最终按住态为准");
+			Check(!spear.InFlight && spear.LastPathPoints > 2, "蓄力期间预览路径，不提前出手");
+			Press("weapon_skill_2", false);
+			Check(await Until(() => spear.InFlight), "合格松手后等待真实ATK抛出");
+			float expected = 1 + steps * 0.2f;
+			Check(Mathf.IsEqualApprox(spear.LastPowerScale, expected) && Mathf.IsEqualApprox(spear.LastMaxDistance, 12 * expected), $"{steps}档基础加算：倍率={spear.LastPowerScale:0.###}、射程={spear.LastMaxDistance:0.###}");
+			Check(steps == 0 ? spear.TargetPoint.DistanceTo(target) < 0.05f : Mathf.Abs(spear.LastHorizontalDistance - spear.LastMaxDistance) < 0.02f, $"准星落点／超射程同向截断：{spear.TargetPoint}");
+			Check(await Until(() => spear.HasSettled), "长枪与真实World地面碰撞落地");
+			Check(roundTripHits == 1, $"飞出路径窄目标只命中一次：{roundTripHits}");
+			Vector3 landed = spear.WeaponPosition;
+			await Wait(0.4);
+			Check(spear.InFlight && !spear.IsReturning && landed.IsEqualApprox(spear.WeaponPosition) && Mathf.Abs(landed.Y) < 0.02f, "长枪落地静止、保持在外，不靠近收回");
+			if (steps == 4)
+			{
+				await Shot("j2_spear_grounded");
+				_camera.GlobalPosition = landed + new Vector3(3, 2, 4);
+				_camera.LookAt(landed + Vector3.Up * 0.6f);
+				_camera.ResetPhysicsInterpolation();
+				await Wait(0.1);
+				await Shot("j2_spear_grounded_detail");
+			}
+			Unit returnTarget = TargetAt(new Vector3(-20, 0, 7));
+			int returnHits = 0;
+			returnTarget.HitReceived += hit => { if (hit.Attack?.Ability == spear.AbilityId) returnHits++; };
+			await Wait(0.05);
+			float originalSpeed = spear.ReturnSpeed;
+			spear.ReturnSpeed = 600;
+			Press("weapon_skill_2", true);
+			await Wait(0.025);
+			Press("weapon_skill_2", false);
+			Check(await Until(() => !spear.IsActive) && !combo.ExternallyBlocked, "长枪再次使用实际回手后解锁");
+			Check(returnHits == 1, $"600m/s回程扫过窄目标仍命中一次：{returnHits}");
+			Check(roundTripHits == 2, $"往返同一窄目标各受击一次：{roundTripHits}");
+			spear.ReturnSpeed = originalSpeed;
+			returnTarget.QueueFree();
+			roundTripTarget.QueueFree();
+		}
+	}
+	private async Task BowCharge()
+	{
+		await Equip(PlayerCharacterKind.Hunter, WeaponPresetKind.Bow);
+		var bow = _player.GetNode<ArrowVolleyAbility>("AbilityWeapon3Skill1");
+		Press("weapon_skill_1", true);
+		Check(await Until(() => bow.ChargeTime >= 1.05f), "弓真实输入蓄满五档");
+		Press("weapon_skill_1", false);
+		await Wait(0.25);
+		Check(bow.ChargeSteps == 5 && Mathf.IsEqualApprox(bow.ChargePowerScale, 2.5f), $"弓五档按基础加算：{bow.ChargePowerScale:0.###}倍");
+		Check(Mathf.IsEqualApprox(bow.LastShotDamage, bow.Damage * 2.5f * _player.Stats.Get("DamageMultiplier")) && Mathf.IsEqualApprox(bow.LastShotSpeed, bow.Speed + 150), $"弓真实发射快照：伤害={bow.LastShotDamage}、弹速={bow.LastShotSpeed}");
 	}
 }

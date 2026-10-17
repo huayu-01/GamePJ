@@ -1,5 +1,10 @@
 # 能力机制：蓄力 · 完美时机 · 技能层数 · 冷却缩减（P2 通用地基）
 
+> **原文纠偏J1/J2（2026-10-17，覆盖下方历史接入记录）**：长枪四段循环；落剑式只归灵剑，镰刀／长枪技能栏五格。投掷在真实ATK出手，合格松手重播释放动画等待ATK，取消不兜底发伤害。
+> `InFlight`表示武器尚未回手，包含飞行、停留和回程；`HasSettled`／`IsReturning`分别标明后两阶段。武技1到实际回手才解锁。
+> `IsBusy = IsActive && !IsBackground && OccupiesAction`。投掷出手后不再占动作；回手／取消收尾不停止其他技能动画。默认镰刀到射程停留，靠近或再次使用收回；长枪碰真实World后静止，默认仅再次使用收回。
+> 后置倍率改为`1+(ChargeStepScale-1)*ChargeSteps`：长枪四档1.8、弓五档2.5。长枪准星选落点，水平射程封顶，蓄力预览与实际弹道共用求解；往返各对路径目标命中一次，Box凸包扫掠覆盖高速两帧间隙。原文真实输入探针及后续边界见[审计](original-design-audit.md)。
+
 > **后续H专项**：修复连续按键提前开窗跳过ATK。近战只有真实ATK开窗，提前输入只缓冲；本段判定结束后推进，避免修改仍在生效的上一段命中体。每段ATK只消费一次，Combo收招不覆盖表内窗口时长；等待ATK超时按每段计时，循环长枪不受累计施法时长误取消。真实连点、逐段命中与采样见followup-h-verification.md。
 
 > **后续G专项**：WeaponThrowAbility的HoldToCharge路径等待合格松手才BeginThrow，提前松手取消；非蓄力路径保持。Tick等待期间不驱动飞行/返回，取消与换装清理。长枪本次距离上限随倍率变化；近距离自动收回须先离开手边范围。表内1s基础+1s额外/.25s=4档，未改数值。真实输入证据见followup-g-verification.md。
@@ -11,7 +16,7 @@
 > 19条玩家技能行已配置统一线稿图标。`Hud/Root/Abilities` 交叉读取当前角色/武器表的Skills与启用能力，
 > 右下角显示图标、名称、真实InputMap按键、扇形CD、充能层数、蓄力进度与后台维持状态；鼠标完全穿透。
 > `RunController.CurrentCharacter/CurrentWeapon` 只读属性仅提供配装身份，不改战斗机制。
-> 当前角色B表把落剑式列在角色Skills中，因此三把武器均显示6格；本批不改这项既有战斗配置。
+> 此为B批历史记录；J1已修正落剑式归属，灵剑6格，镰刀／长枪5格。
 
 > **第二轮 E-1（2026-10-16）**：刹那之眼已切换为 `IsBackground=true`、`HoldToMaintain=true`，
 > `MaintainStartupSeconds=0.3`。用户确认保留软启动期间的免伤与免费后撤，不播放动画、不进入蓄力。
@@ -78,7 +83,7 @@
 | `IsPerfectWindow` | 是否处在完美时机窗口里 | 准星变色 |
 | `PerfectWindowSeconds` | 窗口长度（表列，能量掌武技2 = 0.2s） | — |
 | `ChargeSteps` | 后置蓄力已升到第几档（0 = 只有基础段） | 短弩 +N 支 / 长枪路径增强 |
-| `ChargePowerScale` | 后置蓄力的总倍率 = `ChargeStepScale ^ ChargeSteps` | 弓 / 长枪的伤害与弹速 |
+| `ChargePowerScale` | 后置蓄力的总倍率 = `1+(ChargeStepScale-1)*ChargeSteps`，按基础加算 | 弓 / 长枪的伤害与弹速 |
 | `ChargeMaxStepsEffective` | 档数上限（把 `ChargeMaxSteps` 与 `ChargeMaxSeconds` 合成一个数） | 自测 / UI 显示 |
 | `LastReleasePerfect` | 上一次**松手释放**是不是完美时机 | 表现层 / 自测 |
 | `LastReleaseAborted` | 上一次松手是不是"没蓄满就松"（没释放任何效果） | 自测 |

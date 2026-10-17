@@ -119,17 +119,21 @@ public partial class FeedbackProbe : Node
 			Check(await Until(() => spear.ChargeTime >= desired, 3), $"真实按住蓄到{steps}档，时间={spear.ChargeTime:0.###}s");
 			Check(!spear.InFlight && spear.DamageTickCount == 0, "蓄力期间仍未抛出");
 			InputAction("weapon_skill_2", false);
-			Check(await Until(() => spear.InFlight, 0.2), "松手后才抛出");
-			float expected = spear.MaxThrowDistance * Mathf.Pow(spear.ChargeStepScale, steps);
-			Check(Mathf.IsEqualApprox(spear.LastHorizontalDistance, expected) && Mathf.IsEqualApprox(spear.LastPowerScale, Mathf.Pow(spear.ChargeStepScale, steps)), $"{steps}档：距离={spear.LastHorizontalDistance:0.####}，速度={spear.LastHorizontalSpeed:0.####}，倍率={spear.LastPowerScale:0.####}");
+			Check(await Until(() => spear.InFlight, 1), "松手后等待真实ATK才抛出");
+			float power = 1 + (spear.ChargeStepScale - 1) * steps;
+			float expected = spear.MaxThrowDistance * power;
+			Check(spear.LastHorizontalDistance <= expected + 0.02f && Mathf.IsEqualApprox(spear.LastMaxDistance, expected) && Mathf.IsEqualApprox(spear.LastPowerScale, power), $"{steps}档：目标距离={spear.LastHorizontalDistance:0.####}/{expected:0.####}，速度={spear.LastHorizontalSpeed:0.####}，加算倍率={spear.LastPowerScale:0.####}");
 			Vector3 start = spear.WeaponPosition;
 			await Wait(0.18);
 			Check(spear.InFlight && spear.WeaponPosition.DistanceTo(start) > 1.5f && combo.ExternallyBlocked, "真实飞行超过1.5米，未被起手近距离判据误收回，武技1已锁");
 			if (steps == 4)
 			{
 				await Shot("g_spear_charged");
-				Check(await Until(() => new Vector2(spear.WeaponPosition.X - start.X, spear.WeaponPosition.Z - start.Z).Length() > 20, 0.6), "四档真实水平飞行超过20米，不再被基础12米上限截断");
-				Check(await Until(() => !spear.IsActive) && !combo.ExternallyBlocked, "最远距离自动收回并解锁");
+				Check(await Until(() => spear.HasSettled), "四档长枪真实地形落地");
+				await Wait(0.3);
+				Check(spear.InFlight && !spear.IsReturning && combo.ExternallyBlocked, "落地留枪等待召回，武技1仍锁定");
+				await Tap("weapon_skill_2");
+				Check(await Until(() => !spear.IsActive) && !combo.ExternallyBlocked, "再次使用后回手并解锁");
 			}
 			else
 			{

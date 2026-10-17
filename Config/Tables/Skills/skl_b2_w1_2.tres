@@ -20,7 +20,7 @@ Note = "收回速度（m/s）"
 script = ExtResource("2_param")
 Key = "MaxThrowDistance"
 Value = 8
-Note = "最远抛出距离（米；到点自动收回）"
+Note = "最远抛出距离（米；到点停留，等待再次使用或靠近召回）"
 
 [sub_resource type="Resource" id="p_RecallOnSecondPress"]
 script = ExtResource("2_param")
@@ -77,6 +77,9 @@ HudOrder = 40
 NodeName = "AbilityWeapon5Skill2"
 ClassHint = "ScytheThrowAbility"
 InputAction = "weapon_skill_2"
+Aim = 0
+AnimName = "Skill_B2_Scythe3"
+AnimEvent = "ATK"
 Cooldown = 1.0
 Windup = 0.0
 Recover = 0.05

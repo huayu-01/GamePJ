@@ -1,0 +1,290 @@
+Debug 编译：0 warning / 0 error
+design_headless 退出码=0
+design_render 退出码=0
+[Design] PASS 爆炸特效已脱离短寿命战斗判定节点
+[Design] PASS 场景深度重载后，旧特效仍由原生Timer按时回收
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS EnergyPalm 仅灵剑有落剑式，实际启用=False
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Crossbow 仅灵剑有落剑式，实际启用=False
+[Design] PASS Bow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Bow 仅灵剑有落剑式，实际启用=False
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS SpiritSword 仅灵剑有落剑式，实际启用=True
+[Design] PASS Scythe 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Scythe 仅灵剑有落剑式，实际启用=False
+[Design] PASS Spear 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Spear 仅灵剑有落剑式，实际启用=False
+[Design] PASS 后撤过程中转镜头，起手朝向保持不变
+[Design] PASS 真实Dodge动画事件向起手方向后方施力：(0.006323647, 0, 11.999998)
+[Design] PASS 后撤结束释放自身朝向锁，恢复准星朝向
+[Design] PASS 长枪由表配置四段循环：段数=4
+[Design] PASS 真实输入→动画ATK→连续命中两轮四连，段索引=0,1,2,3,0,1,2,3
+[Design] PASS 两轮四连实际扣血：10000→9804.199
+[Design] PASS 镰刀起手未到ATK不会提前抛出
+[Design] PASS 镰刀真实动画ATK出手
+[Design] PASS 镰刀真实向前飞行，武技1锁定
+[Design] PASS 投出后释放动作占用，手中模型隐藏
+[Design] PASS 镰刀到射程后悬停
+[Design] PASS 飞镰刀与手持使用同一武器模型资源
+[Design] PASS 镰刀默认停留而不自动回收：(-20, 0.9, 1.3999996)
+[Design] PASS 镰刀停留时真实周期命中，次数=2，间隔=497ms
+[Design] PASS 镰刀回程尚未到手时仍锁武技1
+[Design] PASS 镰刀实际回手后才解锁
+[Design] PASS 回手恢复同源手持模型
+[Design] PASS 第二次飞镰刀到前方停留
+[Design] PASS 角色靠近飞镰刀触发召回
+[Design] PASS 长枪蓄至0档，时间=1.062，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 0档基础加算：倍率=1、射程=12
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, 2)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至1档，时间=1.31，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 1档基础加算：倍率=1.2、射程=14.4
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -5.000001)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至2档，时间=1.566，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 2档基础加算：倍率=1.4、射程=16.8
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -7.4000015)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至3档，时间=1.821，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 3档基础加算：倍率=1.6、射程=19.2
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -9.800001)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至4档，时间=2.069，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 4档基础加算：倍率=1.8、射程=21.6
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -12.200003)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 弓真实输入蓄满五档
+[Design] PASS 弓五档按基础加算：2.5倍
+[Design] PASS 弓真实发射快照：伤害=59.999992、弹速=370
+[Design] === 原始设计验收结束：通过 115，失败 0 ===
+[Design] PASS 爆炸特效已脱离短寿命战斗判定节点
+[Design] PASS 场景深度重载后，旧特效仍由原生Timer按时回收
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS EnergyPalm 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS EnergyPalm 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS EnergyPalm 仅灵剑有落剑式，实际启用=False
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Crossbow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Crossbow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Crossbow 仅灵剑有落剑式，实际启用=False
+[Design] PASS Bow 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Bow 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Bow 模型脚尖前向与单位逻辑前向一致，点积=0.9999
+[Design] PASS Bow 仅灵剑有落剑式，实际启用=False
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS SpiritSword 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS SpiritSword 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS SpiritSword 仅灵剑有落剑式，实际启用=True
+[Design] PASS Scythe 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Scythe 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Scythe 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Scythe 仅灵剑有落剑式，实际启用=False
+[Design] PASS 截图 j_scythe_facing_passive
+[Design] PASS Spear 静止转镜头朝向(0, 0, -1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(0, 0, 1)，根前向点积=1.0000
+[Design] PASS Spear 静止转镜头朝向(-1, 0, 0)，根前向点积=1.0000
+[Design] PASS Spear 模型脚尖前向与单位逻辑前向一致，点积=1.0000
+[Design] PASS Spear 仅灵剑有落剑式，实际启用=False
+[Design] PASS 后撤过程中转镜头，起手朝向保持不变
+[Design] PASS 真实Dodge动画事件向起手方向后方施力：(0.006323643, 0, 11.999998)
+[Design] PASS 后撤结束释放自身朝向锁，恢复准星朝向
+[Design] PASS 长枪由表配置四段循环：段数=4
+[Design] PASS 真实输入→动画ATK→连续命中两轮四连，段索引=0,1,2,3,0,1,2,3
+[Design] PASS 两轮四连实际扣血：10000→9804.199
+[Design] PASS 截图 j_spear_four_cycle
+[Design] PASS 镰刀起手未到ATK不会提前抛出
+[Design] PASS 镰刀真实动画ATK出手
+[Design] PASS 镰刀真实向前飞行，武技1锁定
+[Design] PASS 投出后释放动作占用，手中模型隐藏
+[Design] PASS 镰刀到射程后悬停
+[Design] PASS 飞镰刀与手持使用同一武器模型资源
+[Design] PASS 镰刀默认停留而不自动回收：(-20, 0.9, 1.3999996)
+[Design] PASS 镰刀停留时真实周期命中，次数=2，间隔=500ms
+[Design] PASS 截图 j2_scythe_stays
+[Design] PASS 镰刀回程尚未到手时仍锁武技1
+[Design] PASS 镰刀实际回手后才解锁
+[Design] PASS 回手恢复同源手持模型
+[Design] PASS 第二次飞镰刀到前方停留
+[Design] PASS 角色靠近飞镰刀触发召回
+[Design] PASS 长枪蓄至0档，时间=1.063，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 0档基础加算：倍率=1、射程=12
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, 2)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至1档，时间=1.313，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 1档基础加算：倍率=1.2、射程=14.4
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -5.000001)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至2档，时间=1.563，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 2档基础加算：倍率=1.4、射程=16.8
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -7.4000015)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至3档，时间=1.813，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 3档基础加算：倍率=1.6、射程=19.2
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -9.800001)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 长枪蓄至4档，时间=2.061，同帧再按时以最终按住态为准
+[Design] PASS 蓄力期间预览路径，不提前出手
+[Design] PASS 合格松手后等待真实ATK抛出
+[Design] PASS 4档基础加算：倍率=1.8、射程=21.6
+[Design] PASS 准星落点／超射程同向截断：(-20, -2.3841858E-07, -12.200003)
+[Design] PASS 长枪与真实World地面碰撞落地
+[Design] PASS 飞出路径窄目标只命中一次：1
+[Design] PASS 长枪落地静止、保持在外，不靠近收回
+[Design] PASS 截图 j2_spear_grounded
+[Design] PASS 截图 j2_spear_grounded_detail
+[Design] PASS 长枪再次使用实际回手后解锁
+[Design] PASS 600m/s回程扫过窄目标仍命中一次：1
+[Design] PASS 往返同一窄目标各受击一次：2
+[Design] PASS 弓真实输入蓄满五档
+[Design] PASS 弓五档按基础加算：2.5倍
+[Design] PASS 弓真实发射快照：伤害=59.999992、弹速=370
+[Design] === 原始设计验收结束：通过 120，失败 0 ===
+selftest 退出码=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+f 退出码=0
+[Followup] === F专项验收结束：通过 33，失败 0 ===
+c 退出码=0
+[BatchC] === C批验收结束：通过 52，失败 0 ===
+d 退出码=0
+[BatchD] === D批验收结束：通过 90，失败 0 ===
+g 退出码=0
+[Feedback] === G专项验收结束：通过 51，失败 0 ===
+characters 退出码=0
+[CharacterReplacement] 完成：通过 61，失败 0
+b 退出码=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a 退出码=0
+[BatchA] === A 批验收结束：失败 0 ===
+e 退出码=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+memory 退出码=0
+跨进程读档5/0
+ExportRelease 编译：0 warning / 0 error
+截图 docs/screenshots/j2_scythe_stays.png SHA256=3AC9AC278DD156175A05549918004ADCC14052EBE05A4D9BDC86B5940D179BE7
+截图 docs/screenshots/j2_spear_grounded.png SHA256=4CA704C9FF15FF4EAD0733BF343E149344ADE6C3117660A171D8D0E18BD1FF90
+截图 docs/screenshots/j2_spear_grounded_detail.png SHA256=885B7660EDDB28CFB9DD9BAEEC5F0E0EC591A1CDC2969260EA5741DEBFD1D7A5
+存档 meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+selftest.flag 不存在=True
+最终stderr字节检查：
+design_headless stderr字节=0
+design_render stderr字节=0
+selftest stderr字节=0
+f stderr字节=0
+c stderr字节=0
+d stderr字节=0
+g stderr字节=0
+characters stderr字节=0
+b stderr字节=0
+a stderr字节=0
+e stderr字节=0
+memory stderr字节=0
+[log] 17:11:48 [SelfTest] ✅ 机制·后置蓄力（两段结构）：TryActivate=True 基础 0.5s + 每 0.1s ×1.3，上限 1s → 蓄 0.85s：档=3（期望 3）威力×1.9（期望 1+0.3×3=1.9）｜一直按住：档=5（期望封顶 5=floor((1.0-0.5)/0.1)）威力×2.5 → 松手：伤害=75（期望 30×2.5×1=75） 弹速=625 投射物 +1

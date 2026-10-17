@@ -96,6 +96,9 @@ public partial class BatchEProbe : Node
 		await Wait(1); // 等第三人称相机平滑跟随完成，再把靶子放到真实准星点附近。
 		Vector3 point = AimUtil.GetCrosshairPoint(GetViewport(), _player, 200, CombatLayers.World | CombatLayers.UnitMask);
 		Unit markTarget = Target("EyeTarget", point + camera.GlobalBasis.Z * 0.8f);
+		// 本段验并用与真实命中，不依赖满蓄力伤害恰好超过杂兵生命的旧数值。
+		markTarget.ApplyBaseStats(1000, 0, 0, 0);
+		markTarget.FillVitals();
 		Check(hawk.IsBackground && hawk.HoldToMaintain && !hawk.HoldToCharge && hawk.AnimName == "", "表配置：后台维持=True，蓄力=False，动画为空");
 		Button("weapon_skill_2", true);
 		await Wait(0.12);
@@ -119,10 +122,24 @@ public partial class BatchEProbe : Node
 		Check(!hawk.IsActive && Mathf.IsEqualApprox(camera.Fov, baseFov), $"松开右键：active={hawk.IsActive}，FOV恢复={camera.Fov}");
 		Check(arrow.IsCharging && arrow.IsBusy, $"后台收尾后左键仍在蓄力；当前动画={animator.CurrentAnimation}（非循环动画可自然播完）");
 		Check(hawk.CooldownRemaining > 0, $"松开后进入冷却：{hawk.CooldownRemaining:0.##}s");
-		Button("weapon_skill_1", false);
-		await Wait(0.7);
+		float targetHealthBeforeArrow = markTarget.Health;
+		HitInstance? observedArrow = null;
+		void ObserveArrow(HitInstance hit)
+		{
+			if (hit.Attacker == _player && hit.Attack?.AbilityKind == arrow.AbilityId) observedArrow = hit;
+		}
+		markTarget.HitReceived += ObserveArrow;
+		try
+		{
+			Button("weapon_skill_1", false);
+			await Wait(0.7);
+		}
+		finally { markTarget.HitReceived -= ObserveArrow; }
 		Check(arrow.LastShotCount > 0 && arrow.LastShotDamage > 0, $"松开左键真实发箭：{arrow.LastShotCount}支，伤害={arrow.LastShotDamage:0.##}");
-		Check(!IsInstanceValid(markTarget) || markTarget.IsDead, "左键箭命中标记靶子并造成击杀");
+		float arrowHealthLost = targetHealthBeforeArrow - markTarget.Health;
+		float expectedArrowDamage = arrow.LastShotDamage * (observedArrow?.Critical == true ? observedArrow.Attack!.CritMultiplier : 1);
+		Check(observedArrow != null && arrowHealthLost > 0 && Mathf.Abs(arrowHealthLost - expectedArrowDamage) < 0.01f,
+			$"左键箭命中标记靶子：实扣={arrowHealthLost:0.#####}，基础快照={arrow.LastShotDamage:0.#####}，暴击={observedArrow?.Critical}，期望={expectedArrowDamage:0.#####}");
 		hawk.RefreshCooldown();
 		Button("weapon_skill_2", true);
 		await Wait(0.1);

@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/Visual/CharacterDisplay.cs" id="50_display"]
 [ext_resource type="PackedScene" path="res://Scenes/Visual/WeaponGrip.tscn" id="51_grip"]
 [ext_resource type="PackedScene" path="res://Scenes/Visual/MeleeSwingFx.tscn" id="52_swing"]
+[ext_resource type="Script" path="res://Scripts/Visual/ThrownWeaponDisplay.cs" id="53_thrown_display"]
 
 [ext_resource type="Script" uid="uid://duc0wrjly51qb" path="res://Scripts/Player/PlayerController.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://Scenes/Camera/CameraRig.tscn" id="2_rig"]
@@ -232,9 +233,9 @@ AttackTags = PackedStringArray("Melee", "Spin")
 [node name="Shape" parent="AbilityWeapon5Skill2/Attack" index="0"]
 shape = SubResource("BoxShape3D_scythe_spin")
 
-[node name="WeaponVisual" type="MeshInstance3D" parent="AbilityWeapon5Skill2"]
+[node name="WeaponVisual" type="Node3D" parent="AbilityWeapon5Skill2"]
+script = ExtResource("53_thrown_display")
 visible = false
-mesh = SubResource("BoxMesh_scythe_blade")
 
 [node name="Path" type="Node3D" parent="AbilityWeapon5Skill2"]
 script = ExtResource("34_path")
@@ -265,9 +266,12 @@ AttackTags = PackedStringArray("Melee", "Thrown")
 [node name="Shape" parent="AbilityWeapon6Skill2/Attack" index="0"]
 shape = SubResource("BoxShape3D_lance")
 
-[node name="WeaponVisual" type="MeshInstance3D" parent="AbilityWeapon6Skill2"]
+[node name="WeaponVisual" type="Node3D" parent="AbilityWeapon6Skill2"]
+script = ExtResource("53_thrown_display")
+AlignToFlight = true
+ModelRotationDegrees = Vector3(-90, 0, 0)
+ModelOffset = Vector3(0, 0, 1.825)
 visible = false
-mesh = SubResource("BoxMesh_scythe_blade")
 
 [node name="Path" type="Node3D" parent="AbilityWeapon6Skill2"]
 script = ExtResource("34_path")

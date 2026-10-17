@@ -133,7 +133,21 @@ public partial class AudioManager : Node
 	{
 		if (Instance is not { } manager) return;
 		manager._shuttingDown = true;
+		manager.GetNodeOrNull<MusicDirector>("MusicDirector")?.StopForShutdown();
 		manager.StopAllVoices();
+		// 在等待混音线程期间先释放声部节点，避免到引擎清理时才析构其播放实例。
+		if (manager._music != null && IsInstanceValid(manager._music))
+		{
+			manager._music.Finished -= manager.OnMusicFinished;
+			manager._music.QueueFree();
+			manager._music = null;
+		}
+		foreach (AudioStreamPlayer voice in manager._sfx)
+			if (IsInstanceValid(voice)) voice.QueueFree();
+		foreach (AudioStreamPlayer voice in manager._ui)
+			if (IsInstanceValid(voice)) voice.QueueFree();
+		manager._sfx.Clear();
+		manager._ui.Clear();
 	}
 
 	private void StopAllVoices()

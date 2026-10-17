@@ -31,6 +31,8 @@ namespace ActRoguelike.Debug;
 public partial class SelfTest : Node
 {
 #if DEBUG
+	private Unit? _flowProtectedPlayer;
+	private bool _flowOriginalInvulnerable;
 	// 仅在Debug构建执行探针；发行配置只保留始终为false的兼容读取接口。
 
 	private int _phase;
@@ -60,7 +62,9 @@ public partial class SelfTest : Node
 			return;
 		}
 
+		MetaProgress.UseInMemoryStoreForSelfTest();
 		GameLog.Write("SelfTest", "=== 自测开始 ===");
+		GameLog.Write("SelfTest", "存档保护：局外数值沿用玩家存档，收益和消费仅在本进程内生效。");
 	}
 
 	public override void _Process(double delta)
@@ -185,6 +189,13 @@ public partial class SelfTest : Node
 
 			// === 端到端：真的走过去、按 F 交互、按数字键选奖励（不用 DebugTriggerNode 抄近路）===
 			case 7 when _timer > 0.3f:
+				// 以下只验交互／关卡流程；随机刷怪致死会切回基地，使后续流程探针永久等不到Stage。
+				_flowProtectedPlayer = PlayerLocator.Player;
+				if (_flowProtectedPlayer != null)
+				{
+					_flowOriginalInvulnerable = _flowProtectedPlayer.IsInvulnerable;
+					_flowProtectedPlayer.IsInvulnerable = true;
+				}
 				MovePlayerToNode(stage, RewardNodeKind.Enhancement);
 				GameLog.Write("SelfTest", "端到端：已传送到强化节点旁，准备按 F");
 				Next();
@@ -398,6 +409,9 @@ public partial class SelfTest : Node
 				break;
 
 			case 23:
+				if (_flowProtectedPlayer != null && IsInstanceValid(_flowProtectedPlayer))
+					_flowProtectedPlayer.IsInvulnerable = _flowOriginalInvulnerable;
+				_flowProtectedPlayer = null;
 				// 动画管线的**运行期**验证放在最小闭环那几段（case 29–32）：那里用的是玩家身上
 				// 真正的 UnitAnimator，而不是另造一份临时模型。
 				// ⚠️ 曾经这里还有一个"在临时探针节点上跑引擎方法轨道回调"的探针，**已删除**：
@@ -1352,13 +1366,13 @@ public partial class SelfTest : Node
 		w.OnInputReleased();
 		int shotC = _loopProjectiles - _mechProjectilesBefore;
 		float expectStepDamage = w.Damage * powerMax * damageMultiplier;
-		bool stepsOk = ok4 && steps3 == 3 && stepsMax == 5 && Mathf.IsEqualApprox(power3, 2.197f)
+		bool stepsOk = ok4 && steps3 == 3 && stepsMax == 5 && Mathf.IsEqualApprox(power3, 1.9f)
 			&& Mathf.IsEqualApprox(w.LastShotDamage, expectStepDamage)
 			&& Mathf.IsEqualApprox(w.LastShotSpeed, w.Speed * powerMax);
 		GameLog.Write(
 			"SelfTest",
 			$"{(stepsOk ? "✅" : "🔴")} 机制·后置蓄力（两段结构）：TryActivate={ok4} 基础 {w.ChargeBaseSeconds:0.##}s + 每 {w.ChargeStepSeconds:0.##}s ×{w.ChargeStepScale:0.##}，上限 {w.ChargeMaxSeconds:0.##}s"
-			+ $" → 蓄 0.85s：档={steps3}（期望 3）威力×{power3:0.###}（期望 1.3³=2.197）｜一直按住：档={stepsMax}（期望封顶 {stepsCap}=floor((1.0-0.5)/0.1)）威力×{powerMax:0.###}"
+			+ $" → 蓄 0.85s：档={steps3}（期望 3）威力×{power3:0.###}（期望 1+0.3×3=1.9）｜一直按住：档={stepsMax}（期望封顶 {stepsCap}=floor((1.0-0.5)/0.1)）威力×{powerMax:0.###}"
 			+ $" → 松手：伤害={w.LastShotDamage:0.###}（期望 30×{powerMax:0.###}×{damageMultiplier:0.##}={expectStepDamage:0.###}） 弹速={w.LastShotSpeed:0.###} 投射物 +{shotC}");
 
 		// ⑤ 还原（表里的样子：没有后置蓄力）
@@ -3093,7 +3107,7 @@ public partial class SelfTest : Node
 		_p3Target = chaser;
 		GameLog.Write("SelfTest", $"P3·弓：靶子 {chaser.Name} 生命 {chaser.Health:0.#} 已就位");
 
-		// 武技1：两个档位的伤害/弹速（0 档 = 基础；3 档 = ×1.3³ 伤害、+30×3 弹速）。
+		// 武技1：两个档位的伤害/弹速（3档按基础加算+90%伤害、+90弹速）。
 		if (_p3BowW1 != null)
 		{
 			ArrowVolleyAbility w1 = _p3BowW1;
@@ -3114,7 +3128,7 @@ public partial class SelfTest : Node
 			float dmg3 = w1.LastShotDamage;
 			float spd3 = w1.LastShotSpeed;
 			w1._PhysicsProcess(0.1d);
-			float expectDmg3 = w1.Damage * Mathf.Pow(1.3f, steps) * dmgMul;
+			float expectDmg3 = w1.Damage * (1 + 0.3f * steps) * dmgMul;
 			float expectSpd3 = w1.Speed + (30f * steps);
 
 			bool ok = steps == 3
@@ -3125,7 +3139,7 @@ public partial class SelfTest : Node
 			GameLog.Write(
 				"SelfTest",
 				$"{(ok ? "✅" : "🔴")} P3·弓武技1 箭在弦上：基础蓄力 {w1.ChargeBaseSeconds:0.##}s（期望 0.5）/ 每 {w1.ChargeStepSeconds:0.##}s（期望 0.1）一档 / 每档伤害 ×{w1.ChargeStepScale:0.##}（期望 1.3）/ 每档弹速 +{w1.SpeedPerChargeStep:0.##}（期望 30）/ 最多 {w1.ChargeMaxSeconds:0.##}s（期望 1）"
-				+ $" → 基础档：伤害 {dmg0:0.###}（期望 表值 {w1.Damage:0} ×玩家倍率 {dmgMul:0.##}）弹速 {spd0:0.##}（期望 {w1.Speed:0}）；3 档：伤害 {dmg3:0.###}（期望 {expectDmg3:0.###} = 1.3³）弹速 {spd3:0.##}（期望 {expectSpd3:0.##}）");
+				+ $" → 基础档：伤害 {dmg0:0.###}（期望 表值 {w1.Damage:0} ×玩家倍率 {dmgMul:0.##}）弹速 {spd0:0.##}（期望 {w1.Speed:0}）；3 档：伤害 {dmg3:0.###}（期望 {expectDmg3:0.###} = 1+0.3×3）弹速 {spd3:0.##}（期望 {expectSpd3:0.##}）");
 		}
 
 		// 武技2 刹那之眼：无动画软启动期间被击中 → 无效化 + 强制一次不消耗层数的「后撤」。
@@ -3944,45 +3958,11 @@ public partial class SelfTest : Node
 		// 圆柱判定：最后一刀的命中盒尺寸 z=0（= 大回旋 360°）。
 		Vector3 lastSize = w1.CurrentStepBoxSize;
 
-		// ② 抛出：周期伤害 + 飞行期间武技1 被锁 + 再次按键收回。
-		WaitUntilIdle(w2);
-		w2.RefreshCooldown();
-		bool thrown = w2.TryPress();
-		bool inFlight = w2.InFlight;
-
-		// WeaponGate5 是每帧惰性绑定的，这里也推它的物理帧。
-		_p4Player.GetNodeOrNull<WeaponGate>("WeaponGate5")?._PhysicsProcess(0.02d);
-		bool comboLocked = w1.ExternallyBlocked;
-		// ⚠️ 先清冷却：不然"按不动"是冷却导致的，测不出"门"这一条。
-		WaitUntilIdle(w1);
-		w1.RefreshCooldown();
-		bool comboBlockedPress = !w1.TryPress();
-
-		// 推几个周期（每 0.5s 一次判定）。
-		for (int i = 0; i < 8; i++)
-		{
-			w2._PhysicsProcess(0.2d);
-		}
-
-		int ticks = w2.DamageTickCount;
-		Vector3 weaponPos = w2.WeaponPosition;
-		bool secondPress = w2.TryPress();      // 再次使用 → 收回
-		for (int i = 0; i < 40 && w2.IsBusy; i++)
-		{
-			w2._PhysicsProcess(0.05d);
-		}
-
-		_p4Player.GetNodeOrNull<WeaponGate>("WeaponGate5")?._PhysicsProcess(0.02d);
-		bool comboUnlocked = !w1.ExternallyBlocked;
-
-		bool ok = started && advanced >= 2 && lastSize.Z <= 0.0001f
-			&& thrown && inFlight && comboLocked && comboBlockedPress && ticks >= 2 && secondPress && comboUnlocked;
-		GameLog.Write(
-			"SelfTest",
-			$"{(ok ? "✅" : "🔴")} P4·镰刀：武技1 憎恶 段数={w1.ComboStepCount}（期望 3） CD {w1.Cooldown:0.##}（期望 0.5） 连续按键推进={advanced}（期望 ≥2） 最后一刀命中盒 {Fmt(lastSize)}（期望 z=0 = **圆柱 = 大回旋 360°**）"
-			+ $"｜武技2 无情：TryPress={thrown}（期望 True） 在飞={inFlight}（期望 True） 周期伤害 {ticks} 次（期望 ≥2，每 {w2.DamageInterval:0.##}s 一次；推 8×0.2s=1.6s 的物理帧，实际按引擎帧数） CD {w2.Cooldown:0.##}（期望 1） 武器位置 {Fmt(weaponPos)}"
-			+ $"｜「武器飞出去这期间武技1无法使用」：门绑定={_p4Player.GetNodeOrNull<WeaponGate>("WeaponGate5")?.Bound} 武技1 被锁={comboLocked}（期望 True） 此时按武技1={comboBlockedPress}（期望 False）"
-			+ $"｜再次使用收回={secondPress}（期望 True） 收回后武技1 解锁={comboUnlocked}（期望 True） 累计收回 {w2.RecallCount} 次");
+		// 投掷必须等真实动画，禁止在同一帧手推计时伪造出手。完整物理证据由CharacterDesignProbe负责。
+		bool throwContract = w2.Enabled && w2.AnimName.Length > 0 && w2.AnimEvent == "ATK"
+			&& w2.RecallOnSecondPress && w2.RecallDistance > 0 && !w2.AutoRecallOnSettle;
+		bool ok = started && advanced >= 2 && lastSize.Z <= 0.0001f && throwContract;
+		GameLog.Write("SelfTest", $"{(ok ? "✅" : "🔴")} P4·镰刀：三段与末刀圆柱={lastSize.Z <= 0.0001f}，投掷动画契约={throwContract}；前飞、停留、周期命中、锁门及回程见原始设计真实输入探针。");
 	}
 
 	/// <summary>长枪：4 段循环连招 + 武技2 蓄力抛掷（抛物线 / 路径可视化 / 每档 +20% / 收回）。</summary>
@@ -4022,49 +4002,18 @@ public partial class SelfTest : Node
 			maxStepSeen = Mathf.Max(maxStepSeen, w1.ComboStep);
 		}
 
-		// ② 蓄力抛掷：基础档 vs 3 档（每 0.25s 一档 ×1.2）。
-		WaitUntilIdle(w2);
-		w2.RefreshCooldown();
+		// 本同步探针只核查蓄力与配置；真实ATK、落点与回程伤害由CharacterDesignProbe覆盖。
+		w2.ResetForLoadout();
 		bool charged = w2.TryPress();
-		w2.OnInputHeld(w2.ChargeBaseSeconds + 0.01f);      // 基础档
-		float baseDist = w2.MaxThrowDistance * w2.ChargePowerScale;
-		w2.OnInputReleased();
-		float distAt0 = w2.LastHorizontalDistance;
-		float speedAt0 = w2.LastHorizontalSpeed;
-		int pathPoints = w2.LastPathPoints;
-		bool inFlight = w2.InFlight;
-		for (int i = 0; i < 30 && w2.IsBusy; i++)
-		{
-			w2._PhysicsProcess(0.05d);
-		}
-
-		WaitUntilIdle(w2);
-		w2.RefreshCooldown();
-		bool charged3 = w2.TryPress();
-		w2.OnInputHeld(w2.ChargeBaseSeconds + (w2.ChargeStepSeconds * 3f) + 0.01f);
+		w2.OnInputHeld(w2.ChargeBaseSeconds + w2.ChargeStepSeconds * 3 + 0.01f);
 		int steps = w2.ChargeSteps;
 		float power = w2.ChargePowerScale;
-		w2.OnInputReleased();
-		float distAt3 = w2.LastHorizontalDistance;
-		float speedAt3 = w2.LastHorizontalSpeed;
-		bool recall = w2.TryPress();      // 再次使用 → 收回
-		for (int i = 0; i < 40 && w2.IsBusy; i++)
-		{
-			w2._PhysicsProcess(0.05d);
-		}
-
-		float maxDist = w2.MaxThrowDistance * Mathf.Pow(w2.ChargeStepScale, 3f);
-		bool ok = started && w1.ComboStepCount == 4 && advanced >= 5 && maxStepSeen <= 3 && charged && charged3 && steps == 3
-			&& Mathf.IsEqualApprox(speedAt3 / Mathf.Max(0.01f, speedAt0), power)
-			&& Mathf.IsEqualApprox(distAt0, baseDist) && Mathf.IsEqualApprox(distAt3, maxDist)
-			&& distAt3 > distAt0 && pathPoints >= 2 && inFlight && recall;
-		GameLog.Write(
-			"SelfTest",
-			$"{(ok ? "✅" : "🔴")} P4·长枪武技1 横扫千军：段数={w1.ComboStepCount}（期望 4） 循环={w1.ComboLoop}（期望 True，文档「这么循环」） CD {w1.Cooldown:0.##}（期望 0.6） 连续按键推进={advanced}（期望 ≥5） 循环后最大段号={maxStepSeen + 1}（期望 ≤4 = 打满就回到第 1 段）"
-			+ $"｜武技2 长虹贯日：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 1）/ 每 {w2.ChargeStepSeconds:0.##}s 一档（期望 0.25）/ 每档 ×{w2.ChargeStepScale:0.##}（期望 1.2 = +20%）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 4，最多蓄力 {w2.ChargeMaxSeconds:0.##}s）"
-			+ $"｜抛物线：重力 {w2.ArcGravity:0.##} 飞行 {w2.FlightSeconds:0.##}s 路径可视化 {pathPoints} 点（期望 ≥2） 在飞={inFlight}（期望 True）"
-			+ $"｜基础档：水平速度 {speedAt0:0.##} 路径中线 {distAt0:0.##}m ／ 3 档：速度 {speedAt3:0.##} 路径中线 {distAt3:0.##}m（期望 {maxDist:0.##} ≈ 12×1.2³）"
-			+ $"｜丢出去后再次使用收回={recall}（期望 True） 累计收回 {w2.RecallCount} 次｜落日余晖（武器 3 被动）：下落攻击 {_p4Fall?.AbilityId ?? "（找不到）"} 的冲下模式={_p4Fall?.HomingMode}（0=Straight 1=Crosshair） 指向范围 {_p4Fall?.MaxDiveAngleDegrees:0.#}°");
+		w2.ResetForLoadout();
+		bool contract = w2.AnimName.Length > 0 && w2.AnimEvent == "ATK" && w2.ContinuousPathDamage
+			&& w2.RecallDistance == 0 && w2.RecallOnSecondPress && !w2.AutoRecallOnSettle;
+		bool ok = started && w1.ComboStepCount == 4 && advanced >= 5 && maxStepSeen <= 3
+			&& charged && steps == 3 && Mathf.IsEqualApprox(power, 1.6f) && contract;
+		GameLog.Write("SelfTest", $"{(ok ? "✅" : "🔴")} P4·长枪：四段循环，最大索引{maxStepSeen}，三档加算倍率{power:0.###}（期望1.6），留枪与动画契约={contract}；准星落点、地形碰撞与往返命中见原始设计真实输入探针。");
 	}
 
 	/// <summary>取单位下的 <see cref="CharacterMovement"/>（自测探针要同步推它的物理帧）。</summary>
