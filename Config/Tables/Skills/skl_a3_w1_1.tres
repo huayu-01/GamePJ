@@ -19,14 +19,14 @@ Note = "★ 基础伤害（文档：每 0.3s 增加 30% —— 那个 30% 是 Ch
 [sub_resource type="Resource" id="p_a3_w1_1_2"]
 script = ExtResource("2_param")
 Key = "Speed"
-Value = 220.0
-Note = "★ 基础弹速（文档为 n → 预设 220）"
+Value = 160.0
+Note = "★ 基础弹速（文档为 n）。J10 用户裁定「降低整体弹速」→ 220 改成 160（预设值，等用户确认）：原 220 的箭一物理帧飞 3.67m，太快时近距离两只怪容易只结算最近那只"
 
 [sub_resource type="Resource" id="p_a3_w1_1_3"]
 script = ExtResource("2_param")
 Key = "SpeedPerChargeStep"
-Value = 30.0
-Note = "★ 文档原话：每 0.1s 增加 30% 的伤害**和 30 射速** —— 射速这一项写的是**绝对值 +30**，所以走这一列（伤害那 30% 走 ChargeStepScale=1.3）"
+Value = 20.0
+Note = "★ 文档原话：每 0.3s 增加 30% 的伤害**和 30 射速** —— 射速这一项写的是**绝对值**，所以走这一列（伤害那 30% 走 ChargeStepScale=1.3 的加算）。J10 用户裁定「降低整体弹速」→ 30 改成 20（预设值，等用户确认）：满档（3 个后置档）弹速 = 160 + 20×3 = 220（改前 220 + 30×5 = 370）"
 
 [sub_resource type="Resource" id="p_a3_w1_1_4"]
 script = ExtResource("2_param")
