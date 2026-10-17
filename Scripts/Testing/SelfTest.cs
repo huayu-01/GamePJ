@@ -65,6 +65,8 @@ public partial class SelfTest : Node
 		}
 
 		MetaProgress.UseInMemoryStoreForSelfTest();
+		// J11：符文携带也走内存模式（且**恒为空**）—— 8 条硬指标必须在"没带符文"的状态下跑。
+		ActRoguelike.Run.RuneCarry.UseInMemoryStoreForSelfTest();
 		GameLog.Write("SelfTest", "=== 自测开始 ===");
 		GameLog.Write("SelfTest", "存档保护：局外数值沿用玩家存档，收益和消费仅在本进程内生效。");
 	}
@@ -2847,7 +2849,7 @@ public partial class SelfTest : Node
 		//   增幅项不在这一行（见下面「配置表比对·增幅项」）：74 → 57（删了 17 条旧行 = 旧强化 10 + 旧进化 4 + 旧异化 3），
 		//   剩下强化 9（= 设计文档 §227-243 那 9 条）/ 进化 23 / 异化 25。
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}/符文 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.RuneConfig>()}（期望 **J11 后 14 个数 = 6/2/10/1/1/39/7/14/8/5/6/11/4/11**；只打印、不比对。J11 之前是 13 个数 6/2/10/1/1/39/7/14/8/5/6/11/4 —— J11 的差额**只有**末尾多一张表（符文 11 枚），前 13 个数字一位都没动；P6b 后是 6/2/10/1/1/39/7/14/8/5/6/11/4；P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））");
 
 		// 能力卡（局外装备层，`docs/ability-cards.md`）：卡表读数 + 状态层全流程
 		// （解锁 → 重复解锁 → 升级 → 上限 → 重置归还 → 激活额度记账 → 未解锁/额度不足/碎片不足 → 额度扩增）。

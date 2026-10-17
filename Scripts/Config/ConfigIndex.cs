@@ -74,6 +74,12 @@ public partial class ConfigIndex : Node
 		ConfigRows.Rebuild(Config.Nodes);
 		ConfigRows.Rebuild(Config.ValueTags);
 		ConfigRows.Rebuild(Config.Upgrades);
+		// 符文表（`Config/Tables/Runes/rune_*.tres`，J11）：**与增幅项不是同一张表** ——
+		// 符文不进奖励池，只在"开局携带一件"那条路上被查（`RunController.SetCarriedRune`），
+		// 而它对池子的唯一影响是 `RunBuild.RuneUnlocks`（前置判定的一个来源）。
+		// 独立 Rebuild 的另一个原因：`ConfigRows` 按 `typeof(T).Name` 分桶，
+		// `RuneConfig` 虽然继承 `RewardConfig`，两边的 Count 与 ById 互不串台。
+		ConfigRows.Rebuild(Config.Runes);
 		ConfigRows.Rebuild(Config.UpgradePools);
 		ConfigRows.Rebuild(Config.MetaUpgrades);
 		// 能力卡（局外装备层，见 docs/ability-cards.md）：**与 Skills 是两层**，
@@ -105,6 +111,11 @@ public partial class ConfigIndex : Node
 
 		// 能力卡（局外装备层）：卡表行数 + 额度上限公式 + "授予技能"卡指向的技能行在不在索引里。
 		ReportAbilityCards();
+
+		// 符文表（J11）：每枚符文的 handler 校验 + "这枚符文一开会让哪几条增幅的前置变成满足"。
+		// ⚠️ 刻意**不并进上面那条「配置表：…」总览行** —— 那一行是 8 硬指标之一（逐字比对），
+		// 而且符文与增幅项是两层东西，单独一行更好读（与「价值标签」「升级池」「AI 档案」「能力卡」同一条纪律）。
+		ReportRunes();
 
 		// 首领强化：数值型（Pressure 表）与行为型（技能表里 ApplyHandler 非空的行）分别编译，
 		// 两者必须能按来源分开（关卡核心文档 §7.1）。
@@ -364,6 +375,106 @@ public partial class ConfigIndex : Node
 			"Config",
 			$"能力卡（局外装备层，与 Skills 是两层）：{cardCount} 张（来源：{(cardCount > 0 ? "表 AbilityCards" : "代码默认值（表读不到）")}）—— [{lines}]；"
 			+ $"额度上限 = 基础 {Config.AbilityQuotaBase} + 扩增行 {(quota == null ? "（读不到 meta_quota，每级 +1）" : $"{quota.Id} 每级 +{quota.PerLevel:0.##}（1 级价格 {quota.BaseCost}，每级 +{quota.CostGrowth}）")}");
+	}
+
+	/// <summary>
+	/// 把"符文 → 它能满足哪些增幅前置"写进日志（J11 的"顺藤摸瓜"入口）。
+	///
+	/// 两件事必须能一眼看出来：① 读到几枚符文、它们的 handler 有没有拼错（拼错 = 携带后静默没效果）；
+	/// ② **携带某一枚符文会让哪几条增幅的前置从"不满足"变成"满足"** —— 这正是用户那句
+	/// 「携带了这个雷之印等于满足它们的前置要求」在日志里的体现，不必等到进游戏抽卡才知道。
+	///
+	/// 与 <see cref="ReportUpgradePools"/> 同一条纪律：做前置的字符串与增幅项 `Requires` 对不上时，
+	/// 这里会显示「（暂无增幅以此为前置）」，而不是静默什么都不发生。
+	/// </summary>
+	private void ReportRunes()
+	{
+		int runeCount = ConfigRows.Count<RuneConfig>();
+		if (runeCount == 0)
+		{
+			ActRoguelike.Core.GameLog.Write("Config", "符文表：0 枚（来源：无）—— 本批不携带任何符文时前置判定不含符文来源，与加符文之前逐位一致。");
+			return;
+		}
+
+		var lines = new System.Text.StringBuilder();
+		foreach (RuneConfig rune in Config.Runes)
+		{
+			if (rune == null)
+			{
+				continue;
+			}
+
+			if (!rune.HasKnownHandler)
+			{
+				GD.PushWarning($"[ConfigIndex] 符文 {rune.Id} 的 ApplyHandler \"{rune.ApplyHandler}\" 未注册 —— 携带它不会有任何效果。");
+			}
+
+			if (lines.Length > 0)
+			{
+				lines.Append('、');
+			}
+
+			lines.Append($"{rune.Id}（{rune.DisplayName}）{HandlerSummary(rune)}");
+
+			// ② 这枚符文一开，哪几条增幅的前置会变成满足（**含按符文行 Id 书写的那种写法**）。
+			var unlocked = new System.Text.StringBuilder();
+			foreach (RewardConfig upgrade in Config.Upgrades)
+			{
+				if (upgrade == null || !PrerequisiteHits(upgrade, rune))
+				{
+					continue;
+				}
+
+				unlocked.Append(unlocked.Length > 0 ? "、" : string.Empty);
+				unlocked.Append(upgrade.Id);
+			}
+
+			lines.Append(unlocked.Length > 0 ? $" → 解锁前置的增幅 [{unlocked}]" : " → 解锁前置的增幅 [（暂无增幅以此为前置）]");
+		}
+
+		ActRoguelike.Core.GameLog.Write(
+			"Config",
+			$"符文表（开局携带一件的信物，**不进奖励池**）：{runeCount} 枚（来源：表 Runes）—— [{lines}]");
+	}
+
+	/// <summary>某条增幅的 `Requires` 里有没有能被这枚符文满足的项（日志用；判定本体在 `RunBuild.SatisfiesPrerequisite`）。</summary>
+	private static bool PrerequisiteHits(RewardConfig upgrade, RuneConfig rune)
+	{
+		foreach (string required in upgrade.Requires)
+		{
+			if (required == rune.Id)
+			{
+				return true;
+			}
+
+			foreach (string unlock in rune.UnlocksRequires)
+			{
+				if (unlock == required)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/// <summary>一枚符文"怎么产生效果"的一句话摘要（handler + 关键列），日志用。</summary>
+	private static string HandlerSummary(RuneConfig rune)
+	{
+		var text = new System.Text.StringBuilder();
+		text.Append(' ').Append(rune.ApplyHandler);
+		foreach (StatOverride entry in rune.Modifiers)
+		{
+			text.Append(" · ").Append(entry.Stat).Append('=').Append(entry.Value.ToString("0.###"));
+		}
+
+		foreach (ParamEntry entry in rune.HandlerParams)
+		{
+			text.Append(" · ").Append(entry.Key).Append('=').Append(entry.Value);
+		}
+
+		return text.ToString();
 	}
 
 	/// <summary>

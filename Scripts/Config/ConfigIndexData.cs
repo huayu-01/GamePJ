@@ -237,6 +237,21 @@ public partial class ConfigIndexData : Resource
 	/// <summary>增幅项表（`Config/Tables/Upgrades/upg_*.tres`）。空 = 用 <c>RewardCatalog.Fallback</c>。</summary>
 	[Export] public RewardConfig[] Upgrades { get; set; } = System.Array.Empty<RewardConfig>();
 
+	[ExportGroup("表索引 · 符文（开局携带一件的信物）")]
+	/// <summary>
+	/// **符文表**（`Config/Tables/Runes/rune_*.tres`）：**一行 = 一枚符文**，现有 11 行。
+	///
+	/// <para>⚠️ 符文 = **哈迪斯信物**（用户 2026-10-17 澄清）：「携带了这个东西之后，会产生些效果……
+	/// 然后新增的增幅里，有一些它是有前置，要求雷之印，所以携带了这个雷之印等于满足它们的前置要求」。
+	/// 所以一行同时表达两件事：① 一个效果（`ApplyHandler` + `Modifiers`/`HandlerParams`，与增幅项同构）；
+	/// ② <see cref="RuneConfig.UnlocksRequires"/> 里的前置条件被满足。</para>
+	///
+	/// <para>⚠️ 它与 <see cref="Upgrades"/> **不是同一张表**：符文不进奖励池（不进 `RewardPool` 的候选），
+	/// 也不参与"增幅项 62 条"那个读数。判定点见 `RewardPool.HasPrerequisites`（前置是**唯一**的接触面）。
+	/// 空 = 没有任何符文可携带 → 一切都是"没带符文"的既有行为（逐位不变）。</para>
+	/// </summary>
+	[Export] public RuneConfig[] Runes { get; set; } = System.Array.Empty<RuneConfig>();
+
 	[ExportGroup("表索引 · 升级池")]
 	/// <summary>
 	/// 升级池表（`Config/Tables/UpgradePools/pool_*.tres`）：**一行一个池**。
