@@ -173,6 +173,8 @@ ChargedShot  = ChargedShotTuning{ TargetAbility=skl_a3_w1_1, MaxChargeSeconds=3,
 - 专项探针 `Scenes/Debug/_DragonArrowProbe.tscn`（新）headless → **退出码 0**、**stderr 0 字节**、**通过 42，失败 0**。
 - 独立回归 `Scenes/Debug/_ChargeReleaseProbe.tscn`（与 Main 无关的另一套真实输入探针）→ 退出码 0、stderr 0 字节、
   **通过 80，失败 0** —— 与 J6/J7/J8 基线**逐字一致**，证明"没拿龙之箭时"的蓄力/发射行为逐位没变。
+- 独立回归 `Scenes/Debug/_CharacterDesignProbe.tscn`（原文设计验收，历史基线 115/0）→ 退出码 0、stderr 0 字节、
+  **通过 115，失败 0**（同样逐字不变）。
 - Main：`--headless --quit-after 40000 res://Scenes/Main.tscn -- --selftest` → **退出码 0**，68.9s，
   **stderr 0 字节**，日志到 `=== 自测结束 ===`。
 - 8 硬指标逐字一致：配置计数（`（ConfigIndex.tres 已加载）` 在）· 10 节点 2/5/3 · 猎手 **220/20/6.5** ·
