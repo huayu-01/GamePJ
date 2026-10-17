@@ -220,6 +220,16 @@ enemy_units=0  projectiles=0   Curve 面数=0   Curve.visible=false   IsShowing=
 0.4037 → 0.4251 → 0.2967 → 0.3792      （范围正好是 0.45 ~ 0.45×(1−0.35)=0.2925）
 ```
 
+**"两个实例互不染色"**（同一帧读两份材质，`screenshots/si_dual.png` 就是这一帧）：
+
+```
+玩家实例 Area/Ring.albedo_color = (0.35, 0.88, 1.0, 0.45)     ← 青蓝
+敌人实例 Edge.albedo_color      = (1.0, 0.26, 0.2, 0.4251)    ← 红（alpha 是各自呼吸相位）
+```
+
+原理：预制体里的 4 份 `StandardMaterial3D` 是**模板**，`_Ready` 里逐个 `Duplicate()` 给本实例
+（同一份场景的多个实例默认共享 sub-resource，不复制就会互相染色）。
+
 ---
 
 ## 8. 实拍（2026-10-17，游戏内 `Main.tscn`，默认参数没改）
@@ -232,6 +242,7 @@ enemy_units=0  projectiles=0   Curve 面数=0   Curve.visible=false   IsShowing=
 | `screenshots/si_area_red.png` | **② 区域指向（敌人）**：落点**红圈** | `IsHostile=true` + `ShowAreaPoint(Vector3(3.5,0,-8), 2.5)` |
 | `screenshots/si_curve_area2.png` | **③ 曲线 + 末端圈**：弧线 + 落点圈 | `ShowCurvePathPlusArea(Vector3(0,1.4,0), Vector3(2,11,-9), 22.0, 12.0, 2.2)` |
 | `screenshots/si_line_red.png` | **④ 直线区域**：9m × 2m 的红色冲撞矩形（贴地） | `IsHostile=true` + `ShowLineArea(Vector3(0.4,0,1.5), Vector3(0,0,-1), 9.0, 2.0)` |
+| `screenshots/si_dual.png` | **"玩家与敌人共用"的正面证据**：同一帧里**两个实例各画各的** —— 左边青蓝圈（玩家 ②，准星点）、右边红色矩形（敌人 ④）。两份材质各是各的色 | ② 由原实例画；④ 由运行期 `duplicate()` 出来的第二个实例画（`IsHostile=true`），只用来取证，**不是项目里的常驻节点** |
 
 ⚠️ **拍摄方法**：不需要调慢任何参数 —— 本组件**不会自动消失**（不像 `LandingShockwave` 有 `Duration`），
 所以一次 `ShowXxx` 之后画面会一直保持，随拍随取（`runtime screenshot`）。
