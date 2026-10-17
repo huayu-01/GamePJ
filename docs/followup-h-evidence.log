@@ -1,0 +1,110 @@
+Debug 编译：0 warning / 0 error
+selftest_final 退出码=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+probe_final 退出码=0
+[Balance] PASS EnergyPalm第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS EnergyPalm第1轮：命中10，暴击2，基础伤害100，实扣120
+[BalanceSample] EnergyPalm,1,6.0303,10,2,100,120,16.583,19.8996
+[Balance] PASS EnergyPalm第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS EnergyPalm第2轮：命中10，暴击1，基础伤害100，实扣110
+[BalanceSample] EnergyPalm,2,6.0181,10,1,100,110,16.6166,18.2783
+[Balance] PASS Crossbow第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Crossbow第1轮：命中6，暴击1，基础伤害72，实扣84
+[BalanceSample] Crossbow,1,6.1259,6,1,72,84,11.7533,13.7122
+[Balance] PASS Crossbow第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Crossbow第2轮：命中6，暴击0，基础伤害72，实扣72
+[BalanceSample] Crossbow,2,6.1247,6,0,72,72,11.7558,11.7558
+[Balance] PASS Bow第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Bow第1轮：命中4，暴击0，基础伤害356.4412，实扣356.4375
+[BalanceSample] Bow,1,6.0153,4,0,356.4412,356.4375,59.2562,59.2556
+[Balance] PASS Bow第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Bow第2轮：命中4，暴击1，基础伤害356.4412，实扣445.5469
+[BalanceSample] Bow,2,6.018,4,1,356.4412,445.5469,59.2289,74.0354
+[Balance] PASS SpiritSword第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS ATK前快速连点只缓冲，不跳段/不提前判定
+[Balance] PASS SpiritSword第1轮：命中14，暴击0，基础伤害366，实扣366
+[Balance] PASS SpiritSword全部5段均由真实动画命中，段号=[0,1,2,3,4]
+[BalanceSample] SpiritSword,1,6.0422,14,0,366,366,60.5741,60.5741
+[Balance] PASS SpiritSword第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS SpiritSword第2轮：命中14，暴击0，基础伤害366，实扣366
+[Balance] PASS SpiritSword全部5段均由真实动画命中，段号=[0,1,2,3,4]
+[BalanceSample] SpiritSword,2,6.0082,14,0,366,366,60.9171,60.9171
+[Balance] PASS Scythe第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS ATK前快速连点只缓冲，不跳段/不提前判定
+[Balance] PASS Scythe第1轮：命中10，暴击0，基础伤害345.8，实扣345.8047
+[Balance] PASS Scythe全部3段均由真实动画命中，段号=[0,1,2]
+[BalanceSample] Scythe,1,6.1246,10,0,345.8,345.8047,56.4605,56.4612
+[Balance] PASS Scythe第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Scythe第2轮：命中10，暴击0，基础伤害345.8，实扣345.8047
+[Balance] PASS Scythe全部3段均由真实动画命中，段号=[0,1,2]
+[BalanceSample] Scythe,2,6.0097,10,0,345.8,345.8047,57.5406,57.5413
+[Balance] PASS Spear第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS ATK前快速连点只缓冲，不跳段/不提前判定
+[Balance] PASS Spear第1轮：命中17，暴击0，基础伤害432.3，实扣432.3125
+[Balance] PASS Spear全部5段均由真实动画命中，段号=[0,1,2,3,4]
+[BalanceSample] Spear,1,6.0003,17,0,432.3,432.3125,72.0462,72.0483
+[Balance] PASS Spear第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Spear第2轮：命中17，暴击0，基础伤害432.3，实扣432.3125
+[Balance] PASS Spear全部5段均由真实动画命中，段号=[0,1,2,3,4]
+[BalanceSample] Spear,2,6.0006,17,0,432.3,432.3125,72.0433,72.0453
+[Balance] PASS 当前元进度：生命+20，伤害×1，移速×1，暴击+0.26999998
+[Balance] PASS chr_hunter基础表值保留
+[Balance] PASS chr_hunter生命200/甲20，固定10伤害致死=23次（生命加成0）
+[DefenseSample] chr_hunter,0,200,20,6.5,10,23,7,0
+[Balance] PASS chr_hunter生命200/甲20，固定20伤害致死=12次（生命加成0）
+[DefenseSample] chr_hunter,0,200,20,6.5,20,12,14,0
+[Balance] PASS chr_hunter生命200/甲20，固定40伤害致死=6次（生命加成0）
+[DefenseSample] chr_hunter,0,200,20,6.5,40,6,20,8
+[Balance] PASS chr_hunter生命220/甲20，固定10伤害致死=25次（生命加成20）
+[DefenseSample] chr_hunter,20,220,20,6.5,10,25,7,0
+[Balance] PASS chr_hunter生命220/甲20，固定20伤害致死=13次（生命加成20）
+[DefenseSample] chr_hunter,20,220,20,6.5,20,13,14,0
+[Balance] PASS chr_hunter生命220/甲20，固定40伤害致死=7次（生命加成20）
+[DefenseSample] chr_hunter,20,220,20,6.5,40,7,20,8
+[Balance] PASS chr_weapon_master基础表值保留
+[Balance] PASS chr_weapon_master生命220/甲25，固定10伤害致死=26次（生命加成0）
+[DefenseSample] chr_weapon_master,0,220,25,6.8,10,26,7,0
+[Balance] PASS chr_weapon_master生命220/甲25，固定20伤害致死=13次（生命加成0）
+[DefenseSample] chr_weapon_master,0,220,25,6.8,20,13,14,0
+[Balance] PASS chr_weapon_master生命220/甲25，固定40伤害致死=7次（生命加成0）
+[DefenseSample] chr_weapon_master,0,220,25,6.8,40,7,25,3
+[Balance] PASS chr_weapon_master生命240/甲25，固定10伤害致死=28次（生命加成20）
+[DefenseSample] chr_weapon_master,20,240,25,6.8,10,28,7,0
+[Balance] PASS chr_weapon_master生命240/甲25，固定20伤害致死=14次（生命加成20）
+[DefenseSample] chr_weapon_master,20,240,25,6.8,20,14,14,0
+[Balance] PASS chr_weapon_master生命240/甲25，固定40伤害致死=7次（生命加成20）
+[DefenseSample] chr_weapon_master,20,240,25,6.8,40,7,25,3
+[Balance] PASS 截图 h_balance_samples
+[Balance] === H专项验收结束：通过 49，失败 0 ===
+数据 docs/balance-samples.csv SHA256=B2247491CEF4CF144ED9845067250490119D28CE09B9E48FA1A1E905BFDE2831
+数据 docs/balance-defense.csv SHA256=78E4098621045BD1CAF4CFCF15AE81151207D5F0D8F714F93C0066FFFA5C50E8
+feedback 退出码=0
+[Feedback] === G专项验收结束：通过 50，失败 0 ===
+characters 退出码=0
+[CharacterReplacement] 完成：通过 63，失败 0
+d_regression 退出码=0
+[BatchD] === D批验收结束：通过 90，失败 0 ===
+c_regression 退出码=0
+[BatchC] === C批验收结束：通过 52，失败 0 ===
+b_regression 退出码=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a_regression 退出码=0
+[BatchA] === A 批验收结束：失败 0 ===
+e_regression 退出码=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+memory 退出码=0
+跨进程读档5/0
+ExportRelease 编译：0 warning / 0 error
+存档恢复 meta.cfg=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档恢复 ability_cards.cfg=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档恢复 settings.cfg=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档恢复 loadout.cfg=4E8485C2134B42DA70852CD62872D835CFC2B5D13900548AE47F1652380E3104
+截图 h_balance_samples.png SHA256=937E0B22A8E54D742429FF40A46050F9F83BDDB9014CF6F2DBA0FF38C0AF89E8
+selftest.flag 不存在=True

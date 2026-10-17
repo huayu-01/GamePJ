@@ -64,7 +64,7 @@ public partial class MeleeComboAbility : Ability
 	/// <summary>
 	/// **自测用**：不等真实动画事件帧，直接**模拟"事件帧到了"**（= 开窗口 + 本段判定 + 斩断子弹）。
 	///
-	/// <para>为什么需要它：自测是在**同一帧里**连续驱动能力的（`ability._PhysicsProcess(0.06d)`），
+	/// <para>为什么需要它：旧自测是在**同一帧里**连续驱动能力的（手动推进物理时间），
 	/// 而 <c>OnAnimEvent</c> 要等 <c>UnitAnimator</c> 真的把播放位置推过事件帧 —— 同一帧里推不出来。
 	/// 所以自测走这个入口做"连招推进"的取证；真人那一路仍然完全由动画事件帧驱动
 	/// （<see cref="OnAnimEvent"/> 里那一段），本方法不参与任何正式流程。</para>
@@ -183,6 +183,8 @@ public partial class MeleeComboAbility : Ability
 	private float _stepTimer;
 	private float _activeTimer;
 	private bool _striking;
+	private bool _stepHasStruck;
+	private bool _advanceQueued;
 	private bool _lunging;
 	private bool _windowTimerRunning;
 	private bool _pressBuffered;
@@ -291,6 +293,8 @@ public partial class MeleeComboAbility : Ability
 		_pressBuffered = false;
 		_striking = false;
 		_stepTimer = 0f;
+		_stepHasStruck = false;
+		_advanceQueued = false;
 		_activeTimer = 0f;
 
 		// 每次**开新的一次施法**时重读一次表（很小；换武器/换行后必须重读）。
@@ -341,11 +345,12 @@ public partial class MeleeComboAbility : Ability
 			return false;
 		}
 
-		// 输入窗口还没开（例如第一段挥到一半）→ 缓冲这一下，窗口一开就用。
+		// 提前按键只缓冲；真实ATK开窗且本段判定结束后，才能消费下一段。
 		_pressBuffered = true;
-		if (EnableInputWindow())
+		if (ComboWindowOpen)
 		{
-			return Advance();
+			_advanceQueued = true;
+			if (!_striking) return Advance();
 		}
 
 		// 窗口既没开也没到（事件帧还没来）→ 这次按键**记在缓冲里**，等 ATK 帧到来时自动推进
@@ -382,6 +387,8 @@ public partial class MeleeComboAbility : Ability
 
 		ComboStep = next;
 		ComboChained++;
+		_stepHasStruck = false;
+		_advanceQueued = false;
 		ComboWindowOpen = false;
 		_windowTimerRunning = false;
 		_pressBuffered = false;
@@ -398,26 +405,27 @@ public partial class MeleeComboAbility : Ability
 	/// 事件帧：
 	/// <list type="bullet">
 	/// <item><see cref="ComboNextEvent"/>（文档：`ATK`）—— **开输入窗口 + 本段命中判定 + 斩断子弹**；</item>
-	/// <item><see cref="Ability.AnimEventEnd"/> 里除了 ComboNextEvent 之外的名字 → 按"窗口关"处理。</item>
+	/// <item>动画收招标记不覆盖表内窗口时长，避免紧邻ATK时截断输入与判定。</item>
 	/// </list>
 	/// </summary>
 	protected override void OnAnimEvent(string name)
 	{
 		if (!string.IsNullOrEmpty(ComboNextEvent) && name == ComboNextEvent)
 		{
+			if (_stepHasStruck) return;
+			_stepHasStruck = true;
 			Strike();
 			EnableInputWindow();
 			if (_pressBuffered)
 			{
-				Advance();
+				_advanceQueued = true;
 			}
 
 			return;
 		}
 
-		// 第二个事件帧：窗口关（动画侧的"收招"标记）。
-		ComboWindowOpen = false;
-		_windowTimerRunning = false;
+		// Combo是动画收招标记；连招输入窗口仍按表内ComboWindowSeconds计时。
+		// 不能用紧邻ATK的收招标记把输入窗口压成数毫秒，也不能截断真实判定。
 	}
 
 	protected override void Tick(float delta)
@@ -438,10 +446,17 @@ public partial class MeleeComboAbility : Ability
 			}
 		}
 
+		if (_advanceQueued && !_striking)
+		{
+			Advance();
+			return;
+		}
+
 		if (!_windowTimerRunning)
 		{
+			_stepTimer += delta;
 			// 事件帧一直没来（生成表配错）→ 超时收招并写明确日志（不做时间驱动兜底）。
-			if (!HoldToCharge && StateTime > Windup + Recover + 2.5f)
+			if (!HoldToCharge && _stepTimer > Windup + Recover + 2.5f)
 			{
 				GameLog.Write("Combat", $"⚠ 技能 {AbilityId} 等不到动画事件帧「{ComboNextEvent}」，本次施法放弃（检查 SkillAnimations 表的事件帧名）。");
 				Cancel();
@@ -682,6 +697,9 @@ public partial class MeleeComboAbility : Ability
 	protected override void OnFinishOrCancel()
 	{
 		_striking = false;
+		_stepHasStruck = false;
+		_advanceQueued = false;
+		_pressBuffered = false;
 		ComboWindowOpen = false;
 		_windowTimerRunning = false;
 		RestoreSceneShape();

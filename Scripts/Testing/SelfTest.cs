@@ -3603,7 +3603,7 @@ public partial class SelfTest : Node
 		{
 			w1.DebugFireAnimEvent();      // 本段判定 + 开输入窗口
 			w1.TryPress();                // 玩家紧接着又按了一下
-			w1._PhysicsProcess(0.06d);
+			w1._PhysicsProcess(0.25d);   // 留足表内本段判定，再推进缓冲。
 			advanced = w1.ComboChained;
 		}
 
@@ -3937,7 +3937,7 @@ public partial class SelfTest : Node
 		{
 			w1.DebugFireAnimEvent();      // 本段判定 + 开输入窗口
 			w1.TryPress();                // 玩家紧接着又按了一下
-			w1._PhysicsProcess(0.06d);
+			w1._PhysicsProcess(0.25d);   // 留足表内本段判定，再推进缓冲。
 			advanced = w1.ComboChained;
 		}
 
@@ -4017,7 +4017,7 @@ public partial class SelfTest : Node
 		{
 			w1.DebugFireAnimEvent();
 			w1.TryPress();
-			w1._PhysicsProcess(0.06d);
+			w1._PhysicsProcess(0.25d);   // 不是用高频按键越过ATK。
 			advanced = w1.ComboChained;
 			maxStepSeen = Mathf.Max(maxStepSeen, w1.ComboStep);
 		}

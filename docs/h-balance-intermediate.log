@@ -1,0 +1,54 @@
+修复前真实连点采样：退出码1，灵剑/镰刀4项失败；未作为平衡结果交付。
+[Balance] PASS EnergyPalm第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS EnergyPalm第1轮：命中10，暴击2，基础伤害100，实扣120
+[BalanceSample] EnergyPalm,1,6.1009,10,2,100,120,16.391,19.6692
+[Balance] PASS EnergyPalm第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS EnergyPalm第2轮：命中10，暴击1，基础伤害100，实扣110
+[BalanceSample] EnergyPalm,2,6.0529,10,1,100,110,16.5209,18.173
+[Balance] PASS Crossbow第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Crossbow第1轮：命中6，暴击1，基础伤害72，实扣84
+[BalanceSample] Crossbow,1,6.1254,6,1,72,84,11.7543,13.7133
+[Balance] PASS Crossbow第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Crossbow第2轮：命中6，暴击0，基础伤害72，实扣72
+[BalanceSample] Crossbow,2,6.0469,6,0,72,72,11.907,11.907
+[Balance] PASS Bow第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Bow第1轮：命中4，暴击0，基础伤害356.4412，实扣356.4375
+[BalanceSample] Bow,1,6.0034,4,0,356.4412,356.4375,59.3734,59.3728
+[Balance] PASS Bow第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Bow第2轮：命中4，暴击1，基础伤害335.8773，实扣404.4219
+[BalanceSample] Bow,2,6.0176,4,1,335.8773,404.4219,55.816,67.2067
+[Balance] PASS SpiritSword第1轮：真实技能已启用，靶子无甲无盾
+[Balance] FAIL SpiritSword第1轮：命中0，暴击0，基础伤害0，实扣0
+[BalanceSample] SpiritSword,1,6.0387,0,0,0,0,0,0
+[Balance] PASS SpiritSword第2轮：真实技能已启用，靶子无甲无盾
+[Balance] FAIL SpiritSword第2轮：命中0，暴击0，基础伤害0，实扣0
+[BalanceSample] SpiritSword,2,6.0614,0,0,0,0,0,0
+[Balance] PASS Scythe第1轮：真实技能已启用，靶子无甲无盾
+[Balance] FAIL Scythe第1轮：命中0，暴击0，基础伤害0，实扣0
+[BalanceSample] Scythe,1,6.0581,0,0,0,0,0,0
+[Balance] PASS Scythe第2轮：真实技能已启用，靶子无甲无盾
+[Balance] FAIL Scythe第2轮：命中0，暴击0，基础伤害0，实扣0
+[BalanceSample] Scythe,2,6.1154,0,0,0,0,0,0
+[Balance] PASS Spear第1轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Spear第1轮：命中9，暴击0，基础伤害217.8，实扣217.8281
+[BalanceSample] Spear,1,6.035,9,0,217.8,217.8281,36.0898,36.0944
+[Balance] PASS Spear第2轮：真实技能已启用，靶子无甲无盾
+[Balance] PASS Spear第2轮：命中4，暴击0，基础伤害96.8，实扣96.8125
+[BalanceSample] Spear,2,6.0063,4,0,96.8,96.8125,16.1163,16.1184
+[Balance] PASS 当前元进度：生命+20，伤害×1，移速×1，暴击+0.26999998
+[Balance] PASS chr_hunter基础表值保留
+[Balance] PASS chr_hunter生命200/甲20，固定10伤害致死=23次（生命加成0）
+[Balance] PASS chr_hunter生命200/甲20，固定20伤害致死=12次（生命加成0）
+[Balance] PASS chr_hunter生命200/甲20，固定40伤害致死=6次（生命加成0）
+[Balance] PASS chr_hunter生命220/甲20，固定10伤害致死=25次（生命加成20）
+[Balance] PASS chr_hunter生命220/甲20，固定20伤害致死=13次（生命加成20）
+[Balance] PASS chr_hunter生命220/甲20，固定40伤害致死=7次（生命加成20）
+[Balance] PASS chr_weapon_master基础表值保留
+[Balance] PASS chr_weapon_master生命220/甲25，固定10伤害致死=26次（生命加成0）
+[Balance] PASS chr_weapon_master生命220/甲25，固定20伤害致死=13次（生命加成0）
+[Balance] PASS chr_weapon_master生命220/甲25，固定40伤害致死=7次（生命加成0）
+[Balance] PASS chr_weapon_master生命240/甲25，固定10伤害致死=28次（生命加成20）
+[Balance] PASS chr_weapon_master生命240/甲25，固定20伤害致死=14次（生命加成20）
+[Balance] PASS chr_weapon_master生命240/甲25，固定40伤害致死=7次（生命加成20）
+[Balance] PASS 截图 h_balance_samples
+[Balance] === H专项验收结束：通过 36，失败 4 ===

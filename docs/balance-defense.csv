@@ -1,0 +1,13 @@
+character,meta_health_bonus,health,armor,speed,incoming_damage,hits_to_kill,first_armor_loss,first_health_loss
+chr_hunter,0,200,20,6.5,10,23,7,0
+chr_hunter,0,200,20,6.5,20,12,14,0
+chr_hunter,0,200,20,6.5,40,6,20,8
+chr_hunter,20,220,20,6.5,10,25,7,0
+chr_hunter,20,220,20,6.5,20,13,14,0
+chr_hunter,20,220,20,6.5,40,7,20,8
+chr_weapon_master,0,220,25,6.8,10,26,7,0
+chr_weapon_master,0,220,25,6.8,20,13,14,0
+chr_weapon_master,0,220,25,6.8,40,7,25,3
+chr_weapon_master,20,240,25,6.8,10,28,7,0
+chr_weapon_master,20,240,25,6.8,20,14,14,0
+chr_weapon_master,20,240,25,6.8,40,7,25,3
