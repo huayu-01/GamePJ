@@ -1,5 +1,7 @@
 [gd_resource type="Theme" format=3 uid="uid://ca5kpaq8udkf6"]
 
+[ext_resource type="FontVariation" path="res://Assets/UI/Themes/ui_font.tres" id="5_font"]
+
 [ext_resource type="Texture2D" uid="uid://brlsjxi41qive" path="res://Assets/UI/Textures/tex_ui_panel_frame.png" id="1_panel"]
 [ext_resource type="Texture2D" uid="uid://c4qphodw2bve5" path="res://Assets/UI/Textures/tex_ui_panel_frame_small.png" id="2_panel_small"]
 [ext_resource type="Texture2D" uid="uid://dissknj5lrac4" path="res://Assets/UI/Textures/tex_ui_panel_glass_small.png" id="3_glass_small"]
@@ -169,11 +171,8 @@ texture_margin_bottom = 6.0
 region_rect = Rect2(6, 0, 180, 33)
 modulate_color = Color(0.85, 0.92, 1, 0.96)
 
-[sub_resource type="SystemFont" id="SystemFont_ui_cjk"]
-font_names = PackedStringArray("Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", "Source Han Sans CN", "PingFang SC", "WenQuanYi Micro Hei", "Noto Sans CJK SC", "sans-serif")
-
 [resource]
-default_font = SubResource("SystemFont_ui_cjk")
+default_font = ExtResource("5_font")
 default_font_size = 18
 Button/colors/font_color = Color(0.93, 0.96, 1, 1)
 Button/colors/font_disabled_color = Color(0.62, 0.65, 0.72, 0.6)

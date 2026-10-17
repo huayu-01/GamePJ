@@ -1,5 +1,12 @@
 # 交接文档（HANDOFF）
 
+> **2026-10-17 后续专项F**：中文字体改为自带Noto Sans SC 500字重，破甲环圆周32段，导航递归采集World碰撞并烘焙73个多边形。
+> 统一有序退出入口，在引擎退出前回收Ogg播放流；字体、绕墙路径、重烘、早卸载与强制GC均有专项检查。
+> Debug/ExportRelease均0/0；完整自测退出0、八条指标逐字一致；F33/0，A23/0、B74/0、C52/0、读档5/0、D无头90/0、E39/0，5次音乐退出均无泄漏/ERROR/WARNING。
+> 完整结果见[F专项验收](followup-f-verification.md)和[执行清单](followup-plan.md)。用户已确认基础角色数值保留现值，先测平衡再给建议。
+> 当前后续顺序G（Loot/Battle接线、长枪蓄力和旧P4探针）→H（平衡实测）；终版美术持续推进。
+> ⚠️ 旧GCHandle异常仍未定位；压力测试未复现只代表测试覆盖，不能写成已修复。下文旧未完成项均为历史快照。
+
 > **2026-10-17 角色模型专项完成**：按用户指定，猎手换成Lyra，武器大师换成Samurai；基地展台/战斗/正式关卡同源。
 > 新骨架各适配25段技能，灵剑五段使用原生攻击分段；修复旧灵剑第五段ATK被Combo覆盖的问题。
 > Debug/ExportRelease均0/0；真实物理与渲染68/0，基地回归52/0，Main完整自测退出0且8条关键指标一致。
@@ -11,7 +18,7 @@
 > D实拍94/0；C回归52/0、跨进程读档5/0、B74/0、A23/0、E39/0；四存档未改变，selftest.flag不存在。
 > [D批证据与4张截图](d-batch-verification.md) · [18条需求完成核对](roadmap-2-completion.md)。
 > 并行替换角色模型暴露的旧探针读取隐藏Model问题已修复；中间失败原文保留。当前权威状态以本段为准，下文保留历史记录。
-> 仍开着的专项：终版美术、角色平衡、自带中文字体、破甲环、导航/退出资源告警与偶发GCHandle异常定位。
+> D批结束时仍开着的专项（历史）：终版美术、角色平衡、自带中文字体、破甲环、导航/退出资源告警与偶发GCHandle异常定位；当前进展以顶部F专项为准。
 
 > **2026-10-16 第二轮 C 批已交付**：C-1→C-2→C-3按依赖顺序完成。
 > 基地能真实战斗、木桩复原且无关卡结算；每角色独立F交互，只列所属武器，分别记忆上次选择并高亮当前装备。
@@ -397,11 +404,11 @@ docs/                     看第 2 节
 | 项 | 说明 |
 |---|---|
 | **`docs/config.md`（195KB）未逐条改写** | 只加了顶部状态横幅 + 末尾"当前状态"。**用户如果要求逐条更新，那需要单独一轮** |
-| **中文字体仍是 `SystemFont` 占位** | ⚠️ **发行前必须换自带字体**（候选：得意黑 ≈2.7MB 最小 / Noto Sans SC 17MB / 霞鹜文楷 24.4MB，均 OFL 1.1） |
-| **角色数值待定** | ⚠️ `chr_hunter` 200/20/6.5 · `chr_weapon_master` 220/25/6.8 **都是预设值，设计文档没写** → **等用户确认** |
+| **中文字体** | F专项已自带Noto Sans SC/OFL；500字重及项目1104字形由实际字体API验收 |
+| **角色数值** | 用户2026-10-17确认保留 `chr_hunter` 200/20/6.5、`chr_weapon_master` 220/25/6.8，H专项先做平衡实测与建议 |
 | **`Ability.AnyAnimationAvailable` 是死代码** | P4 遗留，无调用点 |
 | **`ComboNextEvent` 与技能行的 `AnimEvent` 重复** | 都是 `ATK`；合并要动 `OnAnimEvent` 判据，**收益小、回归面大** |
-| **`ArmorBreakFx.cs` 的 `TorusMesh` 写反** | `Rings=8, RingSegments=24` 反了 → **破甲环画成八边形**（P6c 发现了但没改，**在别的文件里**） |
+| **破甲环** | F专项已改为Rings=32、RingSegments=8，寿命与战斗结算不变 |
 | **`RangedEnemy` 射击节奏变了** | 删弹匣后从"3 发/2.5s 装填"变成"每 2s 一发"（**删概念的必然副作用**） |
 | **`docs/screenshots/*.png.import`** | 编辑器还没扫出来，工作区里有几个未跟踪的 sidecar |
 
@@ -420,7 +427,7 @@ docs/                     看第 2 节
 9. ⚠️ **`run_project` 传不了 user args** → 用 `RunController.BeginRunWithCharacter(角色, 武器)` 运行期换装（**角色 `Hunter=3`/`WeaponMaster=4`，武器按 `Slot-1`**）
 10. ⚠️ **`call_runtime_node_method` 对带可选参数的 C# 方法、用 0 参数调用会报 `Method not found`** → 用 `evaluate_runtime_expression` 写 `node.TryActivate(null)`；**调带默认值的方法必须把参数写满**（`(3.0,1.0)` 失败、`(3.0,1.0,false)` 成功）
 11. ⚠️ **`evaluate_runtime_expression` 只支持单表达式**（不能赋值/语句/lambda），沙箱**不能用 `Input`/`InputMap`/`Engine`，也不能 `load()` .cs**
-12. ⚠️ **偶发 `FATAL: gchandle.is_released()`**（Godot C# finalizer，**与代码无关**）→ **同一二进制重跑一次即可判定**
+12. ⚠️ **偶发 `FATAL: gchandle.is_released()`**：历史C# finalizer错误尚未定位，不能断言与代码无关，也不能用一次重跑代替修复。保留原始日志；F的12轮卸载/强制GC未复现。
 13. ⚠️ **截图要用 `runtime screenshot`**（不是桌面截图工具）—— **游戏嵌在编辑器的 Game 标签里跑，桌面上没有独立窗口**
 14. ⚠️ **自测必须带场景参数**（`res://Scenes/Main.tscn`）—— **不带会起基地 → 自测找不到 `Stage` → 卡在第 20 阶段**
 

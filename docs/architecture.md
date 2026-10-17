@@ -82,6 +82,10 @@
 
 ## Unit 与表现的分工
 
+**后续F专项**：导航只采`nav_geometry`组内递归子节点的World静态碰撞，网格单元尺寸服从NavigationMap；烘焙计时器退树解绑，重建只管理自有区域。
+正常退出统一走`GameExit.Request`，先卸载音频流并异步等待混音回收，再退出SceneTree；UI/GDScript可调用`UiRouter.RequestQuit(exitCode)`。不新增autoload。
+项目默认字体与界面Theme共用自带FontVariation，禁系统回退；字重以TextServer原生坐标验收。
+
 **第二轮 C 批补充**：PlayerLoadout是基地/关卡共用的装备应用器，不创建关卡上下文。
 角色交互通过表内OwnerCharacter归属校验，LoadoutMemory只负责偏好文件，未新增autoload。
 CharacterDisplay只切换表现模型/握持场景；UnitAnimator把真实动画驱动绑定当前可见模型，骨骼路径只改私有副本。

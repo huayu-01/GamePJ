@@ -1,0 +1,16 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Testing/FollowupProbe.cs" id="1_probe"]
+[ext_resource type="PackedScene" path="res://Scenes/Levels/TestArena.tscn" id="2_arena"]
+[ext_resource type="Script" path="res://Scripts/World/MapManager.cs" id="3_map"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="4_hud"]
+
+[node name="FollowupProbe" type="Node3D"]
+script = ExtResource("1_probe")
+
+[node name="Arena" parent="." instance=ExtResource("2_arena")]
+
+[node name="MapManager" type="Node3D" parent="."]
+script = ExtResource("3_map")
+
+[node name="Hud" parent="." instance=ExtResource("4_hud")]

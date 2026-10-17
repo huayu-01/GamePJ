@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://c8vnyi8h6o2u8"]
+[gd_scene load_steps=15 format=3 uid="uid://c8vnyi8h6o2u8"]
 
 [ext_resource type="Environment" path="res://Assets/ArtRefresh/env_level_garden.tres" id="1_env"]
 [ext_resource type="Material" path="res://Assets/ArtRefresh/mat_level_ground.tres" id="2_ground"]
@@ -48,8 +48,6 @@ size = Vector3(6, 0.6, 8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_rampbase"]
 size = Vector3(6, 2.4, 8)
-
-[sub_resource type="NavigationMesh" id="NavigationMesh_7l2un"]
 
 [node name="TestArena" type="Node3D" unique_id=1313686624 groups=["nav_geometry"]]
 
@@ -128,7 +126,3 @@ shape = SubResource("BoxShape3D_rampbase")
 mesh = SubResource("Mesh_rampbase")
 
 [node name="GardenDressing" parent="." instance=ExtResource("3_garden")]
-
-[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1047289119]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7432747, 0)
-navigation_mesh = SubResource("NavigationMesh_7l2un")

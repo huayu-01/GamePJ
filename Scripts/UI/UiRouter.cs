@@ -17,6 +17,7 @@ public partial class UiRouter : Node
 	public System.Action? OpenMenu { get; set; }
 
 	private readonly List<OverlayScreen> _stack = new();
+	private Window? _window;
 
 	public bool AnyOpen => _stack.Count > 0;
 	public int StackDepth => _stack.Count;
@@ -25,6 +26,9 @@ public partial class UiRouter : Node
 	{
 		Instance = this;
 		ProcessMode = ProcessModeEnum.Always;
+		GetTree().AutoAcceptQuit = false;
+		_window = GetTree().Root;
+		_window.CloseRequested += OnCloseRequested;
 
 		// 玩家设置的唯一启动应用点（音量 / 窗口 / 按键重绑）。
 		// 刻意**不加新的 autoload**（architecture.md 第 4 条：能不加全局入口就不加）——
@@ -35,11 +39,18 @@ public partial class UiRouter : Node
 
 	public override void _ExitTree()
 	{
+		if (IsInstanceValid(_window)) _window!.CloseRequested -= OnCloseRequested;
+		_window = null;
 		if (Instance == this)
 		{
 			Instance = null;
 		}
 	}
+
+	/// <summary>界面与GDScript共用的有序退出入口。</summary>
+	public void RequestQuit(int exitCode) => ActRoguelike.Core.GameExit.Request(GetTree(), exitCode);
+
+	private void OnCloseRequested() => RequestQuit(0);
 
 	public void Push(OverlayScreen screen)
 	{

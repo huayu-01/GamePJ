@@ -27,7 +27,7 @@ public partial class BatchCProbe : Node
 		try { await Run(); } catch (Exception ex) { Check(false, ex.ToString()); }
 		GetTree().Paused = false;
 		GD.Print($"[BatchC] === C批验收结束：通过 {_pass}，失败 {_fail} ===");
-		GetTree().Quit(_fail == 0 ? 0 : 1);
+		ActRoguelike.Core.GameExit.Request(GetTree(), _fail == 0 ? 0 : 1);
 	}
 	private void Check(bool ok, string message) { if (ok) _pass++; else _fail++; GD.Print($"[BatchC] {(ok ? "PASS" : "FAIL")} {message}"); }
 	private async Task Wait(double seconds) => await ToSignal(GetTree().CreateTimer(seconds, true), SceneTreeTimer.SignalName.Timeout);

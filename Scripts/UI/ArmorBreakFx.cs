@@ -75,7 +75,7 @@ internal static class ArmorBreakFx
 
 	private static MeshInstance3D Ring(Color tint, float alpha)
 	{
-		var mesh = new TorusMesh { InnerRadius = 0.45f, OuterRadius = 0.62f, RingSegments = 24, Rings = 8 };
+		var mesh = new TorusMesh { InnerRadius = 0.45f, OuterRadius = 0.62f, RingSegments = 8, Rings = 32 };
 		return new MeshInstance3D
 		{
 			Name = "Ring",

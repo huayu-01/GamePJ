@@ -1,0 +1,75 @@
+Debug 编译：0 warning / 0 error
+selftest_final 退出码=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+probe_final 退出码=0
+[Followup] PASS 生产场地递归烘焙成功：多边形=73
+[Followup] PASS 导航单元与地图一致：0.25/0.25
+[Followup] PASS 原点附近导航点合法：(0, 0.5, 0)
+[Followup] PASS 中央地面可行走
+[Followup] PASS 石柱占地不是可行走点
+[Followup] PASS 墙体占地不是可行走点
+[Followup] PASS 32次刷怪落点有效且分散：不同点=32
+[Followup] PASS 墙体两侧导航路径绕行：路径点=9
+[Followup] PASS 重烘多边形稳定：73→73
+[Followup] PASS 重烘不叠加区域且区域杀仍存在
+[Followup] PASS 字体实际500字重：{ 2003265652: 500.0 }
+[Followup] PASS 内置FontFile且禁用系统字体回退
+[Followup] PASS 未指定主题的控件也使用项目内置字体
+[Followup] PASS 现有界面主题共用同一内置字体
+[Followup] PASS 项目中文语料1104个不同字形，缺字=
+[Followup] PASS 破甲环圆周32段/截面8段
+[Followup] PASS 破甲特效无单位/碰撞/分组
+[Followup] PASS 截图 f_armor_round
+[Followup] PASS 破甲特效按既有时长自毁
+[Followup] PASS 地图卸载后静态引用清理
+[Followup] PASS 截图 f_settings_font
+[Followup] PASS 场景卸载+强制GC第1轮，提前卸载=False
+[Followup] PASS 场景卸载+强制GC第2轮，提前卸载=True
+[Followup] PASS 场景卸载+强制GC第3轮，提前卸载=False
+[Followup] PASS 场景卸载+强制GC第4轮，提前卸载=False
+[Followup] PASS 场景卸载+强制GC第5轮，提前卸载=False
+[Followup] PASS 场景卸载+强制GC第6轮，提前卸载=True
+[Followup] PASS 场景卸载+强制GC第7轮，提前卸载=False
+[Followup] PASS 场景卸载+强制GC第8轮，提前卸载=False
+[Followup] PASS 场景卸载+强制GC第9轮，提前卸载=False
+[Followup] PASS 场景卸载+强制GC第10轮，提前卸载=True
+[Followup] PASS 场景卸载+强制GC第11轮，提前卸载=False
+[Followup] PASS 场景卸载+强制GC第12轮，提前卸载=False
+[Followup] === F专项验收结束：通过 33，失败 0 ===
+d_regression 退出码=0
+[BatchD] === D批验收结束：通过 90，失败 0 ===
+c_regression 退出码=0
+[BatchC] === C批验收结束：通过 52，失败 0 ===
+memory 退出码=0
+[BatchC] === C批验收结束：通过 5，失败 0 ===
+b_regression 退出码=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a_regression 退出码=0
+A批回归：23 PASS / 0 FAIL
+e_regression 退出码=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+audio_exit_1 退出码=0
+音频退出第1轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+audio_exit_2 退出码=0
+音频退出第2轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+audio_exit_3 退出码=0
+音频退出第3轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+audio_exit_4 退出码=0
+音频退出第4轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+audio_exit_5 退出码=0
+音频退出第5轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+ExportRelease 编译：0 warning / 0 error
+存档恢复 meta.cfg=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档恢复 ability_cards.cfg=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档恢复 settings.cfg=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档恢复 loadout.cfg=不存在
+截图 f_armor_round.png SHA256=CC957DDA6CD2ECDF0D8C71FA8EF562CD710CE6510579E3627D69B048908BD253
+截图 f_settings_font.png SHA256=3038944914E074B64A2B416C8B07A517F72FA8E1D506A02588DCF0D98A040CB4
+selftest.flag 不存在=True

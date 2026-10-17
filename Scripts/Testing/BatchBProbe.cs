@@ -31,7 +31,7 @@ public partial class BatchBProbe : Node
 		catch (Exception ex) { Check(false, ex.ToString()); }
 		GetTree().Paused = false;
 		GD.Print($"[BatchB] === B 批验收结束：通过 {_passed}，失败 {_failed} ===");
-		GetTree().Quit(_failed == 0 ? 0 : 1);
+		ActRoguelike.Core.GameExit.Request(GetTree(), _failed == 0 ? 0 : 1);
 	}
 	private void Check(bool condition, string message)
 	{

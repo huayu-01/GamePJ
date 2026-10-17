@@ -169,7 +169,7 @@ func _run() -> void:
 	print("[BatchA] ", wind.call("DebugState"))
 	print("[BatchA] === A 批验收结束：失败 ", _failed, " ===")
 	get_tree().paused = false
-	get_tree().quit(0 if _failed == 0 else 1)
+	get_node("/root/UiRouter").call("RequestQuit", 0 if _failed == 0 else 1)
 
 
 func _group_counts() -> Array[int]:

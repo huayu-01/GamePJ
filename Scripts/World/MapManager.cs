@@ -22,7 +22,8 @@ public partial class MapManager : Node3D
 	[Export] public float AgentRadius { get; set; } = 0.6f;
 	[Export] public float AgentHeight { get; set; } = 1.8f;
 	[Export] public float AgentMaxSlope { get; set; } = 30f;
-	[Export] public float CellSize { get; set; } = 0.3f;
+	/// <summary>烘焙网格的水平精度必须与World3D导航地图一致。</summary>
+	public float CellSize => IsInsideTree() ? NavigationServer3D.MapGetCellSize(GetWorld3D().NavigationMap) : 0.25f;
 
 	/// <summary>参与烘焙的节点组名：把地面 / 建筑挂进这个组（默认关卡根节点上）。</summary>
 	[Export] public string GeometryGroupName { get; set; } = "nav_geometry";
@@ -37,15 +38,23 @@ public partial class MapManager : Node3D
 	private Rid _map;
 	private bool _baked;
 	private int _polygonCount;
+	private SceneTreeTimer? _bakeTimer;
+	private bool _ownsRegion;
 
 	public override void _Ready()
 	{
 		Instance = this;
-		GetTree().CreateTimer(BakeDelaySeconds, processAlways: true).Timeout += Bake;
+		_bakeTimer = GetTree().CreateTimer(BakeDelaySeconds, processAlways: true);
+		_bakeTimer.Timeout += Bake;
 	}
 
 	public override void _ExitTree()
 	{
+		if (_bakeTimer != null && IsInstanceValid(_bakeTimer)) _bakeTimer.Timeout -= Bake;
+		_bakeTimer = null;
+		if (_ownsRegion && IsInstanceValid(_region)) _region!.QueueFree();
+		_region = null;
+		_baked = false;
 		if (Instance == this)
 		{
 			Instance = null;
@@ -53,7 +62,7 @@ public partial class MapManager : Node3D
 	}
 
 	/// <summary>是否已经有可用的导航网格。</summary>
-	public bool IsReady => _baked && _map.IsValid && _polygonCount > 0;
+	public bool IsReady => _baked && _map.IsValid && _polygonCount > 0 && NavigationServer3D.MapGetIterationId(_map) > 0;
 
 	/// <summary>烘焙出的多边形数量（诊断用）。</summary>
 	public int PolygonCount => _polygonCount;
@@ -65,15 +74,20 @@ public partial class MapManager : Node3D
 	/// </summary>
 	public void Rebuild()
 	{
-		_region?.QueueFree();
+		if (_ownsRegion && IsInstanceValid(_region)) _region!.Free();
 		_region = null;
+		_ownsRegion = false;
 		_baked = false;
 		Bake();
 	}
 
 	private void Bake()
 	{
+		if (!IsInsideTree()) return;
+		if (_bakeTimer != null && IsInstanceValid(_bakeTimer)) _bakeTimer.Timeout -= Bake;
+		_bakeTimer = null;
 		Node root = GetTree().CurrentScene ?? GetTree().Root;
+		EnsureKillZone();
 
 		// 优先复用场景里**已经烘焙好**的 NavigationRegion3D（在编辑器里烘的结果会存进场景）。
 		foreach (Node node in root.FindChildren("*", "", true, false))
@@ -84,6 +98,7 @@ public partial class MapManager : Node3D
 				if (_polygonCount > 0)
 				{
 					_region = existing;
+					_ownsRegion = false;
 					_map = existing.GetNavigationMap();
 					_baked = true;
 					ActRoguelike.Core.GameLog.Write("Map", $"复用场景里已烘焙的导航网格：{_polygonCount} 个多边形");
@@ -93,17 +108,19 @@ public partial class MapManager : Node3D
 		}
 
 
+		float cellHeight = NavigationServer3D.MapGetCellHeight(GetWorld3D().NavigationMap);
 		var mesh = new NavigationMesh
 		{
-			AgentRadius = AgentRadius,
-			AgentHeight = AgentHeight,
+			// Recast本来就会上取整；显式量化到地图体素，避免隐式精度告警。
+			AgentRadius = Mathf.Ceil(AgentRadius / CellSize) * CellSize,
+			AgentHeight = Mathf.Ceil(AgentHeight / cellHeight) * cellHeight,
 			AgentMaxSlope = AgentMaxSlope,
 			CellSize = CellSize,
-			CellHeight = CellSize * 0.5f,
+			CellHeight = cellHeight,
 			GeometryParsedGeometryType = NavigationMesh.ParsedGeometryType.StaticColliders,
 			GeometryCollisionMask = GeometryMask,
-			// 用「按组收集」而不是 RootNodeChildren：后者以 region 父节点为扫描根，实测扫不到实例化的关卡几何体。
-			GeometrySourceGeometryMode = NavigationMesh.SourceGeometryMode.GroupsExplicit,
+			// 组标记的是场景根，必须递归收集子节点中的地形碰撞；Explicit只会解析根本身。
+			GeometrySourceGeometryMode = NavigationMesh.SourceGeometryMode.GroupsWithChildren,
 			GeometrySourceGroupName = GeometryGroupName,
 		};
 
@@ -114,11 +131,10 @@ public partial class MapManager : Node3D
 		// 同步烘焙（onThread: true 是异步的，同一帧读多边形数只会是 0）。
 		region.BakeNavigationMesh(false);
 		_region = region;
+		_ownsRegion = true;
 		_map = region.GetNavigationMap();
 		_polygonCount = mesh.GetPolygonCount();
 		_baked = true;
-
-		EnsureKillZone();
 
 		ActRoguelike.Core.GameLog.Write("Map", $"导航网格烘焙完成：{_polygonCount} 个多边形（半径 {AgentRadius} / 高度 {AgentHeight} / 最大坡 {AgentMaxSlope}°）");
 		if (_polygonCount == 0)
@@ -157,13 +173,12 @@ public partial class MapManager : Node3D
 			return false;
 		}
 
-		Vector3 closest = NavigationServer3D.MapGetClosestPoint(_map, position);
-		if (closest.IsZeroApprox())
+		// 原点也可能是合法导航点；用所属区域判断是否查到，不能把零向量当失败。
+		if (!NavigationServer3D.MapGetClosestPointOwner(_map, position).IsValid)
 		{
 			return false;
 		}
-
-		walkable = closest;
+		walkable = NavigationServer3D.MapGetClosestPoint(_map, position);
 		return true;
 	}
 
@@ -176,25 +191,26 @@ public partial class MapManager : Node3D
 	/// <summary>
 	/// 在中心附近找一圈内的可行走点。刷怪点、降临点都用它。
 	/// 导航网格可用时用它吸附；**不可用时退回"随机环点 + 地面射线 + 球形避障"**
-	/// （<see cref="FallbackRingPoint"/>）—— 本项目实测运行时烘焙得到 0 个多边形
-	/// （见 docs/todo-handoff.md 的「已知未解决」），所以这条兜底路径**就是实际生效的那条**。
+	/// （<see cref="FallbackRingPoint"/>）；正常场景使用递归地形烘焙结果。
 	/// </summary>
 	public Vector3 RingPoint(Vector3 center, float minRadius, float maxRadius, int rings = 3, int samples = 12)
 	{
 		if (IsReady)
 		{
+			float startAngle = (float)GD.RandRange(0d, Mathf.Tau);
 			for (int ring = 0; ring < rings; ring++)
 			{
 				float radius = rings == 1 ? minRadius : Mathf.Lerp(minRadius, maxRadius, ring / (float)(rings - 1));
 				for (int i = 0; i < samples; i++)
 				{
-					float angle = Mathf.Tau * i / samples;
+					float angle = startAngle + Mathf.Tau * i / samples;
 					var probe = new Vector3(
 						center.X + (Mathf.Cos(angle) * radius),
 						center.Y + 1.5f,
 						center.Z + (Mathf.Sin(angle) * radius));
 
-					if (TrySnap(probe, out Vector3 walkable) && Mathf.Abs(walkable.Y - center.Y) < 6f)
+					if (TrySnap(probe, out Vector3 walkable) && Mathf.Abs(walkable.Y - center.Y) < 6f
+						&& new Vector2(walkable.X - center.X, walkable.Z - center.Z).Length() >= minRadius * 0.8f)
 					{
 						return walkable + (Vector3.Up * 0.3f);
 					}

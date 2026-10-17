@@ -83,7 +83,7 @@ public partial class _FeelProbe : Node3D
 			{
 				_done = true;
 				GD.Print("[Feel] === 拍摄台结束 ===");
-				GetTree().Quit();
+				ActRoguelike.Core.GameExit.Request(GetTree());
 				return;
 			}
 

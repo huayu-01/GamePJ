@@ -98,7 +98,7 @@ public partial class SelfTest : Node
 			GameLog.Write("SelfTest", "⚠️ 自测中断：玩家在途中阵亡（已走死亡流程回基地），剩余阶段跳过并退出。");
 			GetTree().Paused = false;
 			SetProcess(false);
-			GetTree().Quit();
+			ActRoguelike.Core.GameExit.Request(GetTree());
 			return;
 		}
 		switch (_phase)
@@ -589,7 +589,7 @@ public partial class SelfTest : Node
 				// （正式流程里玩家按 Enter 才会继续）。进程留着不退会让下一轮的日志文件混在一起。
 				GetTree().Paused = false;
 				SetProcess(false);
-				GetTree().Quit();
+				ActRoguelike.Core.GameExit.Request(GetTree());
 				break;
 		}
 	}

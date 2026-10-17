@@ -26,7 +26,7 @@ public partial class CharacterReplacementProbe : Node
 		try { await Run(); } catch (Exception error) { Check(false, error.ToString()); }
 		GetTree().Paused = false;
 		GD.Print($"[CharacterReplacement] 完成：通过 {_pass}，失败 {_fail}");
-		GetTree().Quit(_fail == 0 ? 0 : 1);
+		ActRoguelike.Core.GameExit.Request(GetTree(), _fail == 0 ? 0 : 1);
 	}
 	private void Check(bool ok, string message)
 	{

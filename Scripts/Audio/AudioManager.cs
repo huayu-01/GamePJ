@@ -73,6 +73,7 @@ public partial class AudioManager : Node
 	private string _sfxBus = SfxBus;
 	private string _uiBus = UiBus;
 	private string _musicBus = MusicBus;
+	private bool _shuttingDown;
 
 	public override void _Ready()
 	{
@@ -117,18 +118,43 @@ public partial class AudioManager : Node
 
 	public override void _ExitTree()
 	{
+		if (_music != null && IsInstanceValid(_music)) _music.Finished -= OnMusicFinished;
+		StopAllVoices();
 		GameplayEventBus.Raised -= OnGameplayEvent;
 
-		if (GetTree() is { } tree)
-		{
-			tree.NodeAdded -= OnNodeAdded;
-		}
-
+		if (GetTree() is { } tree) tree.NodeAdded -= OnNodeAdded;
 		LogSummary();
+		if (Instance == this) Instance = null;
+	}
 
-		if (Instance == this)
+	public static bool MusicPlaying => Instance?._music?.Playing == true;
+
+	public static void StopForShutdown()
+	{
+		if (Instance is not { } manager) return;
+		manager._shuttingDown = true;
+		manager.StopAllVoices();
+	}
+
+	private void StopAllVoices()
+	{
+		// 先停止播放再卸载流，让音频线程在场景/引擎退出前归还Ogg播放实例。
+		if (_music != null && IsInstanceValid(_music))
 		{
-			Instance = null;
+			_music.Stop();
+			_music.Stream = null;
+		}
+		foreach (AudioStreamPlayer voice in _sfx)
+		{
+			if (!IsInstanceValid(voice)) continue;
+			voice.Stop();
+			voice.Stream = null;
+		}
+		foreach (AudioStreamPlayer voice in _ui)
+		{
+			if (!IsInstanceValid(voice)) continue;
+			voice.Stop();
+			voice.Stream = null;
 		}
 	}
 
@@ -223,6 +249,7 @@ public partial class AudioManager : Node
 
 	private bool PlayInternal(string? id)
 	{
+		if (_shuttingDown) return false;
 		if (string.IsNullOrEmpty(id))
 		{
 			return false;
