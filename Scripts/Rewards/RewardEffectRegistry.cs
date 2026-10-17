@@ -36,6 +36,31 @@ public static class RewardEffectRegistry
 			volley.ConfigureRamp(tuning.MaxCount, tuning.WindowSeconds, tuning.ShotIntervalSeconds);
 		},
 
+		// ⭐ J9：**蓄力阈值弹**（「龙之箭」）—— 松手那一刻蓄力 ≥ 阈值的那一发更大 + 多穿透 N 个目标。
+		//   参数全部来自行上的强类型 `ChargedShot` 资源（目标技能 / 蓄力上限 / 档数上限 / 阈值 / 尺寸 / 穿透数），
+		//   通过 `ArrowVolleyAbility.ConfigureChargedShot` 这个**公开强类型方法**接进去 ——
+		//   没有 `Godot.Set("属性名", 值)` 那种字符串反射（architecture.md 第 12 条）。
+		["ChargedShot"] = row => context =>
+		{
+			if (row.ChargedShot is not { TargetAbility: { } target } tuning
+				|| Ability.FindByAbilityId(context.Player, target.Id) is not ArrowVolleyAbility volley)
+			{
+				GD.PushWarning($"[Reward] {row.Id} 缺少有效的蓄力阈值弹参数（ChargedShot）或目标技能，已跳过。");
+				return;
+			}
+
+			volley.ConfigureChargedShot(
+				tuning.MaxChargeSeconds,
+				tuning.MaxSteps,
+				tuning.ThresholdSeconds,
+				tuning.SizeScale,
+				tuning.PierceCount);
+			GameLog.Write(
+				"Reward",
+				$"增幅·蓄力阈值弹：{row.Id} → 技能行 {target.Id} 蓄力上限 {volley.ChargeMaxSeconds:0.##}s（档数上限 {(volley.ChargeMaxSteps > 0 ? volley.ChargeMaxSteps + " 档" : "不限")}）"
+				+ $"／松手 ≥ {volley.ChargedShotThresholdSeconds:0.##}s 的大箭：尺寸 ×{volley.ChargedShotSizeScale:0.##} 额外穿透 {volley.ChargedShotPierce} 个");
+		},
+
 		// 异化：击杀触发连锁闪电（数值全部来自表的 HandlerParams）。
 		["ChainLightning"] = row => context =>
 			context.Player.AddChild(new ChainLightningRule

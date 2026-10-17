@@ -1,30 +1,28 @@
-[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_bow.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" path="res://Scripts/Config/ChargedShotTuning.cs" id="3_charged"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a3_w1_1.tres" id="4_ability"]
 
-[sub_resource type="Resource" id="Resource_p0"]
-script = ExtResource("1_param")
-Key = "AbilityId"
-Value = "skl_a3_w1_1"
-Note = "改哪一条技能行（弓武技1 箭在弦上）"
-
-[sub_resource type="Resource" id="Resource_p1"]
-script = ExtResource("1_param")
-Key = "ChargeMaxSeconds"
-Value = 3.0
-Note = "蓄力上限 1s → 3s"
+[sub_resource type="Resource" id="Resource_charged"]
+script = ExtResource("3_charged")
+TargetAbility = ExtResource("4_ability")
+MaxChargeSeconds = 3.0
+MaxSteps = 0
+ThresholdSeconds = 2.0
+SizeScale = 2.0
+PierceCount = 99
 
 [resource]
 script = ExtResource("2_row")
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "AbilityOverride"
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1")]
+ApplyHandler = "ChargedShot"
+ChargedShot = SubResource("Resource_charged")
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Id = "evo_dragon_arrow"
 DisplayName = "龙之箭"
-DescriptionTemplate = "武技1 现在可以蓄力 3 秒"
-Note = "[P5b 新增行] 文档第 94 行（进化池 <A3限定>）「龙之箭:武技1现在可以蓄力3秒,且蓄力2秒后射出的箭会更大且附带全穿透效果」。**只接了前半**（ChargeMaxSeconds 1s → 3s，这一列 P2 就有，弓的档位上限直接读它）。⚠️ 后半「蓄力 2 秒后箭更大 + 全穿透」需要"按累计蓄力时长切换弹型"的新通路，P5b **未接** —— 见 docs/upgrades.md §7。"
+DescriptionTemplate = "武技1 可以蓄力 3 秒；蓄力 2 秒后射出的箭更大，且附带全穿透。"
+Note = "[J9 已接完整] 原文（第 94 行）：「武技1现在可以蓄力3秒,且蓄力2秒后射出的箭会更大且附带全穿透效果」。① 蓄力上限 3 秒 → ChargedShotTuning.MaxChargeSeconds = 3（弓基础 0.5s 起，每 0.1s 一档 → 3 秒 = 25 档）；② 阈值 2 秒 → ThresholdSeconds = 2，松手那一刻的蓄力秒数 ≥ 它才算「大箭」（判定在松手时冻结，释放段重播／等真实 ATK 期间不变）；③ 更大 → SizeScale = 2（投射物整体缩放，弓的 ProjectileSizeScale 是 0 = 1 倍）；④ 全穿透 → PierceCount = 99（额外的可穿透目标数，游戏里同屏目标数远小于它）。⚠️ 口径：档位仍每 0.1 秒加一档直到 3 秒（满蓄 ×8.5）—— 这是「可以蓄力3秒」的直接兑现；若要改成「2 秒后不再加档」，把 MaxSteps 填 15 即可（= floor((2-0.5)/0.1)），不用改 C#。全部数字都在这个强类型资源里，没有字符串反射。实测见 docs/character-design-j9.md。"

@@ -40,6 +40,9 @@ public partial class RewardConfig : ConfigRow
 	/// <summary>点按连射进化；参数及目标技能均为强类型资源。</summary>
 	[Export] public VolleyRampTuning? VolleyRamp { get; set; }
 
+	/// <summary>蓄力阈值弹进化（J9「龙之箭」）：蓄力上限 / 阈值 / 尺寸 / 穿透数及目标技能均为强类型资源。</summary>
+	[Export] public ChargedShotTuning? ChargedShot { get; set; }
+
 	/// <summary>
 	/// 处理器参数：<c>StatSet</c> 用 <c>Modifiers</c>；其余处理器用这里的键值对
 	/// （例：<c>Damage</c> / <c>Range</c> / <c>Jumps</c> / <c>Ratio</c> / <c>Duration</c> / <c>MaxSummons</c>）。

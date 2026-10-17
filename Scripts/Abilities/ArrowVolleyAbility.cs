@@ -138,6 +138,12 @@ public partial class ArrowVolleyAbility : Ability
 	/// <summary>最后一次齐射是不是完美时机。</summary>
 	public bool LastShotPerfect { get; private set; }
 
+	/// <summary>最后一次齐射是不是**阈值大箭**（按松手快照判定；自测 / 排障读）。</summary>
+	public bool LastShotChargedShot { get; private set; }
+
+	/// <summary>最后一次释放**松手那一刻**的蓄力秒数快照（释放段重播 / 等真实 ATK 期间不再变）。</summary>
+	public float LastShotChargeSeconds { get; private set; }
+
 	[ExportGroup("连续射击增强（<A3限定>「变奏」，P5b 新增：不填 = 一行都不进）")]
 	/// <summary>
 	/// 连续射击时**发数的下标上限**（0 = 不启用，= 改动前的行为）。
@@ -162,11 +168,49 @@ public partial class ArrowVolleyAbility : Ability
 	private int _rampCount;
 	private float _rampTimer;
 
+	[ExportGroup("蓄力阈值弹（J9「龙之箭」：松手蓄力 ≥ 阈值 → 更大 + 额外穿透；阈值 ≤0 = 整段不进）")]
+	/// <summary>
+	/// 松手那一刻蓄力 ≥ 这个秒数 → 这一发是"大箭"（≤0 = 这条逻辑一行都不进，既有四把武器逐位不变）。
+	/// 表入口：`ChargedShotTuning.ThresholdSeconds` → `RewardEffectRegistry["ChargedShot"]` → <see cref="ConfigureChargedShot"/>。
+	/// </summary>
+	[Export] public float ChargedShotThresholdSeconds { get; set; }
+
+	/// <summary>大箭的投射物整体缩放（与 <see cref="ProjectileSizeScale"/> 同一个单位；≤0 = 不放大）。</summary>
+	[Export] public float ChargedShotSizeScale { get; set; }
+
+	/// <summary>大箭**额外**可穿透的目标数（0 = 不穿透）。</summary>
+	[Export] public int ChargedShotPierce { get; set; }
+
+	/// <summary>表配置入口（强类型方法，不是字符串反射）：把行上的参数接到这个技能节点上。</summary>
+	public void ConfigureChargedShot(float maxChargeSeconds, int maxSteps, float thresholdSeconds, float sizeScale, int pierce)
+	{
+		if (maxChargeSeconds > 0f)
+		{
+			ChargeMaxSeconds = maxChargeSeconds;
+		}
+
+		if (maxSteps > 0)
+		{
+			ChargeMaxSteps = maxSteps;
+		}
+
+		ChargedShotThresholdSeconds = Mathf.Max(0f, thresholdSeconds);
+		ChargedShotSizeScale = sizeScale;
+		ChargedShotPierce = Mathf.Max(0, pierce);
+	}
+
 	private bool _fired;
 	private bool _perfect;
 	private bool _releasePending, _quickRelease;
 	private float _releasedPower = 1;
 	private int _releasedSteps;
+
+	/// <summary>
+	/// **松手那一刻的蓄力秒数快照**（J9「龙之箭」的判据来源）。
+	/// 为什么是快照而不是在 <c>FireVolley</c> 里直接读 <c>ChargeTime</c>：释放段要重播动画、
+	/// 等真实 ATK 才发射，那期间"算不算大箭"必须**冻在松手那一瞬间**，不能随等待时间漂移。
+	/// </summary>
+	private float _releasedChargeSeconds;
 	private AttackInstance? _burstAttack;
 	private int _burstRemaining;
 	private float _burstTimer, _burstSpeed, _burstSize, _burstInterval;
@@ -181,6 +225,7 @@ public partial class ArrowVolleyAbility : Ability
 		_perfect = false;
 		_releasePending = false; _quickRelease = false;
 		_releasedPower = 1; _releasedSteps = 0;
+		_releasedChargeSeconds = 0f;
 		_burstRemaining = 0; _burstAttack = null;
 
 		if (!ResolveProjectileScene())
@@ -226,6 +271,10 @@ public partial class ArrowVolleyAbility : Ability
 
 		_perfect = perfect;
 		_releasedPower = powerScale; _releasedSteps = steps;
+
+		// 「龙之箭」判据：**松手这一刻**的蓄力秒数（此后 ChargeReleased 已锁住累加，这里再存一份快照，
+		// 是为了让"这一发算不算大箭"在释放段重播 / 等真 ATK 期间完全不可变）。
+		_releasedChargeSeconds = ChargeTime;
 		_quickRelease = !ChargeBaseComplete;
 		_releasePending = true;
 		if (!PlayChargeReleaseAnimation()) Cancel();
@@ -380,6 +429,13 @@ public partial class ArrowVolleyAbility : Ability
 			? 0f
 			: Knockback + (_perfect ? PerfectKnockback : 0f);
 
+		// 「龙之箭」这类**蓄力阈值弹**（J9）：只认**松手那一刻**的蓄力快照 `_releasedChargeSeconds`
+		// （不是此刻的 ChargeTime —— 释放段重播 / 等真 ATK 期间判定必须冻住）。
+		// 阈值 ≤ 0 → 整段不进：`shotPierce` / `shotSize` 逐位等于改动前那两个表达式（既有四把武器不变）。
+		bool chargedShot = ChargedShotThresholdSeconds > 0f && _releasedChargeSeconds >= ChargedShotThresholdSeconds;
+		int shotPierce = Pierce + (int)stats.Get("PierceAdd") + (chargedShot ? ChargedShotPierce : 0);
+		float shotSize = chargedShot && ChargedShotSizeScale > 0f ? ChargedShotSizeScale : ProjectileSizeScale;
+
 		var attack = new AttackInstance
 		{
 			Attacker = OwnerUnit,
@@ -392,7 +448,7 @@ public partial class ArrowVolleyAbility : Ability
 			Policy = HitPolicy.OncePerTarget,
 			Lifetime = MaxLifetime,
 			Tags = AttackTags,
-			Pierce = Pierce + (int)stats.Get("PierceAdd"),
+			Pierce = shotPierce,
 			Ricochet = (int)stats.Get("RicochetAdd"),
 			BypassBlock = BypassBlock,
 			AbilityKind = AbilityId,
@@ -402,12 +458,12 @@ public partial class ArrowVolleyAbility : Ability
 		for (int i = 0; i < (burst ? 1 : count); i++)
 		{
 			float offset = burst ? 0 : (i - ((count - 1) * 0.5f)) * SpreadStepDegrees;
-			FireProjectile(attack, direction, shotSpeed, ProjectileSizeScale, offset);
+			FireProjectile(attack, direction, shotSpeed, shotSize, offset);
 		}
 		if (burst && count > 1)
 		{
 			_burstAttack = attack; _burstRemaining = count - 1;
-			_burstSpeed = shotSpeed; _burstSize = ProjectileSizeScale;
+			_burstSpeed = shotSpeed; _burstSize = shotSize;
 			_burstInterval = Mathf.Max(0.01f, RampShotIntervalSeconds); _burstTimer = _burstInterval;
 			_burstFrame = Engine.GetPhysicsFrames();
 		}
@@ -417,12 +473,17 @@ public partial class ArrowVolleyAbility : Ability
 		LastShotCount = count;
 		LastSpreadDegrees = SpreadStepDegrees;
 		LastShotPerfect = _perfect;
+		LastShotChargedShot = chargedShot;
+		LastShotChargeSeconds = _releasedChargeSeconds;
 
 		GameLog.Write(
 			"Combat",
 			$"箭矢齐射：{AbilityId} 发数 {count}（基础 {Count} + 档 {ChargeSteps}×{CountPerChargeStep}）"
 			+ $" 单发伤害 {attack.BaseDamage:0.##} 弹速 {shotSpeed:0.##} 夹角 {SpreadStepDegrees:0.##}°"
 			+ $"（{(_perfect ? "完美时机" : (HoldToCharge ? "蓄力松手" : "事件帧"))}，蓄力 {ChargeTime:0.##}s 档 {ChargeSteps} 威力 ×{power:0.###}，"
+			+ (chargedShot
+				? $"★蓄力阈值弹：松手 {_releasedChargeSeconds:0.##}s ≥ {ChargedShotThresholdSeconds:0.##}s → 尺寸 ×{shotSize:0.##} 穿透 {shotPierce} 个，"
+				: string.Empty)
 			+ $"下坠起点 {GravityStartDistance:0.##}m 重力 {GravityScale:0.##} 击退 {knockback:0.##} 追踪 [{HomingStatusId}]，方向 {direction}）");
 	}
 	private void FireProjectile(AttackInstance attack, Vector3 direction, float speed, float size, float offset)
