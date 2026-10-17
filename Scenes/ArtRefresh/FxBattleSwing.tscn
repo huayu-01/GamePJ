@@ -141,3 +141,5 @@ libraries/ = SubResource("AnimationLibrary_gjg00")
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=1535444835]
 max_distance = 3.0
+
+[connection signal="finished" from="." to="." method="queue_free"]

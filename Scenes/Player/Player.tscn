@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Visual/CharacterDisplay.cs" id="50_display"]
 [ext_resource type="PackedScene" path="res://Scenes/Visual/WeaponGrip.tscn" id="51_grip"]
+[ext_resource type="PackedScene" path="res://Scenes/Visual/MeleeSwingFx.tscn" id="52_swing"]
 
 [ext_resource type="Script" uid="uid://duc0wrjly51qb" path="res://Scripts/Player/PlayerController.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://Scenes/Camera/CameraRig.tscn" id="2_rig"]
@@ -193,6 +194,8 @@ Enabled = false
 [node name="Shape" parent="AbilityWeapon4Skill1/Attack" index="0"]
 shape = SubResource("BoxShape3D_sword")
 
+[node name="SwingFx" parent="AbilityWeapon4Skill1" instance=ExtResource("52_swing")]
+
 [node name="AbilityWeapon4Skill2" type="Node3D" parent="."]
 script = ExtResource("27_sword_qi")
 Enabled = false
@@ -211,6 +214,8 @@ Knockback = 4.0
 
 [node name="Shape" parent="AbilityWeapon5Skill1/Attack" index="0"]
 shape = SubResource("BoxShape3D_scythe")
+
+[node name="SwingFx" parent="AbilityWeapon5Skill1" instance=ExtResource("52_swing")]
 
 [node name="AbilityWeapon5Skill2" type="Node3D" parent="."]
 script = ExtResource("28_scythe_throw")
@@ -244,6 +249,8 @@ Knockback = 3.5
 
 [node name="Shape" parent="AbilityWeapon6Skill1/Attack" index="0"]
 shape = SubResource("BoxShape3D_spear")
+
+[node name="SwingFx" parent="AbilityWeapon6Skill1" instance=ExtResource("52_swing")]
 
 [node name="AbilityWeapon6Skill2" type="Node3D" parent="."]
 script = ExtResource("29_spear_throw")

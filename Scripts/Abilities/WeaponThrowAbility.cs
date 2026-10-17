@@ -94,6 +94,8 @@ public abstract partial class WeaponThrowAbility : Ability
 	private float _activeTimer;
 	private bool _damageWindowOpen;
 	private bool _wasPressed;
+	private bool _waitingForCharge;
+	private bool _leftRecallRange;
 
 	/// <summary>抛出时的起点（"手上"的位置：胸口高度 + 前方 0.6m）—— 子类画路径/算落地高度要用。</summary>
 	protected Vector3 HomePosition { get; private set; }
@@ -147,6 +149,28 @@ public abstract partial class WeaponThrowAbility : Ability
 		_damageWindowOpen = false;
 		_spin = 0f;
 		DamageTickCount = 0;
+		_leftRecallRange = false;
+		_waitingForCharge = HoldToCharge;
+		if (_waitingForCharge)
+		{
+			PlaySkillAnimation();
+			return;
+		}
+		BeginThrow();
+	}
+
+	protected override void OnChargeReleased(bool perfect, int steps, float powerScale)
+	{
+		if (!_waitingForCharge) return;
+		_waitingForCharge = false;
+		BeginThrow();
+	}
+
+	protected override void OnChargeAborted() => Cancel();
+
+	private void BeginThrow()
+	{
+		if (OwnerUnit == null) { Cancel(); return; }
 
 		Vector3 direction = ResolveThrowDirection();
 		direction.Y = 0f;
@@ -184,7 +208,7 @@ public abstract partial class WeaponThrowAbility : Ability
 
 	protected override void Tick(float delta)
 	{
-		if (!IsBusy)
+		if (!IsBusy || _waitingForCharge)
 		{
 			return;
 		}
@@ -246,8 +270,9 @@ public abstract partial class WeaponThrowAbility : Ability
 
 		float travelled = HomePosition.DistanceTo(WeaponPosition);
 		float nearOwner = OwnerUnit.GlobalPosition.DistanceTo(WeaponPosition);
+		if (nearOwner > RecallDistance) _leftRecallRange = true;
 		if ((RecallOnSecondPress && _wasPressed)
-			|| (RecallDistance > 0f && nearOwner <= RecallDistance)
+			|| (RecallDistance > 0f && _leftRecallRange && nearOwner <= RecallDistance)
 			|| (EffectiveMaxDistance > 0f && travelled >= EffectiveMaxDistance))
 		{
 			BeginReturn();
@@ -437,6 +462,7 @@ public abstract partial class WeaponThrowAbility : Ability
 
 	protected override void OnFinishOrCancel()
 	{
+		_waitingForCharge = false;
 		Hitbox?.Deactivate();
 		_damageWindowOpen = false;
 		SetInFlight(false);
@@ -446,6 +472,7 @@ public abstract partial class WeaponThrowAbility : Ability
 
 	public override void _ExitTree()
 	{
+		_waitingForCharge = false;
 		Hitbox?.Deactivate();
 		SetInFlight(false);
 		base._ExitTree();

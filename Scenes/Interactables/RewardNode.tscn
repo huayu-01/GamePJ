@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Interaction/RewardNode.cs" id="1_node"]
 [ext_resource type="Mesh" path="res://Assets/Models/nodes/mesh_node_enhancement.tres" id="2_mesh"]
 [ext_resource type="Script" path="res://Scripts/Interaction/InteractablePresentation.cs" id="3_pres"]
 [ext_resource type="Mesh" path="res://Assets/Models/nodes/mesh_node_aura_ring.tres" id="4_aura_ring"]
 [ext_resource type="Mesh" path="res://Assets/Models/nodes/mesh_node_aura_rim.tres" id="5_aura_rim"]
+[ext_resource type="PackedScene" path="res://Scenes/Visual/RewardBeaconFx.tscn" id="6_beacon"]
 
 [sub_resource type="Animation" id="Animation_idle"]
 resource_name = "idle"
@@ -353,3 +354,5 @@ cast_shadow = 0
 transform = Transform3D(1.42, 0, 0, 0, 0.06, 0, 0, 0, 1.42, 0, 0.02, 0)
 mesh = ExtResource("4_aura_ring")
 cast_shadow = 0
+
+[node name="BeaconFx" parent="." instance=ExtResource("6_beacon")]

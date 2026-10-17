@@ -1,5 +1,7 @@
 # 表现层（VFX）契约与清单
 
+> **后续G专项**：MeleeSwingFx只读真实StrikeCount，RewardBeaconFx只读奖励可用态与价值色；通过PackedScene替换。私有材质必须在Battle进树播放前准备，否则动画轨道可能缓存旧材质。动画结束自毁，禁用/消耗停粒子，无单位/碰撞/分组。接线见followup-g-verification.md。
+
 > **第二轮 C批**：CharacterDisplay切换角色与握持场景，真实UnitAnimator、受击闪色、蓄力身体表现与残影跟随当前可见模型。
 > 骨骼轨道只在动画私有副本中重定向，关键帧及事件不变；展示子树不创建单位、碰撞或分组。[接入契约](base-loadout.md)。
 

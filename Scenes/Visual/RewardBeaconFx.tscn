@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Visual/RewardBeaconFx.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Scenes/ArtRefresh/FxLootBeacon.tscn" id="2"]
+
+[node name="BeaconFx" type="Node"]
+script = ExtResource("1")
+EffectScene = ExtResource("2")
+MinimumLayer = 2

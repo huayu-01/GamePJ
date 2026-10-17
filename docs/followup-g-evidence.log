@@ -1,0 +1,98 @@
+Debug 编译：0 warning / 0 error
+selftest_final 退出码=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+probe_final 退出码=0
+[Feedback] PASS 按住未满基础蓄力：不飞出、不判定、不命中
+[Feedback] PASS 提前松手取消，武器门无残留
+[Feedback] PASS 真实按住蓄到0档，时间=1.031s
+[Feedback] PASS 蓄力期间仍未抛出
+[Feedback] PASS 松手后才抛出
+[Feedback] PASS 0档：距离=12，速度=15，倍率=1
+[Feedback] PASS 真实飞行超过1.5米，未被起手近距离判据误收回，武技1已锁
+[Feedback] PASS 再次按键收回并解锁武技1
+[Feedback] PASS 真实按住蓄到3档，时间=1.787s
+[Feedback] PASS 蓄力期间仍未抛出
+[Feedback] PASS 松手后才抛出
+[Feedback] PASS 3档：距离=20.736，速度=25.92，倍率=1.728
+[Feedback] PASS 真实飞行超过1.5米，未被起手近距离判据误收回，武技1已锁
+[Feedback] PASS 再次按键收回并解锁武技1
+[Feedback] PASS 真实按住蓄到4档，时间=2.025s
+[Feedback] PASS 蓄力期间仍未抛出
+[Feedback] PASS 松手后才抛出
+[Feedback] PASS 4档：距离=24.8832，速度=31.104，倍率=2.0736
+[Feedback] PASS 真实飞行超过1.5米，未被起手近距离判据误收回，武技1已锁
+[Feedback] PASS 截图 g_spear_charged
+[Feedback] PASS 四档真实水平飞行超过20米，不再被基础12米上限截断
+[Feedback] PASS 最远距离自动收回并解锁
+[Feedback] PASS 蓄力时换装取消旧技能，无飞行/锁门残留
+[Feedback] PASS SpiritSword真实ATK事件播放Battle特效
+[Feedback] PASS 一次真实判定=一次特效，战斗仍造成伤害
+[Feedback] PASS 挥砍特效不含碰撞/单位/分组
+[Feedback] PASS 当前可见的私有材质实际收到挥砍动画参数
+[Feedback] PASS 截图 g_melee_swing
+[Feedback] PASS 一次性动画结束自毁，取消不额外播放
+[Feedback] PASS Scythe真实ATK事件播放Battle特效
+[Feedback] PASS 一次真实判定=一次特效，战斗仍造成伤害
+[Feedback] PASS 挥砍特效不含碰撞/单位/分组
+[Feedback] PASS 当前可见的私有材质实际收到挥砍动画参数
+[Feedback] PASS 一次性动画结束自毁，取消不额外播放
+[Feedback] PASS Spear真实ATK事件播放Battle特效
+[Feedback] PASS 一次真实判定=一次特效，战斗仍造成伤害
+[Feedback] PASS 挥砍特效不含碰撞/单位/分组
+[Feedback] PASS 当前可见的私有材质实际收到挥砍动画参数
+[Feedback] PASS 一次性动画结束自毁，取消不额外播放
+[Feedback] PASS 第1次真实离地→下落→落地
+[Feedback] PASS 落剑式次数=1，预期=1（CD内不重触发，CD后可触发）
+[Feedback] PASS 第2次真实离地→下落→落地
+[Feedback] PASS 落剑式次数=1，预期=1（CD内不重触发，CD后可触发）
+[Feedback] PASS 第3次真实离地→下落→落地
+[Feedback] PASS 落剑式次数=2，预期=2（CD内不重触发，CD后可触发）
+[Feedback] PASS 真实物理伤害：落=3次，落剑式=2次
+[Feedback] PASS Loot仅高价值节点实例化，中价值不堆叠光柱
+[Feedback] PASS 高价值旧光圈让位，信标无碰撞/单位/分组
+[Feedback] PASS 实例私有材质，颜色来自价值标签
+[Feedback] PASS 截图 g_loot_beacons
+[Feedback] PASS 禁用立即隐藏/停粒子，不污染另一实例
+[Feedback] PASS 交互物消失后信标不残留
+[Feedback] PASS 奖励节点卸载回收全部特效
+[Feedback] === G专项验收结束：通过 53，失败 0 ===
+d_regression 退出码=0
+[BatchD] === D批验收结束：通过 90，失败 0 ===
+c_regression 退出码=0
+[BatchC] === C批验收结束：通过 52，失败 0 ===
+memory 退出码=0
+[BatchC] === C批验收结束：通过 5，失败 0 ===
+b_regression 退出码=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a_regression 退出码=0
+A批回归：23 PASS / 0 FAIL
+e_regression 退出码=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+audio_exit_1 退出码=0
+音频退出第1轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+audio_exit_2 退出码=0
+音频退出第2轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+audio_exit_3 退出码=0
+音频退出第3轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+audio_exit_4 退出码=0
+音频退出第4轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+audio_exit_5 退出码=0
+音频退出第5轮：实际播放音乐，0泄漏/0ERROR/0WARNING
+ExportRelease 编译：0 warning / 0 error
+存档恢复 meta.cfg=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档恢复 ability_cards.cfg=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档恢复 settings.cfg=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档恢复 loadout.cfg=不存在
+截图 g_spear_charged.png SHA256=46F9C20B590C9226C2B0DB2E4F9B7F032DD5E3F564649A2376D44F395E155422
+截图 g_melee_swing.png SHA256=AAEA3DC54E60C1620CC4730B3C9DBC012B3B441C21F271CACC3DFA4940DADA99
+截图 g_loot_beacons.png SHA256=ACC24A791693A47BE6738A0CE3BD93772825FB6AA3CEFB1F4564299DD49CE427
+selftest.flag 不存在=True
+[P4实测] [log] 10:03:54 [SelfTest] ✅ P4·武技3 落剑式（被动）：上游 skl_b_fall 落地=True（期望 True） 上游本次伤害 18（**没有被改过**）｜额外那一圈：触发次数 0 → 1（期望 +1） 那一圈伤害 18 挂到 skl_b_fall（期望 skl_b_fall） CD 5（期望 5 = 触发间隔）｜靶子 Chaser 生命 60 → 60｜⚠️ 自测在同一帧里跑，落圈是 Area3D、要等一个物理帧才进重叠列表 → 这一栏不作为判据（判据是触发次数 +1 与 上游伤害没变）
+[P4实测] [log] 10:03:56 [SelfTest] ✅ P4·长枪武技1 横扫千军：段数=5（期望 5） 循环=True（期望 True，文档「这么循环」） CD 0.6（期望 0.6） 连续按键推进=10（期望 ≥5） 循环后最大段号=5（期望 ≤5 = 打满就回到第 1 段）｜武技2 长虹贯日：基础蓄力 1s（期望 1）/ 每 0.25s 一档（期望 0.25）/ 每档 ×1.2（期望 1.2 = +20%）/ 上限 4 档（期望 4，最多蓄力 2s）｜抛物线：重力 22 飞行 0.8s 路径可视化 33 点（期望 ≥2） 在飞=True（期望 True）｜基础档：水平速度 15 路径中线 12m ／ 3 档：速度 25.92 路径中线 20.74m（期望 20.74 ≈ 12×1.2³）｜丢出去后再次使用收回=True（期望 True） 累计收回 2 次｜落日余晖（武器 3 被动）：下落攻击 skl_b_fall 的冲下模式=Straight（0=Straight 1=Crosshair） 指向范围 35°

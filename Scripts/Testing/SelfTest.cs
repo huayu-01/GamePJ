@@ -3489,6 +3489,7 @@ public partial class SelfTest : Node
 	private int _p4FallHits;
 	private float _p4FallHeight;
 	private float _p4FallDamage;
+	private int _p4LandingBefore;
 	private Unit? _p4Victim;
 
 	/// <summary>清场 → 切到"角色 B + 灵剑" → 收集全部能力节点（顺手证明"换武器 = 换武技"）。</summary>
@@ -3821,6 +3822,8 @@ public partial class SelfTest : Node
 
 		FallAttackAbility fall = _p4Fall;
 		WaitUntilIdle(fall);
+		_p4LandingBurst.ResetForLoadout();
+		_p4LandingBefore = _p4LandingBurst.TriggerCount;
 
 		// ① 在地面时不能用（文档：当角色在空中时…）。
 		_p4Player.GlobalPosition = _p4Player.GlobalPosition with { Y = 0.05f };
@@ -3877,7 +3880,8 @@ public partial class SelfTest : Node
 		_p4Victim = SpawnVictim(new Vector3(1.6f, -5.2f, 1.6f));
 		float victimBefore = _p4Victim?.Health ?? 0f;
 
-		int burstBefore = burst.TriggerCount;
+		// 基线取自离地起手前；真实物理帧可能早在两阶段之间已经落地。
+		int burstBefore = _p4LandingBefore;
 		float upstreamDamage = fall.LastDamage;
 
 		// 把玩家压回地面（触发落地事件）。
@@ -4049,14 +4053,15 @@ public partial class SelfTest : Node
 			w2._PhysicsProcess(0.05d);
 		}
 
-		float maxDist = w2.MaxThrowDistance * Mathf.Pow(1.2f, 3f);
+		float maxDist = w2.MaxThrowDistance * Mathf.Pow(w2.ChargeStepScale, 3f);
 		bool ok = started && advanced >= 5 && maxStepSeen <= 4 && charged && charged3 && steps == 3
 			&& Mathf.IsEqualApprox(speedAt3 / Mathf.Max(0.01f, speedAt0), power)
+			&& Mathf.IsEqualApprox(distAt0, baseDist) && Mathf.IsEqualApprox(distAt3, maxDist)
 			&& distAt3 > distAt0 && pathPoints >= 2 && inFlight && recall;
 		GameLog.Write(
 			"SelfTest",
 			$"{(ok ? "✅" : "🔴")} P4·长枪武技1 横扫千军：段数={w1.ComboStepCount}（期望 5） 循环={w1.ComboLoop}（期望 True，文档「这么循环」） CD {w1.Cooldown:0.##}（期望 0.6） 连续按键推进={advanced}（期望 ≥5） 循环后最大段号={maxStepSeen + 1}（期望 ≤5 = 打满就回到第 1 段）"
-			+ $"｜武技2 长虹贯日：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 1）/ 每 {w2.ChargeStepSeconds:0.##}s 一档（期望 0.25）/ 每档 ×{w2.ChargeStepScale:0.##}（期望 1.2 = +20%）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 3，最多蓄力 {w2.ChargeMaxSeconds:0.##}s）"
+			+ $"｜武技2 长虹贯日：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 1）/ 每 {w2.ChargeStepSeconds:0.##}s 一档（期望 0.25）/ 每档 ×{w2.ChargeStepScale:0.##}（期望 1.2 = +20%）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 4，最多蓄力 {w2.ChargeMaxSeconds:0.##}s）"
 			+ $"｜抛物线：重力 {w2.ArcGravity:0.##} 飞行 {w2.FlightSeconds:0.##}s 路径可视化 {pathPoints} 点（期望 ≥2） 在飞={inFlight}（期望 True）"
 			+ $"｜基础档：水平速度 {speedAt0:0.##} 路径中线 {distAt0:0.##}m ／ 3 档：速度 {speedAt3:0.##} 路径中线 {distAt3:0.##}m（期望 {maxDist:0.##} ≈ 12×1.2³）"
 			+ $"｜丢出去后再次使用收回={recall}（期望 True） 累计收回 {w2.RecallCount} 次｜落日余晖（武器 3 被动）：下落攻击 {_p4Fall?.AbilityId ?? "（找不到）"} 的冲下模式={_p4Fall?.HomingMode}（0=Straight 1=Crosshair） 指向范围 {_p4Fall?.MaxDiveAngleDegrees:0.#}°");

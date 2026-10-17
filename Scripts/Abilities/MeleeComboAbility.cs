@@ -118,6 +118,8 @@ public partial class MeleeComboAbility : Ability
 
 	/// <summary>当前段的命中盒尺寸（剑气"大小等比攻击盒大小"读它）。</summary>
 	public Vector3 CurrentStepBoxSize { get; private set; }
+	/// <summary>真实判定次数；表现层据此播放特效，不驱动战斗。</summary>
+	public int StrikeCount { get; private set; }
 
 	/// <summary>本段斩断了几个子弹（自测取证）。</summary>
 	public int LastCutCount { get; private set; }
@@ -489,6 +491,7 @@ public partial class MeleeComboAbility : Ability
 		};
 
 		_hitbox.Activate(OwnerUnit, attack);
+		StrikeCount++;
 		_striking = true;
 		_activeTimer = Mathf.Max(0.02f, StepValue(_activeTimes, ComboStep, StrikeActiveTime));
 		BeginLunge(_activeTimer);

@@ -1,5 +1,7 @@
 # 画面改善专项交接
 
+> 2026-10-17 G专项更新：下文Loot/Battle未接线为历史边界。现已通过独立组件接高价值奖励及三把近战ATK，详见[接线与验收](followup-g-verification.md)。F已修复导航和正常退出Ogg泄漏；旧GCHandle根因仍未定位。角色模型另见character-replacement.md，整体美术仍非终版。
+
 本轮以 `d4270fc` 为视觉对比基线，工作范围仅美术和独立验证。公共 HANDOFF、roadmap、architecture、todo-handoff 不修改，由功能任务整合。
 
 ## 已接入生产场景

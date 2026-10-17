@@ -93,7 +93,9 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 	}
 
 	/// <summary>初始速度（≥ 基准）：基准速度本身也要走抛物线（表里 ThrowSpeed 是"水平速度"）。</summary>
-	protected override float EffectiveThrowSpeed => ThrowSpeed;
+	protected override float EffectiveThrowSpeed => LastHorizontalSpeed;
+
+	protected override float EffectiveMaxDistance => _referenceDistance;
 
 	/// <summary>蓄力标定：每档 +20% 的那一档位由基类给，本类只把它换算成"速度/距离"。</summary>
 	protected override void OnThrowStarted()

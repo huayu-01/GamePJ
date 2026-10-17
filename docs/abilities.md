@@ -1,5 +1,7 @@
 # 能力机制：蓄力 · 完美时机 · 技能层数 · 冷却缩减（P2 通用地基）
 
+> **后续G专项**：WeaponThrowAbility的HoldToCharge路径等待合格松手才BeginThrow，提前松手取消；非蓄力路径保持。Tick等待期间不驱动飞行/返回，取消与换装清理。长枪本次距离上限随倍率变化；近距离自动收回须先离开手边范围。表内1s基础+1s额外/.25s=4档，未改数值。真实输入证据见followup-g-verification.md。
+
 > **第二轮 C批**：基地和关卡共用PlayerLoadout，先恢复绑定再套技能/矩阵/能力卡；换角色会释放旧能力持有的状态。
 > 技能事件由当前可见模型的UnitAnimator驱动，未改事件时刻、伤害或冷却。存档与接入见 [base-loadout.md](base-loadout.md)。
 

@@ -100,6 +100,8 @@ public partial class RewardNode : Interactable
 	[Export] public bool SpawnsEncounter { get; set; } = true;
 
 	private RewardNodeKind _kind = RewardNodeKind.Enhancement;
+	/// <summary>表现层共用的价值色，仍以价值标签表为权威。</summary>
+	public Color PresentationColor => AuraColorFor(_kind);
 
 	public override void _Ready()
 	{
