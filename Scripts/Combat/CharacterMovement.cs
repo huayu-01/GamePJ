@@ -109,7 +109,13 @@ public partial class CharacterMovement : Node
 		_dashSpeed = speed;
 	}
 
-	public void EndDash() => _dashSpeed = 0f;
+	public void EndDash()
+	{
+		if (_dashSpeed <= 0) return;
+		_dashSpeed = 0f;
+		// 强制冲刺结束后归还普通移动，不能把上一帧冲刺速度当作输入惯性继续滑行。
+		_inputVelocity = Vector3.Zero;
+	}
 
 	/// <summary>位移/扑击技能用：直接设置垂直速度。</summary>
 	public void SetVerticalVelocity(float velocity)

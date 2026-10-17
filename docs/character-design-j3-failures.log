@@ -1,0 +1,40 @@
+J3 有效修前基线（0 warning / 0 error，stderr为空，退出1）
+[Action] PASS 真实右键进入蓄力
+[Action] FAIL 后来左键打断右键蓄力，旧动作结束
+[Action] FAIL 旧右键松手不补发：左=10，右=30
+[Action] PASS 真实Dodge开启无敌和自身朝向锁
+[Action] FAIL 新动作打断后撤并清理无敌、朝向锁
+[Action] PASS 第二单位真实快速动画ATK已发射
+[Action] FAIL 其他单位同名ATK不能触发慢动画技能：慢单位伤害快照=10
+[Action] === 动作交接验收结束：通过 3，失败 4 ===
+
+扩展探针暴露同帧顺序问题（stderr为空，退出1）
+[Action] PASS 同帧先左键后Q，最后Q持有动作
+[Action] FAIL 同帧先Q后左键，最后左键持有动作
+[Action] === 动作交接验收结束：通过 26，失败 1 ===
+
+修正：按实际InputEvent顺序交接；保留按住／释放的最终状态判断。
+其他完整验收结果见character-design-j3-evidence.log。
+
+补充中断清理验收，暴露闪的旧速度未停止（stderr为空，退出1）：
+[Action] PASS 真实闪已进入冲刺与配置的无敌
+[Action] FAIL 架打断闪：冲刺、无敌和临时碰撞状态全部清理
+[Action] FAIL 中断后0.1秒无残留冲刺位移：3.672m
+[Action] === 动作交接验收结束：通过 33，失败 2 ===
+修正：闪的任何收尾均停止自身持续冲刺、还原无敌与碰撞；CharacterMovement.EndDash清除该次强制输入速度，归还普通移动。
+
+编辑器MCP原生动画实验（临时节点执行后释放，未改项目场景）：
+{"before":0.3,"same_name_play":0.3,"seek_zero":0.0}
+实际单位再次验证与长按输入边沿的修前结果：
+[Action] FAIL 重复的按住事件不能当作新按下打断动作
+[Action] FAIL 同名新播放回到0：0.0138→0.0138
+[Action] === 动作交接验收结束：通过 36，失败 2 ===
+修正：新动作Play后Seek(0)，不调用Stop；输入队列仅接收Godot的IsActionJustPressedByEvent真实按下沿。
+
+完整渲染回归暴露旧弓探针的时间口径问题（stderr为空，退出1）：
+[Design] FAIL 弓真实输入蓄满五档
+[Design] FAIL 弓五档按基础加算：2.2倍
+[Design] FAIL 弓真实发射快照：伤害=52.799995、弹速=340
+[Design] === 原始设计验收结束：通过 117，失败 3 ===
+现场实际蓄力仅0.92游戏秒，探针已用墙钟2秒提前超时；未达到原断言所需1.05游戏秒。
+修正探针等待口径为游戏ProcessFrame时间，保留五档2.5倍和60伤害／370弹速的原断言。未修改正式技能数值。

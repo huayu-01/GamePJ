@@ -26,6 +26,9 @@ public partial class PlayerAbilityInput : Node
 {
 	private Unit _unit = null!;
 	private readonly List<Ability> _abilities = new();
+	private readonly List<string> _pendingPresses = new();
+	private readonly HashSet<string> _eventActions = new();
+	private readonly HashSet<string> _handledPresses = new();
 
 	/// <summary>已经为哪些能力写过"这个按键动作在 project.godot 里不存在"的警告（只写一次，不刷屏）。</summary>
 	private static readonly HashSet<string> WarnedMissingActions = new();
@@ -50,12 +53,37 @@ public partial class PlayerAbilityInput : Node
 		}
 	}
 
+	public override void _Input(InputEvent inputEvent)
+	{
+		if (inputEvent.IsEcho()) return;
+		_eventActions.Clear();
+		foreach (Ability ability in _abilities)
+		{
+			if (!IsInstanceValid(ability) || !ability.Enabled || string.IsNullOrEmpty(ability.InputAction)) continue;
+			string action = ability.InputAction;
+			if (InputMap.HasAction(action) && Input.IsActionJustPressedByEvent(action, inputEvent) && _eventActions.Add(action))
+				_pendingPresses.Add(action);
+		}
+	}
+
 	public override void _Process(double delta)
 	{
 		if (_unit.IsDead)
 		{
+			_pendingPresses.Clear();
 			return;
 		}
+		// 按实际输入事件顺序交接。同帧的两个按键不能由场景节点顺序决定谁覆盖谁。
+		_handledPresses.Clear();
+		int count = _pendingPresses.Count;
+		for (int i = 0; i < count; i++)
+		{
+			string pressed = _pendingPresses[i];
+			_handledPresses.Add(pressed);
+			foreach (Ability ability in _abilities)
+				if (IsInstanceValid(ability) && ability.Enabled && ability.InputAction == pressed) Activate(ability);
+		}
+		_pendingPresses.RemoveRange(0, count);
 
 		float dt = (float)delta;
 		foreach (Ability ability in _abilities)
@@ -83,7 +111,7 @@ public partial class PlayerAbilityInput : Node
 
 			if (!ability.HoldToCharge && !ability.HoldToMaintain)
 			{
-				if (Input.IsActionJustPressed(action))
+				if (Input.IsActionJustPressed(action) && !_handledPresses.Contains(action))
 				{
 					Activate(ability);
 				}
@@ -92,7 +120,7 @@ public partial class PlayerAbilityInput : Node
 			}
 
 			// 按住式：按下开始，按住期间累加，松开结束。
-			if (Input.IsActionJustPressed(action))
+			if (Input.IsActionJustPressed(action) && !_handledPresses.Contains(action))
 			{
 				Activate(ability);
 			}

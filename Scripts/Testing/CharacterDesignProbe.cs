@@ -24,8 +24,13 @@ public partial class CharacterDesignProbe : Node3D
 	private void Press(string action, bool pressed) => Input.ParseInputEvent(new InputEventAction { Action = action, Pressed = pressed });
 	private async Task<bool> Until(Func<bool> predicate, double seconds = 2)
 	{
-		ulong deadline = Time.GetTicksMsec() + (ulong)(seconds * 1000);
-		while (!predicate() && Time.GetTicksMsec() < deadline) await Wait(0.01);
+		// 蓄力使用游戏帧时间；渲染卡顿时不能拿墙钟两秒误判尚未走完的一秒蓄力。
+		double elapsed = 0;
+		while (!predicate() && elapsed < seconds)
+		{
+			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+			elapsed += GetProcessDeltaTime();
+		}
 		return predicate();
 	}
 	private void Check(bool ok, string message) { if (ok) _pass++; else _fail++; GD.Print($"[Design] {(ok ? "PASS" : "FAIL")} {message}"); }

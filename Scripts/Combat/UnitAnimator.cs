@@ -203,6 +203,11 @@ public partial class UnitAnimator : Node
 
 	/// <summary>当前正在播的动画名（调试 / 运行时探针用；没绑到播放器时是空串）。</summary>
 	public string CurrentAnimation => _current;
+	/// <summary>每次播放／停止均换代；能力只能接收自己那次播放的事件。</summary>
+	public ulong SkillPlaybackId { get; private set; }
+	public double SkillPlaybackPosition => Mathf.Max(0, _skillPlaying && _player != null
+		&& _player.CurrentAnimation == _skillName ? _player.CurrentAnimationPosition : _skillLastPosition);
+	public event System.Action<string, ulong>? SkillEvent;
 
 	/// <summary>
 	/// 技能动画事件帧的**分发口**（用户在动画里挂的 `anim_event` 帧会走到这里）。
@@ -211,7 +216,7 @@ public partial class UnitAnimator : Node
 	/// 而 <c>Ability._PhysicsProcess</c> 与 <c>UnitAnimator</c> 的物理回调谁先谁后由节点顺序决定 ——
 	/// 走事件就等于"逻辑帧跟着动画走"，不依赖任何顺序假设。
 	///
-	/// 同一时刻只有一个单位在播技能动画（玩家），所以这里保持**单个**监听者，不做集合。
+	/// 这是历史自测统计口。战斗能力使用实例SkillEvent和播放序号，不假设场上只有一个动画使用者。
 	/// </summary>
 	public static event System.Action<string>? AnimationEvent;
 
@@ -235,7 +240,8 @@ public partial class UnitAnimator : Node
 	/// <param name="name">事件名（`ATK` / `Dodge` / `Release` …，来自配置表）。</param>
 	public void RaiseAnimationEvent(string name)
 	{
-		int listeners = AnimationEvent?.GetInvocationList().Length ?? 0;
+		SkillEvent?.Invoke(name, SkillPlaybackId);
+		// 历史全局口仅供旧自测统计；战斗能力订阅本单位实例事件。
 		AnimationEvent?.Invoke(name);
 	}
 
@@ -285,7 +291,9 @@ public partial class UnitAnimator : Node
 			}
 
 			// 事件帧：在播放位置跨过它的这一帧触发（当帧生效，跟 speed_scale 走）。
+			ulong playbackId = SkillPlaybackId;
 			DriveSkillEvents();
+			if (SkillPlaybackId != playbackId) return;
 
 			// ⚠️ 判"播完"必须比的是 **_skillName**，不能比 _current：
 			// `Play(name)` 内部有"同名不重复"的早退（`name == _current`），而 _current 在
@@ -459,6 +467,9 @@ public partial class UnitAnimator : Node
 		// 只 `Seek(0)` + `Play()` 就足够把技能动画从头播（`Play` 本身会重置到该段的起点）。
 		_player.SpeedScale = speedScale <= 0f ? 1f : speedScale;
 		_player.Play(full);
+		// Godot对正在播放的同名动画会继续旧位置；新动作必须重新从0开始，且不调用有崩溃历史的Stop。
+		_player.Seek(0);
+		SkillPlaybackId++;
 
 		_skillName = full;
 		_skillPlaying = true;
@@ -476,6 +487,7 @@ public partial class UnitAnimator : Node
 	/// <summary>让技能动画立刻停手（技能被取消 / 单位死亡时调用），把控制权交还运动动画。</summary>
 	public void StopSkillAnimation()
 	{
+		SkillPlaybackId++;
 		_skillPlaying = false;
 		_skillStartupGrace = 0;
 		_skillName = string.Empty;
@@ -583,6 +595,7 @@ public partial class UnitAnimator : Node
 			return;
 		}
 
+		ulong playbackId = SkillPlaybackId;
 		double now = _player.CurrentAnimationPosition;
 		if (now + 1e-6 < _skillLastPosition)
 		{
@@ -605,6 +618,8 @@ public partial class UnitAnimator : Node
 
 			_skillFiredEvents.Add(i);
 			RaiseAnimationEvent(key.Name);
+			// 回调可能换段或交接动作；不能用旧播放位置继续驱动新一轮事件表。
+			if (SkillPlaybackId != playbackId) return;
 		}
 
 		_skillLastPosition = now;

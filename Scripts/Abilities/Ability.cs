@@ -38,6 +38,12 @@ public abstract partial class Ability : Node3D
 
 	/// <summary>未解锁的能力不参与行为决策（Boss 分阶段解锁技能用）。</summary>
 	[Export] public bool Enabled { get; set; } = true;
+	[ExportGroup("动作打断")]
+	/// <summary>默认允许后来的动作打断；明确不可打断的技能行关闭此项。</summary>
+	[Export] public bool CanBeInterrupted { get; set; } = true;
+	/// <summary>起手锁定的动画时间（秒）；0表示立即可打断，随动画加速同步。</summary>
+	[Export] public float InterruptLockSeconds { get; set; }
+	[ExportGroup("行为提示")]
 
 	/// <summary>行为提示：目标进入这个距离区间时适合触发本能力（UseAbilityBehavior 读取）。</summary>
 	[Export] public float ApproachMinRange { get; set; }
@@ -174,6 +180,11 @@ public abstract partial class Ability : Node3D
 	public bool IsBusy => IsActive && !IsBackground && OccupiesAction;
 	/// <summary>持续实体在出手后可释放动作占用；默认技能保持原语义。</summary>
 	protected virtual bool OccupiesAction => true;
+	public double ActionTimelineTime => _playedAnimator != null && IsInstanceValid(_playedAnimator)
+		&& _animationPlaybackId != 0 && _playedAnimator.SkillPlaybackId == _animationPlaybackId
+		? _playedAnimator.SkillPlaybackPosition : StateTime;
+	public bool IsInterruptibleNow => CanBeInterrupted && ActionTimelineTime + 0.000001 >= InterruptLockSeconds;
+	public float InterruptLockRemaining => IsBusy ? Mathf.Max(0, InterruptLockSeconds - (float)ActionTimelineTime) : 0;
 	public float CooldownRemaining { get; private set; }
 
 	/// <summary>
@@ -313,6 +324,10 @@ public abstract partial class Ability : Node3D
 	/// <summary>动画事件帧的分发（`UnitAnimator.AnimationEvent`）。在拥有者解析出来时挂、退树时摘。</summary>
 	private bool _initialized;
 	private bool _animEventHookedByMe;
+	private UnitAnimator? _eventAnimator;
+	private UnitAnimator? _playedAnimator;
+	private ulong _animationPlaybackId;
+	private readonly List<Ability> _actionCandidates = new();
 
 	/// <summary>剩余层数（<see cref="MaxCharges"/> &gt; 1 才用；&lt; 0 = 还没同步过）。</summary>
 	private int _charges = -1;
@@ -360,7 +375,7 @@ public abstract partial class Ability : Node3D
 		EnsureAnimEventHooked();
 
 		float dt = (float)delta;
-		if (IsBackground && IsActive && (!Enabled || OwnerUnit.IsDead))
+		if (IsActive && (!Enabled || OwnerUnit.IsDead))
 		{
 			Cancel();
 		}
@@ -458,6 +473,7 @@ public abstract partial class Ability : Node3D
 		{
 			return false;
 		}
+		if (!TakeAction()) return false;
 
 		Target = target;
 		SyncCharges();
@@ -470,6 +486,24 @@ public abstract partial class Ability : Node3D
 		AnimEventReached = false;
 		OnActivate(target);
 		Activated?.Invoke(this);
+		return true;
+	}
+
+	/// <summary>先确认所有旧动作可交接，再统一收尾；无效请求不影响当前动作。</summary>
+	private bool TakeAction()
+	{
+		if (IsBackground || !OccupiesAction || OwnerUnit == null) return true;
+		_actionCandidates.Clear();
+		NodeSearch.CollectInSubtree(OwnerUnit, _actionCandidates);
+		foreach (Ability other in _actionCandidates)
+			if (other != this && other.IsBusy && !other.IsInterruptibleNow) return false;
+		foreach (Ability other in _actionCandidates)
+		{
+			if (other == this || !other.IsBusy) continue;
+			GameLog.Write("Combat", $"动作交接：{other.AbilityId} 被 {AbilityId} 打断（动画时间{other.ActionTimelineTime:0.###}s）。");
+			// 已起手的技能进入既有冷却／回层；未触发的事件不补发。
+			other.Finish();
+		}
 		return true;
 	}
 
@@ -603,7 +637,9 @@ public abstract partial class Ability : Node3D
 			return;
 		}
 
-		UnitAnimator.AnimationEvent += OnAnimationEvent;
+		_eventAnimator = FindInOwner<UnitAnimator>();
+		if (_eventAnimator == null) return;
+		_eventAnimator.SkillEvent += OnAnimationEvent;
 		_animEventHookedByMe = true;
 	}
 
@@ -611,19 +647,19 @@ public abstract partial class Ability : Node3D
 	{
 		if (_animEventHookedByMe)
 		{
-			UnitAnimator.AnimationEvent -= OnAnimationEvent;
+			if (_eventAnimator != null) _eventAnimator.SkillEvent -= OnAnimationEvent;
 			_animEventHookedByMe = false;
+			_eventAnimator = null;
 		}
 	}
 
 	/// <summary>
-	/// 动画事件帧的过滤与分发：**只认自己等的那一帧**（<see cref="AnimEvent"/>，以及
-	/// 第二帧 <see cref="AnimEventEnd"/>，见「后撤」的无敌区间），
-	/// 且只在自己正忙的时候认（否则别的单位的帧会打到没在放技能的能力上）。
+	/// 只订阅拥有者的实例事件，并校验本能力的播放序号；再过滤起止事件名。
+	/// 同单位重播同名动画和其他单位的同名ATK都不能串触发。
 	/// </summary>
-	private void OnAnimationEvent(string name)
+	private void OnAnimationEvent(string name, ulong playbackId)
 	{
-		if (!IsActive || IsBackground)
+		if (!IsActive || IsBackground || _animationPlaybackId == 0 || playbackId != _animationPlaybackId)
 		{
 			return;
 		}
@@ -788,21 +824,18 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	protected string PlaySkillAnimation()
 	{
-		if (IsBackground || string.IsNullOrEmpty(AnimName))
-		{
-			return string.Empty;
-		}
-
-		return FindInOwner<UnitAnimator>()?.PlaySkillAnimation(AnimName, AnimSpeedScale) ?? string.Empty;
+		return PlaySkillAnimationNamed(AnimName);
 	}
 
 	/// <summary>停掉技能动画（技能结束/取消时调用，把控制权交还"按移速切"）。</summary>
 	protected void StopSkillAnimation()
 	{
-		if (!IsBackground && OccupiesAction)
+		if (!IsBackground && _playedAnimator != null && IsInstanceValid(_playedAnimator)
+			&& _animationPlaybackId != 0 && _playedAnimator.SkillPlaybackId == _animationPlaybackId)
 		{
-			FindInOwner<UnitAnimator>()?.StopSkillAnimation();
+			_playedAnimator.StopSkillAnimation();
 		}
+		_animationPlaybackId = 0;
 	}
 
 	/// <summary>
@@ -827,7 +860,10 @@ public abstract partial class Ability : Node3D
 		}
 
 		float scale = speedScale > 0f ? speedScale : AnimSpeedScale;
-		return FindInOwner<UnitAnimator>()?.PlaySkillAnimation(animationName, scale) ?? string.Empty;
+		_playedAnimator = FindInOwner<UnitAnimator>();
+		string played = _playedAnimator?.PlaySkillAnimation(animationName, scale) ?? string.Empty;
+		_animationPlaybackId = played.Length > 0 ? _playedAnimator!.SkillPlaybackId : 0;
+		return played;
 	}
 
 	/// <summary>

@@ -26,6 +26,7 @@ namespace ActRoguelike.Abilities;
 /// </summary>
 public partial class LandingBurstAbility : Ability
 {
+	protected override bool OccupiesAction => false;
 	[ExportGroup("落地那一圈额外攻击")]
 	/// <summary>**上游技能行 Id**（下落攻击那一行，例如 `skl_b1_fall`）。它落地时本被动出手。</summary>
 	[Export] public string TriggerAbilityId { get; set; } = string.Empty;

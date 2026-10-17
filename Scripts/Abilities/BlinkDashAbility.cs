@@ -95,6 +95,7 @@ public partial class BlinkDashAbility : Ability
 
 	protected override void OnActivate(Unit? target)
 	{
+		_linger = 0;
 		if (OwnerUnit == null || Movement == null)
 		{
 			Cancel();
@@ -231,8 +232,8 @@ public partial class BlinkDashAbility : Ability
 
 	protected override void OnFinishOrCancel()
 	{
-		RestorePierce();
-		_hitbox?.Deactivate();
+		EndDash();
+		if (_linger <= 0) _path?.HidePath();
 	}
 
 	protected override void OnLoadoutReset()
@@ -244,12 +245,7 @@ public partial class BlinkDashAbility : Ability
 
 	public override void _ExitTree()
 	{
-		RestorePierce();
-		if (_invulnerableOwned && OwnerUnit != null && IsInstanceValid(OwnerUnit))
-		{
-			OwnerUnit.IsInvulnerable = false;
-		}
-
+		EndDash();
 		_path?.HidePath();
 		base._ExitTree();
 	}

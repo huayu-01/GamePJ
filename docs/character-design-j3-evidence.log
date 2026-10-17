@@ -1,0 +1,136 @@
+Debug 编译：0 warning / 0 error
+design_headless 退出码=0
+design_headless stderr字节=0
+design_render 退出码=0
+design_render stderr字节=0
+[Action] PASS 真实右键进入蓄力
+[Action] PASS 后来左键打断右键蓄力，旧动作结束
+[Action] PASS 已起手的右键被打断后进入原有冷却
+[Action] PASS 旧右键松手不补发：左=10，右=0
+[Action] PASS 真实Dodge开启无敌和自身朝向锁
+[Action] PASS 新动作打断后撤并清理无敌、朝向锁
+[Action] PASS 第二单位真实快速动画ATK已发射
+[Action] PASS 其他单位同名ATK不能触发慢动画技能：慢单位伤害快照=0
+[Action] PASS 前摇锁定配置写盘
+[Action] PASS 强类型前摇配置实际读回
+[Action] PASS 0.5倍动画前摇：动画时间=0.115s，剩余锁定=0.085s
+[Action] PASS 前摇内拒绝新动作且不消耗其冷却
+[Action] PASS 动画时间0.2s后解锁
+[Action] PASS 前摇结束后真实左键成功打断
+[Action] PASS 2倍动画提前解锁：动画时间=0.2s
+[Action] PASS 加速后锁定随动画时间轴缩短
+[Action] PASS 全程不可打断例外拒绝新动作
+[Action] PASS 禁用仍能清理不可打断状态
+[Action] PASS 同单位同名动画的另一轮播放也不能串ATK
+[Action] PASS 旧技能收尾不停止不属于自己的动画
+[Action] PASS 后台眼与前台蓄箭并用
+[Action] PASS 后撤打断蓄箭，后台眼保留
+[Action] PASS 飞镰刀已经离手，不占动作
+[Action] PASS 架势与离手镰刀并用
+[Action] PASS 回手收尾不取消架势或停止其动画
+[Action] PASS 真实闪已进入冲刺与配置的无敌
+[Action] PASS 架打断闪：冲刺、无敌和临时碰撞状态全部清理
+[Action] PASS 中断后0.1秒无残留冲刺位移：0m
+[Action] PASS 同帧先左键后Q，最后Q持有动作
+[Action] PASS 同帧先Q后左键，最后左键持有动作
+[Action] PASS 左键保持按住，原CD已结束，右键正在蓄力
+[Action] PASS 重复的按住事件不能当作新按下打断动作
+[Action] PASS 同名新播放回到0：0.01449→0
+[Action] PASS 打断后的冷却保留原技能数值
+[Action] PASS 冷却中请求不能打断当前动作
+[Action] PASS 禁用技能请求不能打断当前动作
+[Action] PASS 死亡清理前，真实后撤已持有无敌状态
+[Action] PASS 拥有者死亡取消前台动作并清理无敌、朝向锁
+[Action] === 动作交接验收结束：通过 38，失败 0 ===
+[Action] PASS 真实右键进入蓄力
+[Action] PASS 后来左键打断右键蓄力，旧动作结束
+[Action] PASS 已起手的右键被打断后进入原有冷却
+[Action] PASS 旧右键松手不补发：左=10，右=0
+[Action] PASS 真实Dodge开启无敌和自身朝向锁
+[Action] PASS 新动作打断后撤并清理无敌、朝向锁
+[Action] PASS 截图j3_interrupt_dodge
+[Action] PASS 第二单位真实快速动画ATK已发射
+[Action] PASS 其他单位同名ATK不能触发慢动画技能：慢单位伤害快照=0
+[Action] PASS 前摇锁定配置写盘
+[Action] PASS 强类型前摇配置实际读回
+[Action] PASS 0.5倍动画前摇：动画时间=0.115s，剩余锁定=0.085s
+[Action] PASS 前摇内拒绝新动作且不消耗其冷却
+[Action] PASS 动画时间0.2s后解锁
+[Action] PASS 前摇结束后真实左键成功打断
+[Action] PASS 截图j3_windup_unlock
+[Action] PASS 2倍动画提前解锁：动画时间=0.2s
+[Action] PASS 加速后锁定随动画时间轴缩短
+[Action] PASS 全程不可打断例外拒绝新动作
+[Action] PASS 禁用仍能清理不可打断状态
+[Action] PASS 同单位同名动画的另一轮播放也不能串ATK
+[Action] PASS 旧技能收尾不停止不属于自己的动画
+[Action] PASS 后台眼与前台蓄箭并用
+[Action] PASS 后撤打断蓄箭，后台眼保留
+[Action] PASS 飞镰刀已经离手，不占动作
+[Action] PASS 架势与离手镰刀并用
+[Action] PASS 回手收尾不取消架势或停止其动画
+[Action] PASS 真实闪已进入冲刺与配置的无敌
+[Action] PASS 架打断闪：冲刺、无敌和临时碰撞状态全部清理
+[Action] PASS 中断后0.1秒无残留冲刺位移：0m
+[Action] PASS 同帧先左键后Q，最后Q持有动作
+[Action] PASS 同帧先Q后左键，最后左键持有动作
+[Action] PASS 左键保持按住，原CD已结束，右键正在蓄力
+[Action] PASS 重复的按住事件不能当作新按下打断动作
+[Action] PASS 同名新播放回到0：0.01438→0
+[Action] PASS 打断后的冷却保留原技能数值
+[Action] PASS 冷却中请求不能打断当前动作
+[Action] PASS 禁用技能请求不能打断当前动作
+[Action] PASS 死亡清理前，真实后撤已持有无敌状态
+[Action] PASS 拥有者死亡取消前台动作并清理无敌、朝向锁
+[Action] === 动作交接验收结束：通过 40，失败 0 ===
+original_headless 退出码=0
+original_headless stderr字节=0
+original_render 退出码=0
+original_render stderr字节=0
+[Design] === 原始设计验收结束：通过 115，失败 0 ===
+[Design] === 原始设计验收结束：通过 120，失败 0 ===
+selftest 退出码=0
+selftest stderr字节=0
+[基线逐字一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[基线逐字一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[基线逐字一致] [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[基线逐字一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4（期望 **P6b 后 6/2/10/1/1/39/7/14/8/5/6/11/4**；只打印、不比对。P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[基线逐字一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[基线逐字一致] [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[基线逐字一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[基线逐字一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+f 退出码=0
+f stderr字节=0
+[Followup] === F专项验收结束：通过 33，失败 0 ===
+c 退出码=0
+c stderr字节=0
+[BatchC] === C批验收结束：通过 52，失败 0 ===
+d 退出码=0
+d stderr字节=0
+[BatchD] === D批验收结束：通过 90，失败 0 ===
+g 退出码=0
+g stderr字节=0
+[Feedback] === G专项验收结束：通过 51，失败 0 ===
+characters 退出码=0
+characters stderr字节=0
+[CharacterReplacement] 完成：通过 61，失败 0
+b 退出码=0
+b stderr字节=0
+[BatchB] === B 批验收结束：通过 74，失败 0 ===
+a 退出码=0
+a stderr字节=0
+[BatchA] === A 批验收结束：失败 0 ===
+e 退出码=0
+e stderr字节=0
+[BatchE] === E 批验收结束：通过 39，失败 0 ===
+memory 退出码=0
+memory stderr字节=0
+跨进程读档5/0
+ExportRelease 编译：0 warning / 0 error
+截图 docs/screenshots/j3_interrupt_dodge.png SHA256=5FB15BAC6B28981CFB5424BFBBF1B18535296743FA6EDB5E751A82EA2379D6AA
+截图 docs/screenshots/j3_windup_unlock.png SHA256=18AA60CD7406C8F0EE5F9491D76217D71938E11B7BBB54DCEFB7D57766FB80CB
+存档 meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+selftest.flag 不存在=True

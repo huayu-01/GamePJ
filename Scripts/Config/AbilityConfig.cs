@@ -57,6 +57,9 @@ public partial class AbilityConfig : ConfigRow
 	[Export] public bool IsBackground { get; set; }
 	[Export] public bool HoldToMaintain { get; set; }
 	[Export] public float MaintainStartupSeconds { get; set; }
+	[ExportGroup("动作打断（前摇锁定使用动画时间轴）")]
+	[Export] public bool CanBeInterrupted { get; set; } = true;
+	[Export] public float InterruptLockSeconds { get; set; }
 
 	[ExportGroup("连招（P4：近战武技1 的「每段一段动画」；只有 MeleeComboAbility 读它）")]
 	/// <summary>
@@ -204,6 +207,8 @@ public partial class AbilityConfig : ConfigRow
 		ability.IsBackground = IsBackground;
 		ability.HoldToMaintain = HoldToMaintain;
 		ability.MaintainStartupSeconds = MaintainStartupSeconds;
+		ability.CanBeInterrupted = CanBeInterrupted;
+		ability.InterruptLockSeconds = Mathf.Max(0, InterruptLockSeconds);
 		ability.AnimName = AnimName;
 		ability.AnimEvent = AnimEvent;
 		ability.AnimEventEnd = AnimEventEnd;
