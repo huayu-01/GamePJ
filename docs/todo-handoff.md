@@ -2,7 +2,7 @@
 
 ## J9：龙之箭蓄力阈值大箭 + 全穿透（2026-10-17，已完成）
 
-交接单「下一步顺序」第3条已兑现：[J9验收与边界](character-design-j9.md)、[完整输出](character-design-j9-evidence.log)。`Weapon.cs`／7个共用`Ability`子类／敌人·首领·召唤物行与技能行**一个字没动**；`ConfigIndex.tres`**没有改**（不增删行）。
+交接单「下一步顺序」第3条已兑现：[J9验收与边界](character-design-j9.md)、[完整输出](character-design-j9-evidence.log)。`Weapon.cs`／**其余 6 个**共用`Ability`子类／敌人·首领·召唤物行与技能行**一个字没动**；`ConfigIndex.tres`**没有改**（不增删行）。⚠️ 本批唯一碰到的共用子类是 **`ArrowVolleyAbility`（弓／短弩共用）**，且**只加不删**：3 个`[Export]`（默认全 0）＋公开方法`ConfigureChargedShot`＋松手快照字段＋`FireVolley`里一段「阈值≤0 一行不进」的分支；既有分支语义零改动（独立回归`_ChargeReleaseProbe`80/0、`_CharacterDesignProbe`115/0 逐字不变）。
 
 病根：`evo_dragon_arrow` 的`ApplyHandler`是`AbilityOverride`，参数只有`AbilityId=skl_a3_w1_1`＋`ChargeMaxSeconds=3.0`——原文后半「蓄力2秒后射出的箭更大且附带全穿透」**代码里不存在**，而且它不是纯数据能表达的（要按松手时长切换弹型=新行为），旧处理器还走`Godot.Set`字符串反射。
 

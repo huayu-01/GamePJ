@@ -1,7 +1,10 @@
 # 原始设计纠偏J9：龙之箭（蓄力阈值 → 更大 + 全穿透，按松手冻结、真实释放 ATK 发射）
 
 2026-10-17 执行交接单「下一步顺序」第 3 条。**加了一条强类型资源列、一个 handler、一个技能类的三个字段**，
-`Weapon.cs`、7 个共用 `Ability` 子类、敌人·首领·召唤物的数据行与技能行**一个字都没动**；
+`Weapon.cs`、**其余 6 个**共用 `Ability` 子类、敌人·首领·召唤物的数据行与技能行**一个字都没动**；
+本批唯一碰到的共用子类是 **`ArrowVolleyAbility`（弓／短弩共用）**，而且**只加不删**：
+3 个 `[Export]`（阈值/尺寸/穿透，默认全 0）＋ 1 个公开方法 `ConfigureChargedShot` ＋ 1 个松手快照字段
+＋ `FireVolley` 里一段"阈值 ≤0 一行都不进"的分支 —— 既有分支的语义零改动（见下面的验收与回归读数）。
 `ConfigIndex.tres` **没有改**（本批不增删行）。Debug 与 ExportRelease 均 0 警告／0 错误；
 专项探针 **42/0**、Main 自测退出码 0、stderr 0 字节；8 条硬指标与改前逐字一致；四存档 SHA256 跑前＝跑后＝交接点；
 `selftest.flag` 不存在。[完整输出](character-design-j9-evidence.log)。
@@ -215,6 +218,16 @@ ChargedShot  = ChargedShotTuning{ TargetAbility=skl_a3_w1_1, MaxChargeSeconds=3,
 6. **表行 `ApplyHandler` 从 `AbilityOverride` 换成了 `ChargedShot`**（蓄力上限 3 秒挪进强类型资源，
    所以那一行不再需要字符串反射）。P5b 的 SelfTest 覆盖行仍 ✅（它读的还是 `ChargeMaxSeconds == 3`），
    `docs/upgrades.md` 的处理器表已同步（`AbilityOverride` 服务 7 条 → 6 条）。
+6b. ⚠️ **本批动了 `ArrowVolleyAbility`（弓／短弩共用）** —— 交接单硬性要求写的是"不许碰 7 个共用 `Ability` 子类
+   （要复用就调用公开方法）"。这条要求没有替代方案能实现"**按松手时长切换弹型**"：
+   弹型（尺寸 / 穿透预算）是在 `FireVolley` 造 `AttackInstance` 那一刻决定的，
+   而"这一发算不算大箭"只有那个类拿得到（`_releasedChargeSeconds` 就在它自己手里），
+   `Weapon.cs` / 增幅规则 / `Projectile` 都拿不到这个时刻。所以本批的选择是**只加不删 + 默认关死**：
+   新增 3 个 `[Export]`（默认全 0）、1 个公开方法、1 个快照字段、`FireVolley` 里 1 个分支，
+   既有表达式一个没改（`shotPierce` / `shotSize` 在阈值 ≤0 时逐字等于原式）。
+   证据：`_ChargeReleaseProbe` 80/0、`_CharacterDesignProbe` 115/0 与历史基线**逐字一致**。
+   若用户认为这一条必须完全不碰该类，需要另外立一条"技能发射事件"的通路（那要改 `Ability.cs` 基类，
+   同样是共用类）——请裁定。
 7. **探针取样的物理粒度**：`Settle` 之外，"箭停在墙里"读的是**撞击前一物理帧**的位置
    （探针在树里排在投射物之前；`Projectile` 撞击前已经被推到墙体内 8.2339）。
    这已经是这一套只读接口能给到的最细读数，没有为此给 `Projectile` 加任何新状态。
