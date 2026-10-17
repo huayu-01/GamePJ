@@ -1,5 +1,42 @@
 # 交接文档：待办任务与项目约定
 
+## J11：符文系统（哈迪斯信物 = 一个效果 + 解锁一批增幅前置）（2026-10-18，已完成）
+
+用户定义（原话）：「就是哈迪斯那样的……携带了这个东西之后，会产生些效果，比如雷之印，这个效果就是最大生命值受限，
+仅此而已，然后新增的增幅里，有一些它是有前置，要求雷之印，所以携带了这个雷之印等于满足它们的前置要求」。
+六个提交：**① 表+类 / ② ConfigIndex / ③ 施效 / ④ 前置对接 / ⑤ 携带入口 / ⑥ 探针+文档**。
+契约见 [rune-system.md](rune-system.md)，交付/读数/边界见 [character-design-j11.md](character-design-j11.md)，
+完整输出 [character-design-j11-evidence.log](character-design-j11-evidence.log)。
+`Weapon.cs`／7个共用`Ability`子类／敌人·首领·召唤物行与技能行**一个字没动**；`project.godot`**没动**。
+
+**①表**：新 `Config/Tables/Runes/rune_*.tres` **11 行**（原文就 11 条，用户说的"12 个装备位"第 12 条缺内容，等给）。
+`RuneConfig : RewardConfig` + `UnlocksRequires`（`Array<string>`，architecture 第 12 条）+ `IconPath`（占位，UI 下一批）。
+值全部按用户的"限制必然要够大"：雷之印 **30**／战神印 **×4**／风之印 **×1.5**／死铠 20+每10杀1甲+禁疗／行军 ×2／
+生死 1次+30%／大力符 ×1.2／飞翼 ×1.3+×0.8／狙神 3m×0.5→15m×1.5／巨人 10%／小精灵 5s/8m/20 伤害。行 `Note` 逐条写"文档为 {n}"。
+**②ConfigIndex**：11 条 `ext_resource`（id 283…293）+ `Runes` 数组 + `load_steps 197→208`；备份 `F:\Godot项目\_refactor_backup\ConfigIndex.tres.p12before`。
+**索引串 13 → 14 个数**（`6/2/10/1/1/39/7/14/8/5/6/11/4/11`），前 13 个数字一位没动；`[Config] 配置表：…` 总览行**刻意没加符文**（8硬指标之一）。
+**③施效**：6 枚纯数值走**既有** `StatSet`（零新代码）；5 枚用一个新处理器 `RuneEffect`（`Armor`/`ArmorPerKills`/`DeathAvoid`/`Near…FarScale`/`MaxHealthDamageRatio`/`Pixie…`，有哪个键做哪件事）。
+StatSheet 四个新键：`MaxHealthCap`（0=不夹）/`IncomingDamageMultiplier`（1）/`MaxFallSpeedMultiplier`（1）/`HealMultiplier`（1，**0=禁疗**）。
+新口子两个：`IDeathAvoid`（`ReceiveHit` 的致命判定处）、`IOutgoingDamageBonus`（`RollHit` 的 `+flat`）。**全部"只加不删、没配置时逐位不变"**。
+**④前置**：`RewardPool.HasPrerequisites` 改调 `RunBuild.SatisfiesPrerequisite` = `StacksOf>0` **或** 携带符文的解锁名单；
+名单同时含符文行 Id 与派系名，所以表里两种写法都行。符文**不进** `_stacks`，所以不影响互斥、不进 HUD 构筑列表。
+**⑤入口**：`RuneCarry`（`user://rune.cfg`，**独立文件**所以四个既有存档 SHA256 基线不动）+ `RunController.SetCarriedRune(id)` + `ApplyCarriedRune`（在 `ApplyBalance` 的 `_loadout.Apply` **之后**）。**没有 UI**。
+
+实测（新 `_RuneProbe`，真玩家+真表行+真结算）**83/0**：⭐**雷之印 220→30**、⭐**战神印同样10点伤害 7→28（正好4倍）**、
+风之印冷却 0.3→0.45s、死铠 甲 20→40 且 `Heal(50)=0`、第10杀 40→41、生死 999致命伤→活下来回到30、狙神 1.5m×0.5/9m×1.0/20m×1.5、
+巨人 `RollHit` 10→32、小精灵 7.5s 内出手1次打20 且**不在任何单位分组**。
+⭐**前置**用真实 `RewardPool.Initialize`+`Roll`：不带符文两条 `Requires=[雷之印]/[战神刻印]` 探针行都不进池；
+带雷之印 27→28（正好+1，战神那条仍不进）；带战神印 27→28（雷那条仍不进）；探针后目录恢复 62 条。
+⚠️ **真实表里 0 条增幅的 `Requires` 命中这三个派系** —— 那 21 条"特化增幅"属于后续批次，**没建**（启动日志逐枚打「（暂无增幅以此为前置）」如实留痕）。
+
+验收：双构建 **0/0**；回归 `_ChargeReleaseProbe` **80/0**、`_CharacterDesignProbe` **115/0**、`_DragonArrowProbe` **42/0**、`_BowSweepProbe` **23/0**（期望值一个字节没改）；
+Main 退出码 **0**、8 硬指标**只有索引串**按预期变 14 个数（其余 7 条逐字一致）；四存档 SHA256 跑前=跑后=交接点；`selftest.flag` 与 `rune.cfg` 跑完都不存在。
+
+⚠️ 等用户裁定 / 没做：(1) **"12 个装备位 vs 原文 11 条"**（第 12 条内容缺）；(2) **预设值**：死铠 20/10杀、生死 1次、狙神远端 ×1.5+3m/15m、小精灵 20/8m、飞翼 ×1.3/×0.8；
+(3) **飞翼的"下落攻击下落速度"未实现**（要动 `FallAttackAbility`，本批禁止）；(4) **小精灵没有模型/动画**（自发光小球占位）；
+(5) **符文选择 UI 没做**（基地交互物/面板/图标）；(6) **`快乐小子` 的"奔跑穿透 + 角色虚化"** 不在本批范围；
+(7) 将来要"多装备位"，只需把 `RuneCarry` 从单值改数组 + `SetRuneUnlocks` 收并集，**判定层不用改**。
+
 ## J10：弓的蓄力档位（0.3s / 基础1+后置3=4档）＋ 弹速下调 ＋ 快弹不漏怪（2026-10-17，已完成）
 
 用户裁定：「弓这里的倍率确实过高了，蓄力的档位有问题，这里的间隔应该是 0.3 我填成 0.1 了，另外是弹速过快导致能漏怪的，考虑拉长碰撞体的同时，降低整体弹速，太快的弹速在每次发射前加入射线的检测；」＋「基础蓄力不要让后续蓄力也同时生效……弓的武技1，实际是 3 档」＋「基础蓄力 + 3 个后置档 = 总共 4 个威力档」＋「伤害的增长不是……而是 30+30+30+30 这么算」。四个独立提交：[J10验收与边界](character-design-j10.md)、[完整输出](character-design-j10-evidence.log)。`Weapon.cs`／其余 6 个共用`Ability`子类／敌人·首领·召唤物行与技能行**一个字没动**；`ConfigIndex.tres`**没有改**（不增删行）。

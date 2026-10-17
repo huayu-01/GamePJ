@@ -22,6 +22,23 @@
 | **② 互斥** | 双向：候选排斥已拥有 / 已拥有排斥候选 | `RewardConfig.Excludes`（双向）、`ConflictsWith`（单向） | `Excludes` / `ConflictsWith` | `RewardPool.IsExcluded` + `Roll` 里的 `ConflictsWith` 循环 | **每次抽取** |
 | **③ 前置** | `Requires` 里的 Id **全部**已拥有 | `RewardConfig.Requires` | `RewardDefinition.Requires` | `RewardPool.HasPrerequisites` ← `RewardPool.Roll` | **每次抽取** |
 
+> ### ⭐ 前置现在有**两个来源**（J11 起）：增幅「已拥有」 + **当前携带的符文**
+>
+> 用户 2026-10-17 澄清符文（哈迪斯信物）：「携带了这个雷之印等于满足它们的前置要求」。
+> 落地方式只有一处改动 —— `RewardPool.HasPrerequisites` 改调
+> **`RunBuild.SatisfiesPrerequisite(id)`** = `StacksOf(id) > 0` **或** 该 Id 在当前符文的解锁名单里：
+>
+> | 来源 | 谁写进去 | 读取点 |
+> |---|---|---|
+> | ① **已拥有的增幅**（改动前唯一来源） | `RunBuild.Add` / `DebugGrantWithoutApplying` | `StacksOf(id) > 0` |
+> | ② **当前携带的符文**（J11） | `RunBuild.SetRuneUnlocks` ← `RunController.ApplyCarriedRune` | `_runeUnlocks.Contains(id)` |
+>
+> 名单里同时放**符文行 Id**（`rune_lei_seal`）与行上 `UnlocksRequires` 的**派系名**（`雷之印`），
+> 所以表里两种写法都能用。⚠️ 符文**不进** `_stacks`：它不影响互斥（`Excludes`）、
+> 也不出现在 HUD 的构筑列表里 —— 它只满足**前置**这一层。
+> **不携带任何符文时名单为空 → 判定退化成 `StacksOf(id) > 0`，逐位不变**。
+> 契约见 [rune-system.md](rune-system.md) §4。
+
 **为什么限定在进池时判、互斥/前置在抽取时判**：用户 C2 的原话是「池里一开始有什么，应该在**进入关卡初始化的时候**就判断好的」——
 角色与武器在那一刻就定了，所以候选集合只建一次（`RunController.InitializePool`，调用点唯一）。
 而"你现在已经有什么"是每局的，天然必须每次算。
@@ -89,6 +106,10 @@
 | **`MarkedBonus` 处理器 + `MarkedBonusRule`**（**J8 新增**，服务「发散」「心眼」两条行） | 命中给目标叠「标记」，并按**这一击命中之前**目标身上已有的层数放大**自己**造成的伤害：`StatusId` / `Duration` / `FlatBonus`（心眼 0.5）/ `PerStackBonus`（发散 0.1 = 预设 N）。来源过滤全在表上：**加标来源** = `RequiredEventAbility`（「发散」=<c>skl_a1_w1_1</c>、「心眼」=<c>skl_a3_w1_1</c>），**加伤来源** = 新列 `BonusAgainstAbility`（「发散」只提高波波；「心眼」留空 = 玩家的各种伤害）。消费者是 **`AttackInstance.RollHit` 里那次 `IOutgoingDamageScale` 查询**（所以"第一次加标这一击不加伤"是顺序保证的，不是特例判断） | 2 条 |
 | **`ChargedShot` 处理器 + `ChargedShotTuning` 资源列**（**J9 新增**，服务「龙之箭」） | **松手时蓄力 ≥ 阈值 → 这一发更大 + 额外穿透 N 个**（判定在`ArrowVolleyAbility.OnChargeReleased`**冻结**，`FireVolley` 只读快照；发射仍只由释放段的真实 `ATK` 事件帧触发）。参数全在强类型资源里：`TargetAbility`（资源引用）/ `MaxChargeSeconds` / `MaxSteps`（0=不限，填 15 = "2 秒后不再加档"）/ `ThresholdSeconds` / `SizeScale` / `PierceCount`。接线走公开强类型方法 `ArrowVolleyAbility.ConfigureChargedShot`，**没有 `Godot.Set` 字符串反射** | 1 条 |
 | **`RampMaxCount` / `RampWindowSeconds`**（P5b 新增） | `ArrowVolleyAbility.FireVolley`：连续射击第 N 发时发数至少 N（「变奏」） | 0 / 0（= 一行不进） |
+| **`RuneEffect` 处理器 + `RuneRules.cs` 的 5 个规则类**（**J11 新增**，服务 5 枚"需要一个行为"的符文行） | 符文（开局携带的信物）**分两半**：`Modifiers` 走与 `StatSet` 同一段代码，`HandlerParams` 里**有哪个键就做哪件事** —— `Armor`（立刻加甲）/ `ArmorPerKills`+`ArmorPerTrigger`（每 N 杀加甲）/ `DeathAvoid`+`DeathAvoidHealFraction`（死亡避免）/ `NearRange`…`FarScale`（按距离加伤）/ `MaxHealthDamageRatio`（按最大生命值加伤）/ `PixieIntervalSeconds`…（轨道小精灵）。⚠️ 纯数值的符文（雷之印/战神印/风之印/行军/大力符/飞翼）**不用它**，直接 `StatSet` | 5 条符文行 |
+| **StatSheet 新键 `MaxHealthCap` / `IncomingDamageMultiplier` / `MaxFallSpeedMultiplier` / `HealMultiplier`**（**J11 新增**） | 生命上限**硬夹**（0=不夹，`Unit.RefreshStats`）/ 受到的伤害倍率（1=不变，`Unit.ReceiveHit`）/ 正常下落速度上限（1=不变，`CharacterMovement`）/ 治疗量倍率（1=不变，**0 = 禁疗**，`Unit.Heal`） | 0 / 1 / 1 / 1（= 改动前） |
+| **`IOutgoingDamageBonus` + `Unit.OutgoingDamageBonusAgainst`**（**J11 新增**） | 攻击者侧的**扁平加伤**口（「巨人」符文）：`AttackInstance.RollHit` 里在既有的 `IOutgoingDamageScale` 倍率**之后**加一项；走倍率口会被暴击一起放大，所以单开一个口。没有登记时 `+0f`（`x + 0f == x`） | 无实现方 → 恒 0 |
+| **`IDeathAvoid` + `Unit.AddDeathAvoid`**（**J11 新增**） | **致命伤无效化**（「生死」符文）：钩子在 `Unit.ReceiveHit` 的 `bool killed` 之后、`result` 构造之前（`Damaged` 事件抛得太晚，拦不住 `Die`） | 无实现方 → 那一段 `if` 不进 |
 | **`GameplayEventKind.Parried`**（P5b 新增的事件种类） | 抛点唯一：`GuardStanceAbility.OnOwnerHit`（架住那一刻）。订阅方：招架反击 / 能量护盾 | 没有订阅者时 `Raise` 什么也不做 |
 
 ⚠️ **新增键必须有基础值**（`Unit.SeedStats`）+ 读取端"读到 0 就按中性值算"的双保险 ——

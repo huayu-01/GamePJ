@@ -1,0 +1,180 @@
+# J11 符文系统 · 完整验收输出（2026-10-18）
+
+> 本文件由真实运行日志拼成（_RuneProbe / 四个回归探针 / Main 自测 / 双构建 / 存档哈希）。
+> 口径与结论见 [character-design-j11.md](character-design-j11.md)；系统契约见 [rune-system.md](rune-system.md)。
+
+## 1. 双构建（同一个 shell：先 build.ps1，再 ExportRelease）
+
+```
+=== DEBUG BUILD (build.ps1) ===
+已成功生成。
+
+    0 个警告
+
+    0 个错误
+
+=== EXPORT RELEASE BUILD ===
+已成功生成。
+
+    0 个警告
+
+    0 个错误
+```
+
+## 2. 专项 _RuneProbe（83/0）
+
+```
+[RuneProbe] PASS ① 符文表读到 11 枚（期望 11 = 文档《后续构筑.txt》的 11 条）
+[RuneProbe] PASS ① 11 个 Id 全在表里（缺 0 个）
+[RuneProbe] PASS ① 每条 ApplyHandler 都已注册（未注册 0 条）
+[RuneProbe] PASS ① 雷之印的 UnlocksRequires = [雷之印]（期望 雷之印）
+[RuneProbe] PASS ① 战神印的 UnlocksRequires = [战神刻印]（期望 战神刻印）
+[RuneProbe] PASS ① 风之印的 UnlocksRequires = [风之印]（期望 风之印）
+[RuneProbe] PASS ① 其余 8 枚不解锁前置（实测 8 枚为空）
+[RuneProbe] INFO ① 符文表清单：rune_lei_seal（雷之印）StatSet｜解锁 [雷之印]；rune_war_seal（战神印）StatSet｜解锁 [战神刻印]；rune_wind_seal（风之印）StatSet｜解锁 [风之印]；rune_death_armor（死铠）RuneEffect｜解锁 []；rune_march（行军）StatSet｜解锁 []；rune_life_death（生死）RuneEffect｜解锁 []；rune_strength_talisman（大力符）StatSet｜解锁 []；rune_flying_wing（飞翼）StatSet｜解锁 []；rune_sniper（狙神）RuneEffect｜解锁 []；rune_giant（巨人）RuneEffect｜解锁 []；rune_pixie（小精灵）RuneEffect｜解锁 []
+[RuneProbe] PASS ② 开局没有携带符文（CarriedRuneId「」）
+[RuneProbe] PASS ② 前置解锁名单为空（（没有携带符文））
+[RuneProbe] PASS ② 玩家生命 220（期望 220 = 角色 200 + 元进度 20，与加符文之前逐字一致）
+[RuneProbe] PASS ② 玩家初始护甲 20（期望 20）
+[RuneProbe] PASS ② 玩家移速 6.5（期望 6.5）
+[RuneProbe] PASS ② 七条乘区全是中性值 1（实测 1 / 1 / 1 / 1 / 1 / 1 / 1）
+[RuneProbe] PASS ② 生命上限夹子 0（期望 0 = 不夹）
+[RuneProbe] PASS ② 玩家身上 0 条死亡避免规则（实测 0）
+[RuneProbe] PASS ② 玩家身上 0 个符文规则节点（实测 0）
+[RuneProbe] PASS ② 基线受击：10 点伤害 → 最终 7（= 10 × (1 − 护甲减伤 30%)，玩家身上没有任何符文加成；这个 7 就是后面「战神印 4 倍」的对照值）
+[RuneProbe] PASS ② 真实增幅项目录 62 条（期望 62 = 9/23/30，符文**不进**这张表）
+[RuneProbe] PASS ② 猎手+弓 的候选池 35 条（不带符文时的基线）
+[RuneProbe] PASS ③ SetCarriedRune 返回「rune_lei_seal」（期望 rune_lei_seal）
+[RuneProbe] PASS ③ 运行期字段 CarriedRuneId = 「rune_lei_seal」
+[RuneProbe] ⭐ ③ **雷之印**：玩家最大生命值 220 → 30；当前生命 30
+[RuneProbe] PASS ③ 雷之印：最大生命值从 220 变成 30（期望 30 —— 用户确认「真的限制为 30」）
+[RuneProbe] PASS ③ 雷之印：当前生命被同时夹到 30（不会留在 220）
+[RuneProbe] PASS ③ StatSheet 的 MaxHealthCap = 30（期望 30）
+[RuneProbe] PASS ③ 前置解锁名单 [rune_lei_seal、雷之印]（同时含派系名与符文行 Id）
+[RuneProbe] PASS ③ 雷之印只解锁一条前置
+[RuneProbe] PASS ③ 摘下雷之印后生命上限回到 220（期望 220）
+[RuneProbe] PASS ③ 摘下后前置解锁名单被清空（（没有携带符文））
+[RuneProbe] PASS ④ SetCarriedRune 返回「rune_war_seal」（期望 rune_war_seal）
+[RuneProbe] ⭐ ④ **战神印**：暴击率加成 0.27 → 0.37（+0.1）；受击倍率 ×4；同样 10 点伤害的最终伤害 7 → 28（比值 4）
+[RuneProbe] PASS ④ 战神印：暴击率加成 +0.1（期望 +0.1 = 10%）
+[RuneProbe] PASS ④ 战神印：受击倍率 ×4（期望 ×4 = 「受到伤害增加 300%」）
+[RuneProbe] PASS ④ 战神印：同一次 10 点伤害 → 最终 28，正好是不带符文时 7 的 4 倍（期望 4）
+[RuneProbe] PASS ④ 战神印：挨了这一下还活着（生命 212）
+[RuneProbe] PASS ④ 摘下后受击倍率回到 ×1
+[RuneProbe] PASS ⑤ 风之印：技能 1 实际冷却 0.3s → 0.45s（×1.5，期望 ×1.5 = +50%）
+[RuneProbe] PASS ⑤ 行军：移速倍率 ×2（期望 ×2 = +100%）
+[RuneProbe] PASS ⑤ 大力符：伤害倍率 ×1.2（期望 ×1.2 = +20%）
+[RuneProbe] PASS ⑤ 飞翼：起跳 ×1.3（期望 ×1.3）/ 正常下落上限 ×0.8（期望 ×0.8）
+[RuneProbe] PASS ⑤ 飞翼：真实起跳速度 16.9 m/s（角色行固定值 13 × 1.3 = 16.9；「下落攻击的下落速度」那一半本批**未实现**，见行 Note）
+[RuneProbe] PASS ⑤ 死铠：护甲 20 → 40（期望 +20 = 40）
+[RuneProbe] PASS ⑤ 死铠：治疗倍率 ×0（期望 0 = 无法恢复生命值）
+[RuneProbe] PASS ⑤ 死铠：真实调用 Heal(50) 恢复 0 点（期望 0）
+[RuneProbe] PASS ⑤ 死铠：击杀加甲规则挂上了（击杀加甲规则：每 10 杀 +1 甲｜已击杀 0 · 已加甲 0 次）
+[RuneProbe] PASS ⑤ 死铠：9 杀之后护甲 40（还不到 10 杀，期望不变 = 40）
+[RuneProbe] PASS ⑤ 死铠：第 10 杀 → 护甲 40 → 41（期望 +1）；规则读数：击杀加甲规则：每 10 杀 +1 甲｜已击杀 10 · 已加甲 1 次
+[RuneProbe] PASS ⑤ 摘下后治疗倍率 1 / 移速 1（期望都回到 1）
+[RuneProbe] PASS ⑥ 不携带符文：两条 Requires 探针行**都不进池**（前置未满足 → 根本不出现）
+[RuneProbe] PASS ⑥ 不携带符文时可用候选 27 条（两条探针已被前置拦掉）
+[RuneProbe] PASS ⑥ ⭐ 携带雷之印：`Requires = [雷之印]` 的增幅**进了候选池**（= 用户那句「携带了这个雷之印等于满足它们的前置要求」）
+[RuneProbe] PASS ⑥ 携带雷之印：`Requires = [战神刻印]` 的那条**仍然不进**（派系不串）
+[RuneProbe] PASS ⑥ 携带雷之印让可用候选 27 → 28（正好多 1 条）
+[RuneProbe] PASS ⑥ ⭐ 携带战神印：`Requires = [战神刻印]` 的增幅进了候选池
+[RuneProbe] PASS ⑥ 携带战神印：`Requires = [雷之印]` 的那条仍不进
+[RuneProbe] PASS ⑥ 携带战神印让可用候选 27 → 28（正好多 1 条）
+[RuneProbe] ⭐ ⑥ 前置解锁实测：不携带 27 条 → 雷之印 28 条（多 probe_lei_gated）→ 战神印 28 条（多 probe_war_gated）
+[RuneProbe] PASS ⑥ 探针结束后运行期目录恢复成 62 条（期望 62，没有残留探针行）
+[RuneProbe] PASS ⑦ 狙神：按距离加伤规则挂上了（按距离加伤规则：3m ×0.5 → 15m ×1.5｜最近一次：距离 -1m → ×1）
+[RuneProbe] PASS ⑦ 狙神：1.5m → ×0.5（期望 ×0.5 = 文档「近距离只有 50%」）
+[RuneProbe] PASS ⑦ 狙神：9m → ×1（期望 ≈×1.0，线性插值中点）
+[RuneProbe] PASS ⑦ 狙神：20m → ×1.5（期望 ×1.5 = 远端预设值）
+[RuneProbe] PASS ⑦ 巨人：按最大生命值加伤规则挂上了（最大生命值加伤规则：×0.1｜最近一次额外伤害 0）
+[RuneProbe] PASS ⑦ 巨人：`RollHit` 基础 10 点的这一击 → 伤害 32（期望 32 = 10 + 最大生命值 220 × 10%）；规则读数：最大生命值加伤规则：×0.1｜最近一次额外伤害 22
+[RuneProbe] PASS ⑦ 生死：死亡避免规则挂上了（死亡避免规则：剩余 1 次 · 恢复 0.3 生命｜已触发 0 次（最近一次恢复到 0）；玩家身上 1 条）
+[RuneProbe] PASS ⑦ 生死：剩余次数 1（期望 1 —— 文档写 {n} 未给数，预设 1）
+[RuneProbe] PASS ⑦ 生死：999 点致命伤 → 无效化（未死=True），生命恢复到 30（期望 30 = 100 × 30%），这次扣血读数 100
+[RuneProbe] PASS ⑦ 生死：次数用完（剩余 0）
+[RuneProbe] PASS ⑦ 生死：次数用完后再吃致命伤就真的死了（这次扣血 30）
+[RuneProbe] PASS ⑦ 小精灵：实体挂上了（小精灵：每 5s / 半径 8m / 伤害 20 / 绕行 1.6m｜已出手 0 次（最近目标 （无） 伤害 0））
+[RuneProbe] PASS ⑦ 小精灵：不在任何单位分组里（清场 / 目标选择 / 单位计数都碰不到它）
+[RuneProbe] PASS ⑦ 小精灵：子树 0 个物理体（只是一颗占位小球）
+[RuneProbe] PASS ⑦ 小精灵：7.5 秒内真的出手了一次（间隔表值 5 秒）→ 第 1 次，目标 PixiePrey，伤害 20（期望 ≈20）；规则读数：小精灵：每 5s / 半径 8m / 伤害 20 / 绕行 1.6m｜已出手 1 次（最近目标 PixiePrey 伤害 20）
+[RuneProbe] PASS ⑦ 小精灵：这一次扣了目标 20 点生命（期望 20 = 表值）
+[RuneProbe] PASS ⑧ 结束时 CarriedRuneId「」（期望空）
+[RuneProbe] PASS ⑧ 生命上限 220（期望回到 220）
+[RuneProbe] PASS ⑧ 受击倍率 ×1（期望 1）
+[RuneProbe] PASS ⑧ 移速 ×1（期望 1）
+[RuneProbe] PASS ⑧ 伤害 ×1（期望 1）
+[RuneProbe] PASS ⑧ 生命夹子 0（期望 0）
+[RuneProbe] PASS ⑧ 符文规则节点 0 个（期望 0）
+[RuneProbe] PASS ⑧ 死亡避免规则 0 条（期望 0）
+[RuneProbe] PASS ⑧ 再吃一次同样的 10 点伤害 → 最终 7（期望与基线 7 逐位相等）
+[RuneProbe] PASS ⑧ 候选池回到 35 条（期望基线 35）
+[RuneProbe] PASS ⑧ 增幅项目录仍是 62 条（期望 62）
+[RuneProbe] PASS ⑧ 存档层 RuneCarry.Current 为空（自测内存模式，不写 user://rune.cfg）
+[RuneProbe] === J11 符文系统验收结束：通过 83，失败 0 ===
+```
+
+## 3. 四个回归探针（期望值一个字节都没改）
+
+```
+probe charge exit=0 logBytes=39135 :: [ChargeRelease] === 蓄力释放验收结束：通过 80，失败 0 ===
+  [ChargeRelease] === 蓄力释放验收结束：通过 80，失败 0 ===
+probe chardesign exit=0 logBytes=36409 :: [Design] === 原始设计验收结束：通过 115，失败 0 ===
+  [Design] === 原始设计验收结束：通过 115，失败 0 ===
+probe dragon exit=0 logBytes=18885 :: [DragonArrow] === 龙之箭验收结束：通过 42，失败 0 ===
+  [DragonArrow] === 龙之箭验收结束：通过 42，失败 0 ===
+probe bowsweep exit=0 logBytes=18425 :: [BowSweep] === J10 弓·档位/弹速/扫掠 验收结束：通过 23，失败 0 ===
+  [BowSweep] === J10 弓·档位/弹速/扫掠 验收结束：通过 23，失败 0 ===
+```
+
+## 4. Main 自测：8 条硬指标 + 结束
+
+```
+[log] 02:21:24 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 02:21:26 [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[log] 02:21:26 [SelfTest] 配置表比对·玩家：生命 220（期望 200 + 元进度加成 20；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[log] 02:21:26 [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 10/首领 1/召唤物 1/技能 39/Pressure 7/效果 14/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4/符文 11（期望 **J11 后 14 个数 = 6/2/10/1/1/39/7/14/8/5/6/11/4/11**；只打印、不比对。J11 之前是 13 个数 6/2/10/1/1/39/7/14/8/5/6/11/4 —— J11 的差额**只有**末尾多一张表（符文 11 枚），前 13 个数字一位都没动；P6b 后是 6/2/10/1/1/39/7/14/8/5/6/11/4；P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））
+[log] 02:21:27 [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）
+[log] 02:21:37 [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[log] 02:21:46 [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[log] 02:21:57 [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+
+[log] 02:21:24 [SelfTest] === 自测开始 ===
+[log] 02:22:30 [SelfTest] === 自测结束 ===
+```
+
+5 条历史红色读数标记（改前就有、没有新增）：
+```
+[log] 02:21:46 [SelfTest] 🔴 白板首领闸门·正向：本场第 1 波后降临=True（期望 True）场上存活=1（期望 1）
+[log] 02:21:46 [SelfTest] 🔴 白板首领实例：生命 315（首领行 900 × 0.35 = 315，期望 315）护甲 0（期望 0）标签 [Boss,Melee]
+[log] 02:21:53 [SelfTest] 🔴 Boss 阵亡 → 挑战者状态=False（期望 False，这就是 bug #12 的修复点） 已通关=False（期望 False） 玩家存活=True
+[log] 02:21:55 [SelfTest] 🔴 互动降临节点：接受=True（期望 True）→ 本关通关=False（切关后会被下一关复位，所以这里只看它当场为 True：True）关卡 1→2（期望 +1）已挑战 5→0 挑战者状态=False（期望 False）
+[log] 02:21:57 [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓
+```
+
+## 5. 存档 SHA256（跑前 = 跑后 = 交接点）与开关
+
+```
+=== SAVES BEFORE ===
+存档 meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+selftest.flag before = False
+rune.cfg before = False
+=== MAIN SELFTEST ===
+main exit=0 bytes=144946
+=== SAVES AFTER ===
+存档 meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+selftest.flag after = False
+rune.cfg after = False
+```
+
+## 6. 符文表启动日志（每枚符文的效果 + 它解锁了什么）
+
+```
+[log] 02:21:24 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+```

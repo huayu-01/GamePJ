@@ -1,5 +1,16 @@
 # 数值配置（调参唯一入口）
 
+> **2026-10-18 J11 新增第 20 张表：符文（开局携带一件的信物）** —— `Config/Tables/Runes/rune_*.tres`，现有 **11 行**
+> （`RuneConfig : RewardConfig` + 两个新列 `UnlocksRequires`（`Array<string>`）/ `IconPath`）。
+> 符文 = **一个效果**（走**既有的** `RewardEffectRegistry` 处理器，`StatSet` / `GrantArmor` / 新 `RuneEffect`）
+> **+ 解锁一批增幅前置**（`RunBuild.SatisfiesPrerequisite` 的第二个来源）。
+> `ConfigIndex.tres` 三处同改：11 条 `[ext_resource]`（id 283…293）+ `Runes` 数组 + `load_steps 197 → 208`；
+> **索引串 13 个数 → 14 个数**（`…/能力卡 4/符文 11`），前 13 个数字一位没动。
+> `[Config] 配置表：…` 那条总览行**刻意没加符文**（它是 8 硬指标之一，逐字比对）—— 符文单独一行日志。
+> 四个 StatSheet 新键：`MaxHealthCap`（0=不夹）/ `IncomingDamageMultiplier`（1）/ `MaxFallSpeedMultiplier`（1）/
+> `HealMultiplier`（1，**0 = 禁疗**）。`Weapon.cs`、7 个共用 `Ability` 子类、敌人/首领/召唤物行**一个字没动**；
+> `project.godot` 没动。契约见 [rune-system.md](rune-system.md)，交付与实测见 [character-design-j11.md](character-design-j11.md)。
+
 > **2026-10-17 J6已验80/0、82/0**：`AbilityConfig.ChargeReleaseAnimSpeedScale`为松手释放段独立速度，默认1、弓2。变奏改用强类型`RewardConfig.VolleyRamp`子资源，目标技能资源引用、循环上限3、连续窗口1.2秒、逐箭间隔0.08秒；删除该行旧的字符串属性反射参数。技能39、增幅62及ConfigIndex未增删。[J6接线与证据](character-design-j6.md)。
 
 > **2026-10-17 J5**：`RewardConfig.RequiredEventAbility`为事件来源限制的技能资源引用；闪身步只接受所引用闪技能的实际Kill。`AbilityConfig.AnimationEventTimeout`默认2秒，只负责缺事件取消。架的0.75秒窗口从真实GuardOn开始，旧`GuardStartSeconds`已移除；源动画配置与三份生成资源的GuardOn/GuardOff已分开，避免同刻覆盖。技能／增幅数量及ConfigIndex不变。[J5接线](character-design-j5.md)。

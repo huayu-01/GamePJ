@@ -23,6 +23,7 @@
 | J8 | 包含本文的提交 | 发散／心眼按**命中前**标记结算：攻击者侧`IOutgoingDamageScale`＋`MarkedBonus`处理器；一个类服务两条行，加标/加伤来源都进表 |
 | J9 | ba709fc…2282b80 | 龙之箭：松手蓄力≥2秒的大箭（尺寸×2）＋全穿透（额外99个），阈值/尺寸/穿透全进**强类型资源列**，**按松手快照冻结**、**真实释放ATK发射**；一箭穿3靶与撞World停下均有实测 |
 | J10 | 89002f5／a73f840／2d4950e／5220431 | 弓：`ChargeStepSeconds 0.1→0.3`＋`ChargeMaxSeconds 1.0→1.4`（**基础1档+后置3档=4个威力档，×1.0/1.3/1.6/1.9 加法**）；弹速 `220→160`／每档 `30→20`（**预设待确认**）；`Projectile` 新增 `SweepMaxHits`（默认0=逐位不变）让**每个物理帧把本帧整条线段（长度=弹速×帧时长，逐帧重算）上的所有敌对单位都结算**、不重复、撞World停；只给弓武技1配 `SweepMaxHits=8`。修了共用基类一个真浮点缺陷（`(1.4−0.5)/0.3=2.9999998` → Floor 少算一档）；实测**贴脸双怪**关扫掠只中1只、开扫掠同一物理帧两只全中；`_BowSweepProbe` 23/0 |
+| **J11** | 本批提交 | **符文系统（哈迪斯信物 = 一个效果 + 解锁一批增幅前置）**，按用户划定的 5 步拆成 5 个提交：① 新表 `Config/Tables/Runes/`（**11 枚**，`RuneConfig : RewardConfig` + `UnlocksRequires:Array<string>` + `IconPath`）② `ConfigIndex.tres` 三处同改（id 283…293 / `Runes` 数组 / `load_steps 197→208`，**索引串 13→14 个数**）③ 施效走**既有** handler 通路（6 枚纯数值用 `StatSet`，5 枚用新 `RuneEffect`；StatSheet 新增 `MaxHealthCap`/`IncomingDamageMultiplier`/`MaxFallSpeedMultiplier`/`HealMultiplier` 四个键）④ 前置对接（`RunBuild.SatisfiesPrerequisite`，`RewardPool.HasPrerequisites` 改调它；**不带符文时逐位不变**）⑤ 携带入口（`RuneCarry`→`user://rune.cfg` + `RunController.SetCarriedRune`/`ApplyCarriedRune`，**无 UI**）。实测：**雷之印 220→30**、**战神印同样10点伤害 7→28（正好4倍）**、风之印冷却 ×1.5、死铠 +20甲/每10杀+1甲/禁疗、生死 999致命伤→活下来回到30%、狙神 1.5m×0.5/9m×1.0/20m×1.5、巨人 10基础→32、小精灵 7.5s内出手1次打20；**前置解锁用真实 `RewardPool.Roll` 证**（不带符文两条探针行都不进池；带雷之印正好+1条且派系不串）。`_RuneProbe` **83/0**；回归 80/0、115/0、42/0、23/0；双构建 0/0；Main退出0、8硬指标**只有索引串**按预期变14个数、其余7条逐字一致；四存档SHA256跑前=跑后、**`rune.cfg` 不存在**（自测内存模式）。见[rune-system.md](rune-system.md)（契约）与[character-design-j11.md](character-design-j11.md) |
 
 各批`docs/character-design-j*.md`、`*-evidence.log`、`*-failures.log`和截图均保留。更早A/E/B/C/D和F/G/H只代表当轮范围，仍有原文遗漏。
 
@@ -74,7 +75,9 @@ J6最终：专项无头80/0、渲染82/0；完整20进程回归后仅扩展探�
 - 改C#只能使用edit／apply_patch定点编辑，新C#也一样；禁止PowerShell多行替换或Python写C#。UTF8无BOM、LF。
 - 编译严格：`& 'F:\Godot项目\项目a\build.ps1' --no-incremental -v minimal`，必须0 warning／0 error；另跑`dotnet build ActRoguelike.csproj --no-incremental -v minimal -c ExportRelease`。
 - 构建／Godot验证独占`.ai_validation.lock`（FileShare.None）；Git独占`.ai_git.lock`，stage前必须空、精准清单、禁止git add -A。每批docs＋commit＋push。
-- 增删ConfigIndex必须ext_resource＋数组项＋load_steps三处同改。现6武器／2角／39技能／62增幅，不能静默回退。
+- 增删ConfigIndex必须ext_resource＋数组项＋load_steps三处同改。现6武器／2角／39技能／62增幅／**11符文**，不能静默回退。
+  ⚠️ 索引串那行（`配置表比对·索引`）在 J11 之后是 **14 个数**（`6/2/10/1/1/39/7/14/8/5/6/11/4/11`）；8硬指标里只有它是"预期会变"的。
+  ⚠️ `[Config] 配置表：…` 那条总览行**仍是 13 项、逐字未变** —— 符文有自己的独立日志行，不要再往那条总览里加表。
 - 禁stop_project（会杀别人的自测），禁关Godot编辑器（MCP宿主）。只结束自己启动的PID。自测结束必须清userdata的selftest.flag。
 - 表现层只读，不依特效长度发伤害；残影／VFX不能进单位列表或带物理碰撞。无真实动画事件只取消，不加时间执行兜底。
 - 结构查询优先CodeGraph context→一次explore，已初始化，不再让用户init；字面文本再rg。每批低成本codegraph index --force，不能阻塞计划。
@@ -97,6 +100,10 @@ loadout.cfg       CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A954
 ```
 
 meta碎片20、health_level2、crit_level9；当前武器大师镰刀、猎手记弓。不要盲目恢复旧H的长枪或覆盖用户新手动设置。历史I曾无字节备份污染loadout，已按用户真实日志恢复上述点，不能声称任务最初逐字无变化。自测Meta收益已内存化。
+
+⚠️ **J11 起多了一个 `user://rune.cfg`**（符文携带，`RuneCarry`）：**刻意独立于上面四个存档**，所以 `meta.cfg` 的 SHA256 基线**没有被改**。
+自测走内存模式（`RuneCarry.UseInMemoryStoreForSelfTest`，与 `MetaProgress` 同一条纪律），跑完 `rune.cfg` **不存在**；
+将来若有人手动带了符文再跑 Main，8硬指标会变（玩家生命 220→30 等），那是**预期**行为，不是回归。
 
 `project.godot`有用户／编辑器未提交变化，**保留、不混进提交**。大量未跟踪`.uid`、图片`.import`和csv翻译导入副产物也不能一锅端。验证会重拍旧批次截图，精准恢复自己生成的旧图，保留本批新图；禁止全量git restore。另一个窗口新增SkillIndicator四样式及文档（46f9988、456e14e、b69188d、e40e3bf）已在基线，不能回滚。
 
