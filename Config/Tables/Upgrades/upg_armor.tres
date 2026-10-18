@@ -12,7 +12,7 @@ Note = "每次获得的护甲"
 [resource]
 script = ExtResource("2_row")
 RewardKind = 0
-MaxStacks = 3
+MaxStacks = 0
 ApplyHandler = "GrantArmor"
 HandlerParams = [SubResource("Resource_p0")]
 Id = "upg_armor"

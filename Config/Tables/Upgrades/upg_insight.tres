@@ -12,7 +12,7 @@ Value = 0.9
 [resource]
 script = ExtResource("2_row")
 RewardKind = 0
-MaxStacks = 3
+MaxStacks = 1
 Modifiers = [SubResource("Resource_m0")]
 Id = "upg_insight"
 DisplayName = "洞悉"

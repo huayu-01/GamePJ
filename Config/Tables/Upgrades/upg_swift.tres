@@ -12,7 +12,7 @@ Value = 1.08
 [resource]
 script = ExtResource("2_row")
 RewardKind = 0
-MaxStacks = 3
+MaxStacks = 0
 Modifiers = [SubResource("Resource_m0")]
 Id = "upg_swift"
 DisplayName = "快速"
