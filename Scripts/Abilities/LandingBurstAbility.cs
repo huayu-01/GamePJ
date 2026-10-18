@@ -51,6 +51,24 @@ public partial class LandingBurstAbility : Ability
 	private FallAttackAbility? _source;
 	private int _stage;
 	private float _activeTimer;
+	private Shape3D? _originalBurstShape;
+	public float BurstRadius => (_hitbox?.GetNodeOrNull<CollisionShape3D>("Shape")?.Shape as SphereShape3D)?.Radius ?? 0f;
+	public void ConfigureEnhancement(float damageScale, float sizeScale)
+	{
+		DamageScale *= Mathf.Max(0f, damageScale);
+		if (_hitbox?.GetNodeOrNull<CollisionShape3D>("Shape") is { Shape: SphereShape3D sphere } shape)
+		{
+			_originalBurstShape ??= sphere;
+			// 独立形状，不能修改所有玩家／预制体共用的资源；表现层继续只读真实半径。
+			shape.Shape = new SphereShape3D { Radius = sphere.Radius * Mathf.Max(0.01f, sizeScale) };
+		}
+	}
+	protected override void OnLoadoutReset()
+	{
+		if (_originalBurstShape != null && _hitbox?.GetNodeOrNull<CollisionShape3D>("Shape") is { } shape)
+			shape.Shape = _originalBurstShape;
+		_originalBurstShape = null;
+	}
 
 	protected override void OnReady()
 	{

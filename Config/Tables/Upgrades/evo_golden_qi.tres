@@ -2,6 +2,21 @@
 
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_spirit_sword.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" path="res://Scripts/Config/MeleeProjectileTuning.cs" id="3_tuning"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_1.tres" id="4_skill"]
+[ext_resource type="PackedScene" path="res://Scenes/Combat/SwordQi.tscn" id="5_scene"]
+
+[sub_resource type="Resource" id="ExtraQi"]
+script = ExtResource("3_tuning")
+TargetAbility = ExtResource("4_skill")
+ProjectileScene = ExtResource("5_scene")
+DamageScale = 1.0
+Speed = 60.0
+Lifetime = 0.45
+Pierce = 8
+SizeRatio = 0.5
+SweepMaxHits = 8
+AttackTags = Array[String](["Projectile", "SwordQi", "Physical"])
 
 [resource]
 script = ExtResource("2_row")
@@ -12,4 +27,6 @@ Pool = ExtResource("1_pool")
 Id = "evo_golden_qi"
 DisplayName = "金光术"
 DescriptionTemplate = "武技1 每次攻击额外发射一道剑气"
-Note = "⚠️ 占位行（机制未接）：文档第 125 行（进化池 <B1限定>）「金光术:武技1的每次攻击都会额外发射一道剑气」。**这一行现在没有任何效果** —— 它要的是 MeleeComboAbility 在每一段命中时额外生成一道剑气（新投射物通路：场景引用 + 伤害取当段值 + 朝向前方），P5b 没做。池子/限定/前置三层判定是齐的（它会在正确的人手上出现），但抽到之后不生效 —— 见 docs/upgrades.md §7 的未接清单。"
+ApplyHandler = "MeleeProjectile"
+MeleeProjectile = SubResource("ExtraQi")
+Note = "J13：每段真实ATK后额外一道剑气，包括挥空；伤害继承当段快照，来源仍为武技1。原文未给参数，暂用当段伤害×1／60m每秒／0.45秒／穿透8／尺寸按当段最长边×0.5，均可在强类型子资源调整。"

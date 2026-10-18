@@ -25,6 +25,29 @@ public static class RewardEffectRegistry
 	{
 		// 通用的"改 StatSheet"—— 19 条里有 14 条走它，只靠 Modifiers 里的数据表达，不需要新代码。
 		["StatSet"] = row => context => ApplyModifiers(row, context),
+		["MeleeProjectile"] = row => context =>
+		{
+			if (row.MeleeProjectile is not { TargetAbility: { }, ProjectileScene: { } } tuning
+				|| Ability.FindByAbilityId(context.Player, tuning.TargetAbility.Id) is not MeleeComboAbility melee)
+			{
+				GD.PushWarning($"[Reward] {row.Id} 缺少有效近战额外投射物参数。");
+				return;
+			}
+			melee.ConfigureExtraProjectile(tuning);
+		},
+		["SkillEnhancement"] = row => context =>
+		{
+			if (row.SkillEnhancement is not { TargetAbility: { } } tuning)
+			{
+				GD.PushWarning($"[Reward] {row.Id} 缺少目标技能增强参数。");
+				return;
+			}
+			Ability? ability = Ability.FindByAbilityId(context.Player, tuning.TargetAbility.Id);
+			if (ability is SwordQiAbility draw) draw.ConfigureEnhancement(tuning.DamageScale, tuning.SizeScale, tuning.ProjectileSweepMaxHits, tuning.ProjectileSweepRadius);
+			else if (ability is LandingBurstAbility burst) burst.ConfigureEnhancement(tuning.DamageScale, tuning.SizeScale);
+			else { GD.PushWarning($"[Reward] {row.Id} 的增强目标技能不存在或类型不支持。"); return; }
+			if (tuning.CooldownSeconds >= 0f) ability.Cooldown = tuning.CooldownSeconds;
+		},
 		["VolleyRamp"] = row => context =>
 		{
 			if (row.VolleyRamp is not { TargetAbility: { } target } tuning
@@ -134,8 +157,8 @@ public static class RewardEffectRegistry
 		//
 		// 服务这些行（数值全在表里，代码里一个数字都没有）：
 		//   有备无患（后撤 MaxCharges=3 / RechargeSeconds=0.5）· 专注（武技2 CooldownMultiplier=0.5 +
-		//   完美时机窗口）· 神降术（武技3 Cooldown=2 / DamageScale）· 气贯长虹（武技2 ChargeBaseSeconds=0.5）·
-		//   龙之箭（武技1 ChargeMaxSeconds=3）· 地爆（落剑式 Knockback）· 大拔刀术（拔刀式 ProjectileSizeScale）。
+		//   完美时机窗口）· 气贯长虹（武技2 ChargeBaseSeconds=0.5）· 地爆（落剑式 Knockback）。
+		//   龙之箭已迁ChargedShot；大拔刀术／神降术已迁强类型SkillEnhancement。
 		//
 		// ⚠️ 属性名写错**不静默**：先按 `GetPropertyList()` 查存在性，不存在就打警告并跳过这一条。
 		["AbilityOverride"] = row => context =>
@@ -153,8 +176,7 @@ public static class RewardEffectRegistry
 				return;
 			}
 
-			// 行上如果还带了 Modifiers，先按 StatSet 的语义套上（「大拔刀术」就是"伤害倍率 + 剑气体积"
-			// 两件事写在同一行里：前者走 Modifiers，后者走技能字段覆盖）。
+			// 兼容旧行上的全局修饰器；技能专属增强另走强类型处理器，避免污染其他技能。
 			ApplyModifiers(row, context);
 
 			var applied = new List<string>();

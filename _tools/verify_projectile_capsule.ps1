@@ -1,5 +1,5 @@
 # J12：胶囊扫掠、全局实际弹速上限与五探针回归，验证独占且保护真实存档。
-param([switch]$ProbeOnly)
+param([switch]$ProbeOnly, [switch]$SpiritSword)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
 $godotExe = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
@@ -9,6 +9,7 @@ $lease = $null
 $ownedProcess = $null
 $original = @{}
 $runTag = Get-Date -Format 'yyyyMMdd_HHmmss'
+$batchId = if ($SpiritSword) { 'j13' } else { 'j12' }
 $saveNames = @('meta.cfg','ability_cards.cfg','settings.cfg','loadout.cfg','rune.cfg')
 $utf8 = [Text.UTF8Encoding]::new($false)
 
@@ -29,8 +30,8 @@ function Assert-Saves {
 }
 
 function Invoke-Probe([string]$RunName, [string]$Scene, [string]$Expected, [switch]$Render, [switch]$SelfTest) {
-    $stdoutPath = Join-Path $projectDir ".ai_j12_$runTag.$RunName.log"
-    $stderrPath = Join-Path $projectDir ".ai_j12_$runTag.$RunName.err"
+    $stdoutPath = Join-Path $projectDir ".ai_$($batchId)_$runTag.$RunName.log"
+    $stderrPath = Join-Path $projectDir ".ai_$($batchId)_$runTag.$RunName.err"
     $runArgs = @('--path',$projectDir,'--quit-after','40000',$Scene)
     if ($Render) { $runArgs += @('--resolution','1600x900') } else { $runArgs += '--headless' }
     if ($SelfTest) { $runArgs += @('--','--selftest') }
@@ -52,6 +53,7 @@ function Invoke-Probe([string]$RunName, [string]$Scene, [string]$Expected, [swit
         if ($err) { $evidence.Add($err) }
         if ($ownedProcess.ExitCode -ne 0 -or $out -notmatch $Expected -or $err.Length -gt 0) { throw "$RunName 未通过：$stdoutPath / $stderrPath" }
         if ($SelfTest) {
+            if ($SpiritSword -and $out -notmatch '✅ P5b·实测表参数落到机制上') { throw 'Main专属技能增强契约探针未通过' }
             $markers = @('配置表：武器 6','节点布置：启用','配置表比对·玩家：','配置表比对·索引：','Pressure 测试（进化','白板首领实例：','端到端：按 F 之后','最小闭环·链路：')
             $baseline = Get-Content -LiteralPath (Join-Path $projectDir 'docs\character-design-j11-evidence.log')
             foreach ($marker in $markers) {
@@ -82,46 +84,56 @@ try {
         $path = Join-Path $profileDir $name
         $original[$name] = if (Test-Path -LiteralPath $path) { [Convert]::ToBase64String([IO.File]::ReadAllBytes($path)) } else { $null }
     }
-    [IO.File]::WriteAllText((Join-Path $projectDir ".ai_j12_$runTag.saves.json"),($original | ConvertTo-Json),$utf8)
+    [IO.File]::WriteAllText((Join-Path $projectDir ".ai_$($batchId)_$runTag.saves.json"),($original | ConvertTo-Json),$utf8)
     Save-Fingerprint 'BEFORE'
-    & (Join-Path $projectDir 'build.ps1') --no-incremental -v minimal | Tee-Object -FilePath ".ai_j12_$runTag.Debug.log"
+    & (Join-Path $projectDir 'build.ps1') --no-incremental -v minimal | Tee-Object -FilePath ".ai_$($batchId)_$runTag.Debug.log"
     if ($LASTEXITCODE -ne 0) { throw 'Debug 构建失败' }
-    dotnet build ActRoguelike.csproj --no-incremental -v minimal -c ExportRelease | Tee-Object -FilePath ".ai_j12_$runTag.ExportRelease.log"
+    dotnet build ActRoguelike.csproj --no-incremental -v minimal -c ExportRelease | Tee-Object -FilePath ".ai_$($batchId)_$runTag.ExportRelease.log"
     if ($LASTEXITCODE -ne 0) { throw 'ExportRelease 构建失败' }
     foreach ($configuration in @('Debug','ExportRelease')) {
-        $build = Get-Content -LiteralPath ".ai_j12_$runTag.$configuration.log" -Raw
+        $build = Get-Content -LiteralPath ".ai_$($batchId)_$runTag.$configuration.log" -Raw
         $evidence.Add("=== $configuration ===")
         $evidence.Add($build)
         if ($build -notmatch '0 个警告' -or $build -notmatch '0 个错误') { throw "$configuration 未满足 0/0" }
     }
-    Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 \d+，失败 0'
-    Invoke-Probe 'bow_render' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 \d+，失败 0' -Render
+    if ($SpiritSword) {
+        Invoke-Probe 'sword' 'res://Scenes/Debug/_SpiritSwordEvolutionProbe.tscn' '灵剑进化验收结束：通过 \d+，失败 0'
+        Invoke-Probe 'sword_render' 'res://Scenes/Debug/_SpiritSwordEvolutionProbe.tscn' '灵剑进化验收结束：通过 \d+，失败 0' -Render
+    }
+    else {
+        Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 \d+，失败 0'
+        Invoke-Probe 'bow_render' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 \d+，失败 0' -Render
+    }
     if (-not $ProbeOnly) {
+        if ($SpiritSword) { Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0' }
         Invoke-Probe 'charge' 'res://Scenes/Debug/_ChargeReleaseProbe.tscn' '蓄力释放验收结束：通过 80，失败 0'
         Invoke-Probe 'character' 'res://Scenes/Debug/_CharacterDesignProbe.tscn' '原始设计验收结束：通过 115，失败 0'
         Invoke-Probe 'dragon' 'res://Scenes/Debug/_DragonArrowProbe.tscn' '验收结束：通过 42，失败 0'
         Invoke-Probe 'rune' 'res://Scenes/Debug/_RuneProbe.tscn' '验收结束：通过 83，失败 0'
         Invoke-Probe 'main' 'res://Scenes/Main.tscn' '=== 自测结束 ===' -SelfTest
     }
-    $shotPath = Join-Path $projectDir 'docs\screenshots\j12_capsule_sweep.png'
-    if (-not (Test-Path -LiteralPath $shotPath)) { throw 'J12 截图缺失' }
-    $evidence.Add("截图 SHA256=$((Get-FileHash -LiteralPath $shotPath -Algorithm SHA256).Hash)")
+    $shotNames = if ($SpiritSword) { @('j13_golden_qi','j13_great_draw','j13_divine_descent') } else { @('j12_capsule_sweep') }
+    foreach ($shotName in $shotNames) {
+        $shotPath = Join-Path $projectDir "docs\screenshots\$shotName.png"
+        if (-not (Test-Path -LiteralPath $shotPath)) { throw "$shotName 截图缺失" }
+        $evidence.Add("截图 $shotName SHA256=$((Get-FileHash -LiteralPath $shotPath -Algorithm SHA256).Hash)")
+    }
     Save-Fingerprint 'AFTER'
     $evidence.Add("selftest.flag AFTER=$(Test-Path -LiteralPath (Join-Path $profileDir 'selftest.flag'))")
-    $outputName = if ($ProbeOnly) { "character-design-j12-probe-$runTag.log" } else { 'character-design-j12-evidence.log' }
-    [IO.File]::WriteAllText((Join-Path $projectDir "docs\$outputName"),(($evidence -join "`n").Replace("`r`n","`n") + "`n"),$utf8)
-    Write-Output "J12 验收完成：docs/$outputName"
+    $outputName = if ($ProbeOnly) { "character-design-$batchId-probe-$runTag.log" } else { "character-design-$batchId-evidence.log" }
+    [IO.File]::WriteAllText((Join-Path $projectDir "docs\$outputName"),(($evidence -join "`n").Replace("`r`n","`n").TrimEnd([char[]]"`r`n") + "`n"),$utf8)
+    Write-Output "$batchId 验收完成：docs/$outputName"
 }
 catch {
     $evidence.Add($_.ToString())
     foreach ($configuration in @('Debug','ExportRelease')) {
-        $buildPath = Join-Path $projectDir ".ai_j12_$runTag.$configuration.log"
+        $buildPath = Join-Path $projectDir ".ai_$($batchId)_$runTag.$configuration.log"
         if (Test-Path -LiteralPath $buildPath) {
             $evidence.Add("=== 失败现场构建 $configuration ===")
             $evidence.Add((Get-Content -LiteralPath $buildPath -Raw))
         }
     }
-    [IO.File]::WriteAllText((Join-Path $projectDir "docs\character-design-j12-failure-$runTag.log"),(($evidence -join "`n").Replace("`r`n","`n") + "`n"),$utf8)
+    [IO.File]::WriteAllText((Join-Path $projectDir "docs\character-design-$batchId-failure-$runTag.log"),(($evidence -join "`n").Replace("`r`n","`n").TrimEnd([char[]]"`r`n") + "`n"),$utf8)
     throw
 }
 finally {

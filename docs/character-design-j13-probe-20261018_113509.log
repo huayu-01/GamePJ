@@ -1,0 +1,500 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 344 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.19
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 335 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:02.87
+
+sword exit=0 seconds=22.56 stderrBytes=0
+=== sword ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 11:35:17 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 11:35:17 [Flow] === 新的一局 ===
+[log] 11:35:17 [Flow] 日志文件：user://logs/run_20261018_113517.log
+[log] 11:35:17 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 11:35:17 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 11:35:17 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 11:35:17 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 11:35:17 [Config] 增幅项表：62 条（来源：表）—— 强化 9 / 进化 23 / 异化 30。
+[log] 11:35:17 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 11:35:17 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 11:35:17 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 11:35:17 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 11:35:17 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 11:35:17 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 11:35:17 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 11:35:17 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 11:35:17 [Combat] 单位动画：Player 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 11:35:17 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:17 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 11:35:17 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:17 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 11:35:17 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 11:35:17 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 11:35:17 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 11:35:17 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:17 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:17 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:18 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[log] 11:35:18 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[SwordEvolution] PASS 默认未获金光术：真实近战ATK不出额外弹体
+[log] 11:35:18 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:18 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[SwordEvolution] PASS 真实表行与处理器可读：evo_golden_qi
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_golden_qi
+[log] 11:35:18 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:18 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:18 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:18 [Combat] 动作交接：skl_b1_w1_1 被 skl_b_skill_1 打断（动画时间0s）。
+[log] 11:35:18 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 11:35:19 [Combat] 闪：skl_b_skill_1 朝 (0, 0, -1) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[log] 11:35:19 [Combat] 单位动画切换：Player idle → sprint（当前速度 38.89，阈值 0.15/4）
+[SwordEvolution] PASS 金光术前摇被真实闪打断：无ATK就无额外剑气
+[log] 11:35:19 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:19 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[SwordEvolution] PASS 真实表行与处理器可读：evo_golden_qi
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_golden_qi
+[log] 11:35:19 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:19 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:19 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:19 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[SwordEvolution] PASS 金光术第1段：真实ATK恰好额外一发，累计1
+[log] 11:35:19 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword2（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:19 [Combat] 连招：skl_b1_w1_1 推进到第 2 段（动画「Skill_B1_Sword2」，累计连击 1）
+[log] 11:35:20 [Combat] 伤害 Player(240) → QiFar(99980) 20
+[log] 11:35:20 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 11:35:20 [Combat] 连招·第 2 段判定：skl_b1_w1_1 伤害 23（×1.15）盒子 (2.3, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 2 段
+[SwordEvolution] PASS 金光术第2段：真实ATK恰好额外一发，累计2
+[log] 11:35:20 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:20 [Combat] 连招：skl_b1_w1_1 推进到第 3 段（动画「Skill_B1_Sword3」，累计连击 2）
+[log] 11:35:20 [Combat] 伤害 Player(240) → QiFar(99957) 23
+[log] 11:35:20 [Combat] 连招·第 3 段判定：skl_b1_w1_1 伤害 26（×1.3）盒子 (2.4, 1.6, 3)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 3 段
+[SwordEvolution] PASS 金光术第3段：真实ATK恰好额外一发，累计3
+[log] 11:35:20 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword4（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:20 [Combat] 连招：skl_b1_w1_1 推进到第 4 段（动画「Skill_B1_Sword4」，累计连击 3）
+[log] 11:35:20 [Combat] 伤害 Player(240) → QiFar(99931) 26
+[log] 11:35:20 [Combat] 连招·第 4 段判定：skl_b1_w1_1 伤害 29（×1.45）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 4 段
+[SwordEvolution] PASS 金光术第4段：真实ATK恰好额外一发，累计4
+[log] 11:35:20 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword5（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.424s、Combo@0.484s）
+[log] 11:35:20 [Combat] 连招：skl_b1_w1_1 推进到第 5 段（动画「Skill_B1_Sword5」，累计连击 4）
+[log] 11:35:21 [Combat] 伤害 Player(240) → QiFar(99902) 29
+[log] 11:35:21 [Combat] 连招·第 5 段判定：skl_b1_w1_1 伤害 36（×1.8）盒子 (2.8, 1.8, 3.2)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 5 段
+[SwordEvolution] PASS 金光术第5段：真实ATK恰好额外一发，累计5
+[log] 11:35:21 [Combat] 伤害 Player(240) → QiFar(99866) 36
+[log] 11:35:21 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 4
+[SwordEvolution] PASS 五段剑气真实命中远靶5次，来源均为破剑式
+[SwordEvolution] PASS 剑气第1段伤害快照20＝当段20，玩家倍率只乘一次
+[SwordEvolution] PASS 剑气第2段伤害快照23＝当段23，玩家倍率只乘一次
+[SwordEvolution] PASS 剑气第3段伤害快照26＝当段26，玩家倍率只乘一次
+[SwordEvolution] PASS 剑气第4段伤害快照29＝当段29，玩家倍率只乘一次
+[SwordEvolution] PASS 剑气第5段伤害快照36＝当段36，玩家倍率只乘一次
+[SwordEvolution] PASS 远靶超出近战盒：受伤来自真实额外剑气
+[log] 11:35:21 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:21 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[SwordEvolution] PASS 真实表行与处理器可读：evo_golden_qi
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_golden_qi
+[log] 11:35:22 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:22 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:22 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:22 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[SwordEvolution] PASS 挥空也按真实ATK出一道剑气，不依赖命中事件
+[log] 11:35:22 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 11:35:22 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:22 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:22 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 11:35:22 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:35:22 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:22 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 11:35:23 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[SwordEvolution] PASS 换成镰刀后无金光术残留，不污染共用近战类
+[log] 11:35:23 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:23 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:23 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:23 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:23 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:23 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[log] 11:35:24 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 11:35:24 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=0.35，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:25 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 1 次；纯视觉，不改判定）
+[log] 11:35:25 [Audio] 首次播放「sfx_charge_complete」→ 总线 SFX / res://Assets/Audio/ui/ui_card_unlock.wav
+[log] 11:35:25 [Combat] 蓄力完成反馈：skl_b1_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 1 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[SwordEvolution] PASS 拔刀式真实按键完成基础蓄力
+[log] 11:35:25 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=1，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:25 [Combat] 箭矢齐射：skl_b1_w1_2 发数 1（基础 1 + 档 0×0） 单发伤害 26 弹速 60 夹角 0°（蓄力松手，蓄力 1.02s 档 0 威力 ×1，下坠起点 0m 重力 0 击退 0 追踪 []，方向 (0, 0.0050986707, -0.99998695)）
+[SwordEvolution] PASS 拔刀式释放段真实ATK发出剑气
+[log] 11:35:25 [Combat] 伤害 Player(240) → DrawFar(99948) 52
+[log] 11:35:25 [Combat] 暴击 Player(240) → DrawFar(99948) 52
+[SwordEvolution] PASS 真实表行与处理器可读：evo_golden_qi
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_golden_qi
+[log] 11:35:25 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:25 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:25 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:26 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[log] 11:35:26 [Combat] 伤害 Player(240) → DrawFar(99928) 20
+[SwordEvolution] PASS 真实表行与处理器可读：evo_great_draw
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_great_draw
+[SwordEvolution] PASS 大拔刀术没有修改玩家全局伤害乘区
+[log] 11:35:26 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 11:35:26 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:26 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:26 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:27 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[log] 11:35:27 [Combat] 伤害 Player(240) → DrawFar(99908) 20
+[SwordEvolution] PASS 破剑式额外剑气不吃大拔刀术：20→20
+[log] 11:35:27 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 11:35:27 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=0.35，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:28 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 2 次；纯视觉，不改判定）
+[log] 11:35:28 [Combat] 蓄力完成反馈：skl_b1_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 2 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[SwordEvolution] PASS 拔刀式真实按键完成基础蓄力
+[log] 11:35:28 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=1，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:28 [Combat] 箭矢齐射：skl_b1_w1_2 发数 1（基础 1 + 档 0×0） 单发伤害 39 弹速 60 夹角 0°（蓄力松手，蓄力 1.02s 档 0 威力 ×1，下坠起点 0m 重力 0 击退 0 追踪 []，方向 (0, 0.0050986707, -0.99998695)）
+[SwordEvolution] PASS 拔刀式释放段真实ATK发出剑气
+[log] 11:35:29 [Combat] 伤害 Player(240) → DrawFar(99869) 39
+[SwordEvolution] PASS 大拔刀术真实发射伤害 26→39（×1.5）
+[SwordEvolution] PASS 真实发射前重算后尺寸仍增强 1.4→2.8（×2）
+[SwordEvolution] PASS 增强拔刀式剑气真实命中远靶，攻击快照与发射读数一致
+[log] 11:35:29 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:29 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:29 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=0.35，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:30 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 3 次；纯视觉，不改判定）
+[log] 11:35:30 [Combat] 蓄力完成反馈：skl_b1_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 3 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[SwordEvolution] PASS 拔刀式真实按键完成基础蓄力
+[log] 11:35:30 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=1，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:31 [Combat] 箭矢齐射：skl_b1_w1_2 发数 1（基础 1 + 档 0×0） 单发伤害 26 弹速 60 夹角 0°（蓄力松手，蓄力 1.02s 档 0 威力 ×1，下坠起点 0m 重力 0 击退 0 追踪 []，方向 (0, 0.000257732, -0.99999994)）
+[SwordEvolution] PASS 拔刀式释放段真实ATK发出剑气
+[SwordEvolution] PASS 重新配装后拔刀式伤害和尺寸回到基线
+[log] 11:35:31 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:31 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:31 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[SwordEvolution] PASS 真实下落按键已进入本次起手
+[log] 11:35:32 [Combat] 下落攻击：skl_b_fall Action起动，起手离地3.9913m，参考耗时0.1174s，垂直速34m/s，倍率1.7384，伤害31.2917，方向(0, -1, 0)
+[log] 11:35:32 [Combat] 伤害 Player(240) → BurstNear(99968.7) 31.3
+[log] 11:35:32 [Combat] 下落攻击：skl_b_fall 落地（起手高度 3.99m，伤害 31.29）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 11:35:32 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[log] 11:35:32 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 31.29 = 上游 31.29 ×1，半径/形状来自本行命中体，第 1 次触发）—— 上游下落攻击本身没有改动。
+[log] 11:35:32 [Combat] 伤害 Player(240) → BurstNear(99937.4) 31.3
+[SwordEvolution] PASS 下落经过真实Action并碰到World地面
+[log] 11:35:32 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[SwordEvolution] PASS 未获神降术：真实落地额外一圈，半径3.2
+[SwordEvolution] PASS 基线内圈靶命中，4.2m外圈靶不被额外一圈命中
+[SwordEvolution] PASS 真实表行与处理器可读：evo_divine_descent
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_divine_descent
+[SwordEvolution] PASS 神降术真实碰撞半径4.8，技能冷却2秒
+[SwordEvolution] PASS 神降术未改共用场景球形资源，新实例仍为3.2
+[log] 11:35:32 [Combat] 伤害 Player(240) → BurstOuter(99968.7) 31.3
+[log] 11:35:34 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[SwordEvolution] PASS 真实下落按键已进入本次起手
+[log] 11:35:34 [Combat] 下落攻击：skl_b_fall Action起动，起手离地3.9913m，参考耗时0.1174s，垂直速34m/s，倍率1.7384，伤害31.2917，方向(0, -1, 0)
+[log] 11:35:34 [Combat] 伤害 Player(240) → BurstNear(99906.1) 31.3
+[log] 11:35:34 [Combat] 下落攻击：skl_b_fall 落地（起手高度 3.99m，伤害 31.29）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 11:35:34 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[log] 11:35:34 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 50.07 = 上游 31.29 ×1.6，半径/形状来自本行命中体，第 2 次触发）—— 上游下落攻击本身没有改动。
+[log] 11:35:34 [Combat] 伤害 Player(240) → BurstNear(99856.1) 50.1
+[log] 11:35:34 [Combat] 伤害 Player(240) → BurstOuter(99918.6) 50.1
+[SwordEvolution] PASS 下落经过真实Action并碰到World地面
+[log] 11:35:34 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 4.8m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[SwordEvolution] PASS 神降术真实落地命中4.2m外圈靶，范围已实际扩大
+[SwordEvolution] PASS 额外落地圈伤害50.067＝本次上游31.292×1.6
+[SwordEvolution] PASS 神降术未改共通下落攻击伤害公式
+[log] 11:35:36 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[SwordEvolution] PASS 真实下落按键已进入本次起手
+[log] 11:35:36 [Combat] 下落攻击：skl_b_fall Action起动，起手离地3.9913m，参考耗时0.1174s，垂直速34m/s，倍率1.7384，伤害31.2917，方向(0, -1, 0)
+[log] 11:35:36 [Combat] 伤害 Player(240) → BurstNear(99824.8) 31.3
+[log] 11:35:36 [Combat] 下落攻击：skl_b_fall 落地（起手高度 3.99m，伤害 31.29）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 11:35:36 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 3 次；纯视觉，不改判定）
+[SwordEvolution] PASS 下落经过真实Action并碰到World地面
+[SwordEvolution] PASS 2秒内再次真实落地：额外落地圈被真实冷却拦住
+[log] 11:35:37 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[SwordEvolution] PASS 真实下落按键已进入本次起手
+[log] 11:35:37 [Combat] 下落攻击：skl_b_fall Action起动，起手离地3.9913m，参考耗时0.1174s，垂直速34m/s，倍率1.7384，伤害31.2917，方向(0, -1, 0)
+[log] 11:35:37 [Combat] 伤害 Player(240) → BurstNear(99793.5) 31.3
+[log] 11:35:37 [Combat] 下落攻击：skl_b_fall 落地（起手高度 3.99m，伤害 31.29）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 11:35:37 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 4 次；纯视觉，不改判定）
+[log] 11:35:37 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 50.07 = 上游 31.29 ×1.6，半径/形状来自本行命中体，第 3 次触发）—— 上游下落攻击本身没有改动。
+[log] 11:35:37 [Combat] 伤害 Player(240) → BurstNear(99743.4) 50.1
+[log] 11:35:37 [Combat] 伤害 Player(240) → BurstOuter(99868.6) 50.1
+[SwordEvolution] PASS 下落经过真实Action并碰到World地面
+[log] 11:35:37 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 4.8m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 3 次；纯视觉，不改判定）
+[SwordEvolution] PASS 2秒冷却经过后真实落地再次触发额外一圈
+[log] 11:35:37 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:37 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[SwordEvolution] PASS 换镰刀后额外落剑式关闭且形状恢复3.2
+[SwordEvolution] === 灵剑进化验收结束：通过 69，失败 0 ===
+[log] 11:35:38 [Exit] 音频退出回收：真实等待86ms。
+[log] 11:35:38 [Audio] 音效统计：共 22 次 —— sfx_combat_hit×19、sfx_charge_complete×3（缺失 id 0 个）
+
+sword_render exit=0 seconds=24.39 stderrBytes=0
+=== sword_render ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+D3D12 12_0 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti
+
+[log] 11:35:40 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 11:35:40 [Flow] === 新的一局 ===
+[log] 11:35:40 [Flow] 日志文件：user://logs/run_20261018_113540.log
+[log] 11:35:40 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 11:35:40 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 11:35:40 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 11:35:40 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 11:35:40 [Config] 增幅项表：62 条（来源：表）—— 强化 9 / 进化 23 / 异化 30。
+[log] 11:35:40 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 11:35:40 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 11:35:40 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 11:35:40 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 11:35:40 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 11:35:40 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 11:35:40 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 11:35:40 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 11:35:41 [Combat] 单位动画：Player 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 11:35:41 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:41 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 11:35:41 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:41 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 11:35:41 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 11:35:41 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 11:35:41 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 11:35:41 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:41 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:41 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:41 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[log] 11:35:42 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[SwordEvolution] PASS 默认未获金光术：真实近战ATK不出额外弹体
+[log] 11:35:42 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:42 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[SwordEvolution] PASS 真实表行与处理器可读：evo_golden_qi
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_golden_qi
+[log] 11:35:42 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:42 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:42 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:42 [Combat] 动作交接：skl_b1_w1_1 被 skl_b_skill_1 打断（动画时间0s）。
+[log] 11:35:42 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 11:35:42 [Combat] 闪：skl_b_skill_1 朝 (0, 0, -1) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[log] 11:35:42 [Combat] 单位动画切换：Player idle → sprint（当前速度 38.89，阈值 0.15/4）
+[SwordEvolution] PASS 金光术前摇被真实闪打断：无ATK就无额外剑气
+[log] 11:35:42 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:42 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[SwordEvolution] PASS 真实表行与处理器可读：evo_golden_qi
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_golden_qi
+[log] 11:35:43 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:43 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:43 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:43 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[SwordEvolution] PASS 金光术第1段：真实ATK恰好额外一发，累计1
+[log] 11:35:43 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword2（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:43 [Combat] 连招：skl_b1_w1_1 推进到第 2 段（动画「Skill_B1_Sword2」，累计连击 1）
+[log] 11:35:43 [Combat] 伤害 Player(240) → QiFar(99980) 20
+[log] 11:35:43 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 11:35:43 [Combat] 连招·第 2 段判定：skl_b1_w1_1 伤害 23（×1.15）盒子 (2.3, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 2 段
+[SwordEvolution] PASS 金光术第2段：真实ATK恰好额外一发，累计2
+[log] 11:35:43 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:43 [Combat] 连招：skl_b1_w1_1 推进到第 3 段（动画「Skill_B1_Sword3」，累计连击 2）
+[log] 11:35:44 [Combat] 伤害 Player(240) → QiFar(99957) 23
+[log] 11:35:44 [Combat] 连招·第 3 段判定：skl_b1_w1_1 伤害 26（×1.3）盒子 (2.4, 1.6, 3)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 3 段
+[SwordEvolution] PASS 金光术第3段：真实ATK恰好额外一发，累计3
+[SwordEvolution] PASS 截图 j13_golden_qi
+[log] 11:35:44 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword4（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:44 [Combat] 连招：skl_b1_w1_1 推进到第 4 段（动画「Skill_B1_Sword4」，累计连击 3）
+[log] 11:35:44 [Combat] 伤害 Player(240) → QiFar(99931) 26
+[log] 11:35:44 [Combat] 连招·第 4 段判定：skl_b1_w1_1 伤害 29（×1.45）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 4 段
+[SwordEvolution] PASS 金光术第4段：真实ATK恰好额外一发，累计4
+[log] 11:35:44 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword5（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.424s、Combo@0.484s）
+[log] 11:35:44 [Combat] 连招：skl_b1_w1_1 推进到第 5 段（动画「Skill_B1_Sword5」，累计连击 4）
+[log] 11:35:45 [Combat] 伤害 Player(240) → QiFar(99902) 29
+[log] 11:35:45 [Combat] 连招·第 5 段判定：skl_b1_w1_1 伤害 36（×1.8）盒子 (2.8, 1.8, 3.2)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 5 段
+[SwordEvolution] PASS 金光术第5段：真实ATK恰好额外一发，累计5
+[log] 11:35:45 [Combat] 伤害 Player(240) → QiFar(99866) 36
+[log] 11:35:45 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 4
+[SwordEvolution] PASS 五段剑气真实命中远靶5次，来源均为破剑式
+[SwordEvolution] PASS 剑气第1段伤害快照20＝当段20，玩家倍率只乘一次
+[SwordEvolution] PASS 剑气第2段伤害快照23＝当段23，玩家倍率只乘一次
+[SwordEvolution] PASS 剑气第3段伤害快照26＝当段26，玩家倍率只乘一次
+[SwordEvolution] PASS 剑气第4段伤害快照29＝当段29，玩家倍率只乘一次
+[SwordEvolution] PASS 剑气第5段伤害快照36＝当段36，玩家倍率只乘一次
+[SwordEvolution] PASS 远靶超出近战盒：受伤来自真实额外剑气
+[log] 11:35:45 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:45 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[SwordEvolution] PASS 真实表行与处理器可读：evo_golden_qi
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_golden_qi
+[log] 11:35:45 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:45 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:45 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:46 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[SwordEvolution] PASS 挥空也按真实ATK出一道剑气，不依赖命中事件
+[log] 11:35:46 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 11:35:46 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:46 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:46 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 11:35:46 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:35:46 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:46 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 11:35:47 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[SwordEvolution] PASS 换成镰刀后无金光术残留，不污染共用近战类
+[log] 11:35:47 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:47 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:47 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:47 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:47 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:47 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[log] 11:35:48 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 11:35:48 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=0.35，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:49 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 1 次；纯视觉，不改判定）
+[log] 11:35:49 [Audio] 首次播放「sfx_charge_complete」→ 总线 SFX / res://Assets/Audio/ui/ui_card_unlock.wav
+[log] 11:35:49 [Combat] 蓄力完成反馈：skl_b1_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 1 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[SwordEvolution] PASS 拔刀式真实按键完成基础蓄力
+[log] 11:35:49 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=1，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:49 [Combat] 箭矢齐射：skl_b1_w1_2 发数 1（基础 1 + 档 0×0） 单发伤害 26 弹速 60 夹角 0°（蓄力松手，蓄力 1.03s 档 0 威力 ×1，下坠起点 0m 重力 0 击退 0 追踪 []，方向 (0, 0.0050986707, -0.99998695)）
+[SwordEvolution] PASS 拔刀式释放段真实ATK发出剑气
+[log] 11:35:49 [Combat] 伤害 Player(240) → DrawFar(99974) 26
+[SwordEvolution] PASS 真实表行与处理器可读：evo_golden_qi
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_golden_qi
+[log] 11:35:49 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:49 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:49 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:49 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[log] 11:35:50 [Combat] 伤害 Player(240) → DrawFar(99954) 20
+[SwordEvolution] PASS 真实表行与处理器可读：evo_great_draw
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_great_draw
+[SwordEvolution] PASS 大拔刀术没有修改玩家全局伤害乘区
+[log] 11:35:50 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 11:35:50 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 11:35:50 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:35:50 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 11:35:50 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SwordEvolution] PASS 真实近战 ATK 到达，第 1 段
+[log] 11:35:51 [Combat] 伤害 Player(240) → DrawFar(99934) 20
+[SwordEvolution] PASS 破剑式额外剑气不吃大拔刀术：20→20
+[log] 11:35:51 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 11:35:51 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=0.35，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:52 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 2 次；纯视觉，不改判定）
+[log] 11:35:52 [Combat] 蓄力完成反馈：skl_b1_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 2 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[SwordEvolution] PASS 拔刀式真实按键完成基础蓄力
+[log] 11:35:52 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=1，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:52 [Combat] 箭矢齐射：skl_b1_w1_2 发数 1（基础 1 + 档 0×0） 单发伤害 39 弹速 60 夹角 0°（蓄力松手，蓄力 1.02s 档 0 威力 ×1，下坠起点 0m 重力 0 击退 0 追踪 []，方向 (0, 0.0050986707, -0.99998695)）
+[SwordEvolution] PASS 拔刀式释放段真实ATK发出剑气
+[log] 11:35:53 [Combat] 伤害 Player(240) → DrawFar(99856) 78
+[log] 11:35:53 [Combat] 暴击 Player(240) → DrawFar(99856) 78
+[SwordEvolution] PASS 大拔刀术真实发射伤害 26→39（×1.5）
+[SwordEvolution] PASS 真实发射前重算后尺寸仍增强 1.4→2.8（×2）
+[SwordEvolution] PASS 增强拔刀式剑气真实命中远靶，攻击快照与发射读数一致
+[SwordEvolution] PASS 截图 j13_great_draw
+[log] 11:35:53 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:53 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:53 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=0.35，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:54 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 3 次；纯视觉，不改判定）
+[log] 11:35:54 [Combat] 蓄力完成反馈：skl_b1_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 3 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[SwordEvolution] PASS 拔刀式真实按键完成基础蓄力
+[log] 11:35:54 [Animation] 技能动画开播：Player → skills/Skill_B1_SwordQi（speed_scale=1，循环=False，事件帧 2 个：Charge@0s、ATK@0.364s）
+[log] 11:35:55 [Combat] 箭矢齐射：skl_b1_w1_2 发数 1（基础 1 + 档 0×0） 单发伤害 26 弹速 60 夹角 0°（蓄力松手，蓄力 1.02s 档 0 威力 ×1，下坠起点 0m 重力 0 击退 0 追踪 []，方向 (0, 0.000257732, -0.99999994)）
+[SwordEvolution] PASS 拔刀式释放段真实ATK发出剑气
+[SwordEvolution] PASS 重新配装后拔刀式伤害和尺寸回到基线
+[log] 11:35:55 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:35:55 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[log] 11:35:55 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[SwordEvolution] PASS 真实下落按键已进入本次起手
+[log] 11:35:56 [Combat] 下落攻击：skl_b_fall Action起动，起手离地3.9913m，参考耗时0.1174s，垂直速34m/s，倍率1.7384，伤害31.2917，方向(0, -1, 0)
+[log] 11:35:56 [Combat] 伤害 Player(240) → BurstNear(99968.7) 31.3
+[log] 11:35:56 [Combat] 下落攻击：skl_b_fall 落地（起手高度 3.99m，伤害 31.29）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 11:35:56 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[log] 11:35:56 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 31.29 = 上游 31.29 ×1，半径/形状来自本行命中体，第 1 次触发）—— 上游下落攻击本身没有改动。
+[log] 11:35:56 [Combat] 伤害 Player(240) → BurstNear(99937.4) 31.3
+[SwordEvolution] PASS 下落经过真实Action并碰到World地面
+[log] 11:35:56 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[SwordEvolution] PASS 未获神降术：真实落地额外一圈，半径3.2
+[SwordEvolution] PASS 基线内圈靶命中，4.2m外圈靶不被额外一圈命中
+[SwordEvolution] PASS 真实表行与处理器可读：evo_divine_descent
+[SwordEvolution] PASS 真实 RunBuild.Add 已获得 evo_divine_descent
+[SwordEvolution] PASS 神降术真实碰撞半径4.8，技能冷却2秒
+[SwordEvolution] PASS 神降术未改共用场景球形资源，新实例仍为3.2
+[log] 11:35:56 [Combat] 伤害 Player(240) → BurstOuter(99968.7) 31.3
+[log] 11:35:58 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[SwordEvolution] PASS 真实下落按键已进入本次起手
+[log] 11:35:58 [Combat] 下落攻击：skl_b_fall Action起动，起手离地3.9913m，参考耗时0.1174s，垂直速34m/s，倍率1.7384，伤害31.2917，方向(0, -1, 0)
+[log] 11:35:58 [Combat] 伤害 Player(240) → BurstNear(99906.1) 31.3
+[log] 11:35:59 [Combat] 下落攻击：skl_b_fall 落地（起手高度 3.99m，伤害 31.29）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 11:35:59 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[log] 11:35:59 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 50.07 = 上游 31.29 ×1.6，半径/形状来自本行命中体，第 2 次触发）—— 上游下落攻击本身没有改动。
+[log] 11:35:59 [Combat] 伤害 Player(240) → BurstNear(99856.1) 50.1
+[log] 11:35:59 [Combat] 伤害 Player(240) → BurstOuter(99918.6) 50.1
+[SwordEvolution] PASS 下落经过真实Action并碰到World地面
+[log] 11:35:59 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 4.8m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[SwordEvolution] PASS 神降术真实落地命中4.2m外圈靶，范围已实际扩大
+[SwordEvolution] PASS 额外落地圈伤害50.067＝本次上游31.292×1.6
+[SwordEvolution] PASS 神降术未改共通下落攻击伤害公式
+[SwordEvolution] PASS 截图 j13_divine_descent
+[log] 11:36:00 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[SwordEvolution] PASS 真实下落按键已进入本次起手
+[log] 11:36:00 [Combat] 下落攻击：skl_b_fall Action起动，起手离地3.9913m，参考耗时0.1174s，垂直速34m/s，倍率1.7384，伤害31.2917，方向(0, -1, 0)
+[log] 11:36:00 [Combat] 伤害 Player(240) → BurstNear(99824.8) 31.3
+[log] 11:36:00 [Combat] 下落攻击：skl_b_fall 落地（起手高度 3.99m，伤害 31.29）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 11:36:00 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 3 次；纯视觉，不改判定）
+[SwordEvolution] PASS 下落经过真实Action并碰到World地面
+[SwordEvolution] PASS 2秒内再次真实落地：额外落地圈被真实冷却拦住
+[log] 11:36:01 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[SwordEvolution] PASS 真实下落按键已进入本次起手
+[log] 11:36:02 [Combat] 下落攻击：skl_b_fall Action起动，起手离地3.9913m，参考耗时0.1174s，垂直速34m/s，倍率1.7384，伤害31.2917，方向(0, -1, 0)
+[log] 11:36:02 [Combat] 伤害 Player(240) → BurstNear(99793.5) 31.3
+[log] 11:36:02 [Combat] 下落攻击：skl_b_fall 落地（起手高度 3.99m，伤害 31.29）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 11:36:02 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 4 次；纯视觉，不改判定）
+[log] 11:36:02 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 50.07 = 上游 31.29 ×1.6，半径/形状来自本行命中体，第 3 次触发）—— 上游下落攻击本身没有改动。
+[log] 11:36:02 [Combat] 伤害 Player(240) → BurstNear(99743.4) 50.1
+[log] 11:36:02 [Combat] 伤害 Player(240) → BurstOuter(99868.6) 50.1
+[SwordEvolution] PASS 下落经过真实Action并碰到World地面
+[log] 11:36:02 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 4.8m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 3 次；纯视觉，不改判定）
+[SwordEvolution] PASS 2秒冷却经过后真实落地再次触发额外一圈
+[log] 11:36:02 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:36:02 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 SpiritSwordEvolutionProbe
+[SwordEvolution] PASS 换镰刀后额外落剑式关闭且形状恢复3.2
+[SwordEvolution] === 灵剑进化验收结束：通过 72，失败 0 ===
+[log] 11:36:02 [Exit] 音频退出回收：真实等待89ms。
+[log] 11:36:02 [Audio] 音效统计：共 22 次 —— sfx_combat_hit×19、sfx_charge_complete×3（缺失 id 0 个）
+
+截图 j13_golden_qi SHA256=8F0FDEE47CDE7C1FBA671BF07C5FA0D7D3F4F852DA61C58B166D1E2915EB30E6
+截图 j13_great_draw SHA256=FF7FD0D7A3446CA346D89CA38A33F92B214593417D23D4DB0C221D71D7C41DEA
+截图 j13_divine_descent SHA256=058B73213DA71AD0E39574EB758BC1CA08416C7A146DBC34942E8FB7B9B5EBD9
+存档 AFTER meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 AFTER ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 AFTER settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 AFTER loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 AFTER rune.cfg SHA256=ABSENT
+selftest.flag AFTER=False

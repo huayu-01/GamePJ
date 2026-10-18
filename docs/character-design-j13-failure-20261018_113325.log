@@ -1,0 +1,18 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+Debug 构建失败
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+F:\Godot项目\项目a\Scripts\Abilities\MeleeComboAbility.cs(538,15): error CS7036: 未提供与“Projectile.Launch(AttackInstance, Vector3)”的所需参数“direction”对应的参数 [F:\Godot项目\项目a\ActRoguelike.csproj]
+
+生成失败。
+
+F:\Godot项目\项目a\Scripts\Abilities\MeleeComboAbility.cs(538,15): error CS7036: 未提供与“Projectile.Launch(AttackInstance, Vector3)”的所需参数“direction”对应的参数 [F:\Godot项目\项目a\ActRoguelike.csproj]
+    0 个警告
+    1 个错误
+
+已用时间 00:00:04.84

@@ -1,36 +1,26 @@
 [gd_resource type="Resource" script_class="RewardConfig" format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_spirit_sword.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" path="res://Scripts/Config/SkillEnhancementTuning.cs" id="3_tuning"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_3.tres" id="4_skill"]
 
-[sub_resource type="Resource" id="Resource_p0"]
-script = ExtResource("1_param")
-Key = "AbilityId"
-Value = "skl_b1_w1_3"
-Note = "改哪一条技能行（落剑式）"
-
-[sub_resource type="Resource" id="Resource_p1"]
-script = ExtResource("1_param")
-Key = "Cooldown"
-Value = 2.0
-Note = "文档明确：冷却时间变为 2 秒"
-
-[sub_resource type="Resource" id="Resource_p2"]
-script = ExtResource("1_param")
-Key = "DamageScale"
-Value = 1.6
-Note = "那一圈的伤害倍率"
+[sub_resource type="Resource" id="Enhancement"]
+script = ExtResource("3_tuning")
+TargetAbility = ExtResource("4_skill")
+DamageScale = 1.6
+SizeScale = 1.5
+CooldownSeconds = 2.0
 
 [resource]
 script = ExtResource("2_row")
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "AbilityOverride"
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+ApplyHandler = "SkillEnhancement"
+SkillEnhancement = SubResource("Enhancement")
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Pool = ExtResource("1_pool")
 Id = "evo_divine_descent"
 DisplayName = "神降术"
-DescriptionTemplate = "武技3 的伤害更高，冷却时间变为 2 秒"
-Note = "[P5b 新增行] 文档第 127 行（进化池 <B1限定>）「神降术:武技3的范围更大,造成的伤害更高,冷却时间变为{2}秒」。冷却 2 秒是**文档明确值**（直接覆盖 Ability.Cooldown）；伤害更高走 DamageScale。⚠️ 「范围更大」**没接** —— 那一圈的半径在命中体（AttackHitbox）上，不在这个能力的 [Export] 列里，要它得再开一列。⚠️ 伤害倍率文档没给 → 预设 1.6。"
+DescriptionTemplate = "武技3 的范围更大、伤害更高，冷却时间变为 2 秒"
+Note = "J13：只增强落剑式额外一圈，伤害×1.6／半径×1.5（两项原文未给值，为可配置预设）；冷却2秒是原文明值。不改共通下落攻击或其他武器，范围读真实独立球形碰撞体。"

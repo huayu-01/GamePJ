@@ -3255,7 +3255,7 @@ public partial class SelfTest : Node
 		var probeBackdash = new ChargeAttackAbility { AbilityId = "skl_a1_skill_1", MaxCharges = 1 };
 		var probeSpear = new ChargeAttackAbility { AbilityId = "skl_b3_w1_2" };
 		var probeBowSkill = new ArrowVolleyAbility { AbilityId = "skl_a3_w1_1" };
-		var probeDraw = new ArrowVolleyAbility { AbilityId = "skl_b1_w1_2" };
+		var probeDraw = new SwordQiAbility { AbilityId = "skl_b1_w1_2", Damage = 26f };
 		var probeLanding = new LandingBurstAbility { AbilityId = "skl_b1_w1_3" };
 		probePlayer.AddChild(probeBackdash);
 		probePlayer.AddChild(probeSpear);
@@ -3283,8 +3283,10 @@ public partial class SelfTest : Node
 			&& Mathf.Abs(probeSpear.ChargeStepSeconds - 0.125f) < 0.0001f
 			&& probeBowSkill.RampMaxCount == 3 && Mathf.Abs(probeBowSkill.RampWindowSeconds - 1.2f) < 0.0001f
 			&& Mathf.Abs(probeBowSkill.ChargeMaxSeconds - 3f) < 0.0001f
-			&& Mathf.Abs(probeDraw.ProjectileSizeScale - 2f) < 0.0001f
-			&& Mathf.Abs(probePlayer.Stats.Get("DamageMultiplier") - 1.5f) < 0.0001f
+			// J13：专属增强只改拔刀式；实际尺寸在真实发射前重算，完整链路由灵剑专项覆盖。
+			&& Mathf.Abs(probeDraw.Damage - 39f) < 0.0001f
+			&& probeDraw.SweepMaxHits == 8 && Mathf.Abs(probeDraw.SweepRadius - 0.16f) < 0.0001f
+			&& Mathf.Abs(probePlayer.Stats.Get("DamageMultiplier") - 1f) < 0.0001f
 			&& Mathf.Abs(probeLanding.Knockback - 6f) < 0.0001f
 			&& Mathf.Abs(probeLanding.Cooldown - 2f) < 0.0001f
 			&& Mathf.Abs(probeLanding.DamageScale - 1.6f) < 0.0001f;
@@ -3292,7 +3294,7 @@ public partial class SelfTest : Node
 			$"{(overrideOk ? "✅" : "🔴")} P5b·实测表参数落到机制上（探测技能节点，不进树）：有备无患 → 后撤 MaxCharges {probeBackdash.MaxCharges}（期望 3）Recharge {probeBackdash.RechargeSeconds:0.###}s（期望 0.5）"
 			+ $"｜气贯长虹 → 长枪武技2 基础蓄力 {probeSpear.ChargeBaseSeconds:0.###}s（期望 0.5）每档 {probeSpear.ChargeStepSeconds:0.###}s（期望 0.125）"
 			+ $"｜变奏 + 龙之箭 → 弓武技1 RampMaxCount {probeBowSkill.RampMaxCount}（期望 3）RampWindow {probeBowSkill.RampWindowSeconds:0.###}s（期望 1.2）蓄力上限 {probeBowSkill.ChargeMaxSeconds:0.###}s（期望 3）"
-			+ $"｜大拔刀术 → 拔刀式剑气体积 ×{probeDraw.ProjectileSizeScale:0.###}（期望 2）+ 伤害乘区 {probePlayer.Stats.Get("DamageMultiplier"):0.###}（期望 1.5）"
+			+ $"｜大拔刀术 → 拔刀式自身伤害 {probeDraw.Damage:0.###}（期望39）扫掠 {probeDraw.SweepMaxHits}/半径{probeDraw.SweepRadius:0.###}（期望8/0.16）全局伤害乘区 {probePlayer.Stats.Get("DamageMultiplier"):0.###}（期望1；真实发射尺寸见灵剑专项）"
 			+ $"｜地爆 / 神降术 → 落剑式 Knockback {probeLanding.Knockback:0.###}（期望 6）Cooldown {probeLanding.Cooldown:0.###}s（期望 2）DamageScale {probeLanding.DamageScale:0.###}（期望 1.6）");
 
 		// ⑨ 异化（P5b）：三条新增异化的规则**真的挂上了、参数真的来自表**，并且真的能出手一次。

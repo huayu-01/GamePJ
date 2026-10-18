@@ -38,6 +38,23 @@ public partial class SwordQiAbility : ArrowVolleyAbility
 
 	/// <summary>尺寸的来源说明（自测取证："等比的是谁的盒子"）。</summary>
 	public string LastSizeSource { get; private set; } = string.Empty;
+	private float _enhancedSize = 1f;
+	private (int Hits, float Radius)? _originalSweep;
+	public void ConfigureEnhancement(float damageScale, float sizeScale, int sweepMaxHits, float sweepRadius)
+	{
+		Damage *= Mathf.Max(0f, damageScale);
+		_enhancedSize *= Mathf.Max(0.01f, sizeScale);
+		_originalSweep ??= (SweepMaxHits, SweepRadius);
+		SweepMaxHits = sweepMaxHits;
+		SweepRadius = sweepRadius;
+	}
+	protected override void OnLoadoutReset()
+	{
+		base.OnLoadoutReset();
+		_enhancedSize = 1f;
+		if (_originalSweep is { } sweep) { SweepMaxHits = sweep.Hits; SweepRadius = sweep.Radius; }
+		_originalSweep = null;
+	}
 
 	protected override void OnActivate(Unit? target)
 	{
@@ -70,6 +87,7 @@ public partial class SwordQiAbility : ArrowVolleyAbility
 			LastSize = longest * SizeRatio;
 		}
 
+		LastSize *= _enhancedSize;
 		ProjectileSizeScale = LastSize > 0f ? LastSize : 1f;
 	}
 }

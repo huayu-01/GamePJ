@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
 using ActRoguelike.Core;
@@ -120,6 +121,15 @@ public partial class MeleeComboAbility : Ability
 	public Vector3 CurrentStepBoxSize { get; private set; }
 	/// <summary>真实判定次数；表现层据此播放特效，不驱动战斗。</summary>
 	public int StrikeCount { get; private set; }
+	/// <summary>当前配装由真实 ATK 发出的额外投射物数量。</summary>
+	public int ExtraProjectileCount { get; private set; }
+	private MeleeProjectileTuning? _extraProjectile;
+	public void ConfigureExtraProjectile(MeleeProjectileTuning tuning) => _extraProjectile = tuning;
+	protected override void OnLoadoutReset()
+	{
+		_extraProjectile = null;
+		ExtraProjectileCount = 0;
+	}
 
 	/// <summary>本段斩断了几个子弹（自测取证）。</summary>
 	public int LastCutCount { get; private set; }
@@ -513,6 +523,28 @@ public partial class MeleeComboAbility : Ability
 
 		LastCutCount = CutBullets();
 		TotalCutCount += LastCutCount;
+		// 斩弹之后再生成自己的剑气；未配置时完全不进入出弹通路。
+		if (_extraProjectile is { ProjectileScene: { } scene } tuning)
+		{
+			Vector3 direction = -OwnerUnit.GlobalBasis.Z;
+			var projectile = scene.Instantiate<Projectile>();
+			(GetTree().CurrentScene ?? GetTree().Root).AddChild(projectile);
+			projectile.GlobalPosition = OwnerUnit.GlobalPosition + Vector3.Up * 0.9f + direction * 0.6f;
+			float size = Mathf.Max(CurrentStepBoxSize.X, Mathf.Max(CurrentStepBoxSize.Y, CurrentStepBoxSize.Z)) * tuning.SizeRatio;
+			projectile.Scale = Vector3.One * Mathf.Max(0.01f, size);
+			projectile.Speed = tuning.Speed;
+			projectile.Pierce = 0;
+			projectile.SweepMaxHits = tuning.SweepMaxHits;
+			projectile.Launch(new AttackInstance
+			{
+				Attacker = OwnerUnit, Ability = AbilityId, AbilityKind = AbilityId,
+				BaseDamage = attack.BaseDamage * tuning.DamageScale,
+				CanCrit = attack.CanCrit, CritChance = attack.CritChance, CritMultiplier = attack.CritMultiplier,
+				Knockback = attack.Knockback, Policy = HitPolicy.OncePerTarget,
+				Lifetime = tuning.Lifetime, Pierce = tuning.Pierce, Tags = tuning.AttackTags.ToArray(),
+			}, direction);
+			ExtraProjectileCount++;
+		}
 
 		GameLog.Write(
 			"Combat",

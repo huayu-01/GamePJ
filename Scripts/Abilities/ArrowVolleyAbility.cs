@@ -100,6 +100,8 @@ public partial class ArrowVolleyAbility : Ability
 	/// <para>只有配了这一列的技能行会启用；短弩/灵剑/能量掌等行不配 → 逐位不变。</para>
 	/// </summary>
 	[Export] public int SweepMaxHits { get; set; }
+	/// <summary>启用胶囊扫掠时的世界半径；与投射物模型尺寸独立配置。</summary>
+	[Export] public float SweepRadius { get; set; } = 0.08f;
 
 	/// <summary>暴击率（角色/武器表给基准，这里只是本技能自己的兜底）。</summary>
 	[Export(PropertyHint.Range, "0,1,0.01")] public float CritChance { get; set; }
@@ -512,6 +514,7 @@ public partial class ArrowVolleyAbility : Ability
 		arrow.HomingStatusId = HomingStatusId; arrow.HomingTurnRateDegrees = HomingTurnRateDegrees; arrow.HomingRange = HomingRange;
 		arrow.Pierce = attack.Pierce; arrow.MaxLifetime = MaxLifetime;
 		arrow.SweepMaxHits = SweepMaxHits;
+		arrow.SweepRadius = SweepRadius;
 		arrow.Launch(attack, dir);
 	}
 }
