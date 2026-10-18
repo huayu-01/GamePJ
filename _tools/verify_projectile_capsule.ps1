@@ -1,5 +1,5 @@
 # J12：胶囊扫掠、全局实际弹速上限与五探针回归，验证独占且保护真实存档。
-param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot)
+param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
 $godotExe = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
@@ -13,6 +13,7 @@ $batchId = if ($WingDive) { 'j27' } elseif ($KillFacts) { 'j26' } elseif ($KillJ
 $RewardRules = $RewardRules -or $RewardTiers -or $KillJumps
 if ($ProjectileQuery) { $batchId = 'j28' }
 if ($AttackSnapshot) { $batchId = 'j29' }
+if ($DotAttribution) { $batchId = 'j30' }
 $saveNames = @('meta.cfg','ability_cards.cfg','settings.cfg','loadout.cfg','rune.cfg')
 $utf8 = [Text.UTF8Encoding]::new($false)
 
@@ -99,7 +100,16 @@ try {
         $evidence.Add($build)
         if ($build -notmatch '0 个警告' -or $build -notmatch '0 个错误') { throw "$configuration 未满足 0/0" }
     }
-    if ($AttackSnapshot) {
+    if ($DotAttribution) {
+        Invoke-Probe 'dot_source' 'res://Scenes/Debug/_DotAttributionProbe.tscn' '持续伤害归属验收结束：通过 26，失败 0'
+        if (-not $ProbeOnly) {
+            Invoke-Probe 'kill_facts' 'res://Scenes/Debug/_KillFactProbe.tscn' '逐杀事实验收结束：通过 40，失败 0'
+            Invoke-Probe 'status' 'res://Scenes/UI/_BatchEProbe.tscn' 'E 批验收结束：通过 39，失败 0'
+            Invoke-Probe 'attack_snapshot' 'res://Scenes/Debug/_AttackSnapshotProbe.tscn' '攻击快照验收结束：通过 45，失败 0'
+            Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
+        }
+    }
+    elseif ($AttackSnapshot) {
         Invoke-Probe 'attack_snapshot' 'res://Scenes/Debug/_AttackSnapshotProbe.tscn' '攻击快照验收结束：通过 45，失败 0'
         if (-not $ProbeOnly) {
             Invoke-Probe 'projectile_query' 'res://Scenes/Debug/_ProjectileQueryProbe.tscn' '弹道查询验收结束：通过 56，失败 0'

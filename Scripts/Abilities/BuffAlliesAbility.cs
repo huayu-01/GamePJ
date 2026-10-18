@@ -44,7 +44,7 @@ public partial class BuffAlliesAbility : Ability
 
 			if (StatusPresets.Create(StatusId, BuffDuration) is { } buff)
 			{
-				ally.ApplyStatus(buff);
+				ally.ApplyStatus(buff, OwnerUnit, AbilityId);
 			}
 		}
 

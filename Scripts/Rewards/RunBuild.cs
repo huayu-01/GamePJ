@@ -145,6 +145,8 @@ public abstract partial class TriggerRule : Node
 	public string RewardId { get; set; } = string.Empty;
 	public float Cooldown { get; set; }
 	public int MaxTriggersPerChain { get; set; } = 4;
+	/// <summary>默认保持旧行为：DoT只广播伤害／击杀事实，不再次触发主攻击命中规则。</summary>
+	public bool IncludeDamageOverTimeHits { get; set; }
 
 	private float _cooldownRemaining;
 	private int _chainId = -1;
@@ -170,6 +172,7 @@ public abstract partial class TriggerRule : Node
 
 	private void OnRaised(GameplayEvent gameplayEvent)
 	{
+		if (gameplayEvent.IsDamageOverTime && gameplayEvent.Kind == GameplayEventKind.Hit && !IncludeDamageOverTimeHits) return;
 		if (!IsReady || !Matches(gameplayEvent))
 		{
 			return;

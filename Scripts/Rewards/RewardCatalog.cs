@@ -170,7 +170,7 @@ public partial class BurnOnHitRule : TriggerRule
 	{
 		if (StatusPresets.Create(StatusId, Duration) is { } burn)
 		{
-			gameplayEvent.Target?.ApplyStatus(burn);
+			gameplayEvent.Target?.ApplyStatus(burn, _owner, gameplayEvent.Tag);
 		}
 	}
 }
@@ -646,7 +646,7 @@ public partial class HomingMissileOnCritRule : TriggerRule
 		if (!string.IsNullOrEmpty(BeaconStatusId)
 			&& StatusPresets.Create(BeaconStatusId, BeaconSeconds) is { } beacon)
 		{
-			target.ApplyStatus(beacon);
+			target.ApplyStatus(beacon, _owner, RewardId);
 		}
 
 		Vector3 origin = _owner.GlobalPosition + (Vector3.Up * 1.2f);

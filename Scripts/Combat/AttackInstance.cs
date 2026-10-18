@@ -33,6 +33,8 @@ public sealed class AttackInstance
 
 	public float BaseDamage { get; init; }
 	public bool CanCrit { get; init; }
+	/// <summary>状态周期伤害事实；不作为新主攻击再次触发命中增幅。</summary>
+	public bool IsDamageOverTime { get; init; }
 	public float CritChance { get; init; }
 	public float CritMultiplier { get; init; } = 2f;
 	public float Knockback { get; init; }

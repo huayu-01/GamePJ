@@ -297,7 +297,7 @@ public partial class HawkEyeAbility : Ability
 			return false;
 		}
 
-		best.ApplyStatus(status);
+		best.ApplyStatus(status, OwnerUnit, AbilityId);
 		MarkedCount++;
 		GameLog.Write(
 			"Combat",

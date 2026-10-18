@@ -99,7 +99,7 @@ public partial class MarkedBonusRule : TriggerRule, IOutgoingDamageScale
 			return;
 		}
 
-		target.ApplyStatus(mark);
+		target.ApplyStatus(mark, _owner, MarkAbilityId);
 		MarkAppliedCount++;
 	}
 

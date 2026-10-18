@@ -324,6 +324,7 @@ public partial class Unit : CharacterBody3D
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Hit,
+			IsDamageOverTime = hit.Attack?.IsDamageOverTime == true,
 			Source = hit.Attacker,
 			Target = this,
 			Value = hit.Damage,
@@ -436,12 +437,13 @@ public partial class Unit : CharacterBody3D
 		// 状态效果与伤害本体分离：命中就附加，与伤害数值无关（§20）。
 		if (hit.Attack?.Status is { } status)
 		{
-			ApplyStatus(status);
+			ApplyStatus(status, hit.Attacker, string.IsNullOrEmpty(hit.Attack.AbilityKind) ? hit.Attack.Ability : hit.Attack.AbilityKind);
 		}
 
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Damaged,
+			IsDamageOverTime = hit.Attack?.IsDamageOverTime == true,
 			Source = hit.Attacker,
 			Target = this,
 			Value = result.HealthLost,
@@ -516,12 +518,22 @@ public partial class Unit : CharacterBody3D
 				if (status.TickAccumulator >= 1f)
 				{
 					status.TickAccumulator -= 1f;
+					Unit? source = status.Source is { } original && IsInstanceValid(original) ? original : null;
+					var attack = new AttackInstance
+					{
+						Attacker = source, Ability = $"Status:{status.Effect.Id}", AbilityKind = status.SourceAbilityKind,
+						BaseDamage = status.Effect.DamagePerSecond, IsDamageOverTime = true,
+						Tags = new[] { "Status", "DamageOverTime" },
+					};
 					ReceiveHit(new HitInstance
 					{
 						Target = this,
-						Context = EventContext.Create(null, this),
+						Attacker = source,
+						Attack = attack,
+						Context = EventContext.Create(source, this),
 						Damage = status.Effect.DamagePerSecond,
 						Direction = Vector3.Up,
+						Position = GlobalPosition,
 					});
 				}
 			}
@@ -557,7 +569,7 @@ public partial class Unit : CharacterBody3D
 	/// （每层一份）。设计文档的「标记」是第一条这样的状态 ——「可叠加且不限定单个目标的 buff」，
 	/// 所以层数存在<b>每个单位自己身上</b>（`_statuses` 是单位级容器），天然"不限单个目标"。</para>
 	/// </summary>
-	public void ApplyStatus(StatusEffect effect)
+	public void ApplyStatus(StatusEffect effect, Unit? source = null, string sourceAbilityKind = "")
 	{
 		if (IsDead)
 		{
@@ -570,6 +582,9 @@ public partial class Unit : CharacterBody3D
 			{
 				continue;
 			}
+			// 刷新归属于这次施加者；环境／未知来源刷新也不能冒领旧玩家的后续击杀。
+			existing.Source = source;
+			existing.SourceAbilityKind = sourceAbilityKind;
 
 			// ⚠️ 这一行就是"不叠加层数"那条老路径，一个字都没动（默认语义逐位不变）。
 			if (!effect.IsStackable)
@@ -591,7 +606,7 @@ public partial class Unit : CharacterBody3D
 			return;
 		}
 
-		var active = new ActiveStatus { Effect = effect, Remaining = effect.Duration, Stacks = 1 };
+		var active = new ActiveStatus { Effect = effect, Remaining = effect.Duration, Stacks = 1, Source = source, SourceAbilityKind = sourceAbilityKind };
 		_statuses.Add(active);
 		ApplyStatusModifiers(active);
 
@@ -797,6 +812,7 @@ public partial class Unit : CharacterBody3D
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Died,
+			IsDamageOverTime = hit.Attack?.IsDamageOverTime == true,
 			Source = hit.Attacker,
 			Target = this,
 			Position = GlobalPosition,
@@ -809,6 +825,7 @@ public partial class Unit : CharacterBody3D
 			GameplayEventBus.Raise(new GameplayEvent
 			{
 				Kind = GameplayEventKind.Kill,
+				IsDamageOverTime = hit.Attack?.IsDamageOverTime == true,
 				ComboStep = hit.Attack?.ComboStep ?? -1,
 				ComboStepCount = hit.Attack?.ComboStepCount ?? 0,
 				Source = hit.Attacker,

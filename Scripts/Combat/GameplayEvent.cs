@@ -51,6 +51,7 @@ public readonly struct GameplayEvent
 	public Unit? Source { get; init; }
 	public Unit? Target { get; init; }
 	public float Value { get; init; }
+	public bool IsDamageOverTime { get; init; }
 
 	/// <summary>攻击标签或技能 Id，用于按能力类型过滤，而不是按单位 Id。</summary>
 	public string Tag { get; init; }

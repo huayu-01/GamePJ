@@ -71,7 +71,8 @@ public partial class GuardStanceAbility : Ability
 	/// <summary>被命中：架势内 → 规避这次 + 退出架势。</summary>
 	private void OnOwnerHit(HitInstance hit)
 	{
-		if (!Enabled || !IsBusy || !StanceActive || OwnerUnit == null || hit.Attacker == null || !OwnerUnit.IsHostileTo(hit.Attacker))
+		if (!Enabled || !IsBusy || !StanceActive || OwnerUnit == null || hit.Attacker == null || !OwnerUnit.IsHostileTo(hit.Attacker)
+			|| hit.Attack?.IsDamageOverTime == true)
 		{
 			return;
 		}

@@ -35,6 +35,9 @@ public sealed class ActiveStatus
 	public required StatusEffect Effect { get; set; }
 	public float Remaining { get; set; }
 	public float TickAccumulator { get; set; }
+	/// <summary>同状态最近一次施加者；未知来源保留null，过期／死亡后不猜测其他玩家。</summary>
+	public Unit? Source { get; set; }
+	public string SourceAbilityKind { get; set; } = string.Empty;
 
 	/// <summary>
 	/// 当前层数（<see cref="StatusEffect.MaxStacks"/> ≤ 1 时恒为 1，**不参与任何判定**）。
