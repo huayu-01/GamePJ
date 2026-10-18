@@ -261,6 +261,15 @@ public static class RewardEffectRegistry
 				Damage = Param(row, "Damage", 0f),
 			}),
 
+		// 践踏死亡只记录本人击杀，数值来自表，不经过会吞事实的攻击连锁冷却／次数门。
+		["KillAirJumps"] = row => context =>
+			context.Player.AddChild(new KillAirJumpRule
+			{
+				RewardId = row.Id,
+				ExtraAirJumps = (int)Param(row, "ExtraAirJumps", 0f),
+				JumpCap = (int)Param(row, "JumpCap", 0f),
+			}),
+
 		// 杀戮践踏：成功起跳的事实，不用落地轮询或隐藏冷却替代。
 		["JumpPulse"] = row => context =>
 			context.Player.AddChild(new JumpPulseRule

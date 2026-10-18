@@ -1,5 +1,7 @@
 # 增幅系统 · 三层判定（限定 / 互斥 / 前置）—— P5 接入契约
 
+> **2026-10-18 J25更新**：践踏死亡迁`KillAirJumps`，每个本人Kill立即增加可用次数和未满容量；用户确认满容量后仍补回已消耗次数。增量／封顶共读表及说明，纯计数独立于攻击连锁门，不改通用递归限制。专项78/0及完整19进程通过，见[J25](character-design-j25.md)。
+
 > **2026-10-18 J24更新**：当前生产目录**70=17强化／23进化／30异化**，补生命／暴击／爆伤／坚硬八条等级，前置上一级且每级一次。每行改`Modifiers.Value`即可同步实际效果和`{Modifiers.属性键:格式}`说明；奖励编译也解析HandlerParams。专项78/79与完整19进程通过，见[J24参数与证据](character-design-j24.md)。数值为预设，平衡后置；23项新特化仍待生产。
 
 > **2026-10-18 J23更新**：获取次数只改行内`MaxStacks`：0不限、1一次；力量／护甲／快速可重复，六条未带星号强化一次。候选过滤、真实五次获取与14条既有等级前置39/0、完整18进程通过，见[J23](character-design-j23.md)。每次增量和权重保持，不做平衡调整。
@@ -123,7 +125,8 @@
 | **`ChargeBaseSecondsOverride` / `ChargeStepSecondsOverride` / `ChargeStepSecondsMultiplier`**（P5 新增） | `Ability.ChargeBaseSecondsEffective` / `ChargeStepSecondsEffective` | 0 / 0 / 1 |
 | **`VolleyCountOverride` / `VolleyDamagePerLostArrow`**（P5 新增） | `ArrowVolleyAbility.FireVolley` | 0 / 0 |
 | **`AbilityOverride` 处理器**（P5b 新增） | HandlerParams 里除 `AbilityId` 外每一条 = `Ability` 上的一个 `[Export]` 属性名 → 值，用 Godot 的 `Set()` 套用（属性名写错按 `GetPropertyList()` 查出并告警，**不静默**）；行上若带 `Modifiers` 则先按 `StatSet` 的语义套上 | 服务 **6** 条进化（J9 起「龙之箭」改用 `ChargedShot` 强类型资源） |
-| **`TablePulse` 处理器 + `TablePulseRule`**（P5b 新增；P6a 支持多事件） | 事件 → 效果：`Trigger`（`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`，**可以逗号分隔多个，任一命中即出手**）+ 一次性 CDR（`AbilityId` + `CooldownFraction` / `CooldownSeconds` / `RefreshAbility`）/ `Heal` / `HoverSeconds` / `RequireHover` / `ExtraAirJumps` + `JumpCap` / `Radius` + `Damage` | **一个类服务 6 条行** |
+| **`TablePulse` 处理器 + `TablePulseRule`**（P5b 新增；P6a 支持多事件） | 事件 → 效果：`Trigger`（`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`，**可以逗号分隔多个，任一命中即出手**）+ 一次性 CDR（`AbilityId` + `CooldownFraction` / `CooldownSeconds` / `RefreshAbility`）/ `Heal` / `HoverSeconds` / `RequireHover` / `ExtraAirJumps` + `JumpCap` / `Radius` + `Damage` | 当前5行；践踏死亡已在J25迁独立计数 |
+| **`KillAirJumps` + `KillAirJumpRule`**（J25） | 每次本人Kill增加容量及立即可用次数，满容量后仍补回；`ExtraAirJumps`／`JumpCap`来自表。不产生攻击或新事件，不经过攻击连锁冷却／次数／深度门 | 1行，践踏死亡 |
 | **`JumpPulse` 处理器 + `JumpPulseRule`**（J22纠正「杀戮践踏」） | 成功起跳时按起跳前圆心结算，包括空中跳、跃升Action和成功瞬移跳；订阅拥有者`JumpStarted`，退出成对退订。`Radius` / `Damage`来自表，与能量护盾共用`PulseDamage.Around`；失败跳跃、自然下落和落地不触发，没有隐藏冷却 | 1 条 |
 | **`HomingMissileOnCrit` 处理器 + `HomingMissileOnCritRule`**（**P6b 新增**，服务「巡飞弹」） | 暴击 → 发射一枚**追踪飞弹**：`ProjectileScene` / `Damage` / `Speed` / `SeekRange` / `Lifetime` / `BeaconStatusId` / `BeaconSeconds` / `TurnRateDegrees` / `Cooldown`。复用的是 **P3 的追踪弹通路**（`Projectile.HomingStatusId` + 转向速度）：先给最近的敌人挂**专用信标状态**（`eff_missile_beacon`），再发一枚追这个状态的飞弹 | 1 条 |
 | **`BurnOnHit` 的 `Cooldown`**（P5b 新增） | 命中挂状态那条规则自己的触发间隔（「冰晶」的"每 10 秒最多一次"） | 0（= 不拦，改动前行为） |
@@ -151,7 +154,7 @@
 | 新东西 | 服务几条行 | 做法 |
 |---|---|---|
 | `AbilityOverride` 处理器 | **6 条**（有备无患 / 专注 / 气贯长虹 / 地爆 / 大拔刀术 / 神降术；**J9 起「龙之箭」改用 `ChargedShot`**） | 不写特例：HandlerParams 里**除 `AbilityId` 外每一条都是"属性名 = 值"**，用 Godot 的 `Set()` 套到 `Ability.FindByAbilityId` 找到的那个节点上 |
-| `TablePulse` 处理器 + `TablePulseRule` | **6 条**（乱金柝 / 闪身步 / 招架反击 / 普渡 / 践踏死亡 / 能量护盾） | 一个类带 `Trigger` + 一组效果参数；差别只是"订哪种事件、出手做什么、数值多少" |
+| `TablePulse` 处理器 + `TablePulseRule` | 当前**5条**（乱金柝／闪身步／招架反击／普渡／能量护盾） | 带Trigger及效果参数；践踏死亡在J25独立逐杀计数，防止通用攻击连锁门吞事实 |
 
 ---
 

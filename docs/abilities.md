@@ -299,6 +299,7 @@ Ability.FindByAbilityId(unit, "skl_xxx");  // 增幅按**技能行 Id** 找技�
 |---|---|---|
 | `Ability.AnimEventEnd`（技能行列名同名） | **第二个事件帧**：一段动画里夹出一个区间（后撤的 `Dodge`→`Dodger` 无敌帧；角色 B 的「架」`GuardOn`→`GuardOff` 也是这个形状） | 空 → `OnAnimationEvent` 只认 `AnimEvent` 一个名字，**逐字等于改动前** |
 | `CharacterMovement.SetExtraAirJumps(value, cap)` | 额外空中跳跃次数的**接入点**（上限是参数：文档说"最多 3 次"） | 没人调用 → `ExtraAirJumps` 保持场景值 |
+| `CharacterMovement.GrantAirJumps(amount, cap)`（J25） | 一次性同时增加最大容量与立即可用次数；容量满后仍能补回，纯被动继续用上面的幂等设置 | 没有击杀增幅时不调用；增量／封顶来自表 |
 
 **其余机制一律不碰基类**：散射 / 下坠起点 / 击退门槛 / 追踪 / 滞空 / 标记 / 视角放大 / 无效化
 都是"子类 + 表列"或"独立组件"（见 [combat.md](combat.md) 的「标记 · 无敌帧 · 滞空」表）。

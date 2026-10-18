@@ -487,6 +487,38 @@ internal static class PulseDamage
 	}
 }
 
+/// <summary>践踏死亡逐个记录本人击杀，只增加跳数，不生成攻击或递归事件。</summary>
+public partial class KillAirJumpRule : TriggerRule
+{
+	public int ExtraAirJumps { get; set; }
+	public int JumpCap { get; set; }
+	public int TriggerTally { get; private set; }
+	private Unit? _owner;
+
+	public override void _Ready()
+	{
+		_owner = GetParent<Unit>();
+		// 纯事实计数不接基类的攻击连锁门；不生成新命中，不会递归触发自身。
+		GameplayEventBus.Raised += OnKill;
+	}
+	public override void _ExitTree()
+	{
+		GameplayEventBus.Raised -= OnKill;
+		_owner = null;
+	}
+	public override bool Matches(GameplayEvent fact) => _owner != null && IsInstanceValid(_owner)
+		&& fact.Kind == GameplayEventKind.Kill && fact.Source == _owner;
+	private void OnKill(GameplayEvent fact) { if (Matches(fact)) Execute(fact); }
+	public override void Execute(GameplayEvent fact)
+	{
+		if (_owner == null || !IsInstanceValid(_owner) || _owner.Movement is not { } movement || ExtraAirJumps <= 0 || JumpCap <= 0) return;
+		int capacity = movement.ExtraAirJumps, available = movement.AirJumpsLeft;
+		movement.GrantAirJumps(ExtraAirJumps, JumpCap);
+		TriggerTally++;
+		GameLog.Write("Reward", $"践踏死亡：本人击杀第{TriggerTally}次，表内增量{ExtraAirJumps}／上限{JumpCap}，容量{capacity}→{movement.ExtraAirJumps}／可用{available}→{movement.AirJumpsLeft}");
+	}
+}
+
 /// <summary>
 /// 杀戮践踏订阅成功起跳事实，按起跳前圆心结算；地面跳、空中跳和瞬移跳共用，落地不触发。
 /// 半径和伤害来自增幅表，原文的n继续保留为可配置预设。

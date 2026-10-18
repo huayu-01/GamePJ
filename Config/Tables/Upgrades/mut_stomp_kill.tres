@@ -3,17 +3,11 @@
 [ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
-[sub_resource type="Resource" id="Resource_p0"]
-script = ExtResource("1_param")
-Key = "Trigger"
-Value = "Kill"
-Note = "订阅击杀"
-
 [sub_resource type="Resource" id="Resource_p1"]
 script = ExtResource("1_param")
 Key = "ExtraAirJumps"
 Value = 1
-Note = "每次击杀给几次额外空中跳跃"
+Note = "每次本人击杀立即增加的可用空中跳次数，同时增加未满的最大容量"
 
 [sub_resource type="Resource" id="Resource_p2"]
 script = ExtResource("1_param")
@@ -21,19 +15,13 @@ Key = "JumpCap"
 Value = 3
 Note = "上限（文档：最多 N 次）"
 
-[sub_resource type="Resource" id="Resource_p3"]
-script = ExtResource("1_param")
-Key = "Cooldown"
-Value = 0.1
-Note = "本规则自己的触发间隔"
-
 [resource]
 script = ExtResource("2_row")
 RewardKind = 2
 MaxStacks = 1
-ApplyHandler = "TablePulse"
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3")]
+ApplyHandler = "KillAirJumps"
+HandlerParams = [SubResource("Resource_p1"), SubResource("Resource_p2")]
 Id = "mut_stomp_kill"
 DisplayName = "践踏死亡"
-DescriptionTemplate = "每次击杀都会获得额外的空中跳跃次数（最多 3 次）"
-Note = "[P5b 新增行] 文档第 170 行（异化池，全角色通用）「践踏死亡:每次击杀都会获得额外跳跃的次数(额外跳跃次数最多N次)」。消费者：TablePulseRule → CharacterMovement.SetExtraAirJumps（P3 就是按「上限是参数，不是常量」建的，见 docs/abilities.md §7.1）。⚠️ 文档是 N（没给数）→ **上限预设 3 次**（= 文档第 24 行「上限最多 3 次」），每次击杀 +1 也是预设。"
+DescriptionTemplate = "每次本人击杀立即补充 {ExtraAirJumps:0} 次空中跳跃，同时增加最大容量（最多 {JumpCap:0} 次）；满容量后仍可补回已消耗次数"
+Note = "J25：按每次击杀逐个计入，移除旧0.1秒冷却；纯计数不经过攻击连锁次数／深度门。用户确认空中击杀立即可用，满容量后也可补回已消耗次数，不等落地；每杀1／封顶3沿用可调预设，保留灵动及其他来源已有次数。效果与说明同读HandlerParams。"

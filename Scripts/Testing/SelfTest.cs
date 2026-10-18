@@ -3314,7 +3314,7 @@ public partial class SelfTest : Node
 
 		BurnOnHitRule? freezeRule = null;
 		TablePulseRule? shieldRule = null;
-		TablePulseRule? stompRule = null;
+		KillAirJumpRule? stompRule = null;
 		var probeRules = new List<TriggerRule>();
 		NodeSearch.CollectInSubtree(livePlayer, probeRules);
 		foreach (TriggerRule rule in probeRules)
@@ -3329,7 +3329,7 @@ public partial class SelfTest : Node
 				shieldRule = pulse;
 			}
 
-			if (rule is TablePulseRule stomp && stomp.RewardId == "mut_stomp_kill")
+			if (rule is KillAirJumpRule stomp && stomp.RewardId == "mut_stomp_kill")
 			{
 				stompRule = stomp;
 			}
@@ -3347,13 +3347,13 @@ public partial class SelfTest : Node
 		bool fired = jumpsAfter == Mathf.Min(jumpsBefore + 1, 3);
 		bool ruleOk = freezeRule is { Cooldown: 10f, StatusId: "Freeze" }
 			&& shieldRule is { Trigger: "Parried,ArmorBroken", Radius: 6f, Damage: 20f }
-			&& stompRule is { ExtraAirJumps: 1, JumpCap: 3, Trigger: "Kill" }
+			&& stompRule is { ExtraAirJumps: 1, JumpCap: 3, Cooldown: 0f }
 			&& matched
 			&& fired;
 		GameLog.Write("SelfTest",
 			$"{(ruleOk ? "✅" : "🔴")} P5b·实测异化规则（真实玩家 + 真实 RewardContext）：冰晶 → {freezeRule?.GetType().Name} Cooldown {freezeRule?.Cooldown:0.#}s（期望 10）StatusId「{freezeRule?.StatusId}」（期望 Freeze）"
 			+ $"｜能量护盾 → TablePulseRule Trigger「{shieldRule?.Trigger}」（期望 Parried,ArmorBroken —— P6a 给 ArmorBroken 补了抛点，两路都通）半径 {shieldRule?.Radius:0.#}（期望 6）伤害 {shieldRule?.Damage:0.#}（期望 20）"
-			+ $"｜践踏死亡 → 击杀匹配={matched} 出手一次后 额外空中跳跃 {jumpsBefore} → {jumpsAfter}（期望 +1，封顶 {stompRule?.JumpCap}）");
+			+ $"｜践踏死亡 → {stompRule?.GetType().Name} 击杀匹配={matched} 同步入口一次后额外空中跳跃 {jumpsBefore} → {jumpsAfter}（期望 +1，封顶 {stompRule?.JumpCap}；真实多杀与空中立即补次数由_KillJumpProbe验收）");
 
 		// 清理（这一段量测不留痕）：摘掉三条规则节点、还原额外空中跳跃、释放探测单位。
 		foreach (TriggerRule rule in probeRules)

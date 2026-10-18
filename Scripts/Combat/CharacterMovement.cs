@@ -90,6 +90,14 @@ public partial class CharacterMovement : Node
 		_airJumpsLeft = Mathf.Min(_airJumpsLeft, wanted);
 	}
 
+	/// <summary>击杀等一次性授予同时增加容量与立即可用次数；满容量后仍可补回，不减少其他来源已有次数。</summary>
+	public void GrantAirJumps(int amount, int cap)
+	{
+		if (amount <= 0 || cap <= 0) return;
+		ExtraAirJumps = Mathf.Max(ExtraAirJumps, Mathf.Min(ExtraAirJumps + amount, cap));
+		_airJumpsLeft = Mathf.Max(_airJumpsLeft, Mathf.Min(_airJumpsLeft + amount, Mathf.Min(ExtraAirJumps, cap)));
+	}
+
 	/// <summary>击退等外力的衰减速度（1/秒）。</summary>
 	[Export] public float ImpulseDamping { get; set; } = 6f;
 

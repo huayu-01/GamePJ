@@ -1,0 +1,375 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=9FD4787436FD4EAFAEA11372C2745276A7D35D4FCF192456825E7C1ADDFD02B4
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 339 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.63
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 341 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.32
+
+kill_jumps exit=1 seconds=12.54 stderrBytes=0
+=== kill_jumps ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 21:25:34 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 21:25:34 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 21:25:34 [Flow] === 新的一局 ===
+[log] 21:25:34 [Flow] 日志文件：user://logs/run_20261018_212534.log
+[log] 21:25:34 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 21:25:34 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 21:25:34 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 21:25:34 [Config] 奔跑：角色行暂时读不到（RunSetup.Character=WeaponMaster / 角色表 0 行）→ 先按「sprint」/ 倍率 1 跑，表就绪后会再套一次
+[log] 21:25:34 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 21:25:34 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 21:25:34 [Config] 增幅项表：70 条（来源：表）—— 强化 17 / 进化 23 / 异化 30。
+[log] 21:25:34 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 21:25:34 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 21:25:34 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 21:25:34 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 21:25:34 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 21:25:34 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 21:25:34 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 21:25:34 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 21:25:34 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:25:34 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:25:34 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:25:34 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:34 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 21:25:34 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[log] 21:25:34 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 21:25:34 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS 等待真实武技可用，不手动缩冷却
+[log] 21:25:35 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 21:25:35 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 21:25:35 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 21:25:35 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 21:25:35 [Combat] 伤害 Player(240) → @CharacterBody3D@247(0) 1
+[log] 21:25:35 [Combat] 死亡 @CharacterBody3D@247(0) 击杀者=Player(240)
+[log] 21:25:35 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 21:25:35 [Combat] 击杀 @CharacterBody3D@247(0) by Player(240)
+[log] 21:25:35 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 21:25:35 [Combat] 伤害 Player(240) → @CharacterBody3D@245(0) 1
+[log] 21:25:35 [Combat] 死亡 @CharacterBody3D@245(0) 击杀者=Player(240)
+[log] 21:25:35 [Combat] 击杀 @CharacterBody3D@245(0) by Player(240)
+[log] 21:25:35 [Combat] 伤害 Player(240) → @CharacterBody3D@243(0) 1
+[log] 21:25:35 [Combat] 死亡 @CharacterBody3D@243(0) 击杀者=Player(240)
+[log] 21:25:35 [Combat] 击杀 @CharacterBody3D@243(0) by Player(240)
+[KillJump] PASS 真实按键→动画ATK→物理靶死亡，新增本人击杀3/3
+[log] 21:25:35 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[KillJump] PASS 无增幅真实一刀同帧三杀，共用一个AttackInstance
+[KillJump] PASS 无增幅本人击杀不增加额外跳跃
+[log] 21:25:35 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:35 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS 真实奖励行可编译／查得践踏死亡
+[KillJump] PASS 真实入构筑践踏死亡
+[KillJump] PASS 等待真实武技可用，不手动缩冷却
+[log] 21:25:36 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 21:25:36 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 21:25:36 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 21:25:36 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 21:25:36 [Combat] 伤害 Player(240) → @CharacterBody3D@256(0) 1
+[log] 21:25:36 [Combat] 死亡 @CharacterBody3D@256(0) 击杀者=Player(240)
+[log] 21:25:36 [Combat] 击杀 @CharacterBody3D@256(0) by Player(240)
+[log] 21:25:36 [Reward] 践踏死亡：本人击杀第1次，表内增量1／上限3，容量0→1／可用0→1
+[log] 21:25:36 [Combat] 伤害 Player(240) → @CharacterBody3D@254(0) 1
+[log] 21:25:36 [Combat] 死亡 @CharacterBody3D@254(0) 击杀者=Player(240)
+[log] 21:25:36 [Combat] 击杀 @CharacterBody3D@254(0) by Player(240)
+[log] 21:25:36 [Reward] 践踏死亡：本人击杀第2次，表内增量1／上限3，容量1→2／可用1→2
+[log] 21:25:36 [Combat] 伤害 Player(240) → @CharacterBody3D@252(0) 1
+[log] 21:25:36 [Combat] 死亡 @CharacterBody3D@252(0) 击杀者=Player(240)
+[log] 21:25:36 [Combat] 击杀 @CharacterBody3D@252(0) by Player(240)
+[log] 21:25:36 [Reward] 践踏死亡：本人击杀第3次，表内增量1／上限3，容量2→3／可用2→3
+[KillJump] PASS 真实按键→动画ATK→物理靶死亡，新增本人击杀3/3
+[log] 21:25:36 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[KillJump] PASS 已获得增幅后仍是真实同帧三杀
+[KillJump] PASS 每次击杀均计入，B从0到3，实读3
+[KillJump] PASS 等待真实武技可用，不手动缩冷却
+[log] 21:25:37 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 21:25:37 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 21:25:37 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 21:25:37 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 21:25:37 [Combat] 伤害 Player(240) → @CharacterBody3D@263(0) 1
+[log] 21:25:37 [Combat] 死亡 @CharacterBody3D@263(0) 击杀者=Player(240)
+[log] 21:25:37 [Combat] 击杀 @CharacterBody3D@263(0) by Player(240)
+[log] 21:25:37 [Reward] 践踏死亡：本人击杀第4次，表内增量1／上限3，容量3→3／可用3→3
+[log] 21:25:37 [Combat] 伤害 Player(240) → @CharacterBody3D@265(0) 1
+[log] 21:25:37 [Combat] 死亡 @CharacterBody3D@265(0) 击杀者=Player(240)
+[log] 21:25:37 [Combat] 击杀 @CharacterBody3D@265(0) by Player(240)
+[log] 21:25:37 [Reward] 践踏死亡：本人击杀第5次，表内增量1／上限3，容量3→3／可用3→3
+[log] 21:25:37 [Combat] 伤害 Player(240) → @CharacterBody3D@261(0) 1
+[log] 21:25:37 [Combat] 死亡 @CharacterBody3D@261(0) 击杀者=Player(240)
+[log] 21:25:37 [Combat] 击杀 @CharacterBody3D@261(0) by Player(240)
+[log] 21:25:37 [Reward] 践踏死亡：本人击杀第6次，表内增量1／上限3，容量3→3／可用3→3
+[KillJump] PASS 真实按键→动画ATK→物理靶死亡，新增本人击杀3/3
+[log] 21:25:37 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[KillJump] PASS 继续本人多杀保持表内封顶3
+[KillJump] PASS 站地后可用额外空中跳次数为3
+[KillJump] PASS 真实地面跳起动
+[KillJump] PASS 真实第1次空中跳消耗一次，剩余2
+[KillJump] PASS 真实第2次空中跳消耗一次，剩余1
+[KillJump] PASS 真实第3次空中跳消耗一次，剩余0
+[KillJump] PASS 第四次空中跳失败，不绕过次数限制
+[KillJump] FAIL 真实落地后按已获得容量回满三次
+[log] 21:25:39 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:39 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS 真实奖励行可编译／查得践踏死亡
+[KillJump] PASS 真实入构筑践踏死亡
+[log] 21:25:39 [Combat] 伤害 @CharacterBody3D@269(100) → @CharacterBody3D@271(0) 1
+[log] 21:25:39 [Combat] 死亡 @CharacterBody3D@271(0) 击杀者=@CharacterBody3D@269(100)
+[log] 21:25:39 [Combat] 击杀 @CharacterBody3D@271(0) by @CharacterBody3D@269(100)
+[KillJump] PASS 他人真实击杀不授予本人次数
+[log] 21:25:39 [Combat] 伤害 Player(240) → @CharacterBody3D@273(9999) 1
+[KillJump] PASS 本人非致死命中不计击杀
+[log] 21:25:39 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:39 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[KillJump] PASS 独立用例玩家身体已站地
+[log] 21:25:39 [Combat] 伤害 Player(240) → @CharacterBody3D@275(0) 1
+[log] 21:25:39 [Combat] 死亡 @CharacterBody3D@275(0) 击杀者=Player(240)
+[log] 21:25:39 [Combat] 击杀 @CharacterBody3D@275(0) by Player(240)
+[KillJump] PASS 卸除旧构筑规则后退订，之后本人真实击杀不残留授予
+[log] 21:25:39 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:39 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS 真实奖励行可编译／查得践踏死亡
+[KillJump] PASS 真实入构筑践踏死亡
+[KillJump] PASS 等待真实武技可用，不手动缩冷却
+[log] 21:25:39 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 21:25:39 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 21:25:39 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 21:25:40 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@284(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@284(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@284(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第1次，表内增量1／上限8，容量0→1／可用0→1
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@282(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@282(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@282(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第2次，表内增量1／上限8，容量1→2／可用1→2
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@278(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@278(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@278(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第3次，表内增量1／上限8，容量2→3／可用2→3
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@280(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@280(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@280(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第4次，表内增量1／上限8，容量3→4／可用3→4
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@286(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@286(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@286(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第5次，表内增量1／上限8，容量4→5／可用4→5
+[KillJump] PASS 真实按键→动画ATK→物理靶死亡，新增本人击杀5/5
+[log] 21:25:40 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[KillJump] PASS 真实一刀同帧五杀；RollHit按每个目标建立上下文，不误称这些自然命中属于同链
+[KillJump] PASS 复制表设上限8／冷却0后，独立命中上下文的五杀实际计入5次
+[log] 21:25:40 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:40 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS 真实奖励行可编译／查得践踏死亡
+[KillJump] PASS 真实入构筑践踏死亡
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@293(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@293(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@293(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第1次，表内增量1／上限8，容量0→1／可用0→1
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@295(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@295(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@295(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第2次，表内增量1／上限8，容量1→2／可用1→2
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@297(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@297(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@297(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第3次，表内增量1／上限8，容量2→3／可用2→3
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@299(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@299(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@299(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第4次，表内增量1／上限8，容量3→4／可用3→4
+[log] 21:25:40 [Combat] 伤害 Player(240) → @CharacterBody3D@301(0) 1
+[log] 21:25:40 [Combat] 死亡 @CharacterBody3D@301(0) 击杀者=Player(240)
+[log] 21:25:40 [Combat] 击杀 @CharacterBody3D@301(0) by Player(240)
+[log] 21:25:40 [Reward] 践踏死亡：本人击杀第5次，表内增量1／上限8，容量4→5／可用4→5
+[KillJump] PASS 另用同一根上下文的五次真实ReceiveHit致死命中验证同链，不伪造Kill事件
+[KillJump] PASS 纯事实计数同链五次均计入，实读5，不受攻击连锁四次门影响
+[log] 21:25:40 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:40 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS 真实奖励行可编译／查得践踏死亡
+[KillJump] PASS 真实入构筑践踏死亡
+[log] 21:25:41 [Combat] 伤害 Player(240) → @CharacterBody3D@304(0) 1
+[log] 21:25:41 [Combat] 死亡 @CharacterBody3D@304(0) 击杀者=Player(240)
+[log] 21:25:41 [Combat] 击杀 @CharacterBody3D@304(0) by Player(240)
+[log] 21:25:41 [Reward] 践踏死亡：本人击杀第1次，表内增量1／上限8，容量0→1／可用0→1
+[KillJump] PASS 合法链深度末层真实造成死亡与Kill事实
+[KillJump] PASS 纯事实计数记录合法末层击杀，不把攻击递归深度门套在跳数上
+[log] 21:25:41 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:41 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS 真实奖励行可编译／查得践踏死亡
+[KillJump] PASS 真实入构筑践踏死亡
+[KillJump] PASS 等待真实武技可用，不手动缩冷却
+[log] 21:25:41 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 21:25:41 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 21:25:41 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 21:25:41 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 21:25:41 [Combat] 伤害 Player(240) → @CharacterBody3D@311(0) 1
+[log] 21:25:41 [Combat] 死亡 @CharacterBody3D@311(0) 击杀者=Player(240)
+[log] 21:25:41 [Combat] 击杀 @CharacterBody3D@311(0) by Player(240)
+[log] 21:25:41 [Reward] 践踏死亡：本人击杀第1次，表内增量2／上限5，容量0→2／可用0→2
+[log] 21:25:41 [Combat] 伤害 Player(240) → @CharacterBody3D@309(0) 1
+[log] 21:25:41 [Combat] 死亡 @CharacterBody3D@309(0) 击杀者=Player(240)
+[log] 21:25:41 [Combat] 击杀 @CharacterBody3D@309(0) by Player(240)
+[log] 21:25:41 [Reward] 践踏死亡：本人击杀第2次，表内增量2／上限5，容量2→4／可用2→4
+[log] 21:25:41 [Combat] 伤害 Player(240) → @CharacterBody3D@307(0) 1
+[log] 21:25:41 [Combat] 死亡 @CharacterBody3D@307(0) 击杀者=Player(240)
+[log] 21:25:41 [Combat] 击杀 @CharacterBody3D@307(0) by Player(240)
+[log] 21:25:41 [Reward] 践踏死亡：本人击杀第3次，表内增量2／上限5，容量4→5／可用4→5
+[KillJump] PASS 真实按键→动画ATK→物理靶死亡，新增本人击杀3/3
+[log] 21:25:42 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[KillJump] PASS 只改表每杀增加2／上限5后，真实三杀依次增加并封顶5
+[KillJump] PASS 增量与封顶说明同步表内参数：每次本人击杀立即补充 2 次空中跳跃，同时增加最大容量（最多 5 次）；满容量后仍可补回已消耗次数
+[log] 21:25:42 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:42 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 21:25:42 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 KillJumpProbe
+[log] 21:25:42 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[log] 21:25:42 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS A灵动原有一次额外空中跳跃保持
+[KillJump] PASS 真实奖励行可编译／查得践踏死亡
+[KillJump] PASS 真实入构筑践踏死亡
+[log] 21:25:42 [Combat] 伤害 Player(220) → @CharacterBody3D@317(0) 1
+[log] 21:25:42 [Combat] 死亡 @CharacterBody3D@317(0) 击杀者=Player(220)
+[log] 21:25:42 [Combat] 击杀 @CharacterBody3D@317(0) by Player(220)
+[log] 21:25:42 [Reward] 践踏死亡：本人击杀第1次，表内增量1／上限3，容量1→2／可用1→2
+[log] 21:25:42 [Combat] 伤害 Player(220) → @CharacterBody3D@319(0) 1
+[log] 21:25:42 [Combat] 死亡 @CharacterBody3D@319(0) 击杀者=Player(220)
+[log] 21:25:42 [Combat] 击杀 @CharacterBody3D@319(0) by Player(220)
+[log] 21:25:42 [Reward] 践踏死亡：本人击杀第2次，表内增量1／上限3，容量2→3／可用2→3
+[KillJump] PASS A同一真实伤害快照造成两次本人击杀
+[KillJump] PASS 保留灵动并逐杀立即叠加1→3，容量3／可用3
+[log] 21:25:42 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:42 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[log] 21:25:42 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS 真实奖励行可编译／查得践踏死亡
+[KillJump] PASS 真实入构筑践踏死亡
+[KillJump] PASS 等待真实武技可用，不手动缩冷却
+[log] 21:25:42 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 21:25:42 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 21:25:42 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 21:25:42 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 21:25:42 [Combat] 伤害 Player(240) → @CharacterBody3D@326(0) 1
+[log] 21:25:42 [Combat] 死亡 @CharacterBody3D@326(0) 击杀者=Player(240)
+[log] 21:25:42 [Combat] 击杀 @CharacterBody3D@326(0) by Player(240)
+[log] 21:25:42 [Reward] 践踏死亡：本人击杀第1次，表内增量1／上限3，容量0→1／可用0→1
+[log] 21:25:42 [Combat] 伤害 Player(240) → @CharacterBody3D@324(0) 1
+[log] 21:25:42 [Combat] 死亡 @CharacterBody3D@324(0) 击杀者=Player(240)
+[log] 21:25:42 [Combat] 击杀 @CharacterBody3D@324(0) by Player(240)
+[log] 21:25:42 [Reward] 践踏死亡：本人击杀第2次，表内增量1／上限3，容量1→2／可用1→2
+[log] 21:25:42 [Combat] 伤害 Player(240) → @CharacterBody3D@322(0) 1
+[log] 21:25:42 [Combat] 死亡 @CharacterBody3D@322(0) 击杀者=Player(240)
+[log] 21:25:42 [Combat] 击杀 @CharacterBody3D@322(0) by Player(240)
+[log] 21:25:42 [Reward] 践踏死亡：本人击杀第3次，表内增量1／上限3，容量2→3／可用2→3
+[KillJump] PASS 真实按键→动画ATK→物理靶死亡，新增本人击杀3/3
+[log] 21:25:43 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[KillJump] PASS 空中用尽三次额外跳跃，最大容量仍3
+[log] 21:25:43 [Combat] 伤害 Player(240) → @CharacterBody3D@330(0) 1
+[log] 21:25:43 [Combat] 死亡 @CharacterBody3D@330(0) 击杀者=Player(240)
+[log] 21:25:43 [Combat] 击杀 @CharacterBody3D@330(0) by Player(240)
+[log] 21:25:43 [Reward] 践踏死亡：本人击杀第4次，表内增量1／上限3，容量3→3／可用0→1
+[KillJump] PASS 已达容量上限时空中击杀仍立即补回一次，不等落地
+[KillJump] PASS 补回的次数立刻可由真实空中跳消耗
+[log] 21:25:43 [Combat] 伤害 Player(240) → @CharacterBody3D@332(0) 1
+[log] 21:25:43 [Combat] 死亡 @CharacterBody3D@332(0) 击杀者=Player(240)
+[log] 21:25:43 [Combat] 击杀 @CharacterBody3D@332(0) by Player(240)
+[log] 21:25:43 [Reward] 践踏死亡：本人击杀第5次，表内增量1／上限3，容量3→3／可用0→1
+[log] 21:25:43 [Combat] 伤害 Player(240) → @CharacterBody3D@334(0) 1
+[log] 21:25:43 [Combat] 死亡 @CharacterBody3D@334(0) 击杀者=Player(240)
+[log] 21:25:43 [Combat] 击杀 @CharacterBody3D@334(0) by Player(240)
+[log] 21:25:43 [Reward] 践踏死亡：本人击杀第6次，表内增量1／上限3，容量3→3／可用1→2
+[log] 21:25:43 [Combat] 伤害 Player(240) → @CharacterBody3D@336(0) 1
+[log] 21:25:43 [Combat] 死亡 @CharacterBody3D@336(0) 击杀者=Player(240)
+[log] 21:25:43 [Combat] 击杀 @CharacterBody3D@336(0) by Player(240)
+[log] 21:25:43 [Reward] 践踏死亡：本人击杀第7次，表内增量1／上限3，容量3→3／可用2→3
+[log] 21:25:43 [Combat] 伤害 Player(240) → @CharacterBody3D@338(0) 1
+[log] 21:25:43 [Combat] 死亡 @CharacterBody3D@338(0) 击杀者=Player(240)
+[log] 21:25:43 [Combat] 击杀 @CharacterBody3D@338(0) by Player(240)
+[log] 21:25:43 [Reward] 践踏死亡：本人击杀第8次，表内增量1／上限3，容量3→3／可用3→3
+[KillJump] PASS 空中同帧四杀逐次补回并封顶3，不溢出
+[log] 21:25:43 [Combat] 伤害 Player(240) → @CharacterBody3D@340(0) 1
+[log] 21:25:43 [Combat] 死亡 @CharacterBody3D@340(0) 击杀者=Player(240)
+[log] 21:25:43 [Combat] 击杀 @CharacterBody3D@340(0) by Player(240)
+[log] 21:25:43 [Reward] 践踏死亡：本人击杀第9次，表内增量1／上限3，容量3→3／可用1→2
+[KillJump] PASS 剩一次时击杀只增加一次到2，不直接回满
+[KillJump] PASS 补充后两次真实空中跳正确消耗
+[KillJump] PASS 补回次数耗尽后仍不能无限空中跳
+[log] 21:25:44 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:44 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[KillJump] PASS 独立用例玩家身体已站地
+[KillJump] PASS 真实奖励行可编译／查得践踏死亡
+[KillJump] PASS 真实入构筑践踏死亡
+[log] 21:25:44 [Combat] 伤害 Player(240) → @CharacterBody3D@343(0) 1
+[log] 21:25:44 [Combat] 死亡 @CharacterBody3D@343(0) 击杀者=Player(240)
+[log] 21:25:44 [Combat] 击杀 @CharacterBody3D@343(0) by Player(240)
+[log] 21:25:44 [Reward] 践踏死亡：本人击杀第1次，表内增量2／上限5，容量0→2／可用0→2
+[KillJump] PASS 只改表每杀2／上限5，空中首次击杀立即增加容量与可用次数2
+[log] 21:25:44 [Combat] 伤害 Player(240) → @CharacterBody3D@345(0) 1
+[log] 21:25:44 [Combat] 死亡 @CharacterBody3D@345(0) 击杀者=Player(240)
+[log] 21:25:44 [Combat] 击杀 @CharacterBody3D@345(0) by Player(240)
+[log] 21:25:44 [Reward] 践踏死亡：本人击杀第2次，表内增量2／上限5，容量2→4／可用2→4
+[log] 21:25:44 [Combat] 伤害 Player(240) → @CharacterBody3D@347(0) 1
+[log] 21:25:44 [Combat] 死亡 @CharacterBody3D@347(0) 击杀者=Player(240)
+[log] 21:25:44 [Combat] 击杀 @CharacterBody3D@347(0) by Player(240)
+[log] 21:25:44 [Reward] 践踏死亡：本人击杀第3次，表内增量2／上限5，容量4→5／可用4→5
+[KillJump] PASS 副本空中三杀同帧补充到5，容量／剩余共同封顶
+[log] 21:25:44 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:25:44 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 KillJumpProbe
+[KillJump] PASS 独立用例玩家身体已站地
+[log] 21:25:44 [Combat] 伤害 Player(240) → @CharacterBody3D@349(0) 1
+[log] 21:25:44 [Combat] 死亡 @CharacterBody3D@349(0) 击杀者=Player(240)
+[log] 21:25:44 [Combat] 击杀 @CharacterBody3D@349(0) by Player(240)
+[KillJump] PASS 没有增幅时空中真实击杀也不凭空补跳
+[KillJump] === 击杀跳跃验收结束：通过 77，失败 1 ===
+[log] 21:25:44 [Exit] 音频退出回收：真实等待83ms。
+[log] 21:25:44 [Audio] 音效统计：共 60 次 —— sfx_enemy_die×40、sfx_combat_hit×20（缺失 id 0 个）
+
+kill_jumps 未通过：F:\Godot项目\项目a\.ai_j25_20261018_212524.kill_jumps.log / F:\Godot项目\项目a\.ai_j25_20261018_212524.kill_jumps.err
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 339 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.63
+
+=== 失败现场构建 ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 341 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.32

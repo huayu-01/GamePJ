@@ -1,5 +1,7 @@
 # 架构说明
 
+J25纯击杀计数`KillAirJumpRule`自行成对订阅／退订事实总线，不生成新命中，因此独立于通用攻击链的冷却、每链次数和深度门。`GrantAirJumps`一次性更新容量与立即可用次数，满容量后仍能补回；被动继续用幂等`SetExtraAirJumps`，不会每帧回填。增量／上限来自表。[逐杀与真实空中跳验收](character-design-j25.md)。
+
 J24奖励编译统一解析DescriptionTemplate，HandlerParams／Params及奖励行Modifiers可作为文本数值源；`{Modifiers.属性键:格式}`直接读强类型StatOverride.Value，不复制一份描述数值。八条新等级复用StatSet／Requires／MaxStacks，不添加等级Id的生产代码分支。[目录70与真实卡片验收](character-design-j24.md)。
 
 J23获取次数继续由表行`MaxStacks`控制：0不限、1一次，`RewardPool.Roll`按真实构筑层数过滤；无奖励Id特判。只有力量／护甲／快速不限次数，其余已建项一次，前置仍走`RunBuild.SatisfiesPrerequisite`。[真实候选池验收](character-design-j23.md)。
