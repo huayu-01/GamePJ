@@ -1,5 +1,7 @@
 # 增幅系统 · 三层判定（限定 / 互斥 / 前置）—— P5 接入契约
 
+> **2026-10-18 J18更新**：浮光跃金迁TeleportJump处理器，移除旧全局跳速1.25；地面瞬移高度为当前地面跳高×(1+额外次数)，空中次数只用于高度，后续来源加次数仍生效。真实身体TestMove裁World净空，换装清理，见 [J18](character-design-j18.md)。下一项地爆。
+
 > **2026-10-18 J17更新**：金光大道迁SkillEnhancement，指定ComboStepIndex=2、DamageScale=1.5、ForwardReachScale=1.3；只延长前方盒子和中心偏移，宽高保持，去掉旧全局修饰。真实伤害／内外靶／武技2隔离与换装见 [J17](character-design-j17.md)。距离倍率为可配预设；下一项浮光跃金。
 
 > **2026-10-18 J16更新**：气贯长虹迁强类型 `WeaponRecallTuning`／`WeaponRecall`，缩放原目标技能行的基础／每档／总上限，同时配置手动false／落地自动true，不新增字符串属性反射。真实ATK、落地同帧回程、往返各一次命中与换装还原见 [J16](character-design-j16.md)。当前下一项金光大道，下面半接清单为历史。

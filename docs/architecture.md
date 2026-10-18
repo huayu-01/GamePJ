@@ -94,6 +94,8 @@ J4三维技能位移由`CharacterMovement`按来源持有速度覆盖，技能�
 
 ## Unit 与表现的分工
 
+**J18浮光跃金**：CharacterMovement将额外跳次数作为地面瞬移高度来源，AirJumpsLeft对外为0；TestMove以真实身体裁定向上World净空，然后写入位置、清垂直上升速度并ResetPhysicsInterpolation。地面旧状态用离地锁避免重复瞬移，真实落地后恢复，PlayerLoadout清理模式。默认路径不变，见 [J18](character-design-j18.md)。
+
 **J17金光大道**：复用近战单段模式，指定原连招index2；SkillEnhancementTuning.ForwardReachScale只缩放盒形判定Z及其前伸中心，宽高与其他技能保持，换装清理。只该刀伤害乘1.5，替换旧全局Damage／Range修饰，真实武技2隔离见 [J17](character-design-j17.md)。
 
 **J16气贯长虹**：WeaponRecallTuning从原技能行确定性缩放三项蓄力时间，SpearThrowAbility换装恢复召回策略；真实落地自动回手沿用WeaponThrowAbility既有状态机。长枪高频预览、投掷射线及AttackHitbox扫掠查询参数及时Dispose，避免大量临时资源积压到退出终结；首轮退出失败和复验边界见 [J16](character-design-j16.md)，不等同于引擎终结器修复。

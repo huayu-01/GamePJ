@@ -25,6 +25,7 @@ public static class RewardEffectRegistry
 	{
 		// 通用的"改 StatSheet"—— 19 条里有 14 条走它，只靠 Modifiers 里的数据表达，不需要新代码。
 		["StatSet"] = row => context => ApplyModifiers(row, context),
+		["TeleportJump"] = row => context => context.Player.Movement?.ConfigureTeleportJump(true),
 		["WeaponRecall"] = row => context =>
 		{
 			if (row.WeaponRecall is not { TargetAbility: { } target } tuning

@@ -29,7 +29,20 @@ public partial class CharacterMovement : Node
 	/// 当前**还剩几次空中跳跃**（落地时会被重置成 <see cref="ExtraAirJumps"/>）。
 	/// 滞空（角色 A 技能 2「跃升」）要判"当有跳跃次数时会先执行跳跃"，读的就是它。
 	/// </summary>
-	public int AirJumpsLeft => _airJumpsLeft;
+	public int AirJumpsLeft => TeleportJumpEnabled ? 0 : _airJumpsLeft;
+	/// <summary>额外次数只用于提高瞬移跳高，不再提供空中跳。</summary>
+	public bool TeleportJumpEnabled { get; private set; }
+	public int TeleportJumpCount { get; private set; }
+	public float LastTeleportJumpHeight { get; private set; }
+	private bool _teleportJumpConsumed, _teleportAwaitAir;
+	public void ConfigureTeleportJump(bool enabled)
+	{
+		TeleportJumpEnabled = enabled;
+		TeleportJumpCount = 0;
+		LastTeleportJumpHeight = 0f;
+		_teleportJumpConsumed = _teleportAwaitAir = false;
+		if (enabled) _airJumpsLeft = 0;
+	}
 
 	/// <summary>
 	/// **额外跳跃次数的接入点**（被动「灵动」/ 异化「践踏死亡」这类"在空中额外跳跃"的效果走这里）。
@@ -268,6 +281,7 @@ public partial class CharacterMovement : Node
 	public bool TryJump()
 	{
 		if (HasVelocityOverride) return false;
+		if (TeleportJumpEnabled) return TryTeleportJump();
 		if (_body.IsOnFloor())
 		{
 			_body.Velocity = _body.Velocity with { Y = EffectiveJumpVelocity };
@@ -282,6 +296,32 @@ public partial class CharacterMovement : Node
 		}
 
 		return false;
+	}
+
+	private bool TryTeleportJump()
+	{
+		if (!_body.IsOnFloor() || _teleportJumpConsumed) return false;
+		// 每份额外次数换一份完整地面跳高，不能套普通空中跳的0.5高度比例。
+		float height = EffectiveJumpVelocity * EffectiveJumpVelocity / (2f * Mathf.Max(0.001f, _gravity * GravityScale))
+			* (1 + Mathf.Max(0, ExtraAirJumps));
+		using var collision = new KinematicCollision3D();
+		float travel = _body.TestMove(_body.GlobalTransform, Vector3.Up * height, collision)
+			? Mathf.Clamp(collision.GetTravel().Y, 0f, height) : height;
+		// 净空不足以离开地面吸附范围时不消耗本次跳跃，避免卡在旧地面状态。
+		if (travel <= Mathf.Max(0.001f, _body.FloorSnapLength + 0.002f)) return false;
+		_body.GlobalPosition += Vector3.Up * travel;
+		_body.ResetPhysicsInterpolation();
+		_body.Velocity = _body.Velocity with { Y = 0f };
+		_externalVelocity.Y = 0f;
+		_airJumpsLeft = 0;
+		_teleportJumpConsumed = _teleportAwaitAir = true;
+		_apexY = _body.GlobalPosition.Y;
+		_apexTracking = true;
+		FallHeight = 0f;
+		LastTeleportJumpHeight = travel;
+		TeleportJumpCount++;
+		ActRoguelike.Core.GameLog.Write("Combat", $"浮光跃金：额外{ExtraAirJumps}次 → {1 + ExtraAirJumps}份完整地面跳高，目标{height:0.###}m／实际瞬移{travel:0.###}m");
+		return true;
 	}
 
 	public void AddImpulse(Vector3 impulse) => _externalVelocity += impulse;
@@ -300,12 +340,14 @@ public partial class CharacterMovement : Node
 
 		if (_body.IsOnFloor())
 		{
-			_airJumpsLeft = ExtraAirJumps;
+			if (!_teleportAwaitAir) _teleportJumpConsumed = false;
+			_airJumpsLeft = TeleportJumpEnabled ? 0 : ExtraAirJumps;
 			// 落地：这次的"最高点"追踪结束（FallHeight 保留最后一次的值，落地那一帧仍然读得到）。
 			_apexTracking = false;
 		}
 		else
 		{
+			_teleportAwaitAir = false;
 			// ⭐ J11：正常下落速度上限的单位级倍率（符文「飞翼」= 降低正常下落速度）。
 			// 基础值 1（`Unit.SeedStats`），`-MaxFallSpeed × 1.0f` 与改动前逐位相等；
 			// 只在**正常下落**这一段生效 —— 下落攻击 / 冲刺那些走 VelocityOverride，不受它影响。

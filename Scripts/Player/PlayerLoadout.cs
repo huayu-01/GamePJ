@@ -25,6 +25,7 @@ public sealed class PlayerLoadout
 		var abilities = new List<Ability>();
 		if (player.Movement is { } jump)
 		{
+			jump.ConfigureTeleportJump(false);
 			_baseAirJumps ??= jump.ExtraAirJumps;
 			jump.SetExtraAirJumps(_baseAirJumps.Value, Mathf.Max(_baseAirJumps.Value, jump.ExtraAirJumps));
 		}
