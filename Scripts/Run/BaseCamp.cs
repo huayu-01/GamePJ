@@ -15,6 +15,13 @@ public partial class BaseCamp : Node
 	private Unit? _player;
 	private double _reloadTime = -1;
 	private bool _selectionRestored;
+	public override void _Ready()
+	{
+		// 独立挂载符文台，避免与基地美术场景的编辑争用。
+		AddChild(new RuneScreen { Name = "RuneScreen" });
+		CallDeferred(nameof(AddRuneTerminal));
+	}
+	private void AddRuneTerminal() => GetParent().AddChild(new ActRoguelike.Interaction.RuneTerminal { Name = "RuneTerminal", Position = new Vector3(-7, 0, 4) });
 	public override void _Process(double delta)
 	{
 		if (!_selectionRestored)

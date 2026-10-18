@@ -54,8 +54,7 @@ public partial class RuneConfig : RewardConfig
 	[ExportGroup("符文 · 表现")]
 	/// <summary>
 	/// 图标资源路径（`res://` 开头）。
-	/// ⚠️ **本批（J11）不做符文选择 UI**，所以这一列只占位：留空 = 界面用默认空图。
-	/// 将来做基地的符文选择台时，界面直接读这一列，不需要改 C#。
+	/// 基地选择面板直接读这一列，留空时只显示符文名。
 	/// </summary>
 	[Export(PropertyHint.File, "*.png,*.svg,*.webp")] public string IconPath { get; set; } = string.Empty;
 

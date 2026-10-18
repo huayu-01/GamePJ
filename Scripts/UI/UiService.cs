@@ -79,6 +79,13 @@ public partial class UiService : Node
 	}
 
 	// ───────────────────────── 语义化接口（业务只调这些）─────────────────────────
+	/// <summary>只有基地挂载符文面板；局内没有换装入口。</summary>
+	public bool OpenRunes()
+	{
+		if (Screen<RuneScreen>() is not { } screen) return false;
+		screen.Open();
+		return true;
+	}
 
 	// ⚠️ P6a 删掉了 `OpenUpgrades()`（它开的 `BaseScreen` 是基地里那页旧的「永久强化」，
 	// 整份删除）—— 那一页的职责由 `OpenAbilityMatrix()`（能力卡：解锁 / 升级 / 激活 / 额度扩增）接管。

@@ -18,8 +18,7 @@ namespace ActRoguelike.Run;
 /// <item>不携带符文（文件不存在）时**不产生任何文件**：默认路径上 userdata 一个字节都不多。</item>
 /// </list>
 ///
-/// <para>⚠️ 本批**不做符文选择 UI**（用户划定范围）：现在唯一的写入口是
-/// <c>RunController.SetCarriedRune(id)</c>（C# / 自测可驱动），下一批的基地选择台直接调它即可。</para>
+/// <para>基地 RuneScreen 保存出击配置，RunController 在进关时读取并施效。</para>
 /// </summary>
 public static class RuneCarry
 {

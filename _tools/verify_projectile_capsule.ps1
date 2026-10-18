@@ -1,5 +1,5 @@
 # J12：胶囊扫掠、全局实际弹速上限与五探针回归，验证独占且保护真实存档。
-param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution)
+param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
 $godotExe = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
@@ -14,6 +14,7 @@ $RewardRules = $RewardRules -or $RewardTiers -or $KillJumps
 if ($ProjectileQuery) { $batchId = 'j28' }
 if ($AttackSnapshot) { $batchId = 'j29' }
 if ($DotAttribution) { $batchId = 'j30' }
+if ($RuneUi) { $batchId = 'j31' }
 $saveNames = @('meta.cfg','ability_cards.cfg','settings.cfg','loadout.cfg','rune.cfg')
 $utf8 = [Text.UTF8Encoding]::new($false)
 
@@ -100,7 +101,15 @@ try {
         $evidence.Add($build)
         if ($build -notmatch '0 个警告' -or $build -notmatch '0 个错误') { throw "$configuration 未满足 0/0" }
     }
-    if ($DotAttribution) {
+    if ($RuneUi) {
+        $ownedProcess = Start-Process -FilePath $godotExe -ArgumentList @('--headless','--path',$projectDir,'--editor','--import') -WorkingDirectory $projectDir -WindowStyle Hidden -RedirectStandardOutput ".ai_$($batchId)_$runTag.import.log" -RedirectStandardError ".ai_$($batchId)_$runTag.import.err" -PassThru
+        if (-not $ownedProcess.WaitForExit(60000)) { Stop-Process -Id $ownedProcess.Id; throw '资源导入超时' }
+        if ($ownedProcess.ExitCode -ne 0) { throw '资源导入失败' }
+        $ownedProcess = $null
+        Invoke-Probe 'rune_ui' 'res://Scenes/Debug/_RuneUiProbe.tscn' '符文界面验收结束：通过 42，失败 0'
+        Invoke-Probe 'rune_ui_render' 'res://Scenes/Debug/_RuneUiProbe.tscn' '符文界面验收结束：通过 43，失败 0' -Render
+    }
+    elseif ($DotAttribution) {
         Invoke-Probe 'dot_source' 'res://Scenes/Debug/_DotAttributionProbe.tscn' '持续伤害归属验收结束：通过 26，失败 0'
         if (-not $ProbeOnly) {
             Invoke-Probe 'kill_facts' 'res://Scenes/Debug/_KillFactProbe.tscn' '逐杀事实验收结束：通过 40，失败 0'
