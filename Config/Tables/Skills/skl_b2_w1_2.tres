@@ -71,6 +71,7 @@ Note = "镰刀不画路径（文档只给长枪写了路径可视化）"
 
 [resource]
 script = ExtResource("1_row")
+ActionMovement = 2
 HudIcon = ExtResource("e_hud_icon")
 HudColor = Color(1, 0.76, 0.4, 1)
 HudOrder = 40

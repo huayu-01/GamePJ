@@ -84,6 +84,7 @@ Note = "暴击率基准（角色基础 5%）"
 
 [resource]
 script = ExtResource("1_row")
+ActionMovement = 2
 HudIcon = ExtResource("e_hud_icon")
 HudColor = Color(1, 0.76, 0.4, 1)
 HudOrder = 30

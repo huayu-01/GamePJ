@@ -94,7 +94,9 @@ J4三维技能位移由`CharacterMovement`按来源持有速度覆盖，技能�
 
 ## Unit 与表现的分工
 
-**J19共通地爆**：FallAttackAbility真实Land阶段复用实际形状／变换查询敌人、容量填满扩容、单位去重；Unit.ReceiveKnockback提供纯击退入口，不追加Hit／Damage事件，抗性由移动组件处理。参数通过SkillEnhancement资源配置，默认0、换装清理，三配装见 [J19](character-design-j19.md)。用户新增的技能动画移动许可与灵动授权为下一批；平衡重测暂后置。
+**J19共通地爆**：FallAttackAbility真实Land阶段复用实际形状／变换查询敌人、容量填满扩容、单位去重；Unit.ReceiveKnockback提供纯击退入口，不追加Hit／Damage事件，抗性由移动组件处理。参数通过SkillEnhancement资源配置，默认0、换装清理，三配装见 [J19](character-design-j19.md)。
+
+**J20动作移动**：AbilityConfig.ActionMovement强类型枚举默认Locked，Allowed明确允许，Attack由启用的灵动GrantAttackMovement授权。CharacterMovement只锁地面主动输入，不清击退，不拦技能自身速度覆盖与内部起跳；输入层拦普通跳跃绕过。初次能力收集＋运行期注册／注销，使用真实IsBusy判断前台，不由动画字符串或角色名猜测。[配置与实测](character-design-j20.md)。平衡重测后置，最新构筑来源见 [接收清单](followup-build-updates.md)。
 
 **J18浮光跃金**：CharacterMovement将额外跳次数作为地面瞬移高度来源，AirJumpsLeft对外为0；TestMove以真实身体裁定向上World净空，然后写入位置、清垂直上升速度并ResetPhysicsInterpolation。地面旧状态用离地锁避免重复瞬移，真实落地后恢复，PlayerLoadout清理模式。默认路径不变，见 [J18](character-design-j18.md)。
 

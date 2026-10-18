@@ -242,7 +242,7 @@ public partial class SprintController : Node
 	/// </summary>
 	public float EffectiveSpeed(float baseSpeed)
 	{
-		if (!IsSprinting || SpeedMultiplier <= 0f)
+		if (!IsSprinting || SpeedMultiplier <= 0f || (ExitWhileAbilityBusy && AnyAbilityBusy()))
 		{
 			return baseSpeed;
 		}

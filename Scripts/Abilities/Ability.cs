@@ -15,6 +15,10 @@ namespace ActRoguelike.Abilities;
 /// </summary>
 public abstract partial class Ability : Node3D
 {
+	/// <summary>地面主动移动：默认锁定，明确放行，或由被动授予攻击移动。</summary>
+	public enum MovementPolicy { Locked, Allowed, Attack }
+	[Export] public MovementPolicy ActionMovement { get; set; }
+	private CharacterMovement? _registeredMovement;
 	/// <summary>技能释放方向的来源。不是所有技能都朝准星，所以做成可选配置。</summary>
 	public enum AimSource
 	{
@@ -617,6 +621,11 @@ public abstract partial class Ability : Node3D
 	/// </summary>
 	private void EnsureInitialized()
 	{
+		if (_registeredMovement == null && Movement is { } movement)
+		{
+			movement.RegisterAbility(this);
+			_registeredMovement = movement;
+		}
 		if (_initialized)
 		{
 			return;
@@ -634,6 +643,11 @@ public abstract partial class Ability : Node3D
 		}
 
 		_initialized = true;
+		if (Movement is { } initialMovement)
+		{
+			initialMovement.RegisterAbility(this);
+			_registeredMovement = initialMovement;
+		}
 		EnsureAnimEventHooked();
 		OnReady();
 	}
@@ -673,6 +687,8 @@ public abstract partial class Ability : Node3D
 
 	public override void _ExitTree()
 	{
+		if (_registeredMovement != null && IsInstanceValid(_registeredMovement)) _registeredMovement.UnregisterAbility(this);
+		_registeredMovement = null;
 		if (_animEventHookedByMe)
 		{
 			if (_eventAnimator != null) _eventAnimator.SkillEvent -= OnAnimationEvent;

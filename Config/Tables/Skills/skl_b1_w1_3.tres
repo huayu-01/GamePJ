@@ -30,6 +30,7 @@ Note = "额外那一圈的击退"
 
 [resource]
 script = ExtResource("1_row")
+ActionMovement = 2
 HudIcon = ExtResource("e_hud_icon")
 HudColor = Color(0.64, 0.74, 0.88, 1)
 HudOrder = 110

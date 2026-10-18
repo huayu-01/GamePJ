@@ -84,6 +84,7 @@ Note = "飞出／回手各对沿途目标命中一次，静止时不持续刺伤
 
 [resource]
 script = ExtResource("1_row")
+ActionMovement = 2
 HudIcon = ExtResource("e_hud_icon")
 HudColor = Color(1, 0.76, 0.4, 1)
 HudOrder = 40

@@ -21,6 +21,9 @@ namespace ActRoguelike.Abilities;
 /// </summary>
 public partial class AirJumpPassiveAbility : Ability
 {
+	/// <summary>由技能表授予：允许在攻击动作期间保持主动移动。</summary>
+	[Export] public bool GrantAttackMovement { get; set; }
+	protected override void OnLoadoutReset() => GrantAttackMovement = false;
 	[ExportGroup("额外跳跃次数")]
 	/// <summary>这个被动**授予几次**额外空中跳跃（文档：1 次）。</summary>
 	[Export] public int Grant { get; set; } = 1;

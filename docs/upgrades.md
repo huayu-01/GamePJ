@@ -1,5 +1,7 @@
 # 增幅系统 · 三层判定（限定 / 互斥 / 前置）—— P5 接入契约
 
+> **2026-10-18 J20更新**：动作移动许可进AbilityConfig，A边移边攻击由灵动GrantAttackMovement=true授予；默认地面前台技能锁主动移动，明确Allowed与空中放行，技能内在位移／外力保持，见 [J20](character-design-j20.md)。最新构筑B2风之领域、22项符文前置和重复获取规则见 [接收清单](followup-build-updates.md)，23项仍待生产。后续平衡暂缓，继续未完成进化。
+
 > **2026-10-18 J19更新**：地爆迁SkillEnhancement，目标skl_b_fall／LandingKnockback=6；真实落地复用共通命中形状，一次纯击退，不追加伤害，覆盖三配装，见 [J19](character-design-j19.md)。用户要求后续平衡先后置，数值保持易从表调；优先新增技能动画移动许可与灵动移动攻击授权。
 
 > **2026-10-18 J18更新**：浮光跃金迁TeleportJump处理器，移除旧全局跳速1.25；地面瞬移高度为当前地面跳高×(1+额外次数)，空中次数只用于高度，后续来源加次数仍生效。真实身体TestMove裁World净空，换装清理，见 [J18](character-design-j18.md)。下一项地爆。

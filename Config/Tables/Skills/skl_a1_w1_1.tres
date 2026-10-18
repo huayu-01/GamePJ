@@ -58,6 +58,7 @@ Note = "求「准星打到的世界点」时射线的最大长度（无命中时
 
 [resource]
 script = ExtResource("1_row")
+ActionMovement = 2
 HudIcon = ExtResource("e_hud_icon")
 HudColor = Color(1, 0.76, 0.4, 1)
 HudOrder = 30

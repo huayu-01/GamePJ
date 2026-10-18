@@ -61,6 +61,10 @@ public partial class AbilityConfig : ConfigRow
 	[Export] public bool CanBeInterrupted { get; set; } = true;
 	[Export] public float InterruptLockSeconds { get; set; }
 	[Export] public float AnimationEventTimeout { get; set; } = 2f;
+	[ExportGroup("动作移动（0锁定／1允许／2攻击由被动授权）")]
+	[Export] public Ability.MovementPolicy ActionMovement { get; set; }
+	/// <summary>灵动等被动是否授予移动攻击；只由AirJumpPassiveAbility消费。</summary>
+	[Export] public bool GrantAttackMovement { get; set; }
 	[ExportGroup("下落攻击（强类型参数）")]
 	[Export] public FallAttackTuning? FallAttack { get; set; }
 
@@ -215,6 +219,8 @@ public partial class AbilityConfig : ConfigRow
 		ability.CanBeInterrupted = CanBeInterrupted;
 		ability.InterruptLockSeconds = Mathf.Max(0, InterruptLockSeconds);
 		ability.AnimationEventTimeout = Mathf.Max(0.01f, AnimationEventTimeout);
+		ability.ActionMovement = ActionMovement;
+		if (ability is AirJumpPassiveAbility agility) agility.GrantAttackMovement = GrantAttackMovement;
 		ability.AnimName = AnimName;
 		ability.AnimEvent = AnimEvent;
 		ability.AnimEventEnd = AnimEventEnd;

@@ -84,6 +84,7 @@ Note = "攻击标签（供增幅的武器标签匹配）"
 
 [resource]
 script = ExtResource("1_row")
+ActionMovement = 2
 HudIcon = ExtResource("e_hud_icon")
 HudColor = Color(1, 0.76, 0.4, 1)
 HudOrder = 40

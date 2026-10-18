@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ActRoguelike.Abilities;
 using ActRoguelike.Config;
 using ActRoguelike.Run;
 using Godot;
@@ -12,6 +13,28 @@ namespace ActRoguelike.Combat;
 /// </summary>
 public partial class CharacterMovement : Node
 {
+	private readonly List<Ability> _movementAbilities = new();
+	public void RegisterAbility(Ability ability) { if (!_movementAbilities.Contains(ability)) _movementAbilities.Add(ability); }
+	public void UnregisterAbility(Ability ability) => _movementAbilities.Remove(ability);
+	/// <summary>只限制地面主动输入；空中、技能自身位移和外力仍由原运动流程消费。</summary>
+	public bool IsActionMovementLocked
+	{
+		get
+		{
+			if (_unit == null || _body == null || !_body.IsOnFloor()) return false;
+			bool movingAttack = false;
+			foreach (var ability in _movementAbilities)
+				if (IsInstanceValid(ability) && ability is AirJumpPassiveAbility { Enabled: true, GrantAttackMovement: true }) movingAttack = true;
+			foreach (var ability in _movementAbilities)
+			{
+				if (!IsInstanceValid(ability) || !ability.Enabled || !ability.IsBusy) continue;
+				if (ability.ActionMovement == Ability.MovementPolicy.Allowed) continue;
+				if (ability.ActionMovement == Ability.MovementPolicy.Attack && movingAttack) continue;
+				return true;
+			}
+			return false;
+		}
+	}
 	[Export] public float GravityScale { get; set; } = 1.8f;
 	[Export] public float MaxFallSpeed { get; set; } = 60f;
 	[Export] public float GroundAcceleration { get; set; } = 60f;
@@ -171,6 +194,8 @@ public partial class CharacterMovement : Node
 	{
 		_body = GetParent<CharacterBody3D>();
 		_unit = _body as Unit;
+		// 初始只收集一次；后加的能力由Ability注册，避免每物理帧遍历模型整棵子树。
+		if (_unit != null) NodeSearch.CollectInSubtree(_unit, _movementAbilities);
 		_gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 		if (_unit != null)
 		{
@@ -236,6 +261,7 @@ public partial class CharacterMovement : Node
 
 	public override void _ExitTree()
 	{
+		_movementAbilities.Clear();
 		if (_unit != null)
 		{
 			_unit.KnockbackReceived -= OnKnockback;
@@ -390,6 +416,11 @@ public partial class CharacterMovement : Node
 		{
 			planar = _dashDirection * _dashSpeed;
 			_inputVelocity = planar;
+		}
+		else if (IsActionMovementLocked)
+		{
+			// 进入锁定动作立即收住主动惯性；不清外力，避免抵消击退或技能突进。
+			_inputVelocity = planar = Vector3.Zero;
 		}
 		else
 		{

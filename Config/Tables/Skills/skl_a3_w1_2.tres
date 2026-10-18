@@ -54,6 +54,7 @@ Note = "★ 「后撤」技能的行 Id：无动画软启动期间被击中时�
 
 [resource]
 script = ExtResource("1_row")
+ActionMovement = 2
 HudIcon = ExtResource("e_hud_icon")
 HudColor = Color(1, 0.76, 0.4, 1)
 HudOrder = 40

@@ -42,7 +42,7 @@ public partial class PlayerController : Unit
 		// P6d：按住奔跑键且真的在移动时，意图速度 × 表里的倍率（没有 Sprint 组件 / 没在奔跑 → 原速）。
 		_movement.SetIntent(direction, _sprint?.EffectiveSpeed(MoveSpeed) ?? MoveSpeed);
 
-		if (Input.IsActionJustPressed("jump"))
+		if (Input.IsActionJustPressed("jump") && !_movement.IsActionMovementLocked)
 		{
 			_movement.TryJump();
 		}

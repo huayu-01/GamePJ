@@ -1,0 +1,430 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=9FD4787436FD4EAFAEA11372C2745276A7D35D4FCF192456825E7C1ADDFD02B4
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 335 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.37
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 338 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.00
+
+movement exit=0 seconds=12.27 stderrBytes=0
+=== movement ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 16:31:42 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 16:31:42 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 16:31:42 [Flow] === 新的一局 ===
+[log] 16:31:42 [Flow] 日志文件：user://logs/run_20261018_163142.log
+[log] 16:31:42 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 16:31:42 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 16:31:42 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 16:31:42 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 16:31:42 [Config] 增幅项表：62 条（来源：表）—— 强化 9 / 进化 23 / 异化 30。
+[log] 16:31:42 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 16:31:42 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 16:31:42 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 16:31:42 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 16:31:42 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 16:31:42 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 16:31:42 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 16:31:42 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 16:31:43 [Combat] 单位动画：Player 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 16:31:43 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:43 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 16:31:43 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:31:43 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 16:31:43 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 16:31:43 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 16:31:43 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:43 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 1 次）
+[log] 16:31:43 [Combat] 单位动画切换：Player idle → walk（当前速度 1，阈值 0.15/4）
+[log] 16:31:43 [Combat] 单位动画切换：Player walk → sprint（当前速度 4，阈值 0.15/4）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 空闲移动时真实Shift可以奔跑
+[log] 16:31:43 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 16:31:43 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:31:43 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b1_w1_1
+[log] 16:31:43 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS SpiritSword 地面攻击由默认规则锁主动移动，没有灵动豁免
+[ActionMovement] PASS 从奔跑进入动作立即收住主动惯性，持续方向／Shift不能绕过
+[ActionMovement] PASS 攻击状态真实退出奔跑
+[ActionMovement] PASS 锁定的地面动作不能通过跳跃输入绕过
+[log] 16:31:44 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 16:31:44 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 16:31:44 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 2 次）
+[ActionMovement] PASS 真实收招后持续方向输入自然恢复移动
+[log] 16:31:44 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:44 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:31:44 [Combat] 奔跑：退出（没按奔跑键）
+[log] 16:31:44 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 16:31:44 [Combat] 单位动画切换：Player sprint → walk（当前速度 3，阈值 0.15/4）
+[log] 16:31:44 [Combat] 单位动画切换：Player walk → idle（当前速度 0，阈值 0.15/4）
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:44 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 3 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 空闲移动时真实Shift可以奔跑
+[log] 16:31:45 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 16:31:45 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:31:45 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 16:31:45 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS 真实输入进入前台动作：skl_b2_w1_1
+[ActionMovement] PASS Scythe 地面攻击由默认规则锁主动移动，没有灵动豁免
+[ActionMovement] PASS 从奔跑进入动作立即收住主动惯性，持续方向／Shift不能绕过
+[ActionMovement] PASS 攻击状态真实退出奔跑
+[ActionMovement] PASS 锁定的地面动作不能通过跳跃输入绕过
+[log] 16:31:45 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 16:31:45 [Combat] 连招：skl_b2_w1_1 输入窗口超时（0.5s 没人按），收招。累计连击 0
+[log] 16:31:45 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 4 次）
+[ActionMovement] PASS 真实收招后持续方向输入自然恢复移动
+[log] 16:31:45 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:45 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:31:45 [Combat] 奔跑：退出（没按奔跑键）
+[log] 16:31:45 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:46 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 5 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 空闲移动时真实Shift可以奔跑
+[log] 16:31:46 [Combat] 连招表读取：skl_b3_w1_1 行=[ser_b3_combo] 段动画 4 个 [Skill_B3_Spear1,Skill_B3_Spear2,Skill_B3_Spear3,Skill_B3_Spear4]｜伤害倍率 4｜盒子尺寸 4｜前伸 4｜判定时长 4｜斩断名单 [] 排除 []｜窗口 0.45s 循环 True 事件帧 ATK
+[log] 16:31:46 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:31:46 [Combat] 连招：skl_b3_w1_1 起手 段 1/4 动画「Skill_B3_Spear1」（窗口 0.45s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b3_w1_1
+[log] 16:31:46 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS Spear 地面攻击由默认规则锁主动移动，没有灵动豁免
+[ActionMovement] PASS 从奔跑进入动作立即收住主动惯性，持续方向／Shift不能绕过
+[ActionMovement] PASS 攻击状态真实退出奔跑
+[ActionMovement] PASS 锁定的地面动作不能通过跳跃输入绕过
+[log] 16:31:46 [Combat] 连招·第 1 段判定：skl_b3_w1_1 伤害 22（×1）盒子 (1.2, 1.2, 4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 16:31:47 [Combat] 连招：skl_b3_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 16:31:47 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 6 次）
+[ActionMovement] PASS 真实收招后持续方向输入自然恢复移动
+[log] 16:31:47 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:47 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 16:31:47 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:31:47 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 16:31:47 [Combat] 奔跑：退出（没按奔跑键）
+[log] 16:31:47 [Combat] 单位动画切换：Player idle → sprint（当前速度 8，阈值 0.15/4）
+[log] 16:31:47 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:47 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 7 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 移动攻击授权来自灵动表行与启用的真实被动
+[log] 16:31:47 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK2（speed_scale=0.2，循环=False，事件帧 1 个：ATK@0.1s）
+[log] 16:31:47 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS 真实输入进入前台动作：skl_a1_w1_2
+[ActionMovement] PASS EnergyPalm 真实攻击动画／蓄力期间由灵动放行
+[ActionMovement] PASS 可边移动边攻击，但出招仍退出奔跑加速
+[ActionMovement] PASS 只改灵动表参数为false，同一攻击动作立即失去移动授权
+[ActionMovement] PASS 只改回表参数true，同一动作恢复移动，没有写死角色A
+[log] 16:31:47 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:47 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:48 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 8 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 移动攻击授权来自灵动表行与启用的真实被动
+[log] 16:31:48 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 16:31:48 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS 真实输入进入前台动作：skl_a2_w1_2
+[ActionMovement] PASS Crossbow 真实攻击动画／蓄力期间由灵动放行
+[ActionMovement] PASS 可边移动边攻击，但出招仍退出奔跑加速
+[log] 16:31:48 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:48 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:48 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 9 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 移动攻击授权来自灵动表行与启用的真实被动
+[log] 16:31:48 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=0.7，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[log] 16:31:48 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS 真实输入进入前台动作：skl_a3_w1_1
+[ActionMovement] PASS Bow 真实攻击动画／蓄力期间由灵动放行
+[ActionMovement] PASS 可边移动边攻击，但出招仍退出奔跑加速
+[log] 16:31:49 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:49 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:31:49 [Combat] 蓄力身体表现：模型「Model」上挂了 10 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[log] 16:31:49 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 16:31:49 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:31:49 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b1_w1_1
+[ActionMovement] PASS B技能表明确Allowed时直接放行，不依赖灵动
+[log] 16:31:49 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:49 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:49 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 16:31:49 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:31:49 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b1_w1_1
+[ActionMovement] PASS 普通空中方向移动保持，即使B攻击动画没有地面移动许可
+[log] 16:31:50 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:50 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[log] 16:31:50 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b2_w1_2
+[ActionMovement] PASS 抛掷动作出手前锁地面主动移动
+[log] 16:31:51 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 16:31:51 [Combat] 抛掷：skl_b2_w1_2 朝 (-0, 0, -1) 出手（水平速 18 垂直初速 0，最远 8m，每 0.5s 一次周期伤害）
+[ActionMovement] PASS 真实ATK后武器离手
+[ActionMovement] PASS 离手实体不占前台，武器在外时恢复主动移动
+[log] 16:31:51 [Combat] 抛掷：skl_b2_w1_2 开始收回（累计周期伤害 0 次）
+[log] 16:31:51 [Combat] 抛掷：skl_b2_w1_2 武器已回到手上（第 1 次收回，累计周期伤害 0 次）
+[log] 16:31:51 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[ActionMovement] PASS 实际回手后不遗留移动锁
+[log] 16:31:51 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:51 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[log] 16:31:51 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 16:31:51 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:31:51 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b1_w1_1
+[log] 16:31:51 [Combat] 动作交接：skl_b1_w1_1 被 skl_b_skill_1 打断（动画时间0.02s）。
+[log] 16:31:51 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 16:31:52 [Combat] 闪：skl_b_skill_1 朝 (0, -0.03843312, -0.9992612) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[ActionMovement] PASS 真实闪Action仍能接管自身位移，不被输入锁阻断
+[ActionMovement] PASS 闪自然结束
+[ActionMovement] PASS 动作交接并收招后正常恢复，没有旧动作残留锁
+[log] 16:31:52 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:52 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[log] 16:31:52 [Animation] 技能动画开播：Player → skills/Skill_B_Guard（speed_scale=1，循环=False，事件帧 2 个：GuardOn@0.15s、GuardOff@0.9s）
+[log] 16:31:52 [Combat] 架：skl_b_skill_2 等待真实GuardOn，随后持续0.75游戏秒。
+[ActionMovement] PASS 真实输入进入前台动作：skl_b_skill_2
+[ActionMovement] PASS 灵动只放行Attack，默认Locked的架仍不能主动走位
+[log] 16:31:52 [Combat] 架：skl_b_skill_2 架势开始（0.75s，期间被命中则规避并退出）
+[ActionMovement] PASS 主动移动锁保留真实外力击退，没有把身体冻结
+[log] 16:31:52 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:52 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 换装清理临时被动授权
+[ActionMovement] === 动作移动验收结束：通过 74，失败 0 ===
+[log] 16:31:53 [Exit] 音频退出回收：真实等待87ms。
+[log] 16:31:53 [Audio] 音效统计：本局一次都没播（表里 14 条；检查音效表与触发点）。
+
+movement_render exit=0 seconds=13.21 stderrBytes=0
+=== movement_render ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+D3D12 12_0 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti
+
+[log] 16:31:56 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 16:31:56 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 16:31:56 [Flow] === 新的一局 ===
+[log] 16:31:56 [Flow] 日志文件：user://logs/run_20261018_163156.log
+[log] 16:31:56 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 16:31:56 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 16:31:56 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 16:31:56 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 16:31:56 [Config] 增幅项表：62 条（来源：表）—— 强化 9 / 进化 23 / 异化 30。
+[log] 16:31:56 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 16:31:56 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 16:31:56 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 16:31:56 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 16:31:56 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 16:31:56 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 16:31:56 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 16:31:56 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 16:31:56 [Combat] 单位动画：Player 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 16:31:56 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:56 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 16:31:56 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:31:56 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 16:31:56 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 16:31:56 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 16:31:56 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:56 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 1 次）
+[log] 16:31:56 [Combat] 单位动画切换：Player idle → walk（当前速度 1，阈值 0.15/4）
+[log] 16:31:56 [Combat] 单位动画切换：Player walk → sprint（当前速度 4，阈值 0.15/4）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 空闲移动时真实Shift可以奔跑
+[log] 16:31:57 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 16:31:57 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:31:57 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 16:31:57 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS 真实输入进入前台动作：skl_b1_w1_1
+[ActionMovement] PASS SpiritSword 地面攻击由默认规则锁主动移动，没有灵动豁免
+[ActionMovement] PASS 从奔跑进入动作立即收住主动惯性，持续方向／Shift不能绕过
+[ActionMovement] PASS 攻击状态真实退出奔跑
+[ActionMovement] PASS 锁定的地面动作不能通过跳跃输入绕过
+[log] 16:31:57 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 16:31:57 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 16:31:57 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 2 次）
+[ActionMovement] PASS 真实收招后持续方向输入自然恢复移动
+[log] 16:31:57 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:57 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:31:57 [Combat] 奔跑：退出（没按奔跑键）
+[log] 16:31:57 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 16:31:58 [Combat] 单位动画切换：Player sprint → walk（当前速度 3，阈值 0.15/4）
+[log] 16:31:58 [Combat] 单位动画切换：Player walk → idle（当前速度 0，阈值 0.15/4）
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:58 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 3 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 空闲移动时真实Shift可以奔跑
+[log] 16:31:58 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 16:31:58 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:31:58 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b2_w1_1
+[log] 16:31:58 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS Scythe 地面攻击由默认规则锁主动移动，没有灵动豁免
+[ActionMovement] PASS 从奔跑进入动作立即收住主动惯性，持续方向／Shift不能绕过
+[ActionMovement] PASS 攻击状态真实退出奔跑
+[ActionMovement] PASS 锁定的地面动作不能通过跳跃输入绕过
+[log] 16:31:58 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 16:31:59 [Combat] 连招：skl_b2_w1_1 输入窗口超时（0.5s 没人按），收招。累计连击 0
+[log] 16:31:59 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 4 次）
+[ActionMovement] PASS 真实收招后持续方向输入自然恢复移动
+[log] 16:31:59 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:31:59 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:31:59 [Combat] 奔跑：退出（没按奔跑键）
+[log] 16:31:59 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:31:59 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 5 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 空闲移动时真实Shift可以奔跑
+[log] 16:31:59 [Combat] 连招表读取：skl_b3_w1_1 行=[ser_b3_combo] 段动画 4 个 [Skill_B3_Spear1,Skill_B3_Spear2,Skill_B3_Spear3,Skill_B3_Spear4]｜伤害倍率 4｜盒子尺寸 4｜前伸 4｜判定时长 4｜斩断名单 [] 排除 []｜窗口 0.45s 循环 True 事件帧 ATK
+[log] 16:31:59 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:31:59 [Combat] 连招：skl_b3_w1_1 起手 段 1/4 动画「Skill_B3_Spear1」（窗口 0.45s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b3_w1_1
+[log] 16:31:59 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS Spear 地面攻击由默认规则锁主动移动，没有灵动豁免
+[ActionMovement] PASS 从奔跑进入动作立即收住主动惯性，持续方向／Shift不能绕过
+[ActionMovement] PASS 攻击状态真实退出奔跑
+[ActionMovement] PASS 锁定的地面动作不能通过跳跃输入绕过
+[log] 16:32:00 [Combat] 连招·第 1 段判定：skl_b3_w1_1 伤害 22（×1）盒子 (1.2, 1.2, 4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 16:32:00 [Combat] 连招：skl_b3_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 0
+[log] 16:32:00 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 6 次）
+[ActionMovement] PASS 真实收招后持续方向输入自然恢复移动
+[log] 16:32:00 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:32:00 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 16:32:00 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:32:00 [Combat] 奔跑：退出（没按奔跑键）
+[log] 16:32:00 [Combat] 单位动画切换：Player idle → sprint（当前速度 7，阈值 0.15/4）
+[log] 16:32:00 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[log] 16:32:00 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:32:00 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 7 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 移动攻击授权来自灵动表行与启用的真实被动
+[log] 16:32:01 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK2（speed_scale=0.2，循环=False，事件帧 1 个：ATK@0.1s）
+[log] 16:32:01 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS 真实输入进入前台动作：skl_a1_w1_2
+[ActionMovement] PASS EnergyPalm 真实攻击动画／蓄力期间由灵动放行
+[ActionMovement] PASS 可边移动边攻击，但出招仍退出奔跑加速
+[ActionMovement] PASS 只改灵动表参数为false，同一攻击动作立即失去移动授权
+[ActionMovement] PASS 只改回表参数true，同一动作恢复移动，没有写死角色A
+[ActionMovement] PASS 截图 j20_action_movement
+[log] 16:32:01 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:32:01 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:32:01 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 8 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 移动攻击授权来自灵动表行与启用的真实被动
+[log] 16:32:01 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 16:32:01 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS 真实输入进入前台动作：skl_a2_w1_2
+[ActionMovement] PASS Crossbow 真实攻击动画／蓄力期间由灵动放行
+[ActionMovement] PASS 可边移动边攻击，但出招仍退出奔跑加速
+[log] 16:32:02 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:32:02 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:32:02 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 9 次）
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[ActionMovement] PASS 移动攻击授权来自灵动表行与启用的真实被动
+[log] 16:32:02 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=0.7，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_a3_w1_1
+[log] 16:32:02 [Combat] 奔跑：退出（正在出招（释放技能/武技会退出奔跑））
+[ActionMovement] PASS Bow 真实攻击动画／蓄力期间由灵动放行
+[ActionMovement] PASS 可边移动边攻击，但出招仍退出奔跑加速
+[log] 16:32:02 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:32:02 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[log] 16:32:02 [Combat] 蓄力身体表现：模型「Model」上挂了 10 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[log] 16:32:03 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 16:32:03 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:32:03 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b1_w1_1
+[ActionMovement] PASS B技能表明确Allowed时直接放行，不依赖灵动
+[log] 16:32:03 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:32:03 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[log] 16:32:03 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 16:32:03 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:32:03 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b1_w1_1
+[ActionMovement] PASS 普通空中方向移动保持，即使B攻击动画没有地面移动许可
+[log] 16:32:03 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:32:03 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[log] 16:32:04 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b2_w1_2
+[ActionMovement] PASS 抛掷动作出手前锁地面主动移动
+[log] 16:32:04 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 16:32:04 [Combat] 抛掷：skl_b2_w1_2 朝 (-0, 0, -1) 出手（水平速 18 垂直初速 0，最远 8m，每 0.5s 一次周期伤害）
+[ActionMovement] PASS 真实ATK后武器离手
+[ActionMovement] PASS 离手实体不占前台，武器在外时恢复主动移动
+[log] 16:32:04 [Combat] 抛掷：skl_b2_w1_2 开始收回（累计周期伤害 0 次）
+[log] 16:32:04 [Combat] 抛掷：skl_b2_w1_2 武器已回到手上（第 1 次收回，累计周期伤害 0 次）
+[log] 16:32:04 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[ActionMovement] PASS 实际回手后不遗留移动锁
+[log] 16:32:04 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:32:04 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[log] 16:32:05 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 16:32:05 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 16:32:05 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[ActionMovement] PASS 真实输入进入前台动作：skl_b1_w1_1
+[log] 16:32:05 [Combat] 动作交接：skl_b1_w1_1 被 skl_b_skill_1 打断（动画时间0.018s）。
+[log] 16:32:05 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 16:32:05 [Combat] 闪：skl_b_skill_1 朝 (0, -0.03843312, -0.9992612) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[ActionMovement] PASS 真实闪Action仍能接管自身位移，不被输入锁阻断
+[ActionMovement] PASS 闪自然结束
+[ActionMovement] PASS 动作交接并收招后正常恢复，没有旧动作残留锁
+[log] 16:32:05 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:32:05 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 真实移动输入使身体正常移动
+[log] 16:32:06 [Animation] 技能动画开播：Player → skills/Skill_B_Guard（speed_scale=1，循环=False，事件帧 2 个：GuardOn@0.15s、GuardOff@0.9s）
+[log] 16:32:06 [Combat] 架：skl_b_skill_2 等待真实GuardOn，随后持续0.75游戏秒。
+[ActionMovement] PASS 真实输入进入前台动作：skl_b_skill_2
+[ActionMovement] PASS 灵动只放行Attack，默认Locked的架仍不能主动走位
+[log] 16:32:06 [Combat] 架：skl_b_skill_2 架势开始（0.75s，期间被命中则规避并退出）
+[ActionMovement] PASS 主动移动锁保留真实外力击退，没有把身体冻结
+[log] 16:32:06 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 16:32:06 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 ActionMovementProbe
+[ActionMovement] PASS 空闲地面正常放行，没有旧动作移动锁残留
+[ActionMovement] PASS 换装清理临时被动授权
+[ActionMovement] === 动作移动验收结束：通过 75，失败 0 ===
+[log] 16:32:06 [Exit] 音频退出回收：真实等待85ms。
+[log] 16:32:06 [Audio] 音效统计：本局一次都没播（表里 14 条；检查音效表与触发点）。
+
+截图 j20_action_movement SHA256=CA63A721B66B8D918EEA87B7149975771997057AF2EDA3831B47E84BA85EE63D
+存档 AFTER meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 AFTER ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 AFTER settings.cfg SHA256=9FD4787436FD4EAFAEA11372C2745276A7D35D4FCF192456825E7C1ADDFD02B4
+存档 AFTER loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 AFTER rune.cfg SHA256=ABSENT
+selftest.flag AFTER=False
