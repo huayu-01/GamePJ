@@ -330,7 +330,6 @@ public static class RewardEffectRegistry
 			context.Player.AddChild(new SoulHarvestRule
 			{
 				RewardId = row.Id,
-				Cooldown = Param(row, "Cooldown", 0f),
 				Chance = Param(row, "Chance", 0.3f),
 				Heal = Param(row, "Heal", 8f),
 				PickupRadius = Param(row, "PickupRadius", 1.2f),

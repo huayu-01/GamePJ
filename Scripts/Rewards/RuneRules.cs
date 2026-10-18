@@ -35,15 +35,18 @@ public partial class RuneArmorOnKillRule : TriggerRule
 
 	public override void _Ready()
 	{
-		base._Ready();
 		_owner = GetParent<Unit>();
+		// 加甲只记录已发生的击杀，不生成攻击；合法链末层和第五杀也必须计数。
+		GameplayEventBus.Raised += OnKill;
 	}
 
 	public override void _ExitTree()
 	{
+		GameplayEventBus.Raised -= OnKill;
 		_owner = null;
-		base._ExitTree();
 	}
+
+	private void OnKill(GameplayEvent fact) { if (Matches(fact)) Execute(fact); }
 
 	/// <summary>只认**自己打出来的击杀**（与「连锁闪电」「灵魂收割」同一条判据）。</summary>
 	public override bool Matches(GameplayEvent gameplayEvent)

@@ -1103,13 +1103,22 @@ public partial class SoulHarvestRule : TriggerRule
 
 	public override void _Ready()
 	{
-		base._Ready();
 		_owner = GetParent<Unit>();
+		// 每个真实击杀各掷一次掉落；不产生攻击，不经过攻击连锁次数／深度门。
+		GameplayEventBus.Raised += OnKill;
 	}
+
+	public override void _ExitTree()
+	{
+		GameplayEventBus.Raised -= OnKill;
+		_owner = null;
+	}
+
+	private void OnKill(GameplayEvent fact) { if (Matches(fact)) Execute(fact); }
 
 	public override bool Matches(GameplayEvent gameplayEvent)
 		=> gameplayEvent.Kind == GameplayEventKind.Kill
-			&& gameplayEvent.Source != null
+			&& _owner != null && IsInstanceValid(_owner)
 			&& gameplayEvent.Source == _owner;
 
 	public override void Execute(GameplayEvent gameplayEvent)
