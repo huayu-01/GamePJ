@@ -422,7 +422,8 @@ public partial class ArrowVolleyAbility : Ability
 
 		Vector3 direction = ResolveShotDirection();
 		StatSheet stats = OwnerUnit.Stats;
-		float damageMultiplier = stats.Get("DamageMultiplier");
+		AttackOffense offense = AttackOffense.Capture(OwnerUnit, CritChance, CritMultiplier);
+		float damageMultiplier = offense.DamageMultiplier;
 		float power = HoldToCharge ? _releasedPower : 1;
 		int steps = HoldToCharge ? _releasedSteps : 0;
 
@@ -474,8 +475,8 @@ public partial class ArrowVolleyAbility : Ability
 			Ability = AbilityId,
 			BaseDamage = shotDamage * damageMultiplier * lostArrowDamageMultiplier,
 			CanCrit = true,
-			CritChance = Mathf.Clamp(CritChance + stats.Get("CritChanceAdd"), 0f, 1f),
-			CritMultiplier = CritMultiplier + stats.Get("CritMultiplierAdd"),
+			CritChance = offense.CritChance,
+			CritMultiplier = offense.CritMultiplier,
 			Knockback = knockback,
 			Policy = HitPolicy.OncePerTarget,
 			Lifetime = MaxLifetime,

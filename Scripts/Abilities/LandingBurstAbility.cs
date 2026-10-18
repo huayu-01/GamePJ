@@ -137,7 +137,8 @@ public partial class LandingBurstAbility : Ability
 		}
 
 		float basis = _source?.CurrentBasisDamage ?? _hitbox.Damage;
-		LastBurstDamage = basis * DamageScale;
+		AttackOffense offense = _source?.CurrentOffense ?? AttackOffense.Capture(OwnerUnit, _hitbox.CritChance, _hitbox.CritMultiplier);
+		LastBurstDamage = basis * DamageScale * (_source == null ? offense.DamageMultiplier : 1f);
 		TriggerCount++;
 
 		var attack = new AttackInstance
@@ -145,8 +146,9 @@ public partial class LandingBurstAbility : Ability
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
 			BaseDamage = LastBurstDamage,
-			CritChance = _hitbox.CritChance,
-			CritMultiplier = _hitbox.CritMultiplier,
+			CanCrit = true,
+			CritChance = offense.CritChance,
+			CritMultiplier = offense.CritMultiplier,
 			Knockback = Knockback > 0f ? Knockback : _hitbox.Knockback,
 			Policy = HitPolicy.OncePerTarget,
 			HitInterval = _hitbox.HitInterval,

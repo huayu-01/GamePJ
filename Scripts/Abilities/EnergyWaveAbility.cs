@@ -269,7 +269,8 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		StatSheet stats = OwnerUnit.Stats;
 		// 表里的伤害是**绝对数值**（文档：武技1 伤害 10；武技2 蓄满 30 / 完美 40）。角色/增幅的攻击力倍率默认为 1，
 		// 所以这里照乘就行 —— 不改数值时"伤害 10"就是 10（自测硬指标可逐位核对）。
-		float damageMultiplier = stats.Get("DamageMultiplier");
+		AttackOffense offense = AttackOffense.Capture(OwnerUnit, CritChance, CritMultiplier);
+		float damageMultiplier = offense.DamageMultiplier;
 
 		// 完美时机：**绝对值优先**（表里的 PerfectDamage / PerfectSpeed）；没配才回落到普通值。
 		// 后置蓄力的档位倍率（弓 / 短弩 / 长枪那一段）与完美时机是**两件正交的事**，所以两者相乘
@@ -284,8 +285,8 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 			Ability = AbilityId,
 			BaseDamage = shotDamage * damageMultiplier,
 			CanCrit = true,
-			CritChance = Mathf.Clamp(CritChance + stats.Get("CritChanceAdd"), 0f, 1f),
-			CritMultiplier = CritMultiplier + stats.Get("CritMultiplierAdd"),
+			CritChance = offense.CritChance,
+			CritMultiplier = offense.CritMultiplier,
 			Knockback = Knockback + (_perfect ? PerfectKnockback : 0f),
 			Policy = HitPolicy.OncePerTarget,
 			Lifetime = MaxLifetime,

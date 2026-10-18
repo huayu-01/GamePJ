@@ -88,6 +88,8 @@ public partial class Projectile : Area3D
 	private readonly System.Collections.Generic.HashSet<ulong> _hitTargets = new();
 	private readonly Godot.Collections.Array<Rid> _excludedBodies = new();
 	private AttackInstance? _attack;
+	/// <summary>发射时保存的攻击侧快照，只读供验收与诊断。</summary>
+	public AttackInstance? CurrentAttack => _attack;
 	private Vector3 _velocity;
 	private float _lifetime;
 	private int _pierceLeft;

@@ -212,6 +212,9 @@ public partial class Unit : CharacterBody3D
 		Stats.SetBase("ExplosionRadiusAdd", 0f);
 		Stats.SetBase("ExplosionDamageScale", 0f);
 		Stats.SetBase("CritChanceAdd", 0f);
+		// 玩家出手共读武器表基础值；构造期兜底，配装时由当前武器行覆盖。
+		Stats.SetBase("BaseCritChance", 0.05f);
+		Stats.SetBase("BaseCritMultiplier", 2f);
 		Stats.SetBase("CritMultiplierAdd", 0f);
 		Stats.SetBase("MaxHealthMultiplier", 1f);
 		Stats.SetBase("MaxHealthAdd", 0f);

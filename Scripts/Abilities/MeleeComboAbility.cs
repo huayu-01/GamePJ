@@ -513,6 +513,7 @@ public partial class MeleeComboAbility : Ability
 		}
 
 		float scale = StepValue(_damageScales, ComboStep, 1f);
+		AttackOffense offense = AttackOffense.Capture(OwnerUnit, _hitbox.CritChance, _hitbox.CritMultiplier);
 		var attack = new AttackInstance
 		{
 			Attacker = OwnerUnit,
@@ -521,11 +522,12 @@ public partial class MeleeComboAbility : Ability
 			// 都挂这个键。没配置时它是 1（`Unit.SeedStats` 有基础值），所以这一乘**逐位不变**。
 			// ⚠️ 只加在连招这一路（近战武技 = 玩家专属）；`AttackHitbox` 的默认路径一个字没动 ——
 			// 首领/敌人的伤害走那条，那里乘一次会改动"白板首领 315"这类硬指标。
-			BaseDamage = _hitbox.Damage * scale * MeleeDamageMultiplier * _singleStepDamageScale,
+			BaseDamage = _hitbox.Damage * scale * offense.DamageMultiplier * _singleStepDamageScale,
 			ComboStep = ComboStep,
 			ComboStepCount = Mathf.Max(1, _anims.Count),
-			CritChance = _hitbox.CritChance,
-			CritMultiplier = _hitbox.CritMultiplier,
+			CanCrit = true,
+			CritChance = offense.CritChance,
+			CritMultiplier = offense.CritMultiplier,
 			Knockback = _hitbox.Knockback,
 			Policy = _hitbox.Policy,
 			HitInterval = _hitbox.HitInterval,

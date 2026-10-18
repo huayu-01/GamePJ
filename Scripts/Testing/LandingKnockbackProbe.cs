@@ -42,6 +42,8 @@ public partial class LandingKnockbackProbe : Node3D
 		_targets.Clear(); _knocks.Clear();
 		RunSetup.Weapon = weapon;
 		_loadout.Apply(_player, this, PlayerCharacterKind.WeaponMaster, weapon);
+		// 本专项比较地爆前后同一基础伤害；暴击正例由AttackSnapshotProbe独立覆盖。
+		_player.Stats.SetBase("CritChanceAdd", -100f);
 		_player.GlobalPosition = new Vector3(20, 6, 20); _player.Velocity = Vector3.Zero; _player.ResetPhysicsInterpolation();
 		_camera.GlobalPosition = new Vector3(20, 12, 20); _camera.LookAt(new Vector3(20, 0, 20), Vector3.Forward); _camera.ResetPhysicsInterpolation();
 		if (grant)

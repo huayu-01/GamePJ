@@ -84,6 +84,8 @@ public abstract partial class WeaponThrowAbility : Ability
 	private bool _waitingForCharge;
 	private bool _leftRecallRange;
 	private Vector3? _redirectDestination;
+	private AttackOffense _throwOffense;
+	private float _throwDamage;
 
 	/// <summary>抛出时的起点（"手上"的位置：胸口高度 + 前方 0.6m）—— 子类画路径/算落地高度要用。</summary>
 	protected Vector3 HomePosition { get; private set; }
@@ -186,6 +188,9 @@ public abstract partial class WeaponThrowAbility : Ability
 		OnThrowStarted();
 
 		Launch(direction);
+		// 子类Launch先冻结蓄力倍率；之后所有周期与回程窗口沿用同一次出手属性。
+		_throwOffense = AttackOffense.Capture(OwnerUnit, Hitbox?.CritChance ?? 0f, Hitbox?.CritMultiplier ?? 2f);
+		_throwDamage = (Hitbox?.Damage ?? 0f) * DamageScale * _throwOffense.DamageMultiplier;
 		LastFlightDirection = FlightVelocity.Normalized();
 		if (ContinuousPathDamage) OpenDamageWindow();
 
@@ -334,9 +339,10 @@ public abstract partial class WeaponThrowAbility : Ability
 		{
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
-			BaseDamage = Hitbox.Damage * DamageScale,
-			CritChance = Hitbox.CritChance,
-			CritMultiplier = Hitbox.CritMultiplier,
+			BaseDamage = _throwDamage,
+			CanCrit = true,
+			CritChance = _throwOffense.CritChance,
+			CritMultiplier = _throwOffense.CritMultiplier,
 			Knockback = Hitbox.Knockback,
 			Policy = HitPolicy.OncePerTarget,
 			HitInterval = Hitbox.HitInterval,

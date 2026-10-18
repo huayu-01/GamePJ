@@ -3,6 +3,21 @@ using Godot;
 
 namespace ActRoguelike.Combat;
 
+/// <summary>出手时冻结的攻击侧属性；基础暴击共读当前武器表，增益与局外成长共读属性表。</summary>
+public readonly record struct AttackOffense(float DamageMultiplier, float CritChance, float CritMultiplier)
+{
+	public static AttackOffense Capture(Unit? owner, float fallbackChance = 0f, float fallbackMultiplier = 2f)
+	{
+		StatSheet? stats = owner?.Stats;
+		bool player = owner?.Faction == Faction.Player;
+		float chance = player ? stats!.Get("BaseCritChance") : fallbackChance;
+		float multiplier = player ? stats!.Get("BaseCritMultiplier") : fallbackMultiplier;
+		return new AttackOffense(stats?.Get("DamageMultiplier") ?? 1f,
+			Mathf.Clamp(chance + (stats?.Get("CritChanceAdd") ?? 0f), 0f, 1f),
+			Mathf.Max(1f, multiplier + (stats?.Get("CritMultiplierAdd") ?? 0f)));
+	}
+}
+
 /// <summary>
 /// 一次攻击的攻击侧快照（战斗规则说明 §3-§6）。
 /// 攻击生成时把攻击者当时的攻击侧属性算好，飞行/碰撞期间沿用这份数据；

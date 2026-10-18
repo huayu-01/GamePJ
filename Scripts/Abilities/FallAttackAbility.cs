@@ -170,7 +170,8 @@ public partial class FallAttackAbility : Ability
 		if (!Movement.BeginVelocityOverride(this, velocity)) { Cancel(); return; }
 		LastDownwardSpeed = Mathf.Max(0, -velocity.Y);
 		LastDamageBonus = DamageMultiplierForDive(LastFallHeight, LastDownwardSpeed) - 1;
-		LastDamage = (_hitbox?.Damage ?? 0) * LastDamageMultiplier * OwnerUnit.Stats.Get("DamageMultiplier");
+		CurrentOffense = AttackOffense.Capture(OwnerUnit, _hitbox?.CritChance ?? 0f, _hitbox?.CritMultiplier ?? 2f);
+		LastDamage = (_hitbox?.Damage ?? 0) * LastDamageMultiplier * CurrentOffense.DamageMultiplier;
 		_previousPosition = OwnerUnit.GlobalPosition;
 		_diving = true;
 		ActivateDiveHitbox();
@@ -210,8 +211,9 @@ public partial class FallAttackAbility : Ability
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
 			BaseDamage = LastDamage,
-			CritChance = _hitbox.CritChance,
-			CritMultiplier = _hitbox.CritMultiplier,
+			CanCrit = true,
+			CritChance = CurrentOffense.CritChance,
+			CritMultiplier = CurrentOffense.CritMultiplier,
 			Knockback = _hitbox.Knockback,
 			Policy = HitPolicy.IntervalPerTarget,
 			HitInterval = _hitbox.HitInterval,
@@ -221,6 +223,8 @@ public partial class FallAttackAbility : Ability
 
 		_hitbox.Activate(OwnerUnit, attack);
 	}
+	/// <summary>下冲Action冻结的属性；落剑式继承它，不在落地时重读。</summary>
+	public AttackOffense CurrentOffense { get; private set; }
 
 	protected override void Tick(float delta)
 	{

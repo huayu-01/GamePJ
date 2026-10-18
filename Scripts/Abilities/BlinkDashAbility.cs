@@ -142,17 +142,19 @@ public partial class BlinkDashAbility : Ability
 			_invulnerableOwned = true;
 		}
 
+		AttackOffense offense = AttackOffense.Capture(OwnerUnit, _hitbox?.CritChance ?? 0f, _hitbox?.CritMultiplier ?? 2f);
 		_hitbox?.Activate(OwnerUnit, new AttackInstance
 		{
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
-			BaseDamage = _hitbox.Damage * OwnerUnit.Stats.Get("DamageMultiplier"),
-			CritChance = _hitbox.CritChance,
-			CritMultiplier = _hitbox.CritMultiplier,
-			Knockback = _hitbox.Knockback,
+			BaseDamage = (_hitbox?.Damage ?? 0f) * offense.DamageMultiplier,
+			CanCrit = true,
+			CritChance = offense.CritChance,
+			CritMultiplier = offense.CritMultiplier,
+			Knockback = _hitbox?.Knockback ?? 0f,
 			Policy = HitPolicy.IntervalPerTarget,
-			HitInterval = _hitbox.HitInterval,
-			Tags = _hitbox.AttackTags,
+			HitInterval = _hitbox?.HitInterval ?? 0.2f,
+			Tags = _hitbox?.AttackTags ?? System.Array.Empty<string>(),
 			AbilityKind = AbilityId,
 		});
 

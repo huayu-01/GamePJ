@@ -46,6 +46,8 @@ public sealed class PlayerLoadout
 
 		MetaProgress.Load();
 		player.Stats.RemoveBySource(owner);
+		player.Stats.SetBase("BaseCritChance", weaponRow?.CritChance ?? 0.05f);
+		player.Stats.SetBase("BaseCritMultiplier", weaponRow?.CritMultiplier ?? 2f);
 		player.ApplyBaseStats((character?.MaxHealth ?? player.MaxHealth) + MetaProgress.BonusMaxHealth,
 			character?.StartingArmor ?? player.StartingArmor, character?.MaxShield ?? player.MaxShield, character?.MoveSpeed ?? player.MoveSpeed);
 		player.Stats.AddModifier(new StatModifier { Stat = "DamageMultiplier", Operation = ModifierOperation.Multiply, Value = MetaProgress.BonusDamageMultiplier, Source = owner });

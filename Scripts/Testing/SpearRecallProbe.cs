@@ -36,6 +36,8 @@ public partial class SpearRecallProbe : Node3D
 	{
 		Press("weapon_skill_1", false); Press("weapon_skill_2", false);
 		_loadout.Apply(_player, this, PlayerCharacterKind.WeaponMaster, WeaponPresetKind.Spear);
+		// 往返伤害等量断言隔离随机暴击；暴击与回程快照另有专项目标。
+		_player.Stats.SetBase("CritChanceAdd", -100f);
 		_player.GlobalPosition = new Vector3(20, 0.05f, 20); _player.Velocity = Vector3.Zero;
 		_camera.GlobalPosition = new Vector3(20, 2, 26); _camera.LookAt(new Vector3(20, 0, 0)); _camera.ResetPhysicsInterpolation();
 		if (grant)

@@ -26,6 +26,8 @@ public partial class AttackHitbox : Area3D
 
 	private readonly HitTracker _tracker = new();
 	private AttackInstance? _attack;
+	/// <summary>最近激活的攻击快照，只读供战斗验收与诊断。</summary>
+	public AttackInstance? CurrentAttack => _attack;
 	private bool _active;
 	private int _phase;
 
@@ -112,14 +114,16 @@ public partial class AttackHitbox : Area3D
 		OwnerUnit = owner;
 		ConfigureCollision(owner);
 		_phase = phase;
+		AttackOffense offense = AttackOffense.Capture(owner, CritChance, CritMultiplier);
+		bool player = owner?.Faction == Faction.Player;
 		_attack = attack ?? new AttackInstance
 		{
 			Attacker = owner,
 			Ability = "Hitbox",
-			BaseDamage = Damage,
-			CanCrit = CritChance > 0f,
-			CritChance = CritChance,
-			CritMultiplier = CritMultiplier,
+			BaseDamage = Damage * (player ? offense.DamageMultiplier : 1f),
+			CanCrit = player || CritChance > 0f,
+			CritChance = player ? offense.CritChance : CritChance,
+			CritMultiplier = player ? offense.CritMultiplier : CritMultiplier,
 			Knockback = Knockback,
 			Policy = Policy,
 			HitInterval = HitInterval,

@@ -129,15 +129,16 @@ public partial class Weapon : Node3D
 
 		// 攻击产生时快照攻击侧属性（战斗规则说明 §4）。
 		StatSheet? stats = OwnerUnit?.Stats;
+		AttackOffense offense = AttackOffense.Capture(OwnerUnit, CritChance, CritMultiplier);
 		int projectileCount = Mathf.Max(1, ProjectilesPerShot + (int)(stats?.Get("ProjectileCountAdd") ?? 0f));
 		var attack = new AttackInstance
 		{
 			Attacker = OwnerUnit,
 			Ability = "WeaponFire",
-			BaseDamage = Damage * (stats?.Get("DamageMultiplier") ?? 1f),
+			BaseDamage = Damage * offense.DamageMultiplier,
 			CanCrit = true,
-			CritChance = Mathf.Clamp(CritChance + (stats?.Get("CritChanceAdd") ?? 0f), 0f, 1f),
-			CritMultiplier = CritMultiplier + (stats?.Get("CritMultiplierAdd") ?? 0f),
+			CritChance = offense.CritChance,
+			CritMultiplier = offense.CritMultiplier,
 			Knockback = Knockback,
 			Policy = HitPolicy.OncePerTarget,
 			Lifetime = MaxLifetime,
