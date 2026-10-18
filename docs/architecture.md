@@ -94,6 +94,8 @@ J4三维技能位移由`CharacterMovement`按来源持有速度覆盖，技能�
 
 ## Unit 与表现的分工
 
+**J19共通地爆**：FallAttackAbility真实Land阶段复用实际形状／变换查询敌人、容量填满扩容、单位去重；Unit.ReceiveKnockback提供纯击退入口，不追加Hit／Damage事件，抗性由移动组件处理。参数通过SkillEnhancement资源配置，默认0、换装清理，三配装见 [J19](character-design-j19.md)。用户新增的技能动画移动许可与灵动授权为下一批；平衡重测暂后置。
+
 **J18浮光跃金**：CharacterMovement将额外跳次数作为地面瞬移高度来源，AirJumpsLeft对外为0；TestMove以真实身体裁定向上World净空，然后写入位置、清垂直上升速度并ResetPhysicsInterpolation。地面旧状态用离地锁避免重复瞬移，真实落地后恢复，PlayerLoadout清理模式。默认路径不变，见 [J18](character-design-j18.md)。
 
 **J17金光大道**：复用近战单段模式，指定原连招index2；SkillEnhancementTuning.ForwardReachScale只缩放盒形判定Z及其前伸中心，宽高与其他技能保持，换装清理。只该刀伤害乘1.5，替换旧全局Damage／Range修饰，真实武技2隔离见 [J17](character-design-j17.md)。

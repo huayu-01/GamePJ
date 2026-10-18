@@ -14,6 +14,8 @@ public partial class SkillEnhancementTuning : Resource
 	[Export] public int ComboStepIndex { get; set; } = -1;
 	/// <summary>近战盒形判定沿前方的长度与中心偏移倍率，不改变宽高。</summary>
 	[Export] public float ForwardReachScale { get; set; } = 1f;
+	/// <summary>共通落真实落地后的纯击退强度；负数不配置。</summary>
+	[Export] public float LandingKnockback { get; set; } = -1f;
 	[Export] public int ProjectileSweepMaxHits { get; set; }
 	[Export] public float ProjectileSweepRadius { get; set; } = 0.08f;
 	/// <summary>小于零保留技能原冷却；零表示无冷却。</summary>

@@ -297,6 +297,15 @@ public partial class Unit : CharacterBody3D
 		return Mathf.Clamp(total, 0f, 0.9f);
 	}
 
+	/// <summary>纯击退入口，复用单位乘区、无敌与移动组件抗性。</summary>
+	public bool ReceiveKnockback(Vector3 impulse)
+	{
+		if (IsDead || IsInvulnerable || impulse.LengthSquared() < 0.000001f) return false;
+		// 纯击退不伪造伤害／命中事件；抗性仍由移动组件消费。
+		KnockbackReceived?.Invoke(impulse * Stats.Get("KnockbackMultiplier"));
+		return true;
+	}
+
 	/// <summary>统一命中入口。顺序见 战斗规则说明 §12：命中 → 无敌 → 格挡 → 减伤 → 护甲 → 护盾 → 生命。</summary>
 	public DamageResult ReceiveHit(HitInstance hit)
 	{

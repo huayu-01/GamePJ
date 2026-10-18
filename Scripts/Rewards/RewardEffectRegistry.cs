@@ -73,6 +73,7 @@ public static class RewardEffectRegistry
 			if (ability is SwordQiAbility draw) draw.ConfigureEnhancement(tuning.DamageScale, tuning.SizeScale, tuning.ProjectileSweepMaxHits, tuning.ProjectileSweepRadius);
 			else if (ability is LandingBurstAbility burst) burst.ConfigureEnhancement(tuning.DamageScale, tuning.SizeScale);
 			else if (ability is MeleeComboAbility combo) combo.ConfigureSingleStep(tuning.ComboStepIndex, tuning.DamageScale, tuning.SizeScale, tuning.ForwardReachScale);
+			else if (ability is FallAttackAbility fall && tuning.LandingKnockback >= 0f) fall.ConfigureLandingKnockback(tuning.LandingKnockback);
 			else { GD.PushWarning($"[Reward] {row.Id} 的增强目标技能不存在或类型不支持。"); return; }
 			if (tuning.CooldownSeconds >= 0f) ability.Cooldown = tuning.CooldownSeconds;
 		},
@@ -185,7 +186,7 @@ public static class RewardEffectRegistry
 		//
 		// 服务这些行（数值全在表里，代码里一个数字都没有）：
 		//   有备无患（后撤 MaxCharges=3 / RechargeSeconds=0.5）· 专注（武技2 CooldownMultiplier=0.5 +
-		//   完美时机窗口）· 地爆（落剑式 Knockback）。气贯长虹已迁强类型WeaponRecall。
+		//   完美时机窗口）。地爆已迁SkillEnhancement，气贯长虹已迁强类型WeaponRecall。
 		//   龙之箭已迁ChargedShot；大拔刀术／神降术已迁强类型SkillEnhancement。
 		//
 		// ⚠️ 属性名写错**不静默**：先按 `GetPropertyList()` 查存在性，不存在就打警告并跳过这一条。

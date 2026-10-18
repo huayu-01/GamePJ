@@ -1,0 +1,392 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.12
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 351 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.07
+
+landing exit=0 seconds=8.15 stderrBytes=0
+=== landing ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 12:40:27 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 12:40:27 [Flow] === 新的一局 ===
+[log] 12:40:27 [Flow] 日志文件：user://logs/run_20261018_124027.log
+[log] 12:40:27 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 12:40:27 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 12:40:27 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 12:40:27 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 12:40:27 [Config] 增幅项表：62 条（来源：表）—— 强化 9 / 进化 23 / 异化 30。
+[log] 12:40:27 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 12:40:27 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 12:40:27 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 12:40:27 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 12:40:27 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 12:40:27 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 12:40:27 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 12:40:27 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 12:40:28 [Combat] 单位动画：Player 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 12:40:28 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:28 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 12:40:28 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[log] 12:40:28 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:28 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:28 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 12:40:28 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 12:40:28 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:28 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:28 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 12:40:28 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:28 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:28 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:28 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.0853m，参考耗时0.1496s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[log] 12:40:28 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:29 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 12:40:29 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[LandingKnockback] PASS SpiritSword 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:29 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.09m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:29 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[log] 12:40:29 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 36 = 上游 36 ×1，半径/形状来自本行命中体，第 1 次触发）—— 上游下落攻击本身没有改动。
+[log] 12:40:29 [Combat] 伤害 Player(240) → Resist1(9928) 36
+[log] 12:40:29 [Combat] 伤害 Player(240) → MovableNear(9928) 36
+[LandingKnockback] PASS SpiritSword 真实World落地
+[log] 12:40:29 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[LandingKnockback] PASS 默认未获地爆：没有新增落地击退，原下冲命中保持
+[log] 12:40:29 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:29 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[log] 12:40:29 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:29 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:29 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:29 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:29 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:29 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.9129m，参考耗时0.1739s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS SpiritSword 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:29 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:29 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:29 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.91m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:29 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[log] 12:40:29 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 36 = 上游 36 ×1，半径/形状来自本行命中体，第 2 次触发）—— 上游下落攻击本身没有改动。
+[log] 12:40:29 [Combat] 伤害 Player(240) → Resist1(9928) 36
+[log] 12:40:29 [Combat] 伤害 Player(240) → MovableNear(9928) 36
+[LandingKnockback] PASS SpiritSword 真实World落地
+[log] 12:40:29 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[LandingKnockback] PASS 仅一次落地查询命中两名有效敌人，不含友军／死者／范围外
+[LandingKnockback] PASS 每名范围内敌人只收到一次落地强度6，不依赖额外落剑式
+[LandingKnockback] PASS 真实移动组件向落点外推出敌人：X 22→23.418
+[LandingKnockback] PASS 击退抗性1仍免疫真实位移
+[LandingKnockback] PASS 范围外／友军／死者不受地爆，友军与外靶生命保持
+[LandingKnockback] PASS SpiritSword 地爆不追加伤害：抗性靶实际总伤害72→72
+[log] 12:40:30 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:30 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[log] 12:40:30 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 12:40:30 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:30 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:30 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:30 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:30 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:30 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.9129m，参考耗时0.1739s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS Scythe 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:30 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:30 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:30 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.91m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:30 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 3 次；纯视觉，不改判定）
+[LandingKnockback] PASS Scythe 真实World落地
+[LandingKnockback] PASS 默认未获地爆：没有新增落地击退，原下冲命中保持
+[log] 12:40:30 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:30 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[log] 12:40:30 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:30 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:30 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:30 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:30 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:31 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.9129m，参考耗时0.1739s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS Scythe 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:31 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:31 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:31 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.91m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:31 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 4 次；纯视觉，不改判定）
+[LandingKnockback] PASS Scythe 真实World落地
+[LandingKnockback] PASS 仅一次落地查询命中两名有效敌人，不含友军／死者／范围外
+[LandingKnockback] PASS 每名范围内敌人只收到一次落地强度6，不依赖额外落剑式
+[LandingKnockback] PASS 真实移动组件向落点外推出敌人：X 22→23.035
+[LandingKnockback] PASS 击退抗性1仍免疫真实位移
+[LandingKnockback] PASS 范围外／友军／死者不受地爆，友军与外靶生命保持
+[LandingKnockback] PASS Scythe 地爆不追加伤害：抗性靶实际总伤害36→36
+[log] 12:40:31 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:31 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[log] 12:40:31 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 12:40:31 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:31 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:31 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:31 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:31 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:32 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.9129m，参考耗时0.1739s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS Spear 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:32 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:32 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:32 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.91m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:32 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 5 次；纯视觉，不改判定）
+[LandingKnockback] PASS Spear 真实World落地
+[LandingKnockback] PASS 默认未获地爆：没有新增落地击退，原下冲命中保持
+[log] 12:40:32 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:32 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[log] 12:40:32 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:32 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:32 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:32 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:32 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:32 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.9129m，参考耗时0.1739s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS Spear 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:32 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:32 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:33 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.91m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:33 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 6 次；纯视觉，不改判定）
+[LandingKnockback] PASS Spear 真实World落地
+[LandingKnockback] PASS 仅一次落地查询命中两名有效敌人，不含友军／死者／范围外
+[LandingKnockback] PASS 每名范围内敌人只收到一次落地强度6，不依赖额外落剑式
+[LandingKnockback] PASS 真实移动组件向落点外推出敌人：X 22→23.052
+[LandingKnockback] PASS 击退抗性1仍免疫真实位移
+[LandingKnockback] PASS 范围外／友军／死者不受地爆，友军与外靶生命保持
+[LandingKnockback] PASS Spear 地爆不追加伤害：抗性靶实际总伤害36→36
+[log] 12:40:33 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:33 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[LandingKnockback] PASS 真实自然下落触地
+[LandingKnockback] PASS 普通落地不触发地爆
+[log] 12:40:33 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:33 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[log] 12:40:33 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:33 [Combat] 动作交接：skl_b_fall 被 skl_b_skill_1 打断（动画时间0s）。
+[log] 12:40:33 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 12:40:34 [Combat] 闪：skl_b_skill_1 朝 (0, -1, 4.371139E-08) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[log] 12:40:34 [Combat] 伤害 Player(240) → Interrupted(9986) 14
+[LandingKnockback] PASS 真实前摇被闪打断，不伪造地爆落地
+[log] 12:40:34 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:34 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 换装清除地爆强度与计数
+[LandingKnockback] === 地爆验收结束：通过 53，失败 0 ===
+[log] 12:40:34 [Exit] 音频退出回收：真实等待87ms。
+[log] 12:40:34 [Audio] 音效统计：共 23 次 —— sfx_enemy_die×6、sfx_combat_hit×17（缺失 id 0 个）
+
+landing_render exit=0 seconds=9.7 stderrBytes=0
+=== landing_render ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+D3D12 12_0 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti
+
+[log] 12:40:37 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 12:40:37 [Flow] === 新的一局 ===
+[log] 12:40:37 [Flow] 日志文件：user://logs/run_20261018_124037.log
+[log] 12:40:37 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 12:40:37 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 12:40:37 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 12:40:37 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 12:40:37 [Config] 增幅项表：62 条（来源：表）—— 强化 9 / 进化 23 / 异化 30。
+[log] 12:40:37 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 12:40:37 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 12:40:37 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 12:40:37 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 12:40:37 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 12:40:37 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 12:40:37 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 12:40:37 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 12:40:37 [Combat] 单位动画：Player 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 12:40:37 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:37 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 12:40:37 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[log] 12:40:37 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:37 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:37 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 12:40:37 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 12:40:37 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:37 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:37 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 12:40:37 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:38 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:38 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:38 [Combat] 下落攻击：skl_b_fall Action起动，起手离地4.9547m，参考耗时0.1457s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[log] 12:40:38 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:38 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 12:40:38 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[LandingKnockback] PASS SpiritSword 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:38 [Combat] 下落攻击：skl_b_fall 落地（起手高度 4.95m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:38 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[log] 12:40:38 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 36 = 上游 36 ×1，半径/形状来自本行命中体，第 1 次触发）—— 上游下落攻击本身没有改动。
+[log] 12:40:38 [Combat] 伤害 Player(240) → MovableNear(9928) 36
+[log] 12:40:38 [Combat] 伤害 Player(240) → Resist1(9928) 36
+[LandingKnockback] PASS SpiritSword 真实World落地
+[log] 12:40:38 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[LandingKnockback] PASS 默认未获地爆：没有新增落地击退，原下冲命中保持
+[log] 12:40:38 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:38 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[log] 12:40:38 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:38 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:38 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:38 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:38 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:39 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.9129m，参考耗时0.1739s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS SpiritSword 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:39 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:39 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:39 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.91m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:39 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[log] 12:40:39 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 36 = 上游 36 ×1，半径/形状来自本行命中体，第 2 次触发）—— 上游下落攻击本身没有改动。
+[log] 12:40:39 [Combat] 伤害 Player(240) → Resist1(9928) 36
+[log] 12:40:39 [Combat] 伤害 Player(240) → MovableNear(9928) 36
+[LandingKnockback] PASS SpiritSword 真实World落地
+[log] 12:40:39 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[LandingKnockback] PASS 仅一次落地查询命中两名有效敌人，不含友军／死者／范围外
+[LandingKnockback] PASS 每名范围内敌人只收到一次落地强度6，不依赖额外落剑式
+[LandingKnockback] PASS 真实移动组件向落点外推出敌人：X 22→23.418
+[LandingKnockback] PASS 击退抗性1仍免疫真实位移
+[LandingKnockback] PASS 范围外／友军／死者不受地爆，友军与外靶生命保持
+[LandingKnockback] PASS SpiritSword 地爆不追加伤害：抗性靶实际总伤害72→72
+[log] 12:40:39 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:39 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[log] 12:40:39 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 12:40:39 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:39 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:39 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:39 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:39 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:39 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.9129m，参考耗时0.1739s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS Scythe 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:39 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:39 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:39 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.91m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:39 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 3 次；纯视觉，不改判定）
+[LandingKnockback] PASS Scythe 真实World落地
+[LandingKnockback] PASS 默认未获地爆：没有新增落地击退，原下冲命中保持
+[log] 12:40:40 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:40 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[log] 12:40:40 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:40 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:40 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:40 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:40 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:40 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.9129m，参考耗时0.1739s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS Scythe 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:40 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:40 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:40 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.91m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:40 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 4 次；纯视觉，不改判定）
+[LandingKnockback] PASS Scythe 真实World落地
+[LandingKnockback] PASS 仅一次落地查询命中两名有效敌人，不含友军／死者／范围外
+[LandingKnockback] PASS 每名范围内敌人只收到一次落地强度6，不依赖额外落剑式
+[LandingKnockback] PASS 真实移动组件向落点外推出敌人：X 22→23.052
+[LandingKnockback] PASS 击退抗性1仍免疫真实位移
+[LandingKnockback] PASS 范围外／友军／死者不受地爆，友军与外靶生命保持
+[LandingKnockback] PASS 截图 j19_ground_burst
+[LandingKnockback] PASS Scythe 地爆不追加伤害：抗性靶实际总伤害36→36
+[log] 12:40:41 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:41 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[log] 12:40:41 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 12:40:41 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:41 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:41 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:41 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:41 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:41 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.608m，参考耗时0.1649s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS Spear 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:41 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:41 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:41 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.61m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:41 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 5 次；纯视觉，不改判定）
+[LandingKnockback] PASS Spear 真实World落地
+[LandingKnockback] PASS 默认未获地爆：没有新增落地击退，原下冲命中保持
+[log] 12:40:42 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:42 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[log] 12:40:42 [Combat] 伤害 Player(240) → Dead(0) 1
+[log] 12:40:42 [Combat] 死亡 Dead(0) 击杀者=Player(240)
+[log] 12:40:42 [Combat] 击杀 Dead(0) by Player(240)
+[log] 12:40:42 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 12:40:42 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:42 [Combat] 下落攻击：skl_b_fall Action起动，起手离地5.9129m，参考耗时0.1739s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[LandingKnockback] PASS Spear 真实按键与Action起动下冲
+[LandingKnockback] PASS 空中阶段不提前施加地爆击退
+[log] 12:40:42 [Combat] 伤害 Player(240) → Resist1(9964) 36
+[log] 12:40:42 [Combat] 伤害 Player(240) → MovableNear(9964) 36
+[log] 12:40:42 [Combat] 下落攻击：skl_b_fall 落地（起手高度 5.91m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 12:40:42 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 6 次；纯视觉，不改判定）
+[LandingKnockback] PASS Spear 真实World落地
+[LandingKnockback] PASS 仅一次落地查询命中两名有效敌人，不含友军／死者／范围外
+[LandingKnockback] PASS 每名范围内敌人只收到一次落地强度6，不依赖额外落剑式
+[LandingKnockback] PASS 真实移动组件向落点外推出敌人：X 22→23.035
+[LandingKnockback] PASS 击退抗性1仍免疫真实位移
+[LandingKnockback] PASS 范围外／友军／死者不受地爆，友军与外靶生命保持
+[LandingKnockback] PASS Spear 地爆不追加伤害：抗性靶实际总伤害36→36
+[log] 12:40:42 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:42 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[LandingKnockback] PASS 真实自然下落触地
+[LandingKnockback] PASS 普通落地不触发地爆
+[log] 12:40:43 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:43 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 地爆真实表行指定共通落，不再指灵剑额外落剑式
+[LandingKnockback] PASS 真实入构筑配置落地击退预设6
+[log] 12:40:43 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 12:40:43 [Combat] 动作交接：skl_b_fall 被 skl_b_skill_1 打断（动画时间0s）。
+[log] 12:40:43 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 12:40:43 [Combat] 闪：skl_b_skill_1 朝 (0, -1, 4.371139E-08) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[log] 12:40:43 [Combat] 伤害 Player(240) → Interrupted(9986) 14
+[LandingKnockback] PASS 真实前摇被闪打断，不伪造地爆落地
+[log] 12:40:43 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 12:40:43 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LandingKnockbackProbe
+[LandingKnockback] PASS 换装清除地爆强度与计数
+[LandingKnockback] === 地爆验收结束：通过 54，失败 0 ===
+[log] 12:40:44 [Exit] 音频退出回收：真实等待84ms。
+[log] 12:40:44 [Audio] 音效统计：共 23 次 —— sfx_enemy_die×6、sfx_combat_hit×17（缺失 id 0 个）
+
+截图 j19_ground_burst SHA256=69E0CC4A5E2951B24064C10A429EDB5B1FB6C7DF6FA7FE47AFCF22CCDE32BF98
+存档 AFTER meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 AFTER ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 AFTER settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 AFTER loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 AFTER rune.cfg SHA256=ABSENT
+selftest.flag AFTER=False

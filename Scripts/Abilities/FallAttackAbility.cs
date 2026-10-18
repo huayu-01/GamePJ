@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ActRoguelike.Combat;
 using ActRoguelike.Core;
 using Godot;
@@ -74,6 +75,15 @@ public partial class FallAttackAbility : Ability
 
 	/// <summary>**落地事件**：「落剑式」的额外范围攻击挂它。</summary>
 	public event Action? Landed;
+	public float LandingKnockback { get; private set; }
+	public int LandingKnockbackPulseCount { get; private set; }
+	public int LandingKnockbackHitCount { get; private set; }
+	public void ConfigureLandingKnockback(float strength) => LandingKnockback = Mathf.Max(0f, strength);
+	protected override void OnLoadoutReset()
+	{
+		LandingKnockback = 0f;
+		LandingKnockbackPulseCount = LandingKnockbackHitCount = 0;
+	}
 
 	/// <summary>下落期间每次判定额外加成的比例（自测取一档看得到）。</summary>
 	public float DamageMultiplierForHeight(float height)
@@ -260,8 +270,38 @@ public partial class FallAttackAbility : Ability
 		_hitbox?.Deactivate();
 		Movement?.EndVelocityOverride(this);
 
+		ApplyLandingKnockback();
 		GameLog.Write("Combat", $"下落攻击：{AbilityId} 落地（起手高度 {LastFallHeight:0.##}m，伤害 {LastDamage:0.##}）—— 触发落地事件给「落剑式/落日余晖」这类被动。");
 		Landed?.Invoke();
+	}
+
+	private void ApplyLandingKnockback()
+	{
+		if (LandingKnockback <= 0f || OwnerUnit == null || _hitbox?.GetNodeOrNull<CollisionShape3D>("Shape") is not { Shape: { } geometry } shape) return;
+		LandingKnockbackPulseCount++;
+		using var query = new PhysicsShapeQueryParameters3D
+		{
+			Shape = geometry, Transform = shape.GlobalTransform, CollisionMask = CombatLayers.HostileTo(OwnerUnit.Faction),
+			CollideWithBodies = true, CollideWithAreas = false
+		};
+		var seen = new HashSet<ulong>();
+		int capacity = 128;
+		while (true)
+		{
+			var hits = GetWorld3D().DirectSpaceState.IntersectShape(query, capacity);
+			// 查询顺序不稳定；填满时扩大容量重取，不能漏掉同圈中的敌人。
+			if (hits.Count >= capacity) { capacity *= 2; continue; }
+			foreach (var hit in hits)
+			{
+				if (hit["collider"].AsGodotObject() is not Unit target || target == OwnerUnit || !target.IsValidTarget
+					|| !OwnerUnit.IsHostileTo(target) || !seen.Add(target.GetInstanceId())) continue;
+				Vector3 direction = target.GlobalPosition - OwnerUnit.GlobalPosition;
+				direction.Y = 0f;
+				if (direction.LengthSquared() < 0.000001f) { direction = -OwnerUnit.GlobalTransform.Basis.Z; direction.Y = 0f; }
+				if (target.ReceiveKnockback(direction.Normalized() * LandingKnockback)) LandingKnockbackHitCount++;
+			}
+			break;
+		}
 	}
 
 	/// <summary>
