@@ -25,6 +25,16 @@ public static class RewardEffectRegistry
 	{
 		// 通用的"改 StatSheet"—— 19 条里有 14 条走它，只靠 Modifiers 里的数据表达，不需要新代码。
 		["StatSet"] = row => context => ApplyModifiers(row, context),
+		["WeaponSeek"] = row => context =>
+		{
+			if (row.WeaponSeek is not { TargetAbility: { } } tuning
+				|| Ability.FindByAbilityId(context.Player, tuning.TargetAbility.Id) is not ScytheThrowAbility scythe)
+			{
+				GD.PushWarning($"[Reward] {row.Id} 缺少有效飞镰索敌参数或目标技能。");
+				return;
+			}
+			scythe.ConfigureSeeking(tuning.IntervalSeconds, tuning.TargetHeight);
+		},
 		["MeleeProjectile"] = row => context =>
 		{
 			if (row.MeleeProjectile is not { TargetAbility: { }, ProjectileScene: { } } tuning

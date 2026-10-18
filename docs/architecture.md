@@ -94,6 +94,8 @@ J4三维技能位移由`CharacterMovement`按来源持有速度覆盖，技能�
 
 ## Unit 与表现的分工
 
+**J15喜爱**：ScytheThrowAbility在真实离手后按游戏秒周期，以拥有者位置选最近敌对单位；WeaponThrowAbility提供受保护的重定向飞行段，复用World、射程、周期伤害与回手状态机。默认无重定向不改变旧路径，回程停止索敌，换装清理。参数使用WeaponSeekTuning资源引用，见 [J15](character-design-j15.md)。
+
 **J14末刀进化**：近战单段模式沿用原连招表的动画／几何／真实ATK，选择与伤害倍率只作用目标能力；AttackInstance冻结ComboStep／ComboStepCount，Unit.Die将其带入Kill事件。TablePulse按来源单位／技能／冻结末段过滤普渡，不读玩家当前连招段号，旧攻击延迟结算不会串段。见 [J14](character-design-j14.md)。
 
 **J13灵剑进化**：`MeleeProjectileTuning` 配置每段真实ATK额外投射物，继承当段伤害快照；`SkillEnhancementTuning` 只改指定拔刀式／落剑式，不写全局伤害乘区。拔刀式模型放大与胶囊半径分开配置；落剑式复制独立球体、表现只读真实半径。换装还原增强配置及形状。真链路与预设边界见 [J13](character-design-j13.md)。

@@ -2,6 +2,14 @@
 
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_scythe.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" path="res://Scripts/Config/WeaponSeekTuning.cs" id="3_tuning"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_2.tres" id="4_skill"]
+
+[sub_resource type="Resource" id="Seeking"]
+script = ExtResource("3_tuning")
+TargetAbility = ExtResource("4_skill")
+IntervalSeconds = 2.0
+TargetHeight = 0.9
 
 [resource]
 script = ExtResource("2_row")
@@ -11,5 +19,7 @@ RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Pool = ExtResource("1_pool")
 Id = "evo_affection"
 DisplayName = "喜爱"
-DescriptionTemplate = "武技2 武器飞出后会周期性飞向最近的敌人"
-Note = "⚠️ 占位行（机制未接）：文档第 143 行（进化池 <B2限定>）「喜爱:武技2现在武器飞出去后周期性{2}秒的飞向理你最近的敌人」。**这一行现在没有任何效果** —— 它要的是给飞行中的武器加"每 2 秒朝最近敌人转向"的索敌通路（WeaponThrowAbility / ScytheThrowAbility 的飞行段），P5b 没做。池子/限定/前置判定是齐的，抽到之后不生效 —— 见 docs/upgrades.md §7。"
+DescriptionTemplate = "武器飞出后每2秒飞向离玩家最近的敌人"
+ApplyHandler = "WeaponSeek"
+WeaponSeek = SubResource("Seeking")
+Note = "J15：真实离手后每2游戏秒选择离玩家最近的有效敌对单位，悬停可重新飞行，到目标点或每段原射程后停留；周期伤害、手动与靠近召回保持。目标高度0.9m为可配预设，间隔2秒来自原文。"

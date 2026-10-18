@@ -49,6 +49,8 @@ public partial class RewardConfig : ConfigRow
 	[Export] public MeleeProjectileTuning? MeleeProjectile { get; set; }
 	/// <summary>只调整目标技能自身（大拔刀术／神降术）。</summary>
 	[Export] public SkillEnhancementTuning? SkillEnhancement { get; set; }
+	/// <summary>飞出武器的周期索敌（喜爱）。</summary>
+	[Export] public WeaponSeekTuning? WeaponSeek { get; set; }
 
 	/// <summary>
 	/// 处理器参数：<c>StatSet</c> 用 <c>Modifiers</c>；其余处理器用这里的键值对

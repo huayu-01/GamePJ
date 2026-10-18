@@ -83,6 +83,7 @@ public abstract partial class WeaponThrowAbility : Ability
 	private bool _waitingForThrowEvent;
 	private bool _waitingForCharge;
 	private bool _leftRecallRange;
+	private Vector3? _redirectDestination;
 
 	/// <summary>抛出时的起点（"手上"的位置：胸口高度 + 前方 0.6m）—— 子类画路径/算落地高度要用。</summary>
 	protected Vector3 HomePosition { get; private set; }
@@ -135,6 +136,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		_damageWindowOpen = false;
 		DamageTickCount = 0;
 		_leftRecallRange = false;
+		_redirectDestination = null;
 		_waitingForCharge = HoldToCharge;
 		IsReturning = false;
 		HasSettled = false;
@@ -223,7 +225,11 @@ public abstract partial class WeaponThrowAbility : Ability
 		{
 			Vector3 next = previous + FlightVelocity * delta + Vector3.Down * (0.5f * FlightGravity * delta * delta);
 			FlightVelocity += Vector3.Down * (FlightGravity * delta);
+			bool reachedRedirect = _redirectDestination is { } destination && previous.DistanceSquaredTo(destination) <= previous.DistanceSquaredTo(next);
+			if (reachedRedirect) next = _redirectDestination!.Value;
 			var query = PhysicsRayQueryParameters3D.Create(previous, next, CombatLayers.World);
+			// 仅重定向的飞行段开启：从墙面／墙内重新出发也不能越过地形。
+			query.HitFromInside = _redirectDestination.HasValue;
 			var hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
 			if (hit.Count > 0)
 			{
@@ -233,16 +239,24 @@ public abstract partial class WeaponThrowAbility : Ability
 			else
 			{
 				Vector3 flat = next - HomePosition;
-				flat.Y = 0;
-				if (EffectiveMaxDistance > 0 && flat.Length() >= EffectiveMaxDistance)
+				if (reachedRedirect)
 				{
-					Vector3 limited = HomePosition + flat.Normalized() * EffectiveMaxDistance;
-					WeaponPosition = new Vector3(limited.X, next.Y, limited.Z);
-					// 镰刀在前方悬停；抛物线武器到水平上限后仍须落到真实World。
-					if (FlightGravity <= 0) Settle();
-					else FlightVelocity = new Vector3(0, FlightVelocity.Y, 0);
+					WeaponPosition = next;
+					Settle();
 				}
-				else WeaponPosition = next;
+				else
+				{
+					flat.Y = 0;
+					if (EffectiveMaxDistance > 0 && flat.Length() >= EffectiveMaxDistance)
+					{
+						Vector3 limited = HomePosition + flat.Normalized() * EffectiveMaxDistance;
+						WeaponPosition = new Vector3(limited.X, next.Y, limited.Z);
+						// 镰刀在前方悬停；抛物线武器到水平上限后仍须落到真实World。
+						if (FlightGravity <= 0) Settle();
+						else FlightVelocity = new Vector3(0, FlightVelocity.Y, 0);
+					}
+					else WeaponPosition = next;
+				}
 			}
 			if (FlightVelocity.LengthSquared() > 0.001f) LastFlightDirection = FlightVelocity.Normalized();
 		}
@@ -260,6 +274,17 @@ public abstract partial class WeaponThrowAbility : Ability
 		HasSettled = true;
 		FlightVelocity = Vector3.Zero;
 		OnThrowSettled(WeaponPosition);
+	}
+
+	/// <summary>离手后开始新飞行段；继续沿用地形检测、射程、伤害与回手状态机。</summary>
+	protected bool RedirectFlightTowards(Vector3 destination)
+	{
+		if (!InFlight || IsReturning || WeaponPosition.DistanceSquaredTo(destination) < 0.0001f) return false;
+		HomePosition = WeaponPosition;
+		_redirectDestination = destination;
+		FlightVelocity = (destination - WeaponPosition).Normalized() * EffectiveThrowSpeed;
+		HasSettled = false;
+		return true;
 	}
 
 	private void TickDamage(float delta, Vector3 previous)
@@ -410,6 +435,7 @@ public abstract partial class WeaponThrowAbility : Ability
 
 	protected override void OnFinishOrCancel()
 	{
+		_redirectDestination = null;
 		_waitingForCharge = false;
 		_waitingForThrowEvent = false;
 		Hitbox?.Deactivate();

@@ -9,6 +9,49 @@ public partial class ScytheThrowAbility : WeaponThrowAbility
 	[ExportGroup("镰刀（前方直线抛出）")]
 	/// <summary>抛出的垂直初速（0 = 纯水平，"扔向前方"）。</summary>
 	[Export] public float UpwardSpeed { get; set; }
+	/// <summary>周期索敌间隔（秒）；默认0不启用，保持原飞镰行为。</summary>
+	[Export] public float SeekIntervalSeconds { get; set; }
+	[Export] public float SeekTargetHeight { get; set; } = 0.9f;
+	public int SeekTickCount { get; private set; }
+	public int RedirectCount { get; private set; }
+	public string LastSeekTarget { get; private set; } = string.Empty;
+	public float LastSeekSeconds { get; private set; }
+	private float _seekTimer, _flightSeconds;
+	public void ConfigureSeeking(float interval, float targetHeight)
+	{
+		SeekIntervalSeconds = Mathf.Max(0f, interval);
+		SeekTargetHeight = targetHeight;
+		_seekTimer = 0f;
+	}
+	protected override void OnLoadoutReset()
+	{
+		SeekIntervalSeconds = 0f;
+		SeekTargetHeight = 0.9f;
+		_seekTimer = _flightSeconds = LastSeekSeconds = 0f;
+		SeekTickCount = RedirectCount = 0;
+		LastSeekTarget = string.Empty;
+	}
+	protected override void OnThrowStarted()
+	{
+		_seekTimer = _flightSeconds = LastSeekSeconds = 0f;
+		SeekTickCount = RedirectCount = 0;
+		LastSeekTarget = string.Empty;
+	}
+	protected override void Tick(float delta)
+	{
+		base.Tick(delta);
+		if (!IsActive || !InFlight || IsReturning || SeekIntervalSeconds <= 0f || OwnerUnit == null) return;
+		_flightSeconds += delta;
+		_seekTimer += delta;
+		if (_seekTimer + 0.00001f < SeekIntervalSeconds) return;
+		_seekTimer = Mathf.Max(0f, _seekTimer - SeekIntervalSeconds);
+		SeekTickCount++;
+		LastSeekSeconds = _flightSeconds;
+		// 原文是离玩家最近，不能从武器当前位置挑最近的敌人。
+		var target = Targeting.FindNearestHostile(OwnerUnit, OwnerUnit);
+		LastSeekTarget = target?.Name.ToString() ?? string.Empty;
+		if (target != null && RedirectFlightTowards(target.GlobalPosition + Vector3.Up * SeekTargetHeight)) RedirectCount++;
+	}
 
 	protected override float LaunchUpwardSpeed => UpwardSpeed;
 
