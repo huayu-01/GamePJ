@@ -7,33 +7,21 @@
 script = ExtResource("1_param")
 Key = "Radius"
 Value = 3.0
-Note = "落地践踏的作用半径（米）"
+Note = "起跳践踏半径（米；原文n，沿用预设3）"
 
 [sub_resource type="Resource" id="Resource_p1"]
 script = ExtResource("1_param")
 Key = "Damage"
 Value = 15.0
-Note = "对半径内每个敌人的伤害"
-
-[sub_resource type="Resource" id="Resource_p2"]
-script = ExtResource("1_param")
-Key = "MinFallHeight"
-Value = 0.0
-Note = "要从多高落下才算践踏（米；0 = 任何落地都算）"
-
-[sub_resource type="Resource" id="Resource_p3"]
-script = ExtResource("1_param")
-Key = "Cooldown"
-Value = 0.2
-Note = "本规则自己的触发间隔（秒）"
+Note = "每名敌人的伤害（原文n，沿用预设15）"
 
 [resource]
 script = ExtResource("2_row")
 RewardKind = 2
 MaxStacks = 1
-ApplyHandler = "StompOnLand"
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3")]
+ApplyHandler = "JumpPulse"
+HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1")]
 Id = "mut_stomp"
 DisplayName = "杀戮践踏"
-DescriptionTemplate = "落地时对周围 3 米内的敌人造成 15 点伤害（空中跳跃的落地同样生效）"
-Note = "[P6b 新增行] 文档第 169 行（异化池，全角色通用）「杀戮践踏:跳跃时会对周围{n}码敌人造成{n}伤害,空中跳跃同样享受这个效果;」。★ 判据取**落地那一刻**（行名就是"践踏"）：`CharacterMovement.TryJump` 里地面跳与空中跳共用一条，落地判据天然覆盖两者 —— 正是文档那句「空中跳跃同样享受这个效果」。★ ⚠️ **文档只给了 n（半径与伤害都没数）→ 半径 3 米 / 伤害 15 是预设值**；`MinFallHeight` 也是预设（0 = 任何落地都算）。★ 消费者：`StompOnLandRule`（`Scripts/Rewards/RewardCatalog.cs`）。它是**轮询落地边沿**而不是订阅事件 —— `CharacterMovement` 是共用战斗类（P6b 硬约束：本批不许碰），没有抛起跳/落地事件，所以规则自己每帧读它已公开的 `IsGrounded` / `FallHeight`。★ 范围伤害与「能量护盾」共用同一份实现 `PulseDamage.Around`。"
+DescriptionTemplate = "成功起跳时对周围 {Radius:0.#} 米内的敌人造成 {Damage:0.#} 点伤害，空中跳跃同样生效"
+Note = "J22：按原文起跳触发，包括空中跳、跃升真实Action和浮光跃金成功瞬移跳；圆心取起跳前位置，失败跳跃和落地不触发。移除旧落地轮询、MinFallHeight和隐藏0.2秒冷却。半径3米／伤害15沿用原文n的可配预设，不做平衡调整。"

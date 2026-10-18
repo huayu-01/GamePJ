@@ -92,7 +92,7 @@ public partial class LeapAbility : Ability
 				return;
 			}
 
-			Movement.SetVerticalVelocity(LeapVelocity);
+			Movement.BeginJump(LeapVelocity);
 			LastLeapVelocity = LeapVelocity;
 		}
 

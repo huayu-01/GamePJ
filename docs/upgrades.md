@@ -1,5 +1,7 @@
 # 增幅系统 · 三层判定（限定 / 互斥 / 前置）—— P5 接入契约
 
+> **2026-10-18 J22更新**：杀戮践踏迁`JumpPulse`／`JumpPulseRule`，订阅成功起跳并使用起跳前圆心；半径和伤害改HandlerParams，失败跳与落地不触发，不再轮询落地或配隐藏冷却。专项39/40及完整18进程通过，见[J22](character-design-j22.md)。最新获取规则与另8条强化等级仍待补，见[接收清单](followup-build-updates.md)。
+
 > **2026-10-18 J21更新**：专注／专一／花心／心流改用`ChargeBehavior`＋`ChargeBehaviorTuning`目标技能资源，参数直接改子资源；不再改全局齐射／蓄力。专注明确完美标志，心流满蓄只提交快照后等真实ATK，花心无标记多目标追踪；乱金柝原TablePulse已通过真实击杀验收。[J21证据与参数](character-design-j21.md)。
 
 > **2026-10-18 J20更新**：动作移动许可进AbilityConfig，A边移边攻击由灵动GrantAttackMovement=true授予；默认地面前台技能锁主动移动，明确Allowed与空中放行，技能内在位移／外力保持，见 [J20](character-design-j20.md)。最新构筑B2风之领域、22项符文前置和重复获取规则见 [接收清单](followup-build-updates.md)，23项仍待生产。后续平衡暂缓，继续未完成进化。
@@ -118,7 +120,7 @@
 | **`VolleyCountOverride` / `VolleyDamagePerLostArrow`**（P5 新增） | `ArrowVolleyAbility.FireVolley` | 0 / 0 |
 | **`AbilityOverride` 处理器**（P5b 新增） | HandlerParams 里除 `AbilityId` 外每一条 = `Ability` 上的一个 `[Export]` 属性名 → 值，用 Godot 的 `Set()` 套用（属性名写错按 `GetPropertyList()` 查出并告警，**不静默**）；行上若带 `Modifiers` 则先按 `StatSet` 的语义套上 | 服务 **6** 条进化（J9 起「龙之箭」改用 `ChargedShot` 强类型资源） |
 | **`TablePulse` 处理器 + `TablePulseRule`**（P5b 新增；P6a 支持多事件） | 事件 → 效果：`Trigger`（`Kill` / `Parried` / `Critical` / `ArmorBroken` / `Damaged`，**可以逗号分隔多个，任一命中即出手**）+ 一次性 CDR（`AbilityId` + `CooldownFraction` / `CooldownSeconds` / `RefreshAbility`）/ `Heal` / `HoverSeconds` / `RequireHover` / `ExtraAirJumps` + `JumpCap` / `Radius` + `Damage` | **一个类服务 6 条行** |
-| **`StompOnLand` 处理器 + `StompOnLandRule`**（**P6b 新增**，服务「杀戮践踏」） | **落地那一刻**对周围敌人造成一次范围伤害：`Radius` / `Damage` / `MinFallHeight` / `Cooldown`（触发间隔）。⚠️ 它是**轮询落地边沿**而不是订阅事件 —— `CharacterMovement` 是共用战斗类（P6b 不许碰），没有抛起跳/落地事件；规则自己每帧读它**已公开**的 `IsGrounded` / `FallHeight`。范围伤害与「能量护盾」共用 `PulseDamage.Around` | 1 条 |
+| **`JumpPulse` 处理器 + `JumpPulseRule`**（J22纠正「杀戮践踏」） | 成功起跳时按起跳前圆心结算，包括空中跳、跃升Action和成功瞬移跳；订阅拥有者`JumpStarted`，退出成对退订。`Radius` / `Damage`来自表，与能量护盾共用`PulseDamage.Around`；失败跳跃、自然下落和落地不触发，没有隐藏冷却 | 1 条 |
 | **`HomingMissileOnCrit` 处理器 + `HomingMissileOnCritRule`**（**P6b 新增**，服务「巡飞弹」） | 暴击 → 发射一枚**追踪飞弹**：`ProjectileScene` / `Damage` / `Speed` / `SeekRange` / `Lifetime` / `BeaconStatusId` / `BeaconSeconds` / `TurnRateDegrees` / `Cooldown`。复用的是 **P3 的追踪弹通路**（`Projectile.HomingStatusId` + 转向速度）：先给最近的敌人挂**专用信标状态**（`eff_missile_beacon`），再发一枚追这个状态的飞弹 | 1 条 |
 | **`BurnOnHit` 的 `Cooldown`**（P5b 新增） | 命中挂状态那条规则自己的触发间隔（「冰晶」的"每 10 秒最多一次"） | 0（= 不拦，改动前行为） |
 | **`MarkedBonus` 处理器 + `MarkedBonusRule`**（**J8 新增**，服务「发散」「心眼」两条行） | 命中给目标叠「标记」，并按**这一击命中之前**目标身上已有的层数放大**自己**造成的伤害：`StatusId` / `Duration` / `FlatBonus`（心眼 0.5）/ `PerStackBonus`（发散 0.1 = 预设 N）。来源过滤全在表上：**加标来源** = `RequiredEventAbility`（「发散」=<c>skl_a1_w1_1</c>、「心眼」=<c>skl_a3_w1_1</c>），**加伤来源** = 新列 `BonusAgainstAbility`（「发散」只提高波波；「心眼」留空 = 玩家的各种伤害）。消费者是 **`AttackInstance.RollHit` 里那次 `IOutgoingDamageScale` 查询**（所以"第一次加标这一击不加伤"是顺序保证的，不是特例判断） | 2 条 |
@@ -249,15 +251,15 @@
 1. **通用异化：P6b 做了 2 / 5，P6d 把最后 3 条做完**（30 条**全建**）：
    - 实机取证（真实按键 / 真实拾取 / 实拍截图）与**逐条偏差**见 [rewards.md](rewards.md) 的「P6d 实机取证」；
      拍摄台与两个 MCP 手法见 [vfx.md](vfx.md) §5.1 / §6.1。
-   - ✅ **杀戮践踏**（`mut_stomp`）—— `StompOnLandRule` 轮询落地边沿 + `PulseDamage.Around`；
-     半径 3 米 / 伤害 15 / 最小落高 0 是**预设值**（文档只给了 `n`）。
+   - ✅ **杀戮践踏**（`mut_stomp`）—— J22按原文改为`JumpPulseRule`订阅成功起跳 + `PulseDamage.Around`；
+     半径3米／伤害15沿用**预设值**（文档只给了`n`），去掉旧最小落高与隐藏冷却，见[J22证据](character-design-j22.md)。
    - ✅ **巡飞弹**（`mut_homing_missile`）—— `HomingMissileOnCritRule` 复用 P3 追踪弹通路；
      伤害 50 来自文档，弹速 60 / 索敌 18m / 存活 4s / 信标 1.5s / 转向 360°/s 是预设值。
    - ✅ **护卫**（`mut_guard`，**P6d 已做**）—— 触发的"奔跑"是本批**新补的前置机制**（文档第 19 行「所有角色通用的机制」）：
      `project.godot` 新增 `sprint` 动作（Shift）· 角色表新增 `SprintInputAction` / `SprintSpeedMultiplier` 两列
      （预设 1.5）· 新组件 `Scripts/Combat/SprintController.cs`（挂 `Player.tscn` 的 `Sprint` 节点，
      `IsSprinting` / `EffectiveSpeed`）。**`CharacterMovement` 一行没改**（只读它已公开的
-     `IntentDirection` / `IsGrounded` / `IsDashing` + `Ability.IsBusy`，与 `StompOnLandRule` 同一条纪律）。
+     `IntentDirection` / `IsGrounded` / `IsDashing` + `Ability.IsBusy`；此为P6d历史实现，杀戮践踏已在J22迁起跳事件）。
      格挡本身落在 `GuardOnSprintRule`（`Scripts/Rewards/RewardCatalog.cs`）+ **既有**的 `BlockComponent`：
      获得 = `Blocking = true`，破碎 = `Unit.Damaged` 事件的 `DamageResult.Blocked`。
      `Cooldown 5` 来自文档 `{5}`；挡后剩伤 `0`（完全格挡）/ 正面阈值 `1`（不看正面）是**预设值**。

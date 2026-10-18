@@ -455,7 +455,8 @@ public partial class BowSweepProbe : Node3D
 		_camera.LookAt(new Vector3(20f, 1.2f, 17.6f));
 		_camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng("res://docs/screenshots/j12_capsule_sweep.png") == Error.Ok, "J12 真实双靶命中后截图（青色胶囊仅为只读几何示意）");
+		using var screenshot = GetViewport().GetTexture().GetImage();
+		Check(screenshot.SavePng("res://docs/screenshots/j12_capsule_sweep.png") == Error.Ok, "J12 真实双靶命中后截图（青色胶囊仅为只读几何示意）");
 		display.QueueFree();
 		_camera.GlobalTransform = cameraBefore;
 		_camera.ResetPhysicsInterpolation();

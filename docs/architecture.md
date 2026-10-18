@@ -1,5 +1,7 @@
 # 架构说明
 
+J22成功起跳由`CharacterMovement.JumpStarted`携带起跳前圆心，普通地面／空中跳、跃升Action与成功瞬移跳共用；单纯垂直速度设置、自然离地和落地不发事件。`JumpPulseRule`成对订阅／退订，复用范围命中链，半径和伤害只读表，不再轮询落地或使用隐藏冷却。[契约与实测](character-design-j22.md)。
+
 J21蓄力进化共用`ChargeBehaviorTuning`，以资源引用寻址目标技能，局部字段与全局StatSheet分开；固定时间覆盖优先于缩时倍率。自动满蓄只提交同一个释放快照，实际发射仍等真实释放动画ATK。箭的无标记追踪可预分配不同敌人，目标失效后复用最近敌人筛选；既有标记追踪默认分支保持。[契约与实测](character-design-j21.md)。
 
 J8「按目标标记加伤」的唯一读点放在`AttackInstance.RollHit`：生成`HitInstance`之前问攻击者一次`IOutgoingDamageScale`（`Unit.OutgoingDamageScaleAgainst`），所以"这一击自己刚加的标记"不会算进这一击；规则挂在攻击者身上（增幅是玩家的），敌人／召唤物天然不吃。来源过滤与数值全在表里（`RequiredEventAbility` + 新强类型资源列`BonusAgainstAbility`），不新增`Godot.Get/Set`字符串反射。[标记加伤契约](character-design-j8.md)。

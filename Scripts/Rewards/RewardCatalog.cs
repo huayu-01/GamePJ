@@ -426,7 +426,7 @@ public partial class TablePulseRule : TriggerRule
 
 /// <summary>
 /// 「以自己为圆心、对半径内所有敌人各造成一次伤害」—— 能量护盾（<see cref="TablePulseRule"/>）与
-/// 杀戮践踏（<see cref="StompOnLandRule"/>，P6b 新增）**共用这一份实现**。
+/// 杀戮践踏（<see cref="JumpPulseRule"/>）共用这一份实现。
 ///
 /// <para>抽出来的理由：这是"命中规则"，两条增幅各写一遍迟早会漂移（一个改半径判据、另一个忘改）。
 /// 行为与 P5b 落地时逐位一致（组 `enemy_units` / <see cref="Unit.IsValidTarget"/> / 平方距离比较 /
@@ -488,87 +488,57 @@ internal static class PulseDamage
 }
 
 /// <summary>
-/// 异化「杀戮践踏」（**P6b 新增**）—— 文档 `角色设计.txt` 第 169 行：
-/// 「杀戮践踏:跳跃时会对周围{n}码敌人造成{n}伤害,空中跳跃同样享受这个效果;」。
-///
-/// <para><b>判据取的是"落地那一刻"</b>（行名就是"践踏"）：<see cref="CharacterMovement"/> 里
-/// "空中跳跃"与"地面跳跃"共用同一条 <c>TryJump</c>，落地判据天然把两者都覆盖到 ——
-/// 正是文档那句「空中跳跃同样享受这个效果」。</para>
-///
-/// <para><b>为什么是轮询、不是订阅事件</b>：<c>CharacterMovement</c> 是**共用战斗类**（P6b 硬约束：
-/// 本批不许碰），它没有抛"起跳 / 落地"事件。这里改为每帧读它**已经公开**的
-/// <see cref="CharacterMovement.IsGrounded"/> / <see cref="CharacterMovement.FallHeight"/> 做边沿检测，
-/// 一行共用代码都不用动。⚠️ 文档只写了 `n`（码数 / 伤害都没给），表里填的是**预设值**。</para>
+/// 杀戮践踏订阅成功起跳事实，按起跳前圆心结算；地面跳、空中跳和瞬移跳共用，落地不触发。
+/// 半径和伤害来自增幅表，原文的n继续保留为可配置预设。
 /// </summary>
-public partial class StompOnLandRule : TriggerRule
+public partial class JumpPulseRule : TriggerRule
 {
 	/// <summary>作用半径（米）。</summary>
-	public float Radius { get; set; } = 3f;
+	public float Radius { get; set; }
 
 	/// <summary>对半径内每个敌人的伤害。</summary>
-	public float Damage { get; set; } = 15f;
-
-	/// <summary>要从多高落下才算（米；0 = 任何落地都算）。</summary>
-	public float MinFallHeight { get; set; }
+	public float Damage { get; set; }
 
 	/// <summary>触发几次（自测取证）。</summary>
 	public int TriggerTally { get; private set; }
 
 	private Unit? _owner;
-	private bool _initialized;
-	private bool _wasGrounded = true;
-	private float _sinceTrigger;
+	private CharacterMovement? _movement;
 
-	/// <summary>本规则**不是事件驱动**的（跳跃/落地在共用战斗类里没有事件，见类注释）——
-	/// 永远不匹配任何 <see cref="GameplayEvent"/>，出手完全由 <see cref="_Process"/> 的边沿检测发起。</summary>
+	/// <summary>不匹配战斗事件总线；只由拥有者的成功起跳事件触发。</summary>
 	public override bool Matches(GameplayEvent gameplayEvent) => false;
 
 	public override void _Ready()
 	{
 		base._Ready();
 		_owner = GetParent<Unit>();
+		_movement = _owner.Movement ?? NodeSearch.FindInSubtree<CharacterMovement>(_owner);
+		if (_movement != null) _movement.JumpStarted += OnJumpStarted;
 	}
 
-	public override void _Process(double delta)
+	public override void _ExitTree()
 	{
-		if (!GodotObject.IsInstanceValid(_owner) || _owner.Movement is not { } movement)
-		{
-			return;
-		}
-
-		_sinceTrigger += (float)delta;
-		bool grounded = movement.IsGrounded;
-		if (!_initialized)
-		{
-			// 第一帧只记基线：出生就站在地上不算"落地"。
-			_initialized = true;
-			_wasGrounded = grounded;
-			return;
-		}
-
-		bool landed = grounded && !_wasGrounded;
-		_wasGrounded = grounded;
-		if (!landed || _sinceTrigger < Cooldown || movement.FallHeight < MinFallHeight)
-		{
-			return;
-		}
-
-		_sinceTrigger = 0f;
-		Execute(default);
+		if (_movement != null && GodotObject.IsInstanceValid(_movement)) _movement.JumpStarted -= OnJumpStarted;
+		_movement = null; _owner = null;
+		base._ExitTree();
 	}
 
 	public override void Execute(GameplayEvent gameplayEvent)
 	{
-		if (!GodotObject.IsInstanceValid(_owner))
+		if (_owner != null && GodotObject.IsInstanceValid(_owner)) OnJumpStarted(_owner.GlobalPosition);
+	}
+	private void OnJumpStarted(Vector3 origin)
+	{
+		if (_owner == null || !GodotObject.IsInstanceValid(_owner) || _owner.IsDead)
 		{
 			return;
 		}
 
 		TriggerTally++;
-		int hits = PulseDamage.Around(this, _owner!, Radius, Damage, RewardId);
+		int hits = PulseDamage.Around(this, _owner, origin, Radius, Damage, RewardId);
 		GameLog.Write(
 			"Reward",
-			$"增幅·事件规则：{RewardId} 触发（落地践踏，第 {TriggerTally} 次，半径 {Radius:0.#} 伤害 {Damage:0.#} → 命中 {hits} 个）");
+			$"增幅·事件规则：{RewardId} 触发（起跳践踏，第 {TriggerTally} 次，圆心{origin} 半径 {Radius:0.#} 伤害 {Damage:0.#} → 命中 {hits} 个）");
 	}
 }
 

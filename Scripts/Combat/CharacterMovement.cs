@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ActRoguelike.Abilities;
 using ActRoguelike.Config;
@@ -189,6 +190,13 @@ public partial class CharacterMovement : Node
 		v.Y = velocity;
 		_body.Velocity = v;
 	}
+	/// <summary>成功的主动起跳事实，携带起跳前圆心；落地、击退和单纯离地不产生此事件。</summary>
+	public event Action<Vector3>? JumpStarted;
+	public void BeginJump(float velocity)
+	{
+		SetVerticalVelocity(velocity);
+		if (velocity > 0f) JumpStarted?.Invoke(_body.GlobalPosition);
+	}
 
 	public override void _Ready()
 	{
@@ -310,14 +318,14 @@ public partial class CharacterMovement : Node
 		if (TeleportJumpEnabled) return TryTeleportJump();
 		if (_body.IsOnFloor())
 		{
-			_body.Velocity = _body.Velocity with { Y = EffectiveJumpVelocity };
+			BeginJump(EffectiveJumpVelocity);
 			return true;
 		}
 
 		if (_airJumpsLeft > 0)
 		{
 			_airJumpsLeft--;
-			_body.Velocity = _body.Velocity with { Y = EffectiveAirJumpVelocity };
+			BeginJump(EffectiveAirJumpVelocity);
 			return true;
 		}
 
@@ -335,6 +343,7 @@ public partial class CharacterMovement : Node
 			? Mathf.Clamp(collision.GetTravel().Y, 0f, height) : height;
 		// 净空不足以离开地面吸附范围时不消耗本次跳跃，避免卡在旧地面状态。
 		if (travel <= Mathf.Max(0.001f, _body.FloorSnapLength + 0.002f)) return false;
+		Vector3 origin = _body.GlobalPosition;
 		_body.GlobalPosition += Vector3.Up * travel;
 		_body.ResetPhysicsInterpolation();
 		_body.Velocity = _body.Velocity with { Y = 0f };
@@ -346,6 +355,7 @@ public partial class CharacterMovement : Node
 		FallHeight = 0f;
 		LastTeleportJumpHeight = travel;
 		TeleportJumpCount++;
+		JumpStarted?.Invoke(origin);
 		ActRoguelike.Core.GameLog.Write("Combat", $"浮光跃金：额外{ExtraAirJumps}次 → {1 + ExtraAirJumps}份完整地面跳高，目标{height:0.###}m／实际瞬移{travel:0.###}m");
 		return true;
 	}

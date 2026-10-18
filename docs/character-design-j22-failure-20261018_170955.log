@@ -1,0 +1,175 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=9FD4787436FD4EAFAEA11372C2745276A7D35D4FCF192456825E7C1ADDFD02B4
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 329 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.38
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 332 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.09
+
+jump_stomp exit=1 seconds=9.74 stderrBytes=0
+=== jump_stomp ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 17:10:04 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 17:10:04 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 17:10:04 [Flow] === 新的一局 ===
+[log] 17:10:04 [Flow] 日志文件：user://logs/run_20261018_171004.log
+[log] 17:10:04 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 17:10:04 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 17:10:04 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 17:10:04 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 17:10:04 [Config] 增幅项表：62 条（来源：表）—— 强化 9 / 进化 23 / 异化 30。
+[log] 17:10:04 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 17:10:04 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 17:10:04 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 17:10:04 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 17:10:04 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 17:10:04 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 17:10:04 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 17:10:04 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 17:10:04 [Combat] 单位动画：Player 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 17:10:05 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 17:10:05 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 17:10:05 [Combat] 蓄力身体表现：模型「Model」上挂了 2 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 17:10:05 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 17:10:05 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 17:10:05 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 JumpStompProbe
+[log] 17:10:05 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[log] 17:10:05 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[JumpStomp] PASS 玩家真实物理身体已落在地面
+[JumpStomp] PASS 没有增幅的真实跳跃不制造践踏伤害
+[log] 17:10:05 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 17:10:05 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 JumpStompProbe
+[JumpStomp] PASS 玩家真实物理身体已落在地面
+[JumpStomp] PASS 真实奖励目录存在：mut_stomp
+[JumpStomp] PASS 真实入构筑：mut_stomp
+[log] 17:10:05 [Combat] 伤害 Player(220) → Dead(0) 10000
+[log] 17:10:05 [Combat] 死亡 Dead(0) 击杀者=Player(220)
+[log] 17:10:05 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 17:10:05 [Combat] 击杀 Dead(0) by Player(220)
+[JumpStomp] FAIL 地面真实按跳仍在上升时已结算一次，未等待落地
+[JumpStomp] PASS 起跳伤害来自本人真实AttackInstance，表内基础伤害15
+[JumpStomp] PASS 3米外、友军与死者不触发伤害
+[JumpStomp] FAIL 真实空中跳消耗额外次数，并独立再触发一次伤害
+[JumpStomp] FAIL 相隔不足0.2秒的两次有效跳跃均触发，没有旧隐藏冷却吞掉空中跳
+[JumpStomp] FAIL 额外次数耗尽后再按跳失败，不额外触发践踏
+[JumpStomp] PASS 跳跃后真实自然落地
+[log] 17:10:06 [Combat] 伤害 Player(220) → Near(9985) 15
+[log] 17:10:06 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 1 次，半径 3 伤害 15 → 命中 1 个）
+[JumpStomp] FAIL 普通落地不再额外触发旧落地践踏
+[log] 17:10:06 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 17:10:06 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 17:10:06 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 JumpStompProbe
+[log] 17:10:06 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 17:10:06 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[JumpStomp] PASS 玩家真实物理身体已落在地面
+[JumpStomp] PASS 真实奖励目录存在：mut_stomp
+[JumpStomp] PASS 真实入构筑：mut_stomp
+[JumpStomp] PASS 没有主动跳跃的自然下落真实落地
+[log] 17:10:07 [Combat] 伤害 Player(240) → NaturalFall(9985) 15
+[log] 17:10:07 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 2 次，半径 3 伤害 15 → 命中 1 个）
+[log] 17:10:07 [Combat] 伤害 Player(240) → NaturalFall(9970) 15
+[log] 17:10:07 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 1 次，半径 3 伤害 15 → 命中 1 个）
+[JumpStomp] FAIL 单纯离地及自然落地都不算起跳践踏
+[log] 17:10:07 [Animation] 技能动画开播：Player → skills/Skill_B_Guard（speed_scale=1，循环=False，事件帧 2 个：GuardOn@0.15s、GuardOff@0.9s）
+[log] 17:10:07 [Combat] 架：skl_b_skill_2 等待真实GuardOn，随后持续0.75游戏秒。
+[JumpStomp] FAIL 架动画锁主动跳跃时，失败按键不触发践踏
+[log] 17:10:07 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 17:10:07 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 JumpStompProbe
+[log] 17:10:07 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[JumpStomp] PASS 玩家真实物理身体已落在地面
+[JumpStomp] PASS 真实奖励目录存在：mut_stomp
+[JumpStomp] PASS 真实入构筑：mut_stomp
+[JumpStomp] PASS 技能速度覆盖阻止起跳时，不产生践踏事件
+[log] 17:10:07 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 17:10:07 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 JumpStompProbe
+[JumpStomp] PASS 玩家真实物理身体已落在地面
+[JumpStomp] PASS 换装移除起跳订阅，之后真实起跳没有旧增幅伤害
+[log] 17:10:08 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 17:10:08 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 JumpStompProbe
+[log] 17:10:08 [Combat] 蓄力身体表现：模型「Model」上挂了 7 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 17:10:08 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 17:10:08 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 3 次，半径 3 伤害 15 → 命中 0 个）
+[log] 17:10:08 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 2 次，半径 3 伤害 15 → 命中 0 个）
+[log] 17:10:08 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 1 次，半径 3 伤害 15 → 命中 0 个）
+[JumpStomp] PASS 玩家真实物理身体已落在地面
+[JumpStomp] PASS 真实奖励目录存在：mut_stomp
+[JumpStomp] PASS 真实入构筑：mut_stomp
+[JumpStomp] PASS 真实奖励目录存在：evo_light_leap
+[JumpStomp] PASS 真实入构筑：evo_light_leap
+[log] 17:10:08 [Combat] 浮光跃金：额外2次 → 3份完整地面跳高，目标6.888m／实际瞬移6.888m
+[JumpStomp] FAIL 瞬移跳成功时按起跳前的位置结算，命中原地近敌，不改成到达点攻击
+[JumpStomp] FAIL 瞬移跳在空中再次按键失败，不重复触发
+[log] 17:10:08 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 17:10:08 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 JumpStompProbe
+[log] 17:10:08 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 17:10:08 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 4 次，半径 3 伤害 15 → 命中 0 个）
+[log] 17:10:08 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 3 次，半径 3 伤害 15 → 命中 0 个）
+[log] 17:10:08 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 2 次，半径 3 伤害 15 → 命中 0 个）
+[log] 17:10:08 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 1 次，半径 3 伤害 15 → 命中 0 个）
+[JumpStomp] PASS 玩家真实物理身体已落在地面
+[JumpStomp] PASS 真实奖励目录存在：mut_stomp
+[JumpStomp] PASS 真实入构筑：mut_stomp
+[log] 17:10:08 [Animation] 技能动画开播：Player → skills/Skill_A1_Leap（speed_scale=1，循环=False，事件帧 1 个：Action@0.15s）
+[log] 17:10:09 [Combat] 跃升：skl_a1_skill_2 起跳速度 16 m/s + 滞空 3s（按住跳跃键下落减缓 90%，脚底光环半径 1.15）
+[log] 17:10:09 [Combat] 伤害 Player(220) → Leap(9985) 15
+[log] 17:10:10 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 5 次，半径 3 伤害 15 → 命中 1 个）
+[log] 17:10:10 [Combat] 伤害 Player(220) → Leap(9970) 15
+[log] 17:10:10 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 4 次，半径 3 伤害 15 → 命中 1 个）
+[log] 17:10:10 [Combat] 伤害 Player(220) → Leap(9955) 15
+[log] 17:10:10 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 3 次，半径 3 伤害 15 → 命中 1 个）
+[log] 17:10:10 [Combat] 伤害 Player(220) → Leap(9940) 15
+[log] 17:10:10 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 2 次，半径 3 伤害 15 → 命中 1 个）
+[log] 17:10:10 [Combat] 伤害 Player(220) → Leap(9925) 15
+[log] 17:10:10 [Reward] 增幅·事件规则：mut_stomp 触发（落地践踏，第 1 次，半径 3 伤害 15 → 命中 1 个）
+[JumpStomp] FAIL 跃升真实Action起跳也发出一次起跳事实，伤害不由动画时长补发
+[log] 17:10:11 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 17:10:11 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 JumpStompProbe
+[JumpStomp] PASS 玩家真实物理身体已落在地面
+[JumpStomp] PASS 复制真实表行，仅改半径／伤害后仍经真实注册表编译
+[JumpStomp] FAIL 只改表半径1.5／伤害7后真实起跳立即采用新参数，未写死3米／15伤害
+[JumpStomp] === 起跳践踏验收结束：通过 28，失败 11 ===
+[log] 17:10:12 [Exit] 音频退出回收：真实等待88ms。
+[log] 17:10:12 [Audio] 音效统计：共 1 次 —— sfx_enemy_die×1（缺失 id 0 个）
+
+jump_stomp 未通过：F:\Godot项目\项目a\.ai_j22_20261018_170955.jump_stomp.log / F:\Godot项目\项目a\.ai_j22_20261018_170955.jump_stomp.err
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 329 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.38
+
+=== 失败现场构建 ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 332 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.09

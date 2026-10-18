@@ -289,13 +289,13 @@ public partial class Projectile : Area3D
 			return;
 		}
 
-		var query = PhysicsRayQueryParameters3D.Create(from, to, HitMask);
+		using var query = PhysicsRayQueryParameters3D.Create(from, to, HitMask);
 		// 枪口或敌人可以在彼此身体内；射线起点在形状内部也必须能命中。
 		query.HitFromInside = true;
 		// 穿透后排除已命中的身体，避免从体内再次检测并重复消耗穿透次数。
 		query.Exclude = _excludedBodies;
 
-		Godot.Collections.Dictionary hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
+		using Godot.Collections.Dictionary hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
 		if (hit.Count > 0)
 		{
 			ResolveImpact(hit, to);

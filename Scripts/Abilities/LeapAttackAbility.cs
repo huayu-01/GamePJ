@@ -51,7 +51,7 @@ public partial class LeapAttackAbility : Ability
 		direction.Y = 0f;
 		Movement.FaceDirection(direction, 1f);
 		Movement.BeginDash(direction, HorizontalSpeed);
-		Movement.SetVerticalVelocity(JumpVelocity);
+		Movement.BeginJump(JumpVelocity);
 	}
 
 	protected override void Tick(float delta)

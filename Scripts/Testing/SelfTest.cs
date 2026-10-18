@@ -5050,11 +5050,11 @@ public partial class SelfTest : Node
 
 		var rules = new List<TriggerRule>();
 		NodeSearch.CollectInSubtree(player, rules);
-		StompOnLandRule? stomp = null;
+		JumpPulseRule? stomp = null;
 		HomingMissileOnCritRule? missile = null;
 		foreach (TriggerRule rule in rules)
 		{
-			stomp ??= rule as StompOnLandRule;
+			stomp ??= rule as JumpPulseRule;
 			missile ??= rule as HomingMissileOnCritRule;
 		}
 
@@ -5103,7 +5103,7 @@ public partial class SelfTest : Node
 
 		int spawned = projectilesAfter.Count - projectilesBefore.Count;
 
-		bool stompOk = stomp is { Radius: 3f, Damage: 15f, Cooldown: 0.2f, MinFallHeight: 0f }
+		bool stompOk = stomp is { Radius: 3f, Damage: 15f, Cooldown: 0f }
 			&& stompNotEventDriven
 			&& Mathf.Abs(stompDamageDealt - 15f) < 0.51f;
 		bool missileOk = missile is { Damage: 50f, BeaconStatusId: "MissileBeacon" }
@@ -5114,15 +5114,14 @@ public partial class SelfTest : Node
 			&& beacon is { MaxStacks: 2 } && beacon.Modifiers.Length == 0;
 
 		string line = $"{(stompOk && missileOk ? "✅" : "🔴")} P6b·新异化行为取证（真实玩家 + 真敌人靶子，量完还原）："
-			+ $"杀戮践踏 → {stomp.GetType().Name} 半径 {stomp.Radius:0.#}（期望 3）伤害 {stomp.Damage:0.#}（期望 15）间隔 {stomp.Cooldown:0.##}（期望 0.2）最小落高 {stomp.MinFallHeight:0.#}（期望 0）"
-			+ $"｜事件匹配恒 false={stompNotEventDriven}（期望 True —— 它不是事件驱动，出手由落地边沿发起）"
+			+ $"杀戮践踏 → {stomp.GetType().Name} 半径 {stomp.Radius:0.#}（期望 3）伤害 {stomp.Damage:0.#}（期望 15）隐藏冷却 {stomp.Cooldown:0.##}（期望 0）"
+			+ $"｜不匹配战斗总线={stompNotEventDriven}（期望 True —— 由拥有者成功起跳事实触发）"
 			+ $"｜出手一次：靶子 {targetHealthBefore:0.#} → {target?.Health ?? 0f:0.#}（掉 {stompDamageDealt:0.#}，期望 15）"
 			+ $"｜巡飞弹 → {missile.GetType().Name} 伤害 {missile.Damage:0.#}（期望 50 —— 文档给的就是 50）弹速 {missile.Speed:0.#} 索敌 {missile.SeekRange:0.#}m 信标「{missile.BeaconStatusId}」{missile.BeaconSeconds:0.#}s 转向 {missile.TurnRateDegrees:0.#}°/s"
 			+ $"｜暴击匹配={critMatches}（期望 True）敌人暴击被忽略={enemyCritIgnored}（期望 True）"
 			+ $"｜出手一次：FireCount={missile.FireCount}（期望 1）靶子信标层数={beaconStacks}（期望 ≥1）新生成投射物={spawned}（期望 1）"
 			+ $"｜信标行 StatusPresets.Create → {(beacon == null ? "null（🔴 表里没有这一行）" : $"MaxStacks {beacon.MaxStacks} Modifiers {beacon.Modifiers.Length} 条")}"
-			+ "｜⚠️ 这一段是**直接调 Execute**（与落地轮询/事件总线走的是同一个入口）；"
-			+ "真实按键/落地那一路的端到端留给人手 MCP 验证，免得污染前面的硬指标";
+			+ "｜⚠️ 这一段直接调Execute只验参数与伤害入口；真实起跳／空中跳／落地负例由_JumpStompProbe独立验收";
 
 		// 还原：新生成的投射物、靶子、两条规则节点全部清掉。
 		foreach (ActRoguelike.Combat.Projectile projectile in projectilesAfter)
@@ -5136,7 +5135,7 @@ public partial class SelfTest : Node
 		target?.Free();
 		foreach (TriggerRule rule in rules)
 		{
-			if (rule is StompOnLandRule or HomingMissileOnCritRule)
+			if (rule is JumpPulseRule or HomingMissileOnCritRule)
 			{
 				player.RemoveChild(rule);
 				rule.Free();

@@ -261,16 +261,13 @@ public static class RewardEffectRegistry
 				Damage = Param(row, "Damage", 0f),
 			}),
 
-		// ⭐ P6b：**落地践踏**（「杀戮践踏」）。走的是"轮询落地边沿"而不是事件 ——
-		// `CharacterMovement` 是共用战斗类（本批不许碰），没有起跳/落地事件。
-		["StompOnLand"] = row => context =>
-			context.Player.AddChild(new StompOnLandRule
+		// 杀戮践踏：成功起跳的事实，不用落地轮询或隐藏冷却替代。
+		["JumpPulse"] = row => context =>
+			context.Player.AddChild(new JumpPulseRule
 			{
 				RewardId = row.Id,
-				Cooldown = Param(row, "Cooldown", 0.2f),
-				Radius = Param(row, "Radius", 3f),
-				Damage = Param(row, "Damage", 15f),
-				MinFallHeight = Param(row, "MinFallHeight", 0f),
+				Radius = Param(row, "Radius", 0f),
+				Damage = Param(row, "Damage", 0f),
 			}),
 
 		// ⭐ P6b：**暴击 → 巡飞弹**（「巡飞弹」）。复用 P3 的追踪弹通路：给最近的敌人挂一个
