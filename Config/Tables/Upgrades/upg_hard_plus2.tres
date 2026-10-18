@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "DamageReductionAdd"
+Operation = 0
+Value = 0.15
+
+[resource]
+script = ExtResource("2_row")
+RewardKind = 0
+MaxStacks = 1
+Modifiers = [SubResource("Resource_m0")]
+Requires = PackedStringArray("upg_hard_plus")
+Id = "upg_hard_plus2"
+DisplayName = "坚硬++"
+DescriptionTemplate = "受到的伤害 -{Modifiers.DamageReductionAdd:0.#%}"
+Note = "J24：最新后续构筑要求的强化等级，以前一级为前置，每级只可获得一次。每次增加的数值为待平衡预设，按既有修饰器规则与已获等级累加；实际效果与描述共读Modifiers里的Value。"

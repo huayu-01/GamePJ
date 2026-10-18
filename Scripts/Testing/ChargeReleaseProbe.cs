@@ -31,6 +31,12 @@ public partial class ChargeReleaseProbe : Node3D
 	}
 	private void Press(string action, bool pressed) => Input.ParseInputEvent(new InputEventAction { Action = action, Pressed = pressed });
 	private async Task Wait(double seconds) => await ToSignal(GetTree().CreateTimer(seconds), SceneTreeTimer.SignalName.Timeout);
+	private async Task InputFrame()
+	{
+		// ProcessFrame信号在节点_Process之前；跨过两次信号才能保证输入节点完整消费过一次。
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+	}
 	private async Task<bool> Until(Func<bool> predicate, double seconds = 4)
 	{
 		double start = _elapsed;
@@ -98,11 +104,13 @@ public partial class ChargeReleaseProbe : Node3D
 		Check(await Until(() => ability.IsCharging && ability.ChargeTime >= ability.ChargeBaseSecondsEffective + 0.05f), $"{weapon}真实输入蓄力完成");
 		Check(_spawnTimes.Count == before, $"{weapon}按住越过起手ATK仍不提前出弹");
 		ulong playback = _player.GetNode<UnitAnimator>("Animator").SkillPlaybackId;
-		Press(action, false); await Wait(0.03);
+		ulong releaseFrame = Engine.GetProcessFrames();
+		Press(action, false); await InputFrame();
+		GD.Print($"[ChargeReleasePhase] {weapon}松手帧{releaseFrame}→观测帧{Engine.GetProcessFrames()}，按住={Input.IsActionPressed(action)}，蓄力={ability.IsCharging}，播放序号{playback}→{_player.GetNode<UnitAnimator>("Animator").SkillPlaybackId}");
 		Check(_spawnTimes.Count == before, $"{weapon}松手后仍等待释放ATK，不立即出弹");
 		Check(ability.IsActive && _player.GetNode<UnitAnimator>("Animator").SkillPlaybackId > playback, $"{weapon}松手启动独立的一轮真实释放动画");
 		float snapshot = ability.ChargeTime;
-		Press(action, true); await Wait(0.02); Press(action, false); await Wait(0.02);
+		Press(action, true); await InputFrame(); Press(action, false); await InputFrame();
 		Check(Mathf.Abs(ability.ChargeTime - snapshot) < 0.00001f && !ability.IsCharging, $"{weapon}等待释放时再次按住不重置蓄力快照：{snapshot:0.####}→{ability.ChargeTime:0.####}");
 		Check(await Until(() => _spawnTimes.Count > before), $"{weapon}真实释放ATK才生成投射物");
 		await Until(() => !ability.IsActive);
@@ -135,7 +143,7 @@ public partial class ChargeReleaseProbe : Node3D
 		var energy = (EnergyWaveAbility)await Equip(PlayerCharacterKind.Hunter, WeaponPresetKind.EnergyPalm, "weapon_skill_2");
 		Press(energy.InputAction, true);
 		Check(await Until(() => energy.IsCharging && energy.ChargeTime >= energy.ChargeBaseSecondsEffective + 0.03f), "完美时机夹具完成本次真实蓄力");
-		Press(energy.InputAction, false); await Wait(0.03);
+		Press(energy.InputAction, false); await InputFrame();
 		Check(energy.LastReleasePerfect, "能量掌按松手时刻冻结完美结果");
 		await Until(() => !energy.IsActive);
 		Check(energy.LastShotPerfect && Mathf.IsEqualApprox(energy.LastShotSpeed, energy.PerfectSpeed), $"完美结果实际发射仍保留：{energy.LastShotPerfect}，弹速{energy.LastShotSpeed}");

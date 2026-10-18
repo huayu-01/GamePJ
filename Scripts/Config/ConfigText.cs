@@ -9,6 +9,7 @@ namespace ActRoguelike.Config;
 /// 规则：
 ///   {字段名}        优先取行自身的 [Export] 属性（走 GodotObject.Get）
 ///   {Params 键}     再取 Params 里同名 Key 的值
+///   {Modifiers.属性键:格式} 奖励行直接读取该属性修饰器的Value，说明与效果共用同一个表值。
 ///   {字段名:格式}   **可选的格式说明符**（.NET 数字格式串，如 {MaxHealth:0} / {Value:0.0}）：
 ///                   只对数字字段生效（套 <c>double.ToString(格式)</c>），非数字字段与无效格式串一律**忽略冒号后的部分**；
 ///                   格式串不合法（<c>FormatException</c>）时退回默认写法，**不会抛异常、也不会多打一条警告**。
@@ -88,7 +89,22 @@ public static class ConfigText
 			}
 		}
 
-		// 2) 再找行自身的 [Export] 属性（引擎自带 Get，不需要维护映射）
+		// 奖励说明直接读取强类型修饰器；不复制一份说明参数，也不做表达式求值。
+		const string modifierPrefix = "Modifiers.";
+		if (source is RewardConfig reward && key.StartsWith(modifierPrefix, System.StringComparison.Ordinal))
+		{
+			string stat = key.Substring(modifierPrefix.Length);
+			foreach (StatOverride modifier in reward.Modifiers)
+			{
+				if (modifier.Stat != stat) continue;
+				text = NumberText(modifier.Value, modifier.Value.ToString("0.##", CultureInfo.InvariantCulture), spec);
+				return true;
+			}
+			text = string.Empty;
+			return false;
+		}
+
+		// 再找行自身的 [Export] 属性（引擎自带 Get，不需要维护映射）。
 		Variant value = source.Get(key);
 		if (value.VariantType != Variant.Type.Nil)
 		{

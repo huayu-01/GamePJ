@@ -2915,7 +2915,7 @@ public partial class SelfTest : Node
 		string poolIds = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController")?.PoolPreview ?? string.Empty;
 		string poolSize = poolIds.Length == 0 ? "空" : $"{poolIds.Split(',').Length} 条";
 		GameLog.Write("SelfTest",
-			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望 **P6d 后 62 = 9/23/30**（= 设计文档要求的 30 条异化**全建**）；P6b 后是 59 = 9/23/27；P6a 后是 57 = 9/23/25；P6a 之前是 74 = 19/27/28） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，P6d 后的实测值）");
+			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望 **J24后70 = 17/23/30**（新增生命／暴击／爆伤／坚硬的八条等级）；P6d后是62 = 9/23/30；P6b后是59 = 9/23/27；P6a后是57 = 9/23/25） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，当前表实测值）");
 
 		// 武器 → 升级池 → 选项（配置表阶段 4）：三级回退各层的条数 + 武器实际带上的池 Id。
 		// 这是设计文档 §4.5.5 要求的"顺藤摸瓜"只读校验。回退路径（武器行没填 Pool / 池表读不到）时

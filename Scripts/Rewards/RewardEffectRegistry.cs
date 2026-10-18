@@ -474,11 +474,13 @@ public static class RewardEffectRegistry
 			return null;
 		}
 
+		var textParams = new List<ParamEntry>(row.HandlerParams);
+		textParams.AddRange(row.Params);
 		return new RewardDefinition
 		{
 			Id = row.Id,
 			Name = string.IsNullOrEmpty(row.DisplayName) ? row.Id : row.DisplayName,
-			Description = row.DescriptionTemplate,
+			Description = ConfigText.Format(row.DescriptionTemplate, row, textParams),
 			Kind = row.RewardKind,
 			ApplicablePoolIds = PoolIdsOf(row),
 			RequiredWeaponTags = row.RequiredWeaponTags,
