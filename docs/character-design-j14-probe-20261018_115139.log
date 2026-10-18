@@ -1,0 +1,360 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 336 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.20
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 361 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.67
+
+scythe exit=0 seconds=10.34 stderrBytes=0
+=== scythe ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 11:51:49 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 11:51:49 [Flow] === 新的一局 ===
+[log] 11:51:49 [Flow] 日志文件：user://logs/run_20261018_115149.log
+[log] 11:51:49 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 11:51:49 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 11:51:49 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 11:51:49 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 11:51:49 [Config] 增幅项表：62 条（来源：表）—— 强化 9 / 进化 23 / 异化 30。
+[log] 11:51:49 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 11:51:49 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 11:51:49 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 11:51:49 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 11:51:49 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 11:51:49 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 11:51:49 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 11:51:49 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 11:51:49 [Combat] 单位动画：Player 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 11:51:49 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:51:49 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 11:51:49 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[log] 11:51:50 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 11:51:50 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 11:51:50 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 11:51:50 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 11:51:50 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:51:50 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:51:50 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 11:51:50 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:50 [Combat] 伤害 Player(240) → NormalFront(99974) 26
+[log] 11:51:50 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[ScytheEvolution] PASS 真实ATK到达：段1
+[log] 11:51:50 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe2（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:51:50 [Combat] 连招：skl_b2_w1_1 推进到第 2 段（动画「Skill_B2_Scythe2」，累计连击 1）
+[log] 11:51:51 [Combat] 连招·第 2 段判定：skl_b2_w1_1 伤害 31.2（×1.2）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:51 [Combat] 伤害 Player(240) → NormalFront(99942.8) 31.2
+[ScytheEvolution] PASS 真实ATK到达：段2
+[log] 11:51:51 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:51:51 [Combat] 连招：skl_b2_w1_1 推进到第 3 段（动画「Skill_B2_Scythe3」，累计连击 2）
+[log] 11:51:51 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 49.4（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:51 [Combat] 伤害 Player(240) → NormalFront(99893.4) 49.4
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 默认三连真实命中，快照段号0/1/2、总段数3
+[log] 11:51:51 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:51:51 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[ScytheEvolution] PASS 真实表行／处理器有效：evo_mercy
+[ScytheEvolution] PASS 真实入构筑：evo_mercy
+[log] 11:51:52 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:51:52 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:51:52 [Combat] 连招：skl_b2_w1_1 起手 段 3/3 动画「Skill_B2_Scythe3」（窗口 0.5s）
+[log] 11:51:52 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 74.1（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:52 [Combat] 伤害 Player(240) → MercyFront(99925.9) 74.1
+[log] 11:51:52 [Combat] 伤害 Player(240) → MercyBack(99925.9) 74.1
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 怜悯首次真实ATK就是原末段，360度判定同时命中前／后靶
+[ScytheEvolution] PASS 怜悯末刀伤害74.1＝原末刀49.4×1.5
+[ScytheEvolution] PASS 怜悯不改玩家全局伤害乘区
+[ScytheEvolution] PASS 单次施法内连点不追加前两段，也不重复末刀ATK
+[log] 11:51:53 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:51:53 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:51:53 [Combat] 连招：skl_b2_w1_1 起手 段 3/3 动画「Skill_B2_Scythe3」（窗口 0.5s）
+[log] 11:51:53 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 74.1（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:53 [Combat] 伤害 Player(240) → MercyFront(99851.8) 74.1
+[log] 11:51:53 [Combat] 伤害 Player(240) → MercyBack(99851.8) 74.1
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 下次真实施法仍从末刀开始
+[log] 11:51:53 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:51:53 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[ScytheEvolution] PASS 真实表行／处理器有效：evo_mercy
+[ScytheEvolution] PASS 真实入构筑：evo_mercy
+[log] 11:51:53 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:51:53 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:51:53 [Combat] 连招：skl_b2_w1_1 起手 段 3/3 动画「Skill_B2_Scythe3」（窗口 0.5s）
+[log] 11:51:53 [Combat] 动作交接：skl_b2_w1_1 被 skl_b_skill_1 打断（动画时间0s）。
+[log] 11:51:53 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 11:51:54 [Combat] 闪：skl_b_skill_1 朝 (0, 0, -1) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[log] 11:51:54 [Combat] 单位动画切换：Player idle → sprint（当前速度 38.89，阈值 0.15/4）
+[ScytheEvolution] PASS 怜悯仍服从真实前摇打断，没有计时伤害兜底
+[log] 11:51:54 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:51:54 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[log] 11:51:54 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:51:54 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:51:54 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 11:51:54 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:54 [Combat] 伤害 Player(240) → ResetFront(99974) 26
+[ScytheEvolution] PASS 真实ATK到达：段1
+[ScytheEvolution] PASS 重新配装后恢复普通首段，末刀模式无残留
+[log] 11:51:54 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:51:54 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[ScytheEvolution] PASS 真实表行／处理器有效：evo_salvation
+[ScytheEvolution] PASS 真实入构筑：evo_salvation
+[log] 11:51:55 [Combat] 破甲 Player(240)
+[log] 11:51:55 [Combat] 伤害 InjurySource(100000) → Player(195) 45
+[ScytheEvolution] PASS 真实受击后生命195，留出回血空间
+[log] 11:51:55 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:51:55 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:51:55 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 11:51:55 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:55 [Combat] 伤害 Player(195) → FirstKill(0) 1
+[log] 11:51:55 [Combat] 死亡 FirstKill(0) 击杀者=Player(195)
+[log] 11:51:55 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 11:51:55 [Combat] 击杀 FirstKill(0) by Player(195)
+[ScytheEvolution] PASS 真实ATK到达：段1
+[ScytheEvolution] PASS 普渡：第一刀真实击杀不回血，击杀事件段号0
+[log] 11:51:55 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe2（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:51:55 [Combat] 连招：skl_b2_w1_1 推进到第 2 段（动画「Skill_B2_Scythe2」，累计连击 1）
+[log] 11:51:55 [Combat] 连招·第 2 段判定：skl_b2_w1_1 伤害 31.2（×1.2）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:55 [Combat] 伤害 Player(195) → SecondKill(0) 1
+[log] 11:51:55 [Combat] 死亡 SecondKill(0) 击杀者=Player(195)
+[log] 11:51:55 [Combat] 击杀 SecondKill(0) by Player(195)
+[ScytheEvolution] PASS 真实ATK到达：段2
+[ScytheEvolution] PASS 普渡：第二刀真实击杀不回血，击杀事件段号1
+[log] 11:51:56 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:51:56 [Combat] 连招：skl_b2_w1_1 推进到第 3 段（动画「Skill_B2_Scythe3」，累计连击 2）
+[log] 11:51:56 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 49.4（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:56 [Combat] 伤害 Player(195) → FinalFront(0) 1
+[log] 11:51:56 [Combat] 死亡 FinalFront(0) 击杀者=Player(195)
+[log] 11:51:56 [Combat] 击杀 FinalFront(0) by Player(195)
+[log] 11:51:56 [Reward] 增幅·事件规则：evo_salvation 触发（Kill，第 1 次）
+[log] 11:51:56 [Combat] 伤害 Player(203) → FinalBack(0) 1
+[log] 11:51:56 [Combat] 死亡 FinalBack(0) 击杀者=Player(203)
+[log] 11:51:56 [Combat] 击杀 FinalBack(0) by Player(203)
+[log] 11:51:56 [Reward] 增幅·事件规则：evo_salvation 触发（Kill，第 2 次）
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 普渡：同一末刀真实击杀两靶，生命195→211，每靶+8
+[ScytheEvolution] PASS 末刀击杀事件携带冻结的2/3段快照和正确技能来源
+[log] 11:51:56 [Combat] 连招：skl_b2_w1_1 输入窗口超时（0.5s 没人按），收招。累计连击 2
+[log] 11:51:57 [Combat] 伤害 Player(211) → LateFirstStep(0) 1
+[log] 11:51:57 [Combat] 死亡 LateFirstStep(0) 击杀者=Player(211)
+[log] 11:51:57 [Combat] 击杀 LateFirstStep(0) by Player(211)
+[ScytheEvolution] PASS 第一刀旧快照经真实弹体延迟击杀：当前连招已到末段仍不回血
+[log] 11:51:57 [Combat] 伤害 Player(211) → WrongSource(0) 1
+[log] 11:51:57 [Combat] 死亡 WrongSource(0) 击杀者=Player(211)
+[log] 11:51:57 [Combat] 击杀 WrongSource(0) by Player(211)
+[ScytheEvolution] PASS 实际击杀过滤：来源skl_b2_w1_2／是否本人True／段2/3不触发普渡
+[log] 11:51:57 [Combat] 死亡 @CharacterBody3D@295(0) 击杀者=InjurySource(100000)
+[log] 11:51:57 [Combat] 击杀 @CharacterBody3D@295(0) by InjurySource(100000)
+[ScytheEvolution] PASS 实际击杀过滤：来源skl_b2_w1_1／是否本人False／段2/3不触发普渡
+[log] 11:51:57 [Combat] 伤害 Player(211) → @CharacterBody3D@299(0) 1
+[log] 11:51:57 [Combat] 死亡 @CharacterBody3D@299(0) 击杀者=Player(211)
+[log] 11:51:57 [Combat] 击杀 @CharacterBody3D@299(0) by Player(211)
+[ScytheEvolution] PASS 实际击杀过滤：来源skl_b2_w1_1／是否本人True／段-1/0不触发普渡
+[ScytheEvolution] PASS 真实表行／处理器有效：evo_mercy
+[ScytheEvolution] PASS 真实入构筑：evo_mercy
+[log] 11:51:57 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:51:57 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:51:57 [Combat] 连招：skl_b2_w1_1 起手 段 3/3 动画「Skill_B2_Scythe3」（窗口 0.5s）
+[log] 11:51:57 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 74.1（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:51:57 [Combat] 伤害 Player(211) → MercySalvation(0) 1
+[log] 11:51:57 [Combat] 死亡 MercySalvation(0) 击杀者=Player(211)
+[log] 11:51:57 [Combat] 击杀 MercySalvation(0) by Player(211)
+[log] 11:51:57 [Reward] 增幅·事件规则：evo_salvation 触发（Kill，第 3 次）
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 怜悯＋普渡同时获得：跳到末刀的真实击杀仍回8血
+[ScytheEvolution] === 镰刀末刀进化验收结束：通过 36，失败 0 ===
+[log] 11:51:58 [Exit] 音频退出回收：真实等待87ms。
+[log] 11:51:58 [Audio] 音效统计：共 23 次 —— sfx_combat_hit×14、sfx_enemy_die×9（缺失 id 0 个）
+
+scythe_render exit=0 seconds=11.88 stderrBytes=0
+=== scythe_render ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+D3D12 12_0 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti
+
+[log] 11:52:00 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 11:52:00 [Flow] === 新的一局 ===
+[log] 11:52:00 [Flow] 日志文件：user://logs/run_20261018_115200.log
+[log] 11:52:00 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 11:52:00 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 11:52:00 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 11:52:00 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 11:52:00 [Config] 增幅项表：62 条（来源：表）—— 强化 9 / 进化 23 / 异化 30。
+[log] 11:52:00 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 11:52:00 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 11:52:00 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 11:52:00 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 11:52:00 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 11:52:00 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 11:52:00 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 11:52:00 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 11:52:01 [Combat] 单位动画：Player 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 11:52:01 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:52:01 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 11:52:01 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[log] 11:52:01 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 11:52:01 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 11:52:01 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 11:52:01 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 11:52:01 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:52:01 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:52:01 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 11:52:02 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:02 [Combat] 伤害 Player(240) → NormalFront(99974) 26
+[log] 11:52:02 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[ScytheEvolution] PASS 真实ATK到达：段1
+[log] 11:52:02 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe2（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:52:02 [Combat] 连招：skl_b2_w1_1 推进到第 2 段（动画「Skill_B2_Scythe2」，累计连击 1）
+[log] 11:52:02 [Combat] 连招·第 2 段判定：skl_b2_w1_1 伤害 31.2（×1.2）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:02 [Combat] 伤害 Player(240) → NormalFront(99942.8) 31.2
+[ScytheEvolution] PASS 真实ATK到达：段2
+[log] 11:52:02 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:52:02 [Combat] 连招：skl_b2_w1_1 推进到第 3 段（动画「Skill_B2_Scythe3」，累计连击 2）
+[log] 11:52:03 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 49.4（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:03 [Combat] 伤害 Player(240) → NormalFront(99893.4) 49.4
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 默认三连真实命中，快照段号0/1/2、总段数3
+[log] 11:52:03 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:52:03 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[ScytheEvolution] PASS 真实表行／处理器有效：evo_mercy
+[ScytheEvolution] PASS 真实入构筑：evo_mercy
+[log] 11:52:03 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:52:03 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:52:03 [Combat] 连招：skl_b2_w1_1 起手 段 3/3 动画「Skill_B2_Scythe3」（窗口 0.5s）
+[log] 11:52:03 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 74.1（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:03 [Combat] 伤害 Player(240) → MercyFront(99925.9) 74.1
+[log] 11:52:03 [Combat] 伤害 Player(240) → MercyBack(99925.9) 74.1
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 怜悯首次真实ATK就是原末段，360度判定同时命中前／后靶
+[ScytheEvolution] PASS 怜悯末刀伤害74.1＝原末刀49.4×1.5
+[ScytheEvolution] PASS 怜悯不改玩家全局伤害乘区
+[ScytheEvolution] PASS 单次施法内连点不追加前两段，也不重复末刀ATK
+[ScytheEvolution] PASS 截图 j14_mercy
+[log] 11:52:04 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:52:04 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:52:04 [Combat] 连招：skl_b2_w1_1 起手 段 3/3 动画「Skill_B2_Scythe3」（窗口 0.5s）
+[log] 11:52:05 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 74.1（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:05 [Combat] 伤害 Player(240) → MercyFront(99851.8) 74.1
+[log] 11:52:05 [Combat] 伤害 Player(240) → MercyBack(99851.8) 74.1
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 下次真实施法仍从末刀开始
+[log] 11:52:05 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:52:05 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[ScytheEvolution] PASS 真实表行／处理器有效：evo_mercy
+[ScytheEvolution] PASS 真实入构筑：evo_mercy
+[log] 11:52:05 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:52:05 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:52:05 [Combat] 连招：skl_b2_w1_1 起手 段 3/3 动画「Skill_B2_Scythe3」（窗口 0.5s）
+[log] 11:52:05 [Combat] 动作交接：skl_b2_w1_1 被 skl_b_skill_1 打断（动画时间0s）。
+[log] 11:52:05 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 11:52:05 [Combat] 闪：skl_b_skill_1 朝 (0, 0, -1) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[log] 11:52:05 [Combat] 单位动画切换：Player idle → sprint（当前速度 38.89，阈值 0.15/4）
+[ScytheEvolution] PASS 怜悯仍服从真实前摇打断，没有计时伤害兜底
+[log] 11:52:05 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:52:05 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[log] 11:52:06 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:52:06 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:52:06 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 11:52:06 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:06 [Combat] 伤害 Player(240) → ResetFront(99974) 26
+[ScytheEvolution] PASS 真实ATK到达：段1
+[ScytheEvolution] PASS 重新配装后恢复普通首段，末刀模式无残留
+[log] 11:52:06 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 11:52:06 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 ScytheEvolutionProbe
+[ScytheEvolution] PASS 真实表行／处理器有效：evo_salvation
+[ScytheEvolution] PASS 真实入构筑：evo_salvation
+[log] 11:52:06 [Combat] 破甲 Player(240)
+[log] 11:52:06 [Combat] 伤害 InjurySource(100000) → Player(195) 45
+[ScytheEvolution] PASS 真实受击后生命195，留出回血空间
+[log] 11:52:06 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:52:06 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:52:06 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 11:52:07 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 26（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:07 [Combat] 伤害 Player(195) → FirstKill(0) 1
+[log] 11:52:07 [Combat] 死亡 FirstKill(0) 击杀者=Player(195)
+[log] 11:52:07 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 11:52:07 [Combat] 击杀 FirstKill(0) by Player(195)
+[ScytheEvolution] PASS 真实ATK到达：段1
+[ScytheEvolution] PASS 普渡：第一刀真实击杀不回血，击杀事件段号0
+[log] 11:52:07 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe2（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 11:52:07 [Combat] 连招：skl_b2_w1_1 推进到第 2 段（动画「Skill_B2_Scythe2」，累计连击 1）
+[log] 11:52:07 [Combat] 连招·第 2 段判定：skl_b2_w1_1 伤害 31.2（×1.2）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:07 [Combat] 伤害 Player(195) → SecondKill(0) 1
+[log] 11:52:07 [Combat] 死亡 SecondKill(0) 击杀者=Player(195)
+[log] 11:52:07 [Combat] 击杀 SecondKill(0) by Player(195)
+[ScytheEvolution] PASS 真实ATK到达：段2
+[ScytheEvolution] PASS 普渡：第二刀真实击杀不回血，击杀事件段号1
+[log] 11:52:07 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:52:07 [Combat] 连招：skl_b2_w1_1 推进到第 3 段（动画「Skill_B2_Scythe3」，累计连击 2）
+[log] 11:52:08 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 49.4（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:08 [Combat] 伤害 Player(195) → FinalFront(0) 1
+[log] 11:52:08 [Combat] 死亡 FinalFront(0) 击杀者=Player(195)
+[log] 11:52:08 [Combat] 击杀 FinalFront(0) by Player(195)
+[log] 11:52:08 [Reward] 增幅·事件规则：evo_salvation 触发（Kill，第 1 次）
+[log] 11:52:08 [Combat] 伤害 Player(203) → FinalBack(0) 1
+[log] 11:52:08 [Combat] 死亡 FinalBack(0) 击杀者=Player(203)
+[log] 11:52:08 [Combat] 击杀 FinalBack(0) by Player(203)
+[log] 11:52:08 [Reward] 增幅·事件规则：evo_salvation 触发（Kill，第 2 次）
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 普渡：同一末刀真实击杀两靶，生命195→211，每靶+8
+[ScytheEvolution] PASS 末刀击杀事件携带冻结的2/3段快照和正确技能来源
+[ScytheEvolution] PASS 截图 j14_salvation
+[log] 11:52:08 [Combat] 连招：skl_b2_w1_1 输入窗口超时（0.5s 没人按），收招。累计连击 2
+[log] 11:52:09 [Combat] 伤害 Player(211) → LateFirstStep(0) 1
+[log] 11:52:09 [Combat] 死亡 LateFirstStep(0) 击杀者=Player(211)
+[log] 11:52:09 [Combat] 击杀 LateFirstStep(0) by Player(211)
+[ScytheEvolution] PASS 第一刀旧快照经真实弹体延迟击杀：当前连招已到末段仍不回血
+[log] 11:52:09 [Combat] 伤害 Player(211) → WrongSource(0) 1
+[log] 11:52:09 [Combat] 死亡 WrongSource(0) 击杀者=Player(211)
+[log] 11:52:09 [Combat] 击杀 WrongSource(0) by Player(211)
+[ScytheEvolution] PASS 实际击杀过滤：来源skl_b2_w1_2／是否本人True／段2/3不触发普渡
+[log] 11:52:09 [Combat] 死亡 @CharacterBody3D@297(0) 击杀者=InjurySource(100000)
+[log] 11:52:09 [Combat] 击杀 @CharacterBody3D@297(0) by InjurySource(100000)
+[ScytheEvolution] PASS 实际击杀过滤：来源skl_b2_w1_1／是否本人False／段2/3不触发普渡
+[log] 11:52:09 [Combat] 伤害 Player(211) → @CharacterBody3D@301(0) 1
+[log] 11:52:09 [Combat] 死亡 @CharacterBody3D@301(0) 击杀者=Player(211)
+[log] 11:52:09 [Combat] 击杀 @CharacterBody3D@301(0) by Player(211)
+[ScytheEvolution] PASS 实际击杀过滤：来源skl_b2_w1_1／是否本人True／段-1/0不触发普渡
+[ScytheEvolution] PASS 真实表行／处理器有效：evo_mercy
+[ScytheEvolution] PASS 真实入构筑：evo_mercy
+[log] 11:52:09 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 11:52:09 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 11:52:09 [Combat] 连招：skl_b2_w1_1 起手 段 3/3 动画「Skill_B2_Scythe3」（窗口 0.5s）
+[log] 11:52:09 [Combat] 连招·第 3 段判定：skl_b2_w1_1 伤害 74.1（×1.9）盒子 (7.2, 1.8, 0)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[log] 11:52:09 [Combat] 伤害 Player(211) → MercySalvation(0) 1
+[log] 11:52:09 [Combat] 死亡 MercySalvation(0) 击杀者=Player(211)
+[log] 11:52:09 [Combat] 击杀 MercySalvation(0) by Player(211)
+[log] 11:52:09 [Reward] 增幅·事件规则：evo_salvation 触发（Kill，第 3 次）
+[ScytheEvolution] PASS 真实ATK到达：段3
+[ScytheEvolution] PASS 怜悯＋普渡同时获得：跳到末刀的真实击杀仍回8血
+[ScytheEvolution] === 镰刀末刀进化验收结束：通过 38，失败 0 ===
+[log] 11:52:10 [Exit] 音频退出回收：真实等待99ms。
+[log] 11:52:10 [Audio] 音效统计：共 23 次 —— sfx_combat_hit×14、sfx_enemy_die×9（缺失 id 0 个）
+
+截图 j14_mercy SHA256=8570FAC1C19736A5CBD7B4E0D5663B38F91A8005609A75B0BBAA58B1EFE71E03
+截图 j14_salvation SHA256=4670871A4CE17EE3AD2C7CDBF47F29E83B02039101EC5E96830772E1AFCC3551
+存档 AFTER meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 AFTER ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 AFTER settings.cfg SHA256=3389FC70EFEFFDD5745ABB3EC53418C2E49D06823F698B50DB94247928470864
+存档 AFTER loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 AFTER rune.cfg SHA256=ABSENT
+selftest.flag AFTER=False

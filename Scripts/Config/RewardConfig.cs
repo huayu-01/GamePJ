@@ -31,6 +31,8 @@ public partial class RewardConfig : ConfigRow
 	[Export] public string ApplyHandler { get; set; } = "StatSet";
 	/// <summary>只接受该技能造成的事件；资源引用在编译时转为运行期技能Id。</summary>
 	[Export] public AbilityConfig? RequiredEventAbility { get; set; }
+	/// <summary>事件必须来自攻击快照中的末段连招；默认不限定（普渡）。</summary>
+	[Export] public bool RequireFinalComboStep { get; set; }
 	/// <summary>
 	/// **只对这个技能的伤害加成**（J8：「发散」只提高「波波」而「心眼」提高玩家的各种伤害）。
 	/// 留空 = 不按技能过滤。与 <see cref="RequiredEventAbility"/> 分工：

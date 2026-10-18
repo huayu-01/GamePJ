@@ -54,6 +54,9 @@ public readonly struct GameplayEvent
 
 	/// <summary>攻击标签或技能 Id，用于按能力类型过滤，而不是按单位 Id。</summary>
 	public string Tag { get; init; }
+	/// <summary>来自攻击快照的连招信息；总段数0表示事件不属于连招。</summary>
+	public int ComboStep { get; init; }
+	public int ComboStepCount { get; init; }
 
 	public Vector3 Position { get; init; }
 	public EventContext? Context { get; init; }

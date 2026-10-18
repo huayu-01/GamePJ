@@ -124,11 +124,21 @@ public partial class MeleeComboAbility : Ability
 	/// <summary>当前配装由真实 ATK 发出的额外投射物数量。</summary>
 	public int ExtraProjectileCount { get; private set; }
 	private MeleeProjectileTuning? _extraProjectile;
+	private int? _singleStep;
+	private float _singleStepDamageScale = 1f, _singleStepSizeScale = 1f;
+	public void ConfigureSingleStep(int step, float damageScale, float sizeScale)
+	{
+		_singleStep = step;
+		_singleStepDamageScale = Mathf.Max(0f, damageScale);
+		_singleStepSizeScale = Mathf.Max(0.01f, sizeScale);
+	}
 	public void ConfigureExtraProjectile(MeleeProjectileTuning tuning) => _extraProjectile = tuning;
 	protected override void OnLoadoutReset()
 	{
 		_extraProjectile = null;
 		ExtraProjectileCount = 0;
+		_singleStep = null;
+		_singleStepDamageScale = _singleStepSizeScale = 1f;
 	}
 
 	/// <summary>本段斩断了几个子弹（自测取证）。</summary>
@@ -312,10 +322,12 @@ public partial class MeleeComboAbility : Ability
 		ReadSeries();
 
 		// 连招的每一段都是一段独立动画；单段模式退回行里的 AnimName。
-		string first = ResolveStepAnimation(0);
+		if (_singleStep is { } selected)
+			ComboStep = selected < 0 ? Mathf.Max(0, _anims.Count - 1) : Mathf.Clamp(selected, 0, Mathf.Max(0, _anims.Count - 1));
+		string first = ResolveStepAnimation(ComboStep);
 		PlaySkillAnimationNamed(first);
-		ApplyStepShape(0);
-		GameLog.Write("Combat", $"连招：{AbilityId} 起手 段 1/{Mathf.Max(1, _anims.Count)} 动画「{first}」（窗口 {ComboWindowSeconds:0.##}s）");
+		ApplyStepShape(ComboStep);
+		GameLog.Write("Combat", $"连招：{AbilityId} 起手 段 {ComboStep + 1}/{Mathf.Max(1, _anims.Count)} 动画「{first}」（窗口 {ComboWindowSeconds:0.##}s）");
 	}
 
 	/// <summary>第 i 段的动画名（越界时退回最后一段；空数组退回 <see cref="Ability.AnimName"/>）。</summary>
@@ -383,6 +395,7 @@ public partial class MeleeComboAbility : Ability
 
 	private bool Advance()
 	{
+		if (_singleStep.HasValue) { Finish(); return false; }
 		int next = ComboStep + 1;
 		if (next >= Mathf.Max(1, _anims.Count))
 		{
@@ -505,7 +518,9 @@ public partial class MeleeComboAbility : Ability
 			// 都挂这个键。没配置时它是 1（`Unit.SeedStats` 有基础值），所以这一乘**逐位不变**。
 			// ⚠️ 只加在连招这一路（近战武技 = 玩家专属）；`AttackHitbox` 的默认路径一个字没动 ——
 			// 首领/敌人的伤害走那条，那里乘一次会改动"白板首领 315"这类硬指标。
-			BaseDamage = _hitbox.Damage * scale * MeleeDamageMultiplier,
+			BaseDamage = _hitbox.Damage * scale * MeleeDamageMultiplier * _singleStepDamageScale,
+			ComboStep = ComboStep,
+			ComboStepCount = Mathf.Max(1, _anims.Count),
 			CritChance = _hitbox.CritChance,
 			CritMultiplier = _hitbox.CritMultiplier,
 			Knockback = _hitbox.Knockback,
@@ -539,6 +554,7 @@ public partial class MeleeComboAbility : Ability
 			{
 				Attacker = OwnerUnit, Ability = AbilityId, AbilityKind = AbilityId,
 				BaseDamage = attack.BaseDamage * tuning.DamageScale,
+				ComboStep = attack.ComboStep, ComboStepCount = attack.ComboStepCount,
 				CanCrit = attack.CanCrit, CritChance = attack.CritChance, CritMultiplier = attack.CritMultiplier,
 				Knockback = attack.Knockback, Policy = HitPolicy.OncePerTarget,
 				Lifetime = tuning.Lifetime, Pierce = tuning.Pierce, Tags = tuning.AttackTags.ToArray(),
@@ -618,7 +634,7 @@ public partial class MeleeComboAbility : Ability
 			return;
 		}
 
-		Vector3 size = StepValue(_boxSizes, step, _sceneBoxSize) * MeleeRangeMultiplier;
+		Vector3 size = StepValue(_boxSizes, step, _sceneBoxSize) * MeleeRangeMultiplier * _singleStepSizeScale;
 		CurrentStepBoxSize = size;
 
 		float offset = StepValue(_boxOffsets, step, float.NaN);

@@ -10,6 +10,8 @@ public partial class SkillEnhancementTuning : Resource
 	[Export] public AbilityConfig? TargetAbility { get; set; }
 	[Export] public float DamageScale { get; set; } = 1f;
 	[Export] public float SizeScale { get; set; } = 1f;
+	/// <summary>近战单段模式：负数选择末段，非负数选择指定段（0起）；仅近战目标消费。</summary>
+	[Export] public int ComboStepIndex { get; set; } = -1;
 	[Export] public int ProjectileSweepMaxHits { get; set; }
 	[Export] public float ProjectileSweepRadius { get; set; } = 0.08f;
 	/// <summary>小于零保留技能原冷却；零表示无冷却。</summary>

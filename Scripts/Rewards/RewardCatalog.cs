@@ -250,6 +250,7 @@ public partial class TablePulseRule : TriggerRule
 	public string AbilityId { get; set; } = string.Empty;
 	/// <summary>事件的攻击技能来源限制；空值保持通用事件规则。</summary>
 	public string RequiredAbilityId { get; set; } = string.Empty;
+	public bool RequireFinalComboStep { get; set; }
 
 	/// <summary>乱金柝：只有**当前有滞空**时才出手（"当角色有滞空时"是文档的条件）。</summary>
 	public bool RequireHover { get; set; }
@@ -318,6 +319,7 @@ public partial class TablePulseRule : TriggerRule
 			return false;
 		}
 		if (!string.IsNullOrEmpty(RequiredAbilityId) && gameplayEvent.Tag != RequiredAbilityId) return false;
+		if (RequireFinalComboStep && (gameplayEvent.ComboStepCount <= 0 || gameplayEvent.ComboStep != gameplayEvent.ComboStepCount - 1)) return false;
 
 		// 「当角色有滞空时，击杀会刷新滞空时间」—— 条件放在 Matches 里（放 Execute 会白白吃掉一次冷却）。
 		return !RequireHover || (NodeSearch.FindInSubtree<AirHoverController>(_owner)?.HoverRemaining ?? 0f) > 0f;

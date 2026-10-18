@@ -1,5 +1,7 @@
 # 增幅系统 · 三层判定（限定 / 互斥 / 前置）—— P5 接入契约
 
+> **2026-10-18 J14更新**：怜悯改用SkillEnhancement指定近战单段（负数选择末段），只乘该技能伤害；普渡沿用TablePulse，新增强类型RequireFinalComboStep＋RequiredEventAbility过滤。攻击／真实Kill事件携带冻结段号，群杀每个击杀各回N，N预设8。见 [J14](character-design-j14.md)。以下旧半接清单以当前快照为准，下一项喜爱。
+
 > **2026-10-18 J13更新**：金光术已迁 `MeleeProjectile`（每段真实ATK出弹）；大拔刀术／神降术迁强类型 `SkillEnhancement`，只修改目标技能自身。`AbilityOverride` 当前仍用的为有备无患／专注／气贯长虹／地爆；下方P5b的占位与半接清单是历史，当前剩余以 [会话快照](SESSION-SNAPSHOT.md) 为准。[J13验收与真实命中](character-design-j13.md)。
 
 > **权威**：`docs/character-redesign.md`（用户对"怎么做"的澄清）+ `F:\Godot项目\3d肉鸽雨中哈迪斯\角色设计.txt`（"做什么"）。

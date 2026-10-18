@@ -795,6 +795,8 @@ public partial class Unit : CharacterBody3D
 			GameplayEventBus.Raise(new GameplayEvent
 			{
 				Kind = GameplayEventKind.Kill,
+				ComboStep = hit.Attack?.ComboStep ?? -1,
+				ComboStepCount = hit.Attack?.ComboStepCount ?? 0,
 				Source = hit.Attacker,
 				Target = this,
 				Tag = hit.Attack?.Ability ?? string.Empty,

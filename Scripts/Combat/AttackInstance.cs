@@ -12,6 +12,9 @@ public sealed class AttackInstance
 {
 	public Unit? Attacker { get; init; }
 	public string Ability { get; init; } = string.Empty;
+	/// <summary>发出攻击时冻结的连招段号与总段数；非连招总段数为0。</summary>
+	public int ComboStep { get; init; } = -1;
+	public int ComboStepCount { get; init; }
 
 	public float BaseDamage { get; init; }
 	public bool CanCrit { get; init; }

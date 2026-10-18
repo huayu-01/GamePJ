@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_scythe.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_1.tres" id="3_skill"]
 
 [sub_resource type="Resource" id="Resource_p0"]
 script = ExtResource("1_param")
@@ -19,18 +20,20 @@ Note = "回多少血"
 [sub_resource type="Resource" id="Resource_p2"]
 script = ExtResource("1_param")
 Key = "Cooldown"
-Value = 0.2
-Note = "本规则自己的触发间隔"
+Value = 0.0
+Note = "原文没有额外触发间隔；同一末刀每个真实击杀各触发一次"
 
 [resource]
 script = ExtResource("2_row")
 RewardKind = 1
 MaxStacks = 1
 ApplyHandler = "TablePulse"
+RequiredEventAbility = ExtResource("3_skill")
+RequireFinalComboStep = true
 HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Pool = ExtResource("1_pool")
 Id = "evo_salvation"
 DisplayName = "普渡"
-DescriptionTemplate = "武技1 击杀敌人时回复生命"
-Note = "[P5b 新增行] 文档第 142 行（进化池 <B2限定>）「普渡:武技1最后一刀击杀时角色恢复{n}点血量」。消费者：TablePulseRule → Unit.Heal。⚠️ 文档是 n（没给数）→ **N 预设 8 点**；⚠️ 另外「最后一刀」这个条件**没校验**（Kill 事件里不带连招段号）—— 现在是"镰刀击杀就回血"，属预设。"
+DescriptionTemplate = "武技1 最后一刀击杀敌人时回复生命"
+Note = "J14：仅憎恶末段攻击快照导致的真实击杀回血，来源角色也必须是携带者；前两段／武技2／其他技能／其他单位击杀均不触发。N仍用预设8，可调；同一刀多个击杀分别回血，不另加原文没有的0.2秒冷却。"

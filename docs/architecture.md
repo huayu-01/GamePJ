@@ -94,6 +94,8 @@ J4三维技能位移由`CharacterMovement`按来源持有速度覆盖，技能�
 
 ## Unit 与表现的分工
 
+**J14末刀进化**：近战单段模式沿用原连招表的动画／几何／真实ATK，选择与伤害倍率只作用目标能力；AttackInstance冻结ComboStep／ComboStepCount，Unit.Die将其带入Kill事件。TablePulse按来源单位／技能／冻结末段过滤普渡，不读玩家当前连招段号，旧攻击延迟结算不会串段。见 [J14](character-design-j14.md)。
+
 **J13灵剑进化**：`MeleeProjectileTuning` 配置每段真实ATK额外投射物，继承当段伤害快照；`SkillEnhancementTuning` 只改指定拔刀式／落剑式，不写全局伤害乘区。拔刀式模型放大与胶囊半径分开配置；落剑式复制独立球体、表现只读真实半径。换装还原增强配置及形状。真链路与预设边界见 [J13](character-design-j13.md)。
 
 **原始设计J3**：`Ability`在新请求验证成功后交接前台动作；不可打断例外与动画前摇锁定由强类型技能列配置。`UnitAnimator.SkillEvent`是单位实例事件，能力以播放序号过滤；全局旧事件只留作历史自测统计。回调换段后立即停止旧事件游标。输入按真实事件顺序派发；后台效果、离手武器和落剑式被动圈不参与前台交接。

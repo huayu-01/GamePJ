@@ -45,6 +45,7 @@ public static class RewardEffectRegistry
 			Ability? ability = Ability.FindByAbilityId(context.Player, tuning.TargetAbility.Id);
 			if (ability is SwordQiAbility draw) draw.ConfigureEnhancement(tuning.DamageScale, tuning.SizeScale, tuning.ProjectileSweepMaxHits, tuning.ProjectileSweepRadius);
 			else if (ability is LandingBurstAbility burst) burst.ConfigureEnhancement(tuning.DamageScale, tuning.SizeScale);
+			else if (ability is MeleeComboAbility combo) combo.ConfigureSingleStep(tuning.ComboStepIndex, tuning.DamageScale, tuning.SizeScale);
 			else { GD.PushWarning($"[Reward] {row.Id} 的增强目标技能不存在或类型不支持。"); return; }
 			if (tuning.CooldownSeconds >= 0f) ability.Cooldown = tuning.CooldownSeconds;
 		},
@@ -209,6 +210,7 @@ public static class RewardEffectRegistry
 				Trigger = ParamText(row, "Trigger", "Kill"),
 				AbilityId = ParamText(row, "AbilityId", string.Empty),
 				RequiredAbilityId = row.RequiredEventAbility?.Id ?? string.Empty,
+				RequireFinalComboStep = row.RequireFinalComboStep,
 				RequireHover = ParamBool(row, "RequireHover", false),
 				CooldownFraction = Param(row, "CooldownFraction", 0f),
 				CooldownSeconds = Param(row, "CooldownSeconds", 0f),
