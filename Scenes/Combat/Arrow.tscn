@@ -26,6 +26,7 @@ monitoring = false
 monitorable = false
 script = ExtResource("1_projectile")
 Speed = 220.0
+QueryGeometry = 0
 GravityScale = 0.0
 MaxLifetime = 3.0
 Pierce = 0

@@ -109,17 +109,9 @@ public partial class ArrowVolleyAbility : Ability
 	/// <summary>可穿透的目标数量（0 = 命中即消失）。</summary>
 	[Export] public int Pierce { get; set; }
 
-	/// <summary>
-	/// **每帧线段多命中扫掠**（J10；≤0 = 不启用 = 改动前的行为）。表列 = 技能行 Params 的
-	/// <c>SweepMaxHits</c>（一帧最多结算几个，真正的命中数另受穿透预算限制）。
-	///
-	/// <para>病根：弹速一快，一物理帧的线段里可能同时有两个怪，而既有投射物每帧只结算最近那一个、
-	/// 直接把位置推到帧末 —— 后面那只就被跳过了（J9 探针记录的既有行为）。这里把表值原样传给
-	/// <see cref="ActRoguelike.Combat.Projectile.SweepMaxHits"/>；线段长度由投射物按"当时的真实弹速 ×
-	/// 物理帧时长"逐帧重算。</para>
-	///
-	/// <para>只有配了这一列的技能行会启用；短弩/灵剑/能量掌等行不配 → 逐位不变。</para>
-	/// </summary>
+	/// <summary>查询几何覆盖：-1沿用弹体场景，0线段射线，1有半径扫掠。</summary>
+	[Export(PropertyHint.Enum, "SceneDefault:-1,Ray:0,ShapeSweep:1")] public int QueryGeometry { get; set; } = -1;
+	/// <summary>每帧命中预算；≤0取弹体的默认8，与几何选择无关。</summary>
 	[Export] public int SweepMaxHits { get; set; }
 	/// <summary>启用胶囊扫掠时的世界半径；与投射物模型尺寸独立配置。</summary>
 	[Export] public float SweepRadius { get; set; } = 0.08f;
@@ -558,7 +550,9 @@ public partial class ArrowVolleyAbility : Ability
 			arrow.SeekAnyHostile = true; arrow.AssignedHomingTarget = seekTarget;
 			arrow.HomingTurnRateDegrees = _seekTurnRate; arrow.HomingRange = _seekRange;
 		}
-		arrow.Pierce = attack.Pierce; arrow.MaxLifetime = MaxLifetime;
+		// 穿透已在攻击快照中，不能同时写到弹体再由Launch重复相加。
+		arrow.Pierce = 0; arrow.MaxLifetime = MaxLifetime;
+		if (QueryGeometry >= 0) arrow.QueryGeometry = QueryGeometry;
 		arrow.SweepMaxHits = SweepMaxHits;
 		arrow.SweepRadius = SweepRadius;
 		arrow.Launch(attack, dir);

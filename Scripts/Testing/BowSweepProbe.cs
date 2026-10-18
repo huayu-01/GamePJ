@@ -23,8 +23,8 @@ namespace ActRoguelike.Testing;
 ///   且这一按松手**不释放**；再打两发真实箭：刚过基础那发一点档位加成都不吃，过了 1 档才开始涨；</item>
 /// <item><b>其他蓄力技能的档数口径</b>：短弩武技2（3 后置档）与长枪武技2（4 后置档）按各自表列现算；</item>
 /// <item><b>龙之箭</b>：真实入构筑后 3s 上限 = 8 个后置档；</item>
-/// <item><b>贴脸双怪</b>：同一条单帧线段里的两只怪 —— 关掉扫掠（既有路径）只结算最近那只，
-///   开扫掠（表值 8）两只都在**同一物理帧**结算、不重复；墙夹在两只中间时墙后那只一次都打不到。</item>
+/// <item><b>贴脸双怪</b>：J28射线与形状两种几何都在同一物理帧结算两靶；
+///   旧单射线漏怪反例保存在J28修复前证据，墙夹在两只中间时墙后那只一次都打不到。</item>
 /// </list>
 /// </summary>
 public partial class BowSweepProbe : Node3D
@@ -357,7 +357,7 @@ public partial class BowSweepProbe : Node3D
 			+ "（J9 交付时 25 档 ×8.5 伤害 204 弹速 970；把 step 改成 0.3 之后它自己就降下来了）");
 	}
 
-	/// <summary>⑤ 贴脸双怪：同一帧线段里两只怪，既有路径漏一只、扫掠两只都在同一帧结算。</summary>
+	/// <summary>⑤ 贴脸双怪：两种查询几何都必须覆盖同一帧的穿透余程。</summary>
 	private async Task DualTargetSweep()
 	{
 		var t1 = MakeTarget("T1", new Vector3(20f, 0.9f, 18.2f));
@@ -373,21 +373,24 @@ public partial class BowSweepProbe : Node3D
 
 		int tableSweep = _bow.SweepMaxHits;
 
-		// ⓐ 对照组：把新列临时置 0 = 任何**没配**这一列的武器走的那条既有路径（改动前的行为）。
+		// J28：旧漏怪反例已单独复现留证。缺省预算现在也必须查完射线余程。
+		int tableGeometry = _bow.QueryGeometry;
+		_bow.QueryGeometry = 0;
 		_bow.SweepMaxHits = 0;
 		int start = _hits.Count;
 		int spawn = _spawned.Count;
 		bool okControl = await FireHolding(2.05);
-		await Settle(1, start);
+		await Settle(2, start);
 		Check(
 			okControl && _spawnSweep.Count > spawn && _spawnSweep[spawn] == 0,
-			$"⑤ 对照组：真实投射物上的扫掠预算 {ArrowSweep(spawn)}（期望 0 = 不扫掠，既有路径）");
+			$"⑤ 射线组：真实投射物预算缺省值 {ArrowSweep(spawn)}（0取默认8）");
 		Check(
-			_hits.Count - start == 1 && HitsSince(start) == "T1",
-			$"⑤ 关掉扫掠（= 改动前）：贴脸双怪只结算**最近那只** → 命中 {HitsSince(start)}，T2 一点血都没掉（{t2.Health:0.#}/{t2.MaxHealth:0.#}）");
+			_hits.Count - start == 2 && HitsSince(start) == "T1 → T2" && _hitFrames[start] == _hitFrames[start + 1],
+			$"⑤ J28射线余程：贴脸双怪同帧各结算一次 → {HitsSince(start)}");
 
 		// ⓑ 表值生效：同一对靶、同一条线段 → 两只都结算，而且在**同一物理帧**。
 		_bow.SweepMaxHits = tableSweep;
+		_bow.QueryGeometry = 1;
 		start = _hits.Count;
 		spawn = _spawned.Count;
 		bool okSweep = await FireHolding(2.05);
@@ -427,7 +430,8 @@ public partial class BowSweepProbe : Node3D
 			await Until(() => Projectile.LiveCount == 0, 2.5),
 			$"⑤ 箭撞墙后消失（场上存活投射物 {Projectile.LiveCount}）");
 
-		GD.Print($"[BowSweep] INFO ⑤ 按靶统计命中次数：T1={TotalOf("T1")} T2={TotalOf("T2")}（T2 只在开扫掠且无墙的那发命中，见上面的断言）");
+		GD.Print($"[BowSweep] INFO ⑤ 按靶统计命中次数：T1={TotalOf("T1")} T2={TotalOf("T2")}（J28两种几何都覆盖余程）");
+		_bow.QueryGeometry = tableGeometry;
 		t1.QueueFree();
 		t2.QueueFree();
 		wall.QueueFree();
@@ -464,7 +468,7 @@ public partial class BowSweepProbe : Node3D
 
 	private Projectile DirectShot(Vector3 origin, Vector3 direction, float radius = 0.08f, int budget = 8, int pierce = 10, int ricochet = 0)
 	{
-		var projectile = new Projectile { Speed = 320f, SweepRadius = radius, SweepMaxHits = budget };
+		var projectile = new Projectile { Speed = 320f, QueryGeometry = budget == 0 ? 0 : 1, SweepRadius = radius, SweepMaxHits = budget };
 		AddChild(projectile);
 		projectile.GlobalPosition = origin;
 		projectile.Launch(new AttackInstance { Attacker = _player, BaseDamage = 10f, Lifetime = 0.3f, Policy = HitPolicy.OncePerTarget, Pierce = pierce, Ricochet = ricochet }, direction);

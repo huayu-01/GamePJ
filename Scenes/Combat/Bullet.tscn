@@ -12,6 +12,7 @@ monitoring = false
 monitorable = false
 script = ExtResource("1_projectile")
 Speed = 75.0
+QueryGeometry = 0
 MaxLifetime = 2.2
 
 [node name="Mesh" type="MeshInstance3D" parent="."]

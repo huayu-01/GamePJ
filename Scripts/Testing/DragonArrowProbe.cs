@@ -114,7 +114,7 @@ public partial class DragonArrowProbe : Node3D
 			if (IsInstanceValid(projectile))
 			{
 				_spawnScale.Add(projectile.Scale.X);
-				_spawnPierce.Add(projectile.Pierce);
+				_spawnPierce.Add(projectile.PierceBudgetAtLaunch);
 			}
 			else
 			{
