@@ -38,6 +38,12 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 	public float LastMaxDistance { get; private set; }
 	private float _referenceDistance;
 
+	protected override void OnLoadoutReset()
+	{
+		RecallOnSecondPress = true;
+		AutoRecallOnSettle = false;
+	}
+
 	private Vector3 PickLandingPoint(Vector3 start, Vector3 flat)
 	{
 		float range = MaxThrowDistance * ChargePowerScale;
@@ -48,8 +54,8 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 		if (planar.Length() > range) planar = planar.Normalized() * range;
 		Vector3 target = start + planar;
 		float top = Mathf.Max(start.Y, point.Y) + 1f;
-		var query = PhysicsRayQueryParameters3D.Create(new Vector3(target.X, top, target.Z), new Vector3(target.X, top - MaxAimDistance, target.Z), CombatLayers.World);
-		var hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
+		using var query = PhysicsRayQueryParameters3D.Create(new Vector3(target.X, top, target.Z), new Vector3(target.X, top - MaxAimDistance, target.Z), CombatLayers.World);
+		using var hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
 		return hit.Count > 0 ? hit["position"].AsVector3() : target + Vector3.Down;
 	}
 
@@ -69,7 +75,9 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 		{
 			float time = seconds * i / Mathf.Max(2, ArcPathSteps);
 			Vector3 next = start + velocity * time + Vector3.Down * (0.5f * ArcGravity * time * time);
-			var hit = GetWorld3D().DirectSpaceState.IntersectRay(PhysicsRayQueryParameters3D.Create(points[^1], next, CombatLayers.World));
+			// 蓄力预览每帧采样多次，及时释放临时查询，避免积压到引擎退出时终结。
+			using var query = PhysicsRayQueryParameters3D.Create(points[^1], next, CombatLayers.World);
+			using var hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
 			if (hit.Count > 0) { points.Add(hit["position"].AsVector3()); break; }
 			points.Add(next);
 		}

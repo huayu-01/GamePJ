@@ -3250,10 +3250,10 @@ public partial class SelfTest : Node
 			+ $"｜拿到「冰晶」之后 含 冰晶+={afterFreeze.Contains(",mut_freeze_plus,")}（期望 True） 含 烈阳+={afterFreeze.Contains(",mut_burn_plus,")}（期望 False —— 它前置的是「烈阳」，两条链互不相干）");
 
 		// ⑧ **表里的参数真的落到了机制上**（P5b）：探测技能节点（`new` 出来、**不进树** —— 与上面那三个探针武器同一类做法）
-		//    覆盖 P5b 新加的处理器 `AbilityOverride`（7 条进化在用它：HandlerParams 里 key = Ability 的 [Export] 属性名）。
+		//    覆盖现有进化处理器；专属增强使用真实能力类型，物理链路由专项验证。
 		var probePlayer = new Unit();
 		var probeBackdash = new ChargeAttackAbility { AbilityId = "skl_a1_skill_1", MaxCharges = 1 };
-		var probeSpear = new ChargeAttackAbility { AbilityId = "skl_b3_w1_2" };
+		var probeSpear = new SpearThrowAbility { AbilityId = "skl_b3_w1_2" };
 		var probeBowSkill = new ArrowVolleyAbility { AbilityId = "skl_a3_w1_1" };
 		var probeDraw = new SwordQiAbility { AbilityId = "skl_b1_w1_2", Damage = 26f };
 		var probeLanding = new LandingBurstAbility { AbilityId = "skl_b1_w1_3" };
@@ -3281,6 +3281,8 @@ public partial class SelfTest : Node
 			probeBackdash.MaxCharges == 3 && Mathf.Abs(probeBackdash.RechargeSeconds - 0.5f) < 0.0001f
 			&& Mathf.Abs(probeSpear.ChargeBaseSeconds - 0.5f) < 0.0001f
 			&& Mathf.Abs(probeSpear.ChargeStepSeconds - 0.125f) < 0.0001f
+			&& Mathf.Abs(probeSpear.ChargeMaxSeconds - 1f) < 0.0001f
+			&& !probeSpear.RecallOnSecondPress && probeSpear.AutoRecallOnSettle
 			&& probeBowSkill.RampMaxCount == 3 && Mathf.Abs(probeBowSkill.RampWindowSeconds - 1.2f) < 0.0001f
 			&& Mathf.Abs(probeBowSkill.ChargeMaxSeconds - 3f) < 0.0001f
 			// J13：专属增强只改拔刀式；实际尺寸在真实发射前重算，完整链路由灵剑专项覆盖。
@@ -3292,7 +3294,7 @@ public partial class SelfTest : Node
 			&& Mathf.Abs(probeLanding.DamageScale - 1.6f) < 0.0001f;
 		GameLog.Write("SelfTest",
 			$"{(overrideOk ? "✅" : "🔴")} P5b·实测表参数落到机制上（探测技能节点，不进树）：有备无患 → 后撤 MaxCharges {probeBackdash.MaxCharges}（期望 3）Recharge {probeBackdash.RechargeSeconds:0.###}s（期望 0.5）"
-			+ $"｜气贯长虹 → 长枪武技2 基础蓄力 {probeSpear.ChargeBaseSeconds:0.###}s（期望 0.5）每档 {probeSpear.ChargeStepSeconds:0.###}s（期望 0.125）"
+			+ $"｜气贯长虹 → 长枪武技2 基础蓄力 {probeSpear.ChargeBaseSeconds:0.###}s（期望 0.5）每档 {probeSpear.ChargeStepSeconds:0.###}s（期望 0.125）总上限 {probeSpear.ChargeMaxSeconds:0.###}s（期望1）手动召回 {probeSpear.RecallOnSecondPress}／落地自动召回 {probeSpear.AutoRecallOnSettle}（期望False／True）"
 			+ $"｜变奏 + 龙之箭 → 弓武技1 RampMaxCount {probeBowSkill.RampMaxCount}（期望 3）RampWindow {probeBowSkill.RampWindowSeconds:0.###}s（期望 1.2）蓄力上限 {probeBowSkill.ChargeMaxSeconds:0.###}s（期望 3）"
 			+ $"｜大拔刀术 → 拔刀式自身伤害 {probeDraw.Damage:0.###}（期望39）扫掠 {probeDraw.SweepMaxHits}/半径{probeDraw.SweepRadius:0.###}（期望8/0.16）全局伤害乘区 {probePlayer.Stats.Get("DamageMultiplier"):0.###}（期望1；真实发射尺寸见灵剑专项）"
 			+ $"｜地爆 / 神降术 → 落剑式 Knockback {probeLanding.Knockback:0.###}（期望 6）Cooldown {probeLanding.Cooldown:0.###}s（期望 2）DamageScale {probeLanding.DamageScale:0.###}（期望 1.6）");

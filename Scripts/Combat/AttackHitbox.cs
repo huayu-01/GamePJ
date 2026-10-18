@@ -153,7 +153,7 @@ public partial class AttackHitbox : Area3D
 			}
 			_sweepShape ??= new ConvexPolygonShape3D();
 			_sweepShape.Points = points;
-			var query = new PhysicsShapeQueryParameters3D
+			using var query = new PhysicsShapeQueryParameters3D
 			{
 				Shape = _sweepShape, Transform = new Transform3D(Basis.Identity, shape.GlobalPosition + from - to),
 				CollisionMask = CollisionMask, CollideWithAreas = false, CollideWithBodies = true
@@ -179,7 +179,7 @@ public partial class AttackHitbox : Area3D
 			_sphereSweep.Radius = radius;
 			_sphereSweep.Height = length + 2 * radius;
 			Basis basis = length > 0.00001f ? new Basis(new Quaternion(Vector3.Up, travel / length)) : Basis.Identity;
-			var query = new PhysicsShapeQueryParameters3D
+			using var query = new PhysicsShapeQueryParameters3D
 			{
 				Shape = _sphereSweep, Transform = new Transform3D(basis, shape.GlobalPosition - travel * 0.5f),
 				CollisionMask = CollisionMask, CollideWithAreas = false, CollideWithBodies = true

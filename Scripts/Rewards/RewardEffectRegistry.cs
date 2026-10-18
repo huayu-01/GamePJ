@@ -25,6 +25,22 @@ public static class RewardEffectRegistry
 	{
 		// 通用的"改 StatSheet"—— 19 条里有 14 条走它，只靠 Modifiers 里的数据表达，不需要新代码。
 		["StatSet"] = row => context => ApplyModifiers(row, context),
+		["WeaponRecall"] = row => context =>
+		{
+			if (row.WeaponRecall is not { TargetAbility: { } target } tuning
+				|| Ability.FindByAbilityId(context.Player, target.Id) is not SpearThrowAbility spear)
+			{
+				GD.PushWarning($"[Reward] {row.Id} 缺少有效长枪召回参数或目标技能。");
+				return;
+			}
+			float scale = Mathf.Max(0.01f, tuning.ChargeTimeScale);
+			// 始终从原技能表计算，避免重复应用把时间再次减半。
+			spear.ChargeBaseSeconds = target.ChargeBaseSeconds * scale;
+			spear.ChargeStepSeconds = target.ChargeStepSeconds * scale;
+			spear.ChargeMaxSeconds = target.ChargeMaxSeconds * scale;
+			spear.RecallOnSecondPress = tuning.RecallOnSecondPress;
+			spear.AutoRecallOnSettle = tuning.AutoRecallOnSettle;
+		},
 		["WeaponSeek"] = row => context =>
 		{
 			if (row.WeaponSeek is not { TargetAbility: { } } tuning
@@ -168,7 +184,7 @@ public static class RewardEffectRegistry
 		//
 		// 服务这些行（数值全在表里，代码里一个数字都没有）：
 		//   有备无患（后撤 MaxCharges=3 / RechargeSeconds=0.5）· 专注（武技2 CooldownMultiplier=0.5 +
-		//   完美时机窗口）· 气贯长虹（武技2 ChargeBaseSeconds=0.5）· 地爆（落剑式 Knockback）。
+		//   完美时机窗口）· 地爆（落剑式 Knockback）。气贯长虹已迁强类型WeaponRecall。
 		//   龙之箭已迁ChargedShot；大拔刀术／神降术已迁强类型SkillEnhancement。
 		//
 		// ⚠️ 属性名写错**不静默**：先按 `GetPropertyList()` 查存在性，不存在就打警告并跳过这一条。

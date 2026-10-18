@@ -94,6 +94,8 @@ J4三维技能位移由`CharacterMovement`按来源持有速度覆盖，技能�
 
 ## Unit 与表现的分工
 
+**J16气贯长虹**：WeaponRecallTuning从原技能行确定性缩放三项蓄力时间，SpearThrowAbility换装恢复召回策略；真实落地自动回手沿用WeaponThrowAbility既有状态机。长枪高频预览、投掷射线及AttackHitbox扫掠查询参数及时Dispose，避免大量临时资源积压到退出终结；首轮退出失败和复验边界见 [J16](character-design-j16.md)，不等同于引擎终结器修复。
+
 **J15喜爱**：ScytheThrowAbility在真实离手后按游戏秒周期，以拥有者位置选最近敌对单位；WeaponThrowAbility提供受保护的重定向飞行段，复用World、射程、周期伤害与回手状态机。默认无重定向不改变旧路径，回程停止索敌，换装清理。参数使用WeaponSeekTuning资源引用，见 [J15](character-design-j15.md)。
 
 **J14末刀进化**：近战单段模式沿用原连招表的动画／几何／真实ATK，选择与伤害倍率只作用目标能力；AttackInstance冻结ComboStep／ComboStepCount，Unit.Die将其带入Kill事件。TablePulse按来源单位／技能／冻结末段过滤普渡，不读玩家当前连招段号，旧攻击延迟结算不会串段。见 [J14](character-design-j14.md)。

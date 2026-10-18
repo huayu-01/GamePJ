@@ -227,10 +227,10 @@ public abstract partial class WeaponThrowAbility : Ability
 			FlightVelocity += Vector3.Down * (FlightGravity * delta);
 			bool reachedRedirect = _redirectDestination is { } destination && previous.DistanceSquaredTo(destination) <= previous.DistanceSquaredTo(next);
 			if (reachedRedirect) next = _redirectDestination!.Value;
-			var query = PhysicsRayQueryParameters3D.Create(previous, next, CombatLayers.World);
+			using var query = PhysicsRayQueryParameters3D.Create(previous, next, CombatLayers.World);
 			// 仅重定向的飞行段开启：从墙面／墙内重新出发也不能越过地形。
 			query.HitFromInside = _redirectDestination.HasValue;
-			var hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
+			using var hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
 			if (hit.Count > 0)
 			{
 				WeaponPosition = hit["position"].AsVector3();
