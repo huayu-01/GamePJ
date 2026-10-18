@@ -109,7 +109,7 @@ try {
     Save-Fingerprint 'AFTER'
     $evidence.Add("selftest.flag AFTER=$(Test-Path -LiteralPath (Join-Path $profileDir 'selftest.flag'))")
     $outputName = if ($ProbeOnly) { "character-design-j12-probe-$runTag.log" } else { 'character-design-j12-evidence.log' }
-    [IO.File]::WriteAllLines((Join-Path $projectDir "docs\$outputName"),$evidence,$utf8)
+    [IO.File]::WriteAllText((Join-Path $projectDir "docs\$outputName"),(($evidence -join "`n").Replace("`r`n","`n") + "`n"),$utf8)
     Write-Output "J12 验收完成：docs/$outputName"
 }
 catch {
@@ -121,7 +121,7 @@ catch {
             $evidence.Add((Get-Content -LiteralPath $buildPath -Raw))
         }
     }
-    [IO.File]::WriteAllLines((Join-Path $projectDir "docs\character-design-j12-failure-$runTag.log"),$evidence,$utf8)
+    [IO.File]::WriteAllText((Join-Path $projectDir "docs\character-design-j12-failure-$runTag.log"),(($evidence -join "`n").Replace("`r`n","`n") + "`n"),$utf8)
     throw
 }
 finally {
