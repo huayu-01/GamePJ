@@ -253,6 +253,8 @@ public partial class Unit : CharacterBody3D
 		// ③ 正常下落速度上限的倍率（符文「飞翼」：降低正常下落速度 → 填 0.8）。
 		//    1 = 不变（默认）；消费者：CharacterMovement 的下落夹速。
 		Stats.SetBase("MaxFallSpeedMultiplier", 1f);
+		// 下落攻击速度独立于正常下落夹速；飞翼等只需在表中加乘法修饰器。
+		Stats.SetBase("DiveSpeedMultiplier", 1f);
 		// ④ 治疗量的倍率（符文「死铠」：无法恢复生命值 → 填 0）。
 		//    1 = 不变（默认）；≤0 = 完全禁疗。消费者：Heal。
 		//    ⚠️ 因为"0"在这里是**有意义的值**（禁疗）而不是"没配"，所以基础值必须在构造函数里就位

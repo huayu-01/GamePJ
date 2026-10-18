@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Testing/WingDiveProbe.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Scenes/Levels/TestArena.tscn" id="2"]
+
+[node name="WingDiveProbe" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Arena" parent="." instance=ExtResource("2")]

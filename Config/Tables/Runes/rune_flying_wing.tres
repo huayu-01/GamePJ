@@ -15,14 +15,20 @@ Stat = "MaxFallSpeedMultiplier"
 Operation = 1
 Value = 0.8
 
+[sub_resource type="Resource" id="Resource_m2"]
+script = ExtResource("1_stat")
+Stat = "DiveSpeedMultiplier"
+Operation = 1
+Value = 1.3
+
 [resource]
 script = ExtResource("2_row")
 RewardKind = 0
 MaxStacks = 1
-Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1"), SubResource("Resource_m2")]
 Slot = 8
 UnlocksRequires = Array[String]([])
 Id = "rune_flying_wing"
 DisplayName = "飞翼"
-DescriptionTemplate = "跳跃高度与上升速度 +30%；正常下落速度 −20%。"
-Note = "[J11 新增行·符文] 文档第 10 行「飞翼:跳跃高度更高,提高上升速度,降低正常下落速度,下落攻击的下落速度更快」——**文档一个数都没给**（全是描述）。预设 **起跳速度 ×1.3**（跳跃高度按平方关系 ≈ +69%，「更高」这条一次给足）+ **正常下落上限 ×0.8**（「降低正常下落速度」）+「提高上升速度」与起跳同一条（起跳速度就是上升初速）。⚠️ **「下落攻击的下落速度更快」这一半没有实现**：它要改 `FallAttackAbility.DiveSpeed`，而 `FallAttackAbility` 属于本批硬约束里不许碰的共用 `Ability` 子类；将来只需给它加一个读 `DiveSpeedMultiplier` 的入口，然后本行加一条 Modifier 即可（不用改符文系统的任何代码）。"
+DescriptionTemplate = "起跳速度 ×{Modifiers.JumpVelocityMultiplier:0.##}；正常下落速度上限 ×{Modifiers.MaxFallSpeedMultiplier:0.##}；下落攻击速度 ×{Modifiers.DiveSpeedMultiplier:0.##}。"
+Note = "J27补全后续构筑原文飞翼：跳跃更高、上升更快、正常下落更慢、下落攻击更快。原文未给数值；沿用起跳×1.3、正常下落上限×0.8，下冲×1.3为可调预设，平衡后置。下冲在真实Action读取倍率后冻结整个速度矢量，保留长枪斜向垂直分量及既有伤害公式，不改正常下落夹速。说明共读Modifiers.Value。"

@@ -27,6 +27,15 @@ public partial class FallAttackAbility : Ability
 	[ExportGroup("下落攻击（被动「落」）")]
 	/// <summary>下冲总速度（m/s）；伤害只取该方向的垂直向下分量。</summary>
 	[Export] public float DiveSpeed { get; set; } = 34f;
+	/// <summary>Action起动时读取单位倍率；未配置为1，整条速度矢量一起缩放，保留斜向下冲。</summary>
+	public float EffectiveDiveSpeed
+	{
+		get
+		{
+			float multiplier = OwnerUnit?.Stats.Get("DiveSpeedMultiplier") ?? 1f;
+			return Mathf.Abs(DiveSpeed) * (multiplier > 0f ? multiplier : 1f);
+		}
+	}
 
 	/// <summary>下落期间命中盒的开启时长上限（秒；落地会提前结束）。</summary>
 	[Export] public float MaxDiveSeconds { get; set; } = 4f;
@@ -157,7 +166,7 @@ public partial class FallAttackAbility : Ability
 		if (name != AnimEvent || _diving || _landed || OwnerUnit == null || Movement == null) return;
 		if (Movement.IsGrounded) { Cancel(); return; }
 		LastDiveDirection = ResolveDiveDirection();
-		Vector3 velocity = LastDiveDirection * Mathf.Abs(DiveSpeed);
+		Vector3 velocity = LastDiveDirection * EffectiveDiveSpeed;
 		if (!Movement.BeginVelocityOverride(this, velocity)) { Cancel(); return; }
 		LastDownwardSpeed = Mathf.Max(0, -velocity.Y);
 		LastDamageBonus = DamageMultiplierForDive(LastFallHeight, LastDownwardSpeed) - 1;

@@ -1,0 +1,222 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=9FD4787436FD4EAFAEA11372C2745276A7D35D4FCF192456825E7C1ADDFD02B4
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.14
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 338 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.16
+
+wing_dive exit=1 seconds=11.64 stderrBytes=0
+=== wing_dive ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 21:56:02 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 21:56:02 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 21:56:02 [Flow] === 新的一局 ===
+[log] 21:56:02 [Flow] 日志文件：user://logs/run_20261018_215602.log
+[log] 21:56:02 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 21:56:02 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 21:56:02 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 21:56:02 [Config] 奔跑：角色行暂时读不到（RunSetup.Character=WeaponMaster / 角色表 0 行）→ 先按「sprint」/ 倍率 1 跑，表就绪后会再套一次
+[log] 21:56:02 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 21:56:02 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 21:56:02 [Config] 增幅项表：70 条（来源：表）—— 强化 17 / 进化 23 / 异化 30。
+[log] 21:56:02 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 18 条，其余走「标签匹配 → 通用」两层
+[log] 21:56:02 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 21:56:02 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 21:56:02 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 21:56:02 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 21:56:02 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 21:56:02 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 21:56:02 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 21:56:02 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:56:02 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:56:02 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:56:02 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:02 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 21:56:02 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 WingDiveProbe
+[log] 21:56:02 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 21:56:02 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[WingDive] FAIL SpiritSword 实际单位下冲倍率0，期望1
+[log] 21:56:02 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 21:56:03 [Combat] 下落攻击：skl_b_fall Action起动，起手离地11.9739m，参考耗时0.3522s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[WingDive] PASS SpiritSword 真实按键→动画Action启动下落攻击
+[WingDive] PASS SpiritSword 起动快照垂直速34，表内速度34×1后保留方向垂直分量
+[WingDive] PASS SpiritSword 真实物理位移速度34m/s，期望34；不被正常下落夹速覆盖
+[log] 21:56:03 [Combat] 伤害 Player(240) → @CharacterBody3D@243(9964) 36
+[log] 21:56:03 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 21:56:03 [Combat] 下落攻击：skl_b_fall 落地（起手高度 11.97m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 21:56:03 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[log] 21:56:03 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 36 = 上游 36 ×1，半径/形状来自本行命中体，第 1 次触发）—— 上游下落攻击本身没有改动。
+[log] 21:56:03 [Combat] 伤害 Player(240) → @CharacterBody3D@243(9928) 36
+[WingDive] PASS SpiritSword 真实World落地且只派发一次落地事件
+[log] 21:56:03 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[WingDive] PASS 落地收招归还普通移动，不残留下冲速度覆盖
+[WingDive] PASS SpiritSword 加速前后均真实命中地面敌人，伤害72
+[WingDiveSample] SpiritSword scale=1 height=11.974 vertical=34 physical=34 duration=0.301 damage=36
+[log] 21:56:03 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:03 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 WingDiveProbe
+[WingDive] FAIL SpiritSword 实际单位下冲倍率0，期望1.3
+[log] 21:56:03 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 21:56:03 [Combat] 下落攻击：skl_b_fall Action起动，起手离地11.9913m，参考耗时0.3527s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[WingDive] PASS SpiritSword 真实按键→动画Action启动下落攻击
+[WingDive] FAIL SpiritSword 起动快照垂直速34，表内速度34×1.3后保留方向垂直分量
+[WingDive] FAIL SpiritSword 真实物理位移速度34m/s，期望44.2；不被正常下落夹速覆盖
+[log] 21:56:04 [Combat] 伤害 Player(240) → @CharacterBody3D@247(9964) 36
+[log] 21:56:04 [Combat] 下落攻击：skl_b_fall 落地（起手高度 11.99m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 21:56:04 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[log] 21:56:04 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 36 = 上游 36 ×1，半径/形状来自本行命中体，第 2 次触发）—— 上游下落攻击本身没有改动。
+[log] 21:56:04 [Combat] 伤害 Player(240) → @CharacterBody3D@247(9928) 36
+[WingDive] PASS SpiritSword 真实World落地且只派发一次落地事件
+[log] 21:56:04 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 2 次；纯视觉，不改判定）
+[WingDive] PASS 落地收招归还普通移动，不残留下冲速度覆盖
+[WingDive] PASS SpiritSword 加速前后均真实命中地面敌人，伤害72
+[WingDiveSample] SpiritSword scale=1.3 height=11.991 vertical=34 physical=34 duration=0.297 damage=36
+[WingDive] FAIL SpiritSword 飞翼垂直速度×1.3且落地更快：34→34m/s，0.301→0.297s
+[log] 21:56:04 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:04 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 WingDiveProbe
+[log] 21:56:04 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[WingDive] FAIL Scythe 实际单位下冲倍率0，期望1
+[log] 21:56:04 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 21:56:04 [Combat] 下落攻击：skl_b_fall Action起动，起手离地11.9913m，参考耗时0.3527s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[WingDive] PASS Scythe 真实按键→动画Action启动下落攻击
+[WingDive] PASS Scythe 起动快照垂直速34，表内速度34×1后保留方向垂直分量
+[WingDive] PASS Scythe 真实物理位移速度34m/s，期望34；不被正常下落夹速覆盖
+[log] 21:56:04 [Combat] 伤害 Player(240) → @CharacterBody3D@252(9964) 36
+[log] 21:56:04 [Combat] 下落攻击：skl_b_fall 落地（起手高度 11.99m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 21:56:04 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 3 次；纯视觉，不改判定）
+[WingDive] PASS Scythe 真实World落地且只派发一次落地事件
+[WingDive] PASS 落地收招归还普通移动，不残留下冲速度覆盖
+[WingDive] PASS Scythe 加速前后均真实命中地面敌人，伤害36
+[WingDiveSample] Scythe scale=1 height=11.991 vertical=34 physical=34 duration=0.304 damage=36
+[log] 21:56:05 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:05 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 WingDiveProbe
+[WingDive] FAIL Scythe 实际单位下冲倍率0，期望1.3
+[log] 21:56:05 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 21:56:05 [Combat] 下落攻击：skl_b_fall Action起动，起手离地11.9913m，参考耗时0.3527s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[WingDive] PASS Scythe 真实按键→动画Action启动下落攻击
+[WingDive] FAIL Scythe 起动快照垂直速34，表内速度34×1.3后保留方向垂直分量
+[WingDive] FAIL Scythe 真实物理位移速度34m/s，期望44.2；不被正常下落夹速覆盖
+[log] 21:56:05 [Combat] 伤害 Player(240) → @CharacterBody3D@255(9964) 36
+[log] 21:56:05 [Combat] 下落攻击：skl_b_fall 落地（起手高度 11.99m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 21:56:05 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 4 次；纯视觉，不改判定）
+[WingDive] PASS Scythe 真实World落地且只派发一次落地事件
+[WingDive] PASS 落地收招归还普通移动，不残留下冲速度覆盖
+[WingDive] PASS Scythe 加速前后均真实命中地面敌人，伤害36
+[WingDiveSample] Scythe scale=1.3 height=11.991 vertical=34 physical=34 duration=0.297 damage=36
+[WingDive] FAIL Scythe 飞翼垂直速度×1.3且落地更快：34→34m/s，0.304→0.297s
+[log] 21:56:05 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:05 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 WingDiveProbe
+[log] 21:56:05 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[WingDive] FAIL Spear 实际单位下冲倍率0，期望1
+[log] 21:56:05 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 21:56:06 [Combat] 下落攻击：skl_b_fall Action起动，起手离地11.9913m，参考耗时0.3527s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[WingDive] PASS Spear 真实按键→动画Action启动下落攻击
+[WingDive] PASS Spear 起动快照垂直速34，表内速度34×1后保留方向垂直分量
+[WingDive] PASS Spear 真实物理位移速度34m/s，期望34；不被正常下落夹速覆盖
+[log] 21:56:06 [Combat] 伤害 Player(240) → @CharacterBody3D@257(9964) 36
+[log] 21:56:06 [Combat] 下落攻击：skl_b_fall 落地（起手高度 11.99m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 21:56:06 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 5 次；纯视觉，不改判定）
+[WingDive] PASS Spear 真实World落地且只派发一次落地事件
+[WingDive] PASS 落地收招归还普通移动，不残留下冲速度覆盖
+[WingDive] PASS Spear 加速前后均真实命中地面敌人，伤害36
+[WingDiveSample] Spear scale=1 height=11.991 vertical=34 physical=34 duration=0.304 damage=36
+[log] 21:56:06 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:06 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 WingDiveProbe
+[WingDive] FAIL Spear 实际单位下冲倍率0，期望1.3
+[log] 21:56:06 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 21:56:06 [Combat] 下落攻击：skl_b_fall Action起动，起手离地11.9913m，参考耗时0.3527s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[WingDive] PASS Spear 真实按键→动画Action启动下落攻击
+[WingDive] FAIL Spear 起动快照垂直速34，表内速度34×1.3后保留方向垂直分量
+[WingDive] FAIL Spear 真实物理位移速度34m/s，期望44.2；不被正常下落夹速覆盖
+[log] 21:56:07 [Combat] 伤害 Player(240) → @CharacterBody3D@260(9964) 36
+[log] 21:56:07 [Combat] 下落攻击：skl_b_fall 落地（起手高度 11.99m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 21:56:07 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 6 次；纯视觉，不改判定）
+[WingDive] PASS Spear 真实World落地且只派发一次落地事件
+[WingDive] PASS 落地收招归还普通移动，不残留下冲速度覆盖
+[WingDive] PASS Spear 加速前后均真实命中地面敌人，伤害36
+[WingDiveSample] Spear scale=1.3 height=11.991 vertical=34 physical=34 duration=0.297 damage=36
+[WingDive] FAIL Spear 飞翼垂直速度×1.3且落地更快：34→34m/s，0.304→0.297s
+[log] 21:56:07 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:07 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 WingDiveProbe
+[WingDive] FAIL Spear 实际单位下冲倍率0，期望2
+[log] 21:56:07 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 21:56:07 [Combat] 下落攻击：skl_b_fall Action起动，起手离地11.9913m，参考耗时0.3527s，垂直速30.5122m/s，倍率2，伤害36，方向(0, -0.8974187, -0.4411799)
+[WingDive] PASS Spear 真实按键→动画Action启动下落攻击
+[WingDive] FAIL Spear 起动快照垂直速30.512，表内速度34×2后保留方向垂直分量
+[WingDive] PASS 长枪真实准星斜向下冲，倍率不改变方向
+[WingDive] FAIL Action后移除符文，属性恢复默认1
+[log] 21:56:07 [Combat] 单位动画切换：Player idle → sprint（当前速度 15，阈值 0.15/4）
+[WingDive] FAIL Spear 真实物理位移速度34m/s，期望68；不被正常下落夹速覆盖
+[WingDive] PASS 飞行中的速度保持Action快照，移除只影响下一次下冲
+[log] 21:56:07 [Combat] 下落攻击：skl_b_fall 落地（起手高度 11.99m，伤害 36）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 21:56:07 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 7 次；纯视觉，不改判定）
+[WingDive] PASS Spear 真实World落地且只派发一次落地事件
+[log] 21:56:08 [Combat] 单位动画切换：Player sprint → idle（当前速度 0，阈值 0.15/4）
+[WingDive] PASS 落地收招归还普通移动，不残留下冲速度覆盖
+[WingDiveSample] Spear scale=2 height=11.991 vertical=30.512 physical=34 duration=0.331 damage=36
+[WingDive] PASS 只改飞翼表倍率2后说明同步：跳跃高度与上升速度 +30%；正常下落速度 −20%。
+[log] 21:56:08 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:08 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 WingDiveProbe
+[WingDive] PASS 真实自然下落达到独立速度上限60m/s
+[WingDive] PASS 自然下落速度60只读正常下落倍率1，不读下冲倍率
+[log] 21:56:10 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:10 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 WingDiveProbe
+[WingDive] PASS 真实自然下落达到独立速度上限48m/s
+[WingDive] PASS 自然下落速度48只读正常下落倍率0.8，不读下冲倍率
+[log] 21:56:11 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:11 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 WingDiveProbe
+[log] 21:56:11 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 21:56:11 [Combat] 下落攻击：skl_b_fall Action起动，起手离地11.9739m，参考耗时0.3522s，垂直速34m/s，倍率2，伤害36，方向(0, -1, 0)
+[WingDive] PASS 打断用例先经真实Action开始下冲
+[log] 21:56:11 [Combat] 动作交接：skl_b_fall 被 skl_b_skill_1 打断（动画时间0.3s）。
+[log] 21:56:11 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[WingDive] PASS 真实闪打断下冲，不伪造落地攻击
+[log] 21:56:11 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:56:11 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 WingDiveProbe
+[WingDive] FAIL 卸除／换装后倍率与速度覆盖均复原
+[WingDive] === 飞翼下落验收结束：通过 42，失败 20 ===
+[log] 21:56:12 [Exit] 音频退出回收：真实等待88ms。
+[log] 21:56:12 [Audio] 音效统计：共 8 次 —— sfx_combat_hit×8（缺失 id 0 个）
+
+wing_dive 未通过：F:\Godot项目\项目a\.ai_j27_20261018_215553.wing_dive.log / F:\Godot项目\项目a\.ai_j27_20261018_215553.wing_dive.err
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.14
+
+=== 失败现场构建 ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 338 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.16

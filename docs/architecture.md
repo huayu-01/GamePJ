@@ -1,5 +1,7 @@
 # 架构说明
 
+J27下落攻击倍率`DiveSpeedMultiplier`默认1，真实Action读取并冻结速度矢量；正常下落仍用独立的MaxFallSpeedMultiplier。飞翼复用StatSet表修饰器，说明共读Modifiers.Value，不新增处理器或奖励Id特判。[真实直落／斜向物理速度](character-design-j27.md)。
+
 J26灵魂收割与死铠累计同样自行成对订阅／退订本人Kill事实，不生成攻击，不套通用攻击链门。掉落概率、回血及拾取参数、加甲间隔仍读原表，说明共读HandlerParams；通用TriggerRule不放宽。[真实同链与拾取验收](character-design-j26.md)。
 
 J25纯击杀计数`KillAirJumpRule`自行成对订阅／退订事实总线，不生成新命中，因此独立于通用攻击链的冷却、每链次数和深度门。`GrantAirJumps`一次性更新容量与立即可用次数，满容量后仍能补回；被动继续用幂等`SetExtraAirJumps`，不会每帧回填。增量／上限来自表。[逐杀与真实空中跳验收](character-design-j25.md)。

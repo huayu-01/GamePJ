@@ -271,7 +271,7 @@ public partial class RuneProbe : Node3D
 		float jumpVelocity = _player.Movement?.EffectiveJumpVelocity ?? 0f;
 		Check(Mathf.IsEqualApprox(jump, 1.3f) && Mathf.IsEqualApprox(fall, 0.8f),
 			$"⑤ 飞翼：起跳 ×{jump:0.###}（期望 ×1.3）/ 正常下落上限 ×{fall:0.###}（期望 ×0.8）");
-		Check(jumpVelocity > 13f, $"⑤ 飞翼：真实起跳速度 {jumpVelocity:0.###} m/s（角色行固定值 13 × 1.3 = 16.9；「下落攻击的下落速度」那一半本批**未实现**，见行 Note）");
+		Check(jumpVelocity > 13f, $"⑤ 飞翼：真实起跳速度 {jumpVelocity:0.###} m/s（角色行固定值 13 × 1.3 = 16.9；J27下落攻击实际速度由_WingDiveProbe独立验证）");
 
 		_run.SetCarriedRune("rune_death_armor");
 		await Wait(0.1);
