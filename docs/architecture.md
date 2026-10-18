@@ -94,6 +94,8 @@ J4三维技能位移由`CharacterMovement`按来源持有速度覆盖，技能�
 
 ## Unit 与表现的分工
 
+**J17金光大道**：复用近战单段模式，指定原连招index2；SkillEnhancementTuning.ForwardReachScale只缩放盒形判定Z及其前伸中心，宽高与其他技能保持，换装清理。只该刀伤害乘1.5，替换旧全局Damage／Range修饰，真实武技2隔离见 [J17](character-design-j17.md)。
+
 **J16气贯长虹**：WeaponRecallTuning从原技能行确定性缩放三项蓄力时间，SpearThrowAbility换装恢复召回策略；真实落地自动回手沿用WeaponThrowAbility既有状态机。长枪高频预览、投掷射线及AttackHitbox扫掠查询参数及时Dispose，避免大量临时资源积压到退出终结；首轮退出失败和复验边界见 [J16](character-design-j16.md)，不等同于引擎终结器修复。
 
 **J15喜爱**：ScytheThrowAbility在真实离手后按游戏秒周期，以拥有者位置选最近敌对单位；WeaponThrowAbility提供受保护的重定向飞行段，复用World、射程、周期伤害与回手状态机。默认无重定向不改变旧路径，回程停止索敌，换装清理。参数使用WeaponSeekTuning资源引用，见 [J15](character-design-j15.md)。

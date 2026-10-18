@@ -1,5 +1,7 @@
 # 增幅系统 · 三层判定（限定 / 互斥 / 前置）—— P5 接入契约
 
+> **2026-10-18 J17更新**：金光大道迁SkillEnhancement，指定ComboStepIndex=2、DamageScale=1.5、ForwardReachScale=1.3；只延长前方盒子和中心偏移，宽高保持，去掉旧全局修饰。真实伤害／内外靶／武技2隔离与换装见 [J17](character-design-j17.md)。距离倍率为可配预设；下一项浮光跃金。
+
 > **2026-10-18 J16更新**：气贯长虹迁强类型 `WeaponRecallTuning`／`WeaponRecall`，缩放原目标技能行的基础／每档／总上限，同时配置手动false／落地自动true，不新增字符串属性反射。真实ATK、落地同帧回程、往返各一次命中与换装还原见 [J16](character-design-j16.md)。当前下一项金光大道，下面半接清单为历史。
 
 > **2026-10-18 J15更新**：喜爱迁 `WeaponSeek` 处理器＋强类型 `WeaponSeekTuning`，真实离手后每2秒按玩家距离索敌，悬停续飞、周期伤害与回手保持。默认关闭，配装清理；连续World墙面重试阻挡已验。见 [J15](character-design-j15.md)。下方旧占位清单为历史，当前下一项气贯长虹。

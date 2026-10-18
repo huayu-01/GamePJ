@@ -126,11 +126,13 @@ public partial class MeleeComboAbility : Ability
 	private MeleeProjectileTuning? _extraProjectile;
 	private int? _singleStep;
 	private float _singleStepDamageScale = 1f, _singleStepSizeScale = 1f;
-	public void ConfigureSingleStep(int step, float damageScale, float sizeScale)
+	private float _singleStepForwardReachScale = 1f;
+	public void ConfigureSingleStep(int step, float damageScale, float sizeScale, float forwardReachScale = 1f)
 	{
 		_singleStep = step;
 		_singleStepDamageScale = Mathf.Max(0f, damageScale);
 		_singleStepSizeScale = Mathf.Max(0.01f, sizeScale);
+		_singleStepForwardReachScale = Mathf.Max(0.01f, forwardReachScale);
 	}
 	public void ConfigureExtraProjectile(MeleeProjectileTuning tuning) => _extraProjectile = tuning;
 	protected override void OnLoadoutReset()
@@ -139,6 +141,7 @@ public partial class MeleeComboAbility : Ability
 		ExtraProjectileCount = 0;
 		_singleStep = null;
 		_singleStepDamageScale = _singleStepSizeScale = 1f;
+		_singleStepForwardReachScale = 1f;
 	}
 
 	/// <summary>本段斩断了几个子弹（自测取证）。</summary>
@@ -635,13 +638,15 @@ public partial class MeleeComboAbility : Ability
 		}
 
 		Vector3 size = StepValue(_boxSizes, step, _sceneBoxSize) * MeleeRangeMultiplier * _singleStepSizeScale;
+		if (size.Z > 0.0001f) size.Z *= _singleStepForwardReachScale;
 		CurrentStepBoxSize = size;
 
 		float offset = StepValue(_boxOffsets, step, float.NaN);
 		if (!float.IsNaN(offset))
 		{
 			Vector3 position = _hitbox.Position;
-			position.Z = -offset;
+			// 长度与中心一起前伸，保留靠近玩家的一端，宽高保持原值。
+			position.Z = -offset * (size.Z > 0.0001f ? _singleStepForwardReachScale : 1f);
 			_hitbox.Position = position;
 		}
 
