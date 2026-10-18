@@ -12,8 +12,10 @@ public readonly record struct AttackOffense(float DamageMultiplier, float CritCh
 		bool player = owner?.Faction == Faction.Player;
 		float chance = player ? stats!.Get("BaseCritChance") : fallbackChance;
 		float multiplier = player ? stats!.Get("BaseCritMultiplier") : fallbackMultiplier;
-		return new AttackOffense(stats?.Get("DamageMultiplier") ?? 1f,
-			Mathf.Clamp(chance + (stats?.Get("CritChanceAdd") ?? 0f), 0f, 1f),
+		float rawChance = chance + (stats?.Get("CritChanceAdd") ?? 0f);
+		float overflow = Mathf.Max(0f, rawChance - 1f) * (stats?.Get("CritOverflowToDamage") ?? 0f);
+		return new AttackOffense((stats?.Get("DamageMultiplier") ?? 1f) * (1f + overflow),
+			Mathf.Clamp(rawChance, 0f, 1f),
 			Mathf.Max(1f, multiplier + (stats?.Get("CritMultiplierAdd") ?? 0f)));
 	}
 }
@@ -35,6 +37,8 @@ public sealed class AttackInstance
 	public bool CanCrit { get; init; }
 	/// <summary>状态周期伤害事实；不作为新主攻击再次触发命中增幅。</summary>
 	public bool IsDamageOverTime { get; init; }
+	/// <summary>特化派生伤害，不再次触发同一套主攻击规则。</summary>
+	public bool IsSecondary { get; init; }
 	public float CritChance { get; init; }
 	public float CritMultiplier { get; init; } = 2f;
 	public float Knockback { get; init; }

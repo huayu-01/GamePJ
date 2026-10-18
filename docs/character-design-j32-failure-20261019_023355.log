@@ -1,0 +1,614 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=9FD4787436FD4EAFAEA11372C2745276A7D35D4FCF192456825E7C1ADDFD02B4
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 327 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.38
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 325 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:02.98
+
+specialization exit=1 seconds=6.27 stderrBytes=0
+=== specialization ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 02:34:04 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 02:34:04 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 02:34:04 [Flow] === 新的一局 ===
+[log] 02:34:04 [Flow] 日志文件：user://logs/run_20261019_023404.log
+[log] 02:34:04 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 02:34:04 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 02:34:04 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 02:34:04 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 02:34:04 [Config] 增幅项表：90 条（来源：表）—— 强化 23 / 进化 33 / 异化 34。
+[log] 02:34:04 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 02:34:04 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 0 个
+[log] 02:34:04 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 02:34:04 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 02:34:04 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 02:34:04 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 02:34:04 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 02:34:04 [Config] 配置表：武器 6 / 角色 2 / 敌人 10 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[Specialization] PASS 23项特化全部进生产索引且类型唯一
+[Specialization] PASS 旧三项退出生产目录，70-3+23=90
+[Specialization] PASS 22项有明确符文前置，暴风没有额外前置
+[Specialization] PASS 真实行可编译且说明参数展开 引雷符
+[Specialization] PASS 真实行可编译且说明参数展开 雷凯
+[Specialization] PASS 真实行可编译且说明参数展开 血战
+[Specialization] PASS 真实行可编译且说明参数展开 血铠
+[Specialization] PASS 真实行可编译且说明参数展开 死斗
+[Specialization] PASS 真实行可编译且说明参数展开 风之心
+[Specialization] PASS 真实行可编译且说明参数展开 风凯
+[Specialization] PASS 真实行可编译且说明参数展开 雷之心
+[Specialization] PASS 真实行可编译且说明参数展开 雷池
+[Specialization] PASS 真实行可编译且说明参数展开 落雷术
+[Specialization] PASS 真实行可编译且说明参数展开 风之领域
+[Specialization] PASS 真实行可编译且说明参数展开 战斗之矛
+[Specialization] PASS 真实行可编译且说明参数展开 战斗残影
+[Specialization] PASS 真实行可编译且说明参数展开 嗜血
+[Specialization] PASS 真实行可编译且说明参数展开 风剑
+[Specialization] PASS 真实行可编译且说明参数展开 风痕
+[Specialization] PASS 真实行可编译且说明参数展开 风场
+[Specialization] PASS 真实行可编译且说明参数展开 雷法
+[Specialization] PASS 真实行可编译且说明参数展开 暴雷
+[Specialization] PASS 真实行可编译且说明参数展开 暴力
+[Specialization] PASS 真实行可编译且说明参数展开 战斗之心
+[Specialization] PASS 真实行可编译且说明参数展开 狂风
+[Specialization] PASS 真实行可编译且说明参数展开 暴风
+[Specialization] PASS 无符文只有暴风可抽 chr_hunter/wpn_energy_palm
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_energy_palm/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_energy_palm/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_energy_palm/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_hunter/wpn_crossbow
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_crossbow/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_crossbow/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_crossbow/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_hunter/wpn_bow
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_bow/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_bow/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_bow/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_hunter/wpn_spirit_sword
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_spirit_sword/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_spirit_sword/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_spirit_sword/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_hunter/wpn_scythe
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_scythe/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_scythe/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_scythe/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_hunter/wpn_spear
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_spear/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_spear/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_hunter/wpn_spear/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_weapon_master/wpn_energy_palm
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_energy_palm/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_energy_palm/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_energy_palm/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_weapon_master/wpn_crossbow
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_crossbow/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_crossbow/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_crossbow/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_weapon_master/wpn_bow
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_bow/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_bow/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_bow/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_weapon_master/wpn_spirit_sword
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_spirit_sword/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_spirit_sword/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_spirit_sword/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_weapon_master/wpn_scythe
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_scythe/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_scythe/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_scythe/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 无符文只有暴风可抽 chr_weapon_master/wpn_spear
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_spear/雷之印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_spear/战神刻印
+[Specialization] PASS 已获得的特化不再次出现
+[Specialization] PASS 真实候选与派系／B2双限定 chr_weapon_master/wpn_spear/风之印
+[Specialization] PASS 已获得的特化不再次出现
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(995) 5
+[Specialization] PASS 攻击没有引雷的目标施加引雷
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(990) 5
+[Specialization] PASS 重复攻击不叠加或刷新4秒引雷
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(950) 40
+[Specialization] PASS 4秒后天雷单体40伤害：950 / 950
+[Specialization] PASS 未获得暴雷不波及邻敌：1000 / 1000
+[Specialization] PASS 天雷清除引雷，之后可重挂
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(949) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(948) 1
+[Specialization] PASS 派生与DoT命中不自续引雷／闪电链
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(947) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(935) 12
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@246(988) 12
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(921) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@246(974) 14
+[Specialization] PASS 雷法主动引爆：主击1＋链14＋天雷40×30%：27 / 27
+[Specialization] PASS 暴雷范围12＋闪电链14，敌人不重复命中：26 / 26
+[Specialization] PASS 主动引爆消标，派生链不递归
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(921) 0
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(909) 12
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@246(962) 12
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@248(988) 12
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@244(895) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@246(948) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@248(974) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@250(986) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@241(100) → @CharacterBody3D@252(986) 14
+[Specialization] PASS 雷法额外两跳，至少五名敌人承受链伤害
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@257(100) → @CharacterBody3D@260(90) 10
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@257(100) → @CharacterBody3D@260(76) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@257(100) → @CharacterBody3D@244(881) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@257(100) → @CharacterBody3D@246(934) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@260(76) → @CharacterBody3D@257(100) 0
+[Specialization] PASS 雷凯护甲受伤反10＋闪电链14：76 / 76
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@257(100) → @CharacterBody3D@260(66) 10
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@257(100) → @CharacterBody3D@260(52) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@257(100) → @CharacterBody3D@244(867) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@257(100) → @CharacterBody3D@246(920) 14
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@260(52) → @CharacterBody3D@257(100) 0
+[Specialization] PASS 完全格挡即使不损护甲仍反击：52 / 52
+[Specialization] PASS 血战满血不加伤：10 / 10
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@264(10000) → @CharacterBody3D@261(50) 50
+[Specialization] PASS 血战半血增加100%：20 / 20
+[Specialization] PASS 血铠已有护甲转生命上限：120 / 120
+[Specialization] PASS 血铠不保留护甲：0 / 0
+[Specialization] PASS 后续获得的护甲转生命：125 / 125
+[Specialization] PASS 回满不重新产生旧护甲：0 / 0
+[Specialization] PASS 暴力暴击上限100%：1 / 1
+[Specialization] PASS 155%暴击溢出55%转攻击力：1.55 / 1.55
+[Specialization] PASS 战斗之心将后获得的三档坚硬全部转走：0 / 0
+[Specialization] PASS 5%＋10%＋15%坚硬按1:2转60%爆伤：0.6 / 0.6
+[Specialization] PASS 不吞其他来源减伤：0.2 / 0.2
+[Specialization] PASS 战斗之心移速：1.3 / 1.3
+[Specialization] PASS 战斗之心攻击：1.5 / 1.5
+[Specialization] PASS 战斗之心暴击：0.2 / 0.2
+[Specialization] PASS 先坚硬再战斗之心结果一致：0.1 / 0.1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9999) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9998) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9997) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9996) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9995) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9994) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9993) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9992) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9991) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9990) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9989) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9988) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9987) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9986) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9985) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9984) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9983) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9982) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9981) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9980) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9979) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9978) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9977) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9976) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9975) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9974) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9973) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9972) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9971) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9970) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9969) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9968) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9967) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9966) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9965) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9964) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9963) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9962) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9961) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9960) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9959) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9958) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9957) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9956) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9955) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9954) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9953) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9952) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9951) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9950) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9949) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9948) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9947) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9946) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9945) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9944) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9943) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9942) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9941) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9940) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9939) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9938) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9937) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9936) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9935) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9934) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9933) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9932) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9931) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9930) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9929) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9928) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9927) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9926) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9925) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9924) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9923) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9922) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9921) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9920) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9919) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9918) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9917) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9916) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9915) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9914) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9913) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9912) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9911) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9910) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9909) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9908) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9907) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9906) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9905) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9904) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9903) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9902) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9901) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9900) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9899) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9898) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9897) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9896) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9895) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9894) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9893) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9892) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9891) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9890) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9889) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9888) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9887) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9886) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9885) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9884) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9883) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9882) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9881) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9880) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9879) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9878) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9877) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9876) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9875) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9874) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9873) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9872) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9871) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9870) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9869) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9868) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9867) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9866) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9865) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9864) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9863) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9862) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9861) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9860) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9859) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9858) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9857) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9856) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9855) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9854) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9853) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9852) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9851) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9850) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9849) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9848) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9847) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9846) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9845) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9844) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9843) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9842) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9841) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9840) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9839) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9838) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9837) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9836) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9835) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9834) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9833) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9832) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9831) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9830) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9829) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9828) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9827) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9826) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9825) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9824) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9823) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9822) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9821) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9820) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9819) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9818) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9817) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9816) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9815) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9814) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9813) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9812) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9811) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9810) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9809) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9808) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9807) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9806) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9805) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9804) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9803) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9802) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9801) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9800) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9799) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9798) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9797) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9796) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9795) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9794) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9793) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9792) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9791) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9790) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9789) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9788) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9787) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9786) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9785) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9784) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9783) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9782) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9781) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9780) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9779) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9778) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9777) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9776) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9775) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9774) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9773) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9772) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9771) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9770) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9769) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9768) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9767) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9766) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9765) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9764) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9763) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9762) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9761) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9760) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9759) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9758) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9757) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9756) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9755) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9754) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9753) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9752) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9751) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9750) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9749) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9748) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9747) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9746) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9745) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9744) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9743) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9742) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9741) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9740) 1
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@273(100) → @CharacterBody3D@276(9739) 1
+[Specialization] PASS 30%残影真实随机触发 61/200
+[Specialization] PASS 残影只额外造成一次，无递归：9739 / 9739
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@264(10000) → @CharacterBody3D@277(50) 50
+[log] 02:34:04 [Combat] 死亡 @CharacterBody3D@280(0) 击杀者=@CharacterBody3D@277(50)
+[log] 02:34:04 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 02:34:04 [Combat] 击杀 @CharacterBody3D@280(0) by @CharacterBody3D@277(50)
+[Specialization] PASS 嗜血逐渐恢复而非瞬间回满：52.5 / 52.5
+[Specialization] PASS 嗜血暴击10%：0.1 / 0.1
+[log] 02:34:04 [Combat] 死亡 @CharacterBody3D@282(0) 击杀者=@CharacterBody3D@277(52.5)
+[log] 02:34:04 [Combat] 击杀 @CharacterBody3D@282(0) by @CharacterBody3D@277(52.5)
+[Specialization] PASS 重复击杀刷新暴击而不叠出额外层数：0.1 / 0.1
+[Specialization] PASS 嗜血到期撤销临时暴击：0 / 0
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@264(10000) → @CharacterBody3D@283(0) 100
+[Specialization] PASS 死斗致命伤保留0血状态，不伪造治疗或无敌
+[log] 02:34:04 [Combat] 死亡 @CharacterBody3D@286(0) 击杀者=@CharacterBody3D@267(100)
+[log] 02:34:04 [Combat] 击杀 @CharacterBody3D@286(0) by @CharacterBody3D@267(100)
+[Specialization] PASS 别人击杀不计入死斗
+[log] 02:34:04 [Combat] 死亡 @CharacterBody3D@288(0) 击杀者=@CharacterBody3D@283(0)
+[log] 02:34:04 [Combat] 击杀 @CharacterBody3D@288(0) by @CharacterBody3D@283(0)
+[log] 02:34:04 [Combat] 死亡 @CharacterBody3D@290(0) 击杀者=@CharacterBody3D@283(0)
+[log] 02:34:04 [Combat] 击杀 @CharacterBody3D@290(0) by @CharacterBody3D@283(0)
+[log] 02:34:04 [Combat] 死亡 @CharacterBody3D@292(0) 击杀者=@CharacterBody3D@283(0)
+[log] 02:34:04 [Combat] 击杀 @CharacterBody3D@292(0) by @CharacterBody3D@283(0)
+[Specialization] PASS 死斗限时内完成真实三杀
+[Specialization] PASS 死斗成功恢复30%：30 / 30
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@264(10000) → @CharacterBody3D@283(0) 30
+[log] 02:34:04 [Combat] 死亡 @CharacterBody3D@283(0) 击杀者=@CharacterBody3D@264(10000)
+[log] 02:34:04 [Combat] 击杀 @CharacterBody3D@283(0) by @CharacterBody3D@264(10000)
+[Specialization] PASS 20秒冷却期间不会再度避免死亡
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@264(10000) → @CharacterBody3D@293(0) 100
+[log] 02:34:04 [Combat] 死亡 @CharacterBody3D@293(0) 击杀者=-
+[Specialization] PASS 5秒未达击杀数会真正死亡
+[log] 02:34:04 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@295(100) → @CharacterBody3D@298(98) 2
+[log] 02:34:04 [Combat] 暴击 @CharacterBody3D@295(100) → @CharacterBody3D@298(98) 2
+[Specialization] PASS 真实暴击从玩家发射追踪箭
+[log] 02:34:04 [Combat] 伤害 @CharacterBody3D@295(100) → @CharacterBody3D@298(48) 50
+[log] 02:34:04 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[Specialization] PASS 追踪箭经过真实弹道命中并扣血
+[Specialization] PASS 派生箭不会再次触发战斗之矛
+[Specialization] PASS 风之心未奔跑不造成伤害：1000 / 1000
+[log] 02:34:05 [Combat] 伤害 @CharacterBody3D@299(100) → @CharacterBody3D@302(986.4) 13.6
+[Specialization] PASS 风之心周期12伤害正确叠加暴风13%加伤：986.44 / 986.44
+[Specialization] PASS 风凯奔跑减伤30%：0.7 / 0.7
+[Specialization] PASS 风痕普通旋风的一半大小：1.5 / 1.5
+[Specialization] PASS 奔跑沿路径留下固定旋风
+[Specialization] PASS 风痕持续3秒：3 / 3
+[Specialization] PASS 退出奔跑撤销风凯减伤：1 / 1
+[Specialization] PASS 暴风按6.5米移速提高13%伤害：1.13 / 1.13
+[Specialization] PASS 狂风使已存在的风痕同步增大：2.25 / 2.25
+[Specialization] PASS 狂风使大旋风同步增大：6 / 6
+[Specialization] PASS 风场持续18秒：18 / 18
+[Specialization] PASS 风场普通旋风也受狂风增大：4.5 / 4.5
+[Specialization] PASS 风场在范围内有效地面生成
+[log] 02:34:05 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:34:05 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 1 次）
+[Specialization] PASS 风剑未满1秒不发射
+[Specialization] PASS 奔跑满1秒朝敌人发射旋风弹
+[log] 02:34:05 [Combat] 伤害 @CharacterBody3D@311(100) → @CharacterBody3D@314(82) 18
+[Specialization] PASS 旋风弹经真实物理扫掠命中
+[log] 02:34:06 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 02:34:06 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:34:06 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:34:06 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 02:34:06 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 02:34:06 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 SpecializationProbe
+[log] 02:34:06 [Animation] 技能动画开播：Player → skills/Skill_A1_Leap（speed_scale=1，循环=False，事件帧 1 个：Action@0.15s）
+[Specialization] PASS 真实猎手角色技能2成功释放
+[Specialization] PASS 雷池订阅实际技能释放而非全局任意按键
+[log] 02:34:06 [Combat] 伤害 Player(220) → @CharacterBody3D@321(975) 25
+[Specialization] PASS 雷池周期性降下天雷
+[log] 02:34:06 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:34:06 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:34:06 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 02:34:06 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 02:34:06 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 02:34:06 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 SpecializationProbe
+[log] 02:34:06 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[Specialization] PASS B2真实无情开始出手
+[log] 02:34:06 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 02:34:06 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 02:34:07 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 02:34:07 [Combat] 抛掷：skl_b2_w1_2 朝 (-0, 0, -1) 出手（水平速 36 垂直初速 0，最远 8m，每 0.5s 一次周期伤害）
+[Specialization] PASS 无情真实动画事件后离手
+[Specialization] PASS 落雷术飞行速度18×2：36 / 36
+[log] 02:34:07 [Combat] 抛掷：skl_b2_w1_2 开始收回（累计周期伤害 0 次）
+[log] 02:34:07 [Combat] 伤害 Player(240) → @CharacterBody3D@325(9964) 36
+[log] 02:34:07 [Combat] 暴击 Player(240) → @CharacterBody3D@325(9964) 36
+[log] 02:34:07 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[Specialization] PASS 无情第二次按键被落雷术接管
+[Specialization] PASS 角色瞬移到武器中心
+[Specialization] PASS 立即派发一次100%倍率落地攻击
+[Specialization] FAIL 落地使用真实命中体立即造成100%倍率伤害：36 / 18
+[log] 02:34:07 [Combat] 抛掷：skl_b2_w1_2 武器已回到手上（第 1 次收回，累计周期伤害 0 次）
+[log] 02:34:07 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[Specialization] PASS 接触武器后真实回手解除锁门
+[log] 02:34:07 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:34:07 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:34:07 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 02:34:07 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 02:34:07 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 SpecializationProbe
+[log] 02:34:07 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[Specialization] PASS 风之领域无情开始出手
+[log] 02:34:07 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 02:34:07 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 02:34:08 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 02:34:08 [Combat] 抛掷：skl_b2_w1_2 朝 (-0, 0, -1) 出手（水平速 18 垂直初速 0，最远 8m，每 0.5s 一次周期伤害）
+[Specialization] PASS 武器停止后才产生领域
+[Specialization] PASS 领域大于普通旋风：5 / 5
+[Specialization] PASS 狂风覆盖无情领域：7.5 / 7.5
+[log] 02:34:08 [Combat] 抛掷：skl_b2_w1_2 开始收回（累计周期伤害 0 次）
+[Specialization] PASS 武器回程时领域停止伤害
+[Specialization] === 特化验收结束：通过 183，失败 1 ===
+[log] 02:34:08 [Exit] 音频退出回收：真实等待88ms。
+[log] 02:34:08 [Audio] 音效统计：共 9 次 —— sfx_enemy_die×6、sfx_combat_hit×3（缺失 id 0 个）
+
+specialization 未通过：F:\Godot项目\项目a\.ai_j32_20261019_023355.specialization.log / F:\Godot项目\项目a\.ai_j32_20261019_023355.specialization.err
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 327 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.38
+
+=== 失败现场构建 ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 325 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:02.98

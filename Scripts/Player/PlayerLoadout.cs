@@ -20,6 +20,11 @@ public sealed class PlayerLoadout
 
 	public void Apply(Unit player, Node owner, PlayerCharacterKind characterKind, WeaponPresetKind weaponKind)
 	{
+		if (player.GetNodeOrNull<SpecializationRuntime>(SpecializationRuntime.NodeName) is { } specialization)
+		{
+			player.RemoveChild(specialization); specialization.QueueFree();
+		}
+		player.ResetArmorHealthConversion();
 		CharacterConfig? character = RunController.CharacterRow(characterKind);
 		WeaponConfig? weaponRow = RunController.WeaponRow(weaponKind);
 		var abilities = new List<Ability>();

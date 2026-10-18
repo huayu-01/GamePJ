@@ -181,7 +181,7 @@ public partial class RuneProbe : Node3D
 		pool.Initialize(_weapon, "chr_hunter");
 		_baselineCandidates = pool.CandidateCount;
 		_baselineCatalogLength = RewardCatalog.All.Length;
-		Check(_baselineCatalogLength == 70, $"② 真实增幅项目录 {RewardCatalog.All.Length} 条（期望 J24后70 = 17/23/30，新增八条强化等级，符文**不进**这张表）");
+		Check(_baselineCatalogLength == 90, $"② 真实增幅项目录 {RewardCatalog.All.Length} 条（J32：70减旧3加特化23=90，符文**不进**这张表）");
 		Check(_baselineCandidates > 0, $"② 猎手+弓 的候选池 {_baselineCandidates} 条（不带符文时的基线）");
 		await Wait(0.05);
 	}
@@ -333,8 +333,7 @@ public partial class RuneProbe : Node3D
 	{
 		// 探针合成行：`Requires = ["雷之印"]` —— 文档里那些"雷系特化增幅"就是这么写的。
 		// ⚠️ 它**只在本次调用期间**临时插进运行期目录，用来证明前置通路；
-		//   表里那 21 条雷系/战神系增幅属于**后续批次**（本批不建），所以真实表里现在一条都没有，
-		//   —— 这一点在报告里明确登记，不当成"已经能抽到"。
+		// J32已接23项真实特化；合成行继续单独验证通用前置，增量同时核对真实行Id。
 		RewardDefinition[] original = RewardCatalog.All;
 		RewardDefinition probe = MakeProbeRow("雷之印", "probe_lei_gated");
 		RewardDefinition probeWar = MakeProbeRow("战神刻印", "probe_war_gated");
@@ -357,14 +356,16 @@ public partial class RuneProbe : Node3D
 			List<string> lei = RollAll(pool);
 			Check(lei.Contains("probe_lei_gated"), "⑥ ⭐ 携带雷之印：`Requires = [雷之印]` 的增幅**进了候选池**（= 用户那句「携带了这个雷之印等于满足它们的前置要求」）");
 			Check(!lei.Contains("probe_war_gated"), "⑥ 携带雷之印：`Requires = [战神刻印]` 的那条**仍然不进**（派系不串）");
-			Check(lei.Count == none.Count + 1, $"⑥ 携带雷之印让可用候选 {none.Count} → {lei.Count}（正好多 1 条）");
+			string[] leiExpected = { "probe_lei_gated", "mut_thunder_mark", "mut_thunder_armor", "evo_thunder_heart", "evo_thunder_pool", "upg_thunder_mastery", "upg_thunder_blast" };
+			Check(lei.Except(none).Order().SequenceEqual(leiExpected.Order()), $"⑥ 携带雷之印让可用候选 {none.Count} → {lei.Count}（1条合成前置＋6条真实特化，B2落雷术仍被武器限定拦住）");
 
 			_run.SetCarriedRune("rune_war_seal");
 			await Wait(0.05);
 			List<string> war = RollAll(pool);
 			Check(war.Contains("probe_war_gated"), "⑥ ⭐ 携带战神印：`Requires = [战神刻印]` 的增幅进了候选池");
 			Check(!war.Contains("probe_lei_gated"), "⑥ 携带战神印：`Requires = [雷之印]` 的那条仍不进");
-			Check(war.Count == none.Count + 1, $"⑥ 携带战神印让可用候选 {none.Count} → {war.Count}（正好多 1 条）");
+			string[] warExpected = { "probe_war_gated", "mut_blood_battle", "mut_blood_armor", "mut_death_duel", "evo_war_spear", "evo_war_afterimage", "evo_bloodthirst", "upg_violence", "upg_war_heart" };
+			Check(war.Except(none).Order().SequenceEqual(warExpected.Order()), $"⑥ 携带战神印让可用候选 {none.Count} → {war.Count}（1条合成前置＋8条真实特化，不混入雷／风系）");
 
 			_reportRuneUnlockSummary = $"不携带 {none.Count} 条 → 雷之印 {lei.Count} 条（多 {string.Join(",", lei.Except(none))}）→ 战神印 {war.Count} 条（多 {string.Join(",", war.Except(none))}）";
 			GD.Print($"[RuneProbe] ⭐ ⑥ 前置解锁实测：{_reportRuneUnlockSummary}");
@@ -526,7 +527,7 @@ public partial class RuneProbe : Node3D
 		var pool = new RewardPool();
 		pool.Initialize(_weapon, "chr_hunter");
 		Check(pool.CandidateCount == _baselineCandidates, $"⑧ 候选池回到 {pool.CandidateCount} 条（期望基线 {_baselineCandidates}）");
-		Check(RewardCatalog.All.Length == 70, $"⑧ 增幅项目录仍是 {RewardCatalog.All.Length} 条（期望 J24后70，符文不混入）");
+		Check(RewardCatalog.All.Length == 90, $"⑧ 增幅项目录仍是 {RewardCatalog.All.Length} 条（期望J32后90，符文不混入）");
 
 		Check(RuneCarry.Current.Length == 0, $"⑧ 存档层 RuneCarry.Current 为空（自测内存模式，不写 user://rune.cfg）");
 		await Wait(0.05);

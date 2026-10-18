@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_hard.tres" id="hard"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_hard_plus.tres" id="hard1"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_hard_plus2.tres" id="hard2"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="stat"]
+
+[sub_resource type="Resource" id="p_ConversionRatio"]
+script = ExtResource("param")
+Key = "ConversionRatio"
+Value = 2
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="m_0"]
+script = ExtResource("stat")
+Stat = "MoveSpeedMultiplier"
+Operation = 1
+Value = 1.3
+
+[sub_resource type="Resource" id="m_1"]
+script = ExtResource("stat")
+Stat = "DamageMultiplier"
+Operation = 1
+Value = 1.5
+
+[sub_resource type="Resource" id="m_2"]
+script = ExtResource("stat")
+Stat = "CritChanceAdd"
+Operation = 0
+Value = 0.2
+
+[resource]
+script = ExtResource("row")
+Id = "upg_war_heart"
+DisplayName = "战斗之心"
+RewardKind = 0
+MaxStacks = 1
+ApplyHandler = "Specialization"
+Specialization = 21
+HandlerParams = [SubResource("p_ConversionRatio")]
+DescriptionTemplate = "移速×{Modifiers.MoveSpeedMultiplier:0.##}、攻击力×{Modifiers.DamageMultiplier:0.##}、暴击率+{Modifiers.CritChanceAdd:0%}；所有坚硬及其后续等级按1:{ConversionRatio}转为爆伤。"
+Requires = PackedStringArray("战神刻印")
+ConvertedRewards = [ExtResource("hard"), ExtResource("hard1"), ExtResource("hard2")]
+Modifiers = [SubResource("m_0"), SubResource("m_1"), SubResource("m_2")]
+Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"

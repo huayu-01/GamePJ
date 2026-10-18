@@ -18,7 +18,12 @@ public sealed class StatModifier
 	public ModifierOperation Operation { get; init; } = ModifierOperation.Add;
 	public float Value { get; init; }
 	public object? Source { get; init; }
+	/// <summary>产生修正器的配置行，供指定奖励转换；不替代成组撤销的Source。</summary>
+	public string OriginId { get; init; } = string.Empty;
 }
+
+/// <summary>将指定来源行的加算修正映射到另一属性，获取顺序无关。</summary>
+public sealed record StatConversion(string From, string To, float Ratio, HashSet<string> OriginIds, object Source);
 
 /// <summary>
 /// 单位属性表：基础值 + 修正器列表（执行文档 §3.5 Modifier）。
@@ -30,6 +35,8 @@ public sealed partial class StatSheet : RefCounted
 {
 	private readonly Dictionary<string, float> _baseValues = new();
 	private readonly List<StatModifier> _modifiers = new();
+	private readonly List<StatConversion> _conversions = new();
+	public void AddConversion(StatConversion conversion) => _conversions.Add(conversion);
 
 	public void SetBase(string stat, float value) => _baseValues[stat] = value;
 
@@ -37,7 +44,11 @@ public sealed partial class StatSheet : RefCounted
 
 	public void AddModifier(StatModifier modifier) => _modifiers.Add(modifier);
 
-	public void RemoveBySource(object source) => _modifiers.RemoveAll(m => ReferenceEquals(m.Source, source));
+	public void RemoveBySource(object source)
+	{
+		_modifiers.RemoveAll(m => ReferenceEquals(m.Source, source));
+		_conversions.RemoveAll(c => ReferenceEquals(c.Source, source));
+	}
 
 	public float Get(string stat)
 	{
@@ -48,7 +59,18 @@ public sealed partial class StatSheet : RefCounted
 
 		foreach (StatModifier modifier in _modifiers)
 		{
-			if (modifier.Stat != stat)
+			string effectiveStat = modifier.Stat;
+			float effectiveValue = modifier.Value;
+			foreach (StatConversion conversion in _conversions)
+			{
+				if (modifier.Operation == ModifierOperation.Add && modifier.Stat == conversion.From && conversion.OriginIds.Contains(modifier.OriginId))
+				{
+					effectiveStat = conversion.To;
+					effectiveValue *= conversion.Ratio;
+					break;
+				}
+			}
+			if (effectiveStat != stat)
 			{
 				continue;
 			}
@@ -59,7 +81,7 @@ public sealed partial class StatSheet : RefCounted
 					overrideValue = modifier.Value;
 					break;
 				case ModifierOperation.Add:
-					add += modifier.Value;
+					add += effectiveValue;
 					break;
 				case ModifierOperation.Multiply:
 					multiply *= modifier.Value;

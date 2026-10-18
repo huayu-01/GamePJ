@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_scythe.tres" id="pool"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_2.tres" id="skill"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_fall.tres" id="fall"]
+
+[sub_resource type="Resource" id="p_Damage"]
+script = ExtResource("param")
+Key = "Damage"
+Value = 15
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_Radius"]
+script = ExtResource("param")
+Key = "Radius"
+Value = 5
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_TickInterval"]
+script = ExtResource("param")
+Key = "TickInterval"
+Value = 0.5
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[resource]
+script = ExtResource("row")
+Id = "evo_wind_domain"
+DisplayName = "风之领域"
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "Specialization"
+Specialization = 11
+HandlerParams = [SubResource("p_Damage"), SubResource("p_Radius"), SubResource("p_TickInterval")]
+DescriptionTemplate = "无情武器停止飞行后产生半径{Radius}米的大旋风，每{TickInterval}秒造成{Damage}伤害，移动或收回时停止。"
+Requires = PackedStringArray("风之印")
+Pool = ExtResource("pool")
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+SpecializationTargets = [ExtResource("skill"), ExtResource("fall")]
+Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"

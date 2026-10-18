@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_skill_2.tres" id="skill_a"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_skill_2.tres" id="skill_b"]
+
+[sub_resource type="Resource" id="p_Damage"]
+script = ExtResource("param")
+Key = "Damage"
+Value = 25
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_Duration"]
+script = ExtResource("param")
+Key = "Duration"
+Value = 6
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_Radius"]
+script = ExtResource("param")
+Key = "Radius"
+Value = 4
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_TickInterval"]
+script = ExtResource("param")
+Key = "TickInterval"
+Value = 1
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[resource]
+script = ExtResource("row")
+Id = "evo_thunder_pool"
+DisplayName = "雷池"
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "Specialization"
+Specialization = 9
+HandlerParams = [SubResource("p_Damage"), SubResource("p_Duration"), SubResource("p_Radius"), SubResource("p_TickInterval")]
+DescriptionTemplate = "释放角色技能2时在脚下留下雷池，半径{Radius}米、持续{Duration}秒，每{TickInterval}秒降下{Damage}伤害的天雷。"
+Requires = PackedStringArray("雷之印")
+SpecializationTargets = [ExtResource("skill_a"), ExtResource("skill_b")]
+Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"

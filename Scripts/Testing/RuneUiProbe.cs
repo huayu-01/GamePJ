@@ -56,7 +56,10 @@ public partial class RuneUiProbe : Node
 			Check(terminal.Interact(), "关闭后可重复打开"); await Wait();
 			if (DisplayServer.GetName() != "headless")
 			{
-				GetViewport().GetTexture().GetImage().SavePng("res://docs/character-design-j31-rune-ui.png");
+				var thunder = screen.GetNode<Control>("Root").FindChildren("*", "Button", true, false).OfType<Button>().Single(b => b.Text == "雷之印"); thunder.GrabFocus();
+				await Wait();
+				string batch = ConfigIndex.Settings.Upgrades.Any(r => r.Specialization != SpecializationKind.None) ? "j32" : "j31";
+				GetViewport().GetTexture().GetImage().SavePng($"res://docs/character-design-{batch}-rune-ui.png");
 				Check(true, "符文面板渲染截图");
 			}
 			screen.Close(); await Wait();

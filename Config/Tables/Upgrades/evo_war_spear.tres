@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[ext_resource type="PackedScene" path="res://Scenes/Combat/SpecializationArrow.tscn" id="projectile"]
+
+[sub_resource type="Resource" id="p_Damage"]
+script = ExtResource("param")
+Key = "Damage"
+Value = 50
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_Lifetime"]
+script = ExtResource("param")
+Key = "Lifetime"
+Value = 4
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_Range"]
+script = ExtResource("param")
+Key = "Range"
+Value = 18
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_Speed"]
+script = ExtResource("param")
+Key = "Speed"
+Value = 40
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_TurnRate"]
+script = ExtResource("param")
+Key = "TurnRate"
+Value = 360
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[resource]
+script = ExtResource("row")
+Id = "evo_war_spear"
+DisplayName = "战斗之矛"
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "Specialization"
+Specialization = 12
+HandlerParams = [SubResource("p_Damage"), SubResource("p_Lifetime"), SubResource("p_Range"), SubResource("p_Speed"), SubResource("p_TurnRate")]
+DescriptionTemplate = "暴击时从身上向附近敌人发射一枚追踪箭，造成{Damage}伤害。"
+Requires = PackedStringArray("战神刻印")
+SpecializationProjectile = ExtResource("projectile")
+Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"

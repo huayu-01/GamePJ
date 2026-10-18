@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+
+[sub_resource type="Resource" id="p_DetonateScale"]
+script = ExtResource("param")
+Key = "DetonateScale"
+Value = 0.3
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_ExtraJumps"]
+script = ExtResource("param")
+Key = "ExtraJumps"
+Value = 2
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[resource]
+script = ExtResource("row")
+Id = "upg_thunder_mastery"
+DisplayName = "雷法"
+RewardKind = 0
+MaxStacks = 1
+ApplyHandler = "Specialization"
+Specialization = 18
+HandlerParams = [SubResource("p_DetonateScale"), SubResource("p_ExtraJumps")]
+DescriptionTemplate = "闪电链额外攻击{ExtraJumps}名敌人，并立刻引爆引雷；主动引爆只造成{DetonateScale:0%}天雷伤害。"
+Requires = PackedStringArray("雷之印")
+Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"

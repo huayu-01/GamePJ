@@ -1,5 +1,7 @@
 # 符文系统 · 契约（加一枚符文 / 加一个派系要做什么）
 
+当前入口已完成：基地符文台提供11枚符文的统一“携带”流程、图标和效果／特化预览，一次一枚，也可不携带。J32接入23项特化，详见[J31符文界面](character-design-j31.md)和[J32特化](character-design-j32.md)。
+
 > **2026-10-18 J27**：飞翼已补下落攻击加速；新增原表DiveSpeedMultiplier，默认预设1.3，真实三武器34→44.2m/s，副本倍率2的长枪斜向总速68m/s。原有起跳与正常下落上限保持，正常下落仍60→48m/s。效果与说明共读三个Modifiers.Value，复用StatSet。[反例与真实物理验收](character-design-j27.md)。
 
 > **2026-10-18 J26**：死铠的每杀计数独立于攻击连锁门，同链十杀与合法末层击杀均记录；初始甲／加甲间隔／每次加甲量仍由原表配置，说明共读参数，禁疗保持。[反例与验收](character-design-j26.md)。
@@ -125,15 +127,11 @@
 
 | 派系字符串 | 哪枚符文解锁 | 目前表里有几条增幅吃它 |
 |---|---|---|
-| `雷之印` | `rune_lei_seal` | **0 条**（`后续构筑.txt` 里那些雷系特化增幅属于后续批次，本批不建） |
-| `战神刻印` | `rune_war_seal` | **0 条**（同上） |
-| `风之印` | `rune_wind_seal` | **0 条**（同上） |
+| `雷之印` | `rune_lei_seal` | 7条（落雷术另限定武器大师＋镰刀） |
+| `战神刻印` | `rune_war_seal` | 8条 |
+| `风之印` | `rune_wind_seal` | 7条（风之领域另限定武器大师＋镰刀） |
 
-⚠️ 这是**如实登记**，不是"已经能抽到"：本批只交付**机制**与**表**，
-2026-10-18按最新文档重清：原清单漏计雷池，新增B2风之领域，待建共23项；其中22项有明确符文前置，暴风未写前置，不自行补。完整限定／前置与源文件SHA256见 [更新接收](followup-build-updates.md)。这些生产行仍未建，不能称已能抽到。
-机制侧的证明用的是 `_RuneProbe` 第 ⑥ 段：临时插两条 `Requires = [雷之印]` / `[战神刻印]` 的**探针行**，
-走**真实** `RewardPool.Initialize` + `Roll` —— 不带符文时两条都不进池，携带对应符文时**正好多 1 条**、
-且派系不串。见 [character-design-j11.md](character-design-j11.md) §6。
+以上22条加上无符文前置的“暴风”，共23项真实生产行。限定／前置与源文件SHA256见[更新接收](followup-build-updates.md)。SpecializationProbe遍历真实两角色×六武器的候选池；RuneProbe第⑥段通过RunController.SetCarriedRune验证携带链路，猎手＋弓实际解锁雷系6条、战神8条，另保留两条合成前置的通用回归。
 
 ---
 
@@ -149,17 +147,18 @@
 
 ---
 
-## 6. 携带入口（本批只到 C#，**没有 UI**）
+## 6. 携带入口
 
 | 层 | 在哪 | 说明 |
 |---|---|---|
+| 基地界面 | `RuneTerminal` → `UiService.OpenRunes()` → `RuneScreen` | BaseCamp运行期挂载；选择列表、图标与特化详情读表，统一“携带” |
+| 基地写入口 | `RuneCarry.Set(id)` | 只保存下一次出击配置，基地不反复施加局内效果 |
 | 局外存档 | `RuneCarry`（`Scripts/Run/RuneCarry.cs`）→ `user://rune.cfg` | `ConfigFile`，section `rune`，key `carried`。**单独一个文件**，不动四个既有存档（`meta` 的 SHA256 基线因此保持不变） |
 | 本局字段 | `RunController.CarriedRuneId` / `CarriedRune` | 开局在 `_Process` 的 `_boot` 段读 `RuneCarry.Current` |
 | 写入口 | `RunController.SetCarriedRune(string? id)` | 记字段 + 落盘 + **立刻**重套（换符文时先摘旧的） |
 | 应用点 | `RunController.ApplyCarriedRune()`（在 `ApplyBalance` 里、`_loadout.Apply` **之后**） | 顺序很重要：生命回满之后才夹 30 |
 
-⚠️ **本批没做**：符文选择 UI（基地交互物 / 面板 / 图标）、`快乐小子` 的"奔跑穿透单位 + 角色虚化"。
-下一批做 UI 时只需要调 `SetCarriedRune`，判定与效果代码一行都不用动。
+局内不挂符文面板，进关由现有RunController读携带配置并施效。`快乐小子`的奔跑穿透／角色虚化仍是独立后续事项。
 
 ---
 

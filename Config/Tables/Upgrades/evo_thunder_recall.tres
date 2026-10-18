@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_scythe.tres" id="pool"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_2.tres" id="skill"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_fall.tres" id="fall"]
+
+[sub_resource type="Resource" id="p_LandingDamageScale"]
+script = ExtResource("param")
+Key = "LandingDamageScale"
+Value = 1
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_SpeedScale"]
+script = ExtResource("param")
+Key = "SpeedScale"
+Value = 2
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[resource]
+script = ExtResource("row")
+Id = "evo_thunder_recall"
+DisplayName = "落雷术"
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "Specialization"
+Specialization = 10
+HandlerParams = [SubResource("p_LandingDamageScale"), SubResource("p_SpeedScale")]
+DescriptionTemplate = "无情再次使用改为瞬移到武器中心并接触收回，立即触发{LandingDamageScale:0%}倍率的下落落地攻击；飞行速度×{SpeedScale}。"
+Requires = PackedStringArray("雷之印")
+Pool = ExtResource("pool")
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+SpecializationTargets = [ExtResource("skill"), ExtResource("fall")]
+Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"

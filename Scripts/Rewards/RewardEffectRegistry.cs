@@ -25,6 +25,11 @@ public static class RewardEffectRegistry
 	{
 		// 通用的"改 StatSheet"—— 19 条里有 14 条走它，只靠 Modifiers 里的数据表达，不需要新代码。
 		["StatSet"] = row => context => ApplyModifiers(row, context),
+		["Specialization"] = row => context =>
+		{
+			ApplyModifiers(row, context);
+			SpecializationRuntime.Ensure(context.Player).Apply(row);
+		},
 		["ChargeBehavior"] = row => context =>
 		{
 			if (row.ChargeBehavior is not { TargetAbility: { } target } tuning
@@ -540,6 +545,7 @@ public static class RewardEffectRegistry
 				Operation = entry.Operation,
 				Value = entry.Value,
 				Source = context.Build,
+				OriginId = row.Id,
 			});
 		}
 

@@ -1,6 +1,6 @@
 # 当前开发快照（2026-10-18）
 
-唯一的接续入口；专题见[文档目录](README.md)。不要从头重读历史交接或重做已完成批次。最新机制提交为`e920cc7`（J30），J1～J30已完成；后续哈希以`git log -1`为准。
+唯一的接续入口；专题见[文档目录](README.md)。不要从头重读历史交接或重做已完成批次。本轮完成到J32（符文界面与特化），提交哈希以`git log -1`为准。
 
 ## 当前执行顺序
 
@@ -8,7 +8,7 @@
 
 1. 文档清理：重复交接和旧路线图已归档，原路径保留跳转；不删原始需求、技术专题、验证证据、失败现场和外部美术文档。
 2. 符文：J31已完成基地符文台、选择面板与11枚SVG图标，统一“携带”，一次一枚，可不携带。复用J11的效果、存档和前置解锁；专项42/43均0失败，见[交付记录](character-design-j31.md)。
-3. 特化：接[23项清单](followup-build-updates.md)。22项明确有符文前置；暴风未写前置，不自行补。需实际验证角色／武器限定、候选池、前置和获得后行为，参数与说明尽量共用表。
+3. 特化：J32已接[23项清单](followup-build-updates.md)，22项有符文前置、暴风无前置；B2两项同时限定角色／武器／符文。23项真实行替换旧三项后生产目录90=23／33／34。专项194／195零失败；见[交付记录](character-design-j32.md)。数值平衡与最终特效美术后置。
 
 原文权威：`F:\Godot项目\3d肉鸽雨中哈迪斯\角色设计.txt`、`后续构筑.txt`，结合用户最新裁定。原文只有11枚符文，第12枚缺内容，不编造。其余未完事项：快乐小子奔跑穿透／虚化、小精灵最终表现、派生爆炸与触发伤害审查、独立动作和美术验收。
 
@@ -16,6 +16,8 @@
 
 | 批次 | 内容与证据 |
 |---|---|
+| J32 | [23项特化](character-design-j32.md)：候选、前置、真实派生伤害、属性转换、死斗、旋风与B2技能；194/195零失败 |
+| J31 `42ce447` | [基地符文界面](character-design-j31.md)：11枚统一携带、图标、暂停／输入与存档；42/43零失败 |
 | J28 `3aab844` | [弹道](character-design-j28.md)：细弹逐帧射线／粗弹形状，几何与预算分离，同帧穿透余程和距离累计修复；56/0 |
 | J29 `cc62fe4` | [玩家主攻击快照](character-design-j29.md)：共读武器行5%／2倍基础及局外／构筑，投掷周期／回程、落剑式和额外剑气继承出手属性；45/0 |
 | J30 `e920cc7` | [DoT归属](character-design-j30.md)：燃烧正确产生本人Kill／灵魂／死铠／践踏死亡，未知与已释放来源不冒领，不自续烧，保留原招架与固定DPS；26/0 |
@@ -49,7 +51,7 @@ J13～J27的进化、动作移动许可、强化等级、逐杀记录和飞翼�
 dotnet build ActRoguelike.csproj --no-incremental -v minimal -c ExportRelease
 ```
 
-复用`_tools/verify_projectile_capsule.ps1`，按影响选择专项；已有`-ProjectileQuery`／`-AttackSnapshot`／`-DotAttribution`等入口。新批补对应开关，双构建、适当真实输入／物理探针、五原回归、Main八指标与存档保护，保存实际日志。Godot4.7.2 mono路径：`F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe`。Main必须指定`res://Scenes/Main.tscn -- --selftest`。
+复用`_tools/verify_projectile_capsule.ps1`，按影响选择专项；已有`-ProjectileQuery`／`-AttackSnapshot`／`-DotAttribution`／`-RuneUi`／`-Specialization`等入口。新批补对应开关，双构建、适当真实输入／物理探针、五原回归、Main八指标与存档保护，保存实际日志。Godot4.7.2 mono路径：`F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe`。Main必须指定`res://Scenes/Main.tscn -- --selftest`。
 
 五原回归：蓄力80／原文115／龙之箭42／弓39（渲染40）／符文83，全部0失败；数量变动须说明真实新增／机制迁移原因，不能随手改绿。
 
@@ -66,6 +68,6 @@ Main八指标对照`character-design-j11-evidence.log`逐字一致：
 | 奖励UI | True／Paused True |
 | 最小链路 | 1动画事件→1弹体→命中 |
 
-原5条Main历史红标保持如实记录，不称Main全绿。奖励目录当前70=强化17／进化23／异化30；接特化后目录增量必须有真实新增行依据，不能拿旧计数拦住用户授权的新内容。
+原5条Main历史红标保持如实记录，不称Main全绿。奖励目录当前90=强化23／进化33／异化34（旧目录70减旧三项再加23特化）；符文仍独立为11枚。旧三项资源保留在Config/Retired/Upgrades供历史机制回归，不进入生产池。
 
 存档每批跑前／跑后完整SHA256比较，不覆盖用户后来的手动修改。最近基线：meta `6C29…7EA7`、ability_cards `594B…99CA`、settings `9FD4…02B4`、loadout `CD92…5462`；完整值见J30证据。`rune.cfg`原来不存在，符文UI自测用内存隔离；必须另验证真实存档格式而不写用户目录。结束清理自己创建的selftest.flag。设置现为1920×1080、skill_1=R，不用更旧快照覆盖。

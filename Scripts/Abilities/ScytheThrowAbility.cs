@@ -17,6 +17,28 @@ public partial class ScytheThrowAbility : WeaponThrowAbility
 	public string LastSeekTarget { get; private set; } = string.Empty;
 	public float LastSeekSeconds { get; private set; }
 	private float _seekTimer, _flightSeconds;
+	private float _thunderSpeedScale = 1f, _landingScale = 1f;
+	private FallAttackAbility? _thunderLanding;
+	public event System.Action<Vector3>? Settled;
+	protected override float EffectiveThrowSpeed => base.EffectiveThrowSpeed * _thunderSpeedScale;
+	public void ConfigureThunderRecall(float speedScale, FallAttackAbility landing, float landingScale)
+	{
+		_thunderSpeedScale = Mathf.Max(0.01f, speedScale); _thunderLanding = landing; _landingScale = landingScale;
+	}
+	public override bool TryPress(Unit? target = null)
+	{
+		if (_thunderLanding != null && IsActive && InFlight && !IsReturning)
+		{
+			if (!Enabled || OwnerUnit == null) return false;
+			OwnerUnit.GlobalPosition = WeaponPosition;
+			OwnerUnit.Velocity = Vector3.Zero;
+			OwnerUnit.ResetPhysicsInterpolation();
+			BeginReturn();
+			_thunderLanding.TriggerLandingPulse(_landingScale);
+			return true;
+		}
+		return base.TryPress(target);
+	}
 	public void ConfigureSeeking(float interval, float targetHeight)
 	{
 		SeekIntervalSeconds = Mathf.Max(0f, interval);
@@ -25,6 +47,7 @@ public partial class ScytheThrowAbility : WeaponThrowAbility
 	}
 	protected override void OnLoadoutReset()
 	{
+		_thunderSpeedScale = _landingScale = 1f; _thunderLanding = null;
 		SeekIntervalSeconds = 0f;
 		SeekTargetHeight = 0.9f;
 		_seekTimer = _flightSeconds = LastSeekSeconds = 0f;
@@ -66,6 +89,7 @@ public partial class ScytheThrowAbility : WeaponThrowAbility
 
 	protected override void OnThrowSettled(Vector3 position)
 	{
+		Settled?.Invoke(position);
 		// 停在地面上继续旋转、继续周期伤害（文档："武器会不断旋转并周期性的对武器内的敌人造成伤害"）。
 	}
 }

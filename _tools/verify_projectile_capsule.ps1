@@ -1,5 +1,5 @@
 # J12：胶囊扫掠、全局实际弹速上限与五探针回归，验证独占且保护真实存档。
-param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi)
+param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
 $godotExe = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
@@ -15,6 +15,7 @@ if ($ProjectileQuery) { $batchId = 'j28' }
 if ($AttackSnapshot) { $batchId = 'j29' }
 if ($DotAttribution) { $batchId = 'j30' }
 if ($RuneUi) { $batchId = 'j31' }
+if ($Specialization) { $batchId = 'j32' }
 $saveNames = @('meta.cfg','ability_cards.cfg','settings.cfg','loadout.cfg','rune.cfg')
 $utf8 = [Text.UTF8Encoding]::new($false)
 
@@ -101,7 +102,19 @@ try {
         $evidence.Add($build)
         if ($build -notmatch '0 个警告' -or $build -notmatch '0 个错误') { throw "$configuration 未满足 0/0" }
     }
-    if ($RuneUi) {
+    if ($Specialization) {
+        Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 \d+，失败 0'
+        Invoke-Probe 'specialization_render' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 \d+，失败 0' -Render
+        if (-not $ProbeOnly) {
+            Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
+            Invoke-Probe 'attack_snapshot' 'res://Scenes/Debug/_AttackSnapshotProbe.tscn' '攻击快照验收结束：通过 45，失败 0'
+            Invoke-Probe 'dot_source' 'res://Scenes/Debug/_DotAttributionProbe.tscn' '持续伤害归属验收结束：通过 26，失败 0'
+            Invoke-Probe 'reward_rules' 'res://Scenes/Debug/_RewardRulesProbe.tscn' '获取规则验收结束：通过 78，失败 0'
+            Invoke-Probe 'rune_ui' 'res://Scenes/Debug/_RuneUiProbe.tscn' '符文界面验收结束：通过 42，失败 0'
+            Invoke-Probe 'rune_ui_render' 'res://Scenes/Debug/_RuneUiProbe.tscn' '符文界面验收结束：通过 43，失败 0' -Render
+        }
+    }
+    elseif ($RuneUi) {
         $ownedProcess = Start-Process -FilePath $godotExe -ArgumentList @('--headless','--path',$projectDir,'--editor','--import') -WorkingDirectory $projectDir -WindowStyle Hidden -RedirectStandardOutput ".ai_$($batchId)_$runTag.import.log" -RedirectStandardError ".ai_$($batchId)_$runTag.import.err" -PassThru
         if (-not $ownedProcess.WaitForExit(60000)) { Stop-Process -Id $ownedProcess.Id; throw '资源导入超时' }
         if ($ownedProcess.ExitCode -ne 0) { throw '资源导入失败' }
@@ -226,9 +239,18 @@ try {
     }
     $shotNames = if ($BowExitAudit -or $ChargeInputAudit -or $KillJumps -or $KillFacts -or $WingDive) { @() } elseif ($RewardTiers) { @('j24_reward_tiers') } elseif ($RewardRules) { @() } elseif ($JumpStomp) { @('j22_jump_stomp') } elseif ($ChargeEvolution) { @('j21_distinct_homing','j21_flow') } elseif ($ActionMovement) { @('j20_action_movement') } elseif ($GroundBurst) { @('j19_ground_burst') } elseif ($LightLeap) { @('j18_light_leap') } elseif ($GoldenRoad) { @('j17_golden_road') } elseif ($Rainbow) { @('j16_rainbow') } elseif ($Affection) { @('j15_affection','j15_world') } elseif ($Scythe) { @('j14_mercy','j14_salvation') } elseif ($SpiritSword) { @('j13_golden_qi','j13_great_draw','j13_divine_descent') } else { @('j12_capsule_sweep') }
     foreach ($shotName in $shotNames) {
+        if ($Specialization -or $RuneUi) { break }
         $shotPath = Join-Path $projectDir "docs\screenshots\$shotName.png"
         if (-not (Test-Path -LiteralPath $shotPath)) { throw "$shotName 截图缺失" }
         $evidence.Add("截图 $shotName SHA256=$((Get-FileHash -LiteralPath $shotPath -Algorithm SHA256).Hash)")
+    }
+    $currentShots = if ($Specialization) { @('character-design-j32-wind.png','character-design-j32-rune-ui.png') } elseif ($RuneUi) { @('character-design-j31-rune-ui.png') } else { @() }
+    foreach ($shot in $currentShots) {
+        # ProbeOnly不一定运行符文渲染，只有本次完整流程要求这张界面图。
+        if ($Specialization -and $ProbeOnly -and $shot -like '*rune-ui*') { continue }
+        $path = Join-Path $projectDir "docs\$shot"
+        if (-not (Test-Path -LiteralPath $path)) { throw "$shot 截图缺失" }
+        $evidence.Add("截图 $shot SHA256=$((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash)")
     }
     Save-Fingerprint 'AFTER'
     $evidence.Add("selftest.flag AFTER=$(Test-Path -LiteralPath (Join-Path $profileDir 'selftest.flag'))")

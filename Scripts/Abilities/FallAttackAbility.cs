@@ -88,6 +88,21 @@ public partial class FallAttackAbility : Ability
 	public int LandingKnockbackPulseCount { get; private set; }
 	public int LandingKnockbackHitCount { get; private set; }
 	public void ConfigureLandingKnockback(float strength) => LandingKnockback = Mathf.Max(0f, strength);
+	/// <summary>落雷术触发同一落地命中体与落地事件，倍率从原始下落攻击取100%，不伪造下冲。</summary>
+	public void TriggerLandingPulse(float damageScale)
+	{
+		if (OwnerUnit == null || _hitbox == null) return;
+		CurrentOffense = AttackOffense.Capture(OwnerUnit, _hitbox.CritChance, _hitbox.CritMultiplier);
+		LastDamageBonus = 0f;
+		LastDamage = _hitbox.Damage * CurrentOffense.DamageMultiplier * damageScale;
+		HasLanded = true;
+		_hitbox.Activate(OwnerUnit, new AttackInstance { Attacker = OwnerUnit, Ability = AbilityId, AbilityKind = AbilityId,
+			BaseDamage = LastDamage, CanCrit = true, CritChance = CurrentOffense.CritChance, CritMultiplier = CurrentOffense.CritMultiplier,
+			Knockback = _hitbox.Knockback, Policy = HitPolicy.OncePerTarget, Tags = _hitbox.AttackTags });
+		_hitbox.SweepSphere(_hitbox.GlobalPosition, _hitbox.GlobalPosition);
+		_hitbox.Deactivate();
+		ApplyLandingKnockback(); Landed?.Invoke();
+	}
 	protected override void OnLoadoutReset()
 	{
 		LandingKnockback = 0f;

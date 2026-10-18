@@ -5,6 +5,7 @@
 | 目的 | 文档 |
 |---|---|
 | 当前任务、约定和验收 | [SESSION-SNAPSHOT](SESSION-SNAPSHOT.md) |
+| 本轮完成的符文与特化 | [J31携带界面](character-design-j31.md)、[J32特化接入](character-design-j32.md) |
 | 符文机制与接入 | [符文系统](rune-system.md) |
 | 23项特化权威接收清单 | [后续构筑](followup-build-updates.md) |
 | 架构、战斗与表结构 | [架构](architecture.md)、[战斗](combat.md)、[配置](config-schema.md) |

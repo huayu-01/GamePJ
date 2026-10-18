@@ -2915,7 +2915,7 @@ public partial class SelfTest : Node
 		string poolIds = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController")?.PoolPreview ?? string.Empty;
 		string poolSize = poolIds.Length == 0 ? "空" : $"{poolIds.Split(',').Length} 条";
 		GameLog.Write("SelfTest",
-			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望 **J24后70 = 17/23/30**（新增生命／暴击／爆伤／坚硬的八条等级）；P6d后是62 = 9/23/30；P6b后是59 = 9/23/27；P6a后是57 = 9/23/25） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，当前表实测值）");
+			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望J32后90 = 23/33/34；J24目录70减旧三项加特化23） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，当前表实测值）");
 
 		// 武器 → 升级池 → 选项（配置表阶段 4）：三级回退各层的条数 + 武器实际带上的池 Id。
 		// 这是设计文档 §4.5.5 要求的"顺藤摸瓜"只读校验。回退路径（武器行没填 Pool / 池表读不到）时
@@ -5042,7 +5042,9 @@ public partial class SelfTest : Node
 		};
 		foreach (string id in new[] { "mut_stomp", "mut_homing_missile" })
 		{
-			if (RewardCatalog.Find(id) is { } row)
+			// 旧巡飞弹已退出生产候选，保留历史机制回归，避免删断言掩盖退化。
+			RewardDefinition? legacy = id == "mut_homing_missile" ? RewardEffectRegistry.Compile(RuntimeResources.Load<RewardConfig>("res://Config/Retired/Upgrades/mut_homing_missile.tres")) : null;
+			if ((RewardCatalog.Find(id) ?? legacy) is { } row)
 			{
 				build.Add(row, context);
 			}
@@ -5268,7 +5270,8 @@ public partial class SelfTest : Node
 		}
 
 		// ===================== 落日剑 =====================
-		if (RewardCatalog.Find("mut_sunset_sword") is { } swordRow)
+		// 新引雷符由特化专项验收，旧落日剑仅作为历史机制回归加载。
+		if (RewardEffectRegistry.Compile(RuntimeResources.Load<RewardConfig>("res://Config/Retired/Upgrades/mut_sunset_sword.tres")) is { } swordRow)
 		{
 			build.Add(swordRow, context);
 		}

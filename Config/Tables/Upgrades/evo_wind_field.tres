@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+
+[sub_resource type="Resource" id="p_Damage"]
+script = ExtResource("param")
+Key = "Damage"
+Value = 10
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_Duration"]
+script = ExtResource("param")
+Key = "Duration"
+Value = 18
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_Interval"]
+script = ExtResource("param")
+Key = "Interval"
+Value = 3
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_Radius"]
+script = ExtResource("param")
+Key = "Radius"
+Value = 3
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_SpawnRange"]
+script = ExtResource("param")
+Key = "SpawnRange"
+Value = 8
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[sub_resource type="Resource" id="p_TickInterval"]
+script = ExtResource("param")
+Key = "TickInterval"
+Value = 0.5
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[resource]
+script = ExtResource("row")
+Id = "evo_wind_field"
+DisplayName = "风场"
+RewardKind = 1
+MaxStacks = 1
+ApplyHandler = "Specialization"
+Specialization = 17
+HandlerParams = [SubResource("p_Damage"), SubResource("p_Duration"), SubResource("p_Interval"), SubResource("p_Radius"), SubResource("p_SpawnRange"), SubResource("p_TickInterval")]
+DescriptionTemplate = "周围{SpawnRange}米内每{Interval}秒在有效地面生成普通旋风，半径{Radius}米、持续{Duration}秒，每{TickInterval}秒造成{Damage}伤害。"
+Requires = PackedStringArray("风之印")
+Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"

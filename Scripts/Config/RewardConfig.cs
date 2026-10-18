@@ -55,6 +55,14 @@ public partial class RewardConfig : ConfigRow
 	[Export] public WeaponSeekTuning? WeaponSeek { get; set; }
 	/// <summary>长枪落地召回与蓄力缩时（气贯长虹）。</summary>
 	[Export] public WeaponRecallTuning? WeaponRecall { get; set; }
+	/// <summary>特化机制；数值共读HandlerParams，None不建立规则。</summary>
+	[Export] public SpecializationKind Specialization { get; set; }
+	/// <summary>特化绑定的技能资源（雷池的角色技能2、无情及下落攻击）。</summary>
+	[Export] public AbilityConfig[] SpecializationTargets { get; set; } = System.Array.Empty<AbilityConfig>();
+	/// <summary>特化发射的投射物预制体。</summary>
+	[Export] public PackedScene? SpecializationProjectile { get; set; }
+	/// <summary>战斗之心转换的奖励行，资源引用覆盖普通／+／++且不吞其他减伤。</summary>
+	[Export] public RewardConfig[] ConvertedRewards { get; set; } = System.Array.Empty<RewardConfig>();
 
 	/// <summary>
 	/// 处理器参数：<c>StatSet</c> 用 <c>Modifiers</c>；其余处理器用这里的键值对

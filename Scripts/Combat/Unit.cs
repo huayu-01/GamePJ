@@ -174,7 +174,7 @@ public partial class Unit : CharacterBody3D
 	/// </summary>
 	private void FillArmor()
 	{
-		Armor = Mathf.Max(0f, _startingArmor + _armorBonus);
+		Armor = _armorHealthRatio > 0f ? 0f : Mathf.Max(0f, _startingArmor + _armorBonus);
 		ArmorPeak = Mathf.Max(ArmorPeak, Armor);
 	}
 
@@ -192,9 +192,30 @@ public partial class Unit : CharacterBody3D
 			return;
 		}
 
+		if (_armorHealthRatio > 0f) { ConvertArmorToHealth(amount); return; }
 		_armorBonus += amount;
 		Armor = Mathf.Max(0f, Armor + amount);
 		ArmorPeak = Mathf.Max(ArmorPeak, Armor);
+	}
+	private float _armorHealthRatio;
+	public void ResetArmorHealthConversion()
+	{
+		_armorHealthRatio = 0f; Stats.RemoveBySource(this);
+	}
+	/// <summary>血铠：已有甲立刻转换，以后所有GrantArmor同路转换。</summary>
+	public void ConfigureArmorHealthConversion(float ratio)
+	{
+		_armorHealthRatio = Mathf.Max(0f, ratio);
+		if (_armorHealthRatio <= 0f) return;
+		float armor = Armor; Armor = 0f;
+		ConvertArmorToHealth(armor);
+	}
+	private void ConvertArmorToHealth(float amount)
+	{
+		float health = amount * _armorHealthRatio;
+		if (health <= 0f) return;
+		Stats.AddModifier(new StatModifier { Stat = "MaxHealthAdd", Value = health, Source = this });
+		RefreshStats();
 	}
 
 	private void SeedStats()
@@ -324,6 +345,7 @@ public partial class Unit : CharacterBody3D
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Hit,
+			IsSecondary = hit.Attack?.IsSecondary == true,
 			IsDamageOverTime = hit.Attack?.IsDamageOverTime == true,
 			Source = hit.Attacker,
 			Target = this,
@@ -443,6 +465,7 @@ public partial class Unit : CharacterBody3D
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Damaged,
+			IsSecondary = hit.Attack?.IsSecondary == true,
 			IsDamageOverTime = hit.Attack?.IsDamageOverTime == true,
 			Source = hit.Attacker,
 			Target = this,
@@ -461,6 +484,7 @@ public partial class Unit : CharacterBody3D
 			GameplayEventBus.Raise(new GameplayEvent
 			{
 				Kind = GameplayEventKind.Critical,
+				IsSecondary = hit.Attack?.IsSecondary == true,
 				Source = hit.Attacker,
 				Target = this,
 				Value = damage,
@@ -659,6 +683,13 @@ public partial class Unit : CharacterBody3D
 
 	/// <summary>身上有没有这条状态。</summary>
 	public bool HasStatus(string statusId) => GetStatusStacks(statusId) > 0;
+	/// <summary>移除已主动引爆的状态并撤销其修正器。</summary>
+	public void RemoveStatus(string statusId)
+	{
+		for (int i = _statuses.Count - 1; i >= 0; i--)
+			if (_statuses[i].Effect.Id == statusId) { Stats.RemoveBySource(_statuses[i]); _statuses.RemoveAt(i); }
+		RefreshStats();
+	}
 
 	/// <summary>
 	/// 这个单位作为**攻击者**登记的"按目标状态加伤"规则（J8：增幅「心眼」「发散」）。

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+
+[sub_resource type="Resource" id="p_DamagePerSpeed"]
+script = ExtResource("param")
+Key = "DamagePerSpeed"
+Value = 0.02
+Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+
+[resource]
+script = ExtResource("row")
+Id = "upg_storm"
+DisplayName = "暴风"
+RewardKind = 0
+MaxStacks = 1
+ApplyHandler = "Specialization"
+Specialization = 23
+HandlerParams = [SubResource("p_DamagePerSpeed")]
+DescriptionTemplate = "每1米/秒移动速度使伤害增加{DamagePerSpeed:0%}，奔跑速度也计入。"
+
+Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"
