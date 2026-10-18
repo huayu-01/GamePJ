@@ -44,6 +44,8 @@ public partial class RewardConfig : ConfigRow
 
 	/// <summary>蓄力阈值弹进化（J9「龙之箭」）：蓄力上限 / 阈值 / 尺寸 / 穿透数及目标技能均为强类型资源。</summary>
 	[Export] public ChargedShotTuning? ChargedShot { get; set; }
+	/// <summary>只改变指定技能的蓄力、单箭与分配追踪，不写全局数值。</summary>
+	[Export] public ChargeBehaviorTuning? ChargeBehavior { get; set; }
 
 	/// <summary>近战每段真实 ATK 额外出弹（金光术）。</summary>
 	[Export] public MeleeProjectileTuning? MeleeProjectile { get; set; }

@@ -25,6 +25,16 @@ public static class RewardEffectRegistry
 	{
 		// 通用的"改 StatSheet"—— 19 条里有 14 条走它，只靠 Modifiers 里的数据表达，不需要新代码。
 		["StatSet"] = row => context => ApplyModifiers(row, context),
+		["ChargeBehavior"] = row => context =>
+		{
+			if (row.ChargeBehavior is not { TargetAbility: { } target } tuning
+				|| Ability.FindByAbilityId(context.Player, target.Id) is not { } ability)
+			{
+				GD.PushWarning($"[Reward] {row.Id} 缺少有效蓄力进化参数或目标技能。");
+				return;
+			}
+			ability.ConfigureChargeBehavior(tuning);
+		},
 		["TeleportJump"] = row => context => context.Player.Movement?.ConfigureTeleportJump(true),
 		["WeaponRecall"] = row => context =>
 		{
@@ -185,8 +195,8 @@ public static class RewardEffectRegistry
 		// 用 Godot 自己的 `GodotObject.Set()` 套用（不写反射、不为每个字段写一条特例）。
 		//
 		// 服务这些行（数值全在表里，代码里一个数字都没有）：
-		//   有备无患（后撤 MaxCharges=3 / RechargeSeconds=0.5）· 专注（武技2 CooldownMultiplier=0.5 +
-		//   完美时机窗口）。地爆已迁SkillEnhancement，气贯长虹已迁强类型WeaponRecall。
+		//   有备无患（后撤 MaxCharges=3 / RechargeSeconds=0.5）。专注已迁ChargeBehavior明确完美标志，
+		//   地爆已迁SkillEnhancement，气贯长虹已迁强类型WeaponRecall。
 		//   龙之箭已迁ChargedShot；大拔刀术／神降术已迁强类型SkillEnhancement。
 		//
 		// ⚠️ 属性名写错**不静默**：先按 `GetPropertyList()` 查存在性，不存在就打警告并跳过这一条。

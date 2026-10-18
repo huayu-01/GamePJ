@@ -51,9 +51,16 @@ public partial class TeleportJumpProbe : Node3D
 	}
 	private async Task Jump()
 	{
+		// 跳跃在物理帧消费；让松开经过完整物理帧，再注入新的按下沿，避免渲染帧边沿重叠。
+		Press(false);
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 		int before = Movement.TeleportJumpCount;
+		GD.Print($"[TeleportJump] 输入前 frame={Engine.GetProcessFrames()}/{Engine.GetPhysicsFrames()} held={Input.IsActionPressed("jump")} grounded={Movement.IsGrounded} locked={Movement.IsActionMovementLocked} override={Movement.HasVelocityOverride} count={before} y={_player.GlobalPosition.Y:0.####}");
 		Press(true);
-		Check(await Until(() => Movement.TeleportJumpCount > before, 0.5), "真实跳跃按键触发瞬移");
+		bool jumped = await Until(() => Movement.TeleportJumpCount > before, 0.5);
+		if (!jumped) GD.Print($"[TeleportJump] 输入后 frame={Engine.GetProcessFrames()}/{Engine.GetPhysicsFrames()} held={Input.IsActionPressed("jump")} just={Input.IsActionJustPressed("jump")} grounded={Movement.IsGrounded} locked={Movement.IsActionMovementLocked} override={Movement.HasVelocityOverride} count={Movement.TeleportJumpCount} y={_player.GlobalPosition.Y:0.####}");
+		Check(jumped, "真实跳跃按键触发瞬移");
 		Press(false);
 	}
 	public override async void _Ready()

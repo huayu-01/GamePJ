@@ -41,6 +41,9 @@ public partial class Projectile : Area3D
 
 	/// <summary>追踪搜索半径（米；≤0 = 不限）。</summary>
 	[Export] public float HomingRange { get; set; }
+	/// <summary>不要求标记的追踪；齐射可先给每支箭分配不同敌人，失效后重新索敌。</summary>
+	[Export] public bool SeekAnyHostile { get; set; }
+	public Unit? AssignedHomingTarget { get; set; }
 
 	/// <summary>可穿透的目标数量，0 = 命中即消失。</summary>
 	[Export] public int Pierce { get; set; }
@@ -261,7 +264,7 @@ public partial class Projectile : Area3D
 
 		// 追踪（弓 武技2「刹那之眼」）：朝**最近的一个带标记的敌人**转向。
 		// 默认（HomingStatusId 空 / 转向速度 ≤0）**完全不进这一段** —— 弹道与改动前逐位一致。
-		if (!string.IsNullOrEmpty(HomingStatusId) && HomingTurnRateDegrees > 0f)
+		if ((SeekAnyHostile || !string.IsNullOrEmpty(HomingStatusId)) && HomingTurnRateDegrees > 0f)
 		{
 			SteerTowardsMark();
 		}
@@ -322,15 +325,18 @@ public partial class Projectile : Area3D
 
 		Unit? best = null;
 		float bestDistance = HomingRange > 0f ? HomingRange * HomingRange : float.MaxValue;
+		if (SeekAnyHostile && AssignedHomingTarget is { } assigned && IsInstanceValid(assigned)
+			&& assigned.IsValidTarget && attacker.IsHostileTo(assigned)
+			&& GlobalPosition.DistanceSquaredTo(assigned.GlobalPosition) <= bestDistance) best = assigned;
 		string group = attacker.Faction == Faction.Player ? "enemy_units" : "player_units";
-		foreach (Node node in GetTree().GetNodesInGroup(group))
+		if (best == null) foreach (Node node in GetTree().GetNodesInGroup(group))
 		{
 			if (node is not Unit candidate || !candidate.IsValidTarget || !attacker.IsHostileTo(candidate))
 			{
 				continue;
 			}
 
-			if (!candidate.HasStatus(HomingStatusId))
+			if (!SeekAnyHostile && !candidate.HasStatus(HomingStatusId))
 			{
 				continue;
 			}

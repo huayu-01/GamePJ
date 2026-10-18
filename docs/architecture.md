@@ -1,5 +1,7 @@
 # 架构说明
 
+J21蓄力进化共用`ChargeBehaviorTuning`，以资源引用寻址目标技能，局部字段与全局StatSheet分开；固定时间覆盖优先于缩时倍率。自动满蓄只提交同一个释放快照，实际发射仍等真实释放动画ATK。箭的无标记追踪可预分配不同敌人，目标失效后复用最近敌人筛选；既有标记追踪默认分支保持。[契约与实测](character-design-j21.md)。
+
 J8「按目标标记加伤」的唯一读点放在`AttackInstance.RollHit`：生成`HitInstance`之前问攻击者一次`IOutgoingDamageScale`（`Unit.OutgoingDamageScaleAgainst`），所以"这一击自己刚加的标记"不会算进这一击；规则挂在攻击者身上（增幅是玩家的），敌人／召唤物天然不吃。来源过滤与数值全在表里（`RequiredEventAbility` + 新强类型资源列`BonusAgainstAbility`），不新增`Godot.Get/Set`字符串反射。[标记加伤契约](character-design-j8.md)。
 
 J6蓄力松手为一次性提交：基类冻结输入状态，能力保存释放结果，真实释放动画事件才起动投射物。变奏的强类型参数资源引用目标技能，不新增字符串反射赋值；真实ATK后进入可中断的逐发连射过程。表现层继续只读状态。[蓄力释放契约](character-design-j6.md)。

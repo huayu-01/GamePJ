@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ActRoguelike.Combat;
+using ActRoguelike.Config;
 using ActRoguelike.Core;
 using Godot;
 
@@ -237,6 +238,25 @@ public abstract partial class Ability : Node3D
 	public float ChargeTime { get; private set; }
 	/// <summary>本次已经松手；等待释放动画期间不能再次蓄力或重复提交释放。</summary>
 	public bool ChargeReleased { get; private set; }
+	public bool AlwaysPerfectRelease { get; private set; }
+	public bool AutoReleaseOnFullCharge { get; private set; }
+	private float _chargeBaseOverride = -1f, _chargeStepOverride = -1f, _chargeStepTimeScale = 1f;
+	private float? _chargeCooldownBaseline;
+	/// <summary>进化只配置指定能力；独立字段允许花心与心流按任意获取顺序组合。</summary>
+	public virtual void ConfigureChargeBehavior(ChargeBehaviorTuning tuning)
+	{
+		if (tuning.CooldownScale >= 0f && tuning.TargetAbility is { } row)
+		{
+			// 技能表的0表示保留场景倍率，不能把它当作零冷却；重复施效不再次折半。
+			_chargeCooldownBaseline ??= CooldownMultiplier;
+			CooldownMultiplier = (row.CooldownMultiplier > 0f ? row.CooldownMultiplier : _chargeCooldownBaseline.Value) * tuning.CooldownScale;
+		}
+		if (tuning.BaseSecondsOverride > 0f) _chargeBaseOverride = tuning.BaseSecondsOverride;
+		if (tuning.StepSecondsOverride > 0f) _chargeStepOverride = tuning.StepSecondsOverride;
+		if (tuning.StepTimeScale > 0f && tuning.StepTimeScale != 1f) _chargeStepTimeScale = tuning.StepTimeScale;
+		AlwaysPerfectRelease |= tuning.AlwaysPerfectRelease;
+		AutoReleaseOnFullCharge |= tuning.AutoReleaseOnFullCharge;
+	}
 	/// <summary>释放动画的播放速度，独立于蓄力期间的拉伸速度。</summary>
 	[Export] public float ChargeReleaseAnimSpeedScale { get; set; } = 1f;
 	protected virtual bool CanReleaseBeforeBase => false;
@@ -247,13 +267,14 @@ public abstract partial class Ability : Node3D
 	/// <summary>
 	/// **实际基础蓄力** —— 表的 <see cref="ChargeBaseSeconds"/> 可以被单位级修正器覆盖
 	/// （<c>StatSheet.ChargeBaseSecondsOverride</c> &gt; 0 才覆盖）。异化/进化里的"蓄力时间变为 X"
-	/// 走的就是这一条（例如 <c>&lt;A2限定&gt;</c>「心流」：所有蓄力时间变为 0.1）。
+	/// 全局来源仍走这一条；心流已迁入指定技能的局部覆盖，优先于全局值。
 	/// 没有修正器时**逐位等于** <see cref="ChargeBaseSeconds"/>。
 	/// </summary>
 	public float ChargeBaseSecondsEffective
 	{
 		get
 		{
+			if (_chargeBaseOverride > 0f) return _chargeBaseOverride;
 			float over = OwnerUnit?.Stats.Get("ChargeBaseSecondsOverride") ?? 0f;
 			if (over > 0f)
 			{
@@ -266,15 +287,16 @@ public abstract partial class Ability : Node3D
 
 	/// <summary>
 	/// **实际后置蓄力间隔** = （单位级覆盖 &gt; 0 ? 覆盖 : 表的 <see cref="ChargeStepSeconds"/>）× 倍率。
-	/// 「花心」（后置蓄力时间减半）挂 <c>ChargeStepSecondsMultiplier = 0.5</c>，没有修正器时逐位不变。
+	/// 保留全局来源兼容；花心使用局部缩时，心流的固定间隔覆盖优先，避免获取顺序改变结果。
 	/// </summary>
 	public float ChargeStepSecondsEffective
 	{
 		get
 		{
+			if (_chargeStepOverride > 0f) return _chargeStepOverride;
 			float over = OwnerUnit?.Stats.Get("ChargeStepSecondsOverride") ?? 0f;
 			float mult = OwnerUnit?.Stats.Get("ChargeStepSecondsMultiplier") ?? 1f;
-			return (over > 0f ? over : ChargeStepSeconds) * (mult > 0f ? mult : 1f);
+			return (over > 0f ? over : ChargeStepSeconds) * (mult > 0f ? mult : 1f) * _chargeStepTimeScale;
 		}
 	}
 
@@ -288,9 +310,8 @@ public abstract partial class Ability : Node3D
 	public float ChargePowerScale => ChargeStepScale > 0f ? Mathf.Max(0f, 1f + (ChargeStepScale - 1f) * ChargeSteps) : 1f;
 
 	/// <summary>是否处在**完美时机窗口**里（刚蓄满之后的 <see cref="PerfectWindowSeconds"/> 那一段）。</summary>
-	public bool IsPerfectWindow => PerfectWindowSeconds > 0f
-		&& ChargeTime >= ChargeBaseSecondsEffective
-		&& ChargeTime <= ChargeBaseSecondsEffective + PerfectWindowSeconds;
+	public bool IsPerfectWindow => ChargeBaseComplete && (AlwaysPerfectRelease || (PerfectWindowSeconds > 0f
+		&& ChargeTime <= ChargeBaseSecondsEffective + PerfectWindowSeconds));
 
 	/// <summary>后置蓄力的档数上限（把 <see cref="ChargeMaxSteps"/> 与 <see cref="ChargeMaxSeconds"/> 合成一个数）。</summary>
 	public int ChargeMaxStepsEffective
@@ -758,6 +779,8 @@ public abstract partial class Ability : Node3D
 		// 上限只作用在后置蓄力的**档数**上（ChargeMaxStepsEffective）。
 		ChargeTime += delta;
 		RecountChargeSteps();
+		// 自动提交与松手共用一次性快照，仍由子类等待释放动画的真实ATK。
+		if (AutoReleaseOnFullCharge && ChargeBaseComplete && ChargeSteps >= ChargeMaxStepsEffective) OnInputReleased();
 	}
 
 	/// <summary>
@@ -1008,6 +1031,10 @@ public abstract partial class Ability : Node3D
 	public void ResetForLoadout()
 	{
 		if (IsActive) Cancel();
+		if (_chargeCooldownBaseline.HasValue) CooldownMultiplier = _chargeCooldownBaseline.Value;
+		_chargeCooldownBaseline = null;
+		AlwaysPerfectRelease = AutoReleaseOnFullCharge = false;
+		_chargeBaseOverride = _chargeStepOverride = -1f; _chargeStepTimeScale = 1f;
 		OnLoadoutReset();
 		ResetChargeState();
 		RefreshCooldown();

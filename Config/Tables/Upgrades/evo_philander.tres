@@ -1,24 +1,28 @@
 [gd_resource type="Resource" script_class="RewardConfig" format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" path="res://Scripts/Config/ChargeBehaviorTuning.cs" id="1_tuning"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a2_w1_2.tres" id="3_skill"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_crossbow.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
-[sub_resource type="Resource" id="Resource_m0"]
-script = ExtResource("1_stat")
-Stat = "ChargeStepSecondsMultiplier"
-Operation = 1
-Value = 0.5
+[sub_resource type="Resource" id="Resource_charge"]
+script = ExtResource("1_tuning")
+TargetAbility = ExtResource("3_skill")
+StepTimeScale = 0.5
+SeekDistinctHostiles = true
+HomingRange = 40.0
+HomingTurnRateDegrees = 720.0
 
 [resource]
 script = ExtResource("2_row")
 RewardKind = 1
 MaxStacks = 1
-Modifiers = [SubResource("Resource_m0")]
+ApplyHandler = "ChargeBehavior"
+ChargeBehavior = SubResource("Resource_charge")
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Excludes = PackedStringArray("evo_focus")
 Id = "evo_philander"
 DisplayName = "花心"
-DescriptionTemplate = "武技2后置蓄力时间减半，且射出的箭会自己追踪目标"
-Note = "[P5 新增行] 文档第 79 行（进化池 <A2限定>）「花心:武技2后置蓄力时间减半,且射出的箭会自己追踪目标(尽可能选中更多的敌人),互斥:专一」。★ 落地的是\"后置蓄力时间减半\"（ChargeStepSecondsMultiplier = 0.5，消费者 Ability.ChargeStepSecondsEffective）；「射出的箭会自己追踪目标」**没有实现**（追踪靠技能行的 HomingStatusId 字符串列，StatSheet 是浮点表、没有字符串键的通路；要做得加一个\"授予追踪\"的处理器）。"
+DescriptionTemplate = "武技2后置蓄力时间减半，射出的箭会追踪敌人，优先分配给不同目标"
+Note = "J21：只缩短短弩武技2后置间隔0.2→0.1秒，基础0.4和3个后置档不变；齐射先给不同有效敌人各一支，剩余箭循环分配，失效目标允许重新索敌。无须标记，不影响武技1。追踪40米／每秒720度为文档未给的可调预设；实体仍受World碰撞阻挡。"

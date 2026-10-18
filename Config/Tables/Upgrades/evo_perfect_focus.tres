@@ -1,36 +1,25 @@
 [gd_resource type="Resource" script_class="RewardConfig" format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
+[ext_resource type="Script" path="res://Scripts/Config/ChargeBehaviorTuning.cs" id="1_tuning"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_2.tres" id="3_skill"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_energy_palm.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
-[sub_resource type="Resource" id="Resource_p0"]
-script = ExtResource("1_param")
-Key = "AbilityId"
-Value = "skl_a1_w1_2"
-Note = "改哪一条技能行（能量掌武技2 憋个大的）"
-
-[sub_resource type="Resource" id="Resource_p1"]
-script = ExtResource("1_param")
-Key = "CooldownMultiplier"
-Value = 0.5
-Note = "间隔减半"
-
-[sub_resource type="Resource" id="Resource_p2"]
-script = ExtResource("1_param")
-Key = "PerfectWindowSeconds"
-Value = 3600.0
-Note = "完美时机窗口拉满 = 松手即完美"
+[sub_resource type="Resource" id="Resource_charge"]
+script = ExtResource("1_tuning")
+TargetAbility = ExtResource("3_skill")
+CooldownScale = 0.5
+AlwaysPerfectRelease = true
 
 [resource]
 script = ExtResource("2_row")
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "AbilityOverride"
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
+ApplyHandler = "ChargeBehavior"
+ChargeBehavior = SubResource("Resource_charge")
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Id = "evo_perfect_focus"
 DisplayName = "专注"
 DescriptionTemplate = "武技2 间隔减半，现在发射总会是完美时机"
-Note = "[P5b 新增行] 文档第 57 行（进化池 <A1限定>）「专注:武技2间隔减半,现在发射总会是完美时机」。<A1限定> 的写法 = RequiredCharacterIds（角色 A）+ Pool（武器 1 的池 pool_energy_palm），两者都满足才进池。间隔减半 = 技能行的 CooldownMultiplier（P2 的行级 CDR 列，docs/abilities.md §4 通路②）；总会是完美时机 = 把 PerfectWindowSeconds（完美时机窗口，基础值 0.2）拉大到 3600s —— 这一条是**预设**（等价于松手即完美，机制侧没有单独的 alwaysPerfect 标志位）。"
+Note = "J21：仅能量掌武技2冷却间隔乘0.5，基础蓄力完成后总是完美释放。使用明确布尔，不把完美窗口伪装成3600秒；未满基础仍中止，真实释放动画ATK出弹。"

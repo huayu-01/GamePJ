@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using ActRoguelike.Combat;
+using ActRoguelike.Config;
 using ActRoguelike.Core;
 using Godot;
 
@@ -28,6 +30,25 @@ namespace ActRoguelike.Abilities;
 /// </summary>
 public partial class ArrowVolleyAbility : Ability
 {
+	private int _volleyCountOverride;
+	private float _damagePerLostArrow, _seekRange, _seekTurnRate;
+	private bool _seekDistinctHostiles;
+	public override void ConfigureChargeBehavior(ChargeBehaviorTuning tuning)
+	{
+		base.ConfigureChargeBehavior(tuning);
+		if (tuning.VolleyCountOverride > 0)
+		{
+			_volleyCountOverride = tuning.VolleyCountOverride;
+			// 心流不移除已经授予的专一补偿，两个获取顺序结果一致。
+			_damagePerLostArrow = Mathf.Max(_damagePerLostArrow, tuning.DamagePerLostArrow);
+		}
+		if (tuning.SeekDistinctHostiles)
+		{
+			_seekDistinctHostiles = true;
+			_seekRange = tuning.HomingRange;
+			_seekTurnRate = tuning.HomingTurnRateDegrees;
+		}
+	}
 	[ExportGroup("子弹（箭）")]
 	/// <summary>箭的预制体（`res://Scenes/Combat/Arrow.tscn`）。</summary>
 	[Export] public PackedScene? ProjectileScene { get; set; }
@@ -362,7 +383,11 @@ public partial class ArrowVolleyAbility : Ability
 	{
 		_releasePending = false; _burstRemaining = 0; _burstAttack = null;
 	}
-	protected override void OnLoadoutReset() { _rampCount = 0; _rampTimer = 0; }
+	protected override void OnLoadoutReset()
+	{
+		_rampCount = 0; _rampTimer = 0;
+		_volleyCountOverride = 0; _damagePerLostArrow = _seekRange = _seekTurnRate = 0f; _seekDistinctHostiles = false;
+	}
 	protected virtual void PrepareShot() { }
 
 	/// <summary>
@@ -427,11 +452,11 @@ public partial class ArrowVolleyAbility : Ability
 		// 覆盖值 ≤ 0 → 一行都不进（既有四把武器逐位不变）；被"砍掉"的那几发按**每一发**乘一个倍率
 		// （`VolleyDamagePerLostArrow`，默认 0 → 不乘）。
 		float lostArrowDamageMultiplier = 1f;
-		float countOverride = stats.Get("VolleyCountOverride");
+		float countOverride = _volleyCountOverride > 0 ? _volleyCountOverride : stats.Get("VolleyCountOverride");
 		if (countOverride > 0f && countOverride < count)
 		{
 			int lost = count - Mathf.RoundToInt(countOverride);
-			lostArrowDamageMultiplier = 1f + (lost * Mathf.Max(0f, stats.Get("VolleyDamagePerLostArrow")));
+			lostArrowDamageMultiplier = 1f + (lost * Mathf.Max(0f, _damagePerLostArrow + stats.Get("VolleyDamagePerLostArrow")));
 			count = Mathf.Max(1, Mathf.RoundToInt(countOverride));
 		}
 
@@ -469,11 +494,27 @@ public partial class ArrowVolleyAbility : Ability
 			AbilityKind = AbilityId,
 		};
 
-		// 散射：发数在准星轴上对称展开（3 发 / 20° → -20° / 0° / +20°）。
+		List<Unit>? seekTargets = null;
+		if (_seekDistinctHostiles)
+		{
+			seekTargets = new List<Unit>();
+			string group = OwnerUnit.Faction == Faction.Player ? "enemy_units" : "player_units";
+			float rangeSquared = _seekRange > 0f ? _seekRange * _seekRange : float.MaxValue;
+			foreach (Node node in GetTree().GetNodesInGroup(group))
+				if (node is Unit unit && unit.IsValidTarget && OwnerUnit.IsHostileTo(unit)
+					&& OwnerUnit.GlobalPosition.DistanceSquaredTo(unit.GlobalPosition) <= rangeSquared) seekTargets.Add(unit);
+			seekTargets.Sort((a, b) =>
+			{
+				int distance = OwnerUnit.GlobalPosition.DistanceSquaredTo(a.GlobalPosition).CompareTo(OwnerUnit.GlobalPosition.DistanceSquaredTo(b.GlobalPosition));
+				return distance != 0 ? distance : a.GetInstanceId().CompareTo(b.GetInstanceId());
+			});
+		}
+		// 散射形状保持；追踪优先给每个目标一支，目标数少于箭数时再循环分配。
 		for (int i = 0; i < (burst ? 1 : count); i++)
 		{
 			float offset = burst ? 0 : (i - ((count - 1) * 0.5f)) * SpreadStepDegrees;
-			FireProjectile(attack, direction, shotSpeed, shotSize, offset);
+			Unit? seekTarget = seekTargets is { Count: > 0 } ? seekTargets[i % seekTargets.Count] : null;
+			FireProjectile(attack, direction, shotSpeed, shotSize, offset, seekTarget);
 		}
 		if (burst && count > 1)
 		{
@@ -501,7 +542,7 @@ public partial class ArrowVolleyAbility : Ability
 				: string.Empty)
 			+ $"下坠起点 {GravityStartDistance:0.##}m 重力 {GravityScale:0.##} 击退 {knockback:0.##} 追踪 [{HomingStatusId}]，方向 {direction}）");
 	}
-	private void FireProjectile(AttackInstance attack, Vector3 direction, float speed, float size, float offset)
+	private void FireProjectile(AttackInstance attack, Vector3 direction, float speed, float size, float offset, Unit? seekTarget = null)
 	{
 		if (OwnerUnit == null || ProjectileScene == null) return;
 		Vector3 origin = OwnerUnit.GlobalPosition + Vector3.Up * 0.9f + direction * 0.6f;
@@ -512,6 +553,11 @@ public partial class ArrowVolleyAbility : Ability
 		if (size > 0) arrow.Scale = Vector3.One * size;
 		arrow.Speed = speed; arrow.GravityScale = GravityScale; arrow.GravityStartDistance = GravityStartDistance;
 		arrow.HomingStatusId = HomingStatusId; arrow.HomingTurnRateDegrees = HomingTurnRateDegrees; arrow.HomingRange = HomingRange;
+		if (_seekDistinctHostiles)
+		{
+			arrow.SeekAnyHostile = true; arrow.AssignedHomingTarget = seekTarget;
+			arrow.HomingTurnRateDegrees = _seekTurnRate; arrow.HomingRange = _seekRange;
+		}
 		arrow.Pierce = attack.Pierce; arrow.MaxLifetime = MaxLifetime;
 		arrow.SweepMaxHits = SweepMaxHits;
 		arrow.SweepRadius = SweepRadius;
