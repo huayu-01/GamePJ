@@ -66,6 +66,10 @@ public enum PlayerCharacterKind
 [GlobalClass]
 public partial class ConfigIndexData : Resource
 {
+	[ExportGroup("战斗 · 投射物")]
+	/// <summary>所有 Projectile 的实际速度上限（m/s）；≤0 不限速。发射、转向及重力后统一夹取。</summary>
+	[Export] public float ProjectileMaxSpeed { get; set; } = 200f;
+
 	[ExportGroup("敌人 · 全局倍率")]
 	/// <summary>
 	/// 所有普通敌人的生命倍率（回退值）。⚠️ **必须与 `Config/Tables/Enemies/enemy_global.tres` 的值一致** ——

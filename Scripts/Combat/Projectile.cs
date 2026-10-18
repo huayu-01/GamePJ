@@ -1,12 +1,13 @@
 using ActRoguelike.Core;
 using ActRoguelike.Audio;
+using ActRoguelike.Config;
 using Godot;
 
 namespace ActRoguelike.Combat;
 
 /// <summary>
 /// 统一投射物（子弹、箭矢、气刃、投掷物）。
-/// 每个物理帧沿本帧位移做一次射线检测（战斗规则说明 §7），避免高速穿透；
+/// 每个物理帧沿本帧位移查询：默认单次射线，启用扫掠时用有半径的胶囊；
 /// 命中后建立 HitInstance 交给目标 Unit 结算，并按 Hit Policy 决定是否继续飞行（穿透）。
 /// 弹道下坠只需把 <see cref="GravityScale"/> 设为非 0。
 /// </summary>
@@ -54,9 +55,12 @@ public partial class Projectile : Area3D
 	/// <para>线段长度**不是静态加长**：每帧都是 <c>|velocity| × delta</c>（弹速 × 本帧物理时长），
 	/// 在 <see cref="SweepFrame"/> 里按当时的真实速度重算。撞到非敌对碰撞体（World / 地形）立刻停下。</para>
 	///
-	/// <para>值 = 一帧最多结算几个（循环保险丝）；真正的命中数另受穿透预算限制。</para>
+	/// <para>值 = 一帧最多结算几个；真正的命中数另受穿透预算限制。</para>
 	/// </summary>
 	[Export] public int SweepMaxHits { get; set; }
+
+	/// <summary>胶囊扫掠半径（世界米；不受纯视觉缩放影响），只在 SweepMaxHits &gt; 0 时使用。</summary>
+	[Export(PropertyHint.Range, "0.001,2,0.001,or_greater")] public float SweepRadius { get; set; } = 0.08f;
 
 	/// <summary>兼容场景表列；Launch按来源阵营配置实际查询掩码。</summary>
 	[Export] public uint HitMask { get => CollisionMask; set => CollisionMask = value; }
@@ -66,6 +70,9 @@ public partial class Projectile : Area3D
 
 	/// <summary>已经飞过的距离（米）—— <see cref="GravityStartDistance"/> 的判据，也是自测的取证量。</summary>
 	public float TravelledDistance { get; private set; }
+
+	/// <summary>限速后的真实速度（m/s）；Speed 保留技能传入的原始发射值。</summary>
+	public float ActualSpeed => _velocity.Length();
 
 	/// <summary>当前**速度方向**（自测 / 排障读它；没发射时是零向量）。</summary>
 	public Vector3 VelocityDirection => _velocity.LengthSquared() > 0.0001f ? _velocity.Normalized() : Vector3.Zero;
@@ -89,6 +96,8 @@ public partial class Projectile : Area3D
 	private int _ricochetLeft;
 	private bool _exploded;
 	private Rid _ownerRid;
+	private CapsuleShape3D? _sweepShape;
+	private SphereShape3D? _worldSweepShape;
 
 	/// <summary>
 	/// **斩断"场景名匹配"的投射物**（P4 新增，只加不删）。
@@ -204,7 +213,7 @@ public partial class Projectile : Area3D
 
 	public override void _Ready()
 	{
-		// Area只承担投射物层的分类；不建形状、不监测重叠，射线仍是唯一命中来源。
+		// Area只承担投射物层的分类；不建形状、不监测重叠，命中由主动查询产生。
 		CollisionLayer = CombatLayers.Projectile;
 		Monitoring = false;
 		Monitorable = false;
@@ -213,7 +222,12 @@ public partial class Projectile : Area3D
 
 	}
 
-	public override void _ExitTree() => _live.Remove(this);
+	public override void _ExitTree()
+	{
+		_live.Remove(this);
+		_sweepShape?.Dispose();
+		_worldSweepShape?.Dispose();
+	}
 
 	public void Launch(AttackInstance attack, Vector3 direction)
 	{
@@ -221,6 +235,7 @@ public partial class Projectile : Area3D
 		CollisionLayer = CombatLayers.Projectile;
 		HitMask = CombatLayers.World | (attack.Attacker == null ? CombatLayers.UnitMask : CombatLayers.HostileTo(attack.Attacker.Faction));
 		_velocity = direction.Normalized() * Speed;
+		ClampVelocity();
 		_pierceLeft = Pierce + attack.Pierce;
 		_ricochetLeft = attack.Ricochet;
 		_ownerRid = attack.Attacker?.GetRid() ?? default;
@@ -257,6 +272,8 @@ public partial class Projectile : Area3D
 			float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 			_velocity.Y -= gravity * GravityScale * dt;
 		}
+		// 无论速度来自技能、派生技能、符文、追踪还是重力，实际位移都经过同一上限。
+		ClampVelocity();
 
 		Vector3 from = GlobalPosition;
 		Vector3 to = from + _velocity * dt;
@@ -388,45 +405,113 @@ public partial class Projectile : Area3D
 	}
 
 	/// <summary>
-	/// **本帧线段上的全部命中**（J10；只在 <see cref="SweepMaxHits"/> &gt; 0 时进入）。
-	///
-	/// <para>做法：把 <paramref name="from"/>→<paramref name="to"/> 这一帧的线段**按命中顺序逐段重扫** ——
-	/// 每次拿最近的命中、结算它、把"已经打过的 body"排进 <see cref="_excludedBodies"/>（与既有穿透排除
-	/// 同一套），再从命中点继续扫到帧末。于是"一帧里线段上所有单位"都会被结算，而不会像既有路径那样
-	/// 命中一个就跳到帧末、把线段上后面的单位跳过。</para>
-	///
-	/// <para>三条边界：① 线段长度 = <c>|velocity| × delta</c>，每帧按当时的真实速度重算（不是静态加长）；
-	/// ② 命中过一次的单位不会重复结算（RID 进排除表 + <see cref="HitTracker"/> 策略双保险）；
-	/// ③ 撞到**非敌对碰撞体**（World / 地形）立刻 <c>QueueFree</c> 停下 —— 不像单位那样继续穿。</para>
+	/// 胶囊的两端球心覆盖本帧 from→to，局部 Y 轴沿弹道；一次形状查询取候选，再按沿弹道投影排序。
+	/// World 用同半径球扫掠求最早阻挡距离，避免长墙的中心在墙后目标之后而排错顺序。
 	/// </summary>
 	private void SweepFrame(Vector3 from, Vector3 to)
 	{
-		Vector3 cursor = from;
-		int budget = SweepMaxHits;
-		while (budget-- > 0 && _attack != null)
+		Vector3 motion = to - from;
+		float length = motion.Length();
+		if (length < 0.000001f) return;
+		Vector3 direction = motion / length;
+		float radius = Mathf.Max(0.001f, SweepRadius);
+		_sweepShape ??= new CapsuleShape3D();
+		// 先给足高度，避免 Godot 在设置半径时按旧高度反向夹取。
+		_sweepShape.Height = length + 2f * radius;
+		_sweepShape.Radius = radius;
+		Vector3 reference = Mathf.Abs(direction.Dot(Vector3.Up)) > 0.99f ? Vector3.Right : Vector3.Up;
+		Vector3 x = reference.Cross(direction).Normalized();
+		using var query = new PhysicsShapeQueryParameters3D
 		{
-			var query = PhysicsRayQueryParameters3D.Create(cursor, to, HitMask);
-			// 与既有路径同一个口径：起点在形状内部也必须能命中；穿透后排除已命中的身体。
-			query.HitFromInside = true;
-			query.Exclude = _excludedBodies;
+			Shape = _sweepShape,
+			Transform = new Transform3D(new Basis(x, direction, x.Cross(direction)), (from + to) * 0.5f),
+			CollisionMask = HitMask,
+			Exclude = _excludedBodies,
+			CollideWithBodies = true,
+			CollideWithAreas = false,
+			Margin = 0f,
+		};
+		PhysicsDirectSpaceState3D space = GetWorld3D().DirectSpaceState;
+		int capacity = 256;
+		var hits = space.IntersectShape(query, capacity);
+		// 常规只查一次；候选填满时扩容重取，不能把无序截断的结果当成最近的全部目标。
+		while (hits.Count == capacity)
+		{
+			capacity = checked(capacity * 2);
+			hits = space.IntersectShape(query, capacity);
+		}
 
-			Godot.Collections.Dictionary hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
-			if (hit.Count == 0)
+		float worldDistance = length;
+		bool blocked = false;
+		foreach (var hit in hits)
+		{
+			if (hit["collider"].AsGodotObject() is CollisionObject3D body && (body.CollisionLayer & CombatLayers.World) != 0)
 			{
-				cursor = to;
+				_worldSweepShape ??= new SphereShape3D();
+				_worldSweepShape.Radius = radius;
+				using var worldQuery = new PhysicsShapeQueryParameters3D
+				{
+					Shape = _worldSweepShape,
+					Transform = new Transform3D(Basis.Identity, from),
+					CollisionMask = CombatLayers.World,
+					Exclude = _excludedBodies,
+					Margin = 0f,
+				};
+				// CastMotion 会忽略起点已重叠的形状，先单独覆盖枪口在墙内的情况。
+				if (space.CollideShape(worldQuery, 1).Count > 0)
+				{
+					worldDistance = 0f;
+					blocked = true;
+				}
+				else
+				{
+					worldQuery.Motion = motion;
+					float[] fractions = space.CastMotion(worldQuery);
+					// 胶囊已确认接触 World；边界恰好在帧末时也保守停止。
+					blocked = true;
+					worldDistance = fractions.Length >= 2 ? length * fractions[0] : 0f;
+				}
 				break;
 			}
+		}
 
-			var collider = hit["collider"].As<GodotObject>();
-			Vector3 position = hit["position"].AsVector3();
+		var ordered = new System.Collections.Generic.List<(CollisionObject3D Body, float Distance)>();
+		foreach (var hit in hits)
+		{
+			if (hit["collider"].AsGodotObject() is not CollisionObject3D body) continue;
+			float distance = Mathf.Clamp((body.GlobalPosition - from).Dot(direction), 0f, length);
+			if ((body.CollisionLayer & CombatLayers.World) != 0)
+			{
+				if (!blocked) continue;
+				distance = worldDistance;
+			}
+			ordered.Add((body, distance));
+		}
+		ordered.Sort((a, b) =>
+		{
+			int byDistance = a.Distance.CompareTo(b.Distance);
+			if (byDistance != 0) return byDistance;
+			// 同投影距离时 World 优先，单位之间按实例号稳定排序。
+			int byWorld = ((b.Body.CollisionLayer & CombatLayers.World) != 0).CompareTo((a.Body.CollisionLayer & CombatLayers.World) != 0);
+			return byWorld != 0 ? byWorld : a.Body.GetInstanceId().CompareTo(b.Body.GetInstanceId());
+		});
 
+		int budget = SweepMaxHits;
+		Vector3 cursor = from;
+		foreach (var candidate in ordered)
+		{
+			var collider = candidate.Body;
+			if (!IsInstanceValid(collider) || _excludedBodies.Contains(collider.GetRid())) continue;
+			Vector3 position = from + direction * candidate.Distance;
+			GlobalPosition = position;
+			TravelledDistance += cursor.DistanceTo(position);
+			cursor = position;
 			if (_attack!.ExplosionRadius > 0f && !_exploded)
 			{
 				_exploded = true;
 				Detonate(position);
 			}
 
-			// 非敌对单位（World / 地形）：**不穿墙**，就地消失。
 			if (collider is not Unit target || _attack.Attacker == null || !_attack.Attacker.IsHostileTo(target))
 			{
 				QueueFree();
@@ -444,11 +529,8 @@ public partial class Projectile : Area3D
 				AudioManager.PlaySfx(AudioIds.CombatHit);
 			}
 
-			// 打过（或按策略不许再结算）的单位：只排进后续扫掠的排除表，**不重复结算**。
-			if (!_excludedBodies.Contains(target.GetRid()))
-			{
-				_excludedBodies.Add(target.GetRid());
-			}
+			// 多形状身体也只消耗一次预算，后续帧继续排除。
+			_excludedBodies.Add(target.GetRid());
 
 			if (_pierceLeft <= 0)
 			{
@@ -462,13 +544,21 @@ public partial class Projectile : Area3D
 			}
 
 			_pierceLeft--;
-			cursor = position;
+			if (--budget <= 0) { Orient(); return; }
 		}
 
-		// 走到帧末（或预算用完 → 停在最后一个命中点，剩下的线段留给下一帧接着扫，不跳过）。
-		GlobalPosition = cursor;
-		TravelledDistance += from.DistanceTo(cursor);
+		GlobalPosition = to;
+		TravelledDistance += cursor.DistanceTo(to);
 		Orient();
+	}
+
+	private void ClampVelocity()
+	{
+		float limit = ConfigIndex.Settings.ProjectileMaxSpeed;
+		if (limit > 0f && _velocity.LengthSquared() > limit * limit)
+		{
+			_velocity = _velocity.Normalized() * limit;
+		}
 	}
 
 	/// <summary>弹射：转向附近还没命中过的敌人继续飞。</summary>
@@ -508,6 +598,7 @@ public partial class Projectile : Area3D
 		_ricochetLeft--;
 		Vector3 direction = (next.GlobalPosition - GlobalPosition).Normalized();
 		_velocity = direction * Speed;
+		ClampVelocity();
 		GlobalPosition = GlobalPosition + (direction * 0.6f);
 		Orient();
 		return true;

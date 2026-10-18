@@ -241,6 +241,7 @@
 
 [resource]
 script = ExtResource("1_balance")
+ProjectileMaxSpeed = 200.0
 EnemyHealthMultiplier = 0.75
 EnemyDamageMultiplier = 0.3
 EnemyMoveSpeedMultiplier = 1.0

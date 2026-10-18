@@ -83,7 +83,9 @@ J4三维技能位移由`CharacterMovement`按来源持有速度覆盖，技能�
 - 所有 `Unit` 的CharacterBody3D只撞World，同阵营和敌阵营均可穿过；不加软推挤，不依赖身体挡住来凑近战距离。
 - `AttackHitbox` 在Ready按祖先Unit预配置，在Activate按真实来源刷新；常开Monitoring，仅切换激活态。
   独立生成的Explosion也由Detonate的来源配置。保留IsHostileTo与HitTracker两道结算校验。
-- `Projectile` 仍用每物理帧的扫线结算，Area根不设形状、Monitoring/Monitorable均关闭，避免重复重叠结算。
+- `Projectile` 默认每物理帧单次射线；`SweepMaxHits>0` 时改用整段胶囊 `IntersectShape`，按弹道投影排序，World 用同半径球的最早阻挡距离裁定，预算用尽停点续扫。`SweepRadius` 默认0.08世界米，可在弹体场景调节。
+  `ConfigIndex.tres.ProjectileMaxSpeed` 是全局实际弹速上限，当前200m/s；Launch、弹射与追踪/重力后均夹取速度向量。技能发射快照保留原值，`Projectile.ActualSpeed` 读实际速度，详见 [J12](character-design-j12.md)。
+  Area根不设形状、Monitoring/Monitorable均关闭，避免重复重叠结算。
   Launch统一配置阵营mask，`HitMask`兼容旧导出列；命中起点在体内也有效，已命中的RID加入排除列表，防止重复消耗穿透次数。
   弹射与追踪均按敌对阵营索敌，斩弹仍用既有场景名单与运行期弹体列表。
 - `KillZone` 是Area，layer=0、mask=6，只检测单位身体；死亡Unit的layer归零。

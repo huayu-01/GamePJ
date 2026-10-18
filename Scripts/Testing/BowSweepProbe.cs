@@ -38,6 +38,7 @@ public partial class BowSweepProbe : Node3D
 
 	private readonly List<Projectile> _spawned = new();
 	private readonly List<int> _spawnSweep = new();
+	private readonly List<float> _spawnSpeeds = new();
 	private readonly List<string> _hits = new();
 	private readonly List<float> _hitDamage = new();
 	private readonly List<ulong> _hitFrames = new();
@@ -85,7 +86,11 @@ public partial class BowSweepProbe : Node3D
 		}
 
 		_spawned.Add(projectile);
-		Callable.From(() => _spawnSweep.Add(IsInstanceValid(projectile) ? projectile.SweepMaxHits : -1)).CallDeferred();
+		Callable.From(() =>
+		{
+			_spawnSweep.Add(IsInstanceValid(projectile) ? projectile.SweepMaxHits : -1);
+			_spawnSpeeds.Add(IsInstanceValid(projectile) ? projectile.ActualSpeed : -1f);
+		}).CallDeferred();
 	}
 
 	private Unit MakeTarget(string name, Vector3 position)
@@ -98,6 +103,12 @@ public partial class BowSweepProbe : Node3D
 			KnockbackResistance = 1f,
 		};
 		unit.AddChild(new CollisionShape3D { Shape = new SphereShape3D { Radius = 0.5f } });
+		unit.AddChild(new MeshInstance3D
+		{
+			Mesh = new SphereMesh { Radius = 0.5f, Height = 1f },
+			MaterialOverride = new StandardMaterial3D { AlbedoColor = new Color(0.9f, 0.35f, 0.15f) },
+		});
+		unit.AddChild(new Label3D { Text = name, Position = Vector3.Up * 0.8f, FontSize = 48 });
 		AddChild(unit);
 		unit.GlobalPosition = position;
 		unit.Damaged += (result, hit) =>
@@ -109,7 +120,7 @@ public partial class BowSweepProbe : Node3D
 		return unit;
 	}
 
-	private void MakeWall(Vector3 position, Vector3 size)
+	private StaticBody3D MakeWall(Vector3 position, Vector3 size)
 	{
 		var body = new StaticBody3D
 		{
@@ -120,6 +131,7 @@ public partial class BowSweepProbe : Node3D
 		body.AddChild(new CollisionShape3D { Shape = new BoxShape3D { Size = size } });
 		AddChild(body);
 		body.GlobalPosition = position;
+		return body;
 	}
 
 	public override async void _Ready()
@@ -149,6 +161,8 @@ public partial class BowSweepProbe : Node3D
 			await OtherChargeRows();
 			await GrantDragonArrow();
 			await DualTargetSweep();
+			await CapsuleEdges();
+			await SpeedLimitPaths();
 		}
 		catch (Exception ex)
 		{
@@ -226,11 +240,14 @@ public partial class BowSweepProbe : Node3D
 		await Until(() => !_bow.IsActive, 3);
 
 		// ⓑ 真实箭：**刚过基础**那一发一点档位加成都不吃。
+		int baseSpawn = _spawned.Count;
 		bool okBase = await FireHolding(0.505);
 		Check(
 			okBase && _bow.ChargeSteps == 0 && Mathf.IsEqualApprox(_bow.LastShotDamage, _bow.Damage * dmgMul)
 				&& Mathf.IsEqualApprox(_bow.LastShotSpeed, _bow.Speed),
 			$"② 刚过基础就松手（真实按键 {_bow.LastShotChargeSeconds:0.###}s，档 {_bow.ChargeSteps}）：伤害 {_bow.LastShotDamage:0.###}（期望 {_bow.Damage * dmgMul:0.###} = 表值 {_bow.Damage:0} ×玩家倍率 {dmgMul:0.##}，**不含档位加成**）弹速 {_bow.LastShotSpeed:0.##}（期望 {_bow.Speed:0}）");
+		Check(_spawnSpeeds.Count > baseSpawn && Mathf.IsEqualApprox(_spawnSpeeds[baseSpawn], 160f),
+			$"J12 基础箭真实初速 {SpeedAt(baseSpawn):0.##}（160 不受 200 上限影响）");
 
 		// ⓒ 过 1 个后置档才开始涨。
 		bool okOne = await FireHolding(0.5f + (_bow.ChargeStepSecondsEffective * 1f) + 0.005f);
@@ -242,6 +259,12 @@ public partial class BowSweepProbe : Node3D
 
 		await Until(() => Projectile.LiveCount == 0, 4);
 		await Wait(0.1);
+		int spawn = _spawned.Count;
+		bool full = await FireHolding(1.405);
+		Check(full && Mathf.IsEqualApprox(_bow.LastShotSpeed, 220f)
+			&& _spawnSpeeds.Count > spawn && Mathf.IsEqualApprox(_spawnSpeeds[spawn], 200f),
+			$"J12 普通满蓄：原始发射快照 {_bow.LastShotSpeed:0.##}，实际 {SpeedAt(spawn):0.##}（220→200）");
+		await Until(() => Projectile.LiveCount == 0, 4);
 	}
 
 	/// <summary>③ 其他蓄力技能的档数口径（按各自表列现算，不改它们）。</summary>
@@ -337,16 +360,16 @@ public partial class BowSweepProbe : Node3D
 	/// <summary>⑤ 贴脸双怪：同一帧线段里两只怪，既有路径漏一只、扫掠两只都在同一帧结算。</summary>
 	private async Task DualTargetSweep()
 	{
-		var t1 = MakeTarget("T1", new Vector3(20f, 0.9f, 17.6f));
-		var t2 = MakeTarget("T2", new Vector3(20f, 0.9f, 16.0f));
+		var t1 = MakeTarget("T1", new Vector3(20f, 0.9f, 18.2f));
+		var t2 = MakeTarget("T2", new Vector3(20f, 0.9f, 16.6f));
 		await Wait(0.25);
 
 		int tiers = _bow.ChargeMaxStepsEffective;
-		float shotSpeed = _bow.Speed + (_bow.SpeedPerChargeStep * Mathf.Min(5f, tiers));
+		float shotSpeed = Mathf.Min(ConfigIndex.Settings.ProjectileMaxSpeed, _bow.Speed + (_bow.SpeedPerChargeStep * Mathf.Min(5f, tiers)));
 		float segment = shotSpeed / Engine.PhysicsTicksPerSecond;
 		GD.Print(
 			$"[BowSweep] INFO 贴脸双怪几何：蓄 2.05s 的大箭弹速 {shotSpeed:0.##} m/s → 单帧线段 {segment:0.###}m；"
-			+ $"T1 z=17.6 / T2 z=16.0（半径 0.5，跨 z∈[15.5, 18.1]）都完整落在同一条线段里（枪口 z≈19.4 → 帧末 z≈{19.4f - segment:0.###}）");
+			+ $"T1 z=18.2 / T2 z=16.6（间距 1.6，半径 0.5，跨 z∈[16.1, 18.7]）都完整落在同一条线段里（枪口 z≈19.4 → 帧末 z≈{19.4f - segment:0.###}）");
 
 		int tableSweep = _bow.SweepMaxHits;
 
@@ -372,6 +395,8 @@ public partial class BowSweepProbe : Node3D
 		Check(
 			okSweep && _spawnSweep.Count > spawn && _spawnSweep[spawn] == tableSweep,
 			$"⑤ 真实投射物上的扫掠预算 {ArrowSweep(spawn)}（期望表值 {tableSweep}）");
+		Check(_spawnSpeeds.Count > spawn && Mathf.IsEqualApprox(_spawnSpeeds[spawn], 200f),
+			$"J12 龙之箭实际弹速 {SpeedAt(spawn):0.##}，原始快照 {_bow.LastShotSpeed:0.##}（本次 260→200）");
 		Check(
 			_hits.Count - start == 2 && HitsSince(start) == "T1 → T2",
 			$"⑤⭐ 开扫掠：贴脸双怪**都打到了** → 命中顺序 {HitsSince(start)}，伤害 {DamagesSince(start)}");
@@ -381,11 +406,12 @@ public partial class BowSweepProbe : Node3D
 		Check(
 			CountIn(start, "T1") == 1 && CountIn(start, "T2") == 1,
 			$"⑤ 不重复结算：这一发里 T1 正好 {CountIn(start, "T1")} 次、T2 正好 {CountIn(start, "T2")} 次（各 1 次）");
+		await SweepScreenshot($"Capsule sweep: {HitsSince(start)}\nSame physics frame: {FramesSince(start)}\nSpeed: {SpeedAt(spawn):0} m/s | target gap: 1.6 m", segment);
 
 		// ⓒ 撞 World 停下：墙夹在两靶之间，都落在一帧线段内。
 		t1.GlobalPosition = new Vector3(20f, 0.9f, 17.8f);
 		t2.GlobalPosition = new Vector3(20f, 0.9f, 15.4f);
-		MakeWall(new Vector3(20f, 2.5f, 16.9f), new Vector3(12f, 5f, 0.4f));
+		var wall = MakeWall(new Vector3(20f, 2.5f, 16.9f), new Vector3(12f, 5f, 0.4f));
 		await Wait(0.25);
 		float t2Before = t2.Health;
 		start = _hits.Count;
@@ -401,10 +427,156 @@ public partial class BowSweepProbe : Node3D
 			await Until(() => Projectile.LiveCount == 0, 2.5),
 			$"⑤ 箭撞墙后消失（场上存活投射物 {Projectile.LiveCount}）");
 
-		GD.Print($"[BowSweep] INFO ⑤ 按靶统计命中次数：T1={TotalOf("T1")} T2={TotalOf("T2")}（T2 只在扫掠那发/墙后那发里没被打到，见上面的断言）");
+		GD.Print($"[BowSweep] INFO ⑤ 按靶统计命中次数：T1={TotalOf("T1")} T2={TotalOf("T2")}（T2 只在开扫掠且无墙的那发命中，见上面的断言）");
 		t1.QueueFree();
 		t2.QueueFree();
+		wall.QueueFree();
 		await Wait(0.15);
+	}
+
+	private float SpeedAt(int index) => _spawnSpeeds.Count > index ? _spawnSpeeds[index] : -1f;
+
+	/// <summary>截图里的胶囊只重建已验证线段作显示，不参与物理或结算。</summary>
+	private async Task SweepScreenshot(string caption, float segment)
+	{
+		if (DisplayServer.GetName() == "headless") return;
+		Transform3D cameraBefore = _camera.GlobalTransform;
+		var display = new Node3D();
+		AddChild(display);
+		display.AddChild(new MeshInstance3D
+		{
+			Mesh = new CapsuleMesh { Radius = 0.08f, Height = segment + 0.16f },
+			Position = new Vector3(20f, 0.95f, 19.4f - segment * 0.5f),
+			Rotation = new Vector3(Mathf.Pi * 0.5f, 0f, 0f),
+			MaterialOverride = new StandardMaterial3D { AlbedoColor = Colors.Cyan, ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded },
+		});
+		display.AddChild(new Label3D { Text = caption, Position = new Vector3(20f, 2.8f, 17.5f), FontSize = 48 });
+		_camera.GlobalPosition = new Vector3(25f, 5f, 23f);
+		_camera.LookAt(new Vector3(20f, 1.2f, 17.6f));
+		_camera.ResetPhysicsInterpolation();
+		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+		Check(GetViewport().GetTexture().GetImage().SavePng("res://docs/screenshots/j12_capsule_sweep.png") == Error.Ok, "J12 真实双靶命中后截图（青色胶囊仅为只读几何示意）");
+		display.QueueFree();
+		_camera.GlobalTransform = cameraBefore;
+		_camera.ResetPhysicsInterpolation();
+	}
+
+	private Projectile DirectShot(Vector3 origin, Vector3 direction, float radius = 0.08f, int budget = 8, int pierce = 10, int ricochet = 0)
+	{
+		var projectile = new Projectile { Speed = 320f, SweepRadius = radius, SweepMaxHits = budget };
+		AddChild(projectile);
+		projectile.GlobalPosition = origin;
+		projectile.Launch(new AttackInstance { Attacker = _player, BaseDamage = 10f, Lifetime = 0.3f, Policy = HitPolicy.OncePerTarget, Pierce = pierce, Ricochet = ricochet }, direction);
+		return projectile;
+	}
+
+	/// <summary>真实物理边界：擦边半径、多碰撞形状、预算续扫、竖直轴、长墙与起点在墙内。</summary>
+	private async Task CapsuleEdges()
+	{
+		await Until(() => Projectile.LiveCount == 0, 4);
+		Vector3 origin = new(-20f, 8f, 10f);
+		var graze = MakeTarget("Graze", origin + new Vector3(0.58f, 0f, -1f));
+		await Wait(0.1);
+		int start = _hits.Count;
+		DirectShot(origin, Vector3.Forward, 0.03f);
+		await Wait(0.4);
+		Check(_hits.Count == start, "J12 半径 0.03：偏轴 0.58m 的半径 0.5m 球靶未命中");
+		DirectShot(origin, Vector3.Forward, 0.12f);
+		await Wait(0.4);
+		Check(HitsSince(start) == "Graze", $"J12 半径 0.12：同一擦边靶命中一次 → {HitsSince(start)}");
+		graze.QueueFree();
+		await Wait(0.1);
+
+		// 逆序创建，第一靶有两个形状；预算 1 必须停在第一靶，下帧接着扫。
+		var far = MakeTarget("BudgetFar", origin + Vector3.Forward * 2f);
+		var near = MakeTarget("BudgetNear", origin + Vector3.Forward);
+		near.AddChild(new CollisionShape3D { Shape = new SphereShape3D { Radius = 0.4f } });
+		await Wait(0.1);
+		start = _hits.Count;
+		DirectShot(origin, Vector3.Forward, budget: 1);
+		await Wait(0.4);
+		Check(HitsSince(start) == "BudgetNear → BudgetFar", $"J12 逆序创建＋多形状＋预算续扫：{HitsSince(start)}，各一次");
+		Check(_hitFrames.Count == start + 2 && _hitFrames[start + 1] > _hitFrames[start], "J12 预算 1 在下个物理帧续扫，没有跳过剩余路径");
+		far.QueueFree(); near.QueueFree();
+		await Wait(0.1);
+
+		var vertical = MakeTarget("Vertical", origin + Vector3.Up);
+		await Wait(0.1);
+		start = _hits.Count;
+		DirectShot(origin, Vector3.Up);
+		await Wait(0.4);
+		Check(HitsSince(start) == "Vertical", "J12 竖直弹道胶囊基底有效，命中上方靶");
+		vertical.QueueFree();
+		await Wait(0.1);
+
+		// 墙近面 z=9、中心 z=4，墙后靶中心 z=8；不能按墙中心把靶排到墙前。
+		var wall = MakeWall(origin + Vector3.Forward * 6f, new Vector3(4f, 4f, 10f));
+		var behind = MakeTarget("LongWallBehind", origin + Vector3.Forward * 2f);
+		await Wait(0.1);
+		start = _hits.Count;
+		var shot = DirectShot(origin, Vector3.Forward);
+		await Wait(0.4);
+		Check(_hits.Count == start && !IsInstanceValid(shot), "J12 长墙近面先阻挡：墙中心虽在靶后，墙内／后靶零命中且箭消失");
+		shot = DirectShot(origin + Vector3.Forward * 1.2f, Vector3.Forward);
+		await Wait(0.4);
+		Check(_hits.Count == start && !IsInstanceValid(shot), "J12 出生已在 World 内：立即停止，墙后靶零命中");
+		wall.QueueFree(); behind.QueueFree();
+		await Wait(0.1);
+
+		wall = MakeWall(origin + new Vector3(0.14f, 0f, -1.5f), new Vector3(0.1f, 4f, 1f));
+		behind = MakeTarget("GrazeWallBehind", origin + Vector3.Forward * 2.8f);
+		await Wait(0.1);
+		start = _hits.Count;
+		shot = DirectShot(origin, Vector3.Forward, radius: 0.12f);
+		await Wait(0.4);
+		Check(_hits.Count == start && !IsInstanceValid(shot), "J12 胶囊擦到侧墙也停止：中心射线不碰墙，墙后靶仍零命中");
+		wall.QueueFree(); behind.QueueFree();
+		await Wait(0.1);
+	}
+
+	private async Task SpeedLimitPaths()
+	{
+		await Until(() => Projectile.LiveCount == 0, 4);
+		int spawn = _spawned.Count;
+		bool fired = await FireHolding(3.005);
+		Check(fired && Mathf.IsEqualApprox(_bow.LastShotSpeed, 320f)
+			&& _spawnSpeeds.Count > spawn && Mathf.IsEqualApprox(_spawnSpeeds[spawn], 200f),
+			$"J12 龙之箭满蓄：原始快照 {_bow.LastShotSpeed:0.##}，实际 {SpeedAt(spawn):0.##}（320→200）");
+		await Until(() => Projectile.LiveCount == 0, 4);
+		Vector3 origin = new(-30f, 15f, 10f);
+		var shot = DirectShot(origin, Vector3.Forward, budget: 0);
+		Check(Mathf.IsEqualApprox(shot.Speed, 320f) && Mathf.IsEqualApprox(shot.ActualSpeed, 200f), "J12 Launch：原始 320 保留，实际初速 200；未开扫掠也限速");
+		shot.GravityScale = 1000f;
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+		Vector3 before = shot.GlobalPosition;
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+		float step = shot.GlobalPosition.DistanceTo(before);
+		Check(shot.ActualSpeed <= 200.001f && step > 0f && step <= 200f / Engine.PhysicsTicksPerSecond + 0.001f,
+			$"J12 重力后实际速度 {shot.ActualSpeed:0.###}，单物理帧位移 {step:0.###}m ≤ {200f / Engine.PhysicsTicksPerSecond:0.###}m");
+		shot.QueueFree();
+		await Wait(0.1);
+
+		var near = MakeTarget("RicochetNear", origin + Vector3.Forward);
+		var side = MakeTarget("RicochetSide", origin + Vector3.Forward + Vector3.Right * 3f);
+		await Wait(0.1);
+		shot = DirectShot(origin, Vector3.Forward, pierce: 0, ricochet: 1);
+		await Until(() => CountIn(0, "RicochetNear") > 0, 1);
+		Check(IsInstanceValid(shot) && shot.ActualSpeed <= 200.001f && shot.VelocityDirection.X > 0.9f,
+			"J12 弹射已转向侧靶，重新设置速度后仍不超过 200");
+		await Wait(0.4);
+		near.QueueFree(); side.QueueFree();
+		await Wait(0.1);
+
+		float cap = ConfigIndex.Settings.ProjectileMaxSpeed;
+		try
+		{
+			ConfigIndex.Settings.ProjectileMaxSpeed = 120f;
+			shot = DirectShot(origin, Vector3.Forward);
+			Check(Mathf.IsEqualApprox(shot.ActualSpeed, 120f), "J12 全局导出参数改 120：新弹真实初速 120，无需改技能表");
+			shot.QueueFree();
+		}
+		finally { ConfigIndex.Settings.ProjectileMaxSpeed = cap; }
+		await Wait(0.1);
 	}
 
 	/// <summary>等这一发该结算的都结算完（或投射物自己消失）再关掉本段窗口。</summary>
