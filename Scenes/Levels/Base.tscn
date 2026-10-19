@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://Scripts/Interaction/BaseTerminal.cs" id="2_terminal"]
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/WorldOverlay.tscn" id="27_world"]
 [ext_resource type="Script" path="res://Scripts/Run/CharacterRoster.cs" id="28_roster"]
 [ext_resource type="PackedScene" path="res://Scenes/Interactables/CharacterStand.tscn" id="29_stand"]
+[ext_resource type="Script" path="res://Scripts/Visual/ToonPass.cs" id="30_toon"]
 
 [sub_resource type="BoxShape3D" id="Shape_ground"]
 size = Vector3(26, 1, 26)
@@ -84,6 +85,8 @@ light_energy = 1.1
 light_color = Color(1, 0.88, 0.70, 1)
 shadow_enabled = true
 directional_shadow_max_distance = 80.0
+light_angular_distance = 0.0
+shadow_blur = 0.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("20_env")
@@ -147,3 +150,6 @@ material_override = SubResource("Mat_gate")
 [node name="LoadingScreen" parent="." instance=ExtResource("6_loading")]
 
 [node name="GmConsole" parent="." instance=ExtResource("23_gm")]
+
+[node name="ToonPass" type="Node" parent="."]
+script = ExtResource("30_toon")

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Interaction/CharacterStand.cs" id="1_stand"]
 [ext_resource type="Script" path="res://Scripts/Visual/CharacterDisplay.cs" id="2_display"]
-[ext_resource type="PackedScene" path="res://Assets/Models/player/mesh_player_body.glb" id="3_body"]
+[ext_resource type="PackedScene" path="res://Assets/Characters/Lyra/lyra.glb" id="3_body"]
 [ext_resource type="PackedScene" path="res://Scenes/Visual/WeaponGrip.tscn" id="4_grip"]
 
 [sub_resource type="StandardMaterial3D" id="Mat"]
@@ -28,7 +28,7 @@ script = ExtResource("2_display")
 GripScene = ExtResource("4_grip")
 
 [node name="Model" parent="Visual" instance=ExtResource("3_body")]
-transform = Transform3D(-2.6814, 0, 0, 0, 2.6814, 0, 0, 0, -2.6814, 0, 0.15, 0)
+transform = Transform3D(-1.0588235, 0, 0, 0, 1.0588235, 0, 0, 0, -1.0588235, 0, 0.15, 0)
 
 [node name="Name" type="Label3D" parent="."]
 position = Vector3(0, 3, 0)

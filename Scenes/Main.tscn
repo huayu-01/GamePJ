@@ -31,6 +31,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/AbilityMatrixScreen.tscn" id="32_matrix"]
 [ext_resource type="PackedScene" path="res://Scenes/Debug/GmConsole.tscn" id="33_gm"]
 [ext_resource type="PackedScene" path="res://Scenes/Combat/SkillIndicator.tscn" id="34_skill_indicator"]
+[ext_resource type="Script" path="res://Scripts/Visual/ToonPass.cs" id="35_toon"]
 
 [node name="Main" type="Node3D" unique_id=218913370]
 
@@ -200,3 +201,6 @@ Prompt = "特殊奖励"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
 
 [node name="SkillIndicator" parent="." instance=ExtResource("34_skill_indicator")]
+
+[node name="ToonPass" type="Node" parent="."]
+script = ExtResource("35_toon")

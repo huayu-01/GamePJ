@@ -14,7 +14,7 @@
 [ext_resource type="Script" uid="uid://blkw4uuudvt8t" path="res://Scripts/Player/PlayerAbilityInput.cs" id="9_ability_input"]
 [ext_resource type="Script" uid="uid://cwcvtu5671n0i" path="res://Scripts/Interaction/PlayerInteractInput.cs" id="10_interact"]
 [ext_resource type="Script" uid="uid://c6yba478b1qas" path="res://Scripts/Combat/ChallengerMark.cs" id="17_mark"]
-[ext_resource type="PackedScene" uid="uid://b1ydnaxcewujj" path="res://Assets/Models/player/mesh_player_body.glb" id="18_playerbody"]
+[ext_resource type="PackedScene" path="res://Assets/Characters/Lyra/lyra.glb" id="18_playerbody"]
 [ext_resource type="Script" uid="uid://clctjjwe4dyw" path="res://Scripts/Abilities/EnergyWaveAbility.cs" id="19_energy_wave"]
 [ext_resource type="Script" uid="uid://7gcupr0uof6f" path="res://Scripts/Combat/UnitAnimator.cs" id="90_anim"]
 [ext_resource type="Script" path="res://Scripts/Abilities/ArrowVolleyAbility.cs" id="20_arrow_volley"]
@@ -77,7 +77,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_body")
 
 [node name="Model" parent="." unique_id=1944366345 instance=ExtResource("18_playerbody")]
-transform = Transform3D(-2.6814, 0, 0, 0, 2.6814, 0, 0, 0, -2.6814, 0, 0, 0)
+transform = Transform3D(-1.0588235, 0, 0, 0, 1.0588235, 0, 0, 0, -1.0588235, 0, 0, 0)
 
 [node name="Movement" type="Node" parent="." unique_id=1724105735]
 script = ExtResource("3_movement")

@@ -52,10 +52,17 @@ public partial class CharacterDisplay : Node3D
 					player.Autoplay = string.Empty;
 				}
 				AddChild(model);
-				if (NodeSearch.FindInSubtree<AnimationPlayer>(model) is { } prepared)
-					SkillAnimationLibrary.LoadInto(prepared, row.AnimLibraryName, row.AnimLibraryDir);
 				_models[row.ModelPath] = model;
 			}
+
+			// 技能库**对"解析到的那个模型"加载**，不限于"新实例化"的那条分支：
+			// 角色行 ModelPath 与场景里 `Model` 节点同一个资源时（例如 chr_hunter 直接指向 Player.tscn 的 Model），
+			// 走的是去重分支、不会新建模型 —— 那时也必须把技能库装进这个播放器，否则技能动画查不到（`LoadInto` 幂等）。
+			if (NodeSearch.FindInSubtree<AnimationPlayer>(model) is { } prepared)
+			{
+				SkillAnimationLibrary.LoadInto(prepared, row.AnimLibraryName, row.AnimLibraryDir);
+			}
+
 			EnsureHand(model, row.WeaponGripScene);
 		}
 	}
