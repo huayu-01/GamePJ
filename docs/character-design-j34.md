@@ -26,6 +26,6 @@ Scenes/Debug/_FlightPhysicsLab.tscn为独立交互验证场：方向键移动蓝
 
 最终[定向复核证据](character-design-j34-main-20261019_114438.log)：飞行42通过／0失败、stderr为0；Main 69.18秒，八指标逐字一致、J8共18条通过，5条历史红标与完整回归逐字一致。两轮四份真实存档哈希均不变、rune.cfg仍不存在、selftest.flag已清理。9个C#文件UTF8无BOM／LF、文档链接与diff检查通过，CodeGraph已强制更新。外部project.godot指纹未变化，未暂存配置顺序重排，详见[工作区指纹](character-design-j34-workspace.log)。
 
-交付时远程推送被自动审批拒绝：尚无向具体GitHub目标上传本轮源码与验证日志的明确授权。成果先本地提交，推送需用户授权`huayu-01/GamePJ`的`main`，不绕过审批。用户要求的新模型产线对话仍照常创建。
+远程推送最初被自动审批拒绝，成果先本地提交为a97c20d。随后用户明确回复“允许推送到该仓库的 main”，已授权将本轮源码、验证日志和文档上传至`huayu-01/GamePJ`的`main`，据此完成推送。新模型产线对话照常创建。
 
 失败现场保留：113510为空引用标注警告，已修正为已知初始化后的非空；114318中42项断言虽通过，但测试错误地禁用了整个玩家CollisionObject，Godot将其移出物理空间，产生stderr，因此仍判失败。改为仅停用各节点自动回调、保留身体在物理空间，没有删掉换装断言或忽略stderr。
