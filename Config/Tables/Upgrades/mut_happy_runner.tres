@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=7 format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[sub_resource type="Resource" id="safe"]
+script = ExtResource("param")
+Key = "DamageFreeSeconds"
+Value = 10
+[sub_resource type="Resource" id="heal"]
+script = ExtResource("param")
+Key = "HealPerSecond"
+Value = 1
+[sub_resource type="Resource" id="speed"]
+script = ExtResource("param")
+Key = "PushSpeed"
+Value = 5
+[sub_resource type="Resource" id="cooldown"]
+script = ExtResource("param")
+Key = "PushCooldown"
+Value = 0.5
+[resource]
+script = ExtResource("row")
+Id = "mut_happy_runner"
+DisplayName = "快乐小子"
+RewardKind = 2
+MaxStacks = 1
+ApplyHandler = "HappyRunner"
+HandlerParams = [SubResource("safe"), SubResource("heal"), SubResource("speed"), SubResource("cooldown")]
+DescriptionTemplate = "奔跑时接触普通敌人会轻推开对方，不造成伤害；同一敌人每{PushCooldown}秒最多推一次。连续{DamageFreeSeconds}秒未受伤后，奔跑每秒恢复{HealPerSecond}点生命。"
+Note = "J33用户确认：单位恢复实体碰撞，快乐小子以奔跑轻推普通敌人替换穿透；不推动首领。10秒／每秒1生命来自原文；推力5米每秒与单目标0.5秒间隔为表内可调预设。"

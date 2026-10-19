@@ -181,7 +181,7 @@ public partial class RuneProbe : Node3D
 		pool.Initialize(_weapon, "chr_hunter");
 		_baselineCandidates = pool.CandidateCount;
 		_baselineCatalogLength = RewardCatalog.All.Length;
-		Check(_baselineCatalogLength == 90, $"② 真实增幅项目录 {RewardCatalog.All.Length} 条（J32：70减旧3加特化23=90，符文**不进**这张表）");
+		Check(_baselineCatalogLength == 91, $"② 真实增幅项目录 {RewardCatalog.All.Length} 条（J33在90项上补快乐小子，符文**不进**这张表）");
 		Check(_baselineCandidates > 0, $"② 猎手+弓 的候选池 {_baselineCandidates} 条（不带符文时的基线）");
 		await Wait(0.05);
 	}
@@ -527,7 +527,7 @@ public partial class RuneProbe : Node3D
 		var pool = new RewardPool();
 		pool.Initialize(_weapon, "chr_hunter");
 		Check(pool.CandidateCount == _baselineCandidates, $"⑧ 候选池回到 {pool.CandidateCount} 条（期望基线 {_baselineCandidates}）");
-		Check(RewardCatalog.All.Length == 90, $"⑧ 增幅项目录仍是 {RewardCatalog.All.Length} 条（期望J32后90，符文不混入）");
+		Check(RewardCatalog.All.Length == 91, $"⑧ 增幅项目录仍是 {RewardCatalog.All.Length} 条（期望J33后91，符文不混入）");
 
 		Check(RuneCarry.Current.Length == 0, $"⑧ 存档层 RuneCarry.Current 为空（自测内存模式，不写 user://rune.cfg）");
 		await Wait(0.05);

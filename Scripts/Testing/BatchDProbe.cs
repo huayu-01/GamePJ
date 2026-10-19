@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ActRoguelike.Abilities;
 using ActRoguelike.AI;
@@ -90,6 +91,11 @@ public partial class BatchDProbe : Node3D
 		await Wait(0.12);
 	}
 	private static float Vitals(Unit unit) => unit.Health + unit.Armor + unit.Shield;
+	private static float BodyRadius(Unit unit) => unit.GetChildren().OfType<CollisionShape3D>().Select(c => c.Shape switch
+	{
+		CapsuleShape3D capsule => capsule.Radius, SphereShape3D sphere => sphere.Radius,
+		CylinderShape3D cylinder => cylinder.Radius, BoxShape3D box => box.Size.Z * 0.5f, _ => 0.5f,
+	}).DefaultIfEmpty(0.5f).Max();
 	private async Task Run()
 	{
 		await Wait(0.3);
@@ -107,18 +113,18 @@ public partial class BatchDProbe : Node3D
 		Place(new Vector3(0, 0.05f, 4));
 		View(_player.GlobalPosition);
 		await Wait(0.3);
-		string[] names = { "World", "PlayerUnit", "EnemyUnit", "PlayerHitbox", "EnemyHitbox", "Projectile", "Interactable", "Pickup", "VfxOnly" };
+		string[] names = { "World", "PlayerUnit", "EnemyUnit", "PlayerHitbox", "EnemyHitbox", "Projectile", "Interactable", "Pickup", "VfxOnly", "UnitBody" };
 		for (int i = 0; i < names.Length; i++) Check(ProjectSettings.GetSetting($"layer_names/3d_physics/layer_{i + 1}").AsString() == names[i], $"层{i + 1}命名={names[i]}");
-		Check(_player.CollisionLayer == CombatLayers.Player && _player.CollisionMask == CombatLayers.World && _player.Movement!.IsGrounded, "玩家身体2/1且真实落地");
+		Check(_player.CollisionLayer == CombatLayers.BodyLayerOf(Faction.Player) && _player.CollisionMask == CombatLayers.BodyMask && _player.Movement!.IsGrounded, "玩家身体层与阵营层分开且真实落地");
 		Check(_player.GetNode<SpringArm3D>("CameraRig/SpringArm").CollisionMask == CombatLayers.World, "镜头遮挡只检测地形");
 
-		// 贴身体内仍可命中：使用所有真实敌人近战盒，不扩大表内范围。
+		// 身体接触前沿仍可命中：不能再以强制重叠后任意方向的脱离位置作为近战前置。
 		foreach (string name in _enemies)
 		{
 			Unit enemy = Spawn($"res://Scenes/Enemies/{name}.tscn", new Vector3(0, 0.05f, 4));
-			Place(enemy.GlobalPosition);
+			Place(enemy.GlobalPosition + Vector3.Forward * (BodyRadius(enemy) + BodyRadius(_player) + 0.02f));
 			await Wait(0.12);
-			Check(enemy.CollisionLayer == CombatLayers.Enemy && enemy.CollisionMask == CombatLayers.World, $"{name}身体4/1");
+			Check(enemy.CollisionLayer == CombatLayers.BodyLayerOf(Faction.Enemy) && enemy.CollisionMask == CombatLayers.BodyMask, $"{name}身体共用阻挡层与敌人受击层");
 			var boxes = new List<AttackHitbox>();
 			NodeSearch.CollectInSubtree(enemy, boxes);
 			_player.IsInvulnerable = false;
@@ -129,7 +135,7 @@ public partial class BatchDProbe : Node3D
 				box.Activate(enemy, new AttackInstance { Attacker = enemy, BaseDamage = 1, Knockback = 0 });
 			}
 			await Wait(0.1);
-			if (boxes.Count > 0) Check(Vitals(_player) < before && boxes.TrueForAll(x => x.CollisionLayer == CombatLayers.EnemyHitbox && x.CollisionMask == CombatLayers.Player), $"{name}身体重叠时攻击盒仍命中玩家、层16/2");
+			if (boxes.Count > 0) Check(Vitals(_player) < before && boxes.TrueForAll(x => x.CollisionLayer == CombatLayers.EnemyHitbox && x.CollisionMask == CombatLayers.Player), $"{name}身体接触前沿攻击盒仍命中玩家、层16/2");
 			foreach (AttackHitbox box in boxes) box.Deactivate();
 			_player.IsInvulnerable = true;
 			_player.FillVitals();
@@ -144,7 +150,7 @@ public partial class BatchDProbe : Node3D
 			_player.Movement!.BeginDash(Vector3.Right, 6);
 			await Wait(0.72);
 			_player.Movement.EndDash();
-			Check(_player.GlobalPosition.X > body.GlobalPosition.X + 1, $"真实MoveAndSlide穿过{faction}身体，x={_player.GlobalPosition.X:0.###}");
+			Check(_player.GlobalPosition.X < body.GlobalPosition.X - 0.3f, $"真实MoveAndSlide被身体阻挡{faction}身体，x={_player.GlobalPosition.X:0.###}");
 			await Clear();
 		}
 		Place(new Vector3(0, 0.05f, -12));
@@ -186,7 +192,7 @@ public partial class BatchDProbe : Node3D
 		before = Vitals(target);
 		Check(melee.TryActivate(), "剑突由真实灵剑动画事件启动");
 		await Wait(0.65);
-		Check(_player.GlobalPosition.Z < target.GlobalPosition.Z - 0.7f && Vitals(target) < before, $"剑突穿过目标且命中，z={_player.GlobalPosition.Z:0.###}");
+		Check(_player.GlobalPosition.Z > target.GlobalPosition.Z + 0.3f && Vitals(target) < before, $"剑突被目标身体阻挡但攻击仍命中，z={_player.GlobalPosition.Z:0.###}");
 		_player.Stats.SetBase("MeleeLungeAdd", 0);
 		await Clear();
 		await Wait(0.6);
@@ -197,16 +203,18 @@ public partial class BatchDProbe : Node3D
 		before = Vitals(target);
 		Check(blink.TryActivate(), "闪真实技能激活");
 		await Wait(0.4);
-		Check(_player.GlobalPosition.Z < target.GlobalPosition.Z - 1 && Vitals(target) < before && _player.CollisionMask == CombatLayers.World, $"闪穿过敌人并造成路径伤害，结束mask=1，z={_player.GlobalPosition.Z:0.###}");
+		for (int i = 0; i < 20 && blink.PierceApplied; i++) await Wait(0.05);
+		Check(_player.GlobalPosition.Z < target.GlobalPosition.Z - 1 && Vitals(target) < before && _player.CollisionMask == CombatLayers.BodyMask, $"闪穿过敌人并造成路径伤害，结束恢复身体阻挡mask，z={_player.GlobalPosition.Z:0.###}");
 		View(_player.GlobalPosition);
 		await Shot("d_blink_through");
 		blink.ResetForLoadout();
 		Place(new Vector3(0, 0.05f, -12));
 		Check(blink.TryActivate(), "闪撞墙测试激活");
 		await Wait(0.4);
-		Check(_player.GlobalPosition.Z > -15.2f && _player.GlobalPosition.Z < -14.5f && _player.CollisionMask == CombatLayers.World, $"闪不能穿过地形，z={_player.GlobalPosition.Z:0.###}");
+		for (int i = 0; i < 20 && blink.PierceApplied; i++) await Wait(0.05);
+		Check(_player.GlobalPosition.Z > -15.2f && _player.GlobalPosition.Z < -14.5f && _player.CollisionMask == CombatLayers.BodyMask, $"闪不能穿过地形，z={_player.GlobalPosition.Z:0.###}");
 		blink.ResetForLoadout();
-		Check(_player.CollisionMask == CombatLayers.World && !_player.Movement!.IsDashing, "换装取消闪不残留位移或错误mask");
+		Check(_player.CollisionMask == CombatLayers.BodyMask && !_player.Movement!.IsDashing, "换装取消闪不残留位移或错误mask");
 		await Clear();
 	}
 	private Projectile Fire(string name, Unit owner, Vector3 from)
@@ -332,7 +340,7 @@ public partial class BatchDProbe : Node3D
 		Unit drone = Spawn("res://Scenes/Summons/Drone.tscn", new Vector3(0, 0.05f, 1), frozen: false);
 		Unit enemyTarget = Spawn("res://Scenes/Training/TrainingDummy.tscn", new Vector3(0, 0.05f, -3));
 		await Wait(1.3);
-		Check(drone.CollisionMask == CombatLayers.World && drone.GetNode<EnemyBrain>("Brain").Target == enemyTarget, "玩家召唤物身体只撞地形且真实索敌");
+		Check(drone.CollisionMask == CombatLayers.BodyMask && drone.GetNode<EnemyBrain>("Brain").Target == enemyTarget, "玩家召唤物身体参与阻挡且真实索敌");
 		View(_player.GlobalPosition);
 		await Shot("d_ai_summon");
 		string[] fxPaths = { "res://Assets/Effects/fx_combat_hit.tscn", "res://Assets/Effects/fx_combat_explosion.tscn", "res://Assets/Effects/fx_weapon_muzzle.tscn", "res://Scenes/ArtRefresh/FxLootBeacon.tscn", "res://Scenes/ArtRefresh/FxBattleSwing.tscn" };

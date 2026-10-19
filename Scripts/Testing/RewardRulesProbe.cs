@@ -81,9 +81,9 @@ public partial class RewardRulesProbe : Node3D
 			_player = RuntimeResources.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>(); AddChild(_player);
 			_player.GlobalPosition = new Vector3(20, 0.05f, 20);
 			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-			Check(RewardCatalog.All.Length == 90 && RewardCatalog.All.Count(row => row.Kind == RewardKind.Enhancement) == 23
-				&& RewardCatalog.All.Count(row => row.Kind == RewardKind.Evolution) == 33 && RewardCatalog.All.Count(row => row.Kind == RewardKind.Mutation) == 34,
-				"真实ConfigIndex奖励目录90=23强化／33进化／34异化（旧三项退役，加23项特化，符文不混入目录）");
+			Check(RewardCatalog.All.Length == 91 && RewardCatalog.All.Count(row => row.Kind == RewardKind.Enhancement) == 23
+				&& RewardCatalog.All.Count(row => row.Kind == RewardKind.Evolution) == 33 && RewardCatalog.All.Count(row => row.Kind == RewardKind.Mutation) == 35,
+				"真实ConfigIndex奖励目录91=23强化／33进化／35异化（J33补快乐小子，符文不混入目录）");
 			Check(RewardCatalog.All.All(row => row.MaxStacks == (RepeatIds.Contains(row.Id) ? 0 : 1)), "全目录只有三项星号强化可重复，其他已建项均一次");
 			foreach (string id in RepeatIds)
 			{

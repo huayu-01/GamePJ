@@ -1701,6 +1701,12 @@ public partial class SelfTest : Node
 		}
 
 		arena.AddChild(chaser);
+		// 入树后再关闭决策和位移：初始化会恢复物理回调，固定靶仍保留真实碰撞与状态倒计时。
+		chaser.GetNode("Brain").ProcessMode = ProcessModeEnum.Disabled;
+		chaser.GetNode("Movement").ProcessMode = ProcessModeEnum.Disabled;
+		// 放大的球只用于弹道命中，不作为身体挤开玩家；实体阻挡由身体专项与D批验证。
+		chaser.CollisionLayer = CombatLayers.Enemy;
+		chaser.CollisionMask = CombatLayers.World;
 		chaser.AddChild(new CollisionShape3D
 		{
 			Name = "J8ProbeShape",
@@ -2915,7 +2921,7 @@ public partial class SelfTest : Node
 		string poolIds = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController")?.PoolPreview ?? string.Empty;
 		string poolSize = poolIds.Length == 0 ? "空" : $"{poolIds.Split(',').Length} 条";
 		GameLog.Write("SelfTest",
-			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望J32后90 = 23/33/34；J24目录70减旧三项加特化23） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，当前表实测值）");
+			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望J33后91 = 23/33/35；J32基础上补快乐小子） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，当前表实测值）");
 
 		// 武器 → 升级池 → 选项（配置表阶段 4）：三级回退各层的条数 + 武器实际带上的池 Id。
 		// 这是设计文档 §4.5.5 要求的"顺藤摸瓜"只读校验。回退路径（武器行没填 Pool / 池表读不到）时

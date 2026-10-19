@@ -19,7 +19,7 @@ public enum HitPolicy
 	MultiHit,
 }
 
-/// <summary>层号与位值见 architecture.md；身体只撞地形，战斗查询只检测敌对单位。</summary>
+/// <summary>身体阻挡、阵营受击、攻击盒与弹道分层；对象可同时属于多个层。</summary>
 public static class CombatLayers
 {
 	public const uint World = 1 << 0;
@@ -31,7 +31,10 @@ public static class CombatLayers
 	public const uint Interactable = 1 << 6;
 	public const uint Pickup = 1 << 7;
 	public const uint VfxOnly = 1 << 8;
+	public const uint UnitBody = 1 << 9;
+	public const uint BodyMask = World | UnitBody;
 	public const uint UnitMask = Player | Enemy;
+	public static uint BodyLayerOf(Faction faction) => UnitBody | Of(faction);
 
 	public static uint Of(Faction faction) => faction switch
 	{

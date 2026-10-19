@@ -79,7 +79,7 @@ public partial class SpecializationProbe : Node3D
 	{
 		var rows = ConfigIndex.Settings.Upgrades.Where(r => r.Specialization != K.None).ToArray();
 		Check(rows.Length == 23 && rows.Select(r => r.Specialization).Distinct().Count() == 23, "23项特化全部进生产索引且类型唯一");
-		Check(RewardCatalog.All.Length == 90 && RewardCatalog.Find("mut_chain") == null && RewardCatalog.Find("mut_sunset_sword") == null && RewardCatalog.Find("mut_homing_missile") == null, "旧三项退出生产目录，70-3+23=90");
+		Check(RewardCatalog.All.Length == 91 && RewardCatalog.Find("mut_chain") == null && RewardCatalog.Find("mut_sunset_sword") == null && RewardCatalog.Find("mut_homing_missile") == null, "旧三项退出生产目录，J33补快乐小子后91");
 		Check(rows.Count(r => r.Requires.Length == 1) == 22 && rows.Single(r => r.Specialization == K.Storm).Requires.Length == 0, "22项有明确符文前置，暴风没有额外前置");
 		foreach (var row in rows) Check(RewardCatalog.Find(row.Id) is { MaxStacks: 1 } definition && !definition.Description.Contains('{'), $"真实行可编译且说明参数展开 {row.DisplayName}");
 		var owner = CreateOwner(); var weapon = _contexts[owner].Weapon;

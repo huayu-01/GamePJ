@@ -158,7 +158,7 @@
 | 写入口 | `RunController.SetCarriedRune(string? id)` | 记字段 + 落盘 + **立刻**重套（换符文时先摘旧的） |
 | 应用点 | `RunController.ApplyCarriedRune()`（在 `ApplyBalance` 里、`_loadout.Apply` **之后**） | 顺序很重要：生命回满之后才夹 30 |
 
-局内不挂符文面板，进关由现有RunController读携带配置并施效。`快乐小子`的奔跑穿透／角色虚化仍是独立后续事项。
+局内不挂符文面板，进关由现有RunController读携带配置并施效。J33按用户新裁定将快乐小子穿透／虚化替换为奔跑接触轻推普通敌人，它是独立通用异化，不属于符文特化；见[身体碰撞约定](collision-layers.md)。
 
 ---
 

@@ -1,21 +1,24 @@
-# 当前开发快照（2026-10-18）
+# 当前开发快照（2026-10-19）
 
-唯一的接续入口；专题见[文档目录](README.md)。不要从头重读历史交接或重做已完成批次。本轮完成到J32（符文界面与特化），提交哈希以`git log -1`为准。
+唯一的接续入口；专题见[文档目录](README.md)。不要从头重读历史交接或重做已完成批次。最新机制为J33（身体碰撞与快乐小子），提交哈希以`git log -1`为准。
 
 ## 当前执行顺序
 
-用户最新要求：**清理多余文档 → 做符文 → 接特化**，直接执行，全部留在当前对话，完成后也不要自动新建对话。平衡重测后置，数值n用表内可调预设，不逐项打断询问。
+**最新用户裁定（2026-10-19）**：J33补回单位实体碰撞，身体共用阻挡层、敌我受击层分开；快乐小子改为奔跑接触轻推普通敌人，保留10秒安全期／每秒1生命回血。其他几项机制审查先搁置，完成本轮后优先画面和模型设计。未来需飞行单位、压低高度／打落与受力表现，本轮仅验证三维分层和统一受力入口，不自动开展完整飞行系统。详见[碰撞约定](collision-layers.md)与[J33记录](character-design-j33.md)。
+
+此前的**清理多余文档 → 做符文 → 接特化**已完成，下面三项是交付摘要。全部留在当前对话，完成后也不要自动新建对话。平衡重测后置，数值n用表内可调预设，不逐项打断询问；当前优先级以顶端最新用户裁定为准。
 
 1. 文档清理：重复交接和旧路线图已归档，原路径保留跳转；不删原始需求、技术专题、验证证据、失败现场和外部美术文档。
 2. 符文：J31已完成基地符文台、选择面板与11枚SVG图标，统一“携带”，一次一枚，可不携带。复用J11的效果、存档和前置解锁；专项42/43均0失败，见[交付记录](character-design-j31.md)。
 3. 特化：J32已接[23项清单](followup-build-updates.md)，22项有符文前置、暴风无前置；B2两项同时限定角色／武器／符文。23项真实行替换旧三项后生产目录90=23／33／34。专项194／195零失败；见[交付记录](character-design-j32.md)。数值平衡与最终特效美术后置。
 
-原文权威：`F:\Godot项目\3d肉鸽雨中哈迪斯\角色设计.txt`、`后续构筑.txt`，结合用户最新裁定。原文只有11枚符文，第12枚缺内容，不编造。其余未完事项：快乐小子奔跑穿透／虚化、小精灵最终表现、派生爆炸与触发伤害审查、独立动作和美术验收。
+原文权威：`F:\Godot项目\3d肉鸽雨中哈迪斯\角色设计.txt`、`后续构筑.txt`，结合用户最新裁定。原文只有11枚符文，第12枚缺内容，不编造。快乐小子穿透／虚化已被最新“轻推”裁定替代。其余小精灵最终表现、独立动作和美术验收留给后续画面／模型设计；派生爆炸与触发伤害审查暂缓。
 
 ## 最近已完成
 
 | 批次 | 内容与证据 |
 |---|---|
+| J33 | [身体碰撞与快乐小子](character-design-j33.md)：共用身体层、独立阵营命中、奔跑轻推／回血与飞行受力设计边界 |
 | J32 | [23项特化](character-design-j32.md)：候选、前置、真实派生伤害、属性转换、死斗、旋风与B2技能；194/195零失败 |
 | J31 `42ce447` | [基地符文界面](character-design-j31.md)：11枚统一携带、图标、暂停／输入与存档；42/43零失败 |
 | J28 `3aab844` | [弹道](character-design-j28.md)：细弹逐帧射线／粗弹形状，几何与预算分离，同帧穿透余程和距离累计修复；56/0 |
@@ -40,7 +43,7 @@ J13～J27的进化、动作移动许可、强化等级、逐杀记录和飞翼�
 - 每批精准暂存、核对集合、commit＋push，不用add-A或全量restore。纯文档整理只做链接／内容检查，不机械跑游戏回归。
 - `ConfigIndex.tres`新增行须同步资源引用、数组和load_steps三处。数值与玩家说明共读表／资源。
 
-外部改动必须保留且不混机制提交：`Assets/ArtRefresh/env_level_garden.tres`、四个旧heavy／summoner模型及import删除、`Scenes/Interactables/CharacterStand.tscn`、`Scenes/Levels/Base.tscn`／`TestArena.tscn`、`Scenes/Main.tscn`、`Scenes/Player/Player.tscn`、`Scripts/Visual/CharacterDisplay.cs`、`project.godot`，以及未跟踪shader／ToonPass／模型、图和所有.uid／.import。需接已有脏场景时只改明确必要节点并精准暂存自己的补丁，或优先选择新资源／运行期挂载。参考[J30外部指纹](character-design-j30-workspace.log)；当前验收基于脏工作区，不称干净HEAD独立通过。
+外部改动必须保留且不混机制提交：`Assets/ArtRefresh/env_level_garden.tres`、四个旧heavy／summoner模型及import删除、`Scenes/Interactables/CharacterStand.tscn`、`Scenes/Levels/Base.tscn`／`TestArena.tscn`、`Scenes/Main.tscn`、`Scenes/Player/Player.tscn`、`Scripts/Visual/CharacterDisplay.cs`、`project.godot`，以及未跟踪shader／ToonPass／模型、图和所有.uid／.import。J33对project.godot仅精准提交新增第10层UnitBody，其余外部重排保持未暂存。需接已有脏场景时只改明确必要节点并精准暂存自己的补丁，或优先选择新资源／运行期挂载。参考[J30外部指纹](character-design-j30-workspace.log)；当前验收基于脏工作区，不称干净HEAD独立通过。
 
 ## 验证约定
 
@@ -68,6 +71,6 @@ Main八指标对照`character-design-j11-evidence.log`逐字一致：
 | 奖励UI | True／Paused True |
 | 最小链路 | 1动画事件→1弹体→命中 |
 
-原5条Main历史红标保持如实记录，不称Main全绿。奖励目录当前90=强化23／进化33／异化34（旧目录70减旧三项再加23特化）；符文仍独立为11枚。旧三项资源保留在Config/Retired/Upgrades供历史机制回归，不进入生产池。
+原5条Main历史红标保持如实记录，不称Main全绿。奖励目录当前91=强化23／进化33／异化35（J32目录90补快乐小子）；符文仍独立为11枚。旧三项资源保留在Config/Retired/Upgrades供历史机制回归，不进入生产池。
 
 存档每批跑前／跑后完整SHA256比较，不覆盖用户后来的手动修改。最近基线：meta `6C29…7EA7`、ability_cards `594B…99CA`、settings `9FD4…02B4`、loadout `CD92…5462`；完整值见J30证据。`rune.cfg`原来不存在，符文UI自测用内存隔离；必须另验证真实存档格式而不写用户目录。结束清理自己创建的selftest.flag。设置现为1920×1080、skill_1=R，不用更旧快照覆盖。

@@ -85,25 +85,26 @@ J4三维技能位移由`CharacterMovement`按来源持有速度覆盖，技能�
 | 层号 | 编辑器名 | 位值 | 当前用途与mask |
 |---|---|---:|---|
 | 1 | World | 1 | 地面、墙、坡；单位移动、镜头遮挡、AI避障、刷怪/节点落点只查此层 |
-| 2 | PlayerUnit | 2 | 玩家及玩家阵营召唤物身体；mask=1 |
-| 3 | EnemyUnit | 4 | 普通敌人、精英、Boss身体；mask=1 |
+| 2 | PlayerUnit | 2 | 玩家及玩家阵营召唤物的受击身份；身体同时属于第10层，mask=513 |
+| 3 | EnemyUnit | 4 | 普通敌人、精英、Boss受击身份；身体同时属于第10层，mask=513 |
 | 4 | PlayerHitbox | 8 | 玩家/友方攻击Area；mask=4 |
 | 5 | EnemyHitbox | 16 | 敌方攻击Area；mask=2 |
 | 6 | Projectile | 32 | 四种弹体Area根的类别；mask=5（玩家弹）或3（敌方弹） |
 | 7 | Interactable | 64 | 预留；当前交互物是Node3D+距离判定，不人为添加物理体 |
 | 8 | Pickup | 128 | 预留；当前拾取用距离判定，不人为添加物理体 |
 | 9 | VfxOnly | 256 | 仅预留名字；生产纯特效不创建CollisionObject3D，不分配此层 |
+| 10 | UnitBody | 512 | 共用身体阻挡层，所有单位身体mask=World＋UnitBody（513） |
 
-- 所有 `Unit` 的CharacterBody3D只撞World，同阵营和敌阵营均可穿过；不加软推挤，不依赖身体挡住来凑近战距离。
+- J33用户恢复原意：所有Unit身体彼此阻挡，包括同阵营；攻击与弹道仅查询敌对受击身份。奔跑轻推、飞行高度及后续受力设计见[当前碰撞约定](collision-layers.md)。
 - `AttackHitbox` 在Ready按祖先Unit预配置，在Activate按真实来源刷新；常开Monitoring，仅切换激活态。
   独立生成的Explosion也由Detonate的来源配置。保留IsHostileTo与HitTracker两道结算校验。
-- `Projectile` 默认每物理帧单次射线；`SweepMaxHits>0` 时改用整段胶囊 `IntersectShape`，按弹道投影排序，World 用同半径球的最早阻挡距离裁定，预算用尽停点续扫。`SweepRadius` 默认0.08世界米，可在弹体场景调节。
+- `Projectile` 按QueryGeometry选择射线（0）或整段胶囊查询（1）；SweepMaxHits只控制单帧命中预算，≤0取默认8，与查询几何独立。胶囊命中按弹道投影排序，World用同半径球的最早阻挡距离裁定，预算用尽停点续扫。SweepRadius默认0.08世界米，可在弹体场景调节，见[J28](character-design-j28.md)。
   `ConfigIndex.tres.ProjectileMaxSpeed` 是全局实际弹速上限，当前200m/s；Launch、弹射与追踪/重力后均夹取速度向量。技能发射快照保留原值，`Projectile.ActualSpeed` 读实际速度，详见 [J12](character-design-j12.md)。
   Area根不设形状、Monitoring/Monitorable均关闭，避免重复重叠结算。
   Launch统一配置阵营mask，`HitMask`兼容旧导出列；命中起点在体内也有效，已命中的RID加入排除列表，防止重复消耗穿透次数。
   弹射与追踪均按敌对阵营索敌，斩弹仍用既有场景名单与运行期弹体列表。
 - `KillZone` 是Area，layer=0、mask=6，只检测单位身体；死亡Unit的layer归零。
-- 近战身体完全重叠、闪/剑突穿单位、地形阻挡、双阵营四种弹体与全部敌人AI必须用真实物理帧验收。
+- 近战在身体接触前沿可命中；闪保留显式穿单位例外，普通剑突受身体阻挡。地形阻挡、双阵营弹体与全部敌人AI必须用真实物理帧验收。
   复现及证据见 [d-batch-verification.md](d-batch-verification.md)。
 
 ## Unit 与表现的分工

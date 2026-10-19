@@ -1,0 +1,8 @@
+J33 最终验收汇总（2026-10-19）
+生产代码完整回归：character-design-j33-failure-20261019_110234.log
+该轮身体31、D91、特化194、弹道56、弓39、蓄力80、角色115、龙箭42、符文83均0失败；其Main包含旧固定靶失败，不能作为Main通过证据。
+仅SelfTest固定靶隔离后复核：character-design-j33-main-20261019_110824.log
+Debug及ExportRelease均0警告0错误。Main exit=0 seconds=69.14 stderrBytes=0；八指标逐字一致；J8通过18、红标0；历史红标5，无新增。
+四份真实存档哈希不变，rune.cfg不存在，selftest.flag已清理。完整存档指纹见上述两份原始日志。
+11个C#文件UTF8无BOM/LF；84个文档链接通过；git diff --check通过；CodeGraph已强制更新。
+外部工作区指纹见character-design-j33-workspace.log；project.godot仅暂存新增第10层名，外部配置重排未混入。

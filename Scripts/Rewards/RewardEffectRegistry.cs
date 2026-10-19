@@ -25,6 +25,11 @@ public static class RewardEffectRegistry
 	{
 		// 通用的"改 StatSheet"—— 19 条里有 14 条走它，只靠 Modifiers 里的数据表达，不需要新代码。
 		["StatSet"] = row => context => ApplyModifiers(row, context),
+		["HappyRunner"] = row => context => context.Player.AddChild(new HappyRunnerRule
+		{
+			DamageFreeSeconds = Param(row, "DamageFreeSeconds", 10f), HealPerSecond = Param(row, "HealPerSecond", 1f),
+			PushSpeed = Param(row, "PushSpeed", 5f), PushCooldown = Param(row, "PushCooldown", 0.5f),
+		}),
 		["Specialization"] = row => context =>
 		{
 			ApplyModifiers(row, context);

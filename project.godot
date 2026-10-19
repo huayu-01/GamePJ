@@ -132,6 +132,7 @@ sprint={
 3d_physics/layer_7="Interactable"
 3d_physics/layer_8="Pickup"
 3d_physics/layer_9="VfxOnly"
+3d_physics/layer_10="UnitBody"
 
 [physics]
 

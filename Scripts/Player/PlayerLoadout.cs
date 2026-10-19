@@ -25,6 +25,8 @@ public sealed class PlayerLoadout
 			player.RemoveChild(specialization); specialization.QueueFree();
 		}
 		player.ResetArmorHealthConversion();
+		foreach (Node child in player.GetChildren())
+			if (child is HappyRunnerRule) { player.RemoveChild(child); child.QueueFree(); }
 		CharacterConfig? character = RunController.CharacterRow(characterKind);
 		WeaponConfig? weaponRow = RunController.WeaponRow(weaponKind);
 		var abilities = new List<Ability>();

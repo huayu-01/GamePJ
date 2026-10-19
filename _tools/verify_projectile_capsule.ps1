@@ -1,5 +1,5 @@
 # J12：胶囊扫掠、全局实际弹速上限与五探针回归，验证独占且保护真实存档。
-param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization)
+param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization, [switch]$BodyCollision, [switch]$MainOnly)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
 $godotExe = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
@@ -16,6 +16,7 @@ if ($AttackSnapshot) { $batchId = 'j29' }
 if ($DotAttribution) { $batchId = 'j30' }
 if ($RuneUi) { $batchId = 'j31' }
 if ($Specialization) { $batchId = 'j32' }
+if ($BodyCollision) { $batchId = 'j33' }
 $saveNames = @('meta.cfg','ability_cards.cfg','settings.cfg','loadout.cfg','rune.cfg')
 $utf8 = [Text.UTF8Encoding]::new($false)
 
@@ -59,6 +60,7 @@ function Invoke-Probe([string]$RunName, [string]$Scene, [string]$Expected, [swit
         if ($err) { $evidence.Add($err) }
         if ($ownedProcess.ExitCode -ne 0 -or $out -notmatch $Expected -or $err.Length -gt 0) { throw "$RunName 未通过：$stdoutPath / $stderrPath" }
         if ($SelfTest) {
+            if ($BodyCollision -and $out -match '🔴 J8') { throw 'Main J8真实命中回归失败；保留日志，不以八指标代替技能断言。' }
             if (($SpiritSword -or $Scythe -or $Affection -or $Rainbow -or $GoldenRoad -or $LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) -and $out -notmatch '✅ P5b·实测表参数落到机制上') { throw 'Main专属技能增强契约探针未通过' }
             $markers = @('配置表：武器 6','节点布置：启用','配置表比对·玩家：','配置表比对·索引：','Pressure 测试（进化','白板首领实例：','端到端：按 F 之后','最小闭环·链路：')
             $baseline = Get-Content -LiteralPath (Join-Path $projectDir 'docs\character-design-j11-evidence.log')
@@ -102,7 +104,20 @@ try {
         $evidence.Add($build)
         if ($build -notmatch '0 个警告' -or $build -notmatch '0 个错误') { throw "$configuration 未满足 0/0" }
     }
-    if ($Specialization) {
+    if ($MainOnly) {
+        if (-not $BodyCollision -or $ProbeOnly) { throw 'MainOnly仅用于J33完整回归后的Main修复复核。' }
+        Invoke-Probe 'main' 'res://Scenes/Main.tscn' '=== 自测结束 ===' -SelfTest
+    }
+    elseif ($BodyCollision) {
+        Invoke-Probe 'body' 'res://Scenes/Debug/_BodyCollisionProbe.tscn' '身体分层验收结束：通过 \d+，失败 0'
+        if (-not $ProbeOnly) {
+            Invoke-Probe 'collision' 'res://Scenes/Debug/_BatchDProbe.tscn' 'D批验收结束：通过 91，失败 0'
+            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 194，失败 0'
+            Invoke-Probe 'projectile_query' 'res://Scenes/Debug/_ProjectileQueryProbe.tscn' '弹道查询验收结束：通过 56，失败 0'
+            Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
+        }
+    }
+    elseif ($Specialization) {
         Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 \d+，失败 0'
         Invoke-Probe 'specialization_render' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 \d+，失败 0' -Render
         if (-not $ProbeOnly) {
@@ -215,7 +230,7 @@ try {
         Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 \d+，失败 0'
         Invoke-Probe 'bow_render' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 \d+，失败 0' -Render
     }
-    if (-not $ProbeOnly) {
+    if (-not $ProbeOnly -and -not $MainOnly) {
         if ($WingDive) { Invoke-Probe 'landing' 'res://Scenes/Debug/_LandingKnockbackProbe.tscn' '地爆验收结束：通过 53，失败 0' }
         if ($KillFacts -or $WingDive) { Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0' }
         if ($KillJumps) { Invoke-Probe 'reward_rules' 'res://Scenes/Debug/_RewardRulesProbe.tscn' '获取规则验收结束：通过 78，失败 0' }
@@ -230,7 +245,7 @@ try {
         if ($LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'cleave' 'res://Scenes/Debug/_SpearCleaveProbe.tscn' '金光大道验收结束：通过 31，失败 0' }
         if ($GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'teleport' 'res://Scenes/Debug/_TeleportJumpProbe.tscn' '浮光跃金验收结束：通过 64，失败 0' }
         if ($ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'landing' 'res://Scenes/Debug/_LandingKnockbackProbe.tscn' '地爆验收结束：通过 53，失败 0' }
-        if ($ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'collision' 'res://Scenes/Debug/_BatchDProbe.tscn' 'D批验收结束：通过 90，失败 0' }
+        if ($ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'collision' 'res://Scenes/Debug/_BatchDProbe.tscn' 'D批验收结束：通过 91，失败 0' }
         Invoke-Probe 'charge' 'res://Scenes/Debug/_ChargeReleaseProbe.tscn' '蓄力释放验收结束：通过 80，失败 0'
         Invoke-Probe 'character' 'res://Scenes/Debug/_CharacterDesignProbe.tscn' '原始设计验收结束：通过 115，失败 0'
         Invoke-Probe 'dragon' 'res://Scenes/Debug/_DragonArrowProbe.tscn' '验收结束：通过 42，失败 0'
@@ -239,7 +254,7 @@ try {
     }
     $shotNames = if ($BowExitAudit -or $ChargeInputAudit -or $KillJumps -or $KillFacts -or $WingDive) { @() } elseif ($RewardTiers) { @('j24_reward_tiers') } elseif ($RewardRules) { @() } elseif ($JumpStomp) { @('j22_jump_stomp') } elseif ($ChargeEvolution) { @('j21_distinct_homing','j21_flow') } elseif ($ActionMovement) { @('j20_action_movement') } elseif ($GroundBurst) { @('j19_ground_burst') } elseif ($LightLeap) { @('j18_light_leap') } elseif ($GoldenRoad) { @('j17_golden_road') } elseif ($Rainbow) { @('j16_rainbow') } elseif ($Affection) { @('j15_affection','j15_world') } elseif ($Scythe) { @('j14_mercy','j14_salvation') } elseif ($SpiritSword) { @('j13_golden_qi','j13_great_draw','j13_divine_descent') } else { @('j12_capsule_sweep') }
     foreach ($shotName in $shotNames) {
-        if ($Specialization -or $RuneUi) { break }
+        if ($Specialization -or $RuneUi -or $BodyCollision) { break }
         $shotPath = Join-Path $projectDir "docs\screenshots\$shotName.png"
         if (-not (Test-Path -LiteralPath $shotPath)) { throw "$shotName 截图缺失" }
         $evidence.Add("截图 $shotName SHA256=$((Get-FileHash -LiteralPath $shotPath -Algorithm SHA256).Hash)")
@@ -254,7 +269,7 @@ try {
     }
     Save-Fingerprint 'AFTER'
     $evidence.Add("selftest.flag AFTER=$(Test-Path -LiteralPath (Join-Path $profileDir 'selftest.flag'))")
-    $outputName = if ($ProbeOnly) { "character-design-$batchId-probe-$runTag.log" } else { "character-design-$batchId-evidence.log" }
+    $outputName = if ($MainOnly) { "character-design-$batchId-main-$runTag.log" } elseif ($ProbeOnly) { "character-design-$batchId-probe-$runTag.log" } else { "character-design-$batchId-evidence.log" }
     [IO.File]::WriteAllText((Join-Path $projectDir "docs\$outputName"),(($evidence -join "`n").Replace("`r`n","`n").TrimEnd([char[]]"`r`n") + "`n"),$utf8)
     Write-Output "$batchId 验收完成：docs/$outputName"
 }
