@@ -1,0 +1,4 @@
+J34 工作区基线：c8af135（已有美术Toon与场景提交）
+唯一外部跟踪改动：project.godot 的gui/editor_plugins分节重排，4新增4删除；本批没有修改或暂存它。
+project.godot SHA256=1FEE77ECDDBA370E0EA66AD593E32864904A6BAF8CFEA6B9266E8A824E0AC3A1
+其他未跟踪美术实验场、模型、截图与旧脚本uid/import保留，不混入本批。

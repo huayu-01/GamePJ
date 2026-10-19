@@ -10,6 +10,7 @@
 | 23项特化权威接收清单 | [后续构筑](followup-build-updates.md) |
 | 架构、战斗与表结构 | [架构](architecture.md)、[战斗](combat.md)、[配置](config-schema.md) |
 | 身体碰撞、飞行与受力约定 | [当前碰撞约定](collision-layers.md) |
+| 飞行、压低、打落与持续力接入 | [J34系统与验证场](character-design-j34.md) |
 | 基地与界面 | [基地配装](base-loadout.md)、[UI](ui.md) |
 | 原始角色需求核对 | [原文审计](original-design-audit.md) |
 | 验证与排障 | [测试](testing.md)、[CodeGraph](codegraph-usage.md) |

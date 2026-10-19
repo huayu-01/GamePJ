@@ -57,6 +57,8 @@ public abstract partial class UnitConfig : ConfigRow
 	[ExportGroup("移速（基础移动速度；增益走 StatSheet 的 MoveSpeedMultiplier）")]
 	/// <summary>基础移动速度（增益通过 StatSheet 的 MoveSpeedMultiplier 放大）。</summary>
 	[Export] public float MoveSpeed { get; set; } = 4f;
+	/// <summary>可选物理档案；留空保留Movement场景回退，地面／飞行与质量不依赖阵营。</summary>
+	[Export] public UnitPhysicsProfile? PhysicsProfile { get; set; }
 
 	[ExportGroup("攻击（主攻击 = 子树里第一个带命中体的能力；0 = 不覆盖）")]
 	/// <summary>主攻击的伤害（写进命中体的 <c>Damage</c>；远程兵这类没有命中体的写进武器组件）。0 = 不覆盖。</summary>
@@ -186,6 +188,7 @@ public abstract partial class UnitConfig : ConfigRow
 		unit.ArmorDamageReduction = ArmorDamageReduction;
 		unit.DamageReduction = DamageReduction;
 		unit.KnockbackResistance = KnockbackResistance;
+		ApplyPhysicsTo(unit);
 		if (Tags.Length > 0)
 		{
 			unit.Tags = Tags;
@@ -227,6 +230,10 @@ public abstract partial class UnitConfig : ConfigRow
 	/// 没有 Brain 的单位（玩家、没有 AI 的召唤物）调用它也是空操作。
 	/// </summary>
 	public void ApplyAiProfileTo(Unit unit) => AiProfile?.ApplyTo(unit);
+	public void ApplyPhysicsTo(Unit unit)
+	{
+		if (PhysicsProfile != null) unit.GetNodeOrNull<CharacterMovement>("Movement")?.ConfigurePhysics(PhysicsProfile);
+	}
 
 	/// <summary>
 	/// 攻击组 → 单位的**主攻击**：子树里第一个"带命中体、或带武器组件"的能力。

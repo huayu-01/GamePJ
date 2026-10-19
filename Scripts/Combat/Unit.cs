@@ -326,11 +326,22 @@ public partial class Unit : CharacterBody3D
 	/// <summary>纯击退入口，复用单位乘区、无敌与移动组件抗性。</summary>
 	public bool ReceiveKnockback(Vector3 impulse)
 	{
-		if (IsDead || IsInvulnerable || impulse.LengthSquared() < 0.000001f) return false;
+		if (IsDead || IsInvulnerable || Movement?.IsControlImmune == true || !impulse.IsFinite() || impulse.LengthSquared() < 0.000001f) return false;
 		// 纯击退不伪造伤害／命中事件；抗性仍由移动组件消费。
 		KnockbackReceived?.Invoke(impulse * Stats.Get("KnockbackMultiplier"));
 		return true;
 	}
+	/// <summary>持续战斗力不伪造命中；环境风场可直接调用Movement.SetForce绕过战斗免疫。</summary>
+	public bool ReceiveForce(object source, Vector3 force, float seconds)
+	{
+		if (IsDead || IsInvulnerable || Movement == null || Movement.IsControlImmune || !force.IsFinite() || !float.IsFinite(seconds) || seconds <= 0f) return false;
+		Movement.SetForce(source, force * Stats.Get("KnockbackMultiplier") * (1f - Mathf.Clamp(KnockbackResistance, 0f, 1f)), seconds);
+		return true;
+	}
+	public bool ReceiveHeightSuppression(object source, float height, float seconds) =>
+		!IsDead && !IsInvulnerable && Movement?.SuppressFlightHeight(source, height, seconds) == true;
+	public bool ReceiveKnockDown(float downwardSpeed) =>
+		!IsDead && !IsInvulnerable && Movement?.TryKnockDown(downwardSpeed) == true;
 
 	/// <summary>统一命中入口。顺序见 战斗规则说明 §12：命中 → 无敌 → 格挡 → 减伤 → 护甲 → 护盾 → 生命。</summary>
 	public DamageResult ReceiveHit(HitInstance hit)
@@ -498,7 +509,7 @@ public partial class Unit : CharacterBody3D
 		{
 			Die(hit);
 		}
-		else if (damage > 0f && hit.Knockback > 0f)
+		else if (damage > 0f && hit.Knockback > 0f && Movement?.IsControlImmune != true)
 		{
 			float scale = Stats.Get("KnockbackMultiplier");
 			KnockbackReceived?.Invoke(hit.Direction.Normalized() * hit.Knockback * scale);

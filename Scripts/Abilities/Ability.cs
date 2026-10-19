@@ -503,7 +503,7 @@ public abstract partial class Ability : Node3D
 	{
 		EnsureInitialized();
 		EnsureAnimEventHooked();
-		if (OwnerUnit is null or { IsDead: true } || !IsReady || !CanActivate(target))
+		if (OwnerUnit is null or { IsDead: true } || OwnerUnit.Movement?.IsControlDisabled == true || !IsReady || !CanActivate(target))
 		{
 			return false;
 		}
@@ -1040,6 +1040,8 @@ public abstract partial class Ability : Node3D
 		RefreshCooldown();
 	}
 	protected virtual void OnLoadoutReset() { }
+	/// <summary>明确的硬控制可终止动作；霸体在单位受控入口判断，收尾与普通技能交接一致。</summary>
+	public void InterruptByControl() { if (IsBusy) Finish(); }
 
 	protected void Cancel()
 	{

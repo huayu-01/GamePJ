@@ -17,6 +17,8 @@ public sealed class PlayerLoadout
 {
 	private readonly Dictionary<Ability, (bool Enabled, string Action, string Id)> _baseline = new();
 	private int? _baseAirJumps;
+	private UnitPhysicsProfile? _basePhysicsProfile;
+	private bool _physicsCaptured;
 
 	public void Apply(Unit player, Node owner, PlayerCharacterKind characterKind, WeaponPresetKind weaponKind)
 	{
@@ -32,6 +34,8 @@ public sealed class PlayerLoadout
 		var abilities = new List<Ability>();
 		if (player.Movement is { } jump)
 		{
+			if (!_physicsCaptured) { _basePhysicsProfile = jump.PhysicsProfile; _physicsCaptured = true; }
+			jump.ConfigurePhysics(character?.PhysicsProfile ?? _basePhysicsProfile);
 			jump.ConfigureTeleportJump(false);
 			_baseAirJumps ??= jump.ExtraAirJumps;
 			jump.SetExtraAirJumps(_baseAirJumps.Value, Mathf.Max(_baseAirJumps.Value, jump.ExtraAirJumps));

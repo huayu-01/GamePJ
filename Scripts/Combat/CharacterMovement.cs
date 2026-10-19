@@ -127,6 +127,7 @@ public partial class CharacterMovement : Node
 	/// <summary>动作持有完整三维速度；结束时只能释放自己持有的覆盖。</summary>
 	public bool BeginVelocityOverride(object source, Vector3 velocity, float duration = -1, bool isDash = false)
 	{
+		if (IsControlDisabled) return false;
 		if (_velocityOverrideSource != null && !ReferenceEquals(_velocityOverrideSource, source)) return false;
 		_velocityOverrideSource = source;
 		_overrideVelocity = velocity;
@@ -143,6 +144,7 @@ public partial class CharacterMovement : Node
 		_overrideIsDash = false;
 		_inputVelocity = Vector3.Zero;
 		if (IsInstanceValid(_body)) _body.Velocity = Vector3.Zero;
+		_previousExternalY = 0f;
 	}
 
 	public bool IsGrounded => _body.IsOnFloor();
@@ -179,6 +181,7 @@ public partial class CharacterMovement : Node
 	/// <summary>位移技能用：在持续时间内以固定速度沿方向移动，忽略常规加速度。</summary>
 	public void BeginDash(Vector3 direction, float speed)
 	{
+		if (IsControlDisabled) return;
 		_dashDirection = direction.LengthSquared() < 0.0001f ? -_body.GlobalTransform.Basis.Z : direction.Normalized();
 		_dashSpeed = speed;
 	}
@@ -197,6 +200,7 @@ public partial class CharacterMovement : Node
 		Vector3 v = _body.Velocity;
 		v.Y = velocity;
 		_body.Velocity = v;
+		_previousExternalY = 0f;
 	}
 	/// <summary>成功的主动起跳事实，携带起跳前圆心；落地、击退和单纯离地不产生此事件。</summary>
 	public event Action<Vector3>? JumpStarted;
@@ -277,6 +281,7 @@ public partial class CharacterMovement : Node
 
 	public override void _ExitTree()
 	{
+		_forces.Clear(); _heightLimits.Clear();
 		_movementAbilities.Clear();
 		if (_unit != null)
 		{
@@ -322,6 +327,7 @@ public partial class CharacterMovement : Node
 
 	public bool TryJump()
 	{
+		if (CanFly || IsControlDisabled) return false;
 		if (HasVelocityOverride) return false;
 		if (TeleportJumpEnabled) return TryTeleportJump();
 		if (_body.IsOnFloor())
@@ -356,6 +362,7 @@ public partial class CharacterMovement : Node
 		_body.ResetPhysicsInterpolation();
 		_body.Velocity = _body.Velocity with { Y = 0f };
 		_externalVelocity.Y = 0f;
+		_previousExternalY = 0f;
 		_airJumpsLeft = 0;
 		_teleportJumpConsumed = _teleportAwaitAir = true;
 		_apexY = _body.GlobalPosition.Y;
@@ -368,9 +375,12 @@ public partial class CharacterMovement : Node
 		return true;
 	}
 
-	public void AddImpulse(Vector3 impulse) => _externalVelocity += impulse;
+	public void AddImpulse(Vector3 impulse) { if (impulse.IsFinite()) _externalVelocity += impulse; }
 
-	private void OnKnockback(Vector3 impulse) => AddImpulse(impulse * (1f - (_unit?.KnockbackResistance ?? 0f)));
+	private void OnKnockback(Vector3 impulse)
+	{
+		if (!IsControlImmune) ApplyPhysicalImpulse(impulse * (1f - Mathf.Clamp(_unit?.KnockbackResistance ?? 0f, 0f, 1f)));
+	}
 
 	public override void _PhysicsProcess(double delta)
 	{
@@ -381,6 +391,10 @@ public partial class CharacterMovement : Node
 		}
 
 		Vector3 velocity = _body.Velocity;
+		// 上帧外力仅作为速度组成项，不能再次加到垂直基础速度形成正反馈。
+		velocity.Y -= _previousExternalY;
+		StepPhysicsEffects(dt);
+		bool flying = ApplyFlightLift(ref velocity, dt);
 
 		if (_body.IsOnFloor())
 		{
@@ -389,7 +403,7 @@ public partial class CharacterMovement : Node
 			// 落地：这次的"最高点"追踪结束（FallHeight 保留最后一次的值，落地那一帧仍然读得到）。
 			_apexTracking = false;
 		}
-		else
+		else if (!flying)
 		{
 			_teleportAwaitAir = false;
 			// ⭐ J11：正常下落速度上限的单位级倍率（符文「飞翼」= 降低正常下落速度）。
@@ -415,10 +429,10 @@ public partial class CharacterMovement : Node
 
 		if (HasVelocityOverride)
 		{
-			_externalVelocity *= Mathf.Max(0, 1 - ImpulseDamping * dt);
 			float fraction = _overrideTimeLeft < 0 ? 1 : Mathf.Clamp(_overrideTimeLeft / Mathf.Max(0.000001f, dt), 0, 1);
 			_body.Velocity = _overrideVelocity * fraction;
 			_body.MoveAndSlide();
+			_previousExternalY = 0f;
 			if (_overrideTimeLeft >= 0)
 			{
 				_overrideTimeLeft = Mathf.Max(0, _overrideTimeLeft - dt);
@@ -435,7 +449,7 @@ public partial class CharacterMovement : Node
 			planar = _dashDirection * _dashSpeed;
 			_inputVelocity = planar;
 		}
-		else if (IsActionMovementLocked)
+		else if (IsActionMovementLocked || IsControlDisabled)
 		{
 			// 进入锁定动作立即收住主动惯性；不清外力，避免抵消击退或技能突进。
 			_inputVelocity = planar = Vector3.Zero;
@@ -449,13 +463,12 @@ public partial class CharacterMovement : Node
 			planar = _inputVelocity;
 		}
 
-		_externalVelocity *= Mathf.Max(0f, 1f - ImpulseDamping * dt);
-
 		velocity.X = planar.X + _externalVelocity.X;
 		velocity.Z = planar.Z + _externalVelocity.Z;
 		velocity.Y += _externalVelocity.Y;
 		_body.Velocity = velocity;
 		_body.MoveAndSlide();
+		FinishPhysicsMove(Mathf.Max(0f, -velocity.Y));
 
 		if (!FaceMovementDirection)
 		{
