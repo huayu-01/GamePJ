@@ -43,6 +43,9 @@ public partial class EnemyConfig : UnitConfig
 
 	/// <summary>占用多少 Spawn Budget。</summary>
 	[Export] public int Cost { get; set; } = 1;
+	/// <summary>行为压力条目；有配置时成本由共享压力表求和并向上取整，Cost仅作旧资源回退。</summary>
+	[Export] public string[] PressureBehaviors { get; set; } = System.Array.Empty<string>();
+	public int SpawnResourceCost => EnemyBehaviorPressure.SpawnCost(PressureBehaviors, Cost);
 
 	/// <summary>生成权重（0 = 不参与随机）。</summary>
 	[Export] public float Weight { get; set; } = 1f;

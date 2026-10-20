@@ -340,11 +340,11 @@ public partial class EncounterController : Node3D
 
 			// 总预算还没花完但暂时抽不出（额度不够/时间门槛未到），稍后再试。
 			_spawnTimer = 0.4f;
-			CheckCompleted();
+			if (TotalSpawned > 0) CheckCompleted();
 			return;
 		}
 
-		Spawn(entry);
+		if (!Spawn(entry)) { _spawnTimer = 0.3f; return; }
 		_spawnTimer = SpawnInterval;
 		CheckCompleted();
 	}
@@ -381,8 +381,9 @@ public partial class EncounterController : Node3D
 
 		// 与波次刷怪同序：实例化 → ApplyTo → AddChild（`Unit._EnterTree` 要捕获基础值）。
 		EnemyRow(entry)?.ApplyTo(enemy);
+		if (!SpawnPlanner.TryFindSpawnPoint(player.GlobalPosition, MinSpawnDistance, SpawnRadius, out Vector3 spawnPoint, enemy)) { enemy.Free(); return null; }
 		AddChild(enemy);
-		enemy.GlobalPosition = SpawnPlanner.FindSpawnPoint(player.GlobalPosition, MinSpawnDistance, SpawnRadius);
+		enemy.GlobalPosition = spawnPoint;
 
 		// 全局难度倍率 + 本关缩放：与波次刷怪同一条路（游离怪不该是特例）。
 		ConfigIndex.ScaleEnemy(enemy, this, false);
@@ -522,7 +523,7 @@ public partial class EncounterController : Node3D
 				break;
 			}
 
-			Spawn(burst);
+			if (!Spawn(burst)) break;
 			_waveRemaining--;
 		}
 
@@ -545,7 +546,7 @@ public partial class EncounterController : Node3D
 
 	private bool IsAvailable(EnemySpawnEntry entry)
 	{
-		if (entry.Scene == null || RemainingBudget < entry.Cost || _spendable < entry.Cost)
+		if (!entry.Enabled || entry.Weight <= 0 || entry.Scene == null || RemainingBudget < entry.Cost || _spendable < entry.Cost)
 		{
 			return false;
 		}
@@ -553,15 +554,12 @@ public partial class EncounterController : Node3D
 		return ElapsedSeconds >= entry.MinElapsedSeconds;
 	}
 
-	private void Spawn(EnemySpawnEntry entry)
+	private bool Spawn(EnemySpawnEntry entry)
 	{
 		if (entry.Scene == null || _player == null)
 		{
-			return;
+			return false;
 		}
-
-		RemainingBudget -= entry.Cost;
-		_spendable -= entry.Cost;
 
 		var enemy = entry.Scene.Instantiate<Unit>();
 
@@ -570,17 +568,20 @@ public partial class EncounterController : Node3D
 		// 晚套用会让"回满生命"算错（见 config-tables-inventory.md #10）。
 		EnemyRow(entry)?.ApplyTo(enemy);
 
-		AddChild(enemy);
-		enemy.GlobalPosition = SpawnPlanner.FindSpawnPoint(_player?.GlobalPosition ?? GlobalPosition, MinSpawnDistance, SpawnRadius);
-
 		// 精英概率倍率优先读敌人表的全局行（`Config/Tables/Enemies/enemy_global.tres`），读不到才用 ConfigIndex 的旧字段。
 		float eliteScale = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.EnemyConfig>("enemy_global")?.EliteChanceMultiplier
 			?? ConfigIndex.Settings.EliteChanceMultiplier;
 		float eliteChance = (entry.EliteChance + EliteChanceScale) * eliteScale;
 		if (eliteChance > 0f && GD.Randf() < eliteChance)
 		{
-			enemy.AddChild(new EliteModifier());
+			var elite = new EliteModifier(); enemy.AddChild(elite);
+			// 选点先按最终体积检查；数值仍等EnterTree捕获基础值后由精英Ready套用。
+			enemy.Scale = Vector3.One * elite.ModelScale;
 		}
+		if (!SpawnPlanner.TryFindSpawnPoint(_player.GlobalPosition, MinSpawnDistance, SpawnRadius, out Vector3 spawnPoint, enemy)) { enemy.Free(); return false; }
+		AddChild(enemy); enemy.GlobalPosition = spawnPoint;
+		RemainingBudget -= entry.Cost;
+		_spendable -= entry.Cost;
 
 		// 全局难度倍率在生成后套用（会回满生命）；再乘本关自己的缩放。
 		ConfigIndex.ScaleEnemy(enemy, this, false);
@@ -601,6 +602,7 @@ public partial class EncounterController : Node3D
 		ActRoguelike.Core.GameLog.Write("Spawn", $"生成 {entry.DisplayName}（剩余预算 {RemainingBudget:0}，场上 {AliveCount}）");
 		TotalSpawned++;
 		AliveCount++;
+		return true;
 	}
 
 
@@ -761,7 +763,7 @@ public partial class EncounterController : Node3D
 			if (row != null)
 			{
 				entry.DisplayName = row.DisplayName;
-				entry.Cost = Mathf.Max(1, row.Cost);
+				entry.Cost = row.SpawnResourceCost;
 				entry.Weight = row.Weight;
 				entry.MinElapsedSeconds = row.MinElapsedSeconds;
 				entry.EliteChance = row.EliteChance;
@@ -809,8 +811,12 @@ public partial class EncounterController : Node3D
 
 		_eliteBoss = EliteBossScene.Instantiate<Unit>();
 		BossRow(EliteBossScene)?.ApplyTo(_eliteBoss);
+		if (!SpawnPlanner.TryFindSpawnPoint(_player?.GlobalPosition ?? GlobalPosition, MinSpawnDistance, SpawnRadius, out Vector3 point, _eliteBoss))
+		{
+			_eliteBoss.Free(); _eliteBoss = null; _eliteBossSpawned = false; return;
+		}
 		AddChild(_eliteBoss);
-		_eliteBoss.GlobalPosition = SpawnPlanner.FindSpawnPoint(_player?.GlobalPosition ?? GlobalPosition, MinSpawnDistance, SpawnRadius);
+		_eliteBoss.GlobalPosition = point;
 
 		// 血量倍率优先读首领行（`Config/Tables/Bosses/boss_*.tres` 的 EliteCopyHealthScale），
 		// 读不到才用场景导出值 —— 以前 `ConfigIndex.tres` 里有一份**没有消费者**的同名副本，改了不起作用。

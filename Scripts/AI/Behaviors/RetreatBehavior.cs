@@ -32,6 +32,7 @@ public partial class RetreatBehavior : Behavior
 		Movement.FaceDirection(-direction, delta);
 
 		float distance = HorizontalDistanceTo(Target);
-		Movement.SetIntent(-direction, distance < KeepDistance ? OwnerUnit.MoveSpeed * SpeedScale : 0f);
+		if (distance < KeepDistance) OwnerUnit.GetNodeOrNull<UnitNavigation>("Navigation")?.KeepRange(Target.GlobalPosition, KeepDistance, OwnerUnit.MoveSpeed * SpeedScale);
+		else Movement.Stop();
 	}
 }

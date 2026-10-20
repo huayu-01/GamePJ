@@ -28,15 +28,15 @@ public partial class KeepDistanceBehavior : Behavior
 
 		if (distance > PreferredDistance + Tolerance)
 		{
-			Movement.SetIntent(AvoidObstacles(direction), speed);
+			OwnerUnit.GetNodeOrNull<UnitNavigation>("Navigation")?.MoveTo(Target.GlobalPosition, speed);
 		}
 		else if (distance < Mathf.Max(1.5f, PreferredDistance - Tolerance))
 		{
-			Movement.SetIntent(-direction, speed);
+			OwnerUnit.GetNodeOrNull<UnitNavigation>("Navigation")?.KeepRange(Target.GlobalPosition, PreferredDistance, speed);
 		}
 		else if (Strafe)
 		{
-			Movement.SetIntent(direction.Cross(Vector3.Up).Normalized(), speed * StrafeScale);
+			OwnerUnit.GetNodeOrNull<UnitNavigation>("Navigation")?.KeepRange(Target.GlobalPosition, PreferredDistance, speed * StrafeScale, true);
 		}
 		else
 		{

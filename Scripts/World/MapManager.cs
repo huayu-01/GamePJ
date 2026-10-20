@@ -40,6 +40,7 @@ public partial class MapManager : Node3D
 	private int _polygonCount;
 	private SceneTreeTimer? _bakeTimer;
 	private bool _ownsRegion;
+	private ulong _readyAfterIteration;
 
 	public override void _Ready()
 	{
@@ -50,6 +51,7 @@ public partial class MapManager : Node3D
 
 	public override void _ExitTree()
 	{
+		ClearNavigationProfiles();
 		if (_bakeTimer != null && IsInstanceValid(_bakeTimer)) _bakeTimer.Timeout -= Bake;
 		_bakeTimer = null;
 		if (_ownsRegion && IsInstanceValid(_region)) _region!.QueueFree();
@@ -62,7 +64,8 @@ public partial class MapManager : Node3D
 	}
 
 	/// <summary>是否已经有可用的导航网格。</summary>
-	public bool IsReady => _baked && _map.IsValid && _polygonCount > 0 && NavigationServer3D.MapGetIterationId(_map) > 0;
+	public bool IsReady => _baked && _map.IsValid && _polygonCount > 0 && NavigationServer3D.MapGetIterationId(_map) > _readyAfterIteration
+		&& NavigationServer3D.MapGetClosestPointOwner(_map, GlobalPosition).IsValid;
 
 	/// <summary>烘焙出的多边形数量（诊断用）。</summary>
 	public int PolygonCount => _polygonCount;
@@ -74,7 +77,18 @@ public partial class MapManager : Node3D
 	/// </summary>
 	public void Rebuild()
 	{
-		if (_ownsRegion && IsInstanceValid(_region)) _region!.Free();
+		ClearNavigationProfiles();
+		NavigationRevision++;
+		if (IsInstanceValid(_region))
+		{
+			_baked = false;
+			_readyAfterIteration = NavigationServer3D.MapGetIterationId(_map);
+			_region!.NavigationMesh = CreateNavigationMesh(AgentRadius, AgentHeight);
+			_region.BakeNavigationMesh(false);
+			_polygonCount = _region.NavigationMesh.GetPolygonCount();
+			_map = _region.GetNavigationMap(); _baked = true;
+			return;
+		}
 		_region = null;
 		_ownsRegion = false;
 		_baked = false;
@@ -101,6 +115,7 @@ public partial class MapManager : Node3D
 					_ownsRegion = false;
 					_map = existing.GetNavigationMap();
 					_baked = true;
+					_readyAfterIteration = 0;
 					ActRoguelike.Core.GameLog.Write("Map", $"复用场景里已烘焙的导航网格：{_polygonCount} 个多边形");
 					return;
 				}
@@ -133,8 +148,10 @@ public partial class MapManager : Node3D
 		_region = region;
 		_ownsRegion = true;
 		_map = region.GetNavigationMap();
+		_readyAfterIteration = NavigationServer3D.MapGetIterationId(_map);
 		_polygonCount = mesh.GetPolygonCount();
 		_baked = true;
+		NavigationRevision++;
 
 		ActRoguelike.Core.GameLog.Write("Map", $"导航网格烘焙完成：{_polygonCount} 个多边形（半径 {AgentRadius} / 高度 {AgentHeight} / 最大坡 {AgentMaxSlope}°）");
 		if (_polygonCount == 0)

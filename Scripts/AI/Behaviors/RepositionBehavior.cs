@@ -29,11 +29,8 @@ public partial class RepositionBehavior : Behavior
 			return;
 		}
 
-		float angle = (float)GD.RandRange(0d, Mathf.Tau);
-		float radius = (float)GD.RandRange(MinDistance, MaxDistance);
-		Vector3 offset = new(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
-		_destination = Target.GlobalPosition + offset;
-		_hasDestination = true;
+		_hasDestination = ActRoguelike.World.MapManager.Instance?.TryRingPoint(Target.GlobalPosition, MinDistance, MaxDistance, out _destination, OwnerUnit, OwnerUnit.GlobalPosition) == true;
+		if (!_hasDestination) Movement?.Stop();
 	}
 
 	public override void Tick(float delta)
@@ -56,7 +53,7 @@ public partial class RepositionBehavior : Behavior
 
 		Vector3 direction = offset.Normalized();
 		Movement.FaceDirection(direction, delta);
-		Movement.SetIntent(direction, OwnerUnit.MoveSpeed * SpeedScale);
+		OwnerUnit.GetNodeOrNull<UnitNavigation>("Navigation")?.MoveTo(_destination, OwnerUnit.MoveSpeed * SpeedScale);
 	}
 
 	public override void OnExit() => Movement?.Stop();

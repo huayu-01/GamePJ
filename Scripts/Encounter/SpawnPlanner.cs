@@ -13,6 +13,11 @@ namespace ActRoguelike.Encounter;
 /// </summary>
 public static class SpawnPlanner
 {
+	public static bool TryFindSpawnPoint(Vector3 playerPosition, float minRadius, float maxRadius, out Vector3 point, ActRoguelike.Combat.Unit? unit = null)
+	{
+		point = default;
+		return World.MapManager.Instance?.TryRingPoint(playerPosition, minRadius, maxRadius, out point, unit) == true;
+	}
 	/// <summary>每波数量下限 / 上限（文档 L241）。</summary>
 	public const int MinWaveSize = 4;
 	public const int MaxWaveSize = 15;

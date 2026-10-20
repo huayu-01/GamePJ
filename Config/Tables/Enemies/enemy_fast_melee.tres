@@ -5,6 +5,7 @@
 [ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_fast_melee.tres" id="3_ai"]
 
 [resource]
+PressureBehaviors = PackedStringArray("FastMelee")
 script = ExtResource("1_row")
 Id = "enemy_fast_melee"
 Slot = 2

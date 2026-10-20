@@ -135,6 +135,8 @@ public partial class Unit : CharacterBody3D
 	{
 		SeedStats();
 		Movement = GetNodeOrNull<CharacterMovement>("Movement");
+		if (GetNodeOrNull<ActRoguelike.AI.EnemyBrain>("Brain") != null && GetNodeOrNull<ActRoguelike.AI.UnitNavigation>("Navigation") == null)
+			AddChild(new ActRoguelike.AI.UnitNavigation { Name = "Navigation" });
 		CollisionLayer = CombatLayers.BodyLayerOf(Faction);
 		// 共用身体层负责单位间阻挡；阵营层只供攻击盒和弹道选择目标。
 		CollisionMask = CombatLayers.BodyMask;

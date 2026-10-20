@@ -20,7 +20,7 @@ public partial class ChaseBehavior : Behavior
 		Movement.FaceDirection(toTarget, delta);
 
 		float distance = HorizontalDistanceTo(Target);
-		Vector3 move = AvoidObstacles(toTarget);
-		Movement.SetIntent(move, distance > StopDistance ? OwnerUnit.MoveSpeed * SpeedScale : 0f);
+		if (distance > StopDistance) OwnerUnit.GetNodeOrNull<UnitNavigation>("Navigation")?.MoveTo(Target.GlobalPosition, OwnerUnit.MoveSpeed * SpeedScale);
+		else Movement.Stop();
 	}
 }

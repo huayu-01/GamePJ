@@ -5,6 +5,7 @@
 [ext_resource type="Resource" path="res://Config/Tables/AiProfiles/ai_exploder.tres" id="3_ai"]
 
 [resource]
+PressureBehaviors = PackedStringArray("SelfDestruct")
 script = ExtResource("1_row")
 Id = "enemy_exploder"
 Slot = 3
