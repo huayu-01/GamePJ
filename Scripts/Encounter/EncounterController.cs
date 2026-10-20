@@ -497,10 +497,11 @@ public partial class EncounterController : Node3D
 			return;
 		}
 
+		var pool = new List<EnemySpawnEntry>();
+		foreach (var candidate in _entries) if (IsAvailable(candidate)) pool.Add(candidate);
+		if (pool.Count == 0) return;
 		_waveIndex++;
 		_waveEntries.Clear();
-
-		var pool = new List<EnemySpawnEntry>(_entries);
 		int maxTypes = Mathf.Clamp(WaveMaxTypes, 1, pool.Count);
 		int types = GD.RandRange(1, maxTypes);
 		for (int i = 0; i < types && pool.Count > 0; i++)
@@ -639,7 +640,7 @@ public partial class EncounterController : Node3D
 		float cheapest = float.MaxValue;
 		foreach (EnemySpawnEntry entry in _entries)
 		{
-			if (entry.Scene != null && ElapsedSeconds >= entry.MinElapsedSeconds && entry.Cost < cheapest)
+			if (entry.Enabled && entry.Weight > 0 && entry.Scene != null && entry.Cost < cheapest)
 			{
 				cheapest = entry.Cost;
 			}
@@ -752,6 +753,12 @@ public partial class EncounterController : Node3D
 	public void ApplyEntryFilter(StageDefinition definition)
 	{
 		_entries.Clear();
+		// 单位表是新增敌种的唯一入口；已有场景生成项保留，按路径去重。
+		var scenePaths = new HashSet<string>();
+		foreach (Node child in GetChildren()) if (child is EnemySpawnEntry { Scene: { } scene }) scenePaths.Add(scene.ResourcePath);
+		foreach (var row in ConfigIndex.Settings.Enemies)
+			if (!row.IsGlobal && row.Weight > 0 && !string.IsNullOrEmpty(row.ScenePath) && scenePaths.Add(row.ScenePath))
+				AddChild(new EnemySpawnEntry { Scene = ActRoguelike.Core.RuntimeResources.Load<PackedScene>(row.ScenePath) });
 		foreach (Node child in GetChildren())
 		{
 			if (child is not EnemySpawnEntry entry || entry.Scene == null)

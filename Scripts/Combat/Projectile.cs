@@ -16,6 +16,22 @@ public partial class Projectile : Area3D
 	[Export] public float Speed { get; set; } = 70f;
 	[Export] public float GravityScale { get; set; }
 	[Export] public float MaxLifetime { get; set; } = 2.5f;
+	public enum DistanceEndMode { Disappear, Drop, Explode }
+	[Export] public float MaxTravelDistance { get; set; }
+	[Export] public DistanceEndMode DistanceEnd { get; set; }
+	[Export] public bool ExplosionOnly { get; set; }
+	private bool _distanceEnded;
+	private void EndDistance()
+	{
+		if (_distanceEnded) return; _distanceEnded = true;
+		if (DistanceEnd == DistanceEndMode.Drop)
+		{
+			SeekAnyHostile = false; HomingStatusId = string.Empty; GravityScale = 1; GravityStartDistance = 0; _velocity = Vector3.Down;
+			return;
+		}
+		if (DistanceEnd == DistanceEndMode.Explode && !_exploded && _attack?.ExplosionRadius > 0) { _exploded = true; Detonate(GlobalPosition); }
+		QueueFree();
+	}
 
 	/// <summary>
 	/// **下坠起点**（米；0 = 一发射就受重力，与改动前逐位一致）。
@@ -243,6 +259,7 @@ public partial class Projectile : Area3D
 		_excludedBodies.Clear();
 		if (_ownerRid.IsValid) _excludedBodies.Add(_ownerRid);
 		TravelledDistance = 0f;
+		_distanceEnded = false;
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -278,6 +295,12 @@ public partial class Projectile : Area3D
 
 		Vector3 from = GlobalPosition;
 		Vector3 to = from + _velocity * dt;
+		if (MaxTravelDistance > 0 && !_distanceEnded)
+		{
+			float remaining = Mathf.Max(0, MaxTravelDistance - TravelledDistance);
+			if (from.DistanceTo(to) > remaining) to = from + _velocity.Normalized() * remaining;
+			if (remaining <= 0.00001f) { EndDistance(); return; }
+		}
 
 		if (QueryGeometry == 1)
 		{
@@ -287,6 +310,7 @@ public partial class Projectile : Area3D
 		{
 			RayFrame(from, to);
 		}
+		if (!IsQueuedForDeletion() && MaxTravelDistance > 0 && !_distanceEnded && TravelledDistance + 0.00001f >= MaxTravelDistance) EndDistance();
 	}
 
 	private void MoveAlongPath(Vector3 position)
@@ -384,6 +408,7 @@ public partial class Projectile : Area3D
 		{
 			_exploded = true;
 			Detonate(position);
+			if (ExplosionOnly) { QueueFree(); return false; }
 		}
 
 		if (collider is Unit target && _attack.Attacker != null && _attack.Attacker.IsHostileTo(target))

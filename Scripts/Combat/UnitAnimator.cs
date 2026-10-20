@@ -78,9 +78,17 @@ public partial class UnitAnimator : Node
 	private string _source = "组件默认值";
 	private float _speed;
 	private bool _dead;
+	private bool _reactionPlaying;
+	public void PlayHitReaction()
+	{
+		if (_player == null || _skillPlaying || _dead) return;
+		foreach (string name in new[] { "hit", "hurt", "damage" })
+			if (_player.HasAnimation(name)) { _player.SpeedScale = 1; _player.Play(name, 0.04); _current = name; _reactionPlaying = true; return; }
+	}
 
 	/// <summary>技能动画库的目录/库名（来自单位表；空 = 这个单位没有技能动画）。</summary>
 	private string _skillDir = string.Empty;
+	[Export(PropertyHint.Dir)] public string SkillLibraryDirectory { get; set; } = string.Empty;
 	private string _skillLibrary = "skills";
 
 	/// <summary>已经真的把技能动画库加进播放器了（惰性、只做一次）。</summary>
@@ -251,6 +259,7 @@ public partial class UnitAnimator : Node
 	public override void _Ready()
 	{
 		_unit = GetParent<Unit>();
+		if (!string.IsNullOrEmpty(SkillLibraryDirectory)) _skillDir = SkillLibraryDirectory;
 		_unit.Died += OnDied;
 		_currentAnimator = this;
 		Bind();
@@ -277,6 +286,11 @@ public partial class UnitAnimator : Node
 		}
 
 		Vector3 velocity = _unit.Velocity;
+		if (_reactionPlaying)
+		{
+			if (_unit.Reactions?.IsStaggered == true) return;
+			_reactionPlaying = false; _current = string.Empty;
+		}
 		_speed = new Vector2(velocity.X, velocity.Z).Length();
 
 		if (_skillPlaying)
@@ -424,7 +438,7 @@ public partial class UnitAnimator : Node
 	/// </summary>
 	private void SetLoop(string name, bool loop)
 	{
-		if (_player?.GetAnimation(name) is not { } animation)
+		if (string.IsNullOrEmpty(name) || _player == null || !_player.HasAnimation(name) || _player.GetAnimation(name) is not { } animation)
 		{
 			return;
 		}

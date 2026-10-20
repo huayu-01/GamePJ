@@ -90,6 +90,7 @@ public partial class Unit : CharacterBody3D
 	public event Action? ArmorBroke;
 	public event Action? ShieldBroke;
 	public event Action<Vector3>? KnockbackReceived;
+	public CombatReaction? Reactions { get; private set; }
 
 	public bool IsValidTarget => !IsDead;
 	public bool HasTag(string tag) => Array.IndexOf(Tags, tag) >= 0;
@@ -135,6 +136,8 @@ public partial class Unit : CharacterBody3D
 	{
 		SeedStats();
 		Movement = GetNodeOrNull<CharacterMovement>("Movement");
+		Reactions = GetNodeOrNull<CombatReaction>("Reactions");
+		if (Reactions == null) { Reactions = new CombatReaction { Name = "Reactions" }; AddChild(Reactions); }
 		if (GetNodeOrNull<ActRoguelike.AI.EnemyBrain>("Brain") != null && GetNodeOrNull<ActRoguelike.AI.UnitNavigation>("Navigation") == null)
 			AddChild(new ActRoguelike.AI.UnitNavigation { Name = "Navigation" });
 		CollisionLayer = CombatLayers.BodyLayerOf(Faction);
@@ -379,6 +382,7 @@ public partial class Unit : CharacterBody3D
 		float damage = Mathf.Max(0f, hit.Damage * blocked * (1f - CombinedDamageReduction()) * (incoming > 0f ? incoming : 1f));
 
 		float remaining = damage;
+		bool hadArmor = Armor > 0;
 		float armorLost = 0f;
 		float shieldLost = 0f;
 		float healthLost = 0f;
@@ -468,6 +472,7 @@ public partial class Unit : CharacterBody3D
 		};
 
 		Damaged?.Invoke(result, hit);
+		Reactions?.ReceiveDamage(result, hit, hadArmor);
 
 		// 状态效果与伤害本体分离：命中就附加，与伤害数值无关（§20）。
 		if (hit.Attack?.Status is { } status)

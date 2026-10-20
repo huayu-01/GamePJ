@@ -583,7 +583,9 @@ public partial class SelfTest : Node
 				break;
 
 			case 46 when _timer > 0.3f:
-				if (ProbeGuardStance())
+				if (!_p4GuardVerified) _p4GuardVerified = ProbeGuardStance();
+				// 格挡者现在有真实硬直；下一项独立的下落攻击验收须等硬直自然结束。
+				if (_p4GuardVerified && _p4Player?.Reactions?.IsStaggered != true)
 				{
 					ProbeFallAttack();
 					Next();
@@ -2855,7 +2857,7 @@ public partial class SelfTest : Node
 		//   增幅项不在这一行（见下面「配置表比对·增幅项」）：74 → 57（删了 17 条旧行 = 旧强化 10 + 旧进化 4 + 旧异化 3），
 		//   剩下强化 9（= 设计文档 §227-243 那 9 条）/ 进化 23 / 异化 25。
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}/符文 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.RuneConfig>()}（期望 **J11 后 14 个数 = 6/2/10/1/1/39/7/14/8/5/6/11/4/11**；只打印、不比对。J11 之前是 13 个数 6/2/10/1/1/39/7/14/8/5/6/11/4 —— J11 的差额**只有**末尾多一张表（符文 11 枚），前 13 个数字一位都没动；P6b 后是 6/2/10/1/1/39/7/14/8/5/6/11/4；P6a 清旧后是 6/2/10/1/1/39/7/13/8/6/6/11/6；P5b 之前是 9/5/10/1/1/44/7/13/8/6/9/11/8 —— P6a 的差额**只有**武器 −3 / 角色 −3 / 技能 −5 / 升级池 −3 / 能力卡 −2；P6b 的差额**只有**效果 +1（`eff_missile_beacon`）/ 局外 −1（`meta_reload`）/ 能力卡 −2（两张弹匣卡））");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}/符文 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.RuneConfig>()}（期望J36：6/2/21/1/1/39/7/14/8/5/6/11/4/11；相对J11仅新增11条敌人行，其余索引不变）");
 
 		// 能力卡（局外装备层，`docs/ability-cards.md`）：卡表读数 + 状态层全流程
 		// （解锁 → 重复解锁 → 升级 → 上限 → 重置归还 → 激活额度记账 → 未解锁/额度不足/碎片不足 → 额度扩增）。
@@ -2990,7 +2992,7 @@ public partial class SelfTest : Node
 		ActRoguelike.Config.EnemyConfig? chaser = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.EnemyConfig>("enemy_chaser");
 		EncounterController? encounter = stage?.CurrentNode;
 		GameLog.Write("SelfTest",
-			$"配置表比对·敌人表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()} 行（期望 10 = 1 全局 + 9 敌种） 全局行 生命×{global?.HealthMultiplier:0.##}/伤害×{global?.DamageMultiplier:0.##}（期望 0.75/0.3） 本关白名单 [{string.Join(",", stage?.Definition?.AllowedEnemyIds ?? System.Array.Empty<string>())}]（期望按 Id） 实际可生成 [{encounter?.AllowedEntrySummary}]");
+			$"配置表比对·敌人表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()} 行（期望 21 = 1 全局 + 20 敌种；J36新增11原型） 全局行 生命×{global?.HealthMultiplier:0.##}/伤害×{global?.DamageMultiplier:0.##}（期望 0.75/0.3） 本关白名单 [{string.Join(",", stage?.Definition?.AllowedEnemyIds ?? System.Array.Empty<string>())}]（期望按 Id） 实际可生成 [{encounter?.AllowedEntrySummary}]");
 		GameLog.Write("SelfTest",
 			chaser == null
 				? "配置表比对·敌人行：读不到 enemy_chaser（应回退到场景值）"
@@ -4755,6 +4757,7 @@ public partial class SelfTest : Node
 
 	/// <summary>技能2「架」：0.75s 架势内被命中 → 规避这次 + 退出架势。</summary>
 	private bool _p4GuardStarted;
+	private bool _p4GuardVerified;
 	private bool ProbeGuardStance()
 	{
 		if (_p4Player == null || _p4Guard == null)

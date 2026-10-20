@@ -427,7 +427,7 @@ public partial class CharacterMovement : Node
 			FallHeight = Mathf.Max(0f, _apexY - nowY);
 		}
 
-		if (HasVelocityOverride)
+		if (HasVelocityOverride && _unit?.Reactions?.IsStaggered != true)
 		{
 			float fraction = _overrideTimeLeft < 0 ? 1 : Mathf.Clamp(_overrideTimeLeft / Mathf.Max(0.000001f, dt), 0, 1);
 			_body.Velocity = _overrideVelocity * fraction;
@@ -444,7 +444,7 @@ public partial class CharacterMovement : Node
 
 		// 输入速度单独维护：不能从刚体速度里读回来，否则击退会叠加上一帧的击退形成正反馈。
 		Vector3 planar;
-		if (_dashSpeed > 0f)
+		if (_dashSpeed > 0f && !IsControlDisabled)
 		{
 			planar = _dashDirection * _dashSpeed;
 			_inputVelocity = planar;

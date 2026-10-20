@@ -18,6 +18,7 @@ public partial class MeleeAttackAbility : Ability
 
 	private AttackHitbox _hitbox = null!;
 	private int _stage;
+	protected override void OnFinishOrCancel() => _hitbox?.Deactivate();
 
 	protected override void OnReady()
 	{

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=3 format=3]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1"]
+[ext_resource type="Resource" path="res://Config/Physics/ground_heavy.tres" id="heavy"]
+[resource]
+script = ExtResource("1")
+Id = "enemy_heavy_slammer"
+DisplayName = "重击敌人"
+ScenePath = "res://Scenes/Enemies/HeavySlammer.tscn"
+MaxHealth = 240.0
+MoveSpeed = 2.3
+Cost = 3
+Weight = 1.0
+MinElapsedSeconds = 20.0
+EliteChance = 0.1
+PressureBehaviors = PackedStringArray("GroundSlam")
+AnimLibraryDir = "res://Assets/Animations/enemies/"
+Tags = PackedStringArray("Ground", "heavy_slammer")
+PhysicsProfile = ExtResource("heavy")
+Note = "机制原型；模型为占位。成本由行为压力表求和，Cost只作旧配置回退。"

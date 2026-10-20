@@ -27,6 +27,7 @@ public sealed class PlayerLoadout
 			player.RemoveChild(specialization); specialization.QueueFree();
 		}
 		player.ResetArmorHealthConversion();
+		player.Reactions?.Reset();
 		foreach (Node child in player.GetChildren())
 			if (child is HappyRunnerRule) { player.RemoveChild(child); child.QueueFree(); }
 		CharacterConfig? character = RunController.CharacterRow(characterKind);

@@ -15,6 +15,7 @@ public partial class AreaAttackAbility : Ability
 
 	private AttackHitbox _hitbox = null!;
 	private int _stage;
+	protected override void OnFinishOrCancel() => _hitbox?.Deactivate();
 
 	protected override void OnReady()
 	{

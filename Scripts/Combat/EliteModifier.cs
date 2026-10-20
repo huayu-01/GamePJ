@@ -60,7 +60,8 @@ public partial class EliteModifier : Node
 			EmissionEnergyMultiplier = 0.35f,
 		};
 
-		TintRecursive(unit, material);
+		if (unit.GetNodeOrNull<UnitPresentation>("Presentation") is { } presentation && presentation.IsNodeReady()) presentation.SetBaseMaterial(material);
+		else TintRecursive(unit, material);
 	}
 
 	/// <summary>

@@ -1,5 +1,5 @@
 # J12：胶囊扫掠、全局实际弹速上限与五探针回归，验证独占且保护真实存档。
-param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization, [switch]$BodyCollision, [switch]$MainOnly, [switch]$FlightPhysics, [switch]$NavigationFoundation)
+param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization, [switch]$BodyCollision, [switch]$MainOnly, [switch]$FlightPhysics, [switch]$NavigationFoundation, [switch]$EnemyRoster, [switch]$LabOnly)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
 $godotExe = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
@@ -19,6 +19,7 @@ if ($Specialization) { $batchId = 'j32' }
 if ($BodyCollision) { $batchId = 'j33' }
 if ($FlightPhysics) { $batchId = 'j34' }
 if ($NavigationFoundation) { $batchId = 'j35' }
+if ($EnemyRoster) { $batchId = 'j36' }
 $saveNames = @('meta.cfg','ability_cards.cfg','settings.cfg','loadout.cfg','rune.cfg')
 $utf8 = [Text.UTF8Encoding]::new($false)
 
@@ -63,17 +64,31 @@ function Invoke-Probe([string]$RunName, [string]$Scene, [string]$Expected, [swit
         if ($err) { $evidence.Add($err) }
         if ($ownedProcess.ExitCode -ne 0 -or $out -notmatch $Expected -or $err.Length -gt 0) { throw "$RunName 未通过：$stdoutPath / $stderrPath" }
         if ($SelfTest) {
-            if (($BodyCollision -or $FlightPhysics -or $NavigationFoundation) -and $out -match '🔴 J8') { throw 'Main J8真实命中回归失败；保留日志，不以八指标代替技能断言。' }
+            if ($EnemyRoster) {
+                foreach ($line in ($out -split "`n" | Where-Object { $_.Contains('🔴') })) {
+                    if ($line -notmatch '🔴 (白板首领闸门·正向：|白板首领实例：|Boss 阵亡 →|互动降临节点：|最小闭环·链路：)') {
+                        throw "Main新增红标：$line"
+                    }
+                }
+            }
+            if (($BodyCollision -or $FlightPhysics -or $NavigationFoundation -or $EnemyRoster) -and $out -match '🔴 J8') { throw 'Main J8真实命中回归失败；保留日志，不以八指标代替技能断言。' }
             if (($SpiritSword -or $Scythe -or $Affection -or $Rainbow -or $GoldenRoad -or $LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) -and $out -notmatch '✅ P5b·实测表参数落到机制上') { throw 'Main专属技能增强契约探针未通过' }
             $markers = @('配置表：武器 6','节点布置：启用','配置表比对·玩家：','配置表比对·索引：','Pressure 测试（进化','白板首领实例：','端到端：按 F 之后','最小闭环·链路：')
             $baseline = Get-Content -LiteralPath (Join-Path $projectDir 'docs\character-design-j11-evidence.log')
             foreach ($marker in $markers) {
                 $before = ($baseline | Where-Object { $_.StartsWith('[log] ') -and $_.Contains($marker) } | Select-Object -First 1) -replace '^\[log\] \S+ ', ''
                 $after = ($out -split "`n" | Where-Object { $_.StartsWith('[log] ') -and $_.Contains($marker) } | Select-Object -First 1) -replace '^\[log\] \S+ ', ''
+                if ($EnemyRoster -and $marker -eq '配置表：武器 6') { $before = $before.Replace('敌人 10 /','敌人 21 /') }
+                if ($EnemyRoster -and $marker -eq '配置表比对·索引：') {
+                    # 校验全部14项实际数值；历史解释文字已改写为J36现状。
+                    $before = $before.Replace('/敌人 10/','/敌人 21/').Split('（期望')[0]
+                    $after = $after.Split('（期望')[0]
+                }
                 if ([string]::IsNullOrWhiteSpace($before) -or $before.TrimEnd() -cne $after.TrimEnd()) { throw "硬指标变化：$marker" }
-                $evidence.Add("[J11逐字一致] $($after.TrimEnd())")
+                $note = if ($EnemyRoster) { 'J11基线比对；J36仅敌人数10→21' } else { 'J11逐字一致' }
+                $evidence.Add("[$note] $($after.TrimEnd())")
             }
-            Write-Output 'Main 八条硬指标逐字一致（索引14个数、末尾符文11）'
+            Write-Output 'Main 八条硬指标通过（J36仅敌人数10→21，其余与J11一致；索引14项全校验）'
         }
     }
     finally {
@@ -107,10 +122,28 @@ try {
         $evidence.Add($build)
         if ($build -notmatch '0 个警告' -or $build -notmatch '0 个错误') { throw "$configuration 未满足 0/0" }
     }
-    if ($MainOnly) {
-        if ((-not $BodyCollision -and -not $FlightPhysics) -or $ProbeOnly) { throw 'MainOnly仅用于J33／J34完整回归后的定向复核。' }
+    if ($LabOnly) {
+        if (-not $EnemyRoster) { throw 'LabOnly仅用于J36渲染定向复核。' }
+        Invoke-Probe 'roster_lab' 'res://Scenes/Debug/_EnemyRosterLab.tscn' '截图=Ok／闪色=Ok' -Render -UserArgs '--roster-lab-capture'
+    }
+    elseif ($MainOnly) {
+        if ((-not $BodyCollision -and -not $FlightPhysics -and -not $EnemyRoster) -or $ProbeOnly) { throw 'MainOnly仅用于J33／J34／J36完整回归后的定向复核。' }
+        if ($EnemyRoster) { Invoke-Probe 'roster_lab' 'res://Scenes/Debug/_EnemyRosterLab.tscn' '截图=Ok／闪色=Ok' -Render -UserArgs '--roster-lab-capture' }
         if ($FlightPhysics) { Invoke-Probe 'flight' 'res://Scenes/Debug/_FlightPhysicsProbe.tscn' '飞行与受力验收结束：通过 \d+，失败 0' }
         Invoke-Probe 'main' 'res://Scenes/Main.tscn' '=== 自测结束 ===' -SelfTest
+    }
+    elseif ($EnemyRoster) {
+        Invoke-Probe 'roster' 'res://Scenes/Debug/_EnemyRosterProbe.tscn' '敌人清单验收结束：通过 \d+，失败 0'
+        if (-not $ProbeOnly) {
+            Invoke-Probe 'roster_lab' 'res://Scenes/Debug/_EnemyRosterLab.tscn' '截图=Ok／闪色=Ok' -Render -UserArgs '--roster-lab-capture'
+            Invoke-Probe 'navigation' 'res://Scenes/Debug/_NavigationFoundationProbe.tscn' '导航基础验收结束：通过 \d+，失败 0'
+            Invoke-Probe 'collision' 'res://Scenes/Debug/_BatchDProbe.tscn' 'D批验收结束：通过 91，失败 0'
+            Invoke-Probe 'body' 'res://Scenes/Debug/_BodyCollisionProbe.tscn' '身体分层验收结束：通过 31，失败 0'
+            Invoke-Probe 'flight' 'res://Scenes/Debug/_FlightPhysicsProbe.tscn' '飞行与受力验收结束：通过 42，失败 0'
+            Invoke-Probe 'projectile_query' 'res://Scenes/Debug/_ProjectileQueryProbe.tscn' '弹道查询验收结束：通过 56，失败 0'
+            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 194，失败 0'
+            Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
+        }
     }
     elseif ($NavigationFoundation) {
         Invoke-Probe 'navigation' 'res://Scenes/Debug/_NavigationFoundationProbe.tscn' '导航基础验收结束：通过 \d+，失败 0'
@@ -280,12 +313,12 @@ try {
     }
     $shotNames = if ($BowExitAudit -or $ChargeInputAudit -or $KillJumps -or $KillFacts -or $WingDive) { @() } elseif ($RewardTiers) { @('j24_reward_tiers') } elseif ($RewardRules) { @() } elseif ($JumpStomp) { @('j22_jump_stomp') } elseif ($ChargeEvolution) { @('j21_distinct_homing','j21_flow') } elseif ($ActionMovement) { @('j20_action_movement') } elseif ($GroundBurst) { @('j19_ground_burst') } elseif ($LightLeap) { @('j18_light_leap') } elseif ($GoldenRoad) { @('j17_golden_road') } elseif ($Rainbow) { @('j16_rainbow') } elseif ($Affection) { @('j15_affection','j15_world') } elseif ($Scythe) { @('j14_mercy','j14_salvation') } elseif ($SpiritSword) { @('j13_golden_qi','j13_great_draw','j13_divine_descent') } else { @('j12_capsule_sweep') }
     foreach ($shotName in $shotNames) {
-        if ($Specialization -or $RuneUi -or $BodyCollision -or $FlightPhysics -or $NavigationFoundation) { break }
+        if ($Specialization -or $RuneUi -or $BodyCollision -or $FlightPhysics -or $NavigationFoundation -or $EnemyRoster) { break }
         $shotPath = Join-Path $projectDir "docs\screenshots\$shotName.png"
         if (-not (Test-Path -LiteralPath $shotPath)) { throw "$shotName 截图缺失" }
         $evidence.Add("截图 $shotName SHA256=$((Get-FileHash -LiteralPath $shotPath -Algorithm SHA256).Hash)")
     }
-    $currentShots = if ($Specialization) { @('character-design-j32-wind.png','character-design-j32-rune-ui.png') } elseif ($RuneUi) { @('character-design-j31-rune-ui.png') } else { @() }
+    $currentShots = if ($EnemyRoster -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j36_enemy_roster.png','screenshots/j36_attack_warning.png') } elseif ($Specialization) { @('character-design-j32-wind.png','character-design-j32-rune-ui.png') } elseif ($RuneUi) { @('character-design-j31-rune-ui.png') } else { @() }
     foreach ($shot in $currentShots) {
         # ProbeOnly不一定运行符文渲染，只有本次完整流程要求这张界面图。
         if ($Specialization -and $ProbeOnly -and $shot -like '*rune-ui*') { continue }

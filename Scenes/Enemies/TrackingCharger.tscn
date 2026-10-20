@@ -1,0 +1,69 @@
+[gd_scene load_steps=17 format=3]
+[ext_resource type="Script" path="res://Scripts/Combat/Unit.cs" id="unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="movement"]
+[ext_resource type="Script" path="res://Scripts/AI/EnemyBrain.cs" id="brain"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/UseAbilityBehavior.cs" id="use"]
+[ext_resource type="Script" path="res://Scripts/AI/Behaviors/KeepDistanceBehavior.cs" id="keep"]
+[ext_resource type="Script" path="res://Scripts/Abilities/EnemyPlanAbility.cs" id="ability"]
+[ext_resource type="Resource" path="res://Config/EnemyPlans/tracking_charger.tres" id="plan"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="presentation"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitAnimator.cs" id="animator"]
+[ext_resource type="Script" path="res://Scripts/Combat/BlockComponent.cs" id="block"]
+[ext_resource type="Animation" path="res://Assets/Animations/enemies/EnemyDeath.tres" id="death"]
+[sub_resource type="CapsuleShape3D" id="body"]
+radius = 0.45
+height = 1.8
+[sub_resource type="StandardMaterial3D" id="material"]
+albedo_color = Color(0.52, 0.66, 0.40, 1)
+[sub_resource type="CapsuleMesh" id="mesh"]
+radius = 0.45
+height = 1.8
+material = SubResource("material")
+[sub_resource type="Animation" id="idle"]
+resource_name = "idle"
+length = 1.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rotation:x")
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
+[sub_resource type="AnimationLibrary" id="library"]
+_data = {&"idle": SubResource("idle"), &"walk": SubResource("idle"), &"sprint": SubResource("idle"), &"die": ExtResource("death")}
+[node name="TrackingCharger" type="CharacterBody3D"]
+script = ExtResource("unit")
+Faction = 1
+MaxHealth = 100.0
+MoveSpeed = 3.6
+[node name="Body" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("body")
+[node name="Model" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.9, 0)
+mesh = SubResource("mesh")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Model"]
+libraries = {&"": SubResource("library")}
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("movement")
+FaceMovementDirection = false
+[node name="Brain" type="Node" parent="."]
+script = ExtResource("brain")
+[node name="Attack" type="Node" parent="Brain"]
+script = ExtResource("use")
+Priority = 100
+AbilityNodeName = "AbilityPlan"
+[node name="KeepDistance" type="Node" parent="Brain"]
+script = ExtResource("keep")
+Priority = 10
+PreferredDistance = 2
+Tolerance = 0.4
+[node name="AbilityPlan" type="Node3D" parent="."]
+script = ExtResource("ability")
+Plan = ExtResource("plan")
+AbilityId = "skl_enemy_tracking_charger"
+[node name="Block" type="Node" parent="."]
+script = ExtResource("block")
+Blocking = false
+[node name="Animator" type="Node" parent="."]
+script = ExtResource("animator")
+SkillLibraryDirectory = "res://Assets/Animations/enemies/"
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("presentation")

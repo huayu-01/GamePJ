@@ -16,6 +16,7 @@ namespace ActRoguelike.Abilities;
 /// </summary>
 public abstract partial class Ability : Node3D
 {
+	protected virtual bool WarnOnActivate => true;
 	/// <summary>地面主动移动：默认锁定，明确放行，或由被动授予攻击移动。</summary>
 	public enum MovementPolicy { Locked, Allowed, Attack }
 	[Export] public MovementPolicy ActionMovement { get; set; }
@@ -527,6 +528,8 @@ public abstract partial class Ability : Node3D
 		StateTime = 0f;
 		AnimEventReached = false;
 		OnActivate(target);
+		if (WarnOnActivate && IsActive && !IsBackground && OwnerUnit.Faction == Faction.Enemy)
+			OwnerUnit.GetNodeOrNull<UnitPresentation>("Presentation")?.FlashAttack();
 		Activated?.Invoke(this);
 		return true;
 	}

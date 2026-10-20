@@ -56,7 +56,7 @@ StopDistance = 1.0
 [node name="AbilityExplode" type="Node3D" parent="."]
 script = ExtResource("7_explode")
 Cooldown = 30.0
-Windup = 0.35
+Windup = 0.9
 Recover = 0.1
 ActiveTime = 0.12
 TriggerRadius = 2.4

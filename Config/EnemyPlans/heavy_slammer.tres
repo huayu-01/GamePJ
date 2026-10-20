@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyActionPlan" load_steps=4 format=3]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActionPlan.cs" id="plan"]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActionStep.cs" id="step"]
+[sub_resource type="Resource" id="s0"]
+script = ExtResource("step")
+Kind = 7
+WindupSeconds = 1
+Damage = 25
+Speed = 0
+Radius = 3
+ActiveSeconds = 0.15
+RecoverSeconds = 0.5
+Centered = true
+[resource]
+script = ExtResource("plan")
+Far = [SubResource("s0")]
+CooldownSeconds = 2
+TriggerDistance = 3.2
+NearDistance = 3

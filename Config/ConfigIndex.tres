@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ConfigIndexData" load_steps=266 format=3]
+[gd_resource type="Resource" script_class="ConfigIndexData" load_steps=277 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/ConfigIndexData.cs" id="1_balance"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
@@ -270,6 +270,18 @@
 
 [ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_happy_runner.tres" id="j33_happy"]
 
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_burrow_hunter.tres" id="j36_burrow_hunter"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_spear_guard.tres" id="j36_spear_guard"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_arc_thrower.tres" id="j36_arc_thrower"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_meteor_mage.tres" id="j36_meteor_mage"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_tracking_charger.tres" id="j36_tracking_charger"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_hover_diver.tres" id="j36_hover_diver"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_heavy_slammer.tres" id="j36_heavy_slammer"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_blade_spinner.tres" id="j36_blade_spinner"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_bomb_lobber.tres" id="j36_bomb_lobber"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_arc_bomber.tres" id="j36_arc_bomber"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_combo_fighter.tres" id="j36_combo_fighter"]
+
 [resource]
 script = ExtResource("1_balance")
 ProjectileMaxSpeed = 200.0
@@ -291,7 +303,7 @@ BossPressureAttackSpeedPerLevel = 0.06
 Stages = [ExtResource("2_stg_outer"), ExtResource("3_stg_inner"), ExtResource("4_stg_core")]
 Weapons = [ExtResource("142_wpn_energy_palm"), ExtResource("147_wpn_crossbow"), ExtResource("148_wpn_bow"), ExtResource("180_wpn_spirit_sword"), ExtResource("181_wpn_scythe"), ExtResource("182_wpn_spear")]
 Characters = [ExtResource("143_chr_hunter"), ExtResource("179_chr_weapon_master")]
-Enemies = [ExtResource("11_enemy_global"), ExtResource("55_enemy_chaser"), ExtResource("56_enemy_fast_melee"), ExtResource("57_enemy_exploder"), ExtResource("58_enemy_jumping_melee"), ExtResource("59_enemy_ranged"), ExtResource("60_enemy_charger"), ExtResource("61_enemy_screamer"), ExtResource("62_enemy_guard"), ExtResource("63_enemy_skill_elite")]
+Enemies = [ExtResource("11_enemy_global"), ExtResource("55_enemy_chaser"), ExtResource("56_enemy_fast_melee"), ExtResource("57_enemy_exploder"), ExtResource("58_enemy_jumping_melee"), ExtResource("59_enemy_ranged"), ExtResource("60_enemy_charger"), ExtResource("61_enemy_screamer"), ExtResource("62_enemy_guard"), ExtResource("63_enemy_skill_elite"), ExtResource("j36_burrow_hunter"), ExtResource("j36_spear_guard"), ExtResource("j36_arc_thrower"), ExtResource("j36_meteor_mage"), ExtResource("j36_tracking_charger"), ExtResource("j36_hover_diver"), ExtResource("j36_heavy_slammer"), ExtResource("j36_blade_spinner"), ExtResource("j36_bomb_lobber"), ExtResource("j36_arc_bomber"), ExtResource("j36_combo_fighter")]
 Effects = [ExtResource("12_eff_slow"), ExtResource("13_eff_weaken"), ExtResource("14_eff_burn"), ExtResource("15_eff_empowered"), ExtResource("16_eff_stun"), ExtResource("18_eff_explosion"), ExtResource("19_eff_lifesteal"), ExtResource("20_eff_summon_on_kill"), ExtResource("21_eff_chain_lightning"), ExtResource("146_eff_mark"), ExtResource("270_eff_freeze"), ExtResource("271_eff_freeze_plus"), ExtResource("272_eff_burn_plus"), ExtResource("275_eff_missile_beacon")]
 Nodes = [ExtResource("23_node_enhance"), ExtResource("24_node_evolution"), ExtResource("25_node_mutation"), ExtResource("26_node_resource"), ExtResource("27_node_heal"), ExtResource("28_node_special"), ExtResource("29_node_shop"), ExtResource("30_node_portal")]
 ValueTags = [ExtResource("120_tag_high"), ExtResource("121_tag_mid"), ExtResource("122_tag_low")]

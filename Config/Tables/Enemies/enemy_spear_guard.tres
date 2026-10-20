@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1"]
+[resource]
+script = ExtResource("1")
+Id = "enemy_spear_guard"
+DisplayName = "矛盾冲锋兵"
+ScenePath = "res://Scenes/Enemies/SpearGuard.tscn"
+MaxHealth = 110.0
+MoveSpeed = 3.2
+Cost = 6
+Weight = 1.0
+MinElapsedSeconds = 10.0
+EliteChance = 0.1
+PressureBehaviors = PackedStringArray("TimedGuard", "BasicMelee", "StraightCharge")
+AnimLibraryDir = "res://Assets/Animations/enemies/"
+Tags = PackedStringArray("Ground", "spear_guard")
+Note = "机制原型；模型为占位。成本由行为压力表求和，Cost只作旧配置回退。"

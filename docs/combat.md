@@ -25,7 +25,7 @@
   **不存在"最大护甲"**（`MaxArmor` / `MaxArmorMultiplier` / `MaxArmorAdd` / `UnitConfig.MaxArmor` 全部已删除）。
   ⚠️ **甲为 0 时管线会自动跳过两件事**：① `CombinedDamageReduction()` 里 `Armor > 0f ? ArmorDamageReduction : 0f`
   → 护甲减伤那一项取 0（所以场景里留着 `ArmorDamageReduction = 0.3` 也不会偷偷减伤）；② `Armor` 阶段整段跳过
-  （不吸收伤害、也不发 `ArmorBroke`）。**护甲现在唯一的"额外获取手段"是精英怪的 `EliteModifier`（`ArmorAdd +120` → `GrantArmor`）**，
+  （不吸收伤害、也不发 `ArmorBroke`）。额外护甲统一走`GrantArmor`，包括精英`ArmorAdd +120`与符文／构筑效果，
   首领没有任何获取途径（2026-10 用户要求「去掉首领的甲」；判据见 [config.md](config.md) 的「首领去甲 + 单位动画实测」）。
 - **死亡**：HP ≤ 0 立即 `IsDead = true` 并从碰撞层移除（逻辑死亡与视觉死亡分离）；死亡单位不再被射线/AOE/索敌选中。
 
@@ -214,7 +214,7 @@
 ⚠️ C1 之后 `ArmorAdd` 是**纯粹的加甲**：本来 0 甲的敌种（追猎者/自爆兵/远程兵…）精英化后也会真的拿到 120 甲
 （改动前那条 `MaxArmorAdd` 只把它们的上限抬到 120、甲仍是 0，等于一层不吸收伤害的空壳）。
 
-**当前避障与后续寻路**：`Behavior.AvoidObstacles`仍是射线探路后侧移；MapManager已有导航网格烘焙和点位供给，但敌人尚未统一沿网格路径移动。2026-10-20用户确认必须补齐网格寻路，并以导航区域、连通性、距离和身体净空共同判断“有效位置”，射线只作视线／局部检查。新增11种敌人及模块拆分见[敌人清单](enemy-roster.md)。
+**导航与新敌人**：J35的UnitNavigation已让追击、撤退、保持距离和换位沿导航路径移动，旧AvoidObstacles射线侧移不再用于这些行为。MapManager严格Try接口验证同步、完整连通路径、投影后范围和身体净空，生产刷怪失败保留预算。J36新增11种地面敌人机制原型，通过EnemyActionPlan／Step组合，伤害段等待真实ATK事件；地图和资源计费见[J35](character-design-j35.md)，新敌人配置与成本见[敌人清单](enemy-roster.md)。原有8种随机原型保留，随机池现有19种，另有1种专用首领护卫；模型与动作美术待后续制作。
 
 ## Encounter 与 Spawn Budget（阶段 4）
 
@@ -332,7 +332,7 @@ J33：Unit._Ready设置身体层＋阵营受击层，所有单位的身体Mask�
 | **近战斩断子弹** | `Projectile.CutBySceneName` ← `MeleeComboAbility.CutBullets`（`ATK` 帧） | 判据是"投射物的**来源场景名**"（`Bullet`），**不是敌我** → 友军的也清；**能量波在排除名单里 → 斩不断** | 连招行里的 `CutSceneNames` / `CutExcludeSceneNames`；半径是能力节点上的 `CutRadius` |
 | **下落攻击** | `Scripts/Abilities/FallAttackAbility.cs` | 空中 + 按键（`fall_attack` = Ctrl）才可用；`DiveSpeed` 直接写垂直速度；下落期间命中盒常开（`IntervalPerTarget`）；**高度取"这次离地后净下落多少米"**（`CharacterMovement.FallHeight`）；落地抛 `Landed` 事件 | `DiveSpeed` / `HeightStep` / `DamageBonusPerStep` / `MaxDamageBonus` / `HomingMode` / `MaxDiveAngleDegrees` |
 | **冲刺（穿透 + 可视化路径）** | `Scripts/Abilities/BlinkDashAbility.cs` + `Scripts/Combat/DashPathIndicator.cs` | 冲刺期间 `CollisionMask` 只留世界层（**穿透单位、仍撞地形**），结束后**一定还原**；方向保留 Y 分量（可冲至空中）；路径 = `ImmediateMesh` 折线 | `Distance` / `Duration` / `PierceUnits` / `ShowPath` / `PathColor` / `PathWidth` / `PathSteps` |
-| **架势（架）** | `Scripts/Abilities/GuardStanceAbility.cs` | 架势内被命中 → 把这次命中**无效化**（`Unit.IsInvulnerable`）并立刻收招；**每帧把"自己设的那次规避"清掉** → 下一次命中仍会被规避（"挡一下"而不是"无敌到架势结束"） | `StanceSeconds` / `GuardStartSeconds`（`0.75` 来自文档） |
+| **架势（架）** | `Scripts/Abilities/GuardStanceAbility.cs` | 真实GuardOn开启0.75秒窗口；首个敌方有效命中仅标记本HitInstance.Negated并收招，派发Parried，同时给格挡者自身硬直；不扩散成同帧无敌 | `StanceSeconds` / `GuardOnEvent` / `GuardOffEvent` / `BlockStunSeconds` |
 | **武器抛出 / 收回** | `Scripts/Abilities/WeaponThrowAbility.cs`（镰刀/长枪共用）+ `ScytheThrowAbility` / `SpearThrowAbility` | 抛出 → 旋转 → 每 `DamageInterval` 秒一次判定 → 再次按键 / 靠近 / 到最远距离收回；收回途中也能再打一次 | `ThrowSpeed` / `ReturnSpeed` / `MaxThrowDistance` / `RecallOnSecondPress` / `RecallDistance` / `SpinDegreesPerSecond` / `DamageInterval` / `DamageOnReturn` |
 | **抛物线投射 + 路径可视化** | `SpearThrowAbility` + `DashPathIndicator.SampleArcToDistance` | 基础蓄力 1s；每蓄力 0.25s（档）**伤害 ×1.2、水平速度 ×1.2、路径中线 ×1.2**；"路径中线延长"是**非倍率维度**（速度放大、飞行时间不变） | `ArcGravity` / `FlightSeconds` / `ArcPathSteps` + 基类蓄力列 |
 | **武器不在手上 → 武技1 不能用** | `Scripts/Combat/WeaponGate.cs`（场景里的 `WeaponGate5` / `WeaponGate6`） | `WeaponThrowAbility.InFlightChanged` → `WeaponGate` → `MeleeComboAbility.SetExternallyBlocked`；默认按节点名推两个技能行 Id | — |
@@ -345,10 +345,12 @@ J33：Unit._Ready设置身体层＋阵营受击层，所有单位的身体Mask�
 > ② 同理，自测用 `MeleeComboAbility.DebugFireAnimEvent()` **模拟"事件帧到了"**来取证连招推进 ——
 > 真人那一路仍然完全由 `UnitAnimator` 的事件帧驱动（同一条 `OnAnimEvent`）。
 
+以上为早期SelfTest的覆盖边界。J36独立EnemyRosterProbe跨真实物理帧验证新敌人的近战／范围实际伤害、实际ATK与GuardOn事件、爆炸去重和动作中断，没有以模拟事件或“仅判断已触发”代替这些断言。
+
 ## 当前实现缺口与后续要求
 
-- 普通BlockComponent有正面判定与破防阈值，技能架另有单次命中无效化／Parried事实。2026-10-20用户确认：持盾格挡可配格挡者自身硬直，技能格挡有该硬直；效果提供的一次性护罩挡伤没有该硬直。反应按防御机制区分，不可一律给所有挡伤加硬直。攻击者弹刀属于独立机制，详见[防御规则](enemy-roster.md#六防御方式与格挡硬直)。
+- J36的BlockComponent和主动GuardStance成功挡伤后分别调用格挡者自身CombatReaction.BlockRecoil（默认0.15秒）；护罩单次Negated路径不调用。正面、破防、穿透格挡规则保留；攻击者不因此被硬直。详见[防御规则](enemy-roster.md#六防御方式与格挡硬直)。
 - 状态效果只有 Slow / Weaken / Burn（Burn 按秒走一次普通伤害流程，会被护甲/护盾吸收）。
-- J34已有三维冲量、持续力、质量和独立ControlImmune；但敌人按护甲区分普通受击硬直／动作打断的流程仍待补齐。用户已确认有甲免普通受击硬直、前摇不被普通受击打断，并需护甲特效和明显精英表现；不等于自动获得全部控制免疫。
+- J36的CombatReaction按命中前有甲保护敌人普通受击与前摇：无甲有效非DoT命中硬直0.18秒并打断允许中断的动作；破甲当击仍受保护、下一击可打断。有甲外壳随甲量显示，精英放大／底材在闪色后保留。物理质量、击退抗性及ControlImmune独立，不把护甲等同于全控制免疫。
 - 传送类位移（牵引/降临）需要额外同步物理体，见 `docs/testing.md`。
-- 敌人追击／撤退／换位需接入导航网格路径；MapManager虽已有导航点位，当前随机环点和射线兜底不能继续充当严格的“有效位置”成功结果。这个缺口是待实现要求，不是长期接受的设计限制。
+- 旧MapManager的Vector3返回值接口仍用于历史交互／掉落；严格生产刷怪、新敌人换位和后跳已用Try接口，不再以随机环点或射线兜底作为有效点成功结果。精英附加词条和额外生成压力等待后续设计。

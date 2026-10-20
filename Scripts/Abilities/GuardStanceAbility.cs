@@ -15,6 +15,7 @@ public partial class GuardStanceAbility : Ability
 	[ExportGroup("架势")]
 	/// <summary>架势总时长（秒）。文档：0.75。</summary>
 	[Export] public float StanceSeconds { get; set; } = 0.75f;
+	[Export] public float BlockStunSeconds { get; set; } = 0.15f;
 
 	/// <summary>开架势的真实动画事件名；留空拒绝，不以时间代替。</summary>
 	[Export] public string GuardOnEvent { get; set; } = "GuardOn";
@@ -95,6 +96,7 @@ public partial class GuardStanceAbility : Ability
 		// 订阅方是两条**表驱动**的增幅：「招架反击」（刷新技能 2 冷却）、「能量护盾」（对周围敌人造成伤害）。
 		// 没有任何订阅者时这一句什么也不做（Raise 自己判 handlers == null）。
 		EndStance(exitStance: true);
+		OwnerUnit.Reactions?.BlockRecoil(BlockStunSeconds);
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Parried,

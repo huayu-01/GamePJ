@@ -41,7 +41,7 @@ public partial class EnemyBrain : Node
 	public override void _PhysicsProcess(double delta)
 	{
 		float dt = (float)delta;
-		if (OwnerUnit.IsDead)
+		if (OwnerUnit.IsDead || OwnerUnit.Movement?.IsControlDisabled == true)
 		{
 			return;
 		}

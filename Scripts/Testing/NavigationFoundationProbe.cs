@@ -95,7 +95,7 @@ public partial class NavigationFoundationProbe : Node3D
 		var player = Actor(new Vector3(35, 0.05f, 0), Faction.Player); player.IsInvulnerable = true;
 		var encounter = new EncounterController { AutoStart = false, WaveMode = false, TotalBudget = 10, BudgetCap = 10, SpawnInterval = 0.1f, MinSpawnDistance = 10, SpawnRadius = 12 };
 		encounter.AddChild(new EnemySpawnEntry { Scene = RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn"), Cost = 2, EliteChance = 0 });
-		AddChild(encounter); encounter.ApplyEntryFilter(new StageDefinition()); encounter.Start(); await Wait(45);
+		AddChild(encounter); encounter.ApplyEntryFilter(new StageDefinition { AllowedEnemyIds = new[] { "enemy_chaser" } }); encounter.Start(); await Wait(45);
 		Check(encounter.TotalSpawned == 0 && encounter.RemainingBudget == 10, "选点失败没有生成单位、扣资源或推进生成计数");
 		player.GlobalPosition = new Vector3(-6, 0.05f, -10); encounter.MinSpawnDistance = 3; encounter.SpawnRadius = 5; await Wait(55);
 		Check(encounter.TotalSpawned > 0 && Mathf.Abs(encounter.RemainingBudget - (10 - encounter.TotalSpawned * 2)) < 0.001f, "有效点恢复后真实生成，预算严格按行为成本扣除");

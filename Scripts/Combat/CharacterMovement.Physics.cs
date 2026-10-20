@@ -10,7 +10,7 @@ public partial class CharacterMovement
 	public enum FlightPhase { Ground, Flying, Falling, Recovering }
 	[Export] public UnitPhysicsProfile? PhysicsProfile { get; set; }
 	public bool CanFly => PhysicsProfile?.CanFly == true;
-	public bool IsControlDisabled => FlightState is FlightPhase.Falling or FlightPhase.Recovering;
+	public bool IsControlDisabled => FlightState is FlightPhase.Falling or FlightPhase.Recovering || _unit?.Reactions?.IsStaggered == true;
 	public bool IsControlImmune => PhysicsProfile?.ControlImmune == true;
 	public float Mass => Mathf.Max(0.01f, PhysicsProfile?.Mass ?? 1f);
 	public FlightPhase FlightState { get; private set; }

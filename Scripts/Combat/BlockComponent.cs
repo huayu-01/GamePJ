@@ -9,6 +9,7 @@ namespace ActRoguelike.Combat;
 public partial class BlockComponent : Node
 {
 	[Export] public bool Blocking { get; set; } = true;
+	[Export] public float BlockStunSeconds { get; set; } = 0.15f;
 
 	/// <summary>格挡后剩余的伤害比例：0 = 完全格挡，0.2 = 只吃 20%。</summary>
 	[Export(PropertyHint.Range, "0,1,0.05")] public float BlockDamageMultiplier { get; set; } = 0.2f;
@@ -22,7 +23,7 @@ public partial class BlockComponent : Node
 	/// <summary>返回伤害倍率：1 = 没挡到。</summary>
 	public float ResolveMultiplier(HitInstance hit)
 	{
-		if (!Blocking || GetParent() is not Unit owner)
+		if (!Blocking || BlockDamageMultiplier >= 1 || GetParent() is not Unit owner)
 		{
 			return 1f;
 		}
@@ -40,9 +41,12 @@ public partial class BlockComponent : Node
 		incoming.Y = 0f;
 		if (incoming.LengthSquared() < 0.0001f)
 		{
+			owner.Reactions?.BlockRecoil(BlockStunSeconds);
 			return BlockDamageMultiplier;
 		}
 
-		return incoming.Normalized().Dot(forward) <= FrontDotThreshold ? BlockDamageMultiplier : 1f;
+		if (incoming.Normalized().Dot(forward) > FrontDotThreshold) return 1f;
+		owner.Reactions?.BlockRecoil(BlockStunSeconds);
+		return BlockDamageMultiplier;
 	}
 }

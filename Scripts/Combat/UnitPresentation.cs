@@ -20,6 +20,40 @@ public partial class UnitPresentation : Node
 	private StandardMaterial3D _flashMaterial = null!;
 	private double _flashTimer;
 	private bool _flashing;
+	private readonly Dictionary<MeshInstance3D, Material?> _baseMaterials = new();
+	private readonly StandardMaterial3D _attackMaterial = new() { AlbedoColor = new Color(1, 0.85f, 0.25f), EmissionEnabled = true, Emission = new Color(1, 0.65f, 0.1f), EmissionEnergyMultiplier = 2 };
+	private float _attackTimer;
+	private MeshInstance3D? _armorAura;
+	public int AttackWarningCount { get; private set; }
+	public void FlashAttack() { AttackWarningCount++; _attackTimer = 0.12f; ApplyMaterial(); }
+	public void SetBaseMaterial(Material material)
+	{
+		foreach (var mesh in _meshes) if (IsInstanceValid(mesh)) _baseMaterials[mesh] = material;
+		ApplyMaterial();
+	}
+	private void ApplyMaterial()
+	{
+		foreach (var mesh in _meshes)
+			if (IsInstanceValid(mesh)) mesh.MaterialOverride = _attackTimer > 0 ? _attackMaterial : _flashing ? _flashMaterial : _baseMaterials.GetValueOrDefault(mesh);
+	}
+	private void EnsureArmorAura()
+	{
+		if (!IsInstanceValid(_unit) || !_unit.IsInsideTree() || _unit.GetNodeOrNull<CollisionShape3D>("Body") == null) return;
+		var size = ActRoguelike.World.MapManager.BodySize(_unit);
+		Vector3 scale = _unit.GlobalTransform.Basis.Scale.Abs();
+		float radius = size.Radius / Mathf.Max(0.01f, Mathf.Max(scale.X, scale.Z)) + 0.035f;
+		float height = size.Height / Mathf.Max(0.01f, scale.Y) + 0.07f;
+		_armorAura = new MeshInstance3D
+		{
+			Name = "ArmorAura", Position = Vector3.Up * (height * 0.5f), CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
+			Mesh = new CapsuleMesh { Radius = radius, Height = Mathf.Max(radius * 2, height), Material = new StandardMaterial3D
+			{
+				Transparency = BaseMaterial3D.TransparencyEnum.Alpha, AlbedoColor = new Color(0.35f, 0.65f, 1, 0.18f),
+				EmissionEnabled = true, Emission = new Color(0.25f, 0.5f, 1), EmissionEnergyMultiplier = 0.6f,
+			} },
+		};
+		_unit.AddChild(_armorAura); _armorAura.Visible = _unit.Armor > 0;
+	}
 
 	public override void _Ready()
 	{
@@ -42,6 +76,7 @@ public partial class UnitPresentation : Node
 		UnitAnimator.Ensure(_unit);
 		// 收集模型之后再挂状态特效，避免受击闪色覆盖纯视觉节点。
 		StatusEffectFx.Ensure(_unit);
+		CallDeferred(nameof(EnsureArmorAura));
 	}
 
 	public override void _ExitTree()
@@ -55,31 +90,20 @@ public partial class UnitPresentation : Node
 
 	public override void _Process(double delta)
 	{
-		if (!_flashing)
-		{
-			return;
-		}
-
-		_flashTimer -= delta;
-		if (_flashTimer <= 0d)
-		{
-			_flashing = false;
-			foreach (MeshInstance3D mesh in _meshes)
-			{
-				if (IsInstanceValid(mesh))
-				{
-					mesh.MaterialOverride = null;
-				}
-			}
-		}
+		if (IsInstanceValid(_armorAura)) _armorAura!.Visible = !_unit.IsDead && _unit.Armor > 0;
+		bool wasFlashing = _flashing; bool wasAttack = _attackTimer > 0;
+		_flashTimer -= delta; _attackTimer = Mathf.Max(0, _attackTimer - (float)delta);
+		_flashing = _flashTimer > 0;
+		if (wasFlashing != _flashing || wasAttack != (_attackTimer > 0)) ApplyMaterial();
 	}
 
 	/// <summary>换模型后只收集该模型及其握持武器，排除单位状态特效。</summary>
 	public void BindVisual(Node model)
 	{
-		if (_flashing) foreach (var mesh in _meshes) if (IsInstanceValid(mesh)) mesh.MaterialOverride = null;
+		foreach (var mesh in _meshes) if (IsInstanceValid(mesh)) mesh.MaterialOverride = _baseMaterials.GetValueOrDefault(mesh);
 		_flashing = false;
 		_meshes.Clear();
+		_baseMaterials.Clear();
 		CollectMeshes(model);
 	}
 
@@ -90,6 +114,7 @@ public partial class UnitPresentation : Node
 			if (child is MeshInstance3D mesh)
 			{
 				_meshes.Add(mesh);
+				_baseMaterials[mesh] = mesh.MaterialOverride;
 			}
 
 			CollectMeshes(child);
@@ -103,13 +128,9 @@ public partial class UnitPresentation : Node
 			return;
 		}
 
-		foreach (MeshInstance3D mesh in _meshes)
-		{
-			mesh.MaterialOverride = _flashMaterial;
-		}
-
 		_flashing = true;
 		_flashTimer = FlashDuration;
+		ApplyMaterial();
 	}
 
 	private void OnDied(HitInstance hit)
