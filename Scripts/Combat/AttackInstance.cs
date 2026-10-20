@@ -34,6 +34,8 @@ public sealed class AttackInstance
 	public int ComboStepCount { get; init; }
 
 	public float BaseDamage { get; init; }
+	/// <summary>出手时冻结的表现重量，与伤害／击退独立。</summary>
+	public float FeedbackWeight { get; init; } = 1f;
 	public bool CanCrit { get; init; }
 	/// <summary>状态周期伤害事实；不作为新主攻击再次触发命中增幅。</summary>
 	public bool IsDamageOverTime { get; init; }

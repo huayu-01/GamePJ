@@ -518,6 +518,7 @@ public partial class MeleeComboAbility : Ability
 		{
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
+			FeedbackWeight = _hitbox.FeedbackWeight,
 			// **攻击力乘区**（P5）：`StatSheet` 的 `DamageMultiplier` —— 强化「力量」与小刀阔斧的"+20% 伤害"
 			// 都挂这个键。没配置时它是 1（`Unit.SeedStats` 有基础值），所以这一乘**逐位不变**。
 			// ⚠️ 只加在连招这一路（近战武技 = 玩家专属）；`AttackHitbox` 的默认路径一个字没动 ——

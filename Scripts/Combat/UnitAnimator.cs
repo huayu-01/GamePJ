@@ -79,6 +79,16 @@ public partial class UnitAnimator : Node
 	private float _speed;
 	private bool _dead;
 	private bool _reactionPlaying;
+	private bool _impactHolding;
+	private float _impactSpeed = 1;
+	/// <summary>保持动画播放位置；恢复原实例速度，不重播／Seek，也不补发动画事件。</summary>
+	public void SetImpactHold(bool held)
+	{
+		if (_player == null || held == _impactHolding) return;
+		if (held) { _impactSpeed = _player.SpeedScale; _player.SpeedScale = 0; }
+		else _player.SpeedScale = _impactSpeed;
+		_impactHolding = held;
+	}
 	public void PlayHitReaction()
 	{
 		if (_player == null || _skillPlaying || _dead) return;
@@ -280,6 +290,7 @@ public partial class UnitAnimator : Node
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_unit.ImpactPause?.IsHolding == true) return;
 		if (_dead || _player == null)
 		{
 			return;
@@ -331,6 +342,7 @@ public partial class UnitAnimator : Node
 	/// <summary>死亡：切成倒地动画（一次性，停在最后一帧），之后不再按速度切。</summary>
 	private void OnDied(HitInstance hit)
 	{
+		_unit.ImpactPause?.Clear();
 		_dead = true;
 		Play(_death, 0f);
 	}
@@ -501,6 +513,7 @@ public partial class UnitAnimator : Node
 	/// <summary>让技能动画立刻停手（技能被取消 / 单位死亡时调用），把控制权交还运动动画。</summary>
 	public void StopSkillAnimation()
 	{
+		if (IsInstanceValid(_unit)) _unit.ImpactPause?.Clear();
 		SkillPlaybackId++;
 		_skillPlaying = false;
 		_skillStartupGrace = 0;

@@ -85,6 +85,7 @@ public partial class GuardStanceAbility : Ability
 		}
 
 		hit.Negated = true;
+		hit.Parried = true;
 		ParryCount++;
 		LastParriedDamage = hit.Damage;
 

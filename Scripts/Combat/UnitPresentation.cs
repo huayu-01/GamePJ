@@ -58,7 +58,6 @@ public partial class UnitPresentation : Node
 	public override void _Ready()
 	{
 		_unit = GetParent<Unit>();
-		_unit.Damaged += OnDamaged;
 		_unit.Died += OnDied;
 
 		_flashMaterial = new StandardMaterial3D
@@ -83,7 +82,6 @@ public partial class UnitPresentation : Node
 	{
 		if (IsInstanceValid(_unit))
 		{
-			_unit.Damaged -= OnDamaged;
 			_unit.Died -= OnDied;
 		}
 	}
@@ -123,15 +121,18 @@ public partial class UnitPresentation : Node
 		}
 	}
 
-	private void OnDamaged(DamageResult result, HitInstance hit)
+	public void ShowImpact(ImpactKind kind, float duration)
 	{
-		if (result.FinalDamage <= 0f || _meshes.Count == 0)
+		if (_meshes.Count == 0)
 		{
 			return;
 		}
 
 		_flashing = true;
-		_flashTimer = FlashDuration;
+		_flashTimer = Mathf.Max(0, duration);
+		Color color = CombatFeedback.ColorFor(kind);
+		_flashMaterial.AlbedoColor = color;
+		_flashMaterial.Emission = color;
 		ApplyMaterial();
 	}
 

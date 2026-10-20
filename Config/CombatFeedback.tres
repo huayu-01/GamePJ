@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CombatFeedbackProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/CombatFeedbackProfile.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+LightPauseSeconds = 0.025
+HeavyPauseSeconds = 0.05
+MaxPauseSeconds = 0.065
+PauseCooldownSeconds = 0.12
+FinisherWeight = 1.45
+CriticalWeight = 1.25
+BreakWeight = 1.6
+CameraStrength = 1.0
+CameraMaxOffset = 0.065
+CameraSeconds = 0.13

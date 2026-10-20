@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ConfigIndexData" load_steps=277 format=3]
+[gd_resource type="Resource" script_class="ConfigIndexData" load_steps=278 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Config/ConfigIndexData.cs" id="1_balance"]
+[ext_resource type="Resource" path="res://Config/CombatFeedback.tres" id="feedback"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_outer.tres" id="2_stg_outer"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_inner.tres" id="3_stg_inner"]
 [ext_resource type="Resource" path="res://Config/Tables/Stages/stg_core.tres" id="4_stg_core"]
@@ -325,6 +326,7 @@ EnemyHealthBarHeight = 7.0
 EnemyHealthBarTopOffset = 0.25
 BossBarFullRange = 22.0
 ShowHitEffects = true
+CombatFeedback = ExtResource("feedback")
 HitEffectScenePath = "res://Assets/Effects/fx_combat_hit.tscn"
 HitEffectLifetime = 1.8
 KillPlaneY = -8.0

@@ -170,7 +170,8 @@ public partial class EnemyRosterProbe : Node3D
 		int before = enemy.Reactions.HitStunCount; enemy.ReceiveHit(Hit(enemy, target, 9, true));
 		Check(!enemy.Reactions.IsStaggered && enemy.Reactions.HitStunCount == before, "一次护罩无效化本次命中，无受击或格挡硬直");
 		var presentation = enemy.GetNode<UnitPresentation>("Presentation"); var mesh = enemy.GetNode<MeshInstance3D>("Model");
-		enemy.AddChild(new EliteModifier()); await Wait(3);
+		// J38护罩也有短闪；先让该瞬态结束，再记录实际精英底材用于恢复比较。
+		enemy.AddChild(new EliteModifier()); await Wait(9);
 		Material? eliteBase = mesh.MaterialOverride;
 		Check(enemy.Scale.X > 1 && enemy.GetNode<MeshInstance3D>("ArmorAura").Visible, "精英体型放大、有甲额外外壳可见");
 		presentation.FlashAttack(); await Wait(12);

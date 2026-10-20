@@ -13,4 +13,4 @@ PitchScale = 1.0
 PitchRandom = 0.1
 Id = "sfx_combat_hit"
 DisplayName = "命中"
-Note = "触发点：Projectile.ResolveImpact + AttackHitbox._PhysicsProcess（与命中特效同一个位置，两条路径共用这一条）。素材：Kenney Impact Sounds / impactGeneric_light_000.ogg（CC0）。"
+Note = "触发点：Unit.ReceiveHit结算后CombatFeedback统一路由；打肉／碰甲／格挡／破甲有独立可换SoundId及临时音高。当前复用Kenney Impact Sounds / impactGeneric_light_000.ogg（CC0）占位。"

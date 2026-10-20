@@ -1,0 +1,628 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=9FD4787436FD4EAFAEA11372C2745276A7D35D4FCF192456825E7C1ADDFD02B4
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 338 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.75
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 345 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.37
+
+feedback exit=0 seconds=5.01 stderrBytes=0
+=== feedback ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 20:09:23 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 20:09:23 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 20:09:23 [Flow] === 新的一局 ===
+[log] 20:09:23 [Flow] 日志文件：user://logs/run_20261020_200923.log
+[log] 20:09:23 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 20:09:23 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 20:09:23 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 20:09:23 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 20:09:23 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 20:09:23 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 20:09:23 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 20:09:23 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 20:09:23 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 20:09:23 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 20:09:23 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 20:09:23 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 20:09:23 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(1000) 0
+[log] 20:09:23 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[Feedback] PASS 护甲保留30%减伤，10伤耗7甲，走蓝色碰甲结果
+[Feedback] PASS 有甲命中没有普通受击硬直
+[log] 20:09:23 [Combat] 破甲 @CharacterBody3D@10(1000)
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(995) 5
+[Feedback] PASS 破甲事实来自本击结算快照
+[Feedback] PASS 破甲当击仍免普通受击硬直
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(985) 10
+[Feedback] PASS 下一击打肉才产生原有普通硬直
+[Feedback] PASS 无敌擦过不播放成功命中反馈
+[Feedback] PASS 效果护罩有防御反馈，无格挡者硬直
+[Feedback] PASS 技能招架事实与效果护罩分开
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(985) 0
+[Feedback] PASS 持盾正面完全格挡，黄色反馈与自身硬直保留
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(975) 10
+[Feedback] PASS DoT照常扣血，不闪烁／停顿／震屏／刷音效
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@46(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@48(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@51(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@54(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@57(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@60(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@63(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@66(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@69(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@72(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@75(990) 10
+[log] 20:09:23 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@78(990) 10
+[Feedback] PASS 同帧群体12命中最多一个音效／镜头脉冲
+[log] 20:09:24 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(965) 10
+[log] 20:09:24 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(955) 10
+[Feedback] PASS 同目标密集命中限频，伤害仍独立结算
+[log] 20:09:24 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(945) 10
+[Feedback] PASS 派生伤害轻反馈，不抢镜头／停顿预算
+[log] 20:09:24 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@83(1000) 0
+[Feedback] PASS 资源护盾使用紫色防御材质反馈
+[log] 20:09:24 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(935) 10
+[Feedback] PASS 关闭反馈后伤害与规则完全照常
+[log] 20:09:24 [Combat] 伤害 @CharacterBody3D@92(1000) → @CharacterBody3D@94(990) 10
+[Feedback] PASS 真实投射物结算一次，远程命中不暂停射手
+[log] 20:09:24 [Combat] 伤害 @CharacterBody3D@92(1000) → @CharacterBody3D@94(980) 10
+[Feedback] PASS 真实爆炸不按附着近战处理，不暂停施法者
+[log] 20:09:24 [Combat] 伤害 @CharacterBody3D@92(1000) → @CharacterBody3D@94(970) 10
+[Feedback] PASS 召唤物攻击不冒领玩家镜头／局部停顿
+[log] 20:09:24 [Combat] 伤害 @CharacterBody3D@92(1000) → @CharacterBody3D@94(0) 970
+[log] 20:09:24 [Combat] 死亡 @CharacterBody3D@94(0) 击杀者=@CharacterBody3D@92(1000)
+[log] 20:09:24 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 20:09:24 [Combat] 击杀 @CharacterBody3D@94(0) by @CharacterBody3D@92(1000)
+[Feedback] PASS 击杀反馈可以越过普通目标限频，不延迟死亡结算
+[Feedback] PASS 镜头实际产生有上限的短促方向冲击
+[Feedback] PASS 冲击不写相机跟随位置／旋转／ADS视野
+[Feedback] PASS 准星射线方向与求交原点不受镜头冲击影响
+[Feedback] PASS 镜头归零，无累积漂移
+[Feedback] PASS 震动强度0即时关闭
+[log] 20:09:25 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 20:09:25 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 20:09:25 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 20:09:25 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 CombatFeedbackProbe
+[log] 20:09:25 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 20:09:25 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 20:09:25 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 20:09:25 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 20:09:25 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 20:09:25 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 20:09:25 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[Feedback] PASS 真实灵剑连招起手成功
+[log] 20:09:25 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 20:09:25 [Combat] 伤害 Player(240) → @CharacterBody3D@103(1000) 0
+[Feedback] PASS 真实ATK→命中盒→扣甲→出手者局部停顿
+[Feedback] PASS 命中顿帧不暂停有甲防御者，不冒充受击打断
+[Feedback] PASS 停顿期间动画事件位置不前进、不重复ATK
+[Feedback] PASS 动作突进与动画共用停顿，不出现滑步
+[Feedback] PASS 外部弹道照常飞行，全局TimeScale未改
+[Feedback] PASS 同刀多目标命中不叠加停顿
+[Feedback] PASS 到期后动画／动作时钟同步续播
+[Feedback] PASS 动作中断清理局部停顿，不冻结下一动作
+[Feedback] PASS 运行中关闭顿帧可恢复
+[log] 20:09:26 [Combat] 单位动画切换：Player idle → die（当前速度 0，阈值 0.15/4）
+[log] 20:09:26 [Combat] 死亡 Player(0) 击杀者=-
+[Feedback] PASS 死亡清理停顿，不挂死死亡动画
+[Feedback] === 打击反馈验收结束：通过 35，失败 0 ===
+[log] 20:09:26 [Exit] 音频退出回收：真实等待88ms。
+[log] 20:09:26 [Audio] 音效统计：共 10 次 —— sfx_combat_hit×9、sfx_enemy_die×1（缺失 id 0 个）
+
+feedback_render exit=0 seconds=6.28 stderrBytes=0
+=== feedback_render ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+D3D12 12_0 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti
+
+[log] 20:09:29 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 20:09:29 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 20:09:29 [Flow] === 新的一局 ===
+[log] 20:09:29 [Flow] 日志文件：user://logs/run_20261020_200929.log
+[log] 20:09:29 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 20:09:29 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 20:09:29 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 20:09:29 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 20:09:29 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 20:09:29 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 20:09:29 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 20:09:29 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 20:09:29 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 20:09:29 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 20:09:29 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 20:09:29 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 20:09:29 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(1000) 0
+[log] 20:09:29 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[Feedback] PASS 护甲保留30%减伤，10伤耗7甲，走蓝色碰甲结果
+[Feedback] PASS 有甲命中没有普通受击硬直
+[log] 20:09:29 [Combat] 破甲 @CharacterBody3D@10(1000)
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(995) 5
+[Feedback] PASS 破甲事实来自本击结算快照
+[Feedback] PASS 破甲当击仍免普通受击硬直
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(985) 10
+[Feedback] PASS 下一击打肉才产生原有普通硬直
+[Feedback] PASS 无敌擦过不播放成功命中反馈
+[Feedback] PASS 效果护罩有防御反馈，无格挡者硬直
+[Feedback] PASS 技能招架事实与效果护罩分开
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(985) 0
+[Feedback] PASS 持盾正面完全格挡，黄色反馈与自身硬直保留
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(975) 10
+[Feedback] PASS DoT照常扣血，不闪烁／停顿／震屏／刷音效
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@46(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@48(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@51(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@54(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@57(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@60(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@63(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@66(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@69(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@72(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@75(990) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@78(990) 10
+[Feedback] PASS 同帧群体12命中最多一个音效／镜头脉冲
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(965) 10
+[log] 20:09:29 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(955) 10
+[Feedback] PASS 同目标密集命中限频，伤害仍独立结算
+[log] 20:09:30 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(945) 10
+[Feedback] PASS 派生伤害轻反馈，不抢镜头／停顿预算
+[log] 20:09:30 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@83(1000) 0
+[Feedback] PASS 资源护盾使用紫色防御材质反馈
+[log] 20:09:30 [Combat] 伤害 @CharacterBody3D@8(1000) → @CharacterBody3D@10(935) 10
+[Feedback] PASS 关闭反馈后伤害与规则完全照常
+[log] 20:09:30 [Combat] 伤害 @CharacterBody3D@92(1000) → @CharacterBody3D@94(990) 10
+[Feedback] PASS 真实投射物结算一次，远程命中不暂停射手
+[log] 20:09:30 [Combat] 伤害 @CharacterBody3D@92(1000) → @CharacterBody3D@94(980) 10
+[Feedback] PASS 真实爆炸不按附着近战处理，不暂停施法者
+[log] 20:09:30 [Combat] 伤害 @CharacterBody3D@92(1000) → @CharacterBody3D@94(970) 10
+[Feedback] PASS 召唤物攻击不冒领玩家镜头／局部停顿
+[log] 20:09:30 [Combat] 伤害 @CharacterBody3D@92(1000) → @CharacterBody3D@94(0) 970
+[log] 20:09:30 [Combat] 死亡 @CharacterBody3D@94(0) 击杀者=@CharacterBody3D@92(1000)
+[log] 20:09:30 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 20:09:30 [Combat] 击杀 @CharacterBody3D@94(0) by @CharacterBody3D@92(1000)
+[Feedback] PASS 击杀反馈可以越过普通目标限频，不延迟死亡结算
+[Feedback] PASS 镜头实际产生有上限的短促方向冲击
+[Feedback] PASS 冲击不写相机跟随位置／旋转／ADS视野
+[Feedback] PASS 准星射线方向与求交原点不受镜头冲击影响
+[Feedback] PASS 镜头归零，无累积漂移
+[Feedback] PASS 震动强度0即时关闭
+[log] 20:09:31 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 20:09:31 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 20:09:31 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 20:09:31 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 CombatFeedbackProbe
+[log] 20:09:31 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 20:09:31 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 20:09:31 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 20:09:31 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 20:09:31 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 20:09:31 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 20:09:31 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[Feedback] PASS 真实灵剑连招起手成功
+[log] 20:09:31 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 20（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 20:09:31 [Combat] 伤害 Player(240) → @CharacterBody3D@103(1000) 0
+[Feedback] PASS 真实ATK→命中盒→扣甲→出手者局部停顿
+[Feedback] PASS 命中顿帧不暂停有甲防御者，不冒充受击打断
+[Feedback] PASS 停顿期间动画事件位置不前进、不重复ATK
+[Feedback] PASS 动作突进与动画共用停顿，不出现滑步
+[Feedback] PASS 外部弹道照常飞行，全局TimeScale未改
+[Feedback] PASS 同刀多目标命中不叠加停顿
+[Feedback] PASS 到期后动画／动作时钟同步续播
+[Feedback] PASS 动作中断清理局部停顿，不冻结下一动作
+[Feedback] PASS 运行中关闭顿帧可恢复
+[log] 20:09:32 [Combat] 单位动画切换：Player idle → die（当前速度 0，阈值 0.15/4）
+[log] 20:09:32 [Combat] 死亡 Player(0) 击杀者=-
+[Feedback] PASS 死亡清理停顿，不挂死死亡动画
+[Feedback] PASS 渲染反馈截图保存成功
+[Feedback] === 打击反馈验收结束：通过 36，失败 0 ===
+[log] 20:09:32 [Exit] 音频退出回收：真实等待88ms。
+[log] 20:09:32 [Audio] 音效统计：共 10 次 —— sfx_combat_hit×9、sfx_enemy_die×1（缺失 id 0 个）
+
+warnings exit=0 seconds=14.7 stderrBytes=0
+=== warnings ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 20:09:34 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 20:09:34 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 20:09:34 [Flow] === 新的一局 ===
+[log] 20:09:34 [Flow] 日志文件：user://logs/run_20261020_200934.log
+[log] 20:09:34 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 20:09:34 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 20:09:34 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 20:09:34 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 20:09:34 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 20:09:34 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 20:09:34 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 20:09:34 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 20:09:34 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 20:09:34 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 20:09:34 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 20:09:34 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 20:09:34 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 20:09:34 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-8, 0.05, 0) 方向 (0, 0, -1) 长 7m 宽 2m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[log] 20:09:34 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (8, 0.05, 0) 方向 (1, 0, 0) 长 4m 宽 3m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 同时绘制的指示器各自独立ImmediateMesh
+[Warning] PASS 隐藏另一个敌人的矩形，不清除本敌人的描边
+[Warning] PASS 指示器纯视觉，没有碰撞体、单位或分组
+[log] 20:09:34 [Combat] 单位动画：Exploder 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 20:09:34 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0.27539557, 0.7710887, 0.6874683) 半径 4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 自爆前摇显示范围圈
+[Warning] PASS 自爆显示实际伤害半径4米、贴地；不是触发距离2.4
+[Warning] PASS 自爆预警在可反应前摇存在，未提前造成伤害
+[Warning] PASS 无甲自爆受击打断立即清理范围圈
+[log] 20:09:35 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0.27539557, 1.0335888, 0.6874683) 半径 5.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 精英自爆按真实1.35身体／命中体缩放显示5.4米
+[Warning] PASS 身体攻击闪色与精英底材不覆盖预警红色
+[log] 20:09:35 [Combat] 单位动画切换：Exploder idle → die（当前速度 0，阈值 0.15/4）
+[log] 20:09:35 [Combat] 死亡 Exploder(0) 击杀者=-
+[log] 20:09:35 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[Warning] PASS 死亡时尚未释放的自爆预警清理
+[log] 20:09:35 [Combat] 单位动画：HeavySlammer 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_heavy_slammer）
+[log] 20:09:35 [Animation] 技能动画库已加载：HeavySlammer ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:35 [Animation] 技能动画开播：HeavySlammer → skills/EnemyAction（speed_scale=0.55，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:09:35 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.6960216, 0.8202446, 0.36100462) 半径 3m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 重击蓄势按实际球形命中体显示3米范围
+[log] 20:09:36 [Combat] 伤害 HeavySlammer(240) → @CharacterBody3D@14(9975) 25
+[log] 20:09:36 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[Warning] PASS 真实ATK执行重击时结束前摇预警
+[log] 20:09:36 [Combat] 单位动画：Screamer 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 20:09:36 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0.16893893, 1.0211674, 0.8101665) 半径 7.5m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 既有尖啸范围能力复用同一预警入口
+[log] 20:09:36 [Combat] 单位动画：Charger 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 20:09:36 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-0.34905255, 0.05000024, 0.900361) 方向 (0.050500177, 0, -0.9987241) 长 16.4m 宽 2.4m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 直线冲锋前摇显示含命中体宽度／前后端的路径区域
+[Warning] PASS 直线冲锋的预警与实际起手锁定方向一致
+[Warning] PASS 取消冲锋后隐藏路径并释放冲刺
+[log] 20:09:36 [Combat] 单位动画：TrackingCharger 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_tracking_charger）
+[log] 20:09:36 [Animation] 技能动画库已加载：TrackingCharger ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:36 [Animation] 技能动画开播：TrackingCharger → skills/EnemyAction（speed_scale=0.55，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:09:36 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-0.8156696, 0.05, 1.454478) 方向 (0.10877086, 0, -0.99406683) 长 17.6m 宽 3.6m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 追踪冲锋按实际半径1.8显示路径宽3.6米
+[Warning] PASS 追踪冲锋蓄势朝玩家更新时，预警跟随真实当前方向
+[Warning] PASS 追踪冲锋打断后不残留路径
+[log] 20:09:36 [Combat] 单位动画：SpearGuard 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_spear_guard）
+[log] 20:09:36 [Animation] 技能动画库已加载：SpearGuard ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[Warning] PASS 纯举盾阶段不误画冲锋预警
+[log] 20:09:37 [Animation] 技能动画开播：SpearGuard → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:09:37 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-0.7721612, 0.05000024, 1.0568514) 方向 (0.10877086, 0, -0.99406683) 长 16.8m 宽 2.8m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 举盾后选择持盾冲锋分支才出现路径预警
+[log] 20:09:37 [Combat] 单位动画：MeteorMage 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_meteor_mage）
+[log] 20:09:37 [Animation] 技能动画库已加载：MeteorMage ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:37 [Animation] 技能动画开播：MeteorMage → skills/EnemyAction（speed_scale=0.46，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:09:37 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, 0.05, -6) 半径 2.6m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 陨石蓄力显示实际爆炸半径2.6米
+[Warning] PASS 蓄力期间预警跟随将被采样的目标位置
+[log] 20:09:39 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (2, 1.8500001, -6) 半径 2.6m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 真实ATK后预警交给独立陨石弹体，施法圈结束
+[Warning] PASS 施法收招后圈仍存在，已发射陨石不追随移动后的玩家
+[log] 20:09:39 [Combat] 单位动画切换：MeteorMage idle → die（当前速度 0，阈值 0.15/4）
+[log] 20:09:39 [Combat] 死亡 MeteorMage(0) 击杀者=-
+[Warning] PASS 已经发出的落弹预警不被施法者死亡提前清掉
+[Warning] PASS 陨石命中或失效后同步清理落点预警
+[log] 20:09:40 [Combat] 单位动画：BombLobber 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_bomb_lobber）
+[log] 20:09:40 [Animation] 技能动画库已加载：BombLobber ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:40 [Animation] 技能动画开播：BombLobber → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:09:40 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.04894686, 0.8619723, -5.55267) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS bomb_lobber前摇显示预估爆炸区
+[log] 20:09:41 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.048946828, 0.8605939, -5.55267) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS bomb_lobber飞行期间范围来自本弹真实爆炸快照
+[log] 20:09:41 [Combat] 伤害 BombLobber(55) → @CharacterBody3D@33(9982) 18
+[Warning] PASS bomb_lobber爆炸后不留预警节点
+[log] 20:09:43 [Combat] 单位动画：ArcBomber 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_arc_bomber）
+[log] 20:09:43 [Animation] 技能动画库已加载：ArcBomber ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:43 [Animation] 技能动画开播：ArcBomber → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:09:43 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.048946865, 1.313588, -5.55267) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS arc_bomber前摇显示预估爆炸区
+[log] 20:09:43 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.048946925, 1.31221, -5.55267) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS arc_bomber飞行期间范围来自本弹真实爆炸快照
+[log] 20:09:45 [Combat] 伤害 ArcBomber(65) → @CharacterBody3D@38(9982) 18
+[Warning] PASS arc_bomber爆炸后不留预警节点
+[log] 20:09:46 [Animation] 技能动画库已加载：BombLobber ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:46 [Animation] 技能动画开播：BombLobber → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:09:46 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.037330806, 0.85913104, -7.551561) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 20:09:46 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.03733188, 0.85808, -7.5515485) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 接入预览后仍保留原始发射Speed，实际弹速独立受全局上限约束 raw=499.99997 actual=199.99998
+[log] 20:09:46 [Combat] 单位动画：JumpingMelee 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 20:09:46 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (0.9175517, 0.05, -14.385354) 方向 (0.108734526, 0, -0.9940708) 长 2.2m 宽 2.2m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 旧跳跃敌人按真实盒形落地命中体显示预计范围
+[Warning] PASS 跳跃落地区域在预测前方的地面，避免圈挂在空中
+[Warning] PASS 跳跃打断后预警和水平冲刺一并清理
+[log] 20:09:46 [Combat] 单位动画：HoverDiver 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_hover_diver）
+[log] 20:09:46 [Animation] 技能动画库已加载：HoverDiver ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:47 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0.07613955, 0.05, -6.6958466) 半径 2.3m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Warning] PASS 新俯冲敌人起跳即预告后续落地范围
+[Warning] PASS 滞空时落地圈保持贴地
+[log] 20:09:47 [Animation] 技能动画开播：HoverDiver → skills/EnemyAction（speed_scale=3.67，循环=False，事件帧 1 个：ATK@0.55s）
+[Warning] PASS 俯冲中断清理落点和速度所有权
+[Warning] === 敌人预警验收结束：通过 40，失败 0 ===
+[log] 20:09:47 [Exit] 音频退出回收：真实等待88ms。
+[log] 20:09:47 [Audio] 音效统计：共 5 次 —— sfx_enemy_die×2、sfx_combat_hit×3（缺失 id 0 个）
+
+roster exit=1 seconds=41.96 stderrBytes=0
+=== roster ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 20:09:49 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 20:09:49 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 20:09:49 [Flow] === 新的一局 ===
+[log] 20:09:49 [Flow] 日志文件：user://logs/run_20261020_200949.log
+[log] 20:09:49 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 20:09:49 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 20:09:49 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 20:09:49 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 20:09:49 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 20:09:49 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 20:09:49 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 20:09:49 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 20:09:49 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 20:09:49 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 20:09:49 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 20:09:49 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 20:09:49 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 20:09:49 [Map] 区域杀已就位：中心 Y=-38、覆盖 300×300
+[log] 20:09:49 [Map] 导航网格烘焙完成：2 个多边形（半径 0.6 / 高度 1.8 / 最大坡 30°）
+[Roster] PASS 导航地图真实烘焙同步
+[Roster] PASS 生产索引21行：全局1、旧敌种9、新敌种11
+[Roster] PASS 无限制关卡自动接入19个随机敌种：enemy_chaser(成本2), enemy_fast_melee(成本1), enemy_exploder(成本1), enemy_jumping_melee(成本2), enemy_ranged(成本2), enemy_charger(成本3), enemy_screamer(成本2), enemy_guard(成本3), enemy_burrow_hunter(成本5), enemy_spear_guard(成本6), enemy_arc_thrower(成本4), enemy_meteor_mage(成本4), enemy_tracking_charger(成本5), enemy_hover_diver(成本4), enemy_heavy_slammer(成本3), enemy_blade_spinner(成本3), enemy_bomb_lobber(成本3), enemy_arc_bomber(成本6), enemy_combo_fighter(成本4)
+[Roster] PASS 重复应用白名单不重复注册生成项
+[Roster] PASS burrow_hunter按行为压力计费=5
+[log] 20:09:49 [Combat] 单位动画：BurrowHunter 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_burrow_hunter）
+[log] 20:09:49 [Animation] 技能动画库已加载：BurrowHunter ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:49 [Animation] 技能动画开播：BurrowHunter → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[Roster] PASS burrow_hunter通过真实动画存在性闸门起手
+[Roster] PASS burrow_hunter等待真实ATK并完整收招，次数=1
+[Roster] PASS burrow_hunter每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS burrow_hunter收尾归还格挡和速度所有权
+[Roster] PASS 地鼠发射转向率受限的追踪弹
+[Roster] PASS 攻击后等待、遁地，并在导航净空点出土
+[Roster] PASS spear_guard按行为压力计费=6
+[log] 20:09:53 [Combat] 单位动画：SpearGuard 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_spear_guard）
+[log] 20:09:53 [Animation] 技能动画库已加载：SpearGuard ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[Roster] PASS spear_guard通过真实动画存在性闸门起手
+[log] 20:09:53 [Animation] 技能动画开播：SpearGuard → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:09:53 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-0.7721612, 0.05000024, 1.0568514) 方向 (0.10877086, 0, -0.99406683) 长 16.8m 宽 2.8m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[log] 20:09:54 [Combat] 伤害 SpearGuard(110) → @CharacterBody3D@27(9988) 12
+[log] 20:09:54 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 20:09:54 [Combat] 单位动画切换：SpearGuard sprint → idle（当前速度 0，阈值 0.15/4）
+[Roster] PASS spear_guard等待真实ATK并完整收招，次数=1
+[Roster] PASS spear_guard每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS spear_guard收尾归还格挡和速度所有权
+[Roster] PASS 矛盾先举盾，远处冲锋持续正面格挡
+[Roster] PASS arc_thrower按行为压力计费=4
+[log] 20:09:55 [Combat] 单位动画：ArcThrower 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_arc_thrower）
+[log] 20:09:55 [Animation] 技能动画库已加载：ArcThrower ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:55 [Animation] 技能动画开播：ArcThrower → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[Roster] PASS arc_thrower通过真实动画存在性闸门起手
+[log] 20:09:56 [Combat] 伤害 ArcThrower(55) → @CharacterBody3D@30(9988) 12
+[Roster] PASS arc_thrower等待真实ATK并完整收招，次数=1
+[Roster] PASS arc_thrower每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS arc_thrower收尾归还格挡和速度所有权
+[Roster] PASS 投掷兵真实抛物线飞行
+[Roster] PASS meteor_mage按行为压力计费=4
+[log] 20:09:57 [Combat] 单位动画：MeteorMage 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_meteor_mage）
+[log] 20:09:57 [Animation] 技能动画库已加载：MeteorMage ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:09:57 [Animation] 技能动画开播：MeteorMage → skills/EnemyAction（speed_scale=0.46，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:09:57 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, 0.05, -6) 半径 2.6m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Roster] PASS meteor_mage通过真实动画存在性闸门起手
+[log] 20:09:58 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, 1.8500001, -6) 半径 2.6m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 20:09:59 [Combat] 伤害 MeteorMage(65) → @CharacterBody3D@33(9978) 22
+[Roster] PASS meteor_mage等待真实ATK并完整收招，次数=1
+[Roster] PASS meteor_mage每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS meteor_mage收尾归还格挡和速度所有权
+[Roster] PASS 法师蓄力后在目标上方下砸，爆炸仅伤一次 hits=1
+[Roster] PASS tracking_charger按行为压力计费=5
+[log] 20:10:00 [Combat] 单位动画：TrackingCharger 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_tracking_charger）
+[log] 20:10:00 [Animation] 技能动画库已加载：TrackingCharger ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:00 [Animation] 技能动画开播：TrackingCharger → skills/EnemyAction（speed_scale=0.55，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:00 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-0.8156696, 0.05000024, 1.454478) 方向 (0.10877086, 0, -0.99406683) 长 17.6m 宽 3.6m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[Roster] PASS tracking_charger通过真实动画存在性闸门起手
+[log] 20:10:02 [Combat] 伤害 TrackingCharger(100) → @CharacterBody3D@36(9994) 6
+[log] 20:10:02 [Animation] 技能动画开播：TrackingCharger → skills/EnemyAction（speed_scale=6.88，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:02 [Combat] 伤害 TrackingCharger(100) → @CharacterBody3D@36(9980) 14
+[Roster] PASS tracking_charger等待真实ATK并完整收招，次数=2
+[Roster] PASS tracking_charger每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS tracking_charger收尾归还格挡和速度所有权
+[Roster] PASS 追踪冲锋真实转向移动后的目标，结束后仅接一次近战
+[Roster] PASS hover_diver按行为压力计费=4
+[log] 20:10:02 [Combat] 单位动画：HoverDiver 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_hover_diver）
+[log] 20:10:02 [Animation] 技能动画库已加载：HoverDiver ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:02 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0.07613955, 0.05, -6.6958466) 半径 2.3m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Roster] PASS hover_diver通过真实动画存在性闸门起手
+[log] 20:10:03 [Animation] 技能动画开播：HoverDiver → skills/EnemyAction（speed_scale=3.67，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:03 [Combat] 单位动画切换：HoverDiver sprint → idle（当前速度 0，阈值 0.15/4）
+[log] 20:10:04 [Combat] 伤害 HoverDiver(65) → @CharacterBody3D@42(9982) 18
+[Roster] PASS hover_diver等待真实ATK并完整收招，次数=1
+[Roster] PASS hover_diver每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS hover_diver收尾归还格挡和速度所有权
+[Roster] PASS 跳起、真实滞空、俯冲落地 maxY=1.73
+[Roster] PASS heavy_slammer按行为压力计费=3
+[log] 20:10:04 [Combat] 单位动画：HeavySlammer 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_heavy_slammer）
+[log] 20:10:04 [Animation] 技能动画库已加载：HeavySlammer ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:04 [Animation] 技能动画开播：HeavySlammer → skills/EnemyAction（speed_scale=0.55，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:04 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.6960216, 0.8006446, 0.36100462) 半径 3m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Roster] PASS heavy_slammer通过真实动画存在性闸门起手
+[log] 20:10:05 [Combat] 伤害 HeavySlammer(240) → @CharacterBody3D@45(9975) 25
+[Roster] PASS heavy_slammer等待真实ATK并完整收招，次数=1
+[Roster] PASS heavy_slammer每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS heavy_slammer收尾归还格挡和速度所有权
+[Roster] PASS 重击范围伤害一次、重型质量 hits=1
+[Roster] PASS blade_spinner按行为压力计费=3
+[log] 20:10:06 [Combat] 单位动画：BladeSpinner 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_blade_spinner）
+[log] 20:10:06 [Animation] 技能动画库已加载：BladeSpinner ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:06 [Animation] 技能动画开播：BladeSpinner → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:06 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-1.1624266, 0.05000024, 2.6132183) 方向 (0.20278479, 0, -0.9792234) 长 7.4m 宽 4.6m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[Roster] PASS blade_spinner通过真实动画存在性闸门起手
+[log] 20:10:06 [Combat] 伤害 BladeSpinner(75) → @CharacterBody3D@49(9984) 16
+[log] 20:10:07 [Combat] 单位动画切换：BladeSpinner sprint → idle（当前速度 0，阈值 0.15/4）
+[Roster] PASS blade_spinner等待真实ATK并完整收招，次数=1
+[Roster] PASS blade_spinner每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS blade_spinner收尾归还格挡和速度所有权
+[Roster] PASS 持刀突进大回旋、同段只命中一次 hits=1
+[Roster] PASS bomb_lobber按行为压力计费=3
+[log] 20:10:07 [Combat] 单位动画：BombLobber 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_bomb_lobber）
+[log] 20:10:07 [Animation] 技能动画库已加载：BombLobber ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:07 [Animation] 技能动画开播：BombLobber → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:07 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.048946828, 0.8605939, -5.55267) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Roster] PASS bomb_lobber通过真实动画存在性闸门起手
+[log] 20:10:08 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.048946828, 0.8605939, -5.55267) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 20:10:08 [Combat] 伤害 BombLobber(55) → @CharacterBody3D@52(9982) 18
+[Roster] PASS bomb_lobber等待真实ATK并完整收招，次数=1
+[Roster] PASS bomb_lobber每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS bomb_lobber收尾归还格挡和速度所有权
+[Roster] PASS 直投炸弹接触爆炸，不叠直击伤害 hits=1
+[Roster] PASS arc_bomber按行为压力计费=6
+[log] 20:10:10 [Combat] 单位动画：ArcBomber 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_arc_bomber）
+[log] 20:10:10 [Animation] 技能动画库已加载：ArcBomber ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:10 [Animation] 技能动画开播：ArcBomber → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:10 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.048946865, 1.31221, -5.55267) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Roster] PASS arc_bomber通过真实动画存在性闸门起手
+[log] 20:10:10 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.048946925, 1.31221, -5.55267) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 20:10:11 [Combat] 伤害 ArcBomber(65) → @CharacterBody3D@56(9982) 18
+[Roster] PASS arc_bomber等待真实ATK并完整收招，次数=1
+[Roster] PASS arc_bomber每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS arc_bomber收尾归还格挡和速度所有权
+[Roster] PASS 抛物线炸弹落地爆炸一次 hits=1
+[Roster] PASS combo_fighter按行为压力计费=4
+[log] 20:10:12 [Combat] 单位动画：ComboFighter 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_combo_fighter）
+[log] 20:10:12 [Animation] 技能动画库已加载：ComboFighter ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:12 [Animation] 技能动画开播：ComboFighter → skills/EnemyAction（speed_scale=1.72，循环=False，事件帧 1 个：ATK@0.55s）
+[Roster] PASS combo_fighter通过真实动画存在性闸门起手
+[log] 20:10:13 [Combat] 伤害 ComboFighter(100) → @CharacterBody3D@60(9993) 7
+[log] 20:10:13 [Combat] 单位动画切换：ComboFighter sprint → idle（当前速度 0，阈值 0.15/4）
+[log] 20:10:13 [Animation] 技能动画开播：ComboFighter → skills/EnemyAction（speed_scale=2.29，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:13 [Combat] 伤害 ComboFighter(100) → @CharacterBody3D@60(9985) 8
+[log] 20:10:14 [Animation] 技能动画开播：ComboFighter → skills/EnemyAction（speed_scale=2.29，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:14 [Combat] 伤害 ComboFighter(100) → @CharacterBody3D@60(9974) 11
+[Roster] PASS combo_fighter等待真实ATK并完整收招，次数=3
+[Roster] PASS combo_fighter每段攻击起手闪身一次，举盾和等待不误闪
+[Roster] PASS combo_fighter收尾归还格挡和速度所有权
+[Roster] PASS 三段真实ATK连招，各段突进 hits=3
+[log] 20:10:15 [Animation] 技能动画库已加载：SpearGuard ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:15 [Animation] 技能动画开播：SpearGuard → skills/EnemyAction（speed_scale=1.57，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:16 [Combat] 伤害 SpearGuard(110) → @CharacterBody3D@69(9985) 15
+[Roster] PASS spear_guard近身走近战分支，近战不保留格挡
+[log] 20:10:16 [Animation] 技能动画库已加载：ArcThrower ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:16 [Animation] 技能动画开播：ArcThrower → skills/EnemyAction（speed_scale=2.2，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:17 [Combat] 伤害 ArcThrower(55) → @CharacterBody3D@72(9992) 8
+[log] 20:10:17 [Combat] 单位动画切换：ArcThrower idle → sprint（当前速度 7，阈值 0.15/4）
+[log] 20:10:17 [Combat] 单位动画切换：ArcThrower sprint → idle（当前速度 0，阈值 0.15/4）
+[Roster] PASS arc_thrower近身走近战分支，近战不保留格挡
+[Roster] PASS arc_thrower近战后跳，落点仍有导航连通路径
+[log] 20:10:18 [Animation] 技能动画库已加载：ArcBomber ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:18 [Animation] 技能动画开播：ArcBomber → skills/EnemyAction（speed_scale=2.2，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:18 [Combat] 伤害 ArcBomber(65) → @CharacterBody3D@76(9992) 8
+[log] 20:10:18 [Combat] 单位动画切换：ArcBomber idle → sprint（当前速度 7，阈值 0.15/4）
+[log] 20:10:19 [Combat] 单位动画切换：ArcBomber sprint → idle（当前速度 0，阈值 0.15/4）
+[Roster] PASS arc_bomber近身走近战分支，近战不保留格挡
+[Roster] PASS arc_bomber近战后跳，落点仍有导航连通路径
+[log] 20:10:19 [Animation] 技能动画库已加载：HeavySlammer ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:19 [Animation] 技能动画开播：HeavySlammer → skills/EnemyAction（speed_scale=0.55，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:19 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-0.6960216, 0.8006446, 0.36100462) 半径 3m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 20:10:19 [Combat] 伤害 @CharacterBody3D@79(10000) → HeavySlammer(239) 1
+[Roster] PASS 无甲前摇被普通命中打断并进入受击硬直
+[log] 20:10:20 [Animation] 技能动画开播：HeavySlammer → skills/EnemyAction（speed_scale=0.55，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 20:10:20 [Combat] 破甲 HeavySlammer(239)
+[log] 20:10:20 [Combat] 伤害 @CharacterBody3D@79(10000) → HeavySlammer(230) 9
+[Roster] PASS 破甲当击按命中前有甲处理，攻击前摇继续
+[log] 20:10:20 [Combat] 伤害 @CharacterBody3D@79(10000) → HeavySlammer(229) 1
+[Roster] PASS 护甲破碎后下一击可打断
+[log] 20:10:20 [Combat] 伤害 @CharacterBody3D@79(10000) → HeavySlammer(228) 1
+[Roster] PASS 持盾格挡硬直属于格挡者，攻击者不受此硬直
+[Roster] PASS 一次护罩无效化本次命中，无受击或格挡硬直
+[Roster] PASS 精英体型放大、有甲额外外壳可见
+[Roster] FAIL 攻击闪色结束后恢复精英底材
+[log] 20:10:21 [Combat] 破甲 HeavySlammer(228)
+[log] 20:10:21 [Combat] 伤害 @CharacterBody3D@79(10000) → HeavySlammer(0) 228
+[log] 20:10:21 [Combat] 单位动画切换：HeavySlammer idle → die（当前速度 0，阈值 0.15/4）
+[log] 20:10:21 [Combat] 死亡 HeavySlammer(0) 击杀者=@CharacterBody3D@79(10000)
+[log] 20:10:21 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 20:10:21 [Combat] 击杀 HeavySlammer(0) by @CharacterBody3D@79(10000)
+[Roster] PASS 破甲或死亡后外壳隐藏
+[log] 20:10:21 [Animation] 技能动画库已加载：HeavySlammer ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:21 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 20:10:21 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 20:10:21 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 20:10:21 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 EnemyRosterProbe
+[log] 20:10:21 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 20:10:21 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 20:10:21 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 20:10:21 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 20:10:21 [Animation] 技能动画开播：Player → skills/Skill_B_Guard（speed_scale=1，循环=False，事件帧 2 个：GuardOn@0.15s、GuardOff@0.9s）
+[log] 20:10:21 [Combat] 架：skl_b_skill_2 等待真实GuardOn，随后持续0.75游戏秒。
+[Roster] PASS 玩家主动架势通过真实技能动画起手
+[log] 20:10:22 [Combat] 架：skl_b_skill_2 架势开始（0.75s，期间被命中则规避并退出）
+[log] 20:10:22 [Combat] 架：skl_b_skill_2 **架住了**（挡下 12 点，来源 HeavySlammer），规避这次攻击并退出架势（累计 1 次）
+[log] 20:10:22 [Combat] 架：skl_b_skill_2 架势结束（累计架住 1 次）
+[Roster] PASS 真实GuardOn后挡伤、退出架势，并只给玩家自身格挡硬直
+[log] 20:10:22 [Combat] 单位动画：Exploder 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 20:10:22 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0.27539557, 0.7514887, 0.6874683) 半径 4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[Roster] PASS 自爆前摇至少0.9秒且闪身预警
+[Roster] PASS 前摇期间不提前自爆或造成伤害
+[log] 20:10:22 [Combat] 伤害 @CharacterBody3D@127(10000) → Exploder(24) 1
+[Roster] PASS 无甲自爆在前摇被打断，取消爆炸命中体
+[log] 20:10:23 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0.27539557, 0.7514887, 0.6874683) 半径 4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 20:10:24 [Combat] 伤害 Exploder(25) → @CharacterBody3D@129(9978) 22
+[log] 20:10:24 [Combat] 单位动画切换：Exploder idle → die（当前速度 0，阈值 0.15/4）
+[log] 20:10:24 [Combat] 死亡 Exploder(0) 击杀者=-
+[Roster] PASS 未被打断则前摇后真实爆炸伤害并死亡
+[log] 20:10:25 [Animation] 技能动画库已加载：BombLobber ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[Roster] PASS 固定航程后停止追踪，垂直掉落
+[log] 20:10:25 [Combat] 伤害 BombLobber(55) → @CharacterBody3D@131(9993) 7
+[Roster] PASS 炸弹达到固定航程触发一次范围爆炸 hits=1
+[log] 20:10:28 [Animation] 技能动画库已加载：ComboFighter ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:28 [Config] 敌人倍率：普通 生命×0.75 伤害×0.3 移速×1 / Boss 生命×1 伤害×0.9（来源：表 enemy_global）
+[log] 20:10:28 [Spawn] 生成 连招敌人（剩余预算 6，场上 0）
+[log] 20:10:29 [Animation] 技能动画库已加载：@CharacterBody3D@157 ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 20:10:29 [Spawn] 生成 连招敌人（剩余预算 2，场上 1）
+[log] 20:10:29 [Combat] 单位动画切换：ComboFighter idle → walk（当前速度 0.25，阈值 0.15/4）
+[log] 20:10:29 [Combat] 单位动画切换：ComboFighter walk → sprint（当前速度 4.2，阈值 0.15/4）
+[Roster] PASS 生成连招敌人每只4点、余2不足作废，真实生成=2
+[Roster] PASS 生产生成的新敌人带动作计划和导航
+[Roster] PASS 生产生成的新敌人带动作计划和导航
+[Roster] === 敌人清单验收结束：通过 94，失败 1 ===
+[log] 20:10:29 [Exit] 音频退出回收：真实等待89ms。
+[log] 20:10:29 [Audio] 音效统计：共 27 次 —— sfx_combat_hit×25、sfx_enemy_die×2（缺失 id 0 个）
+
+roster 未通过：F:\Godot项目\项目a\.ai_j38_20261020_200914.roster.log / F:\Godot项目\项目a\.ai_j38_20261020_200914.roster.err
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 338 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.75
+
+=== 失败现场构建 ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 345 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.37

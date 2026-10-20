@@ -11,6 +11,8 @@ namespace ActRoguelike.Combat;
 /// </summary>
 public partial class Unit : CharacterBody3D
 {
+	public ImpactPause? ImpactPause { get; private set; }
+	internal ulong FeedbackReadyAt { get; set; }
 	[Export] public Faction Faction { get; set; } = Faction.Enemy;
 
 	[Export] public float MaxHealth { get; set; } = 100f;
@@ -136,6 +138,8 @@ public partial class Unit : CharacterBody3D
 	{
 		SeedStats();
 		Movement = GetNodeOrNull<CharacterMovement>("Movement");
+		ImpactPause = GetNodeOrNull<ImpactPause>("ImpactPause");
+		if (ImpactPause == null) { ImpactPause = new ImpactPause { Name = "ImpactPause" }; AddChild(ImpactPause); }
 		Reactions = GetNodeOrNull<CombatReaction>("Reactions");
 		if (Reactions == null) { Reactions = new CombatReaction { Name = "Reactions" }; AddChild(Reactions); }
 		if (GetNodeOrNull<ActRoguelike.AI.EnemyBrain>("Brain") != null && GetNodeOrNull<ActRoguelike.AI.UnitNavigation>("Navigation") == null)
@@ -373,7 +377,9 @@ public partial class Unit : CharacterBody3D
 
 		if (IsInvulnerable || hit.Negated)
 		{
-			return new DamageResult { Hit = true, Invulnerable = true };
+			var avoided = new DamageResult { Hit = true, Invulnerable = true };
+			CombatFeedback.Present(this, hit, avoided);
+			return avoided;
 		}
 
 		float blocked = ResolveBlock(hit);
@@ -384,6 +390,7 @@ public partial class Unit : CharacterBody3D
 		float remaining = damage;
 		bool hadArmor = Armor > 0;
 		float armorLost = 0f;
+		bool armorBroken = false;
 		float shieldLost = 0f;
 		float healthLost = 0f;
 
@@ -394,6 +401,7 @@ public partial class Unit : CharacterBody3D
 			remaining -= armorLost;
 			if (Armor <= 0f)
 			{
+				armorBroken = true;
 				ArmorBroke?.Invoke();
 				// P6a：把"护甲被打光"抛到事件总线 —— **抛点唯一**（就在这一处，与 `Parried` 同一个标准）。
 				// 在此之前 `ArmorBroken` 这个枚举值全项目一个抛点都没有（只有 `GameLog` 的 switch 认得它），
@@ -464,6 +472,7 @@ public partial class Unit : CharacterBody3D
 			Hit = true,
 			FinalDamage = damage,
 			ArmorLost = armorLost,
+			ArmorBroken = armorBroken,
 			ShieldLost = shieldLost,
 			HealthLost = healthLost,
 			Blocked = blocked < 1f,
@@ -522,6 +531,7 @@ public partial class Unit : CharacterBody3D
 			KnockbackReceived?.Invoke(hit.Direction.Normalized() * hit.Knockback * scale);
 		}
 
+		CombatFeedback.Present(this, hit, result);
 		return result;
 	}
 

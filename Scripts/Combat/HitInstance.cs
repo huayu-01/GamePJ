@@ -20,6 +20,10 @@ public sealed class HitInstance
 	public float Knockback { get; init; }
 	/// <summary>防御能力只无效化本次命中，不把规避扩散成一帧内的所有攻击无敌。</summary>
 	public bool Negated { get; set; }
+	/// <summary>主动招架事实；一次性效果护罩只写Negated，不冒充招架。</summary>
+	public bool Parried { get; set; }
+	/// <summary>命中体仍附着在出手单位上；远程、爆炸与脱手区域不使出手者停顿。</summary>
+	public bool ContactFeedback { get; set; }
 
 	/// <summary>
 	/// **无视格挡**（文档：能量波"能穿透格挡（无视格挡效果）"，而剑气"可被格挡"）。

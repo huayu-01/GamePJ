@@ -170,6 +170,7 @@ script = ExtResource("32_fall_attack")
 Enabled = false
 
 [node name="Attack" parent="AbilityFallAttack" instance=ExtResource("36_melee_strike")]
+FeedbackWeight = 1.8
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 Damage = 18.0
 Knockback = 2.0
@@ -210,6 +211,7 @@ script = ExtResource("26_melee_combo")
 Enabled = false
 
 [node name="Attack" parent="AbilityWeapon5Skill1" instance=ExtResource("36_melee_strike")]
+FeedbackWeight = 1.2
 Damage = 26.0
 Knockback = 4.0
 
@@ -245,6 +247,7 @@ script = ExtResource("26_melee_combo")
 Enabled = false
 
 [node name="Attack" parent="AbilityWeapon6Skill1" instance=ExtResource("36_melee_strike")]
+FeedbackWeight = 0.9
 Damage = 22.0
 Knockback = 3.5
 

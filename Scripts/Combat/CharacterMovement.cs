@@ -384,6 +384,7 @@ public partial class CharacterMovement : Node
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_unit?.ImpactPause?.IsHolding == true) return;
 		float dt = (float)delta;
 		if (_unit is { IsDead: true })
 		{

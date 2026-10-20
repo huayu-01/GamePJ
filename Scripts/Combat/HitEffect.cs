@@ -52,7 +52,7 @@ public static class HitEffect
 	/// </summary>
 	/// <param name="context">调用方自己（只用来取 <see cref="Node.GetTree"/> 与 <c>CurrentScene</c>）。</param>
 	/// <param name="position">世界坐标下的命中点。</param>
-	public static void Spawn(Node context, Vector3 position)
+	public static void Spawn(Node context, Vector3 position, float scale = 1)
 	{
 		ConfigIndexData settings = ConfigIndex.Settings;
 
@@ -77,6 +77,7 @@ public static class HitEffect
 		// 直接挂在最终父节点下再写世界坐标：**不做 reparent**（见类注释里的缩放坑）。
 		parent.AddChild(fx);
 		fx.GlobalPosition = position;
+		fx.Scale *= Mathf.Clamp(scale, .5f, 1.6f);
 
 #if DEBUG
 		// 自测取证用（正式逻辑从不读它；Release 构建里这些成员不存在）。

@@ -12,8 +12,10 @@
   └─ 生成 HitInstance（含暴击判定，暴击属于攻击侧）
 目标结算（Unit.ReceiveHit）
   OnHit → 无敌 → 格挡钩子 → 伤害减免 → Armor → Shield → HP
-  → OnTakeDamage → 死亡判定 → 击退
+  → OnTakeDamage → 死亡判定 → 击退 → CombatFeedback读取本击结果
 ```
+
+J38已统一打肉／碰甲／破甲／格挡／招架／护罩反馈，并接入玩家附着近战局部停顿。流程分析、参考游戏拆解、反馈矩阵、时序边界与试玩见[战斗打击反馈](combat-feel.md)。判定端不再无条件播放火花和命中声；无敌不播放成功伤害反馈。
 
 - **快照 vs 命中读取**：攻击侧属性在 `AttackInstance` 创建时快照（战斗规则说明 §4）。需要“命中时读取”的效果属于后续 Trigger/Effect。
 - **护甲/护盾顺序**：采用 战斗规则说明 §12 的当前推荐 `Damage → Armor → Shield → HP`（全局唯一，不在各单位里各写一套）。

@@ -1,5 +1,4 @@
 using System;
-using ActRoguelike.Audio;
 using Godot;
 
 namespace ActRoguelike.Combat;
@@ -12,6 +11,7 @@ namespace ActRoguelike.Combat;
 public partial class AttackHitbox : Area3D
 {
 	[Export] public float Damage { get; set; } = 10f;
+	[Export] public float FeedbackWeight { get; set; } = 1f;
 	[Export] public float Knockback { get; set; } = 3f;
 	[Export] public HitPolicy Policy { get; set; } = HitPolicy.OncePerTarget;
 	[Export] public float HitInterval { get; set; } = 0.2f;
@@ -30,6 +30,7 @@ public partial class AttackHitbox : Area3D
 	public AttackInstance? CurrentAttack => _attack;
 	private bool _active;
 	private int _phase;
+	private bool _contact;
 
 	public Unit? OwnerUnit { get; private set; }
 
@@ -112,6 +113,7 @@ public partial class AttackHitbox : Area3D
 	public void Activate(Unit? owner, AttackInstance? attack = null, int phase = 0)
 	{
 		OwnerUnit = owner;
+		_contact = this is not Explosion && owner != null && owner.IsAncestorOf(this);
 		ConfigureCollision(owner);
 		_phase = phase;
 		AttackOffense offense = AttackOffense.Capture(owner, CritChance, CritMultiplier);
@@ -120,6 +122,7 @@ public partial class AttackHitbox : Area3D
 		{
 			Attacker = owner,
 			Ability = "Hitbox",
+			FeedbackWeight = FeedbackWeight,
 			BaseDamage = Damage * (player ? offense.DamageMultiplier : 1f),
 			CanCrit = player || CritChance > 0f,
 			CritChance = player ? offense.CritChance : CritChance,
@@ -196,6 +199,7 @@ public partial class AttackHitbox : Area3D
 	public override void _PhysicsProcess(double delta)
 	{
 		if (!_active || _attack == null) return;
+		if (_contact && OwnerUnit?.ImpactPause?.IsHolding == true) return;
 		foreach (Node3D node in GetOverlappingBodies())
 			if (node is Unit target) HitTarget(target);
 	}
@@ -225,13 +229,9 @@ public partial class AttackHitbox : Area3D
 
 		Vector3 direction = target.GlobalPosition - GlobalPosition;
 		direction.Y = 0f;
-		target.ReceiveHit(_attack.RollHit(target, direction.Normalized(), target.GlobalPosition));
-
-		// 击中特效（Binbun Hit FX）：**打在哪就炸在哪**（用户要求：「实际应该在命中的位置发生特效」）。
-		HitEffect.Spawn(this, hitPoint);
-
-		// 命中音效：与命中特效**同一个位置、同一个判定**，按 id 播（表里说了算）。
-		AudioManager.PlaySfx(AudioIds.CombatHit);
+		var hit = _attack.RollHit(target, direction.Normalized(), hitPoint);
+		hit.ContactFeedback = _contact;
+		target.ReceiveHit(hit);
 
 		HitLanded?.Invoke(target);
 	}

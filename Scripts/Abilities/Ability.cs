@@ -422,6 +422,8 @@ public abstract partial class Ability : Node3D
 		}
 		SyncCharges();
 		TickCooldown(dt);
+		// 命中停顿只延长动作，不吞输入、不延长独立技能的冷却。
+		if (OwnerUnit.ImpactPause?.IsHolding == true) return;
 
 		if (IsActive)
 		{

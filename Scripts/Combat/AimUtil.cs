@@ -14,7 +14,7 @@ public static class AimUtil
 		Camera3D? camera = viewport.GetCamera3D();
 		if (camera == null) return false;
 		Vector2 center = viewport.GetVisibleRect().Size * 0.5f;
-		Vector3 origin = camera.ProjectRayOrigin(center);
+		Vector3 origin = CameraImpact.AimOrigin(camera, center);
 		var query = PhysicsRayQueryParameters3D.Create(origin, origin + camera.ProjectRayNormal(center) * maxDistance, CombatLayers.World);
 		if (owner is CollisionObject3D body) query.Exclude = new Godot.Collections.Array<Rid> { body.GetRid() };
 		var hit = owner.GetWorld3D().DirectSpaceState.IntersectRay(query);
@@ -29,7 +29,7 @@ public static class AimUtil
 		Camera3D? camera = viewport.GetCamera3D();
 		if (camera == null) return false;
 		Vector2 center = viewport.GetVisibleRect().Size * 0.5f;
-		Vector3 origin = camera.ProjectRayOrigin(center);
+		Vector3 origin = CameraImpact.AimOrigin(camera, center);
 		var query = PhysicsRayQueryParameters3D.Create(origin, origin + camera.ProjectRayNormal(center) * maxDistance, mask);
 		if (owner is CollisionObject3D body) query.Exclude = new Godot.Collections.Array<Rid> { body.GetRid() };
 		var hit = owner.GetWorld3D().DirectSpaceState.IntersectRay(query);
@@ -60,7 +60,7 @@ public static class AimUtil
 		}
 
 		Vector2 center = viewport.GetVisibleRect().Size * 0.5f;
-		Vector3 origin = camera.ProjectRayOrigin(center);
+		Vector3 origin = CameraImpact.AimOrigin(camera, center);
 		Vector3 end = origin + (camera.ProjectRayNormal(center) * maxDistance);
 		var query = PhysicsRayQueryParameters3D.Create(origin, end, mask);
 		if (owner is CollisionObject3D body)

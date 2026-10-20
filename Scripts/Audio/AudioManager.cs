@@ -186,6 +186,8 @@ public partial class AudioManager : Node
 
 	/// <summary>按 id 播一条**战斗**音效（等价于 <see cref="Play"/>）。</summary>
 	public static bool PlaySfx(string? id) => Play(id);
+	/// <summary>命中层只调整一次播放的音高／音量，不修改共享音效表。</summary>
+	public static bool PlayImpact(string? id, float pitch = 1, float volumeDb = 0) => Instance?.PlayInternal(id, pitch, volumeDb) ?? false;
 
 	/// <summary>按 id 播一条**界面**音效（等价于 <see cref="Play"/>）。</summary>
 	public static bool PlayUi(string? id) => Play(id);
@@ -261,7 +263,7 @@ public partial class AudioManager : Node
 		return MasterBus;
 	}
 
-	private bool PlayInternal(string? id)
+	private bool PlayInternal(string? id, float pitch = 1, float volumeDb = 0)
 	{
 		if (_shuttingDown) return false;
 		if (string.IsNullOrEmpty(id))
@@ -290,8 +292,8 @@ public partial class AudioManager : Node
 		};
 
 		voice.Stream = row.Stream;
-		voice.VolumeDb = row.VolumeDb + CenteredRandom(row.VolumeRandomDb);
-		voice.PitchScale = Mathf.Max(0.01f, row.PitchScale + CenteredRandom(row.PitchRandom));
+		voice.VolumeDb = row.VolumeDb + CenteredRandom(row.VolumeRandomDb) + Mathf.Clamp(volumeDb, -12, 3);
+		voice.PitchScale = Mathf.Max(0.01f, (row.PitchScale + CenteredRandom(row.PitchRandom)) * Mathf.Clamp(pitch, .4f, 2));
 		voice.Play();
 
 		Record(id!, voice.Bus);

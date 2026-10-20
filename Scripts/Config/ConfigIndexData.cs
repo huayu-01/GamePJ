@@ -66,6 +66,9 @@ public enum PlayerCharacterKind
 [GlobalClass]
 public partial class ConfigIndexData : Resource
 {
+	[ExportGroup("表现 · 战斗反馈")]
+	[Export] public ActRoguelike.Combat.CombatFeedbackProfile? CombatFeedback { get; set; }
+
 	[ExportGroup("战斗 · 投射物")]
 	/// <summary>所有 Projectile 的实际速度上限（m/s）；≤0 不限速。发射、转向及重力后统一夹取。</summary>
 	[Export] public float ProjectileMaxSpeed { get; set; } = 200f;

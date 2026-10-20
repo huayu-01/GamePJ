@@ -97,6 +97,7 @@ public partial class FallAttackAbility : Ability
 		LastDamage = _hitbox.Damage * CurrentOffense.DamageMultiplier * damageScale;
 		HasLanded = true;
 		_hitbox.Activate(OwnerUnit, new AttackInstance { Attacker = OwnerUnit, Ability = AbilityId, AbilityKind = AbilityId,
+			FeedbackWeight = _hitbox.FeedbackWeight,
 			BaseDamage = LastDamage, CanCrit = true, CritChance = CurrentOffense.CritChance, CritMultiplier = CurrentOffense.CritMultiplier,
 			Knockback = _hitbox.Knockback, Policy = HitPolicy.OncePerTarget, Tags = _hitbox.AttackTags });
 		_hitbox.SweepSphere(_hitbox.GlobalPosition, _hitbox.GlobalPosition);

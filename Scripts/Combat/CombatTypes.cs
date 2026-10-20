@@ -63,6 +63,7 @@ public struct DamageResult
 	public bool Hit { get; init; }
 	public float FinalDamage { get; init; }
 	public float ArmorLost { get; init; }
+	public bool ArmorBroken { get; init; }
 	public float ShieldLost { get; init; }
 	public float HealthLost { get; init; }
 	public bool Invulnerable { get; init; }

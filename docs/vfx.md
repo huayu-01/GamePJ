@@ -1,5 +1,7 @@
 # 表现层（VFX）契约与清单
 
+J38新增[统一命中反馈与局部时钟](combat-feel.md)：`CombatFeedback`只读结算结果并调度视觉／音效／镜头；`ImpactPause`是独立、明确的战斗时序能力，由Ability、UnitAnimator和CharacterMovement共同遵守，不属于纯VFX。敌人预警与全局时间不暂停。
+
 > **原文纠偏J4**：下落风线继续读取真实下冲状态与逆速度方向。`CharacterDisplay`仅在长枪共通落的Crosshair模式且真实IsDiving时，将同源握持模型的枪尖+Y对齐真实方向，点积实测1；临时TopLevel解除骨骼父变换防二次转偏，结束／换装还原局部握持变换。没有复制单位或创建额外碰撞，逻辑不读取模型结果。截图和未完成动画边界见[下落专项](character-design-j4.md)。
 
 > **原文纠偏J2**：`ThrownWeaponDisplay`只读投掷位置／方向／阶段和当前武器模型路径，飞出模型复用手持资源；`CharacterDisplay`只读尚未回手状态隐藏握持物，回手恢复。长枪沿弹道朝向、尖端锚定落点，落地不旋转；镰刀水平旋转。姿态／模型偏移用Export配置；两个显示分支都不含单位或碰撞，逻辑不读取显示结果。
