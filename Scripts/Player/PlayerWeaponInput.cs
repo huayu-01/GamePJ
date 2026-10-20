@@ -18,7 +18,6 @@ public partial class PlayerWeaponInput : Node3D
 
 	private Weapon? _weapon;
 	private Unit? _unit;
-	private MeleeAttackAbility? _melee;
 
 	public override void _Ready()
 	{
@@ -43,36 +42,8 @@ public partial class PlayerWeaponInput : Node3D
 		Vector3 bodyAim = AimUtil.GetCrosshairDirection(GetViewport(), -_unit.GlobalTransform.Basis.Z);
 		_unit.Movement?.SetFacing(bodyAim);
 
-		// 近战角色（武器 Enabled=false）：左键改为触发近战重击，不走枪械逻辑。
-		if (!_weapon.Enabled)
-		{
-			// 本轮新增：武器关了之后，左键**先看有没有"绑在左键上的技能"**（表里 InputAction 说了算），
-			// 有就交给它 —— 能量掌（没有任何弹匣概念）走这条；没有才退到近战重击的老逻辑。
-			if (Input.IsActionJustPressed("fire"))
-			{
-				Ability? bound = PlayerAbilityInput.FindByInputAction(_unit, "weapon_skill_1");
-				if (bound != null)
-				{
-					// 方向不用在这里算：进入武器分流之前已经更新了准星朝向，
-					// 而技能的 `Ability.Aim = Crosshair` 自己会解析屏幕中心射线（与枪械同一条路）。
-					bound.TryActivate();
-					return;
-				}
-
-				_melee ??= NodeSearch.FindInSubtree<MeleeAttackAbility>(_unit);
-				if (_melee != null)
-				{
-					// 近战需要「范围内的目标」才会挥（能力自己会校验距离），够不着就不出招。
-					Unit? victim = Targeting.FindNearestHostile(_unit, _unit, _melee.AttackRange);
-					if (victim != null)
-					{
-						_melee.TryActivate(victim);
-					}
-				}
-			}
-
-			return;
-		}
+		// 技能驱动武器只由技能槽输入层执行，不能让fire再触发一遍左键技能。
+		if (!_weapon.Enabled) { _weapon.SetAiming(false); return; }
 
 		Camera3D? camera = GetViewport().GetCamera3D();
 		Vector3 direction;

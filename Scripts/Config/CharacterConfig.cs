@@ -35,8 +35,8 @@ public partial class CharacterConfig : UnitConfig
 
 	[ExportGroup("能力开关矩阵（取代硬编码的 if/else）")]
 	/// <summary>
-	/// 启用名单按技能行Id匹配，同时兼容脚本类名。PlayerLoadout先恢复场景绑定，
-	/// 再套技能行，最后执行名单；名单外保持场景/技能行状态，能力卡随后覆盖。
+	/// 启用名单按技能行Id匹配，同时兼容脚本类名；只作用于当前配装声明的技能。
+	/// PlayerLoadout先清理仓库技能，再安装角色／武器技能与槽位，最后执行名单与能力卡。
 	/// </summary>
 	[Export] public string[] EnabledAbilityIds { get; set; } = System.Array.Empty<string>();
 

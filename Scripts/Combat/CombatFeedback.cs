@@ -67,6 +67,7 @@ public static class CombatFeedback
 			_effectCount++;
 			if (kind == ImpactKind.Flesh) HitEffect.Spawn(target, hit.Position, Mathf.Sqrt(weight));
 			else CombatImpactFx.Spawn(target, hit.Position, hit.Direction, kind, weight);
+			ImpactVisibility.Spawn(target, hit.Position, kind);
 		}
 		Unit? source = hit.Attacker is { } owner && GodotObject.IsInstanceValid(owner) ? owner : null;
 		bool playerSource = source?.Faction == Faction.Player && !source.HasTag("Summon");

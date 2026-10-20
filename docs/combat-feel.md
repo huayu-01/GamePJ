@@ -69,7 +69,7 @@ flowchart TD
 - Ability暂停动作StateTime和Tick；冷却／回层继续，输入仍接收，既有取消与交接可以清理停顿。
 - CharacterMovement暂停该单位的运动步，突进与动作一起停；附着AttackHitbox暂停后续物理步的重叠检查。同帧群体判定仍完整处理。
 - 有甲防御者继续自身动作；敌人预警、弹体、其它单位、状态计时、HUD与全局时间继续。没有设置Engine.TimeScale、SceneTree.Paused或定时sleep。
-- 请求处有冷却，同刀多目标不累计；动作取消、换装、死亡、关闭功能均恢复。物理步会量化短暂停顿，25ms不等于所有帧率上精确25ms。
+- 请求处有冷却，同刀多目标不累计；动作取消、换装、死亡、关闭功能均恢复。物理步会量化短暂停顿，35ms不等于所有帧率上精确35ms。
 
 这是明确的局部战斗时序能力，和纯VFX分开。会略微延长近战命中后的动作占用，是有意的手感变化；并非所有玩法时序都与关闭时逐帧相同。伤害公式、控制免疫和判定尺寸没有随之改变。
 
@@ -80,10 +80,11 @@ flowchart TD
 | 参数 | 当前预设 |
 |---|---|
 | Enabled／LocalPauseEnabled／CameraStrength | 总开关／顿帧开关／镜头强度，镜头0关闭 |
-| LightPauseSeconds／HeavyPauseSeconds／MaxPauseSeconds | 0.025／0.05／0.065秒；本项目预设，非参考游戏数据 |
+| LightPauseSeconds／HeavyPauseSeconds／MaxPauseSeconds | J39增强为0.035／0.06／0.075秒；本项目预设，非参考游戏数据 |
 | PauseCooldownSeconds | 0.12秒，同刀／密集命中不累计 |
 | FinisherWeight／CriticalWeight／BreakWeight／KillWeight | 1.45／1.25／1.6／1.2，最终有界 |
-| CameraSeconds／CameraMaxOffset | 0.13秒／0.065米上限，方向冲击快速归零 |
+| CameraBaseOffset／CameraSeconds／CameraMaxOffset | J39增强为0.035米／0.14秒／0.085米上限，方向冲击快速归零 |
+| ContactCoreSeconds／ContactCoreSize | 0.07秒／0.16米；接触点短亮核避免被目标模型吞没，World墙体遮挡时不生成 |
 | SoundCooldownSeconds／CameraCooldownSeconds | 0.045／0.07秒，且每物理帧各最多一次 |
 | TargetCooldownSeconds／MaxEffectsPerFrame | 0.035秒／每物理帧12个独立命中特效；身体提示仍各自处理 |
 | FlashSeconds／BurstSeconds | 0.075／0.18秒 |
@@ -94,6 +95,8 @@ AttackHitbox.FeedbackWeight和AttackInstance.FeedbackWeight与伤害独立。当
 相机只动HOffset/VOffset，不写CameraRig跟随、鼠标角度、FOV或角色变换。AimUtil使用扣除本组件偏移后的准星射线原点，方向不变；HUD不随之移动。只给玩家本人相关、当前相机画面内的事件申请冲击；召唤物与远处后台命中不冒领镜头。
 
 `ShowHitEffects`仍控制接触特效，预警保持原独立配色；它不控制伤害、身体起手警告或机械硬直。纯视觉预算与伤害次数没有互相依赖。
+
+J39处理侧面／背面命中特效被目标挡住的问题：外围粒子继续正常深度测试，`ImpactVisibility`只为实际接触坐标增加极短的小亮核，先查询World遮挡再允许越过目标深度。没有移动真实命中点、改共享素材或关闭所有粒子的深度；该射线仅用于表现遮挡，不用于敌人寻路。镜头基础冲击从0.025增强到0.035米，停顿各加10ms，伤害数值不变。
 
 ## 试玩与后续美术接入
 

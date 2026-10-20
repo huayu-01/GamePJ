@@ -14,6 +14,7 @@ public partial class CombatFeedbackLab : Node3D
 	private readonly System.Collections.Generic.List<Unit> _targets = new();
 	private bool _enabled, _pause;
 	private float _camera;
+	private readonly PlayerLoadout _loadout = new();
 	private readonly WeaponPresetKind[] _weapons = { WeaponPresetKind.SpiritSword, WeaponPresetKind.Scythe, WeaponPresetKind.Spear, WeaponPresetKind.Bow, WeaponPresetKind.EnergyPalm, WeaponPresetKind.Crossbow };
 	public override async void _Ready()
 	{
@@ -28,7 +29,7 @@ public partial class CombatFeedbackLab : Node3D
 		_player.GlobalPosition = new Vector3(0, .05f, 5); _player.IsInvulnerable = true; Equip(0); Spawn();
 		NodeSearch.FindInSubtree<Camera3D>(_player.GetNode("CameraRig"))?.MakeCurrent();
 	}
-	private void Equip(int index) => new PlayerLoadout().Apply(_player, this, index < 3 ? PlayerCharacterKind.WeaponMaster : PlayerCharacterKind.Hunter, _weapons[index]);
+	private void Equip(int index) => _loadout.Apply(_player, this, index < 3 ? PlayerCharacterKind.WeaponMaster : PlayerCharacterKind.Hunter, _weapons[index]);
 	private void Spawn()
 	{
 		foreach (var target in _targets) if (IsInstanceValid(target)) target.QueueFree(); _targets.Clear();

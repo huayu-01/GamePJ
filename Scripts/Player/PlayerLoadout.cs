@@ -15,13 +15,9 @@ namespace ActRoguelike.Player;
 /// <summary>基地与关卡共用的装备应用器；不创建关卡、奖励或结算上下文。</summary>
 public sealed class PlayerLoadout
 {
-	private readonly Dictionary<Ability, (bool Enabled, string Action, string Id)> _baseline = new();
-	private int? _baseAirJumps;
-	private UnitPhysicsProfile? _basePhysicsProfile;
-	private bool _physicsCaptured;
-
 	public void Apply(Unit player, Node owner, PlayerCharacterKind characterKind, WeaponPresetKind weaponKind)
 	{
+		var slots = player.AbilitySlots; slots.CaptureDefaults(player); slots.Clear();
 		if (player.GetNodeOrNull<SpecializationRuntime>(SpecializationRuntime.NodeName) is { } specialization)
 		{
 			player.RemoveChild(specialization); specialization.QueueFree();
@@ -35,25 +31,17 @@ public sealed class PlayerLoadout
 		var abilities = new List<Ability>();
 		if (player.Movement is { } jump)
 		{
-			if (!_physicsCaptured) { _basePhysicsProfile = jump.PhysicsProfile; _physicsCaptured = true; }
-			jump.ConfigurePhysics(character?.PhysicsProfile ?? _basePhysicsProfile);
+			jump.ConfigurePhysics(character?.PhysicsProfile ?? slots.BasePhysicsProfile);
 			jump.ConfigureTeleportJump(false);
-			_baseAirJumps ??= jump.ExtraAirJumps;
-			jump.SetExtraAirJumps(_baseAirJumps.Value, Mathf.Max(_baseAirJumps.Value, jump.ExtraAirJumps));
+			jump.SetExtraAirJumps(slots.BaseAirJumps, Mathf.Max(slots.BaseAirJumps, jump.ExtraAirJumps));
 		}
 		player.GetNodeOrNull<AirHoverController>("AirHover")?.ResetForLoadout();
 		NodeSearch.CollectInSubtree(player, abilities);
 		foreach (Ability ability in abilities)
 		{
-			if (!_baseline.TryGetValue(ability, out var baseline))
-			{
-				baseline = (ability.Enabled, ability.InputAction, ability.AbilityId);
-				_baseline.Add(ability, baseline);
-			}
 			ability.ResetForLoadout();
-			ability.Enabled = baseline.Enabled;
-			ability.InputAction = baseline.Action;
-			ability.AbilityId = baseline.Id;
+			ability.Enabled = false;
+			ability.InputAction = string.Empty;
 		}
 
 		MetaProgress.Load();
@@ -88,14 +76,20 @@ public sealed class PlayerLoadout
 		if (weaponRow?.FallAttackAim is { TargetAbility: { } fallRow } aim
 			&& Ability.FindByAbilityId(player, fallRow.Id) is FallAttackAbility fall) aim.ApplyAimTo(fall);
 
-		// 先恢复绑定、再套技能行、最后执行矩阵；不能把新技能的按键再次清空。
+		// 只有当前角色／武器声明的技能能占槽；其它节点只是仓库，不参与输入。
+		if (character != null) slots.Assign(player, character.Skills);
+		if (weaponRow != null) slots.Assign(player, weaponRow.Skills);
 		foreach (Ability ability in abilities)
 		{
-			if (character != null && Matches(character.DisabledAbilityIds, ability)) ability.Enabled = false;
-			if (character != null && Matches(character.EnabledAbilityIds, ability)) ability.Enabled = true;
+			if (slots.Owns(ability))
+			{
+				if (character != null && Matches(character.DisabledAbilityIds, ability)) ability.Enabled = false;
+				if (character != null && Matches(character.EnabledAbilityIds, ability)) ability.Enabled = true;
+			}
 			ability.RefreshCooldown();
 		}
 		AbilityEffects.ApplyToPlayer(player, owner);
+		player.GetNodeOrNull<PlayerAbilityInput>("AbilityInput")?.ResetForLoadout();
 		if (character != null && weaponRow != null)
 			player.GetNodeOrNull<ActRoguelike.Visual.CharacterDisplay>("Appearance")?.Apply(character, weaponRow);
 		GameLog.Write("Flow", $"装备应用：{character?.Id}/{weaponRow?.Id} · 已套角色/武技/能力卡，来源 {owner.Name}");

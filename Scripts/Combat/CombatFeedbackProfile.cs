@@ -8,17 +8,20 @@ public partial class CombatFeedbackProfile : Resource
 {
 	[Export] public bool Enabled { get; set; } = true;
 	[Export] public bool LocalPauseEnabled { get; set; } = true;
-	[Export] public float LightPauseSeconds { get; set; } = .025f;
-	[Export] public float HeavyPauseSeconds { get; set; } = .05f;
-	[Export] public float MaxPauseSeconds { get; set; } = .065f;
+	[Export] public float LightPauseSeconds { get; set; } = .035f;
+	[Export] public float HeavyPauseSeconds { get; set; } = .06f;
+	[Export] public float MaxPauseSeconds { get; set; } = .075f;
 	[Export] public float PauseCooldownSeconds { get; set; } = .12f;
 	[Export] public float FinisherWeight { get; set; } = 1.45f;
 	[Export] public float CriticalWeight { get; set; } = 1.25f;
 	[Export] public float BreakWeight { get; set; } = 1.6f;
 	[Export] public float KillWeight { get; set; } = 1.2f;
 	[Export] public float CameraStrength { get; set; } = 1f;
-	[Export] public float CameraMaxOffset { get; set; } = .065f;
-	[Export] public float CameraSeconds { get; set; } = .13f;
+	[Export] public float CameraBaseOffset { get; set; } = .035f;
+	[Export] public float CameraMaxOffset { get; set; } = .085f;
+	[Export] public float CameraSeconds { get; set; } = .14f;
+	[Export] public float ContactCoreSeconds { get; set; } = .07f;
+	[Export] public float ContactCoreSize { get; set; } = .16f;
 	[Export] public float CameraCooldownSeconds { get; set; } = .07f;
 	[Export] public float SoundCooldownSeconds { get; set; } = .045f;
 	[Export] public float TargetCooldownSeconds { get; set; } = .035f;

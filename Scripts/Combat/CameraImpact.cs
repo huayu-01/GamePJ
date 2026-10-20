@@ -27,7 +27,7 @@ public partial class CameraImpact : Node
 	{
 		var p = CombatFeedback.Profile;
 		_remaining = Mathf.Max(0, p.CameraSeconds);
-		_amplitude = Mathf.Clamp(.025f * weight * p.CameraStrength, 0, Mathf.Max(0, p.CameraMaxOffset));
+		_amplitude = Mathf.Clamp(p.CameraBaseOffset * weight * p.CameraStrength, 0, Mathf.Max(0, p.CameraMaxOffset));
 		_axis = new Vector2(direction.Dot(_camera.GlobalBasis.X), direction.Dot(_camera.GlobalBasis.Y));
 		_axis = _axis.LengthSquared() < .01f ? new Vector2(.35f, .94f) : _axis.Normalized();
 	}

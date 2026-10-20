@@ -93,6 +93,7 @@ public abstract partial class WeaponThrowAbility : Ability
 	protected override void OnReady()
 	{
 		Hitbox = GetNodeOrNull<AttackHitbox>("Attack");
+		if (Hitbox != null) Hitbox.ContactFeedbackEnabled = false;
 		_path = GetNodeOrNull<DashPathIndicator>("Path");
 		if (_path != null)
 		{

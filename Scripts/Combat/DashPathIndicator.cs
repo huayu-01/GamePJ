@@ -79,7 +79,7 @@ public partial class DashPathIndicator : Node3D
 		_geometry.SurfaceBegin(Mesh.PrimitiveType.LineStrip, _material);
 		foreach (Vector3 point in points)
 		{
-			_geometry.SurfaceAddVertex(point);
+			_geometry.SurfaceAddVertex(point + Vector3.Up * GroundOffset);
 		}
 
 		_geometry.SurfaceEnd();
@@ -199,5 +199,9 @@ public partial class DashPathIndicator : Node3D
 		};
 
 		AddChild(_mesh);
+		// 输入点已是世界坐标，不能再叠加角色的平移、旋转和缩放。
+		_mesh.TopLevel = true;
+		_mesh.GlobalTransform = Transform3D.Identity;
+		_mesh.PhysicsInterpolationMode = PhysicsInterpolationModeEnum.Off;
 	}
 }

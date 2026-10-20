@@ -36,14 +36,9 @@ public partial class AbilityConfig : ConfigRow
 	[Export] public string ClassHint { get; set; } = string.Empty;
 
 	/// <summary>
-	/// <b>这个技能绑哪个按键动作</b>（`project.godot` 的 `[input]` 名，例如 <c>weapon_skill_1</c>）。
-	///
-	/// <para>⚠️ 本轮**推翻了**原来的设计决定。原注释写的是："刻意**没有** InputAction 列：按键动作名现在由
-	/// <c>PlayerAbilityInput</c> 按能力**类**硬编码"—— 那条路让"加一个技能/角色/武器"必须改 C# 代码
-	/// （用户硬要求：只加表行）。现在输入层（<c>PlayerAbilityInput</c>）**只读这一列**。</para>
-	///
-	/// <para>留空 = 这个技能不由玩家按键直接触发（敌人技能 / 被动 / 由别的技能驱动）。
-	/// 填了但在 <c>project.godot</c> 里不存在的动作名，输入层会写一条警告并跳过（不静默）。</para>
+	/// 默认安装槽（对应InputMap动作，例如weapon_skill_1）。PlayerLoadout只安装当前配装声明的技能。
+	/// 实际输入只读取Unit.AbilitySlots的槽位索引，不扫描仓库中技能的此属性；可显式装入其它槽。
+	/// 留空表示被动／由事件驱动。InputMap决定物理按键，技能行不保存Q或鼠标键本身。
 	/// </summary>
 	[Export] public string InputAction { get; set; } = string.Empty;
 

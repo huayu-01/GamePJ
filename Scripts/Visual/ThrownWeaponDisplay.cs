@@ -16,7 +16,7 @@ public partial class ThrownWeaponDisplay : Node3D
 	public override void _PhysicsProcess(double delta)
 	{
 		var ability = GetParent<WeaponThrowAbility>();
-		Visible = ability.InFlight;
+		Visible = ability.Enabled && ability.InFlight && (ability.OwnerUnit?.AbilitySlots is not { IsConfigured: true } slots || slots.Owns(ability));
 		if (!Visible) { _angle = 0; return; }
 		string path = ability.OwnerUnit?.GetNodeOrNull<CharacterDisplay>("Appearance")?.CurrentWeaponPath ?? string.Empty;
 		if (_path != path)

@@ -19,9 +19,8 @@ public partial class AbilityHud : Control
 	[Export] public Color PanelColor { get; set; } = new(0.045f, 0.075f, 0.105f, 0.94f);
 	[Export] public Color TextColor { get; set; } = new(0.91f, 0.96f, 0.94f);
 
-	private sealed record Slot(Ability Ability, AbilityConfig Row);
+	private sealed record Slot(Ability Ability, AbilityConfig Row, string InputAction);
 	private readonly List<Slot> _slots = new();
-	private readonly HashSet<string> _declared = new();
 	private readonly StyleBoxFlat _panel = new();
 	private readonly StyleBoxFlat _key = new();
 	private float _timer;
@@ -48,17 +47,11 @@ public partial class AbilityHud : Control
 		_slots.Clear();
 		if (PlayerLocator.Player is { IsDead: false } player)
 		{
-			_declared.Clear();
-			RunController? run = RunController.Instance;
-			AddDeclared(RunController.CharacterRow(run?.CurrentCharacter ?? RunSetup.Character)?.Skills);
-			AddDeclared(RunController.WeaponRow(run?.CurrentWeapon ?? RunSetup.Weapon)?.Skills);
-			foreach (Node node in player.FindChildren("*", string.Empty, true, false))
+			foreach (var equipped in player.AbilitySlots.Equipped)
 			{
-				if (node is Ability { Enabled: true } ability
-					&& _declared.Contains(ability.AbilityId)
-					&& ConfigRows.ById<AbilityConfig>(ability.AbilityId) is { HudIcon: not null } row)
+				if (equipped.Ability is { Enabled: true } ability && equipped.Row is { HudIcon: not null } row)
 				{
-					_slots.Add(new Slot(ability, row));
+					_slots.Add(new Slot(ability, row, equipped.InputSlot));
 				}
 			}
 			_slots.Sort((a, b) => a.Row.HudOrder != b.Row.HudOrder
@@ -67,12 +60,6 @@ public partial class AbilityHud : Control
 		}
 		QueueRedraw();
 	}
-	private void AddDeclared(IEnumerable<AbilityConfig>? rows)
-	{
-		if (rows == null) return;
-		foreach (AbilityConfig row in rows) if (row != null) _declared.Add(row.Id);
-	}
-
 	private int Columns => Mathf.Max(1, Mathf.Min(_slots.Count, (int)((Size.X - EdgeMargin * 2) / (TileSize + TileGap))));
 	private Rect2 TileRect(int index)
 	{
@@ -127,7 +114,7 @@ public partial class AbilityHud : Control
 			}
 			Rect2 keyRect = new(rect.Position + new Vector2(TileSize * 0.25f, TileSize - 17), new Vector2(TileSize * 0.5f, 22));
 			_key.Draw(GetCanvasItem(), keyRect);
-			Text(font, keyRect.Position + new Vector2(0, 16), keyRect.Size.X, KeyCaption(ability.InputAction), 13, TextColor);
+			Text(font, keyRect.Position + new Vector2(0, 16), keyRect.Size.X, KeyCaption(slot.InputAction), 13, TextColor);
 			Text(font, rect.Position + new Vector2(-4, TileSize + 24), TileSize + 8, slot.Row.DisplayName, 14, TextColor);
 		}
 	}

@@ -12,6 +12,8 @@ public partial class AttackHitbox : Area3D
 {
 	[Export] public float Damage { get; set; } = 10f;
 	[Export] public float FeedbackWeight { get; set; } = 1f;
+	/// <summary>脱手投掷即使仍挂在单位子树，也不能让远程命中暂停出手者。</summary>
+	[Export] public bool ContactFeedbackEnabled { get; set; } = true;
 	[Export] public float Knockback { get; set; } = 3f;
 	[Export] public HitPolicy Policy { get; set; } = HitPolicy.OncePerTarget;
 	[Export] public float HitInterval { get; set; } = 0.2f;
@@ -113,7 +115,7 @@ public partial class AttackHitbox : Area3D
 	public void Activate(Unit? owner, AttackInstance? attack = null, int phase = 0)
 	{
 		OwnerUnit = owner;
-		_contact = this is not Explosion && owner != null && owner.IsAncestorOf(this);
+		_contact = ContactFeedbackEnabled && this is not Explosion && owner != null && owner.IsAncestorOf(this);
 		ConfigureCollision(owner);
 		_phase = phase;
 		AttackOffense offense = AttackOffense.Capture(owner, CritChance, CritMultiplier);

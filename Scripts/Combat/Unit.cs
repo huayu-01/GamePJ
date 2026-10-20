@@ -12,6 +12,7 @@ namespace ActRoguelike.Combat;
 public partial class Unit : CharacterBody3D
 {
 	public ImpactPause? ImpactPause { get; private set; }
+	public ActRoguelike.Abilities.AbilitySlots AbilitySlots { get; } = new();
 	internal ulong FeedbackReadyAt { get; set; }
 	[Export] public Faction Faction { get; set; } = Faction.Enemy;
 
