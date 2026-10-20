@@ -9,6 +9,8 @@ public partial class SkillEnhancementTuning : Resource
 {
 	[Export] public AbilityConfig? TargetAbility { get; set; }
 	[Export] public float DamageScale { get; set; } = 1f;
+	/// <summary>灵能汲取：本人击杀后只延长仍存在的灵剑。</summary>
+	[Export] public float KillExtensionSeconds { get; set; }
 	[Export] public float SizeScale { get; set; } = 1f;
 	/// <summary>近战单段模式：负数选择末段，非负数选择指定段（0起）；仅近战目标消费。</summary>
 	[Export] public int ComboStepIndex { get; set; } = -1;

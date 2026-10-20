@@ -198,7 +198,9 @@ public abstract partial class Ability : Node3D
 	/// <summary>
 	/// 能不能用。⚠️ <see cref="MaxCharges"/> ≤ 1 时**逐位等价于改动前**（只看 <see cref="CooldownRemaining"/>）。
 	/// </summary>
-	public bool IsReady => Enabled && !IsActive && (MaxCharges > 1 ? ChargesRemaining > 0 : CooldownRemaining <= 0f);
+	public virtual bool IsReady => Enabled && !IsActive && (MaxCharges > 1 ? ChargesRemaining > 0 : CooldownRemaining <= 0f);
+	/// <summary>施法结束后仍持续的效果秒数，供HUD显示；不占用前台动作状态。</summary>
+	public virtual float EffectRemainingSeconds => 0f;
 
 	/// <summary>
 	/// 剩余层数。单层技能（<see cref="MaxCharges"/> ≤ 1）退化成"冷却好了就是 1 层"，

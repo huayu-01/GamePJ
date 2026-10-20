@@ -121,6 +121,9 @@ public partial class MeleeComboAbility : Ability
 	public Vector3 CurrentStepBoxSize { get; private set; }
 	/// <summary>真实判定次数；表现层据此播放特效，不驱动战斗。</summary>
 	public int StrikeCount { get; private set; }
+	/// <summary>真实ATK开窗后发布出手快照，协同武器沿这次挥击跟随。</summary>
+	public event System.Action<AttackInstance>? StrikeStarted;
+	public bool IsStriking => IsBusy && _striking;
 	/// <summary>当前配装由真实 ATK 发出的额外投射物数量。</summary>
 	public int ExtraProjectileCount { get; private set; }
 	private MeleeProjectileTuning? _extraProjectile;
@@ -541,6 +544,7 @@ public partial class MeleeComboAbility : Ability
 		_striking = true;
 		_activeTimer = Mathf.Max(0.02f, StepValue(_activeTimes, ComboStep, StrikeActiveTime));
 		BeginLunge(_activeTimer);
+		StrikeStarted?.Invoke(attack);
 
 		LastCutCount = CutBullets();
 		TotalCutCount += LastCutCount;

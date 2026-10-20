@@ -24,7 +24,7 @@ public partial class SpiritSwordEvolutionProbe : Node3D
 	private readonly PlayerLoadout _loadout = new();
 	private RunBuild _build = new();
 	private MeleeComboAbility Melee => (MeleeComboAbility)PlayerAbilityInput.FindByInputAction(_player, "weapon_skill_1")!;
-	private SwordQiAbility Draw => (SwordQiAbility)PlayerAbilityInput.FindByInputAction(_player, "weapon_skill_2")!;
+	private SpiritSwordsAbility Draw => (SpiritSwordsAbility)PlayerAbilityInput.FindByInputAction(_player, "weapon_skill_2")!;
 	private FallAttackAbility Fall => _player.GetNode<FallAttackAbility>("AbilityFallAttack");
 	private LandingBurstAbility Burst => _player.GetNode<LandingBurstAbility>("AbilityPassive2");
 	private readonly List<(string Target, string Ability, float Damage, float BaseDamage, bool Qi)> _hits = new();
@@ -175,54 +175,38 @@ public partial class SpiritSwordEvolutionProbe : Node3D
 		await TapMelee();
 		Check(_spawns == start && Melee.ExtraProjectileCount == 0, "换成镰刀后无金光术残留，不污染共用近战类");
 	}
-	private async Task FireDraw()
-	{
-		await Until(() => Draw.IsReady && !Melee.IsBusy, 6);
-		int start = _spawns;
-		Press("weapon_skill_2", true);
-		Check(await Until(() => Draw.IsCharging && Draw.ChargeTime >= 1.01f), "拔刀式真实按键完成基础蓄力");
-		Press("weapon_skill_2", false);
-		Check(await Until(() => _spawns > start), "拔刀式释放段真实ATK发出剑气");
-		await Until(() => !Draw.IsActive);
-		// 10m远靶需要约0.16秒真实飞行；先结清这一发，再开始下一段命中采样。
-		await Wait(0.22);
-	}
 	private async Task GreatDraw()
 	{
-		await Equip();
-		var target = Target("DrawFar", new Vector3(20, 0.9f, 10));
-		var side = Target("DrawSide", new Vector3(20.15f, 0.95f, 10), 0.05f);
-		await TapMelee();
-		await Until(() => !Melee.IsBusy);
-		await FireDraw();
-		float damage = Draw.LastShotDamage, size = Draw.LastSize;
+		// J42：这部分改验灵能汲取；金光术与神降术的原验收继续保留。
+		await Equip(); Grant("evo_golden_qi");
+		var target = Target("QiFar", new Vector3(20, .9f, 5));
+		await TapMelee(); await Wait(.4);
+		float before = _hits.Last(h => h.Qi).BaseDamage;
 		float global = _player.Stats.Get("DamageMultiplier");
-		Check(!_hits.Any(h => h.Target == "DrawSide"), "默认拔刀式射线没有命中偏轴0.15m、半径0.05m的小靶");
-		Grant("evo_golden_qi");
-		int start = _hits.Count;
-		await TapMelee();
-		await Wait(0.4);
-		float qiBefore = _hits.Skip(start).First(h => h.Qi).BaseDamage;
 		Grant("evo_great_draw");
-		Check(Mathf.IsEqualApprox(_player.Stats.Get("DamageMultiplier"), global), "大拔刀术没有修改玩家全局伤害乘区");
+		Check(Mathf.IsEqualApprox(Draw.KillExtensionSeconds, 2f), "灵能汲取配置真实落到三剑技能");
+		Check(Mathf.IsEqualApprox(_player.Stats.Get("DamageMultiplier"), global), "灵能汲取不改变全局伤害");
 		await Until(() => !Melee.IsBusy);
-		start = _hits.Count;
-		await TapMelee();
-		await Wait(0.4);
-		float qiAfter = _hits.Skip(start).First(h => h.Qi).BaseDamage;
-		Check(Mathf.IsEqualApprox(qiBefore, qiAfter), $"破剑式额外剑气不吃大拔刀术：{qiBefore:0.###}→{qiAfter:0.###}");
-		start = _hits.Count;
-		await FireDraw();
-		Check(Mathf.IsEqualApprox(Draw.LastShotDamage, damage * 1.5f), $"大拔刀术真实发射伤害 {damage:0.###}→{Draw.LastShotDamage:0.###}（×1.5）");
-		Check(Mathf.IsEqualApprox(Draw.LastSize, size * 2f), $"真实发射前重算后尺寸仍增强 {size:0.###}→{Draw.LastSize:0.###}（×2）");
-		Check(_hits.Skip(start).Any(h => h.Ability == "skl_b1_w1_2" && Mathf.IsEqualApprox(h.BaseDamage, damage * 1.5f)), "增强拔刀式剑气真实命中远靶，攻击快照与发射读数一致");
-		Check(_hits.Skip(start).Any(h => h.Target == "DrawSide" && h.Ability == "skl_b1_w1_2"), "增强拔刀式半径0.16胶囊实际命中偏轴小靶，范围不只放大模型");
-		await Screenshot("j13_great_draw", $"Great Draw: damage {Draw.LastShotDamage:0.##}\nSize {Draw.LastSize:0.##} (2x) | global damage unchanged");
+		await TapMelee(); await Wait(.4);
+		Check(Mathf.IsEqualApprox(before, _hits.Last(h => h.Qi).BaseDamage), "金光术剑气不吃旧大拔刀术的伤害倍率");
+		Press("weapon_skill_2", true); await Wait(.03); Press("weapon_skill_2", false);
+		Check(Draw.Summoned && Draw.SwordCount == 3, "三剑即时召唤，不发射旧拔刀剑气");
+		Check(Draw.CooldownRemaining > 14f && !Draw.IsBusy, "召唤后立即起算冷却且不占前台");
+		float remaining = Draw.RemainingSeconds;
+		target.ForceKill(_player);
+		Check(Mathf.IsEqualApprox(Draw.RemainingSeconds, remaining + 2f), "真实本人敌对击杀增加2秒持续时间");
+		Check(Draw.ExtensionCount == 1, "同一次死亡只增加一次续时");
 		target.QueueFree();
-		side.QueueFree();
+		await Until(() => !Melee.IsBusy); await TapMelee();
+		Check(Draw.LastSwordAttack?.Ability == "skl_b1_w1_2", "三剑独立技能归属，不冒用金光术");
+		Check(Draw.FollowCount == 1, "真实近战ATK触发一次三剑协同");
+		Check(Mathf.IsEqualApprox(Draw.LastSwordAttack!.BaseDamage, Melee.GetNode<AttackHitbox>("Attack").CurrentAttack!.BaseDamage * .3f), "灵能汲取保留三剑原始伤害比例");
+		await Until(() => !Draw.Following);
+		Check(!Draw.SwordsReady, "挥击后缓慢回位，未立即恢复攻击");
+		Check(await Until(() => Draw.SwordsReady), "完全归位后才能再次协同");
 		await Equip();
-		await FireDraw();
-		Check(Mathf.IsEqualApprox(Draw.LastShotDamage, damage) && Mathf.IsEqualApprox(Draw.LastSize, size), "重新配装后拔刀式伤害和尺寸回到基线");
+		Check(!Draw.Summoned && Draw.SwordCount == 0 && Draw.KillExtensionSeconds == 0f, "重配装清理剑体和续时");
+		Check(Draw.SwordDamageScale == .3f && Draw.DurationSeconds == 10f, "重配装保留新基线，不残留旧增强");
 	}
 	private async Task FallOnce()
 	{

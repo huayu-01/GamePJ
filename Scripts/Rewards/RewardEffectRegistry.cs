@@ -90,7 +90,8 @@ public static class RewardEffectRegistry
 				return;
 			}
 			Ability? ability = Ability.FindByAbilityId(context.Player, tuning.TargetAbility.Id);
-			if (ability is SwordQiAbility draw) draw.ConfigureEnhancement(tuning.DamageScale, tuning.SizeScale, tuning.ProjectileSweepMaxHits, tuning.ProjectileSweepRadius);
+			if (ability is SpiritSwordsAbility swords) swords.ConfigureKillExtension(tuning.KillExtensionSeconds);
+			else if (ability is SwordQiAbility draw) draw.ConfigureEnhancement(tuning.DamageScale, tuning.SizeScale, tuning.ProjectileSweepMaxHits, tuning.ProjectileSweepRadius);
 			else if (ability is LandingBurstAbility burst) burst.ConfigureEnhancement(tuning.DamageScale, tuning.SizeScale);
 			else if (ability is MeleeComboAbility combo) combo.ConfigureSingleStep(tuning.ComboStepIndex, tuning.DamageScale, tuning.SizeScale, tuning.ForwardReachScale);
 			else if (ability is FallAttackAbility fall && tuning.LandingKnockback >= 0f) fall.ConfigureLandingKnockback(tuning.LandingKnockback);

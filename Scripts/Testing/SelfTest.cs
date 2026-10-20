@@ -3265,7 +3265,7 @@ public partial class SelfTest : Node
 		var probeBackdash = new ChargeAttackAbility { AbilityId = "skl_a1_skill_1", MaxCharges = 1 };
 		var probeSpear = new SpearThrowAbility { AbilityId = "skl_b3_w1_2" };
 		var probeBowSkill = new ArrowVolleyAbility { AbilityId = "skl_a3_w1_1" };
-		var probeDraw = new SwordQiAbility { AbilityId = "skl_b1_w1_2", Damage = 26f };
+		var probeDraw = new SpiritSwordsAbility { AbilityId = "skl_b1_w1_2" };
 		var probeLanding = new LandingBurstAbility { AbilityId = "skl_b1_w1_3" };
 		var probeFall = new FallAttackAbility { AbilityId = "skl_b_fall" };
 		probePlayer.AddChild(probeBackdash);
@@ -3297,9 +3297,9 @@ public partial class SelfTest : Node
 			&& !probeSpear.RecallOnSecondPress && probeSpear.AutoRecallOnSettle
 			&& probeBowSkill.RampMaxCount == 3 && Mathf.Abs(probeBowSkill.RampWindowSeconds - 1.2f) < 0.0001f
 			&& Mathf.Abs(probeBowSkill.ChargeMaxSeconds - 3f) < 0.0001f
-			// J13：专属增强只改拔刀式；实际尺寸在真实发射前重算，完整链路由灵剑专项覆盖。
-			&& Mathf.Abs(probeDraw.Damage - 39f) < 0.0001f
-			&& probeDraw.SweepMaxHits == 8 && Mathf.Abs(probeDraw.SweepRadius - 0.16f) < 0.0001f
+			// J42：旧大拔刀术迁为灵能汲取，续时参数来自实际奖励行。
+			&& Mathf.Abs(probeDraw.KillExtensionSeconds - 2f) < 0.0001f
+			&& Mathf.Abs(probeDraw.SwordDamageScale - 0.3f) < 0.0001f
 			&& Mathf.Abs(probePlayer.Stats.Get("DamageMultiplier") - 1f) < 0.0001f
 			&& Mathf.Abs(probeFall.LandingKnockback - 6f) < 0.0001f && Mathf.IsZeroApprox(probeLanding.Knockback)
 			&& Mathf.Abs(probeLanding.Cooldown - 2f) < 0.0001f
@@ -3308,7 +3308,7 @@ public partial class SelfTest : Node
 			$"{(overrideOk ? "✅" : "🔴")} P5b·实测表参数落到机制上（探测技能节点，不进树）：有备无患 → 后撤 MaxCharges {probeBackdash.MaxCharges}（期望 3）Recharge {probeBackdash.RechargeSeconds:0.###}s（期望 0.5）"
 			+ $"｜气贯长虹 → 长枪武技2 基础蓄力 {probeSpear.ChargeBaseSeconds:0.###}s（期望 0.5）每档 {probeSpear.ChargeStepSeconds:0.###}s（期望 0.125）总上限 {probeSpear.ChargeMaxSeconds:0.###}s（期望1）手动召回 {probeSpear.RecallOnSecondPress}／落地自动召回 {probeSpear.AutoRecallOnSettle}（期望False／True）"
 			+ $"｜变奏 + 龙之箭 → 弓武技1 RampMaxCount {probeBowSkill.RampMaxCount}（期望 3）RampWindow {probeBowSkill.RampWindowSeconds:0.###}s（期望 1.2）蓄力上限 {probeBowSkill.ChargeMaxSeconds:0.###}s（期望 3）"
-			+ $"｜大拔刀术 → 拔刀式自身伤害 {probeDraw.Damage:0.###}（期望39）扫掠 {probeDraw.SweepMaxHits}/半径{probeDraw.SweepRadius:0.###}（期望8/0.16）全局伤害乘区 {probePlayer.Stats.Get("DamageMultiplier"):0.###}（期望1；真实发射尺寸见灵剑专项）"
+			+ $"｜灵能汲取 → 每杀续时 {probeDraw.KillExtensionSeconds:0.###}秒（期望2）单剑伤害比例{probeDraw.SwordDamageScale:0.###}（期望0.3）全局伤害乘区 {probePlayer.Stats.Get("DamageMultiplier"):0.###}（期望1；真实协同与击杀见灵剑专项）"
 			+ $"｜地爆 → 共通落落地击退 {probeFall.LandingKnockback:0.###}（期望6）／落剑式额外击退 {probeLanding.Knockback:0.###}（期望0）｜神降术 → 落剑式 Cooldown {probeLanding.Cooldown:0.###}s（期望2）DamageScale {probeLanding.DamageScale:0.###}（期望1.6）");
 
 		// ⑨ 异化（P5b）：三条新增异化的规则**真的挂上了、参数真的来自表**，并且真的能出手一次。
@@ -4438,7 +4438,7 @@ public partial class SelfTest : Node
 
 	private Unit? _p4Player;
 	private MeleeComboAbility? _p4SwordW1;
-	private SwordQiAbility? _p4SwordW2;
+	private SpiritSwordsAbility? _p4SwordW2;
 	private LandingBurstAbility? _p4LandingBurst;
 	private FallAttackAbility? _p4Fall;
 	private MeleeComboAbility? _p4ScytheW1;
@@ -4469,7 +4469,7 @@ public partial class SelfTest : Node
 		}
 
 		_p4SwordW1 = PlayerAbilityInput.FindByInputAction(_p4Player, "weapon_skill_1") as MeleeComboAbility;
-		_p4SwordW2 = PlayerAbilityInput.FindByInputAction(_p4Player, "weapon_skill_2") as SwordQiAbility;
+		_p4SwordW2 = PlayerAbilityInput.FindByInputAction(_p4Player, "weapon_skill_2") as SpiritSwordsAbility;
 		// ⚠️ 节点名与角色的 **B 槽**（`AbilityBSkill1` / `AbilityBSkill2`）：角色 A 与角色 B 的
 		// 「技能 1 / 技能 2」用同一对按键，所以场景里必须**两个不同名的节点**（`AbilitySkill1` 是 A 的后撤、
 		// `AbilityBSkill1` 才是 B 的「闪」）。这两行原来写的是 `AbilitySkill1`/`AbilitySkill2` ——
@@ -4654,54 +4654,20 @@ public partial class SelfTest : Node
 	{
 		if (_p4Player == null || _p4SwordW2 == null || _p4SwordW1 == null)
 		{
-			GameLog.Write("SelfTest", "🔴 P4·剑气：上一段没准备好。");
+			GameLog.Write("SelfTest", "🔴 P4·三剑协同：上一段没准备好。");
 			return;
 		}
-
-		SwordQiAbility w2 = _p4SwordW2;
-
-		// ① 基础蓄力 1s 还没满就松手 → 不释放（按真实帧按住 0.4s）
-		if (!await WaitAbilityReady(w2))
-		{
-			GameLog.Write("SelfTest", $"🔴 P4·剑气：技能等不到可用（忙={w2.IsActive} 冷却={w2.CooldownRemaining:0.###}），本段跳过。");
-			return;
-		}
-
-		int projectilesBefore = CountProjectiles("SwordQi");
-		bool started = w2.TryPress();                       // 按下（进入蓄力）
-		bool heldAbort = await HoldCharge(w2, 0.4f);        // 基础蓄力 1s 还没满
-		bool aborted = w2.ChargeBaseComplete;               // 期望 False
-		w2.OnInputReleased();                               // 没蓄满就松手 → 不释放
-		bool abortSettled = await WaitSettle(w2, 2.0);
-		int projectilesAfterAbort = CountProjectiles("SwordQi") - projectilesBefore;
-
-		// ② 蓄满 → 松手 → 等释放段真 ATK + 自然收招 → 数剑气
-		if (!await WaitAbilityReady(w2))
-		{
-			GameLog.Write("SelfTest", $"🔴 P4·剑气：蓄满那一轮开始前技能还没收招（忙={w2.IsActive}），本段跳过。");
-			return;
-		}
-
-		int beforeFull = CountProjectiles("SwordQi");
-		bool started2 = w2.TryPress();
-		bool heldFull = await HoldCharge(w2, w2.ChargeBaseSecondsEffective + 0.05f);
-		GameLog.Write(
-			"SelfTest",
-			$"P4·剑气尺寸基准：武技1 当前第 {_p4SwordW1.ComboStep + 1} 段命中盒 {Fmt(_p4SwordW1.CurrentStepBoxSize)}");
-		w2.OnInputReleased();
-		bool fullSettled = await WaitSettle(w2);
-		bool fired = ReleaseAtkFired(w2, fullSettled);
-		int projectiles = CountProjectiles("SwordQi") - beforeFull;
-
-		bool ok = started && heldAbort && !aborted && abortSettled && projectilesAfterAbort == 0
-			&& started2 && heldFull && fired && projectiles >= 1
-			&& w2.Pierce >= 1 && !w2.BypassBlock && w2.MaxLifetime <= 0.6f && w2.LastSize > 0f;
-		GameLog.Write(
-			"SelfTest",
-			$"{(ok ? "✅" : "🔴")} P4·灵剑武技2 拔刀式：TryPress={started}（期望 True） 基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 1）/ CD {w2.Cooldown:0.##}（期望 2）"
-			+ $"｜没蓄满就松手：基础完成={aborted}（期望 False）→ 剑气生成 {projectilesAfterAbort} 个（期望 0，设计文档「未完成不释放」；已收招={abortSettled}）"
-			+ $"｜蓄满松手：释放段真ATK到达={fired}（自然收招={fullSettled}）生成 {projectiles} 个（期望 ≥1）｜剑气属性 —— 穿透 {w2.Pierce}（期望 ≥1，能穿透路径上的敌人） 可被格挡={!w2.BypassBlock}（期望 True） 存活 {w2.MaxLifetime:0.##}s（期望 ≤0.6 = 飞行路径短）"
-			+ $"｜大小等比攻击盒：剑气尺寸 {w2.LastSize:0.###}（来源：{w2.LastSizeSource}）");
+		SpiritSwordsAbility w2 = _p4SwordW2;
+		bool started = w2.TryPress();
+		bool immediate = w2.SwordCount == 3 && !w2.IsBusy && !w2.HoldToCharge;
+		float cooldown = w2.CooldownRemaining;
+		int before = _p4SwordW1.StrikeCount;
+		bool melee = _p4SwordW1.TryPress();
+		await UntilProbe(() => _p4SwordW1.StrikeCount > before, 3);
+		bool followed = w2.FollowCount == 1 && w2.LastSwordAttack?.ComboStepCount == 5;
+		bool ok = started && immediate && melee && followed && cooldown > 14f
+			&& Mathf.IsEqualApprox(w2.DurationSeconds, 10f) && Mathf.IsEqualApprox(w2.Cooldown, 15f);
+		GameLog.Write("SelfTest", $"{(ok ? "✅" : "🔴")} P4·灵剑武技2 三才灵剑：召唤={started} 三剑即时就位={immediate} 近战起手={melee} 真实ATK协同={followed} 持续{w2.DurationSeconds:0.##}秒／冷却{w2.Cooldown:0.##}秒，起算剩余{cooldown:0.##}秒");
 	}
 
 	private int CountProjectiles(string sceneName)

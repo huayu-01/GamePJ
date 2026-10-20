@@ -1,89 +1,46 @@
 [gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://ba4hyf4e4w1yn"]
 
-[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_slash.svg" id="e_hud_icon"]
-[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_slash.svg" id="icon"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
 
-[sub_resource type="Resource" id="p_Damage"]
-script = ExtResource("2_param")
-Key = "Damage"
-Value = 26
-Note = "剑气伤害（文档写 n → 预设 26）"
+[sub_resource type="Resource" id="Duration"]
+script = ExtResource("param")
+Key = "DurationSeconds"
+Value = 10.0
 
-[sub_resource type="Resource" id="p_Speed"]
-script = ExtResource("2_param")
-Key = "Speed"
-Value = 60
-Note = "剑气弹速（文档写 n → 预设 60；飞行路径短由 MaxLifetime 表达）"
+[sub_resource type="Resource" id="Return"]
+script = ExtResource("param")
+Key = "ReturnSeconds"
+Value = 1.1
 
-[sub_resource type="Resource" id="p_MaxLifetime"]
-script = ExtResource("2_param")
-Key = "MaxLifetime"
-Value = 0.45
-Note = "★ 飞行路径短：存活 0.45s × 60 m/s ≈ 27m"
+[sub_resource type="Resource" id="Damage"]
+script = ExtResource("param")
+Key = "SwordDamageScale"
+Value = 0.3
 
-[sub_resource type="Resource" id="p_Pierce"]
-script = ExtResource("2_param")
-Key = "Pierce"
-Value = 8.0
-Note = "★ 能穿透路径上的敌人"
+[sub_resource type="Resource" id="Reach"]
+script = ExtResource("param")
+Key = "OuterReach"
+Value = 3.4
 
-[sub_resource type="Resource" id="p_BypassBlock"]
-script = ExtResource("2_param")
-Key = "BypassBlock"
-Value = false
-Note = "★ 可被格挡（文档第 114 行）—— 与能量波的 BypassBlock=true 相反"
-
-[sub_resource type="Resource" id="p_MaxAimDistance"]
-script = ExtResource("2_param")
-Key = "MaxAimDistance"
-Value = 200
-Note = "求准星世界点的射线长度（与枪械同一个 200）"
-
-[sub_resource type="Resource" id="p_SizeSourceAbilityId"]
-script = ExtResource("2_param")
-Key = "SizeSourceAbilityId"
-Value = "skl_b1_w1_1"
-Note = "★ 剑气大小等比攻击盒大小：基准 = 武技1 当前那一段的命中盒"
-
-[sub_resource type="Resource" id="p_SizeRatio"]
-script = ExtResource("2_param")
-Key = "SizeRatio"
-Value = 0.5
-Note = "等比系数：剑气尺寸 = 武技1 命中盒最长边 × 0.5"
-
-[sub_resource type="Resource" id="p_FallbackSize"]
-script = ExtResource("2_param")
-Key = "FallbackSize"
-Value = 1.2
-Note = "找不到武技1 时的绝对尺寸（米）"
-
-[sub_resource type="Resource" id="p_AttackTags"]
-script = ExtResource("2_param")
-Key = "AttackTags"
-Value = PackedStringArray("Projectile", "SwordQi", "Physical")
-Note = "攻击标签（供增幅的武器标签匹配）"
+[sub_resource type="Resource" id="Spacing"]
+script = ExtResource("param")
+Key = "SwordSpacing"
+Value = 0.65
 
 [resource]
 script = ExtResource("1_row")
-ActionMovement = 2
-HudIcon = ExtResource("e_hud_icon")
-HudColor = Color(1, 0.76, 0.4, 1)
+HudIcon = ExtResource("icon")
+HudColor = Color(0.2, 0.9, 1, 1)
 HudOrder = 40
 NodeName = "AbilityWeapon4Skill2"
-ClassHint = "SwordQiAbility"
+ClassHint = "SpiritSwordsAbility"
 InputAction = "weapon_skill_2"
-HoldToCharge = true
-AnimName = "Skill_B1_SwordQi"
-AnimEvent = "ATK"
-AnimSpeedScale = 0.35
-ChargeBaseSeconds = 1.0
-Aim = 2
-Cooldown = 2.0
-Windup = 0.05
-Recover = 0.1
+IsBackground = true
+Cooldown = 15.0
 Id = "skl_b1_w1_2"
-DisplayName = "拔刀式"
-DescriptionTemplate = "基础蓄力 {ChargeBaseSeconds:0.##} 秒后朝准星方向发射一发剑气，对路径上的敌人造成伤害；剑气可穿透敌人、飞行路径短、可被格挡。"
-Note = "[P4 新增行] 角色 B 武器1 灵剑 武技2（文档 CD:2 / 基础蓄力 1 秒）。★ 它就是一支箭：复用 ArrowVolleyAbility（直线 / 穿透 / 可格挡 / 短射程），只是外观按 SizeRatio 等比武技1 的命中盒大小（SwordQiAbility）。★ BypassBlock=false → **可被格挡**（与能量波相反，文档第 114 行逐字）。★ 蓄力技能的事件帧只是闭合标记，触发点是松手（docs/abilities.md §1.3）。"
-Params = [SubResource("p_Damage"), SubResource("p_Speed"), SubResource("p_MaxLifetime"), SubResource("p_Pierce"), SubResource("p_BypassBlock"), SubResource("p_MaxAimDistance"), SubResource("p_SizeSourceAbilityId"), SubResource("p_SizeRatio"), SubResource("p_FallbackSize"), SubResource("p_AttackTags")]
+DisplayName = "三才灵剑"
+DescriptionTemplate = "在头顶召唤3柄灵剑，持续{DurationSeconds:0.##}秒。挥剑时灵剑沿攻击轨迹的外圈协同挥击，随后缓慢归位，完全归位后才能再次协同。冷却{Cooldown:0.##}秒，从召唤时开始。"
+Note = "J42最新重做，替换旧拔刀式。即时背景召唤不占前台动作；单剑继承真实当段伤害的30%，外圈中心3.4/4.05/4.7米，缓慢回位1.1秒，均为可调预设；仅挥击阶段有伤害，回位和待机无伤害。冷却结束仍有灵剑时不允许叠组。"
+Params = [SubResource("Duration"), SubResource("Return"), SubResource("Damage"), SubResource("Reach"), SubResource("Spacing")]

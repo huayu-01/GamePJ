@@ -8,10 +8,7 @@
 [sub_resource type="Resource" id="Enhancement"]
 script = ExtResource("3_tuning")
 TargetAbility = ExtResource("4_skill")
-DamageScale = 1.5
-SizeScale = 2.0
-ProjectileSweepMaxHits = 8
-ProjectileSweepRadius = 0.16
+KillExtensionSeconds = 2.0
 
 [resource]
 script = ExtResource("2_row")
@@ -22,6 +19,6 @@ SkillEnhancement = SubResource("Enhancement")
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Pool = ExtResource("1_pool")
 Id = "evo_great_draw"
-DisplayName = "大拔刀术"
-DescriptionTemplate = "武技2 发射的剑气伤害更高、体积更大"
-Note = "J13：只增强拔刀式自身，不再修改玩家全局伤害；尺寸在真实发射前重算后乘倍率，同时启用胶囊使扩大范围真实影响擦边命中。原文未给幅度，预设伤害×1.5／模型尺寸×2／胶囊半径0.16世界米／每帧最多8命中，均可调。"
+DisplayName = "灵能汲取"
+DescriptionTemplate = "击杀敌人后，延长当前灵剑持续时间{SkillEnhancement.KillExtensionSeconds:0.##}秒。"
+Note = "J42替换大拔刀术，保留原Id和灵剑进化池引用。仅本人的真实敌对击杀续时；没有灵剑或已到期时不储存、不复活。不会修改伤害或范围。"

@@ -81,11 +81,12 @@ public partial class AbilityHud : Control
 			Rect2 rect = TileRect(i);
 			Vector2 center = rect.GetCenter() + new Vector2(0, -4);
 			Color accent = slot.Row.HudColor;
-			_panel.BorderColor = ability.IsActive ? accent : new Color(accent, 0.35f);
+			bool effectActive = ability.IsActive || ability.EffectRemainingSeconds > 0f;
+			_panel.BorderColor = effectActive ? accent : new Color(accent, 0.35f);
 			_panel.Draw(GetCanvasItem(), rect);
 			float radius = TileSize * 0.34f;
 			var iconRect = new Rect2(center - Vector2.One * radius * 0.72f, Vector2.One * radius * 1.44f);
-			DrawTextureRect(slot.Row.HudIcon!, iconRect, false, ability.IsReady || ability.IsActive ? accent : accent.Darkened(0.35f));
+			DrawTextureRect(slot.Row.HudIcon!, iconRect, false, ability.IsReady || effectActive ? accent : accent.Darkened(0.35f));
 			float cooldown = Fraction(ability);
 			DrawArc(center, radius, -Mathf.Pi / 2, Mathf.Tau - Mathf.Pi / 2, 64, new Color(accent, 0.14f), 2, true);
 			if (cooldown > 0)
@@ -97,7 +98,7 @@ public partial class AbilityHud : Control
 					Text(font, center + new Vector2(-radius, 8), radius * 2, ability.CooldownRemaining.ToString("0.0"), 23, TextColor);
 				}
 			}
-			else if (ability.IsActive)
+			else if (effectActive)
 			{
 				DrawArc(center, radius, -Mathf.Pi / 2, Mathf.Tau - Mathf.Pi / 2, 64, accent, 2.5f, true);
 			}
@@ -108,6 +109,7 @@ public partial class AbilityHud : Control
 				DrawRect(new Rect2(track.Position, track.Size * new Vector2(ability.ChargeProgress, 1)), accent);
 			}
 			if (ability.IsMaintaining) Text(font, rect.Position + new Vector2(5, 18), TileSize - 10, "维持", 13, accent);
+			if (ability.EffectRemainingSeconds > 0f) Text(font, rect.Position + new Vector2(5, 18), TileSize - 10, $"{ability.EffectRemainingSeconds:0.0}s", 13, accent);
 			if (ability.MaxCharges > 1)
 			{
 				Text(font, rect.Position + new Vector2(TileSize - 43, 19), 36, $"{ability.ChargesRemaining}/{ability.MaxCharges}", 15, TextColor);

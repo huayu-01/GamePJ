@@ -1,0 +1,56 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/AttackHitbox.cs" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Glow"]
+shading_mode = 0
+albedo_color = Color(0.2, 0.9, 1, 1)
+emission_enabled = true
+emission = Color(0.15, 0.7, 1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="Gold"]
+shading_mode = 0
+albedo_color = Color(1, 0.8, 0.3, 1)
+
+[sub_resource type="CylinderMesh" id="Blade"]
+material = SubResource("Glow")
+top_radius = 0.0
+bottom_radius = 0.13
+height = 1.25
+radial_segments = 4
+
+[sub_resource type="BoxMesh" id="Guard"]
+material = SubResource("Gold")
+size = Vector3(0.5, 0.08, 0.13)
+
+[sub_resource type="CylinderMesh" id="Hilt"]
+material = SubResource("Gold")
+top_radius = 0.045
+bottom_radius = 0.045
+height = 0.3
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.3, 1.7, 0.25)
+
+[node name="SpiritSword" type="Area3D"]
+script = ExtResource("1")
+ContactFeedbackEnabled = false
+
+[node name="Blade" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.12, 0)
+mesh = SubResource("Blade")
+cast_shadow = 0
+
+[node name="Guard" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.52, 0)
+mesh = SubResource("Guard")
+cast_shadow = 0
+
+[node name="Hilt" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.7, 0)
+mesh = SubResource("Hilt")
+cast_shadow = 0
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+shape = SubResource("Shape")

@@ -98,7 +98,10 @@ public partial class AttackSnapshotProbe : Node3D
 				Verify(await Fire(melee), $"{weapon}近战");
 			}
 			await Equip(WeaponPresetKind.SpiritSword);
-			Verify(await FireRanged(PlayerAbilityInput.FindByInputAction(_player, "weapon_skill_2")!), "拔刀式真实剑气");
+			var swords = (SpiritSwordsAbility)PlayerAbilityInput.FindByInputAction(_player, "weapon_skill_2")!;
+			Press("weapon_skill_2", true); await Wait(.03); Press("weapon_skill_2", false);
+			await Fire(PlayerAbilityInput.FindByInputAction(_player, "weapon_skill_1")!);
+			Verify(swords.LastSwordAttack!, "三剑协同继承真实近战快照");
 			foreach (var weapon in new[] { WeaponPresetKind.Scythe, WeaponPresetKind.Spear })
 			{
 				await Equip(weapon);

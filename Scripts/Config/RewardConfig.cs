@@ -49,7 +49,7 @@ public partial class RewardConfig : ConfigRow
 
 	/// <summary>近战每段真实 ATK 额外出弹（金光术）。</summary>
 	[Export] public MeleeProjectileTuning? MeleeProjectile { get; set; }
-	/// <summary>只调整目标技能自身（大拔刀术／神降术）。</summary>
+	/// <summary>只调整目标技能自身（灵能汲取／神降术等）。</summary>
 	[Export] public SkillEnhancementTuning? SkillEnhancement { get; set; }
 	/// <summary>飞出武器的周期索敌（喜爱）。</summary>
 	[Export] public WeaponSeekTuning? WeaponSeek { get; set; }

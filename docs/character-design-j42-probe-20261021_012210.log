@@ -1,0 +1,228 @@
+存档 BEFORE meta.cfg SHA256=7885F3B5E29E723EA045A3118D680718D60C2805B3DA50DAF4EE9F47476F42A2
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=BDB209C14A682176C8513E57D49A9B4AFA1DAEBA71AF05348230F99BBB9B8760
+存档 BEFORE loadout.cfg SHA256=7F889D7A1C784E37C4B9E8557BD4C80A0A7ACEC5261E56C00D9FCF3924B20AA5
+存档 BEFORE rune.cfg SHA256=CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 330 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:09.65
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 342 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:07.01
+
+spirit_swords exit=0 seconds=42.01 stderrBytes=0
+=== spirit_swords ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 01:22:29 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 01:22:29 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 01:22:29 [Flow] === 新的一局 ===
+[log] 01:22:29 [Flow] 日志文件：user://logs/run_20261021_012229.log
+[log] 01:22:29 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 01:22:29 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 01:22:29 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 01:22:29 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 01:22:29 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 01:22:29 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 01:22:29 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 01:22:29 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 01:22:29 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 01:22:29 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 01:22:29 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 01:22:29 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 01:22:29 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 01:22:29 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 01:22:29 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:22:29 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 01:22:29 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[log] 01:22:30 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 01:22:30 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 01:22:30 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 01:22:30 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[SpiritSwords] PASS 真实右键召唤成功
+[SpiritSwords] PASS 三柄待机灵剑，持续10秒／冷却15秒
+[SpiritSwords] PASS 背景召唤不占动作、不蓄力，立即开始冷却
+[SpiritSwords] PASS 持续中拒绝重复召唤，不叠组
+[log] 01:22:30 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 01:22:30 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:22:30 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[SpiritSwords] 外圈靶=(19.694654, 4.3233514, 16.741322) 玩家=(20, 0.00025416387, 20)
+[log] 01:22:30 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 30（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SpiritSwords] PASS 真实近战ATK到达
+[SpiritSwords] PASS 第一段真实ATK启动一次协同
+[SpiritSwords] PASS 三剑继承当段30%伤害和出手暴击，攻击力不重复相乘
+[log] 01:22:30 [Combat] 伤害 Player(240) → @CharacterBody3D@246(99973) 27
+[log] 01:22:30 [Combat] 暴击 Player(240) → @CharacterBody3D@246(99973) 27
+[log] 01:22:30 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 01:22:30 [Combat] 伤害 Player(240) → @CharacterBody3D@246(99946) 27
+[log] 01:22:30 [Combat] 暴击 Player(240) → @CharacterBody3D@246(99946) 27
+[SpiritSwords] PASS 真实剑体命中外圈物理靶
+[SpiritSwords] PASS 外圈靶超出手中剑命中范围，确由灵剑扩大攻击距离
+[SpiritSwords] PASS 每柄每次挥击对同一目标至多一次
+[SpiritSwords] PASS 原挥击结束进入缓慢归位
+[SpiritSwords] PASS 灵剑真实移动而非仅扩大攻击盒，归位途中未就绪
+[log] 01:22:30 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword2（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:22:30 [Combat] 连招：skl_b1_w1_1 推进到第 2 段（动画「Skill_B1_Sword2」，累计连击 1）
+[log] 01:22:30 [Combat] 连招·第 2 段判定：skl_b1_w1_1 伤害 34.5（×1.15）盒子 (2.3, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SpiritSwords] PASS 真实近战ATK到达
+[SpiritSwords] PASS 连续第二段发生在归位期，不重复协同
+[SpiritSwords] PASS 归位过程关闭伤害
+[log] 01:22:31 [Combat] 连招：skl_b1_w1_1 输入窗口超时（0.45s 没人按），收招。累计连击 1
+[SpiritSwords] PASS 三剑完全归位后恢复就绪
+[log] 01:22:31 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 01:22:31 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:22:31 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 01:22:31 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 30（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SpiritSwords] PASS 真实近战ATK到达
+[SpiritSwords] PASS 归位后下一次攻击再次协同
+[log] 01:22:31 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:22:31 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:22:32 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 01:22:32 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:22:32 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 01:22:32 [Combat] 动作交接：skl_b1_w1_1 被 skl_b_skill_1 打断（动画时间0s）。
+[log] 01:22:32 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 01:22:32 [Combat] 闪：skl_b_skill_1 朝 (-0.6272039, -0.30464187, -0.71680444) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[log] 01:22:32 [Combat] 单位动画切换：Player idle → sprint（当前速度 37.04，阈值 0.15/4）
+[SpiritSwords] PASS 近战前摇被闪打断，没有ATK就不协同
+[log] 01:22:32 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:22:32 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:22:32 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 MissingSwordATK
+[log] 01:22:32 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:22:32 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 01:22:35 [Combat] ⚠ 技能 skl_b1_w1_1 等不到动画事件帧「MissingSwordATK」，本次施法放弃（检查 SkillAnimations 表的事件帧名）。
+[SpiritSwords] PASS 缺失真实ATK只取消原攻击，不计时补发灵剑
+[log] 01:22:35 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:22:35 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:22:36 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 01:22:36 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:22:36 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 01:22:36 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 30（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SpiritSwords] PASS 真实近战ATK到达
+[SpiritSwords] PASS 第1段动画外圈灵剑跟随握持剑的空间姿态
+[SpiritSwords] PASS 第1段挥击实际形成运动路径
+[log] 01:22:36 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:22:36 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:22:36 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 01:22:36 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword2（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:22:36 [Combat] 连招：skl_b1_w1_1 起手 段 2/5 动画「Skill_B1_Sword2」（窗口 0.45s）
+[log] 01:22:36 [Combat] 连招·第 2 段判定：skl_b1_w1_1 伤害 34.5（×1.15）盒子 (2.3, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SpiritSwords] PASS 真实近战ATK到达
+[SpiritSwords] PASS 第2段动画外圈灵剑跟随握持剑的空间姿态
+[SpiritSwords] PASS 第2段挥击实际形成运动路径
+[log] 01:22:37 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:22:37 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:22:37 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 01:22:37 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword3（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:22:37 [Combat] 连招：skl_b1_w1_1 起手 段 3/5 动画「Skill_B1_Sword3」（窗口 0.45s）
+[log] 01:22:37 [Combat] 连招·第 3 段判定：skl_b1_w1_1 伤害 39（×1.3）盒子 (2.4, 1.6, 3)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SpiritSwords] PASS 真实近战ATK到达
+[SpiritSwords] PASS 第3段动画外圈灵剑跟随握持剑的空间姿态
+[SpiritSwords] PASS 第3段挥击实际形成运动路径
+[log] 01:22:37 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:22:37 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:22:37 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 01:22:37 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword4（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:22:37 [Combat] 连招：skl_b1_w1_1 起手 段 4/5 动画「Skill_B1_Sword4」（窗口 0.45s）
+[log] 01:22:38 [Combat] 连招·第 4 段判定：skl_b1_w1_1 伤害 43.5（×1.45）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SpiritSwords] PASS 真实近战ATK到达
+[SpiritSwords] PASS 第4段动画外圈灵剑跟随握持剑的空间姿态
+[SpiritSwords] PASS 第4段挥击实际形成运动路径
+[log] 01:22:38 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:22:38 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:22:38 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 01:22:38 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword5（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.424s、Combo@0.484s）
+[log] 01:22:38 [Combat] 连招：skl_b1_w1_1 起手 段 5/5 动画「Skill_B1_Sword5」（窗口 0.45s）
+[log] 01:22:38 [Combat] 连招·第 5 段判定：skl_b1_w1_1 伤害 54（×1.8）盒子 (2.8, 1.8, 3.2)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[SpiritSwords] PASS 真实近战ATK到达
+[SpiritSwords] PASS 第5段动画外圈灵剑跟随握持剑的空间姿态
+[SpiritSwords] PASS 第5段挥击实际形成运动路径
+[log] 01:22:38 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:22:38 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:22:38 [Combat] 伤害 Player(240) → @CharacterBody3D@271(0) 1
+[log] 01:22:38 [Combat] 死亡 @CharacterBody3D@271(0) 击杀者=Player(240)
+[log] 01:22:38 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 01:22:38 [Combat] 击杀 @CharacterBody3D@271(0) by Player(240)
+[SpiritSwords] PASS 没有灵能汲取时本人击杀不续时
+[SpiritSwords] PASS 10秒实际到期清除全部剑体，冷却仍剩约5秒
+[SpiritSwords] PASS 召唤起算15秒后技能重新可用
+[SpiritSwords] PASS 真实奖励目录和RunBuild获得灵能汲取，每杀延长2秒
+[SpiritSwords] PASS 新名称与说明读取同一个续时数值
+[log] 01:22:53 [Combat] 伤害 Player(240) → @CharacterBody3D@274(0) 1
+[log] 01:22:53 [Combat] 死亡 @CharacterBody3D@274(0) 击杀者=Player(240)
+[log] 01:22:53 [Combat] 击杀 @CharacterBody3D@274(0) by Player(240)
+[SpiritSwords] PASS 效果到期后击杀不复活灵剑、不储存续时
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:22:53 [Combat] 伤害 Player(240) → @CharacterBody3D@279(0) 1
+[log] 01:22:53 [Combat] 死亡 @CharacterBody3D@279(0) 击杀者=Player(240)
+[log] 01:22:53 [Combat] 击杀 @CharacterBody3D@279(0) by Player(240)
+[SpiritSwords] PASS 本人真实击杀立即精确增加2秒
+[log] 01:22:53 [Combat] 伤害 @CharacterBody3D@283(100000) → @CharacterBody3D@286(0) 1
+[log] 01:22:53 [Combat] 死亡 @CharacterBody3D@286(0) 击杀者=@CharacterBody3D@283(100000)
+[log] 01:22:53 [Combat] 击杀 @CharacterBody3D@286(0) by @CharacterBody3D@283(100000)
+[SpiritSwords] PASS 其他单位击杀不冒领续时
+[log] 01:22:53 [Combat] 死亡 @CharacterBody3D@290(0) 击杀者=-
+[SpiritSwords] PASS 无归属的环境死亡不冒领续时
+[log] 01:22:53 [Combat] 伤害 Player(240) → @CharacterBody3D@294(0) 1
+[log] 01:22:53 [Combat] 死亡 @CharacterBody3D@294(0) 击杀者=Player(240)
+[log] 01:22:53 [Combat] 击杀 @CharacterBody3D@294(0) by Player(240)
+[log] 01:22:53 [Combat] 伤害 Player(240) → @CharacterBody3D@298(0) 1
+[log] 01:22:53 [Combat] 死亡 @CharacterBody3D@298(0) 击杀者=Player(240)
+[log] 01:22:53 [Combat] 击杀 @CharacterBody3D@298(0) by Player(240)
+[log] 01:22:53 [Combat] 伤害 Player(240) → @CharacterBody3D@302(0) 1
+[log] 01:22:53 [Combat] 死亡 @CharacterBody3D@302(0) 击杀者=Player(240)
+[log] 01:22:53 [Combat] 击杀 @CharacterBody3D@302(0) by Player(240)
+[log] 01:22:53 [Combat] 伤害 Player(240) → @CharacterBody3D@306(0) 1
+[log] 01:22:53 [Combat] 死亡 @CharacterBody3D@306(0) 击杀者=Player(240)
+[log] 01:22:53 [Combat] 击杀 @CharacterBody3D@306(0) by Player(240)
+[SpiritSwords] PASS 连续敌对击杀逐次增加持续时间
+[SpiritSwords] PASS 续时超过15秒，冷却已好仍不能叠出第二组
+[log] 01:23:08 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:23:08 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[log] 01:23:08 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[SpiritSwords] PASS 换武器清剑体、状态和灵能汲取参数
+[log] 01:23:09 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 01:23:09 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 01:23:09 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 01:23:09 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 39（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[SpiritSwords] PASS 真实近战ATK到达
+[SpiritSwords] PASS 换装后旧订阅不跟随镰刀出手
+[log] 01:23:09 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 01:23:09 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 SpiritSwordsProbe
+[SpiritSwords] PASS 真实右键召唤成功
+[log] 01:23:09 [Combat] 单位动画切换：Player idle → die（当前速度 0，阈值 0.15/4）
+[log] 01:23:09 [Combat] 死亡 Player(0) 击杀者=-
+[SpiritSwords] PASS 玩家死亡清理剑体与事件订阅
+[SpiritSwords] === 三剑协同验收结束：通过 60，失败 0 ===
+[log] 01:23:09 [Exit] 音频退出回收：真实等待88ms。
+[log] 01:23:09 [Audio] 音效统计：共 12 次 —— sfx_combat_hit×3、sfx_enemy_die×9（缺失 id 0 个）
+
+存档 AFTER meta.cfg SHA256=7885F3B5E29E723EA045A3118D680718D60C2805B3DA50DAF4EE9F47476F42A2
+存档 AFTER ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 AFTER settings.cfg SHA256=BDB209C14A682176C8513E57D49A9B4AFA1DAEBA71AF05348230F99BBB9B8760
+存档 AFTER loadout.cfg SHA256=7F889D7A1C784E37C4B9E8557BD4C80A0A7ACEC5261E56C00D9FCF3924B20AA5
+存档 AFTER rune.cfg SHA256=CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6
+selftest.flag AFTER=False

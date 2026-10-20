@@ -24,7 +24,8 @@
 [ext_resource type="Script" path="res://Scripts/Abilities/AirJumpPassiveAbility.cs" id="24_air_jump"]
 [ext_resource type="Script" path="res://Scripts/Abilities/HawkEyeAbility.cs" id="25_hawk_eye"]
 [ext_resource type="Script" path="res://Scripts/Abilities/MeleeComboAbility.cs" id="26_melee_combo"]
-[ext_resource type="Script" path="res://Scripts/Abilities/SwordQiAbility.cs" id="27_sword_qi"]
+[ext_resource type="Script" path="res://Scripts/Abilities/SpiritSwordsAbility.cs" id="27_sword_qi"]
+[ext_resource type="PackedScene" path="res://Scenes/Combat/SpiritSword.tscn" id="spirit_sword"]
 [ext_resource type="Script" path="res://Scripts/Abilities/ScytheThrowAbility.cs" id="28_scythe_throw"]
 [ext_resource type="Script" path="res://Scripts/Abilities/SpearThrowAbility.cs" id="29_spear_throw"]
 [ext_resource type="Script" path="res://Scripts/Abilities/BlinkDashAbility.cs" id="30_blink_dash"]
@@ -201,10 +202,7 @@ shape = SubResource("BoxShape3D_sword")
 [node name="AbilityWeapon4Skill2" type="Node3D" parent="."]
 script = ExtResource("27_sword_qi")
 Enabled = false
-ProjectileScenePath = "res://Scenes/Combat/SwordQi.tscn"
-
-[node name="Path" type="Node3D" parent="AbilityWeapon4Skill2"]
-script = ExtResource("34_path")
+SwordScene = ExtResource("spirit_sword")
 
 [node name="AbilityWeapon5Skill1" type="Node3D" parent="."]
 script = ExtResource("26_melee_combo")

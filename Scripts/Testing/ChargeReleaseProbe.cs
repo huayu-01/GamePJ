@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
@@ -74,13 +75,13 @@ public partial class ChargeReleaseProbe : Node3D
 			foreach (var row in new[] {
 				(PlayerCharacterKind.Hunter, WeaponPresetKind.EnergyPalm, "weapon_skill_2"),
 				(PlayerCharacterKind.Hunter, WeaponPresetKind.Crossbow, "weapon_skill_2"),
-				(PlayerCharacterKind.Hunter, WeaponPresetKind.Bow, "weapon_skill_1"),
-				(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.SpiritSword, "weapon_skill_2") })
+				(PlayerCharacterKind.Hunter, WeaponPresetKind.Bow, "weapon_skill_1") })
 			{
 				await ReleaseEvents(row.Item1, row.Item2, row.Item3);
 				await MissingEvent(row.Item1, row.Item2, row.Item3);
 				await EarlyRelease(row.Item1, row.Item2, row.Item3);
 			}
+			await InstantSwords();
 			await PerfectSnapshot();
 			await NormalAndChargedSnapshots();
 			await InterruptedRelease();
@@ -139,6 +140,28 @@ public partial class ChargeReleaseProbe : Node3D
 		Check(!ability.IsActive && (ability.AllowEarlyChargeRelease
 			? _spawnTimes.Count == before + 1 && ability.LastReleaseEarly && !ability.LastReleasePerfect && Mathf.IsEqualApprox(ability.LastReleaseDamageScale, .5f)
 			: _spawnTimes.Count == before && ability.LastReleaseAborted), $"{weapon}提前松手按当前行规则：允许时低伤单发，其余仍取消");
+	}
+	private async Task InstantSwords()
+	{
+		var swords = (SpiritSwordsAbility)await Equip(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.SpiritSword, "weapon_skill_2");
+		int before = _spawnTimes.Count;
+		Check(!swords.HoldToCharge && swords.IsBackground, "灵剑武技2迁为背景召唤，不再参与蓄力释放");
+		Press("weapon_skill_2", true); await InputFrame(); Press("weapon_skill_2", false);
+		Check(swords.SwordCount == 3 && swords.Summoned, "真实右键即时产生三剑");
+		Check(!swords.IsBusy, "三剑持续不占前台动作");
+		Check(swords.CooldownRemaining > 14f, "召唤成功即起算15秒冷却");
+		Check(!swords.IsCharging && !swords.ChargeReleased, "松手不进入旧剑气蓄力快照");
+		Check(_spawnTimes.Count == before, "召唤不生成旧剑气弹体");
+		Check(!swords.TryPress() && swords.SwordCount == 3, "再次按下不叠出另一组");
+		var melee = (MeleeComboAbility)_player.AbilitySlots.Resolve("weapon_skill_1")!;
+		Press("weapon_skill_1", true); await InputFrame(); Press("weapon_skill_1", false);
+		Check(await Until(() => melee.StrikeCount > 0), "原近战真实ATK到达");
+		Check(swords.FollowCount == 1 && swords.Swords.All(s => s.CurrentAttack != null), "三柄灵剑在真实ATK同时开启判定");
+		Check(Mathf.IsEqualApprox(swords.LastSwordAttack!.BaseDamage, melee.GetNode<AttackHitbox>("Attack").CurrentAttack!.BaseDamage * .3f), "三剑伤害继承本段快照");
+		await Until(() => !swords.Following);
+		Check(!swords.SwordsReady, "挥击完成进入归位期");
+		await Equip(PlayerCharacterKind.Hunter, WeaponPresetKind.Bow, "weapon_skill_1");
+		Check(swords.SwordCount == 0 && !swords.Summoned, "换装清理独立持续效果");
 	}
 	private async Task PerfectSnapshot()
 	{

@@ -105,7 +105,12 @@ public static class ConfigText
 		}
 
 		// 再找行自身的 [Export] 属性（引擎自带 Get，不需要维护映射）。
-		Variant value = source.Get(key);
+		// 强类型子资源也可作为说明数值来源，例如SkillEnhancement.KillExtensionSeconds。
+		int dot = key.IndexOf('.');
+		Variant value;
+		if (dot > 0 && source.Get(key.Substring(0, dot)).AsGodotObject() is Resource resource)
+			value = resource.Get(key.Substring(dot + 1));
+		else value = source.Get(key);
 		if (value.VariantType != Variant.Type.Nil)
 		{
 			text = value.VariantType switch

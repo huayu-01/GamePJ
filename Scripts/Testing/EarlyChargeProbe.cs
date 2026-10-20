@@ -68,8 +68,17 @@ public partial class EarlyChargeProbe : Node3D
 				await Verify(sample.Item1, sample.Item2);
 			foreach (var sample in new[] { (WeaponPresetKind.Crossbow, "weapon_skill_2"), (WeaponPresetKind.SpiritSword, "weapon_skill_2") })
 			{
-				var ability = await Equip(sample.Item1, sample.Item2); await Release(ability, sample.Item2, .04f); await Wait(.4f);
-				Check(!ability.AllowEarlyChargeRelease && ability.LastReleaseAborted && _shots == 0 && _hits.Count == 0, $"{sample.Item1}未获提前释放权限，仍取消");
+				var ability = await Equip(sample.Item1, sample.Item2);
+				if (ability is SpiritSwordsAbility swords)
+				{
+					Press(sample.Item2, true); await Frame(); await Frame(); Press(sample.Item2, false); await Wait(.1f);
+					Check(!ability.HoldToCharge && swords.SwordCount == 3 && _shots == 0 && _hits.Count == 0, "灵剑武技2已改为即时三剑召唤，不进入低伤蓄力发射链");
+				}
+				else
+				{
+					await Release(ability, sample.Item2, .04f); await Wait(.4f);
+					Check(!ability.AllowEarlyChargeRelease && ability.LastReleaseAborted && _shots == 0 && _hits.Count == 0, $"{sample.Item1}未获提前释放权限，仍取消");
+				}
 			}
 			var bow = await Equip(WeaponPresetKind.Bow, "weapon_skill_1");
 			Press("weapon_skill_1", true); Press("weapon_skill_1", false); await Until(() => _hits.Count > 0);
