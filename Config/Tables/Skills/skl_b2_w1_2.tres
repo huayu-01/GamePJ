@@ -69,6 +69,18 @@ Key = "ShowPath"
 Value = false
 Note = "镰刀不画路径（文档只给长枪写了路径可视化）"
 
+[sub_resource type="Resource" id="p_TravelPathDamage"]
+script = ExtResource("2_param")
+Key = "TravelPathDamage"
+Value = true
+Note = "飞出和回程持续扫掠，各段每目标一次；提前收回也能命中，停留后恢复周期伤害"
+
+[sub_resource type="Resource" id="p_TravelDamageScale"]
+script = ExtResource("2_param")
+Key = "TravelDamageScale"
+Value = 0.8
+Note = "移动路径伤害为原周期伤害的80%；悬停周期仍为原伤害"
+
 [resource]
 script = ExtResource("1_row")
 ActionMovement = 2
@@ -86,6 +98,6 @@ Windup = 0.0
 Recover = 0.05
 Id = "skl_b2_w1_2"
 DisplayName = "无情"
-DescriptionTemplate = "将武器扔向前方，武器会不断旋转并周期性 {DamageInterval:0.##} 秒对武器内的敌人造成伤害；武器飞出去这期间武技1无法使用；再次使用或靠近武器时收回武器。"
+DescriptionTemplate = "将武器扔向前方，飞出和回程各对沿途敌人造成一次原伤害 {TravelDamageScale:0%} 的路径伤害；悬停旋转时每 {DamageInterval:0.##} 秒造成原伤害。武器在外期间武技1无法使用；再次使用或靠近武器时收回。"
 Note = "[P4 新增行] 角色 B 武器2 镰刀 武技2（文档 CD:1 / 周期 0.5s）。★ 抛出/收回/旋转/周期伤害全在 WeaponThrowAbility 这一段（与长枪的武技2 共用）。★ 「飞出去这期间武技1无法使用」由场景里的 WeaponGate5 把 InFlight 连到 MeleeComboAbility.ExternallyBlocked。★ n（伤害）= 预设 22。"
-Params = [SubResource("p_ThrowSpeed"), SubResource("p_ReturnSpeed"), SubResource("p_MaxThrowDistance"), SubResource("p_RecallOnSecondPress"), SubResource("p_RecallDistance"), SubResource("p_SpinDegreesPerSecond"), SubResource("p_DamageInterval"), SubResource("p_DamageActiveTime"), SubResource("p_DamageOnReturn"), SubResource("p_UpwardSpeed"), SubResource("p_ShowPath")]
+Params = [SubResource("p_ThrowSpeed"), SubResource("p_ReturnSpeed"), SubResource("p_MaxThrowDistance"), SubResource("p_RecallOnSecondPress"), SubResource("p_RecallDistance"), SubResource("p_SpinDegreesPerSecond"), SubResource("p_DamageInterval"), SubResource("p_DamageActiveTime"), SubResource("p_DamageOnReturn"), SubResource("p_UpwardSpeed"), SubResource("p_ShowPath"), SubResource("p_TravelPathDamage"), SubResource("p_TravelDamageScale")]

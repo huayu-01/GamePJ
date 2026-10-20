@@ -36,7 +36,12 @@ public partial class PlayerAbilityInput : Node
 	public override void _Process(double delta)
 	{
 		if (_revision != _unit.AbilitySlots.Revision) ResetForLoadout();
-		if (_unit.IsDead) { _pendingPresses.Clear(); return; }
+		if (_unit.IsDead)
+		{
+			_pendingPresses.Clear();
+			foreach (var entry in _unit.AbilitySlots.Equipped) entry.Ability.UpdateInputPreview(false);
+			return;
+		}
 		_handledPresses.Clear();
 		var pending = _pendingPresses.ToArray(); _pendingPresses.Clear();
 		foreach (string action in pending)
@@ -49,12 +54,14 @@ public partial class PlayerAbilityInput : Node
 			if (!InputMap.HasAction(action)) continue;
 			if (_blockedUntilReleased.Contains(action))
 			{
+				_unit.AbilitySlots.Resolve(action)?.UpdateInputPreview(false);
 				if (!Input.IsActionPressed(action) && !Input.IsActionJustPressed(action)) _blockedUntilReleased.Remove(action);
 				continue;
 			}
 			Ability? ability = _unit.AbilitySlots.Resolve(action);
 			if (ability == null) continue;
 			if (Input.IsActionJustPressed(action) && !_handledPresses.Contains(action)) Activate(action);
+			ability.UpdateInputPreview(Input.IsActionPressed(action));
 			if (!ability.HoldToCharge && !ability.HoldToMaintain) continue;
 			if (ability.IsActive && Input.IsActionPressed(action)) ability.OnInputHeld((float)delta);
 			// 暂停期间松手也可收尾；同帧重按以当前按住状态为准。

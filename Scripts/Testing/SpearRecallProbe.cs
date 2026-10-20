@@ -68,9 +68,19 @@ public partial class SpearRecallProbe : Node3D
 	}
 	private async Task LandAndReturn()
 	{
+		// 根据独立的落地方程求真实地面交点；空间瞄准点不是强制落地的位置。
+		Vector3 flat = Spear.TargetPoint - _player.GlobalPosition; flat.Y = 0; flat = flat.Normalized();
+		Vector3 origin = _player.GlobalPosition + Vector3.Up * .9f + flat * .6f;
+		float time = Mathf.Max(.05f, Spear.LastHorizontalDistance / Mathf.Max(.001f, Spear.LastHorizontalSpeed));
+		float upward = (Spear.TargetPoint.Y - origin.Y) / time + .5f * Spear.ArcGravity * time;
+		float landingTime = (upward + Mathf.Sqrt(upward * upward + 2 * Spear.ArcGravity * origin.Y)) / Spear.ArcGravity;
+		Vector3 expectedLanding = origin + flat * Mathf.Min(Spear.LastMaxDistance, Spear.LastHorizontalSpeed * landingTime);
+		expectedLanding.Y = 0;
 		Check(await Until(() => Spear.HasSettled), "实际弹道碰World落地");
 		Check(Spear.IsReturning && Spear.InFlight && Melee.ExternallyBlocked, "首次观察落地时已在回程，真实到手前仍锁武技1");
-		Check(Spear.WeaponPosition.DistanceTo(Spear.TargetPoint) < 0.25f, $"实际落地位置接近准星弹道落点：{Spear.WeaponPosition}");
+		// 空间目标可能在射程截断后位于空中，后续仍受重力直到真正碰World；落地必须在地面上。
+		Check(Spear.WeaponPosition.DistanceTo(expectedLanding) < 0.25f
+			&& Mathf.Abs(Spear.WeaponPosition.Y) < 0.02f, $"实际World落地符合独立重力方程且高度为0：实际{Spear.WeaponPosition}／期望{expectedLanding}");
 		Check(await Until(() => !Spear.InFlight) && !Melee.ExternallyBlocked, "无需再次按键，实际回手后才解锁武技1");
 	}
 	private async Task Screenshot()

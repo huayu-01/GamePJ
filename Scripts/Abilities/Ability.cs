@@ -753,6 +753,9 @@ public abstract partial class Ability : Node3D
 	{
 	}
 
+	/// <summary>由当前槽位的输入消费者驱动面向玩家的预览；不依赖技能的飞行或收招生命周期。</summary>
+	public virtual void UpdateInputPreview(bool held) { }
+
 	/// <summary>
 	/// **按住期间每帧**（仅在 <see cref="HoldToCharge"/> 为 true 且按键仍被按住时由输入层调用）。
 	///
@@ -1035,6 +1038,7 @@ public abstract partial class Ability : Node3D
 	/// <summary>换装前释放本能力持有的状态，保留正常技能的取消生命周期。</summary>
 	public void ResetForLoadout()
 	{
+		UpdateInputPreview(false);
 		if (IsActive) Cancel();
 		if (_chargeCooldownBaseline.HasValue) CooldownMultiplier = _chargeCooldownBaseline.Value;
 		_chargeCooldownBaseline = null;

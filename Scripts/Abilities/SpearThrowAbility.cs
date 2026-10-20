@@ -4,7 +4,7 @@ using Godot;
 
 namespace ActRoguelike.Abilities;
 
-/// <summary>长虹贯日：准星选择地面落点，按蓄力射程截断；预览与飞行共用弹道求解，真实World碰撞停留。</summary>
+/// <summary>长虹贯日：准星选择空间目标，按蓄力射程截断；预览与飞行共用弹道求解，真实World碰撞停留。</summary>
 public partial class SpearThrowAbility : WeaponThrowAbility
 {
 	[ExportGroup("长虹贯日（抛物线抛掷 + 蓄力放大路径）")]
@@ -12,8 +12,8 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 	[Export] public float ArcGravity { get; set; } = 22f;
 
 	/// <summary>
-	/// **基准飞行时间**（秒）：水平距离 ÷ 这个时间 = 水平速度。
-	/// 满射程速度与距离同倍率放大；选择较近落点时缩短飞行时间。
+	/// **基准飞行时间**（秒）：空间距离 ÷ 这个时间 = 基础速度。
+	/// 满射程速度与距离同倍率放大；选择较近空间目标时缩短飞行时间。
 	/// </summary>
 	[Export] public float FlightSeconds { get; set; } = 0.8f;
 
@@ -36,6 +36,7 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 	[Export] public float MaxAimDistance { get; set; } = 120f;
 	public Vector3 TargetPoint { get; private set; }
 	public float LastMaxDistance { get; private set; }
+	public float LastAimDistance { get; private set; }
 	private float _referenceDistance;
 
 	protected override void OnLoadoutReset()
@@ -44,19 +45,16 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 		AutoRecallOnSettle = false;
 	}
 
-	private Vector3 PickLandingPoint(Vector3 start, Vector3 flat)
+	private Vector3 PickAimPoint(Vector3 start, Vector3 flat)
 	{
 		float range = MaxThrowDistance * ChargePowerScale;
-		Vector3 point = AimUtil.TryGetCrosshairPoint(GetViewport(), OwnerUnit!, MaxAimDistance, CombatLayers.World, out var aimed)
-			? aimed : start + flat * range;
-		Vector3 planar = point - start;
-		planar.Y = 0;
-		if (planar.Length() > range) planar = planar.Normalized() * range;
-		Vector3 target = start + planar;
-		float top = Mathf.Max(start.Y, point.Y) + 1f;
-		using var query = PhysicsRayQueryParameters3D.Create(new Vector3(target.X, top, target.Z), new Vector3(target.X, top - MaxAimDistance, target.Z), CombatLayers.World);
-		using var hit = GetWorld3D().DirectSpaceState.IntersectRay(query);
-		return hit.Count > 0 ? hit["position"].AsVector3() : target + Vector3.Down;
+		Vector3 point = GetViewport().GetCamera3D() != null
+			? AimUtil.GetCrosshairPoint(GetViewport(), OwnerUnit!, MaxAimDistance,
+				CombatLayers.World | CombatLayers.HostileTo(OwnerUnit!.Faction))
+			: start + flat * range;
+		Vector3 offset = point - start;
+		// 保留目标高度，空中目标和天空远端都不能被强制投到地面；垂直瞄准也有有界射程。
+		return start + offset.LimitLength(range);
 	}
 
 	private Vector3 Solve(Vector3 start, Vector3 target, out float seconds)
@@ -64,7 +62,7 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 		Vector3 planar = target - start;
 		planar.Y = 0;
 		float speed = MaxThrowDistance / Mathf.Max(0.05f, FlightSeconds) * ChargePowerScale;
-		seconds = Mathf.Max(0.05f, planar.Length() / Mathf.Max(0.01f, speed));
+		seconds = Mathf.Max(0.05f, start.DistanceTo(target) / Mathf.Max(0.01f, speed));
 		return planar / seconds + Vector3.Up * ((target.Y - start.Y) / seconds + 0.5f * ArcGravity * seconds);
 	}
 
@@ -88,10 +86,9 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 	protected override void PreviewPath()
 	{
 		if (OwnerUnit == null) return;
-		Vector3 flat = ResolveThrowDirection(); flat.Y = 0;
-		flat = flat.LengthSquared() > 0.001f ? flat.Normalized() : Vector3.Forward;
+		Vector3 flat = ResolveFlatThrowDirection();
 		Vector3 start = OwnerUnit.GlobalPosition + Vector3.Up * 0.9f + flat * 0.6f;
-		Vector3 target = PickLandingPoint(start, flat);
+		Vector3 target = PickAimPoint(start, flat);
 		Path(start, Solve(start, target, out float seconds), seconds);
 	}
 
@@ -101,7 +98,8 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 		DamageScale = LastPowerScale;
 		_referenceDistance = MaxThrowDistance * LastPowerScale;
 		LastMaxDistance = _referenceDistance;
-		TargetPoint = PickLandingPoint(HomePosition, flatDirection);
+		TargetPoint = PickAimPoint(HomePosition, flatDirection);
+		LastAimDistance = HomePosition.DistanceTo(TargetPoint);
 		FlightVelocity = Solve(HomePosition, TargetPoint, out float seconds);
 		LastHorizontalDistance = new Vector2(TargetPoint.X - HomePosition.X, TargetPoint.Z - HomePosition.Z).Length();
 		LastHorizontalSpeed = new Vector2(FlightVelocity.X, FlightVelocity.Z).Length();

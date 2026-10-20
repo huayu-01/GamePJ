@@ -1,0 +1,206 @@
+存档 BEFORE meta.cfg SHA256=6C295F398153205ABAFD39F186979AD7034D04EF7CD99EC6B976AF3202647EA7
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=9FD4787436FD4EAFAEA11372C2745276A7D35D4FCF192456825E7C1ADDFD02B4
+存档 BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档 BEFORE rune.cfg SHA256=ABSENT
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 334 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.81
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 346 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.01
+
+aim_throw exit=1 seconds=13.48 stderrBytes=0
+=== aim_throw ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 21:43:10 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 21:43:10 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 21:43:10 [Flow] === 新的一局 ===
+[log] 21:43:10 [Flow] 日志文件：user://logs/run_20261020_214310.log
+[log] 21:43:10 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 21:43:10 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 21:43:10 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 21:43:10 [Config] 奔跑：角色行暂时读不到（RunSetup.Character=Hunter / 角色表 0 行）→ 先按「sprint」/ 倍率 1 跑，表就绪后会再套一次
+[log] 21:43:10 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 21:43:10 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 21:43:10 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 21:43:10 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 21:43:10 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 21:43:10 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 21:43:10 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 21:43:10 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 21:43:10 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 21:43:10 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 21:43:10 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 21:43:10 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:43:10 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:43:10 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:43:10 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:10 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 21:43:10 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[log] 21:43:10 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:43:10 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[AimThrow] pose Spear player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -1) override=False
+[log] 21:43:10 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[AimThrow] PASS 右键按住即显示预览，不等待蓄力完成
+[AimThrow] PASS 抬头看天空时，抛物线目标随准星升高
+[AimThrow] PASS 保持右键转镜头，预览实时跟随三维准星
+[log] 21:43:11 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 1 次；纯视觉，不改判定）
+[log] 21:43:11 [Audio] 首次播放「sfx_charge_complete」→ 总线 SFX / res://Assets/Audio/ui/ui_card_unlock.wav
+[log] 21:43:11 [Combat] 蓄力完成反馈：skl_b3_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 1 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[log] 21:43:11 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[AimThrow] PASS 松手立即隐藏路径，技能仍可处于释放或飞行阶段
+[log] 21:43:12 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 21:43:12 [Combat] 长虹贯日：0档 加算倍率1，准星落点(3.3537803, 4.867536, -11.443752)，水平距离11.325/12m，水平速度14.156
+[log] 21:43:12 [Combat] 抛掷：skl_b3_w1_2 朝 (0.26764384, 0, -0.96351796) 出手（水平速 14.16 垂直初速 0，最远 12m，每 0.25s 一次周期伤害）
+[AimThrow] PASS 真实ATK抛出的长枪保留向上速度和空中目标
+[AimThrow] PASS 预览末点与释放目标一致，不再投到地面
+[AimThrow] PASS 天空远端按三维射程截断，垂直瞄准也不产生无限目标
+[AimThrow] PASS 真实飞行向上，离手期间路径不残留
+[log] 21:43:12 [Combat] 抛掷：skl_b3_w1_2 开始收回（累计周期伤害 2 次）
+[AimThrow] PASS 再次右键召回不会重显抛掷预览
+[log] 21:43:12 [Combat] 抛掷：skl_b3_w1_2 武器已回到手上（第 1 次收回，累计周期伤害 2 次）
+[log] 21:43:12 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[AimThrow] PASS 真实回手后无路径残留
+[log] 21:43:12 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:12 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[AimThrow] pose Spear player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -0.99999917) override=False
+[log] 21:43:12 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[log] 21:43:13 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 2 次；纯视觉，不改判定）
+[log] 21:43:13 [Combat] 蓄力完成反馈：skl_b3_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 2 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[log] 21:43:13 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[log] 21:43:13 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 21:43:13 [Combat] 长虹贯日：0档 加算倍率1，准星落点(0, 4.890859, -5.5634365)，水平距离1.037/12m，水平速度8.687
+[log] 21:43:13 [Combat] 抛掷：skl_b3_w1_2 朝 (0, 0, -1) 出手（水平速 8.69 垂直初速 0，最远 12m，每 0.25s 一次周期伤害）
+[AimThrow] PASS 准星射线识别敌方身体，瞄准空中靶而非背后地面
+[log] 21:43:13 [Combat] 伤害 Player(240) → @CharacterBody3D@11(9964) 36
+[log] 21:43:13 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[AimThrow] PASS 长枪实际弹道与空中靶发生伤害碰撞
+[log] 21:43:13 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[log] 21:43:13 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:13 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[AimThrow] pose Spear player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -0.99999917) override=False
+[log] 21:43:14 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[log] 21:43:15 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 3 次；纯视觉，不改判定）
+[log] 21:43:15 [Combat] 蓄力完成反馈：skl_b3_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 3 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[log] 21:43:15 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[log] 21:43:15 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 21:43:15 [Combat] 长虹贯日：0档 加算倍率1，准星落点(0, 12.883536, 0.028369546)，水平距离0.628/12m，水平速度0.785
+[log] 21:43:15 [Combat] 抛掷：skl_b3_w1_2 朝 (-0, 0, -1) 出手（水平速 0.79 垂直初速 0，最远 12m，每 0.25s 一次周期伤害）
+[AimThrow] PASS 接近垂直瞄准仍有有界目标和有限速度
+[log] 21:43:15 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[log] 21:43:15 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:15 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[AimThrow] pose Spear player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -0.99999917) override=False
+[log] 21:43:15 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[AimThrow] PASS 提前松手取消蓄力并立即清理预览
+[log] 21:43:15 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[AimThrow] PASS 程序接口仍可启动独立蓄力
+[AimThrow] PASS 程序驱动蓄力没有玩家按住输入，不自行打开玩家指示器
+[log] 21:43:15 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:15 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[AimThrow] pose Spear player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -0.99999917) override=False
+[log] 21:43:15 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[AimThrow] PASS 换装清理检查前预览真实打开
+[log] 21:43:16 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:16 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 21:43:16 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[log] 21:43:16 [Combat] 蓄力身体表现：模型「Model」上挂了 5 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:43:16 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[AimThrow] PASS 按住中换装清理旧预览，输入不穿越到新右键槽
+[log] 21:43:16 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:16 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[AimThrow] pose Crossbow player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -0.99999917) override=False
+[log] 21:43:16 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 21:43:16 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 4 次；纯视觉，不改判定）
+[log] 21:43:16 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 4 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[log] 21:43:16 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 21:43:17 [Combat] 箭矢齐射：skl_a2_w1_2 发数 3（基础 3 + 档 0×2） 单发伤害 18 弹速 180 夹角 20°（蓄力松手，蓄力 0.44s 档 0 威力 ×1，下坠起点 10m 重力 0.9 击退 0 追踪 []，方向 (0, -0.9594956, 0.28172356)）
+[AimThrow] FAIL 短弩右键真实配装为准星瞄准，保留俯仰：(0, -0.9594956, 0.28172356) player=(0, 6.450019, -8) target=(0, 6, -8)
+[AimThrow] PASS 基础蓄力依旧由真实ATK发出三支散射箭
+[AimThrow] FAIL 实际中央箭沿准星飞行，整排箭保留向上分量
+[log] 21:43:17 [Combat] 伤害 Player(220) → @CharacterBody3D@16(9982) 18
+[log] 21:43:17 [Combat] 伤害 Player(220) → @CharacterBody3D@16(9964) 18
+[log] 21:43:17 [Combat] 伤害 Player(220) → @CharacterBody3D@16(9946) 18
+[AimThrow] PASS 中央弩箭实际命中高处敌方靶
+[log] 21:43:17 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:17 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[AimThrow] pose Crossbow player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -0.99999917) override=False
+[log] 21:43:17 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 21:43:17 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 5 次；纯视觉，不改判定）
+[log] 21:43:17 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 5 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[AimThrow] PASS 向下瞄准时短弩右键也保留向下分量
+[log] 21:43:17 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 21:43:17 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:17 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[log] 21:43:17 [Combat] 蓄力身体表现：模型「Model」上挂了 7 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:43:17 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[AimThrow] pose Scythe player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -0.99999917) override=False
+[log] 21:43:17 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 21:43:18 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 21:43:18 [Combat] 抛掷：skl_b2_w1_2 朝 (-0, 0, -1) 出手（水平速 18 垂直初速 0，最远 8m，每 0.5s 一次周期伤害）
+[log] 21:43:18 [Combat] 伤害 Player(240) → @CharacterBody3D@23(9973.6) 26.4
+[AimThrow] PASS 真实镰刀表启用移动路径命中及80%伤害
+[AimThrow] PASS 未到首个0.5秒周期且仍在飞出时，沿途目标已经真实受伤
+[AimThrow] PASS 飞出路径伤害降低且攻击倍率只乘一次：26.4/26.4
+[log] 21:43:18 [Combat] 抛掷：skl_b2_w1_2 开始收回（累计周期伤害 2 次）
+[AimThrow] PASS 真实右键可在尚未飞满射程时开始回手
+[log] 21:43:18 [Combat] 抛掷：skl_b2_w1_2 武器已回到手上（第 1 次收回，累计周期伤害 2 次）
+[log] 21:43:18 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[AimThrow] FAIL 半途收回完整扫过回程，往返各一次低伤，不按帧重复扣血：hits=1 damage=26.40039 player=(0, 1.4000192, -3.2)
+[AimThrow] PASS 提前收回不伤到武器尚未到达的远端目标
+[log] 21:43:18 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:18 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[AimThrow] pose Scythe player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -0.99999917) override=False
+[log] 21:43:18 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 21:43:19 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 21:43:19 [Combat] 抛掷：skl_b2_w1_2 朝 (-0, 0, -1) 出手（水平速 18 垂直初速 0，最远 8m，每 0.5s 一次周期伤害）
+[AimThrow] FAIL 先低伤路径命中，悬停周期恢复原伤害；飞出后增益不篡改冻结快照：hits= pos=(0, 2.3000193, -17.2) player=(0, 1.4000193, -8.6)
+[AimThrow] FAIL 悬停周期仍为0.5秒，不叠加逐帧路径伤害
+[log] 21:43:21 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[log] 21:43:21 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 20 —— 本局没有激活的卡（全部效果为空）
+[log] 21:43:21 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 AimAndThrowProbe
+[AimThrow] pose Spear player=(0, 0, 0) velocity=(0, 0, 0) facing=(-0, -0, -0.99999917) override=False
+[AimThrow] PASS 换装清理镰刀飞行和低伤判定状态
+[AimThrow] === 立体瞄准与投掷验收结束：通过 27，失败 5 ===
+[log] 21:43:21 [Exit] 音频退出回收：真实等待87ms。
+[log] 21:43:21 [Audio] 音效统计：共 8 次 —— sfx_charge_complete×5、sfx_combat_hit×3（缺失 id 0 个）
+
+aim_throw 未通过：F:\Godot项目\项目a\.ai_j40_20261020_214258.aim_throw.log / F:\Godot项目\项目a\.ai_j40_20261020_214258.aim_throw.err
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 334 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.81
+
+=== 失败现场构建 ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 346 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.01

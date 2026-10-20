@@ -240,11 +240,15 @@ public partial class CharacterDesignProbe : Node3D
 			if (steps == 1) { Press("weapon_skill_2", false); Press("weapon_skill_2", true); }
 			Check(await Until(() => spear.ChargeTime >= 1.06f + steps * 0.25f, 3), $"长枪蓄至{steps}档，时间={spear.ChargeTime:0.###}，同帧再按时以最终按住态为准");
 			Check(!spear.InFlight && spear.LastPathPoints > 2, "蓄力期间预览路径，不提前出手");
+			Vector3 flat = AimUtil.GetCrosshairDirection(GetViewport(), Vector3.Forward); flat.Y = 0; flat = flat.Normalized();
+			Vector3 origin = _player.GlobalPosition + Vector3.Up * .9f + flat * .6f;
+			Vector3 aimed = AimUtil.GetCrosshairPoint(GetViewport(), _player, spear.MaxAimDistance, CombatLayers.World | CombatLayers.Enemy);
+			Vector3 expectedAim = origin + (aimed - origin).LimitLength(12 * (1 + steps * .2f));
 			Press("weapon_skill_2", false);
 			Check(await Until(() => spear.InFlight), "合格松手后等待真实ATK抛出");
 			float expected = 1 + steps * 0.2f;
 			Check(Mathf.IsEqualApprox(spear.LastPowerScale, expected) && Mathf.IsEqualApprox(spear.LastMaxDistance, 12 * expected), $"{steps}档基础加算：倍率={spear.LastPowerScale:0.###}、射程={spear.LastMaxDistance:0.###}");
-			Check(steps == 0 ? spear.TargetPoint.DistanceTo(target) < 0.05f : Mathf.Abs(spear.LastHorizontalDistance - spear.LastMaxDistance) < 0.02f, $"准星落点／超射程同向截断：{spear.TargetPoint}");
+			Check(spear.TargetPoint.DistanceTo(expectedAim) < 0.05f && (steps == 0 || Mathf.Abs(spear.LastAimDistance - spear.LastMaxDistance) < 0.02f), $"准星空间目标／超三维射程同向截断：{spear.TargetPoint}");
 			Check(await Until(() => spear.HasSettled), "长枪与真实World地面碰撞落地");
 			Check(roundTripHits == 1, $"飞出路径窄目标只命中一次：{roundTripHits}");
 			Vector3 landed = spear.WeaponPosition;

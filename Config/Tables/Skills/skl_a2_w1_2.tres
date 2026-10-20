@@ -92,6 +92,7 @@ NodeName = "AbilityWeapon2Skill2"
 ClassHint = "ArrowVolleyAbility"
 InputAction = "weapon_skill_2"
 HoldToCharge = true
+Aim = 2
 AnimName = "ATK_A2_ChargedVolley"
 AnimEvent = "ATK"
 AnimSpeedScale = 0.3
@@ -103,6 +104,6 @@ Windup = 0.6
 Recover = 0.1
 Id = "skl_a2_w1_2"
 DisplayName = "大射天下"
-DescriptionTemplate = "按住右键：基础蓄力 {ChargeBaseSeconds:0.##}s 后朝角色朝向散射 {Count:0} 支箭（夹角 {SpreadStepDegrees:0}°），之后每 {ChargeStepSeconds:0.##}s 再 +{CountPerChargeStep:0} 支（最多 {ChargeMaxSteps} 档 → 总 9 支）；没蓄满就松手不释放。"
-Note = "[新增行·P3] 角色 A 武器 2「短弩」武技2（文档 CD:0.5 / 基础蓄力 0.4s / 每 0.2s +2 支 / 最多 +6 支（总数 9））。★ 蓄力三段状态机在 **Ability 基类**（docs/abilities.md），本行只填列：ChargeBaseSeconds=0.4 / ChargeStepSeconds=0.2 / ChargeMaxSteps=3；「每档 +2 支」是**非倍率维度**，所以走 ArrowVolleyAbility 自己的列 CountPerChargeStep（文档 §1.3 第 4 条）。★ AnimSpeedScale = 0.3 = 源段 ATK 帧（0.12s）÷ 基础蓄力 0.4s，让「闭合帧」正好落在基础蓄力完成处。★ **方向口径**：文档这一行写的是「朝角色方向」（对比武技1 的「朝准星方向」），所以 Aim = Facing（角色朝向）—— 照文档原文的取法；实际手感要改就改这一格（不改代码）。★ 文档为 n 的弹速/伤害都填了最小预设值。"
+DescriptionTemplate = "按住右键：基础蓄力 {ChargeBaseSeconds:0.##}s 后朝准星散射 {Count:0} 支箭（夹角 {SpreadStepDegrees:0}°），保留俯仰；之后每 {ChargeStepSeconds:0.##}s 再 +{CountPerChargeStep:0} 支（最多 {ChargeMaxSteps} 档 → 总 9 支）；没蓄满就松手不释放。"
+Note = "J40按用户试玩裁定改为Aim=Crosshair，保留完整俯仰和准星世界点；原朝角色方向口径作废。基础0.4秒、每档0.2秒加2支、最多9支、0.5秒CD和真实ATK发射保持；蓄力仍共读Ability。"
 Params = [SubResource("p_a2_w1_2_0"), SubResource("p_a2_w1_2_1"), SubResource("p_a2_w1_2_2"), SubResource("p_a2_w1_2_3"), SubResource("p_a2_w1_2_4"), SubResource("p_a2_w1_2_5"), SubResource("p_a2_w1_2_6"), SubResource("p_a2_w1_2_7"), SubResource("p_a2_w1_2_8"), SubResource("p_a2_w1_2_9"), SubResource("p_a2_w1_2_10"), SubResource("p_a2_w1_2_11"), SubResource("p_a2_w1_2_12")]

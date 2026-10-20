@@ -38,6 +38,10 @@ public abstract partial class WeaponThrowAbility : Ability
 	[Export] public bool DamageOnReturn { get; set; } = true;
 	/// <summary>飞出与回程各持续判定一次路径；关闭时使用周期伤害。</summary>
 	[Export] public bool ContinuousPathDamage { get; set; }
+	/// <summary>飞出／回程连续扫掠，各段每目标一次；停留时恢复周期伤害。</summary>
+	[Export] public bool TravelPathDamage { get; set; }
+	/// <summary>移动路径相对原始周期伤害的倍率，仍沿用出手时冻结的攻击属性。</summary>
+	[Export] public float TravelDamageScale { get; set; } = 0.8f;
 	[Export] public bool AutoRecallOnSettle { get; set; }
 	[Export] public float ThrowEventTimeout { get; set; } = 2f;
 
@@ -80,6 +84,8 @@ public abstract partial class WeaponThrowAbility : Ability
 	private float _intervalTimer;
 	private float _activeTimer;
 	private bool _damageWindowOpen;
+	private bool _travelDamageOpen;
+	private bool _inputPreviewHeld;
 	private bool _waitingForThrowEvent;
 	private bool _waitingForCharge;
 	private bool _leftRecallRange;
@@ -137,6 +143,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		_intervalTimer = 0f;
 		_activeTimer = 0f;
 		_damageWindowOpen = false;
+		_travelDamageOpen = false;
 		DamageTickCount = 0;
 		_leftRecallRange = false;
 		_redirectDestination = null;
@@ -148,6 +155,7 @@ public abstract partial class WeaponThrowAbility : Ability
 
 	protected override void OnChargeReleased(bool perfect, int steps, float powerScale)
 	{
+		UpdateInputPreview(false);
 		if (!_waitingForCharge) return;
 		_waitingForCharge = false;
 		_waitingForThrowEvent = true;
@@ -165,27 +173,39 @@ public abstract partial class WeaponThrowAbility : Ability
 		if (_waitingForCharge) base.OnInputHeld(delta);
 	}
 	protected virtual void PreviewPath() { }
+	public override void UpdateInputPreview(bool held)
+	{
+		_inputPreviewHeld = held && Enabled && ShowPath && OwnerUnit is { IsDead: false } && !InFlight
+			&& (!IsActive || IsCharging);
+		if (_inputPreviewHeld) PreviewPath();
+		else _path?.HidePath();
+	}
 
 	protected override void OnChargeAborted() => Cancel();
+
+	/// <summary>预览与实际离手共用水平出手轴；近垂直瞄准时保持玩家当前朝向。</summary>
+	protected Vector3 ResolveFlatThrowDirection()
+	{
+		Vector3 direction = ResolveThrowDirection(); direction.Y = 0;
+		if (direction.LengthSquared() < 0.0001f)
+		{
+			direction = OwnerUnit != null ? -OwnerUnit.GlobalTransform.Basis.Z : Vector3.Forward;
+			direction.Y = 0;
+		}
+		return direction.Normalized();
+	}
 
 	private void BeginThrow()
 	{
 		if (OwnerUnit == null) { Cancel(); return; }
 
-		Vector3 direction = ResolveThrowDirection();
-		direction.Y = 0f;
-		if (direction.LengthSquared() < 0.0001f)
-		{
-			direction = -OwnerUnit.GlobalTransform.Basis.Z;
-			direction.Y = 0f;
-		}
-
-		direction = direction.Normalized();
+		Vector3 direction = ResolveFlatThrowDirection();
 		HomePosition = OwnerUnit.GlobalPosition + (Vector3.Up * 0.9f) + (direction * 0.6f);
 		WeaponPosition = HomePosition;
 		// 只在自身仍占动作时交还动画；回手收尾不能停止其他技能的动画。
 		StopSkillAnimation();
 		SetInFlight(true);
+		UpdateInputPreview(false);
 		OnThrowStarted();
 
 		Launch(direction);
@@ -194,6 +214,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		_throwDamage = (Hitbox?.Damage ?? 0f) * DamageScale * _throwOffense.DamageMultiplier;
 		LastFlightDirection = FlightVelocity.Normalized();
 		if (ContinuousPathDamage) OpenDamageWindow();
+		else if (TravelPathDamage) { OpenDamageWindow(TravelDamageScale); _travelDamageOpen = true; }
 
 		GameLog.Write(
 			"Combat",
@@ -213,7 +234,7 @@ public abstract partial class WeaponThrowAbility : Ability
 	protected override void Tick(float delta)
 	{
 		if (!IsActive) return;
-		if (_waitingForCharge) { PreviewPath(); return; }
+		if (_waitingForCharge) return;
 		if (_waitingForThrowEvent)
 		{
 			if (StateTime > ThrowEventTimeout) Cancel();
@@ -290,6 +311,12 @@ public abstract partial class WeaponThrowAbility : Ability
 		_redirectDestination = destination;
 		FlightVelocity = (destination - WeaponPosition).Normalized() * EffectiveThrowSpeed;
 		HasSettled = false;
+		// 新索敌飞行段重新建立一次路径判定，不能把悬停窗口当成整段飞行。
+		if (TravelPathDamage)
+		{
+			Hitbox?.Deactivate();
+			OpenDamageWindow(TravelDamageScale); _travelDamageOpen = true;
+		}
 		return true;
 	}
 
@@ -301,6 +328,16 @@ public abstract partial class WeaponThrowAbility : Ability
 		{
 			if (!HasSettled || IsReturning || previous != WeaponPosition) Hitbox.SweepBox(previous, WeaponPosition);
 			return;
+		}
+		if (TravelPathDamage && (!HasSettled || IsReturning || previous != WeaponPosition))
+		{
+			if (!_travelDamageOpen) { OpenDamageWindow(TravelDamageScale); _travelDamageOpen = true; }
+			Hitbox.SweepBox(previous, WeaponPosition);
+			return;
+		}
+		if (_travelDamageOpen)
+		{
+			Hitbox.Deactivate(); _damageWindowOpen = _travelDamageOpen = false; _intervalTimer = 0;
 		}
 		_intervalTimer += delta;
 		if (_intervalTimer >= Mathf.Max(0.01f, DamageInterval))
@@ -327,7 +364,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		if (DamageOnReturn) TickDamage(delta, previous);
 		if (WeaponPosition.IsEqualApprox(hand)) FinishReturn();
 	}
-	private void OpenDamageWindow()
+	private void OpenDamageWindow(float phaseScale = 1f)
 	{
 		if (Hitbox == null || OwnerUnit == null)
 		{
@@ -340,7 +377,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		{
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
-			BaseDamage = _throwDamage,
+			BaseDamage = _throwDamage * Mathf.Max(0, phaseScale),
 			CanCrit = true,
 			CritChance = _throwOffense.CritChance,
 			CritMultiplier = _throwOffense.CritMultiplier,
@@ -376,7 +413,9 @@ public abstract partial class WeaponThrowAbility : Ability
 		}
 
 		_damageWindowOpen = false;
+		_travelDamageOpen = false;
 		if (DamageOnReturn && ContinuousPathDamage) OpenDamageWindow();
+		else if (DamageOnReturn && TravelPathDamage) { OpenDamageWindow(TravelDamageScale); _travelDamageOpen = true; }
 		GameLog.Write("Combat", $"抛掷：{AbilityId} 开始收回（累计周期伤害 {DamageTickCount} 次）");
 	}
 
@@ -432,7 +471,7 @@ public abstract partial class WeaponThrowAbility : Ability
 	/// <summary>画出抛掷路径（子类在 <see cref="Launch"/> 里按自己的弹道调用）。</summary>
 	protected void DrawPath(IReadOnlyList<Vector3> points)
 	{
-		if (!ShowPath || _path == null)
+		if (!ShowPath || !_inputPreviewHeld || _path == null)
 		{
 			return;
 		}
@@ -447,6 +486,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		_waitingForThrowEvent = false;
 		Hitbox?.Deactivate();
 		_damageWindowOpen = false;
+		_travelDamageOpen = _inputPreviewHeld = false;
 		SetInFlight(false);
 		IsReturning = false;
 		HasSettled = false;

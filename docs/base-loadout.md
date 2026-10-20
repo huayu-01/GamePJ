@@ -16,6 +16,8 @@ J39：配装默认值与当前槽位由玩家实例持有，重新创建PlayerLo
 
 `AbilityConfig.InputAction`用于安装默认槽，InputMap负责Q／鼠标等实际按键。`AbilitySlots.AssignToSlot(unit, "skill_1", row)`可将任意技能索引显式装入技能1；其原本的InputAction不影响该槽路由。仓库可以保留其它角色技能，只有当前装槽对象响应输入。换装前排队、按住或尚未释放的旧输入必须先松开，不能穿越到新技能。
 
+玩家投掷路径通过当前槽位的`UpdateInputPreview(held)`消费实际输入：按住瞄准时更新，松手、换装和死亡隐藏；不能以长期保持的`IsActive/InFlight`决定玩家预览显隐。程序接口蓄力与玩家按键预览独立，详见[J40](character-design-j40.md)。
+
 `Ability.ResetForLoadout`只在装备重配时调用，沿用取消生命周期；后撤、闪和架补齐其持有的无敌/碰撞/订阅清理。
 本轮纠正原始设计归属：落剑式只在灵剑的武器技能行引用，不再放在角色B共通技能中。灵剑6格；镰刀和长枪没有额外落剑式，为5格。共通“落”仍保留，长枪专属方向改型另行核验。
 

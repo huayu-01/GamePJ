@@ -1,5 +1,5 @@
 # J12：胶囊扫掠、全局实际弹速上限与五探针回归，验证独占且保护真实存档。
-param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization, [switch]$BodyCollision, [switch]$MainOnly, [switch]$FlightPhysics, [switch]$NavigationFoundation, [switch]$EnemyRoster, [switch]$LabOnly, [switch]$EnemyWarnings, [switch]$CombatFeedback, [switch]$LoadoutSlots)
+param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization, [switch]$BodyCollision, [switch]$MainOnly, [switch]$FlightPhysics, [switch]$NavigationFoundation, [switch]$EnemyRoster, [switch]$LabOnly, [switch]$EnemyWarnings, [switch]$CombatFeedback, [switch]$LoadoutSlots, [switch]$AimAndThrow)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
 $godotExe = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
@@ -11,7 +11,7 @@ $original = @{}
 $runTag = Get-Date -Format 'yyyyMMdd_HHmmss'
 $batchId = if ($WingDive) { 'j27' } elseif ($KillFacts) { 'j26' } elseif ($KillJumps) { 'j25' } elseif ($RewardTiers) { 'j24' } elseif ($RewardRules) { 'j23' } elseif ($JumpStomp) { 'j22' } elseif ($ChargeEvolution) { 'j21' } elseif ($ActionMovement) { 'j20' } elseif ($GroundBurst) { 'j19' } elseif ($LightLeap) { 'j18' } elseif ($GoldenRoad) { 'j17' } elseif ($Rainbow) { 'j16' } elseif ($Affection) { 'j15' } elseif ($Scythe) { 'j14' } elseif ($SpiritSword) { 'j13' } else { 'j12' }
 $RewardRules = $RewardRules -or $RewardTiers -or $KillJumps
-$EnemyRoster = $EnemyRoster -or $EnemyWarnings -or $CombatFeedback -or $LoadoutSlots
+$EnemyRoster = $EnemyRoster -or $EnemyWarnings -or $CombatFeedback -or $LoadoutSlots -or $AimAndThrow
 if ($ProjectileQuery) { $batchId = 'j28' }
 if ($AttackSnapshot) { $batchId = 'j29' }
 if ($DotAttribution) { $batchId = 'j30' }
@@ -24,6 +24,7 @@ if ($EnemyRoster) { $batchId = 'j36' }
 if ($EnemyWarnings) { $batchId = 'j37' }
 if ($CombatFeedback) { $batchId = 'j38' }
 if ($LoadoutSlots) { $batchId = 'j39' }
+if ($AimAndThrow) { $batchId = 'j40' }
 $saveNames = @('meta.cfg','ability_cards.cfg','settings.cfg','loadout.cfg','rune.cfg')
 $utf8 = [Text.UTF8Encoding]::new($false)
 
@@ -138,6 +139,18 @@ try {
         if ($EnemyRoster) { Invoke-Probe 'roster_lab' 'res://Scenes/Debug/_EnemyRosterLab.tscn' '截图=Ok／闪色=Ok' -Render -UserArgs '--roster-lab-capture' }
         if ($FlightPhysics) { Invoke-Probe 'flight' 'res://Scenes/Debug/_FlightPhysicsProbe.tscn' '飞行与受力验收结束：通过 \d+，失败 0' }
         Invoke-Probe 'main' 'res://Scenes/Main.tscn' '=== 自测结束 ===' -SelfTest
+    }
+    elseif ($AimAndThrow) {
+        Invoke-Probe 'aim_throw' 'res://Scenes/Debug/_AimAndThrowProbe.tscn' '立体瞄准与投掷验收结束：通过 \d+，失败 0'
+        if (-not $ProbeOnly) {
+            Invoke-Probe 'aim_throw_render' 'res://Scenes/Debug/_AimAndThrowProbe.tscn' '立体瞄准与投掷验收结束：通过 \d+，失败 0' -Render
+            Invoke-Probe 'slots' 'res://Scenes/Debug/_LoadoutSlotsProbe.tscn' '换装与技能槽验收结束：通过 57，失败 0'
+            Invoke-Probe 'snapshot' 'res://Scenes/Debug/_AttackSnapshotProbe.tscn' '攻击快照验收结束：通过 45，失败 0'
+            Invoke-Probe 'scythe' 'res://Scenes/Debug/_ScytheEvolutionProbe.tscn' '镰刀末刀进化验收结束：通过 36，失败 0'
+            Invoke-Probe 'seek' 'res://Scenes/Debug/_ScytheSeekProbe.tscn' '飞镰喜爱验收结束：通过 42，失败 0'
+            Invoke-Probe 'spear' 'res://Scenes/Debug/_SpearRecallProbe.tscn' '气贯长虹验收结束：通过 89，失败 0'
+            Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
+        }
     }
     elseif ($LoadoutSlots) {
         Invoke-Probe 'slots' 'res://Scenes/Debug/_LoadoutSlotsProbe.tscn' '换装与技能槽验收结束：通过 \d+，失败 0'
@@ -362,7 +375,7 @@ try {
         if (-not (Test-Path -LiteralPath $shotPath)) { throw "$shotName 截图缺失" }
         $evidence.Add("截图 $shotName SHA256=$((Get-FileHash -LiteralPath $shotPath -Algorithm SHA256).Hash)")
     }
-    $currentShots = if ($LoadoutSlots -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j39_contact_visibility.png','screenshots/j39_spear_preview.png') } elseif ($CombatFeedback -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j38_combat_feedback.png') } elseif ($EnemyWarnings -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j37_enemy_warning.png') } elseif ($EnemyRoster -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j36_enemy_roster.png','screenshots/j36_attack_warning.png') } elseif ($Specialization) { @('character-design-j32-wind.png','character-design-j32-rune-ui.png') } elseif ($RuneUi) { @('character-design-j31-rune-ui.png') } else { @() }
+    $currentShots = if ($AimAndThrow) { if (-not $ProbeOnly) { @('screenshots/j40_spear_aim.png','screenshots/j40_crossbow_aim.png') } else { @() } } elseif ($LoadoutSlots -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j39_contact_visibility.png','screenshots/j39_spear_preview.png') } elseif ($CombatFeedback -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j38_combat_feedback.png') } elseif ($EnemyWarnings -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j37_enemy_warning.png') } elseif ($EnemyRoster -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j36_enemy_roster.png','screenshots/j36_attack_warning.png') } elseif ($Specialization) { @('character-design-j32-wind.png','character-design-j32-rune-ui.png') } elseif ($RuneUi) { @('character-design-j31-rune-ui.png') } else { @() }
     foreach ($shot in $currentShots) {
         # ProbeOnly不一定运行符文渲染，只有本次完整流程要求这张界面图。
         if ($Specialization -and $ProbeOnly -and $shot -like '*rune-ui*') { continue }

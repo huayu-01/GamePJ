@@ -162,6 +162,8 @@ public partial class ArrowVolleyAbility : Ability
 
 	/// <summary>最后一次齐射实际用的夹角（度）。</summary>
 	public float LastSpreadDegrees { get; private set; }
+	/// <summary>发射时的三维准星中心方向；实际中央弹沿此方向飞行。</summary>
+	public Vector3 LastShotDirection { get; private set; }
 
 	/// <summary>最后一次齐射是不是完美时机。</summary>
 	public bool LastShotPerfect { get; private set; }
@@ -387,7 +389,7 @@ public partial class ArrowVolleyAbility : Ability
 	/// <list type="bullet">
 	/// <item><c>Aim = Crosshair</c>：**与枪械/能量掌同一个口径** —— 先求"准星打到的世界点"，
 	///   再从箭的出生点朝那个点飞（<see cref="AimUtil.GetCrosshairPoint"/>）。</item>
-	/// <item>其余（文档：大射天下的「朝角色方向」= 角色的朝向）：走基类 <see cref="Ability.ResolveAimDirection"/>。</item>
+	/// <item>其余方向来源走基类 <see cref="Ability.ResolveAimDirection"/>；短弩右键现按用户裁定使用准星。</item>
 	/// </list>
 	/// </summary>
 	private Vector3 ResolveShotDirection()
@@ -521,6 +523,7 @@ public partial class ArrowVolleyAbility : Ability
 		LastShotSpeed = shotSpeed;
 		LastShotCount = count;
 		LastSpreadDegrees = SpreadStepDegrees;
+		LastShotDirection = direction;
 		LastShotPerfect = _perfect;
 		LastShotChargedShot = chargedShot;
 		LastShotChargeSeconds = _releasedChargeSeconds;

@@ -106,13 +106,14 @@ public partial class AttackSnapshotProbe : Node3D
 				var attack = await Fire(ability);
 				Verify(attack, $"{weapon}投掷");
 				float expected = ability.GetNode<AttackHitbox>("Attack").Damage * _player.Stats.Get("DamageMultiplier")
-					* (ability is SpearThrowAbility spear ? spear.LastPowerScale : 1f);
+					* (ability is SpearThrowAbility spear ? spear.LastPowerScale : ability.TravelPathDamage ? ability.TravelDamageScale : 1f);
 				Check(Mathf.IsEqualApprox(attack.BaseDamage, expected), $"{weapon}投掷合并一次玩家攻击力：{attack.BaseDamage:0.###}／期望{expected:0.###}");
 				_player.Stats.SetBase("DamageMultiplier", 2f); _player.Stats.SetBase("CritChanceAdd", -1f); _player.Stats.SetBase("CritMultiplierAdd", 5f);
-				if (ability is ScytheThrowAbility) await Wait(0.65);
+				if (ability is ScytheThrowAbility) await Until(() => ability.HasSettled && ability.DamageTickCount >= 2);
 				else { Press("weapon_skill_2", true); await Wait(0.03); Press("weapon_skill_2", false); await Wait(0.15); }
 				var later = ability.GetNode<AttackHitbox>("Attack").CurrentAttack!;
-				Check(Mathf.IsEqualApprox(later.BaseDamage, attack.BaseDamage) && Mathf.IsEqualApprox(later.CritChance, 1f) && Mathf.IsEqualApprox(later.CritMultiplier, 3f), $"{weapon}后续周期／回程沿用出手属性，不重读后来的增益");
+				float laterExpected = ability.TravelPathDamage ? attack.BaseDamage / ability.TravelDamageScale : attack.BaseDamage;
+				Check(Mathf.IsEqualApprox(later.BaseDamage, laterExpected) && Mathf.IsEqualApprox(later.CritChance, 1f) && Mathf.IsEqualApprox(later.CritMultiplier, 3f), $"{weapon}后续周期／回程沿用出手属性，周期恢复原伤害，不重读后来的增益");
 			}
 			await Equip(WeaponPresetKind.SpiritSword);
 			Verify(await Fire(_player.GetNode<BlinkDashAbility>("AbilityBSkill1")), "闪");

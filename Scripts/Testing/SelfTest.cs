@@ -3968,7 +3968,7 @@ public partial class SelfTest : Node
 			$"{(okAll ? "✅" : "🔴")} P3·短弩武技2 大射天下：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 0.4）/ 每档 {w2.ChargeStepSeconds:0.##}s（期望 0.2）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 3） 每档 +{w2.CountPerChargeStep} 支（期望 2）"
 			+ $" → 蓄到基础（档 {stepsAt0}）松手：释放段真ATK到达={firedA}（自然收招={settledA}）发数 {countAt0}（期望 3，= 基础 {w2.Count}）投射物 +{shotsA}"
 			+ $"；蓄到 3 档（档 {stepsAt3}，威力 ×{powerAt3:0.###}）松手：释放段真ATK到达={firedB}（自然收招={settledB}）发数 {countAt3}（期望 9 = 3 + 2×3）投射物 +{shotsB}"
-			+ $"｜动画={w2.AnimName} 方向来源 Aim={w2.Aim}（0 = Facing：文档这一行写的是「朝角色方向」）");
+			+ $"｜动画={w2.AnimName} 方向来源 Aim={w2.Aim}（J40按试玩裁定使用Crosshair，保留完整俯仰）");
 	}
 
 	/// <summary>
