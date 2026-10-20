@@ -113,7 +113,9 @@ public partial class SpearRecallProbe : Node3D
 			await ManualRecall();
 			await Equip(true);
 			Press("weapon_skill_2", true); await Wait(0.32); Press("weapon_skill_2", false); await Wait(0.5);
-			Check(!Spear.InFlight && !Spear.IsActive && !Melee.ExternallyBlocked, "未满新基础0.5秒松手仍取消，零出手不锁门");
+			Check(Spear.InFlight && Spear.LastReleaseEarly && !Spear.LastReleasePerfect && Melee.ExternallyBlocked
+				&& Mathf.IsEqualApprox(Spear.GetNode<AttackHitbox>("Attack").CurrentAttack!.BaseDamage,
+					Spear.GetNode<AttackHitbox>("Attack").Damage * _player.Stats.Get("DamageMultiplier") * .5f), "未满新基础0.5秒可低伤投掷，离手仍锁武技1");
 			foreach (var shot in new[] { (0.55, 0), (0.70, 1), (0.83, 2), (0.95, 3), (1.12, 4), (1.50, 4) })
 			{
 				await Equip(true); await Throw(shot.Item1, shot.Item2);

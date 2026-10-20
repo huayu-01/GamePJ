@@ -235,8 +235,9 @@ public partial class BowSweepProbe : Node3D
 			mid && stepsMid == 0 && Mathf.IsEqualApprox(powerMid, 1f) && progress < 1f,
 			$"② 基础蓄力期间不加档：按到 {held:0.###}s（< 基础 {_bow.ChargeBaseSecondsEffective:0.##}s）→ ChargeSteps {stepsMid}（期望 0）ChargePowerScale ×{powerMid:0.###}（期望 1）进度 {progress:0.###}（期望 <1）");
 		Check(
-			_bow.LastReleaseAborted && _spawned.Count == before,
-			$"② 没蓄满就松手：不释放（LastReleaseAborted={_bow.LastReleaseAborted}）场上新弹体 {_spawned.Count - before} 个（期望 0）");
+			_bow.LastReleaseEarly && !_bow.LastReleaseAborted && _spawned.Count == before + 1
+				&& Mathf.IsEqualApprox(_bow.LastShotDamage, _bow.Damage * dmgMul * .5f) && Mathf.IsEqualApprox(_bow.LastShotSpeed, _bow.Speed),
+			$"② 没蓄满就松手：低伤单箭且不缩弹速，弹体 {_spawned.Count - before} 个／伤害{_bow.LastShotDamage:0.###}");
 		await Until(() => !_bow.IsActive, 3);
 
 		// ⓑ 真实箭：**刚过基础**那一发一点档位加成都不吃。

@@ -276,7 +276,7 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		// 后置蓄力的档位倍率（弓 / 短弩 / 长枪那一段）与完美时机是**两件正交的事**，所以两者相乘
 		// （武技2 没有后置蓄力 → ChargePowerScale 恒为 1，于是 30 → 40、250 → 400 逐位精确）。
 		float power = HoldToCharge ? _releasedPower : 1;
-		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power;
+		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power * (HoldToCharge ? LastReleaseDamageScale : 1f);
 		float shotSpeed = (_perfect && PerfectSpeed > 0f ? PerfectSpeed : Speed) * power;
 
 		var attack = new AttackInstance

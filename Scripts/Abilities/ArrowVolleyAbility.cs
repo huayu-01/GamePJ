@@ -193,7 +193,7 @@ public partial class ArrowVolleyAbility : Ability
 		RampShotIntervalSeconds = Mathf.Max(0.01f, interval);
 		_rampCount = 0; _rampTimer = 0;
 	}
-	protected override bool CanReleaseBeforeBase => RampMaxCount > 0;
+	protected override bool CanReleaseBeforeBase => base.CanReleaseBeforeBase || RampMaxCount > 0;
 
 	private int _rampCount;
 	private float _rampTimer;
@@ -456,7 +456,7 @@ public partial class ArrowVolleyAbility : Ability
 		}
 
 		// 伤害：绝对值 × 档位倍率（A2 的 ChargeStepScale = 1 → 不变；A3 = 1.3^档）。
-		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power;
+		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power * (HoldToCharge ? LastReleaseDamageScale : 1f);
 		// 弹速：绝对值 + 档数 × 每档（文档写的是**加** 30 射速，不是乘 1.3）。
 		float shotSpeed = (_perfect && PerfectSpeed > 0f ? PerfectSpeed : Speed) + (steps * SpeedPerChargeStep);
 		// 击退：只有"弹速较高"时才给（文档：射速较高的时候造成击退）。

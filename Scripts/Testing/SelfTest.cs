@@ -1457,8 +1457,7 @@ public partial class SelfTest : Node
 		EnergyWaveAbility w = _mechW2;
 		float damageMultiplier = _mechPlayer.Stats.Get("DamageMultiplier");
 
-		// ① **基础蓄力没完成就松手 = 不释放**（设计文档第 14 行）
-		//    按住走真实帧（每帧把帧 delta 交给技能），0.3s < 基础 0.5s → 松手走 OnChargeAborted。
+		// ① J41：基础蓄力未完成也可低伤释放，仍等待释放段的真实ATK。
 		if (!await WaitAbilityReady(w))
 		{
 			GameLog.Write("SelfTest", $"🔴 机制·蓄力未完成松手：技能等不到可用（忙={w.IsActive} 冷却={w.CooldownRemaining:0.###}），本段跳过。");
@@ -1472,16 +1471,19 @@ public partial class SelfTest : Node
 		bool heldOk1 = await HoldCharge(w, 0.3f);
 		string held = $"蓄力={w.ChargeTime:0.##}s 进度={w.ChargeProgress:0.##} 基础完成={w.ChargeBaseComplete} 完美窗口={w.IsPerfectWindow}";
 		w.OnInputReleased();
+		bool noImmediateShot = Mathf.IsEqualApprox(w.LastShotDamage, _mechShotDamageBefore);
+		bool earlySettled = await WaitSettle(w);
 		int aborted = _loopProjectiles - _mechProjectilesBefore;
-		bool abortOk = ok1 && heldOk1 && w.LastReleaseAborted && Mathf.IsEqualApprox(w.LastShotDamage, _mechShotDamageBefore) && !w.IsBusy;
+		bool abortOk = ok1 && heldOk1 && noImmediateShot && w.LastReleaseEarly && !w.LastReleaseAborted && !w.LastShotPerfect
+			&& ReleaseAtkFired(w, earlySettled) && Mathf.IsEqualApprox(w.LastShotDamage, w.Damage * damageMultiplier * .5f)
+			&& Mathf.IsEqualApprox(w.LastShotSpeed, w.Speed);
 		GameLog.Write(
 			"SelfTest",
 			$"{(abortOk ? "✅" : "🔴")} 机制·蓄力未完成松手：TryActivate={ok1}（期望 True） 按住到 0.3s={heldOk1}（期望 True，真实帧） {held}（期望 0.3s / 0.6 / False / False）"
-			+ $" → 松手：放弃={w.LastReleaseAborted}（期望 True） 伤害未变={Mathf.IsEqualApprox(w.LastShotDamage, _mechShotDamageBefore)}（期望 True）"
-			+ $" 仍在施法={w.IsBusy}（期望 False） 投射物 +{aborted}（期望 0；这一项只报数，别的单位也在打枪所以不作判据）");
+			+ $" → 松手：低伤={w.LastReleaseEarly}（期望 True）真ATK后伤害={w.LastShotDamage:0.###}（期望{w.Damage * damageMultiplier * .5f:0.###}）"
+			+ $" 自然收招={earlySettled}（期望 True）投射物 +{aborted}（只报数，其余单位也可能开火）");
 
-		// ⚠️ 这条路**没有释放 ATK**（松手即 Cancel），所以"还在施法"必须当场为 false。
-		//    万一没走取消分支，先把技能复位，免得 ②③④ 级联红灯掩盖真正的原因。
+		// 异常时先复位，避免后续完美／普通／后置档位探针级联失败。
 		if (w.IsActive)
 		{
 			w.ResetForLoadout();

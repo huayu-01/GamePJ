@@ -67,7 +67,7 @@ public partial class PlayerAbilityInput : Node
 			// 暂停期间松手也可收尾；同帧重按以当前按住状态为准。
 			if (ability.IsActive && !Input.IsActionPressed(action)
 				&& (Input.IsActionJustReleased(action) || ability.IsMaintaining
-					|| (ability.IsCharging && _inputOwners.GetValueOrDefault(action) == ability)))
+					|| (ability.HoldToCharge && !ability.ChargeReleased && _inputOwners.GetValueOrDefault(action) == ability)))
 			{
 				ability.OnInputReleased(); _inputOwners.Remove(action);
 			}

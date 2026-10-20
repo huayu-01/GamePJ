@@ -74,6 +74,8 @@ NodeName = "AbilityWeaponSkill2"
 ClassHint = "EnergyWaveAbility"
 InputAction = "weapon_skill_2"
 HoldToCharge = true
+AllowEarlyChargeRelease = true
+EarlyReleaseDamageScale = 0.5
 AnimName = "Skill_A1_ATK2"
 AnimEvent = "ATK"
 AnimSpeedScale = 0.2
@@ -85,6 +87,6 @@ Windup = 1.7
 Recover = 0.1
 Id = "skl_a1_w1_2"
 DisplayName = "憋个大的"
-DescriptionTemplate = "按住右键蓄力：蓄满 {ChargeBaseSeconds:0.##}s 后松手 = 伤害 {Damage:0} / 弹速 {Speed:0}；刚蓄满的 {PerfectWindowSeconds:0.##}s 内松手 = 完美时机（伤害 {PerfectDamage:0} / 弹速 {PerfectSpeed:0}）；没蓄满就松手不释放。"
+DescriptionTemplate = "按住右键蓄力：蓄满 {ChargeBaseSeconds:0.##}s 后松手 = 伤害 {Damage:0} / 弹速 {Speed:0}；刚蓄满的 {PerfectWindowSeconds:0.##}s 内松手 = 完美时机（伤害 {PerfectDamage:0} / 弹速 {PerfectSpeed:0}）；未完成基础蓄力也可松手，造成基础伤害的 {EarlyReleaseDamageScale:0%}。"
 Note = "角色 A 武器 1「能量掌」武技2（文档 CD:1 / 蓄力 30-250 / 完美时机 40-400，窗口 0.2s）。★ 蓄力的三段状态机（基础蓄力 → 完美窗口 → 后置蓄力档位）在 **Ability 基类**里（见 docs/abilities.md），本行只填列：ChargeBaseSeconds=0.5、PerfectWindowSeconds=0.2，两个绝对值 PerfectDamage=40 / PerfectSpeed=400 走 Params。★ AnimSpeedScale 是「逻辑帧跟着动画走」那条线：0.2× 让源段的 ATK 帧（0.10s）正好落在基础蓄力完成（0.5s）处；改蓄力时长按同比例改它就仍然对齐。⚠️ 完美时机由**松手**决定（不再是"
 Params = [SubResource("p_a1_w1_2_0"), SubResource("p_a1_w1_2_1"), SubResource("p_a1_w1_2_2"), SubResource("p_a1_w1_2_3"), SubResource("p_a1_w1_2_4"), SubResource("p_a1_w1_2_5"), SubResource("p_a1_w1_2_6"), SubResource("p_a1_w1_2_7"), SubResource("p_a1_w1_2_8"), SubResource("p_a1_w1_2_9")]

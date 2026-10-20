@@ -136,7 +136,9 @@ public partial class ChargeReleaseProbe : Node3D
 		Ability ability = await Equip(character, weapon, action);
 		int before = _spawnTimes.Count;
 		Press(action, true); await Wait(0.04); Press(action, false); await Wait(0.6);
-		Check(_spawnTimes.Count == before && !ability.IsActive, $"{weapon}未获变奏时提前松手不释放");
+		Check(!ability.IsActive && (ability.AllowEarlyChargeRelease
+			? _spawnTimes.Count == before + 1 && ability.LastReleaseEarly && !ability.LastReleasePerfect && Mathf.IsEqualApprox(ability.LastReleaseDamageScale, .5f)
+			: _spawnTimes.Count == before && ability.LastReleaseAborted), $"{weapon}提前松手按当前行规则：允许时低伤单发，其余仍取消");
 	}
 	private async Task PerfectSnapshot()
 	{

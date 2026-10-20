@@ -129,7 +129,8 @@ public partial class ChargeEvolutionProbe : Node3D
 		Check(Skill().CooldownRemaining <= cooldown * 0.5f && Skill().CooldownRemaining > 0, "真实收招后的剩余冷却来自减半后的间隔");
 		await Equip(WeaponPresetKind.EnergyPalm); Grant("evo_perfect_focus");
 		Press("weapon_skill_2", true); await Until(() => Skill().IsCharging); await Wait(0.12); Press("weapon_skill_2", false); await Wait(0.3);
-		Check(Skill().LastReleaseAborted && _shots.Count == 0, "专注未满基础蓄力仍中止，不把提前松手变成完美发射");
+		Check(Skill().LastReleaseEarly && !Skill().LastReleasePerfect && _shots.Count == 1
+			&& Mathf.IsEqualApprox(((EnergyWaveAbility)Skill()).LastShotDamage, 15), "专注未满基础仍为15伤害低伤波，不把提前松手变成完美发射");
 		await Equip(WeaponPresetKind.EnergyPalm);
 		Check(!Skill().AlwaysPerfectRelease && Mathf.IsEqualApprox(Skill().EffectiveCooldown, cooldown), "换装移除专注完美与冷却改动");
 	}

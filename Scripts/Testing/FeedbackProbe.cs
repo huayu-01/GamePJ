@@ -109,7 +109,7 @@ public partial class FeedbackProbe : Node
 		Check(spear.IsCharging && !spear.InFlight && spear.DamageTickCount == 0 && _spearHits == 0, "按住未满基础蓄力：不飞出、不判定、不命中");
 		InputAction("weapon_skill_2", false);
 		await Wait(0.08);
-		Check(!spear.IsActive && !spear.InFlight && !combo.ExternallyBlocked && spear.LastReleaseAborted, "提前松手取消，武器门无残留");
+		Check(spear.IsActive && !spear.InFlight && !combo.ExternallyBlocked && spear.LastReleaseEarly, "提前松手接受低伤释放，真实ATK之前不离手、不提前锁门");
 		foreach (int steps in new[] { 0, 3, 4 })
 		{
 			spear.ResetForLoadout();

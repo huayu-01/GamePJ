@@ -128,7 +128,8 @@ public partial class AimAndThrowProbe : Node3D
 			&& spear.TargetPoint.Y > 10 && spear.LastAimDistance <= spear.LastMaxDistance + .001f, "接近垂直瞄准仍有有界目标和有限速度");
 		Check(spear.TargetPoint.DistanceTo(verticalPreview[^1]) < .03f, "身体偏转且接近垂直时，预览和真实发射使用同一退化方向与出手位置");
 		await Equip(WeaponPresetKind.Spear); Press(true); await Wait(.2f); Press(false); await Wait(.15f);
-		Check(!spear.IsActive && !spear.InFlight && !path.IsShowing, "提前松手取消蓄力并立即清理预览");
+		Check(spear.LastReleaseEarly && !spear.LastReleaseAborted && !path.IsShowing, "提前松手接受低伤投掷并立即清理预览");
+		await Equip(WeaponPresetKind.Spear);
 		Check(spear.TryActivate(), "程序接口仍可启动独立蓄力"); spear.OnInputHeld(.2f); await Wait(.1f);
 		Check(spear.IsCharging && !path.IsShowing, "程序驱动蓄力没有玩家按住输入，不自行打开玩家指示器");
 		await Equip(WeaponPresetKind.Spear); Press(true); await Wait(.2f);

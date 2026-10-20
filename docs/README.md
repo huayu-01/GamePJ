@@ -13,6 +13,7 @@
 | 战斗流程、参考拆解与打击反馈 | [打击感框架与调参](combat-feel.md)、[J38交付与验证](character-design-j38.md) |
 | 换装串技能、长枪路径与命中遮挡修复 | [J39技能槽修复](character-design-j39.md)、[当前槽位与输入约定](base-loadout.md) |
 | 长枪／短弩立体瞄准、输入预览与飞镰路径伤害 | [J40修复与验证](character-design-j40.md) |
+| 弓武技1／能量掌武技2／长枪武技2未蓄满释放 | [J41低伤点按](character-design-j41.md) |
 | 地图导航与生成资源基础 | [J35导航／有效点／行为压力](character-design-j35.md) |
 | 架构、战斗与表结构 | [架构](architecture.md)、[战斗](combat.md)、[配置](config-schema.md) |
 | 身体碰撞、飞行与受力约定 | [当前碰撞约定](collision-layers.md) |

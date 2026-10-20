@@ -260,7 +260,13 @@ public abstract partial class Ability : Node3D
 	}
 	/// <summary>释放动画的播放速度，独立于蓄力期间的拉伸速度。</summary>
 	[Export] public float ChargeReleaseAnimSpeedScale { get; set; } = 1f;
-	protected virtual bool CanReleaseBeforeBase => false;
+	/// <summary>允许未完成基础蓄力时松手，使用独立低伤倍率。</summary>
+	[Export] public bool AllowEarlyChargeRelease { get; set; }
+	[Export(PropertyHint.Range, "0,1,0.01")] public float EarlyReleaseDamageScale { get; set; } = 0.5f;
+	public bool LastReleaseEarly { get; private set; }
+	/// <summary>松手时冻结的纯伤害倍率，不缩短弹速、射程，也不影响后置蓄力档位。</summary>
+	public float LastReleaseDamageScale { get; private set; } = 1f;
+	protected virtual bool CanReleaseBeforeBase => AllowEarlyChargeRelease;
 
 	/// <summary>后置蓄力已经升到第几档（0 = 只有基础蓄力那一段）。</summary>
 	public int ChargeSteps { get; private set; }
@@ -796,7 +802,7 @@ public abstract partial class Ability : Node3D
 	///
 	/// 两条路（设计文档第 14 行）：
 	/// <list type="bullet">
-	/// <item>**基础蓄力没完成** → 走 <see cref="OnChargeAborted"/>：**不释放效果**。</item>
+	/// <item>基础蓄力未完成：允许提前释放时冻结低伤倍率，否则走取消分支。</item>
 	/// <item>**蓄满了** → 走 <see cref="OnChargeReleased"/>，并带上"是不是完美时机 / 第几档 / 威力倍率"。</item>
 	/// </list>
 	/// </summary>
@@ -817,6 +823,8 @@ public abstract partial class Ability : Node3D
 		bool released = ChargeBaseComplete || CanReleaseBeforeBase;
 		LastReleasePerfect = ChargeBaseComplete && IsPerfectWindow;
 		LastReleaseAborted = !released;
+		LastReleaseEarly = released && !ChargeBaseComplete;
+		LastReleaseDamageScale = LastReleaseEarly && AllowEarlyChargeRelease ? Mathf.Clamp(EarlyReleaseDamageScale, 0f, 1f) : 1f;
 		int steps = ChargeSteps;
 		float power = ChargePowerScale;
 		IsCharging = false;
@@ -831,7 +839,7 @@ public abstract partial class Ability : Node3D
 	}
 
 	/// <summary>
-	/// **蓄满之后松手**（真正的释放）。三个入参就是那一刻的蓄力结果，子类照它算效果即可
+	/// 松手被接受后冻结释放结果；低伤倍率单独读取LastReleaseDamageScale，不混入档位或弹速。
 	/// （都不是"必须用"的 —— 子类也可以直接读那几个只读属性）。
 	/// </summary>
 	protected virtual void OnChargeReleased(bool perfect, int steps, float powerScale)
@@ -867,6 +875,8 @@ public abstract partial class Ability : Node3D
 		ChargeSteps = 0;
 		LastReleasePerfect = false;
 		LastReleaseAborted = false;
+		LastReleaseEarly = false;
+		LastReleaseDamageScale = 1f;
 	}
 
 	/// <summary>

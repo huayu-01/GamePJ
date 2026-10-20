@@ -122,10 +122,13 @@ public partial class AbilityConfig : ConfigRow
 
 	[ExportGroup("蓄力（按住激活 → 抬起释放；数值全在这一组，代码里没有硬编码）")]
 	/// <summary>
-	/// 基础蓄力时长（秒）：**没蓄满就松手 = 不释放效果**（设计文档第 14 行）。
+	/// 基础蓄力时长（秒）；未完成时按AllowEarlyChargeRelease决定低伤释放或取消。
 	/// 只在 <see cref="HoldToCharge"/> 为 true 时有意义；0 = 按住即算蓄满。
 	/// </summary>
 	[Export] public float ChargeBaseSeconds { get; set; }
+	/// <summary>仅指定技能启用未蓄满低伤释放；留空仍取消。</summary>
+	[Export] public bool AllowEarlyChargeRelease { get; set; }
+	[Export(PropertyHint.Range, "0,1,0.01")] public float EarlyReleaseDamageScale { get; set; } = 0.5f;
 
 	/// <summary>后置蓄力：基础蓄满后每多少秒升一档（≤0 = 没有后置蓄力）。弓 0.1 / 短弩 0.2 / 长枪 0.25。</summary>
 	[Export] public float ChargeStepSeconds { get; set; }
@@ -250,6 +253,8 @@ public partial class AbilityConfig : ConfigRow
 		// 蓄力这几个是"行了就是权威"（行里空着 = 0 = 没有基础蓄力/没有后置蓄力），
 		// 因为非蓄力技能根本不会读它们（HoldToCharge 才是开关）。
 		ability.ChargeBaseSeconds = ChargeBaseSeconds;
+		ability.AllowEarlyChargeRelease = AllowEarlyChargeRelease;
+		ability.EarlyReleaseDamageScale = Mathf.Clamp(EarlyReleaseDamageScale, 0f, 1f);
 		ability.ChargeStepSeconds = ChargeStepSeconds;
 		ability.ChargeMaxSteps = ChargeMaxSteps;
 		ability.ChargeMaxSeconds = ChargeMaxSeconds;

@@ -211,7 +211,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		Launch(direction);
 		// 子类Launch先冻结蓄力倍率；之后所有周期与回程窗口沿用同一次出手属性。
 		_throwOffense = AttackOffense.Capture(OwnerUnit, Hitbox?.CritChance ?? 0f, Hitbox?.CritMultiplier ?? 2f);
-		_throwDamage = (Hitbox?.Damage ?? 0f) * DamageScale * _throwOffense.DamageMultiplier;
+		_throwDamage = (Hitbox?.Damage ?? 0f) * DamageScale * _throwOffense.DamageMultiplier * (HoldToCharge ? LastReleaseDamageScale : 1f);
 		LastFlightDirection = FlightVelocity.Normalized();
 		if (ContinuousPathDamage) OpenDamageWindow();
 		else if (TravelPathDamage) { OpenDamageWindow(TravelDamageScale); _travelDamageOpen = true; }
