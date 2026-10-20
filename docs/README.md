@@ -8,6 +8,7 @@
 | 本轮完成的符文与特化 | [J31携带界面](character-design-j31.md)、[J32特化接入](character-design-j32.md) |
 | 符文机制与接入 | [符文系统](rune-system.md) |
 | 23项特化权威接收清单 | [后续构筑](followup-build-updates.md) |
+| 地面敌人清单与后续规则 | [20项敌人清单、预警／护甲／格挡／导航](enemy-roster.md) |
 | 架构、战斗与表结构 | [架构](architecture.md)、[战斗](combat.md)、[配置](config-schema.md) |
 | 身体碰撞、飞行与受力约定 | [当前碰撞约定](collision-layers.md) |
 | 飞行、压低、打落与持续力接入 | [J34系统与验证场](character-design-j34.md) |
