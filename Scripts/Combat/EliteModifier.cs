@@ -73,6 +73,7 @@ public partial class EliteModifier : Node
 	{
 		foreach (Node child in node.GetChildren())
 		{
+			if (child is SkillIndicator or EnemyAttackWarning) continue;
 			if (child is MeshInstance3D mesh)
 			{
 				mesh.MaterialOverride = material;

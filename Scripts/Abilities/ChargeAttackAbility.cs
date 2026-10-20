@@ -17,10 +17,13 @@ public partial class ChargeAttackAbility : Ability
 	private Vector3 _startPosition;
 	private int _stage;
 	private bool _hitSomething;
+	private EnemyAttackWarning? _warning;
+	protected override void OnFinishOrCancel() { _warning?.HideAll(); _hitbox?.Deactivate(); Movement?.EndDash(); }
 
 	protected override void OnReady()
 	{
 		_hitbox = GetNode<AttackHitbox>("Attack");
+		_warning = EnemyAttackWarning.Create(this, OwnerUnit);
 		_hitbox.HitLanded += _ => _hitSomething = true;
 	}
 
@@ -53,6 +56,7 @@ public partial class ChargeAttackAbility : Ability
 		_direction = _direction.LengthSquared() < 0.0001f ? -OwnerUnit.GlobalTransform.Basis.Z : _direction.Normalized();
 		_startPosition = OwnerUnit.GlobalPosition;
 		Movement?.FaceDirection(_direction, 1f);
+		_warning?.Hitbox(_hitbox, sweepDirection: _direction, sweepDistance: MaxDistance);
 	}
 
 	protected override void Tick(float delta)
@@ -68,6 +72,7 @@ public partial class ChargeAttackAbility : Ability
 				if (StateTime >= Windup)
 				{
 					Movement?.BeginDash(_direction, ChargeSpeed);
+					_warning?.HideAll();
 					_hitbox.Activate(OwnerUnit);
 					_stage = 1;
 					StateTime = 0f;

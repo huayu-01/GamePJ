@@ -111,6 +111,8 @@ public partial class UnitPresentation : Node
 	{
 		foreach (Node child in node.GetChildren())
 		{
+			// 攻击预警有独立阵营配色，不能被身体闪色或精英底材染色。
+			if (child is SkillIndicator or EnemyAttackWarning) continue;
 			if (child is MeshInstance3D mesh)
 			{
 				_meshes.Add(mesh);

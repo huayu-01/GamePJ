@@ -7,6 +7,8 @@
 > 脚本 `Scripts/Combat/SkillIndicator.cs` · 预制体 `Scenes/Combat/SkillIndicator.tscn` ·
 > 截图表见 §8。表现层总纪律见 [vfx.md](vfx.md)（本组件是那张表里的一行）。
 
+2026-10-20（J37）已接入敌人攻击：自爆／尖啸、陨石、冲锋、重击、跳跃／俯冲落地、回旋和炸弹。入口为EnemyAttackWarning，能力与已发射弹体各自持有独立预制体实例。此前只有Main下默认隐藏的共享实例，实际技能尚未调用；详见[J37接入与验收](character-design-j37.md)。
+
 ---
 
 ## 0. 三条纪律（和 `docs/vfx.md` §1 / §3 同源）
@@ -178,9 +180,9 @@ SkillIndicator (Node3D, SkillIndicator.cs)
 
 | 场景 | 怎么挂 |
 |---|---|
-| **共享实例**（默认，现在就是这么挂的） | `Scenes/Main.tscn` → `Main/SkillIndicator`（世界空间；谁要画就调它。默认不画、开销为零） |
+| **历史共享实例**（保留兼容） | `Scenes/Main.tscn` → `Main/SkillIndicator`（世界空间，默认隐藏；不能同时承担多次攻击） |
 | 玩家独立实例 | 挂到 `Scenes/Player/Player.tscn`（`Player/SkillIndicator`），`IsHostile = false` |
-| 敌人独立实例 | 挂到那个敌人 / 首领的场景，`IsHostile = true` |
+| 敌人独立实例（J37已接入） | 能力或已发射弹体的`AttackWarning/Indicator`，运行期从同一SkillIndicator预制体创建，`IsHostile = true` |
 
 ⚠️ 一个实例同时只有一个样式在画（`ShowXxx` 会先清掉上一次）。
 "玩家预览"与"敌人示警"要**同时**在场上，就各用各的实例（一个共享实例不够）。
@@ -252,10 +254,8 @@ enemy_units=0  projectiles=0   Curve 面数=0   Curve.visible=false   IsShowing=
 
 ## 9. 没做 / 边界（照实说）
 
-- **没有把任何一个技能接上去**：`长虹贯日`（`SpearThrowAbility.PreviewPath`）现在仍然用它自己那条
-  `WeaponThrowAbility.DrawPath`（`DashPathIndicator`，1px 线）。要换成这个组件只需在它的
-  `PreviewPath()` 里改成 `indicator.ShowCurvePath(...)` 那一路 —— 但那是改战斗技能类，
-  **不在本批边界内**（本批不碰 `Ability` 子类）。
+- **敌人攻击已接入，玩家投掷预览保留旧接口**：`SpearThrowAbility.PreviewPath`仍使用`DashPathIndicator`；本轮不迁移玩家预览。敌人预警几何来自实际攻击参数与世界缩放，取消／死亡清理未释放预警，已释放落弹的圈交由弹体管理。
+- **多实例网格隔离**：J37给可变ImmediateMesh启用resource_local_to_scene，避免某个实例Show／Hide清掉其他敌人的描边；材质仍逐实例复制。身体闪色与精英染色跳过整个预警子树。
 - **① 的曲线不做逐段地形截断**：只按"落回发射高度 / 飞满射程"截断，弧线穿过矮掩体时不会自动停在
   掩体表面（`SpearThrowAbility` 的真实弹道会逐段打射线，因为它要的是真实落点）。要地形贴合就
   让上游用 `DashPathIndicator.SampleLine` 自己采样点列 → 目前没有"喂点列"的入口（要的话是另一个 `ShowPolyline`）。

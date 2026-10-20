@@ -39,8 +39,10 @@ emission = Color(0.35, 0.88, 1, 1)
 emission_energy_multiplier = 1.8
 
 [sub_resource type="ImmediateMesh" id="mesh_band"]
+resource_local_to_scene = true
 
 [sub_resource type="ImmediateMesh" id="mesh_edge"]
+resource_local_to_scene = true
 
 [sub_resource type="TorusMesh" id="mesh_ring"]
 outer_radius = 1.0

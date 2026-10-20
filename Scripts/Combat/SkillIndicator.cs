@@ -152,6 +152,11 @@ public partial class SkillIndicator : Node3D
 
 	/// <summary>最近一次圈 / 曲线的落点半径（米；① 不带圈时为 0）。</summary>
 	public float LastRadius { get; private set; }
+	/// <summary>实际贴地后的圆心或矩形起点，以及本次矩形几何；供接入方核对预警。</summary>
+	public Vector3 LastWorldPoint { get; private set; }
+	public Vector3 LastDirection { get; private set; }
+	public float LastLength { get; private set; }
+	public float LastWidth { get; private set; }
 
 	/// <summary>最近一次"是谁让指示器出现的"（日志与探针用，一行说明）。</summary>
 	public string LastSource { get; private set; } = "（还没画过）";
@@ -303,6 +308,7 @@ public partial class SkillIndicator : Node3D
 
 		flat = flat.Normalized();
 		Vector3 start = SnapToGround(origin) + (Vector3.Up * GroundOffset);
+		LastWorldPoint = start; LastDirection = flat; LastLength = len; LastWidth = wide;
 		Vector3 forward = flat * len;
 		Vector3 half = new Vector3(-flat.Z, 0f, flat.X) * (wide * 0.5f);   // 地面上的右手垂直
 
@@ -448,6 +454,7 @@ public partial class SkillIndicator : Node3D
 		float r = Mathf.Max(0.1f, radius);
 		LastRadius = r;
 		Vector3 ground = SnapToGround(worldPos) + (Vector3.Up * GroundOffset);
+		LastWorldPoint = ground;
 
 		if (_area != null)
 		{
@@ -551,11 +558,13 @@ public partial class SkillIndicator : Node3D
 	/// <summary>每次 Show 之前先把上一次的画法清干净，再记下"这一次画什么"。</summary>
 	private void Begin(IndicatorStyle style)
 	{
+		bool continuing = IsShowing && CurrentStyle == style;
+		float previousPulse = _pulseTime;
 		HideAll();
 		CurrentStyle = style;
 		LastRadius = 0f;
 		LastSamplePoints = 0;
-		_pulseTime = 0f;
+		_pulseTime = continuing ? previousPulse : 0f;
 	}
 
 	/// <summary>收尾：上色、开呼吸、写日志（同一个样式只在第一次出现时记一行，长按预览不会刷屏）。</summary>

@@ -20,6 +20,10 @@ public partial class Projectile : Area3D
 	[Export] public float MaxTravelDistance { get; set; }
 	[Export] public DistanceEndMode DistanceEnd { get; set; }
 	[Export] public bool ExplosionOnly { get; set; }
+	/// <summary>敌方爆炸弹预计落点；随弹体生命周期清理，已经出手后不随施法者收招消失。</summary>
+	[Export] public bool ShowImpactWarning { get; set; }
+	private EnemyAttackWarning? _impactWarning;
+	private float _warningRefresh;
 	private bool _distanceEnded;
 	private void EndDistance()
 	{
@@ -260,6 +264,18 @@ public partial class Projectile : Area3D
 		if (_ownerRid.IsValid) _excludedBodies.Add(_ownerRid);
 		TravelledDistance = 0f;
 		_distanceEnded = false;
+		if (ShowImpactWarning && attack.ExplosionRadius > 0) _impactWarning ??= EnemyAttackWarning.Create(this, attack.Attacker);
+		_warningRefresh = 0;
+		UpdateImpactWarning(1);
+	}
+	private void UpdateImpactWarning(float delta)
+	{
+		if (_impactWarning == null || _attack == null) return;
+		_warningRefresh -= delta; if (_warningRefresh > 0) return; _warningRefresh = .1f;
+		float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle() * GravityScale;
+		float remaining = MaxTravelDistance > 0 ? Mathf.Max(.001f, MaxTravelDistance - TravelledDistance) : 0;
+		Vector3 impact = EnemyAttackWarning.PredictImpact(this, GlobalPosition, _velocity, gravity, remaining, _attack.Lifetime - _lifetime, HitMask);
+		_impactWarning.Circle(impact, _attack.ExplosionRadius);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -270,6 +286,7 @@ public partial class Projectile : Area3D
 		}
 
 		float dt = (float)delta;
+		UpdateImpactWarning(dt);
 		_lifetime += dt;
 		if (_lifetime > _attack.Lifetime)
 		{

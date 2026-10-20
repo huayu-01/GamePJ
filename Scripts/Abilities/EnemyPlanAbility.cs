@@ -31,6 +31,7 @@ public partial class EnemyPlanAbility : Ability
 		Cooldown = Plan.CooldownSeconds; ApproachMaxRange = Plan.TriggerDistance;
 		AnimName = "EnemyAction"; AnimEvent = "ATK";
 		_model = OwnerUnit!.GetNodeOrNull<Node3D>("Model");
+		_warning = EnemyAttackWarning.Create(this, OwnerUnit);
 		if (_model != null) { _modelPosition = _model.Position; _modelRotation = _model.Rotation; }
 	}
 	protected override bool CanActivate(Unit? target) => IsInstanceValid(target) && target is { IsDead: false } && OwnerUnit!.GlobalPosition.DistanceTo(target.GlobalPosition) <= Plan.TriggerDistance;
@@ -62,6 +63,7 @@ public partial class EnemyPlanAbility : Ability
 			if (PlaySkillAnimationNamed("EnemyAction", 0.55f / Mathf.Max(0.06f, _step.WindupSeconds)).Length == 0) { Cancel(); return; }
 		}
 		else { _phase = 1; BeginExecution(); }
+		UpdateWarning(1);
 	}
 	private void FaceTarget(float dt)
 	{
@@ -75,6 +77,7 @@ public partial class EnemyPlanAbility : Ability
 		if (!IsBusy || _step == null) return;
 		if (!IsInstanceValid(Target) || Target is not { IsDead: false }) { Cancel(); return; }
 		_elapsed += delta;
+		UpdateWarning(delta);
 		if (_phase == 0)
 		{
 			// 蓄势一直看向玩家，真正执行时才锁定直线动作方向。
@@ -131,14 +134,15 @@ public partial class EnemyPlanAbility : Ability
 	private void OpenHitbox(float radius)
 	{
 		if (_hitbox != null) return;
-		_hitbox = new AttackHitbox { Position = Vector3.Up * 0.8f + (_step!.Kind == Kind.Spin || _step.Centered ? Vector3.Zero : Vector3.Forward * 0.7f) };
+		_hitbox = new AttackHitbox { Position = HitboxOffset() };
 		_hitbox.AddChild(new CollisionShape3D { Shape = new SphereShape3D { Radius = Mathf.Max(0.2f, radius) } });
 		OwnerUnit!.AddChild(_hitbox); _hitbox.HitLanded += _ => _contact = true;
-		_hitbox.Activate(OwnerUnit, Attack(_step.Damage)); _hitbox.SweepSphere(_hitbox.GlobalPosition, _hitbox.GlobalPosition);
+		_hitbox.Activate(OwnerUnit, Attack(_step!.Damage)); _hitbox.SweepSphere(_hitbox.GlobalPosition, _hitbox.GlobalPosition);
 	}
 	private void BeginExecution()
 	{
 		if (_step == null) return;
+		if (_step.Kind is Kind.Melee or Kind.Meteor or Kind.Bomb or Kind.ArcBomb) _warning?.HideAll();
 		switch (_step.Kind)
 		{
 			case Kind.Shot: case Kind.ArcShot: case Kind.Bomb: case Kind.ArcBomb: case Kind.Meteor: Fire(); break;
@@ -151,7 +155,8 @@ public partial class EnemyPlanAbility : Ability
 				Movement!.BeginJump(5); Movement.BeginVelocityOverride(this, -_direction * _step.Speed + Vector3.Up * 3); break;
 			case Kind.Dive:
 				Vector3 dive = Target!.GlobalPosition - OwnerUnit!.GlobalPosition; dive.Y = Mathf.Min(-1, dive.Y);
-				Movement!.BeginVelocityOverride(this, dive.Normalized() * _step.Speed); break;
+				_warningDiveVelocity = dive.Normalized() * _step.Speed;
+				Movement!.BeginVelocityOverride(this, _warningDiveVelocity); break;
 		}
 	}
 	private void Fire()
@@ -169,15 +174,9 @@ public partial class EnemyPlanAbility : Ability
 			Radius = projectile.SweepRadius, Height = projectile.SweepRadius * 2,
 			Material = new StandardMaterial3D { AlbedoColor = bomb ? new Color(1, 0.35f, 0.1f) : new Color(0.8f, 0.3f, 1), EmissionEnabled = true, Emission = new Color(0.7f, 0.2f, 0.1f) },
 		} });
-		Vector3 origin = OwnerUnit!.GlobalPosition + Vector3.Up * 1f;
-		Vector3 target = Target.GlobalPosition + Vector3.Up * 0.8f;
-		Vector3 velocity = (target - origin).Normalized() * _step.Speed;
-		if (_step.Kind is Kind.ArcShot or Kind.ArcBomb)
-		{
-			projectile.GravityScale = 1.5f; float flight = Mathf.Max(0.2f, _step.FlightSeconds);
-			velocity = (target - origin) / flight + Vector3.Up * ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle() * projectile.GravityScale * flight * 0.5f;
-		}
-		if (_step.Kind == Kind.Meteor) { origin = Target.GlobalPosition + Vector3.Up * 8; velocity = Vector3.Down * _step.Speed; projectile.GravityScale = 1; }
+		ProjectileMotion(out Vector3 origin, out Vector3 velocity, out float gravityScale);
+		projectile.GravityScale = gravityScale;
+		projectile.ShowImpactWarning = bomb;
 		if (_step.Kind == Kind.Shot)
 		{ projectile.SeekAnyHostile = true; projectile.AssignedHomingTarget = Target; projectile.HomingTurnRateDegrees = _step.TurnDegreesPerSecond; }
 		projectile.Speed = velocity.Length();
@@ -186,6 +185,7 @@ public partial class EnemyPlanAbility : Ability
 	}
 	private void ClearStep()
 	{
+		_warning?.HideAll();
 		Movement?.EndVelocityOverride(this); Movement?.EndDash(); Movement?.Stop();
 		if (IsInstanceValid(_hitbox)) { _hitbox!.Deactivate(); _hitbox.QueueFree(); } _hitbox = null;
 		if (IsInstanceValid(_model)) { _model!.Position = _modelPosition; _model.Rotation = _modelRotation; }

@@ -15,11 +15,13 @@ public partial class AreaAttackAbility : Ability
 
 	private AttackHitbox _hitbox = null!;
 	private int _stage;
-	protected override void OnFinishOrCancel() => _hitbox?.Deactivate();
+	private EnemyAttackWarning? _warning;
+	protected override void OnFinishOrCancel() { _hitbox?.Deactivate(); _warning?.HideAll(); }
 
 	protected override void OnReady()
 	{
 		_hitbox = GetNode<AttackHitbox>("Attack");
+		_warning = EnemyAttackWarning.Create(this, OwnerUnit);
 	}
 
 	protected override bool CanActivate(Unit? target)
@@ -36,6 +38,7 @@ public partial class AreaAttackAbility : Ability
 	{
 		_stage = 0;
 		_hitbox.Deactivate();
+		_warning?.Hitbox(_hitbox);
 	}
 
 	protected override void Tick(float delta)
@@ -48,9 +51,11 @@ public partial class AreaAttackAbility : Ability
 		switch (_stage)
 		{
 			case 0:
+				_warning?.Hitbox(_hitbox);
 				if (StateTime >= Windup)
 				{
 					_hitbox.Activate(OwnerUnit);
+					_warning?.HideAll();
 					_stage = 1;
 					StateTime = 0f;
 				}

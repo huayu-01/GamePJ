@@ -50,7 +50,7 @@
 | **灵魂收割掉的"灵魂"**（P6d，**不是纯表现** —— 拾取会回血） | `Scripts/Combat/SoulPickup.cs` | 无（掉落物自己就是"事实"）；拾取是**每帧距离轮询** `player_units`，**没有 `Area3D`** | `CurrentScene` → `Soul`（异化「灵魂收割」击杀时掉） |
 | 滞空光环（P3，写在机制描述里的那条） | `Scripts/Combat/AirHoverController.cs` 的光环部分 | 滞空状态本身 | 玩家脚下 |
 | 破甲特效（更早） | `Scripts/UI/ArmorBreakFx.cs`（静态工具） | `Unit.ArmorBroke` 事件 | 一次性，挂 `CurrentScene` |
-| **技能指示器**（四种样式：曲线路径 / 区域指向 / 曲线+区域 / 直线区域；**玩家与敌人共用**） | `Scripts/Combat/SkillIndicator.cs` | 无（**纯入参**：起点 / 初速 / 重力 / 落点 / 方向 / 半径 全由调用方给）；"准星指哪就是哪"内部走 `AimUtil.GetCrosshairPoint`；曲线采样复用 `DashPathIndicator.SampleParabola` | `Scenes/Main.tscn` → `Main/SkillIndicator`（**世界空间共享实例**，默认不画）；玩家/敌人要独立实例就挂各自场景。契约见 [skill-indicator.md](skill-indicator.md) |
+| **技能指示器**（曲线路径／范围圈／曲线＋范围／直线区域） | `Scripts/Combat/SkillIndicator.cs`，预制体`Scenes/Combat/SkillIndicator.tscn` | 纯几何入参；EnemyAttackWarning从能力／弹体传入实际范围、世界缩放和预计落点，指示器本身不改变战斗 | J37敌人已接入：自爆、陨石、冲锋、重击、跳扑／俯冲、回旋、炸弹；每次攻击独立实例。Main历史共享实例仍默认隐藏。见[契约](skill-indicator.md)与[J37](character-design-j37.md) |
 
 **新增表现层时照这张表办**：先问"我要读的那个事实，战斗层有没有公开只读的入口？"
 - **有** → 直接用，一行战斗代码都不要碰（`AfterimageTrail` / `ProjectileTrail` 就是这么做的）。

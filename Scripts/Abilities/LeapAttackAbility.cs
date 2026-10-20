@@ -17,10 +17,15 @@ public partial class LeapAttackAbility : Ability
 	private AttackHitbox _hitbox = null!;
 	private int _stage;
 	private bool _leftGround;
+	private EnemyAttackWarning? _warning;
+	private Vector3 _jumpDirection;
+	private float _warningRefresh;
+	protected override void OnFinishOrCancel() { _warning?.HideAll(); _hitbox?.Deactivate(); Movement?.EndDash(); }
 
 	protected override void OnReady()
 	{
 		_hitbox = GetNode<AttackHitbox>("Attack");
+		_warning = EnemyAttackWarning.Create(this, OwnerUnit);
 	}
 
 	protected override bool CanActivate(Unit? target)
@@ -52,6 +57,16 @@ public partial class LeapAttackAbility : Ability
 		Movement.FaceDirection(direction, 1f);
 		Movement.BeginDash(direction, HorizontalSpeed);
 		Movement.BeginJump(JumpVelocity);
+		_jumpDirection = direction.Normalized(); _warningRefresh = 0; UpdateWarning();
+	}
+	private void UpdateWarning()
+	{
+		if (_warning == null || OwnerUnit == null) return;
+		float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
+		Vector3 velocity = _jumpDirection * HorizontalSpeed + Vector3.Up * OwnerUnit.Velocity.Y;
+		Vector3 landing = EnemyAttackWarning.PredictImpact(OwnerUnit, OwnerUnit.GlobalPosition + Vector3.Up * .05f, velocity, gravity, 0, MaxAirTime, CombatLayers.World);
+		Vector3 center = landing + _hitbox.GlobalPosition - OwnerUnit.GlobalPosition;
+		_warning.Hitbox(_hitbox, center);
 	}
 
 	protected override void Tick(float delta)
@@ -64,6 +79,8 @@ public partial class LeapAttackAbility : Ability
 		switch (_stage)
 		{
 			case 0:
+				_warningRefresh -= delta;
+				if (_warningRefresh <= 0) { UpdateWarning(); _warningRefresh = .1f; }
 				if (Movement == null)
 				{
 					Finish();
@@ -79,6 +96,7 @@ public partial class LeapAttackAbility : Ability
 				{
 					Movement.EndDash();
 					_hitbox.Activate(OwnerUnit);
+					_warning?.HideAll();
 					_stage = 1;
 					StateTime = 0f;
 				}
