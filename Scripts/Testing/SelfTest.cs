@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ActRoguelike.Abilities;
@@ -4658,16 +4659,26 @@ public partial class SelfTest : Node
 			return;
 		}
 		SpiritSwordsAbility w2 = _p4SwordW2;
-		bool started = w2.TryPress();
+		// 上一项斩弹仍可能处在连招窗口；先真实收招，隔离其低血靶，避免追击正常击杀它后取消余剑。
+		bool meleeReady = await WaitAbilityReady(_p4SwordW1, 4);
+		if (_p4Victim != null && IsInstanceValid(_p4Victim) && !_p4Victim.IsDead) _p4Victim.ForceKill();
+		bool started = meleeReady && w2.TryPress();
 		bool immediate = w2.SwordCount == 3 && !w2.IsBusy && !w2.HoldToCharge;
 		float cooldown = w2.CooldownRemaining;
+		float expectedCooldown = w2.EffectiveCooldown;
+		var victim = new Unit { Faction = Faction.Enemy, MaxHealth = 100000, KnockbackResistance = 1 };
+		victim.AddChild(new CollisionShape3D { Shape = new SphereShape3D { Radius = .5f } });
+		GetTree().CurrentScene.AddChild(victim);
+		victim.GlobalPosition = _p4Player.GlobalPosition - _p4Player.GlobalBasis.Z * 1.6f + Vector3.Up * .9f;
 		int before = _p4SwordW1.StrikeCount;
 		bool melee = _p4SwordW1.TryPress();
 		await UntilProbe(() => _p4SwordW1.StrikeCount > before, 3);
-		bool followed = w2.FollowCount == 1 && w2.LastSwordAttack?.ComboStepCount == 5;
-		bool ok = started && immediate && melee && followed && cooldown > 14f
+		await UntilProbe(() => w2.LaunchCount == 3, 3);
+		bool followed = w2.VolleyCount == 1 && w2.LaunchOrder.SequenceEqual(new[] { 1, 0, 2 }) && w2.LastSwordAttack?.ComboStepCount == 5;
+		victim.QueueFree();
+		bool ok = started && immediate && melee && followed && Mathf.Abs(cooldown - expectedCooldown) < .05f
 			&& Mathf.IsEqualApprox(w2.DurationSeconds, 10f) && Mathf.IsEqualApprox(w2.Cooldown, 15f);
-		GameLog.Write("SelfTest", $"{(ok ? "✅" : "🔴")} P4·灵剑武技2 三才灵剑：召唤={started} 三剑即时就位={immediate} 近战起手={melee} 真实ATK协同={followed} 持续{w2.DurationSeconds:0.##}秒／冷却{w2.Cooldown:0.##}秒，起算剩余{cooldown:0.##}秒");
+		GameLog.Write("SelfTest", $"{(ok ? "✅" : "🔴")} P4·灵剑武技2 三才灵剑：召唤={started} 三剑即时就位={immediate} 近战起手={melee} 真实命中有序追击={followed}（轮数{w2.VolleyCount}／出剑{w2.LaunchCount}／顺序{string.Join(",", w2.LaunchOrder)}）持续{w2.DurationSeconds:0.##}秒／冷却{w2.Cooldown:0.##}秒，起算剩余{cooldown:0.##}秒（属性后期望{expectedCooldown:0.##}）");
 	}
 
 	private int CountProjectiles(string sceneName)

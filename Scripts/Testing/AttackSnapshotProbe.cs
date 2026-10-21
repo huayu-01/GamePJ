@@ -100,8 +100,12 @@ public partial class AttackSnapshotProbe : Node3D
 			await Equip(WeaponPresetKind.SpiritSword);
 			var swords = (SpiritSwordsAbility)PlayerAbilityInput.FindByInputAction(_player, "weapon_skill_2")!;
 			Press("weapon_skill_2", true); await Wait(.03); Press("weapon_skill_2", false);
+			_target.AddChild(new CollisionShape3D { Shape = new SphereShape3D { Radius = .5f } });
+			_target.GlobalPosition = _player.GlobalPosition - _player.GlobalBasis.Z * 1.6f + Vector3.Up * .9f;
 			await Fire(PlayerAbilityInput.FindByInputAction(_player, "weapon_skill_1")!);
-			Verify(swords.LastSwordAttack!, "三剑协同继承真实近战快照");
+			await Until(() => swords.LaunchCount > 0);
+			Verify(swords.LastSwordAttack!, "三剑追击继承真实命中快照");
+			_target.GlobalPosition = new Vector3(70f, 5f, 70f);
 			foreach (var weapon in new[] { WeaponPresetKind.Scythe, WeaponPresetKind.Spear })
 			{
 				await Equip(weapon);

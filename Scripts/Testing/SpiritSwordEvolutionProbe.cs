@@ -197,13 +197,15 @@ public partial class SpiritSwordEvolutionProbe : Node3D
 		Check(Mathf.IsEqualApprox(Draw.RemainingSeconds, remaining + 2f), "真实本人敌对击杀增加2秒持续时间");
 		Check(Draw.ExtensionCount == 1, "同一次死亡只增加一次续时");
 		target.QueueFree();
+		var close = Target("SwordsTarget", _player.GlobalPosition - _player.GlobalBasis.Z * 1.6f + Vector3.Up * .9f, .4f);
 		await Until(() => !Melee.IsBusy); await TapMelee();
+		await Until(() => Draw.LaunchCount == 3);
 		Check(Draw.LastSwordAttack?.Ability == "skl_b1_w1_2", "三剑独立技能归属，不冒用金光术");
-		Check(Draw.FollowCount == 1, "真实近战ATK触发一次三剑协同");
+		Check(Draw.VolleyCount == 1 && Draw.LaunchOrder.SequenceEqual(new[] { 1, 0, 2 }), "真实命中触发一次有序三连刺");
 		Check(Mathf.IsEqualApprox(Draw.LastSwordAttack!.BaseDamage, Melee.GetNode<AttackHitbox>("Attack").CurrentAttack!.BaseDamage * .3f), "灵能汲取保留三剑原始伤害比例");
-		await Until(() => !Draw.Following);
-		Check(!Draw.SwordsReady, "挥击后缓慢回位，未立即恢复攻击");
+		Check(!Draw.SwordsReady, "三连刺后缓慢回位，未立即恢复攻击");
 		Check(await Until(() => Draw.SwordsReady), "完全归位后才能再次协同");
+		close.QueueFree();
 		await Equip();
 		Check(!Draw.Summoned && Draw.SwordCount == 0 && Draw.KillExtensionSeconds == 0f, "重配装清理剑体和续时");
 		Check(Draw.SwordDamageScale == .3f && Draw.DurationSeconds == 10f, "重配装保留新基线，不残留旧增强");

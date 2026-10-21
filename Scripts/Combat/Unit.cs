@@ -366,6 +366,7 @@ public partial class Unit : CharacterBody3D
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Hit,
+			Attack = hit.Attack,
 			IsSecondary = hit.Attack?.IsSecondary == true,
 			IsDamageOverTime = hit.Attack?.IsDamageOverTime == true,
 			Source = hit.Attacker,
@@ -493,6 +494,7 @@ public partial class Unit : CharacterBody3D
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Damaged,
+			Attack = hit.Attack,
 			IsSecondary = hit.Attack?.IsSecondary == true,
 			IsDamageOverTime = hit.Attack?.IsDamageOverTime == true,
 			Source = hit.Attacker,

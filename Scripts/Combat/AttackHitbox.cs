@@ -35,6 +35,8 @@ public partial class AttackHitbox : Area3D
 	private bool _contact;
 
 	public Unit? OwnerUnit { get; private set; }
+	/// <summary>定向追击可限定本次伤害目标；留空仍按原来的敌对重叠规则。</summary>
+	public Unit? RequiredTarget { get; set; }
 
 	/// <summary>
 	/// 命中体向前能够到的距离 = 形状半长 + 命中体中心相对拥有者前方的偏移。
@@ -209,6 +211,7 @@ public partial class AttackHitbox : Area3D
 	private void HitTarget(Unit target)
 	{
 		if (_attack == null) return;
+		if (RequiredTarget != null && target != RequiredTarget) return;
 		float now = Time.GetTicksMsec() / 1000f;
 		if (!target.IsValidTarget)
 		{

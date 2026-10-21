@@ -1,0 +1,18 @@
+存档 BEFORE meta.cfg SHA256=7885F3B5E29E723EA045A3118D680718D60C2805B3DA50DAF4EE9F47476F42A2
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=BDB209C14A682176C8513E57D49A9B4AFA1DAEBA71AF05348230F99BBB9B8760
+存档 BEFORE loadout.cfg SHA256=5B1931B31E8E64EED8851C9CAF4B741B62135B9FCFD2FEF4C874238C13123C45
+存档 BEFORE rune.cfg SHA256=CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6
+Debug 构建失败
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+F:\Godot项目\项目a\Scripts\Testing\SelfTest.cs(4672,57): error CS0411: 无法从用法中推断出方法“MemoryExtensions.SequenceEqual<T>(ReadOnlySpan<T>, ReadOnlySpan<T>)”的类型参数。请尝试显式指定类型参数。 [F:\Godot项目\项目a\ActRoguelike.csproj]
+
+生成失败。
+
+F:\Godot项目\项目a\Scripts\Testing\SelfTest.cs(4672,57): error CS0411: 无法从用法中推断出方法“MemoryExtensions.SequenceEqual<T>(ReadOnlySpan<T>, ReadOnlySpan<T>)”的类型参数。请尝试显式指定类型参数。 [F:\Godot项目\项目a\ActRoguelike.csproj]
+    0 个警告
+    1 个错误
+
+已用时间 00:00:09.14

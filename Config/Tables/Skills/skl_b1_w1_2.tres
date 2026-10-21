@@ -21,13 +21,28 @@ Value = 0.3
 
 [sub_resource type="Resource" id="Reach"]
 script = ExtResource("param")
-Key = "OuterReach"
-Value = 3.4
+Key = "ThrustSpeed"
+Value = 85.0
 
 [sub_resource type="Resource" id="Spacing"]
 script = ExtResource("param")
-Key = "SwordSpacing"
+Key = "LaunchIntervalSeconds"
+Value = 0.12
+
+[sub_resource type="Resource" id="Windup"]
+script = ExtResource("param")
+Key = "WindupSeconds"
+Value = 0.065
+
+[sub_resource type="Resource" id="FlightTimeout"]
+script = ExtResource("param")
+Key = "FlightTimeoutSeconds"
 Value = 0.65
+
+[sub_resource type="Resource" id="ChaseDistance"]
+script = ExtResource("param")
+Key = "MaxChaseDistance"
+Value = 18.0
 
 [resource]
 script = ExtResource("1_row")
@@ -41,6 +56,6 @@ IsBackground = true
 Cooldown = 15.0
 Id = "skl_b1_w1_2"
 DisplayName = "三才灵剑"
-DescriptionTemplate = "在头顶召唤3柄灵剑，持续{DurationSeconds:0.##}秒。挥剑时灵剑沿攻击轨迹的外圈协同挥击，随后缓慢归位，完全归位后才能再次协同。冷却{Cooldown:0.##}秒，从召唤时开始。"
-Note = "J42最新重做，替换旧拔刀式。即时背景召唤不占前台动作；单剑继承真实当段伤害的30%，外圈中心3.4/4.05/4.7米，缓慢回位1.1秒，均为可调预设；仅挥击阶段有伤害，回位和待机无伤害。冷却结束仍有灵剑时不允许叠组。"
-Params = [SubResource("Duration"), SubResource("Return"), SubResource("Damage"), SubResource("Reach"), SubResource("Spacing")]
+DescriptionTemplate = "在头顶召唤3柄灵剑，持续{DurationSeconds:0.##}秒。攻击命中敌人后，灵剑依次高速突刺该目标，随后缓慢归位，完全归位后才能再次追击。冷却{Cooldown:0.##}秒，从召唤时开始。"
+Note = "J43按试玩反馈改为命中后定向三连刺，替换J42外圈随挥。固定中→左→右顺序，间隔0.12秒，蓄势0.065秒后以85米/秒突刺；单剑继承本次攻击30%伤害。回位1.1秒、持续10秒、冷却15秒和灵能汲取续时保留。目标死亡／失效收剑，不自动转打旁人；每剑只伤锁定目标一次，归位无伤害。"
+Params = [SubResource("Duration"), SubResource("Return"), SubResource("Damage"), SubResource("Reach"), SubResource("Spacing"), SubResource("Windup"), SubResource("FlightTimeout"), SubResource("ChaseDistance")]

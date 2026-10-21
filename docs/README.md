@@ -4,7 +4,7 @@
 
 | 目的 | 文档 |
 |---|---|
-| 灵剑武技2三剑协同／灵能汲取重做 | [J42实现与验证](character-design-j42.md) |
+| 灵剑武技2命中后三连刺／灵能汲取 | [J43有序突刺与瘦长剑体](character-design-j43.md)、[J42持续与续时基础](character-design-j42.md) |
 | 当前任务、约定和验收 | [SESSION-SNAPSHOT](SESSION-SNAPSHOT.md) |
 | 本轮完成的符文与特化 | [J31携带界面](character-design-j31.md)、[J32特化接入](character-design-j32.md) |
 | 符文机制与接入 | [符文系统](rune-system.md) |

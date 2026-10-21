@@ -154,12 +154,16 @@ public partial class ChargeReleaseProbe : Node3D
 		Check(_spawnTimes.Count == before, "召唤不生成旧剑气弹体");
 		Check(!swords.TryPress() && swords.SwordCount == 3, "再次按下不叠出另一组");
 		var melee = (MeleeComboAbility)_player.AbilitySlots.Resolve("weapon_skill_1")!;
+		var victim = new Unit { Faction = Faction.Enemy, MaxHealth = 100000, KnockbackResistance = 1 };
+		victim.AddChild(new CollisionShape3D { Shape = new SphereShape3D { Radius = .5f } }); AddChild(victim);
+		victim.GlobalPosition = _player.GlobalPosition - _player.GlobalBasis.Z * 1.6f + Vector3.Up * .9f;
 		Press("weapon_skill_1", true); await InputFrame(); Press("weapon_skill_1", false);
 		Check(await Until(() => melee.StrikeCount > 0), "原近战真实ATK到达");
-		Check(swords.FollowCount == 1 && swords.Swords.All(s => s.CurrentAttack != null), "三柄灵剑在真实ATK同时开启判定");
+		await Until(() => swords.LaunchCount == 3);
+		Check(swords.VolleyCount == 1 && swords.LaunchOrder.SequenceEqual(new[] { 1, 0, 2 }), "真实命中后按中左右顺序出剑");
 		Check(Mathf.IsEqualApprox(swords.LastSwordAttack!.BaseDamage, melee.GetNode<AttackHitbox>("Attack").CurrentAttack!.BaseDamage * .3f), "三剑伤害继承本段快照");
-		await Until(() => !swords.Following);
-		Check(!swords.SwordsReady, "挥击完成进入归位期");
+		Check(!swords.SwordsReady, "三连刺完成仍需等待归位");
+		victim.QueueFree();
 		await Equip(PlayerCharacterKind.Hunter, WeaponPresetKind.Bow, "weapon_skill_1");
 		Check(swords.SwordCount == 0 && !swords.Summoned, "换装清理独立持续效果");
 	}

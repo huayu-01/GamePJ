@@ -53,6 +53,8 @@ public readonly struct GameplayEvent
 	public float Value { get; init; }
 	public bool IsDamageOverTime { get; init; }
 	public bool IsSecondary { get; init; }
+	/// <summary>Hit／Damaged携带原始出手快照，追击类效果可在伤害结算后选择目标，不再反查当前技能。</summary>
+	public AttackInstance? Attack { get; init; }
 
 	/// <summary>攻击标签或技能 Id，用于按能力类型过滤，而不是按单位 Id。</summary>
 	public string Tag { get; init; }
