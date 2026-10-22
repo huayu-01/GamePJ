@@ -6,5 +6,5 @@
 script = ExtResource("1_row")
 Id = "pool_crossbow"
 Slot = 5
-DisplayName = "短弩升级池"
+DisplayName = "飞刀升级池"
 Note = "[P5 新增行] 角色 A 武器 2 wpn_crossbow 的升级池（<A2限定> 的落点）。"

@@ -21,7 +21,7 @@ namespace ActRoguelike.Testing;
 /// <item><b>表 → 机制</b>：step 0.3 / 上限 1.4s（3 个后置档）/ 弹速 160＋每档 20 / 扫掠预算 8；</item>
 /// <item><b>基础蓄力期间不加档</b>：按到 0.35s（&lt; 0.5s）读 <c>ChargeSteps=0</c>、<c>ChargePowerScale=1</c>，
 ///   且这一按松手**不释放**；再打两发真实箭：刚过基础那发一点档位加成都不吃，过了 1 档才开始涨；</item>
-/// <item><b>其他蓄力技能的档数口径</b>：短弩武技2（3 后置档）与长枪武技2（4 后置档）按各自表列现算；</item>
+/// <item><b>其他蓄力技能的档数口径</b>：飞刀武技2（3 后置档）与长枪武技2（4 后置档）按各自表列现算；</item>
 /// <item><b>龙之箭</b>：真实入构筑后 3s 上限 = 8 个后置档；</item>
 /// <item><b>贴脸双怪</b>：J28射线与形状两种几何都在同一物理帧结算两靶；
 ///   旧单射线漏怪反例保存在J28修复前证据，墙夹在两只中间时墙后那只一次都打不到。</item>
@@ -273,7 +273,7 @@ public partial class BowSweepProbe : Node3D
 	{
 		AbilityConfig? crossbow = ConfigRows.ById<AbilityConfig>("skl_a2_w1_2");
 		AbilityConfig? spear = ConfigRows.ById<AbilityConfig>("skl_b3_w1_2");
-		Check(crossbow != null, "表行 skl_a2_w1_2（短弩武技2）已加载");
+		Check(crossbow != null, "表行 skl_a2_w1_2（飞刀武技2）已加载");
 		Check(spear != null, "表行 skl_b3_w1_2（长枪武技2）已加载");
 		if (crossbow == null || spear == null)
 		{
@@ -284,7 +284,7 @@ public partial class BowSweepProbe : Node3D
 		Check(
 			Mathf.IsEqualApprox(crossbow.ChargeBaseSeconds, 0.4f) && Mathf.IsEqualApprox(crossbow.ChargeStepSeconds, 0.2f)
 				&& crossbow.ChargeMaxSteps == 3 && crossbowTiers == 3,
-			$"短弩武技2：基础 {crossbow.ChargeBaseSeconds:0.##}s + 每 {crossbow.ChargeStepSeconds:0.##}s × {crossbowTiers} 个后置档（ChargeMaxSteps={crossbow.ChargeMaxSteps}）→ 基础 1 + 后置 {crossbowTiers} = {crossbowTiers + 1} 个**发数**档（每档 +{crossbow.Param("CountPerChargeStep", 0f):0} 支）；行里没填 ChargeStepScale（节点上保持 1）→ 不分伤害档，**与用户口径一致、不需要改**");
+			$"飞刀武技2：基础 {crossbow.ChargeBaseSeconds:0.##}s + 每 {crossbow.ChargeStepSeconds:0.##}s × {crossbowTiers} 个后置档（ChargeMaxSteps={crossbow.ChargeMaxSteps}）→ 基础 1 + 后置 {crossbowTiers} = {crossbowTiers + 1} 个**发数**档（每档 +{crossbow.Param("CountPerChargeStep", 0f):0} 支）；行里没填 ChargeStepScale（节点上保持 1）→ 不分伤害档，**与用户口径一致、不需要改**");
 
 		int spearTiers = PostTiers(spear);
 		float spearPower = 1f + (spear.ChargeStepScale - 1f) * spearTiers;
@@ -294,7 +294,7 @@ public partial class BowSweepProbe : Node3D
 				&& Mathf.IsEqualApprox(spearPower, 1.8f),
 			$"长枪武技2：基础 {spear.ChargeBaseSeconds:0.##}s + (上限 {spear.ChargeMaxSeconds:0.##}s − 基础)/{spear.ChargeStepSeconds:0.##}s = {spearTiers} 个后置档 → 基础 1 + 后置 {spearTiers} = {spearTiers + 1} 档，威力 ×{spearPower:0.###}（它自己的 ChargeStepScale={spear.ChargeStepScale:0.##}，加算）；⚠️ 比用户新口径「基础+后置3=4档」多 1 档，**本批没改**，等用户确认");
 
-		GD.Print("[BowSweep] INFO 档数口径：弓（本批）基础 1 + 后置 3 = 4 档；短弩武技2 基础 1 + 后置 3 = 4 档（发数档）；长枪武技2 基础 1 + 后置 4 = 5 档（原裁定「额外每.25四档」）");
+		GD.Print("[BowSweep] INFO 档数口径：弓（本批）基础 1 + 后置 3 = 4 档；飞刀武技2 基础 1 + 后置 3 = 4 档（发数档）；长枪武技2 基础 1 + 后置 4 = 5 档（原裁定「额外每.25四档」）");
 		await Wait(0.05);
 	}
 

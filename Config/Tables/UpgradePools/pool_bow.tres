@@ -7,4 +7,4 @@ script = ExtResource("1_row")
 Id = "pool_bow"
 Slot = 6
 DisplayName = "弓升级池"
-Note = "[P5 新增行] 角色 A 武器 3 wpn_bow 的升级池（<A3限定> 的落点）。⚠️ 短弩与弓的 AttackTags 完全相同（Projectile/Arrow/Physical），所以\"限定武器\"必须靠池引用，不能靠标签。"
+Note = "[P5 新增行] 角色 A 武器 3 wpn_bow 的升级池（<A3限定> 的落点）。⚠️ 飞刀与弓的 AttackTags 完全相同（Projectile/Arrow/Physical），所以\"限定武器\"必须靠池引用，不能靠标签。"

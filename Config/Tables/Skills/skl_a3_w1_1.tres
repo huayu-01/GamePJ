@@ -49,7 +49,7 @@ Note = "击退（文档为 n → 预设 2）"
 [sub_resource type="Resource" id="p_a3_w1_1_7"]
 script = ExtResource("2_param")
 Key = "GravityScale"
-Note = "弓的箭**不下坠**（文档只给短弩的子弹写了「飞行一段距离后会下坠」）"
+Note = "弓的箭**不下坠**（文档只给飞刀的子弹写了「飞行一段距离后会下坠」）"
 
 [sub_resource type="Resource" id="p_a3_w1_1_8"]
 script = ExtResource("2_param")

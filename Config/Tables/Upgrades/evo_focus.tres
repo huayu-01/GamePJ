@@ -22,5 +22,5 @@ Pool = ExtResource("1_pool")
 Excludes = PackedStringArray("evo_philander")
 Id = "evo_focus"
 DisplayName = "专一"
-DescriptionTemplate = "武技2只会射出一箭，但原先每多出一箭这一箭伤害 +80%"
-Note = "J21：仅短弩武技2发数覆盖1，原本每少一箭按基础伤害加80%，公式1+少箭数×0.8；不修改武技1或角色全局数值。与花心互斥，心流可叠加。"
+DescriptionTemplate = "武技2改为只掷出一把飞刀；每减少一把，保留下来的飞刀增加80%基础伤害。"
+Note = "J21：仅飞刀武技2发数覆盖1，原本每少一把飞刀按基础伤害加80%，公式1+少箭数×0.8；不修改武技1或角色全局数值。与花心互斥，心流可叠加。"

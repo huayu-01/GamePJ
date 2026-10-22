@@ -191,9 +191,9 @@ public partial class ChargeReleaseProbe : Node3D
 		var crossbow = (ArrowVolleyAbility)await Equip(PlayerCharacterKind.Hunter, WeaponPresetKind.Crossbow, "weapon_skill_2");
 		int before = _spawnTimes.Count;
 		Press(crossbow.InputAction, true);
-		Check(await Until(() => crossbow.IsCharging && crossbow.ChargeTime >= 1.05f), "短弩后置蓄力三档确实完成");
+		Check(await Until(() => crossbow.IsCharging && crossbow.ChargeTime >= 1.05f), "飞刀后置蓄力三档确实完成");
 		Press(crossbow.InputAction, false); await Until(() => !crossbow.IsActive);
-		Check(crossbow.ChargeSteps == 3 && crossbow.LastShotCount == 9 && _spawnTimes.Count - before == 9, "短弩三档释放快照实际生成9箭，仍保持散射");
+		Check(crossbow.ChargeSteps == 3 && crossbow.LastShotCount == 9 && _spawnTimes.Count - before == 9, "飞刀三档释放快照实际生成9箭，仍保持散射");
 	}
 	private async Task InterruptedRelease()
 	{

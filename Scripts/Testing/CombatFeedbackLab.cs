@@ -58,7 +58,7 @@ public partial class CombatFeedbackLab : Node3D
 	public override void _Process(double delta)
 	{
 		var p = CombatFeedback.Profile;
-		_label.Text = $"打击反馈对照场（机制占位）\nF1 灵剑  F2 镰刀  F3 长枪  F4 弓  F5 能量掌  F6 短弩\nF7 反馈 {p.Enabled}  F8 近战顿帧 {p.LocalPauseEnabled}  F9 镜头 {p.CameraStrength:0.0}  Home复位\n沿用WASD／鼠标／左键／右键／技能操作\n最近结果 {CombatFeedback.LastKind}  反馈 {CombatFeedback.PresentedCount}  镜头 {CombatFeedback.CameraCount}";
+		_label.Text = $"打击反馈对照场（机制占位）\nF1 灵剑  F2 镰刀  F3 长枪  F4 弓  F5 能量掌  F6 飞刀\nF7 反馈 {p.Enabled}  F8 近战顿帧 {p.LocalPauseEnabled}  F9 镜头 {p.CameraStrength:0.0}  Home复位\n沿用WASD／鼠标／左键／右键／技能操作\n最近结果 {CombatFeedback.LastKind}  反馈 {CombatFeedback.PresentedCount}  镜头 {CombatFeedback.CameraCount}";
 	}
 	public override void _ExitTree() { var p = CombatFeedback.Profile; p.Enabled = _enabled; p.LocalPauseEnabled = _pause; p.CameraStrength = _camera; }
 }

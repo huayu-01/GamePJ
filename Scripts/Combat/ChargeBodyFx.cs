@@ -17,7 +17,7 @@ namespace ActRoguelike.Combat;
 ///
 /// <para><b>触发点只有一个</b>：某个 <see cref="Ability"/> 的 <see cref="Ability.ChargeBaseComplete"/>
 /// **由 false 变 true** 的那一帧 —— **每次完成基础蓄力**都给一次反馈，
-/// 所有蓄力武器（能量掌武技2 / 弓武技1 武技2 / 短弩武技2 / 长枪武技2）共用这一份实现，
+/// 所有蓄力武器（能量掌武技2 / 弓武技1 武技2 / 飞刀武技2 / 长枪武技2）共用这一份实现，
 /// **加武器不用改代码**（它是遍历单位身上的全部 <see cref="Ability"/>，不认类名、不认技能行 Id）。</para>
 ///
 /// <para><b>一次反馈由三样东西组成</b>（用户给的三个可选形态全用上了，都是 <c>[Export]</c>）：</para>

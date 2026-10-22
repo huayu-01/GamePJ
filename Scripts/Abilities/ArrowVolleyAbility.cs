@@ -7,25 +7,25 @@ using Godot;
 namespace ActRoguelike.Abilities;
 
 /// <summary>
-/// **箭矢齐射**：角色 A 武器 2「短弩」与武器 3「弓」的武技共用这一个类。
+/// **投射物齐发**：角色 A 武器 2「飞刀」与武器 3「弓」的武技共用这一个类。
 ///
 /// <para>文档里的四件事都在这一个类里，差别**只有表**（`Config/Tables/Skills/skl_a2_*.tres` /
 /// `skl_a3_*.tres` 的列与 Params）—— 代码里没有任何一个技能专属的数值：</para>
 /// <list type="bullet">
-/// <item><b>散射</b>（武技1「射射射」3 发 / 20°）：<see cref="Count"/> × <see cref="SpreadStepDegrees"/>。</item>
-/// <item><b>基础蓄力 + 后置蓄力逐档 + 每档加发数</b>（武技2「大射天下」0.4s 基础、每 0.2s +2 支、最多 9）：
+/// <item><b>散射</b>（武技1「飞刀散掷」3 发 / 20°）：<see cref="Count"/> × <see cref="SpreadStepDegrees"/>。</item>
+/// <item><b>基础蓄力 + 后置蓄力逐档 + 每档加发数</b>（武技2「千刃齐发」0.4s 基础、每 0.2s +2 支、最多 9）：
 ///   档位由 <see cref="Ability"/> 基类算（`ChargeSteps`），本类按 <see cref="CountPerChargeStep"/>
 ///   换算成发数 —— 这就是 `docs/abilities.md` §1.3 第 4 条说的"非倍率维度：自己子类加一列"。</item>
 /// <item><b>蓄力增伤 + 增弹速</b>（弓 武技1「箭在弦上」每 0.1s +30% 伤害、+30 弹速）：
 ///   伤害走基类的 <c>ChargePowerScale</c>（表列 <c>ChargeStepScale = 1.3</c>），
 ///   弹速走本类的 <see cref="SpeedPerChargeStep"/>（+30 是**绝对值**，不是倍率）。</item>
-/// <item><b>箭的子弹特性</b>（短弩）：飞行一段距离后下坠（<see cref="GravityStartDistance"/>，
+/// <item><b>投射物特性</b>（飞刀）：飞行一段距离后下坠（<see cref="GravityStartDistance"/>，
 ///   "射速决定什么时候开始下坠"）+ 弹速够高才击退（<see cref="KnockbackMinSpeed"/>）+ 追踪被打标记的目标
 ///   （<see cref="HomingStatusId"/>，弓 武技2「刹那之眼」那条）。</item>
 /// </list>
 ///
 /// <para><b>动画驱动</b>（用户裁定"没有对应动画 → 技能不执行"）：
-/// 非蓄力技（短弩武技1）在事件帧（<c>ATK</c>）里一次把整排箭发完；
+/// 非蓄力技（飞刀武技1）在事件帧（<c>ATK</c>）里一次把整排飞刀掷出；
 	/// 蓄力技松手冻结档位，重播释放段，只有该轮真实ATK才发射；变奏从ATK开始逐箭连发。</para>
 /// </summary>
 public partial class ArrowVolleyAbility : Ability
@@ -49,7 +49,7 @@ public partial class ArrowVolleyAbility : Ability
 			_seekTurnRate = tuning.HomingTurnRateDegrees;
 		}
 	}
-	[ExportGroup("子弹（箭）")]
+	[ExportGroup("投射物（飞刀／箭）")]
 	/// <summary>箭的预制体（`res://Scenes/Combat/Arrow.tscn`）。</summary>
 	[Export] public PackedScene? ProjectileScene { get; set; }
 
@@ -66,7 +66,7 @@ public partial class ArrowVolleyAbility : Ability
 	[Export] public float MaxLifetime { get; set; } = 1.6f;
 
 	[ExportGroup("散射（多角度多弹）")]
-	/// <summary>**基础发数**（文档：射射射 3 发 / 大射天下 基础 3 支）。</summary>
+	/// <summary>**基础发数**（文档：飞刀散掷 3 发 / 千刃齐发 基础 3 支）。</summary>
 	[Export] public int Count { get; set; } = 1;
 
 	/// <summary>
@@ -75,15 +75,18 @@ public partial class ArrowVolleyAbility : Ability
 	/// </summary>
 	[Export] public float SpreadStepDegrees { get; set; }
 
+	/// <summary>固定散射总夹角；负数沿用相邻夹角。非负值让全部弹体均匀分布在中心两侧，单发居中。</summary>
+	[Export(PropertyHint.Range, "-1,180,0.1")] public float SpreadAngleDegrees { get; set; } = -1f;
+
 	[ExportGroup("蓄力档位 → 发数 / 弹速（非倍率维度：位阶由基类给，单位由本类定）")]
-	/// <summary>**后置蓄力每升一档多发几支**（文档：大射天下 每 0.2s +2 支）。0 = 不增加。</summary>
+	/// <summary>**后置蓄力每升一档多发几支**（文档：千刃齐发 每 0.2s +2 支）。0 = 不增加。</summary>
 	[Export] public int CountPerChargeStep { get; set; }
 
 	/// <summary>**后置蓄力每升一档加多少弹速**（绝对值；文档：箭在弦上 每档 +30 射速）。</summary>
 	[Export] public float SpeedPerChargeStep { get; set; }
 
-	[ExportGroup("子弹行为（短弩的子弹特性）")]
-	/// <summary>重力缩放（0 = 直线无下坠）。短弩的箭 = 表里给一个 &gt; 0 的值。</summary>
+	[ExportGroup("子弹行为（飞刀的子弹特性）")]
+	/// <summary>重力缩放（0 = 直线无下坠）。飞刀表里给一个 &gt; 0 的值。</summary>
 	[Export] public float GravityScale { get; set; }
 
 	/// <summary>**下坠起点**（米；0 = 一发射就下坠）。文档：「飞行一段距离后会下坠，射速决定了什么时候开始下坠」。</summary>
@@ -160,8 +163,10 @@ public partial class ArrowVolleyAbility : Ability
 	/// <summary>最后一次齐射的**发数**（散射 / 档位加发数之后）。</summary>
 	public int LastShotCount { get; private set; }
 
-	/// <summary>最后一次齐射实际用的夹角（度）。</summary>
+	/// <summary>最后一次齐射相邻两发的夹角（度；单发为0）。</summary>
 	public float LastSpreadDegrees { get; private set; }
+	/// <summary>最后一次齐射最外侧两发之间的总夹角（度）。</summary>
+	public float LastSpreadAngleDegrees { get; private set; }
 	/// <summary>发射时的三维准星中心方向；实际中央弹沿此方向飞行。</summary>
 	public Vector3 LastShotDirection { get; private set; }
 
@@ -389,7 +394,7 @@ public partial class ArrowVolleyAbility : Ability
 	/// <list type="bullet">
 	/// <item><c>Aim = Crosshair</c>：**与枪械/能量掌同一个口径** —— 先求"准星打到的世界点"，
 	///   再从箭的出生点朝那个点飞（<see cref="AimUtil.GetCrosshairPoint"/>）。</item>
-	/// <item>其余方向来源走基类 <see cref="Ability.ResolveAimDirection"/>；短弩右键现按用户裁定使用准星。</item>
+	/// <item>其余方向来源走基类 <see cref="Ability.ResolveAimDirection"/>；飞刀右键现按用户裁定使用准星。</item>
 	/// </list>
 	/// </summary>
 	private Vector3 ResolveShotDirection()
@@ -429,7 +434,7 @@ public partial class ArrowVolleyAbility : Ability
 		float power = HoldToCharge ? _releasedPower : 1;
 		int steps = HoldToCharge ? _releasedSteps : 0;
 
-		// 发数 = 基础 + 档数 × 每档（文档：大射天下 3 + 2×档，最多 9）。
+		// 发数 = 基础 + 档数 × 每档（文档：千刃齐发 3 + 2×档，最多 9）。
 		int count = Mathf.Max(1, Count + (steps * CountPerChargeStep));
 
 		// **连续射击增强**（P5b `<A3限定>`「变奏」）：第 N 发连射时发数至少 N（文档：第二箭二连发、第三箭三连发）。
@@ -504,10 +509,13 @@ public partial class ArrowVolleyAbility : Ability
 				return distance != 0 ? distance : a.GetInstanceId().CompareTo(b.GetInstanceId());
 			});
 		}
-		// 散射形状保持；追踪优先给每个目标一支，目标数少于箭数时再循环分配。
+		// 固定总角度在最终发数确定后均分；追踪目标只影响出手后的转向，不改变初速散射范围。
+		float spreadStep = count <= 1 || burst ? 0f
+			: SpreadAngleDegrees >= 0f ? Mathf.Clamp(SpreadAngleDegrees, 0f, 180f) / (count - 1)
+			: SpreadStepDegrees;
 		for (int i = 0; i < (burst ? 1 : count); i++)
 		{
-			float offset = burst ? 0 : (i - ((count - 1) * 0.5f)) * SpreadStepDegrees;
+			float offset = (i - ((count - 1) * 0.5f)) * spreadStep;
 			Unit? seekTarget = seekTargets is { Count: > 0 } ? seekTargets[i % seekTargets.Count] : null;
 			FireProjectile(attack, direction, shotSpeed, shotSize, offset, seekTarget);
 		}
@@ -522,7 +530,8 @@ public partial class ArrowVolleyAbility : Ability
 		LastShotDamage = attack.BaseDamage;
 		LastShotSpeed = shotSpeed;
 		LastShotCount = count;
-		LastSpreadDegrees = SpreadStepDegrees;
+		LastSpreadDegrees = spreadStep;
+		LastSpreadAngleDegrees = spreadStep * (count - 1);
 		LastShotDirection = direction;
 		LastShotPerfect = _perfect;
 		LastShotChargedShot = chargedShot;
@@ -530,8 +539,8 @@ public partial class ArrowVolleyAbility : Ability
 
 		GameLog.Write(
 			"Combat",
-			$"箭矢齐射：{AbilityId} 发数 {count}（基础 {Count} + 档 {ChargeSteps}×{CountPerChargeStep}）"
-			+ $" 单发伤害 {attack.BaseDamage:0.##} 弹速 {shotSpeed:0.##} 夹角 {SpreadStepDegrees:0.##}°"
+			$"投射物齐发：{AbilityId} 发数 {count}（基础 {Count} + 档 {ChargeSteps}×{CountPerChargeStep}）"
+			+ $" 单发伤害 {attack.BaseDamage:0.##} 弹速 {shotSpeed:0.##} 相邻夹角 {LastSpreadDegrees:0.##}° 总夹角 {LastSpreadAngleDegrees:0.##}°"
 			+ $"（{(_perfect ? "完美时机" : (HoldToCharge ? "蓄力松手" : "事件帧"))}，蓄力 {ChargeTime:0.##}s 档 {ChargeSteps} 威力 ×{power:0.###}，"
 			+ (chargedShot
 				? $"★蓄力阈值弹：松手 {_releasedChargeSeconds:0.##}s ≥ {ChargedShotThresholdSeconds:0.##}s → 尺寸 ×{shotSize:0.##} 穿透 {shotPierce} 个，"
@@ -542,7 +551,15 @@ public partial class ArrowVolleyAbility : Ability
 	{
 		if (OwnerUnit == null || ProjectileScene == null) return;
 		Vector3 origin = OwnerUnit.GlobalPosition + Vector3.Up * 0.9f + direction * 0.6f;
-		Vector3 dir = Mathf.Abs(offset) < 0.0001f ? direction : direction.Rotated(Vector3.Up, Mathf.DegToRad(offset));
+		Vector3 spreadAxis = Vector3.Up;
+		if (SpreadAngleDegrees >= 0f)
+		{
+			// 扇面随准星俯仰；接近竖直时选备用轴，避免正上方瞄准让扇面塌成一条线。
+			Vector3 right = direction.Cross(Vector3.Up);
+			if (right.LengthSquared() < 0.0001f) right = Vector3.Right;
+			spreadAxis = right.Cross(direction).Normalized();
+		}
+		Vector3 dir = Mathf.Abs(offset) < 0.0001f ? direction : direction.Rotated(spreadAxis, Mathf.DegToRad(offset));
 		var arrow = ProjectileScene.Instantiate<Projectile>();
 		(GetTree().CurrentScene ?? GetTree().Root).AddChild(arrow);
 		arrow.GlobalPosition = origin;

@@ -160,7 +160,7 @@ public abstract partial class Ability : Node3D
 
 	/// <summary>
 	/// **后置蓄力**：基础蓄满之后**每多少秒升一档**（≤0 = 没有后置蓄力，只有基础蓄力这一段）。
-	/// 文档里的弓（0.1s / +30%）、短弩（0.2s / +2 支）、长枪（0.25s / +20%）都是这一段。
+	/// 文档里的弓（0.1s / +30%）、飞刀（0.2s / +2 支）、长枪（0.25s / +20%）都是这一段。
 	/// </summary>
 	[Export] public float ChargeStepSeconds { get; set; }
 
@@ -340,7 +340,7 @@ public abstract partial class Ability : Node3D
 				// ⚠️ 浮点容差（J10）：表里的 (1.4-0.5)/0.3 在 float 下是 2.9999998，Floor 会少算一档
 				// ——「基础 1 档 + 后置 3 档 = 4 个威力档」就变成 2 档。这里加一个远小于任何真实档位的
 				// epsilon（1e-4 档），只影响"表值正好落在整数档边界"的行；既有行（长枪 (2.0-1.0)/0.25 = 4
-				// 精确、短弩用 ChargeMaxSteps 封顶、其余 step ≤ 0 直接返回 0）的结果一个都不变。
+				// 精确、飞刀用 ChargeMaxSteps 封顶、其余 step ≤ 0 直接返回 0）的结果一个都不变。
 				steps = Mathf.Min(steps, (int)Mathf.Floor(((ChargeMaxSeconds - baseSeconds) / stepSeconds) + 0.0001f));
 			}
 

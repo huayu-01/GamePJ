@@ -500,7 +500,7 @@ public partial class SelfTest : Node
 			case 33 when _timer > 0.9f:
 				// 跨帧探针：武技2 两轮都要等释放段真 ATK；任务结束才 Next。
 				_crossbowProbeTask ??= RunCrossbowProbe();
-				if (ProbeTaskDone(_crossbowProbeTask, "P3·短弩"))
+				if (ProbeTaskDone(_crossbowProbeTask, "P3·飞刀"))
 				{
 					_crossbowProbeTask = null;
 					Next();
@@ -1548,7 +1548,7 @@ public partial class SelfTest : Node
 			+ $" 伤害={w.LastShotDamage:0.###}（期望 表值 {w.Damage:0} ×{damageMultiplier:0.##} = {expectNormalDamage:0.###}）"
 			+ $" 弹速={w.LastShotSpeed:0.###}（期望 表值 {w.Speed:0}） 投射物 +{shotB}");
 
-		// ④ **后置蓄力**（弓 0.1s/+30%、短弩 0.2s/+2 支、长枪 0.25s/+20% 都是这个结构）：
+		// ④ **后置蓄力**（弓 0.1s/+30%、飞刀 0.2s/+2 支、长枪 0.25s/+20% 都是这个结构）：
 		//    在真技能节点上现场配一段"弓式"参数，证明基类那套档位/上限是通用的、且全是表列。
 		if (!await WaitAbilityReady(w))
 		{
@@ -3156,7 +3156,7 @@ public partial class SelfTest : Node
 			withFocus.DebugGrantWithoutApplying(focus);
 			string focusIds = Ids(hunterPalm, withFocus);
 			// 注意：专一属于 pool_crossbow，猎手拿能量掌时两件都进不了池；
-			// 所以平衡互斥要用"猎手 + 短弩"那一侧来量。
+			// 所以平衡互斥要用"猎手 + 飞刀"那一侧来量。
 			RewardPool hunterCrossbow = MakePool(crossbow, "chr_hunter");
 			var cbFresh = new RunBuild();
 			string cbIds = Ids(hunterCrossbow, cbFresh);
@@ -3166,14 +3166,14 @@ public partial class SelfTest : Node
 			balanceOk = cbIds.Contains(",evo_focus,") && cbIds.Contains(",evo_philander,")
 				&& cbAfter.Contains(",evo_philander,") == false;
 			GameLog.Write("SelfTest",
-				$"P5·互斥对在池里的原始状态（猎手+短弩）：含 专一={cbIds.Contains(",evo_focus,")} 含 花心={cbIds.Contains(",evo_philander,")}（都期望 True）｜拿到专一后 含 花心={cbAfter.Contains(",evo_philander,")}（期望 False）｜空转对照（能量掌侧）{focusIds.Length > 0}");
+				$"P5·互斥对在池里的原始状态（猎手+飞刀）：含 专一={cbIds.Contains(",evo_focus,")} 含 花心={cbIds.Contains(",evo_philander,")}（都期望 True）｜拿到专一后 含 花心={cbAfter.Contains(",evo_philander,")}（期望 False）｜空转对照（能量掌侧）{focusIds.Length > 0}");
 		}
 
 		GameLog.Write("SelfTest",
 			$"{(mutualOk ? "✅" : "🔴")} P5·层③互斥（双向，逻辑冲突）：弹射 × 穿透 —— 空构筑里两条都在（含穿透={beforePrereq.Contains(",mut_pierce,")}）→ 拿到弹射后穿透消失（含={afterPrereq.Contains(",mut_pierce,")}，期望 False）→ 反向再验一次也拦得住");
 
 		GameLog.Write("SelfTest",
-			$"{(balanceOk ? "✅" : "🔴")} P5·层③互斥（双向，平衡限制）：专一 × 花心 —— 猎手+短弩空构筑两条都在 → 拿到专一后花心消失（同一个 Excludes 字段，与逻辑冲突无区别）");
+			$"{(balanceOk ? "✅" : "🔴")} P5·层③互斥（双向，平衡限制）：专一 × 花心 —— 猎手+飞刀空构筑两条都在 → 拿到专一后花心消失（同一个 Excludes 字段，与逻辑冲突无区别）");
 
 		energyPalm.Free();
 		crossbow.Free();
@@ -3852,7 +3852,7 @@ public partial class SelfTest : Node
 	private Unit? _p3Target;
 	private int _p3MarkedTotal;
 
-	/// <summary>先清场（避免探针做到一半被怪打断/打死），再切到"角色 A + 短弩"。</summary>
+	/// <summary>先清场（避免探针做到一半被怪打断/打死），再切到"角色 A + 飞刀"。</summary>
 	private void BeginCrossbowProbe()
 	{
 		GetTree().Paused = false;
@@ -3872,7 +3872,7 @@ public partial class SelfTest : Node
 		_p3Player = PlayerLocator.Player;
 		if (_p3Player == null)
 		{
-			GameLog.Write("SelfTest", "🔴 P3·短弩：找不到玩家。");
+			GameLog.Write("SelfTest", "🔴 P3·飞刀：找不到玩家。");
 			return;
 		}
 
@@ -3890,13 +3890,13 @@ public partial class SelfTest : Node
 		Ability? staleW1 = _p3Player.GetNodeOrNull<Ability>("AbilityWeaponSkill1");
 		GameLog.Write(
 			"SelfTest",
-			$"P3·短弩换装：左键={_p3CrossbowW1?.AbilityId ?? "（找不到）"}（期望 skl_a2_w1_1） 右键={_p3CrossbowW2?.AbilityId ?? "（找不到）"}（期望 skl_a2_w1_2）"
+			$"P3·飞刀换装：左键={_p3CrossbowW1?.AbilityId ?? "（找不到）"}（期望 skl_a2_w1_1） 右键={_p3CrossbowW2?.AbilityId ?? "（找不到）"}（期望 skl_a2_w1_2）"
 			+ $"｜上一把武器（能量掌）的两个节点应为空绑定：{staleW1?.AbilityId ?? ""} Enabled={staleW1?.Enabled} 按键=「{staleW1?.InputAction}」（期望：AbilityId 空 / Enabled False / 按键空）"
 			+ $"｜武器 3 的两个节点此时也不该绑上：{_p3BowW1?.AbilityId ?? ""}/{_p3BowW2?.AbilityId ?? ""}（期望都为空）");
 
 		if (_p3CrossbowW1 == null || _p3CrossbowW2 == null)
 		{
-			GameLog.Write("SelfTest", "🔴 P3·短弩：左键/右键技能不是 ArrowVolleyAbility —— 武器行的 Skills 列没接上？");
+			GameLog.Write("SelfTest", "🔴 P3·飞刀：左键/右键技能不是 ArrowVolleyAbility —— 武器行的 Skills 列没接上？");
 			return;
 		}
 
@@ -3905,25 +3905,25 @@ public partial class SelfTest : Node
 		bool ok1 = _p3CrossbowW1.TryActivate();
 		GameLog.Write(
 			"SelfTest",
-			$"P3·短弩武技1 射射射：TryActivate={ok1}（期望 True） 动画={_p3CrossbowW1.AnimName} 事件帧={_p3CrossbowW1.AnimEvent}｜表列：发数 {_p3CrossbowW1.Count}（期望 3） 夹角 {_p3CrossbowW1.SpreadStepDegrees:0.##}°（期望 20） 下坠起点 {_p3CrossbowW1.GravityStartDistance:0.##}m 重力 {_p3CrossbowW1.GravityScale:0.##} 击退 {_p3CrossbowW1.Knockback:0.##} 击退弹速门槛 {_p3CrossbowW1.KnockbackMinSpeed:0.##}｜下一段读结果（发数在事件帧那一帧才写）");
+			$"P3·飞刀武技1 飞刀散掷：TryActivate={ok1}（期望 True） 动画={_p3CrossbowW1.AnimName} 事件帧={_p3CrossbowW1.AnimEvent}｜表列：发数 {_p3CrossbowW1.Count}（期望 3） 夹角 {_p3CrossbowW1.SpreadStepDegrees:0.##}°（期望 20） 下坠起点 {_p3CrossbowW1.GravityStartDistance:0.##}m 重力 {_p3CrossbowW1.GravityScale:0.##} 击退 {_p3CrossbowW1.Knockback:0.##} 击退弹速门槛 {_p3CrossbowW1.KnockbackMinSpeed:0.##}｜下一段读结果（发数在事件帧那一帧才写）");
 	}
 
 	/// <summary>
-	/// 短弩结果 + 武技2 的"基础蓄力 + 每档 +2 支"。
+	/// 飞刀结果 + 武技2 的"基础蓄力 + 每档 +2 支"。
 	/// 武技2 两轮都**跨帧**：按住按真实帧推进 → 松手 → 等释放段真 ATK + 自然收招 → 再读发数。
 	/// </summary>
 	private async Task RunCrossbowProbe()
 	{
 		if (_p3CrossbowW1 == null || _p3CrossbowW2 == null)
 		{
-			GameLog.Write("SelfTest", "🔴 P3·短弩：上一段没准备好，本段跳过。");
+			GameLog.Write("SelfTest", "🔴 P3·飞刀：上一段没准备好，本段跳过。");
 			return;
 		}
 
 		bool fired = _p3CrossbowW1.LastShotCount > 0;
 		GameLog.Write(
 			"SelfTest",
-			$"{(fired ? "✅" : "🔴")} P3·短弩武技1 结果：发数 {_p3CrossbowW1.LastShotCount}（期望 3） 单发伤害 {_p3CrossbowW1.LastShotDamage:0.##} 弹速 {_p3CrossbowW1.LastShotSpeed:0.##}｜链路：动画 {_p3CrossbowW1.AnimName} → 事件帧 {_p3CrossbowW1.AnimEvent} → 投射物 {_p3CrossbowW1.LastShotCount} 个");
+			$"{(fired ? "✅" : "🔴")} P3·飞刀武技1 结果：发数 {_p3CrossbowW1.LastShotCount}（期望 3） 单发伤害 {_p3CrossbowW1.LastShotDamage:0.##} 弹速 {_p3CrossbowW1.LastShotSpeed:0.##}｜链路：动画 {_p3CrossbowW1.AnimName} → 事件帧 {_p3CrossbowW1.AnimEvent} → 投射物 {_p3CrossbowW1.LastShotCount} 个");
 
 		// 武技2：基础蓄力 0.4s（此时 0 档 → 3 支），再蓄 0.2×3 → 3 档 → 3 + 2×3 = 9 支。
 		// ⚠️ 每轮之间等技能**自己收招**（`IsReady` 要求 !IsActive）；绝不同帧硬拍 `_PhysicsProcess`。
@@ -3931,7 +3931,7 @@ public partial class SelfTest : Node
 
 		if (!await WaitAbilityReady(w2))
 		{
-			GameLog.Write("SelfTest", $"🔴 P3·短弩武技2：技能等不到可用（忙={w2.IsActive} 冷却={w2.CooldownRemaining:0.###}），本段跳过。");
+			GameLog.Write("SelfTest", $"🔴 P3·飞刀武技2：技能等不到可用（忙={w2.IsActive} 冷却={w2.CooldownRemaining:0.###}），本段跳过。");
 			return;
 		}
 
@@ -3948,7 +3948,7 @@ public partial class SelfTest : Node
 
 		if (!await WaitAbilityReady(w2))
 		{
-			GameLog.Write("SelfTest", $"🔴 P3·短弩武技2：第二轮开始前技能还没收招（忙={w2.IsActive}），本段跳过。");
+			GameLog.Write("SelfTest", $"🔴 P3·飞刀武技2：第二轮开始前技能还没收招（忙={w2.IsActive}），本段跳过。");
 			return;
 		}
 
@@ -3968,7 +3968,7 @@ public partial class SelfTest : Node
 			&& stepsAt0 == 0 && countAt0 == 3 && stepsAt3 == 3 && countAt3 == 9;
 		GameLog.Write(
 			"SelfTest",
-			$"{(okAll ? "✅" : "🔴")} P3·短弩武技2 大射天下：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 0.4）/ 每档 {w2.ChargeStepSeconds:0.##}s（期望 0.2）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 3） 每档 +{w2.CountPerChargeStep} 支（期望 2）"
+			$"{(okAll ? "✅" : "🔴")} P3·飞刀武技2 千刃齐发：基础蓄力 {w2.ChargeBaseSeconds:0.##}s（期望 0.4）/ 每档 {w2.ChargeStepSeconds:0.##}s（期望 0.2）/ 上限 {w2.ChargeMaxStepsEffective} 档（期望 3） 每档 +{w2.CountPerChargeStep} 支（期望 2）"
 			+ $" → 蓄到基础（档 {stepsAt0}）松手：释放段真ATK到达={firedA}（自然收招={settledA}）发数 {countAt0}（期望 3，= 基础 {w2.Count}）投射物 +{shotsA}"
 			+ $"；蓄到 3 档（档 {stepsAt3}，威力 ×{powerAt3:0.###}）松手：释放段真ATK到达={firedB}（自然收招={settledB}）发数 {countAt3}（期望 9 = 3 + 2×3）投射物 +{shotsB}"
 			+ $"｜动画={w2.AnimName} 方向来源 Aim={w2.Aim}（J40按试玩裁定使用Crosshair，保留完整俯仰）");
@@ -3996,7 +3996,7 @@ public partial class SelfTest : Node
 		_p3BowW2 = PlayerAbilityInput.FindByInputAction(_p3Player, "weapon_skill_2") as HawkEyeAbility;
 		GameLog.Write(
 			"SelfTest",
-			$"P3·弓换装：左键={_p3BowW1?.AbilityId ?? "（找不到）"}（期望 skl_a3_w1_1） 右键={_p3BowW2?.AbilityId ?? "（找不到）"}（期望 skl_a3_w1_2）｜短弩的节点已清：{_p3Player.GetNodeOrNull<Ability>("AbilityWeapon2Skill1")?.AbilityId ?? ""}（期望空）");
+			$"P3·弓换装：左键={_p3BowW1?.AbilityId ?? "（找不到）"}（期望 skl_a3_w1_1） 右键={_p3BowW2?.AbilityId ?? "（找不到）"}（期望 skl_a3_w1_2）｜飞刀的节点已清：{_p3Player.GetNodeOrNull<Ability>("AbilityWeapon2Skill1")?.AbilityId ?? ""}（期望空）");
 
 		// ⚠️ 靶子**必须等武技1 打完再出现**：武技1 现在是真的走释放段 ATK（真箭）——
 		//    上一版它只是同帧空算、一支箭都不发，所以把 60 血的 Chaser 摆在弹道 0.9m 处也无所谓。

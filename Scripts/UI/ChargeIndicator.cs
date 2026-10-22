@@ -49,7 +49,7 @@ public partial class ChargeIndicator : Control
 	/// 哪一条技能行是"方形蓄力圈"的技能（**表里的技能行 Id**，默认 = 能量掌 武技2「憋个大的」）。
 	///
 	/// <para><b>P7 用户裁定</b>：「方形蓄力圈就是**能量掌武技2独有的**」—— 所以别的武器武技2
-	/// （弓「刹那之眼」/ 短弩「大射天下」/ 长枪）蓄力时**不该**出现这个圈。
+	/// （弓「刹那之眼」/ 飞刀「千刃齐发」/ 长枪）蓄力时**不该**出现这个圈。
 	/// 填了 <see cref="AbilityId"/> 就**只认它**：按行 Id 找不到（这一局没装那把武器）就当"没有这个技能"，
 	/// <b>不回退</b> —— 回退会让"别的武器武技2 又冒出方形圈"这个 bug 原样回来。
 	/// 与 <c>ScopeOverlay.AbilityId</c> / <c>AfterimageTrail.AbilityId</c> 同一条纪律
@@ -209,7 +209,7 @@ public partial class ChargeIndicator : Control
 	///
 	/// <para>⚠️ 填了 <see cref="AbilityId"/> 就**只认它**：按行 Id 找不到就返回 null（= 不画圈），
 	/// **不**回退到 <see cref="AbilityInputAction"/>。理由见 <see cref="AbilityId"/> 的注释 ——
-	/// 回退 = "弓/短弩/长枪的武技2 蓄力时又冒出方形圈"（用户明确裁定过那是不对的）。</para>
+	/// 回退 = "弓/飞刀/长枪的武技2 蓄力时又冒出方形圈"（用户明确裁定过那是不对的）。</para>
 	///
 	/// <para>行 Id 是**表里的标识**，所以"哪一条技能行用这个圈 / 换一把武器"都是填表，不是改代码
 	/// （`docs/vfx.md` §2 第 5 条）。</para>

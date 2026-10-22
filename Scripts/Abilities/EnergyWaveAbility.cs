@@ -273,7 +273,7 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		float damageMultiplier = offense.DamageMultiplier;
 
 		// 完美时机：**绝对值优先**（表里的 PerfectDamage / PerfectSpeed）；没配才回落到普通值。
-		// 后置蓄力的档位倍率（弓 / 短弩 / 长枪那一段）与完美时机是**两件正交的事**，所以两者相乘
+		// 后置蓄力的档位倍率（弓 / 飞刀 / 长枪那一段）与完美时机是**两件正交的事**，所以两者相乘
 		// （武技2 没有后置蓄力 → ChargePowerScale 恒为 1，于是 30 → 40、250 → 400 逐位精确）。
 		float power = HoldToCharge ? _releasedPower : 1;
 		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power * (HoldToCharge ? LastReleaseDamageScale : 1f);

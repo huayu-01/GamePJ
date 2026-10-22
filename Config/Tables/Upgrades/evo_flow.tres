@@ -23,5 +23,5 @@ RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Id = "evo_flow"
 DisplayName = "心流"
-DescriptionTemplate = "武技2所有蓄力时间变为 0.1s，且蓄力完成立刻射出 1 箭"
-Note = "J21：仅短弩武技2基础和每档后置蓄力覆盖0.1秒，保留3个后置档（当前总满蓄0.4秒），满蓄自动提交一次释放，真实释放动画ATK才出1箭。与花心组合时固定覆盖优先于缩时；按住不自动开始下一次。各时间和开关可直接改此资源。"
+DescriptionTemplate = "武技2所有蓄力时间变为 0.1s，且蓄力完成立刻掷出 1 把飞刀"
+Note = "J21：仅飞刀武技2基础和每档后置蓄力覆盖0.1秒，保留3个后置档（当前总满蓄0.4秒），满蓄自动提交一次释放，真实释放动画ATK才出1把飞刀。与花心组合时固定覆盖优先于缩时；按住不自动开始下一次。各时间和开关可直接改此资源。"

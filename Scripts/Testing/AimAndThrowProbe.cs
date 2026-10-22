@@ -148,7 +148,7 @@ public partial class AimAndThrowProbe : Node3D
 		try
 		{
 			Press(true); await Until(() => volley.ChargeTime >= .43f); Press(false); await Until(() => shots.Count == 3);
-			Check(volley.Aim == Ability.AimSource.Crosshair && volley.LastShotDirection.Y > .2f, $"短弩右键真实配装为准星瞄准，保留俯仰：{volley.LastShotDirection} player={_player.GlobalPosition} target={air.GlobalPosition}");
+			Check(volley.Aim == Ability.AimSource.Crosshair && volley.LastShotDirection.Y > .2f, $"飞刀右键真实配装为准星瞄准，保留俯仰：{volley.LastShotDirection} player={_player.GlobalPosition} target={air.GlobalPosition}");
 			Check(shots.Count == 3 && volley.LastShotCount == 3, "基础蓄力依旧由真实ATK发出三支散射箭");
 			Check(shots.Count == 3 && shots[1].VelocityDirection.Dot(volley.LastShotDirection) > .9999f && shots.All(p => p.VelocityDirection.Y > .1f), "实际中央箭沿准星飞行，整排箭保留向上分量");
 			if (DisplayServer.GetName() != "headless")
@@ -162,12 +162,12 @@ public partial class AimAndThrowProbe : Node3D
 				}
 				Transform3D before = _camera.GlobalTransform;
 				_camera.GlobalPosition = new Vector3(10, 7, 5); _camera.LookAt(new Vector3(0, 3, -4)); _camera.ResetPhysicsInterpolation();
-				await Capture("j40_crossbow_aim", "短弩右键：高处敌方靶；金线为三支真实弩箭的初速方向（8米参考线）");
+				await Capture("j40_crossbow_aim", "飞刀右键：高处敌方靶；金线为三支真实飞刀的初速方向（8米参考线）");
 				_camera.GlobalTransform = before; _camera.ResetPhysicsInterpolation(); foreach (var line in lines) line.QueueFree();
 			}
 			foreach (var shot in shots) if (IsInstanceValid(shot)) shot.SetPhysicsProcess(true);
 			await Until(() => air.Health < air.MaxHealth);
-			Check(air.Health < air.MaxHealth, "中央弩箭实际命中高处敌方靶");
+			Check(air.Health < air.MaxHealth, "中央飞刀实际命中高处敌方靶");
 		}
 		finally { GetTree().NodeAdded -= Added; foreach (var shot in shots) if (IsInstanceValid(shot)) shot.QueueFree(); }
 		await Equip(WeaponPresetKind.Crossbow); Aim(new Vector3(0, 0, -4));
@@ -175,7 +175,7 @@ public partial class AimAndThrowProbe : Node3D
 		GetTree().NodeAdded += DownAdded;
 		try { Press(true); await Until(() => volley.ChargeTime >= .43f); Press(false); await Until(() => downShots == 3); }
 		finally { GetTree().NodeAdded -= DownAdded; }
-		Check(volley.LastShotDirection.Y < -.05f, "向下瞄准时短弩右键也保留向下分量");
+		Check(volley.LastShotDirection.Y < -.05f, "向下瞄准时飞刀右键也保留向下分量");
 	}
 	private async Task ScytheDamage()
 	{

@@ -38,7 +38,7 @@ public partial class WeaponConfig : ConfigRow
 	/// <item><c>true</c> = 传统枪械：左键 → <c>Weapon.TryFire</c>。</item>
 	/// <item><c>false</c> = **武技驱动**：攻击全部由本行 <see cref="Skills"/> 里那几个技能完成，
 	///   <c>PlayerWeaponInput</c> 看到 <c>Weapon.Enabled == false</c> 就把左键交给
-	///   <c>InputAction = weapon_skill_1</c> 的那个技能（能量掌 / 短弩 / 弓 / 灵剑 / 镰刀 / 长枪 全是这种）。</item>
+	///   <c>InputAction = weapon_skill_1</c> 的那个技能（能量掌 / 飞刀 / 弓 / 灵剑 / 镰刀 / 长枪 全是这种）。</item>
 	/// </list>
 	///
 	/// <para>默认 <c>true</c> —— 与 <c>Weapon.cs</c> 的 <c>Enabled</c> 默认值一致（"表读不到 → 用组件自身默认值"

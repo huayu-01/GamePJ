@@ -8,13 +8,13 @@
 script = ExtResource("2_param")
 Key = "ProjectileScenePath"
 Value = "res://Scenes/Combat/Arrow.tscn"
-Note = "箭的预制体"
+Note = "飞刀当前共用的投射物预制体"
 
 [sub_resource type="Resource" id="p_a2_w1_2_1"]
 script = ExtResource("2_param")
 Key = "Damage"
 Value = 12.0
-Note = "★ 文档为 n → 预设 12（每支箭的单发伤害）"
+Note = "★ 文档为 n → 预设 12（每把飞刀的单发伤害）"
 
 [sub_resource type="Resource" id="p_a2_w1_2_2"]
 script = ExtResource("2_param")
@@ -26,7 +26,7 @@ Note = "★ 文档为 n → 预设 180（基础档的弹速）"
 script = ExtResource("2_param")
 Key = "SpeedPerChargeStep"
 Value = 25.0
-Note = "★ 文档为 n（只写了每蓄力 0.2s 增加 2 支箭）→ 预设每档 +25 弹速，好让「射速较高时击退」在满蓄力时真的跨过门槛"
+Note = "★ 文档为 n（只写了每蓄力 0.2s 增加 2 把飞刀）→ 预设每档 +25 弹速，好让「射速较高时击退」在满蓄力时真的跨过门槛"
 
 [sub_resource type="Resource" id="p_a2_w1_2_4"]
 script = ExtResource("2_param")
@@ -38,7 +38,7 @@ Note = "存活时间（秒）"
 script = ExtResource("2_param")
 Key = "Count"
 Value = 3.0
-Note = "★ 基础发数（文档：基础蓄力后散射出 3 支箭）"
+Note = "基础数量：基础蓄力后掷出3把飞刀。"
 
 [sub_resource type="Resource" id="p_a2_w1_2_6"]
 script = ExtResource("2_param")
@@ -48,9 +48,9 @@ Note = "★ 后置蓄力**每档多发几支**（文档：每 0.2s 增加 2 支�
 
 [sub_resource type="Resource" id="p_a2_w1_2_7"]
 script = ExtResource("2_param")
-Key = "SpreadStepDegrees"
-Value = 20.0
-Note = "★ 相邻两发的夹角（文档：角度 20）"
+Key = "SpreadAngleDegrees"
+Value = 60.0
+Note = "固定散射总夹角，预设60°：准星两侧各30°，按最终飞刀数量均匀排列；单刀居中。"
 
 [sub_resource type="Resource" id="p_a2_w1_2_8"]
 script = ExtResource("2_param")
@@ -103,7 +103,7 @@ Cooldown = 0.5
 Windup = 0.6
 Recover = 0.1
 Id = "skl_a2_w1_2"
-DisplayName = "大射天下"
-DescriptionTemplate = "按住右键：基础蓄力 {ChargeBaseSeconds:0.##}s 后朝准星散射 {Count:0} 支箭（夹角 {SpreadStepDegrees:0}°），保留俯仰；之后每 {ChargeStepSeconds:0.##}s 再 +{CountPerChargeStep:0} 支（最多 {ChargeMaxSteps} 档 → 总 9 支）；没蓄满就松手不释放。"
-Note = "J40按用户试玩裁定改为Aim=Crosshair，保留完整俯仰和准星世界点；原朝角色方向口径作废。基础0.4秒、每档0.2秒加2支、最多9支、0.5秒CD和真实ATK发射保持；蓄力仍共读Ability。"
+DisplayName = "千刃齐发"
+DescriptionTemplate = "按住右键：基础蓄力 {ChargeBaseSeconds:0.##}s 后朝准星掷出 {Count:0} 把飞刀，之后每 {ChargeStepSeconds:0.##}s 再增加 {CountPerChargeStep:0} 把（最多 {ChargeMaxSteps} 档）。所有飞刀均匀分布在总夹角 {SpreadAngleDegrees:0}° 内，增加数量只会缩小间距；单刀沿准星中心掷出，保留俯仰。未完成基础蓄力时松手取消。"
+Note = "飞刀武技2：沿准星空间方向掷出。基础0.4秒、每档0.2秒增加2把，默认最多9把，0.5秒冷却；由真实释放ATK发射。SpreadAngleDegrees是固定总夹角，预设60°，最终数量包括进化覆盖；不再用相邻20°累加扩宽。蓄力仍共读Ability。"
 Params = [SubResource("p_a2_w1_2_0"), SubResource("p_a2_w1_2_1"), SubResource("p_a2_w1_2_2"), SubResource("p_a2_w1_2_3"), SubResource("p_a2_w1_2_4"), SubResource("p_a2_w1_2_5"), SubResource("p_a2_w1_2_6"), SubResource("p_a2_w1_2_7"), SubResource("p_a2_w1_2_8"), SubResource("p_a2_w1_2_9"), SubResource("p_a2_w1_2_10"), SubResource("p_a2_w1_2_11"), SubResource("p_a2_w1_2_12")]

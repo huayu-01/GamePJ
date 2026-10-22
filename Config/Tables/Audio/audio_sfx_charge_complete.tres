@@ -13,4 +13,4 @@ PitchScale = 1.0
 PitchRandom = 0.03
 Id = "sfx_charge_complete"
 DisplayName = "蓄力完成"
-Note = "触发点：Scripts/Combat/ChargeBodyFx.cs —— **任意**蓄力技能的 Ability.ChargeBaseComplete 由 false 变 true 的那一帧（每次完成基础蓄力响一声；能量掌武技2 / 弓武技1 武技2 / 短弩武技2 / 长枪武技2 共用这一条，加武器不用改代码）。★ 总线刻意走 SFX（0）而不是 UI（1）：它是战斗反馈，玩家单独关掉界面音时也该响。★ 素材是**临时借用**项目自制的 ui_card_unlock.wav（「能力卡·解锁」那一声，语义最接近「就绪」）—— 正式素材出来之后把 Stream 指过去即可，**代码一个字都不用改**（调用方只认 AudioIds.ChargeComplete 这个 id）。"
+Note = "触发点：Scripts/Combat/ChargeBodyFx.cs —— **任意**蓄力技能的 Ability.ChargeBaseComplete 由 false 变 true 的那一帧（每次完成基础蓄力响一声；能量掌武技2 / 弓武技1 武技2 / 飞刀武技2 / 长枪武技2 共用这一条，加武器不用改代码）。★ 总线刻意走 SFX（0）而不是 UI（1）：它是战斗反馈，玩家单独关掉界面音时也该响。★ 素材是**临时借用**项目自制的 ui_card_unlock.wav（「能力卡·解锁」那一声，语义最接近「就绪」）—— 正式素材出来之后把 Stream 指过去即可，**代码一个字都不用改**（调用方只认 AudioIds.ChargeComplete 这个 id）。"

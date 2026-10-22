@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_row")
 Id = "anim_a2_charged_volley"
-DisplayName = "A2 武技2 大射天下 · ATK 闭合帧"
-Note = "角色 A 武器 2（短弩）武技2：源段双手射击，事件帧 ATK @0.12s。蓄力期用 speed_scale 拉伸这段（0.12 ÷ 0.3 = 0.4s = 基础蓄力），所以逻辑帧跟着动画走；「每档 +2 支」由逻辑按档位算。"
+DisplayName = "A2 武技2 千刃齐发 · ATK 闭合帧"
+Note = "角色 A 武器 2（飞刀）武技2：源段双手射击，事件帧 ATK @0.12s。蓄力期用 speed_scale 拉伸这段（0.12 ÷ 0.3 = 0.4s = 基础蓄力），所以逻辑帧跟着动画走；「每档 +2 支」由逻辑按档位算。"
 SourceModelPath = "res://Assets/Models/player/mesh_player_body.glb"
 SourceAnimation = "holding-both-shoot"
 SourcePlayerPath = "AnimationPlayer"

@@ -18,7 +18,7 @@ public enum WeaponPresetKind
 	/// <summary>角色 A 武器 1「能量掌」（`wpn_energy_palm`，Slot 4）。</summary>
 	EnergyPalm = 3,
 
-	/// <summary>角色 A 武器 2「短弩」（`wpn_crossbow`，Slot 5）：散射三发 / 蓄力加发数。</summary>
+	/// <summary>角色 A 武器 2「飞刀」（`wpn_crossbow`，Slot 5）：散射三发 / 蓄力加发数。</summary>
 	Crossbow = 4,
 
 	/// <summary>角色 A 武器 3「弓」（`wpn_bow`，Slot 6）：蓄力增伤增速 / 标记与追踪。</summary>

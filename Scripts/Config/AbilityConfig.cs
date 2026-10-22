@@ -130,13 +130,13 @@ public partial class AbilityConfig : ConfigRow
 	[Export] public bool AllowEarlyChargeRelease { get; set; }
 	[Export(PropertyHint.Range, "0,1,0.01")] public float EarlyReleaseDamageScale { get; set; } = 0.5f;
 
-	/// <summary>后置蓄力：基础蓄满后每多少秒升一档（≤0 = 没有后置蓄力）。弓 0.1 / 短弩 0.2 / 长枪 0.25。</summary>
+	/// <summary>后置蓄力：基础蓄满后每多少秒升一档（≤0 = 没有后置蓄力）。弓 0.1 / 飞刀 0.2 / 长枪 0.25。</summary>
 	[Export] public float ChargeStepSeconds { get; set; }
 
 	/// <summary>每档的威力倍率（1.3 = 每档 +30%；**≤0 = 不覆盖**，保留 1 = 不增强）。</summary>
 	[Export] public float ChargeStepScale { get; set; }
 
-	/// <summary>后置蓄力最多几档（≤0 = 不限，由 <see cref="ChargeMaxSeconds"/> 封顶）。短弩 = 3（+6 支）。</summary>
+	/// <summary>后置蓄力最多几档（≤0 = 不限，由 <see cref="ChargeMaxSeconds"/> 封顶）。飞刀 = 3（+6 支）。</summary>
 	[Export] public int ChargeMaxSteps { get; set; }
 
 	/// <summary>后置蓄力的总时长上限（秒；≤0 = 不限）。弓「最多蓄力 1 秒」→ 1。</summary>

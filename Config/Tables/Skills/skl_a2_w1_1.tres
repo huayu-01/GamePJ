@@ -8,7 +8,7 @@
 script = ExtResource("2_param")
 Key = "ProjectileScenePath"
 Value = "res://Scenes/Combat/Arrow.tscn"
-Note = "箭的预制体（子弹特性：飞行一段距离后下坠 / 弹速够高才击退）"
+Note = "飞刀当前共用的投射物预制体（子弹特性：飞行一段距离后下坠 / 弹速够高才击退）"
 
 [sub_resource type="Resource" id="p_a2_w1_1_1"]
 script = ExtResource("2_param")
@@ -98,7 +98,7 @@ Cooldown = 1.0
 Windup = 0.08
 Recover = 0.42
 Id = "skl_a2_w1_1"
-DisplayName = "射射射"
-DescriptionTemplate = "朝准星方向散射 {Count:0} 发弩箭（相邻夹角 {SpreadStepDegrees:0}°）：单发伤害 {Damage:0} / 弹速 {Speed:0}。"
-Note = "[新增行·P3] 角色 A 武器 2「短弩」武技1（文档 CD:1 / 散射三发 / 角度 20 / 伤害 n / 弹速 n）。★ 子弹特性：飞行一段距离后下坠（GravityStartDistance = 10m，射速决定飞完要多久）+ 射速较高时击退（KnockbackMinSpeed 门槛）。★ 文档为 n 的参数（伤害/弹速/下坠距离/重力/击退）都填了**能跑起来的最小预设值**，等实际开发再调。★ 动画走事件帧 ATK（生成表 anim_a2_scatter）。"
+DisplayName = "飞刀散掷"
+DescriptionTemplate = "朝准星方向同时掷出 {Count:0} 把飞刀（相邻夹角 {SpreadStepDegrees:0}°）：每把伤害 {Damage:0} / 飞行速度 {Speed:0}。"
+Note = "[新增行·P3] 角色 A 武器 2「飞刀」武技1（文档 CD:1 / 散射三发 / 角度 20 / 伤害 n / 弹速 n）。★ 子弹特性：飞行一段距离后下坠（GravityStartDistance = 10m，射速决定飞完要多久）+ 射速较高时击退（KnockbackMinSpeed 门槛）。★ 文档为 n 的参数（伤害/弹速/下坠距离/重力/击退）都填了**能跑起来的最小预设值**，等实际开发再调。★ 动画走事件帧 ATK（生成表 anim_a2_scatter）。"
 Params = [SubResource("p_a2_w1_1_0"), SubResource("p_a2_w1_1_1"), SubResource("p_a2_w1_1_2"), SubResource("p_a2_w1_1_3"), SubResource("p_a2_w1_1_4"), SubResource("p_a2_w1_1_5"), SubResource("p_a2_w1_1_6"), SubResource("p_a2_w1_1_7"), SubResource("p_a2_w1_1_8"), SubResource("p_a2_w1_1_9"), SubResource("p_a2_w1_1_10"), SubResource("p_a2_w1_1_11"), SubResource("p_a2_w1_1_12")]

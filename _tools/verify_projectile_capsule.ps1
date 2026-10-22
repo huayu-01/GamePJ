@@ -1,5 +1,5 @@
 # J12：胶囊扫掠、全局实际弹速上限与五探针回归，验证独占且保护真实存档。
-param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization, [switch]$BodyCollision, [switch]$MainOnly, [switch]$FlightPhysics, [switch]$NavigationFoundation, [switch]$EnemyRoster, [switch]$LabOnly, [switch]$EnemyWarnings, [switch]$CombatFeedback, [switch]$LoadoutSlots, [switch]$AimAndThrow, [switch]$EarlyCharge, [switch]$SpiritSwords, [switch]$SpiritSwordRush)
+param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization, [switch]$BodyCollision, [switch]$MainOnly, [switch]$FlightPhysics, [switch]$NavigationFoundation, [switch]$EnemyRoster, [switch]$LabOnly, [switch]$EnemyWarnings, [switch]$CombatFeedback, [switch]$LoadoutSlots, [switch]$AimAndThrow, [switch]$EarlyCharge, [switch]$SpiritSwords, [switch]$SpiritSwordRush, [switch]$KnifeVolley)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
 $godotExe = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
@@ -12,7 +12,7 @@ $runTag = Get-Date -Format 'yyyyMMdd_HHmmss'
 $batchId = if ($WingDive) { 'j27' } elseif ($KillFacts) { 'j26' } elseif ($KillJumps) { 'j25' } elseif ($RewardTiers) { 'j24' } elseif ($RewardRules) { 'j23' } elseif ($JumpStomp) { 'j22' } elseif ($ChargeEvolution) { 'j21' } elseif ($ActionMovement) { 'j20' } elseif ($GroundBurst) { 'j19' } elseif ($LightLeap) { 'j18' } elseif ($GoldenRoad) { 'j17' } elseif ($Rainbow) { 'j16' } elseif ($Affection) { 'j15' } elseif ($Scythe) { 'j14' } elseif ($SpiritSword) { 'j13' } else { 'j12' }
 $SpiritSwords = $SpiritSwords -or $SpiritSwordRush
 $RewardRules = $RewardRules -or $RewardTiers -or $KillJumps
-$EnemyRoster = $EnemyRoster -or $EnemyWarnings -or $CombatFeedback -or $LoadoutSlots -or $AimAndThrow -or $EarlyCharge -or $SpiritSwords
+$EnemyRoster = $EnemyRoster -or $EnemyWarnings -or $CombatFeedback -or $LoadoutSlots -or $AimAndThrow -or $EarlyCharge -or $SpiritSwords -or $KnifeVolley
 if ($ProjectileQuery) { $batchId = 'j28' }
 if ($AttackSnapshot) { $batchId = 'j29' }
 if ($DotAttribution) { $batchId = 'j30' }
@@ -28,6 +28,7 @@ if ($LoadoutSlots) { $batchId = 'j39' }
 if ($AimAndThrow) { $batchId = 'j40' }
 if ($EarlyCharge) { $batchId = 'j41' }
 if ($SpiritSwords) { $batchId = if ($SpiritSwordRush) { 'j43' } else { 'j42' } }
+if ($KnifeVolley) { $batchId = 'knife-volley' }
 $saveNames = @('meta.cfg','ability_cards.cfg','settings.cfg','loadout.cfg','rune.cfg')
 $utf8 = [Text.UTF8Encoding]::new($false)
 
@@ -139,9 +140,19 @@ try {
     }
     elseif ($MainOnly) {
         if ((-not $BodyCollision -and -not $FlightPhysics -and -not $EnemyRoster) -or $ProbeOnly) { throw 'MainOnly仅用于J33／J34／J36完整回归后的定向复核。' }
-        if ($EnemyRoster -and -not $SpiritSwords) { Invoke-Probe 'roster_lab' 'res://Scenes/Debug/_EnemyRosterLab.tscn' '截图=Ok／闪色=Ok' -Render -UserArgs '--roster-lab-capture' }
+        if ($EnemyRoster -and -not $SpiritSwords -and -not $KnifeVolley) { Invoke-Probe 'roster_lab' 'res://Scenes/Debug/_EnemyRosterLab.tscn' '截图=Ok／闪色=Ok' -Render -UserArgs '--roster-lab-capture' }
         if ($FlightPhysics) { Invoke-Probe 'flight' 'res://Scenes/Debug/_FlightPhysicsProbe.tscn' '飞行与受力验收结束：通过 \d+，失败 0' }
         Invoke-Probe 'main' 'res://Scenes/Main.tscn' '=== 自测结束 ===' -SelfTest
+    }
+    elseif ($KnifeVolley) {
+        Invoke-Probe 'knife_volley' 'res://Scenes/Debug/_KnifeVolleyProbe.tscn' '飞刀散射验收结束：通过 \d+，失败 0'
+        if (-not $ProbeOnly) {
+            Invoke-Probe 'charge_evolution' 'res://Scenes/Debug/_ChargeEvolutionProbe.tscn' '蓄力进化验收结束：通过 151，失败 0'
+            Invoke-Probe 'aim_throw' 'res://Scenes/Debug/_AimAndThrowProbe.tscn' '立体瞄准与投掷验收结束：通过 33，失败 0'
+            Invoke-Probe 'slots' 'res://Scenes/Debug/_LoadoutSlotsProbe.tscn' '换装与技能槽验收结束：通过 57，失败 0'
+            Invoke-Probe 'snapshot' 'res://Scenes/Debug/_AttackSnapshotProbe.tscn' '攻击快照验收结束：通过 45，失败 0'
+            Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
+        }
     }
     elseif ($SpiritSwords) {
         Invoke-Probe 'spirit_swords' 'res://Scenes/Debug/_SpiritSwordsProbe.tscn' '三剑协同验收结束：通过 \d+，失败 0'
