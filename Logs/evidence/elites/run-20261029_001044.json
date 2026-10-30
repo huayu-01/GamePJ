@@ -1,0 +1,62 @@
+{
+  "Date": "2026-10-29T00:10:44",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "PauseDive",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 12.64,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.PauseDive.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.PauseDive.headless.err",
+      "SHA256": "ED9457AA608766D33691098FC317A0BA7E2AE9796208F8D3DE71580B877960AA"
+    },
+    {
+      "Name": "PauseDive",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 17.91,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.PauseDive.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.PauseDive.render.err",
+      "SHA256": "7E3F148867EFF134E71EE1D229E4E5F5DC0539166A9AC25F75F5D9263EB7110B"
+    },
+    {
+      "Name": "Content049054",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 5.57,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.Content049054.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.Content049054.headless.err",
+      "SHA256": "EDD51752A52744557BA9855C1B1810F8749F171A2E6557A49C3F5D3CB2FCB457"
+    },
+    {
+      "Name": "Content049054",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 7.59,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.Content049054.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.Content049054.render.err",
+      "SHA256": "145C3868D08AC632549193EBFA3EBB40B9B76EB4CCE465AC6E104BB083674C29"
+    },
+    {
+      "Name": "CombatArt",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 5.05,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.CombatArt.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.CombatArt.headless.err",
+      "SHA256": "DD1FC9459F097BC52811E7FE8A0FB1259D72334BC7ABD2ADB20113DDF54BD6EE"
+    },
+    {
+      "Name": "CombatArt",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 20.76,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.CombatArt.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_001044.CombatArt.render.err",
+      "SHA256": "9F4069D6FD529F5473B46093D8ABFDC46EC04B28BEAC7F19A5BD724AAC4A33CF"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-26T20:05:57",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "performance",
+      "Mode": "render",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_200557.performance.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_200557.performance.render.err",
+      "SHA256": "3BDAB0127892B01C39A7CBAA2BE8ADFB48A6489FB487304A4F458594709B91DC"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

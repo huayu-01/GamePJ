@@ -43,7 +43,7 @@ public partial class BatchEProbe : Node
 	{
 		if (DisplayServer.GetName() == "headless") return;
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Error result = GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png");
+		Error result = GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png"));
 		Check(result == Error.Ok, $"视口截图 {name}.png");
 	}
 
@@ -124,9 +124,14 @@ public partial class BatchEProbe : Node
 		Check(hawk.CooldownRemaining > 0, $"松开后进入冷却：{hawk.CooldownRemaining:0.##}s");
 		float targetHealthBeforeArrow = markTarget.Health;
 		HitInstance? observedArrow = null;
+		float outgoingScaleAtHit = 1f, flatBonusAtHit = 0f;
 		void ObserveArrow(HitInstance hit)
 		{
-			if (hit.Attacker == _player && hit.Attack?.AbilityKind == arrow.AbilityId) observedArrow = hit;
+			if (hit.Attacker != _player || hit.Attack?.AbilityKind != arrow.AbilityId) return;
+			observedArrow = hit;
+			// 此探针使用真实携带配置；距离类符文在命中时结算，不能把它误判为弹道伤害串用。
+			outgoingScaleAtHit = _player.OutgoingDamageScaleAgainst(markTarget, hit.Attack);
+			flatBonusAtHit = _player.OutgoingDamageBonusAgainst(markTarget, hit.Attack);
 		}
 		markTarget.HitReceived += ObserveArrow;
 		try
@@ -137,8 +142,8 @@ public partial class BatchEProbe : Node
 		finally { markTarget.HitReceived -= ObserveArrow; }
 		Check(arrow.LastShotCount > 0 && arrow.LastShotDamage > 0, $"松开左键真实发箭：{arrow.LastShotCount}支，伤害={arrow.LastShotDamage:0.##}");
 		float arrowHealthLost = targetHealthBeforeArrow - markTarget.Health;
-		float expectedArrowDamage = arrow.LastShotDamage * (observedArrow?.Critical == true ? observedArrow.Attack!.CritMultiplier : 1);
-		Check(observedArrow != null && arrowHealthLost > 0 && Mathf.Abs(arrowHealthLost - expectedArrowDamage) < 0.01f,
+		float expectedArrowDamage = arrow.LastShotDamage * (observedArrow?.Critical == true ? observedArrow.Attack!.CritMultiplier : 1) * outgoingScaleAtHit + flatBonusAtHit;
+		Check(observedArrow != null && Mathf.IsEqualApprox(observedArrow.Attack!.BaseDamage, arrow.LastShotDamage) && arrowHealthLost > 0 && Mathf.Abs(arrowHealthLost - expectedArrowDamage) < 0.01f,
 			$"左键箭命中标记靶子：实扣={arrowHealthLost:0.#####}，基础快照={arrow.LastShotDamage:0.#####}，暴击={observedArrow?.Critical}，期望={expectedArrowDamage:0.#####}");
 		hawk.RefreshCooldown();
 		Button("weapon_skill_2", true);

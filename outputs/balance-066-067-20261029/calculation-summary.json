@@ -1,0 +1,188 @@
+{
+  "phase_rows": [
+    {
+      "phase": 0,
+      "start_s": 0.0,
+      "end_s": 72.0,
+      "budget_per_s": 2,
+      "budget_integral": 144.0,
+      "elite_chance": 0,
+      "max_alive": 18,
+      "max_pressure": 36,
+      "weighted_base_cost": 2.076923076923077,
+      "forced_elites": 0,
+      "enemies": "chaser/fast_melee/scaredy_shroom"
+    },
+    {
+      "phase": 1,
+      "start_s": 72.0,
+      "end_s": 201.60000000000002,
+      "budget_per_s": 2.6,
+      "budget_integral": 336.9600000000001,
+      "elite_chance": 0,
+      "max_alive": 24,
+      "max_pressure": 48,
+      "weighted_base_cost": 1.8958333333333333,
+      "forced_elites": 1,
+      "enemies": "chaser/fast_melee/exploder/ranged/scaredy_shroom"
+    },
+    {
+      "phase": 2,
+      "start_s": 201.60000000000002,
+      "end_s": 360.0,
+      "budget_per_s": 3.1,
+      "budget_integral": 491.03999999999996,
+      "elite_chance": 0.03,
+      "max_alive": 28,
+      "max_pressure": 64,
+      "weighted_base_cost": 3.0396039603960396,
+      "forced_elites": 0,
+      "enemies": "chaser/exploder/ranged/spear_guard/arc_thrower/burrow_hunter/scaredy_shroom"
+    },
+    {
+      "phase": 3,
+      "start_s": 360.0,
+      "end_s": 525.6,
+      "budget_per_s": 3.8,
+      "budget_integral": 629.2800000000001,
+      "elite_chance": 0.05,
+      "max_alive": 32,
+      "max_pressure": 84,
+      "weighted_base_cost": 2.8333333333333335,
+      "forced_elites": 1,
+      "enemies": "chaser/heavy_slammer/blade_spinner/hover_diver/ranged/bomb_lobber/scaredy_shroom"
+    },
+    {
+      "phase": 4,
+      "start_s": 525.6,
+      "end_s": 648.0,
+      "budget_per_s": 4.7,
+      "budget_integral": 575.2799999999999,
+      "elite_chance": 0.08,
+      "max_alive": 38,
+      "max_pressure": 108,
+      "weighted_base_cost": 3.4705882352941178,
+      "forced_elites": 1,
+      "enemies": "fast_melee/meteor_mage/tracking_charger/combo_fighter/heavy_slammer/arc_bomber/scaredy_shroom"
+    },
+    {
+      "phase": 5,
+      "start_s": 648.0,
+      "end_s": 720.0,
+      "budget_per_s": 5.5,
+      "budget_integral": 396.0,
+      "elite_chance": 0.1,
+      "max_alive": 42,
+      "max_pressure": 132,
+      "weighted_base_cost": 2.4545454545454546,
+      "forced_elites": 0,
+      "enemies": "chaser/fast_melee/exploder/tracking_charger/meteor_mage/heavy_slammer/scaredy_shroom"
+    }
+  ],
+  "full_supply_income": [
+    {
+      "budget_use_fraction": 1,
+      "extra_per_elite": 0,
+      "random_spawn_count_reference": 954.3029907930454,
+      "random_elites_expected": 45.22329316328972,
+      "forced_elites": 3,
+      "final_boss": 1,
+      "total_hostile_kills_reference": 958.3029907930454,
+      "dropped_shards_expected": 532.2329316328971,
+      "pickup_fraction": 1,
+      "collected_shards_expected": 532.2329316328971,
+      "existing_settlement_full_clear": 68,
+      "settled_total_expected": 600.2329316328971,
+      "note": "成功完成三强敌/三信标/单首领；供给比例、拾取率及每精英附费为假设，非实测。基准权重忽略预算不足时候选截断、时机、压力上限和存活残留。"
+    },
+    {
+      "budget_use_fraction": 1,
+      "extra_per_elite": 2,
+      "random_spawn_count_reference": 921.9306363499744,
+      "random_elites_expected": 42.87766970281095,
+      "forced_elites": 3,
+      "final_boss": 1,
+      "total_hostile_kills_reference": 925.9306363499744,
+      "dropped_shards_expected": 508.7766970281095,
+      "pickup_fraction": 1,
+      "collected_shards_expected": 508.7766970281095,
+      "existing_settlement_full_clear": 68,
+      "settled_total_expected": 576.7766970281095,
+      "note": "成功完成三强敌/三信标/单首领；供给比例、拾取率及每精英附费为假设，非实测。基准权重忽略预算不足时候选截断、时机、压力上限和存活残留。"
+    }
+  ],
+  "costs": [
+    {
+      "id": "card_crit",
+      "name": "锐利直觉",
+      "unlock": 35,
+      "upgrade_costs": "25/40/55/70",
+      "full_unlock_and_upgrade": 225
+    },
+    {
+      "id": "card_damage",
+      "name": "凶戾印记",
+      "unlock": 40,
+      "upgrade_costs": "30/50/70/90",
+      "full_unlock_and_upgrade": 280
+    },
+    {
+      "id": "card_speed",
+      "name": "疾风之靴",
+      "unlock": 30,
+      "upgrade_costs": "20/35/50/65",
+      "full_unlock_and_upgrade": 200
+    },
+    {
+      "id": "card_vitality",
+      "name": "强化肌体",
+      "unlock": 30,
+      "upgrade_costs": "20/35/50/65",
+      "full_unlock_and_upgrade": 200
+    }
+  ],
+  "dash": [
+    {
+      "version": "current_reference",
+      "distance_m": 6,
+      "travel_s": 0.5,
+      "mean_speed_mps": 12.0,
+      "distance_per_60hz_frame_m": 0.2,
+      "distance_per_30hz_frame_m": 0.4,
+      "animation_invulnerability_s": 0.35,
+      "vulnerable_travel_s": 0.15000000000000002,
+      "nominal_busy_s": 0.5,
+      "base_cooldown_s": 10,
+      "base_cycle_s": 10.5,
+      "continuous_camera_lag_at_travel_end_m": 0.9975212478233336,
+      "three_full_charge_burst_m": 18,
+      "sustained_charge_interval_s": 0.5,
+      "charge_sustained_distance_mps": 12.0,
+      "charge_invulnerability_fraction": 0.7
+    },
+    {
+      "version": "authorized_target",
+      "distance_m": 12,
+      "travel_s": 0.3,
+      "mean_speed_mps": 40.0,
+      "distance_per_60hz_frame_m": 0.6666666666666666,
+      "distance_per_30hz_frame_m": 1.3333333333333333,
+      "animation_invulnerability_s": 0.35,
+      "vulnerable_travel_s": 0,
+      "nominal_busy_s": 0.35,
+      "base_cooldown_s": 10,
+      "base_cycle_s": 10.35,
+      "continuous_camera_lag_at_travel_end_m": 3.242254258509025,
+      "three_full_charge_burst_m": 36,
+      "sustained_charge_interval_s": 0.5,
+      "charge_sustained_distance_mps": 24.0,
+      "charge_invulnerability_fraction": 0.7
+    }
+  ],
+  "acceptance": {
+    "C75": "角色A的后撤效果修改",
+    "D75": "基础值再加一倍,这个技能的位移要在0.3秒内完成",
+    "C76": "死战的精英和首领死后会掉落少量碎片10/50",
+    "D76": ""
+  }
+}

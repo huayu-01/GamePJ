@@ -14,6 +14,7 @@ NodeName = "AbilityMelee"
 ClassHint = "MeleeAttackAbility"
 Windup = 0.4
 AttackParams = [SubResource("a_skl_enemy_chaser_melee_0")]
+NumericId = 1192
 Id = "skl_enemy_chaser_melee"
 DisplayName = "近战挥砍"
 Note = "基础近战：伤害 12 / 间隔 1.3 / 射程 2.3 / 击退 3 在 enemy_chaser 行。"

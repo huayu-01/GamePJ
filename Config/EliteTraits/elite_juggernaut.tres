@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JuggernautTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/JuggernautTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1011
+Id = "elite_juggernaut"
+Title = "强横"
+Description = "免普通控制，移速降低，保留持盾自身硬直。"
+NameKey = "elite.juggernaut.name"
+DescriptionKey = "elite.juggernaut.description"
+Magnitude = 0.85

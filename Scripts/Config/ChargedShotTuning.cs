@@ -1,3 +1,4 @@
+using ActRoguelike.Abilities;
 using Godot;
 
 namespace ActRoguelike.Config;
@@ -18,10 +19,9 @@ namespace ActRoguelike.Config;
 /// </summary>
 [Tool]
 [GlobalClass]
-public partial class ChargedShotTuning : Resource
+public partial class ChargedShotTuning : AbilityRewardTuning
 {
 	/// <summary>改哪一条技能行（资源引用；运行期按行 Id 找到玩家身上那个 <c>Ability</c>）。</summary>
-	[Export] public AbilityConfig? TargetAbility { get; set; }
 
 	/// <summary>蓄力总时长上限（秒；≤0 = 不动技能行自己的 <c>ChargeMaxSeconds</c>）。原文「现在可以蓄力3秒」就是它。</summary>
 	[Export] public float MaxChargeSeconds { get; set; } = 3f;
@@ -40,4 +40,7 @@ public partial class ChargedShotTuning : Resource
 
 	/// <summary>大箭**额外**可穿透的目标数（0 = 不穿透；99 = 实际意义上的"全穿透"）。</summary>
 	[Export] public int PierceCount { get; set; }
+	public override bool Supports(System.Type abilityType) => typeof(ArrowVolleyAbility).IsAssignableFrom(abilityType);
+	public override void Apply(Ability ability) { ((ArrowVolleyAbility)ability).ConfigureChargedShot(MaxChargeSeconds, MaxSteps, ThresholdSeconds, SizeScale, PierceCount); }
+	public override System.Collections.Generic.IEnumerable<string> Validate() { foreach (var error in RewardEffectValidation.NonNegative(this)) yield return error; }
 }

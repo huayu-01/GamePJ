@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/EnergyEchoRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+Threshold = 20
+Radius = 3
+DamageScale = 0.4
+[resource]
+script = ExtResource("row")
+NumericId = 1290
+Id = "surv_energy_echo"
+DisplayName = "采能回路"
+RewardKind = 2
+MaxStacks = 1
+Weight = 1.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_energy_echo"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "吸收每{Effects.0.Threshold:0}点原始敌人经验充能一次；下一次主武技命中产生{Effects.0.Radius:0.#}米回响，造成该次基础伤害的{Effects.0.DamageScale:0%}。最多储备一次。"
+NameKey = "content.surv_energy_echo.name"
+DescriptionKey = "content.surv_energy_echo.description"
+Requires = PackedStringArray("surv_scavenger_compass")

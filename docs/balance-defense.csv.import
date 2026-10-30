@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://d2ujbytdjgg7g"
+
+[deps]
+
+files=["res://docs/balance-defense.meta.translation", "res://docs/balance-defense.health.translation", "res://docs/balance-defense.armor.translation", "res://docs/balance-defense.speed.translation", "res://docs/balance-defense.incoming.translation", "res://docs/balance-defense.hits.translation", "res://docs/balance-defense.first.translation", "res://docs/balance-defense.first.translation"]
+
+source_file="res://docs/balance-defense.csv"
+dest_files=["res://docs/balance-defense.meta.translation", "res://docs/balance-defense.health.translation", "res://docs/balance-defense.armor.translation", "res://docs/balance-defense.speed.translation", "res://docs/balance-defense.incoming.translation", "res://docs/balance-defense.hits.translation", "res://docs/balance-defense.first.translation", "res://docs/balance-defense.first.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

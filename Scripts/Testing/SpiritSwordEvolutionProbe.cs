@@ -88,7 +88,7 @@ public partial class SpiritSwordEvolutionProbe : Node3D
 		_camera.LookAt(_player.GlobalPosition + new Vector3(0, 0.4f, -2));
 		_camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"截图 {name}");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"截图 {name}");
 		label.QueueFree();
 		_camera.GlobalTransform = before;
 		_camera.ResetPhysicsInterpolation();

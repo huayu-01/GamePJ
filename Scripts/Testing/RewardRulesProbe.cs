@@ -23,8 +23,8 @@ public partial class RewardRulesProbe : Node3D
 	private RunBuild _build = new();
 	private Weapon Weapon => NodeSearch.FindInSubtree<Weapon>(_player)!;
 	private string _characterId = "chr_hunter";
-	private static readonly string[] RepeatIds = { "upg_power", "upg_armor", "upg_swift" };
-	private static readonly string[] SingleIds = { "upg_life", "upg_crit", "upg_critdmg", "upg_hard", "upg_climb", "upg_insight" };
+	private static readonly string[] RepeatIds = { "upg_power", "upg_life", "upg_swift" };
+	private static readonly string[] SingleIds = { "upg_crit", "upg_critdmg", "upg_hard", "upg_climb" };
 	private static readonly (string Id, string Parent)[] Levels =
 	{
 		("mut_burn_plus", "mut_burn"), ("mut_freeze_plus", "mut_freeze"),
@@ -81,10 +81,10 @@ public partial class RewardRulesProbe : Node3D
 			_player = RuntimeResources.Load<PackedScene>("res://Scenes/Player/Player.tscn").Instantiate<Unit>(); AddChild(_player);
 			_player.GlobalPosition = new Vector3(20, 0.05f, 20);
 			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-			Check(RewardCatalog.All.Length == 91 && RewardCatalog.All.Count(row => row.Kind == RewardKind.Enhancement) == 23
-				&& RewardCatalog.All.Count(row => row.Kind == RewardKind.Evolution) == 33 && RewardCatalog.All.Count(row => row.Kind == RewardKind.Mutation) == 35,
-				"真实ConfigIndex奖励目录91=23强化／33进化／35异化（J33补快乐小子，符文不混入目录）");
-			Check(RewardCatalog.All.All(row => row.MaxStacks == (RepeatIds.Contains(row.Id) ? 0 : 1)), "全目录只有三项星号强化可重复，其他已建项均一次");
+			var inventory = ContentInventorySnapshot.Current;
+			Check(RewardCatalog.All.Length == inventory.Count("Upgrades") && Enum.GetValues<RewardKind>().All(kind => RewardCatalog.All.Count(row => row.Kind == kind) == inventory.RewardCount(kind)),
+				"真实奖励目录及分类符合唯一内容基线，符文不混入目录");
+			Check(RewardCatalog.All.All(row => row.Weight == 0 || row.MaxStacks == (RepeatIds.Contains(row.Id) ? 0 : 1)), "当前候选只有力量/生命/快速按固定等级重复，其他项均一次");
 			foreach (string id in RepeatIds)
 			{
 				Reset();
@@ -99,6 +99,7 @@ public partial class RewardRulesProbe : Node3D
 			foreach (var level in Levels)
 			{
 				var row = RewardCatalog.Find(level.Id)!;
+				if (row.Weight == 0) { Check(!Available().Any(candidate => candidate.Id == row.Id), $"{row.Id}历史分支已停用，不进入真实候选"); continue; }
 				bool compatible = false;
 				foreach (var character in new[] { PlayerCharacterKind.Hunter, PlayerCharacterKind.WeaponMaster })
 				{
@@ -132,7 +133,8 @@ public partial class RewardRulesProbe : Node3D
 			{
 				string id = family.Id + suffix;
 				var row = ConfigRows.ById<RewardConfig>(id)!;
-				total += row.Modifiers.Single(modifier => modifier.Stat == family.Stat).Value;
+				if (row.Weight == 0) { Check(!Acquire(id), $"{id}停用旧生命升级分支，不影响固定逐级成长"); continue; }
+				total = row.Modifiers.Single(modifier => modifier.Stat == family.Stat).Value;
 				bool acquired = Acquire(id);
 				bool consumed = family.Stat switch
 				{
@@ -140,7 +142,7 @@ public partial class RewardRulesProbe : Node3D
 					"DamageReductionAdd" => _player.CombinedDamageReduction() > reductionBaseline || Mathf.IsEqualApprox(_player.CombinedDamageReduction(), 0.9f),
 					_ => true,
 				};
-				Check(acquired && consumed && Mathf.IsEqualApprox(_player.Stats.Get(family.Stat), baseline + total), $"{id}按真实候选取得后，实际属性={_player.Stats.Get(family.Stat):0.###}，基线+表内累计={baseline + total:0.###}，生命／减伤消费者={consumed}");
+				Check(acquired && consumed && Mathf.IsEqualApprox(_player.Stats.Get(family.Stat), baseline + total), $"{id}按真实候选取得后，实际属性={_player.Stats.Get(family.Stat):0.###}，基线+当前级效果={baseline + total:0.###}，生命／减伤消费者={consumed}");
 			}
 			Reset();
 			using var copy = (RewardConfig)ConfigRows.ById<RewardConfig>(family.Id + "_plus")!.Duplicate(true);
@@ -157,14 +159,10 @@ public partial class RewardRulesProbe : Node3D
 	}
 	private void TestHandlerDescription()
 	{
-		Check(RewardCatalog.Find("mut_stomp")!.Description == "成功起跳时对周围 3 米内的敌人造成 15 点伤害，空中跳跃同样生效", "既有杀戮践踏HandlerParams占位符在奖励编译时解析，不把原始模板交给卡片");
+		Check(RewardCatalog.Find("mut_stomp")!.Description == "成功起跳时对周围 3 米内的敌人造成 15 点伤害，空中跳跃同样生效", "杀戮践踏效果资源占位符在奖励编译时解析，不把原始模板交给卡片");
 		using var copy = (RewardConfig)ConfigRows.ById<RewardConfig>("mut_stomp")!.Duplicate(true);
-		foreach (var parameter in copy.HandlerParams)
-		{
-			if (parameter.Key == "Radius") parameter.Value = 1.5f;
-			if (parameter.Key == "Damage") parameter.Value = 7f;
-		}
-		Check(RewardEffectRegistry.Compile(copy)!.Description == "成功起跳时对周围 1.5 米内的敌人造成 7 点伤害，空中跳跃同样生效", "仅改既有处理器半径／伤害参数，编译说明同步变化");
+		var effect = copy.Effects.OfType<JumpPulseRewardEffect>().Single(); effect.Radius = 1.5f; effect.Damage = 7f;
+		Check(RewardEffectRegistry.Compile(copy)!.Description == "成功起跳时对周围 1.5 米内的敌人造成 7 点伤害，空中跳跃同样生效", "仅改实际效果资源半径／伤害参数，编译说明同步变化");
 	}
 	private async Task TestRewardCards()
 	{
@@ -174,13 +172,13 @@ public partial class RewardRulesProbe : Node3D
 		{
 			screen.Open(options, "强化等级与表内参数");
 			await ToSignal(GetTree().CreateTimer(0.35, true), SceneTreeTimer.SignalName.Timeout);
-			var buttons = screen.GetNode<VBoxContainer>("Root/Panel/VBox/Cards").GetChildren().OfType<Button>().Where(button => button.Visible).ToArray();
+			var buttons = screen.GetNode<Container>("Root/Panel/VBox/ChoicesScroll/Cards").GetChildren().OfType<Button>().Where(button => button.Visible).ToArray();
 			Check(buttons.Length == 3 && options.Select((option, index) => buttons[index].Text.Contains(option.Description) && !buttons[index].Text.Contains('{')).All(ok => ok), "真实奖励界面三张卡片显示解析后的数值，无模板占位符");
 			if (DisplayServer.GetName() != "headless")
 			{
 				await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
 				using var screenshot = GetViewport().GetTexture().GetImage();
-				Check(screenshot.SavePng("res://docs/screenshots/j24_reward_tiers.png") == Error.Ok, "真实奖励卡片截图j24_reward_tiers");
+				Check(screenshot.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j24_reward_tiers.png")) == Error.Ok, "真实奖励卡片截图j24_reward_tiers");
 			}
 		}
 		finally { screen.Close(); screen.QueueFree(); }

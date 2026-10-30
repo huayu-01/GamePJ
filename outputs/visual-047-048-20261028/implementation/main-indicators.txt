@@ -1,0 +1,8 @@
+[Main指标一致] [Config] 配置表：武器 <内容基线> / 角色 <内容基线> / 敌人 <内容基线> / 首领 <内容基线> / 召唤物 <内容基线> / 技能 <内容基线> / 连招参数 <内容基线> / Pressure <内容基线> / 效果 <内容基线> / 节点 <内容基线> / 局外成长 <内容基线> / AI 档案 <内容基线> / 能力卡 <内容基线>（ConfigIndex.tres 已加载）
+[Main指标一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）
+[Main指标一致] [SelfTest] 配置表比对·玩家：生命 <配装>（期望 200 + 元进度加成 <存档>；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）
+[Main指标一致] [SelfTest] 配置表比对·索引：武器 <内容基线>/角色 <内容基线>/敌人 <内容基线>/首领 <内容基线>/召唤物 <内容基线>/技能 <内容基线>/Pressure <内容基线>/效果 <内容基线>/节点 <内容基线>/局外 <内容基线>/升级池 <内容基线>/AI 档案 <内容基线>/能力卡 <内容基线>/符文 <内容基线>
+[Main指标一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=<护甲节点已登记>（期望 pressure=3 pmods=3 bank=0）
+[Main指标一致] [SelfTest] 🔴 白板首领实例：生命 <公式核验> 护甲 0（期望 0）标签 [Boss,Melee]
+[Main指标一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True
+[Main指标一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓

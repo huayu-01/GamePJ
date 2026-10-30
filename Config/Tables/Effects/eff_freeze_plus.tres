@@ -18,6 +18,7 @@ Value = 0.0
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1077
 Kind = 5
 VisualStyle = 2
 VisualIcon = ExtResource("e_visual_icon")
@@ -28,6 +29,6 @@ VisualCount = 8
 Duration = 3.0
 Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
 Id = "FreezePlus"
-Slot = 12
+Slot = 0
 DisplayName = "冰冻+"
 Note = "[P5b 新增行] 文档第 179-180 行「烈阳+/冰晶+:你的附加效果变得更强,前置:烈阳/冰晶;（冰冻+:3秒无法动;燃烧+:间隔变为0.25秒）」。这一行是「冰晶」的强化版：只差 Duration 1s → 3s（文档明确值）。挂它的增幅是 mut_freeze_plus（前置 mut_freeze）。"

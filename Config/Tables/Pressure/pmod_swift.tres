@@ -11,6 +11,7 @@ Value = 1.35
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1126
 Id = "pmod_swift"
 DisplayName = "疾行"
 DescriptionTemplate = "移速 +35%"

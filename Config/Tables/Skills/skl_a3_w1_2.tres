@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://b0bh8c674p7ia"]
 
 [ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_eye.svg" id="e_hud_icon"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_a3_w1_2_0"]
@@ -54,18 +53,16 @@ Note = "★ 「后撤」技能的行 Id：无动画软启动期间被击中时�
 
 [resource]
 script = ExtResource("1_row")
-ActionMovement = 2
-HudIcon = ExtResource("e_hud_icon")
-HudColor = Color(1, 0.76, 0.4, 1)
-HudOrder = 40
 NodeName = "AbilityWeapon3Skill2"
 ClassHint = "HawkEyeAbility"
 InputAction = "weapon_skill_2"
 IsBackground = true
 HoldToMaintain = true
 MaintainStartupSeconds = 0.3
+ActionMovement = 2
 Cooldown = 2.0
 Recover = 0.2
+NumericId = 1175
 Id = "skl_a3_w1_2"
 DisplayName = "刹那之眼"
 DescriptionTemplate = "按住右键维持纯效果：无动画软启动 {MaintainStartupSeconds:0.##}s 后放大视角（FOV {ZoomFov:0.#}），每 {MarkIntervalSeconds:0.##}s 为准星 {MarkRadius:0.#}m 内最近的目标叠加「标记」，持续 {MarkDuration:0.##}s；可同时使用其他技能，松手停止。启动期间受击仍免伤并强制触发免费后撤。箭会追踪最近的标记目标。"

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/DefenseReactionRewardEffect.cs" id="effect"]
+[sub_resource type="Resource" id="reaction"]
+script = ExtResource("effect")
+Kind = 1
+Radius = 3
+Damage = 20
+Knockback = 8
+[resource]
+script = ExtResource("row")
+NumericId = 1338
+DisplayName = "铿锵"
+DescriptionTemplate = "每次成功格挡对周围{Effects.0.Radius:0.#}米敌人造成{Effects.0.Damage:0}点伤害并击退，范围受大刀阔斧影响。"
+NameKey = "content.1338.name"
+DescriptionKey = "content.1338.description"
+RewardKind = 1
+Effects = [SubResource("reaction")]

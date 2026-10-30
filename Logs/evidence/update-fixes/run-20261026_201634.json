@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-26T20:16:34",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "spawn_height",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_201634.spawn_height.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_201634.spawn_height.headless.err",
+      "SHA256": "BD953A5E3F2E257DE026DA56E92430597CF4AB1B55D1E2A13BB2842107B3F11E"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

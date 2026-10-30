@@ -1,0 +1,19 @@
+{
+  "api_version": 1,
+  "artifacts": [],
+  "command": "tool-call.execute_editor_script",
+  "data": {
+    "output": [
+      "{ \"placements\": 1043, \"prefabs\": 29, \"materials\": 10, \"navigation_polygons\": 1770, \"size_meters\": 120, \"scene\": \"res://Scenes/Levels/NatureArena/NatureArena.tscn\" }"
+    ],
+    "success": true
+  },
+  "meta": {
+    "duration_ms": 1589,
+    "next_cursor": null,
+    "truncated": false
+  },
+  "ok": true,
+  "schema_version": 1,
+  "warnings": []
+}

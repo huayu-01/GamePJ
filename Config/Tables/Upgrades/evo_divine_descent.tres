@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 [ext_resource type="Script" path="res://Scripts/Config/SkillEnhancementTuning.cs" id="3_tuning"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_3.tres" id="4_skill"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="Enhancement"]
 script = ExtResource("3_tuning")
@@ -12,15 +13,23 @@ DamageScale = 1.6
 SizeScale = 1.5
 CooldownSeconds = 2.0
 
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("Enhancement")
+
 [resource]
 script = ExtResource("2_row")
+NumericId = 1220
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "SkillEnhancement"
-SkillEnhancement = SubResource("Enhancement")
+Effects = [SubResource("Resource_effect_tuning")]
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Pool = ExtResource("1_pool")
 Id = "evo_divine_descent"
 DisplayName = "神降术"
 DescriptionTemplate = "武技3 的范围更大、伤害更高，冷却时间变为 2 秒"
 Note = "J13：只增强落剑式额外一圈，伤害×1.6／半径×1.5（两项原文未给值，为可配置预设）；冷却2秒是原文明值。不改共通下落攻击或其他武器，范围读真实独立球形碰撞体。"
+
+NameKey = "content.evo_divine_descent.name"
+
+DescriptionKey = "content.evo_divine_descent.description"

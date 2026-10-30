@@ -1,0 +1,5 @@
+.godot/
+*.import
+*.uid
+humanoid-pilot_texture_*.png
+mixamo-upload_*.png

@@ -187,8 +187,8 @@ public partial class BowSweepProbe : Node3D
 				&& tiers == 3,
 			$"表→机制·蓄力：基础 {_bow.ChargeBaseSeconds:0.##}s / 每 {_bow.ChargeStepSeconds:0.##}s 一档 / 每档 ×{_bow.ChargeStepScale:0.##}（**加算**：1 + {_bow.ChargeStepScale - 1f:0.##}×档）/ 上限 {_bow.ChargeMaxSeconds:0.##}s → {tiers} 个后置档（基础 1 + 后置 {tiers} = {tiers + 1} 个威力档）");
 		Check(
-			Mathf.IsEqualApprox(_bow.Speed, 160f) && Mathf.IsEqualApprox(_bow.SpeedPerChargeStep, 20f),
-			$"表→机制·弹速：基础 {_bow.Speed:0.##} m/s / 每档 +{_bow.SpeedPerChargeStep:0.##} → 满档 {_bow.Speed + (_bow.SpeedPerChargeStep * tiers):0.##}（J10 预设值，等用户确认）");
+			Mathf.IsEqualApprox(_bow.Speed, 45f) && Mathf.IsEqualApprox(_bow.SpeedPerChargeStep, 6f),
+			$"表→机制·弹速：基础 {_bow.Speed:0.##} m/s / 每档 +{_bow.SpeedPerChargeStep:0.##} → 满档 {_bow.Speed + (_bow.SpeedPerChargeStep * tiers):0.##}（玩家弹道新预设）");
 		Check(_bow.SweepMaxHits == 8, $"表→机制·扫掠：技能行 SweepMaxHits={_bow.SweepMaxHits}（期望 8）已套到技能节点上");
 
 		// 威力阶梯（公式是**加法**：1 + (Scale-1) × 档数，与之前"弓五档 2.5 倍/长枪四档 1.8 倍"一致）。
@@ -247,8 +247,8 @@ public partial class BowSweepProbe : Node3D
 			okBase && _bow.ChargeSteps == 0 && Mathf.IsEqualApprox(_bow.LastShotDamage, _bow.Damage * dmgMul)
 				&& Mathf.IsEqualApprox(_bow.LastShotSpeed, _bow.Speed),
 			$"② 刚过基础就松手（真实按键 {_bow.LastShotChargeSeconds:0.###}s，档 {_bow.ChargeSteps}）：伤害 {_bow.LastShotDamage:0.###}（期望 {_bow.Damage * dmgMul:0.###} = 表值 {_bow.Damage:0} ×玩家倍率 {dmgMul:0.##}，**不含档位加成**）弹速 {_bow.LastShotSpeed:0.##}（期望 {_bow.Speed:0}）");
-		Check(_spawnSpeeds.Count > baseSpawn && Mathf.IsEqualApprox(_spawnSpeeds[baseSpawn], 160f),
-			$"J12 基础箭真实初速 {SpeedAt(baseSpawn):0.##}（160 不受 200 上限影响）");
+		Check(_spawnSpeeds.Count > baseSpawn && Mathf.IsEqualApprox(_spawnSpeeds[baseSpawn], _bow.Speed),
+			$"基础箭真实初速 {SpeedAt(baseSpawn):0.##}（表定45，不受200全局上限影响）");
 
 		// ⓒ 过 1 个后置档才开始涨。
 		bool okOne = await FireHolding(0.5f + (_bow.ChargeStepSecondsEffective * 1f) + 0.005f);
@@ -262,9 +262,9 @@ public partial class BowSweepProbe : Node3D
 		await Wait(0.1);
 		int spawn = _spawned.Count;
 		bool full = await FireHolding(1.405);
-		Check(full && Mathf.IsEqualApprox(_bow.LastShotSpeed, 220f)
-			&& _spawnSpeeds.Count > spawn && Mathf.IsEqualApprox(_spawnSpeeds[spawn], 200f),
-			$"J12 普通满蓄：原始发射快照 {_bow.LastShotSpeed:0.##}，实际 {SpeedAt(spawn):0.##}（220→200）");
+		Check(full && Mathf.IsEqualApprox(_bow.LastShotSpeed, 63f)
+			&& _spawnSpeeds.Count > spawn && Mathf.IsEqualApprox(_spawnSpeeds[spawn], 63f),
+			$"普通满蓄：原始发射快照 {_bow.LastShotSpeed:0.##}，实际 {SpeedAt(spawn):0.##}（45 + 6×3）");
 		await Until(() => Projectile.LiveCount == 0, 4);
 	}
 
@@ -361,6 +361,9 @@ public partial class BowSweepProbe : Node3D
 	/// <summary>⑤ 贴脸双怪：两种查询几何都必须覆盖同一帧的穿透余程。</summary>
 	private async Task DualTargetSweep()
 	{
+		// 高速防漏怪属于几何压力测试，独立保留200米/秒夹具，不再要求正式弓也这么快。
+		float speedBefore = _bow.Speed, stepBefore = _bow.SpeedPerChargeStep, gravityBefore = _bow.GravityScale;
+		_bow.Speed = 200f; _bow.SpeedPerChargeStep = 0f; _bow.GravityScale = 0f;
 		var t1 = MakeTarget("T1", new Vector3(20f, 0.9f, 18.2f));
 		var t2 = MakeTarget("T2", new Vector3(20f, 0.9f, 16.6f));
 		await Wait(0.25);
@@ -400,7 +403,7 @@ public partial class BowSweepProbe : Node3D
 			okSweep && _spawnSweep.Count > spawn && _spawnSweep[spawn] == tableSweep,
 			$"⑤ 真实投射物上的扫掠预算 {ArrowSweep(spawn)}（期望表值 {tableSweep}）");
 		Check(_spawnSpeeds.Count > spawn && Mathf.IsEqualApprox(_spawnSpeeds[spawn], 200f),
-			$"J12 龙之箭实际弹速 {SpeedAt(spawn):0.##}，原始快照 {_bow.LastShotSpeed:0.##}（本次 260→200）");
+			$"高速几何夹具实际弹速 {SpeedAt(spawn):0.##}，原始快照 {_bow.LastShotSpeed:0.##}（固定200）");
 		Check(
 			_hits.Count - start == 2 && HitsSince(start) == "T1 → T2",
 			$"⑤⭐ 开扫掠：贴脸双怪**都打到了** → 命中顺序 {HitsSince(start)}，伤害 {DamagesSince(start)}");
@@ -413,6 +416,9 @@ public partial class BowSweepProbe : Node3D
 		await SweepScreenshot($"Capsule sweep: {HitsSince(start)}\nSame physics frame: {FramesSince(start)}\nSpeed: {SpeedAt(spawn):0} m/s | target gap: 1.6 m", segment);
 
 		// ⓒ 撞 World 停下：墙夹在两靶之间，都落在一帧线段内。
+		// 新箭寿命覆盖完整上射升降，不能再依赖此前的高速穿透箭已自然到期。
+		foreach (var prior in _spawned) if (IsInstanceValid(prior)) prior.QueueFree();
+		await Wait(.05);
 		t1.GlobalPosition = new Vector3(20f, 0.9f, 17.8f);
 		t2.GlobalPosition = new Vector3(20f, 0.9f, 15.4f);
 		var wall = MakeWall(new Vector3(20f, 2.5f, 16.9f), new Vector3(12f, 5f, 0.4f));
@@ -433,6 +439,7 @@ public partial class BowSweepProbe : Node3D
 
 		GD.Print($"[BowSweep] INFO ⑤ 按靶统计命中次数：T1={TotalOf("T1")} T2={TotalOf("T2")}（J28两种几何都覆盖余程）");
 		_bow.QueryGeometry = tableGeometry;
+		_bow.Speed = speedBefore; _bow.SpeedPerChargeStep = stepBefore; _bow.GravityScale = gravityBefore;
 		t1.QueueFree();
 		t2.QueueFree();
 		wall.QueueFree();
@@ -461,7 +468,7 @@ public partial class BowSweepProbe : Node3D
 		_camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
 		using var screenshot = GetViewport().GetTexture().GetImage();
-		Check(screenshot.SavePng("res://docs/screenshots/j12_capsule_sweep.png") == Error.Ok, "J12 真实双靶命中后截图（青色胶囊仅为只读几何示意）");
+		Check(screenshot.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j12_capsule_sweep.png")) == Error.Ok, "J12 真实双靶命中后截图（青色胶囊仅为只读几何示意）");
 		display.QueueFree();
 		_camera.GlobalTransform = cameraBefore;
 		_camera.ResetPhysicsInterpolation();
@@ -545,9 +552,9 @@ public partial class BowSweepProbe : Node3D
 		await Until(() => Projectile.LiveCount == 0, 4);
 		int spawn = _spawned.Count;
 		bool fired = await FireHolding(3.005);
-		Check(fired && Mathf.IsEqualApprox(_bow.LastShotSpeed, 320f)
-			&& _spawnSpeeds.Count > spawn && Mathf.IsEqualApprox(_spawnSpeeds[spawn], 200f),
-			$"J12 龙之箭满蓄：原始快照 {_bow.LastShotSpeed:0.##}，实际 {SpeedAt(spawn):0.##}（320→200）");
+		Check(fired && Mathf.IsEqualApprox(_bow.LastShotSpeed, 93f)
+			&& _spawnSpeeds.Count > spawn && Mathf.IsEqualApprox(_spawnSpeeds[spawn], 93f),
+			$"龙之箭满蓄：原始快照 {_bow.LastShotSpeed:0.##}，实际 {SpeedAt(spawn):0.##}（45 + 6×8）；全局限速另用独立320夹具验证");
 		await Until(() => Projectile.LiveCount == 0, 4);
 		Vector3 origin = new(-30f, 15f, 10f);
 		var shot = DirectShot(origin, Vector3.Forward, budget: 0);

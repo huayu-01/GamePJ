@@ -1,27 +1,21 @@
 [gd_resource type="Resource" script_class="RewardConfig" format=3]
-
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
-[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
-
-[sub_resource type="Resource" id="Resource_p0"]
-script = ExtResource("1_param")
-Key = "Radius"
-Value = 3.0
-Note = "起跳践踏半径（米；原文n，沿用预设3）"
-
-[sub_resource type="Resource" id="Resource_p1"]
-script = ExtResource("1_param")
-Key = "Damage"
-Value = 15.0
-Note = "每名敌人的伤害（原文n，沿用预设15）"
-
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/JumpPulseRewardEffect.cs" id="definition"]
+[sub_resource type="Resource" id="definition"]
+script = ExtResource("definition")
+Radius = 3
+Damage = 15
 [resource]
-script = ExtResource("2_row")
+script = ExtResource("row")
+NumericId = 1277
 RewardKind = 2
 MaxStacks = 1
-ApplyHandler = "JumpPulse"
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1")]
+Effects = [SubResource("definition")]
 Id = "mut_stomp"
 DisplayName = "杀戮践踏"
-DescriptionTemplate = "成功起跳时对周围 {Radius:0.#} 米内的敌人造成 {Damage:0.#} 点伤害，空中跳跃同样生效"
+DescriptionTemplate = "成功起跳时对周围 {Effects.0.Radius:0.#} 米内的敌人造成 {Effects.0.Damage:0.#} 点伤害，空中跳跃同样生效"
 Note = "J22：按原文起跳触发，包括空中跳、跃升真实Action和浮光跃金成功瞬移跳；圆心取起跳前位置，失败跳跃和落地不触发。移除旧落地轮询、MinFallHeight和隐藏0.2秒冷却。半径3米／伤害15沿用原文n的可配预设，不做平衡调整。"
+
+NameKey = "content.mut_stomp.name"
+
+DescriptionKey = "content.mut_stomp.description"

@@ -1,0 +1,42 @@
+# 当前配置编辑入口
+
+调参从 `Config/ConfigIndex.tres` 的引用进入，行资源放在 `Config/Tables/<表名>/`；一行一个 `.tres`。强类型字段定义以 `Scripts/Config/*.cs` 为准，运行时结果以当前日志及专项验证为准。
+
+新增内容优先按[制作入口](content-authoring.md)接入。2026-10-24起支持组合效果资源、稳定文本键与 `ContentValidator`；修改后可运行统一验证的 `content`／`effects`／`localization` 专项。
+
+## 常用入口
+
+| 要改的内容 | 入口与实际规则 |
+|---|---|
+| 角色、武器、所属关系 | Characters / Weapons；六武器按 OwnerCharacter 归属，基地与关卡共用 PlayerLoadout |
+| 技能、连招、动作事件 | Skills / SkillSeries / SkillAnimations；伤害仍等待真实 ATK 等事件，缺事件不补计时伤害 |
+| 增幅、前置、互斥、次数 | Upgrades；处理器及强类型参数资源表达机制，Requires / Excludes / MaxStacks 过滤真实候选 |
+| 符文 | Runes；一次携带一枚，不进奖励池，进关施效并满足对应特化前置 |
+| 敌人、行为、资源成本 | Enemies / AiProfiles / Config/EnemyPlans；行为压力决定生成成本，Weight 控制抽取概率 |
+| 节点价值与波数 | Nodes / ValueTags；价值标签优先，当前高4／中3／低1波 |
+| 节点数量与分布 | 每关固定10个，高2／中5／低3；地图必须提供足够候选点，不在关卡表另填数量 |
+| 免费挑战额度 | ConfigIndex.FreeChallengeBaseQuota / FreeChallengeMaxQuota；实际值=基础+关序增量，受上限约束；当前1／2／2 |
+| 三关敌人、首领强度 | Stages；敌人白名单、预算、倍率、护卫、首领开场技能数 |
+| 首领数值词条 | Pressure；与行为型首领技能分池，节点完成后抽取并在首领出生时施效 |
+| 召唤数量与存活上限 | SummonAbility.Count 是单次请求数，MaxAlive=0 不限；正数统计本技能生成单位及全场 Summon 标签单位，实时检查剩余名额，死亡／待删除不占名额；无合法落点不计成功 |
+| 局外成长 | AbilityCards / Meta；当前玩家入口是能力矩阵，旧存档基础加成保留兼容 |
+| 命中、停顿、镜头反馈 | Config/CombatFeedback.tres；表现预算与伤害判定分离 |
+
+## 已移除的假可调项
+
+- StageDefinition.RewardNodeCount、StageDefinition.FreeChallengeQuota，以及 StageController.ActiveNodeCount 的旧 Inspector 入口已移除。它们曾被固定分层／全局额度规则覆盖，不能继续留作调参入口。
+- 武器没有弹匣和装填机制；旧 MagazineSize / ReloadTime / AutoReloadDelay 不属于当前字段。
+- 波次一次性出场与逐只生成的并发约束需区分；MaxConcurrent 不是整波硬上限。调整难度时应同时看实际波次、成本、可用预算及游离怪数量。
+
+## 增删资源的约定
+
+1. 修改现有行时保留稳定 Id、UID 与引用；不要只依据中文显示名判断身份。
+2. 新增索引行时同步 ConfigIndex.tres 的 ext_resource、数组与 load_steps。移除行时反向检查这些位置。
+3. 路径未被直接写出不代表资源没用。需检查目录遍历、枚举插值、UID、动画库扫描、测试和回退依赖，见[资源审计](resource-lifecycle-audit.md)。
+4. 未知字段不会自动成为功能；新增可调项必须找到实际消费者并验证修改能改变预期结果。
+5. ConfigIndex 的资源依赖损坏可能使整份索引加载失败并回退，不能把“还能启动”当作配置正确。
+6. 数值说明优先读取同一行或强类型参数，不复制另一份固定值。
+
+## 阅读范围
+
+本页用于当前维护。原始分表设计、阶段编号、旧角色／装填字段、迁移过程和历史统计见[配置设计归档](archive/reference-before-2026-10-21/config-schema.md)，无需作为新人接手前置阅读。

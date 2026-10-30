@@ -9,7 +9,7 @@ namespace ActRoguelike.Combat;
 /// （改动前后逐位一致）。&gt; 1 时变成"<b>可叠加</b>"：每次施加 +1 层（封顶），持续时间同样刷新，
 /// 且 <see cref="Modifiers"/> 按层数放大（每层一份）。
 /// 设计文档里的「标记」就是这一条 ——「可叠加且不限定单个目标的 buff」
-/// （`docs/refactor-survey.md` §硬编码审计第 6 条：`Unit.ApplyStatus` 原来"不叠加层数"）。</para>
+/// （`docs/archive/design-notes/refactor-survey.md` §硬编码审计第 6 条：`Unit.ApplyStatus` 原来"不叠加层数"）。</para>
 /// </summary>
 public sealed class StatusEffect
 {
@@ -17,6 +17,10 @@ public sealed class StatusEffect
 	public float Duration { get; init; }
 	public StatModifier[] Modifiers { get; init; } = Array.Empty<StatModifier>();
 	public float DamagePerSecond { get; init; }
+	/// <summary>控制状态可由来源化霸体拒绝；旧减速修正仍由单位自动识别。</summary>
+	public bool IsControl { get; init; }
+	/// <summary>冻结等状态在有效期内暂停主动移动和技能，而不暂停重力或外力。</summary>
+	public bool PreventsActions { get; init; }
 
 	/// <summary>
 	/// **最多叠几层**（1 = 原来的行为：同名只刷新时间）。数值来自效果表

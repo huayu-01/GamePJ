@@ -1,0 +1,576 @@
+{
+  "date": "2026-10-26T15:14:24",
+  "passed": true,
+  "scope": {
+    "traits": 33,
+    "deferred": [
+      "虫洞",
+      "筑墙",
+      "飞弹减速"
+    ],
+    "single_carrier_traits": 12,
+    "modes": [
+      "原冒险节点遭遇",
+      "暮光回廊生存试炼"
+    ]
+  },
+  "reports": {
+    "elite": "Logs/evidence/elites/run-20261026_150451.json",
+    "legacy": "Logs/evidence/survival/integration-20261026_145910.json",
+    "interruption": "Logs/evidence/survival/integration-20261026_151215.json",
+    "survival_builds": "Logs/evidence/survival-builds/run-20261026_150725.json",
+    "gc": "Logs/evidence/content-gc-20261026_151303.json"
+  },
+  "run_count": 37,
+  "elite_assertions": [
+    {
+      "name": "EliteDefense-headless",
+      "pass": 70,
+      "fail": 0
+    },
+    {
+      "name": "EliteDefense-render",
+      "pass": 71,
+      "fail": 0
+    },
+    {
+      "name": "EliteHazards-headless",
+      "pass": 60,
+      "fail": 0
+    },
+    {
+      "name": "EliteHazards-render",
+      "pass": 66,
+      "fail": 0
+    },
+    {
+      "name": "EliteIntegration-headless",
+      "pass": 30,
+      "fail": 0
+    },
+    {
+      "name": "EliteIntegration-render",
+      "pass": 31,
+      "fail": 0
+    },
+    {
+      "name": "EliteMotion-headless",
+      "pass": 53,
+      "fail": 0
+    },
+    {
+      "name": "EliteMotion-render",
+      "pass": 54,
+      "fail": 0
+    }
+  ],
+  "elite_assertion_total": 435,
+  "builds": [
+    {
+      "configuration": "Debug",
+      "warnings": 0,
+      "errors": 0,
+      "log": "Logs/validation/survival_integration_20261026_151215.Debug.log"
+    },
+    {
+      "configuration": "ExportRelease",
+      "warnings": 0,
+      "errors": 0,
+      "log": "Logs/validation/survival_integration_20261026_151215.ExportRelease.log"
+    }
+  ],
+  "text_sync": {
+    "entries": 311,
+    "pending_files": 0
+  },
+  "docs": {
+    "checked": 5,
+    "broken_links": 0
+  },
+  "saves_unchanged": true,
+  "save_sha256": {
+    "ability_cards.cfg": "4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D",
+    "settings.cfg": "7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1",
+    "meta.cfg": "26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446",
+    "rune.cfg": "CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6",
+    "loadout.cfg": "CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462"
+  },
+  "screenshots": [
+    "Logs/evidence/elites/defense-fog.png",
+    "Logs/evidence/elites/elite-arcane.png",
+    "Logs/evidence/elites/elite-burner.png",
+    "Logs/evidence/elites/elite-linker.png",
+    "Logs/evidence/elites/elite-spinner.png",
+    "Logs/evidence/elites/elite-thorn-jump.png",
+    "Logs/evidence/elites/elite-wall-clipped.png",
+    "Logs/evidence/elites/integration-summoner.png",
+    "Logs/evidence/elites/motion-flanker.png"
+  ],
+  "verified_fixes": [
+    "地板使用真实地形面和碰撞体脚底",
+    "墙阻挡直线光束且预警与判定同源",
+    "中断近战前摇不生成余震",
+    "免费随从排除猎令候选",
+    "压力硬上限不足时基础精英回退",
+    "旧发射路径采用配置弹速",
+    "俯仰散射保持真实三维夹角"
+  ],
+  "fixture_correction": {
+    "failure_report": "Logs/evidence/survival/integration-20261026_150906.json",
+    "reason": "固定140毫秒墙钟取样早于0.2秒动画解锁点，改按物理帧观察动画时间轴，保留原阈值与解锁断言。",
+    "repeat_report": "Logs/evidence/survival/integration-20261026_151215.json"
+  },
+  "validation_order": "19项旧流程先通过；随后新增Melee实际执行计数及光束裁切，8个精英专项和生存构筑复验通过；最后仅修正旧中断测试取样，双构建及中断38项、7次GC通过。最后一次仅修改测试，其他专项沿用已通过批次。",
+  "limits": [
+    "数值与特效为首版，未宣称12分钟人工平衡或性能基准",
+    "24总量/来源6只覆盖精英特性区域，原型技能/投射物沿原系统限制，跨原型统一额度尚未接入",
+    "探针截图采用1800秒副本，正式生存阶段仍为720秒",
+    "原工作区与美术会话修改保留，未提交或推送"
+  ],
+  "source_sha256": [
+    {
+      "path": "_tools/build_elite_traits.py",
+      "sha256": "9aa656187cd8acf0832b79cbb25ba067e6122ed2fd0115e8ab31e621b6d79787"
+    },
+    {
+      "path": "_tools/sync_content_text.py",
+      "sha256": "16ee52d5099cac8571bca68965dbcf32366da82cc993da000200484d157050c9"
+    },
+    {
+      "path": "_tools/verify_elite_traits.ps1",
+      "sha256": "54c4036fc688375ddaa0258bebfb0c5beaa2c3ff3ea2ab16aa08ee4f84e65536"
+    },
+    {
+      "path": "Config/EliteTraits/catalog.tres",
+      "sha256": "2b68cbcc87f7697360b6876055c78abd917ce2dfa8ff6087bf15870f8c22484a"
+    },
+    {
+      "path": "Config/EliteTraits/elite_aftershock.tres",
+      "sha256": "8923b07e13ecd29dff6fd2b6fd817c5823dcc81bdb800d494d3c4c3008a7e068"
+    },
+    {
+      "path": "Config/EliteTraits/elite_arcane.tres",
+      "sha256": "2d1f0af73cee58031caaee04ac81c6fedf60d1a9f9d0caf78a6f4b88a7f9e9dc"
+    },
+    {
+      "path": "Config/EliteTraits/elite_armor_recoil.tres",
+      "sha256": "e509fe60271639681656d40661538069d09ed0f28d53b52c46b4bd6adaf85588"
+    },
+    {
+      "path": "Config/EliteTraits/elite_avenger.tres",
+      "sha256": "b26c63694508e7a7e860095ed67b74e141802fdcd74c2b8ef3ef400c6736856c"
+    },
+    {
+      "path": "Config/EliteTraits/elite_bruiser.tres",
+      "sha256": "0f9be20ff5dc640f7509a2c754b165de1db405e21446e1eccdb220c277852037"
+    },
+    {
+      "path": "Config/EliteTraits/elite_burner.tres",
+      "sha256": "17b9aa68ac786f675ff75c79aedba0bf5535a92a5a37459768214a165fd53454"
+    },
+    {
+      "path": "Config/EliteTraits/elite_burrower.tres",
+      "sha256": "2907a0ddf9ee2f362091a7b900f4da868746c3b4b0620f287f0b50e8c42c2d6e"
+    },
+    {
+      "path": "Config/EliteTraits/elite_clanger.tres",
+      "sha256": "1df2d7fed5ace3db7036ef94daf69250306f60b416fa0fc52d5263ee2a1c8274"
+    },
+    {
+      "path": "Config/EliteTraits/elite_flanker.tres",
+      "sha256": "216573d6f9f955914cab2c9e6a8dba8ae91fc8145fcd3b6fb44b252ce6e9d62e"
+    },
+    {
+      "path": "Config/EliteTraits/elite_frozen.tres",
+      "sha256": "0f7d55071e73b47736190a908e5aaad52b85a4e6d9106715939a24ca8a512e1b"
+    },
+    {
+      "path": "Config/EliteTraits/elite_health_link.tres",
+      "sha256": "75b2e861c79027bd0862b093908c87ec19cfd6743c6dd52e2584c52703821525"
+    },
+    {
+      "path": "Config/EliteTraits/elite_juggernaut.tres",
+      "sha256": "2fc6f549d63d7706fb9c6cfabe6135393bb8d75d474f12f294af351b29bafdc1"
+    },
+    {
+      "path": "Config/EliteTraits/elite_knockback.tres",
+      "sha256": "b5fe93547fc240c3b4dc09d80bef7c5661f585ddcc42788933f09522eff70988"
+    },
+    {
+      "path": "Config/EliteTraits/elite_linker.tres",
+      "sha256": "dbd74b2c0b05651b9d1deb8126d6ea5aefd7ebbb7ffad8b148feffed432e75d4"
+    },
+    {
+      "path": "Config/EliteTraits/elite_molten.tres",
+      "sha256": "f7ae3115adf0754b358557e6c6d1cc4e3d8b47c9b451d2581043512a347c0ed1"
+    },
+    {
+      "path": "Config/EliteTraits/elite_multishot.tres",
+      "sha256": "8651cbe8594c8e7b33f67c7f5ab3b78572fa7351fee94c66cf35d29e34574b5e"
+    },
+    {
+      "path": "Config/EliteTraits/elite_pressure_rebound.tres",
+      "sha256": "ffe41760c989dc8a9a2654820d1108af6f025f1302e5a991cf25f8ec94dafcac"
+    },
+    {
+      "path": "Config/EliteTraits/elite_reforge.tres",
+      "sha256": "38aa1ba1b2c681920083e366a3e7632306f6ca5a50aeee496999c1388d1ed6c5"
+    },
+    {
+      "path": "Config/EliteTraits/elite_savior.tres",
+      "sha256": "9e9852e10b63ca1dea7440fef5d98252cc28384932e41e7949d0afebeed2927a"
+    },
+    {
+      "path": "Config/EliteTraits/elite_seeker.tres",
+      "sha256": "6ed733a2c2fae050f7dd73b687a0a5269b3825c10daea984bb75bba9cd537fdb"
+    },
+    {
+      "path": "Config/EliteTraits/elite_shielding.tres",
+      "sha256": "200890e7b1d717991fb997d6645a2781fac6f948da386445e225f95cad71a44e"
+    },
+    {
+      "path": "Config/EliteTraits/elite_shifter.tres",
+      "sha256": "40d46a8948a1792be85fe47e07a7d72e358940e50676fa98004397812487b09e"
+    },
+    {
+      "path": "Config/EliteTraits/elite_slicer.tres",
+      "sha256": "5067b57516a66fd631b31528848ba4fdeeec44079bfa724a3c70925f140ae1e8"
+    },
+    {
+      "path": "Config/EliteTraits/elite_slugger.tres",
+      "sha256": "3534cbbf2b611887e7e7d3960b9cbf8cde2954bc1b8d97121a9be438469a126f"
+    },
+    {
+      "path": "Config/EliteTraits/elite_speeder.tres",
+      "sha256": "5741c1f94767a136959e7800d52358cafa5af5de263b97d48139737bcc02038d"
+    },
+    {
+      "path": "Config/EliteTraits/elite_spiller.tres",
+      "sha256": "1d4acfe1c90d3a37d78379ddf0b76ae62ee1e9f853c00e6ee5713e5d6e66c2b1"
+    },
+    {
+      "path": "Config/EliteTraits/elite_spinner.tres",
+      "sha256": "61250fb7c739e116bce0fa23025b9aafc709fcaeef8b6af5d2a32cb97b253099"
+    },
+    {
+      "path": "Config/EliteTraits/elite_summoner.tres",
+      "sha256": "2b98492053b735fa558adc89aa7a69f73a0f8125f8cb8906c0ddd906359b4d23"
+    },
+    {
+      "path": "Config/EliteTraits/elite_suppressor.tres",
+      "sha256": "3dd540da3078a98c00cd14a79edd6d2a55c6ac2598a52aeb991ac4ae328e45f3"
+    },
+    {
+      "path": "Config/EliteTraits/elite_thorn_grid.tres",
+      "sha256": "9bfc79a6ae71235e6e996b2f7b37d27ca0a8448a8653939b5f14dea3b2f610b5"
+    },
+    {
+      "path": "Config/EliteTraits/elite_tidal.tres",
+      "sha256": "fa38f9b938721ee30f2a20b598a64675e1d8e06d00a1485ce7d25fc35753cb10"
+    },
+    {
+      "path": "Config/EliteTraits/elite_trail_brand.tres",
+      "sha256": "71689d278a7930de3b5e5ac2ff8bf9f9b98486ec333d58904d3173817ecfbf40"
+    },
+    {
+      "path": "Config/EliteTraits/elite_vampiric.tres",
+      "sha256": "95f6bf070a64e98ad9112c21c7f4fd9f1849156ef41e88be245417efc1d57555"
+    },
+    {
+      "path": "Config/Localization/zh.tres",
+      "sha256": "5706fb8b77cbb04d0756c61f0e2f6ee328e21a4b0a935eac985edacaaac4da6f"
+    },
+    {
+      "path": "Scripts/Abilities/Ability.cs",
+      "sha256": "b8c209ce7d25f9ca2ec2383e27c7e94346686e00bbba785f9f978137ffa688f5"
+    },
+    {
+      "path": "Scripts/Abilities/EnemyActions/EnemyProjectileExecution.cs",
+      "sha256": "a1ff9d7d479c3982b37ffa82191bdd37475f2a82400d1db84d05cc66aad7fef4"
+    },
+    {
+      "path": "Scripts/Abilities/EnemyPlanAbility.cs",
+      "sha256": "645f1f5b2c3dff785ef94d8102fa84fba99ebcfca39fb6574fa68cca29d31826"
+    },
+    {
+      "path": "Scripts/Abilities/MeleeAttackAbility.cs",
+      "sha256": "a4105624c617574122ddf7932baa662b74720993fb969188e6893b46b0968fe9"
+    },
+    {
+      "path": "Scripts/Abilities/ProjectileAttackAbility.cs",
+      "sha256": "18d1944bc5a254ee665b568b0b7afbe2804730ce8eb2a77fa02bb18128884677"
+    },
+    {
+      "path": "Scripts/Combat/CharacterMovement.cs",
+      "sha256": "efdcc88303f6099a7cf12b22056e016d8d7fd9b6eab7a36661deb38bd34782ae"
+    },
+    {
+      "path": "Scripts/Combat/CombatReaction.cs",
+      "sha256": "7805da335e07a394b0603bb501d32ec933ed9d7dae8a566c2cabaec0ea9149fe"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/AftershockTraitDefinition.cs",
+      "sha256": "9065c66846a07c5e2cedceed3a064f41901ed0e49011c2677a6d3666ecffc57f"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/ArcaneTraitDefinition.cs",
+      "sha256": "7d3e292c83f2f219ec20c9321fc8da66f681995804a4d0f2dcc959b68330188d"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/ArmorRecoilTraitDefinition.cs",
+      "sha256": "6c5573c48e9c9f3ebfd72a8428d79f8b90251925d6b9182e9ad67b37f6056902"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/AvengerTraitDefinition.cs",
+      "sha256": "509daf2d726fb78d90638c187cc59f31f12b0c4bb9b55b59f238ea8a6bae9227"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/BruiserTraitDefinition.cs",
+      "sha256": "dff542cbe1501d034d06ed9f29e08e8de096b547fbfd191b11d57409402b2571"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/BurnerTraitDefinition.cs",
+      "sha256": "759ed857d1d908b97892be235c63421b7a054f3ce902999acb3e9b7a380019d3"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/BurrowerTraitDefinition.cs",
+      "sha256": "4f856e3a2195ce997959e7ffda3a25459f7630f9c38be34a0adf523b1e9501ca"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/ClangerTraitDefinition.cs",
+      "sha256": "bf51fb1a696003723b0f34e03795239784f53055752edacf61acb57c05b83b3e"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/FlankerTraitDefinition.cs",
+      "sha256": "02da985e5fb7c397b4a4b518ddf5fefb4f16930d09aa2b77d685ecd8ad05cda3"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/FrozenTraitDefinition.cs",
+      "sha256": "22b724ca1e13cc670802effaf2ffa7d75c11e7365d2fc5921c90b490b5a75aac"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/HealthLinkTraitDefinition.cs",
+      "sha256": "07f9da1f6f6ac988b747c21a2de76f935a4b768a10e5445c58251b217b79641d"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/JuggernautTraitDefinition.cs",
+      "sha256": "a6ca69e6a017461871f06a87e8967f3c56fb06d7070953560497f3096c42ed80"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/KnockbackTraitDefinition.cs",
+      "sha256": "758c3ecce1793cffa1a6f2637a85f291772c0c9160b7f732d53577b54f5d972f"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/LinkerTraitDefinition.cs",
+      "sha256": "62ae32d1725ef8c7e8baab42f1e18fc1226f24b737f2d1fd09ed9ec77c8e9a9c"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/MoltenTraitDefinition.cs",
+      "sha256": "6672b21779ef6383d659e5be8f2c8213663961977e1512dc58a055096c1afc91"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/MultishotTraitDefinition.cs",
+      "sha256": "b2c26137c02cf79c559e3e4893d26b1a64c41d7f0e5d739e7dd6bcbc14ebe34b"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/PressureReboundTraitDefinition.cs",
+      "sha256": "bb479b41093c6cee7947e92b53af553e901a660de473aaad70930f9e3fbaf5ec"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/ReforgeTraitDefinition.cs",
+      "sha256": "3c368a6a7e055f1f9f7355469f84535cc72bed37d4782cbada3e592678923888"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/SaviorTraitDefinition.cs",
+      "sha256": "bf31be19e8fe944781580199b0ada23389158b6ab17ae973809cee93720dc0ac"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/SeekerTraitDefinition.cs",
+      "sha256": "1bdf689e25ce982600b5a5d9000229c401d029afc35dcbcf220c34007c05da65"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/ShieldingTraitDefinition.cs",
+      "sha256": "9c1a5df2adc2c1dc25bc16e1b3be7e87cb5646bf5db467b2d4e5c12bf8283782"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/ShifterTraitDefinition.cs",
+      "sha256": "daee93f0ba42109aaa2dd6dfd1c0135e2f33d7c3c7ed3084e1e2df6dff9590f7"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/SlicerTraitDefinition.cs",
+      "sha256": "ab8c10884c6bf79ff5d5be1c1aa34cfb60acd8649a8688ad478452247a0e582d"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/SluggerTraitDefinition.cs",
+      "sha256": "99d82e6c1cc84d19cf2ccc68c3f53d653ea647fbfd4695b26b7c91f08c11e28c"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/SpeederTraitDefinition.cs",
+      "sha256": "0b339e46a6b45106992d980f334e5e64ca1c8fcd7f222c446425f505c50cb475"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/SpillerTraitDefinition.cs",
+      "sha256": "554429d2b2e5d645a3b96f43d090d1d222030563f9ffd423f99f3463948a396f"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/SpinnerTraitDefinition.cs",
+      "sha256": "2d41df21fbd2127bb0ccc7a5708a832471703e9ab9fe213cf67374c0b0df7aea"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/SummonerTraitDefinition.cs",
+      "sha256": "cb2fb98aadad26bdeab82246f8592e41f268b4dd16d8eae892f722b39bd6a1f6"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/SuppressorTraitDefinition.cs",
+      "sha256": "0b36868ac77964f7f562006479bc6db903fd07cd6a5eea7eee322d1232c6d0ce"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/ThornGridTraitDefinition.cs",
+      "sha256": "b04e10a0f0ca600a1367fb908b687ac0a48efa70a1c05b5050c290958d6f6f7e"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/TidalTraitDefinition.cs",
+      "sha256": "24f58c969eeadf6326689668c1470af37b46dd990ec6c08f62e3400a51fccfd6"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/TrailBrandTraitDefinition.cs",
+      "sha256": "13df5634d3df2bd014b4bfa78b057c94fc9c567436a18bf94621e05d7ca6daaa"
+    },
+    {
+      "path": "Scripts/Combat/Elites/Definitions/VampiricTraitDefinition.cs",
+      "sha256": "c935c24e2f163f4a7cecb761e9efdf995f7b72c1aa7838082708aef88bbc71a3"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteAttributeTraits.cs",
+      "sha256": "1dc35603dca2ea6f301b8e6d151fe4f8ad549ad1b159787799f70d08c25228a8"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteBarrierTraits.cs",
+      "sha256": "8b082bec1a2b2ca89763895da3b0d06e11cf5356ae9cfe3df1b34994568bd403"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteDefenseTraitBehavior.cs",
+      "sha256": "7e1c88c53988b2ae269c5ecd03d391b02fd8a30128d8042bbb3fdbee6120dfe0"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteHazardBehaviors.cs",
+      "sha256": "1bd461cffadee44676a57fbb1283deaf1cd66f0c0d7189ee2e954dcaf25f88d4"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteHazardWorld.cs",
+      "sha256": "144fa8a8e51e243a1ac379221617460467d4001631eaae25be15743ea6ac2b7d"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteMotionBehaviors.cs",
+      "sha256": "77e558411684b097f1ded27a984e96421e8f4939ac3029f5dbb4341af77f356c"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteReactiveTraits.cs",
+      "sha256": "0ba4c025adba15f4bbcafa1e965b617a40cc242bce1058d88d488da48e9ba137"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteTraitBehavior.cs",
+      "sha256": "8f8d253854e68d7ee76339f36ab5f50211e11fdc7cf3eed4a9cf9269eddea348"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteTraitCatalog.cs",
+      "sha256": "cf427ab3ad8b304d245f9ca1b5af1f7b7d209f2443d8ca777c89c68fe81c380c"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteTraitDefinition.cs",
+      "sha256": "b7d403a5d170c3a8aa62181ebf6470a956eb7301d8872ffdf1135d445d195624"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteTraitRuntime.cs",
+      "sha256": "1814918d14197782bed7c8628cd15f869a68e7eb476e9c07a5fd7fc54ba7dacd"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteTraitWave.cs",
+      "sha256": "9d1495b77d8ff5744d1ff192ce72fc639c86a4b7f6d465d7ef62705a7b0710f9"
+    },
+    {
+      "path": "Scripts/Combat/Elites/EliteWardTraits.cs",
+      "sha256": "67b5c3665e14a507ba858d16227ff6a1b7b3d420d90ab30b1707b9596b89ce1b"
+    },
+    {
+      "path": "Scripts/Combat/HitInstance.cs",
+      "sha256": "b2ea46d01a1ad3a7204cf9f62a51ac4183f0539eecd500d62edf4feb75cc5a42"
+    },
+    {
+      "path": "Scripts/Combat/Projectile.cs",
+      "sha256": "21f7d032eb65afd2a5e71f231ac904c86d8667f5c895275de66690057a0abcf7"
+    },
+    {
+      "path": "Scripts/Combat/StatusEffect.cs",
+      "sha256": "27893f226b0da43ab7c3fbdedf2b12388e434ce8576f3fb66b1fe778ae9e749d"
+    },
+    {
+      "path": "Scripts/Combat/Unit.cs",
+      "sha256": "d5a32731d6487d186e39ba16ef1381d742c286677a71d7e53fa8fa1557d4f4fe"
+    },
+    {
+      "path": "Scripts/Combat/Unit.EliteWard.cs",
+      "sha256": "e294060abdddb92ea1ba32c6a7c26bdebcb81b39205b4513cd972841dc404f24"
+    },
+    {
+      "path": "Scripts/Combat/Unit.IncomingRules.cs",
+      "sha256": "585be8cdb426d864bc56f5ffc4e95dfc8605d6f40c4e19aa7b8a22ddccc0c476"
+    },
+    {
+      "path": "Scripts/Config/Validation/ContentValidator.cs",
+      "sha256": "109a9b7208bba0e599da35339fd5ce6f1ec1b000d161d2fca3f1b2419aef3f50"
+    },
+    {
+      "path": "Scripts/Encounter/EncounterController.cs",
+      "sha256": "4681a2ab5d1b716a7c2e7b36ad2360ea0b67fa1dfdaa23e16c3629f9eff4cdcf"
+    },
+    {
+      "path": "Scripts/Encounter/EncounterController.EliteTraits.cs",
+      "sha256": "2203f79e77891fa69745be6602b437f25bbe31355514b6859d18008bdad8702b"
+    },
+    {
+      "path": "Scripts/Run/Survival/SurvivalContractRules.cs",
+      "sha256": "dd70374107a7c946653e2aaac77c1e9d5f023b175bbc4dfd9033a9c8f157cd6f"
+    },
+    {
+      "path": "Scripts/Run/Survival/SurvivalDirector.cs",
+      "sha256": "3edb4d96b399a767b00921f8dbdf4ac53d878da2146873a989d16e9fa973c454"
+    },
+    {
+      "path": "Scripts/Run/Survival/SurvivalDirector.EliteTraits.cs",
+      "sha256": "197abc48964280a3a21d3c53861840606751a202a9cfd1d000657038d0a5016b"
+    },
+    {
+      "path": "Scripts/Run/Survival/SurvivalDirector.Spawning.cs",
+      "sha256": "29bb6b9637406bc6454265d9bfc5eb945e696b3d1537b6c6eea9a97231083a65"
+    },
+    {
+      "path": "Scripts/Testing/ActionInterruptionProbe.cs",
+      "sha256": "326c8468f344bf5a966666d15ab85e29515c3962e954076b38dcea55fa24d5bd"
+    },
+    {
+      "path": "Scripts/Testing/EliteDefenseProbe.cs",
+      "sha256": "c01a38b427627f6174fa7accc9c891052c5005915d44897cffef72134f37897a"
+    },
+    {
+      "path": "Scripts/Testing/EliteHazardsProbe.cs",
+      "sha256": "d79c6fa79c3a8b10ade185500521474c25b82811401ab9ebd01ef9de3ecbce28"
+    },
+    {
+      "path": "Scripts/Testing/EliteIntegrationProbe.cs",
+      "sha256": "de5291c5097021083c02e7f4eea7ba303ca09972174b0ea0c62bf9c41bce1383"
+    },
+    {
+      "path": "Scripts/Testing/EliteMotionProbe.cs",
+      "sha256": "eb8162690802a3924beb97cb62d196560fab287af5cbe6542f1b761701238075"
+    },
+    {
+      "path": "Scripts/Testing/EliteTraitProbeSupport.cs",
+      "sha256": "e44a2890ea3b489f3ff3c3cb2206e549d07f05c7df4e6ea27926884921ac498d"
+    },
+    {
+      "path": "Scripts/Weapons/Weapon.cs",
+      "sha256": "ea5b88ed1e914e58307828df5eb5aa4e217f895b1c11aa46fa43ad8aefb2e13a"
+    }
+  ]
+}

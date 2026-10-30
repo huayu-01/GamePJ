@@ -1,0 +1,38 @@
+{
+  "Date": "2026-10-26T20:56:15",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "base",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 28.58,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_205615.base.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_205615.base.err",
+      "Failure": "",
+      "SHA256": "CC9D58A24B7BBBCFDEC033B2F61B90B81EE65A858809719A236E20AFDC7EDECA"
+    },
+    {
+      "Name": "run_flow",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 7.86,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_205615.run_flow.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_205615.run_flow.err",
+      "Failure": "",
+      "SHA256": "783B941603D1EBA17D050B65CB267EE1F6A026C3F95F2998BA5AAE14F668657F"
+    },
+    {
+      "Name": "specialization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 12.88,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_205615.specialization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_205615.specialization.err",
+      "Failure": "",
+      "SHA256": "26B8870B623E0A10DD3D8DB5429C4CE08DD3BEED749713E3327DA3D42E465C0D"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

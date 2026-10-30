@@ -8,6 +8,8 @@ public partial class ChaseBehavior : Behavior
 {
 	[Export] public float StopDistance { get; set; } = 1.5f;
 	[Export] public float SpeedScale { get; set; } = 1f;
+	private ActRoguelike.Abilities.MeleeAttackAbility? _melee;
+	protected override void OnReady() => _melee = NodeSearch.FindInSubtree<ActRoguelike.Abilities.MeleeAttackAbility>(OwnerUnit);
 
 	public override void Tick(float delta)
 	{
@@ -20,7 +22,7 @@ public partial class ChaseBehavior : Behavior
 		Movement.FaceDirection(toTarget, delta);
 
 		float distance = HorizontalDistanceTo(Target);
-		if (distance > StopDistance) OwnerUnit.GetNodeOrNull<UnitNavigation>("Navigation")?.MoveTo(Target.GlobalPosition, OwnerUnit.MoveSpeed * SpeedScale);
+		if (distance > StopDistance || _melee != null && !_melee.IsInRange(Target)) OwnerUnit.GetNodeOrNull<UnitNavigation>("Navigation")?.MoveTo(Target.GlobalPosition, OwnerUnit.MoveSpeed * SpeedScale);
 		else Movement.Stop();
 	}
 }

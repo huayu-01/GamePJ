@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="LinkerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/LinkerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1013
+Id = "elite_linker"
+Title = "连线"
+Description = "与同波友军形成有预警的伤害连线。"
+NameKey = "elite.linker.name"
+DescriptionKey = "elite.linker.description"
+Cooldown = 4
+Radius = 8
+Count = 1
+Duration = 4

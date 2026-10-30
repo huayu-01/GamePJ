@@ -1,5 +1,7 @@
 # Lyra / Samurai 角色接入
 
+当前状态（2026-10-26）：角色A已切换为[三叶旅童](clover-combat-trial.md)，角色B继续使用Samurai。下文保留2026-10-17的原接入与验证历史，Lyra资源仍可作为视觉档案候选，不代表当前角色A默认模型。
+
 2026-10-17。按用户指定，角色一Lyra对应猎手，角色二Samurai对应武器大师；基地展台、基地战斗玩家和正式关卡共用角色表。
 本批未替换首领或普通敌人。
 
@@ -32,7 +34,7 @@
 
 运行Assets/Characters/tools/verify_characters.ps1：非增量Debug构建、真实渲染/物理帧验收。
 探针走InputEventAction和实际动画播放，不调用DebugFireAnimEvent；覆盖新身体碰墙、敌方命中、六武器换装、猎手三武器投射物命中、灵剑5段/镰刀3段/长枪5段与循环、同段不重复伤害和换装清理。
-`-SkipBuild -SelfTest`运行正式Main完整自测；所有构建/运行均独占.ai_validation.lock，只退出自己的PID。
+`-SkipBuild -SelfTest`运行正式Main完整自测；所有构建/运行均独占.ai/locks/validation.lock，只退出自己的PID。
 
 复现资产准备：先将作者两份免费ZIP放在忽略的_art_staging/selected_characters，再运行prepare_selected_characters.py；Godot导入后运行generate_character_skills.gd。
 角色切换采用既有PlayerLoadout，测试不写正式角色选择记忆。
@@ -46,7 +48,7 @@
 | 原生攻击姿态实拍 | attack / double_attack六时刻对照，退出0 |
 | 存档 | 各验收运行中meta.cfg、ability_cards.cfg、settings.cfg、loadout.cfg哈希不变 |
 
-原始判定摘要、关键自测日志与截图哈希见[验收证据](character-replacement-evidence.log)。
+原始判定摘要、关键自测日志与截图哈希见[验收证据](../Logs/evidence/character-replacement-evidence.log)。
 截图：characters_native_idle.png（两模型正面）、characters_samurai_sword.png（实际基地）、characters_combo_*.png（三近战命中）。
 
 导入工具的环境问题也保留：另开headless编辑器会报告共享MCP的9080端口占用；recovery-mode导入时则出现GodotTools的HotReloadAssemblyWatcher计时器错误，两个导入进程均退出0。

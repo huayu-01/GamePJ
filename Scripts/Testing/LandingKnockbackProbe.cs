@@ -141,7 +141,7 @@ public partial class LandingKnockbackProbe : Node3D
 		AddChild(label); _camera.GlobalPosition = new Vector3(28, 8, 29); _camera.LookAt(new Vector3(20, 0.8f, 20)); _camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
 		using var screenshot = GetViewport().GetTexture().GetImage();
-		Check(screenshot.SavePng("res://docs/screenshots/j19_ground_burst.png") == Error.Ok, "截图 j19_ground_burst");
+		Check(screenshot.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j19_ground_burst.png")) == Error.Ok, "截图 j19_ground_burst");
 		label.QueueFree(); _camera.GlobalTransform = before; _camera.ResetPhysicsInterpolation();
 	}
 }

@@ -1,0 +1,18 @@
+{
+  "Date": "2026-10-29T17:22:45",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "specialization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 11.76,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_172245.specialization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_172245.specialization.err",
+      "Failure": "",
+      "SHA256": "09234BCAFCD1FF1B7BC715F0F14151136C97DEFC1E079EE181183439079F6338"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

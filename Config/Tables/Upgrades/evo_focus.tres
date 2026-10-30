@@ -4,23 +4,32 @@
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a2_w1_2.tres" id="3_skill"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_crossbow.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="Resource_charge"]
 script = ExtResource("1_tuning")
 TargetAbility = ExtResource("3_skill")
 VolleyCountOverride = 1
-DamagePerLostArrow = 0.8
+DamagePerLostArrow = 1.0
+
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("Resource_charge")
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1223
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "ChargeBehavior"
-ChargeBehavior = SubResource("Resource_charge")
+Effects = [SubResource("Resource_effect_tuning")]
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Excludes = PackedStringArray("evo_philander")
 Id = "evo_focus"
 DisplayName = "专一"
-DescriptionTemplate = "武技2改为只掷出一把飞刀；每减少一把，保留下来的飞刀增加80%基础伤害。"
-Note = "J21：仅飞刀武技2发数覆盖1，原本每少一把飞刀按基础伤害加80%，公式1+少箭数×0.8；不修改武技1或角色全局数值。与花心互斥，心流可叠加。"
+DescriptionTemplate = "武技2只掷出一把飞刀，将本次其余飞刀的基础伤害全部合并；蓄力增加的数量也转为这一发的伤害。"
+Note = "064：保持单发；按照未压缩的基础/蓄力/增生发数合并直接弹体基础伤害，补偿系数1。与心流叠加时每轮仍单发，获取顺序无关；派生命中特效不按原发数复制。"
+
+NameKey = "content.evo_focus.name"
+
+DescriptionKey = "content.evo_focus.description"

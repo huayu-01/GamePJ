@@ -7,6 +7,12 @@ namespace ActRoguelike.Combat;
 /// </summary>
 public static class AimUtil
 {
+	public static bool TryAssistedPoint(Node3D owner, float maxDistance, out Vector3 point)
+	{
+		point = Vector3.Zero;
+		return owner is Unit unit && unit.GetNodeOrNull<ActRoguelike.Player.AimAssistController>("AimAssist") is { } assist
+			&& assist.TryGetAim(maxDistance, out point);
+	}
 	/// <summary>准星必须命中可站立的World表面；墙面、敌人和远端空点都不是地面。</summary>
 	public static bool TryGetCrosshairGroundPoint(Viewport viewport, Node3D owner, float maxDistance, float minNormalY, out Vector3 point)
 	{
@@ -15,7 +21,9 @@ public static class AimUtil
 		if (camera == null) return false;
 		Vector2 center = viewport.GetVisibleRect().Size * 0.5f;
 		Vector3 origin = CameraImpact.AimOrigin(camera, center);
-		var query = PhysicsRayQueryParameters3D.Create(origin, origin + camera.ProjectRayNormal(center) * maxDistance, CombatLayers.World);
+		Vector3 end = origin + camera.ProjectRayNormal(center) * maxDistance;
+		if (TryAssistedPoint(owner, maxDistance, out var assisted)) { origin = assisted + Vector3.Up * .02f; end = origin + Vector3.Down * maxDistance; }
+		var query = PhysicsRayQueryParameters3D.Create(origin, end, CombatLayers.World);
 		if (owner is CollisionObject3D body) query.Exclude = new Godot.Collections.Array<Rid> { body.GetRid() };
 		var hit = owner.GetWorld3D().DirectSpaceState.IntersectRay(query);
 		if (hit.Count == 0 || hit["normal"].AsVector3().Y < minNormalY) return false;
@@ -38,8 +46,9 @@ public static class AimUtil
 		return true;
 	}
 	/// <summary>屏幕中心射线方向；没有相机时返回 fallback。</summary>
-	public static Vector3 GetCrosshairDirection(Viewport viewport, Vector3 fallback)
+	public static Vector3 GetCrosshairDirection(Viewport viewport, Vector3 fallback, Unit? owner = null)
 	{
+		if (owner != null && TryAssistedPoint(owner, 200, out var point)) return (point - Targeting.AimPoint(owner)).Normalized();
 		Camera3D? camera = viewport.GetCamera3D();
 		if (camera == null)
 		{
@@ -53,6 +62,7 @@ public static class AimUtil
 	/// <summary>准星指向的世界点：射线打到东西就用命中点，否则取最大距离处。</summary>
 	public static Vector3 GetCrosshairPoint(Viewport viewport, Node3D owner, float maxDistance, uint mask)
 	{
+		if (TryAssistedPoint(owner, maxDistance, out var assisted)) return assisted;
 		Camera3D? camera = viewport.GetCamera3D();
 		if (camera == null)
 		{

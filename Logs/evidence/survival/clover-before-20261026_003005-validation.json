@@ -1,0 +1,283 @@
+{
+  "passed": true,
+  "pass": 64,
+  "fail": 0,
+  "checks": [
+    {
+      "passed": true,
+      "message": "\u6863\u6848\u9AA8\u67B6\u3001\u52A8\u753B\u4E0E\u60AC\u6D6E\u6302\u70B9\u7ED1\u5B9A\u6709\u6548"
+    },
+    {
+      "passed": true,
+      "message": "\u989D\u5934\u72EC\u7ACB\u5B9E\u4F8B\u6750\u8D28\uFF0C\u4E0D\u628A\u5171\u4EAB\u78A7\u7EFF\u773C\u775B\u4E00\u8D77\u6539\u4EAE"
+    },
+    {
+      "passed": true,
+      "message": "\u989D\u5934\u3001\u80CC\u90E8\u4E09\u7247\u53F6\u548C\u53F6\u830E\u5747\u7ED1\u5B9A\u53D1\u5149\uFF0C\u5171\u4E94\u5757\u56FE\u6848"
+    },
+    {
+      "passed": true,
+      "message": "\u6B63\u5F0F\u73A9\u5BB6\u78B0\u649E\u4E0E\u6839\u5C3A\u5EA6\u4FDD\u7559"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u9645\u9759\u6B62\u64AD\u653Eidle"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u9645\u6162\u901F\u79FB\u52A8\u64AD\u653Ewalk"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u9645\u5FEB\u901F\u79FB\u52A8\u64AD\u653Esprint"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u8DF3\u8DC3\u8F93\u5165\u9A71\u52A8jump\u59FF\u6001\u4E0E\u7269\u7406\u5347\u964D"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u62CD jump"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u63A5\u5730\u540E\u64AD\u653E\u7F13\u51B2\u5E76\u8FD4\u56DE\u5F85\u673A"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u6570\u5B57\u952E\u5207\u6362\u6B66\u5668\uFF1AKey1 \u2192 EnergyPalm"
+    },
+    {
+      "passed": true,
+      "message": "EnergyPalm\u771F\u5B9E\u91CA\u653E\u5E27\u89E6\u53D1\u989D\u5934\u95EA\u5149"
+    },
+    {
+      "passed": true,
+      "message": "EnergyPalm\u91CA\u653E\u65F6\u4ECE\u6697\u5904\u5F00\u59CB\uFF0C\u6CA1\u6709\u77AC\u95F4\u8DF3\u5230\u6700\u4EAE"
+    },
+    {
+      "passed": true,
+      "message": "EnergyPalm\u4ECE\u6697\u5E73\u6ED1\u5347\u5230\u4EAE\u5EA6\u5CF0\u503C"
+    },
+    {
+      "passed": true,
+      "message": "EnergyPalm\u524D\u540E\u56FE\u6848\u540C\u6B65\u8FBE\u5230\u53D1\u5149\u5CF0\u503C"
+    },
+    {
+      "passed": true,
+      "message": "EnergyPalm\u771F\u5B9E\u6295\u5C04\u7269\u547D\u4E2D\u654C\u4EBA\u5E76\u6263\u8840"
+    },
+    {
+      "passed": true,
+      "message": "EnergyPalm\u4E00\u6B21\u91CA\u653E\u4EC5\u95EA\u4E00\u6B21\uFF0C\u591A\u5F39\u4E0D\u91CD\u590D\u95EA"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u62CD attack-EnergyPalm"
+    },
+    {
+      "passed": true,
+      "message": "EnergyPalm\u5CF0\u503C\u540E\u7F13\u52A8\u53D8\u6697\uFF0C\u4EAE\u5EA6\u4E0D\u4F1A\u786C\u5207\u6D88\u5931"
+    },
+    {
+      "passed": true,
+      "message": "EnergyPalm\u95EA\u5149\u81EA\u7136\u8870\u51CF\u5B8C\u6210"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u6570\u5B57\u952E\u5207\u6362\u6B66\u5668\uFF1AKey2 \u2192 Crossbow"
+    },
+    {
+      "passed": true,
+      "message": "Crossbow\u771F\u5B9E\u91CA\u653E\u5E27\u89E6\u53D1\u989D\u5934\u95EA\u5149"
+    },
+    {
+      "passed": true,
+      "message": "Crossbow\u91CA\u653E\u65F6\u4ECE\u6697\u5904\u5F00\u59CB\uFF0C\u6CA1\u6709\u77AC\u95F4\u8DF3\u5230\u6700\u4EAE"
+    },
+    {
+      "passed": true,
+      "message": "Crossbow\u4ECE\u6697\u5E73\u6ED1\u5347\u5230\u4EAE\u5EA6\u5CF0\u503C"
+    },
+    {
+      "passed": true,
+      "message": "Crossbow\u524D\u540E\u56FE\u6848\u540C\u6B65\u8FBE\u5230\u53D1\u5149\u5CF0\u503C"
+    },
+    {
+      "passed": true,
+      "message": "Crossbow\u771F\u5B9E\u6295\u5C04\u7269\u547D\u4E2D\u654C\u4EBA\u5E76\u6263\u8840"
+    },
+    {
+      "passed": true,
+      "message": "Crossbow\u4E00\u6B21\u91CA\u653E\u4EC5\u95EA\u4E00\u6B21\uFF0C\u591A\u5F39\u4E0D\u91CD\u590D\u95EA"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u62CD attack-Crossbow"
+    },
+    {
+      "passed": true,
+      "message": "Crossbow\u5CF0\u503C\u540E\u7F13\u52A8\u53D8\u6697\uFF0C\u4EAE\u5EA6\u4E0D\u4F1A\u786C\u5207\u6D88\u5931"
+    },
+    {
+      "passed": true,
+      "message": "Crossbow\u95EA\u5149\u81EA\u7136\u8870\u51CF\u5B8C\u6210"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u6570\u5B57\u952E\u5207\u6362\u6B66\u5668\uFF1AKey3 \u2192 Bow"
+    },
+    {
+      "passed": true,
+      "message": "\u84C4\u529B\u4E2D\u7684ATK\u4E8B\u4EF6\u4E0D\u5192\u5145\u91CA\u653E\u95EA\u5149\uFF1ABow"
+    },
+    {
+      "passed": true,
+      "message": "Bow\u771F\u5B9E\u91CA\u653E\u5E27\u89E6\u53D1\u989D\u5934\u95EA\u5149"
+    },
+    {
+      "passed": true,
+      "message": "Bow\u91CA\u653E\u65F6\u4ECE\u6697\u5904\u5F00\u59CB\uFF0C\u6CA1\u6709\u77AC\u95F4\u8DF3\u5230\u6700\u4EAE"
+    },
+    {
+      "passed": true,
+      "message": "Bow\u4ECE\u6697\u5E73\u6ED1\u5347\u5230\u4EAE\u5EA6\u5CF0\u503C"
+    },
+    {
+      "passed": true,
+      "message": "Bow\u524D\u540E\u56FE\u6848\u540C\u6B65\u8FBE\u5230\u53D1\u5149\u5CF0\u503C"
+    },
+    {
+      "passed": true,
+      "message": "Bow\u771F\u5B9E\u6295\u5C04\u7269\u547D\u4E2D\u654C\u4EBA\u5E76\u6263\u8840"
+    },
+    {
+      "passed": true,
+      "message": "Bow\u4E00\u6B21\u91CA\u653E\u4EC5\u95EA\u4E00\u6B21\uFF0C\u591A\u5F39\u4E0D\u91CD\u590D\u95EA"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u62CD attack-Bow"
+    },
+    {
+      "passed": true,
+      "message": "Bow\u5CF0\u503C\u540E\u7F13\u52A8\u53D8\u6697\uFF0C\u4EAE\u5EA6\u4E0D\u4F1A\u786C\u5207\u6D88\u5931"
+    },
+    {
+      "passed": true,
+      "message": "Bow\u95EA\u5149\u81EA\u7136\u8870\u51CF\u5B8C\u6210"
+    },
+    {
+      "passed": true,
+      "message": "\u5C0F\u952E\u76D83\u4E5F\u80FD\u5207\u6362\u5F13"
+    },
+    {
+      "passed": true,
+      "message": "\u4EC5\u903B\u8F91\u952E\u7801\u7684\u952E\u76D8\u4E8B\u4EF6\u4E5F\u80FD\u6B63\u5E38\u5207\u6362"
+    },
+    {
+      "passed": true,
+      "message": "\u672A\u5B8C\u6210\u4E14\u4E0D\u5141\u8BB8\u4F4E\u84C4\u529B\u91CA\u653E\u65F6\uFF0C\u6CA1\u6709\u91CA\u653E\u95EA\u5149"
+    },
+    {
+      "passed": true,
+      "message": "\u6309\u4F4F\u84C4\u529B\u4E0D\u91CD\u590D\u53D1\u5149"
+    },
+    {
+      "passed": true,
+      "message": "\u84C4\u529B\u5B8C\u6210\u677E\u624B\uFF0C\u5728\u65B0\u64AD\u653E\u7684ATK\u5E27\u53D1\u5149"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u62CD charged-release"
+    },
+    {
+      "passed": true,
+      "message": "\u540E\u64A4Dodge\u91CA\u653E\u5E27\u53D1\u5149"
+    },
+    {
+      "passed": true,
+      "message": "Dodger\u7ED3\u675F\u5E27\u4E0D\u91CD\u590D\u53D1\u5149"
+    },
+    {
+      "passed": true,
+      "message": "\u8DC3\u5347Action\u771F\u5B9E\u8D77\u8DF3\u5E76\u53D1\u5149"
+    },
+    {
+      "passed": true,
+      "message": "\u65E0\u52A8\u753B\u7684\u7EF4\u6301\u6280\u80FD\u6210\u529F\u542F\u52A8\u4E5F\u53D1\u5149"
+    },
+    {
+      "passed": true,
+      "message": "\u7EF4\u6301\u6280\u80FD\u6309\u4F4F\u671F\u95F4\u4E0D\u6BCF\u5E27\u91CD\u95EA"
+    },
+    {
+      "passed": true,
+      "message": "\u6682\u505C\u68C0\u67E5\u524D\u771F\u5B9E\u51FA\u624B"
+    },
+    {
+      "passed": true,
+      "message": "\u6682\u505C\u68C0\u67E5\u8986\u76D6\u6B63\u5728\u6E10\u4EAE\u7684\u53EF\u89C1\u8109\u51B2"
+    },
+    {
+      "passed": true,
+      "message": "\u5168\u5C40\u6682\u505C\u51BB\u7ED3\u95EA\u5149\u65F6\u949F"
+    },
+    {
+      "passed": true,
+      "message": "\u6B63\u9762\u8FD1\u666F\u7531\u771F\u5B9E\u91CA\u653E\u89E6\u53D1\u56FE\u6848\u53D1\u5149"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u62CD forehead-glow"
+    },
+    {
+      "passed": true,
+      "message": "\u5207\u56DE\u539F\u6A21\u578B\u65F6\u65E7\u56FE\u6848\u65E0\u6B8B\u7559\u53D1\u5149"
+    },
+    {
+      "passed": true,
+      "message": "\u5207\u56DE\u65C5\u7AE5\u590D\u7528\u5B9E\u4F8B\u4E14\u4FDD\u6301\u5E72\u51C0\u72B6\u6001"
+    },
+    {
+      "passed": true,
+      "message": "\u654C\u65B9\u771F\u5B9E\u547D\u4E2D\u6263\u8840\u5E76\u64AD\u653E\u7AD9\u7ACB\u53D7\u51FB"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u62CD hit"
+    },
+    {
+      "passed": true,
+      "message": "\u53D7\u51FB\u59FF\u6001\u7ED3\u675F\u56DE\u5230\u5F85\u673A"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u81F4\u6B7B\u547D\u4E2D\u64AD\u653E\u6B7B\u4EA1\u5E76\u6E05\u9664\u95EA\u5149"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u62CD death"
+    }
+  ],
+  "glow_samples": [
+    {
+      "weapon": "EnergyPalm",
+      "start": 0,
+      "peak": 0.9957569,
+      "falling": 0.82786953
+    },
+    {
+      "weapon": "Crossbow",
+      "start": 0,
+      "peak": 0.98884845,
+      "falling": 0.9708955
+    },
+    {
+      "weapon": "Bow",
+      "start": 0,
+      "peak": 0.9894877,
+      "falling": 0.97912884
+    }
+  ]
+}

@@ -1,27 +1,21 @@
 [gd_resource type="Resource" script_class="RewardConfig" format=3]
-
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
-[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
-
-[sub_resource type="Resource" id="Resource_p1"]
-script = ExtResource("1_param")
-Key = "ExtraAirJumps"
-Value = 1
-Note = "每次本人击杀立即增加的可用空中跳次数，同时增加未满的最大容量"
-
-[sub_resource type="Resource" id="Resource_p2"]
-script = ExtResource("1_param")
-Key = "JumpCap"
-Value = 3
-Note = "上限（文档：最多 N 次）"
-
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/KillAirJumpRewardEffect.cs" id="definition"]
+[sub_resource type="Resource" id="definition"]
+script = ExtResource("definition")
+ExtraAirJumps = 1
+JumpCap = 3
 [resource]
-script = ExtResource("2_row")
+script = ExtResource("row")
+NumericId = 1278
 RewardKind = 2
 MaxStacks = 1
-ApplyHandler = "KillAirJumps"
-HandlerParams = [SubResource("Resource_p1"), SubResource("Resource_p2")]
+Effects = [SubResource("definition")]
 Id = "mut_stomp_kill"
 DisplayName = "践踏死亡"
-DescriptionTemplate = "每次本人击杀立即补充 {ExtraAirJumps:0} 次空中跳跃，同时增加最大容量（最多 {JumpCap:0} 次）；满容量后仍可补回已消耗次数"
-Note = "J25：按每次击杀逐个计入，移除旧0.1秒冷却；纯计数不经过攻击连锁次数／深度门。用户确认空中击杀立即可用，满容量后也可补回已消耗次数，不等落地；每杀1／封顶3沿用可调预设，保留灵动及其他来源已有次数。效果与说明同读HandlerParams。"
+DescriptionTemplate = "每次本人击杀立即补充 {Effects.0.ExtraAirJumps:0} 次空中跳跃，同时增加最大容量（最多 {Effects.0.JumpCap:0} 次）；满容量后仍可补回已消耗次数"
+Note = "J25：按每次击杀逐个计入，移除旧0.1秒冷却；纯计数不经过攻击连锁次数／深度门。用户确认空中击杀立即可用，满容量后也可补回已消耗次数，不等落地；每杀1／封顶3沿用可调预设，保留灵动及其他来源已有次数。效果与说明同读Effects。"
+
+NameKey = "content.mut_stomp_kill.name"
+
+DescriptionKey = "content.mut_stomp_kill.description"

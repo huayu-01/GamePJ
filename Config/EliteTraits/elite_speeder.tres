@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpeederTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/SpeederTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1024
+Id = "elite_speeder"
+Title = "迅捷"
+Description = "移动和恢复加快，保留攻击预警。"
+NameKey = "elite.speeder.name"
+DescriptionKey = "elite.speeder.description"
+Magnitude = 1.25
+Requirements = 1

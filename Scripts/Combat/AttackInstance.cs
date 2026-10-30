@@ -27,7 +27,44 @@ public readonly record struct AttackOffense(float DamageMultiplier, float CritCh
 /// </summary>
 public sealed class AttackInstance
 {
-	public Unit? Attacker { get; init; }
+	private static long _castSequence;
+	public static long NextCastId() => System.Threading.Interlocked.Increment(ref _castSequence);
+	public long CastId { get; init; } = NextCastId();
+	/// <summary>生成时冻结手动武技来源，多弹共享快照，衍生伤害不得冒充主武技。</summary>
+	public bool IsManualWeaponAttack { get; init; }
+	/// <summary>由本次武技明确组成的追击段；仍属衍生攻击以阻止递归，但可参与该武技吸血。</summary>
+	public bool IsWeaponSkillComponent { get; init; }
+	/// <summary>自动区域可独立禁止按命中次数复制的扁平附伤，不影响已有攻击的默认规则。</summary>
+	public bool SuppressFlatDamageBonuses { get; init; }
+	/// <summary>主动技能本体的直伤；可享受直接攻击增益，但不冒充主武技触发协击。</summary>
+	public bool IsDirectAbilityAttack { get; init; }
+	private Unit? _attacker;
+	private float _capturedPower;
+	private Dictionary<ulong, int>? _powerApplications;
+	public Unit? Attacker
+	{
+		get => _attacker;
+		init
+		{
+			_attacker = value;
+			float power = value?.Stats.Get("AttackPowerAdd") ?? 0;
+			_capturedPower = power > 0 ? power * AttackOffense.Capture(value).DamageMultiplier : 0;
+		}
+	}
+	/// <summary>直接出手的固定攻击预算，按多弹和连招组成段分配；药剂到期不改已出手攻击。</summary>
+	public float PowerDamageWeight { get; init; } = 1;
+	public float PowerDamageSnapshotOverride { get; init; } = -1;
+	public float CapturedAttackPower => PowerDamageSnapshotOverride >= 0 ? PowerDamageSnapshotOverride : _capturedPower;
+	private float TakePowerBonus(Unit target)
+	{
+		float power = CapturedAttackPower;
+		if (power <= 0 || IsDamageOverTime || !(IsManualWeaponAttack || IsDirectAbilityAttack || IsWeaponSkillComponent)) return 0;
+		int parts = System.Math.Max(1, ProjectileCount);
+		_powerApplications ??= new Dictionary<ulong, int>(); ulong id = target.GetInstanceId();
+		int used = _powerApplications.GetValueOrDefault(id); if (used >= parts) return 0;
+		_powerApplications[id] = used + 1;
+		return power * Mathf.Max(0, PowerDamageWeight) / (parts * System.Math.Max(1, ComboStepCount));
+	}
 	public string Ability { get; init; } = string.Empty;
 	/// <summary>发出攻击时冻结的连招段号与总段数；非连招总段数为0。</summary>
 	public int ComboStep { get; init; } = -1;
@@ -98,11 +135,11 @@ public sealed class AttackInstance
 			? attacker.OutgoingDamageScaleAgainst(target, this)
 			: 1f;
 
-		// ⭐ J11：**扁平加伤**（「巨人」符文 = 每次攻击额外造成玩家最大生命值 10% 的伤害）。
+		// 扁平附伤（「巨人」比例读取符文配置），在本次暴击倍率之外独立加算。
 		// 与上面那个倍率分成两个口子，是因为它是一笔"与本次伤害无关的固定量"：
 		// 走倍率会被暴击倍率一起放大（见 `IOutgoingDamageBonus` 的注释）。
 		// 没有任何规则登记时恒为 0，而 `x + 0f == x`（浮点逐位相等）→ 改动前行为逐位不变。
-		float flatBonus = Attacker is { } bonusAttacker && GodotObject.IsInstanceValid(bonusAttacker)
+		float flatBonus = !SuppressFlatDamageBonuses && Attacker is { } bonusAttacker && GodotObject.IsInstanceValid(bonusAttacker)
 			? bonusAttacker.OutgoingDamageBonusAgainst(target, this)
 			: 0f;
 
@@ -112,7 +149,7 @@ public sealed class AttackInstance
 			Attacker = Attacker,
 			Attack = this,
 			Context = EventContext.Create(Attacker, target),
-			Damage = (BaseDamage * (critical ? CritMultiplier : 1f) * marked) + flatBonus,
+			Damage = ((BaseDamage + TakePowerBonus(target)) * (critical ? CritMultiplier : 1f) * marked) + flatBonus,
 			Critical = critical,
 			Direction = direction,
 			Position = position,

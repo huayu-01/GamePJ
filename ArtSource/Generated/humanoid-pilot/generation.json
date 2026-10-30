@@ -1,0 +1,21 @@
+{
+  "job_id": "1503679606820970496",
+  "status": "DONE",
+  "provider": "hunyuan3d",
+  "credit_consumed": 25,
+  "credit_details": "{\"GenerateType-LowPoly\":25}",
+  "files": [
+    {
+      "type": "OBJ",
+      "file": "original-00-obj.zip",
+      "bytes": 9150882,
+      "sha256": "4364cda6db60fbda5fcca0d97a3b7fa264c72b04b835188c81b2dd2f65abd582"
+    },
+    {
+      "type": "GLB",
+      "file": "original-01-glb.glb",
+      "bytes": 10173664,
+      "sha256": "3d23981f461fd3be49a79636550e764342803c5f01a90921f51ca3e642b91566"
+    }
+  ]
+}

@@ -92,7 +92,7 @@ public partial class SpearRecallProbe : Node3D
 		_camera.GlobalPosition = new Vector3(29, 8, 23); _camera.LookAt(new Vector3(20, 0.8f, 12)); _camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
 		using var screenshot = GetViewport().GetTexture().GetImage();
-		Check(screenshot.SavePng("res://docs/screenshots/j16_rainbow.png") == Error.Ok, "截图 j16_rainbow");
+		Check(screenshot.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j16_rainbow.png")) == Error.Ok, "截图 j16_rainbow");
 		label.QueueFree(); _camera.GlobalTransform = before; _camera.ResetPhysicsInterpolation();
 	}
 	public override async void _Ready()

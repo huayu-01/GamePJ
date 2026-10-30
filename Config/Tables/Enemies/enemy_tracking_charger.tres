@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1"]
 [resource]
 script = ExtResource("1")
+NumericId = 1106
 Id = "enemy_tracking_charger"
 DisplayName = "追踪冲锋兵"
 ScenePath = "res://Scenes/Enemies/TrackingCharger.tscn"

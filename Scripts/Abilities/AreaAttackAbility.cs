@@ -52,6 +52,7 @@ public partial class AreaAttackAbility : Ability
 		{
 			case 0:
 				_warning?.Hitbox(_hitbox);
+				_warning?.SetProgress(StateTime/Mathf.Max(.001f,Windup));
 				if (StateTime >= Windup)
 				{
 					_hitbox.Activate(OwnerUnit);

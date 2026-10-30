@@ -13,7 +13,7 @@ using Godot;
 
 namespace ActRoguelike.Testing;
 
-/// <summary>喜爱：真实离手、2秒索敌、悬停续飞、周期伤害、回手和World边界。</summary>
+/// <summary>喜爱：两倍飞速、抵达后1秒索敌、武器最近目标、回手和World边界。</summary>
 public partial class ScytheSeekProbe : Node3D
 {
 	private int _pass, _fail;
@@ -48,7 +48,7 @@ public partial class ScytheSeekProbe : Node3D
 			var def = RewardCatalog.Find("evo_affection");
 			Check(row?.WeaponSeek?.TargetAbility?.Id == "skl_b2_w1_2" && row.HasKnownHandler && def != null, "喜爱真实表行与强类型目标／处理器有效");
 			if (def != null) _build.Add(def, new RewardContext { Player = _player, Weapon = NodeSearch.FindInSubtree<Weapon>(_player)!, Build = _build });
-			Check(_build.Has("evo_affection") && Mathf.IsEqualApprox(Scythe.SeekIntervalSeconds, 2f), "真实入构筑后飞镰索敌间隔为表内2秒");
+			Check(_build.Has("evo_affection") && Mathf.IsEqualApprox(Scythe.SeekIntervalSeconds, 1f) && Mathf.IsEqualApprox(Scythe.SeekFlightSpeedScale, 2f), "真实入构筑：到达后1秒索敌，出手／回程速度2倍");
 		}
 		await Wait(0.2);
 	}
@@ -87,7 +87,7 @@ public partial class ScytheSeekProbe : Node3D
 		AddChild(label); AddChild(marker);
 		_camera.GlobalPosition = new Vector3(31, 10, 29); _camera.LookAt(new Vector3(23, 0.7f, 16)); _camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"截图 {name}");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"截图 {name}");
 		label.QueueFree(); marker.QueueFree(); _camera.GlobalTransform = before; _camera.ResetPhysicsInterpolation();
 	}
 	public override async void _Ready()
@@ -118,20 +118,27 @@ public partial class ScytheSeekProbe : Node3D
 		Target("FriendlyNearest", new Vector3(21, 0, 20), Faction.Player);
 		var dead = Target("DeadNearest", new Vector3(22, 0, 20), hp: 1);
 		dead.ReceiveHit(new AttackInstance { Attacker = _player, Ability = "probe_kill", BaseDamage = 10 }.RollHit(dead, Vector3.Zero, dead.GlobalPosition));
-		await Wait(0.1); await Throw(); await Wait(1.7);
-		Check(Scythe.SeekTickCount == 0 && Scythe.HasSettled, "离手后未满2秒不提前索敌，原飞镰已悬停");
-		Check(await Until(() => Scythe.SeekTickCount == 1, 1), "真实离手后第2秒触发第一次索敌");
-		Check(Scythe.LastSeekTarget == "OwnerNearest" && Scythe.RedirectCount == 1 && !Scythe.HasSettled,
-			$"按玩家距离选OwnerNearest，忽略友军／死者／更靠近武器的目标：{Scythe.LastSeekTarget}");
-		Check(Mathf.Abs(Scythe.LastSeekSeconds - 2f) < 0.025f && Scythe.WeaponVelocity.X > 0f, $"首次索敌时刻{Scythe.LastSeekSeconds:0.###}秒，武器实际速度已转向侧方");
-		Check(await Until(() => Scythe.SeekTickCount >= 2, 3), "第4秒重新评估目标");
-		Check(Mathf.Abs(Scythe.LastSeekSeconds - 4f) < 0.025f, $"第二次索敌时刻{Scythe.LastSeekSeconds:0.###}秒，周期2秒");
-		await Wait(0.65);
-		Check(Scythe.WeaponPosition.DistanceTo(a.GlobalPosition + Vector3.Up * 0.9f) < 0.15f && Scythe.HasSettled, "悬停可续飞，实际到目标点停留而不越过目标");
-		Check(a.Health < a.MaxHealth, $"新目标实际被周期伤害命中，生命{a.Health:0.###}");
-		await Screenshot("j15_affection", $"Affection: owner-nearest target\nSeek at 2s / 4s | target HP {a.Health:0.##}");
-		b.GlobalPosition = new Vector3(20, 0, 15.5f);
-		Check(await Until(() => Scythe.SeekTickCount >= 3, 3) && Scythe.LastSeekTarget == "WeaponNearest", "目标移动后，第6秒按新的玩家最近距离切换目标");
+		await Wait(0.1); await Throw();
+		Check(Scythe.WeaponVelocity.Length() > Scythe.ThrowSpeed * 1.9f, "真实离手飞速提高100%");
+		await Until(() => Scythe.HasSettled, 1);
+		double arrival = _elapsed;
+		b.GlobalPosition = Scythe.WeaponPosition + Vector3.Right * 3 - Vector3.Up * .9f;
+		await Wait(.65);
+		Check(Scythe.SeekTickCount == 0 && Scythe.HasSettled, "抵达后未满1秒不提前索敌");
+		Check(await Until(() => Scythe.SeekTickCount == 1, 1), "抵达后第1秒触发第一次索敌");
+		Check(Scythe.LastSeekTarget == "WeaponNearest" && Scythe.RedirectCount == 1 && !Scythe.HasSettled,
+			$"按武器距离选WeaponNearest，忽略友军／死者及离玩家近的目标：{Scythe.LastSeekTarget}");
+		Check(Math.Abs(_elapsed - arrival - 1) < .07 && Scythe.WeaponVelocity.X > 0f, "停留约1秒后武器实际转向侧方");
+		Check(await Until(() => Scythe.HasSettled, 1), "重定向飞行到达目标才停留");
+		double secondArrival = _elapsed;
+		Check(Scythe.WeaponPosition.DistanceTo(b.GlobalPosition + Vector3.Up * 0.9f) < 0.15f && Scythe.HasSettled, "实际到目标点停留而不越过目标");
+		Check(b.Health < b.MaxHealth, $"新目标被真实伤害命中，生命{b.Health:0.###}");
+		a.GlobalPosition = Scythe.WeaponPosition + Vector3.Right * 6 - Vector3.Up * .9f;
+		b.GlobalPosition += Vector3.Right * 30;
+		await Wait(.65);
+		Check(Scythe.SeekTickCount == 1, "第二次飞行时间不消耗新的停留间隔");
+		Check(await Until(() => Scythe.SeekTickCount >= 2, 1) && Math.Abs(_elapsed - secondArrival - 1) < .07 && Scythe.LastSeekTarget == "OwnerNearest", "新一次抵达后重新等1秒，再按最新武器距离切换目标");
+		await Screenshot("j48_affection", "Affection: weapon-nearest\n2x speed | wait 1s after arrival");
 		int ticks = Scythe.SeekTickCount;
 		await Recall(); await Wait(2.1);
 		Check(Scythe.SeekTickCount == ticks && !Scythe.InFlight, "回程和回手后停止索敌，不被下一次周期抢回飞行状态");
@@ -143,11 +150,11 @@ public partial class ScytheSeekProbe : Node3D
 		Check(await Until(() => !Scythe.InFlight), "携带喜爱时靠近武器仍自动收回");
 		await ClearTargets();
 		await Equip();
-		Check(Mathf.IsZeroApprox(Scythe.SeekIntervalSeconds) && Scythe.SeekTickCount == 0, "重新配装后清除喜爱配置与计时状态");
+		Check(Mathf.IsZeroApprox(Scythe.SeekIntervalSeconds) && Scythe.SeekTickCount == 0 && Mathf.IsEqualApprox(Scythe.SeekFlightSpeedScale, 1), "重新配装后清除喜爱配置、速度倍率与计时状态");
 	}
 	private async Task EmptyAndWorld()
 	{
-		await Equip(true); await Throw(); await Wait(2.3);
+		await Equip(true); await Throw(); await Until(() => Scythe.SeekTickCount >= 1, 3);
 		Check(Scythe.SeekTickCount == 1 && Scythe.RedirectCount == 0 && Scythe.InFlight && Scythe.HasSettled, "没有有效敌人时只做周期检查，继续悬停而不产生伪目标");
 		await Recall();
 		await Equip(true);
@@ -158,11 +165,11 @@ public partial class ScytheSeekProbe : Node3D
 		wall.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = size }, MaterialOverride = new StandardMaterial3D { AlbedoColor = Colors.SlateGray } });
 		AddChild(wall); wall.GlobalPosition = new Vector3(23, 1.8f, 15.7f);
 		await Wait(0.1); await Throw();
-		Check(await Until(() => Scythe.SeekTickCount >= 3, 7), "墙前连续经历第2／4／6秒三次索敌");
+		Check(await Until(() => Scythe.SeekTickCount >= 3, 7), "墙前经历三次到达后重新计时的索敌");
 		await Wait(0.25);
 		Check(Scythe.HasSettled && Scythe.WeaponPosition.X <= 22.71f && behind.Health == behind.MaxHealth,
 			$"真实World阻挡与墙面再出发：武器{Scythe.WeaponPosition}，墙后靶零伤害");
-		await Screenshot("j15_world", "Affection: World blocks redirected flight\n3 seek attempts | no wall penetration");
+		await Screenshot("j48_affection_world", "Affection: World blocks redirected flight\n3 seek attempts | no wall penetration");
 		await Recall(); wall.QueueFree(); await ClearTargets();
 	}
 }

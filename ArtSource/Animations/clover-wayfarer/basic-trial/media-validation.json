@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "media\\die.mp4",
+      "bytes": 193497,
+      "decoded": true
+    },
+    {
+      "file": "media\\hit.mp4",
+      "bytes": 84480,
+      "decoded": true
+    },
+    {
+      "file": "media\\idle.mp4",
+      "bytes": 118968,
+      "decoded": true
+    },
+    {
+      "file": "media\\jump.mp4",
+      "bytes": 94342,
+      "decoded": true
+    },
+    {
+      "file": "media\\sprint.mp4",
+      "bytes": 103339,
+      "decoded": true
+    },
+    {
+      "file": "media\\walk.mp4",
+      "bytes": 117106,
+      "decoded": true
+    },
+    {
+      "file": "clover-basic-six.mp4",
+      "bytes": 695312,
+      "decoded": true
+    }
+  ],
+  "gif": {
+    "frames": 72,
+    "size": [
+      960,
+      1260
+    ],
+    "bytes": 13524477
+  }
+}

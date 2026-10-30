@@ -85,10 +85,10 @@ public partial class EnemyRosterLab : Node3D
 	{
 		await ToSignal(GetTree().CreateTimer(.8), SceneTreeTimer.SignalName.Timeout);
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Error result = GetViewport().GetTexture().GetImage().SavePng("res://docs/screenshots/j36_enemy_roster.png");
+		Error result = GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j36_enemy_roster.png"));
 		_enemy!.GetNode<UnitPresentation>("Presentation").FlashAttack();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Error flash = GetViewport().GetTexture().GetImage().SavePng("res://docs/screenshots/j36_attack_warning.png");
+		Error flash = GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j36_attack_warning.png"));
 		GD.Print($"[RosterLab] 截图={result}／闪色={flash}");
 		GameExit.Request(GetTree(), result == Error.Ok && flash == Error.Ok ? 0 : 1);
 	}

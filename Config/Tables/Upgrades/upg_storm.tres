@@ -1,23 +1,31 @@
-[gd_resource type="Resource" script_class="RewardConfig" load_steps=4 format=3]
-
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[ext_resource type="Script" path="res://Scripts/Config/Specializations/StormBehaviorDefinition.cs" id="behavior_definition"]
 
-[sub_resource type="Resource" id="p_DamagePerSpeed"]
-script = ExtResource("param")
-Key = "DamagePerSpeed"
-Value = 0.02
-Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/SpecializationRewardEffect.cs" id="specialization_effect"]
+
+[sub_resource type="Resource" id="behavior_definition"]
+script = ExtResource("behavior_definition")
+DamagePerSpeed = 0.02
+
+
+[sub_resource type="Resource" id="specialization_effect"]
+script = ExtResource("specialization_effect")
+Definition = SubResource("behavior_definition")
 
 [resource]
 script = ExtResource("row")
+NumericId = 1311
 Id = "upg_storm"
 DisplayName = "暴风"
 RewardKind = 0
 MaxStacks = 1
-ApplyHandler = "Specialization"
+Effects = [SubResource("specialization_effect")]
 Specialization = 23
-HandlerParams = [SubResource("p_DamagePerSpeed")]
-DescriptionTemplate = "每1米/秒移动速度使伤害增加{DamagePerSpeed:0%}，奔跑速度也计入。"
+DescriptionTemplate = "每1米/秒移动速度使伤害增加{SpecializationBehavior.DamagePerSpeed:0%}，奔跑速度也计入。"
 
 Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"
+
+NameKey = "content.upg_storm.name"
+
+DescriptionKey = "content.upg_storm.description"

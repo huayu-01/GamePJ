@@ -1,6 +1,7 @@
 using ActRoguelike.Combat;
 using ActRoguelike.Core;
 using ActRoguelike.Config;
+using ActRoguelike.Interaction;
 using ActRoguelike.UI;
 using Godot;
 
@@ -19,9 +20,23 @@ public partial class BaseCamp : Node
 	{
 		// 独立挂载符文台，避免与基地美术场景的编辑争用。
 		AddChild(new RuneScreen { Name = "RuneScreen" });
+		AddChild(new ExpeditionScreen { Name = "ExpeditionScreen" });
+		AddChild(new BaseGuide { Name = "BaseGuide" });
 		CallDeferred(nameof(AddRuneTerminal));
 	}
-	private void AddRuneTerminal() => GetParent().AddChild(new ActRoguelike.Interaction.RuneTerminal { Name = "RuneTerminal", Position = new Vector3(-7, 0, 4) });
+	private void AddRuneTerminal()
+	{
+		var host = new Node3D { Name = "RuneTerminal", Position = new Vector3(-7, 0, 4) };
+		host.AddChild(new InteractionComponent { Name = "InteractionComponent", Kind = InteractionKind.Runes });
+		GetParent().AddChild(host);
+		var trial = new Node3D { Name = "SurvivalGate", Position = new Vector3(-10, 0, -5) };
+		trial.AddChild(new InteractionComponent
+		{
+			Name = "InteractionComponent", Kind = InteractionKind.Expedition, Prompt = "暮光回廊 · 生存试炼",
+			Destination = RuntimeResources.Load<ExpeditionDestination>("res://Config/Modes/survival_destination.tres")
+		});
+		GetParent().AddChild(trial);
+	}
 	public override void _Process(double delta)
 	{
 		if (!_selectionRestored)

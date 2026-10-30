@@ -42,7 +42,7 @@ public abstract partial class UnitConfig : ConfigRow
 	/// </summary>
 	[Export] public float StartingArmor { get; set; }
 
-	/// <summary>最大护盾（在护甲之前被消耗，不吃护甲减伤）。</summary>
+	/// <summary>最大护盾。命中先按受击前护甲状态计算整击减伤，再依次扣护甲、临时/普通护盾、生命；破甲余伤不重新计算减伤。</summary>
 	[Export] public float MaxShield { get; set; }
 
 	/// <summary>护甲大于 0 时提供的伤害减免。</summary>
@@ -109,7 +109,26 @@ public abstract partial class UnitConfig : ConfigRow
 
 	[ExportGroup("表现（模型 / 图标 / 缩放）")]
 	/// <summary>替换占位模型用的预制体（空 = 用场景里自带的占位模型）。</summary>
-	[Export(PropertyHint.File, "*.glb,*.gltf,*.tscn")] public string ModelPath { get; set; } = string.Empty;
+	private UnitVisualProfile? _visualProfile;
+	[Export] public UnitVisualProfile? VisualProfile
+	{
+		get => _visualProfile;
+		set { _visualProfile = value; if (Engine.IsEditorHint()) NotifyPropertyListChanged(); }
+	}
+	public override void _ValidateProperty(Godot.Collections.Dictionary property)
+	{
+		base._ValidateProperty(property);
+		if (VisualProfile == null) return;
+		string name = property["name"].AsString();
+		if (name is "ModelPath" or "ModelTransform" or "WeaponGripScene" or "AnimIdle" or "AnimWalk" or "AnimRun" or "AnimDeath" or "AnimLibraryDir" or "AnimLibraryName")
+		{
+			// 档案是唯一制作来源；兼容属性仍能读取，但不在 Inspector 重复编辑或另存一份副本。
+			var usage = (PropertyUsageFlags)property["usage"].AsInt64();
+			property["usage"] = (long)(usage & ~(PropertyUsageFlags.Editor | PropertyUsageFlags.Storage));
+		}
+	}
+	private string _modelPath = string.Empty;
+	[Export(PropertyHint.File, "*.glb,*.gltf,*.tscn")] public string ModelPath { get => VisualProfile?.ModelScene?.ResourcePath ?? _modelPath; set => _modelPath = value; }
 
 	// ⚠️ 刻意**没有** IconPath 列：敌人/召唤物现在没有任何"图标"界面（首领面板的头像是 BarBoss.tscn 的
 	// 固定色块），加一列没人读的图标路径就是死配置。要做首领头像时再加一列 + 一处 UI（`PlayerHud`）。
@@ -122,26 +141,30 @@ public abstract partial class UnitConfig : ConfigRow
 	/// 待机动画名（速度低于 <see cref="AnimWalkMinSpeed"/> 时播）。
 	/// <b>空 = 不覆盖</b>：用 <see cref="UnitAnimator.AnimIdle"/> 的默认值（`idle`）。
 	/// </summary>
-	[Export] public string AnimIdle { get; set; } = string.Empty;
+	private string _animIdle = string.Empty;
+	[Export] public string AnimIdle { get => VisualProfile?.AnimIdle ?? _animIdle; set => _animIdle = value; }
 
 	/// <summary>
 	/// 移动动画名（速度在 <see cref="AnimWalkMinSpeed"/> 与 <see cref="AnimRunMinSpeed"/> 之间时播）。
 	/// <b>空 = 不覆盖</b>：用 <see cref="UnitAnimator.AnimWalk"/> 的默认值（`walk`）。
 	/// </summary>
-	[Export] public string AnimWalk { get; set; } = string.Empty;
+	private string _animWalk = string.Empty;
+	[Export] public string AnimWalk { get => VisualProfile?.AnimWalk ?? _animWalk; set => _animWalk = value; }
 
 	/// <summary>
 	/// 奔跑动画名（速度不低于 <see cref="AnimRunMinSpeed"/> 时播）。
 	/// <b>空 = 不覆盖</b>：用 <see cref="UnitAnimator.AnimRun"/> 的默认值（`sprint` —— Kenney Mini Characters
 	/// 的 32 段里"跑"就叫 `sprint`，没有 `run`）。
 	/// </summary>
-	[Export] public string AnimRun { get; set; } = string.Empty;
+	private string _animRun = string.Empty;
+	[Export] public string AnimRun { get => VisualProfile?.AnimRun ?? _animRun; set => _animRun = value; }
 
 	/// <summary>
 	/// 死亡动画名（播一遍停在倒地帧，撑到 <see cref="UnitPresentation.DeathLinger"/> 到期）。
 	/// <b>空 = 不覆盖</b>：用 <see cref="UnitAnimator.AnimDeath"/> 的默认值（`die`）。
 	/// </summary>
-	[Export] public string AnimDeath { get; set; } = string.Empty;
+	private string _animDeath = string.Empty;
+	[Export] public string AnimDeath { get => VisualProfile?.AnimDeath ?? _animDeath; set => _animDeath = value; }
 
 	/// <summary>
 	/// 「开始移动」的速度阈值（m/s）。<b>0 = 不覆盖</b>（用 <see cref="UnitAnimator.WalkMinSpeed"/> 的默认值 0.15）。
@@ -165,10 +188,12 @@ public abstract partial class UnitConfig : ConfigRow
 	/// <b>空 = 这个单位没有技能动画</b>：需要动画的技能会因此**拒绝执行**并写明确日志
 	/// （用户裁定："严格要求有相应动画才会执行相应技能"，不做时间驱动兜底）。
 	/// </summary>
-	[Export(PropertyHint.Dir)] public string AnimLibraryDir { get; set; } = string.Empty;
+	private string _animLibraryDir = string.Empty;
+	[Export(PropertyHint.Dir)] public string AnimLibraryDir { get => VisualProfile?.SkillLibraryDir ?? _animLibraryDir; set => _animLibraryDir = value; }
 
 	/// <summary>技能动画的库名（与 <see cref="AnimLibraryDir"/> 的目录名一致；留空按目录名的最后一段推）。</summary>
-	[Export] public string AnimLibraryName { get; set; } = "skills";
+	private string _animLibraryName = "skills";
+	[Export] public string AnimLibraryName { get => VisualProfile?.SkillLibraryName ?? _animLibraryName; set => _animLibraryName = value; }
 
 	/// <summary>作用距离的候选属性名，按能力子类依次尝试（见 <see cref="AttackRange"/>）。</summary>
 	private static readonly string[] RangeProperties = { "AttackRange", "TriggerRadius", "MaxRange", "MaxDistance" };
@@ -328,11 +353,13 @@ public abstract partial class UnitConfig : ConfigRow
 	{
 		if (!string.IsNullOrEmpty(ModelPath))
 		{
-			if (ResourceLoader.Exists(ModelPath) && RuntimeResources.Load<PackedScene>(ModelPath) is { } model)
+			if (ResourceLoader.Exists(ModelPath) && (VisualProfile?.ModelScene ?? RuntimeResources.Load<PackedScene>(ModelPath)) is { } model)
 			{
 				// 单位这时还没进场景树，占位模型可以直接 Free（QueueFree 要等进树才生效）。
 				unit.GetNodeOrNull<Node>("Model")?.Free();
-				unit.AddChild(model.Instantiate());
+				Node visual = model.Instantiate();
+				if (VisualProfile != null && visual is Node3D spatial) { spatial.Name = "Model"; spatial.Transform = VisualProfile.ModelTransform; }
+				unit.AddChild(visual);
 			}
 			else
 			{

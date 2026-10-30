@@ -13,8 +13,15 @@ namespace ActRoguelike.Config;
 /// </summary>
 [Tool]
 [GlobalClass]
-public partial class NodeConfig : ConfigRow
+public partial class NodeConfig : ConfigRow, IContentValidatable
 {
+	[Export] public NodeRewardBehavior? RewardBehavior { get; set; }
+	public System.Collections.Generic.IEnumerable<string> Validate()
+	{
+		if (Layer < 0 || Layer > 2 || WaveCount < 0) yield return "Layer / WaveCount：价值层必须为0到2，波数不能为负。";
+		if (ShopHealCost < 0 || ShopRewardCost < 0 || ShopWeaponCost < 0) yield return "商店价目：不能为负数。";
+		if (!float.IsFinite(BossPressurePoints) || BossPressurePoints < 0 || BossModifierRolls < 0) yield return "首领压力：点数和额外抽取次数必须为非负有限数值。";
+	}
 	[ExportGroup("身份 · 节点类型与奖励过滤")]
 	/// <summary>节点类型（对应 <see cref="RewardNodeKind"/> 与 `Main.tscn` 上的 <c>Kind</c>）。</summary>
 	[Export] public RewardNodeKind Kind { get; set; } = RewardNodeKind.Enhancement;

@@ -18,6 +18,8 @@ public partial class ChargeAttackAbility : Ability
 	private int _stage;
 	private bool _hitSomething;
 	private EnemyAttackWarning? _warning;
+	private readonly System.Collections.Generic.HashSet<ulong> _crowdPushed = new();
+	private Vector3 _crowdPrevious;
 	protected override void OnFinishOrCancel() { _warning?.HideAll(); _hitbox?.Deactivate(); Movement?.EndDash(); }
 
 	protected override void OnReady()
@@ -42,6 +44,7 @@ public partial class ChargeAttackAbility : Ability
 	protected override void OnActivate(Unit? target)
 	{
 		_stage = 0;
+		_crowdPushed.Clear();
 		_hitSomething = false;
 		_hitbox.Deactivate();
 
@@ -55,6 +58,7 @@ public partial class ChargeAttackAbility : Ability
 		_direction.Y = 0f;
 		_direction = _direction.LengthSquared() < 0.0001f ? -OwnerUnit.GlobalTransform.Basis.Z : _direction.Normalized();
 		_startPosition = OwnerUnit.GlobalPosition;
+		_crowdPrevious = _startPosition;
 		Movement?.FaceDirection(_direction, 1f);
 		_warning?.Hitbox(_hitbox, sweepDirection: _direction, sweepDistance: MaxDistance);
 	}
@@ -69,6 +73,7 @@ public partial class ChargeAttackAbility : Ability
 		switch (_stage)
 		{
 			case 0:
+				_warning?.SetProgress(StateTime/Mathf.Max(.001f,Windup));
 				if (StateTime >= Windup)
 				{
 					Movement?.BeginDash(_direction, ChargeSpeed);
@@ -81,6 +86,7 @@ public partial class ChargeAttackAbility : Ability
 				break;
 
 			case 1:
+				if (OwnerUnit != null) { BossCrowdPush.Sweep(OwnerUnit, _crowdPrevious, OwnerUnit.GlobalPosition, _direction, _crowdPushed); _crowdPrevious = OwnerUnit.GlobalPosition; }
 				bool traveled = OwnerUnit != null && OwnerUnit.GlobalPosition.DistanceTo(_startPosition) >= MaxDistance;
 				if (_hitSomething || traveled || StateTime > 2f)
 				{

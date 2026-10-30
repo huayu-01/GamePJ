@@ -11,7 +11,7 @@ Value = PackedStringArray("Melee", "Charge")
 [sub_resource type="Resource" id="p_skl_enemy_charger_charge_0"]
 script = ExtResource("2_param")
 Key = "ChargeSpeed"
-Value = 16.0
+Value = 24.0
 Note = "冲锋速度"
 
 [resource]
@@ -23,6 +23,7 @@ Recover = 0.6
 ApproachMinRange = 4.5
 ApproachMaxRange = 14.0
 AttackParams = [SubResource("a_skl_enemy_charger_charge_0")]
+NumericId = 1191
 Id = "skl_enemy_charger_charge"
 DisplayName = "冲锋"
 Note = "冲锋兵：MaxDistance 14 由单位行的攻击范围给。"

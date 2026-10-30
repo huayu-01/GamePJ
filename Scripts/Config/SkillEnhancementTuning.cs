@@ -1,3 +1,4 @@
+using ActRoguelike.Abilities;
 using Godot;
 
 namespace ActRoguelike.Config;
@@ -5,9 +6,8 @@ namespace ActRoguelike.Config;
 /// <summary>指定技能自身的伤害、尺寸与冷却调整，不写玩家全局乘区。</summary>
 [Tool]
 [GlobalClass]
-public partial class SkillEnhancementTuning : Resource
+public partial class SkillEnhancementTuning : AbilityRewardTuning
 {
-	[Export] public AbilityConfig? TargetAbility { get; set; }
 	[Export] public float DamageScale { get; set; } = 1f;
 	/// <summary>灵能汲取：本人击杀后只延长仍存在的灵剑。</summary>
 	[Export] public float KillExtensionSeconds { get; set; }
@@ -22,4 +22,10 @@ public partial class SkillEnhancementTuning : Resource
 	[Export] public float ProjectileSweepRadius { get; set; } = 0.08f;
 	/// <summary>小于零保留技能原冷却；零表示无冷却。</summary>
 	[Export] public float CooldownSeconds { get; set; } = -1f;
+	/// <summary>仅缩放目标技能的冷却；通过参数租约撤销，不影响其他槽位。</summary>
+	[Export] public float CooldownScale { get; set; } = 1f;
+	public float CooldownReduction => 1f - CooldownScale;
+	public override bool Supports(System.Type abilityType) => typeof(IAbilityEnhancementConsumer).IsAssignableFrom(abilityType);
+	public override void Apply(Ability ability) { ((IAbilityEnhancementConsumer)ability).ApplyEnhancement(this); if (CooldownSeconds >= 0) ability.Cooldown = CooldownSeconds; ability.CooldownMultiplier *= CooldownScale; }
+	public override System.Collections.Generic.IEnumerable<string> Validate() { if (DamageScale < 0 || SizeScale <= 0 || ForwardReachScale <= 0 || CooldownSeconds < -1 || CooldownScale < 0 || LandingKnockback < -1 || KillExtensionSeconds < 0 || ProjectileSweepMaxHits < 0 || ProjectileSweepRadius < 0) yield return "技能增强：伤害与冷却倍率非负，尺寸和前伸倍率大于零，冷却／击退以负一保留原值。"; }
 }

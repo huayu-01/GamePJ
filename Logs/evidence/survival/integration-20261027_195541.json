@@ -1,0 +1,28 @@
+{
+  "Date": "2026-10-27T19:55:41",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "slots",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 8.87,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195541.slots.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195541.slots.err",
+      "Failure": "",
+      "SHA256": "806E3BB17B2840E3D92D692945E894D0422F4F5CA2E9A5A6CF942F39D35E183D"
+    },
+    {
+      "Name": "main",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 71.17,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195541.main.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195541.main.err",
+      "Failure": "",
+      "SHA256": "E9165048F823B465F155D32DA83CC107D926523E4C70E59C2F17C324AC680699"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

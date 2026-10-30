@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://ciacrgj8307x8"
+
+[deps]
+
+files=["res://docs/balance-samples.trial.translation", "res://docs/balance-samples.seconds.translation", "res://docs/balance-samples.hits.translation", "res://docs/balance-samples.crits.translation", "res://docs/balance-samples.base.translation", "res://docs/balance-samples.actual.translation", "res://docs/balance-samples.base.translation", "res://docs/balance-samples.actual.translation"]
+
+source_file="res://docs/balance-samples.csv"
+dest_files=["res://docs/balance-samples.trial.translation", "res://docs/balance-samples.seconds.translation", "res://docs/balance-samples.hits.translation", "res://docs/balance-samples.crits.translation", "res://docs/balance-samples.base.translation", "res://docs/balance-samples.actual.translation", "res://docs/balance-samples.base.translation", "res://docs/balance-samples.actual.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

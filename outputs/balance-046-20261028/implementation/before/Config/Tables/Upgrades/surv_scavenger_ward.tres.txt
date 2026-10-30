@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/ScavengerWardRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+Threshold = 20
+ShieldRatio = 0.05
+CapRatio = 0.1
+Duration = 4
+[resource]
+script = ExtResource("row")
+NumericId = 1293
+Id = "surv_scavenger_ward"
+DisplayName = "流转护膜"
+RewardKind = 2
+MaxStacks = 1
+Weight = 1.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_scavenger_ward"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "每吸收{Effects.0.Threshold:0}点原始敌人经验获得最大生命{Effects.0.ShieldRatio:0%}的护盾，持续{Effects.0.Duration:0.#}秒，此来源上限{Effects.0.CapRatio:0%}；抵挡不产生格挡硬直。"
+NameKey = "content.surv_scavenger_ward.name"
+DescriptionKey = "content.surv_scavenger_ward.description"
+Requires = PackedStringArray("surv_scavenger_compass")

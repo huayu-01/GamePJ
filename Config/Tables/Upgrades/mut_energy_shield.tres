@@ -1,33 +1,27 @@
 [gd_resource type="Resource" script_class="RewardConfig" format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
-[sub_resource type="Resource" id="Resource_p0"]
-script = ExtResource("1_param")
-Key = "Trigger"
-Value = "Parried,ArmorBroken"
-Note = "订阅「架住/格挡成功」与「自己的护甲被打光」两种事件（逗号分隔，任一命中即出手；P6a 给 ArmorBroken 补上了抛点，见 Unit.ReceiveHit）"
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/EventPulseRewardEffect.cs" id="effect_0"]
 
-[sub_resource type="Resource" id="Resource_p1"]
-script = ExtResource("1_param")
-Key = "Radius"
-Value = 6.0
-Note = "作用半径"
-
-[sub_resource type="Resource" id="Resource_p2"]
-script = ExtResource("1_param")
-Key = "Damage"
-Value = 20.0
-Note = "伤害"
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Events = 10
+Radius = 6.0
+Damage = 20.0
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1256
 RewardKind = 2
 MaxStacks = 1
-ApplyHandler = "TablePulse"
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2")]
 Id = "mut_energy_shield"
 DisplayName = "能量护盾"
 DescriptionTemplate = "格挡成功或护甲被打光时，对周围敌人造成伤害"
 Note = "[P5b 新增行 · P6a 补齐两路] 文档第 172-173 行（异化池，全角色通用）「能量护盾:当你格挡/护甲破碎时对周围敌人造成伤害」。P5b 只接了「格挡」那一路（GameplayEventKind.Parried，抛点在 GuardStanceAbility 架住那一刻）；P6a 给 ArmorBroken 补上了**唯一**的抛点（Unit.ReceiveHit 里护甲 <= 0 那一处），于是这一行的 Trigger 改成逗号分隔的 `Parried,ArmorBroken`，两路都通了（TablePulseRule 对 Radius 内的敌人造成伤害）。⚠️ 半径 6 / 伤害 20 都是预设（文档是 n）。"
+
+NameKey = "content.mut_energy_shield.name"
+
+DescriptionKey = "content.mut_energy_shield.description"
+
+Effects = [SubResource("Resource_effect_0")]

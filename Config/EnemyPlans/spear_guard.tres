@@ -1,25 +1,33 @@
-[gd_resource type="Resource" script_class="EnemyActionPlan" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="EnemyActionPlan" load_steps=11 format=3]
 [ext_resource type="Script" path="res://Scripts/Config/EnemyActionPlan.cs" id="plan"]
 [ext_resource type="Script" path="res://Scripts/Config/EnemyActionStep.cs" id="step"]
+[ext_resource type="Resource" path="res://Config/EnemyActions/guard.tres" id="action_guard"]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActions/ChargeEnemyAction.cs" id="action_charge_script"]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActions/MeleeEnemyAction.cs" id="action_melee_script"]
 [sub_resource type="Resource" id="s0"]
 script = ExtResource("step")
 Kind = 1
+Action = ExtResource("action_guard")
 ActiveSeconds = 0.8
 RecoverSeconds = 0
+[sub_resource type="Resource" id="action_s1"]
+script = ExtResource("action_melee_script")
+Damage = 15
+Radius = 1.5
+Speed = 0
 [sub_resource type="Resource" id="s1"]
 script = ExtResource("step")
-Kind = 7
+Action = SubResource("action_s1")
 WindupSeconds = 0.35
-Damage = 15
-Speed = 0
-Radius = 1.5
-[sub_resource type="Resource" id="s2"]
-script = ExtResource("step")
-Kind = 9
-WindupSeconds = 0.5
+[sub_resource type="Resource" id="action_s2"]
+script = ExtResource("action_charge_script")
 Damage = 12
 Radius = 1.4
-Speed = 13
+Speed = 19.5
+[sub_resource type="Resource" id="s2"]
+script = ExtResource("step")
+Action = SubResource("action_s2")
+WindupSeconds = 0.5
 ActiveSeconds = 1.1
 Blocking = true
 [resource]

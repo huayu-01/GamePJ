@@ -1,0 +1,40 @@
+[gd_resource type="Environment" format=3 uid="uid://bq4pij651q1x1"]
+
+[ext_resource type="Shader" uid="uid://1kwlx4cgdhxc" path="res://Assets/Environment/NatureBenchmark/Shaders/sky.gdshader" id="1_4atdd"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_4atdd"]
+seed = 20261021
+frequency = 0.012
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_dc68w"]
+noise = SubResource("FastNoiseLite_4atdd")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ywii8"]
+shader = ExtResource("1_4atdd")
+shader_parameter/zenith_color = Color(0.26, 0.64, 0.86, 1)
+shader_parameter/horizon_color = Color(0.79, 0.9, 0.9, 1)
+shader_parameter/cloud_color = Color(1, 0.98, 0.9, 1)
+shader_parameter/cloud_noise = SubResource("NoiseTexture2D_dc68w")
+
+[sub_resource type="Sky" id="Sky_dg1jy"]
+sky_material = SubResource("ShaderMaterial_ywii8")
+radiance_size = 2
+
+[resource]
+background_mode = 2
+sky = SubResource("Sky_dg1jy")
+ambient_light_source = 2
+ambient_light_color = Color(0.7529412, 0.84705883, 0.8901961, 1)
+ambient_light_energy = 0.38
+tonemap_white = 4.0
+ssao_enabled = true
+ssao_radius = 1.2
+ssao_intensity = 1.1
+ssao_light_affect = 0.12
+fog_enabled = true
+fog_light_color = Color(0.8117647, 0.8745098, 0.7647059, 1)
+fog_density = 0.0015
+fog_sky_affect = 0.0
+fog_height = -1.0
+fog_height_density = 0.025

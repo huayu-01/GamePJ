@@ -3,18 +3,32 @@
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
+
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
 Stat = "MaxHealthAdd"
 Operation = 0
 Value = 20
 
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Modifiers = [SubResource("Resource_m0")]
+
 [resource]
 script = ExtResource("2_row")
+Excludes = PackedStringArray("rune_lei_seal")
+NumericId = 1307
 RewardKind = 0
-MaxStacks = 1
-Modifiers = [SubResource("Resource_m0")]
+MaxStacks = 0
 Id = "upg_life"
 DisplayName = "生命"
-DescriptionTemplate = "最大生命 +20"
-Note = "[P5 新增行] 文档第 230 行「生命:加最大生命值」，前置参数 n → 预设 +20/层。消费者：Unit.RefreshStats。"
+DescriptionTemplate = "每级最大生命+20，按固定值相加。"
+Note = "032：固定逐级成长，第二次获取起显示升级和等级；界面不显示堆叠角标。"
+
+NameKey = "content.upg_life.name"
+
+DescriptionKey = "content.upg_life.description"
+
+Effects = [SubResource("Resource_effect_0")]
+ShowUpgradeLevel = true

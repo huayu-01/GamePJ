@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-26T20:47:03",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "guard_locomotion",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_204703.guard_locomotion.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_204703.guard_locomotion.headless.err",
+      "SHA256": "02AA6B2F188D60A398E458BEEE3270DA43D23D1E3751958BEB3CCE8CD425292A"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

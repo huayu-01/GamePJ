@@ -1,0 +1,32 @@
+{
+  "raw_triangles": 4447,
+  "triangles": 4584,
+  "vertices": 2481,
+  "height_meters": 3,
+  "bones": 17,
+  "unweighted_vertices": 0,
+  "max_vertex_influences": 1,
+  "materials": [
+    "GolemPlus_Stone",
+    "GolemPlus_Sockets",
+    "GolemPlus_Eyes"
+  ],
+  "animations": [
+    "idle",
+    "walk",
+    "slam",
+    "hit",
+    "die"
+  ],
+  "eye_source_faces": 18,
+  "impact_time_seconds": 0.62,
+  "connectivity_corrected_faces": 47,
+  "hunyuan_job_id": "1504389242456629248",
+  "generation_credits": 25,
+  "runtime": "Assets/Enemies/StoneGolemPlus/stone_golem_plus.glb",
+  "source": "ArtSource/Blender/stone-golem-plus/stone-golem-plus.blend",
+  "runtime_sha256": "f52be779886bb7785f656eaf74c2c90c118bb0b45e097c0ae7671dda62aebc2e",
+  "runtime_bytes": 551572,
+  "geometry_reference_sha256": "30244c747696fbf95ada31c0b1ef47eb761fae38c576187335521cb970f0f243",
+  "palette_reference_sha256": "05e920318d4333c9c4ab7544e9901b2a7dc6aad3ed4ce472758eae7f430c49aa"
+}

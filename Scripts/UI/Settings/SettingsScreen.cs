@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ActRoguelike.Rewards;
 using Godot;
 
 namespace ActRoguelike.UI;
@@ -35,6 +36,10 @@ public partial class SettingsScreen : OverlayScreen
 	private int _active = -1;
 	private bool _keyHeld;
 	private bool _helpHeld;
+	private VBoxContainer _adventure = null!;
+	private Button _abandon = null!;
+	private HBoxContainer _confirm = null!;
+	private Label _adventureMessage = null!;
 
 	/// <summary>正在等待按键的动作（重绑中）；null = 不在重绑。</summary>
 	private string? _awaitAction;
@@ -74,6 +79,11 @@ public partial class SettingsScreen : OverlayScreen
 		_page = GetNode<VBoxContainer>("Root/Panel/VBox/Body/PageScroll/Page");
 
 		BuildSections();
+		BuildAdventureActions();
+		var codex = new CodexScreen { Name = "CodexScreen" }; AddChild(codex);
+		var codexButton = new Button { Name = "OpenCodex", Text = Config.ContentText.Get("ui.codex.menu", "图鉴  [J]"), CustomMinimumSize = new Vector2(0, 40) };
+		_root.GetNode<VBoxContainer>("Panel/VBox").AddChild(codexButton);
+		codexButton.Pressed += () => { if (IsOpen && !InputBlocked) codex.Open(); };
 		if (UiRouter.Instance != null)
 		{
 			UiRouter.Instance.OpenMenu = Open;
@@ -86,6 +96,7 @@ public partial class SettingsScreen : OverlayScreen
 
 	public override void _Process(double delta)
 	{
+		_adventure.Visible = RunController.Instance?.CanCancelAdventure == true;
 		if (_awaitAction != null)
 		{
 			// 重绑中：不要用 O 把界面关掉（那时玩家按的 O 是"要绑的键"）。
@@ -154,6 +165,8 @@ public partial class SettingsScreen : OverlayScreen
 		}
 
 		CancelRebind();
+		_confirm.Visible = false; _abandon.Visible = true; _adventureMessage.Text = string.Empty;
+		_adventure.Visible = RunController.Instance?.CanCancelAdventure == true;
 		ShowSection(_active < 0 ? 0 : _active);
 
 		SetKeyHints(
@@ -163,6 +176,37 @@ public partial class SettingsScreen : OverlayScreen
 			(Key.E, "下一类"));
 
 		BeginOpen();
+	}
+	private void BuildAdventureActions()
+	{
+		_adventure = new VBoxContainer { Name = "AdventureActions", Visible = false };
+		_root.GetNode<VBoxContainer>("Panel/VBox").AddChild(_adventure);
+		_adventureMessage = new Label { Name = "Message", HorizontalAlignment = HorizontalAlignment.Center, AutowrapMode = TextServer.AutowrapMode.WordSmart };
+		_adventure.AddChild(_adventureMessage);
+		_abandon = new Button { Name = "Abandon", Text = "取消本次冒险，返回出击前状态", CustomMinimumSize = new Vector2(0, 44) };
+		_adventure.AddChild(_abandon);
+		_confirm = new HBoxContainer { Name = "Confirmation", Visible = false, Alignment = BoxContainer.AlignmentMode.Center };
+		_adventure.AddChild(_confirm);
+		var confirm = new Button { Name = "Confirm", Text = "确认取消冒险", CustomMinimumSize = new Vector2(220, 44) };
+		var back = new Button { Name = "Back", Text = "继续冒险", CustomMinimumSize = new Vector2(180, 44) };
+		_confirm.AddChild(back); _confirm.AddChild(confirm);
+		bool Interactive() => IsOpen && !InputBlocked && UiRouter.Instance?.IsTopScreen(this) != false;
+		_abandon.Pressed += () =>
+		{
+			if (!Interactive()) return;
+			_adventureMessage.Text = "本次冒险的收益和消耗将撤回，恢复出击前的资源与配装。";
+			_confirm.Visible = true; _abandon.Visible = false; back.GrabFocus();
+		};
+		back.Pressed += () =>
+		{
+			if (!Interactive()) return;
+			_confirm.Visible = false; _abandon.Visible = true; _adventureMessage.Text = string.Empty; _abandon.GrabFocus();
+		};
+		confirm.Pressed += () =>
+		{
+			if (!Interactive() || !_confirm.Visible) return;
+			if (RunController.Instance is { } run && !run.CancelAdventure(out string error)) _adventureMessage.Text = error;
+		};
 	}
 
 	public override void Close()
@@ -280,6 +324,8 @@ public partial class SettingsScreen : OverlayScreen
 	/// </summary>
 	public override void _Input(InputEvent @event)
 	{
+		base._Input(@event);
+		if (GetViewport().IsInputHandled()) return;
 		if (!IsOpen || _awaitAction == null)
 		{
 			return;

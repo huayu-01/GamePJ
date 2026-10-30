@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://Scripts/Abilities/KnifeDanceAbility.cs" id="script"]
+[ext_resource type="PackedScene" path="res://Scenes/Combat/ThrowingKnife.tscn" id="projectile"]
+[node name="EvolvedAbility" type="Node3D"]
+script = ExtResource("script")
+Cooldown = 1
+Damage = 12
+FollowupDamage = 8
+FollowupCount = 3
+Speed = 32
+FollowupInterval = 0.08
+HomingDelay = 0.15
+Lifetime = 1.5
+AnimName = "ATK_A2_Scatter"
+AnimEvent = "ATK"
+Recover = 0.42
+ProjectileScene = ExtResource("projectile")

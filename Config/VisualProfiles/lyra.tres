@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UnitVisualProfile" load_steps=4 format=3]
+[ext_resource type="Script" path="res://Scripts/Config/UnitVisualProfile.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Assets/Characters/Lyra/lyra.glb" id="model"]
+[ext_resource type="PackedScene" path="res://Scenes/Visual/MeshyWeaponGrip.tscn" id="grip"]
+[resource]
+script = ExtResource("1")
+ModelScene = ExtResource("model")
+SkeletonPath = NodePath("Armature/Skeleton3D")
+AnimationPlayerPath = NodePath("AnimationPlayer")
+ModelTransform = Transform3D(-1.0588235, 0, 0, 0, 1.0588235, 0, 0, 0, -1.0588235, 0, 0, 0)
+GripScene = ExtResource("grip")
+GripBone = "RightHand"
+SkillLibraryDir = "res://Assets/Characters/Lyra/skills/"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MotionFxPreset" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/MotionFxPreset.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1034
+Id = "body_dash"
+EventName = "FX_MOTION_BODY"
+StopEventName = "FX_MOTION_BODY_STOP"
+Offset = Vector3(0, 0.96, 0)
+Duration = 0.65
+BlurRadius = Vector2(1.55, 1.55)
+BlurSeconds = 0.08
+Width = 0.55
+Height = 0.65

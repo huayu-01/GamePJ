@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1049
 Id = "ai_guard"
 DisplayName = "守卫"
 SearchRange = 30.0

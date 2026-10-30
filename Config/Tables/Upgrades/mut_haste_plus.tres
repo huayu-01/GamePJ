@@ -3,20 +3,34 @@
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
+
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_haste.tres" id="previous"]
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
 Stat = "CooldownMultiplier"
 Operation = 1
-Value = 0.9
+Value = 0.8
+
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Modifiers = [SubResource("Resource_m0")]
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1265
 RewardKind = 2
 MaxStacks = 1
-Modifiers = [SubResource("Resource_m0")]
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Requires = PackedStringArray("mut_haste")
 Id = "mut_haste_plus"
-DisplayName = "速攻+"
-DescriptionTemplate = "近战武技冷却再 -10%"
-Note = "[P5 新增行] 文档第 220 行「速攻+:更快,前置:速攻」。叠加后 ×0.81。"
+DisplayName = "升级：速攻"
+DescriptionTemplate = "替换上一级效果：冷却倍率×{Modifiers.CooldownMultiplier:0.##}"
+Note = "032：当前级效果替换前级实例，保留历史身份满足前置；不再与上一级重复叠加。"
+
+NameKey = "content.mut_haste_plus.name"
+
+DescriptionKey = "content.mut_haste_plus.description"
+
+Effects = [SubResource("Resource_effect_0")]
+Replaces = ExtResource("previous")

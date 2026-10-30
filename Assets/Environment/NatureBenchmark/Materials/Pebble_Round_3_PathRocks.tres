@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c1jq4fmwe5gdl"]
+
+[ext_resource type="Texture2D" uid="uid://b5andcg5b8qp0" path="res://Assets/Environment/StylizedNature/Models/PathRocks_Diffuse.png" id="1_s1j02"]
+
+[resource]
+resource_name = "PathRocks"
+cull_mode = 2
+specular_mode = 2
+albedo_color = Color(1.45, 1.45, 1.36, 1)
+albedo_texture = ExtResource("1_s1j02")
+normal_scale = 0.6
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0

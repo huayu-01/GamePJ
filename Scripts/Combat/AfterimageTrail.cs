@@ -58,7 +58,7 @@ public partial class AfterimageTrail : Node3D
 	[Export] public float GhostLifetime { get; set; } = 0.34f;
 
 	/// <summary>残影刚出现时的不透明度。</summary>
-	[Export(PropertyHint.Range, "0,1,0.01")] public float GhostStartAlpha { get; set; } = 0.62f;
+	[Export(PropertyHint.Range, "0,1,0.01")] public float GhostStartAlpha { get; set; } = 0.25f;
 
 	/// <summary>残影颜色（不受光的纯色剪影，明暗只由这个颜色 + alpha 决定）。
 	/// 取饱和一点的青蓝 —— 竞技场地面很白，淡色会看不见。</summary>

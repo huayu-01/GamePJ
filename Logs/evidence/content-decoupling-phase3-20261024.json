@@ -1,0 +1,230 @@
+{
+  "phase": 3,
+  "date": "2026-10-24",
+  "notes": [
+    "按专项选择最终有效证据；没有把首次失败运行改名为成功。",
+    "首次Main的J8组合用例依赖换装残留，已修正为重新通过奖励入口获取；180258复测通过，原伤害断言保留。",
+    "首次特化221项通过后退出时发生Godot原生清理异常；180258同专项无错误退出，根因尚未确认。",
+    "Main仍保留5类历史红标，8项硬指标一致。",
+    "原玩家五份存档即时指纹保持一致；回退专项使用独立工程和用户目录。"
+  ],
+  "cases": [
+    {
+      "name": "effects",
+      "exit_code": 0,
+      "seconds": 2.05,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180550.log",
+      "source_sha256": "54F3F79744E0DDFA1E3F3BD4D16419C1F7D5D26340C45248B67C942676CF1DEE",
+      "summaries": [
+        "[RewardEffects] SUMMARY pass=35 fail=0"
+      ]
+    },
+    {
+      "name": "decoupling",
+      "exit_code": 0,
+      "seconds": 3.8,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180258.log",
+      "source_sha256": "24E4D45D4C68E6167A878449C31CEA3B65F3D4C35298C1F2DE8134639E55A0E9",
+      "summaries": [
+        "[Decoupling] SUMMARY pass=30 fail=0"
+      ]
+    },
+    {
+      "name": "enemy_actions",
+      "exit_code": 0,
+      "seconds": 2.31,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180712.log",
+      "source_sha256": "610077D641A9D81739D7647F63ED815565EB4166AEA4C1140CD4A210AEF50578",
+      "summaries": [
+        "[EnemyActions] SUMMARY pass=22 fail=0"
+      ]
+    },
+    {
+      "name": "replacement",
+      "exit_code": 0,
+      "seconds": 16.91,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[CharacterReplacement] 完成：通过 61，失败 0"
+      ]
+    },
+    {
+      "name": "replacement_render",
+      "exit_code": 0,
+      "seconds": 19.06,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180258.log",
+      "source_sha256": "24E4D45D4C68E6167A878449C31CEA3B65F3D4C35298C1F2DE8134639E55A0E9",
+      "summaries": [
+        "[CharacterReplacement] 完成：通过 66，失败 0"
+      ]
+    },
+    {
+      "name": "content",
+      "exit_code": 0,
+      "seconds": 3.33,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180712.log",
+      "source_sha256": "610077D641A9D81739D7647F63ED815565EB4166AEA4C1140CD4A210AEF50578",
+      "summaries": [
+        "[ContentValidation] SUMMARY pass=20 fail=0"
+      ]
+    },
+    {
+      "name": "roster",
+      "exit_code": 0,
+      "seconds": 42.33,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180550.log",
+      "source_sha256": "54F3F79744E0DDFA1E3F3BD4D16419C1F7D5D26340C45248B67C942676CF1DEE",
+      "summaries": [
+        "[Roster] === 敌人清单验收结束：通过 95，失败 0 ==="
+      ]
+    },
+    {
+      "name": "reward_ui",
+      "exit_code": 0,
+      "seconds": 6.87,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[BuildRewards] SUMMARY pass=37 fail=0"
+      ]
+    },
+    {
+      "name": "reward_rules",
+      "exit_code": 0,
+      "seconds": 3.04,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[RewardRules] === 获取规则验收结束：通过 78，失败 0 ==="
+      ]
+    },
+    {
+      "name": "slots",
+      "exit_code": 0,
+      "seconds": 9.85,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[Slots] === 换装与技能槽验收结束：通过 57，失败 0 ==="
+      ]
+    },
+    {
+      "name": "snapshot",
+      "exit_code": 0,
+      "seconds": 11.25,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[AttackSnapshot] === 攻击快照验收结束：通过 45，失败 0 ==="
+      ]
+    },
+    {
+      "name": "bow",
+      "exit_code": 0,
+      "seconds": 24.92,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[BowSweep] === J10 弓·档位/弹速/扫掠 验收结束：通过 39，失败 0 ==="
+      ]
+    },
+    {
+      "name": "charge",
+      "exit_code": 0,
+      "seconds": 30.34,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[ChargeRelease] === 蓄力释放验收结束：通过 80，失败 0 ==="
+      ]
+    },
+    {
+      "name": "character",
+      "exit_code": 0,
+      "seconds": 46.09,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[Design] === 原始设计验收结束：通过 115，失败 0 ==="
+      ]
+    },
+    {
+      "name": "dragon",
+      "exit_code": 0,
+      "seconds": 13.52,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[DragonArrow] === 龙之箭验收结束：通过 42，失败 0 ==="
+      ]
+    },
+    {
+      "name": "rune",
+      "exit_code": 0,
+      "seconds": 10.63,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[RuneProbe] === J11 符文系统验收结束：通过 83，失败 0 ==="
+      ]
+    },
+    {
+      "name": "synergy",
+      "exit_code": 0,
+      "seconds": 9.17,
+      "source": "Logs/evidence/gameplay-fixes-failure-20261024_175605.log",
+      "source_sha256": "CC4EDC99F8742AA9ED72A7995C3CEBB3505E24F75E681E75A04F6EBAD4E52075",
+      "summaries": [
+        "[SynergyMatrix] SUMMARY combinations=964 pass=1013 fail=0"
+      ]
+    },
+    {
+      "name": "specialization",
+      "exit_code": 0,
+      "seconds": 12.2,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180258.log",
+      "source_sha256": "24E4D45D4C68E6167A878449C31CEA3B65F3D4C35298C1F2DE8134639E55A0E9",
+      "summaries": [
+        "[Specialization] === 特化验收结束：通过 221，失败 0 ==="
+      ]
+    },
+    {
+      "name": "main",
+      "exit_code": 0,
+      "seconds": 70.45,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180258.log",
+      "source_sha256": "24E4D45D4C68E6167A878449C31CEA3B65F3D4C35298C1F2DE8134639E55A0E9",
+      "summaries": [
+        "[Main指标一致] [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）",
+        "[Main指标一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）",
+        "[Main指标一致] [SelfTest] 配置表比对·玩家：生命 <配装>（期望 200 + 元进度加成 <存档>；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）",
+        "[Main指标一致] [SelfTest] 配置表比对·索引：武器 6/角色 2/敌人 21/首领 1/召唤物 1/技能 39/Pressure 7/效果 15/节点 8/局外 5/升级池 6/AI 档案 11/能力卡 4/符文 11",
+        "[Main指标一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）",
+        "[Main指标一致] [SelfTest] 🔴 白板首领实例：生命 <公式核验> 护甲 0（期望 0）标签 [Boss,Melee]",
+        "[Main指标一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True",
+        "[Main指标一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓"
+      ]
+    },
+    {
+      "name": "adventure",
+      "exit_code": 0,
+      "seconds": 23.47,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180737.log",
+      "source_sha256": "8F8B921FEFA0D4BB86D02150593ECD5EAA494F1CED720300FBB71429F2856D94",
+      "summaries": [
+        "[AdventureCancel] SUMMARY pass=39 fail=0"
+      ]
+    },
+    {
+      "name": "adventure_render",
+      "exit_code": 0,
+      "seconds": 29.86,
+      "source": "Logs/evidence/gameplay-fixes-evidence-20261024_180737.log",
+      "source_sha256": "8F8B921FEFA0D4BB86D02150593ECD5EAA494F1CED720300FBB71429F2856D94",
+      "summaries": [
+        "[AdventureCancel] SUMMARY pass=41 fail=0"
+      ]
+    }
+  ]
+}

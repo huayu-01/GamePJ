@@ -37,6 +37,6 @@ public partial class ThrownWeaponDisplay : Node3D
 		Basis basis = AlignToFlight
 			? Basis.LookingAt(direction, Mathf.Abs(direction.Dot(Vector3.Up)) > 0.99f ? Vector3.Right : Vector3.Up)
 			: new Basis(Vector3.Up, _angle);
-		GlobalTransform = new Transform3D(basis, ability.WeaponPosition);
+		GlobalTransform = new Transform3D(basis.Scaled(Vector3.One * ability.ThrowSizeScale), ability.WeaponPosition);
 	}
 }

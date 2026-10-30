@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityReplacementRewardEffect.cs" id="definition"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_2.tres" id="target"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_spirit_sword.tres" id="pool"]
+[ext_resource type="PackedScene" path="res://Scenes/Abilities/Builds/ArcaneSlice.tscn" id="replacement"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+TargetAbility = ExtResource("target")
+ReplacementScene = ExtResource("replacement")
+SkillName = "秘法切刃"
+SkillNameKey = "skill.1347.name"
+SkillDescriptionKey = "content.1347.description"
+SkillDescription = "武技2化为无敌粒子优先飞向锁定目标，再向附近敌人弹射{Effects.0.ReplacementScene.Bounces}次，不重复命中；结束时每目标造成{Effects.0.ReplacementScene.Damage}基础伤害，在最后目标附近有效位置现身并前滑。冷却{Effects.0.ReplacementScene.Cooldown}秒。"
+[resource]
+script = ExtResource("row")
+NumericId = 1347
+DisplayName = "秘法切刃"
+NameKey = "content.1347.name"
+DescriptionKey = "content.1347.description"
+DescriptionTemplate = "武技2化为无敌粒子优先飞向锁定目标，再向附近敌人弹射{Effects.0.ReplacementScene.Bounces}次，不重复命中；结束时每目标造成{Effects.0.ReplacementScene.Damage}基础伤害，在最后目标附近有效位置现身并前滑。冷却{Effects.0.ReplacementScene.Cooldown}秒。"
+RewardKind = 1
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+Pool = ExtResource("pool")
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Excludes = PackedStringArray("evo_great_draw")
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

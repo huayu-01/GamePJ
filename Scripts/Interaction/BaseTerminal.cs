@@ -31,7 +31,9 @@ public partial class BaseTerminal : Interactable
 	[Export] public TerminalKind Kind { get; set; } = TerminalKind.Upgrades;
 
 	/// <summary>出击门加载的场景。</summary>
-	[Export] public string TargetScene { get; set; } = "res://Scenes/Main.tscn";
+	[Export] public string TargetScene { get; set; } = "res://Scenes/Expedition.tscn";
+	[Export] public ExpeditionDestination? Destination { get; set; }
+	private bool _departing;
 
 	public override void _Ready()
 	{
@@ -50,6 +52,11 @@ public partial class BaseTerminal : Interactable
 
 	protected override bool OnInteract()
 	{
+		if (Kind == TerminalKind.Gate)
+		{
+			if (_departing || !ResourceLoader.Exists(Destination?.ScenePath ?? TargetScene)) return false;
+			_departing = true; Depart(); return true;
+		}
 		UiService? ui = UiService.Instance;
 		if (ui == null)
 		{
@@ -72,22 +79,21 @@ public partial class BaseTerminal : Interactable
 				return ui.OpenHelp();
 
 			default:
-				// 出击：带着基地里的配置切到关卡场景。
-				RunSetup.HasSelection = true;
-				GameLog.Write("Flow", $"基地出击 → {TargetScene}（角色 {RunSetup.Character} / 武器 {RunSetup.Weapon}）");
-
-				// 走加载页：显示"加载中"并暂停输入，最短显示时间后切场景。
-				if (GetTree().CurrentScene?.GetNodeOrNull<LoadingScreen>("LoadingScreen") is { } loading)
-				{
-					loading.BeginLoad(TargetScene);
-				}
-				else
-				{
-						RuntimeResources.ChangeScene(GetTree(), TargetScene);
-				}
-
-				return true;
+				return false;
 		}
+	}
+
+	private void Depart()
+	{
+		// 入口交互即出击；在任何本局改动前捕获资源与配装，取消时仍能完整回退。
+		AdventureCheckpoint.Capture(PlayerLocator.Player);
+		RunSetup.HasSelection = true;
+		string target = Destination?.ScenePath ?? TargetScene;
+		GameLog.Write("Flow", $"基地出击 → {target}（角色 {RunSetup.Character} / 武器 {RunSetup.Weapon}）");
+		if (GetTree().CurrentScene?.GetNodeOrNull<LoadingScreen>("LoadingScreen") is { } loading)
+			loading.BeginLoad(target);
+		else
+			RuntimeResources.ChangeScene(GetTree(), target);
 	}
 
 	/// <summary>兼容旧配置台预制体；角色由独立交互对象决定，这里只选当前角色的武器。</summary>

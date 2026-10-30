@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "animation_keyframes_identical": true,
+  "rest_skeleton_identical": true,
+  "modified_meshes": [
+    "CW_ForeheadClover",
+    "CW_JadeEyes",
+    "CW_OwlMask"
+  ],
+  "preserved_actions": [
+    "die",
+    "hit",
+    "idle",
+    "jump",
+    "sprint",
+    "walk"
+  ]
+}

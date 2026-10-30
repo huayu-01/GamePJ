@@ -1,13 +1,17 @@
-[gd_resource type="Resource" script_class="EnemyActionPlan" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyActionPlan" load_steps=6 format=3]
 [ext_resource type="Script" path="res://Scripts/Config/EnemyActionPlan.cs" id="plan"]
 [ext_resource type="Script" path="res://Scripts/Config/EnemyActionStep.cs" id="step"]
-[sub_resource type="Resource" id="s0"]
-script = ExtResource("step")
-Kind = 4
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActions/ProjectileEnemyAction.cs" id="projectile"]
+[sub_resource type="Resource" id="projectile_action"]
+script = ExtResource("projectile")
+Mode = 2
 Damage = 18
 Radius = 2.4
-Speed = 13
+Speed = 7.8
 TravelDistance = 12
+[sub_resource type="Resource" id="s0"]
+script = ExtResource("step")
+Action = SubResource("projectile_action")
 ActiveSeconds = 0.05
 [resource]
 script = ExtResource("plan")

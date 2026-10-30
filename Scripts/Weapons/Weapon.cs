@@ -131,11 +131,17 @@ public partial class Weapon : Node3D
 		StatSheet? stats = OwnerUnit?.Stats;
 		AttackOffense offense = AttackOffense.Capture(OwnerUnit, CritChance, CritMultiplier);
 		int projectileCount = Mathf.Max(1, ProjectilesPerShot + (int)(stats?.Get("ProjectileCountAdd") ?? 0f));
+		int extras = Mathf.Max(0, (int)(stats?.Get("ProjectileCountAdd") ?? 0f));
+		int followupFrames = Mathf.Max(0, Mathf.RoundToInt(stats?.Get("ProjectileFollowupDelayFrames") ?? 0));
+		bool eliteEligible = OwnerUnit?.Faction == Faction.Enemy && (stats?.Get("ExplosionRadiusAdd") ?? 0) <= 0;
+		var elitePlan = ActRoguelike.Combat.Elites.EliteProjectileRules.GetPlan(OwnerUnit, eliteEligible, projectileCount);
+		projectileCount = elitePlan.Count;
+		int primaryCount = elitePlan.IsModified ? projectileCount : Mathf.Max(1, projectileCount - extras);
 		var attack = new AttackInstance
 		{
 			Attacker = OwnerUnit,
 			Ability = "WeaponFire",
-			BaseDamage = Damage * offense.DamageMultiplier,
+			BaseDamage = Damage * offense.DamageMultiplier * elitePlan.DamageScale,
 			CanCrit = true,
 			CritChance = offense.CritChance,
 			CritMultiplier = offense.CritMultiplier,
@@ -150,17 +156,20 @@ public partial class Weapon : Node3D
 			ExplosionDamage = Damage * (stats?.Get("ExplosionDamageScale") ?? 0f),
 		};
 
-		Node parent = GetTree().CurrentScene ?? GetTree().Root;
 		for (int i = 0; i < projectileCount; i++)
 		{
-			float lateral = projectileCount > 1 ? (i - ((projectileCount - 1) * 0.5f)) * MultiShotSpreadDegrees : 0f;
-			Vector3 shotDirection = direction.Rotated(Vector3.Up, Mathf.DegToRad(lateral));
+			float lateral = i < primaryCount && primaryCount > 1 ? elitePlan.IsModified
+				? Mathf.Lerp(-elitePlan.SpreadDegrees * .5f, elitePlan.SpreadDegrees * .5f, (float)i / (projectileCount - 1))
+				: (i - ((primaryCount - 1) * 0.5f)) * MultiShotSpreadDegrees : 0f;
+			Vector3 shotDirection = elitePlan.IsModified
+				? ActRoguelike.Combat.Elites.EliteProjectileRules.SpreadDirection(direction, lateral)
+				: direction.Rotated(Vector3.Up, Mathf.DegToRad(lateral));
 			shotDirection = ApplySpread(shotDirection, spread);
 
 			var projectile = ProjectileScene.Instantiate<Projectile>();
-			parent.AddChild(projectile);
-			projectile.GlobalPosition = origin;
-			projectile.Launch(attack, shotDirection);
+			projectile.Speed = ProjectileSpeed;
+			ActRoguelike.Combat.Elites.EliteProjectileRules.Configure(OwnerUnit, projectile, null, eliteEligible);
+			ProjectileDispatch.Submit(this, OwnerUnit, projectile, attack, origin, shotDirection, i < primaryCount ? 0 : followupFrames * (i - primaryCount + 1));
 			PelletsFired++;
 		}
 

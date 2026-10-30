@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1047
 Id = "ai_exploder"
 DisplayName = "自爆"
 SearchRange = 40.0

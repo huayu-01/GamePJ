@@ -1,0 +1,80 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using ActRoguelike.Combat;
+using ActRoguelike.Config;
+using ActRoguelike.Core;
+using ActRoguelike.Rewards;
+using ActRoguelike.Run;
+using ActRoguelike.UI;
+using Godot;
+
+namespace ActRoguelike.Testing;
+
+public partial class CodexProbe : EliteTraitProbeSupport
+{
+	protected override string ProbeTag => "Codex";
+	private async Task Tap(Key key)
+	{
+		Input.ParseInputEvent(new InputEventKey { Keycode = key, PhysicalKeycode = key, Pressed = true }); await Wait(.05);
+		Input.ParseInputEvent(new InputEventKey { Keycode = key, PhysicalKeycode = key, Pressed = false }); await Wait(.05);
+	}
+	protected override async Task RunChecks()
+	{
+		var screen = UiService.Instance!.Screen<CodexScreen>()!;
+		Check(screen != null && !screen.IsOpen, "045死战场景已通过共用设置面板挂载图鉴，默认关闭");
+		// 查询由SetSearch直接送入；测试不激活本机输入法，避免其原生PNG告警污染引擎错误通道。
+		if (!OS.GetCmdlineUserArgs().Contains("--codex-focus-only")) screen!.SearchBox.Editable = false;
+		float hp = Player.Health, armor = Player.Armor; int units = Director.AliveCount;
+		var run = Mode.GetNode<RunController>("RunController"); int build = run.Build.Acquired.Count;
+		await Tap(Key.J); await Wait(.35);
+		Check(screen!.IsOpen && GetTree().Paused && Input.MouseMode == Input.MouseModeEnum.Visible, "045真实J打开图鉴，暂停战场并释放鼠标");
+		if (OS.GetCmdlineUserArgs().Contains("--codex-open-only")) { screen.Close(); return; }
+		if (OS.GetCmdlineUserArgs().Contains("--codex-focus-only")) {
+			screen.SearchBox.GrabFocus(); await Wait(.2);
+			foreach (System.Diagnostics.ProcessModule module in System.Diagnostics.Process.GetCurrentProcess().Modules)
+				if (module.FileName.Contains("Sogou", StringComparison.OrdinalIgnoreCase) || module.FileName.Contains("QQPinyin", StringComparison.OrdinalIgnoreCase)) GD.Print("[Codex] IME_MODULE " + module.ModuleName);
+			screen.SearchBox.ReleaseFocus(); screen.Close(); return;
+		}
+		Check(screen.EntryCount > 200 && screen.Entries.Select(e => e.Key).Distinct().Count() == screen.EntryCount, "045现有内容按身份归集，无重复条目");
+		Check(screen.Entries.All(e => !string.IsNullOrWhiteSpace(e.Name) && e.Icon != null), "045所有条目有名称和图标回退");
+		Check(!screen.Entries.Any(e => e.Key.EndsWith("/upg_insight") || e.Key.EndsWith("/upg_armor")), "045停用的洞悉与旧护甲强化不出现在正式内容图鉴");
+		Check(screen.HasKeyHintBar && screen.KeyHintBarTopmost && screen.KeyHintBarIgnoresMouse, "045保留框架按键栏与鼠标穿透契约");
+		var enemyTab = (Button)screen.FindChild("Category_enemies", true, false); enemyTab.GrabFocus(); await Tap(Key.Enter);
+		Check(screen.ActiveCategory == "enemies" && screen.VisibleEntryCount == ConfigIndex.Settings.Enemies.Count(e => !e.IsGlobal && e.Weight > 0), "045真实键盘切换敌人分类，数量与正式配置一致");
+		screen.SearchBox.GrabFocus(); screen.SetSearch("胆小菇"); await Wait(.1);
+		Check(screen.VisibleEntryCount == 1 && screen.SelectedName == "胆小菇" && screen.SelectedDescription.Contains("遁地"), "045搜索和行为说明实际接入新敌人");
+		Check(screen.ModelVisible && screen.ModelPath.EndsWith("scaredy_shroom.glb"), "045直接使用胆小菇真实模型展示");
+		await Shot("045-codex-shroom");
+		await Tap(Key.J); Check(screen.IsOpen && screen.SearchBox.Text == "胆小菇", "045搜索框输入J不会关闭图鉴");
+		screen.SetSearch("不存在的条目xyz"); await Wait(.05);
+		Check(screen.VisibleEntryCount == 0 && !screen.ModelVisible, "045无搜索结果显示空态，并回收旧模型预览");
+		screen.SetSearch(""); screen.ChooseCategory("all"); await Wait(.05);
+		int previews = 0;
+		foreach (var entry in screen.Entries.Where(e => !string.IsNullOrEmpty(e.ModelPath)))
+		{
+			if (OS.GetCmdlineUserArgs().Contains("--codex-skip-model-loop")) break;
+			GD.Print("[Codex] MODEL " + entry.Name);
+			screen.SelectEntry(entry.Key);
+			Check(screen.ModelVisible && screen.ModelPath == entry.ModelPath, "045模型可预览：" + entry.Name); previews++;
+		}
+		if (!OS.GetCmdlineUserArgs().Contains("--codex-skip-model-loop")) Check(previews >= ConfigIndex.Settings.Weapons.Length, "045角色、武器与已有敌人模型都由视觉档案进入图鉴");
+		screen.ChooseCategory("evolutions"); screen.SetSearch("浮光跃金"); await Wait(.05);
+		Check(screen.VisibleEntryCount == 1 && screen.SelectedDescription.Contains("0.5") && screen.SelectedDescription.Contains("50%"), "045图鉴读取最新进化参数，不复制旧5倍/2秒描述");
+		await Shot("045-codex-evolution");
+		screen.SetSearch(""); screen.ChooseCategory("stages"); screen.SelectEntry(screen.Entries.First(e => e.Key.EndsWith("/survival_twilight")).Key); await Wait(.05);
+		await Shot("045-codex-mode");
+		screen.SearchBox.ReleaseFocus(); await Tap(Key.Escape); await Wait(.2);
+		Check(!screen.IsOpen && !GetTree().Paused && !screen.ModelVisible, "045Esc关闭后恢复战斗并停止展台渲染");
+		var settings = UiService.Instance.Screen<SettingsScreen>()!; settings.Open(); await Wait(.35);
+		var menu = (Button)settings.FindChild("OpenCodex", true, false); menu.GrabFocus(); await Tap(Key.Enter); await Wait(.35);
+		Check(screen.IsOpen && settings.IsOpen && UiRouter.Instance!.IsTopScreen(screen), "045ESC菜单按钮可打开图鉴，返回层级保持正确");
+		screen.Close(); await Wait(.2); Check(settings.IsOpen && GetTree().Paused && UiRouter.Instance!.IsTopScreen(settings), "045从菜单进入的图鉴关闭后返回菜单");
+		settings.Close(); await Wait(.2);
+		Check(Player.Health == hp && Player.Armor == armor && Director.AliveCount == units && run.Build.Acquired.Count == build, "045浏览不修改生命、护甲、场上敌人数或玩家构筑");
+		if (OS.GetCmdlineUserArgs().Contains("--codex-skip-locale")) return;
+		ContentText.SetLocale("en"); screen.Open(); await Wait(.35); screen.ChooseCategory("enemies"); screen.SetSearch("胆小菇"); await Wait(.05);
+		Check(CodexCatalog.CategoryName("enemies") == "Enemies" && screen.SelectedDescription.Contains("Burrows"), "045分类及新增行为说明使用独立英文词条");
+		screen.Close(); ContentText.SetLocale("zh");
+	}
+}

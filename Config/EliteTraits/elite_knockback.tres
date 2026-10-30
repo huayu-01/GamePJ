@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="KnockbackTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/KnockbackTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1012
+Id = "elite_knockback"
+Title = "击退"
+Description = "本体直接攻击间歇附加击退。"
+NameKey = "elite.knockback.name"
+DescriptionKey = "elite.knockback.description"
+Cooldown = 1.2
+Magnitude = 5

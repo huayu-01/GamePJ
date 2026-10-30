@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_0phsp")
+NumericId = 1078
 Kind = 7
 Id = "Lifesteal"
 Slot = 12

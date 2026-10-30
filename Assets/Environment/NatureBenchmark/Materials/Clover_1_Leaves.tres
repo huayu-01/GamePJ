@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dfq4juw4eqmfh"]
+
+[ext_resource type="Shader" uid="uid://crsm4hdlh1fo7" path="res://Assets/Environment/NatureBenchmark/Shaders/foliage.gdshader" id="1_2gk38"]
+[ext_resource type="Texture2D" uid="uid://cpd14ubh7a5hx" path="res://Assets/Environment/StylizedNature/Models/Leaves.png" id="2_15jih"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_2gk38")
+shader_parameter/leaf_texture = ExtResource("2_15jih")
+shader_parameter/leaf_color = Color(0.69803923, 0.84705883, 0.5294118, 1)
+shader_parameter/crown_center = Vector3(-0.10415357, 0.55957407, -0.017619103)
+shader_parameter/crown_radius = 0.57236624
+shader_parameter/normal_blend = 0.6
+shader_parameter/wind_strength = 0.05
+shader_parameter/texture_color_weight = 0.85

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SceneRuneDefinition" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/SceneRuneDefinition.cs" id="row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/SceneRunes/icon_1333.svg" id="icon"]
+[resource]
+script = ExtResource("row")
+NumericId = 1333
+DisplayName = "浮空场"
+NameKey = "scene_rune.1333.name"
+DescriptionKey = "scene_rune.1333.description"
+DescriptionTemplate = "周期生成半径{Radius:0.#}米的浮空地板，触及的地面单位被弹起约{LaunchHeight:0.#}米。"
+Kind = 1
+Impact = 0
+Icon = ExtResource("icon")
+Tint = Color(0.721569, 0.682353, 1.000000, 1)
+Interval = 16
+LaunchHeight = 3
+MaxActive = 1

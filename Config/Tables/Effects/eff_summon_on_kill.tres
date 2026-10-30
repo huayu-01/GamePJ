@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_dkvh8")
+NumericId = 1083
 Kind = 9
 SummonScenePath = "res://Scenes/Summons/Drone.tscn"
 Id = "SummonOnKill"

@@ -1,0 +1,1806 @@
+{
+  "access_date": "2026-10-30",
+  "engine_version_observed": "4.7.2.stable.mono.official.ed1daf0bf",
+  "msbuild_properties_observed": {
+    "TargetFramework": "net8.0",
+    "LangVersion": "12.0",
+    "NETCoreSdkVersion": "10.0.401"
+  },
+  "scope": "Read-only GLB JSON/BIN parsing, no Godot scene import or gameplay run. WEIGHTS_0 checks do not validate deformation quality. Root ranges are local export coordinates, not measured world movement.",
+  "assets": [
+    {
+      "path": "Assets/Characters/CloverWayfarer/clover-wayfarer.glb",
+      "sha256": "8e74c532102afc7279c780b814eebdb092b1f19c0ae960de769d3175ee0810af",
+      "skin_count": 1,
+      "joint_count": 15,
+      "joint_names": [
+        "Root",
+        "Hips",
+        "LeftThigh",
+        "LeftShin",
+        "LeftFoot",
+        "RightThigh",
+        "RightShin",
+        "RightFoot",
+        "Spine",
+        "Chest",
+        "CapeBack",
+        "CapeLeft",
+        "CapeRight",
+        "Neck",
+        "Head"
+      ],
+      "root_joints": [
+        "Root"
+      ],
+      "nonunit_joint_scales": [],
+      "exported_primitive_vertices_including_splits": 5586,
+      "weighted_primitive_count": 33,
+      "weight0_sum_outside_0_001": 0,
+      "weight0_nonfinite_rows": 0,
+      "animations": [
+        {
+          "name": "die",
+          "seconds": 2.416667,
+          "channels": 45,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.634416,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "hit",
+          "seconds": 0.483333,
+          "channels": 45,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "idle",
+          "seconds": 2.516667,
+          "channels": 45,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "jump",
+          "seconds": 0.816667,
+          "channels": 45,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "sprint",
+          "seconds": 0.683333,
+          "channels": 45,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "walk",
+          "seconds": 1.35,
+          "channels": 45,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "path": "Assets/Characters/GeneratedPilot/pilot_ual.glb",
+      "sha256": "7fa0f4a8ffee90bfa69d3a5520884435cbf47a2f2687dff3c7e8819c6241f001",
+      "skin_count": 1,
+      "joint_count": 23,
+      "joint_names": [
+        "Root",
+        "Hips",
+        "LeftUpperLeg",
+        "LeftLowerLeg",
+        "LeftFoot",
+        "LeftToes",
+        "RightUpperLeg",
+        "RightLowerLeg",
+        "RightFoot",
+        "RightToes",
+        "Spine",
+        "Chest",
+        "UpperChest",
+        "LeftShoulder",
+        "LeftUpperArm",
+        "LeftLowerArm",
+        "LeftHand",
+        "Neck",
+        "Head",
+        "RightShoulder",
+        "RightUpperArm",
+        "RightLowerArm",
+        "RightHand"
+      ],
+      "root_joints": [
+        "Root"
+      ],
+      "nonunit_joint_scales": [],
+      "exported_primitive_vertices_including_splits": 7854,
+      "weighted_primitive_count": 1,
+      "weight0_sum_outside_0_001": 0,
+      "weight0_nonfinite_rows": 0,
+      "animations": [
+        {
+          "name": "attack",
+          "seconds": 0.433333,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "attack_b",
+          "seconds": 0.533333,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "die",
+          "seconds": 2.4,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "hit",
+          "seconds": 0.833333,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "idle",
+          "seconds": 2.5,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "jog",
+          "seconds": 0.933333,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "jump",
+          "seconds": 2.5,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "jump_start",
+          "seconds": 1.333333,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "land",
+          "seconds": 1.266667,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "sprint",
+          "seconds": 0.666667,
+          "channels": 23,
+          "root_translation_range_local": {}
+        },
+        {
+          "name": "walk",
+          "seconds": 1.333333,
+          "channels": 23,
+          "root_translation_range_local": {}
+        }
+      ]
+    },
+    {
+      "path": "Assets/Characters/Lyra/lyra.glb",
+      "sha256": "9119b715b900d0c5ddad432245087d64f37b61cd3650f095e22b6a81e6dd9ebc",
+      "skin_count": 1,
+      "joint_count": 24,
+      "joint_names": [
+        "Hips",
+        "LeftUpLeg",
+        "LeftLeg",
+        "LeftFoot",
+        "LeftToeBase",
+        "RightUpLeg",
+        "RightLeg",
+        "RightFoot",
+        "RightToeBase",
+        "Spine02",
+        "Spine01",
+        "Spine",
+        "LeftShoulder",
+        "LeftArm",
+        "LeftForeArm",
+        "LeftHand",
+        "RightShoulder",
+        "RightArm",
+        "RightForeArm",
+        "RightHand",
+        "neck",
+        "Head",
+        "head_end",
+        "headfront"
+      ],
+      "root_joints": [
+        "Hips"
+      ],
+      "nonunit_joint_scales": [],
+      "exported_primitive_vertices_including_splits": 21815,
+      "weighted_primitive_count": 1,
+      "weight0_sum_outside_0_001": 0,
+      "weight0_nonfinite_rows": 0,
+      "animations": [
+        {
+          "name": "block",
+          "seconds": 2.533333,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              4.713928,
+              3.253319,
+              8.261673
+            ]
+          }
+        },
+        {
+          "name": "idle",
+          "seconds": 2.0,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              4.633942,
+              0.402313,
+              0.703005
+            ]
+          }
+        },
+        {
+          "name": "jump",
+          "seconds": 1.9,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              8.14163,
+              78.053734,
+              9.789176
+            ]
+          }
+        },
+        {
+          "name": "sprint",
+          "seconds": 0.633333,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              0.766969,
+              6.101151,
+              5.66122
+            ]
+          }
+        },
+        {
+          "name": "die",
+          "seconds": 4.433333,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              35.622676,
+              66.495123,
+              107.927044
+            ]
+          }
+        },
+        {
+          "name": "walk",
+          "seconds": 1.033333,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              6.116,
+              6.265755,
+              3.840158
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "path": "Assets/Characters/Samurai/samurai.glb",
+      "sha256": "2a6539e4044e5702b00c881243b19234d8f8ed6cff2d518d2d61a0ba3a091328",
+      "skin_count": 1,
+      "joint_count": 24,
+      "joint_names": [
+        "Hips",
+        "LeftUpLeg",
+        "LeftLeg",
+        "LeftFoot",
+        "LeftToeBase",
+        "RightUpLeg",
+        "RightLeg",
+        "RightFoot",
+        "RightToeBase",
+        "Spine02",
+        "Spine01",
+        "Spine",
+        "LeftShoulder",
+        "LeftArm",
+        "LeftForeArm",
+        "LeftHand",
+        "RightShoulder",
+        "RightArm",
+        "RightForeArm",
+        "RightHand",
+        "neck",
+        "Head",
+        "head_end",
+        "headfront"
+      ],
+      "root_joints": [
+        "Hips"
+      ],
+      "nonunit_joint_scales": [],
+      "exported_primitive_vertices_including_splits": 22770,
+      "weighted_primitive_count": 1,
+      "weight0_sum_outside_0_001": 0,
+      "weight0_nonfinite_rows": 0,
+      "animations": [
+        {
+          "name": "attack",
+          "seconds": 2.833333,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              17.622693,
+              24.427494,
+              30.363166
+            ]
+          }
+        },
+        {
+          "name": "block",
+          "seconds": 3.5,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              3.461364,
+              7.528618,
+              9.561096
+            ]
+          }
+        },
+        {
+          "name": "double_attack",
+          "seconds": 2.866667,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              12.348955,
+              21.103943,
+              110.996656
+            ]
+          }
+        },
+        {
+          "name": "idle",
+          "seconds": 2.033333,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              4.13028,
+              0.456345,
+              0.535285
+            ]
+          }
+        },
+        {
+          "name": "push",
+          "seconds": 2.633333,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              10.016142,
+              19.754375,
+              68.841313
+            ]
+          }
+        },
+        {
+          "name": "sprint",
+          "seconds": 0.666667,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              2.42496,
+              4.876755,
+              4.310834
+            ]
+          }
+        },
+        {
+          "name": "die",
+          "seconds": 4.466667,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              31.209907,
+              60.897346,
+              96.641337
+            ]
+          }
+        },
+        {
+          "name": "walk",
+          "seconds": 1.066667,
+          "channels": 72,
+          "root_translation_range_local": {
+            "Hips": [
+              6.286412,
+              5.083496,
+              4.929182
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "path": "Assets/Enemies/GhostMage/ghost_mage.glb",
+      "sha256": "2fed7c088f45ba9d6d0663d6896d4781aff3db17dfe869aff3cefbfe13148eee",
+      "skin_count": 1,
+      "joint_count": 7,
+      "joint_names": [
+        "Root",
+        "Body",
+        "Grip",
+        "Staff",
+        "Head",
+        "Hat",
+        "Tail"
+      ],
+      "root_joints": [
+        "Root"
+      ],
+      "nonunit_joint_scales": [],
+      "exported_primitive_vertices_including_splits": 2486,
+      "weighted_primitive_count": 10,
+      "weight0_sum_outside_0_001": 0,
+      "weight0_nonfinite_rows": 0,
+      "animations": [
+        {
+          "name": "idle",
+          "seconds": 2.0,
+          "channels": 21,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.07,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "cast",
+          "seconds": 1.0,
+          "channels": 21,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "path": "Assets/Enemies/ScaredyShroom/scaredy_shroom.glb",
+      "sha256": "a8915305ccb6e9fb5d9f095d0ec82897b3e71125d8a23561777ef8f843e83d32",
+      "skin_count": 1,
+      "joint_count": 4,
+      "joint_names": [
+        "Root",
+        "Stem",
+        "Head",
+        "Cap"
+      ],
+      "root_joints": [
+        "Root"
+      ],
+      "nonunit_joint_scales": [],
+      "exported_primitive_vertices_including_splits": 5870,
+      "weighted_primitive_count": 2,
+      "weight0_sum_outside_0_001": 0,
+      "weight0_nonfinite_rows": 0,
+      "animations": [
+        {
+          "name": "idle",
+          "seconds": 2.0,
+          "channels": 12,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "burrow",
+          "seconds": 0.65,
+          "channels": 12,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              1.22,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "emerge",
+          "seconds": 0.65,
+          "channels": 12,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              1.22,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "shoot",
+          "seconds": 0.4,
+          "channels": 12,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "path": "Assets/Enemies/StoneGolemPlus/stone_golem_plus.glb",
+      "sha256": "f52be779886bb7785f656eaf74c2c90c118bb0b45e097c0ae7671dda62aebc2e",
+      "skin_count": 1,
+      "joint_count": 17,
+      "joint_names": [
+        "Root",
+        "Hips",
+        "LeftUpperLeg",
+        "LeftLowerLeg",
+        "LeftFoot",
+        "RightUpperLeg",
+        "RightLowerLeg",
+        "RightFoot",
+        "Spine",
+        "Chest",
+        "Head",
+        "LeftUpperArm",
+        "LeftLowerArm",
+        "LeftHand",
+        "RightUpperArm",
+        "RightLowerArm",
+        "RightHand"
+      ],
+      "root_joints": [
+        "Root"
+      ],
+      "nonunit_joint_scales": [],
+      "exported_primitive_vertices_including_splits": 9992,
+      "weighted_primitive_count": 3,
+      "weight0_sum_outside_0_001": 0,
+      "weight0_nonfinite_rows": 0,
+      "animations": [
+        {
+          "name": "idle",
+          "seconds": 2.0,
+          "channels": 51,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "channels": 51,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "slam",
+          "seconds": 1.2,
+          "channels": 51,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "hit",
+          "seconds": 0.4,
+          "channels": 51,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "die",
+          "seconds": 1.1,
+          "channels": 51,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.52,
+              0.0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "path": "Assets/Enemies/StoneSlammer/stone_slammer.glb",
+      "sha256": "dc00827029aa456356f194d3b16ce0083a77dbe9766cdf58b5e109389ef80fd5",
+      "skin_count": 1,
+      "joint_count": 23,
+      "joint_names": [
+        "Root",
+        "Hips",
+        "LeftUpperLeg",
+        "LeftLowerLeg",
+        "LeftFoot",
+        "LeftToes",
+        "RightUpperLeg",
+        "RightLowerLeg",
+        "RightFoot",
+        "RightToes",
+        "Spine",
+        "Chest",
+        "UpperChest",
+        "LeftShoulder",
+        "LeftUpperArm",
+        "LeftLowerArm",
+        "LeftHand",
+        "Neck",
+        "Head",
+        "RightShoulder",
+        "RightUpperArm",
+        "RightLowerArm",
+        "RightHand"
+      ],
+      "root_joints": [
+        "Root"
+      ],
+      "nonunit_joint_scales": [],
+      "exported_primitive_vertices_including_splits": 4182,
+      "weighted_primitive_count": 11,
+      "weight0_sum_outside_0_001": 0,
+      "weight0_nonfinite_rows": 0,
+      "animations": [
+        {
+          "name": "idle",
+          "seconds": 2.0,
+          "channels": 69,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "channels": 69,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "sprint",
+          "seconds": 0.9,
+          "channels": 69,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "slam",
+          "seconds": 0.9,
+          "channels": 69,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "hit",
+          "seconds": 0.4,
+          "channels": 69,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "die",
+          "seconds": 1.2,
+          "channels": 69,
+          "root_translation_range_local": {
+            "Root": [
+              0.0,
+              0.48,
+              0.0
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "local_animation_archives": [
+    {
+      "path": "F:\\Godot项目\\3d肉鸽雨中哈迪斯\\动画库\\Universal Animation Library 2[Standard].zip",
+      "sha256": "4008ea208a604773a2b2177d965f0f5d3195498b5bf838c3f5785d68e95f2a68",
+      "license": "CC0 1.0 (read from bundled License.txt)",
+      "variants": [
+        {
+          "file": "Universal Animation Library 2[Standard]/Unreal-Godot/UAL2_Standard.glb",
+          "joints": [
+            65
+          ],
+          "animations": [
+            "A_TPose",
+            "Chest_Open",
+            "ClimbUp_1m",
+            "Consume",
+            "Farm_Harvest",
+            "Farm_PlantSeed",
+            "Farm_Watering",
+            "Hit_Knockback",
+            "Idle_FoldArms_Loop",
+            "Idle_Lantern_Loop",
+            "Idle_No_Loop",
+            "Idle_Rail_Call",
+            "Idle_Rail_Loop",
+            "Idle_Shield_Break",
+            "Idle_Shield_Loop",
+            "Idle_TalkingPhone_Loop",
+            "LayToIdle",
+            "Melee_Hook",
+            "Melee_Hook_Rec",
+            "NinjaJump_Idle_Loop",
+            "NinjaJump_Land",
+            "NinjaJump_Start",
+            "OverhandThrow",
+            "Shield_Dash",
+            "Shield_OneShot",
+            "Slide_Exit",
+            "Slide_Loop",
+            "Slide_Start",
+            "Sword_Block",
+            "Sword_Dash",
+            "Sword_Heavy_Combo",
+            "Sword_Regular_A",
+            "Sword_Regular_A_Rec",
+            "Sword_Regular_B",
+            "Sword_Regular_B_Rec",
+            "Sword_Regular_C",
+            "Sword_Regular_Combo",
+            "TreeChopping_Loop",
+            "Walk_Carry_Loop",
+            "Yes",
+            "Zombie_Idle_Loop",
+            "Zombie_Scratch",
+            "Zombie_Walk_Fwd_Loop"
+          ]
+        },
+        {
+          "file": "Universal Animation Library 2[Standard]/Unreal-Godot/UAL2_Standard_RM.glb",
+          "joints": [
+            65
+          ],
+          "animations": [
+            "A_TPose",
+            "Chest_Open",
+            "ClimbUp_1m",
+            "Consume",
+            "Farm_Harvest",
+            "Farm_PlantSeed",
+            "Farm_Watering",
+            "Hit_Knockback",
+            "Idle_FoldArms_Loop",
+            "Idle_Lantern_Loop",
+            "Idle_No_Loop",
+            "Idle_Rail_Call",
+            "Idle_Rail_Loop",
+            "Idle_Shield_Break",
+            "Idle_Shield_Loop",
+            "Idle_TalkingPhone_Loop",
+            "LayToIdle",
+            "Melee_Hook",
+            "Melee_Hook_Rec",
+            "NinjaJump_Idle_Loop",
+            "NinjaJump_Land",
+            "NinjaJump_Start",
+            "OverhandThrow",
+            "Shield_Dash",
+            "Shield_OneShot",
+            "Slide_Exit",
+            "Slide_Loop",
+            "Slide_Start",
+            "Sword_Block",
+            "Sword_Dash",
+            "Sword_Heavy_Combo",
+            "Sword_Regular_A",
+            "Sword_Regular_A_Rec",
+            "Sword_Regular_B",
+            "Sword_Regular_B_Rec",
+            "Sword_Regular_C",
+            "Sword_Regular_Combo",
+            "TreeChopping_Loop",
+            "Walk_Carry_Loop",
+            "Yes",
+            "Zombie_Idle_Loop",
+            "Zombie_Scratch",
+            "Zombie_Walk_Fwd_Loop"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "F:\\Godot项目\\3d肉鸽雨中哈迪斯\\动画库\\Universal Animation Library[Standard].zip",
+      "sha256": "cc73fc4e495b82958207316596317a3f40b9fa38065bde1027937452da537724",
+      "license": "CC0 1.0 (read from bundled License.txt)",
+      "variants": [
+        {
+          "file": "Universal Animation Library[Standard]/Unreal-Godot/UAL1_Standard.glb",
+          "joints": [
+            65
+          ],
+          "animations": [
+            "A_TPose",
+            "Crouch_Fwd_Loop",
+            "Crouch_Idle_Loop",
+            "Dance_Loop",
+            "Death01",
+            "Driving_Loop",
+            "Fixing_Kneeling",
+            "Hit_Chest",
+            "Hit_Head",
+            "Idle_Loop",
+            "Idle_Talking_Loop",
+            "Idle_Torch_Loop",
+            "Interact",
+            "Jog_Fwd_Loop",
+            "Jump_Land",
+            "Jump_Loop",
+            "Jump_Start",
+            "PickUp_Table",
+            "Pistol_Aim_Down",
+            "Pistol_Aim_Neutral",
+            "Pistol_Aim_Up",
+            "Pistol_Idle_Loop",
+            "Pistol_Reload",
+            "Pistol_Shoot",
+            "Punch_Cross",
+            "Punch_Jab",
+            "Push_Loop",
+            "Roll",
+            "Sitting_Enter",
+            "Sitting_Exit",
+            "Sitting_Idle_Loop",
+            "Sitting_Talking_Loop",
+            "Spell_Simple_Enter",
+            "Spell_Simple_Exit",
+            "Spell_Simple_Idle_Loop",
+            "Spell_Simple_Shoot",
+            "Sprint_Loop",
+            "Swim_Fwd_Loop",
+            "Swim_Idle_Loop",
+            "Sword_Attack",
+            "Sword_Idle",
+            "Walk_Formal_Loop",
+            "Walk_Loop"
+          ]
+        },
+        {
+          "file": "Universal Animation Library[Standard]/Unreal-Godot/UAL1_Standard_RM.glb",
+          "joints": [
+            65
+          ],
+          "animations": [
+            "A_TPose",
+            "Crouch_Fwd_Loop",
+            "Crouch_Idle_Loop",
+            "Dance_Loop",
+            "Death01",
+            "Driving_Loop",
+            "Fixing_Kneeling",
+            "Hit_Chest",
+            "Hit_Head",
+            "Idle_Loop",
+            "Idle_Talking_Loop",
+            "Idle_Torch_Loop",
+            "Interact",
+            "Jog_Fwd_Loop",
+            "Jump_Land",
+            "Jump_Loop",
+            "Jump_Start",
+            "PickUp_Table",
+            "Pistol_Aim_Down",
+            "Pistol_Aim_Neutral",
+            "Pistol_Aim_Up",
+            "Pistol_Idle_Loop",
+            "Pistol_Reload",
+            "Pistol_Shoot",
+            "Punch_Cross",
+            "Punch_Jab",
+            "Push_Loop",
+            "Roll",
+            "Sitting_Enter",
+            "Sitting_Exit",
+            "Sitting_Idle_Loop",
+            "Sitting_Talking_Loop",
+            "Spell_Simple_Enter",
+            "Spell_Simple_Exit",
+            "Spell_Simple_Idle_Loop",
+            "Spell_Simple_Shoot",
+            "Sprint_Loop",
+            "Swim_Fwd_Loop",
+            "Swim_Idle_Loop",
+            "Sword_Attack",
+            "Sword_Idle",
+            "Walk_Formal_Loop",
+            "Walk_Loop"
+          ]
+        }
+      ]
+    }
+  ],
+  "legacy_scene_models": [
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_boss.glb",
+      "sha256": "3cd9e1b5d6409fce0ba1af617d9e008c3069493185a4c100f49fb99a2626a055",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_charger.glb",
+      "sha256": "672a6506f7475bbd655da1d7ff712c1729a430f134c62385a4e5d3c1378acb40",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_chaser.glb",
+      "sha256": "791fc0c203924c175c0a3d5b60d030daf36797b039506689cf7cd01ef5253b3c",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_exploder.glb",
+      "sha256": "dd12b2e75ffb1cdb45aaec3916c3d6e732929ccb4a8b89b946f69baaabfa64da",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_fast_melee.glb",
+      "sha256": "3ee3939f80d718945fcb9199f909a92c39669e38aeec7f544536b5dce6e79f98",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_guard.glb",
+      "sha256": "cd76681090ce29861b055b0f8b2bdcf84bfccc4ca816f428df42a9bb76d6e1b6",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_jumping_melee.glb",
+      "sha256": "2ff4311897bfaf99be80d2fa13918db30f506607da0291640b2609d82b70e0ca",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_ranged.glb",
+      "sha256": "ed151fc47c5cd6be9693c524e92f045170c965819f4f81b28ed66dcc3c1085bf",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_screamer.glb",
+      "sha256": "8cfcff43460da8b421f2a7fdfb43ec177321cad2746db9497cbf128d5806e2a8",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/enemies/mesh_enemy_skill_elite.glb",
+      "sha256": "2288438e7baf9acc91a870c82dc00d66710bb486592cfc3474ef8ed93a03863a",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    },
+    {
+      "path": "Assets/Models/player/mesh_player_body.glb",
+      "sha256": "77572792bfe2773b715b8cd8e18644b52b3e1f155fe10450254b50f9c364382a",
+      "skin_count": 2,
+      "joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head",
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ],
+      "animation_names": [
+        "static",
+        "idle",
+        "walk",
+        "sprint",
+        "jump",
+        "fall",
+        "crouch",
+        "sit",
+        "drive",
+        "die",
+        "pick-up",
+        "emote-yes",
+        "emote-no",
+        "holding-right",
+        "holding-left",
+        "holding-both",
+        "holding-right-shoot",
+        "holding-left-shoot",
+        "holding-both-shoot",
+        "attack-melee-right",
+        "attack-melee-left",
+        "attack-kick-right",
+        "attack-kick-left",
+        "interact-right",
+        "interact-left",
+        "wheelchair-sit",
+        "wheelchair-look-left",
+        "wheelchair-look-right",
+        "wheelchair-move-forward",
+        "wheelchair-move-back",
+        "wheelchair-move-left",
+        "wheelchair-move-right"
+      ],
+      "audit_scope": "JSON metadata only; deformation and weights not revalidated",
+      "joint_reference_count": 14,
+      "unique_joint_count": 7,
+      "joints_per_skin": [
+        7,
+        7
+      ],
+      "unique_joint_names": [
+        "root",
+        "leg-left",
+        "leg-right",
+        "torso",
+        "arm-left",
+        "arm-right",
+        "head"
+      ]
+    }
+  ]
+}

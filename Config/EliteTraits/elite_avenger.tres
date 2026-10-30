@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AvengerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/AvengerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1003
+Id = "elite_avenger"
+Title = "复仇"
+Description = "固定同波成员死亡后增强，最多三次。"
+NameKey = "elite.avenger.name"
+DescriptionKey = "elite.avenger.description"
+Magnitude = 1.15
+Count = 3

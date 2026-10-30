@@ -143,6 +143,7 @@ public partial class LandingBurstAbility : Ability
 
 		var attack = new AttackInstance
 		{
+			IsDirectAbilityAttack = true,
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
 			BaseDamage = LastBurstDamage,

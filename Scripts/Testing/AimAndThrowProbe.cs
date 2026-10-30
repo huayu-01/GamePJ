@@ -56,8 +56,7 @@ public partial class AimAndThrowProbe : Node3D
 	private Vector3[] Points(SpearThrowAbility spear)
 	{
 		var path = spear.GetNode<DashPathIndicator>("Path");
-		return path.GetNode<MeshInstance3D>("Path").Mesh!.SurfaceGetArrays(0)[(int)Mesh.ArrayType.Vertex].AsVector3Array()
-			.Select(p => p - Vector3.Up * path.GroundOffset).ToArray();
+		return path.Points.ToArray();
 	}
 	private async Task Capture(string name, string text)
 	{
@@ -65,7 +64,7 @@ public partial class AimAndThrowProbe : Node3D
 		var layer = new CanvasLayer(); layer.AddChild(new Label { Text = text, Position = new Vector2(24, 24) }); AddChild(layer);
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
 		using var picture = GetViewport().GetTexture().GetImage();
-		Check(picture.SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"截图 {name}");
+		Check(picture.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"截图 {name}");
 		layer.QueueFree();
 	}
 	public override async void _Ready()

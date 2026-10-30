@@ -55,6 +55,7 @@ Enabled = false
 ApproachMinRange = 0.0
 ApproachMaxRange = 6.0
 AttackParams = [SubResource("a_skl_enemy_elite_control_0"), SubResource("a_skl_enemy_elite_control_1"), SubResource("a_skl_enemy_elite_control_2"), SubResource("a_skl_enemy_elite_control_3"), SubResource("a_skl_enemy_elite_control_4")]
+NumericId = 1194
 Id = "skl_enemy_elite_control"
 DisplayName = "精英控制"
 Note = "技能精英：默认关闭，由 EliteSkillRandomizer 随机开启（Skills = AbilityBuff / AbilityControl）。"

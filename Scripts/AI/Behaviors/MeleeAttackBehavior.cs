@@ -16,7 +16,7 @@ public partial class MeleeAttackBehavior : Behavior
 		return _ability is { IsReady: true }
 			&& base.CanRun()
 			&& Target != null
-			&& HorizontalDistanceTo(Target) <= Mathf.Min(_ability.AttackRange, _ability.HitReach);
+			&& _ability.IsInRange(Target);
 	}
 
 	public override void Tick(float delta)

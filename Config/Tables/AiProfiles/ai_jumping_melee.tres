@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1050
 Id = "ai_jumping_melee"
 DisplayName = "跳跃近战"
 SearchRange = 40.0

@@ -1,0 +1,207 @@
+存档BEFORE meta.cfg SHA256=26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446
+存档BEFORE ability_cards.cfg SHA256=4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D
+存档BEFORE settings.cfg SHA256=7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1
+存档BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档BEFORE rune.cfg SHA256=CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 345 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.49
+
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 332 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.20
+
+=== effects exit=1 seconds=1.82 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 16:35:51 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 16:35:51 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 16:35:51 [Flow] === 新的一局 ===
+[log] 16:35:51 [Flow] 日志文件：res://Logs/runtime/run_20261024_163551_026.log
+[log] 16:35:51 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 16:35:51 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 16:35:51 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 16:35:51 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 16:35:51 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 16:35:51 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 16:35:51 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 16:35:51 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 16:35:51 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 16:35:51 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 16:35:51 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 16:35:51 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 16:35:51 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[RewardEffects] PASS 生产力量行已迁组合效果资源
+[RewardEffects] PASS 生产灼烧弹已迁强类型状态引用
+[RewardEffects] PASS 第一持有者只应用一次：1.15 / 1.15
+[RewardEffects] PASS 第二持有者独立重复获取：1.3225 / 1.3225
+[RewardEffects] PASS 定义共享但三次应用各有独立实例
+[RewardEffects] PASS 重复撤销幂等：1 / 1
+[RewardEffects] PASS 撤销不影响其他持有者：1.3225 / 1.3225
+[RewardEffects] PASS 单增幅组合三个效果，触发规则只登记一次
+[log] 16:35:51 [Combat] 伤害 @CharacterBody3D@7(1000) → @CharacterBody3D@3(900) 100
+[log] 16:35:51 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 16:35:51 [Combat] 伤害 @CharacterBody3D@3(900) → @CharacterBody3D@7(980) 20
+[RewardEffects] PASS 组合吸血使用真实伤害事实：2 / 2
+[RewardEffects] PASS 组合状态通过真实命中生效
+[log] 16:35:51 [Combat] 伤害 @CharacterBody3D@3(902) → @CharacterBody3D@7(960) 20
+[RewardEffects] PASS 释放后同帧不再吸血：902 / 902
+[RewardEffects] PASS 释放后同帧不再加状态，计时登记清除
+[RewardEffects] PASS 组合属性一并撤销：1 / 1
+[RewardEffects] PASS 后一个效果失败时撤回构筑获取记录
+[RewardEffects] PASS 失败回滚只撤本次效果，不吞其他增幅：1.1 / 1.1
+[RewardEffects] PASS 换装释放普通效果，符文按自身携带周期保留：1.4 / 1.4
+[RewardEffects] PASS 换符文按独立构筑来源释放：1 / 1
+[RewardEffects] PASS 三类旧处理器均适配为独立托管实例
+[log] 16:35:51 [Combat] 伤害 @CharacterBody3D@7(960) → @CharacterBody3D@12(900) 100
+[log] 16:35:51 [Combat] 伤害 @CharacterBody3D@12(900) → @CharacterBody3D@7(940) 20
+[RewardEffects] FAIL 旧吸血与属性效果保持原结算：2 / 2.4
+[RewardEffects] PASS 旧状态字符串适配仍能施加状态
+[log] 16:35:51 [Combat] 伤害 @CharacterBody3D@12(902) → @CharacterBody3D@7(920) 20
+[RewardEffects] PASS 仅调用旧来源清理入口也会当帧释放属性与事件
+[log] 16:35:51 [Combat] 死亡 @CharacterBody3D@3(0) 击杀者=@CharacterBody3D@7(920)
+[log] 16:35:51 [Combat] 击杀 @CharacterBody3D@3(0) by @CharacterBody3D@7(920)
+[RewardEffects] PASS 死亡释放全部托管实例和事件规则
+[RewardEffects] PASS 死亡撤销属性：1 / 1
+[RewardEffects] PASS 旧Source成组清理后再次释放实例保持安全：1 / 1
+[RewardEffects] PASS 缺引用及非有限数值在制作期可校验
+[RewardEffects] PASS 退树清理不遗留实例或重复释放错误
+[RewardEffects] SUMMARY pass=25 fail=1
+[log] 16:35:51 [Exit] 音频退出回收：真实等待85ms。
+[log] 16:35:51 [Audio] 音效统计：共 1 次 —— sfx_combat_hit×1（缺失 id 0 个）
+
+=== content exit=0 seconds=3.08 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 16:35:52 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 16:35:52 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 16:35:52 [Flow] === 新的一局 ===
+[log] 16:35:52 [Flow] 日志文件：res://Logs/runtime/run_20261024_163552_905.log
+[log] 16:35:52 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 16:35:52 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 16:35:52 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 16:35:52 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 16:35:52 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 16:35:52 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 16:35:52 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 16:35:52 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 16:35:52 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 16:35:52 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 16:35:52 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 16:35:52 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 16:35:52 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[ContentValidation] PASS 全部生产索引、引用、节点、真实动画事件、压力与制作目录，问题数 0
+[ContentValidation] PASS 拒绝重复 Id
+[ContentValidation] PASS 拒绝未知效果处理器
+[ContentValidation] PASS 效果定义参数进入统一报告
+[ContentValidation] PASS 拒绝不存在的前置条件
+[ContentValidation] PASS 拒绝未知行为压力
+[ContentValidation] PASS 引用存在但漏索引仍失败
+[ContentValidation] PASS 预制体缺能力节点在制作期失败
+[ContentValidation] PASS 缺真实动画不能由普通播放回退掩盖
+[ContentValidation] PASS 每项报告包含资源、字段、消费者、原因和修复方式
+[ContentValidation] PASS 实际方法轨道匹配指定事件
+[ContentValidation] PASS 禁用事件轨道不能误判成功
+[ContentValidation] PASS 旧中文条件双向兼容稳定 Id，派系不混用
+[ContentValidation] PASS 能力自行消费被动参数，保持通用 Params 的覆盖顺序
+[ContentValidation] PASS 能力自行绑定连招资源，核心配置不识别具体连招类型
+[ContentValidation] PASS 下落专用资源仍在通用 Params 后覆盖，数值权威不变
+[ContentValidation] SUMMARY pass=16 fail=0
+[log] 16:35:54 [Audio] 音效统计：本局一次都没播（表里 14 条；检查音效表与触发点）。
+
+=== localization exit=0 seconds=2.32 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 16:35:55 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 16:35:55 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 16:35:55 [Flow] === 新的一局 ===
+[log] 16:35:55 [Flow] 日志文件：res://Logs/runtime/run_20261024_163555_975.log
+[log] 16:35:55 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 16:35:55 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 16:35:56 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 16:35:56 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 16:35:56 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 16:35:56 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 16:35:56 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 16:35:56 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 16:35:56 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 16:35:56 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 16:35:56 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 16:35:56 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 16:35:56 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[ContentLocalization] PASS 显式目录与引擎翻译表实际加载成功
+[ContentLocalization] PASS 中文目录与效果参数一致
+[log] 16:35:56 [Audio] 首次播放「ui_open」→ 总线 UI / res://Assets/Audio/ui/ui_open.ogg
+[ContentLocalization] PASS 已打开构筑界面先显示中文
+[ContentLocalization] locale=en loaded=zh,en power=Power / Multiply attack damage by 1.15. burn=Scorching Hits / Hits burn the target for 3 seconds. direct=Power
+[ContentLocalization] PASS 原目录实例自动刷新英文整句与强类型数值
+[ContentLocalization] PASS 数组内效果字段直接供译文使用
+[ContentLocalization] PASS 已打开构筑详情刷新且保留选择
+[ContentLocalization] PASS 已打开奖励卡原地刷新文本
+[ContentLocalization] PASS 翻译不重抽候选或替换选项对象
+[ContentLocalization] PASS 语言切换前后身份、前置和互斥完全相同
+[ContentLocalization] PASS 缺译显示原文，不显示空白或逻辑键
+[ContentLocalization] PASS 统一校验捕获缺译、参数不一致和无效参数
+[ContentLocalization] PASS 切回中文刷新同一批界面
+[ContentLocalization] SUMMARY pass=12 fail=0
+[log] 16:35:56 [Exit] 音频退出回收：真实等待88ms。
+[log] 16:35:56 [Audio] 音效统计：共 2 次 —— ui_open×2（缺失 id 0 个）
+
+=== localization_render exit=0 seconds=3.38 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+D3D12 12_0 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti
+
+[log] 16:35:59 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 16:35:59 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 16:35:59 [Flow] === 新的一局 ===
+[log] 16:35:59 [Flow] 日志文件：res://Logs/runtime/run_20261024_163559_369.log
+[log] 16:35:59 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 16:35:59 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 16:35:59 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 16:35:59 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 16:35:59 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 16:35:59 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 16:35:59 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 16:35:59 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 16:35:59 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 16:35:59 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 16:35:59 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 16:35:59 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 16:35:59 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[ContentLocalization] PASS 显式目录与引擎翻译表实际加载成功
+[ContentLocalization] PASS 中文目录与效果参数一致
+[log] 16:35:59 [Audio] 首次播放「ui_open」→ 总线 UI / res://Assets/Audio/ui/ui_open.ogg
+[ContentLocalization] PASS 已打开构筑界面先显示中文
+[ContentLocalization] locale=en loaded=zh,en power=Power / Multiply attack damage by 1.15. burn=Scorching Hits / Hits burn the target for 3 seconds. direct=Power
+[ContentLocalization] PASS 原目录实例自动刷新英文整句与强类型数值
+[ContentLocalization] PASS 数组内效果字段直接供译文使用
+[ContentLocalization] PASS 已打开构筑详情刷新且保留选择
+[ContentLocalization] PASS 已打开奖励卡原地刷新文本
+[ContentLocalization] PASS 翻译不重抽候选或替换选项对象
+[ContentLocalization] PASS 保存真实渲染的英文界面检查图
+[ContentLocalization] PASS 语言切换前后身份、前置和互斥完全相同
+[ContentLocalization] PASS 缺译显示原文，不显示空白或逻辑键
+[ContentLocalization] PASS 统一校验捕获缺译、参数不一致和无效参数
+[ContentLocalization] PASS 切回中文刷新同一批界面
+[ContentLocalization] SUMMARY pass=13 fail=0
+[log] 16:36:00 [Exit] 音频退出回收：真实等待88ms。
+[log] 16:36:00 [Audio] 音效统计：共 2 次 —— ui_open×2（缺失 id 0 个）
+
+存档AFTER rune.cfg SHA256=CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6
+存档AFTER settings.cfg SHA256=7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1
+存档AFTER loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档AFTER meta.cfg SHA256=26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446
+存档AFTER ability_cards.cfg SHA256=4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D
+effects 未通过：F:\Godot项目\项目a\Logs\validation\.ai_gameplay_20261024_163540.effects.log / F:\Godot项目\项目a\Logs\validation\.ai_gameplay_20261024_163540.effects.err

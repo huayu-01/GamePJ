@@ -2,13 +2,13 @@
 
 飞刀最新口径：武器原名已统一改为“飞刀”，武技1“飞刀散掷”、武技2“千刃齐发”，进化说明同步使用飞刀。右键通过 `SpreadAngleDegrees` 配置固定总夹角（默认60°、准星两侧各30°）；按最终数量均分，3／5／7／9把和更多数量均不扩大边界，单刀居中，扇面随准星俯仰。左键仍为相邻20°的三刀散掷。旧稳定Id、枚举与资源路径保留以兼容配装存档，历史日志不重写。[实现与验证](throwing-knife-volley.md)。
 
-灵剑最新规则以[J43](character-design-j43.md)为准：武技2“三才灵剑”即时召唤头顶3柄瘦长灵剑，持续10秒、冷却15秒；本人攻击真实命中敌人后，三剑按中→左→右依次高速突刺同一目标，随后缓慢归位，完全归位后才可再次追击。挥空不出剑，灵剑自身不递归触发；J42的外圈随挥表现已被替换。“大拔刀术”已替换为“灵能汲取”，本人击杀敌人延长当前灵剑2秒；技能与奖励Id保持，下方旧批次保留为历史证据。
+灵剑最新规则以[J43](archive/development-batches/character-design-j43.md)为准：武技2“三才灵剑”即时召唤头顶3柄瘦长灵剑，持续10秒、冷却15秒；本人攻击真实命中敌人后，三剑按中→左→右依次高速突刺同一目标，随后缓慢归位，完全归位后才可再次追击。挥空不出剑，灵剑自身不递归触发；J42的外圈随挥表现已被替换。“大拔刀术”已替换为“灵能汲取”，本人击杀敌人延长当前灵剑2秒；技能与奖励Id保持，下方旧批次保留为历史证据。
 
-未蓄满释放以[J41](character-design-j41.md)为准：弓武技1、能量掌武技2、长枪武技2可在基础蓄力未完成时松手，默认造成基础伤害的50%，不缩减弹速／射程，不算完美或后置档位。松手仍重播释放段并等待真实ATK；飞刀保持未满取消。下方这些指定技能的历史“未满不释放”口径作废。
+未蓄满释放以[J41](archive/development-batches/character-design-j41.md)为准：弓武技1、能量掌武技2、长枪武技2可在基础蓄力未完成时松手，默认造成基础伤害的50%，不缩减弹速／射程，不算完美或后置档位。松手仍重播释放段并等待真实ATK；飞刀保持未满取消。下方这些指定技能的历史“未满不释放”口径作废。
 
-当前长枪／飞刀瞄准、玩家路径预览及镰刀移动伤害以[J40契约](character-design-j40.md)为准：长枪取准星空间目标，飞刀右键使用Crosshair；投掷预览由当前槽位输入驱动，松手即隐藏。镰刀移动时各段每目标一次80%路径伤害，悬停每0.5秒原伤害。下方历史“朝角色方向”“只选地面落点”和旧飞行周期口径已被最新试玩裁定替代。
+当前长枪／飞刀瞄准、玩家路径预览及镰刀移动伤害以[J40契约](archive/development-batches/character-design-j40.md)为准：长枪取准星空间目标，飞刀右键使用Crosshair；投掷预览由当前槽位输入驱动，松手即隐藏。镰刀移动时各段每目标一次80%路径伤害，悬停每0.5秒原伤害。下方历史“朝角色方向”“只选地面落点”和旧飞行周期口径已被最新试玩裁定替代。
 
-> **原文纠偏J6已验80/0、82/0**：能量掌／飞刀／弓／剑气松手只冻结完美结果、档位与威力，随后重播释放段，在该轮真实ATK发射。`ChargeReleased`阻止同次释放再次蓄力／重复松手；`ChargeReleaseAnimSpeedScale`独立于蓄力慢放速度。变奏点按免基础蓄力，按1→2→3循环，第一箭必须经ATK，后续按强类型`VolleyRampTuning.ShotIntervalSeconds`逐箭发射；打断取消待发箭，长按仍是蓄力单箭。[本批证据与边界](character-design-j6.md)。
+> **原文纠偏J6已验80/0、82/0**：能量掌／飞刀／弓／剑气松手只冻结完美结果、档位与威力，随后重播释放段，在该轮真实ATK发射。`ChargeReleased`阻止同次释放再次蓄力／重复松手；`ChargeReleaseAnimSpeedScale`独立于蓄力慢放速度。变奏点按免基础蓄力，按1→2→3循环，第一箭必须经ATK，后续按强类型`VolleyRampTuning.ShotIntervalSeconds`逐箭发射；打断取消待发箭，长按仍是蓄力单箭。[本批证据与边界](archive/development-batches/character-design-j6.md)。
 
 > **原文纠偏J9（龙之箭，"蓄力阈值弹"）**：③ 引入**第三种蓄力结果**（前两种是"档位倍率"与"完美时机"）——
 > **松手时蓄力 ≥ 阈值**这一发换弹型（更大 + 额外穿透 N 个）。判据在 `Ability.OnInputReleased` →
@@ -17,18 +17,18 @@
 > 参数全在强类型 `ChargedShotTuning`（阈值／尺寸／穿透数／蓄力上限／档数上限），**0 = 整条逻辑不启用**。
 > ⚠️ 口径：`ChargeMaxSeconds` 只决定"能按多久"，档数照旧每 `ChargeStepSeconds` 加一档（弓改 3 秒 = 25 档 ×8.5）；
 > 要"阈值后不再加档"就填 `ChargeMaxSteps`。**不锁存**：每一发都按它自己松手那一刻判定。
-> [证据](character-design-j9.md)。
+> [证据](archive/development-batches/character-design-j9.md)。
 
-> **原文纠偏J5**：闪仅真实Action后启动完整三维冲刺，缺事件只取消；架由真实GuardOn开启0.75游戏秒窗口，命中只无效化该HitInstance，同帧下一击不共享无敌。用户已确认架能规避能量波，普通格挡仍被穿透。Kill携带真实技能Id，闪身步经资源引用只匹配闪的击杀；施法期间冷却操作保留到收招。架收招后派发Parried，招架反击实际刷新为0。[实测与配置](character-design-j5.md)。
+> **原文纠偏J5**：闪仅真实Action后启动完整三维冲刺，缺事件只取消；架由真实GuardOn开启0.75游戏秒窗口，命中只无效化该HitInstance，同帧下一击不共享无敌。用户已确认架能规避能量波，普通格挡仍被穿透。Kill携带真实技能Id，闪身步经资源引用只匹配闪的击杀；施法期间冷却操作保留到收招。架收招后派发Parried，招架反击实际刷新为0。[实测与配置](archive/development-batches/character-design-j5.md)。
 
-> **原文纠偏J4**：共通落在按下时记录脚下到World地面的高度，真实Action才下冲；倍率改为`min(上限, 起手高度/普通单跳高度 × 垂直速度/标准速度)`。标准单跳1倍、二段跳额外50%高度时同速1.5倍，不额外加1；默认上限2倍，可在强类型`FallAttackTuning`配置。普通空中跳高比例独立进角色表，默认0.5。长枪从武器行引用共通技能并覆盖准星方向，墙／天空回落直下，超范围同向截断；镰刀／灵剑直落，只有灵剑有额外落剑式。只有真实落地发Landed，超时取消；高速球体胶囊扫掠与Area共用命中追踪。[接线与实测](character-design-j4.md)。
+> **原文纠偏J4**：共通落在按下时记录脚下到World地面的高度，真实Action才下冲；倍率改为`min(上限, 起手高度/普通单跳高度 × 垂直速度/标准速度)`。标准单跳1倍、二段跳额外50%高度时同速1.5倍，不额外加1；默认上限2倍，可在强类型`FallAttackTuning`配置。普通空中跳高比例独立进角色表，默认0.5。长枪从武器行引用共通技能并覆盖准星方向，墙／天空回落直下，超范围同向截断；镰刀／灵剑直落，只有灵剑有额外落剑式。只有真实落地发Landed，超时取消；高速球体胶囊扫掠与Area共用命中追踪。[接线与实测](archive/development-batches/character-design-j4.md)。
 
-> **原文纠偏J3**：前台动作默认后按打断前一个。`CanBeInterrupted=false`为全程例外，`InterruptLockSeconds`为起手锁定的动画秒数，默认0；不用旧Windup代替。每单位实例事件加播放序号隔离，旧技能不能消费新动画的ATK，也不能在收尾时停止新动画。被打断进入原有CD／回层，未触发效果不补发；后台、离手武器和落地附加圈不占前台动作。真实同帧输入按事件顺序交接。[配置和证据](character-design-j3.md)。
+> **原文纠偏J3**：前台动作默认后按打断前一个。`CanBeInterrupted=false`为全程例外，`InterruptLockSeconds`为起手锁定的动画秒数，默认0；不用旧Windup代替。每单位实例事件加播放序号隔离，旧技能不能消费新动画的ATK，也不能在收尾时停止新动画。被打断进入原有CD／回层，未触发效果不补发；后台、离手武器和落地附加圈不占前台动作。真实同帧输入按事件顺序交接。[配置和证据](archive/development-batches/character-design-j3.md)。
 
 > **原文纠偏J1/J2（2026-10-17，覆盖下方历史接入记录）**：长枪四段循环；落剑式只归灵剑，镰刀／长枪技能栏五格。投掷在真实ATK出手，合格松手重播释放动画等待ATK，取消不兜底发伤害。
 > `InFlight`表示武器尚未回手，包含飞行、停留和回程；`HasSettled`／`IsReturning`分别标明后两阶段。武技1到实际回手才解锁。
 > `IsBusy = IsActive && !IsBackground && OccupiesAction`。投掷出手后不再占动作；回手／取消收尾不停止其他技能动画。默认镰刀到射程停留，靠近或再次使用收回；长枪碰真实World后静止，默认仅再次使用收回。
-> 后置倍率改为`1+(ChargeStepScale-1)*ChargeSteps`：长枪四档1.8、弓五档2.5。长枪准星选落点，水平射程封顶，蓄力预览与实际弹道共用求解；往返各对路径目标命中一次，Box凸包扫掠覆盖高速两帧间隙。原文真实输入探针及后续边界见[审计](original-design-audit.md)。
+> 后置倍率改为`1+(ChargeStepScale-1)*ChargeSteps`：长枪四档1.8、弓五档2.5。长枪准星选落点，水平射程封顶，蓄力预览与实际弹道共用求解；往返各对路径目标命中一次，Box凸包扫掠覆盖高速两帧间隙。原文真实输入探针及后续边界见[审计](archive/design-notes/original-design-audit.md)。
 
 > **后续H专项**：修复连续按键提前开窗跳过ATK。近战只有真实ATK开窗，提前输入只缓冲；本段判定结束后推进，避免修改仍在生效的上一段命中体。每段ATK只消费一次，Combo收招不覆盖表内窗口时长；等待ATK超时按每段计时，循环长枪不受累计施法时长误取消。真实连点、逐段命中与采样见followup-h-verification.md。
 
@@ -48,19 +48,19 @@
 > `IsActive` 表示效果生命周期，`IsBusy = IsActive && !IsBackground` 表示占用动作；`IsReady` 仍防重复激活。
 > 输入按住累加 `HeldTime`，松开走 `OnMaintainReleased()`，停标记并平滑恢复 FOV，然后进入原 2s 冷却。
 > 后台效果不订阅角色技能动画事件，也不播放或停止技能动画；禁用、死亡、退树会还原相机。
-> 默认三列均为 false/0，其余技能仍使用原蓄力、档位、完美窗口和动画链路。详见 [E 批验收](e-batch-verification.md)。
+> 默认三列均为 false/0，其余技能仍使用原蓄力、档位、完美窗口和动画链路。详见 [E 批验收](archive/development-batches/e-batch-verification.md)。
 
 > **第二轮 A-5（2026-10-16）**：下落攻击增加 `IsDiving` 只读属性，表现组件
 > `DiveWindFx` 挂在 `Player/AbilityFallAttack/DiveWind`，只读该属性和真实速度来画向上的青蓝风线。
 > 起手速度、伤害、高度加成、CD、命中体和落地事件均未改。真实 Ctrl 下落、落圈、退出淡出及安全性实测见
-> [A 批验收记录](a-batch-verification.md)，可调参数和只读来源见 [vfx.md](vfx.md)。
+> [A 批验收记录](archive/development-batches/a-batch-verification.md)，可调参数和只读来源见 [vfx.md](vfx.md)。
 
 > **本轮范围**：把设计文档第 13/14 行的两个**通用机制**（技能层数、蓄力）+ **完美时机** + **冷却缩减（CDR）**
 > 做成**6 把武器公用的地基**。落地位置：`Ability` 基类（机制）+ `AbilityConfig`（表列）。
 > **本文件就是"后续 6 把武器照它做"的接入契约。**
 >
 > 权威：`F:\Godot项目\3d肉鸽雨中哈迪斯\角色设计.txt`（第 13/14 行 = 层数与蓄力的定义）；
-> 澄清：`docs/character-redesign.md`；动画那一段的机制见 [anim-pipeline.md](anim-pipeline.md)；
+> 澄清：`docs/archive/design-notes/character-redesign.md`；动画那一段的机制见 [anim-pipeline.md](anim-pipeline.md)；
 > 战斗管线见 [combat.md](combat.md)；架构铁律见 [architecture.md](architecture.md)。
 
 ---
@@ -508,7 +508,7 @@ TryPress(第一次) → TryActivate → OnActivate：播 ComboAnimations[0]
 
 > ⚠️ **2026-10-15 P6a 清旧之后**：索引是 **`6/2/10/1/1/39/7/13/8/6/6/11/6`**
 > （旧 3 角色 / 3 武器 / 5 条旧技能行 / 3 个旧池 / 2 张旧卡已删；效果 10 → 13 是 P5b 的三条状态行）。
-> 见 [character-redesign.md](character-redesign.md) §六。
+> 见 [character-redesign.md](archive/design-notes/character-redesign.md) §六。
 
 **动画对齐**（`AnimSpeedScale` 逐条算过：事件帧绝对时刻 = 目标长度 × 源时刻/源长）：
 

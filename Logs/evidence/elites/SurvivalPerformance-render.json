@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "pass": 5,
+  "fail": 0,
+  "checks": [
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u751F\u5B58\u6A21\u5F0F\u3001\u73A9\u5BB6\u548C\u5BFC\u822A\u5DF2\u51C6\u5907"
+    },
+    {
+      "passed": true,
+      "message": "\u6B63\u5F0F\u5BFC\u6F14\u751F\u6210100\u540D\u771F\u5B9E\u654C\u4EBA\uFF0C\u4FDD\u7559AI\u3001\u5BFC\u822A\u3001\u52A8\u753B\u548C\u653B\u51FB\uFF0C\u62E5\u6324\u6A21\u5F0FAvoidance"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u9645\u7EB9\u7406(3840, 2160)\uFF0C3D\u6BD4\u4F8B\u4E3A1\uFF0C\u65E0\u964D\u91C7\u6837"
+    },
+    {
+      "passed": true,
+      "message": "\u57FA\u51C6\u5B8C\u6210\u6709\u6548\u91C7\u6837\uFF0C100\u654C\u4EBA\u671F\u95F4\u5B9E\u9645\u53D1\u51FA\u73A9\u5BB6\u653B\u51FB\u8BF7\u6C42"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u6E32\u67D3 performance-4k-100-Avoidance"
+    }
+  ]
+}

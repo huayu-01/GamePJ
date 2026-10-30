@@ -23,7 +23,7 @@ Value = PackedStringArray("Melee", "Charge")
 [sub_resource type="Resource" id="p_skl_boss_charge_0"]
 script = ExtResource("2_param")
 Key = "ChargeSpeed"
-Value = 18.0
+Value = 27.0
 Note = "冲锋速度"
 
 [sub_resource type="Resource" id="p_skl_boss_charge_1"]
@@ -43,6 +43,7 @@ Enabled = false
 ApproachMinRange = 5.0
 ApproachMaxRange = 16.0
 AttackParams = [SubResource("a_skl_boss_charge_0"), SubResource("a_skl_boss_charge_1"), SubResource("a_skl_boss_charge_2")]
+NumericId = 1186
 Id = "skl_boss_charge"
 DisplayName = "首领冲锋"
 Note = "Boss 阶段 2 解锁，也可以被「冲锋强化」词条开场解锁。"

@@ -1,111 +1,55 @@
 [gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://cafy8lisvsfu7"]
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[sub_resource type="Resource" id="p_LinearShot"]
+script = ExtResource("param")
+Key = "LinearShot"
+Value = true
 
-[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_throw.svg" id="e_hud_icon"]
-[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
+[sub_resource type="Resource" id="p_LanceDamage"]
+script = ExtResource("param")
+Key = "LanceDamage"
+Value = 50
 
-[sub_resource type="Resource" id="p_ReturnSpeed"]
-script = ExtResource("2_param")
-Key = "ReturnSpeed"
-Value = 30
-Note = "收回速度（m/s）"
+[sub_resource type="Resource" id="p_LanceSpeed"]
+script = ExtResource("param")
+Key = "LanceSpeed"
+Value = 40
+
+[sub_resource type="Resource" id="p_LanceKnockback"]
+script = ExtResource("param")
+Key = "LanceKnockback"
+Value = 10
+
+[sub_resource type="Resource" id="p_LanceMaxTargets"]
+script = ExtResource("param")
+Key = "LanceMaxTargets"
+Value = 2
 
 [sub_resource type="Resource" id="p_MaxThrowDistance"]
-script = ExtResource("2_param")
+script = ExtResource("param")
 Key = "MaxThrowDistance"
-Value = 12
-Note = "★ 路径中线基准长度（米；蓄力每档 +20%）"
-
-[sub_resource type="Resource" id="p_FlightSeconds"]
-script = ExtResource("2_param")
-Key = "FlightSeconds"
-Value = 0.8
-Note = "基准飞行时间；空间距离÷它作为基础速度，蓄力按同倍率增加速度和射程"
-
-[sub_resource type="Resource" id="p_ArcGravity"]
-script = ExtResource("2_param")
-Key = "ArcGravity"
-Value = 22
-Note = "抛物线重力（m/s²）"
-
-[sub_resource type="Resource" id="p_ArcPathSteps"]
-script = ExtResource("2_param")
-Key = "ArcPathSteps"
-Value = 32.0
-Note = "路径采样段数"
-
-[sub_resource type="Resource" id="p_SpinDegreesPerSecond"]
-script = ExtResource("2_param")
-Key = "SpinDegreesPerSecond"
-Value = 0
-Note = "长枪沿速度方向飞行，落地后静止"
-
-[sub_resource type="Resource" id="p_DamageInterval"]
-script = ExtResource("2_param")
-Key = "DamageInterval"
-Value = 0.25
-Note = "周期性伤害间隔（长枪飞行较快，给 0.25）"
-
-[sub_resource type="Resource" id="p_DamageActiveTime"]
-script = ExtResource("2_param")
-Key = "DamageActiveTime"
-Value = 0.12
-Note = "每次判定的持续"
-
-[sub_resource type="Resource" id="p_RecallOnSecondPress"]
-script = ExtResource("2_param")
-Key = "RecallOnSecondPress"
-Value = true
-Note = "★ 丢出去后可再次使用技能收回（文档）"
-
-[sub_resource type="Resource" id="p_RecallDistance"]
-script = ExtResource("2_param")
-Key = "RecallDistance"
-Value = 0
-Note = "默认只在再次使用时收回，不靠近自动收回"
-
-[sub_resource type="Resource" id="p_DamageOnReturn"]
-script = ExtResource("2_param")
-Key = "DamageOnReturn"
-Value = true
-Note = "★ 回来时能再次对路径中的敌人造成伤害（文档）"
+Value = 30
 
 [sub_resource type="Resource" id="p_ShowPath"]
-script = ExtResource("2_param")
+script = ExtResource("param")
 Key = "ShowPath"
-Value = true
-Note = "★ 路径可视化指示器（文档第 151 行）"
-
-[sub_resource type="Resource" id="p_ContinuousPathDamage"]
-script = ExtResource("2_param")
-Key = "ContinuousPathDamage"
-Value = true
-Note = "飞出／回手各对沿途目标命中一次，静止时不持续刺伤"
+Value = false
 
 [resource]
-script = ExtResource("1_row")
-ActionMovement = 2
-HudIcon = ExtResource("e_hud_icon")
-HudColor = Color(1, 0.76, 0.4, 1)
-HudOrder = 40
+script = ExtResource("row")
+NumericId = 1182
+Id = "skl_b3_w1_2"
 NodeName = "AbilityWeapon6Skill2"
 ClassHint = "SpearThrowAbility"
 InputAction = "weapon_skill_2"
-HoldToCharge = true
-AllowEarlyChargeRelease = true
-EarlyReleaseDamageScale = 0.5
 AnimName = "Skill_B3_Spear4"
 AnimEvent = "ATK"
-ChargeBaseSeconds = 1.0
-ChargeStepSeconds = 0.25
-ChargeStepScale = 1.2
-ChargeMaxSeconds = 2.0
 Aim = 2
-Cooldown = 0.5
-Windup = 0.0
+Cooldown = 10
 Recover = 0.05
-Id = "skl_b3_w1_2"
 DisplayName = "长虹贯日"
-DescriptionTemplate = "未完成基础蓄力也可松手投出，伤害为基础的 {EarlyReleaseDamageScale:0%}；基础蓄力1秒，额外最多1秒，每0.25秒增强20%基础伤害、弹速和射程，最多1.8倍；朝准星空间目标抛出，保留俯仰，超射程同向截断；按住右键预览，松手隐藏；落地静止，再次使用收回，回程再次造成路径伤害。"
-Note = "J40按最新试玩裁定：准星取World或敌方身体的三维目标，空射取准星远端；按空间射程截断，不向地面投影。预览与释放共用弹道求解，玩家输入驱动显隐，松手／换装清理，不跟随离手生命周期。原1秒基础＋1秒额外、每0.25秒加算20%、碰World静止和往返各一次保持；临时动作待后续适配。"
-Params = [SubResource("p_ReturnSpeed"), SubResource("p_MaxThrowDistance"), SubResource("p_FlightSeconds"), SubResource("p_ArcGravity"), SubResource("p_ArcPathSteps"), SubResource("p_SpinDegreesPerSecond"), SubResource("p_DamageInterval"), SubResource("p_DamageActiveTime"), SubResource("p_RecallOnSecondPress"), SubResource("p_RecallDistance"), SubResource("p_DamageOnReturn"), SubResource("p_ShowPath"), SubResource("p_ContinuousPathDamage")]
+DescriptionTemplate = "向准星方向快速发射直线长枪，伤害{LanceDamage:0}并击退，最多命中{LanceMaxTargets:0}名敌人；不蓄力，冷却{Cooldown:0}秒。"
+NameKey = "content.skl_b3_w1_2.name"
+DescriptionKey = "content.skl_b3_w1_2.description"
+Params = [SubResource("p_LinearShot"), SubResource("p_LanceDamage"), SubResource("p_LanceSpeed"), SubResource("p_LanceKnockback"), SubResource("p_LanceMaxTargets"), SubResource("p_MaxThrowDistance"), SubResource("p_ShowPath")]

@@ -125,7 +125,7 @@ public partial class SkillIndicator : Node3D { ... }
 
 ## 5. 与交接单的关系
 
-`docs/DEEPSEEK_HANDOFF.md` 第 73 行原文：
+`docs/archive/handoffs-2026-10-18/DEEPSEEK_HANDOFF.md` 第 73 行原文：
 
 > **「结构查询优先 CodeGraph context→一次 explore，已初始化，不再让用户 init；字面文本再 rg。每批低成本 `codegraph index --force`，不能阻塞计划。」**
 

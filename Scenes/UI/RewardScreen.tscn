@@ -44,11 +44,21 @@ theme_type_variation = &"UiTitle"
 text = "选择奖励"
 horizontal_alignment = 1
 
-[node name="Cards" type="VBoxContainer" parent="Root/Panel/VBox"]
-size_flags_horizontal = 4
-theme_override_constants/separation = 12
+[node name="ChoicesScroll" type="ScrollContainer" parent="Root/Panel/VBox"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0,528)
+horizontal_scroll_mode = 0
+follow_focus = true
 
-[node name="CardTemplate" type="Button" parent="Root/Panel/VBox/Cards"]
+[node name="Cards" type="GridContainer" parent="Root/Panel/VBox/ChoicesScroll"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+columns = 3
+
+[node name="CardTemplate" type="Button" parent="Root/Panel/VBox/ChoicesScroll/Cards"]
 visible = false
 custom_minimum_size = Vector2(1000, 92)
 alignment = 0

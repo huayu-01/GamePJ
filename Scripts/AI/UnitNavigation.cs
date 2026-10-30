@@ -16,19 +16,26 @@ public partial class UnitNavigation : Node
 	private int _index, _revision = -1;
 	private MapManager? _map;
 	public bool HasPath => _index < _path.Length;
-	public override void _Ready() => _unit = GetParent<Unit>();
-	public override void _PhysicsProcess(double delta) => _repathLeft -= (float)delta;
+	public override void _Ready()
+	{
+		_unit = GetParent<Unit>(); _crowd = EnemyCrowdConfig.Current;
+		_crowd.Changed += RefreshCrowd; _unit.Died += OnDied;
+		RefreshCrowd();
+	}
+	public override void _PhysicsProcess(double delta)
+	{
+		_repathLeft -= (float)delta;
+		UpdateAvoidance((float)delta);
+	}
 	public void Stop() { _path = System.Array.Empty<Vector3>(); _index = 0; _repathLeft = 0; _unit.Movement?.Stop(); }
 	public bool MoveTo(Vector3 destination, float speed)
 	{
 		var map = MapManager.Instance;
 		if (map == null || !map.IsReady || _unit.Movement == null || _unit.Movement.IsControlDisabled) { _unit.Movement?.Stop(); return false; }
-		// 目标可以跳起，行走目标取其脚下的导航位置；实际攻击仍检查真实几何。
-		if (!map.TrySnap(destination, out Vector3 ground)) { Stop(); return false; }
-		if (_map != map || _revision != map.NavigationRevision || _repathLeft <= 0 || ground.DistanceTo(_target) > 1f)
+		if (_map != map || _revision != map.NavigationRevision || _repathLeft <= 0 || destination.DistanceTo(_target) > 1f)
 		{
-			_map = map; _revision = map.NavigationRevision; _target = ground; _repathLeft = RepathSeconds; _index = 0;
-			if (!map.TryPath(_unit.GlobalPosition, ground, out _path, _unit)) { _unit.Movement.Stop(); return false; }
+			_map = map; _revision = map.NavigationRevision; _target = destination; _repathLeft = RepathSeconds; _index = 0;
+			if (!map.TryApproachPath(_unit.GlobalPosition, destination, out _path, _unit)) { _unit.Movement.Stop(); return false; }
 		}
 		while (_index < _path.Length)
 		{

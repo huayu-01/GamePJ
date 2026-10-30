@@ -11,6 +11,7 @@ Value = 1.2
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1121
 Id = "pmod_berserk_speed"
 DisplayName = "狂暴·攻速"
 DescriptionTemplate = "攻速 ×1.2"

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ActRoguelike.Boss;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
@@ -21,6 +22,7 @@ public partial class EncounterController : Node3D
 	[Export] public float TotalBudget { get; set; } = 30f;
 	[Export] public float BudgetRegenPerSecond { get; set; } = 1.5f;
 	[Export] public float BudgetCap { get; set; } = 10f;
+	/// <summary>非波次逐只生成的并发上限；整波出场由波大小和资源预算控制。</summary>
 	[Export] public int MaxConcurrent { get; set; } = 6;
 	[Export] public float SpawnInterval { get; set; } = 1.4f;
 	[Export] public float SpawnRadius { get; set; } = 22f;
@@ -51,8 +53,13 @@ public partial class EncounterController : Node3D
 	/// <summary>Boss 开场**技能**条数（策划文档 §12 Boss 构筑，界面上叫技能不叫词条），由 Stage 配置决定。</summary>
 	public int BossPerkCount { get; set; } = 2;
 
-	/// <summary>波次生成模式（用户需求：一波一波刷，剩 ≤1 只才刷下一波）。</summary>
+	/// <summary>波次生成模式：剩余压力低于门槛，且没有存活精英／首领时再开下一波。</summary>
 	[Export] public bool WaveMode { get; set; } = true;
+	/// <summary>严格小于此值才续波；预设3允许剩一个2成本普通兵或两个1成本自爆兵。</summary>
+	[Export(PropertyHint.Range, "0.1,30,0.1")] public float NextWavePressureThreshold { get; set; } = 3f;
+	public float AlivePressure { get; private set; }
+	public bool HasPrioritySurvivor { get; private set; }
+	public bool CanOpenNextWave => AliveCount == 0 || (!HasPrioritySurvivor && AlivePressure < NextWavePressureThreshold);
 	[Export] public int WaveMinEnemies { get; set; } = 4;
 	[Export] public int WaveMaxEnemies { get; set; } = 15;
 
@@ -90,6 +97,8 @@ public partial class EncounterController : Node3D
 	public delegate void EncounterFailedEventHandler();
 
 	public event Action<bool>? Finished;
+	/// <summary>停止或复位不是清场成功，供关卡立即撤销挑战状态。</summary>
+	public event Action? Aborted;
 
 	public bool IsRunning { get; private set; }
 	public bool IsCompleted { get; private set; }
@@ -164,6 +173,7 @@ public partial class EncounterController : Node3D
 
 	private readonly List<EnemySpawnEntry> _entries = new();
 	private readonly List<Unit> _spawned = new();
+	private readonly Dictionary<Unit, float> _spawnedPressure = new();
 	private float _spendable;
 	private float _spawnTimer;
 	private float _bossPending = -1f;
@@ -200,7 +210,9 @@ public partial class EncounterController : Node3D
 		_spawnTimer = 0.3f;
 	}
 
-	public void Stop() => IsRunning = false;
+	public void Stop() { IsRunning = false; StopEliteTraits(); Aborted?.Invoke(); }
+	/// <summary>即时生成额度，与剩余总预算分别显示，不允许界面改写。</summary>
+	public float SpendableBudget => _spendable;
 
 	/// <summary>诊断用（自测/日志）：可生成项数量。</summary>
 	public int EntryCount => _entries.Count;
@@ -242,9 +254,11 @@ public partial class EncounterController : Node3D
 	/// </summary>
 	public void StopSpawning()
 	{
+		StopEliteTraits();
 		IsRunning = false;
 		_waveRemaining = 0;
 		IsCompleted = true;
+		Aborted?.Invoke();
 		ActRoguelike.Core.GameLog.Write("Spawn", "冻结生成：波次与预算停止（StopSpawning）");
 	}
 
@@ -284,7 +298,8 @@ public partial class EncounterController : Node3D
 		if (TotalSpawned > 0 && AliveCount == 0 && (!WaveMode || _waveRemaining == 0))
 		{
 			CheckCompleted();
-			return;
+			// 尚有后续波次时继续生成，不能在波间空场永久停住。
+			if (IsCompleted || !IsRunning) return;
 		}
 
 		ElapsedSeconds += dt;
@@ -304,18 +319,24 @@ public partial class EncounterController : Node3D
 
 		if (WaveMode)
 		{
-			// 上一波只剩 ≤1 只（或已清空）时才开下一波；残留的那只不计入新波的类型限制。
+			// 按实际生成成本计算剩余压力；精英和首领必须击杀后才允许续波。
 			// 白板首领已经出场后不再开常规波（否则会「首领+杂兵」一起打）。
-			if (_waveRemaining <= 0 && AliveCount <= 1 && !_eliteBossSpawned)
+			if (_waveRemaining <= 0 && CanOpenNextWave && !_eliteBossSpawned)
 			{
 				BeginWave();
 			}
 
+			if (_waveRemaining > 0)
+			{
+				_spawnTimer -= dt;
+				if (_spawnTimer <= 0f) FillWave();
+			}
 			if (_waveRemaining <= 0 && TotalSpawned > 0)
 			{
 				CheckCompleted();
-				return;
 			}
+			// 波次按整波出场；MaxConcurrent 只约束下面的非波次逐只生成。
+			return;
 		}
 
 		if (AliveCount >= MaxConcurrent)
@@ -329,7 +350,7 @@ public partial class EncounterController : Node3D
 			return;
 		}
 
-		EnemySpawnEntry? entry = WaveMode ? PickWaveEntry() : PickEntry();
+		EnemySpawnEntry? entry = PickEntry();
 		if (entry == null)
 		{
 			if (WaveMode)
@@ -506,15 +527,23 @@ public partial class EncounterController : Node3D
 		int types = GD.RandRange(1, maxTypes);
 		for (int i = 0; i < types && pool.Count > 0; i++)
 		{
-			int pick = (int)(GD.Randi() % (uint)pool.Count);
-			_waveEntries.Add(pool[pick]);
-			pool.RemoveAt(pick);
+			EnemySpawnEntry? picked = PickWeighted(pool);
+			if (picked == null) break;
+			_waveEntries.Add(picked);
+			pool.Remove(picked);
 		}
 
 		_waveRemaining = SpawnPlanner.RollWaveSize(WaveMinEnemies, WaveMaxEnemies);
+		BeginTraitWave();
 		ActRoguelike.Core.GameLog.Write("Spawn", $"第 {_waveIndex} 波开始：{_waveEntries.Count} 种类型（{string.Join("/", _waveEntries.ConvertAll(e => e.DisplayName))}）× 目标 {_waveRemaining} 只");
 
 		// 用户需求：一波敌人一次性刷出来，不要逐只滴灌（生成间隔只用于"下一波"）。
+		FillWave();
+		ActRoguelike.Core.GameLog.Write("Spawn", $"第 {_waveIndex} 波已出场，场上 {AliveCount} 只，待生成 {_waveRemaining} 只");
+	}
+
+	private void FillWave()
+	{
 		while (_waveRemaining > 0)
 		{
 			EnemySpawnEntry? burst = PickWaveEntry();
@@ -524,11 +553,10 @@ public partial class EncounterController : Node3D
 				break;
 			}
 
-			if (!Spawn(burst)) break;
+			if (!Spawn(burst)) { _spawnTimer = 0.3f; break; }
 			_waveRemaining--;
 		}
-
-		ActRoguelike.Core.GameLog.Write("Spawn", $"第 {_waveIndex} 波已全部出场，场上 {AliveCount} 只");
+		if (_waveRemaining == 0) _currentTraitWave?.Seal();
 	}
 
 	private EnemySpawnEntry? PickWaveEntry()
@@ -542,7 +570,24 @@ public partial class EncounterController : Node3D
 			}
 		}
 
-		return usable.Count == 0 ? null : usable[(int)(GD.Randi() % (uint)usable.Count)];
+		return PickWeighted(usable);
+	}
+
+	/// <summary>类型和波内生成共用正权重抽签；零权重条目已经由可用性检查排除。</summary>
+	internal static EnemySpawnEntry? PickWeighted(System.Collections.Generic.IReadOnlyList<EnemySpawnEntry> entries)
+	{
+		float total = 0f;
+		foreach (EnemySpawnEntry entry in entries) total += Mathf.Max(0f, entry.Weight);
+		if (total <= 0f) return null;
+		float roll = (float)GD.RandRange(0d, total);
+		foreach (EnemySpawnEntry entry in entries)
+		{
+			if (entry.Weight <= 0f) continue;
+			roll -= entry.Weight;
+			if (roll <= 0f) return entry;
+		}
+		for (int i = entries.Count - 1; i >= 0; i--) if (entries[i].Weight > 0f) return entries[i];
+		return null;
 	}
 
 	private bool IsAvailable(EnemySpawnEntry entry)
@@ -579,10 +624,16 @@ public partial class EncounterController : Node3D
 			// 选点先按最终体积检查；数值仍等EnterTree捕获基础值后由精英Ready套用。
 			enemy.Scale = Vector3.One * elite.ModelScale;
 		}
+		if (!WaveMode && (_currentTraitWave == null || _currentTraitWave.IsSealed || _currentTraitWave.Members.Count >= 4)) BeginTraitWave();
+		bool isElite = enemy.GetChildren().OfType<EliteModifier>().Any();
+		if (_currentTraitWave?.CanAssign(enemy, isElite) == true && _currentTraitWave.Definition is { } chosen
+			&& entry.Cost + chosen.ExtraCost <= Mathf.Min(RemainingBudget, BudgetCap) && _spendable < entry.Cost + chosen.ExtraCost) { enemy.Free(); return false; }
+		using var trait = _currentTraitWave?.Reserve(enemy, isElite, Mathf.Min(RemainingBudget, _spendable) - entry.Cost);
+		int traitCost = trait?.Cost ?? 0;
 		if (!SpawnPlanner.TryFindSpawnPoint(_player.GlobalPosition, MinSpawnDistance, SpawnRadius, out Vector3 spawnPoint, enemy)) { enemy.Free(); return false; }
 		AddChild(enemy); enemy.GlobalPosition = spawnPoint;
-		RemainingBudget -= entry.Cost;
-		_spendable -= entry.Cost;
+		RemainingBudget -= entry.Cost + traitCost;
+		_spendable -= entry.Cost + traitCost;
 
 		// 全局难度倍率在生成后套用（会回满生命）；再乘本关自己的缩放。
 		ConfigIndex.ScaleEnemy(enemy, this, false);
@@ -600,9 +651,15 @@ public partial class EncounterController : Node3D
 		enemy.FillVitals();
 
 		_spawned.Add(enemy);
+		_currentTraitWave?.Register(enemy); trait?.Commit(enemy);
+		if (trait != null) enemy.FillVitals();
+		_spawnedPressure[enemy] = entry.Cost + traitCost;
+		AlivePressure += entry.Cost + traitCost;
+		HasPrioritySurvivor |= IsPrioritySurvivor(enemy);
 		ActRoguelike.Core.GameLog.Write("Spawn", $"生成 {entry.DisplayName}（剩余预算 {RemainingBudget:0}，场上 {AliveCount}）");
 		TotalSpawned++;
 		AliveCount++;
+		if (!WaveMode && (_currentTraitWave?.Members.Count >= Mathf.Max(1, Mathf.Min(4, MaxConcurrent)) || AliveCount >= MaxConcurrent)) _currentTraitWave?.Seal();
 		return true;
 	}
 
@@ -610,20 +667,29 @@ public partial class EncounterController : Node3D
 	private void PruneSpawned()
 	{
 		int alive = 0;
+		float pressure = 0f;
+		HasPrioritySurvivor = false;
 		for (int i = _spawned.Count - 1; i >= 0; i--)
 		{
 			Unit unit = _spawned[i];
-			if (!IsInstanceValid(unit) || unit.IsDead)
+			if (!IsInstanceValid(unit) || unit.IsQueuedForDeletion() || unit.IsDead)
 			{
+				_spawnedPressure.Remove(unit);
 				_spawned.RemoveAt(i);
 				continue;
 			}
 
 			alive++;
+			pressure += _spawnedPressure.GetValueOrDefault(unit, 1f);
+			HasPrioritySurvivor |= IsPrioritySurvivor(unit);
 		}
 
 		AliveCount = alive;
+		AlivePressure = pressure;
 	}
+
+	private static bool IsPrioritySurvivor(Unit unit)
+		=> unit.HasTag("Boss") || unit.HasTag("Elite") || unit.IsInGroup("elite_units");
 
 	/// <summary>
 	/// 剩余预算买不起任何「当前已解锁」的敌人时，把它当作已花完。
@@ -671,11 +737,14 @@ public partial class EncounterController : Node3D
 		}
 
 		CheckCompleted();
-		return true;
+		return IsCompleted;
 	}
 
 	private void CheckCompleted()
 	{
+		if (IsCompleted || (WaveMode && _waveRemaining > 0)) return;
+		// 仍有预算且限定波次未出完时，空场只是波间间隙，不能提前庆祝或解锁交互。
+		if (WaveMode && WaveCount > 0 && _waveIndex < WaveCount && RemainingBudget > 0 && !_eliteBossSpawned) return;
 		// 关卡核心文档 L196-198：只要求「本次生成的敌人全部击杀」，预算没花完也可以结束。
 		// 注意：「还没生成过任何敌人」的判断只能放在 TryCompleteIfClear()（外部驱动入口），
 		// 不能放在这里 —— 本方法也被生成循环调用，加守卫会 return 掉整帧的生成。
@@ -705,6 +774,7 @@ public partial class EncounterController : Node3D
 
 		IsRunning = false;
 		IsCompleted = true;
+		StopEliteTraits();
 		ActRoguelike.Core.GameLog.Write("Spawn", $"Encounter 清场完成：共生成 {TotalSpawned}，用时 {ElapsedSeconds:0}s");
 		EmitSignal(SignalName.EncounterCompleted);
 		Finished?.Invoke(true);
@@ -721,6 +791,8 @@ public partial class EncounterController : Node3D
 	/// </summary>
 	public void ResetEncounter()
 	{
+		StopEliteTraits();
+		Aborted?.Invoke();
 		IsRunning = false;
 		IsCompleted = false;
 		_started = false;
@@ -736,6 +808,9 @@ public partial class EncounterController : Node3D
 		TotalSpawned = 0;
 		AliveCount = 0;
 		_spawned.Clear();
+		_spawnedPressure.Clear();
+		AlivePressure = 0f;
+		HasPrioritySurvivor = false;
 
 		// 波次状态也必须复位，否则上一场的 _waveIndex 会顶到 WaveCount，
 		// 下一场的 BeginWave() 直接被「到达波数上限」拦掉 ——
@@ -832,7 +907,7 @@ public partial class EncounterController : Node3D
 		{
 			Stat = "MaxHealthMultiplier",
 			Operation = ModifierOperation.Multiply,
-			Value = eliteScale,
+			Value = eliteScale * ConfigIndex.Settings.BossHealthMultiplier,
 			Source = this,
 		});
 		_eliteBoss.RefreshStats();
@@ -859,16 +934,42 @@ public partial class EncounterController : Node3D
 			return;
 		}
 
-		BossActive = true;
 		Node parent = GetTree().CurrentScene ?? GetTree().Root;
+		_player = _player != null && IsInstanceValid(_player) ? _player : FindPlayer();
 		Vector3 center = _player != null && IsInstanceValid(_player) ? _player.GlobalPosition : GlobalPosition;
 
-		Boss = BossScene.Instantiate<Unit>();
+		var preparedBoss = BossScene.Instantiate<Unit>();
 		// 单位表（`Config/Tables/Bosses/boss_*.tres`）：生命/护甲/移速/攻击/持有技能/标签。
 		// 与敌人一样，必须在 `Unit._EnterTree` 之前套用（先 ApplyTo、再 AddChild）。
-		BossRow(BossScene)?.ApplyTo(Boss);
+		BossRow(BossScene)?.ApplyTo(preparedBoss);
+		var guards = new List<(Unit Unit, Vector3 Point)>();
+		if (!SpawnPlanner.TryFindSpawnPoint(center, Mathf.Max(2f, BossSpawnDistance * 0.65f), BossSpawnDistance, out Vector3 bossPoint, preparedBoss))
+		{
+			preparedBoss.Free(); _started = true; _bossPending = 0.3f; return;
+		}
+		for (int i = 0; i < BossGuardCount && BossGuardScene != null; i++)
+		{
+			Unit guard = BossGuardScene.Instantiate<Unit>();
+			ConfigRows.ByScenePath<EnemyConfig>(BossGuardScene.ResourcePath)?.ApplyTo(guard);
+			bool found = false; Vector3 point = default;
+			for (int attempt = 0; attempt < 16; attempt++)
+			{
+				if (ActRoguelike.World.MapManager.Instance?.TryRingPoint(bossPoint, 3f, 7f, out point, guard, connectedTo: center) != true) continue;
+				bool overlaps = false;
+				foreach (var placed in guards) if (placed.Point.DistanceTo(point) < 2f) { overlaps = true; break; }
+				if (!overlaps) { found = true; break; }
+			}
+			if (!found)
+			{
+				guard.Free(); foreach (var placed in guards) placed.Unit.Free();
+				preparedBoss.Free(); _started = true; _bossPending = 0.3f; return;
+			}
+			guards.Add((guard, point));
+		}
+		Boss = preparedBoss;
+		BossActive = true; _bossPending = 0f;
 		parent.AddChild(Boss);
-		Boss.GlobalPosition = center + new Vector3(-BossSpawnDistance, 0.6f, 0f);
+		Boss.GlobalPosition = bossPoint;
 		ConfigIndex.ScaleEnemy(Boss, this, true);
 		if (!Mathf.IsEqualApprox(BossHealthScale, 1f))
 		{
@@ -901,14 +1002,10 @@ public partial class EncounterController : Node3D
 			_bossPerks.Add(perk);
 		}
 
-		for (int i = 0; i < BossGuardCount && BossGuardScene != null; i++)
+		foreach (var prepared in guards)
 		{
-			var guard = BossGuardScene.Instantiate<Unit>();
-			// 护卫也走单位表（`enemy_skill_elite` 那一行）：与生成项一样，先套用再 AddChild。
-			ConfigRows.ByScenePath<EnemyConfig>(BossGuardScene.ResourcePath)?.ApplyTo(guard);
-			parent.AddChild(guard);
-			float angle = Mathf.Pi * (i + 1) / (BossGuardCount + 1);
-			guard.GlobalPosition = Boss.GlobalPosition + new Vector3(Mathf.Cos(angle) * 6f, 0.6f, Mathf.Sin(angle) * 6f);
+			parent.AddChild(prepared.Unit);
+			prepared.Unit.GlobalPosition = prepared.Point;
 		}
 
 		EmitSignal(SignalName.BossSpawned);
@@ -917,6 +1014,7 @@ public partial class EncounterController : Node3D
 	/// <summary>玩家死亡 → Encounter 失败（阶段 7 的死亡结算会接管）。</summary>
 	public void FailEncounter()
 	{
+		StopEliteTraits();
 		if (IsCompleted)
 		{
 			return;
@@ -925,6 +1023,7 @@ public partial class EncounterController : Node3D
 		IsRunning = false;
 		IsCompleted = false;
 		EmitSignal(SignalName.EncounterFailed);
+		Aborted?.Invoke();
 		Finished?.Invoke(false);
 	}
 

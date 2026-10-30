@@ -4,6 +4,8 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>ActRoguelike</RootNamespace>
     <Nullable>enable</Nullable>
+    <!-- 文档／表格工具的Node依赖不属于游戏源码，避免SDK递归编译其中的C#安装辅助代码。 -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/node_modules/**;**/.ai/**</DefaultItemExcludes>
     <!-- YARD 插件的 C# 包装类在 Nullable=enable 下报 CS8618（上游问题，改上游文件会被升级覆盖）。
          我们自己的代码仍受 Nullable=enable 检查，只是不再把这一条当噪声。 -->
     <NoWarn>$(NoWarn);CS8618</NoWarn>

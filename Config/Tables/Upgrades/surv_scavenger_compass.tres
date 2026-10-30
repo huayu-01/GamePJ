@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/ScavengerCompassRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+RadiusScale = 1.5
+SpeedScale = 1.25
+[resource]
+script = ExtResource("row")
+NumericId = 1292
+Id = "surv_scavenger_compass"
+DisplayName = "拾荒罗盘"
+RewardKind = 0
+MaxStacks = 1
+Weight = 0.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_scavenger_compass"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "经验拾取半径×{Effects.0.RadiusScale:0.##}，吸收速度×{Effects.0.SpeedScale:0.##}。"
+NameKey = "content.surv_scavenger_compass.name"
+DescriptionKey = "content.surv_scavenger_compass.description"
+
+Note = "2026-10-28按用户决定退出全部正式获取和图鉴；旧身份与效果资源仅保留追溯，不恢复旧四路线。"

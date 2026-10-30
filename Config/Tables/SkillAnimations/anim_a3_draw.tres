@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1144
 Id = "anim_a3_draw"
 DisplayName = "A3 武技1 箭在弦上 · Charge/ATK 帧"
 Note = "角色 A 武器 3（弓）武技1：32 段素材里没有拉弓姿势（refactor-survey.md §1.2 明确列出没有 bow-draw），所以用「双手持械」（holding-both，0.167s）拉到 0.5s 代替。★ 事件帧时刻写的是**源片段时刻**，生成器会按 Length/源长（0.5/0.167 = 3 倍）等比缩放：0.1167 → 0.35s。ATK 落在 0.35s，配合技能行 AnimSpeedScale = 0.7 正好对齐基础蓄力 0.5s。"

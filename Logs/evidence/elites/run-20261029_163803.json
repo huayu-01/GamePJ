@@ -1,0 +1,44 @@
+{
+  "Date": "2026-10-29T16:38:03",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "Content062067",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 6.42,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.Content062067.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.Content062067.headless.err",
+      "SHA256": "5C473143E2AF03B207CF690586543D42D63C9E4294074D0B3F1B402DD4B2460B"
+    },
+    {
+      "Name": "Content062067",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 12.3,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.Content062067.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.Content062067.render.err",
+      "SHA256": "BD04181E179FED48070021993CE0695C7C7424B308C5D519ECE0BD58F78209F9"
+    },
+    {
+      "Name": "SurvivalMilestoneRetry",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 5.19,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.SurvivalMilestoneRetry.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.SurvivalMilestoneRetry.headless.err",
+      "SHA256": "AB03AB9758BFE5BFC4DAF9028F554845BB4204AEFE2B1AD1E071AB0FF7E6A079"
+    },
+    {
+      "Name": "SurvivalMilestoneRetry",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 6.76,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.SurvivalMilestoneRetry.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.SurvivalMilestoneRetry.render.err",
+      "SHA256": "B4461185007218A619F1324C530C152FD23AEA5E8DCE15340756DB49A32A0FC2"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

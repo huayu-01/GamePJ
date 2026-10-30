@@ -17,6 +17,10 @@ namespace ActRoguelike.UI;
 /// </summary>
 public static class SettingsStore
 {
+	public enum MovementMode { Direct, Anchor }
+	public const string KeyMovementMode = "movement_mode";
+	/// <summary>保留原操控为默认；锚点模式只归一化键盘方向，不改变鼠标相机输入。</summary>
+	public static MovementMode PlayerMovementMode => GetInt(ControlsSection, KeyMovementMode, 0) == 1 ? MovementMode.Anchor : MovementMode.Direct;
 	public const string FilePath = "user://settings.cfg";
 
 	// 节名（= 分类 id，与设置菜单的分类一一对应；不写死取值的只有"有哪些键"）。
@@ -341,6 +345,7 @@ public static class SettingsStore
 
 		foreach (string action in Cfg.GetSectionKeys(ControlsSection))
 		{
+			if (action == KeyMovementMode) continue;
 			if (!InputMap.HasAction(action))
 			{
 				GameLog.Write("UI", $"设置里存了动作「{action}」，但 InputMap 里没有它 —— 跳过");

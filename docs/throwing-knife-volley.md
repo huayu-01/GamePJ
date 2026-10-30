@@ -20,7 +20,7 @@
 
 首次运行的固定散射断言均通过，但两个仰视准星方向检查失败：夹具把相机向后退4米，仰视时相机进入地板下方，射线先击中地板。夹具改为从胸口投射准星，保留原断言及阈值，失败现场见 `character-design-knife-volley-failure-20261021_213322.log`。
 
-最终验证于日志批次 `20261021_213523` 完成，2026-10-22继续核对并收尾：[完整证据](character-design-knife-volley-evidence.log)。Debug／ExportRelease均0警告、0错误；全部游戏进程退出码0、标准错误为空。
+最终验证于日志批次 `20261021_213523` 完成，2026-10-22继续核对并收尾：[完整证据](../Logs/evidence/character-design-knife-volley-evidence.log)。Debug／ExportRelease均0警告、0错误；全部游戏进程退出码0、标准错误为空。
 
 | 专项／回归 | 通过 | 失败 |
 |---|---:|---:|

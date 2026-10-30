@@ -8,6 +8,7 @@ namespace ActRoguelike.Visual;
 public partial class MeleeSwingFx : Node
 {
 	[Export] public PackedScene? EffectScene { get; set; }
+	[Export] public Color Tint { get; set; } = new(1, .76f, .4f);
 	private MeleeComboAbility _ability = null!;
 	private int _lastCount;
 	public int SpawnCount { get; private set; }
@@ -27,8 +28,7 @@ public partial class MeleeSwingFx : Node
 		{
 			Node3D effect = EffectScene.Instantiate<Node3D>();
 			// 必须早于进树播放：AnimationPlayer会缓存材质属性轨道的目标。
-			Color color = ConfigRows.ById<AbilityConfig>(_ability.AbilityId)?.HudColor ?? Colors.LightCyan;
-			FxPalette.Apply(effect, color, 1.25f);
+			FxPalette.Apply(effect, Tint, 1.25f);
 			(GetTree().CurrentScene ?? GetTree().Root).AddChild(effect);
 			effect.GlobalTransform = _ability.GetNode<Node3D>("Attack").GlobalTransform;
 			Vector3 size = _ability.CurrentStepBoxSize;

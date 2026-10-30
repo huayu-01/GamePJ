@@ -3,26 +3,40 @@
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
+
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_cleave.tres" id="previous"]
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
 Stat = "AttackRangeMultiplier"
 Operation = 1
-Value = 1.3
+Value = 1.7
 
 [sub_resource type="Resource" id="Resource_m1"]
 script = ExtResource("1_stat")
 Stat = "DamageMultiplier"
 Operation = 1
-Value = 1.08
+Value = 1.3
+
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1253
 RewardKind = 2
 MaxStacks = 1
-Modifiers = [SubResource("Resource_m0"), SubResource("Resource_m1")]
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Requires = PackedStringArray("mut_cleave")
 Id = "mut_cleave_plus"
-DisplayName = "大刀阔斧+"
-DescriptionTemplate = "近战攻击范围 +70%、伤害 +30%"
-Note = "[P5 新增行] 文档第 211 行「大刀阔斧+:范围增加至{70}%,伤害至{30}%,前置:大刀阔斧」。用**乘法链**表达\"至\"：1.3×1.3=1.69（+69%≈70%）、1.2×1.08=1.296（+30%）。"
+DisplayName = "升级：大刀阔斧"
+DescriptionTemplate = "替换上一级效果：近战范围倍率×{Modifiers.AttackRangeMultiplier:0.##}，伤害倍率×{Modifiers.DamageMultiplier:0.##}"
+Note = "032：当前级效果替换前级实例，保留历史身份满足前置；不再与上一级重复叠加。"
+
+NameKey = "content.mut_cleave_plus.name"
+
+DescriptionKey = "content.mut_cleave_plus.description"
+
+Effects = [SubResource("Resource_effect_0")]
+Replaces = ExtResource("previous")

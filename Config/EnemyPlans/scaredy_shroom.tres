@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyActionPlan" load_steps=11 format=3]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActionPlan.cs" id="plan"]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActionStep.cs" id="step"]
+[ext_resource type="Resource" path="res://Config/EnemyActions/wait.tres" id="action_wait"]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActions/ProjectileEnemyAction.cs" id="projectile"]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActions/BurrowEnemyAction.cs" id="burrow"]
+[sub_resource type="Resource" id="shot_action"]
+script = ExtResource("projectile")
+Speed = 6.6
+Damage = 10
+TravelDistance = 20
+[sub_resource type="Resource" id="burrow_action"]
+script = ExtResource("burrow")
+Depth = 2.0
+[sub_resource type="Resource" id="s0"]
+script = ExtResource("step")
+Action = SubResource("shot_action")
+ActiveSeconds = 0.05
+RecoverSeconds = 0.2
+[sub_resource type="Resource" id="s1"]
+script = ExtResource("step")
+Action = ExtResource("action_wait")
+ActiveSeconds = 2
+RecoverSeconds = 0
+[sub_resource type="Resource" id="s2"]
+script = ExtResource("step")
+Action = SubResource("burrow_action")
+ActiveSeconds = 0.5
+RecoverSeconds = 0.2
+[resource]
+script = ExtResource("plan")
+Far = [SubResource("s0")]
+Closing = [SubResource("s1"), SubResource("s2")]
+CooldownSeconds = 0.6
+TriggerDistance = 120
+NearDistance = 3

@@ -35,6 +35,7 @@ Recover = 0.8
 ApproachMinRange = 0.0
 ApproachMaxRange = 7.0
 AttackParams = [SubResource("a_skl_enemy_screamer_scream_0"), SubResource("a_skl_enemy_screamer_scream_1"), SubResource("a_skl_enemy_screamer_scream_2")]
+NumericId = 1201
 Id = "skl_enemy_screamer_scream"
 DisplayName = "减速尖啸"
 Note = "尖啸者：伤害 6 / 间隔 4 / 半径 7 / 击退 6 在 enemy_screamer 行。"

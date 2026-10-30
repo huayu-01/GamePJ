@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BurnerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/BurnerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1005
+Id = "elite_burner"
+Title = "燃烧"
+Description = "周期铺设短暂地面火焰。"
+NameKey = "elite.burner.name"
+DescriptionKey = "elite.burner.description"
+Cooldown = 5
+Radius = 2
+Duration = 3
+Damage = 6

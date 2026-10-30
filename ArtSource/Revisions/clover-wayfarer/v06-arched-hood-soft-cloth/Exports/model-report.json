@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "asset": "clover-wayfarer",
+  "revision": "v06-arched-hood-soft-cloth",
+  "triangles": 2742,
+  "meshes": 20,
+  "bones": 15,
+  "materials": 12,
+  "animations": [
+    {
+      "name": "idle",
+      "duration_seconds": 1.9999999664723873,
+      "channels": 45
+    },
+    {
+      "name": "walk",
+      "duration_seconds": 1.2000000141561031,
+      "channels": 45
+    }
+  ],
+  "max_weight_sum_error": 1.2665987014770508e-07,
+  "glb_bytes": 261780,
+  "includes_hands": false,
+  "includes_backpack": false,
+  "back_pattern": "three-leaf clover",
+  "candidate_only": true,
+  "geometry_check": {
+    "passed": true,
+    "asset_meshes": 20,
+    "triangles": 2742,
+    "bones": 15,
+    "mask_manifold": true,
+    "no_hands_or_arms": true,
+    "same_jade_material": true,
+    "no_head_filler": true,
+    "jade_color_srgb": "#2bc98e",
+    "head_binding_verified": true,
+    "front_hood_crown_z": 1.765,
+    "front_mask_forehead_z": 1.785,
+    "rear_hood_crown_z": 1.87,
+    "front_lip_below_mask": true,
+    "raised_curved_rear_crown": true,
+    "side_render_reviewed": true,
+    "cloth_folds": "irregular drifting folds, shoulder tension, asymmetric opening",
+    "cloth_edges": "thin turned front edges and hem",
+    "cloth_shading": "smooth body cloth and scarf; faceted wood",
+    "hem_min_z": 0.19516324996948242,
+    "hem_max_z": 0.2850700914859772,
+    "back_clover": "clipped onto individual cloth triangles",
+    "unchanged_mask_eyes_glyph_boot_meshes": [
+      "CW_OwlMaskMesh",
+      "CW_JadeEyesMesh",
+      "CW_ForeheadCloverMesh",
+      "CW_LeftBootMesh",
+      "CW_LeftBootCuffMesh",
+      "CW_LeftSoleMesh",
+      "CW_RightBootMesh",
+      "CW_RightBootCuffMesh",
+      "CW_RightSoleMesh"
+    ]
+  },
+  "references": [
+    "user-owl-outline-v03.png",
+    "https://oricutstudios.itch.io/low-poly-forest-spirit-nori",
+    "https://oricutstudios.itch.io/low-poly-campfire-scout-niko"
+  ],
+  "blender_roundtrip": {
+    "passed": true,
+    "asset_meshes": 20,
+    "triangles": 2742,
+    "bones": 15,
+    "importer_bone_display_helpers": 0
+  }
+}

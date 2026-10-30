@@ -227,7 +227,7 @@ public partial class SummonOnKillRule : TriggerRule
 /// <para><b>为什么合成一个类</b>（`docs/upgrades.md` §2.3 那条"一个类服务所有同类行"）：这 6 条的差别**只有
 /// "订阅哪一种事件 + 出手时做什么 + 数值多少"**，三样全是行里的键值对。一条行一个类会让"再加一条这类增幅"
 /// 变成改 C#，与 `character-redesign.md` §1.5「加一条增幅 = 加一行表」冲突；
-/// 而 6 个几乎一样的类正是 `docs/refactor-survey.md` 点名的复制粘贴。</para>
+/// 而 6 个几乎一样的类正是 `docs/archive/design-notes/refactor-survey.md` 点名的复制粘贴。</para>
 ///
 /// <para>数值**没有一个字面量**：`Trigger` / `AbilityId` / `RequireHover` / `CooldownFraction` /
 /// `CooldownSeconds` / `RefreshAbility` / `Heal` / `HoverSeconds` / `ExtraAirJumps` / `JumpCap` /
@@ -245,6 +245,8 @@ public partial class TablePulseRule : TriggerRule
 	/// 而它是**一行**增幅（一个 <c>Trigger</c> 列）。写法：<c>Trigger = "Parried,ArmorBroken"</c>。</para>
 	/// </summary>
 	public string Trigger { get; set; } = "Kill";
+	/// <summary>生产效果使用强类型事件集合；Trigger仅供旧资源与诊断。</summary>
+	public GameplayEventKind[]? EventKinds { get; set; }
 
 	/// <summary>一次性 CDR 的目标（**技能行 Id**，不是节点名）：走 `Ability.FindByAbilityId`。</summary>
 	public string AbilityId { get; set; } = string.Empty;
@@ -305,7 +307,9 @@ public partial class TablePulseRule : TriggerRule
 		// `Trigger` 是逗号分隔的事件名列表（P6a：「能量护盾」的"格挡 / 护甲破碎"两件事共用一个 Trigger 列）。
 		// 任一条命中即通过 —— 单值时行为与改前逐位一致。
 		bool kindOk = false;
-		foreach (string trigger in Triggers)
+		if (EventKinds != null)
+			kindOk = Array.IndexOf(EventKinds, gameplayEvent.Kind) >= 0 && (mine || gameplayEvent.Kind == GameplayEventKind.ArmorBroken && gameplayEvent.Target == _owner);
+		else foreach (string trigger in Triggers)
 		{
 			if (MatchesKind(trigger, gameplayEvent, mine))
 			{
@@ -499,16 +503,18 @@ public partial class KillAirJumpRule : TriggerRule
 	{
 		_owner = GetParent<Unit>();
 		// 纯事实计数不接基类的攻击连锁门；不生成新命中，不会递归触发自身。
+		IsStopped = false;
 		GameplayEventBus.Raised += OnKill;
 	}
 	public override void _ExitTree()
 	{
-		GameplayEventBus.Raised -= OnKill;
+		Stop();
 		_owner = null;
 	}
+	public override void Stop() { GameplayEventBus.Raised -= OnKill; base.Stop(); }
 	public override bool Matches(GameplayEvent fact) => _owner != null && IsInstanceValid(_owner)
 		&& fact.Kind == GameplayEventKind.Kill && fact.Source == _owner;
-	private void OnKill(GameplayEvent fact) { if (Matches(fact)) Execute(fact); }
+	private void OnKill(GameplayEvent fact) { if (!IsStopped && Matches(fact)) Execute(fact); }
 	public override void Execute(GameplayEvent fact)
 	{
 		if (_owner == null || !IsInstanceValid(_owner) || _owner.Movement is not { } movement || ExtraAirJumps <= 0 || JumpCap <= 0) return;
@@ -550,9 +556,14 @@ public partial class JumpPulseRule : TriggerRule
 
 	public override void _ExitTree()
 	{
-		if (_movement != null && GodotObject.IsInstanceValid(_movement)) _movement.JumpStarted -= OnJumpStarted;
+		Stop();
 		_movement = null; _owner = null;
 		base._ExitTree();
+	}
+	public override void Stop()
+	{
+		if (_movement != null && GodotObject.IsInstanceValid(_movement)) _movement.JumpStarted -= OnJumpStarted;
+		base.Stop();
 	}
 
 	public override void Execute(GameplayEvent gameplayEvent)
@@ -561,7 +572,7 @@ public partial class JumpPulseRule : TriggerRule
 	}
 	private void OnJumpStarted(Vector3 origin)
 	{
-		if (_owner == null || !GodotObject.IsInstanceValid(_owner) || _owner.IsDead)
+		if (IsStopped || _owner == null || !GodotObject.IsInstanceValid(_owner) || _owner.IsDead)
 		{
 			return;
 		}
@@ -747,7 +758,8 @@ public partial class GuardOnSprintRule : TriggerRule
 		}
 	}
 
-	public override void _ExitTree()
+	public override void _ExitTree() => Stop();
+	public override void Stop()
 	{
 		if (_subscribed && _owner != null && GodotObject.IsInstanceValid(_owner))
 		{
@@ -755,7 +767,8 @@ public partial class GuardOnSprintRule : TriggerRule
 		}
 
 		_subscribed = false;
-		base._ExitTree();
+		if (HasGuard && IsInstanceValid(_block)) _block!.Blocking = false;
+		HasGuard = false; SetProcess(false); base.Stop();
 	}
 
 	public override void _Process(double delta)
@@ -770,7 +783,7 @@ public partial class GuardOnSprintRule : TriggerRule
 	/// </summary>
 	public void PollOnce(float delta)
 	{
-		if (!GodotObject.IsInstanceValid(_owner) || _owner!.IsDead)
+		if (IsStopped || !GodotObject.IsInstanceValid(_owner) || _owner!.IsDead)
 		{
 			return;
 		}
@@ -1108,13 +1121,15 @@ public partial class SoulHarvestRule : TriggerRule
 		GameplayEventBus.Raised += OnKill;
 	}
 
-	public override void _ExitTree()
+	public override void _ExitTree() => Stop();
+	public override void Stop()
 	{
+		base.Stop();
 		GameplayEventBus.Raised -= OnKill;
 		_owner = null;
 	}
 
-	private void OnKill(GameplayEvent fact) { if (Matches(fact)) Execute(fact); }
+	private void OnKill(GameplayEvent fact) { if (!IsStopped && Matches(fact)) Execute(fact); }
 
 	public override bool Matches(GameplayEvent gameplayEvent)
 		=> gameplayEvent.Kind == GameplayEventKind.Kill
@@ -1142,7 +1157,7 @@ public partial class SoulHarvestRule : TriggerRule
 			? gameplayEvent.Position
 			: gameplayEvent.Target?.GlobalPosition ?? owner.GlobalPosition;
 
-		DropAt(where);
+		DropAt(PickupDropLayout.Claim(gameplayEvent.Target, where));
 	}
 
 	/// <summary>

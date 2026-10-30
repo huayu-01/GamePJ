@@ -1,0 +1,12 @@
+{
+  "animations_present": true,
+  "anime_style_enabled": true,
+  "burrow_root_y": -1.16820108890533,
+  "cast_grip_delta_radians": 0.293935418128967,
+  "demo_cycle_returned_to_idle": true,
+  "mage_bones": 7,
+  "mushroom_bones": 4,
+  "passed": true,
+  "scope": "外观模型与演示动作，未接生产敌人战斗",
+  "styled_surfaces": 23
+}

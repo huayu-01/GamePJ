@@ -1,0 +1,28 @@
+{
+  "Date": "2026-10-29T16:29:51",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "adventure_render",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 41.78,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162951.adventure_render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162951.adventure_render.err",
+      "Failure": "",
+      "SHA256": "B025B807E54ECCCC9AEB2C4D4E28E9182F5B2518BF9282E61E3A207B57D5766D"
+    },
+    {
+      "Name": "survival",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162951.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162951.survival.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162951.survival.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162951.survival.err",
+      "SHA256": "C46EC236D9B54D940268787E16259F8A757BAC4A31A4F752BF49132BA1731843"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "相关流程回归存在失败，见逐项报告。"
+}

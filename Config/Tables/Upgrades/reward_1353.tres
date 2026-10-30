@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="definition"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="modifier"]
+[sub_resource type="Resource" id="modifier0"]
+script = ExtResource("modifier")
+Stat = "ElectromagneticRadiusAdd"
+Operation = 0
+Value = 0.2
+[sub_resource type="Resource" id="modifier1"]
+script = ExtResource("modifier")
+Stat = "ElectromagneticTargetsAdd"
+Operation = 0
+Value = 1
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+Modifiers = [SubResource("modifier0"), SubResource("modifier1")]
+[resource]
+script = ExtResource("row")
+NumericId = 1353
+DisplayName = "磁化"
+NameKey = "content.1353.name"
+DescriptionKey = "content.1353.description"
+DescriptionTemplate = "电磁圈半径增加20%，闪电链总目标数增加1。"
+RewardKind = 0
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+Requires = PackedStringArray("1343")
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

@@ -1,0 +1,1276 @@
+存档BEFORE meta.cfg SHA256=26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446
+存档BEFORE ability_cards.cfg SHA256=4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D
+存档BEFORE settings.cfg SHA256=7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1
+存档BEFORE loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档BEFORE rune.cfg SHA256=CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 329 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.29
+
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 323 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.94
+
+=== effects exit=0 seconds=2.29 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 02:39:38 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 02:39:38 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 02:39:38 [Flow] === 新的一局 ===
+[log] 02:39:38 [Flow] 日志文件：res://Logs/runtime/run_20261025_023938_589.log
+[log] 02:39:38 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 02:39:38 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 02:39:38 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 02:39:38 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 02:39:38 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 02:39:38 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 02:39:38 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 02:39:38 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 02:39:38 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 02:39:38 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 02:39:38 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 02:39:38 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 02:39:38 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[RewardEffects] PASS 生产力量行已迁组合效果资源
+[RewardEffects] PASS 生产灼烧弹已迁强类型状态引用
+[RewardEffects] PASS 第一持有者只应用一次：1.15 / 1.15
+[RewardEffects] PASS 第二持有者独立重复获取：1.3225 / 1.3225
+[RewardEffects] PASS 定义共享但三次应用各有独立实例
+[RewardEffects] PASS 重复撤销幂等：1 / 1
+[RewardEffects] PASS 撤销不影响其他持有者：1.3225 / 1.3225
+[RewardEffects] PASS 单增幅组合三个效果，触发规则只登记一次
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@7(1000) → @CharacterBody3D@3(900) 100
+[log] 02:39:38 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@3(900) → @CharacterBody3D@7(980) 20
+[RewardEffects] PASS 组合吸血使用真实伤害事实：2 / 2
+[RewardEffects] PASS 组合状态通过真实命中生效
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@3(902) → @CharacterBody3D@7(960) 20
+[RewardEffects] PASS 释放后同帧不再吸血：902 / 902
+[RewardEffects] PASS 释放后同帧不再加状态，计时登记清除
+[RewardEffects] PASS 组合属性一并撤销：1 / 1
+[RewardEffects] PASS 后一个效果失败时撤回构筑获取记录
+[RewardEffects] PASS 失败回滚只撤本次效果，不吞其他增幅：1.1 / 1.1
+[RewardEffects] PASS 换装释放普通效果，符文按自身携带周期保留：1.4 / 1.4
+[RewardEffects] PASS 换符文按独立构筑来源释放：1 / 1
+[RewardEffects] PASS 三类旧处理器均适配为独立托管实例
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@7(960) → @CharacterBody3D@12(900) 100
+[RewardEffects] PASS 旧属性处理器保留倍率：1.2 / 1.2
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@12(900) → @CharacterBody3D@7(936) 24
+[RewardEffects] PASS 旧吸血与属性效果保持原结算：2.4000244 / 2.4
+[RewardEffects] PASS 旧状态字符串适配仍能施加状态
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@12(902.4) → @CharacterBody3D@7(916) 20
+[RewardEffects] PASS 仅调用旧来源清理入口也会当帧释放属性与事件
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@3(0) 击杀者=@CharacterBody3D@7(916)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@3(0) by @CharacterBody3D@7(916)
+[RewardEffects] PASS 死亡释放全部托管实例和事件规则
+[RewardEffects] PASS 死亡撤销属性：1 / 1
+[RewardEffects] PASS 旧Source成组清理后再次释放实例保持安全：1 / 1
+[RewardEffects] PASS 缺引用及非有限数值在制作期可校验
+[RewardEffects] PASS 退树清理不遗留实例或重复释放错误
+[RewardEffects] PASS 发散与心眼已使用同一强类型效果组件
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@19(1000) → @CharacterBody3D@21(990) 10
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@19(1000) → @CharacterBody3D@21(979) 11
+[RewardEffects] PASS 标记按本次命中前的层数加伤，首击不加伤：21 / 21
+[RewardEffects] PASS 匹配来源正常叠标
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@19(1000) → @CharacterBody3D@21(969) 10
+[RewardEffects] PASS 不匹配来源既不叠标也不吃限定加伤
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@19(1000) → @CharacterBody3D@21(959) 10
+[RewardEffects] PASS 移除当帧注销命中订阅和加伤接口，已有标记按原期限保留
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@19(1000) → @CharacterBody3D@21(949) 10
+[RewardEffects] PASS 旧标记参数仍可适配到托管实例
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@26(1000) → @CharacterBody3D@28(0) 1000
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@28(0) 击杀者=@CharacterBody3D@26(1000)
+[log] 02:39:38 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@28(0) by @CharacterBody3D@26(1000)
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@26(1000) → @CharacterBody3D@30(993) 7
+[RewardEffects] PASS 连锁闪电通过真实击杀事件触发，保持参数结算：7 / 7
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@26(1000) → @CharacterBody3D@35(0) 1000
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@35(0) 击杀者=@CharacterBody3D@26(1000)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@35(0) by @CharacterBody3D@26(1000)
+[RewardEffects] PASS 撤销闪电后不再响应新的击杀：993 / 993
+[RewardEffects] PASS 奔跑、起跳与逐杀补跳生产行使用独立效果资源
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@42(1000) → @CharacterBody3D@38(900) 100
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@42(1000) → @CharacterBody3D@40(900) 100
+[RewardEffects] PASS 奔跑效果冻结参数，跨无伤门槛仅恢复超出的半秒：905 / 905
+[RewardEffects] PASS 共享定义不会共享持有者计时：900 / 900
+[RewardEffects] PASS 撤销持续规则当帧退树，仅清理自己的实例
+[RewardEffects] PASS 停止持续规则后即使迟到更新也不再回血：905 / 905
+[RewardEffects] PASS 持有者组件退树时先停规则，父单位仍在树内也不二次拆子节点
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@49(0) 击杀者=@CharacterBody3D@38(905)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@49(0) by @CharacterBody3D@38(905)
+[RewardEffects] PASS 直接停止逐杀规则也会当帧退订自己的总线，不能绕过基类停止状态
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@52(0) 击杀者=@CharacterBody3D@38(905)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@52(0) by @CharacterBody3D@38(905)
+[log] 02:39:38 [Reward] 践踏死亡：本人击杀第1次，表内增量1／上限3，容量0→1／可用0→1
+[RewardEffects] PASS 新实例重新订阅，本人真实击杀立即补充跳数
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@54(0) 击杀者=@CharacterBody3D@38(905)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@54(0) by @CharacterBody3D@38(905)
+[RewardEffects] PASS 撤销后不再补跳，已获得资源按原规则保留
+[RewardEffects] PASS 停止起跳效果会当帧退订运动事件
+[RewardEffects] PASS 持续和资源补充效果参数在制作期拒绝错误值
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@58(0) 击杀者=@CharacterBody3D@38(905)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@58(0) by @CharacterBody3D@38(905)
+[log] 02:39:38 [Reward] 践踏死亡：本人击杀第1次，表内增量1／上限3，容量1→2／可用1→2
+[RewardEffects] PASS 旧逐杀处理器仍通过同一托管实例生效
+[RewardEffects] PASS 嗜血与死斗生产行引用各自的强类型定义
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@64(1000) → @CharacterBody3D@60(500) 500
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@64(1000) → @CharacterBody3D@62(500) 500
+[RewardEffects] PASS 独立嗜血实例冻结获得时的恢复比例：550 / 550
+[RewardEffects] PASS 嗜血实例之间没有共享恢复队列：500 / 500
+[RewardEffects] PASS 嗜血仅增加本实例暴击来源：0.2 / 0.2
+[RewardEffects] PASS 幂等撤销嗜血移除自己的暴击来源：0 / 0
+[RewardEffects] PASS 撤销后不会继续结算剩余恢复：550 / 550
+[RewardEffects] PASS 死斗只接自己持有者的致命伤
+[RewardEffects] PASS 撤销死斗后不能再次触发死亡避免
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@68(0) 击杀者=@CharacterBody3D@60(550)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@68(0) by @CharacterBody3D@60(550)
+[RewardEffects] PASS 真实击杀通过协调器分发到独立嗜血组件：0.1 / 0.1
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@60(0) 击杀者=@CharacterBody3D@64(1000)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@60(0) by @CharacterBody3D@64(1000)
+[RewardEffects] PASS 真实死亡立即撤销新组件的临时修正器：0 / 0
+[RewardEffects] PASS 死亡后持续提示同步清除
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@72(0) 击杀者=@CharacterBody3D@70(1000)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@72(0) by @CharacterBody3D@70(1000)
+[RewardEffects] PASS 旧特化参数通过兼容层建立相同独立组件：0.2 / 0.2
+[RewardEffects] PASS 协调器退树成对撤销组件：0 / 0
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@74(1000) → @CharacterBody3D@76(999) 1
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@74(1000) → @CharacterBody3D@76(985) 14
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@74(1000) → @CharacterBody3D@7(902) 14
+[log] 02:39:38 [Combat] 伤害 @CharacterBody3D@74(1000) → @CharacterBody3D@21(935) 14
+[RewardEffects] PASS 生产特化由托管效果创建，真实命中仍能施加引雷
+[RewardEffects] PASS 逐项撤销引雷会清理自有标记，保留另一条闪电链
+[RewardEffects] PASS 逐项撤销风心当帧停止并回收自有区域
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@81(0) 击杀者=@CharacterBody3D@74(1000)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@81(0) by @CharacterBody3D@74(1000)
+[RewardEffects] PASS 同类型多来源共享一个行为，不重复添加暴击：0.1 / 0.1
+[RewardEffects] PASS 来源清理释放全部租约和临时修正，不保留特化状态
+[RewardEffects] PASS 23项生产特化全部通过统一效果入口安装
+[RewardEffects] PASS 全部生产增幅与符文均使用组合效果资源，不依赖处理器分发
+[RewardEffects] PASS 技能增强冻结参数，两个来源各自生效
+[RewardEffects] PASS 逆序撤销较早增强，保留较晚来源且不重复缩时
+[RewardEffects] PASS 最后增强撤销后恢复能力原参数
+[RewardEffects] PASS 目标缺失明确失败，并撤回本次组合的属性与获取记录
+[RewardEffects] PASS 组合尚未全部应用时失败，不发放一次性护甲：7 / 7
+[RewardEffects] PASS 提交后续步骤失败也回滚本次护甲，不吞原有护甲：7 / 7
+[RewardEffects] PASS 血铠应用后的组合失败恢复原护甲、生命与转换修正
+[RewardEffects] PASS 正常移除一次性奖励不追缴已经发放的护甲：10 / 10
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@86(0) 击杀者=@CharacterBody3D@83(1000)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@86(0) by @CharacterBody3D@83(1000)
+[log] 02:39:38 [Rune] 符文·击杀加甲：第 1 杀 → 护甲 +2（现在 12，累计加甲 1 次）
+[log] 02:39:38 [Combat] 死亡 @CharacterBody3D@88(0) 击杀者=@CharacterBody3D@83(1000)
+[log] 02:39:38 [Combat] 击杀 @CharacterBody3D@88(0) by @CharacterBody3D@83(1000)
+[RewardEffects] PASS 撤销逐杀加甲当帧退订真实击杀事实：12 / 12
+[RewardEffects] PASS 撤销保命规则当帧移除注册，迟到调用也不会消耗次数或复活
+[RewardEffects] PASS 多个瞬移跳来源移除一个仍保持生效
+[RewardEffects] PASS 最后瞬移跳来源撤销恢复原模式
+[RewardEffects] PASS 制作期拒绝把飞镰索敌参数安装到箭矢技能
+[RewardEffects] PASS 制作期拒绝缺失冷却目标与非法恢复比例
+[RewardEffects] SUMMARY pass=81 fail=0
+[log] 02:39:39 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:39 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:39 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:39 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:39 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:39 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:39 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:39 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:39 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 1 次）
+[log] 02:39:39 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 1 次）
+[log] 02:39:39 [Combat] 奔跑：进入（按键「sprint」按住 + 有移动意图，移速 ×1.5，累计第 1 次）
+[log] 02:39:39 [Exit] 音频退出回收：真实等待87ms。
+[log] 02:39:39 [Audio] 音效统计：共 12 次 —— sfx_combat_hit×1、sfx_enemy_die×11（缺失 id 0 个）
+
+=== decoupling exit=0 seconds=4.06 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 02:39:40 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 02:39:40 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 02:39:40 [Flow] === 新的一局 ===
+[log] 02:39:40 [Flow] 日志文件：res://Logs/runtime/run_20261025_023940_900.log
+[log] 02:39:40 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 02:39:40 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 02:39:40 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 02:39:40 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 02:39:41 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 02:39:41 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 02:39:41 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 02:39:41 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 02:39:41 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 02:39:41 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 02:39:41 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 02:39:41 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 02:39:41 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[Decoupling] PASS 共享动作定义创建独立执行实例
+[Decoupling] PASS 滞空执行器取得移动所有权
+[Decoupling] PASS 重复释放滞空幂等，归还移动所有权
+[Decoupling] PASS 执行器不会释放其他动作持有的移动覆盖
+[Decoupling] PASS 生产持盾计划已引用动作定义
+[Decoupling] PASS 生产滞空与等待计划已迁移
+[Decoupling] PASS chr_hunter 模型、骨架、挂点完整
+[Decoupling] PROFILE chr_hunter skeleton=Armature/Skeleton3D player=AnimationPlayer
+[Decoupling] PASS 显式错误骨架路径不能回退成成功
+[Decoupling] PASS 表现档案保存往返正确，不产生第二份旧字段参数
+[Decoupling] PASS chr_weapon_master 模型、骨架、挂点完整
+[Decoupling] PROFILE chr_weapon_master skeleton=Armature/Skeleton3D player=AnimationPlayer
+[Decoupling] PASS 显式错误骨架路径不能回退成成功
+[Decoupling] PASS 表现档案保存往返正确，不产生第二份旧字段参数
+[log] 02:39:41 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 02:39:41 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:39:41 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 02:39:41 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 ContentDecouplingProbe
+[log] 02:39:41 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:41 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:39:41 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 02:39:41 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[Decoupling] PASS 新只读提供者能隐藏手持模型，无需显示组件识别能力类型
+[Decoupling] PASS 只读方向驱动真实模型姿态，不修改攻击和移动
+[Decoupling] PASS 表现状态结束恢复握持变换
+[Decoupling] PASS 无效表现方向不污染模型变换
+[log] 02:39:42 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:39:42 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 02:39:42 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 ContentDecouplingProbe
+[log] 02:39:42 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:39:42 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 ContentDecouplingProbe
+[log] 02:39:42 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:39:42 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 ContentDecouplingProbe
+[log] 02:39:42 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:39:42 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 ContentDecouplingProbe
+[log] 02:39:42 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:39:42 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 ContentDecouplingProbe
+[log] 02:39:42 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:39:42 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 ContentDecouplingProbe
+[Decoupling] PASS 重复换模复用缓存，表现缩放不改变角色身体
+[Decoupling] PASS 开始独立奖励会话
+[Decoupling] PASS 候选快照固定，待完成会话不能被新选择覆盖
+[Decoupling] PASS 无效下标不应用也不触发完成
+[Decoupling] PASS 一次合法选择成功应用
+[Decoupling] PASS 同步重入和重复信号都不会重复应用
+[Decoupling] PASS 完成回调只执行一次
+[Decoupling] PASS 应用失败保留原候选，可重试且未误完成
+[Decoupling] PASS 取消可阻止已应用但尚未交还流程的完成回调
+[Decoupling] PASS 应用期间取消后不再推进节点
+[Decoupling] PASS 完成回调可安全打开下一次选择
+[log] 02:39:42 [Audio] 首次播放「ui_open」→ 总线 UI / res://Assets/Audio/ui/ui_open.ogg
+[Decoupling] PASS 按真实时钟等待界面保护期结束
+[log] 02:39:42 [Audio] 首次播放「ui_click」→ 总线 UI / res://Assets/Audio/ui/ui_click.ogg
+[Decoupling] PASS 旧按钮迟到回调不能领取新会话奖励
+[Decoupling] PASS 新会话按钮仍正常分发选择
+[Decoupling] PASS 全部生产节点明确引用收益策略
+[Decoupling] PASS 独立商店策略使用界面服务打开选择
+[Decoupling] PASS 重复购买回调只扣一次，奖励完成前不提前触发挑战
+[Decoupling] PASS 奖励领取后节点只完成一次
+[Decoupling] PASS 取消待领取购买立即退还其花费，迟到选择不能发奖或完成
+[Decoupling] PASS 奖励池无候选或窗口拒绝时退款，并按商店规则完成节点挑战
+[Decoupling] PASS 收益窗口异常时退还本次花费并取消会话
+[Decoupling] PASS 余额不足不扣款，商店不购买仍完成节点
+[Decoupling] PASS 已取消会话不能重新打开商店
+[Decoupling] PASS 死亡或退出后迟到购买无副作用
+[Decoupling] PASS 资源节点直接按定义发放，重复调用同会话不重复收益
+[Decoupling] PASS 自定义节点直接消费自己的波数，不被相同旧Kind覆盖
+[Decoupling] PASS 扣款服务同步重入取消时立即退款，不继续发奖
+[Decoupling] PASS 节点定义在制作期拒绝负数价目
+[Decoupling] PASS 内置交互Enhancement的后端与外观定义可校验
+[Decoupling] PASS 内置交互Evolution的后端与外观定义可校验
+[Decoupling] PASS 内置交互Mutation的后端与外观定义可校验
+[Decoupling] PASS 内置交互Resource的后端与外观定义可校验
+[Decoupling] PASS 内置交互Heal的后端与外观定义可校验
+[Decoupling] PASS 内置交互Special的后端与外观定义可校验
+[Decoupling] PASS 内置交互Shop的后端与外观定义可校验
+[Decoupling] PASS 内置交互BossDoor的后端与外观定义可校验
+[Decoupling] PASS 内置交互Exit的后端与外观定义可校验
+[Decoupling] PASS 内置交互Expedition的后端与外观定义可校验
+[Decoupling] PASS 内置交互AbilityCards的后端与外观定义可校验
+[Decoupling] PASS 内置交互Loadout的后端与外观定义可校验
+[Decoupling] PASS 内置交互Runes的后端与外观定义可校验
+[Decoupling] PASS 内置交互Help的后端与外观定义可校验
+[Decoupling] PASS 内置交互Character的后端与外观定义可校验
+[Decoupling] PASS 内置交互Signal的后端与外观定义可校验
+[Decoupling] PASS 新交互外观可独立打包
+[Decoupling] PASS 无需新增Kind即可用定义安装后端和独立模型
+[Decoupling] PASS 交互反馈读取自定义模型实际主网格
+[Decoupling] PASS 自定义交互退树后清理公共注册
+[Decoupling] PASS 制作期拒绝错误后端和错误模型根类型
+[Decoupling] SUMMARY pass=65 fail=0
+[log] 02:39:43 [Exit] 音频退出回收：真实等待87ms。
+[log] 02:39:43 [Audio] 音效统计：共 4 次 —— ui_open×2、ui_click×2（缺失 id 0 个）
+
+=== interaction_render exit=0 seconds=12.14 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+D3D12 12_0 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti
+
+[log] 02:39:46 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 02:39:46 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 02:39:46 [Flow] === 新的一局 ===
+[log] 02:39:46 [Flow] 日志文件：res://Logs/runtime/run_20261025_023946_038.log
+[log] 02:39:46 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 02:39:46 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 02:39:46 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 02:39:46 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 02:39:46 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 02:39:46 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 02:39:46 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 02:39:46 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 02:39:46 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 02:39:46 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 02:39:46 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 02:39:46 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 02:39:46 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[InteractionComponent] PASS 使用真实Unit及玩家公共定位服务
+[InteractionComponent] PASS Inspector导出Kind枚举，具备编辑和存储标志
+[InteractionComponent] PASS 组件及Area／宿主引用能打包为内存PackedScene
+[InteractionComponent] PASS 场景往返保留类型、复用模式、半径、提示和目标场景
+[InteractionComponent] PASS 序列化的Area与宿主引用指向新实例，未残留原对象
+[InteractionComponent] PASS 场景实例就绪后创建正确后端并安装真实Area
+[InteractionComponent] PASS 新版Inspector不再导出旧模型／隐藏目标，ModelRoot为只读结果
+[InteractionComponent] PASS 序列化场景就绪后生成新模型并隐藏携带的旧模型
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 类型Enhancement连接RewardNode
+[InteractionComponent] PASS Enhancement保留不生成战斗的配置
+[InteractionComponent] PASS 类型Enhancement自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Evolution连接RewardNode
+[InteractionComponent] PASS Evolution保留不生成战斗的配置
+[InteractionComponent] PASS 类型Evolution自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Mutation连接RewardNode
+[InteractionComponent] PASS Mutation保留不生成战斗的配置
+[InteractionComponent] PASS 类型Mutation自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Resource连接RewardNode
+[InteractionComponent] PASS Resource保留不生成战斗的配置
+[InteractionComponent] PASS 类型Resource自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Heal连接RewardNode
+[InteractionComponent] PASS Heal保留不生成战斗的配置
+[InteractionComponent] PASS 类型Heal自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Special连接RewardNode
+[InteractionComponent] PASS Special保留不生成战斗的配置
+[InteractionComponent] PASS 类型Special自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Shop连接RewardNode
+[InteractionComponent] PASS Shop保留不生成战斗的配置
+[InteractionComponent] PASS 类型Shop自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Exit连接RewardNode
+[InteractionComponent] PASS Exit保留不生成战斗的配置
+[InteractionComponent] PASS 类型Exit自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型BossDoor连接BossDoor
+[InteractionComponent] PASS 类型BossDoor自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Expedition连接BaseTerminal
+[InteractionComponent] PASS 类型Expedition自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型AbilityCards连接BaseTerminal
+[InteractionComponent] PASS 类型AbilityCards自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Loadout连接BaseTerminal
+[InteractionComponent] PASS 类型Loadout自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Help连接BaseTerminal
+[InteractionComponent] PASS 类型Help自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Runes连接RuneTerminal
+[InteractionComponent] PASS 类型Runes自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Character连接CharacterStand
+[InteractionComponent] PASS 类型Character自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Signal连接SignalInteraction
+[InteractionComponent] PASS 类型Signal自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 强化／进化／异化具有不同几何形状
+[InteractionComponent] PASS 恢复／材料／商店具有不同几何形状
+[InteractionComponent] PASS 首领门／离场／出击的门体几何可区分
+[InteractionComponent] PASS 能力卡／装备／符文／说明使用不同结构
+[InteractionComponent] PASS 角色展台与信号机关具有不同结构
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 任意Node3D子挂载后，半径Signal被真实输入组件选中
+[InteractionComponent] PASS 真实F按下只转发一次Triggered信号
+[InteractionComponent] PASS 按住F及键盘重复事件不会重复触发
+[InteractionComponent] PASS 松开再按可再次使用Repeatable交互
+[InteractionComponent] PASS 按下时重检半径，旧范围缓存不能跨距离触发
+[InteractionComponent] PASS 隐藏宿主立即拒绝交互，不等待范围缓存刷新
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS Once真实交互后消耗后端并收起新生成模型
+[InteractionComponent] PASS 一次性节点不能重复触发
+[InteractionComponent] PASS ResetNode恢复新模型及交互状态
+[InteractionComponent] PASS 复位后真实F可再次触发一次
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 真实Area包含半径外玩家，范围判定采用物理重叠
+[InteractionComponent] PASS PlayerInteractInput不再以旧3.2米半径二次裁掉Area目标
+[InteractionComponent] PASS 旧半径之外的真实F仍能触发Area交互
+[InteractionComponent] PASS 离开Area后直接Interact仍拒绝
+[InteractionComponent] PASS 仍在Area时隐藏宿主也立即拒绝
+[InteractionComponent] PASS 关闭真实Area的Monitoring失败关闭，不回退半径
+[InteractionComponent] PASS MoveTo移动整个指定祖先宿主，触发器、挂点与外观保持相对位置
+[InteractionComponent] PASS 新模型随宿主MoveTo整体移动，旧模型保持隐藏
+[InteractionComponent] PASS 宿主移走后旧位置不会继续触发
+[InteractionComponent] PASS 移动后触发器在新位置继续接受真实F
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 未显式指定Area时识别宿主唯一直接Area
+[InteractionComponent] PASS 直接挂到Area下时采用父Area
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS None不生成后端，编辑器能说明原因
+[InteractionComponent] PASS 角色缺Character失败关闭并给配置提示
+[InteractionComponent] PASS 多个Area未指定时失败关闭，不擅自选取或退回半径
+[InteractionComponent] PASS 无效配置不污染公共交互注册列表
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 同宿主的重复兄弟组件只注册一个有效后端
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 不同挂点显式共享HostRoot时也只生成一个有效后端
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[log] 02:39:50 [Node] 奖励节点光圈颜色：Enhancement → 价值标签「tag_mid」（3 波）的 AuraColor (0.15, 0.72, 1, 1)（来源：表 ValueTags）
+[InteractionComponent] PASS 奖励组件隐藏旧模型并自动生成全新的类型主模型
+[InteractionComponent] PASS 高亮描边只附着新模型主网格，未引用旧模型
+[InteractionComponent] PASS Reset恢复新模型及其类型造型，旧模型不会重新出现
+[InteractionComponent] PASS Enabled关闭会收起新模型，旧模型继续隐藏
+[InteractionComponent] PASS Visible关闭会收起新模型，旧模型继续隐藏
+[InteractionComponent] PASS Vanished后新旧模型都不可见
+[InteractionComponent] PASS 消失后Reset只恢复当前类型新模型，不复活历史外观
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[log] 02:39:52 [Audio] 首次播放「music_level_01」→ 总线 Music / res://Assets/Audio/music/music_level_01.ogg
+[log] 02:39:52 [Audio] 音乐：播关卡曲库「music_level_01」（1/2 首）
+[InteractionComponent] PASS Stage实际收集多层宿主中的10个组件后端
+[InteractionComponent] PASS 嵌套组件按高2／中5／低3启用
+[InteractionComponent] PASS 关卡剩余数读取嵌套后端的真实启用状态
+[InteractionComponent] PASS 关卡重新启用能操作同一批嵌套后端
+[log] 02:39:52 [Audio] 音乐：离开关卡 → 淡出停播（基地里没有 BGM）
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[log] 02:39:52 [Audio] 首次播放「music_level_02」→ 总线 Music / res://Assets/Audio/music/music_level_02.ogg
+[log] 02:39:52 [Audio] 音乐：播关卡曲库「music_level_02」（2/2 首）
+[log] 02:39:52 [Node] 奖励节点光圈颜色：Portal → 价值标签「tag_low」（1 波）的 AuraColor (0.4, 0.86, 0.45, 1)（来源：表 ValueTags）
+[InteractionComponent] PASS 预置Exit不占10个普通奖励节点配额
+[InteractionComponent] PASS 首领门可以位于容器与挂点下的嵌套宿主
+[InteractionComponent] PASS 预置出口开局禁用且隐藏后端，不刷怪或提供普通奖励
+[InteractionComponent] PASS 出口开局收起新类型模型，旧外观已隐藏且不会作为当前模型
+[InteractionComponent] PASS 首领未结束前，走近预置出口也不能离场
+[log] 02:39:53 [Node] 降临节点落地：(-10, 0.05, -20)（落地后可交互）
+[InteractionComponent] PASS 首领结束后激活预置出口并采用当前离场提示
+[InteractionComponent] PASS 激活原预置后端，没有因配置PortalScene再生成第二个出口
+[InteractionComponent] PASS 出口保留设计位置，未搬到首领门或传入的死亡位置
+[InteractionComponent] PASS 出口激活时只展示新类型模型，旧外观仍保持隐藏
+[InteractionComponent] PASS 首领结束找到嵌套门并收起其后端与新模型，旧外观不复现
+[InteractionComponent] PASS 离场阶段真实玩家输入能选中同一个预置出口
+[log] 02:39:54 [Node] 互动降临节点 → 前往下一关
+[InteractionComponent] PASS 真实F通过预置出口触发一次Victory，无RunController或收益写入
+[InteractionComponent] PASS 已使用出口收起新模型，旧外观不复现，再按F不会重复离场
+[log] 02:39:54 [Node] Stage 表行：probe_reset（复位验证）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 02:39:54 [Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 / 额外抽 0 次 / 标签 [不限制]
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (-24, 0, 24) 挪到 (-24, 0.25, 24)
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (-12, 0, 24) 挪到 (-12, 0.25, 24)
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (0, 0, 24) 挪到 (0, 0.25, 24)
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (12, 0, 24) 挪到 (12, 0.25, 24)
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (24, 0, 24) 挪到 (24, 0.25, 24)
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (-24, 0, 48) 挪到 (-24, 0.25, 48)
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (-12, 0, 48) 挪到 (-12, 0.25, 48)
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (0, 0, 48) 挪到 (0, 0.25, 48)
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (12, 0, 48) 挪到 (12, 0.25, 48)
+[log] 02:39:55 [Node] 节点避障：Interaction 从 (24, 0, 48) 挪到 (24, 0.25, 48)
+[InteractionComponent] PASS 正式换关复位保留同一预置出口后端并清除一次性使用状态
+[InteractionComponent] PASS 复位后出口原位隐藏／禁用，普通节点仍为10个且没有出口副本
+[log] 02:39:55 [Audio] 音乐：离开关卡 → 淡出停播（基地里没有 BGM）
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] === 交互组件验收结束：通过 119，失败 0 ===
+[log] 02:39:55 [Exit] 音频退出回收：真实等待95ms。
+[log] 02:39:55 [Audio] 音效统计：共 2 次 —— music_level_01×1、music_level_02×1（缺失 id 0 个）
+
+=== reward_ui_render exit=0 seconds=8.86 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+D3D12 12_0 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti
+
+[log] 02:40:06 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 02:40:06 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 02:40:06 [Flow] === 新的一局 ===
+[log] 02:40:06 [Flow] 日志文件：res://Logs/runtime/run_20261025_024006_020.log
+[log] 02:40:06 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 02:40:06 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 02:40:06 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 02:40:06 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 02:40:06 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 02:40:06 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 02:40:06 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 02:40:06 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 02:40:06 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 02:40:06 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 02:40:06 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 02:40:06 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 02:40:06 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 02:40:06 [Combat] 单位动画：RewardPlayer 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 02:40:06 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:06 [Combat] 单位动画：RewardPlayer 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 02:40:06 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 BuildRewardsProbe
+[log] 02:40:07 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:40:07 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:40:07 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Hunter（行 Id「chr_hunter」）· 武器 EnergyPalm（PoolId pool_energy_palm）→ 候选 62 条（限定两层之后）
+[BuildRewards] PASS 符合能量掌／猎手限定的发散进入候选
+[BuildRewards] PASS 列表逐项遵守角色和武器限定
+[BuildRewards] PASS 不满足限定的镰刀喜爱不能从列表获取
+[BuildRewards] PASS 未拥有上一级时不能获取生命二级
+[log] 02:40:07 [Reward] GM获取增幅 生命（当前 1 层）
+[BuildRewards] PASS 真实授予一级生命立即改变生命上限
+[BuildRewards] PASS 前置实时解锁，同时单层增幅不能重复获取
+[log] 02:40:07 [Reward] GM获取增幅 穿透（当前 1 层）
+[BuildRewards] PASS 获取穿透后真实互斥项弹射退出列表
+[log] 02:40:07 [Audio] 首次播放「ui_open」→ 总线 UI / res://Assets/Audio/ui/ui_open.ogg
+[BuildRewards] PASS GM打开时暂停世界并释放鼠标
+[BuildRewards] PASS GM默认显示完整当前可获取池
+[BuildRewards] PASS GM分类过滤只显示进化
+[BuildRewards] PASS GM搜索可按稳定ID定位一项
+[log] 02:40:07 [Reward] GM获取增幅 力量（当前 1 层）
+[log] 02:40:07 [Audio] 首次播放「ui_click」→ 总线 UI / res://Assets/Audio/ui/ui_click.ogg
+[BuildRewards] PASS 真实鼠标点击GM列表：增幅进入构筑且真实攻击属性上升
+[log] 02:40:07 [Reward] GM获取增幅 力量（当前 2 层）
+[BuildRewards] PASS 可重复增幅点击叠加，获取后仍可继续测试
+[BuildRewards] PASS GM仍允许原可重复增幅获取，但列表和提示不显示层数
+[BuildRewards] PASS 截图 gm_rewards
+[BuildRewards] PASS GM关闭恢复暂停、鼠标与路由栈
+[BuildRewards] PASS 构筑库存每种增幅只有一个格子
+[BuildRewards] PASS 真实悬停立即选中并显示对应名称
+[BuildRewards] PASS 详情显示完整效果描述
+[BuildRewards] PASS 其他信息独立完整显示规则分区
+[BuildRewards] PASS 可重复和单次增幅均不显示层数角标，后端真实叠层保留
+[BuildRewards] PASS 详情、汇总和构筑摘要不显示层数
+[BuildRewards] PASS 选中格子具有外部发光圈
+[BuildRewards] PASS 连续帧不重建格子，悬停及选中保持稳定
+[BuildRewards] PASS 键盘焦点进入也更新选中项
+[BuildRewards] PASS 库存与详情各占一半内容宽度（871/871）
+[BuildRewards] PASS 截图 build_inventory
+[BuildRewards] PASS 构筑面板关闭恢复游戏
+[BuildRewards] PASS 真实特殊奖励节点入口接受唯一一次选择
+[BuildRewards] PASS 特殊池尊重AnyRewardKind，含符合限定的进化和强化
+[BuildRewards] PASS 特殊池仍排除错误武器与未满足前置
+[BuildRewards] PASS 截图 special_reward
+[log] 02:40:10 [Reward] 选择奖励 暴风（Enhancement）
+[BuildRewards] PASS 一次选择真实生效并立即完成节点一次
+[BuildRewards] PASS 等待动画结束后奖励页关闭，不再打开第二页
+[BuildRewards] PASS 唯一选择完成后解除模态与暂停
+[BuildRewards] PASS 重复数字键不会再次授予奖励或触发完成回调
+[BuildRewards] PASS 连续奖励完成后恢复世界、输入捕获和路由栈
+[BuildRewards] PASS 只剩一个合格候选时特殊节点仍可领取
+[log] 02:40:11 [Reward] 选择奖励 灼烧弹（Mutation）
+[BuildRewards] PASS 唯一选择用尽池子后正常结束，不吞回调、不暂停卡死
+[BuildRewards] PASS 候选池已空则拒绝开页，不伪造领取回调
+[BuildRewards] SUMMARY pass=40 fail=0
+[log] 02:40:12 [Exit] 音频退出回收：真实等待92ms。
+[log] 02:40:12 [Audio] 音效统计：共 6 次 —— ui_open×4、ui_click×2（缺失 id 0 个）
+
+=== charge_evolution exit=0 seconds=31.79 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 02:40:13 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 02:40:13 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 02:40:13 [Flow] === 新的一局 ===
+[log] 02:40:13 [Flow] 日志文件：res://Logs/runtime/run_20261025_024013_945.log
+[log] 02:40:13 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 02:40:13 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 02:40:14 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 02:40:14 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 02:40:14 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 02:40:14 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 02:40:14 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 02:40:14 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 02:40:14 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 02:40:14 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 02:40:14 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 02:40:14 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 02:40:14 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 02:40:14 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 02:40:14 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:40:14 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:40:14 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 02:40:14 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:14 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 02:40:14 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[log] 02:40:14 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_perfect_focus
+[ChargeEvolution] PASS 真实入构筑：evo_perfect_focus
+[ChargeEvolution] PASS 专注只将武技2冷却乘0.5，使用明确完美标志，保留原窗口秒数
+[ChargeEvolution] PASS 重复应用专注配置仍是一次减半，不继续折半
+[ChargeEvolution] PASS 能量掌武技1未获专注的完美授权
+[log] 02:40:14 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK2（speed_scale=0.2，循环=False，事件帧 1 个：ATK@0.1s）
+[log] 02:40:15 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 2.7m（调用方给定（蓄力完成）），扩散 0.45s（第 1 次；纯视觉，不改判定）
+[log] 02:40:15 [Audio] 首次播放「sfx_charge_complete」→ 总线 SFX / res://Assets/Audio/ui/ui_card_unlock.wav
+[log] 02:40:15 [Combat] 蓄力完成反馈：skl_a1_w1_2 基础蓄力完成（同时在完美时机窗口里 → 金色 / ×1.8 档） → 角色闪一下 0.22s（强度 1.53）+ 一圈扩大 2.7m（0.45s）+ 音效「sfx_charge_complete」（第 1 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 真实按住蓄力达到1秒
+[ChargeEvolution] PASS 手动释放前没有越过蓄力动画ATK提前出弹
+[log] 02:40:15 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK2（speed_scale=1，循环=False，事件帧 1 个：ATK@0.1s）
+[ChargeEvolution] PASS 松手提交快照，仍等待独立释放动画
+[log] 02:40:16 [Combat] 能量波发射：skl_a1_w1_2 伤害 40 弹速 85（完美时机，蓄力 1.01s/0.5s 档 0 威力 ×1，无视格挡=True，穿透 0，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 真实释放ATK到达后才生成投射物
+[log] 02:40:16 [Combat] 伤害 Player(320) → Perfect(99960) 40
+[log] 02:40:16 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[ChargeEvolution] PASS 专注释放的真实能量波命中物理靶
+[ChargeEvolution] PASS 超过原完美窗口仍实际打出完美波：40伤害／85表定弹速，一次命中
+[ChargeEvolution] PASS 真实收招后的剩余冷却来自减半后的间隔
+[log] 02:40:16 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:16 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_perfect_focus
+[ChargeEvolution] PASS 真实入构筑：evo_perfect_focus
+[log] 02:40:16 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK2（speed_scale=0.2，循环=False，事件帧 1 个：ATK@0.1s）
+[log] 02:40:16 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK2（speed_scale=1，循环=False，事件帧 1 个：ATK@0.1s）
+[log] 02:40:16 [Combat] 能量波发射：skl_a1_w1_2 伤害 15 弹速 60（普通，蓄力 0.13s/0.5s 档 0 威力 ×1，无视格挡=True，穿透 0，方向 (0, 0.000257732, -0.99999994)）
+[ChargeEvolution] PASS 专注未满基础仍为15伤害低伤波，不把提前松手变成完美发射
+[log] 02:40:16 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:16 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 换装移除专注完美与冷却改动
+[log] 02:40:17 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:17 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_focus
+[ChargeEvolution] PASS 真实入构筑：evo_focus
+[log] 02:40:17 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:17 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 2 次；纯视觉，不改判定）
+[log] 02:40:17 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 2 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 真实按住蓄力达到0.45秒
+[ChargeEvolution] PASS 手动释放前没有越过蓄力动画ATK提前出弹
+[log] 02:40:17 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 松手提交快照，仍等待独立释放动画
+[log] 02:40:17 [Combat] 投射物齐发：skl_a2_w1_2 发数 1（基础 3 + 档 0×2） 单发伤害 31.2 弹速 32 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.46s 档 0 威力 ×1，下坠起点 0m 重力 1 击退 0 追踪 []，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 真实释放ATK到达后才生成投射物
+[ChargeEvolution] PASS 专一实际只产生一支箭
+[log] 02:40:18 [Combat] 伤害 Player(320) → Single(99968.8) 31.2
+[ChargeEvolution] PASS 专一实际命中基础伤害31.2，期望31.2
+[log] 02:40:18 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:18 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_focus
+[ChargeEvolution] PASS 真实入构筑：evo_focus
+[log] 02:40:18 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:18 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 3 次；纯视觉，不改判定）
+[log] 02:40:18 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 3 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 真实按住蓄力达到0.65秒
+[ChargeEvolution] PASS 手动释放前没有越过蓄力动画ATK提前出弹
+[log] 02:40:19 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 松手提交快照，仍等待独立释放动画
+[log] 02:40:19 [Combat] 投射物齐发：skl_a2_w1_2 发数 1（基础 3 + 档 1×2） 单发伤害 50.4 弹速 36 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.66s 档 1 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 真实释放ATK到达后才生成投射物
+[ChargeEvolution] PASS 专一实际只产生一支箭
+[log] 02:40:19 [Combat] 伤害 Player(320) → Single(99899.2) 100.8
+[log] 02:40:19 [Combat] 暴击 Player(320) → Single(99899.2) 100.8
+[ChargeEvolution] PASS 专一实际命中基础伤害50.4，期望50.4
+[log] 02:40:19 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:19 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_focus
+[ChargeEvolution] PASS 真实入构筑：evo_focus
+[log] 02:40:19 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:19 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 4 次；纯视觉，不改判定）
+[log] 02:40:20 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 4 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 真实按住蓄力达到1.05秒
+[ChargeEvolution] PASS 手动释放前没有越过蓄力动画ATK提前出弹
+[log] 02:40:20 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 松手提交快照，仍等待独立释放动画
+[log] 02:40:20 [Combat] 投射物齐发：skl_a2_w1_2 发数 1（基础 3 + 档 3×2） 单发伤害 88.8 弹速 44 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 1.06s 档 3 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 真实释放ATK到达后才生成投射物
+[ChargeEvolution] PASS 专一实际只产生一支箭
+[log] 02:40:20 [Combat] 伤害 Player(320) → Single(99822.4) 177.6
+[log] 02:40:20 [Combat] 暴击 Player(320) → Single(99822.4) 177.6
+[ChargeEvolution] PASS 专一实际命中基础伤害88.8，期望88.8
+[ChargeEvolution] PASS 真实候选池移除已获得专一，并以互斥排除花心
+[log] 02:40:20 [Animation] 技能动画开播：Player → skills/ATK_A2_Scatter（speed_scale=1，循环=False，事件帧 1 个：ATK@0.08s）
+[log] 02:40:21 [Combat] 投射物齐发：skl_a2_w1_1 发数 3（基础 3 + 档 0×0） 单发伤害 12 弹速 36 相邻夹角 20° 总夹角 40°（事件帧，蓄力 0s 档 0 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 有专一时武技1仍实际发三箭，不受武技2单箭配置污染
+[ChargeEvolution] PASS 专一没有写角色全局齐射覆盖／伤害补偿
+[log] 02:40:21 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:21 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_philander
+[ChargeEvolution] PASS 真实入构筑：evo_philander
+[ChargeEvolution] PASS 花心只缩后置0.2→0.1，基础0.4与三档上限保持
+[ChargeEvolution] PASS 真实候选池验证花心反向排除专一
+[log] 02:40:21 [Combat] 伤害 Player(320) → SeekDead(0) 1
+[log] 02:40:21 [Combat] 死亡 SeekDead(0) 击杀者=Player(320)
+[log] 02:40:21 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 02:40:21 [Combat] 击杀 SeekDead(0) by Player(320)
+[log] 02:40:21 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:21 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 5 次；纯视觉，不改判定）
+[log] 02:40:21 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 5 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 真实按住蓄力达到0.75秒
+[ChargeEvolution] PASS 手动释放前没有越过蓄力动画ATK提前出弹
+[log] 02:40:22 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 松手提交快照，仍等待独立释放动画
+[log] 02:40:22 [Combat] 投射物齐发：skl_a2_w1_2 发数 9（基础 3 + 档 3×2） 单发伤害 12 弹速 44 相邻夹角 7.5° 总夹角 60°（蓄力松手，蓄力 0.76s 档 3 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.002617793, -0.9999966)）
+[ChargeEvolution] PASS 真实释放ATK到达后才生成投射物
+[ChargeEvolution] PASS 花心满蓄仍为九支实际箭，未凭缩时增加档数
+[ChargeEvolution] PASS 九箭实际分配给三个不同敌人，各三支，友军／死者／范围外不被分配
+[log] 02:40:22 [Combat] 伤害 Player(320) → SeekCenter(99988) 12
+[log] 02:40:22 [Combat] 伤害 Player(320) → SeekCenter(99976) 12
+[log] 02:40:22 [Combat] 伤害 Player(320) → SeekCenter(99964) 12
+[log] 02:40:22 [Combat] 伤害 Player(320) → SeekRight(99976) 24
+[log] 02:40:22 [Combat] 暴击 Player(320) → SeekRight(99976) 24
+[log] 02:40:22 [Combat] 伤害 Player(320) → SeekLeft(99988) 12
+[ChargeEvolution] PASS 三个没有标记的不同敌人都受到真实追踪箭命中
+[ChargeEvolution] PASS 友军与范围外目标没有被分配箭误伤
+[log] 02:40:22 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:22 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_philander
+[ChargeEvolution] PASS 真实入构筑：evo_philander
+[log] 02:40:22 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:23 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 6 次；纯视觉，不改判定）
+[log] 02:40:23 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 6 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 真实按住蓄力达到0.45秒
+[ChargeEvolution] PASS 手动释放前没有越过蓄力动画ATK提前出弹
+[log] 02:40:23 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 松手提交快照，仍等待独立释放动画
+[log] 02:40:23 [Combat] 投射物齐发：skl_a2_w1_2 发数 3（基础 3 + 档 0×2） 单发伤害 12 弹速 32 相邻夹角 30° 总夹角 60°（蓄力松手，蓄力 0.46s 档 0 威力 ×1，下坠起点 0m 重力 1 击退 0 追踪 []，方向 (0, 0.000257732, -0.99999994)）
+[ChargeEvolution] PASS 真实释放ATK到达后才生成投射物
+[ChargeEvolution] PASS 没有有效目标时保留原散射飞行，不报错或凭空制造目标
+[log] 02:40:23 [Animation] 技能动画开播：Player → skills/ATK_A2_Scatter（speed_scale=1，循环=False，事件帧 1 个：ATK@0.08s）
+[log] 02:40:23 [Combat] 投射物齐发：skl_a2_w1_1 发数 3（基础 3 + 档 0×0） 单发伤害 12 弹速 36 相邻夹角 20° 总夹角 40°（事件帧，蓄力 0s 档 0 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.000257732, -0.99999994)）
+[ChargeEvolution] PASS 有花心时武技1仍为原三箭，没有被授予追踪
+[log] 02:40:23 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:23 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_philander
+[ChargeEvolution] PASS 真实入构筑：evo_philander
+[log] 02:40:23 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:24 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 7 次；纯视觉，不改判定）
+[log] 02:40:24 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 7 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 真实按住蓄力达到0.45秒
+[ChargeEvolution] PASS 手动释放前没有越过蓄力动画ATK提前出弹
+[log] 02:40:24 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 松手提交快照，仍等待独立释放动画
+[log] 02:40:24 [Combat] 投射物齐发：skl_a2_w1_2 发数 3（基础 3 + 档 0×2） 单发伤害 12 弹速 32 相邻夹角 30° 总夹角 60°（蓄力松手，蓄力 0.46s 档 0 威力 ×1，下坠起点 0m 重力 1 击退 0 追踪 []，方向 (0, 0.000257732, -0.99999994)）
+[ChargeEvolution] PASS 真实释放ATK到达后才生成投射物
+[ChargeEvolution] PASS 真实追踪箭已有分配目标，准备移除该目标
+[ChargeEvolution] PASS 被分配目标实际退出场景后，存活箭重新索敌，不读取已释放对象
+[log] 02:40:24 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:24 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_philander
+[ChargeEvolution] PASS 真实入构筑：evo_philander
+[log] 02:40:24 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:25 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 8 次；纯视觉，不改判定）
+[log] 02:40:25 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 8 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 真实按住蓄力达到0.45秒
+[ChargeEvolution] PASS 手动释放前没有越过蓄力动画ATK提前出弹
+[log] 02:40:25 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 松手提交快照，仍等待独立释放动画
+[log] 02:40:25 [Combat] 投射物齐发：skl_a2_w1_2 发数 3（基础 3 + 档 0×2） 单发伤害 12 弹速 32 相邻夹角 30° 总夹角 60°（蓄力松手，蓄力 0.46s 档 0 威力 ×1，下坠起点 0m 重力 1 击退 0 追踪 []，方向 (0, 0.00645148, -0.9999792)）
+[ChargeEvolution] PASS 真实释放ATK到达后才生成投射物
+[ChargeEvolution] PASS 无标记追踪箭真实撞World消失，墙后目标保持满血
+[log] 02:40:26 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:26 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_flow
+[ChargeEvolution] PASS 真实入构筑：evo_flow
+[ChargeEvolution] PASS 心流覆盖基础及每档为0.1秒，三档完成自动提交，获取顺序不改变结果
+[log] 02:40:26 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:26 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 9 次；纯视觉，不改判定）
+[log] 02:40:26 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 9 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 只完成基础仍不自动出弹，等待完整后置三档
+[log] 02:40:26 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.5，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 保持按键，满蓄自动提交一次快照，未跳过释放动画
+[ChargeEvolution] PASS 心流自动提交实测0.407秒，完整三档
+[log] 02:40:26 [Combat] 投射物齐发：skl_a2_w1_2 发数 1（基础 3 + 档 3×2） 单发伤害 12 弹速 44 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.41s 档 3 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 自动提交后真实释放ATK只生成一箭
+[log] 02:40:27 [Combat] 伤害 Player(320) → Flow(99988) 12
+[ChargeEvolution] PASS 组合后的实际命中伤害12，期望12
+[ChargeEvolution] PASS 继续按住超过收招及冷却，不二次施放、不重复发射，也不改已提交快照
+[log] 02:40:27 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:27 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_focus
+[ChargeEvolution] PASS 真实入构筑：evo_focus
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_flow
+[ChargeEvolution] PASS 真实入构筑：evo_flow
+[ChargeEvolution] PASS 心流覆盖基础及每档为0.1秒，三档完成自动提交，获取顺序不改变结果
+[log] 02:40:28 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:28 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 10 次；纯视觉，不改判定）
+[log] 02:40:28 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 10 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 只完成基础仍不自动出弹，等待完整后置三档
+[log] 02:40:28 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.5，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 保持按键，满蓄自动提交一次快照，未跳过释放动画
+[ChargeEvolution] PASS 心流自动提交实测0.407秒，完整三档
+[log] 02:40:28 [Combat] 投射物齐发：skl_a2_w1_2 发数 1（基础 3 + 档 3×2） 单发伤害 88.8 弹速 44 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.41s 档 3 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 自动提交后真实释放ATK只生成一箭
+[log] 02:40:28 [Combat] 伤害 Player(320) → Flow(99822.4) 177.6
+[log] 02:40:28 [Combat] 暴击 Player(320) → Flow(99822.4) 177.6
+[ChargeEvolution] PASS 组合后的实际命中伤害88.8，期望88.8
+[ChargeEvolution] PASS 继续按住超过收招及冷却，不二次施放、不重复发射，也不改已提交快照
+[log] 02:40:29 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:29 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_flow
+[ChargeEvolution] PASS 真实入构筑：evo_flow
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_focus
+[ChargeEvolution] PASS 真实入构筑：evo_focus
+[ChargeEvolution] PASS 心流覆盖基础及每档为0.1秒，三档完成自动提交，获取顺序不改变结果
+[log] 02:40:30 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:30 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 11 次；纯视觉，不改判定）
+[log] 02:40:30 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 11 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 只完成基础仍不自动出弹，等待完整后置三档
+[log] 02:40:30 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.5，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 保持按键，满蓄自动提交一次快照，未跳过释放动画
+[ChargeEvolution] PASS 心流自动提交实测0.407秒，完整三档
+[log] 02:40:30 [Combat] 投射物齐发：skl_a2_w1_2 发数 1（基础 3 + 档 3×2） 单发伤害 88.8 弹速 44 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.41s 档 3 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 自动提交后真实释放ATK只生成一箭
+[log] 02:40:30 [Combat] 伤害 Player(320) → Flow(99822.4) 177.6
+[log] 02:40:30 [Combat] 暴击 Player(320) → Flow(99822.4) 177.6
+[ChargeEvolution] PASS 组合后的实际命中伤害88.8，期望88.8
+[ChargeEvolution] PASS 继续按住超过收招及冷却，不二次施放、不重复发射，也不改已提交快照
+[log] 02:40:31 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:31 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_philander
+[ChargeEvolution] PASS 真实入构筑：evo_philander
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_flow
+[ChargeEvolution] PASS 真实入构筑：evo_flow
+[ChargeEvolution] PASS 心流覆盖基础及每档为0.1秒，三档完成自动提交，获取顺序不改变结果
+[log] 02:40:31 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:32 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 12 次；纯视觉，不改判定）
+[log] 02:40:32 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 12 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 只完成基础仍不自动出弹，等待完整后置三档
+[log] 02:40:32 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.5，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 保持按键，满蓄自动提交一次快照，未跳过释放动画
+[ChargeEvolution] PASS 心流自动提交实测0.407秒，完整三档
+[log] 02:40:32 [Combat] 投射物齐发：skl_a2_w1_2 发数 1（基础 3 + 档 3×2） 单发伤害 12 弹速 44 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.41s 档 3 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 自动提交后真实释放ATK只生成一箭
+[log] 02:40:32 [Combat] 伤害 Player(320) → Flow(99976) 24
+[log] 02:40:32 [Combat] 暴击 Player(320) → Flow(99976) 24
+[ChargeEvolution] PASS 组合后的实际命中伤害12，期望12
+[ChargeEvolution] PASS 继续按住超过收招及冷却，不二次施放、不重复发射，也不改已提交快照
+[log] 02:40:33 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:33 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_flow
+[ChargeEvolution] PASS 真实入构筑：evo_flow
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_philander
+[ChargeEvolution] PASS 真实入构筑：evo_philander
+[ChargeEvolution] PASS 心流覆盖基础及每档为0.1秒，三档完成自动提交，获取顺序不改变结果
+[log] 02:40:33 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:33 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 13 次；纯视觉，不改判定）
+[log] 02:40:33 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 13 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[ChargeEvolution] PASS 只完成基础仍不自动出弹，等待完整后置三档
+[log] 02:40:34 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.5，循环=False，事件帧 1 个：ATK@0.12s）
+[ChargeEvolution] PASS 保持按键，满蓄自动提交一次快照，未跳过释放动画
+[ChargeEvolution] PASS 心流自动提交实测0.407秒，完整三档
+[log] 02:40:34 [Combat] 投射物齐发：skl_a2_w1_2 发数 1（基础 3 + 档 3×2） 单发伤害 12 弹速 44 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.41s 档 3 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, 0.007042081, -0.9999752)）
+[ChargeEvolution] PASS 自动提交后真实释放ATK只生成一箭
+[log] 02:40:34 [Combat] 伤害 Player(320) → Flow(99976) 24
+[log] 02:40:34 [Combat] 暴击 Player(320) → Flow(99976) 24
+[ChargeEvolution] PASS 组合后的实际命中伤害12，期望12
+[ChargeEvolution] PASS 继续按住超过收招及冷却，不二次施放、不重复发射，也不改已提交快照
+[log] 02:40:35 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:35 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_flow
+[ChargeEvolution] PASS 真实入构筑：evo_flow
+[log] 02:40:35 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:35 [Combat] 箭矢：skl_a2_w1_2 基础蓄力未完成（0.03s / 0.4s）就松手，本次不释放。
+[ChargeEvolution] PASS 心流未满0.1秒基础即松手仍中止，没有提前自动发射
+[log] 02:40:36 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:36 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_flow
+[ChargeEvolution] PASS 真实入构筑：evo_flow
+[log] 02:40:36 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:36 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 14 次；纯视觉，不改判定）
+[log] 02:40:36 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 14 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[log] 02:40:36 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=1，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:38 [Combat] ⚠ 技能 skl_a2_w1_2 等不到动画事件帧「MissingReleaseATK」，本次施法放弃（检查 SkillAnimations 表的事件帧名）。
+[ChargeEvolution] PASS 自动释放缺真实ATK只取消，不用计时补发
+[log] 02:40:38 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:38 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_flow
+[ChargeEvolution] PASS 真实入构筑：evo_flow
+[log] 02:40:39 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.3，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:39 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 15 次；纯视觉，不改判定）
+[log] 02:40:39 [Combat] 蓄力完成反馈：skl_a2_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 15 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[log] 02:40:39 [Animation] 技能动画开播：Player → skills/ATK_A2_ChargedVolley（speed_scale=0.25，循环=False，事件帧 1 个：ATK@0.12s）
+[log] 02:40:39 [Combat] 动作交接：skl_a2_w1_2 被 skl_a1_skill_1 打断（动画时间0.003s）。
+[log] 02:40:39 [Animation] 技能动画开播：Player → skills/Skill_A1_Backdash（speed_scale=1，循环=False，事件帧 2 个：Dodge@0s、Dodger@0.35s）
+[log] 02:40:39 [Combat] 后撤：skl_a1_skill_1 后撤力 20（方向 (0, 0, 20)，**不改变朝向**）｜无敌帧开（Dodge）
+[log] 02:40:39 [Combat] 后撤残影：skl_a1_skill_1 无敌帧开（Dodge）→ 每 0.09s 留一个残影，每个淡出 0.34s（纯视觉：无碰撞 / 不进单位列表）
+[log] 02:40:39 [Combat] 后撤：skl_a1_skill_1 无敌帧关（Dodger）
+[log] 02:40:39 [Combat] 后撤残影：skl_a1_skill_1 无敌帧关（Dodger）—— 本次共留 4 个影，现在场上还剩 4 个（会自己淡完回收）
+[ChargeEvolution] PASS 心流满蓄提交后被真实后撤打断，旧释放ATK不漏出箭
+[log] 02:40:40 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:40 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[log] 02:40:40 [Combat] 单位动画切换：Player walk → idle（当前速度 0，阈值 0.15/4）
+[ChargeEvolution] PASS 换装清除自动释放和所有局部蓄力覆盖
+[log] 02:40:40 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:40 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 真实表行与处理器有效：evo_stall_kill
+[ChargeEvolution] PASS 真实入构筑：evo_stall_kill
+[log] 02:40:40 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK1（speed_scale=1，循环=False，事件帧 1 个：ATK@0.08s）
+[log] 02:40:40 [Combat] 能量波发射：skl_a1_w1_1 伤害 10 弹速 45（普通，蓄力 0s/0s 档 0 威力 ×1，无视格挡=True，穿透 0，方向 (0, 0.007042081, -0.9999752)）
+[log] 02:40:41 [Combat] 伤害 Player(320) → NoHoverKill(0) 1
+[log] 02:40:41 [Combat] 暴击 Player(320) → NoHoverKill(0) 20
+[log] 02:40:41 [Combat] 死亡 NoHoverKill(0) 击杀者=Player(320)
+[log] 02:40:41 [Combat] 击杀 NoHoverKill(0) by Player(320)
+[ChargeEvolution] PASS 没有滞空时，本人真实能量波击杀不会凭空获得滞空
+[log] 02:40:41 [Animation] 技能动画开播：Player → skills/Skill_A1_Leap（speed_scale=1，循环=False，事件帧 1 个：Action@0.15s）
+[log] 02:40:41 [Combat] 跃升：skl_a1_skill_2 起跳速度 16 m/s + 滞空 3s（按住跳跃键下落减缓 90%，脚底光环半径 1.15）
+[ChargeEvolution] PASS 真实跃升Action使玩家起跳并获得滞空
+[ChargeEvolution] PASS 真实按住跳跃键减缓下落，滞空已真实消耗到不足1.4秒
+[log] 02:40:43 [Combat] 伤害 OtherKiller(100000) → OtherVictim(0) 1
+[log] 02:40:43 [Combat] 死亡 OtherVictim(0) 击杀者=OtherKiller(100000)
+[log] 02:40:43 [Combat] 击杀 OtherVictim(0) by OtherKiller(100000)
+[ChargeEvolution] PASS 其他单位真实击杀不刷新玩家滞空
+[log] 02:40:43 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK1（speed_scale=1，循环=False，事件帧 1 个：ATK@0.08s）
+[log] 02:40:43 [Combat] 能量波发射：skl_a1_w1_1 伤害 10 弹速 45（普通，蓄力 0s/0s 档 0 威力 ×1，无视格挡=True，穿透 0，方向 (0, -0.35214207, -0.9359465)）
+[log] 02:40:43 [Combat] 伤害 Player(320) → OwnHoverKill(0) 1
+[log] 02:40:43 [Combat] 暴击 Player(320) → OwnHoverKill(0) 20
+[log] 02:40:43 [Combat] 死亡 OwnHoverKill(0) 击杀者=Player(320)
+[log] 02:40:43 [Combat] 击杀 OwnHoverKill(0) by Player(320)
+[log] 02:40:43 [Reward] 增幅·事件规则：evo_stall_kill 触发（Kill，第 1 次）
+[ChargeEvolution] PASS 滞空中本人真实能量波命中并击杀
+[ChargeEvolution] PASS 乱金柝仅本人击杀刷新一次，剩余2.983秒
+[ChargeEvolution] PASS 松开真实跳跃键停止减缓下落
+[log] 02:40:43 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:43 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 ChargeEvolutionProbe
+[ChargeEvolution] PASS 换装移除旧滞空状态
+[ChargeEvolution] === 蓄力进化验收结束：通过 151，失败 0 ===
+[log] 02:40:43 [Exit] 音频退出回收：真实等待89ms。
+[log] 02:40:43 [Audio] 音效统计：共 32 次 —— sfx_charge_complete×15、sfx_combat_hit×14、sfx_enemy_die×3（缺失 id 0 个）
+
+=== slots exit=0 seconds=9.95 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 02:40:45 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 02:40:45 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 02:40:45 [Flow] === 新的一局 ===
+[log] 02:40:45 [Flow] 日志文件：res://Logs/runtime/run_20261025_024045_698.log
+[log] 02:40:45 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 02:40:45 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 02:40:45 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 02:40:45 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 02:40:45 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 02:40:45 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 02:40:45 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 02:40:45 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 02:40:45 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 02:40:45 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 02:40:45 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 02:40:45 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 02:40:45 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 02:40:46 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 02:40:46 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:46 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:40:46 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[log] 02:40:46 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[Slots] PASS 0/SpiritSword当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 0/SpiritSword仓库技能没有残留启用
+[Slots] PASS 0/SpiritSword换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:46 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 02:40:46 [Combat] 蓄力身体表现：模型「Model」上挂了 7 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[Slots] PASS 0/Scythe当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 0/Scythe仓库技能没有残留启用
+[Slots] PASS 0/Scythe换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:46 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[Slots] PASS 0/Spear当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 0/Spear仓库技能没有残留启用
+[Slots] PASS 0/Spear换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 02:40:46 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:46 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[log] 02:40:46 [Combat] 蓄力身体表现：模型「Model」上挂了 5 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[Slots] PASS 0/Bow当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 0/Bow仓库技能没有残留启用
+[Slots] PASS 0/Bow换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[Slots] PASS 0/EnergyPalm当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 0/EnergyPalm仓库技能没有残留启用
+[Slots] PASS 0/EnergyPalm换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[Slots] PASS 0/Crossbow当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 0/Crossbow仓库技能没有残留启用
+[Slots] PASS 0/Crossbow换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[Slots] PASS 1/Crossbow当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 1/Crossbow仓库技能没有残留启用
+[Slots] PASS 1/Crossbow换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[Slots] PASS 1/EnergyPalm当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 1/EnergyPalm仓库技能没有残留启用
+[Slots] PASS 1/EnergyPalm换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[Slots] PASS 1/Bow当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 1/Bow仓库技能没有残留启用
+[Slots] PASS 1/Bow换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:46 [Combat] 蓄力身体表现：模型「Model」上挂了 10 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[Slots] PASS 1/Spear当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 1/Spear仓库技能没有残留启用
+[Slots] PASS 1/Spear换装后没有旧投掷状态
+[log] 02:40:46 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:46 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[Slots] PASS 1/Scythe当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 1/Scythe仓库技能没有残留启用
+[Slots] PASS 1/Scythe换装后没有旧投掷状态
+[log] 02:40:47 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:47 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[Slots] PASS 1/SpiritSword当前主动槽唯一且就绪（武器大师另有下落槽）
+[Slots] PASS 1/SpiritSword仓库技能没有残留启用
+[Slots] PASS 1/SpiritSword换装后没有旧投掷状态
+[log] 02:40:47 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:47 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:47 [Combat] 蓄力身体表现：模型「Model」上挂了 12 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 02:40:47 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK1（speed_scale=1，循环=False，事件帧 1 个：ATK@0.08s）
+[log] 02:40:47 [Combat] 能量波发射：skl_a1_w1_1 伤害 10 弹速 45（普通，蓄力 0s/0s 档 0 威力 ×1，无视格挡=True，穿透 0，方向 (0, -0.06906545, -0.9976121)）
+[Slots] PASS fire与左键技能别名同帧，只发一个真实能量掌弹体
+[log] 02:40:47 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:47 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:47 [Animation] 技能动画开播：Player → skills/Skill_A1_Backdash（speed_scale=1，循环=False，事件帧 2 个：Dodge@0s、Dodger@0.35s）
+[Slots] PASS 100个启用同键仓库技能存在时，Q只执行当前后撤槽
+[log] 02:40:47 [Combat] 后撤：skl_a1_skill_1 后撤力 20（方向 (0, 0, 20)，**不改变朝向**）｜无敌帧开（Dodge）
+[log] 02:40:47 [Combat] 后撤残影：skl_a1_skill_1 无敌帧开（Dodge）→ 每 0.09s 留一个残影，每个淡出 0.34s（纯视觉：无碰撞 / 不进单位列表）
+[log] 02:40:48 [Combat] 后撤：skl_a1_skill_1 无敌帧关（Dodger）
+[log] 02:40:48 [Combat] 后撤残影：skl_a1_skill_1 无敌帧关（Dodger）—— 本次共留 4 个影，现在场上还剩 4 个（会自己淡完回收）
+[Slots] PASS 槽位索引决定执行对象，不受技能仓库自身InputAction改写影响
+[Slots] PASS 真实按下已进入输入队列，尚未消费
+[Slots] PASS 换槽前排队的按下／按住不穿越到新技能
+[Slots] PASS 松开再按后，仅执行新槽位技能
+[log] 02:40:48 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:48 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:48 [Combat] 蓄力身体表现：模型「Model」上挂了 10 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[Slots] PASS 重新配装后100个仓库技能全部退出活动集合
+[log] 02:40:48 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:48 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:48 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[Slots] PASS 程序接口启动的蓄力不被输入层误认为物理松手
+[log] 02:40:48 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:48 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:48 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 02:40:49 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 02:40:49 [Combat] 抛掷：skl_b2_w1_2 朝 (-0, 0, -1) 出手（水平速 18 垂直初速 0，最远 8m，每 0.5s 一次周期伤害）
+[Slots] PASS 镰刀先真实抛出，覆盖在飞时切武器
+[log] 02:40:49 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[log] 02:40:49 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:49 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[Slots] PASS 切长枪时镰刀飞行清理，长枪保留不自转配置
+[log] 02:40:49 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[log] 02:40:50 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 1 次；纯视觉，不改判定）
+[log] 02:40:50 [Audio] 首次播放「sfx_charge_complete」→ 总线 SFX / res://Assets/Audio/ui/ui_card_unlock.wav
+[log] 02:40:50 [Combat] 蓄力完成反馈：skl_b3_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 1 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[Slots] PASS 长枪右键蓄力路径在世界坐标绘制，角色偏移与旋转不二次叠加
+[Slots] PASS 平移到12米外的真实玩家，预览起点仍贴实际出手位置
+[log] 02:40:50 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[log] 02:40:50 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 02:40:50 [Combat] 长虹贯日：1档 加算倍率1.2，准星落点(12, 2.4020665, 3.5299196)，水平距离0.87/14.4m，水平速度9.022
+[log] 02:40:50 [Combat] 抛掷：skl_b3_w1_2 朝 (0, 0, -1) 出手（水平速 9.02 垂直初速 0，最远 14.4m，每 0.25s 一次周期伤害）
+[log] 02:40:50 [Combat] 伤害 Player(340) → @CharacterBody3D@15(971.2) 28.8
+[log] 02:40:50 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[Slots] PASS 释放蓄力只抛长枪，旧镰刀即使同键启用也不执行
+[Slots] PASS 真实脱手长枪命中仍扣血，不让玩家进入近战顿帧
+[log] 02:40:50 [Combat] 抛掷：skl_b3_w1_2 开始收回（累计周期伤害 2 次）
+[Slots] PASS 再次右键只召回长枪，不启动旋转镰刀逻辑
+[log] 02:40:51 [Combat] 抛掷：skl_b3_w1_2 武器已回到手上（第 1 次收回，累计周期伤害 2 次）
+[log] 02:40:51 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[Slots] PASS 长枪真实回手并清理路径
+[log] 02:40:51 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:51 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:51 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[log] 02:40:51 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:51 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 LoadoutSlotsProbe
+[log] 02:40:51 [Combat] 蓄力身体表现：模型「Model」上挂了 12 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[Slots] PASS 蓄力按住中换角色，新右键不继承旧蓄力
+[Slots] PASS 旧右键松开不释放新角色技能或残留长枪
+[Slots] PASS 目标模型背面命中点保留原坐标，独立亮核可显示
+[Slots] PASS 仅短时接触亮核越过目标深度，外围粒子保持正常深度
+[Slots] PASS World墙体挡住视线时不创建穿墙亮核
+[Slots] === 换装与技能槽验收结束：通过 57，失败 0 ===
+[log] 02:40:53 [Exit] 音频退出回收：真实等待89ms。
+[log] 02:40:53 [Audio] 音效统计：共 2 次 —— sfx_charge_complete×1、sfx_combat_hit×1（缺失 id 0 个）
+
+=== snapshot exit=0 seconds=11.2 ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 02:40:55 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 02:40:55 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 02:40:55 [Flow] === 新的一局 ===
+[log] 02:40:55 [Flow] 日志文件：res://Logs/runtime/run_20261025_024055_661.log
+[log] 02:40:55 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 02:40:55 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 02:40:55 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 02:40:55 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 02:40:55 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 02:40:55 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 02:40:55 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 02:40:55 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 02:40:55 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 02:40:55 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 02:40:55 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 02:40:55 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 02:40:55 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 02:40:56 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 02:40:56 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:56 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 02:40:56 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:40:56 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 02:40:56 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 02:40:56 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 02:40:56 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[log] 02:40:56 [Animation] 技能动画开播：Player → skills/Skill_A1_ATK1（speed_scale=1，循环=False，事件帧 1 个：ATK@0.08s）
+[log] 02:40:56 [Combat] 能量波发射：skl_a1_w1_1 伤害 15 弹速 45（普通，蓄力 0s/0s 档 0 威力 ×1，无视格挡=True，穿透 0，方向 (0, -0.02180714, -0.9997622)）
+[AttackSnapshot] PASS EnergyPalm真实远程弹体快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:40:56 [Combat] 伤害 Player(320) → @CharacterBody3D@242(99955) 45
+[log] 02:40:56 [Combat] 暴击 Player(320) → @CharacterBody3D@242(99955) 45
+[log] 02:40:56 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[AttackSnapshot] PASS EnergyPalm真实远程弹体真实结算100%暴击：基础15／扣血45
+[log] 02:40:56 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:56 [Flow] 装备应用：chr_hunter/wpn_crossbow · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:40:56 [Animation] 技能动画开播：Player → skills/ATK_A2_Scatter（speed_scale=1，循环=False，事件帧 1 个：ATK@0.08s）
+[log] 02:40:56 [Combat] 投射物齐发：skl_a2_w1_1 发数 3（基础 3 + 档 0×0） 单发伤害 18 弹速 36 相邻夹角 20° 总夹角 40°（事件帧，蓄力 0s 档 0 威力 ×1，下坠起点 0m 重力 1 击退 6 追踪 []，方向 (0, -0.021800987, -0.99976236)）
+[AttackSnapshot] PASS Crossbow真实远程弹体快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:40:56 [Combat] 伤害 Player(320) → @CharacterBody3D@242(99901) 54
+[log] 02:40:56 [Combat] 暴击 Player(320) → @CharacterBody3D@242(99901) 54
+[AttackSnapshot] PASS Crossbow真实远程弹体真实结算100%暴击：基础18／扣血54
+[log] 02:40:56 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:56 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:40:57 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=0.7，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[log] 02:40:57 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 1 次；纯视觉，不改判定）
+[log] 02:40:57 [Audio] 首次播放「sfx_charge_complete」→ 总线 SFX / res://Assets/Audio/ui/ui_card_unlock.wav
+[log] 02:40:57 [Combat] 蓄力完成反馈：skl_a3_w1_1 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 1 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[log] 02:40:57 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=2，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[log] 02:40:57 [Combat] 投射物齐发：skl_a3_w1_1 发数 1（基础 1 + 档 0×0） 单发伤害 36 弹速 45 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.52s 档 0 威力 ×1，下坠起点 0m 重力 1 击退 2 追踪 [Mark]，方向 (0, -0.021800987, -0.99976236)）
+[AttackSnapshot] PASS Bow真实远程弹体快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:40:57 [Combat] 伤害 Player(320) → @CharacterBody3D@242(99793) 108
+[log] 02:40:57 [Combat] 暴击 Player(320) → @CharacterBody3D@242(99793) 108
+[AttackSnapshot] PASS Bow真实远程弹体真实结算100%暴击：基础36／扣血108
+[log] 02:40:57 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:57 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 02:40:57 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:40:57 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 02:40:57 [Combat] 被动·落剑式：skl_b1_w1_3 已挂到下落攻击 skl_b_fall 的落地事件上（冷却 5s 就是它的触发间隔）。
+[AttackSnapshot] PASS SpiritSword武器表统一基础5%／2倍
+[log] 02:40:57 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 02:40:57 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 02:40:57 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 02:40:58 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 30（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[AttackSnapshot] PASS SpiritSword近战快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:40:58 [Combat] 伤害 Player(340) → @CharacterBody3D@242(99703) 90
+[log] 02:40:58 [Combat] 暴击 Player(340) → @CharacterBody3D@242(99703) 90
+[AttackSnapshot] PASS SpiritSword近战真实结算100%暴击：基础30／扣血90
+[log] 02:40:58 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:58 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:40:58 [Combat] 武器门：skl_b2_w1_2（抛掷）在飞 → 锁住 skl_b2_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[AttackSnapshot] PASS Scythe武器表统一基础5%／2倍
+[log] 02:40:58 [Combat] 连招表读取：skl_b2_w1_1 行=[ser_b2_combo] 段动画 3 个 [Skill_B2_Scythe1,Skill_B2_Scythe2,Skill_B2_Scythe3]｜伤害倍率 3｜盒子尺寸 3｜前伸 3｜判定时长 3｜斩断名单 [] 排除 []｜窗口 0.5s 循环 False 事件帧 ATK
+[log] 02:40:58 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 02:40:58 [Combat] 连招：skl_b2_w1_1 起手 段 1/3 动画「Skill_B2_Scythe1」（窗口 0.5s）
+[log] 02:40:58 [Combat] 连招·第 1 段判定：skl_b2_w1_1 伤害 39（×1）盒子 (3.2, 1.8, 3.4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[AttackSnapshot] PASS Scythe近战快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:40:58 [Combat] 伤害 Player(340) → @CharacterBody3D@242(99586) 117
+[log] 02:40:58 [Combat] 暴击 Player(340) → @CharacterBody3D@242(99586) 117
+[AttackSnapshot] PASS Scythe近战真实结算100%暴击：基础39／扣血117
+[log] 02:40:58 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:58 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:40:58 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[AttackSnapshot] PASS Spear武器表统一基础5%／2倍
+[log] 02:40:58 [Combat] 连招表读取：skl_b3_w1_1 行=[ser_b3_combo] 段动画 4 个 [Skill_B3_Spear1,Skill_B3_Spear2,Skill_B3_Spear3,Skill_B3_Spear4]｜伤害倍率 4｜盒子尺寸 4｜前伸 4｜判定时长 4｜斩断名单 [] 排除 []｜窗口 0.45s 循环 True 事件帧 ATK
+[log] 02:40:58 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 02:40:58 [Combat] 连招：skl_b3_w1_1 起手 段 1/4 动画「Skill_B3_Spear1」（窗口 0.45s）
+[log] 02:40:59 [Combat] 连招·第 1 段判定：skl_b3_w1_1 伤害 33（×1）盒子 (1.2, 1.2, 4)｜斩断子弹 0 个（名单 []，排除 [] → 能量波斩不断）
+[AttackSnapshot] PASS Spear近战快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:40:59 [Combat] 伤害 Player(340) → @CharacterBody3D@242(99487) 99
+[log] 02:40:59 [Combat] 暴击 Player(340) → @CharacterBody3D@242(99487) 99
+[AttackSnapshot] PASS Spear近战真实结算100%暴击：基础33／扣血99
+[log] 02:40:59 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:59 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:40:59 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 02:40:59 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 02:40:59 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 02:40:59 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 30（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[log] 02:40:59 [Combat] 伤害 Player(340) → @CharacterBody3D@242(99397) 90
+[log] 02:40:59 [Combat] 暴击 Player(340) → @CharacterBody3D@242(99397) 90
+[AttackSnapshot] PASS 三剑追击继承真实命中快照快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:40:59 [Combat] 伤害 Player(340) → @CharacterBody3D@242(99370) 27
+[log] 02:40:59 [Combat] 暴击 Player(340) → @CharacterBody3D@242(99370) 27
+[AttackSnapshot] PASS 三剑追击继承真实命中快照真实结算100%暴击：基础9／扣血27
+[log] 02:40:59 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:40:59 [Flow] 装备应用：chr_weapon_master/wpn_scythe · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:40:59 [Animation] 技能动画开播：Player → skills/Skill_B2_Scythe3（speed_scale=1，循环=False，事件帧 2 个：ATK@0.463s、Combo@0.478s）
+[log] 02:41:00 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 02:41:00 [Combat] 抛掷：skl_b2_w1_2 朝 (-0, 0, -1) 出手（水平速 18 垂直初速 0，最远 8m，每 0.5s 一次周期伤害）
+[AttackSnapshot] PASS Scythe投掷快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:41:00 [Combat] 伤害 Player(340) → @CharacterBody3D@242(99290.8) 79.2
+[log] 02:41:00 [Combat] 暴击 Player(340) → @CharacterBody3D@242(99290.8) 79.2
+[AttackSnapshot] PASS Scythe投掷真实结算100%暴击：基础26.4／扣血79.203
+[AttackSnapshot] PASS Scythe投掷合并一次玩家攻击力：26.4／期望26.4
+[AttackSnapshot] PASS Scythe后续周期／回程沿用出手属性，周期恢复原伤害，不重读后来的增益
+[log] 02:41:01 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[log] 02:41:01 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:41:01 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:41:01 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[log] 02:41:02 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 2 次；纯视觉，不改判定）
+[log] 02:41:02 [Combat] 蓄力完成反馈：skl_b3_w1_2 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 2 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[log] 02:41:02 [Animation] 技能动画开播：Player → skills/Skill_B3_Spear4（speed_scale=1，循环=False，事件帧 2 个：ATK@0.145s、Combo@0.15s）
+[log] 02:41:02 [Combat] 武器门：武器飞出去了 → 武技1  锁住
+[log] 02:41:02 [Combat] 长虹贯日：0档 加算倍率1，准星落点(20, 0.6345307, 7.402937)，水平距离11.997/12m，水平速度14.996
+[log] 02:41:02 [Combat] 抛掷：skl_b3_w1_2 朝 (0, 0, -1) 出手（水平速 15 垂直初速 0，最远 12m，每 0.25s 一次周期伤害）
+[AttackSnapshot] PASS Spear投掷快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:41:02 [Combat] 伤害 Player(340) → @CharacterBody3D@242(99182.8) 108
+[log] 02:41:02 [Combat] 暴击 Player(340) → @CharacterBody3D@242(99182.8) 108
+[AttackSnapshot] PASS Spear投掷真实结算100%暴击：基础36／扣血108
+[AttackSnapshot] PASS Spear投掷合并一次玩家攻击力：36／期望36
+[log] 02:41:02 [Combat] 抛掷：skl_b3_w1_2 开始收回（累计周期伤害 2 次）
+[log] 02:41:02 [Combat] 抛掷：skl_b3_w1_2 武器已回到手上（第 1 次收回，累计周期伤害 2 次）
+[log] 02:41:02 [Combat] 武器门：武器回到手上 → 武技1  解锁
+[AttackSnapshot] PASS Spear后续周期／回程沿用出手属性，周期恢复原伤害，不重读后来的增益
+[log] 02:41:02 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:41:02 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:41:03 [Animation] 技能动画开播：Player → skills/Skill_B_Blink（speed_scale=1，循环=False，事件帧 1 个：Action@0.25s）
+[log] 02:41:03 [Combat] 闪：skl_b_skill_1 朝 (0, -0.04226988, -0.9991062) 冲刺 7m / 0.18s（速度 38.89）｜穿透单位=True（碰撞层摘到只剩世界层：True）无敌=False｜可视化路径 17 点（颜色 (0.55, 0.9, 1, 0.85) 宽 0.07）—— 路径抬升 0.06m
+[AttackSnapshot] PASS 闪快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:41:03 [Combat] 伤害 Player(340) → @CharacterBody3D@242(99119.8) 63
+[log] 02:41:03 [Combat] 暴击 Player(340) → @CharacterBody3D@242(99119.8) 63
+[AttackSnapshot] PASS 闪真实结算100%暴击：基础21／扣血63
+[log] 02:41:03 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:41:03 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:41:03 [Animation] 技能动画开播：Player → skills/Skill_B_Fall（speed_scale=1，循环=False，事件帧 1 个：Action@0.3s）
+[log] 02:41:03 [Combat] 下落攻击：skl_b_fall Action起动，起手离地4.9913m，参考耗时0.1468s，垂直速34m/s，倍率2，伤害54，方向(0, -1, 0)
+[AttackSnapshot] PASS 下落攻击快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:41:03 [Combat] 伤害 Player(340) → @CharacterBody3D@242(98957.8) 162
+[log] 02:41:03 [Combat] 暴击 Player(340) → @CharacterBody3D@242(98957.8) 162
+[AttackSnapshot] PASS 下落攻击真实结算100%暴击：基础54／扣血162
+[log] 02:41:04 [Combat] 下落攻击：skl_b_fall 落地（起手高度 4.99m，伤害 54）—— 触发落地事件给「落剑式/落日余晖」这类被动。
+[log] 02:41:04 [Combat] 落圈特效：下落攻击 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[log] 02:41:04 [Combat] 落剑式：skl_b1_w1_3 在落地处多开一圈攻击（伤害 54 = 上游 54 ×1，半径/形状来自本行命中体，第 1 次触发）—— 上游下落攻击本身没有改动。
+[AttackSnapshot] PASS 真实World落地生成落剑式
+[AttackSnapshot] PASS 落剑式继承下冲出手快照快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:41:04 [Combat] 伤害 Player(340) → @CharacterBody3D@242(98795.8) 162
+[log] 02:41:04 [Combat] 暴击 Player(340) → @CharacterBody3D@242(98795.8) 162
+[AttackSnapshot] PASS 落剑式继承下冲出手快照真实结算100%暴击：基础54／扣血162
+[log] 02:41:04 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:41:04 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:41:04 [Combat] 落圈特效：落剑式 落地画一圈 —— 半径 3.2m（命中体 Attack/Shape/SphereShape3D.Radius），扩散 0.38s（第 1 次；纯视觉，不改判定）
+[AttackSnapshot] PASS 只改当前武器行就统一修改基础暴击／暴伤，仍合并局外加成：0.51／2.5
+[AttackSnapshot] PASS 负暴击夹到0，伤害倍率0保留有效值
+[log] 02:41:04 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 02:41:04 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 02:41:04 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 02:41:04 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 0（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[AttackSnapshot] PASS 真实近战0倍率无伤害、0暴击不掷出暴击
+[log] 02:41:04 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 30 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 02:41:04 [Flow] 装备应用：chr_weapon_master/wpn_spirit_sword · 已套角色/武技/能力卡，来源 AttackSnapshotProbe
+[log] 02:41:04 [Audio] 首次播放「sfx_weapon_fire」→ 总线 SFX / res://Assets/Audio/sfx/sfx_weapon_fire.ogg
+[AttackSnapshot] PASS 武器组件仍能真实生成弹体
+[AttackSnapshot] PASS 玩家武器组件快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:41:04 [Combat] 伤害 Player(340) → @CharacterBody3D@242(98750.8) 45
+[log] 02:41:04 [Combat] 暴击 Player(340) → @CharacterBody3D@242(98750.8) 45
+[AttackSnapshot] PASS 玩家武器组件真实结算100%暴击：基础15／扣血45
+[log] 02:41:04 [Combat] 连招表读取：skl_b1_w1_1 行=[ser_b1_combo] 段动画 5 个 [Skill_B1_Sword1,Skill_B1_Sword2,Skill_B1_Sword3,Skill_B1_Sword4,Skill_B1_Sword5]｜伤害倍率 5｜盒子尺寸 5｜前伸 5｜判定时长 5｜斩断名单 [Bullet] 排除 [EnergyWave]｜窗口 0.45s 循环 False 事件帧 ATK
+[log] 02:41:04 [Animation] 技能动画开播：Player → skills/Skill_B1_Sword1（speed_scale=1.44，循环=False，事件帧 2 个：ATK@0.363s、Combo@0.375s）
+[log] 02:41:04 [Combat] 连招：skl_b1_w1_1 起手 段 1/5 动画「Skill_B1_Sword1」（窗口 0.45s）
+[log] 02:41:05 [Combat] 连招·第 1 段判定：skl_b1_w1_1 伤害 30（×1）盒子 (2.2, 1.6, 2.8)｜斩断子弹 0 个（名单 [Bullet]，排除 [EnergyWave] → 能量波斩不断）
+[AttackSnapshot] PASS 金光术附加剑气快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:41:05 [Combat] 伤害 Player(340) → @CharacterBody3D@242(98660.8) 90
+[log] 02:41:05 [Combat] 暴击 Player(340) → @CharacterBody3D@242(98660.8) 90
+[AttackSnapshot] PASS 金光术附加剑气真实结算100%暴击：基础30／扣血90
+[AttackSnapshot] PASS 附加剑气继承当段基础伤害，攻击倍率不重复相乘
+[AttackSnapshot] PASS 玩家通用命中盒默认路径快照允许暴击并合并玩家属性：CanCrit=True／率1／倍率3
+[log] 02:41:05 [Combat] 伤害 Player(340) → @CharacterBody3D@242(98615.8) 45
+[log] 02:41:05 [Combat] 暴击 Player(340) → @CharacterBody3D@242(98615.8) 45
+[AttackSnapshot] PASS 玩家通用命中盒默认路径真实结算100%暴击：基础15／扣血45
+[AttackSnapshot] PASS 通用玩家命中盒只乘一次攻击力
+[AttackSnapshot] PASS 敌人通用命中盒保持原始伤害／暴击语义
+[AttackSnapshot] === 攻击快照验收结束：通过 45，失败 0 ===
+[log] 02:41:05 [Exit] 音频退出回收：真实等待86ms。
+[log] 02:41:05 [Audio] 音效统计：共 18 次 —— sfx_combat_hit×15、sfx_charge_complete×2、sfx_weapon_fire×1（缺失 id 0 个）
+
+存档AFTER rune.cfg SHA256=CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6
+存档AFTER settings.cfg SHA256=7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1
+存档AFTER meta.cfg SHA256=26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446
+存档AFTER loadout.cfg SHA256=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+存档AFTER ability_cards.cfg SHA256=4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D
+引擎验证未通过：exit=-1073741795；F:\Godot项目\项目a\Logs\validation\.ai_gameplay_20261025_023928.content.log / F:\Godot项目\项目a\Logs\validation\.ai_gameplay_20261025_023928.content.err

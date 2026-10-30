@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ExpeditionDestination" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/ExpeditionDestination.cs" id="script"]
+[ext_resource type="Resource" path="res://Config/Modes/twilight_survival.tres" id="settings"]
+[resource]
+script = ExtResource("script")
+Title = "暮光回廊 · 死战"
+ScenePath = "res://Scenes/Survival.tscn"
+ModeSettings = ExtResource("settings")

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="row"]
+[ext_resource type="Resource" path="res://Config/VisualProfiles/scaredy_shroom.tres" id="visual"]
+[resource]
+script = ExtResource("row")
+NumericId = 1339
+DisplayName = "胆小菇"
+ScenePath = "res://Scenes/Enemies/ScaredyShroom.tscn"
+VisualProfile = ExtResource("visual")
+MaxHealth = 55
+MoveSpeed = 0
+Cost = 5
+Weight = 1
+MinElapsedSeconds = 10
+EliteChance = 0.1
+PressureBehaviors = PackedStringArray("BurrowRelocate", "HomingShot")
+Tags = PackedStringArray("Ground", "scaredy_shroom")

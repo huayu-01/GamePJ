@@ -6,7 +6,7 @@ using Godot;
 namespace ActRoguelike.Rewards;
 
 /// <summary>快乐小子：奔跑接触轻推普通敌人；脱离受伤后奔跑回血，不赋予无敌或穿墙。</summary>
-public partial class HappyRunnerRule : Node
+public partial class HappyRunnerRule : Node, IStoppableRewardRule
 {
 	public float DamageFreeSeconds { get; set; } = 10f;
 	public float HealPerSecond { get; set; } = 1f;
@@ -15,10 +15,12 @@ public partial class HappyRunnerRule : Node
 	private Unit _owner = null!;
 	private SprintController? _sprint;
 	private float _safeSeconds;
+	private bool _stopped;
 	private readonly Dictionary<ulong, float> _cooldowns = new();
 	public int PushCount { get; private set; }
 	public override void _Ready()
 	{
+		_stopped = false;
 		_owner = GetParent<Unit>(); _sprint = _owner.GetNodeOrNull<SprintController>("Sprint");
 		_owner.Damaged += OnDamaged;
 	}
@@ -28,7 +30,7 @@ public partial class HappyRunnerRule : Node
 	}
 	public override void _PhysicsProcess(double delta)
 	{
-		if (_owner.IsDead) return;
+		if (_stopped || _owner.IsDead) return;
 		float dt = (float)delta;
 		float previousSafe = _safeSeconds; _safeSeconds += dt;
 		foreach (ulong id in _cooldowns.Keys.ToArray()) { _cooldowns[id] -= dt; if (_cooldowns[id] <= 0f) _cooldowns.Remove(id); }
@@ -45,5 +47,11 @@ public partial class HappyRunnerRule : Node
 			_cooldowns[target.GetInstanceId()] = Mathf.Max(0.05f, PushCooldown); PushCount++;
 		}
 	}
-	public override void _ExitTree() { if (IsInstanceValid(_owner)) _owner.Damaged -= OnDamaged; }
+	public void Stop()
+	{
+		if (_stopped) return; _stopped = true;
+		if (IsInstanceValid(_owner)) _owner.Damaged -= OnDamaged;
+		SetPhysicsProcess(false); _cooldowns.Clear();
+	}
+	public override void _ExitTree() => Stop();
 }

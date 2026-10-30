@@ -1,0 +1,68 @@
+[
+  {
+    "Name": "ChargeRelease",
+    "StderrBytes": 0,
+    "Exit": 0,
+    "Passed": true,
+    "Seconds": 0
+  },
+  {
+    "Failure": "保留上次失败：CharacterDesign；stderr非空",
+    "Name": "CharacterDesign",
+    "Passed": false
+  },
+  {
+    "Name": "DragonArrow",
+    "StderrBytes": 0,
+    "Exit": 0,
+    "Passed": true,
+    "Seconds": 14.51
+  },
+  {
+    "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\outputs\\visual-047-048-20261028\\implementation\\BowSweep-regression.log / F:\\Godot项目\\项目a\\outputs\\visual-047-048-20261028\\implementation\\BowSweep-regression.err",
+    "Name": "BowSweep",
+    "Passed": false
+  },
+  {
+    "Name": "Rune",
+    "StderrBytes": 0,
+    "Exit": 0,
+    "Passed": true,
+    "Seconds": 11.47
+  },
+  {
+    "Name": "BatchE",
+    "StderrBytes": 0,
+    "Exit": 0,
+    "Passed": true,
+    "Seconds": 21.64
+  },
+  {
+    "Name": "SurvivalMode",
+    "StderrBytes": 0,
+    "Exit": 0,
+    "Passed": true,
+    "Seconds": 29.83
+  },
+  {
+    "Name": "Main",
+    "StderrBytes": 0,
+    "Exit": 0,
+    "Passed": true,
+    "Seconds": 71.63
+  },
+  {
+    "Name": "CharacterReplacement",
+    "StderrBytes": 0,
+    "Exit": 0,
+    "Passed": true,
+    "Seconds": 24.07
+  },
+  {
+    "Name": "ActionInterruption",
+    "StderrBytes": 0,
+    "Exit": 0,
+    "Passed": true,
+    "Seconds": 13.15
+  }
+]

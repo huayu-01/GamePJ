@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TrailBrandTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/TrailBrandTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1031
+Id = "elite_trail_brand"
+Title = "疾行烙印"
+Description = "短暂标记玩家经过处，延迟产生有限爆点。"
+NameKey = "elite.trail_brand.name"
+DescriptionKey = "elite.trail_brand.description"
+Cooldown = 7
+Radius = 1.2
+Duration = 3
+Count = 5
+Damage = 10

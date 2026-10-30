@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1079
 Kind = 10
 VisualStyle = 1
 VisualIcon = ExtResource("e_visual_icon")

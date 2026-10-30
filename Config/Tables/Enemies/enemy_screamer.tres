@@ -7,6 +7,7 @@
 [resource]
 PressureBehaviors = PackedStringArray("AreaSlow")
 script = ExtResource("1_row")
+NumericId = 1103
 Id = "enemy_screamer"
 Slot = 7
 DisplayName = "尖啸者"

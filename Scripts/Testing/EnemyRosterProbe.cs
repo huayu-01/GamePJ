@@ -38,6 +38,7 @@ public partial class EnemyRosterProbe : Node3D
 	{
 		foreach (var unit in _units) if (IsInstanceValid(unit)) unit.QueueFree(); _units.Clear();
 		foreach (var node in GetTree().GetNodesInGroup("projectiles")) node.QueueFree();
+		foreach (Node child in GetChildren()) if(child is Explosion) child.QueueFree();
 		await Wait(3);
 	}
 	private HitInstance Hit(Unit target, Unit attacker, float damage, bool negated = false) => new()
@@ -59,7 +60,7 @@ public partial class EnemyRosterProbe : Node3D
 		_map = new MapManager { BakeDelaySeconds = .1f }; AddChild(_map);
 		for (int i = 0; i < 120 && !_map.IsReady; i++) await Frame();
 		Check(_map.IsReady, "导航地图真实烘焙同步");
-		Check(ConfigIndex.Settings.Enemies.Length == 21, "生产索引21行：全局1、旧敌种9、新敌种11");
+		Check(ConfigIndex.Settings.Enemies.Length == ContentInventorySnapshot.Current.Count("Enemies"), "生产敌人索引总数符合唯一内容基线");
 		var encounter = new EncounterController { AutoStart = false }; AddChild(encounter);
 		encounter.ApplyEntryFilter(new StageDefinition());
 		Check(encounter.EntryCount == 19 && encounter.AllowedEntrySummary.Contains("enemy_combo_fighter(成本4)"), $"无限制关卡自动接入19个随机敌种：{encounter.AllowedEntrySummary}");
@@ -82,7 +83,8 @@ public partial class EnemyRosterProbe : Node3D
 	}
 	private async Task Plan(string key)
 	{
-		float distance = key == "heavy_slammer" ? 2 : key is "blade_spinner" or "combo_fighter" ? 3 : 6;
+		// 地鼠在玩家周围 4～8 米出土；拉开到 12 米，保留 >3 米断言并排除合法落点偶然靠近原位。
+		float distance = key == "burrow_hunter" ? 12 : key == "heavy_slammer" ? 2 : key is "blade_spinner" or "combo_fighter" ? 3 : 6;
 		var target = Target(distance); var enemy = Enemy(key); await Wait(4);
 		var ability = enemy.GetNode<EnemyPlanAbility>("AbilityPlan"); var presentation = enemy.GetNode<UnitPresentation>("Presentation");
 		int hits = 0; target.Damaged += (_, _) => hits++;
@@ -111,7 +113,13 @@ public partial class EnemyRosterProbe : Node3D
 				}
 			await Frame();
 		}
-		if (key is "meteor_mage" or "arc_thrower" or "bomb_lobber" or "arc_bomber") await Wait(90);
+		if (key is "meteor_mage" or "arc_thrower" or "bomb_lobber" or "arc_bomber")
+		{
+			float flight=1;
+			foreach(var step in ability.Plan!.Far)
+				if(step.Action is ProjectileEnemyAction projectile) flight=Mathf.Max(flight,projectile.FlightSeconds);
+			await Wait(Mathf.Max(90,Mathf.CeilToInt(flight*Engine.PhysicsTicksPerSecond)+30));
+		}
 		Check(!ability.IsBusy && ability.ExecutedAttackCount >= 1, $"{key}等待真实ATK并完整收招，次数={ability.ExecutedAttackCount}");
 		Check(presentation.AttackWarningCount == ability.ExecutedAttackCount, $"{key}每段攻击起手闪身一次，举盾和等待不误闪");
 		Check(!enemy.Block!.Blocking && !enemy.Movement!.HasVelocityOverride, $"{key}收尾归还格挡和速度所有权");
@@ -169,7 +177,8 @@ public partial class EnemyRosterProbe : Node3D
 		await Wait(20); enemy.Block.Blocking = false;
 		int before = enemy.Reactions.HitStunCount; enemy.ReceiveHit(Hit(enemy, target, 9, true));
 		Check(!enemy.Reactions.IsStaggered && enemy.Reactions.HitStunCount == before, "一次护罩无效化本次命中，无受击或格挡硬直");
-		var presentation = enemy.GetNode<UnitPresentation>("Presentation"); var mesh = enemy.GetNode<MeshInstance3D>("Model");
+		var presentation = enemy.GetNode<UnitPresentation>("Presentation"); var model = enemy.GetNode<Node3D>("Model");
+		var mesh = model as MeshInstance3D ?? NodeSearch.FindInSubtree<MeshInstance3D>(model)!;
 		// J38护罩也有短闪；先让该瞬态结束，再记录实际精英底材用于恢复比较。
 		enemy.AddChild(new EliteModifier()); await Wait(9);
 		Material? eliteBase = mesh.MaterialOverride;

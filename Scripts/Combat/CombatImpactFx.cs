@@ -19,14 +19,14 @@ public partial class CombatImpactFx : Node3D
 	}
 	private void Configure(Vector3 direction, ImpactKind kind, float weight)
 	{
-		Kind = kind; _duration = Mathf.Max(.03f, CombatFeedback.Profile.BurstSeconds);
+		Kind = kind; _duration = Mathf.Max(.03f, kind == ImpactKind.Parry ? CombatFeedback.Profile.ParryBurstSeconds : CombatFeedback.Profile.BurstSeconds);
 		_material = new StandardMaterial3D { ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
 			AlbedoColor = CombatFeedback.ColorFor(kind), Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
 			NoDepthTest = false, EmissionEnabled = true, Emission = CombatFeedback.ColorFor(kind), EmissionEnergyMultiplier = 1.4f };
 		Vector3 normal = direction.LengthSquared() > .001f ? direction.Normalized() : Vector3.Forward;
 		Vector3 up = Mathf.Abs(normal.Dot(Vector3.Up)) > .95f ? Vector3.Right : Vector3.Up;
 		Basis basis = Basis.LookingAt(normal, up);
-		int count = kind == ImpactKind.ArmorBreak ? 10 : 6;
+		int count = kind == ImpactKind.ArmorBreak ? 10 : kind == ImpactKind.Parry ? 8 : 6;
 		for (int i = 0; i < count; i++)
 		{
 			float angle = i * Mathf.Tau / count;
@@ -36,7 +36,8 @@ public partial class CombatImpactFx : Node3D
 			AddChild(shard); shard.LookAt(GlobalPosition + outward, Mathf.Abs(outward.Normalized().Dot(up)) > .95f ? Vector3.Forward : up);
 			_shards.Add((shard, outward * (.6f + weight * .3f)));
 		}
-		_ring = new MeshInstance3D { Mesh = new TorusMesh { InnerRadius = .16f * weight, OuterRadius = .19f * weight, Rings = 12, RingSegments = 20, Material = _material },
+		float radius = kind == ImpactKind.Parry ? .38f : .16f;
+		_ring = new MeshInstance3D { Mesh = new TorusMesh { InnerRadius = radius * weight, OuterRadius = (radius + .03f) * weight, Rings = 12, RingSegments = 20, Material = _material },
 			Basis = basis * new Basis(Vector3.Right, Mathf.Pi * .5f), CastShadow = GeometryInstance3D.ShadowCastingSetting.Off };
 		AddChild(_ring);
 	}

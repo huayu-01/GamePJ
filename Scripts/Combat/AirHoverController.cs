@@ -2,35 +2,19 @@ using Godot;
 
 namespace ActRoguelike.Combat;
 
-/// <summary>
-/// **「滞空」**（角色 A 技能 2「跃升」的效果，设计文档第 30/31 行）：
-///
-/// <list type="bullet">
-/// <item>「角色进行一次强力的跳跃，且获得一段时间{3s}的**滞空**」—— 时长由授予方（技能行的表值）
-///   通过 <see cref="Grant"/> 传进来，这个组件自己没有任何秒数。</item>
-/// <item>「滞空：当角色处于空中时**按住跳跃键**可大幅减缓{90}%下降速度（有按住特效，**脚底出现一个光环**）；
-///   **当有跳跃次数时会先执行跳跃**」—— 所以本组件只在"已经在空中 + 还按着跳跃键"时把下落速度按
-///   <see cref="FallSlowPercent"/> 削掉；按下那一帧若还有空中跳跃次数，由 <c>PlayerController</c> 先消费掉
-///   （<c>IsActionJustPressed</c> 那条路），这里刻意**不抢那一次按下**。</item>
-/// </list>
-///
-/// <para><b>为什么单独一个组件而不是写在技能里</b>：跃升技能在"动画事件帧"那一刻就 <c>Finish()</c> 了，
-/// 而滞空要持续 3s —— 状态必须挂在一个**常驻**节点上（挂在玩家场景里，与技能行解耦）。</para>
-///
-/// <para><b>执行顺序</b>：<see cref="ProcessPhysicsPriority"/> 设成一个较大的值，
-/// 保证它在 <c>CharacterMovement</c>（默认 0）之后跑 —— 这样"本帧重力已经加过"，
-/// 我们改的就是**这一帧交给物理的最终速度**（下一帧 <c>CharacterMovement</c> 读回来的起点也更低）。</para>
-///
-/// <para>光环是**代码生成的环**（<c>TorusMesh</c>，无着色 + 自发光），不依赖任何美术资源；
-/// 半径/颜色/高度都在导出属性里（技能行可以覆盖）。</para>
-/// </summary>
+/// <summary>统一浮空状态：授予后在空中自动减缓下落，持续时间耗尽或按可重绑的下落动作取消。
+/// 上升不受影响，主动跳跃优先；Ctrl取消不吞输入，角色B可在同一次按键中发动下落攻击。
+/// 光环由组件管理，授予方只提供时长与表现参数。</summary>
 public partial class AirHoverController : Node3D
 {
-	/// <summary>滞空期间按住跳跃键时的**下落速度削减比例**（0.9 = 减缓 90%）。</summary>
+	/// <summary>滞空自动保持期间的下落速度削减比例（0.9 = 减缓 90%）。</summary>
 	[Export(PropertyHint.Range, "0,1,0.05")] public float FallSlowPercent { get; set; } = 0.9f;
 
-	/// <summary>跳跃键的动作名（`project.godot` 的 `[input]` 名）。</summary>
+	/// <summary>额外跳跃优先判定使用的动作名；不再用于维持浮空。</summary>
 	[Export] public string JumpAction { get; set; } = "jump";
+	/// <summary>共用可重绑的下落动作；取消浮空不吞掉按键，角色B仍可开始下落攻击。</summary>
+	[Export] public string CancelAction { get; set; } = "fall_attack";
+	public bool Maintaining { get; private set; }
 
 	[ExportGroup("脚底光环（表现）")]
 	/// <summary>光环外半径（米）。</summary>
@@ -51,6 +35,12 @@ public partial class AirHoverController : Node3D
 
 	/// <summary>是不是处在滞空状态（还剩时间）。</summary>
 	public bool IsHovering => HoverRemaining > 0f;
+	/// <summary>只延长已经存在的浮空，不把普通跳跃变成浮空。</summary>
+	public bool Extend(float seconds)
+	{
+		if (!IsHovering || !Maintaining || !float.IsFinite(seconds) || seconds <= 0 || _unit.IsDead) return false;
+		HoverRemaining += seconds; return true;
+	}
 
 	/// <summary>本帧有没有真的在"减缓下落"（自测取证用）。</summary>
 	public bool IsSlowFalling { get; private set; }
@@ -94,6 +84,7 @@ public partial class AirHoverController : Node3D
 		}
 
 		HoverRemaining = Mathf.Max(HoverRemaining, seconds);
+		Maintaining = true;
 		if (fallSlowPercent >= 0f)
 		{
 			FallSlowPercent = Mathf.Clamp(fallSlowPercent, 0f, 1f);
@@ -106,6 +97,7 @@ public partial class AirHoverController : Node3D
 	public void ResetForLoadout()
 	{
 		HoverRemaining = 0;
+		Maintaining = false;
 		IsSlowFalling = false;
 		SetRingVisible(false);
 	}
@@ -159,9 +151,8 @@ public partial class AirHoverController : Node3D
 		}
 
 		bool airborne = !_body.IsOnFloor();
-		bool holding = DebugForceJumpHeld || (!string.IsNullOrEmpty(JumpAction)
-			&& InputMap.HasAction(JumpAction)
-			&& Input.IsActionPressed(JumpAction));
+		if (IsHovering && !string.IsNullOrEmpty(CancelAction) && InputMap.HasAction(CancelAction) && Input.IsActionJustPressed(CancelAction)) ResetForLoadout();
+		bool holding = Maintaining || DebugForceJumpHeld;
 
 		if (!airborne)
 		{
@@ -177,6 +168,7 @@ public partial class AirHoverController : Node3D
 		}
 
 		HoverRemaining = Mathf.Max(0f, HoverRemaining - dt);
+		if (HoverRemaining <= 0) { Maintaining = false; SetRingVisible(false); return; }
 
 		if (!holding)
 		{

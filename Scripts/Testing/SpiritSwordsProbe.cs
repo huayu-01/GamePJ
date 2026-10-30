@@ -100,7 +100,7 @@ public partial class SpiritSwordsProbe : Node3D
 			_camera.ResetPhysicsInterpolation();
 		}
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"渲染截图{name}");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"渲染截图{name}");
 		_camera.GlobalTransform = before; _camera.ResetPhysicsInterpolation();
 	}
 	public override async void _Ready()

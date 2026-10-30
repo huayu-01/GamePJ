@@ -28,6 +28,11 @@ public static class RuneCarry
 
 	private static string _current = string.Empty;
 	private static bool _loaded;
+	internal static System.Action CaptureRollback()
+	{
+		Load(); string current = _current;
+		return () => { _current = current; _loaded = true; };
+	}
 
 #if DEBUG
 	/// <summary>自测：不读盘、不写盘，且**恒为空**（整套硬指标必须在"没带符文"的状态下跑）。</summary>

@@ -47,6 +47,7 @@ Note = "本规则自己的触发间隔（0 = 不额外拦 —— 文档的条件
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1038
 RewardKind = 2
 MaxStacks = 1
 ApplyHandler = "SunsetSword"

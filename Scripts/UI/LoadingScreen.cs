@@ -28,7 +28,7 @@ public partial class LoadingScreen : CanvasLayer
 	{
 		_target = scenePath;
 		Visible = true;
-		_label.Text = $"加载中…\n{scenePath}";
+			_label.Text = "正在准备出击…\n进入关卡后，先观察节点与周围的敌人。";
 		GetTree().Paused = true;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
 		GameLog.Write("Flow", $"加载页面：准备进入 {scenePath}");

@@ -1,0 +1,38 @@
+{
+  "Passed": true,
+  "Rules": {
+    "LateBuildGoal": "允许成型后收割或低压",
+    "EliteArmorTiming": "出生或显式回满时按最终最大生命；普通刷新不回甲",
+    "KnifeCloseRange": "保留极端贴脸多弹收益",
+    "ArmorScope": "只改精英额外护甲"
+  },
+  "Workbook": {
+    "saved": "F:\\Godot项目\\项目a\\outputs\\acceptance-20261026\\更新与修复验收.xlsx",
+    "backup": "F:\\Godot项目\\项目a\\Logs\\maintenance\\acceptance-20261026\\backup-balance-1793073722424.xlsx",
+    "addedIds": [
+      29,
+      30
+    ],
+    "updatedId": 22,
+    "originalValuesAndFormulasPreserved": true,
+    "playerAcceptancePreserved": true,
+    "rows": 39,
+    "savedFileReadbackVerified": true
+  },
+  "Values": {
+    "ArcBombFlightSeconds": 1.2833333,
+    "ArcThrowFlightSeconds": 1.1666667,
+    "MarchMultiplier": 1.75,
+    "EliteArmorMaxHealthRatio": 0.3,
+    "EliteMinimumBonusArmor": 120,
+    "HomingSpeed": 13.2,
+    "GiantMaxHealthRatio": 0.08
+  },
+  "Date": "2026-10-27T12:05:22.6462437+08:00",
+  "VerifiedRunCount": 9,
+  "SavesUnchanged": true,
+  "Reports": [
+    "Logs/evidence/elites/run-20261027_115602.json",
+    "Logs/evidence/survival/integration-20261027_115748.json"
+  ]
+}

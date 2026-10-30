@@ -15,6 +15,7 @@ ClassHint = "MeleeAttackAbility"
 Windup = 0.55
 Recover = 0.5
 AttackParams = [SubResource("a_skl_boss_melee_0")]
+NumericId = 1187
 Id = "skl_boss_melee"
 DisplayName = "首领挥击"
 Note = "Boss 主攻击：伤害 24 / 间隔 1.8 / 射程 3.4 / 击退 6 在 boss_final 行。"

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SaviorTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/SaviorTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1018
+Id = "elite_savior"
+Title = "庇护"
+Description = "周期授予附近友军一次性挡伤护罩。"
+NameKey = "elite.savior.name"
+DescriptionKey = "elite.savior.description"
+MaxCarriers = 1
+Cooldown = 7
+Radius = 7
+Count = 2
+Duration = 4

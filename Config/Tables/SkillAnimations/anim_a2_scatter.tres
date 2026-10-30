@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1143
 Id = "anim_a2_scatter"
 DisplayName = "A2 武技1 飞刀散掷 · ATK 帧"
 Note = "角色 A 武器 2（飞刀）武技1：源段单手射击，事件帧 ATK @0.08s（= 源段 40% 处）。三发散射在这一帧一次发完。"

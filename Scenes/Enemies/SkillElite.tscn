@@ -109,6 +109,7 @@ IncludeSelf = true
 script = ExtResource("12_elite")
 HealthMultiplier = 1.0
 ArmorAdd = 0.0
+GrantArmorBonus = false
 DamageMultiplier = 1.0
 MoveSpeedMultiplier = 1.0
 KnockbackResistance = 0.0

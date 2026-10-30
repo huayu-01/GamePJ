@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/RunShardsRewardEffect.cs" id="definition"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+Amount = 20
+[resource]
+script = ExtResource("row")
+NumericId = 1355
+DisplayName = "碎片"
+NameKey = "content.1355.name"
+DescriptionKey = "content.1355.description"
+DescriptionTemplate = "获得{Effects.0.Amount}本局碎片；正常结束时兑现，取消冒险作废。"
+RewardKind = 0
+Weight = 1
+MaxStacks = 0
+Effects = [SubResource("effect")]
+
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

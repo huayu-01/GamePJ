@@ -150,18 +150,14 @@ public partial class JumpStompProbe : Node3D
 		var label = new Label3D { Text = "Ground jump + air jump: two pulses before landing\nLanding adds no damage | range, allies and dead filtered", Position = _player.GlobalPosition + Vector3.Up * 2.5f, FontSize = 36, Billboard = BaseMaterial3D.BillboardModeEnum.Enabled }; AddChild(label);
 		_camera.GlobalPosition = _player.GlobalPosition + new Vector3(-5, 10, -5); _camera.LookAt(_player.GlobalPosition); _camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		using var screenshot = GetViewport().GetTexture().GetImage(); Check(screenshot.SavePng("res://docs/screenshots/j22_jump_stomp.png") == Error.Ok, "截图j22_jump_stomp");
+		using var screenshot = GetViewport().GetTexture().GetImage(); Check(screenshot.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j22_jump_stomp.png")) == Error.Ok, "截图j22_jump_stomp");
 		label.QueueFree();
 	}
 	private async Task TableParameters()
 	{
 		await Equip();
 		using var row = (RewardConfig)ConfigRows.ById<RewardConfig>("mut_stomp")!.Duplicate(true);
-		foreach (var entry in row.HandlerParams)
-		{
-			if (entry.Key == "Radius") entry.Value = 1.5f;
-			if (entry.Key == "Damage") entry.Value = 7f;
-		}
+		var effect = (JumpPulseRewardEffect)row.Effects.Single(); effect.Radius = 1.5f; effect.Damage = 7;
 		var definition = RewardEffectRegistry.Compile(row);
 		Check(definition != null, "复制真实表行，仅改半径／伤害后仍经真实注册表编译");
 		if (definition == null) return;

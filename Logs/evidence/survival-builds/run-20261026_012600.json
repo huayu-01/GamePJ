@@ -1,0 +1,24 @@
+{
+  "Date": "2026-10-26T01:26:00",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "headless",
+      "Exit": 0,
+      "Seconds": 22.98,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_012600.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_012600.headless.err",
+      "SHA256": "077A002E492BCCD6E23CC82D9B9D0D71538A3EB99E71D9B3F0CAFCD4A0AA7A29"
+    },
+    {
+      "Name": "render",
+      "Exit": 0,
+      "Seconds": 28.1,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_012600.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_012600.render.err",
+      "SHA256": "C115EF1BF42FA699AFAFCF73D23E736E36BD0FD69BA40497BC29D0ACC818897F"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

@@ -1,0 +1,116 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 21:04:28 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 21:04:28 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 21:04:28 [Flow] === 新的一局 ===
+[log] 21:04:28 [Flow] 日志文件：res://Logs/runtime/run_20261028_210428_417.log
+[log] 21:04:28 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 21:04:28 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 21:04:28 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 21:04:28 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波 · 1340（tag_low）1 波
+[log] 21:04:28 [Config] 增幅项表：105 条（来源：表）—— 强化 27 / 进化 35 / 异化 43。
+[log] 21:04:28 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 21:04:28 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 12 个
+[log] 21:04:28 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 21:04:28 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 21:04:28 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=1.75 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 21:04:28 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 21:04:28 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 21:04:28 [Config] 配置表：武器 6 / 角色 2 / 敌人 22 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 9 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 21:04:29 [Combat] 单位动画：Player 共 6 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 21:04:29 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 45 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:04:29 [Combat] 单位动画：Player 共 13 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 21:04:29 [Flow] 装备应用：chr_hunter/wpn_bow · 已套角色/武技/能力卡，来源 DragonArrowProbe
+[log] 21:04:29 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:04:29 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:04:29 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[log] 21:04:29 [Combat] 蓄力身体表现：模型「Model」上挂了 28 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[DragonArrow] PASS 改前默认：蓄力上限 1.4s（3 档）阈值 0 尺寸 0 穿透 0（期望 1.4s/3档/0/0/0）
+[DragonArrow] PASS 表行 evo_dragon_arrow 已加载
+[DragonArrow] PASS 行上的强类型 ChargedShot 指向弓武技1：skl_a3_w1_1
+[DragonArrow] PASS 表里的数字：蓄力上限 3s 阈值 2s 尺寸 ×2 穿透 99 档数上限 0（0=不限）
+[DragonArrow] PASS RewardCatalog 编译出了这一行（ApplyHandler=ChargedShot 已注册）
+[DragonArrow] PASS 通过真实 RunBuild.Add（生产里抽中后入构筑的同一条路）拿到龙之箭
+[DragonArrow] PASS 拿到之后技能节点：蓄力上限 3s（8 档）阈值 2s 尺寸 ×2 穿透 99
+[DragonArrow] INFO 口径（交接单点名的歧义）：上限 3s → 满蓄 8 档 = ×3.4（每 0.3s 仍加一档）；2.0s 处 = 5 档 ×2.5。→ 现在是「继续加档到 3 秒」，2 秒只是大箭阈值；要改成「2 秒后不再加档」把 MaxSteps 填 5 即可（不改 C#）。
+[log] 21:04:29 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=0.7，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[log] 21:04:30 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 1 次；纯视觉，不改判定）
+[log] 21:04:30 [Audio] 首次播放「sfx_charge_complete」→ 总线 SFX / res://Assets/Audio/ui/ui_card_unlock.wav
+[log] 21:04:30 [Combat] 蓄力完成反馈：skl_a3_w1_1 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 1 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[DragonArrow] PASS ① 蓄 0.6s：真实按键蓄到 0.60s（实际 0.6s）
+[log] 21:04:30 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=2，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[DragonArrow] PASS ① 蓄 0.6s：松手后仍等释放段 ATK，不立即出弹
+[log] 21:04:30 [Combat] 投射物齐发：skl_a3_w1_1 发数 1（基础 1 + 档 0×0） 单发伤害 24 弹速 45 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.61s 档 0 威力 ×1，下坠起点 0m 重力 0 击退 2 追踪 [Mark]，方向 (0, 0.0065267505, -0.9999787)）
+[DragonArrow] PASS ① 蓄 0.6s：真实释放 ATK 才发射
+[DragonArrow] PASS ① 蓄 0.6s：这一发的判据是**松手快照** 0.607s（松手冻结值 0.607s，按住期间 0.6s）
+[log] 21:04:30 [Combat] 伤害 Player(320) → T1(99976) 24
+[log] 21:04:30 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[DragonArrow] PASS ① 小箭：不是大箭=True 尺寸 ×1 穿透预算 0（期望 False/×1/0）
+[DragonArrow] PASS ① 小箭只中最近 1 个靶：命中顺序 T1，伤害 24
+[log] 21:04:30 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=0.7，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[log] 21:04:31 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 2 次；纯视觉，不改判定）
+[log] 21:04:31 [Combat] 蓄力完成反馈：skl_a3_w1_1 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 2 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[DragonArrow] PASS ② 蓄 1.9s：真实按键蓄到 1.90s（实际 1.904s）
+[log] 21:04:32 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=2，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[DragonArrow] PASS ② 蓄 1.9s：松手后仍等释放段 ATK，不立即出弹
+[log] 21:04:32 [Combat] 投射物齐发：skl_a3_w1_1 发数 1（基础 1 + 档 4×0） 单发伤害 52.8 弹速 69 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 1.91s 档 4 威力 ×2.2，下坠起点 0m 重力 0 击退 2 追踪 [Mark]，方向 (0, 0.0065267505, -0.9999787)）
+[DragonArrow] PASS ② 蓄 1.9s：真实释放 ATK 才发射
+[DragonArrow] PASS ② 蓄 1.9s：这一发的判据是**松手快照** 1.911s（松手冻结值 1.911s，按住期间 1.904s）
+[log] 21:04:32 [Combat] 伤害 Player(320) → T1(99923.2) 52.8
+[DragonArrow] PASS ② 1.9s < 阈值：仍不是大箭=True 尺寸 ×1 穿透预算 0（期望 False/×1/0）
+[DragonArrow] PASS ② 1.9s 只中最近 1 个靶：命中顺序 T1，伤害 52.8
+[log] 21:04:33 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=0.7，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[log] 21:04:33 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 3 次；纯视觉，不改判定）
+[log] 21:04:33 [Combat] 蓄力完成反馈：skl_a3_w1_1 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 3 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：真实按键蓄到 2.05s（实际 2.055s）
+[log] 21:04:35 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=2，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：松手后仍等释放段 ATK，不立即出弹
+[log] 21:04:35 [Combat] 投射物齐发：skl_a3_w1_1 发数 1（基础 1 + 档 5×0） 单发伤害 60 弹速 75 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 2.06s 档 5 威力 ×2.5，★蓄力阈值弹：松手 2.06s ≥ 2s → 尺寸 ×2 穿透 99 个，下坠起点 0m 重力 0 击退 2 追踪 [Mark]，方向 (0, 0.0065267505, -0.9999787)）
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：真实释放 ATK 才发射
+[DragonArrow] PASS ③ 蓄 2.05s（大箭）：这一发的判据是**松手快照** 2.062s（松手冻结值 2.062s，按住期间 2.055s）
+[log] 21:04:35 [Combat] 伤害 Player(320) → T1(99863.2) 60
+[log] 21:04:35 [Combat] 伤害 Player(320) → T2(99880) 120
+[log] 21:04:35 [Combat] 暴击 Player(320) → T2(99880) 120
+[log] 21:04:36 [Combat] 伤害 Player(320) → T3(99880) 120
+[log] 21:04:36 [Combat] 暴击 Player(320) → T3(99880) 120
+[DragonArrow] PASS ③ 大箭：是大箭=True 尺寸 ×2 穿透预算 99（期望 True/×2/99）
+[DragonArrow] PASS ③ 一箭穿三个靶：命中顺序 T1 → T2 → T3，伤害 60 / 120 / 120
+[DragonArrow] PASS ③ 三次命中是**同一个 AttackInstance**（同一发箭），不是三箭
+[DragonArrow] PASS ③ 三次命中分布在不同物理帧（扫掠逐帧推进，不是同一帧重复结算）（帧间隔 15/14）
+[DragonArrow] INFO ③ 第三个靶之后箭还活着=True（MaxLifetime 24s，说明它没在最后一个靶上消失）
+[DragonArrow] INFO ③ 命中#1 靶 T1 伤害 60 暴击快照 60 帧 397
+[DragonArrow] INFO ③ 命中#2 靶 T2 伤害 120 暴击快照 60 帧 412
+[DragonArrow] INFO ③ 命中#3 靶 T3 伤害 120 暴击快照 60 帧 426
+[log] 21:04:36 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=0.7，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[log] 21:04:36 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 4 次；纯视觉，不改判定）
+[log] 21:04:36 [Combat] 蓄力完成反馈：skl_a3_w1_1 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 4 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：真实按键蓄到 0.60s（实际 0.607s）
+[log] 21:04:36 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=2，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：松手后仍等释放段 ATK，不立即出弹
+[log] 21:04:36 [Combat] 投射物齐发：skl_a3_w1_1 发数 1（基础 1 + 档 0×0） 单发伤害 24 弹速 45 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 0.61s 档 0 威力 ×1，下坠起点 0m 重力 0 击退 2 追踪 [Mark]，方向 (0, 0.0065267505, -0.9999787)）
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：真实释放 ATK 才发射
+[DragonArrow] PASS ④ 大箭后再蓄 0.6s：这一发的判据是**松手快照** 0.614s（松手冻结值 0.614s，按住期间 0.607s）
+[log] 21:04:37 [Combat] 伤害 Player(320) → T1(99815.2) 48
+[log] 21:04:37 [Combat] 暴击 Player(320) → T1(99815.2) 48
+[DragonArrow] PASS ④ 不锁存：大箭之后 0.6s 又回到小箭=True 尺寸 ×1 穿透预算 0（期望 False/×1/0）
+[DragonArrow] PASS ④ 小箭只中最近 1 个靶：命中顺序 T1，伤害 48
+[log] 21:04:37 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=0.7，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[log] 21:04:38 [Combat] 落圈特效：蓄力完成 落地画一圈 —— 半径 1.5m（调用方给定（蓄力完成）），扩散 0.45s（第 5 次；纯视觉，不改判定）
+[log] 21:04:38 [Combat] 蓄力完成反馈：skl_a3_w1_1 基础蓄力完成 → 角色闪一下 0.22s（强度 0.85）+ 一圈扩大 1.5m（0.45s）+ 音效「sfx_charge_complete」（第 5 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：真实按键蓄到 2.05s（实际 2.055s）
+[log] 21:04:39 [Animation] 技能动画开播：Player → skills/ATK_A3_Draw（speed_scale=2，循环=False，事件帧 2 个：Charge@0s、ATK@0.35s）
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：松手后仍等释放段 ATK，不立即出弹
+[log] 21:04:39 [Combat] 投射物齐发：skl_a3_w1_1 发数 1（基础 1 + 档 5×0） 单发伤害 60 弹速 75 相邻夹角 0° 总夹角 0°（蓄力松手，蓄力 2.06s 档 5 威力 ×2.5，★蓄力阈值弹：松手 2.06s ≥ 2s → 尺寸 ×2 穿透 99 个，下坠起点 0m 重力 1 击退 2 追踪 [Mark]，方向 (0, 0.009919534, -0.9999508)）
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：真实释放 ATK 才发射
+[DragonArrow] PASS ⑤ 大箭射向 World 墙：这一发的判据是**松手快照** 2.062s（松手冻结值 2.062s，按住期间 2.055s）
+[log] 21:04:39 [Combat] 伤害 Player(320) → W_Front(99880) 120
+[log] 21:04:39 [Combat] 暴击 Player(320) → W_Front(99880) 120
+[DragonArrow] PASS ⑤ 这一发确实是全穿透的大箭（穿透预算 99）
+[DragonArrow] PASS ⑤ 只打中墙**前**的靶：命中顺序 W_Front，伤害 120
+[DragonArrow] PASS ⑤ 墙**后**的靶一次都没被打到：生命 100000/100000（穿透没有穿过地形）
+[DragonArrow] PASS ⑤ 箭的最后一帧读数在墙的**近侧**：(20, 0.91842335, 9.400518)（墙 z∈[7.5,8.5]，墙后靶 z=2）—— 没有穿到墙后
+[DragonArrow] PASS ⑤ 箭撞墙后消失（不是穿墙继续飞）
+[DragonArrow] INFO ⑤ 场上存活投射物 1
+[DragonArrow] === 龙之箭验收结束：通过 42，失败 0 ===
+[log] 21:04:40 [Exit] 音频退出回收：真实等待89ms。
+[log] 21:04:40 [Audio] 音效统计：共 12 次 —— sfx_charge_complete×5、sfx_combat_hit×7（缺失 id 0 个）

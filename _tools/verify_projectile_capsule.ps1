@@ -1,7 +1,10 @@
 # J12：胶囊扫掠、全局实际弹速上限与五探针回归，验证独占且保护真实存档。
-param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization, [switch]$BodyCollision, [switch]$MainOnly, [switch]$FlightPhysics, [switch]$NavigationFoundation, [switch]$EnemyRoster, [switch]$LabOnly, [switch]$EnemyWarnings, [switch]$CombatFeedback, [switch]$LoadoutSlots, [switch]$AimAndThrow, [switch]$EarlyCharge, [switch]$SpiritSwords, [switch]$SpiritSwordRush, [switch]$KnifeVolley)
+param([switch]$ProbeOnly, [switch]$SpiritSword, [switch]$Scythe, [switch]$Affection, [switch]$Rainbow, [switch]$GoldenRoad, [switch]$LightLeap, [switch]$GroundBurst, [switch]$ActionMovement, [switch]$ChargeEvolution, [switch]$JumpStomp, [switch]$BowExitAudit, [switch]$RewardRules, [switch]$RewardTiers, [switch]$ChargeInputAudit, [switch]$KillJumps, [switch]$KillFacts, [switch]$WingDive, [switch]$ProjectileQuery, [switch]$AttackSnapshot, [switch]$DotAttribution, [switch]$RuneUi, [switch]$Specialization, [switch]$BodyCollision, [switch]$MainOnly, [switch]$FlightPhysics, [switch]$NavigationFoundation, [switch]$EnemyRoster, [switch]$LabOnly, [switch]$EnemyWarnings, [switch]$CombatFeedback, [switch]$LoadoutSlots, [switch]$AimAndThrow, [switch]$EarlyCharge, [switch]$SpiritSwords, [switch]$SpiritSwordRush, [switch]$PlayerExperience, [switch]$FlowRobustness, [switch]$KnifeVolley, [switch]$InteractionComponents, [switch]$InteractionModels, [switch]$ChallengeFeedback)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
+. (Join-Path $projectDir '_tools/LogPaths.ps1')
+Initialize-ProjectLogPaths -ProjectRoot $projectDir
+. (Join-Path $PSScriptRoot 'Validation.Common.ps1')
 $godotExe = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
 $profileDir = Join-Path $env:APPDATA 'Godot\app_userdata\ACT Roguelike'
 $evidence = [Collections.Generic.List[string]]::new()
@@ -12,7 +15,11 @@ $runTag = Get-Date -Format 'yyyyMMdd_HHmmss'
 $batchId = if ($WingDive) { 'j27' } elseif ($KillFacts) { 'j26' } elseif ($KillJumps) { 'j25' } elseif ($RewardTiers) { 'j24' } elseif ($RewardRules) { 'j23' } elseif ($JumpStomp) { 'j22' } elseif ($ChargeEvolution) { 'j21' } elseif ($ActionMovement) { 'j20' } elseif ($GroundBurst) { 'j19' } elseif ($LightLeap) { 'j18' } elseif ($GoldenRoad) { 'j17' } elseif ($Rainbow) { 'j16' } elseif ($Affection) { 'j15' } elseif ($Scythe) { 'j14' } elseif ($SpiritSword) { 'j13' } else { 'j12' }
 $SpiritSwords = $SpiritSwords -or $SpiritSwordRush
 $RewardRules = $RewardRules -or $RewardTiers -or $KillJumps
-$EnemyRoster = $EnemyRoster -or $EnemyWarnings -or $CombatFeedback -or $LoadoutSlots -or $AimAndThrow -or $EarlyCharge -or $SpiritSwords -or $KnifeVolley
+$InteractionModels = $InteractionModels -or $ChallengeFeedback
+$InteractionComponents = $InteractionComponents -or $InteractionModels
+$FlowRobustness = $FlowRobustness -or $InteractionComponents
+$PlayerExperience = $PlayerExperience -or $FlowRobustness
+$EnemyRoster = $EnemyRoster -or $EnemyWarnings -or $CombatFeedback -or $LoadoutSlots -or $AimAndThrow -or $EarlyCharge -or $SpiritSwords -or $PlayerExperience -or $KnifeVolley
 if ($ProjectileQuery) { $batchId = 'j28' }
 if ($AttackSnapshot) { $batchId = 'j29' }
 if ($DotAttribution) { $batchId = 'j30' }
@@ -28,7 +35,12 @@ if ($LoadoutSlots) { $batchId = 'j39' }
 if ($AimAndThrow) { $batchId = 'j40' }
 if ($EarlyCharge) { $batchId = 'j41' }
 if ($SpiritSwords) { $batchId = if ($SpiritSwordRush) { 'j43' } else { 'j42' } }
+if ($PlayerExperience) { $batchId = 'j44' }
+if ($FlowRobustness) { $batchId = 'j45' }
 if ($KnifeVolley) { $batchId = 'knife-volley' }
+if ($InteractionComponents) { $batchId = 'j46' }
+if ($InteractionModels) { $batchId = 'j47' }
+if ($ChallengeFeedback) { $batchId = 'j48' }
 $saveNames = @('meta.cfg','ability_cards.cfg','settings.cfg','loadout.cfg','rune.cfg')
 $utf8 = [Text.UTF8Encoding]::new($false)
 
@@ -40,38 +52,31 @@ function Save-Fingerprint([string]$Phase) {
     }
 }
 
-function Assert-Saves {
-    foreach ($name in $saveNames) {
-        $path = Join-Path $profileDir $name
-        $current = if (Test-Path -LiteralPath $path) { [Convert]::ToBase64String([IO.File]::ReadAllBytes($path)) } else { $null }
-        if ($current -cne $original[$name]) { throw "存档变化：$name；保留现场，不覆盖用户可能的手动改动。" }
-    }
-}
+function Assert-Saves { Assert-ValidationSaves $profileDir $original }
 
-function Invoke-Probe([string]$RunName, [string]$Scene, [string]$Expected, [switch]$Render, [switch]$SelfTest, [string[]]$UserArgs = @()) {
-    $stdoutPath = Join-Path $projectDir ".ai_$($batchId)_$runTag.$RunName.log"
-    $stderrPath = Join-Path $projectDir ".ai_$($batchId)_$runTag.$RunName.err"
-    $runArgs = @('--path',$projectDir,'--quit-after','40000',$Scene)
+function Invoke-Probe([string]$RunName, [string]$Scene, [string]$Expected, [switch]$Render, [switch]$SelfTest, [switch]$EditorScene, [string[]]$UserArgs = @()) {
+    $stdoutPath = Join-Path $projectDir "Logs/validation/.ai_$($batchId)_$runTag.$RunName.log"
+    $stderrPath = Join-Path $projectDir "Logs/validation/.ai_$($batchId)_$runTag.$RunName.err"
+    $runArgs = @('--path',$projectDir,'--log-file',(Join-Path $projectDir "Logs/validation/.ai_$($batchId)_$runTag.$RunName.engine.log"),'--quit-after','40000',$Scene)
     if ($Render) { $runArgs += @('--resolution','1600x900') } else { $runArgs += '--headless' }
+    if ($EditorScene) {
+        # 在隔离工程中验证相同源码和程序集，避免启用用户编辑器插件或争用其MCP端口。
+        $editorMirror = New-ValidationMirror $projectDir 'interaction_editor' -ShareAssembly
+        $editorProject = $editorMirror.Project
+        Copy-Item -LiteralPath (Join-Path $projectDir '_tools/interaction_editor_probe.gd') -Destination (Join-Path $editorProject '_tools')
+        $editorConfig = "config_version=5`n[application]`nconfig/name=`"Interaction Editor Probe`"`nconfig/features=PackedStringArray(`"4.7`",`"C#`")`n[dotnet]`nproject/assembly_name=`"ActRoguelike`"`n"
+        [IO.File]::WriteAllText((Join-Path $editorProject 'project.godot'),$editorConfig,$utf8)
+        $runArgs = @('--headless','--editor','--path',$editorProject,$Scene)
+    }
     if ($SelfTest) { $runArgs += @('--','--selftest') }
     elseif ($UserArgs.Count -gt 0) { $runArgs += '--'; $runArgs += $UserArgs }
     try {
-        $script:ownedProcess = Start-Process -FilePath $godotExe -ArgumentList $runArgs -WorkingDirectory $projectDir -WindowStyle Hidden -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru
-        $timer = [Diagnostics.Stopwatch]::StartNew()
-        while (-not $ownedProcess.HasExited -and $timer.Elapsed.TotalSeconds -lt 180) {
-            Start-Sleep -Milliseconds 300
-            $ownedProcess.Refresh()
-        }
-        if (-not $ownedProcess.HasExited) { throw "$RunName 超时；仅清理本脚本 PID $($ownedProcess.Id)。" }
-        $out = Get-Content -LiteralPath $stdoutPath -Raw
-        $err = Get-Content -LiteralPath $stderrPath -Raw
-        $result = "$RunName exit=$($ownedProcess.ExitCode) seconds=$([Math]::Round($timer.Elapsed.TotalSeconds,2)) stderrBytes=$((Get-Item -LiteralPath $stderrPath).Length)"
-        Write-Output $result
-        $evidence.Add($result)
-        $evidence.Add("=== $RunName ===")
-        $evidence.Add($out)
-        if ($err) { $evidence.Add($err) }
-        if ($ownedProcess.ExitCode -ne 0 -or $out -notmatch $Expected -or $err.Length -gt 0) { throw "$RunName 未通过：$stdoutPath / $stderrPath" }
+        $result = Invoke-ValidationEngine $godotExe $runArgs $projectDir $stdoutPath $stderrPath 180
+        $out = $result.Output
+        $evidence.Add("$RunName exit=$($result.ExitCode) seconds=$($result.Seconds) stderrBytes=0")
+        $evidence.Add("=== $RunName ==="); $evidence.Add($out)
+        if ($out -notmatch $Expected) { throw "$RunName 未满足完成断言：$stdoutPath" }
+        Write-Output "PASS $RunName"
         if ($SelfTest) {
             if ($EnemyRoster) {
                 foreach ($line in ($out -split "`n" | Where-Object { $_.Contains('🔴') })) {
@@ -82,22 +87,9 @@ function Invoke-Probe([string]$RunName, [string]$Scene, [string]$Expected, [swit
             }
             if (($BodyCollision -or $FlightPhysics -or $NavigationFoundation -or $EnemyRoster) -and $out -match '🔴 J8') { throw 'Main J8真实命中回归失败；保留日志，不以八指标代替技能断言。' }
             if (($SpiritSword -or $Scythe -or $Affection -or $Rainbow -or $GoldenRoad -or $LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) -and $out -notmatch '✅ P5b·实测表参数落到机制上') { throw 'Main专属技能增强契约探针未通过' }
-            $markers = @('配置表：武器 6','节点布置：启用','配置表比对·玩家：','配置表比对·索引：','Pressure 测试（进化','白板首领实例：','端到端：按 F 之后','最小闭环·链路：')
-            $baseline = Get-Content -LiteralPath (Join-Path $projectDir 'docs\character-design-j11-evidence.log')
-            foreach ($marker in $markers) {
-                $before = ($baseline | Where-Object { $_.StartsWith('[log] ') -and $_.Contains($marker) } | Select-Object -First 1) -replace '^\[log\] \S+ ', ''
-                $after = ($out -split "`n" | Where-Object { $_.StartsWith('[log] ') -and $_.Contains($marker) } | Select-Object -First 1) -replace '^\[log\] \S+ ', ''
-                if ($EnemyRoster -and $marker -eq '配置表：武器 6') { $before = $before.Replace('敌人 10 /','敌人 21 /') }
-                if ($EnemyRoster -and $marker -eq '配置表比对·索引：') {
-                    # 校验全部14项实际数值；历史解释文字已改写为J36现状。
-                    $before = $before.Replace('/敌人 10/','/敌人 21/').Split('（期望')[0]
-                    $after = $after.Split('（期望')[0]
-                }
-                if ([string]::IsNullOrWhiteSpace($before) -or $before.TrimEnd() -cne $after.TrimEnd()) { throw "硬指标变化：$marker" }
-                $note = if ($EnemyRoster) { 'J11基线比对；J36仅敌人数10→21' } else { 'J11逐字一致' }
-                $evidence.Add("[$note] $($after.TrimEnd())")
-            }
-            Write-Output 'Main 八条硬指标通过（J36仅敌人数10→21，其余与J11一致；索引14项全校验）'
+            $evidence.AddRange([string[]](Assert-MainValidation $projectDir $out))
+            Write-Output 'Main八条硬指标、内容基线和历史红标核对通过'
+
         }
     }
     finally {
@@ -111,7 +103,7 @@ function Invoke-Probe([string]$RunName, [string]$Scene, [string]$Expected, [swit
 
 Push-Location $projectDir
 try {
-    $lease = [IO.File]::Open((Join-Path $projectDir '.ai_validation.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+    $lease = Open-ProjectValidationLease $projectDir 900
     $active = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -like 'Godot*' -and $_.CommandLine -notmatch '--editor' })
     if ($active.Count -gt 0) { throw "发现已有 Godot 游戏进程：$($active.ProcessId -join ',')，未停止它们。" }
     if (Test-Path -LiteralPath (Join-Path $profileDir 'selftest.flag')) { throw '已有 selftest.flag，需先核实归属。' }
@@ -119,17 +111,10 @@ try {
         $path = Join-Path $profileDir $name
         $original[$name] = if (Test-Path -LiteralPath $path) { [Convert]::ToBase64String([IO.File]::ReadAllBytes($path)) } else { $null }
     }
-    [IO.File]::WriteAllText((Join-Path $projectDir ".ai_$($batchId)_$runTag.saves.json"),($original | ConvertTo-Json),$utf8)
+    [IO.File]::WriteAllText((Join-Path $projectDir "Logs/validation/.ai_$($batchId)_$runTag.saves.json"),($original | ConvertTo-Json),$utf8)
     Save-Fingerprint 'BEFORE'
-    & (Join-Path $projectDir 'build.ps1') --no-incremental -v minimal | Tee-Object -FilePath ".ai_$($batchId)_$runTag.Debug.log"
-    if ($LASTEXITCODE -ne 0) { throw 'Debug 构建失败' }
-    dotnet build ActRoguelike.csproj --no-incremental -v minimal -c ExportRelease | Tee-Object -FilePath ".ai_$($batchId)_$runTag.ExportRelease.log"
-    if ($LASTEXITCODE -ne 0) { throw 'ExportRelease 构建失败' }
     foreach ($configuration in @('Debug','ExportRelease')) {
-        $build = Get-Content -LiteralPath ".ai_$($batchId)_$runTag.$configuration.log" -Raw
-        $evidence.Add("=== $configuration ===")
-        $evidence.Add($build)
-        if ($build -notmatch '0 个警告' -or $build -notmatch '0 个错误') { throw "$configuration 未满足 0/0" }
+        $evidence.Add((Invoke-ValidationBuild $projectDir $configuration (Join-Path $projectDir "Logs/validation/.ai_$($batchId)_$runTag.$configuration.log")))
     }
     if ($LabOnly) {
         if (-not $EnemyRoster) { throw 'LabOnly仅用于J36／J37渲染定向复核。' }
@@ -154,6 +139,29 @@ try {
             Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
         }
     }
+    elseif ($PlayerExperience) {
+        if ($ChallengeFeedback) { Invoke-Probe 'challenge_feedback' 'res://Scenes/Debug/_ChallengeFeedbackProbe.tscn' '挑战状态与拒绝反馈验收结束：通过 \d+，失败 0' -UserArgs '--challenge-feedback' }
+        if ($InteractionModels) { Invoke-Probe 'interaction_editor' 'res://Scenes/Debug/_InteractionEditorProbe.tscn' '编辑器模型验收结束：通过 6，失败 0' -EditorScene -UserArgs '--interaction-editor-check' }
+        if ($InteractionComponents) { Invoke-Probe 'interaction_component' 'res://Scenes/Debug/_InteractionComponentProbe.tscn' '交互组件验收结束：通过 \d+，失败 0' }
+        if ($FlowRobustness) { Invoke-Probe 'spawn_flow' 'res://Scenes/Debug/_SpawnContinuityProbe.tscn' '增援与召唤验收结束：通过 \d+，失败 0' }
+        $experienceArgs = if ($ChallengeFeedback) { @('--challenge-feedback','--interaction-models','--interaction-components') } elseif ($InteractionModels) { @('--interaction-models','--interaction-components') } elseif ($InteractionComponents) { @('--interaction-components') } elseif ($FlowRobustness) { @('--flow-robustness') } else { @() }
+        Invoke-Probe 'run_flow' 'res://Scenes/Debug/_RunFlowContinuityProbe.tscn' '整局与离场验收结束：通过 \d+，失败 0'
+        Invoke-Probe 'player_flow' 'res://Scenes/Debug/_PlayerExperienceProbe.tscn' '玩家流程验收结束：通过 \d+，失败 0' -UserArgs $experienceArgs
+        if ($InteractionModels) {
+            Invoke-Probe 'base_input' 'res://Scenes/Debug/_BatchCProbe.tscn' 'C批验收结束：通过 \d+，失败 0' -UserArgs '--loadout-test'
+            Invoke-Probe 'character_visual' 'res://Scenes/Debug/_CharacterReplacementProbe.tscn' '完成：通过 \d+，失败 0' -UserArgs '--loadout-test'
+        }
+        if (-not $ProbeOnly) {
+            if ($ChallengeFeedback) { Invoke-Probe 'challenge_feedback_render' 'res://Scenes/Debug/_ChallengeFeedbackProbe.tscn' '挑战状态与拒绝反馈验收结束：通过 \d+，失败 0' -Render -UserArgs '--challenge-feedback' }
+            if ($InteractionComponents) { Invoke-Probe 'interaction_lab' 'res://Scenes/Debug/InteractionComponentLab.tscn' '组件示例验收：组件 9／后端 9／新模型 9／触发器 2／截图 Ok' -Render -UserArgs (@('--interaction-lab-capture') + $experienceArgs) }
+            Invoke-Probe 'player_flow_render' 'res://Scenes/Debug/_PlayerExperienceProbe.tscn' '玩家流程验收结束：通过 \d+，失败 0' -Render -UserArgs $experienceArgs
+            Invoke-Probe 'navigation' 'res://Scenes/Debug/_NavigationFoundationProbe.tscn' '导航基础验收结束：通过 \d+，失败 0'
+            Invoke-Probe 'roster' 'res://Scenes/Debug/_EnemyRosterProbe.tscn' '敌人清单验收结束：通过 \d+，失败 0'
+            Invoke-Probe 'rune_ui' 'res://Scenes/Debug/_RuneUiProbe.tscn' '符文界面验收结束：通过 \d+，失败 0'
+            if ($FlowRobustness) { Invoke-Probe 'rune_ui_render' 'res://Scenes/Debug/_RuneUiProbe.tscn' '符文界面验收结束：通过 43，失败 0' -Render -UserArgs $experienceArgs }
+            Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
+        }
+    }
     elseif ($SpiritSwords) {
         Invoke-Probe 'spirit_swords' 'res://Scenes/Debug/_SpiritSwordsProbe.tscn' '三剑协同验收结束：通过 \d+，失败 0'
         if (-not $ProbeOnly) {
@@ -163,7 +171,7 @@ try {
             Invoke-Probe 'early_charge' 'res://Scenes/Debug/_EarlyChargeProbe.tscn' '未蓄满释放验收结束：通过 37，失败 0'
             Invoke-Probe 'slots' 'res://Scenes/Debug/_LoadoutSlotsProbe.tscn' '换装与技能槽验收结束：通过 57，失败 0'
             Invoke-Probe 'action' 'res://Scenes/Debug/_ActionInterruptionProbe.tscn' '动作交接验收结束：通过 38，失败 0'
-            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 194，失败 0'
+            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 221，失败 0'
             Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
         }
     }
@@ -175,7 +183,7 @@ try {
             Invoke-Probe 'action' 'res://Scenes/Debug/_ActionInterruptionProbe.tscn' '动作交接验收结束：通过 38，失败 0'
             Invoke-Probe 'snapshot' 'res://Scenes/Debug/_AttackSnapshotProbe.tscn' '攻击快照验收结束：通过 45，失败 0'
             Invoke-Probe 'charge_evolution' 'res://Scenes/Debug/_ChargeEvolutionProbe.tscn' '蓄力进化验收结束：通过 151，失败 0'
-            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 194，失败 0'
+            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 221，失败 0'
             Invoke-Probe 'spear' 'res://Scenes/Debug/_SpearRecallProbe.tscn' '气贯长虹验收结束：通过 89，失败 0'
             Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
         }
@@ -187,7 +195,7 @@ try {
             Invoke-Probe 'slots' 'res://Scenes/Debug/_LoadoutSlotsProbe.tscn' '换装与技能槽验收结束：通过 57，失败 0'
             Invoke-Probe 'snapshot' 'res://Scenes/Debug/_AttackSnapshotProbe.tscn' '攻击快照验收结束：通过 45，失败 0'
             Invoke-Probe 'scythe' 'res://Scenes/Debug/_ScytheEvolutionProbe.tscn' '镰刀末刀进化验收结束：通过 36，失败 0'
-            Invoke-Probe 'seek' 'res://Scenes/Debug/_ScytheSeekProbe.tscn' '飞镰喜爱验收结束：通过 42，失败 0'
+            Invoke-Probe 'seek' 'res://Scenes/Debug/_ScytheSeekProbe.tscn' '飞镰喜爱验收结束：通过 43，失败 0'
             Invoke-Probe 'spear' 'res://Scenes/Debug/_SpearRecallProbe.tscn' '气贯长虹验收结束：通过 89，失败 0'
             Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
         }
@@ -199,7 +207,7 @@ try {
             Invoke-Probe 'feedback' 'res://Scenes/Debug/_CombatFeedbackProbe.tscn' '打击反馈验收结束：通过 41，失败 0'
             Invoke-Probe 'action' 'res://Scenes/Debug/_ActionInterruptionProbe.tscn' '动作交接验收结束：通过 \d+，失败 0'
             Invoke-Probe 'snapshot' 'res://Scenes/Debug/_AttackSnapshotProbe.tscn' '攻击快照验收结束：通过 45，失败 0'
-            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 194，失败 0'
+            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 221，失败 0'
             Invoke-Probe 'sword' 'res://Scenes/Debug/_SpiritSwordEvolutionProbe.tscn' '灵剑进化验收结束：通过 \d+，失败 0'
             Invoke-Probe 'scythe' 'res://Scenes/Debug/_ScytheEvolutionProbe.tscn' '镰刀末刀进化验收结束：通过 36，失败 0'
             Invoke-Probe 'spear' 'res://Scenes/Debug/_SpearRecallProbe.tscn' '气贯长虹验收结束：通过 89，失败 0'
@@ -238,7 +246,7 @@ try {
             Invoke-Probe 'body' 'res://Scenes/Debug/_BodyCollisionProbe.tscn' '身体分层验收结束：通过 31，失败 0'
             Invoke-Probe 'flight' 'res://Scenes/Debug/_FlightPhysicsProbe.tscn' '飞行与受力验收结束：通过 42，失败 0'
             Invoke-Probe 'projectile_query' 'res://Scenes/Debug/_ProjectileQueryProbe.tscn' '弹道查询验收结束：通过 56，失败 0'
-            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 194，失败 0'
+            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 221，失败 0'
             Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
         }
     }
@@ -260,7 +268,7 @@ try {
             Invoke-Probe 'movement' 'res://Scenes/Debug/_ActionMovementProbe.tscn' '动作移动验收结束：通过 74，失败 0'
             Invoke-Probe 'jump_stomp' 'res://Scenes/Debug/_JumpStompProbe.tscn' '起跳践踏验收结束：通过 39，失败 0'
             Invoke-Probe 'landing' 'res://Scenes/Debug/_LandingKnockbackProbe.tscn' '地爆验收结束：通过 53，失败 0'
-            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 194，失败 0'
+            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 221，失败 0'
             Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
         }
     }
@@ -268,7 +276,7 @@ try {
         Invoke-Probe 'body' 'res://Scenes/Debug/_BodyCollisionProbe.tscn' '身体分层验收结束：通过 \d+，失败 0'
         if (-not $ProbeOnly) {
             Invoke-Probe 'collision' 'res://Scenes/Debug/_BatchDProbe.tscn' 'D批验收结束：通过 91，失败 0'
-            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 194，失败 0'
+            Invoke-Probe 'specialization' 'res://Scenes/Debug/_SpecializationProbe.tscn' '特化验收结束：通过 221，失败 0'
             Invoke-Probe 'projectile_query' 'res://Scenes/Debug/_ProjectileQueryProbe.tscn' '弹道查询验收结束：通过 56，失败 0'
             Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0'
         }
@@ -286,10 +294,7 @@ try {
         }
     }
     elseif ($RuneUi) {
-        $ownedProcess = Start-Process -FilePath $godotExe -ArgumentList @('--headless','--path',$projectDir,'--editor','--import') -WorkingDirectory $projectDir -WindowStyle Hidden -RedirectStandardOutput ".ai_$($batchId)_$runTag.import.log" -RedirectStandardError ".ai_$($batchId)_$runTag.import.err" -PassThru
-        if (-not $ownedProcess.WaitForExit(60000)) { Stop-Process -Id $ownedProcess.Id; throw '资源导入超时' }
-        if ($ownedProcess.ExitCode -ne 0) { throw '资源导入失败' }
-        $ownedProcess = $null
+        $null = Invoke-ValidationEngine $godotExe @('--headless','--path',$projectDir,'--editor','--import') $projectDir (Join-Path $projectDir "Logs/validation/.ai_$($batchId)_$runTag.import.log") (Join-Path $projectDir "Logs/validation/.ai_$($batchId)_$runTag.import.err") 60
         Invoke-Probe 'rune_ui' 'res://Scenes/Debug/_RuneUiProbe.tscn' '符文界面验收结束：通过 42，失败 0'
         Invoke-Probe 'rune_ui_render' 'res://Scenes/Debug/_RuneUiProbe.tscn' '符文界面验收结束：通过 43，失败 0' -Render
     }
@@ -396,7 +401,7 @@ try {
         if ($SpiritSword -or $Scythe -or $Affection -or $Rainbow -or $GoldenRoad -or $LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'bow' 'res://Scenes/Debug/_BowSweepProbe.tscn' '验收结束：通过 39，失败 0' }
         if ($Scythe -or $Affection -or $Rainbow -or $GoldenRoad -or $LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'sword' 'res://Scenes/Debug/_SpiritSwordEvolutionProbe.tscn' '灵剑进化验收结束：通过 71，失败 0' }
         if ($Affection -or $Rainbow -or $GoldenRoad -or $LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'scythe' 'res://Scenes/Debug/_ScytheEvolutionProbe.tscn' '镰刀末刀进化验收结束：通过 36，失败 0' }
-        if ($Rainbow -or $GoldenRoad -or $LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'seek' 'res://Scenes/Debug/_ScytheSeekProbe.tscn' '飞镰喜爱验收结束：通过 42，失败 0' }
+        if ($Rainbow -or $GoldenRoad -or $LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'seek' 'res://Scenes/Debug/_ScytheSeekProbe.tscn' '飞镰喜爱验收结束：通过 43，失败 0' }
         if ($GoldenRoad -or $LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'rainbow' 'res://Scenes/Debug/_SpearRecallProbe.tscn' '气贯长虹验收结束：通过 89，失败 0' }
         if ($LightLeap -or $GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'cleave' 'res://Scenes/Debug/_SpearCleaveProbe.tscn' '金光大道验收结束：通过 31，失败 0' }
         if ($GroundBurst -or $ActionMovement -or $ChargeEvolution -or $JumpStomp -or $RewardRules) { Invoke-Probe 'teleport' 'res://Scenes/Debug/_TeleportJumpProbe.tscn' '浮光跃金验收结束：通过 64，失败 0' }
@@ -408,14 +413,20 @@ try {
         Invoke-Probe 'rune' 'res://Scenes/Debug/_RuneProbe.tscn' '验收结束：通过 83，失败 0'
         Invoke-Probe 'main' 'res://Scenes/Main.tscn' '=== 自测结束 ===' -SelfTest
     }
-    $shotNames = if ($BowExitAudit -or $ChargeInputAudit -or $KillJumps -or $KillFacts -or $WingDive) { @() } elseif ($RewardTiers) { @('j24_reward_tiers') } elseif ($RewardRules) { @() } elseif ($JumpStomp) { @('j22_jump_stomp') } elseif ($ChargeEvolution) { @('j21_distinct_homing','j21_flow') } elseif ($ActionMovement) { @('j20_action_movement') } elseif ($GroundBurst) { @('j19_ground_burst') } elseif ($LightLeap) { @('j18_light_leap') } elseif ($GoldenRoad) { @('j17_golden_road') } elseif ($Rainbow) { @('j16_rainbow') } elseif ($Affection) { @('j15_affection','j15_world') } elseif ($Scythe) { @('j14_mercy','j14_salvation') } elseif ($SpiritSword) { @('j13_golden_qi','j13_great_draw','j13_divine_descent') } else { @('j12_capsule_sweep') }
+    $shotNames = if ($BowExitAudit -or $ChargeInputAudit -or $KillJumps -or $KillFacts -or $WingDive) { @() } elseif ($RewardTiers) { @('j24_reward_tiers') } elseif ($RewardRules) { @() } elseif ($JumpStomp) { @('j22_jump_stomp') } elseif ($ChargeEvolution) { @('j21_distinct_homing','j21_flow') } elseif ($ActionMovement) { @('j20_action_movement') } elseif ($GroundBurst) { @('j19_ground_burst') } elseif ($LightLeap) { @('j18_light_leap') } elseif ($GoldenRoad) { @('j17_golden_road') } elseif ($Rainbow) { @('j16_rainbow') } elseif ($Affection) { @('j48_affection','j48_affection_world') } elseif ($Scythe) { @('j14_mercy','j14_salvation') } elseif ($SpiritSword) { @('j13_golden_qi','j13_great_draw','j13_divine_descent') } else { @('j12_capsule_sweep') }
     foreach ($shotName in $shotNames) {
         if ($Specialization -or $RuneUi -or $BodyCollision -or $FlightPhysics -or $NavigationFoundation -or $EnemyRoster) { break }
         $shotPath = Join-Path $projectDir "docs\screenshots\$shotName.png"
         if (-not (Test-Path -LiteralPath $shotPath)) { throw "$shotName 截图缺失" }
         $evidence.Add("截图 $shotName SHA256=$((Get-FileHash -LiteralPath $shotPath -Algorithm SHA256).Hash)")
     }
-    $currentShots = if ($SpiritSwordRush) { if ($ProbeOnly) { @() } else { @('screenshots/j43_swords_hover.png','screenshots/j43_swords_thrust.png') } } elseif ($SpiritSwords) { if ($ProbeOnly) { @() } else { @('screenshots/j42_swords_hover.png','screenshots/j42_swords_attack.png') } } elseif ($EarlyCharge) { @() } elseif ($AimAndThrow) { if (-not $ProbeOnly) { @('screenshots/j40_spear_aim.png','screenshots/j40_crossbow_aim.png') } else { @() } } elseif ($LoadoutSlots -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j39_contact_visibility.png','screenshots/j39_spear_preview.png') } elseif ($CombatFeedback -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j38_combat_feedback.png') } elseif ($EnemyWarnings -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j37_enemy_warning.png') } elseif ($EnemyRoster -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j36_enemy_roster.png','screenshots/j36_attack_warning.png') } elseif ($Specialization) { @('character-design-j32-wind.png','character-design-j32-rune-ui.png') } elseif ($RuneUi) { @('character-design-j31-rune-ui.png') } else { @() }
+    $currentShots = if ($PlayerExperience) { if ($ProbeOnly) { @() } else { @("screenshots/$($batchId)_base_guide.png","screenshots/$($batchId)_expedition_summary.png","screenshots/$($batchId)_summary_settings.png","screenshots/$($batchId)_forest_node.png","screenshots/$($batchId)_forest_reward.png","screenshots/$($batchId)_forest_combat.png") } } elseif ($SpiritSwordRush) { if ($ProbeOnly) { @() } else { @('screenshots/j43_swords_hover.png','screenshots/j43_swords_thrust.png') } } elseif ($SpiritSwords) { if ($ProbeOnly) { @() } else { @('screenshots/j42_swords_hover.png','screenshots/j42_swords_attack.png') } } elseif ($EarlyCharge) { @() } elseif ($AimAndThrow) { if (-not $ProbeOnly) { @('screenshots/j40_spear_aim.png','screenshots/j40_crossbow_aim.png') } else { @() } } elseif ($LoadoutSlots -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j39_contact_visibility.png','screenshots/j39_spear_preview.png') } elseif ($CombatFeedback -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j38_combat_feedback.png') } elseif ($EnemyWarnings -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j37_enemy_warning.png') } elseif ($EnemyRoster -and (-not $ProbeOnly -or $LabOnly)) { @('screenshots/j36_enemy_roster.png','screenshots/j36_attack_warning.png') } elseif ($Specialization) { @('character-design-j32-wind.png','character-design-j32-rune-ui.png') } elseif ($RuneUi) { @('character-design-j31-rune-ui.png') } else { @() }
+    # 旧入口读取本次新产物，不能把docs中保留的历史预警图当成本轮截图。
+    if ($EnemyWarnings) { $currentShots = @($currentShots | ForEach-Object { if ($_ -eq 'screenshots/j37_enemy_warning.png') { '../Logs/evidence/enemy-warning.png' } else { $_ } }) }
+    if ($Specialization) { $currentShots = @($currentShots | ForEach-Object { if ($_ -eq 'character-design-j32-wind.png') { '../Logs/evidence/specialization-wind.png' } else { $_ } }) }
+    if ($InteractionComponents -and -not $ProbeOnly) { $currentShots += @("character-design-$batchId-rune-ui.png","screenshots/$($batchId)_interaction_lab.png") }
+    elseif ($FlowRobustness -and -not $ProbeOnly) { $currentShots += 'character-design-j45-rune-ui.png' }
+    if ($ChallengeFeedback -and -not $ProbeOnly) { $currentShots += @('screenshots/j48_challenge_active.png','screenshots/j48_challenge_rejected.png','screenshots/j48_challenge_cleared.png') }
     foreach ($shot in $currentShots) {
         # ProbeOnly不一定运行符文渲染，只有本次完整流程要求这张界面图。
         if ($Specialization -and $ProbeOnly -and $shot -like '*rune-ui*') { continue }
@@ -426,19 +437,19 @@ try {
     Save-Fingerprint 'AFTER'
     $evidence.Add("selftest.flag AFTER=$(Test-Path -LiteralPath (Join-Path $profileDir 'selftest.flag'))")
     $outputName = if ($MainOnly) { "character-design-$batchId-main-$runTag.log" } elseif ($ProbeOnly) { "character-design-$batchId-probe-$runTag.log" } else { "character-design-$batchId-evidence.log" }
-    [IO.File]::WriteAllText((Join-Path $projectDir "docs\$outputName"),(($evidence -join "`n").Replace("`r`n","`n").TrimEnd([char[]]"`r`n") + "`n"),$utf8)
-    Write-Output "$batchId 验收完成：docs/$outputName"
+    [IO.File]::WriteAllText((Join-Path $projectDir "Logs/evidence/$outputName"),(($evidence -join "`n").Replace("`r`n","`n").TrimEnd([char[]]"`r`n") + "`n"),$utf8)
+    Write-Output "$batchId 验收完成：Logs/evidence/$outputName"
 }
 catch {
     $evidence.Add($_.ToString())
     foreach ($configuration in @('Debug','ExportRelease')) {
-        $buildPath = Join-Path $projectDir ".ai_$($batchId)_$runTag.$configuration.log"
+        $buildPath = Join-Path $projectDir "Logs/validation/.ai_$($batchId)_$runTag.$configuration.log"
         if (Test-Path -LiteralPath $buildPath) {
             $evidence.Add("=== 失败现场构建 $configuration ===")
             $evidence.Add((Get-Content -LiteralPath $buildPath -Raw))
         }
     }
-    [IO.File]::WriteAllText((Join-Path $projectDir "docs\character-design-$batchId-failure-$runTag.log"),(($evidence -join "`n").Replace("`r`n","`n").TrimEnd([char[]]"`r`n") + "`n"),$utf8)
+    [IO.File]::WriteAllText((Join-Path $projectDir "Logs/evidence/character-design-$batchId-failure-$runTag.log"),(($evidence -join "`n").Replace("`r`n","`n").TrimEnd([char[]]"`r`n") + "`n"),$utf8)
     throw
 }
 finally {

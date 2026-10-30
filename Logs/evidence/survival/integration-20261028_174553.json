@@ -1,0 +1,18 @@
+{
+  "Date": "2026-10-28T17:45:53",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "snapshot",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 11.34,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174553.snapshot.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174553.snapshot.err",
+      "Failure": "",
+      "SHA256": "0EAF7AC21B8FF1DE2902AA219C13EC3F2C6C3AFEB412092229BB5F875F42FD5F"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

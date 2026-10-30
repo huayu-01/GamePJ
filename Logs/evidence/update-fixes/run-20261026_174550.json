@@ -1,0 +1,24 @@
+{
+  "Date": "2026-10-26T17:45:50",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "player_feedback",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_174550.player_feedback.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_174550.player_feedback.headless.err",
+      "SHA256": "0F85CA0B8D8A536097B7BFEAC33EF82AEB9AA22F899FB0A676961E7AE502F3B3"
+    },
+    {
+      "Name": "player_feedback",
+      "Mode": "render",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_174550.player_feedback.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_174550.player_feedback.render.err",
+      "SHA256": "AD1A9CDF3E823C85DF87BE7822C5EBE5059CA0ABD8B1E6480BDF110512A13E4F"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

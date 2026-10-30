@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Assets/Enemies/GhostMage/ghost_mage.glb" id="1"]
+[ext_resource type="Script" path="res://Scripts/Testing/EnemyVisualPreview.gd" id="2"]
+
+[node name="GhostMageVisual" type="Node3D"]
+script = ExtResource("2")
+preview_kind = "mage"
+metadata/art_source = "ghost-mage-approved-v1"
+
+[node name="Model" parent="." instance=ExtResource("1")]
+scale = Vector3(0.82, 0.82, 0.82)

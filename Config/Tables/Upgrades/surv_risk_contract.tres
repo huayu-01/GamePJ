@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/RiskContractRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+ExperienceScale = 1.2
+HealthDamageScale = 1.1
+[resource]
+script = ExtResource("row")
+NumericId = 1291
+Id = "surv_risk_contract"
+DisplayName = "危险契约"
+RewardKind = 2
+MaxStacks = 1
+Weight = 0.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_risk_contract"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "敌人经验收益×{Effects.0.ExperienceScale:0.##}；实际承受的生命伤害×{Effects.0.HealthDamageScale:0.##}，不放大护甲和护盾损耗。"
+NameKey = "content.surv_risk_contract.name"
+DescriptionKey = "content.surv_risk_contract.description"
+
+Note = "2026-10-28按用户决定退出全部正式获取和图鉴；旧身份与效果资源仅保留追溯，不恢复旧四路线。"

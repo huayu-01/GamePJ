@@ -1,0 +1,20 @@
+{
+  "glb_bytes": 3505092,
+  "bones": 4,
+  "glb_sha256": "A8915305CCB6E9FB5D9F095D0EC82897B3E71125D8A23561777EF8F843E83D32",
+  "runtime": "Assets/Enemies/ScaredyShroom/scaredy_shroom.glb",
+  "texture_size": 2048,
+  "height_meters": 1.55,
+  "animations": [
+    "idle",
+    "burrow",
+    "emerge",
+    "shoot"
+  ],
+  "triangles": 9594,
+  "vertices": 5869,
+  "hunyuan_job_id": "1504328840385544192",
+  "report": "ArtSource/Blender/scaredy-shroom/build-report.json",
+  "source": "ArtSource/Blender/scaredy-shroom/scaredy-shroom.blend",
+  "generation_credits": 25
+}

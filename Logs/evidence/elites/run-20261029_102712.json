@@ -1,0 +1,17 @@
+{
+  "Date": "2026-10-29T10:27:12",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "Content057060",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 12.43,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102712.Content057060.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102712.Content057060.headless.err",
+      "SHA256": "74523961A525ED9C414D60B4217C948AFB5BA823ACC32A282593FA630B7908DC"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

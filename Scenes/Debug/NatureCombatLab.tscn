@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Testing/NatureCombatLab.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Scenes/Levels/NatureArena/NatureArena.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://Scenes/Player/GeneratedPilot.tscn" id="3"]
+[ext_resource type="Script" path="res://Scripts/World/MapManager.cs" id="4"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/Visuals/NaturePilotSword.tscn" id="5"]
+
+[node name="NatureCombatLab" type="Node3D"]
+script = ExtResource("1")
+PilotWeapon = ExtResource("5")
+
+[node name="NatureArena" parent="." instance=ExtResource("2")]
+
+[node name="MapManager" type="Node3D" parent="."]
+script = ExtResource("4")
+
+[node name="Player" parent="." instance=ExtResource("3")]
+position = Vector3(0, 0.08, 8)
+
+[node name="Overview" type="Camera3D" parent="."]
+position = Vector3(80, 86, 88)
+projection = 1
+size = 146.0
+far = 400.0

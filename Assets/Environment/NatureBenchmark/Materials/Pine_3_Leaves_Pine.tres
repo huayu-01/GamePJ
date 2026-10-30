@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://ds7byiqriu2ts"]
+
+[ext_resource type="Shader" uid="uid://crsm4hdlh1fo7" path="res://Assets/Environment/NatureBenchmark/Shaders/foliage.gdshader" id="1_lm267"]
+[ext_resource type="Texture2D" uid="uid://r2j5jkb4022m" path="res://Assets/Environment/StylizedNature/Models/Leaf_Pine_C.png" id="2_b5jau"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_lm267")
+shader_parameter/leaf_texture = ExtResource("2_b5jau")
+shader_parameter/leaf_color = Color(0.39607844, 0.6509804, 0.23529412, 1)
+shader_parameter/crown_center = Vector3(-0.30803955, 5.1723495, -0.2944368)
+shader_parameter/crown_radius = 1.9847608
+shader_parameter/normal_blend = 0.85
+shader_parameter/wind_strength = 0.12
+shader_parameter/texture_color_weight = 0.0

@@ -53,7 +53,7 @@ public partial class BatchBProbe : Node
 		bool paused = GetTree().Paused;
 		GetTree().Paused = false;
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"视口截图 {name}.png");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"视口截图 {name}.png");
 		GetTree().Paused = paused;
 	}
 	private async Task Command(string text, bool success = true)
@@ -84,7 +84,7 @@ public partial class BatchBProbe : Node
 		_run.Call("BeginRunWithCharacter", 3, 3);
 		await Wait(0.3);
 		Check(_hud.SlotCount == 5 && _hud.MouseFilter == Control.MouseFilterEnum.Ignore, _hud.DebugState());
-		Check(_hud.IconPathOf("skl_a1_w1_2").EndsWith("ic_skill_nova.svg"), "HUD图标读取技能行Texture2D引用");
+		Check(_hud.IconPathOf("skl_a1_w1_2").EndsWith($"icon_{ConfigRows.ById<AbilityConfig>("skl_a1_w1_2")!.NumericId}.svg"), "HUD图标按技能数字身份约定读取");
 		Check(AbilityHud.KeyCaption("skill_1") == "Q" && AbilityHud.KeyCaption("weapon_skill_1") == "左键", "按键提示来自InputMap");
 		await Shot("b_hud_ready");
 		await KeyPress(Key.Q);

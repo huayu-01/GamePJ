@@ -78,6 +78,12 @@ public partial class PlayerAbilityInput : Node
 	private void Activate(string action)
 	{
 		Unit? victim = Targeting.FindNearestHostile(_unit, _unit, 200f);
+		if (_unit.GetNodeOrNull<AimAssistController>("AimAssist") is { } assist && assist.TryGetAim(200, out var point))
+		{
+			victim = assist.Selected;
+			_unit.Movement?.SetFacing(point - Targeting.AimPoint(_unit));
+			_unit.Movement?.FaceDirection(point - Targeting.AimPoint(_unit), 1);
+		}
 		Ability? ability = _unit.AbilitySlots.Resolve(action);
 		if (_unit.AbilitySlots.Press(action, victim) && ability is { HoldToCharge: true } or { HoldToMaintain: true }) _inputOwners[action] = ability;
 	}

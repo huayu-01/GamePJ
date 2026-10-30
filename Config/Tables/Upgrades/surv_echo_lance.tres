@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/EchoLanceRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+DamageScale = 1.1
+Interval = 2.2
+ExtraPierce = 2
+[resource]
+script = ExtResource("row")
+NumericId = 1288
+Id = "surv_echo_lance"
+DisplayName = "集束协议"
+RewardKind = 1
+MaxStacks = 1
+Weight = 0.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_echo_lance"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "两枚协击合为冲针，造成基础伤害{Effects.0.DamageScale:0%}，再穿过{Effects.0.ExtraPierce:0}个敌人；触发间隔改为{Effects.0.Interval:0.#}秒。"
+NameKey = "content.surv_echo_lance.name"
+DescriptionKey = "content.surv_echo_lance.description"
+Requires = PackedStringArray("surv_echo_familiar")
+Excludes = PackedStringArray("surv_echo_mark")
+
+Note = "2026-10-28按用户决定退出全部正式获取和图鉴；旧身份与效果资源仅保留追溯，不恢复旧四路线。"

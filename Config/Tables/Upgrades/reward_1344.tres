@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/WeaponLeechRewardEffect.cs" id="definition"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+Ratio = 0.01
+[resource]
+script = ExtResource("row")
+NumericId = 1344
+DisplayName = "汲血"
+NameKey = "content.1344.name"
+DescriptionKey = "content.1344.description"
+DescriptionTemplate = "武技1及其组成追击段实际造成伤害的{Effects.0.Ratio:0%}转为生命恢复；不含自动衍生伤害，并遵循禁疗。"
+RewardKind = 2
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

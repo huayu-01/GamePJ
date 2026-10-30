@@ -2,7 +2,7 @@
 
 > **用途**：给"现在就想把灰盒换成能看的东西"的人一份**可以直接下载的清单**。
 > **项目**：`F:\Godot项目\项目a`（Godot 4.7 / Forward+ / C#，第三人称动作 Roguelike，**目前零美术资源**）。
-> **相关**：[art-onboarding.md](art-onboarding.md)（接入说明）、[visual-inventory.md](visual-inventory.md)（88 个视觉元素清单）、[assets.md](assets.md)（目录与命名规范）。
+> **相关**：[art-onboarding.md](art-onboarding.md)（接入说明）、[visual-inventory.md](archive/design-notes/visual-inventory.md)（88 个视觉元素清单）、[assets.md](assets.md)（目录与命名规范）。
 > **本次没有下载任何资源、没有改任何 `.cs` / `.tscn` / `.tres`**；本文档是唯一产物。
 > **采集时间点**：扫描时 `Scenes/Interactables/`、`Scenes/UI/`、`Scripts/Interaction/`、`Scripts/Run/` 正由**另外两个代理**改动 —— 本文档里凡涉及这四个目录的步骤都标了 **⚠️冲突**。
 
@@ -35,7 +35,7 @@
 
 ## 1. 项目需求 → 素材映射
 
-对照 [visual-inventory.md](visual-inventory.md) §3 / §5 / §6 / §7，本项目需要的东西与"当前实现"：
+对照 [visual-inventory.md](archive/design-notes/visual-inventory.md) §3 / §5 / §6 / §7，本项目需要的东西与"当前实现"：
 
 | 类别 | 需要几个 | 现在是什么 | 备注 |
 |---|---|---|---|
@@ -74,7 +74,7 @@
 
 **逐条适配性评估**
 
-- **C1 Sci-Fi Essentials Kit**（**本项目首选**）：它是唯一一个"**敌人 + 枪 + 道具 + 场景小件**同一套科幻风格"的免费包，直接命中本项目的题材。**注意**：① 免费版只有 39 个模型，9 种敌人可能需要用**换色 + 缩放**（`EliteModifier` 已经在做缩放，配色本来就是项目里的区分手段，见 [visual-inventory.md](visual-inventory.md) §3）；② 官方说 Source 版工程是 **Godot 4.3** 做的，并声明"**高于此版本的都可以**"，本项目 **4.7** 在范围内，但 `.tscn` 直接搬进来仍有版本差异风险；③ **免费版 159 MB 解压后更大**，别整个塞进仓库。
+- **C1 Sci-Fi Essentials Kit**（**本项目首选**）：它是唯一一个"**敌人 + 枪 + 道具 + 场景小件**同一套科幻风格"的免费包，直接命中本项目的题材。**注意**：① 免费版只有 39 个模型，9 种敌人可能需要用**换色 + 缩放**（`EliteModifier` 已经在做缩放，配色本来就是项目里的区分手段，见 [visual-inventory.md](archive/design-notes/visual-inventory.md) §3）；② 官方说 Source 版工程是 **Godot 4.3** 做的，并声明"**高于此版本的都可以**"，本项目 **4.7** 在范围内，但 `.tscn` 直接搬进来仍有版本差异风险；③ **免费版 159 MB 解压后更大**，别整个塞进仓库。
 - **C2 Bestiary**：**7 只怪 × 3 套配色 = 21 种外观**，正好能铺满 9 种敌人 + Boss（Boss 挑最大的一只放大）。**它没有动画**，所以接进来是"静态摆件"或需要另配 C14/C15/C16 动画库。**许可不是 CC0 而是 QAL** —— 对本项目（做游戏卖）**完全够用**，但**不能**把模型原样再发布出去。
 - **C3/C4/C5**：`C3` 提供人形底模（11 个），`C4` 提供怪物（50 个），`C5` 提供机器人。三者都是 CC0 且风格接近，可以**混用**。**注意 C5 没有 glTF**，只有 FBX/OBJ/Blend —— Godot 4 导入 FBX 需要 **FBX2glTF**（Kenney 的 [KB](https://kenney.nl/knowledge-base/game-assets-3d/importing-characters-and-animations) 也是这么写的："make sure to use (and/or download) FBX2glTF when prompted"）。**优先选带 glTF 的包能省一步**。
 - **C6/C7 KayKit**：**美术质量最高、动画最全、骨架统一**，还配免费动画库。**唯一的问题是题材**：它是**剑与魔法/地牢**风（骑士、法师、游侠、骷髅），放进科幻竞技场会**风格打架**。若能接受"奇幻竞技场"的设定，`C6 + C7 + C10` 是**最省事的一整套**（同一个作者的骨架，动画互通）。**1024² 图集可降到 128²**，体积友好。
@@ -138,7 +138,7 @@
 ### 2.4 UI（面板 / 按钮 / 血条贴图 / 字体 / 准星）
 
 > ⚠️ **冲突警告**：`Scenes/UI/` 与 `Scripts/UI/` 正被**另一个代理**改动。**本节任何一步都先跟他协调**，否则必冲突。
-> 且 [visual-inventory.md](visual-inventory.md) §8.3/§8.4 有三条硬约束：`Root/HealthBarFill` **被强转成 `ColorRect`**（换 `TextureRect` 会在 `_Ready` 抛异常）、卡片模板**必须是 `Button`**、`Root/Panel/VBox/...` 是**绝对路径**（中间插一层就炸）。
+> 且 [visual-inventory.md](archive/design-notes/visual-inventory.md) §8.3/§8.4 有三条硬约束：`Root/HealthBarFill` **被强转成 `ColorRect`**（换 `TextureRect` 会在 `_Ready` 抛异常）、卡片模板**必须是 `Button`**、`Root/Panel/VBox/...` 是**绝对路径**（中间插一层就炸）。
 
 | # | 名称 | 链接 | 许可 | 价格 | 格式 | 覆盖本项目哪一项 | 状态 |
 |---|---|---|---|---|---|---|---|
@@ -150,10 +150,10 @@
 
 **逐条适配性评估**
 
-- **U1/U2 是"贴图"不是"主题"**：本项目**没有任何 `Theme`/`StyleBox` 资源**（[visual-inventory.md](visual-inventory.md) §6.3）。拿到 PNG 后要**自己建一个 `Theme`**：
+- **U1/U2 是"贴图"不是"主题"**：本项目**没有任何 `Theme`/`StyleBox` 资源**（[visual-inventory.md](archive/design-notes/visual-inventory.md) §6.3）。拿到 PNG 后要**自己建一个 `Theme`**：
   `Assets/UI/ui_theme_base.tres` → 挂到 `project.godot` 的 **`gui/theme/custom`**。
   **这样做的最大好处**：**完全不碰任何场景节点名**，`Root/Panel/VBox/...` 这些绝对路径**一个都不动**，绕开了 §8.3 的所有雷。
-- **U3 准星可以直接用**：`CrosshairH`/`CrosshairV`/`CrosshairDot` **没有任何代码引用**（[visual-inventory.md](visual-inventory.md) §8.3 表里没有它们），可以换成 `TextureRect` 或干脆换成一张准星图。这也是**零代码**的。
+- **U3 准星可以直接用**：`CrosshairH`/`CrosshairV`/`CrosshairDot` **没有任何代码引用**（[visual-inventory.md](archive/design-notes/visual-inventory.md) §8.3 表里没有它们），可以换成 `TextureRect` 或干脆换成一张准星图。这也是**零代码**的。
 - **U4 vs U5**：Kenney 字体是**像素/方块风**（CC0，最省心）；Oxanium 是**科幻无衬线**（OFL，需带许可文本）。**两者都免费商用**。想要"科技感"选 U5，想要"零义务"选 U4。
 - **⚠️ 血条**：`Root/HealthBarFill` **必须是 `ColorRect`**（`PlayerHud.cs:46` 强转），且宽度被 `PlayerHud.cs:16` 的 `HealthBarWidth = 260f` **每帧覆盖**（改场景宽度不生效）。**所以血条不能直接换成贴图** —— 想换就得**同时改 C#**。**建议第一轮先不动血条**。
 
@@ -215,7 +215,7 @@
 
 ### 4.1 坑一：轴心位置（原点在脚底 vs 在中心）
 
-**项目现状**（[visual-inventory.md](visual-inventory.md) §8.2）：
+**项目现状**（[visual-inventory.md](archive/design-notes/visual-inventory.md) §8.2）：
 
 - 单位是 `CharacterBody3D`，**原点在脚底**（`Body` 的 `CollisionShape3D.transform.y = 高度/2`，胶囊底面正好在 local `y = 0`）。
 - `Model`（`MeshInstance3D`）的 `transform.y` **也等于 高度/2**（玩家 1.8 高 → `y = 0.9`），**因为内置 `CapsuleMesh` 的轴心在几何中心**。
@@ -227,7 +227,7 @@
 | **几何中心**（= 现在 `CapsuleMesh` 就是这样） | **`高度/2`**（保持现状，玩家 = 0.9） | 中心对齐，脚正好落在 `y=0` |
 | **脚底**（大多数 game-ready 角色的惯例） | **`0`** | 脚底对齐原点，脚正好落在 `y=0` |
 
-> ⚠️ **两份项目文档在这里的措辞会让人绕晕**：[art-onboarding.md](art-onboarding.md) 第 54 行说"换成原点在脚底的模型会**下沉**半身高，要往上抬 高度/2"，而 [visual-inventory.md](visual-inventory.md) §8.2.2 给的改法是"**把 `Model` 的 y 改成 0**"。
+> ⚠️ **两份项目文档在这里的措辞会让人绕晕**：[art-onboarding.md](art-onboarding.md) 第 54 行说"换成原点在脚底的模型会**下沉**半身高，要往上抬 高度/2"，而 [visual-inventory.md](archive/design-notes/visual-inventory.md) §8.2.2 给的改法是"**把 `Model` 的 y 改成 0**"。
 > **按上表来**：脚底轴心 → `y = 0`（**往下改**，不是往上抬）；中心轴心 → `y = 高度/2`（保持现状）。**物理上只有一个正确答案，用上面那张表**。§8.2.2 的改法是对的。
 
 **⚠️ 我无法替你验证任何一个包的轴心**（没下载）。**5 行脚本自己量一次，别猜**（跑法见 [assets.md](assets.md) §6.3，记得带 `ResourceLoader.CACHE_MODE_IGNORE`）：
@@ -248,7 +248,7 @@ print("轴心在脚底?", absf(box.position.y) < 0.05, "  → Model.transform.y 
 
 **顺带一个更省事的做法**：不管轴心在哪，**别改 `Model` 的 y**，而是在 `Model` 下面加一层空 `Node3D` 当"对齐节点"，把补偿写在那一层。这样以后换包不用重新想。`Model` **没有任何代码引用，可以随便改名**（[art-onboarding.md](art-onboarding.md) 第五节）。
 
-**另外两个连带项**（换高个子模型时必查，[visual-inventory.md](visual-inventory.md) §8.2）：
+**另外两个连带项**（换高个子模型时必查，[visual-inventory.md](archive/design-notes/visual-inventory.md) §8.2）：
 
 - **相机胸口高 1.5 米写死在 `CameraRig.cs:23`** 的 `TargetOffset = (0,1.5,0)`，`Player.tscn` **没有覆盖它**。换 2.5 米模型 → 在 `Player.tscn` 里覆盖 `TargetOffset.y` 到 ~1.8，或改代码。
 - **手里枪的位置**：`Player.tscn:61-64` 的 `WeaponMount` 在 `(0.36, 1.15, -0.25)` → **手部高度约 1.15 米**。人形模型的**手要对得上这个高度**，否则枪会悬空/穿模。
@@ -288,7 +288,7 @@ print("轴心在脚底?", absf(box.position.y) < 0.05, "  → Model.transform.y 
 
 ### 4.3 坑三：骨骼 / 动画（本项目现在完全没有）
 
-**现状**：全项目 grep `AnimationPlayer|Skeleton3D` → **0 命中**（[visual-inventory.md](visual-inventory.md) §1.3）。**没有一行动画代码。**
+**现状**：全项目 grep `AnimationPlayer|Skeleton3D` → **0 命中**（[visual-inventory.md](archive/design-notes/visual-inventory.md) §1.3）。**没有一行动画代码。**
 
 **接入成本（按由低到高）**：
 

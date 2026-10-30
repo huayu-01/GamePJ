@@ -1,0 +1,58 @@
+{
+  "Date": "2026-10-26T00:35:48",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "clover",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 27.61,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.clover.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.clover.err",
+      "Failure": "",
+      "SHA256": "81DEBFC44B0ED2D4ABE4A67FB3AE4631553E502D14821550919ABB9A11DFD26C"
+    },
+    {
+      "Name": "run_flow",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 7.84,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.run_flow.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.run_flow.err",
+      "Failure": "",
+      "SHA256": "649C45F738762D8FF65E3A3B98F9BB8469455D02598A8F8DF3A70CF109A80CF7"
+    },
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.3,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.content.err",
+      "Failure": "",
+      "SHA256": "16939A3F92702C6B3AF14BDB68C09045711DD3D6DF75BFE5F26FB794342E975F"
+    },
+    {
+      "Name": "adventure",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 23.16,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.adventure.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.adventure.err",
+      "Failure": "",
+      "SHA256": "3D0B15262D1A722F244AF2096CA7387E9FA2EC07AD874AC367650A1BD1B10137"
+    },
+    {
+      "Name": "adventure_render",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 25.16,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.adventure_render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003548.adventure_render.err",
+      "Failure": "",
+      "SHA256": "89705F4866131A2E6435013375B1AC3DFE0D8789167439D63E88D4A93F237684"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

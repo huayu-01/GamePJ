@@ -22,9 +22,18 @@ public partial class RuneScreen : OverlayScreen
 	private readonly List<RuneConfig?> _rows = new();
 	private readonly List<Button> _buttons = new();
 	private int _preview;
+	private string _textRevision = string.Empty;
+	public override void _Process(double delta)
+	{
+		if (!IsOpen || _textRevision == ContentText.Revision) return;
+		_textRevision = ContentText.Revision;
+		for (int i = 0; i < _buttons.Count; i++) _buttons[i].Text = _rows[i]?.LocalizedName ?? "不携带符文";
+		Preview(_preview);
+	}
 	protected override Control Root => _root;
 	public int OptionCount => _rows.Count;
 	public string PreviewId => _rows.ElementAtOrDefault(_preview)?.Id ?? string.Empty;
+	public string UnlockPreviewText => _unlocks.Text;
 	public override void _Ready()
 	{
 		Layer = 11;
@@ -74,7 +83,7 @@ public partial class RuneScreen : OverlayScreen
 		for (int i = 0; i < _rows.Count; i++)
 		{
 			int index = i; RuneConfig? row = _rows[i];
-			var button = new Button { Text = row?.DisplayName ?? "不携带符文", Alignment = HorizontalAlignment.Left, CustomMinimumSize = new Vector2(0, 62), Icon = Icon(row), ExpandIcon = true };
+			var button = new Button { Text = row?.LocalizedName ?? "不携带符文", Alignment = HorizontalAlignment.Left, CustomMinimumSize = new Vector2(0, 62), Icon = Icon(row), ExpandIcon = true };
 			button.AddThemeConstantOverride("icon_max_width", 42);
 			button.FocusEntered += () => Preview(index);
 			button.Pressed += () => { if (!InputBlocked) { Preview(index); EquipPreview(); } };
@@ -88,14 +97,18 @@ public partial class RuneScreen : OverlayScreen
 	{
 		_preview = index;
 		RuneConfig? row = _rows[index];
-		_title.Text = row?.DisplayName ?? "不携带符文";
+		_title.Text = row?.LocalizedName ?? "不携带符文";
 		_icon.Texture = Icon(row);
-		_description.Text = row == null ? "以当前角色和武器的基础配置出击。" : RewardEffectRegistry.Compile(row)?.Description ?? row.DescriptionTemplate;
+		_description.Text = row == null ? "以当前角色和武器的基础配置出击。" : RewardEffectRegistry.Compile(row)?.Description ?? row.LocalizedDescription;
 		var tokens = new HashSet<string>(row?.UnlockList() ?? System.Array.Empty<string>());
 		if (row != null) tokens.Add(row.Id);
-		string[] names = ConfigIndex.Settings.Upgrades.Where(r => r != null && r.Requires.Any(tokens.Contains)).Select(r => r.DisplayName).ToArray();
-		_unlocks.Text = names.Length == 0 ? "没有额外的特化前置解锁。" : "可发现的特化增幅\n" + string.Join(" · ", names);
-		_current.Text = $"当前携带：{RuneCarry.Row?.DisplayName ?? "不携带"}　·　每次出击只能携带一枚";
+		CharacterConfig? character = RunController.CharacterRow(RunSetup.Character);
+		WeaponConfig? weapon = RunController.WeaponRow(RunSetup.Weapon);
+		string[] names = ConfigIndex.Settings.Upgrades.Where(r => r != null && r.Requires.Any(tokens.Contains))
+			.Where(r => character != null && weapon != null && RewardEffectRegistry.Compile(r) is { } definition
+				&& definition.AllowsCharacter(character.Id) && definition.AllowsWeapon(weapon)).Select(r => r.LocalizedName).ToArray();
+		_unlocks.Text = names.Length == 0 ? "当前角色／武器没有额外的特化前置解锁。" : "当前配装可发现的特化增幅\n" + string.Join(" · ", names);
+		_current.Text = $"当前携带：{RuneCarry.Row?.LocalizedName ?? "不携带"}　·　每次出击只能携带一枚";
 		bool carried = PreviewId == RuneCarry.Current;
 		_equip.Text = carried ? "✓ 已携带" : row == null ? "不携带符文" : "携带";
 		_equip.Disabled = carried;

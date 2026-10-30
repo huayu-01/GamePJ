@@ -1,7 +1,10 @@
-# 只管理本脚本的验证进程，每个构建/运行期间独占工作区验证锁。
+﻿# 只管理本脚本的验证进程，每个构建/运行期间独占工作区验证锁。
 param([switch]$ProbeOnly, [switch]$SkipImport, [switch]$Before)
 $ErrorActionPreference = 'Stop'
 $projectDir = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
+. (Join-Path $projectDir '_tools/Validation.Common.ps1')
+. (Join-Path $projectDir '_tools/LogPaths.ps1')
+Initialize-ProjectLogPaths -ProjectRoot $projectDir
 $enginePath = 'F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
 $evidence = [System.Collections.Generic.List[string]]::new()
 $script:validationStarted = $false
@@ -15,7 +18,7 @@ foreach ($name in @('meta.cfg', 'ability_cards.cfg', 'settings.cfg')) {
 
 function Open-ValidationLock {
     try {
-        $handle = [System.IO.File]::Open((Join-Path $projectDir '.ai_validation.lock'), 'OpenOrCreate', 'ReadWrite', 'None')
+        $handle = [System.IO.File]::Open((Get-ProjectValidationLockPath $projectDir), 'OpenOrCreate', 'ReadWrite', 'None')
         $script:validationStarted = $true
         return $handle
     }
@@ -26,8 +29,8 @@ function Invoke-OwnedProcess([string]$Name, [string[]]$RunArgs) {
     $validationLock = Open-ValidationLock
     $ownedProcess = $null
     try {
-        $stdoutPath = Join-Path $projectDir ".ai_art_$Name.log"
-        $stderrPath = Join-Path $projectDir ".ai_art_$Name.err"
+        $stdoutPath = Join-Path $projectDir "Logs/validation/art_$Name.log"
+        $stderrPath = Join-Path $projectDir "Logs/validation/art_$Name.err"
         $ownedProcess = Start-Process -FilePath $enginePath -ArgumentList $RunArgs -WindowStyle Hidden -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru
         $deadline = (Get-Date).AddSeconds(160)
         while (-not $ownedProcess.HasExited -and (Get-Date) -lt $deadline) {
@@ -55,9 +58,9 @@ try {
     if (-not $ProbeOnly) {
         $validationLock = Open-ValidationLock
         try {
-            & 'F:\Godot项目\项目a\build.ps1' --no-incremental -v minimal | Tee-Object -FilePath '.ai_art_build.log'
+            & 'F:\Godot项目\项目a\build.ps1' --no-incremental -v minimal | Tee-Object -FilePath 'Logs/validation/art_build.log'
             if ($LASTEXITCODE -ne 0) { throw '构建失败' }
-            $output = Get-Content '.ai_art_build.log' -Raw
+            $output = Get-Content 'Logs/validation/art_build.log' -Raw
             if ($output -notmatch '0 个警告' -or $output -notmatch '0 个错误') { throw '构建必须0warning/0error' }
             $evidence.Add('build.ps1 --no-incremental -v minimal：0 warning / 0 error')
         }
@@ -65,14 +68,14 @@ try {
         if (-not $SkipImport) { Invoke-OwnedProcess 'import' @('--headless', '--path', $projectDir, '--import', '--mcp-port=19081') }
     }
     Invoke-OwnedProcess 'probe' @('--path', $projectDir, '--resolution', '1920x1080', '--quit-after', '2400', 'res://Scenes/ArtRefresh/ArtRefreshProbe.tscn')
-    $lines = Get-Content '.ai_art_probe.log'
+    $lines = Get-Content 'Logs/validation/art_probe.log'
     if (($lines -join "`n") -notmatch '验收结束：通过 \d+，失败 0') { throw '美术探针未完整通过' }
     foreach ($line in $lines | Where-Object { $_.StartsWith('[ArtRefresh]') }) { $evidence.Add($line) }
     Invoke-OwnedProcess 'gameplay' @('--path', $projectDir, '--resolution', '1920x1080', '--quit-after', '1200', 'res://Scenes/ArtRefresh/GameplaySmoke.tscn')
-    foreach ($line in Get-Content '.ai_art_gameplay.log' | Where-Object { $_.StartsWith('[ArtRefresh]') }) { $evidence.Add($line) }
+    foreach ($line in Get-Content 'Logs/validation/art_gameplay.log' | Where-Object { $_.StartsWith('[ArtRefresh]') }) { $evidence.Add($line) }
     if (-not $ProbeOnly) {
         Invoke-OwnedProcess 'selftest' @('--headless', '--path', $projectDir, '--quit-after', '40000', 'res://Scenes/Main.tscn', '--', '--selftest')
-        $lines = Get-Content '.ai_art_selftest.log'
+        $lines = Get-Content 'Logs/validation/art_selftest.log'
         if (($lines -join "`n") -notmatch '=== 自测结束 ===') { throw '自测缺少结束标记' }
         $baseline = Get-Content 'docs/e-batch-evidence.log'
         foreach ($marker in @('配置表：武器 6', '节点布置：启用', '配置表比对·玩家：', '配置表比对·索引：', 'Pressure 测试（进化', '白板首领实例：', '端到端：按 F 之后', '最小闭环·链路：')) {
@@ -88,12 +91,12 @@ try {
         foreach ($pair in @(@('TestArena', 'arena'), @('Base', 'base'))) {
             $source = ((& git show "d4270fc:Scenes/Levels/$($pair[0]).tscn") -join "`n") -replace ' uid="[^"]+"', ''
             if ($LASTEXITCODE -ne 0) { throw '无法读取比较基线d4270fc' }
-            $comparisonName = ".ai_art_before_$($pair[1])_$comparisonId.tscn"
+            $comparisonName = "Logs/validation/art_before_$($pair[1])_$comparisonId.tscn"
             $comparisonScenes.Add((Join-Path $projectDir $comparisonName))
             [System.IO.File]::WriteAllText($comparisonScenes[$comparisonScenes.Count - 1], $source + "`n", [System.Text.UTF8Encoding]::new($false))
         }
-        $arenaArg = '--before-arena=res://' + [System.IO.Path]::GetFileName($comparisonScenes[0])
-        $baseArg = '--before-base=res://' + [System.IO.Path]::GetFileName($comparisonScenes[1])
+        $arenaArg = '--before-arena=res://' + 'Logs/validation/' + [System.IO.Path]::GetFileName($comparisonScenes[0])
+        $baseArg = '--before-base=res://' + 'Logs/validation/' + [System.IO.Path]::GetFileName($comparisonScenes[1])
         Invoke-OwnedProcess 'before' @('--path', $projectDir, '--resolution', '1920x1080', '--quit-after', '2400', 'res://Scenes/ArtRefresh/ArtRefreshProbe.tscn', '--', '--before', $arenaArg, $baseArg)
     }
     foreach ($name in $saveHashes.Keys) {

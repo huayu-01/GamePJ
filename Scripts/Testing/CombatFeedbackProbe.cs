@@ -186,6 +186,6 @@ public partial class CombatFeedbackProbe : Node3D
 		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng("res://docs/screenshots/j38_combat_feedback.png") == Error.Ok, "渲染反馈截图保存成功");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j38_combat_feedback.png")) == Error.Ok, "渲染反馈截图保存成功");
 	}
 }

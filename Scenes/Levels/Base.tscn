@@ -1,7 +1,7 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://Scripts/Interaction/BaseTerminal.cs" id="2_terminal"]
+[ext_resource type="Script" path="res://Scripts/Interaction/InteractionComponent.cs" id="2_interaction"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/StartScreen.tscn" id="4_start"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/LoadingScreen.tscn" id="6_loading"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/BossPreviewScreen.tscn" id="7_preview"]
@@ -19,41 +19,14 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="26_hud"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/WorldOverlay.tscn" id="27_world"]
 [ext_resource type="Script" path="res://Scripts/Run/CharacterRoster.cs" id="28_roster"]
-[ext_resource type="PackedScene" path="res://Scenes/Interactables/CharacterStand.tscn" id="29_stand"]
 [ext_resource type="Script" path="res://Scripts/Visual/ToonPass.cs" id="30_toon"]
 
 [sub_resource type="BoxShape3D" id="Shape_ground"]
 size = Vector3(26, 1, 26)
 
-[sub_resource type="StandardMaterial3D" id="Mat_ground"]
-albedo_color = Color(0.22, 0.24, 0.28, 1)
-
 [sub_resource type="BoxMesh" id="Mesh_ground"]
 material = ExtResource("21_ground")
 size = Vector3(26, 1, 26)
-
-[sub_resource type="StandardMaterial3D" id="Mat_upgrade"]
-albedo_color = Color(0.35, 0.75, 0.45, 1)
-emission_enabled = true
-emission = Color(0.12, 0.35, 0.18, 1)
-
-[sub_resource type="StandardMaterial3D" id="Mat_loadout"]
-albedo_color = Color(0.4, 0.6, 0.95, 1)
-emission_enabled = true
-emission = Color(0.12, 0.2, 0.4, 1)
-
-[sub_resource type="StandardMaterial3D" id="Mat_help"]
-albedo_color = Color(0.95, 0.85, 0.4, 1)
-emission_enabled = true
-emission = Color(0.35, 0.3, 0.1, 1)
-
-[sub_resource type="StandardMaterial3D" id="Mat_gate"]
-albedo_color = Color(0.9, 0.35, 0.35, 1)
-emission_enabled = true
-emission = Color(0.4, 0.12, 0.12, 1)
-
-[sub_resource type="BoxMesh" id="Mesh_terminal"]
-size = Vector3(1.6, 2.2, 1.6)
 
 [node name="Base" type="Node3D"]
 
@@ -107,36 +80,29 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 9)
 script = ExtResource("10_loadout")
 
 [node name="TerminalUpgrades" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.1, 0)
-script = ExtResource("2_terminal")
-Kind = 0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="TerminalUpgrades"]
-mesh = SubResource("Mesh_terminal")
-material_override = SubResource("Mat_upgrade")
+[node name="InteractionComponent" type="Node3D" parent="TerminalUpgrades"]
+script = ExtResource("2_interaction")
+Kind = 11
 
 [node name="CharacterRoster" type="Node3D" parent="."]
 script = ExtResource("28_roster")
-StandScene = ExtResource("29_stand")
 
 [node name="TerminalHelp" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.1, 4)
-script = ExtResource("2_terminal")
-Kind = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 4)
 
-[node name="Mesh" type="MeshInstance3D" parent="TerminalHelp"]
-mesh = SubResource("Mesh_terminal")
-material_override = SubResource("Mat_help")
+[node name="InteractionComponent" type="Node3D" parent="TerminalHelp"]
+script = ExtResource("2_interaction")
+Kind = 14
 
 [node name="TerminalGate" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.1, 0)
-script = ExtResource("2_terminal")
-Kind = 3
-TargetScene = "res://Scenes/Main.tscn"
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="TerminalGate"]
-mesh = SubResource("Mesh_terminal")
-material_override = SubResource("Mat_gate")
+[node name="InteractionComponent" type="Node3D" parent="TerminalGate"]
+script = ExtResource("2_interaction")
+Kind = 10
+TargetScene = "res://Scenes/Expedition.tscn"
 
 [node name="Screens" type="Node" parent="."]
 

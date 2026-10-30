@@ -42,13 +42,8 @@ public partial class AbilityConfig : ConfigRow
 	/// </summary>
 	[Export] public string InputAction { get; set; } = string.Empty;
 
-	[ExportGroup("技能栏（只供HUD读取，不参与战斗）")]
-	[Export] public Texture2D? HudIcon { get; set; }
-	[Export] public Color HudColor { get; set; } = new(0.45f, 0.88f, 0.85f);
-	[Export] public int HudOrder { get; set; }
-
 	/// <summary>按住式输入（蓄力类技能用）：按住期间每帧回调，松开时回调一次"释放"。</summary>
-	[Export] public bool HoldToCharge { get; set; }
+	public virtual bool HoldToCharge { get; set; }
 	[Export] public bool IsBackground { get; set; }
 	[Export] public bool HoldToMaintain { get; set; }
 	[Export] public float MaintainStartupSeconds { get; set; }
@@ -60,10 +55,9 @@ public partial class AbilityConfig : ConfigRow
 	[Export] public Ability.MovementPolicy ActionMovement { get; set; }
 	/// <summary>灵动等被动是否授予移动攻击；只由AirJumpPassiveAbility消费。</summary>
 	[Export] public bool GrantAttackMovement { get; set; }
-	[ExportGroup("下落攻击（强类型参数）")]
-	[Export] public FallAttackTuning? FallAttack { get; set; }
+	/// <summary>兼容通用配置消费接口；只有FallAbilityConfig导出该字段。</summary>
+	public virtual FallAttackTuning? FallAttack { get; set; }
 
-	[ExportGroup("连招（P4：近战武技1 的「每段一段动画」；只有 MeleeComboAbility 读它）")]
 	/// <summary>
 	/// **这个技能的连招参数行**（`Config/Tables/SkillSeries/*.tres` 里的一个 <see cref="AbilitySeries"/>）：
 	/// 每段动画名 / 每段命中盒 / 每段伤害倍率 / 斩断子弹的名单。**留空 = 这个技能不是连招**。
@@ -76,7 +70,7 @@ public partial class AbilityConfig : ConfigRow
 	///
 	/// <para>为什么"一串参数"要落成独立资源而不是这里的一堆数组列：见 <see cref="AbilitySeries"/> 的类注释。</para>
 	/// </summary>
-	[Export] public AbilitySeries? ComboSeries { get; set; }
+	public virtual AbilitySeries? ComboSeries { get; set; }
 
 	[ExportGroup("动画（「没有对应动画 → 技能不执行」，用户裁定）")]
 	/// <summary>
@@ -101,7 +95,7 @@ public partial class AbilityConfig : ConfigRow
 	/// <summary>动画速度倍率（&gt;1 加速释放，蓄力类 &lt;1 拉长）。写在每个单位自己的播放器上。</summary>
 	[Export] public float AnimSpeedScale { get; set; } = 1f;
 	/// <summary>松手释放段的独立速度；不能沿用蓄力期的慢放倍率。</summary>
-	[Export] public float ChargeReleaseAnimSpeedScale { get; set; } = 1f;
+	public virtual float ChargeReleaseAnimSpeedScale { get; set; } = 1f;
 
 	[ExportGroup("冷却缩减 / 技能层数（**0 = 不覆盖**）")]
 	/// <summary>
@@ -120,30 +114,29 @@ public partial class AbilityConfig : ConfigRow
 	/// <summary>每层回复间隔（秒；**≤0 = 不覆盖**，退化成 <see cref="Cooldown"/>）。文档给的参考值是 0.5s。</summary>
 	[Export] public float RechargeSeconds { get; set; }
 
-	[ExportGroup("蓄力（按住激活 → 抬起释放；数值全在这一组，代码里没有硬编码）")]
 	/// <summary>
 	/// 基础蓄力时长（秒）；未完成时按AllowEarlyChargeRelease决定低伤释放或取消。
 	/// 只在 <see cref="HoldToCharge"/> 为 true 时有意义；0 = 按住即算蓄满。
 	/// </summary>
-	[Export] public float ChargeBaseSeconds { get; set; }
+	public virtual float ChargeBaseSeconds { get; set; }
 	/// <summary>仅指定技能启用未蓄满低伤释放；留空仍取消。</summary>
-	[Export] public bool AllowEarlyChargeRelease { get; set; }
-	[Export(PropertyHint.Range, "0,1,0.01")] public float EarlyReleaseDamageScale { get; set; } = 0.5f;
+	public virtual bool AllowEarlyChargeRelease { get; set; }
+	public virtual float EarlyReleaseDamageScale { get; set; } = 0.5f;
 
 	/// <summary>后置蓄力：基础蓄满后每多少秒升一档（≤0 = 没有后置蓄力）。弓 0.1 / 飞刀 0.2 / 长枪 0.25。</summary>
-	[Export] public float ChargeStepSeconds { get; set; }
+	public virtual float ChargeStepSeconds { get; set; }
 
 	/// <summary>每档的威力倍率（1.3 = 每档 +30%；**≤0 = 不覆盖**，保留 1 = 不增强）。</summary>
-	[Export] public float ChargeStepScale { get; set; }
+	public virtual float ChargeStepScale { get; set; }
 
 	/// <summary>后置蓄力最多几档（≤0 = 不限，由 <see cref="ChargeMaxSeconds"/> 封顶）。飞刀 = 3（+6 支）。</summary>
-	[Export] public int ChargeMaxSteps { get; set; }
+	public virtual int ChargeMaxSteps { get; set; }
 
 	/// <summary>后置蓄力的总时长上限（秒；≤0 = 不限）。弓「最多蓄力 1 秒」→ 1。</summary>
-	[Export] public float ChargeMaxSeconds { get; set; }
+	public virtual float ChargeMaxSeconds { get; set; }
 
 	/// <summary>完美时机窗口（秒；≤0 = 没有完美时机）。文档（能量掌武技2）：0.2s。</summary>
-	[Export] public float PerfectWindowSeconds { get; set; }
+	public virtual float PerfectWindowSeconds { get; set; }
 
 	[ExportGroup("通用项（多数技能填这一组）")]
 	/// <summary>释放方向来源（行里给了就用行里的；所有行都会显式给出，与场景里的值一致）。</summary>
@@ -177,15 +170,14 @@ public partial class AbilityConfig : ConfigRow
 	/// </summary>
 	[Export] public ParamEntry[] AttackParams { get; set; } = System.Array.Empty<ParamEntry>();
 
-	[ExportGroup("首领行为技能（Boss Build；这两列只有技能行用）")]
 	/// <summary>
 	/// 处理器 id（<c>BossPerkCatalog</c> 里注册的字符串）。**留空 = 这是一条普通单位技能行**；
 	/// 非空 = 这是一条首领行为技能（`bhv_*.tres`），会被编译成运行期条目参与 Boss Build 抽取。
 	/// </summary>
-	[Export] public string ApplyHandler { get; set; } = string.Empty;
+	public virtual string ApplyHandler { get; set; } = string.Empty;
 
 	/// <summary>抽中概率（只在 <see cref="ApplyHandler"/> 非空时有意义）。</summary>
-	[Export] public float Weight { get; set; } = 1f;
+	public virtual float Weight { get; set; } = 1f;
 
 	/// <summary>这条行是不是"首领行为技能"（Boss Build），而不是挂在单位身上的普通技能。</summary>
 	public bool IsBossBuild => !string.IsNullOrEmpty(ApplyHandler);
@@ -218,21 +210,14 @@ public partial class AbilityConfig : ConfigRow
 		ability.InterruptLockSeconds = Mathf.Max(0, InterruptLockSeconds);
 		ability.AnimationEventTimeout = Mathf.Max(0.01f, AnimationEventTimeout);
 		ability.ActionMovement = ActionMovement;
-		if (ability is AirJumpPassiveAbility agility) agility.GrantAttackMovement = GrantAttackMovement;
+		if (ability is IAbilityConfigConsumer before) before.ConfigureBeforeParameters(this);
 		ability.AnimName = AnimName;
 		ability.AnimEvent = AnimEvent;
 		ability.AnimEventEnd = AnimEventEnd;
 		ability.AnimSpeedScale = AnimSpeedScale <= 0f ? 1f : AnimSpeedScale;
 		ability.ChargeReleaseAnimSpeedScale = Mathf.Max(0.01f, ChargeReleaseAnimSpeedScale);
 
-		// 连招参数行（P8）：**强类型赋值**。只有 `MeleeComboAbility` 有 `Series` 这一个字段，
-		// 所以这里用类型判断挑出来 —— 其它能力子类没有它，跳过它不是"错配"（不写警告）。
-		// ⚠️ 这里**不再走 Get()/Set() 字符串反射**：属性名写错时反射不报错、只是静默不生效
-		// （旧的 `ComboSeriesPath` 就是这么一条脆弱机制，P8 删掉了）。
-		if (ComboSeries != null && ability is MeleeComboAbility comboAbility)
-		{
-			comboAbility.Series = ComboSeries;
-		}
+		// 连招等专用参数由能力自身的配置接口消费，仍在通用 Params 之前应用。
 
 		// 冷却缩减 / 层数 / 蓄力：**0 = 不覆盖**（保留场景值），与 Cooldown 同一条纪律。
 		if (CooldownMultiplier > 0f)
@@ -300,7 +285,7 @@ public partial class AbilityConfig : ConfigRow
 		}
 
 		ApplyAttackParams(ability);
-		if (ability is FallAttackAbility fall) FallAttack?.ApplyTo(fall);
+		if (ability is IAbilityConfigConsumer after) after.ConfigureAfterParameters(this);
 	}
 
 	/// <summary>命中体参数 → 这个技能的命中体（没有命中体时退到武器组件）。</summary>

@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_stage")
+NumericId = 1207
 Id = "stg_outer"
 DisplayName = "Stage 1 · 外围"
 CombatBudget = 10.0
@@ -12,9 +13,7 @@ SpawnInterval = 2.0
 EnemyHealthMultiplier = 1.0
 EnemyDamageMultiplier = 1.0
 EliteChanceScale = 0.0
-AllowedEnemyIds = PackedStringArray("enemy_chaser", "enemy_fast_melee", "enemy_exploder")
-RewardNodeCount = 3
-FreeChallengeQuota = 2
+AllowedEnemyIds = PackedStringArray("enemy_chaser", "enemy_fast_melee", "enemy_exploder", "1339")
 BossGuardCount = 2
 BossHealthMultiplier = 1.0
 BossDamageMultiplier = 1.0

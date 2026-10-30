@@ -57,21 +57,28 @@ public partial class Unit : CharacterBody3D
 	private float _startingArmor;
 
 	/// <summary>
-	/// 由 <see cref="GrantArmor"/> 累积的**额外护甲**（精英怪的 <c>EliteModifier.ArmorAdd</c> 走这里）。
+	/// 由 <see cref="GrantArmor"/> 累积的额外护甲；精英比例授甲由独立初始化来源提供。
 	/// 护甲没有上限，所以它不是"上限"、也不进 <c>StatSheet</c>；记一份是为了让
 	/// "进树前就加了甲"（子节点 <c>_Ready</c> 早于单位本身）与"进树后加甲"结果一致。
 	/// </summary>
 	private float _armorBonus;
+	private readonly List<(IInitialArmorBonus Source, float Granted)> _initialArmorBonuses = new();
 
 	private float _baseMaxShield;
 
 	/// <summary>可选的移动能力组件（名为 Movement 的子节点）。没有移动能力的单位该属性为 null。</summary>
 	public CharacterMovement? Movement { get; private set; }
+	public ActRoguelike.AI.UnitNavigation? Navigation { get; private set; }
 
 	public float Health { get; private set; }
 
 	/// <summary>当前护甲。**没有上限**（用户 C1）：被打就减，只在 <see cref="GrantArmor"/> 时增加。</summary>
-	public float Armor { get; private set; }
+	private float _armor;
+	public float Armor
+	{
+		get => _armor;
+		private set { if (_armor == value) return; _armor = value; ArmorChanged?.Invoke(); }
+	}
 
 	/// <summary>
 	/// 这个单位**见过的最高护甲值**（运行期派生，只增不减）。
@@ -85,12 +92,21 @@ public partial class Unit : CharacterBody3D
 	public float Shield { get; private set; }
 	public bool IsDead { get; private set; }
 	public bool IsInvulnerable { get; set; }
+	internal void RestoreAdventureVitals(float health, float armor, float shield, float armorPeak)
+	{
+		Health = Mathf.Clamp(health, 1f, MaxHealth); Armor = Mathf.Max(0f, armor);
+		Shield = Mathf.Clamp(shield, 0f, MaxShield); ArmorPeak = Mathf.Max(Armor, armorPeak);
+		_armorBonus = Mathf.Max(0f, Armor - _startingArmor);
+	}
 
 	public event Action<HitInstance>? HitReceived;
 	public event Action<DamageResult, HitInstance>? Damaged;
 	public event Action<HitInstance>? Died;
 	public event Action<Unit, HitInstance>? KillConfirmed;
 	public event Action? ArmorBroke;
+	/// <summary>只读表现订阅数值变化；不替代破甲和伤害事实。</summary>
+	public event Action? ArmorChanged;
+	public event Action? StatusesChanged;
 	public event Action? ShieldBroke;
 	public event Action<Vector3>? KnockbackReceived;
 	public CombatReaction? Reactions { get; private set; }
@@ -143,11 +159,12 @@ public partial class Unit : CharacterBody3D
 		if (ImpactPause == null) { ImpactPause = new ImpactPause { Name = "ImpactPause" }; AddChild(ImpactPause); }
 		Reactions = GetNodeOrNull<CombatReaction>("Reactions");
 		if (Reactions == null) { Reactions = new CombatReaction { Name = "Reactions" }; AddChild(Reactions); }
-		if (GetNodeOrNull<ActRoguelike.AI.EnemyBrain>("Brain") != null && GetNodeOrNull<ActRoguelike.AI.UnitNavigation>("Navigation") == null)
+		if ((Faction == Faction.Enemy || GetNodeOrNull<ActRoguelike.AI.EnemyBrain>("Brain") != null) && GetNodeOrNull<ActRoguelike.AI.UnitNavigation>("Navigation") == null)
 			AddChild(new ActRoguelike.AI.UnitNavigation { Name = "Navigation" });
+		Navigation = GetNodeOrNull<ActRoguelike.AI.UnitNavigation>("Navigation");
 		CollisionLayer = CombatLayers.BodyLayerOf(Faction);
-		// 共用身体层负责单位间阻挡；阵营层只供攻击盒和弹道选择目标。
-		CollisionMask = CombatLayers.BodyMask;
+		// 拥挤策略选择身体阻挡掩码；阵营层继续供攻击盒和弹道选择目标。
+		CollisionMask = EnemyCrowdConfig.BodyMaskFor(this);
 		// 召唤物单独归组：避免被当成玩家（ResolvePlayer 之类只认 player_units），
 		// 也不会被敌人的目标选择盯上（Targeting 按阵营选组）。
 		AddToGroup(HasTag("Summon") ? "summon_units" : Faction == Faction.Player ? "player_units" : "enemy_units");
@@ -184,12 +201,38 @@ public partial class Unit : CharacterBody3D
 	/// </summary>
 	private void FillArmor()
 	{
-		Armor = _armorHealthRatio > 0f ? 0f : Mathf.Max(0f, _startingArmor + _armorBonus);
+		float initialBonus = 0;
+		for (int index = 0; index < _initialArmorBonuses.Count; index++)
+		{
+			var entry = _initialArmorBonuses[index];
+			float amount = Mathf.Max(0, entry.Source.ArmorFor(this));
+			_initialArmorBonuses[index] = (entry.Source, amount);
+			initialBonus += amount;
+		}
+		Armor = _armorHealthRatio > 0f ? 0f : Mathf.Max(0f, _startingArmor + _armorBonus + initialBonus);
 		ArmorPeak = Mathf.Max(ArmorPeak, Armor);
 	}
 
+	/// <summary>挂载后立即授予一次；之后只在显式初始化/回满时重新按最终属性计算，不累计重复授予。</summary>
+	public void AddInitialArmorBonus(IInitialArmorBonus source)
+	{
+		foreach (var entry in _initialArmorBonuses) if (ReferenceEquals(entry.Source, source)) return;
+		float amount = Mathf.Max(0, source.ArmorFor(this));
+		_initialArmorBonuses.Add((source, amount));
+		Armor = Mathf.Max(0, Armor + amount); ArmorPeak = Mathf.Max(ArmorPeak, Armor);
+	}
+	public void RemoveInitialArmorBonus(IInitialArmorBonus source)
+	{
+		for (int index = _initialArmorBonuses.Count - 1; index >= 0; index--)
+			if (ReferenceEquals(_initialArmorBonuses[index].Source, source))
+			{
+				Armor = Mathf.Max(0, Armor - _initialArmorBonuses[index].Granted);
+				_initialArmorBonuses.RemoveAt(index);
+			}
+	}
+
 	/// <summary>
-	/// **直接加护甲**（护甲没有上限，用户 C1）：精英怪的 <c>EliteModifier.ArmorAdd</c> 走这里，
+	/// **直接加护甲**（护甲没有上限，用户 C1）：玩家奖励、符文和重铸等固定加甲走这里，
 	/// 取代原来的 <c>MaxArmorAdd</c> 修正器 —— 那个修正是"抬高上限"，现在没有上限这回事了。
 	///
 	/// 允许在**进树前**调用（精英组件挂在单位下，子节点的 <c>_Ready</c> 早于单位本身的 <c>_Ready</c>）：
@@ -294,6 +337,7 @@ public partial class Unit : CharacterBody3D
 		//    ⚠️ 因为"0"在这里是**有意义的值**（禁疗）而不是"没配"，所以基础值必须在构造函数里就位
 		//    （SeedStats 在 `Unit()` 里无条件跑一次），读取端不能再用"读到 0 就按 1 算"那套兜底。
 		Stats.SetBase("HealMultiplier", 1f);
+		Stats.SetBase("IncomingHealthDamageMultiplier", 1f);
 	}
 
 	/// <summary>修正器变化后重算派生属性（增益/精英/状态效果都会调用）。</summary>
@@ -336,7 +380,7 @@ public partial class Unit : CharacterBody3D
 	/// <summary>纯击退入口，复用单位乘区、无敌与移动组件抗性。</summary>
 	public bool ReceiveKnockback(Vector3 impulse)
 	{
-		if (IsDead || IsInvulnerable || Movement?.IsControlImmune == true || !impulse.IsFinite() || impulse.LengthSquared() < 0.000001f) return false;
+		if (IsDead || IsInvulnerable || Movement?.IsControlImmune == true || HasTraitControlImmunity || !impulse.IsFinite() || impulse.LengthSquared() < 0.000001f) return false;
 		// 纯击退不伪造伤害／命中事件；抗性仍由移动组件消费。
 		KnockbackReceived?.Invoke(impulse * Stats.Get("KnockbackMultiplier"));
 		return true;
@@ -344,14 +388,14 @@ public partial class Unit : CharacterBody3D
 	/// <summary>持续战斗力不伪造命中；环境风场可直接调用Movement.SetForce绕过战斗免疫。</summary>
 	public bool ReceiveForce(object source, Vector3 force, float seconds)
 	{
-		if (IsDead || IsInvulnerable || Movement == null || Movement.IsControlImmune || !force.IsFinite() || !float.IsFinite(seconds) || seconds <= 0f) return false;
+		if (IsDead || IsInvulnerable || HasTraitControlImmunity || Movement == null || Movement.IsControlImmune || !force.IsFinite() || !float.IsFinite(seconds) || seconds <= 0f) return false;
 		Movement.SetForce(source, force * Stats.Get("KnockbackMultiplier") * (1f - Mathf.Clamp(KnockbackResistance, 0f, 1f)), seconds);
 		return true;
 	}
 	public bool ReceiveHeightSuppression(object source, float height, float seconds) =>
-		!IsDead && !IsInvulnerable && Movement?.SuppressFlightHeight(source, height, seconds) == true;
+		!IsDead && !IsInvulnerable && !HasTraitControlImmunity && Movement?.SuppressFlightHeight(source, height, seconds) == true;
 	public bool ReceiveKnockDown(float downwardSpeed) =>
-		!IsDead && !IsInvulnerable && Movement?.TryKnockDown(downwardSpeed) == true;
+		!IsDead && !IsInvulnerable && !HasTraitControlImmunity && Movement?.TryKnockDown(downwardSpeed) == true;
 
 	/// <summary>统一命中入口。顺序见 战斗规则说明 §12：命中 → 无敌 → 格挡 → 减伤 → 护甲 → 护盾 → 生命。</summary>
 	public DamageResult ReceiveHit(HitInstance hit)
@@ -362,6 +406,8 @@ public partial class Unit : CharacterBody3D
 		}
 
 		// OnHit 与 OnDamage 分开：命中无敌单位也算命中（§13）。
+		if (!hit.Transferred)
+		{
 		HitReceived?.Invoke(hit);
 		GameplayEventBus.Raise(new GameplayEvent
 		{
@@ -376,8 +422,10 @@ public partial class Unit : CharacterBody3D
 			Position = hit.Position,
 			Context = hit.Context,
 		});
+		}
+		if (IsDead) return DamageResult.Miss;
 
-		if (IsInvulnerable || hit.Negated)
+		if (IsInvulnerable || hit.Negated || BlockIncomingByRule(hit))
 		{
 			var avoided = new DamageResult { Hit = true, Invulnerable = true };
 			CombatFeedback.Present(this, hit, avoided);
@@ -385,9 +433,13 @@ public partial class Unit : CharacterBody3D
 		}
 
 		float blocked = ResolveBlock(hit);
+		if (blocked < 1f) RaiseBlocked(hit);
 		// ⭐ J11：「战神印」的"受到的伤害 +300%"（= 承受 4 倍）。基础值 1，`x × 1.0f` 与改动前逐位相等。
 		float incoming = Stats.Get("IncomingDamageMultiplier");
-		float damage = Mathf.Max(0f, hit.Damage * blocked * (1f - CombinedDamageReduction()) * (incoming > 0f ? incoming : 1f));
+		float assigned = blocked > 0f ? AdjustIncomingByRules(hit, hit.Damage) : hit.Damage;
+		// 链接分摊的接收者可能触发死亡连锁；本体若已在连锁中死亡，不再重复结算和广播死亡。
+		if (IsDead) return DamageResult.Miss;
+		float damage = Mathf.Max(0f, assigned * blocked * (1f - CombinedDamageReduction()) * (incoming > 0f ? incoming : 1f));
 
 		float remaining = damage;
 		bool hadArmor = Armor > 0;
@@ -421,12 +473,12 @@ public partial class Unit : CharacterBody3D
 			}
 		}
 
-		if (remaining > 0f && Shield > 0f)
+		if (remaining > 0f && (Shield > 0f || TemporaryShield > 0f))
 		{
-			shieldLost = Mathf.Min(Shield, remaining);
-			Shield -= shieldLost;
-			remaining -= shieldLost;
-			if (Shield <= 0f)
+			shieldLost = ConsumeTemporaryShield(remaining); remaining -= shieldLost;
+			float regularLost = Mathf.Min(Shield, remaining); Shield -= regularLost;
+			remaining -= regularLost; shieldLost += regularLost;
+			if (Shield + TemporaryShield <= 0f)
 			{
 				ShieldBroke?.Invoke();
 				// P6a：同上 —— `ShieldBroken` 的**唯一**抛点（护盾被打光那一刻）。
@@ -445,6 +497,8 @@ public partial class Unit : CharacterBody3D
 
 		if (remaining > 0f)
 		{
+			float scaled = remaining * Mathf.Max(0, Stats.Get("IncomingHealthDamageMultiplier"));
+			damage += scaled - remaining; remaining = scaled;
 			healthLost = Mathf.Min(Health, remaining);
 			Health -= healthLost;
 		}
@@ -486,7 +540,7 @@ public partial class Unit : CharacterBody3D
 		Reactions?.ReceiveDamage(result, hit, hadArmor);
 
 		// 状态效果与伤害本体分离：命中就附加，与伤害数值无关（§20）。
-		if (hit.Attack?.Status is { } status)
+		if (!hit.Transferred && hit.Attack?.Status is { } status)
 		{
 			ApplyStatus(status, hit.Attacker, string.IsNullOrEmpty(hit.Attack.AbilityKind) ? hit.Attack.Ability : hit.Attack.AbilityKind);
 		}
@@ -495,11 +549,12 @@ public partial class Unit : CharacterBody3D
 		{
 			Kind = GameplayEventKind.Damaged,
 			Attack = hit.Attack,
-			IsSecondary = hit.Attack?.IsSecondary == true,
+			IsSecondary = hit.Transferred || hit.Attack?.IsSecondary == true,
 			IsDamageOverTime = hit.Attack?.IsDamageOverTime == true,
 			Source = hit.Attacker,
 			Target = this,
 			Value = result.HealthLost,
+			DamageApplied = result.ArmorLost + result.ShieldLost + result.HealthLost,
 			Tag = hit.Attack?.Ability ?? string.Empty,
 			Position = hit.Position,
 			Context = hit.Context,
@@ -509,7 +564,7 @@ public partial class Unit : CharacterBody3D
 		// 判据用的是 `HitInstance.Critical`（= 攻击方按 `CritChance` 掷出来的那一次），
 		// 不是"伤害数字大" —— 语义与 `DamageResult.Critical` 同一份来源，不会漂移。
 		// 触发者判据（Source == 玩家）交给订阅方（`TablePulseRule` 的 `mine`），所以敌人的暴击也不会误触发玩家的增幅。
-		if (hit.Critical && damage > 0f)
+		if (!hit.Transferred && hit.Critical && damage > 0f)
 		{
 			GameplayEventBus.Raise(new GameplayEvent
 			{
@@ -528,7 +583,7 @@ public partial class Unit : CharacterBody3D
 		{
 			Die(hit);
 		}
-		else if (damage > 0f && hit.Knockback > 0f && Movement?.IsControlImmune != true)
+		else if (damage > 0f && hit.Knockback > 0f && Movement?.IsControlImmune != true && !HasTraitControlImmunity)
 		{
 			float scale = Stats.Get("KnockbackMultiplier");
 			KnockbackReceived?.Invoke(hit.Direction.Normalized() * hit.Knockback * scale);
@@ -556,6 +611,8 @@ public partial class Unit : CharacterBody3D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		using var frameProfile=ActRoguelike.Core.RuntimeFrameProfiler.Measure("Unit");
+		TickTemporaryShields((float)delta);
 		if (IsDead || _statuses.Count == 0)
 		{
 			return;
@@ -598,6 +655,7 @@ public partial class Unit : CharacterBody3D
 				Stats.RemoveBySource(status);
 				_statuses.RemoveAt(i);
 				RefreshStats();
+				StatusesChanged?.Invoke();
 			}
 		}
 	}
@@ -626,7 +684,7 @@ public partial class Unit : CharacterBody3D
 	/// </summary>
 	public void ApplyStatus(StatusEffect effect, Unit? source = null, string sourceAbilityKind = "")
 	{
-		if (IsDead)
+		if (IsDead || HasTraitControlImmunity && IsControlStatus(effect))
 		{
 			return;
 		}
@@ -645,6 +703,7 @@ public partial class Unit : CharacterBody3D
 			if (!effect.IsStackable)
 			{
 				existing.Remaining = Mathf.Max(existing.Remaining, effect.Duration);
+				StatusesChanged?.Invoke();
 				return;
 			}
 
@@ -657,6 +716,7 @@ public partial class Unit : CharacterBody3D
 			{
 				ApplyStatusModifiers(existing);
 			}
+			StatusesChanged?.Invoke();
 
 			return;
 		}
@@ -666,6 +726,7 @@ public partial class Unit : CharacterBody3D
 		ApplyStatusModifiers(active);
 
 		RefreshStats();
+		StatusesChanged?.Invoke();
 	}
 
 	/// <summary>
@@ -720,6 +781,7 @@ public partial class Unit : CharacterBody3D
 		for (int i = _statuses.Count - 1; i >= 0; i--)
 			if (_statuses[i].Effect.Id == statusId) { Stats.RemoveBySource(_statuses[i]); _statuses.RemoveAt(i); }
 		RefreshStats();
+		StatusesChanged?.Invoke();
 	}
 
 	/// <summary>

@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1_audio_cfg")
+NumericId = 1064
 Stream = ExtResource("2_stream")
 Bus = 1
 VolumeDb = -4.0

@@ -25,10 +25,10 @@ mouse_filter = 2
 color = Color(0.015, 0.025, 0.04, 0.8)
 
 [node name="Panel" type="PanelContainer" parent="Root"]
-anchor_left = 0.1
-anchor_top = 0.12
-anchor_right = 0.9
-anchor_bottom = 0.82
+anchor_left = 0.06
+anchor_top = 0.06
+anchor_right = 0.94
+anchor_bottom = 0.9
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -63,7 +63,7 @@ text = "关闭  Esc"
 
 [node name="Description" type="Label" parent="Root/Panel/Margin/Layout"]
 layout_mode = 2
-text = "获取资源、配置测试角色、发放增幅和调用交互。先查询 ID，再执行命令。"
+text = "关卡内按分类选择增幅，点击立即获取；命令区可查询 ID 和调用其他测试工具。"
 
 [node name="Quick" type="HFlowContainer" parent="Root/Panel/Margin/Layout"]
 layout_mode = 2
@@ -92,7 +92,7 @@ text = "技能 ID"
 
 [node name="Upgrades" type="Button" parent="Root/Panel/Margin/Layout/Quick"]
 layout_mode = 2
-text = "增幅 ID"
+text = "获取增幅"
 
 [node name="Enemies" type="Button" parent="Root/Panel/Margin/Layout/Quick"]
 layout_mode = 2
@@ -102,7 +102,47 @@ text = "敌人 ID"
 layout_mode = 2
 text = "交互列表"
 
-[node name="Output" type="RichTextLabel" parent="Root/Panel/Margin/Layout"]
+[node name="Tabs" type="TabContainer" parent="Root/Panel/Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Rewards" type="VBoxContainer" parent="Root/Panel/Margin/Layout/Tabs"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Filters" type="HBoxContainer" parent="Root/Panel/Margin/Layout/Tabs/Rewards"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Category" type="OptionButton" parent="Root/Panel/Margin/Layout/Tabs/Rewards/Filters"]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+
+[node name="Search" type="LineEdit" parent="Root/Panel/Margin/Layout/Tabs/Rewards/Filters"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "搜索名称、效果或 ID"
+
+[node name="Status" type="Label" parent="Root/Panel/Margin/Layout/Tabs/Rewards"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Root/Panel/Margin/Layout/Tabs/Rewards"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="List" type="VBoxContainer" parent="Root/Panel/Margin/Layout/Tabs/Rewards/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Console" type="VBoxContainer" parent="Root/Panel/Margin/Layout/Tabs"]
+layout_mode = 2
+
+[node name="Output" type="RichTextLabel" parent="Root/Panel/Margin/Layout/Tabs/Console"]
 layout_mode = 2
 size_flags_vertical = 3
 selection_enabled = true

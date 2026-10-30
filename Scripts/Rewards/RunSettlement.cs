@@ -20,10 +20,10 @@ public static class RunSettlement
 		=> (ShardsPerStage * stageIndex) + (ShardsPerChallenge * challengesUsed) + (victory ? ShardsForVictory : 0);
 
 	/// <summary>结算正文（展示给玩家的那段文字）。</summary>
-	public static string Describe(bool victory, string stageName, string buildSummary, int earned, int total, float seconds)
+	public static string Describe(bool victory, string stageName, string buildSummary, int earned, int total, float seconds, int challengesStarted = 0, int stageCount = 3)
 	{
-		string headline = victory ? "通关！三关全部清理" : $"倒在了 {stageName}";
-		return $"{headline}，用时 {seconds:0} 秒\n" +
+		string headline = victory ? $"通关！{stageCount} 关全部完成" : $"倒在了 {stageName}";
+		return $"{headline}\n本局有效用时 {seconds:0} 秒 · 节点挑战 {challengesStarted} 次\n" +
 			   $"{buildSummary}\n" +
 			   $"获得碎片 +{earned}（累计 {total}）";
 	}

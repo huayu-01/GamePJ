@@ -31,7 +31,7 @@ namespace ActRoguelike.Testing;
 ///   `Requires = ["雷之印"]` 的探针行）—— 不带符文时它**进不了池**，携带雷之印时才进；换战神印仍进不了
 ///   （派系不串）；池子其余候选数与真实目录长度一位都没变；</item>
 /// <item><b>带行为的 5 枚</b>：死铠（+20 甲 / 每 10 杀 +1 甲 / 禁疗）、生死（致命伤无效化 + 恢复 30%）、
-///   狙神（1.5m ×0.5 / 9m ×1.0 / 20m ×1.5）、巨人（`RollHit` 多出 10% 最大生命值）、
+///   狙神（距离插值倍率）、巨人（`RollHit` 多出 8% 最大生命值）、
 ///   小精灵（绕行 + 每 5 秒打一次且不在任何单位分组里）；</item>
 /// <item><b>摘下符文后回到逐位不变</b>：所有读数回到第 2 段的基线。</item>
 /// </list>
@@ -52,9 +52,17 @@ public partial class RuneProbe : Node3D
 	private float _baselineIncomingDamage;
 	private float _baselineCatalogLength;
 	private int _baselineCandidates;
+	private float _expectedLoadoutHealth;
+	private float[] _expectedLoadoutMultipliers = Array.Empty<float>();
 
 	/// <summary>基线（不带符文）时一次受击的最终伤害。</summary>
 	private float _baselineHit;
+	private float[] ReadMultipliers() => new[]
+	{
+		_player.Stats.Get("DamageMultiplier"), _player.Stats.Get("IncomingDamageMultiplier"),
+		_player.Stats.Get("CooldownMultiplier"), _player.Stats.Get("MoveSpeedMultiplier"),
+		_player.Stats.Get("JumpVelocityMultiplier"), _player.Stats.Get("MaxFallSpeedMultiplier"), _player.Stats.Get("HealMultiplier"),
+	};
 
 	public override async void _Ready()
 	{
@@ -78,6 +86,9 @@ public partial class RuneProbe : Node3D
 
 			_loadout.Apply(_player, this, PlayerCharacterKind.Hunter, WeaponPresetKind.Bow);
 			_weapon = NodeSearch.FindInSubtree<Weapon>(_player)!;
+			// 对照真实配装基线，玩家继续升级局外成长后也能检验「不带符文不改变数值」。
+			_expectedLoadoutHealth = _player.MaxHealth;
+			_expectedLoadoutMultipliers = ReadMultipliers();
 
 			// 真·RunController：`SetCarriedRune` 是本批唯一的"携带"写入口（UI 下一批再做）。
 			_run = new RunController { Name = "RuneProbeRun", AutoStartStage = false };
@@ -107,7 +118,7 @@ public partial class RuneProbe : Node3D
 	{
 		await Wait(0.1);
 		int count = ConfigRows.Count<RuneConfig>();
-		Check(count == 11, $"① 符文表读到 {count} 枚（期望 11 = 文档《后续构筑.txt》的 11 条）");
+		Check(count == ContentInventorySnapshot.Current.Count("Runes"), $"① 符文表读到 {count} 枚，符合唯一内容基线");
 
 		string[] expected =
 		{
@@ -126,20 +137,20 @@ public partial class RuneProbe : Node3D
 			}
 		}
 
-		Check(unknownHandler.Count == 0, $"① 每条 ApplyHandler 都已注册（未注册 {unknownHandler.Count} 条{(unknownHandler.Count == 0 ? string.Empty : "：" + string.Join(",", unknownHandler))}）");
+		Check(unknownHandler.Count == 0, $"① 每条符文均声明可编译的效果（未注册 {unknownHandler.Count} 条{(unknownHandler.Count == 0 ? string.Empty : "：" + string.Join(",", unknownHandler))}）");
 
 		// UnlocksRequires 是 `Godot.Collections.Array<string>`（architecture.md 第 12 条）——
 		// 这里逐项核对"项数 + 每一项的值"，证"能写盘、能读回、不是一整串文本"。
-		Check(UnlockOf("rune_lei_seal") == "雷之印", $"① 雷之印的 UnlocksRequires = [{UnlockOf("rune_lei_seal")}]（期望 雷之印）");
-		Check(UnlockOf("rune_war_seal") == "战神刻印", $"① 战神印的 UnlocksRequires = [{UnlockOf("rune_war_seal")}]（期望 战神刻印）");
-		Check(UnlockOf("rune_wind_seal") == "风之印", $"① 风之印的 UnlocksRequires = [{UnlockOf("rune_wind_seal")}]（期望 风之印）");
+		Check(UnlockOf("rune_lei_seal") == "rune_lei_seal", $"① 雷之印的前置已迁稳定 Id [{UnlockOf("rune_lei_seal")}]");
+		Check(UnlockOf("rune_war_seal") == "rune_war_seal", $"① 战神印的前置已迁稳定 Id [{UnlockOf("rune_war_seal")}]");
+		Check(UnlockOf("rune_wind_seal") == "rune_wind_seal", $"① 风之印的前置已迁稳定 Id [{UnlockOf("rune_wind_seal")}]");
 		int emptyUnlocks = expected.Count(id => ConfigRows.ById<RuneConfig>(id) is { } row && row.UnlocksRequires.Count == 0);
 		Check(emptyUnlocks == 8, $"① 其余 8 枚不解锁前置（实测 {emptyUnlocks} 枚为空）");
 
 		GD.Print("[RuneProbe] INFO ① 符文表清单：" + string.Join("；", expected.Select(id =>
 		{
 			RuneConfig row = ConfigRows.ById<RuneConfig>(id)!;
-			return $"{row.Id}（{row.DisplayName}）{row.ApplyHandler}｜解锁 [{string.Join(",", row.UnlockList())}]";
+			return $"{row.Id}（{row.DisplayName}）{string.Join(",", row.Effects.Select(effect => effect.GetType().Name))}｜解锁 [{string.Join(",", row.UnlockList())}]";
 		})));
 	}
 
@@ -155,19 +166,13 @@ public partial class RuneProbe : Node3D
 		_baselineHealth = Mathf.RoundToInt(_player.MaxHealth);
 		_baselineArmor = _player.StartingArmor;
 		_baselineMoveSpeed = _player.MoveSpeed;
-		Check(_baselineHealth == 220, $"② 玩家生命 {_player.MaxHealth:0}（期望 220 = 角色 200 + 元进度 20，与加符文之前逐字一致）");
+		Check(Mathf.IsEqualApprox(_player.MaxHealth, _expectedLoadoutHealth), $"② 玩家生命 {_player.MaxHealth:0}（期望真实配装基线 {_expectedLoadoutHealth:0}，无符文时逐位不变）");
 		Check(Mathf.IsEqualApprox(_baselineArmor, 20f), $"② 玩家初始护甲 {_player.StartingArmor:0}（期望 20）");
 		Check(Mathf.IsEqualApprox(_baselineMoveSpeed, 6.5f), $"② 玩家移速 {_player.MoveSpeed:0.##}（期望 6.5）");
 
-		float[] multipliers =
-		{
-			_player.Stats.Get("DamageMultiplier"), _player.Stats.Get("IncomingDamageMultiplier"),
-			_player.Stats.Get("CooldownMultiplier"), _player.Stats.Get("MoveSpeedMultiplier"),
-			_player.Stats.Get("JumpVelocityMultiplier"), _player.Stats.Get("MaxFallSpeedMultiplier"),
-			_player.Stats.Get("HealMultiplier"),
-		};
-		Check(multipliers.All(v => Mathf.IsEqualApprox(v, 1f)),
-			$"② 七条乘区全是中性值 1（实测 {string.Join(" / ", multipliers.Select(v => v.ToString("0.###")))}）");
+		float[] multipliers = ReadMultipliers();
+		Check(multipliers.Select((value, index) => Mathf.IsEqualApprox(value, _expectedLoadoutMultipliers[index])).All(equal => equal),
+			$"② 七条乘区与无符文真实配装基线一致（实测 {string.Join(" / ", multipliers.Select(v => v.ToString("0.###")))}）");
 		Check(Mathf.IsEqualApprox(_player.Stats.Get("MaxHealthCap"), 0f), $"② 生命上限夹子 {_player.Stats.Get("MaxHealthCap"):0.##}（期望 0 = 不夹）");
 		Check(_player.DeathAvoidRuleCount == 0, $"② 玩家身上 0 条死亡避免规则（实测 {_player.DeathAvoidRuleCount}）");
 		Check(CountRuneNodes() == 0, $"② 玩家身上 0 个符文规则节点（实测 {CountRuneNodes()}）");
@@ -181,7 +186,7 @@ public partial class RuneProbe : Node3D
 		pool.Initialize(_weapon, "chr_hunter");
 		_baselineCandidates = pool.CandidateCount;
 		_baselineCatalogLength = RewardCatalog.All.Length;
-		Check(_baselineCatalogLength == 91, $"② 真实增幅项目录 {RewardCatalog.All.Length} 条（J33在90项上补快乐小子，符文**不进**这张表）");
+		Check(_baselineCatalogLength == ContentInventorySnapshot.Current.Count("Upgrades"), $"② 真实增幅项目录 {RewardCatalog.All.Length} 条符合显式基线；生存专属有模式限定，符文不进入这张表");
 		Check(_baselineCandidates > 0, $"② 猎手+弓 的候选池 {_baselineCandidates} 条（不带符文时的基线）");
 		await Wait(0.05);
 	}
@@ -198,8 +203,8 @@ public partial class RuneProbe : Node3D
 		Check(Mathf.IsEqualApprox(_player.MaxHealth, 30f), $"③ 雷之印：最大生命值从 {_baselineHealth} 变成 {_player.MaxHealth:0}（期望 30 —— 用户确认「真的限制为 30」）");
 		Check(_player.Health <= 30f, $"③ 雷之印：当前生命被同时夹到 {_player.Health:0}（不会留在 220）");
 		Check(Mathf.IsEqualApprox(_player.Stats.Get("MaxHealthCap"), 30f), $"③ StatSheet 的 MaxHealthCap = {_player.Stats.Get("MaxHealthCap"):0.##}（期望 30）");
-		Check(_run.Build.RuneUnlocks.Contains("雷之印") && _run.Build.RuneUnlocks.Contains("rune_lei_seal"),
-			$"③ 前置解锁名单 {_run.Build.DescribeRuneUnlocks()}（同时含派系名与符文行 Id）");
+		Check(_run.Build.SatisfiesPrerequisite("雷之印") && _run.Build.RuneUnlocks.Contains("rune_lei_seal"),
+			$"③ 前置解锁名单 {_run.Build.DescribeRuneUnlocks()}（旧派系名与稳定 Id 判定一致）");
 		Check(ConfigRows.ById<RuneConfig>("rune_lei_seal")!.UnlocksRequires.Count == 1, "③ 雷之印只解锁一条前置");
 
 		// 回到满血再进下一段（雷之印会一直夹着 30，所以先摘掉）。
@@ -256,8 +261,8 @@ public partial class RuneProbe : Node3D
 
 		_run.SetCarriedRune("rune_march");
 		await Wait(0.1);
-		Check(Mathf.IsEqualApprox(_player.Stats.Get("MoveSpeedMultiplier"), 2f),
-			$"⑤ 行军：移速倍率 ×{_player.Stats.Get("MoveSpeedMultiplier"):0.###}（期望 ×2 = +100%）");
+		Check(Mathf.IsEqualApprox(_player.Stats.Get("MoveSpeedMultiplier"), _expectedLoadoutMultipliers[3] * 1.75f),
+			$"⑤ 行军：移速倍率 ×{_player.Stats.Get("MoveSpeedMultiplier"):0.###}（期望基线×1.75 = +75%）");
 
 		_run.SetCarriedRune("rune_strength_talisman");
 		await Wait(0.1);
@@ -324,8 +329,8 @@ public partial class RuneProbe : Node3D
 		_run.SetCarriedRune(string.Empty);
 		Refill();
 		await Wait(0.1);
-		Check(Mathf.IsEqualApprox(_player.Stats.Get("HealMultiplier"), 1f) && Mathf.IsEqualApprox(_player.Stats.Get("MoveSpeedMultiplier"), 1f),
-			$"⑤ 摘下后治疗倍率 {_player.Stats.Get("HealMultiplier"):0.###} / 移速 {_player.Stats.Get("MoveSpeedMultiplier"):0.###}（期望都回到 1）");
+		Check(Mathf.IsEqualApprox(_player.Stats.Get("HealMultiplier"), _expectedLoadoutMultipliers[6]) && Mathf.IsEqualApprox(_player.Stats.Get("MoveSpeedMultiplier"), _expectedLoadoutMultipliers[3]),
+			$"⑤ 摘下后治疗倍率 {_player.Stats.Get("HealMultiplier"):0.###} / 移速 {_player.Stats.Get("MoveSpeedMultiplier"):0.###}（期望回到真实配装基线）");
 	}
 
 	// ── ⑥ ⭐ 符文 → 增幅前置（本系统的核心价值） ───────────────────────────
@@ -447,9 +452,9 @@ public partial class RuneProbe : Node3D
 			await Wait(0.05);
 			var attack = new AttackInstance { Attacker = _player, Ability = "probe_giant", BaseDamage = 10f, CanCrit = false };
 			HitInstance hit = attack.RollHit(target, Vector3.Forward, target.GlobalPosition);
-			float expected = 10f + (_player.MaxHealth * 0.1f);
+			float expected = 10f + (_player.MaxHealth * 0.08f);
 			Check(Mathf.IsEqualApprox(hit.Damage, expected),
-				$"⑦ 巨人：`RollHit` 基础 10 点的这一击 → 伤害 {hit.Damage:0.##}（期望 {expected:0.##} = 10 + 最大生命值 {_player.MaxHealth:0} × 10%）；规则读数：{giant.DebugState()}");
+				$"⑦ 巨人：`RollHit` 基础 10 点的这一击 → 伤害 {hit.Damage:0.##}（期望 {expected:0.##} = 10 + 最大生命值 {_player.MaxHealth:0} × 8%）；规则读数：{giant.DebugState()}");
 			target.QueueFree();
 		}
 
@@ -515,7 +520,7 @@ public partial class RuneProbe : Node3D
 		Check(_run.CarriedRuneId.Length == 0, $"⑧ 结束时 CarriedRuneId「{_run.CarriedRuneId}」（期望空）");
 		Check(Mathf.IsEqualApprox(_player.MaxHealth, _baselineHealth), $"⑧ 生命上限 {_player.MaxHealth:0}（期望回到 {_baselineHealth}）");
 		Check(Mathf.IsEqualApprox(_player.Stats.Get("IncomingDamageMultiplier"), 1f), $"⑧ 受击倍率 ×{_player.Stats.Get("IncomingDamageMultiplier"):0.###}（期望 1）");
-		Check(Mathf.IsEqualApprox(_player.Stats.Get("MoveSpeedMultiplier"), 1f), $"⑧ 移速 ×{_player.Stats.Get("MoveSpeedMultiplier"):0.###}（期望 1）");
+		Check(Mathf.IsEqualApprox(_player.Stats.Get("MoveSpeedMultiplier"), _expectedLoadoutMultipliers[3]), $"⑧ 移速 ×{_player.Stats.Get("MoveSpeedMultiplier"):0.###}（期望基线 {_expectedLoadoutMultipliers[3]:0.###}）");
 		Check(Mathf.IsEqualApprox(_player.Stats.Get("DamageMultiplier"), 1f), $"⑧ 伤害 ×{_player.Stats.Get("DamageMultiplier"):0.###}（期望 1）");
 		Check(Mathf.IsEqualApprox(_player.Stats.Get("MaxHealthCap"), 0f), $"⑧ 生命夹子 {_player.Stats.Get("MaxHealthCap"):0.##}（期望 0）");
 		Check(CountRuneNodes() == 0, $"⑧ 符文规则节点 {CountRuneNodes()} 个（期望 0）");
@@ -527,7 +532,7 @@ public partial class RuneProbe : Node3D
 		var pool = new RewardPool();
 		pool.Initialize(_weapon, "chr_hunter");
 		Check(pool.CandidateCount == _baselineCandidates, $"⑧ 候选池回到 {pool.CandidateCount} 条（期望基线 {_baselineCandidates}）");
-		Check(RewardCatalog.All.Length == 91, $"⑧ 增幅项目录仍是 {RewardCatalog.All.Length} 条（期望J33后91，符文不混入）");
+		Check(RewardCatalog.All.Length == ContentInventorySnapshot.Current.Count("Upgrades"), $"⑧ 增幅项目录{RewardCatalog.All.Length}条符合内容基线，符文不混入");
 
 		Check(RuneCarry.Current.Length == 0, $"⑧ 存档层 RuneCarry.Current 为空（自测内存模式，不写 user://rune.cfg）");
 		await Wait(0.05);

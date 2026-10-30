@@ -1,0 +1,272 @@
+存档 BEFORE meta.cfg SHA256=AFDF471AA97A31701A6C3EF56220E2D410CA92EA0B37A194345BF8FD94B1545F
+存档 BEFORE ability_cards.cfg SHA256=4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D
+存档 BEFORE settings.cfg SHA256=7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1
+存档 BEFORE loadout.cfg SHA256=4E8485C2134B42DA70852CD62872D835CFC2B5D13900548AE47F1652380E3104
+存档 BEFORE rune.cfg SHA256=F34C39C26F362F8B417B0AA8391833FDD874794AAAC4546D21914F3D0CF42A0E
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 354 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:06.37
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 455 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:05.56
+
+challenge_feedback exit=1 seconds=9.74 stderrBytes=0
+=== challenge_feedback ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 00:16:59 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 00:16:59 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 00:16:59 [Flow] === 新的一局 ===
+[log] 00:16:59 [Flow] 日志文件：user://logs/run_20261024_001659.log
+[log] 00:16:59 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 00:16:59 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 00:17:00 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[ChallengeFeedback] PASS 无AI测试敌人使用真实Unit预制体
+[log] 00:17:00 [Node] 第 2 层因最小间距 8 不足，已放宽补足到 2/2
+[log] 00:17:00 [Node] 第 1 层因最小间距 8 不足，已放宽补足到 5/5
+[log] 00:17:00 [Node] 第 0 层因最小间距 8 不足，已放宽补足到 3/3
+[log] 00:17:00 [Node] Stage 表行：feedback_probe（挑战反馈）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 00:17:00 [Node] Pressure 节点驱动：节点表 0 行都没配 → 全部走「关卡行 → ConfigIndex 全局默认值」回退
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (-10, 0, 12) 挪到 (-10, 0.25, 12)
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (-5, 0, 12) 挪到 (-5, 0.25, 12)
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (0, 0, 12) 挪到 (0, 0.25, 12)
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (5, 0, 12) 挪到 (5, 0.25, 12)
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (10, 0, 12) 挪到 (10, 0.25, 12)
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (-10, 0, 17) 挪到 (-10, 0.25, 17)
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (-5, 0, 17) 挪到 (-5, 0.25, 17)
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (0, 0, 17) 挪到 (0, 0.25, 17)
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (5, 0, 17) 挪到 (5, 0.25, 17)
+[log] 00:17:00 [Node] 节点避障：Interaction 从 (10, 0, 17) 挪到 (10, 0.25, 17)
+[log] 00:17:00 [Node] 第 2 层因最小间距 8 不足，已放宽补足到 2/2
+[log] 00:17:00 [Node] 第 1 层因最小间距 8 不足，已放宽补足到 5/5
+[log] 00:17:00 [Node] 第 0 层因最小间距 8 不足，已放宽补足到 3/3
+[log] 00:17:00 [Config] 奔跑：角色行暂时读不到（RunSetup.Character=Hunter / 角色表 0 行）→ 先按「sprint」/ 倍率 1 跑，表就绪后会再套一次
+[log] 00:17:00 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 00:17:00 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 00:17:00 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 00:17:00 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 00:17:00 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 00:17:00 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 00:17:00 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 00:17:00 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 00:17:00 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 00:17:00 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 00:17:00 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 00:17:00 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 00:17:00 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 00:17:00 [Audio] 首次播放「music_level_01」→ 总线 Music / res://Assets/Audio/music/music_level_01.ogg
+[log] 00:17:00 [Audio] 音乐：播关卡曲库「music_level_01」（1/2 首）
+[log] 00:17:00 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 00:17:01 [Node] 奖励节点光圈颜色：Evolution → 价值标签「tag_high」（4 波）的 AuraColor (1, 0.75, 0.15, 1)（来源：表 ValueTags）
+[log] 00:17:01 [Node] 奖励节点光圈颜色：Enhancement → 价值标签「tag_mid」（3 波）的 AuraColor (0.15, 0.72, 1, 1)（来源：表 ValueTags）
+[log] 00:17:01 [Node] 奖励节点光圈颜色：Heal → 价值标签「tag_low」（1 波）的 AuraColor (0.4, 0.86, 0.45, 1)（来源：表 ValueTags）
+[log] 00:17:01 [Map] 区域杀已就位：中心 Y=-38、覆盖 300×300
+[log] 00:17:01 [Map] 导航网格烘焙完成：2 个多边形（半径 0.6 / 高度 1.8 / 最大坡 30°）
+[ChallengeFeedback] PASS 真实静态地面完成导航烘焙及同步
+[ChallengeFeedback] PASS 探索时无挑战粒子或挑战面板
+[ChallengeFeedback] PASS 反馈夹具保留10个普通节点，机关不占配额
+[log] 00:17:01 [Spawn] 第 1 场 Encounter 开始（节点触发的战斗）
+[log] 00:17:01 [Audio] 首次播放「ui_open」→ 总线 UI / res://Assets/Audio/ui/ui_open.ogg
+[log] 00:17:01 [Combat] 单位动画：JumpingMelee 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 00:17:01 [Config] 敌人倍率：普通 生命×0.75 伤害×0.3 移速×1 / Boss 生命×1 伤害×0.9（来源：表 enemy_global）
+[log] 00:17:01 [Spawn] 生成 （剩余预算 3，场上 0）
+[log] 00:17:01 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-4.86678, 0.05, 10.873596) 方向 (0.2777406, 0, 0.9606561) 长 2.2m 宽 2.2m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[log] 00:17:01 [Combat] 单位动画切换：JumpingMelee idle → sprint（当前速度 8.5，阈值 0.15/4）
+[log] 00:17:01 [Combat] 单位动画：Chaser 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 00:17:01 [Spawn] 生成 （剩余预算 2，场上 1）
+[log] 00:17:01 [Audio] 首次播放「music_challenge_01」→ 总线 Music / res://Assets/Audio/music/music_challenge_01.ogg
+[log] 00:17:01 [Audio] 音乐：播挑战曲库「music_challenge_01」（1/2 首）
+[log] 00:17:01 [Combat] 单位动画切换：Chaser idle → walk（当前速度 0.25，阈值 0.15/4）
+[ChallengeFeedback] PASS 真实Stage开始当前挑战并暴露同一Encounter
+[ChallengeFeedback] FAIL 预算花完后真实生成2个活着的敌人
+[ChallengeFeedback] PASS 挑战者入态后身上持续发射粒子
+[ChallengeFeedback] FAIL 右上面板读真实预算和本场存活，预算耗尽不退态
+[ChallengeFeedback] PASS 挑战面板不抢输入或暂停游戏
+[log] 00:17:01 [Combat] 单位动画切换：Chaser walk → idle（当前速度 0，阈值 0.15/4）
+[ChallengeFeedback] PASS 类型组件三个失败参数真正传给后端反馈
+[log] 00:17:01 [Audio] 首次播放「ui_card_fail」→ 总线 UI / res://Assets/Audio/ui/ui_card_fail.wav
+[log] 00:17:01 [Node] 「测试机关」拒绝交互：挑战尚未完成（挑战者状态）
+[log] 00:17:01 [Combat] 单位动画切换：Player idle → sprint（当前速度 8.1，阈值 0.15/4）
+[ChallengeFeedback] PASS 真实F拒绝时播放一次音效及光波
+[ChallengeFeedback] PASS 失败生成红色半球光波罩，使用组件设定范围
+[ChallengeFeedback] PASS 失败不消耗目标、不发成功信号、不改配额
+[log] 00:17:01 [Combat] 单位动画切换：Player sprint → walk（当前速度 3.87，阈值 0.15/4）
+[ChallengeFeedback] PASS 拒绝冲量经真实Movement将角色向物体外弹开
+[ChallengeFeedback] PASS 其他物体拒绝不终止当前挑战或播放完成
+[ChallengeFeedback] PASS 交互提示明确说明挑战中不可使用
+[log] 00:17:02 [Combat] 单位动画切换：JumpingMelee sprint → idle（当前速度 0，阈值 0.15/4）
+[log] 00:17:02 [Node] 「测试机关」拒绝交互：挑战尚未完成（挑战者状态）
+[log] 00:17:02 [Combat] 单位动画切换：Player walk → sprint（当前速度 8.28，阈值 0.15/4）
+[log] 00:17:02 [Combat] 单位动画切换：Player sprint → idle（当前速度 0，阈值 0.15/4）
+[ChallengeFeedback] PASS 靠墙拒绝仍有反馈，弹开经碰撞停止且不穿墙
+[log] 00:17:02 [Combat] 单位动画切换：JumpingMelee idle → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:02 [Combat] 死亡 JumpingMelee(0) 击杀者=Player(120)
+[log] 00:17:02 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 00:17:02 [Combat] 击杀 JumpingMelee(0) by Player(120)
+[ChallengeFeedback] PASS 还剩1只敌人时仍锁定其他交互
+[log] 00:17:03 [Combat] 单位动画切换：Chaser idle → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:03 [Combat] 死亡 Chaser(0) 击杀者=Player(120)
+[log] 00:17:03 [Combat] 击杀 Chaser(0) by Player(120)
+[ChallengeFeedback] PASS 暂停期间不会因清场缓存误报完成
+[log] 00:17:03 [Spawn] Encounter 清场完成：共生成 2，用时 2s
+[log] 00:17:03 [Audio] 首次播放「ui_card_unlock」→ 总线 UI / res://Assets/Audio/ui/ui_card_unlock.wav
+[ChallengeFeedback] PASS 真实清完当前Encounter后只发一次完成并解除挑战
+[ChallengeFeedback] PASS 完成时消除身上粒子并触发一次完成表现
+[ChallengeFeedback] PASS 完成后的右上提示明确显示挑战完成
+[ChallengeFeedback] PASS 解锁后同一机关通过真实F正常成功
+[log] 00:17:03 [Spawn] 第 1 波开始：1 种类型（）× 目标 2 只
+[log] 00:17:03 [Spawn] 生成 （剩余预算 6，场上 0）
+[log] 00:17:03 [Spawn] 生成 （剩余预算 4，场上 1）
+[log] 00:17:03 [Spawn] 第 1 波已出场，场上 2 只，待生成 0 只
+[ChallengeFeedback] PASS 限定两波的第一波真实出场，仍留后续预算
+[log] 00:17:03 [Combat] 死亡 FeedbackEnemy(0) 击杀者=Player(120)
+[log] 00:17:03 [Combat] 击杀 FeedbackEnemy(0) by Player(120)
+[log] 00:17:03 [Combat] 死亡 @CharacterBody3D@52(0) 击杀者=Player(120)
+[log] 00:17:03 [Combat] 击杀 @CharacterBody3D@52(0) by Player(120)
+[ChallengeFeedback] PASS 波间空场不能提前结算后续尚未生成的波次
+[log] 00:17:03 [Spawn] 第 2 波开始：1 种类型（）× 目标 2 只
+[log] 00:17:03 [Spawn] 生成 （剩余预算 2，场上 0）
+[log] 00:17:03 [Spawn] 生成 （剩余预算 0，场上 1）
+[log] 00:17:03 [Spawn] 第 2 波已出场，场上 2 只，待生成 0 只
+[ChallengeFeedback] PASS 第一波全灭后继续生成第二波，不在空场停住
+[log] 00:17:03 [Combat] 死亡 @CharacterBody3D@53(0) 击杀者=Player(120)
+[log] 00:17:03 [Combat] 击杀 @CharacterBody3D@53(0) by Player(120)
+[log] 00:17:03 [Combat] 死亡 @CharacterBody3D@54(0) 击杀者=Player(120)
+[log] 00:17:03 [Combat] 击杀 @CharacterBody3D@54(0) by Player(120)
+[log] 00:17:03 [Spawn] Encounter 清场完成：共生成 4，用时 0s
+[log] 00:17:03 [Audio] 首次播放「music_level_02」→ 总线 Music / res://Assets/Audio/music/music_level_02.ogg
+[log] 00:17:03 [Audio] 音乐：播关卡曲库「music_level_02」（2/2 首）
+[ChallengeFeedback] PASS 两波全部清完后只结算一次成功
+[log] 00:17:03 [Spawn] 第 2 场 Encounter 开始（节点触发的战斗）
+[log] 00:17:04 [Audio] 首次播放「music_challenge_02」→ 总线 Music / res://Assets/Audio/music/music_challenge_02.ogg
+[log] 00:17:04 [Audio] 音乐：播挑战曲库「music_challenge_02」（2/2 首）
+[log] 00:17:04 [Combat] 单位动画：FastMelee 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 00:17:04 [Spawn] 生成 （剩余预算 3，场上 0）
+[log] 00:17:04 [Combat] 单位动画切换：FastMelee idle → walk（当前速度 0.25，阈值 0.15/4）
+[log] 00:17:04 [Spawn] 生成 （剩余预算 1，场上 1）
+[ChallengeFeedback] PASS 真实Stage开始当前挑战并暴露同一Encounter
+[log] 00:17:04 [Combat] 单位动画切换：FastMelee walk → sprint（当前速度 4.5，阈值 0.15/4）
+[log] 00:17:04 [Combat] 单位动画切换：FastMelee sprint → idle（当前速度 0，阈值 0.15/4）
+[ChallengeFeedback] PASS 连续开战取消旧淡出回调，挑战标记及粒子继续可见
+[ChallengeFeedback] PASS Encounter失败只取消状态，不冒充完成
+[ChallengeFeedback] PASS 重复失败不重复发结束事件
+[log] 00:17:05 [Combat] 单位动画切换：FastMelee idle → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:05 [Combat] 死亡 FastMelee(0) 击杀者=Player(120)
+[log] 00:17:05 [Combat] 击杀 FastMelee(0) by Player(120)
+[log] 00:17:05 [Combat] 死亡 FeedbackEnemy(0) 击杀者=Player(120)
+[log] 00:17:05 [Combat] 击杀 FeedbackEnemy(0) by Player(120)
+[log] 00:17:05 [Spawn] 第 3 场 Encounter 开始（节点触发的战斗）
+[log] 00:17:05 [Audio] 音乐：播挑战曲库「music_challenge_01」（1/2 首）
+[log] 00:17:05 [Combat] 单位动画：BladeSpinner 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_blade_spinner）
+[log] 00:17:05 [Animation] 技能动画库已加载：BladeSpinner ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 00:17:05 [Spawn] 生成 （剩余预算 3，场上 0）
+[log] 00:17:05 [Combat] 单位动画：HoverDiver 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_hover_diver）
+[log] 00:17:05 [Animation] 技能动画库已加载：HoverDiver ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 00:17:05 [Spawn] 生成 （剩余预算 2，场上 1）
+[log] 00:17:05 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-5.361429, 0, 1.2132465) 半径 2.3m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[ChallengeFeedback] PASS 真实Stage开始当前挑战并暴露同一Encounter
+[log] 00:17:05 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 00:17:05 [Animation] 技能动画开播：BladeSpinner → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 00:17:05 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-12.172827, 0.05, 0.24055341) 方向 (0.9798139, 0, 0.19991219) 长 7.4m 宽 4.6m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[ChallengeFeedback] PASS 强制停止生成不被误认作真实清场
+[log] 00:17:05 [Combat] 单位动画切换：BladeSpinner skills/EnemyAction → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:05 [Combat] 死亡 BladeSpinner(0) 击杀者=Player(120)
+[log] 00:17:05 [Combat] 击杀 BladeSpinner(0) by Player(120)
+[log] 00:17:05 [Combat] 单位动画切换：HoverDiver idle → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:05 [Combat] 死亡 HoverDiver(0) 击杀者=Player(120)
+[log] 00:17:05 [Combat] 击杀 HoverDiver(0) by Player(120)
+[log] 00:17:05 [Spawn] 第 4 场 Encounter 开始（节点触发的战斗）
+[log] 00:17:05 [Audio] 音乐：播挑战曲库「music_challenge_02」（2/2 首）
+[log] 00:17:06 [Combat] 单位动画：ArcBomber 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_arc_bomber）
+[log] 00:17:06 [Animation] 技能动画库已加载：ArcBomber ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 00:17:06 [Spawn] 生成 （剩余预算 3，场上 0）
+[log] 00:17:06 [Animation] 技能动画开播：ArcBomber → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 00:17:06 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-6.355665, 1.5168794, 1.6408601) 半径 2.4m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 00:17:06 [Combat] 单位动画：TrackingCharger 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_tracking_charger）
+[log] 00:17:06 [Animation] 技能动画库已加载：TrackingCharger ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 00:17:06 [Spawn] 生成 （剩余预算 2，场上 1）
+[log] 00:17:06 [Animation] 技能动画开播：TrackingCharger → skills/EnemyAction（speed_scale=0.55，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 00:17:06 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (-13.044424, 0.05, 2.3866203) 方向 (0.99217236, 0, -0.12487618) 长 17.6m 宽 3.6m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[ChallengeFeedback] PASS 真实Stage开始当前挑战并暴露同一Encounter
+[ChallengeFeedback] PASS Encounter复位立即撤销挑战，不播放绿波
+[log] 00:17:06 [Combat] 单位动画切换：ArcBomber skills/EnemyAction → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:06 [Combat] 死亡 ArcBomber(0) 击杀者=Player(120)
+[log] 00:17:06 [Combat] 击杀 ArcBomber(0) by Player(120)
+[log] 00:17:06 [Combat] 单位动画切换：TrackingCharger skills/EnemyAction → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:06 [Combat] 死亡 TrackingCharger(0) 击杀者=Player(120)
+[log] 00:17:06 [Combat] 击杀 TrackingCharger(0) by Player(120)
+[log] 00:17:06 [Spawn] 第 5 场 Encounter 开始（节点触发的战斗）
+[log] 00:17:06 [Audio] 音乐：播挑战曲库「music_challenge_01」（1/2 首）
+[log] 00:17:06 [Combat] 单位动画：MeteorMage 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_meteor_mage）
+[log] 00:17:06 [Animation] 技能动画库已加载：MeteorMage ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 00:17:06 [Spawn] 生成 （剩余预算 3，场上 0）
+[log] 00:17:06 [Animation] 技能动画开播：MeteorMage → skills/EnemyAction（speed_scale=0.46，循环=False，事件帧 1 个：ATK@0.55s）
+[log] 00:17:06 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (-6, 0, 1.5) 半径 2.6m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 00:17:06 [Combat] 单位动画：BurrowHunter 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_burrow_hunter）
+[log] 00:17:06 [Animation] 技能动画库已加载：BurrowHunter ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 00:17:06 [Spawn] 生成 （剩余预算 2，场上 1）
+[log] 00:17:06 [Animation] 技能动画开播：BurrowHunter → skills/EnemyAction（speed_scale=1.1，循环=False，事件帧 1 个：ATK@0.55s）
+[ChallengeFeedback] PASS 真实Stage开始当前挑战并暴露同一Encounter
+[log] 00:17:06 [Node] Stage 表行：feedback_reset（Stage 1）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 00:17:06 [Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 / 额外抽 0 次 / 标签 [不限制]
+[log] 00:17:06 [Node] 第 2 层因最小间距 8 不足，已放宽补足到 2/2
+[log] 00:17:06 [Node] 第 1 层因最小间距 8 不足，已放宽补足到 5/5
+[log] 00:17:06 [Node] 第 0 层因最小间距 8 不足，已放宽补足到 3/3
+[log] 00:17:06 [Combat] 单位动画切换：MeteorMage skills/EnemyAction → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:06 [Combat] 死亡 MeteorMage(0) 击杀者=-
+[log] 00:17:06 [Combat] 单位动画切换：BurrowHunter skills/EnemyAction → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:06 [Combat] 死亡 BurrowHunter(0) 击杀者=-
+[ChallengeFeedback] PASS 正式换关消除当前挑战且没有伪完成或面板残留
+[log] 00:17:06 [Spawn] 第 1 场 Encounter 开始（节点触发的战斗）
+[log] 00:17:07 [Audio] 音乐：播挑战曲库「music_challenge_02」（2/2 首）
+[log] 00:17:07 [Spawn] 生成 跳跃近战（剩余预算 2，场上 0）
+[log] 00:17:07 [Combat] 技能指示器：④ 直线区域（直线区域：起点 (2.4016547, 0.05, -6.080526) 方向 (0.74228233, 0, -0.6700873) 长 2.2m 宽 2.2m（贴地投影）；纯表现 无碰撞 无单位 无分组）
+[log] 00:17:07 [Spawn] 生成 快速近战（剩余预算 1，场上 1）
+[ChallengeFeedback] PASS 真实Stage开始当前挑战并暴露同一Encounter
+[log] 00:17:07 [Combat] 单位动画切换：Player idle → die（当前速度 0，阈值 0.15/4）
+[log] 00:17:07 [Combat] 死亡 Player(0) 击杀者=-
+[log] 00:17:07 [Combat] 单位动画切换：FastMelee walk → idle（当前速度 0，阈值 0.15/4）
+[ChallengeFeedback] PASS 玩家死亡清除粒子和挑战UI，不庆祝完成
+[ChallengeFeedback] PASS 光波不注册为敌人或参与清场计数
+[ChallengeFeedback] 挑战状态与拒绝反馈验收结束：通过 38，失败 2
+[log] 00:17:07 [Spawn] 定期刷怪：这一次没刷出来（找不到玩家 / 本关没有可生成项），下个间隔再试
+[log] 00:17:07 [Exit] 音频退出回收：真实等待91ms。
+[log] 00:17:07 [Audio] 音效统计：共 31 次 —— music_level_01×1、ui_open×6、music_challenge_01×3、ui_card_fail×2、sfx_enemy_die×14、ui_card_unlock×1、music_level_02×1、music_challenge_02×3（缺失 id 0 个）
+
+challenge_feedback 未通过：F:\Godot项目\项目a\.ai_j48_20261024_001645.challenge_feedback.log / F:\Godot项目\项目a\.ai_j48_20261024_001645.challenge_feedback.err
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 354 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:06.37
+
+=== 失败现场构建 ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 455 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:05.56

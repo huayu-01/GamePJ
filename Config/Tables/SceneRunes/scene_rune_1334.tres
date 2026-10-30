@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SceneRuneDefinition" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/SceneRuneDefinition.cs" id="row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/SceneRunes/icon_1334.svg" id="icon"]
+[resource]
+script = ExtResource("row")
+NumericId = 1334
+DisplayName = "力场"
+NameKey = "scene_rune.1334.name"
+DescriptionKey = "scene_rune.1334.description"
+DescriptionTemplate = "周期生成半径{Radius:0.#}米的力场，玩家在圈内造成的伤害×{DamageMultiplier:0.##}，离开立即结束。"
+Kind = 2
+Impact = 0
+Icon = ExtResource("icon")
+Tint = Color(1.000000, 0.854902, 0.462745, 1)
+Interval = 16
+DamageMultiplier = 1.25
+MaxActive = 1

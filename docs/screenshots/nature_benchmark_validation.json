@@ -1,0 +1,23 @@
+{
+  "animation_event_strikes": 2,
+  "attack_activated": true,
+  "boundary_collision": true,
+  "cardinal_paths_clear": true,
+  "damage": 40.3125,
+  "enemy_approach_meters": 4.38635158538818,
+  "enemy_approaches": [
+    4.43983459472656,
+    5.19565296173096,
+    3.55004644393921,
+    3.69675397872925,
+    5.04947090148926
+  ],
+  "floor_height": 0.00101964827626944,
+  "jump_height": 2.50400328636169,
+  "movement_meters": 6.65000438690186,
+  "navigation_polygons": 179,
+  "navigation_ready": true,
+  "passed": true,
+  "reachable_enemies": 5,
+  "spawned_enemies": 5
+}

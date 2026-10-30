@@ -1,0 +1,3188 @@
+{
+  "date": "2026-10-26T21:33:35.225272+08:00",
+  "engine": "4.7.2-stable (official)",
+  "physicsEngine": "Jolt Physics",
+  "world": {
+    "id": "survival_arena",
+    "nodeCount": 477,
+    "meshes": 200,
+    "visibleMeshes": 200,
+    "skinnedMeshes": 0,
+    "surfaces": 256,
+    "distinctMaterials": 14,
+    "surfacesWithNextPass": 0,
+    "materialOverlays": 0,
+    "shadowCasters": 200,
+    "bones": 0,
+    "skeletons": 0,
+    "animationPlayers": [],
+    "collisionShapes": 97,
+    "enabledShapes": 97,
+    "areas": 0,
+    "monitoringAreas": 0,
+    "navigationAgents": 0,
+    "multimeshes": 0,
+    "occluders": 0,
+    "abilities": [],
+    "processCallbacks": 0,
+    "physicsCallbacks": 0,
+    "callbacks": []
+  },
+  "enemies": [
+    {
+      "id": "enemy_chaser",
+      "nodeCount": 22,
+      "meshes": 3,
+      "visibleMeshes": 2,
+      "skinnedMeshes": 2,
+      "surfaces": 3,
+      "distinctMaterials": 2,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 2,
+      "enabledShapes": 2,
+      "areas": 1,
+      "monitoringAreas": 1,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_chaser_melee",
+          "type": "MeleeAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 9,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee",
+          "type": "MeleeAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_fast_melee",
+      "nodeCount": 22,
+      "meshes": 3,
+      "visibleMeshes": 2,
+      "skinnedMeshes": 2,
+      "surfaces": 3,
+      "distinctMaterials": 2,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 2,
+      "enabledShapes": 2,
+      "areas": 1,
+      "monitoringAreas": 1,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_fast_melee_melee",
+          "type": "MeleeAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 9,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee",
+          "type": "MeleeAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_exploder",
+      "nodeCount": 31,
+      "meshes": 8,
+      "visibleMeshes": 2,
+      "skinnedMeshes": 2,
+      "surfaces": 6,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 2,
+      "enabledShapes": 2,
+      "areas": 1,
+      "monitoringAreas": 1,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_exploder_blow",
+          "type": "AreaAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 9,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityExplode",
+          "type": "AreaAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityExplode/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityExplode/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_jumping_melee",
+      "nodeCount": 31,
+      "meshes": 8,
+      "visibleMeshes": 2,
+      "skinnedMeshes": 2,
+      "surfaces": 6,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 2,
+      "enabledShapes": 2,
+      "areas": 1,
+      "monitoringAreas": 1,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_jumping_leap",
+          "type": "LeapAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 9,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityLeap",
+          "type": "LeapAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityLeap/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityLeap/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_ranged",
+      "nodeCount": 23,
+      "meshes": 3,
+      "visibleMeshes": 2,
+      "skinnedMeshes": 2,
+      "surfaces": 3,
+      "distinctMaterials": 2,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_ranged_shot",
+          "type": "ProjectileAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 2,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityRanged",
+          "type": "ProjectileAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityRanged/Weapon",
+          "type": "Weapon",
+          "process": "ActRoguelike.Weapons.Weapon",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_charger",
+      "nodeCount": 31,
+      "meshes": 8,
+      "visibleMeshes": 3,
+      "skinnedMeshes": 2,
+      "surfaces": 6,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 2,
+      "enabledShapes": 2,
+      "areas": 1,
+      "monitoringAreas": 1,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_charger_charge",
+          "type": "ChargeAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 9,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityCharge",
+          "type": "ChargeAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityCharge/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityCharge/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_screamer",
+      "nodeCount": 31,
+      "meshes": 8,
+      "visibleMeshes": 2,
+      "skinnedMeshes": 2,
+      "surfaces": 6,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 2,
+      "enabledShapes": 2,
+      "areas": 1,
+      "monitoringAreas": 1,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_screamer_scream",
+          "type": "AreaAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 9,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityScream",
+          "type": "AreaAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityScream/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityScream/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_guard",
+      "nodeCount": 23,
+      "meshes": 3,
+      "visibleMeshes": 3,
+      "skinnedMeshes": 2,
+      "surfaces": 3,
+      "distinctMaterials": 2,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 2,
+      "enabledShapes": 2,
+      "areas": 1,
+      "monitoringAreas": 1,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_guard_melee",
+          "type": "MeleeAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 9,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee",
+          "type": "MeleeAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_skill_elite",
+      "nodeCount": 39,
+      "meshes": 8,
+      "visibleMeshes": 3,
+      "skinnedMeshes": 2,
+      "surfaces": 6,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 2,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 3,
+      "enabledShapes": 3,
+      "areas": 2,
+      "monitoringAreas": 2,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_elite_control",
+          "type": "AreaAttackAbility",
+          "Enabled": false,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        },
+        {
+          "AbilityId": "skl_enemy_elite_buff",
+          "type": "BuffAlliesAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        },
+        {
+          "AbilityId": "skl_enemy_elite_melee",
+          "type": "MeleeAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 12,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityControl",
+          "type": "AreaAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityControl/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityControl/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityBuff",
+          "type": "BuffAlliesAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee",
+          "type": "MeleeAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_burrow_hunter",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_burrow_hunter",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_spear_guard",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_spear_guard",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_arc_thrower",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_arc_thrower",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_meteor_mage",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_meteor_mage",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_tracking_charger",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_tracking_charger",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_hover_diver",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_hover_diver",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_heavy_slammer",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_heavy_slammer",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_blade_spinner",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_blade_spinner",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_bomb_lobber",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_bomb_lobber",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_arc_bomber",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_arc_bomber",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "enemy_combo_fighter",
+      "nodeCount": 26,
+      "meshes": 7,
+      "visibleMeshes": 1,
+      "skinnedMeshes": 0,
+      "surfaces": 5,
+      "distinctMaterials": 5,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 1,
+      "bones": 0,
+      "skeletons": 0,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 1,
+      "enabledShapes": 1,
+      "areas": 0,
+      "monitoringAreas": 0,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_enemy_combo_fighter",
+          "type": "EnemyPlanAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 8,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan",
+          "type": "EnemyPlanAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityPlan/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    },
+    {
+      "id": "boss_final",
+      "nodeCount": 52,
+      "meshes": 13,
+      "visibleMeshes": 2,
+      "skinnedMeshes": 2,
+      "surfaces": 9,
+      "distinctMaterials": 8,
+      "surfacesWithNextPass": 0,
+      "materialOverlays": 0,
+      "shadowCasters": 2,
+      "bones": 7,
+      "skeletons": 1,
+      "animationPlayers": [
+        {
+          "path": "Model/AnimationPlayer",
+          "playing": true,
+          "callbackMode": "Idle"
+        }
+      ],
+      "collisionShapes": 4,
+      "enabledShapes": 4,
+      "areas": 3,
+      "monitoringAreas": 3,
+      "navigationAgents": 0,
+      "multimeshes": 0,
+      "occluders": 0,
+      "abilities": [
+        {
+          "AbilityId": "skl_boss_summon",
+          "type": "SummonAbility",
+          "Enabled": false,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        },
+        {
+          "AbilityId": "skl_boss_charge",
+          "type": "ChargeAttackAbility",
+          "Enabled": false,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        },
+        {
+          "AbilityId": "skl_boss_scream",
+          "type": "AreaAttackAbility",
+          "Enabled": false,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        },
+        {
+          "AbilityId": "skl_boss_melee",
+          "type": "MeleeAttackAbility",
+          "Enabled": true,
+          "IsActive": false,
+          "CooldownRemaining": 0,
+          "physicsEnabled": true
+        }
+      ],
+      "processCallbacks": 1,
+      "physicsCallbacks": 16,
+      "callbacks": [
+        {
+          "path": ".",
+          "type": "Unit",
+          "process": null,
+          "physics": "ActRoguelike.Combat.Unit",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "StatusEffects",
+          "type": "StatusEffectFx",
+          "process": null,
+          "physics": "ActRoguelike.Combat.StatusEffectFx",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Navigation",
+          "type": "UnitNavigation",
+          "process": null,
+          "physics": "ActRoguelike.AI.UnitNavigation",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Reactions",
+          "type": "CombatReaction",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CombatReaction",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "ImpactPause",
+          "type": "ImpactPause",
+          "process": null,
+          "physics": "ActRoguelike.Combat.ImpactPause",
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Animator",
+          "type": "UnitAnimator",
+          "process": null,
+          "physics": "ActRoguelike.Combat.UnitAnimator",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Presentation",
+          "type": "UnitPresentation",
+          "process": "ActRoguelike.Combat.UnitPresentation",
+          "physics": null,
+          "processEnabled": true,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "Pressure",
+          "type": "BossPressure",
+          "process": null,
+          "physics": "ActRoguelike.Boss.BossPressure",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Phases",
+          "type": "BossPhaseController",
+          "process": null,
+          "physics": "ActRoguelike.Boss.BossPhaseController",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilitySummon",
+          "type": "SummonAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityCharge",
+          "type": "ChargeAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityCharge/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityCharge/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityScream",
+          "type": "AreaAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityScream/AttackWarning/Indicator",
+          "type": "SkillIndicator",
+          "process": "ActRoguelike.Combat.SkillIndicator",
+          "physics": null,
+          "processEnabled": false,
+          "physicsEnabled": false,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityScream/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee",
+          "type": "MeleeAttackAbility",
+          "process": null,
+          "physics": "ActRoguelike.Abilities.Ability",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "AbilityMelee/Attack",
+          "type": "AttackHitbox",
+          "process": null,
+          "physics": "ActRoguelike.Combat.AttackHitbox",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Brain",
+          "type": "EnemyBrain",
+          "process": null,
+          "physics": "ActRoguelike.AI.EnemyBrain",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        },
+        {
+          "path": "Movement",
+          "type": "CharacterMovement",
+          "process": null,
+          "physics": "ActRoguelike.Combat.CharacterMovement",
+          "processEnabled": false,
+          "physicsEnabled": true,
+          "canProcess": true
+        }
+      ]
+    }
+  ],
+  "note": "\u771F\u5B9EReady\u540E\u9010\u4E2A\u539F\u578B\u7684\u53EA\u8BFB\u7ED3\u6784\u5FEB\u7167\uFF1B\u4E0D\u662F\u6218\u6597\u5E27\u8017\u65F6\u621650\uFF0F100\u654C\u4EBA\u538B\u529B\u6D4B\u8BD5\uFF1B\u4E0D\u4EE3\u8868\u8282\u70B9\u3001\u9AA8\u9ABC\u6216\u6750\u8D28\u6570\u91CF\u4E0E\u8017\u65F6\u7EBF\u6027\u5BF9\u5E94\u3002"
+}

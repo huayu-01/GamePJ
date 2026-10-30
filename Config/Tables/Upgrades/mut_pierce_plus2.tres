@@ -3,20 +3,34 @@
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
+
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_pierce_plus.tres" id="previous"]
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
 Stat = "PierceAdd"
 Operation = 0
-Value = 2
+Value = 6
+
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Modifiers = [SubResource("Resource_m0")]
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1272
 RewardKind = 2
 MaxStacks = 1
-Modifiers = [SubResource("Resource_m0")]
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Requires = PackedStringArray("mut_pierce_plus")
 Id = "mut_pierce_plus2"
-DisplayName = "穿透++"
-DescriptionTemplate = "穿透数再 +2"
-Note = "[P5 新增行] 文档第 200 行「穿透++:子弹现在全程穿透,弹速增加{n}%,前置:穿透+」。★ 「全程穿透」（无限穿透标记）与「弹速 +n%」**没有实现**（M23：没有全程穿透标记；弹速乘区也没有键），本行只落地穿透数 +2。"
+DisplayName = "升级：穿透（2级）"
+DescriptionTemplate = "替换上一级效果：额外穿透数+{Modifiers.PierceAdd:0.##}"
+Note = "032：当前级效果替换前级实例，保留历史身份满足前置；不再与上一级重复叠加。"
+
+NameKey = "content.mut_pierce_plus2.name"
+
+DescriptionKey = "content.mut_pierce_plus2.description"
+
+Effects = [SubResource("Resource_effect_0")]
+Replaces = ExtResource("previous")

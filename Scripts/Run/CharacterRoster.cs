@@ -4,10 +4,9 @@ using Godot;
 
 namespace ActRoguelike.Run;
 
-/// <summary>按角色表实例化交互预制体，新增角色无需改场景或代码。</summary>
+/// <summary>按角色表创建展台宿主与交互组件，统一使用当前类型模型，不再依赖旧展台预制体。</summary>
 public partial class CharacterRoster : Node3D
 {
-	[Export] public PackedScene StandScene { get; set; } = null!;
 	[Export] public float Spacing { get; set; } = 6;
 	public override void _Ready()
 	{
@@ -16,11 +15,12 @@ public partial class CharacterRoster : Node3D
 		{
 			CharacterConfig row = ConfigIndex.Settings.Characters[i];
 			if (row == null) continue;
-			var stand = StandScene.Instantiate<CharacterStand>();
-			stand.Character = row;
-			stand.GetNode<ActRoguelike.Visual.CharacterDisplay>("Visual").FixedCharacter = row;
-			stand.Name = row.Id;
-			stand.Position = Vector3.Right * ((i - (count - 1) * 0.5f) * Spacing);
+			var stand = new Node3D
+			{
+				Name = row.Id,
+				Position = Vector3.Right * ((i - (count - 1) * 0.5f) * Spacing),
+			};
+			stand.AddChild(new InteractionComponent { Name = "InteractionComponent", Kind = InteractionKind.Character, Character = row });
 			AddChild(stand);
 		}
 	}

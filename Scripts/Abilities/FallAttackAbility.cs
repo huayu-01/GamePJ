@@ -12,8 +12,14 @@ namespace ActRoguelike.Abilities;
 /// 标准单跳为1倍；额外空中跳高50%时同速为1.5倍，不额外再加1。
 /// 长枪由武器资源覆盖准星定向；只有真实落地派发Landed，超时与打断均取消。
 /// </summary>
-public partial class FallAttackAbility : Ability
+public partial class FallAttackAbility : Ability, IAbilityConfigConsumer, ActRoguelike.Visual.IWeaponPresentationSource
 {
+	public bool TryReadWeaponPresentation(out ActRoguelike.Visual.WeaponPresentationState state)
+	{
+		bool active = Enabled && IsDiving && HomingMode == DiveMode.Crosshair;
+		state = new(false, active, LastDiveDirection); return active;
+	}
+	public void ConfigureAfterParameters(Config.AbilityConfig config) => config.FallAttack?.ApplyTo(this);
 	/// <summary>下落时的朝向模式（表列 <c>HomingMode</c>）。</summary>
 	public enum DiveMode
 	{
@@ -33,7 +39,7 @@ public partial class FallAttackAbility : Ability
 		get
 		{
 			float multiplier = OwnerUnit?.Stats.Get("DiveSpeedMultiplier") ?? 1f;
-			return Mathf.Abs(DiveSpeed) * (multiplier > 0f ? multiplier : 1f);
+			return Mathf.Abs(DiveSpeed) * DiveSpeedScale * (multiplier > 0f ? multiplier : 1f);
 		}
 	}
 
@@ -59,6 +65,10 @@ public partial class FallAttackAbility : Ability
 
 	/// <summary>求"准星世界点"时射线的最大长度（判断"准星有没有指向地面"用）。</summary>
 	[Export] public float MaxAimDistance { get; set; } = 60f;
+	/// <summary>正值按脚下实时离地高度限定水平半径；零兼容旧角度配置。</summary>
+	[Export] public float AimRadiusHeightRatio { get; set; }
+	[Export] public float DiveSpeedScale { get; set; } = 1f;
+	[Export] public bool ShowLandingIndicator { get; set; }
 
 	[ExportGroup("运行期可读状态（自测 / UI / 落剑式）")]
 	/// <summary>本次下落攻击**起手时**的高度（米）。</summary>
@@ -96,7 +106,7 @@ public partial class FallAttackAbility : Ability
 		LastDamageBonus = 0f;
 		LastDamage = _hitbox.Damage * CurrentOffense.DamageMultiplier * damageScale;
 		HasLanded = true;
-		_hitbox.Activate(OwnerUnit, new AttackInstance { Attacker = OwnerUnit, Ability = AbilityId, AbilityKind = AbilityId,
+		_hitbox.Activate(OwnerUnit, new AttackInstance { IsDirectAbilityAttack = true, Attacker = OwnerUnit, Ability = AbilityId, AbilityKind = AbilityId,
 			FeedbackWeight = _hitbox.FeedbackWeight,
 			BaseDamage = LastDamage, CanCrit = true, CritChance = CurrentOffense.CritChance, CritMultiplier = CurrentOffense.CritMultiplier,
 			Knockback = _hitbox.Knockback, Policy = HitPolicy.OncePerTarget, Tags = _hitbox.AttackTags });
@@ -106,6 +116,7 @@ public partial class FallAttackAbility : Ability
 	}
 	protected override void OnLoadoutReset()
 	{
+		HideLandingPreview();
 		LandingKnockback = 0f;
 		LandingKnockbackPulseCount = LandingKnockbackHitCount = 0;
 	}
@@ -142,9 +153,9 @@ public partial class FallAttackAbility : Ability
 		height = 0;
 		if (OwnerUnit == null) return false;
 		Vector3 feet = OwnerUnit.GlobalPosition;
-		var query = PhysicsRayQueryParameters3D.Create(feet + Vector3.Up * 0.02f, feet + Vector3.Down * GroundProbeDistance, CombatLayers.World);
+		using var query = PhysicsRayQueryParameters3D.Create(feet + Vector3.Up * 0.02f, feet + Vector3.Down * GroundProbeDistance, CombatLayers.World);
 		query.Exclude = new Godot.Collections.Array<Rid> { OwnerUnit.GetRid() };
-		var hit = OwnerUnit.GetWorld3D().DirectSpaceState.IntersectRay(query);
+		using var hit = OwnerUnit.GetWorld3D().DirectSpaceState.IntersectRay(query);
 		if (hit.Count == 0 || hit["normal"].AsVector3().Y < GroundMinNormalY) return false;
 		height = Mathf.Max(0, feet.Y - hit["position"].AsVector3().Y);
 		return height > 0.001f;
@@ -183,7 +194,9 @@ public partial class FallAttackAbility : Ability
 		if (Movement.IsGrounded) { Cancel(); return; }
 		LastDiveDirection = ResolveDiveDirection();
 		Vector3 velocity = LastDiveDirection * EffectiveDiveSpeed;
-		if (!Movement.BeginVelocityOverride(this, velocity)) { Cancel(); return; }
+		// 定向落有明确终点：最后一帧按剩余航时缩短位移，避免碰地后沿地面滑过落点。
+		float duration = HasGroundAim ? OwnerUnit.GlobalPosition.DistanceTo(LastAimPoint) / Mathf.Max(.001f, EffectiveDiveSpeed) : -1;
+		if (!Movement.BeginVelocityOverride(this, velocity, duration)) { Cancel(); return; }
 		LastDownwardSpeed = Mathf.Max(0, -velocity.Y);
 		LastDamageBonus = DamageMultiplierForDive(LastFallHeight, LastDownwardSpeed) - 1;
 		CurrentOffense = AttackOffense.Capture(OwnerUnit, _hitbox?.CritChance ?? 0f, _hitbox?.CritMultiplier ?? 2f);
@@ -197,22 +210,10 @@ public partial class FallAttackAbility : Ability
 	/// <summary>准星打到的东西（判断"有没有指向地面"）→ 朝那个点的方向；没打到地面就返回向下。</summary>
 	private Vector3 ResolveDiveDirection()
 	{
-		if (OwnerUnit == null)
-		{
-			return Vector3.Down;
-		}
-
-		if (HomingMode != DiveMode.Crosshair) return Vector3.Down;
-		HasGroundAim = AimUtil.TryGetCrosshairGroundPoint(GetViewport(), OwnerUnit, MaxAimDistance, GroundMinNormalY, out Vector3 target);
-		if (!HasGroundAim) return Vector3.Down;
-		// 目标须低于角色；超出角度时仍保留同一水平方向。
-		Vector3 delta = target - OwnerUnit.GlobalPosition;
-		if (delta.Y >= -0.001f) { HasGroundAim = false; return Vector3.Down; }
-		Vector3 planar = new(delta.X, 0, delta.Z);
-		float maxRange = -delta.Y * Mathf.Tan(Mathf.DegToRad(Mathf.Clamp(MaxDiveAngleDegrees, 0, 85)));
-		if (planar.Length() > maxRange) planar = planar.Normalized() * maxRange;
-		LastAimPoint = OwnerUnit.GlobalPosition + new Vector3(planar.X, delta.Y, planar.Z);
-		return (LastAimPoint - OwnerUnit.GlobalPosition).Normalized();
+		HasGroundAim = TryResolveLandingAim(out var point, out _, out _);
+		LastAimPoint = point;
+		HideLandingPreview();
+		return HasGroundAim && OwnerUnit != null ? (point - OwnerUnit.GlobalPosition).Normalized() : Vector3.Down;
 	}
 
 	private void ActivateDiveHitbox()
@@ -224,6 +225,7 @@ public partial class FallAttackAbility : Ability
 
 		var attack = new AttackInstance
 		{
+			IsDirectAbilityAttack = true,
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
 			BaseDamage = LastDamage,
@@ -251,6 +253,9 @@ public partial class FallAttackAbility : Ability
 
 		if (_diving)
 		{
+			// 有限下冲结束但碰地尚差一个接触间隙时，归还普通重力；不能永久持有归零的速度覆盖。
+			// 暂停不取消动作；恢复后仍只以真实着地触发落地事件。
+			if (Movement is { IsGrounded: false } && Movement.VelocityOverrideFinished(this)) Movement.EndVelocityOverride(this);
 			_diveTime += delta;
 			if (OwnerUnit != null)
 			{
@@ -350,6 +355,7 @@ public partial class FallAttackAbility : Ability
 
 	protected override void OnFinishOrCancel()
 	{
+		HideLandingPreview();
 		_diving = false;
 		_hitbox?.Deactivate();
 		Movement?.EndVelocityOverride(this);

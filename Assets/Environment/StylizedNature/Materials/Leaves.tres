@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://b25n4vvisdj4r"]
+
+[ext_resource type="Texture2D" uid="uid://cpd14ubh7a5hx" path="res://Assets/Environment/StylizedNature/Models/Leaves.png" id="1_xdr31"]
+
+[resource]
+resource_name = "Leaves"
+transparency = 2
+alpha_scissor_threshold = 0.2
+alpha_antialiasing_mode = 0
+cull_mode = 2
+diffuse_mode = 3
+specular_mode = 2
+albedo_texture = ExtResource("1_xdr31")
+roughness = 0.95
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0

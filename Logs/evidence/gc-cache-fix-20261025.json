@@ -1,0 +1,367 @@
+{
+  "date": "2026-10-25",
+  "status": "本次项目加载路径GC回归已修复；没有修改或替换引擎",
+  "cause": "新增制作校验默认缓存了C#资源，包装器已收集而终结器阻塞时再次触及缓存，引发已释放GCHandle。修复必须覆盖首次读取；仅第二次IgnoreDeep不足。",
+  "before": {
+    "Date": "2026-10-25T08:31:30",
+    "Mode": "修改前实际ContentValidator目录扫描",
+    "Failure": "引擎验证未通过：exit=-1073741795；F:\\Godot项目\\项目a\\Logs\\validation\\gc_before_20261025_083107.log / F:\\Godot项目\\项目a\\Logs\\validation\\gc_before_20261025_083107.err",
+    "WeakCollected": true,
+    "ValidatorCompleted": true,
+    "FatalGcHandle": true,
+    "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_before_20261025_083107.log",
+    "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_before_20261025_083107.err",
+    "stdout_file": {
+      "path": "Logs/validation/gc_before_20261025_083107.log",
+      "bytes": 6884,
+      "sha256": "bb2755f9003a1e9b744d66497841ef00f8828e2bca3022bee7d5698cea0d8956"
+    },
+    "stderr_file": {
+      "path": "Logs/validation/gc_before_20261025_083107.err",
+      "bytes": 745,
+      "sha256": "e66175998dfe19ae750b529d1ad51731234b3405bcfdf9477b7a4d4f966aacfd"
+    }
+  },
+  "isolation": [
+    {
+      "Name": "collect_only",
+      "Failure": "",
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.collect_only.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.collect_only.err",
+      "stdout_file": {
+        "path": "Logs/validation/gc_isolate_20261025_083430.collect_only.log",
+        "bytes": 7120,
+        "sha256": "a61ebda5c100d3be84b059be5e529ddcc6805767ea82ca0bb84125842704667b"
+      },
+      "stderr_file": {
+        "path": "Logs/validation/gc_isolate_20261025_083430.collect_only.err",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "Name": "direct_reload",
+      "Failure": "引擎验证未通过：exit=-1073741795；F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.direct_reload.log / F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.direct_reload.err",
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.direct_reload.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.direct_reload.err",
+      "stdout_file": {
+        "path": "Logs/validation/gc_isolate_20261025_083430.direct_reload.log",
+        "bytes": 6864,
+        "sha256": "d1df19097ecf6d95140a696a7dfd65f15c0edbe38e0913decdc711393cf594b7"
+      },
+      "stderr_file": {
+        "path": "Logs/validation/gc_isolate_20261025_083430.direct_reload.err",
+        "bytes": 745,
+        "sha256": "e66175998dfe19ae750b529d1ad51731234b3405bcfdf9477b7a4d4f966aacfd"
+      }
+    },
+    {
+      "Name": "original_safe",
+      "Failure": "",
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.original_safe.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.original_safe.err",
+      "stdout_file": {
+        "path": "Logs/validation/gc_isolate_20261025_083430.original_safe.log",
+        "bytes": 7127,
+        "sha256": "90250ce169955bd68a3a031c328488af5d829f4e0d85f804529bbc97642884ee"
+      },
+      "stderr_file": {
+        "path": "Logs/validation/gc_isolate_20261025_083430.original_safe.err",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "second_read_only_fix_failure": {
+    "path": "Logs/evidence/content-gc-20261025_083318.json",
+    "bytes": 317,
+    "sha256": "f96285653653c928792c74931b5585bf5c8223e52f0183af482ad02e909ec49a"
+  },
+  "after": {
+    "Date": "2026-10-25T08:36:25",
+    "Passed": true,
+    "Runs": [
+      {
+        "Name": "content_1",
+        "Exit": 0,
+        "Seconds": 3.82,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_1.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_1.err",
+        "StdoutSHA256": "1522085E0B6841B15A7CC7497068306B3A0471B8822B2EDB15DA50EB5C731D11",
+        "StderrBytes": 0,
+        "stdout_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_1.log",
+          "bytes": 7129,
+          "sha256": "1522085e0b6841b15a7cc7497068306b3a0471b8822b2edb15da50eb5c731d11"
+        },
+        "stderr_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_1.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "Name": "content_2",
+        "Exit": 0,
+        "Seconds": 3.82,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_2.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_2.err",
+        "StdoutSHA256": "CB7278D5D23F47CCFA91E7D824C9A48E4A0BD18E8447330062CAF9B5765D6D09",
+        "StderrBytes": 0,
+        "stdout_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_2.log",
+          "bytes": 7129,
+          "sha256": "cb7278d5d23f47ccfa91e7d824c9a48e4a0bd18e8447330062caf9b5765d6d09"
+        },
+        "stderr_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_2.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "Name": "content_3",
+        "Exit": 0,
+        "Seconds": 3.82,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_3.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_3.err",
+        "StdoutSHA256": "FFBDCFE80A06A173974EA26499EF8FDA73CB8510434AD4BDB1C6C03E327D94C2",
+        "StderrBytes": 0,
+        "stdout_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_3.log",
+          "bytes": 7129,
+          "sha256": "ffbdcfe80a06a173974ea26499ef8fda73cb8510434ad4bdb1c6c03e327d94c2"
+        },
+        "stderr_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_3.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "Name": "content_stress",
+        "Exit": 0,
+        "Seconds": 13.75,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_stress.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_stress.err",
+        "StdoutSHA256": "97D09E7F21253204BA45E303C4D994079BB5448CF4FB3306D3E4E58B8EFB7D8F",
+        "StderrBytes": 0,
+        "stdout_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_stress.log",
+          "bytes": 7392,
+          "sha256": "97d09e7f21253204ba45e303c4d994079bb5448cf4fb3306d3e4e58b8efb7d8f"
+        },
+        "stderr_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_stress.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "Name": "resource_safe",
+        "Exit": 0,
+        "Seconds": 2.03,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.resource_safe.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.resource_safe.err",
+        "StdoutSHA256": "2028923E552C0697FA48102EF026F911A0CD63E021D4CC3A0DA501A8DC43B31D",
+        "StderrBytes": 0,
+        "stdout_file": {
+          "path": "Logs/validation/gc_20261025_083625.resource_safe.log",
+          "bytes": 7127,
+          "sha256": "2028923e552c0697fa48102ef026f911a0cd63e021d4cc3a0da501a8dc43b31d"
+        },
+        "stderr_file": {
+          "path": "Logs/validation/gc_20261025_083625.resource_safe.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "Name": "native_safe",
+        "Exit": 0,
+        "Seconds": 2.04,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.native_safe.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.native_safe.err",
+        "StdoutSHA256": "BC927C62C81BE1CF2849EC07D703B6CD6E4185DB4065111E8C59C2F52F921E45",
+        "StderrBytes": 0,
+        "stdout_file": {
+          "path": "Logs/validation/gc_20261025_083625.native_safe.log",
+          "bytes": 7156,
+          "sha256": "bc927c62c81be1cf2849ec07d703b6cd6e4185db4065111e8c59c2f52f921e45"
+        },
+        "stderr_file": {
+          "path": "Logs/validation/gc_20261025_083625.native_safe.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "Name": "content_render",
+        "Exit": 0,
+        "Seconds": 7.37,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_render.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261025_083625.content_render.err",
+        "StdoutSHA256": "550A08298530C6515E5EE8F0259EAE4A0B6844658B3AAA15FAB9E75AA58AD545",
+        "StderrBytes": 0,
+        "stdout_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_render.log",
+          "bytes": 9171,
+          "sha256": "550a08298530c6515e5ee8f0259eae4a0b6844658b3aaa15fab9e75aa58ad545"
+        },
+        "stderr_file": {
+          "path": "Logs/validation/gc_20261025_083625.content_render.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    ],
+    "SavesUnchanged": true,
+    "Failure": ""
+  },
+  "builds": [
+    {
+      "path": "Logs/validation/gc_20261025_083625.Debug.log",
+      "bytes": 256,
+      "sha256": "93d6186f10b247eacbbdef7f664912ff7fad7a4850b16b3ffc85d4b44f6da111"
+    },
+    {
+      "path": "Logs/validation/gc_20261025_083625.ExportRelease.log",
+      "bytes": 294,
+      "sha256": "d36537c0993bcbb31e93f8490f67729efc3d80c59eec3099cd00cec0930a6e21"
+    },
+    {
+      "path": "Logs/validation/gc_final_20261025.ExportRelease.log",
+      "bytes": 294,
+      "sha256": "5a0bf9a30cea68f34ac1f96b3df033ada27d6c41c23cc7710b6d9ffa7b29e1eb"
+    }
+  ],
+  "regression": {
+    "evidence": {
+      "path": "Logs/evidence/gameplay-fixes-evidence-20261025_083751.log",
+      "bytes": 1058797,
+      "sha256": "8792d79de93344b8d39c6a1e9419b034ee7ad20b75a8cdccb54cbc919c53175e"
+    },
+    "cases": [
+      [
+        "effects",
+        "0",
+        "2.29"
+      ],
+      [
+        "decoupling",
+        "0",
+        "4.07"
+      ],
+      [
+        "replacement_render",
+        "0",
+        "19.47"
+      ],
+      [
+        "content",
+        "0",
+        "3.81"
+      ],
+      [
+        "specialization",
+        "0",
+        "12.23"
+      ],
+      [
+        "synergy",
+        "0",
+        "9.15"
+      ],
+      [
+        "main",
+        "0",
+        "70.25"
+      ]
+    ],
+    "main_metrics": [
+      "[Main指标一致] [Config] 配置表：武器 <内容基线> / 角色 <内容基线> / 敌人 <内容基线> / 首领 <内容基线> / 召唤物 <内容基线> / 技能 <内容基线> / 连招参数 <内容基线> / Pressure <内容基线> / 效果 <内容基线> / 节点 <内容基线> / 局外成长 <内容基线> / AI 档案 <内容基线> / 能力卡 <内容基线>（ConfigIndex.tres 已加载）",
+      "[Main指标一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）",
+      "[Main指标一致] [SelfTest] 配置表比对·玩家：生命 <配装>（期望 200 + 元进度加成 <存档>；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）",
+      "[Main指标一致] [SelfTest] 配置表比对·索引：武器 <内容基线>/角色 <内容基线>/敌人 <内容基线>/首领 <内容基线>/召唤物 <内容基线>/技能 <内容基线>/Pressure <内容基线>/效果 <内容基线>/节点 <内容基线>/局外 <内容基线>/升级池 <内容基线>/AI 档案 <内容基线>/能力卡 <内容基线>/符文 <内容基线>",
+      "[Main指标一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）",
+      "[Main指标一致] [SelfTest] 🔴 白板首领实例：生命 <公式核验> 护甲 0（期望 0）标签 [Boss,Melee]",
+      "[Main指标一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True",
+      "[Main指标一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓"
+    ],
+    "main_status": "八指标一致，无新增失败，历史五类红标保留"
+  },
+  "scene_unload": {
+    "stdout": {
+      "path": "Logs/validation/.ai_f_probe_final.log",
+      "bytes": 47080,
+      "sha256": "82a1c65b4e7d73aa5e6d044a1cf03c6790841bb43d32d288c6550ccdd2061ef4"
+    },
+    "stderr": {
+      "path": "Logs/validation/.ai_f_probe_final.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "exit_code": 0,
+    "passes": 33,
+    "failures": 0,
+    "gc_unload_rounds": 12,
+    "entry_evidence": {
+      "path": "Logs/evidence/followup-f-evidence.log",
+      "bytes": 2641,
+      "sha256": "485a2aa5cb7261efba316283fb4fb235e3f8e5f939fe2ba924a9ff469a9326e6"
+    }
+  },
+  "followup_fixture_correction": {
+    "reason": "语料写入已迁到Logs，读取仍指向旧根路径，首轮32通过/1失败；12轮GC均已通过。仅修正语料读取路径，保留原数量及字形断言。",
+    "preserved_stdout": {
+      "path": "Logs/evidence/gc-followup-first-failure-20261025/.ai_f_probe_final.log",
+      "bytes": 47077,
+      "sha256": "123aeb93c6d6800f977ed5d05b8ce45c2def32f85a1047cb18fe33c44071f539"
+    }
+  },
+  "real_player_save_sha256": {
+    "meta.cfg": "26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446",
+    "ability_cards.cfg": "4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D",
+    "settings.cfg": "7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1",
+    "loadout.cfg": "CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462",
+    "rune.cfg": "CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6"
+  },
+  "source_files": [
+    {
+      "path": "Scripts/Config/Validation/ContentValidator.cs",
+      "bytes": 13757,
+      "sha256": "92032b1f48fafe5c2cfe241dd8424ca41508d37d7d29f3aee7e3dd5bbe09248c"
+    },
+    {
+      "path": "Scripts/Config/UnitVisualProfile.cs",
+      "bytes": 3404,
+      "sha256": "37d17baf8acadd0602543691cd69fe9dd229d00e0d569e91c7958af1b553dd13"
+    },
+    {
+      "path": "Scripts/Core/RuntimeResources.cs",
+      "bytes": 1932,
+      "sha256": "39ae37abc9d430f5f7ff824fb6e89533ff17bcd4bf86dc13f9a90091fd22a2bb"
+    },
+    {
+      "path": "Scripts/Testing/ResourceLifetimeProbe.cs",
+      "bytes": 6329,
+      "sha256": "ddd431ad63aba0784dadf1cddaf9112027a5cb9229802b91826d802f32977119"
+    },
+    {
+      "path": "Scripts/Testing/RuneUiProbe.cs",
+      "bytes": 4610,
+      "sha256": "fb8bf3edf6ad0dbf9da773bc57fbc48c2fda98a71a68a6ea4133452a8fe89c77"
+    },
+    {
+      "path": "Scripts/Testing/FollowupProbe.cs",
+      "bytes": 8050,
+      "sha256": "86c826b781044dd80cb6517c1bead8efd4a9708a66fd7224f84fd6117d942614"
+    },
+    {
+      "path": "_tools/verify_content_gc.ps1",
+      "bytes": 3705,
+      "sha256": "7c17c408317937f67079c1ecc6cb2197f0873a94e85ae3104ef81b6c3ff12f07"
+    }
+  ],
+  "remaining_unrelated": "PNG颜色配置告警不在本次GC修复范围，未宣称修复。"
+}

@@ -1,0 +1,187 @@
+[
+  {
+    "path": "Scenes/Enemies/MeteorMage.tscn",
+    "sha256": "f8428505d482049908b46a369a253604f2282d94f3c3372eee59996e52d8ac37",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Config/UnitConfig.cs",
+    "sha256": "e797419511f6c2f6b0dc9171b9f836c677747f82676dcb7c502a289fdea3f6b0",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalDirector.cs",
+    "sha256": "2121bf1fdb5334992059ee17ba027e29b69995c15e6c834d784024cb89b26c09",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalDirector.Spawning.cs",
+    "sha256": "7c9efd82b1ab5e963a253bfb278bfbd31d5a46a04cf95f29359e97665144e049",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalObjective.cs",
+    "sha256": "a7c0bf064a0179afd7a9be6866f110eee09ca70e9ba57aaa4f80e4485e155659",
+    "changed": true
+  },
+  {
+    "path": "Config/Localization/zh.tres",
+    "sha256": "b9e69e0e7fbb5598009f10d199df0f4ee1ee8ea3fba6236a497ec32abb62b8b3",
+    "changed": true
+  },
+  {
+    "path": "Config/Localization/en.tres",
+    "sha256": "6d0cd20bdcdf10984c99c60abc5f82100da5ae4087b07455520801d1e17e9c89",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Testing/SurvivalAugmentsProbe.cs",
+    "sha256": "18594529b881f3d1c86d46edfc8ed2b5be6627cd964895c62ba5d46ec20343a2",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Testing/SurvivalModeProbe.cs",
+    "sha256": "a62cf728bf4e5af102d22366ce80ed4ce6c16bb7d909a349713b26d0c13af1ee",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Testing/CodexProbe.cs",
+    "sha256": "2b96f95892d75e767d32f3b5c90d16147ecb4fff46d2cd797d7608abb9fa2589",
+    "changed": true
+  },
+  {
+    "path": "_tools/build_survival_augments.py",
+    "sha256": "f5c5619d6dcbb0b1715ac8b451528b33a9352408a54b1cc1966d7b2f9b23c4a6",
+    "changed": true
+  },
+  {
+    "path": "docs/enemy-roster.md",
+    "sha256": "e3244a4e824d7f95614e23b91f80c58a54f75b6d90ff3500e85db9ba4ebfe4b2",
+    "changed": true
+  },
+  {
+    "path": "docs/config-authoring.md",
+    "sha256": "a3cfb973243c703720dca8bb3770665e0840b05819c04991d071f40748e8a6b2",
+    "changed": true
+  },
+  {
+    "path": "docs/combat.md",
+    "sha256": "19e01d5af015be593e739719fbc3357e6c9c3c01390cabd558b14ac4f665b9d1",
+    "changed": true
+  },
+  {
+    "path": "docs/README.md",
+    "sha256": "6a6338d5ac6c4bb63f80a4b6f3e2d1ffef3ad54cd68d2781754d1b795897b2fd",
+    "changed": true
+  },
+  {
+    "path": "docs/SESSION-SNAPSHOT.md",
+    "sha256": "cb7b0ee75dc21e34bd31cbec06e8e31ee82fbba7288819ea662a334797c1a39e",
+    "changed": true
+  },
+  {
+    "path": "docs/survival-mode.md",
+    "sha256": "5aa8fb259e734419b3dc0b0d5a97f32f94fd92f8a92e0783cad47e01a8e582f0",
+    "changed": true
+  },
+  {
+    "path": "docs/survival-builds.md",
+    "sha256": "b94b9f7d42ef342f0d7959e1f5fddbd4f8d456aea8635f5064b5dd6638f628a8",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_anchor_afterglow.tres",
+    "sha256": "5ad0a3c618ae4574350188301c314ac5ba7389adb9993e82354c6362d45b274a",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_anchor_core.tres",
+    "sha256": "e949de66347f1506e513d85ddb36a81a42e9c55fa8397dc0e08f653d9e9bbc84",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_anchor_pulse.tres",
+    "sha256": "8f325d86c69ee8c3cd04d99fca112544d5eb824ef21e507c45c64d990b9af0ce",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_contract_payoff.tres",
+    "sha256": "fe0028198a841136d9f3a530d6bb9f30573cdc6054cb247898c16daecea5f345",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_echo_familiar.tres",
+    "sha256": "f3e54b393f197f8dab5da756cf0a05344c5a2d68c775b4c75fe30071d0e920f7",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_echo_lance.tres",
+    "sha256": "ef821bb3eef3ddb9bff08fc5e630f1cd281113f2c2bdbbcbbbac0973f91a84ea",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_echo_mark.tres",
+    "sha256": "51a164844756fe3e2165b23711594cbc5c62440ce6841e0f5c0f401bc63c8027",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_energy_echo.tres",
+    "sha256": "db4aa78bb760e384c483e21826b0cb48208aa2dfac3bb5e17383073eff0fc21a",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_risk_contract.tres",
+    "sha256": "0fe2439a4d33d6b43983621379bd8d3c9af89c569f069cecfc9edc7b059b6ea8",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_scavenger_compass.tres",
+    "sha256": "39ee3aa9160dad3e0e721ec1969adf3a9d35996584f9cc88ddf537ca9e1be80b",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_scavenger_ward.tres",
+    "sha256": "863ab12878ea2a392ac67678ee16a85d7a9c03d580f0434ddec640c15d4c608e",
+    "changed": true
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_timed_hunt.tres",
+    "sha256": "8ca549d9f8ed4b8534f66f347c49b532c9979e41f1a7bfef75e95ff929f365e4",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Testing/AttackSnapshotProbe.cs",
+    "sha256": "960896a487fa9900fa240961b858f5ab3c3d94d11dc7b43b44887983238c3895",
+    "changed": true
+  },
+  {
+    "path": "_tools/verify_survival_integration.ps1",
+    "sha256": "9b152c0ba03b8f47fe5b114ffe72e6e46a432f9c0087b5e6d168f32a0e8b85dd",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Debug/GmConsole.cs",
+    "sha256": "05fb6922a752888e2ade6604f6dec1f6e230fb8bcb3c3a57c7edac165fa9cc20",
+    "changed": true
+  },
+  {
+    "path": "Scripts/Testing/SurvivalAugmentsProbe.Retired.cs",
+    "sha256": "6ddf3675404efb2c146e11f00de0fbf8157c4988740ba77092a12f52e0499694",
+    "before_captured": false
+  },
+  {
+    "path": "docs/reviews/20261028/balance-046-implementation.md",
+    "sha256": "7d3771a25ded9434a9a7edae5c263ab230086f85962d2dbae42e00092e6ade60",
+    "before_captured": false
+  },
+  {
+    "path": "docs/reviews/20261028/balance-046.md",
+    "sha256": "9d4648282c629184d80719e3f79e470bef68e0adf253b7a7bf75bc1c6a70f261",
+    "before_captured": false
+  },
+  {
+    "path": "outputs/balance-046-20261028/README.md",
+    "sha256": "acfe531e15cff89ea08dfebe8eb6ce29f3a335f59104acef99c5a2c58103cfd8",
+    "before_captured": false
+  }
+]

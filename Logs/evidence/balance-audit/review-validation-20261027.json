@@ -1,0 +1,40 @@
+{
+  "Artifacts": [
+    {
+      "Path": "docs/balance-review-20261027.md",
+      "Sha256": "B738BD67384DD3D9017FC7611BD1A5A3C9CF30C473975262078FA0434DB71BA9"
+    },
+    {
+      "Path": "docs/balance-values-20261027.md",
+      "Sha256": "2D55F293CCE99E95F6E0E61FD748A06FF25F3608A670BE9116D6284A86CAD7AA"
+    },
+    {
+      "Path": "Logs/evidence/balance-audit/balance-audit-20261027.json",
+      "Sha256": "E7A0582B18AFCC9E896CA753F5CB684DE2470AFAA5EE80ECD7FC9B47C7554B36"
+    },
+    {
+      "Path": "Logs/evidence/balance-audit/balance-catalog-20261027.json",
+      "Sha256": "7535E731A44CFBBA81336B24D15438387C8E2D1B3938843CC3A3A50E4FA8D75F"
+    }
+  ],
+  "Notes": "旧输入驱动诊断样本和退出失败日志不作为最终证据；短窗口无甲静止单靶不代表整局胜率。",
+  "ProductionBalanceChanged": false,
+  "ReviewedAt": "2026-10-27T11:32:07.6511821+08:00",
+  "FullAudit": {
+    "SaveVerification": "审计包装器在运行前和finally比较meta/ability_cards/settings/loadout/rune五份真实存档，逐字节一致",
+    "ObservedWrapperResult": "PASS 平衡审计和真实动作采样，生产数值及真实存档未改。",
+    "BuildDebug": "Logs/validation/balance_audit_20261027_111759.Debug.log",
+    "BuildExportRelease": "Logs/validation/balance_audit_20261027_111759.ExportRelease.log",
+    "EngineExitCode": 0,
+    "StderrBytes": 0,
+    "Stdout": "Logs/validation/balance_audit_20261027_111759.log"
+  },
+  "Scope": {
+    "EliteTraits": 33,
+    "Upgrades": 103,
+    "Runes": 11,
+    "Samples": 17,
+    "EnemyInstances": 41,
+    "Weapons": 6
+  }
+}

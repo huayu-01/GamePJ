@@ -41,7 +41,7 @@ public partial class FollowupProbe : Node3D
 	{
 		if (DisplayServer.GetName() == "headless") return;
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"截图 {name}");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"截图 {name}");
 	}
 	private async Task RunAudioExit()
 	{
@@ -104,7 +104,7 @@ public partial class FollowupProbe : Node3D
 		Check(font.ResourcePath == "res://Assets/UI/Themes/ui_font.tres", "实际控件使用项目内置字体");
 		var themeFont = (FontVariation)RuntimeResources.Load<Theme>("res://Assets/UI/Themes/ui_theme.tres").DefaultFont;
 		Check(themeFont.ResourcePath == font.ResourcePath && themeFont.BaseFont.ResourcePath == font.BaseFont.ResourcePath, "独立主题资源图仍指向同一内置字体文件");
-		string corpus = FileAccess.GetFileAsString("res://.ai_font_corpus.txt");
+		string corpus = FileAccess.GetFileAsString("res://Logs/validation/.ai_font_corpus.txt");
 		var missing = new List<char>();
 		foreach (char character in corpus) if (!font.HasChar(character)) missing.Add(character);
 		Check(corpus.Length > 500 && missing.Count == 0, $"项目中文语料{corpus.Length}个不同字形，缺字={new string(missing.ToArray())}");

@@ -1,0 +1,1102 @@
+{
+  "date": "2026-10-25",
+  "scope": "本计划剩余内容解耦、制作入口、公共验证与文件整理；不含最终美术、平衡及历史问题修复",
+  "content_baseline": {
+    "path": "Config/Validation/content_inventory.tres",
+    "bytes": 707,
+    "sha256": "57af90f398e28f6eb666f53cd3be5d4f192093a9b75f74a4b582b59463cec72c"
+  },
+  "coverage": {
+    "selectors": 47,
+    "invocations": {
+      "rules": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 4.34,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.rules.log",
+          "bytes": 13813,
+          "sha256": "969a9d3536237a03ed1cb6c4485ff6ec48e7f6f953aa35a96a69b53eb4052bdc"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.rules.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[GameplayRules] === 玩法规则验收结束：通过 26，失败 0 ==="
+        ]
+      },
+      "effects": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 2.55,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024516.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.effects.log",
+          "bytes": 20592,
+          "sha256": "7dd95a13c34d55cb57eaff30ee65c75f91664d23b77bae6d057b7af36a46b33d"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.effects.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[RewardEffects] SUMMARY pass=85 fail=0"
+        ]
+      },
+      "jump_stomp": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 7.17,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.jump_stomp.log",
+          "bytes": 16375,
+          "sha256": "d3a783c6e9ef22f306cc6540d97a4d1ac0b339b395743bf4686062cc39322af4"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.jump_stomp.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[JumpStomp] === 起跳践踏验收结束：通过 39，失败 0 ==="
+        ]
+      },
+      "kill_jumps": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 13.2,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.kill_jumps.log",
+          "bytes": 36997,
+          "sha256": "d2afc6a7dfb9b0f1cee20a67878ac7fcb9558d7fe4ea26793bb7e833797b0456"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.kill_jumps.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[KillJump] === 击杀跳跃验收结束：通过 78，失败 0 ==="
+        ]
+      },
+      "kill_facts": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 8.65,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.kill_facts.log",
+          "bytes": 31478,
+          "sha256": "72b6bc176d91da30562b5fce27129b1a69c95f53942ade6280df8f79a28a949b"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.kill_facts.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[KillFact] === 逐杀事实验收结束：通过 40，失败 0 ==="
+        ]
+      },
+      "body": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 9.12,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.body.log",
+          "bytes": 19968,
+          "sha256": "f5fc231059f31135437e0ee59820cc7bf79cd5c31f4ff7f6da817d3d531dc5bd"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.body.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Body] === 身体分层验收结束：通过 31，失败 0 ==="
+        ]
+      },
+      "decoupling": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 4.34,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024516.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.decoupling.log",
+          "bytes": 15236,
+          "sha256": "8b9a480acd68ee33d8f6a12af9c1166262289bd11e5a109b9abd2b21dec21c3a"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.decoupling.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Decoupling] SUMMARY pass=65 fail=0"
+        ]
+      },
+      "interaction": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 11.0,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.interaction.log",
+          "bytes": 18698,
+          "sha256": "976d6d45debd12bf7d31e5c0feb244e55e33561c5ae060dacabe54b0c6edf9f7"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.interaction.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[InteractionComponent] === 交互组件验收结束：通过 119，失败 0 ==="
+        ]
+      },
+      "interaction_render": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 12.14,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024634.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.interaction_render.log",
+          "bytes": 18939,
+          "sha256": "3b57a0917b4435b3af753bf208b7095e1cc4b0c46d82688e0446f7bc2359ef39"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.interaction_render.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[InteractionComponent] === 交互组件验收结束：通过 119，失败 0 ==="
+        ]
+      },
+      "enemy_actions": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 4.11,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.enemy_actions.log",
+          "bytes": 18159,
+          "sha256": "5268c3320137e68a822d7d45a080376e5b1bceaf269882c93ea1a62880bea09c"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.enemy_actions.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[EnemyActions] SUMMARY pass=68 fail=0"
+        ]
+      },
+      "warnings": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 15.29,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.warnings.log",
+          "bytes": 18539,
+          "sha256": "7091004d5877be555ee334f2065256bca86ee46244a1d7f519600300bd66723c"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.warnings.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Warning] === 敌人预警验收结束：通过 40，失败 0 ==="
+        ]
+      },
+      "warnings_render": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 16.55,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.warnings_render.log",
+          "bytes": 20103,
+          "sha256": "9f5ea6f66554633e1c9ca0180851cf176e9ee19580f81178b63746d9326a93f6"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.warnings_render.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Warning] === 敌人预警验收结束：通过 41，失败 0 ==="
+        ]
+      },
+      "replacement": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 17.13,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.replacement.log",
+          "bytes": 34387,
+          "sha256": "7d542de17839066a097d66b47f31c324bb75fd32c60d47ff5d14330185505508"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.replacement.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": []
+      },
+      "replacement_render": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 19.13,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.replacement_render.log",
+          "bytes": 34778,
+          "sha256": "12920b07e7fb9af12e8a3b85e56db9f8df715602056595fbdf4c1c9f5725cec6"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.replacement_render.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": []
+      },
+      "content": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 3.84,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024634.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.content.log",
+          "bytes": 8566,
+          "sha256": "523d782a449fa56d5b2178617ff0550a9258d435e89e4f5bc371449a9150b8db"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.content.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[ContentValidation] SUMMARY pass=24 fail=0"
+        ]
+      },
+      "localization": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 2.59,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.localization.log",
+          "bytes": 7743,
+          "sha256": "3b03fd7963897c896ea2fd03128ed8218dfd32841f87a2ed4d6679c02d14adb2"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.localization.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[ContentLocalization] SUMMARY pass=12 fail=0"
+        ]
+      },
+      "localization_render": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 3.8,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.localization_render.log",
+          "bytes": 7892,
+          "sha256": "c9f9273cf0dd6bcf098b07b261b8f8c5ee5d879f8bc214e151792cd991ff6835"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.localization_render.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[ContentLocalization] SUMMARY pass=13 fail=0"
+        ]
+      },
+      "visual": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 5.11,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.visual.log",
+          "bytes": 12651,
+          "sha256": "c6c05db7dc4d816c7501dc66969740ccf012c9b44645ba3e257d7eeaf2b95db1"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.visual.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[VisualReadability] === 表现可读性验收结束：通过 33，失败 0 ==="
+        ]
+      },
+      "visual_render": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 6.41,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.visual_render.log",
+          "bytes": 12385,
+          "sha256": "f655c884aef41a8507b6a86ada876624b40f18b7f4fbbe304d9c4777bc7bdfb7"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.visual_render.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[VisualReadability] === 表现可读性验收结束：通过 35，失败 0 ==="
+        ]
+      },
+      "ballistics": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 2.78,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.ballistics.log",
+          "bytes": 10233,
+          "sha256": "88c35c28e81bd0453c91bb49797604a95959ab2becccd1429527150bc8d4b50f"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.ballistics.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[PlayerBallistics] === 玩家弹道验收结束：通过 37，失败 0 ==="
+        ]
+      },
+      "projectile_query": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 8.15,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.projectile_query.log",
+          "bytes": 13335,
+          "sha256": "f9e46d75f9decf68d0dcc37364098f402430e719570cec0510a62a9e0d8350f7"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.projectile_query.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[ProjectileQuery] === 弹道查询验收结束：通过 56，失败 0 ==="
+        ]
+      },
+      "movement": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 12.75,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.movement.log",
+          "bytes": 27209,
+          "sha256": "49c98cd2d3b7bb3ac368908bf54f5b5688163aa42738a72fdd19dd93c7e8d826"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.movement.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[ActionMovement] === 动作移动验收结束：通过 74，失败 0 ==="
+        ]
+      },
+      "seek": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 19.65,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.seek.log",
+          "bytes": 17769,
+          "sha256": "314dddea5f51964d6f65581dc7d11a649797db7fb2fca05c9f1f9fe583037ec4"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.seek.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[ScytheSeek] === 飞镰喜爱验收结束：通过 43，失败 0 ==="
+        ]
+      },
+      "knife": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 22.65,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.knife.log",
+          "bytes": 50142,
+          "sha256": "437103ef8895cfe8705fc4a0cc9b8f421482d7a528e78e37fb41012bd1b53552"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.knife.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[KnifeVolley] === 飞刀散射验收结束：通过 219，失败 0 ==="
+        ]
+      },
+      "charge_evolution": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 31.63,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024516.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.charge_evolution.log",
+          "bytes": 46784,
+          "sha256": "945b0c49c8c20c51214bd619a68d3562a16fa1cfde15b14f372115cc2e1c9c6b"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.charge_evolution.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[ChargeEvolution] === 蓄力进化验收结束：通过 151，失败 0 ==="
+        ]
+      },
+      "aim": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 13.6,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.aim.log",
+          "bytes": 24411,
+          "sha256": "499affda48ddc5fc14fc0aff04746c76f2b95e055d38184e38df275688b2ba68"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.aim.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[AimThrow] === 立体瞄准与投掷验收结束：通过 33，失败 0 ==="
+        ]
+      },
+      "slots": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 9.88,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024516.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.slots.log",
+          "bytes": 23483,
+          "sha256": "7df123eb2339dfc73e779aad440f326bceb3d45bc232f32184d2fa7ed3c72634"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.slots.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Slots] === 换装与技能槽验收结束：通过 57，失败 0 ==="
+        ]
+      },
+      "snapshot": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 11.18,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024516.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.snapshot.log",
+          "bytes": 29955,
+          "sha256": "af72d76cd1d541321375d0ccd7376a5a2859bc8f90d4d3a7c1b1d71114421c62"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024516.snapshot.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[AttackSnapshot] === 攻击快照验收结束：通过 45，失败 0 ==="
+        ]
+      },
+      "bow": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 25.12,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.bow.log",
+          "bytes": 22802,
+          "sha256": "56963c26769fffd6d0a9af2ee5ca1c6604ac48a1b954035a14f2f1ca43daf5d0"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.bow.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[BowSweep] === J10 弓·档位/弹速/扫掠 验收结束：通过 39，失败 0 ==="
+        ]
+      },
+      "early": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 20.77,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.early.log",
+          "bytes": 31527,
+          "sha256": "0a4baf5003438ab2fa5e20c38d02809d6492c15cb820fa091efb14365ec56163"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.early.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[EarlyCharge] === 未蓄满释放验收结束：通过 37，失败 0 ==="
+        ]
+      },
+      "roster": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 42.65,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.roster.log",
+          "bytes": 31332,
+          "sha256": "6e93fc0a88bbff93ef652be5bbd6b0d9d71b82ec1a4e35fe689e285af8a7cca4"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.roster.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Roster] === 敌人清单验收结束：通过 95，失败 0 ==="
+        ]
+      },
+      "flight": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 27.96,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.flight.log",
+          "bytes": 10683,
+          "sha256": "352cd5be1f989589cae138e72dca84679de8788fb0324129e7cf72e57a2d4b08"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.flight.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Flight] === 飞行与受力验收结束：通过 42，失败 0 ==="
+        ]
+      },
+      "reward_rules": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 3.35,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.reward_rules.log",
+          "bytes": 39876,
+          "sha256": "2eefb26e19e325ff732043ccfe5afa5a13d0da3c2facfdceb425158e683da549"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.reward_rules.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[RewardRules] === 获取规则验收结束：通过 78，失败 0 ==="
+        ]
+      },
+      "specialization": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 12.42,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024634.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.specialization.log",
+          "bytes": 72649,
+          "sha256": "6c345ce8ad605b5f0b566bba0932ea9511074a3231e50928000d673380b01b5e"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.specialization.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Specialization] === 特化验收结束：通过 221，失败 0 ==="
+        ]
+      },
+      "specialization_render": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 14.58,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.specialization_render.log",
+          "bytes": 75403,
+          "sha256": "eef5eeb658dd3e82d6dca1d5deedb499763c7277d856e9ae2463ec9d7b7a610c"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.specialization_render.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Specialization] === 特化验收结束：通过 225，失败 0 ==="
+        ]
+      },
+      "landing": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 9.14,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.landing.log",
+          "bytes": 24766,
+          "sha256": "a993e84bf06faea5c0b0b513ec57aaefd29339656093df4847a809d88d6d6bd4"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.landing.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[LandingKnockback] === 地爆验收结束：通过 53，失败 0 ==="
+        ]
+      },
+      "synergy": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 9.42,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024634.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.synergy.log",
+          "bytes": 755468,
+          "sha256": "141b393227d8b7349d7218863bcb3da907a9c4fa920a6eb96a2e9761c330cbff"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.synergy.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[SynergyMatrix] SUMMARY combinations=964 pass=1013 fail=0"
+        ]
+      },
+      "ui": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 20.86,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.ui.log",
+          "bytes": 23356,
+          "sha256": "d5be56cc920f3cfb555afaff4b71b201a273741dcb378f661eb15e026f6e34a7"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.ui.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[BatchE] === E 批验收结束：通过 39，失败 0 ==="
+        ]
+      },
+      "charge": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 30.37,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.charge.log",
+          "bytes": 39625,
+          "sha256": "716714feb245739b13ad1c8a5efccee44795aa05ceadf5f3a795f1715ef53745"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.charge.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[ChargeRelease] === 蓄力释放验收结束：通过 80，失败 0 ==="
+        ]
+      },
+      "character": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 46.33,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.character.log",
+          "bytes": 37919,
+          "sha256": "08a65b325ec5a45a4c25b3d45fd6e4d75f7cb0851a41a2d615a80217c2bb82ca"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.character.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[Design] === 原始设计验收结束：通过 115，失败 0 ==="
+        ]
+      },
+      "dragon": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 13.67,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.dragon.log",
+          "bytes": 19037,
+          "sha256": "b24237b89380047709458abac7adaa8efd2b3b8132b7ce8ef73d44c71b9a02bd"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.dragon.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[DragonArrow] === 龙之箭验收结束：通过 42，失败 0 ==="
+        ]
+      },
+      "rune": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 10.96,
+        "batch": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "source_batch_had_failures": true,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.rune.log",
+          "bytes": 25754,
+          "sha256": "18fc03a6e04f1556e422855798225a0d84baf76c6f9de73500907dcb07f5d08e"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.rune.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[RuneProbe] === J11 符文系统验收结束：通过 83，失败 0 ==="
+        ]
+      },
+      "main": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 70.44,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024634.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.main.log",
+          "bytes": 149554,
+          "sha256": "090458a0d0cc5ca9da31b9c43f3a06dca7326b35b440f58667da980af522044e"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.main.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": []
+      },
+      "reward_ui": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 7.41,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_023329.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_023329.reward_ui.log",
+          "bytes": 11325,
+          "sha256": "a59d884e4a72047e50d04f7b18ffe3875e5ab31a4cce766f48051e9e421b8ff6"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_023329.reward_ui.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[BuildRewards] SUMMARY pass=37 fail=0"
+        ]
+      },
+      "reward_ui_render": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 9.27,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024634.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.reward_ui_render.log",
+          "bytes": 11535,
+          "sha256": "06afe5e9905d1fa287aad85c0945ed7119d961ed41ab3f161aa29c4aa10a54d8"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024634.reward_ui_render.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[BuildRewards] SUMMARY pass=40 fail=0"
+        ]
+      },
+      "adventure": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 23.68,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024847.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024847.adventure.log",
+          "bytes": 25293,
+          "sha256": "f14ea1a50ab5b77057107f30f40be2c1d925cf679bfcd0de083eb649433af841"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024847.adventure.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[AdventureCancel] SUMMARY pass=39 fail=0"
+        ]
+      },
+      "adventure_render": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "seconds": 29.42,
+        "batch": "Logs/evidence/gameplay-fixes-evidence-20261025_024847.log",
+        "source_batch_had_failures": false,
+        "stdout": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024847.adventure_render.log",
+          "bytes": 25481,
+          "sha256": "f02810ab48749927e5972355241d96b17681f26d9e28019cd0fbe008e244b35f"
+        },
+        "stderr": {
+          "path": "Logs/validation/.ai_gameplay_20261025_024847.adventure_render.err",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summaries": [
+          "[AdventureCancel] SUMMARY pass=41 fail=0"
+        ]
+      }
+    },
+    "batches": [
+      {
+        "path": "Logs/evidence/gameplay-fixes-failure-20261024_223726.log",
+        "bytes": 1972841,
+        "sha256": "ff582f14f701cea9200fe36ebb60b02b2ccfdc81f8237846b04305471fa3bea1"
+      },
+      {
+        "path": "Logs/evidence/gameplay-fixes-evidence-20261025_023329.log",
+        "bytes": 1046767,
+        "sha256": "1bb176f414c3ebfe851b8943e847bd8e9a52dd8d278c42d5416ae7f6ce1ad009"
+      },
+      {
+        "path": "Logs/evidence/gameplay-fixes-failure-20261025_023928.log",
+        "bytes": 168600,
+        "sha256": "807d76821e6ddae03fb4066ba367ad3971d0af8117c14716d1ed5ba1dc29b4ad"
+      },
+      {
+        "path": "Logs/evidence/gameplay-fixes-evidence-20261025_024516.log",
+        "bytes": 146398,
+        "sha256": "0c75a9e0db2860841ac8ad472c61767b55ce43ac74306c53c3c660bc57dfd0ad"
+      },
+      {
+        "path": "Logs/evidence/gameplay-fixes-evidence-20261025_024634.log",
+        "bytes": 1019840,
+        "sha256": "683f0e4c52f0cbaccc5f5c234370cce97cb864453b6c2b9747da3b8f456a8741"
+      },
+      {
+        "path": "Logs/evidence/gameplay-fixes-evidence-20261025_024847.log",
+        "bytes": 52589,
+        "sha256": "f3d0b5d4584c1d363d3449ac72e7c5284511df92152a31b81d0bc259fd68c432"
+      }
+    ],
+    "main_metrics": [
+      "[Main指标一致] [Config] 配置表：武器 <内容基线> / 角色 <内容基线> / 敌人 <内容基线> / 首领 <内容基线> / 召唤物 <内容基线> / 技能 <内容基线> / 连招参数 <内容基线> / Pressure <内容基线> / 效果 <内容基线> / 节点 <内容基线> / 局外成长 <内容基线> / AI 档案 <内容基线> / 能力卡 <内容基线>（ConfigIndex.tres 已加载）",
+      "[Main指标一致] [SelfTest] 节点布置：启用 10 个（高 2 / 中 5 / 低 3）→ 期望 10（2/5/3）（按**价值层**数，见 NodePlacement.LayerOf）",
+      "[Main指标一致] [SelfTest] 配置表比对·玩家：生命 <配装>（期望 200 + 元进度加成 <存档>；角色 A 的 200 是**预设值**） 护甲 20（期望 20，预设值） 移速 6.5（期望 6.5，预设值） 减伤 0（期望 0）",
+      "[Main指标一致] [SelfTest] 配置表比对·索引：武器 <内容基线>/角色 <内容基线>/敌人 <内容基线>/首领 <内容基线>/召唤物 <内容基线>/技能 <内容基线>/Pressure <内容基线>/效果 <内容基线>/节点 <内容基线>/局外 <内容基线>/升级池 <内容基线>/AI 档案 <内容基线>/能力卡 <内容基线>/符文 <内容基线>",
+      "[Main指标一致] [SelfTest] Pressure 测试（进化 150×1.25 + 异化 150×1.5）：pending=False running=False waves=0 waveIndex=0 remaining=0 alive=0 spawned=0 encRunning=False encDone=False challenges=2 freeQuota=0 free=False node=- boss=False pressure=3 pmods=3 bank=0 victory=False all=11（期望 pressure=3 pmods=3 bank=0）",
+      "[Main指标一致] [SelfTest] 🔴 白板首领实例：生命 <公式核验> 护甲 0（期望 0）标签 [Boss,Melee]",
+      "[Main指标一致] [SelfTest] 端到端：按 F 之后 奖励界面打开 = True  Paused = True",
+      "[Main指标一致] [SelfTest] 🔴 最小闭环·链路：按键 weapon_skill_1 → 技能 skl_a1_w1_1 → 动画 1 个事件帧 → 投射物 1 → 命中掉血 ✓"
+    ],
+    "main_status": "原8指标一致，无新增失败，保留5类历史红标；不是Main全绿",
+    "real_player_save_sha256": {
+      "meta.cfg": "26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446",
+      "ability_cards.cfg": "4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D",
+      "settings.cfg": "7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1",
+      "loadout.cfg": "CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462",
+      "rune.cfg": "CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6"
+    }
+  },
+  "infrastructure": {
+    "counterexamples": 16,
+    "evidence": {
+      "path": "Logs/evidence/validation-infrastructure-20261025_025117.json",
+      "bytes": 1367,
+      "sha256": "0ec34aa6cedff08d007ca5a88e7f43ff3234ad9a128f67d8176ef30fa536cc55"
+    }
+  },
+  "legacy_entry_evidence": [
+    {
+      "path": "Logs/evidence/character-design-j3-evidence.log",
+      "bytes": 5388,
+      "sha256": "9a8465a117ee583b49f922ceed23fedf2ed878ad84a8c356b8ac9dc1c018e958"
+    },
+    {
+      "path": "Logs/evidence/c-batch-evidence.log",
+      "bytes": 5151,
+      "sha256": "2371602d8e33835e5eed4ec30a42032deb3328b7ac2d083a9298c23484b87a94"
+    },
+    {
+      "path": "Logs/evidence/character-design-j47-probe-20261024_225803.log",
+      "bytes": 229732,
+      "sha256": "e515a801412ca5212988478542612edc314ef8bcdcf7f11b553ff766bfa09a14"
+    }
+  ],
+  "art_and_history": {
+    "unchanged_protected_files": [
+      {
+        "path": "Scripts/Testing/StoneSlammerShowcase.cs",
+        "bytes": 7363,
+        "sha256": "e83753b9dfc329dc3107259a33b6949b39a040d38261714e1320d74cf876c48e"
+      },
+      {
+        "path": "Scripts/Testing/StoneSlammerShowcase.cs.uid",
+        "bytes": 19,
+        "sha256": "3274d1af7af9664c198b56b4c700b59409c63227aa388325695ae14c34ad9337"
+      },
+      {
+        "path": "Scenes/Enemies/HeavySlammer.tscn",
+        "bytes": 3116,
+        "sha256": "9a07c15766d8cd37eb666cc4d1358367a5b0f162ed959e5d5d3393503fc47a98"
+      },
+      {
+        "path": "Scenes/Enemies/Art/ScaredyShroomVisual.tscn",
+        "bytes": 393,
+        "sha256": "c4f8b8e934e624eb1761009c01d9110eaa9aeaecc9f31ebc8fb68da7cda59295"
+      },
+      {
+        "path": "Scenes/Enemies/Art/StoneSlammer.tscn",
+        "bytes": 3061,
+        "sha256": "d6bc7b1530460c61b9047783f6383fffc52aed9a40a6d041876d67343c91d3b3"
+      }
+    ],
+    "historical_screenshots_restored": {
+      "path": "Logs/evidence/historical-screenshot-overwrites-20261025/manifest.json",
+      "bytes": 1523,
+      "sha256": "e8cdb9e8d3c66ba36c689b24a9ad1d2d464787b74962b114c161c2783e80b685"
+    },
+    "root_log_count": 0
+  },
+  "documentation": {
+    "markdown": 170,
+    "broken": []
+  },
+  "known_unresolved": [
+    {
+      "issue": "内容校验期间Godot原生RefCounted终结器遇到已释放GCHandle，退出0xC000001D。",
+      "evidence": {
+        "path": "Logs/validation/.ai_gameplay_20261025_023928.content.err",
+        "bytes": 745,
+        "sha256": "e66175998dfe19ae750b529d1ad51731234b3405bcfdf9477b7a4d4f966aacfd"
+      },
+      "failure_batch": "Logs/evidence/gameplay-fixes-failure-20261025_023928.log",
+      "status": "已将技能参数兼容性改为类型检查，避免临时节点；后续两次content及相关回归严格通过，未确认该调整修复崩溃，保留未定位状态。"
+    },
+    {
+      "issue": "奖励界面渲染偶发libpng颜色配置告警。",
+      "evidence": [
+        {
+          "path": "Logs/validation/.ai_gameplay_20261024_223726.reward_ui_render.err",
+          "bytes": 54,
+          "sha256": "1c72364d645d162181bab82b8277a3d2efb14482062f5845ebe606fcc41a66e1"
+        },
+        {
+          "path": "Logs/validation/.ai_gameplay_20261024_224630.reward_ui_render.err",
+          "bytes": 54,
+          "sha256": "1c72364d645d162181bab82b8277a3d2efb14482062f5845ebe606fcc41a66e1"
+        },
+        {
+          "path": "Logs/validation/.ai_gameplay_20261024_225336.reward_ui_render.err",
+          "bytes": 54,
+          "sha256": "1c72364d645d162181bab82b8277a3d2efb14482062f5845ebe606fcc41a66e1"
+        }
+      ],
+      "status": "未定位来源；正常完整渲染已通过严格stderr检查。未屏蔽告警、删除原断言、修改模型纹理或把复测通过当作根因修复。"
+    }
+  ],
+  "not_claimed": [
+    "完整英文翻译",
+    "性能提升",
+    "最终模型或骨架定稿",
+    "Main历史红标已修复",
+    "偶发原生问题根因已修复"
+  ]
+}

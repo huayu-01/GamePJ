@@ -1,29 +1,32 @@
-[gd_resource type="Resource" script_class="RewardConfig" load_steps=5 format=3]
-
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[ext_resource type="Script" path="res://Scripts/Config/Specializations/ThunderMasteryBehaviorDefinition.cs" id="behavior_definition"]
 
-[sub_resource type="Resource" id="p_DetonateScale"]
-script = ExtResource("param")
-Key = "DetonateScale"
-Value = 0.3
-Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/SpecializationRewardEffect.cs" id="specialization_effect"]
 
-[sub_resource type="Resource" id="p_ExtraJumps"]
-script = ExtResource("param")
-Key = "ExtraJumps"
-Value = 2
-Note = "机制参数；原文未给的数值为可调预设，文案共读此值。"
+[sub_resource type="Resource" id="behavior_definition"]
+script = ExtResource("behavior_definition")
+DetonateScale = 0.3
+ExtraJumps = 2
+
+
+[sub_resource type="Resource" id="specialization_effect"]
+script = ExtResource("specialization_effect")
+Definition = SubResource("behavior_definition")
 
 [resource]
 script = ExtResource("row")
+NumericId = 1314
 Id = "upg_thunder_mastery"
 DisplayName = "雷法"
 RewardKind = 0
 MaxStacks = 1
-ApplyHandler = "Specialization"
+Effects = [SubResource("specialization_effect")]
 Specialization = 18
-HandlerParams = [SubResource("p_DetonateScale"), SubResource("p_ExtraJumps")]
-DescriptionTemplate = "闪电链额外攻击{ExtraJumps}名敌人，并立刻引爆引雷；主动引爆只造成{DetonateScale:0%}天雷伤害。"
-Requires = PackedStringArray("雷之印")
+DescriptionTemplate = "闪电链额外攻击{SpecializationBehavior.ExtraJumps}名敌人，并立刻引爆引雷；主动引爆只造成{SpecializationBehavior.DetonateScale:0%}天雷伤害。"
+Requires = PackedStringArray("rune_lei_seal")
 Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"
+
+NameKey = "content.upg_thunder_mastery.name"
+
+DescriptionKey = "content.upg_thunder_mastery.description"

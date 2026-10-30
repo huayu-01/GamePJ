@@ -13,10 +13,23 @@ namespace ActRoguelike.Encounter;
 /// </summary>
 public static class SpawnPlanner
 {
-	public static bool TryFindSpawnPoint(Vector3 playerPosition, float minRadius, float maxRadius, out Vector3 point, ActRoguelike.Combat.Unit? unit = null)
+	/// <summary>严格选点；同批同类单位可预留位置，避免同一物理帧的碰撞更新延迟造成重叠。</summary>
+	public static bool TryFindSpawnPoint(Vector3 playerPosition, float minRadius, float maxRadius, out Vector3 point, ActRoguelike.Combat.Unit? unit = null, IReadOnlyList<Vector3>? reserved = null)
 	{
 		point = default;
-		return World.MapManager.Instance?.TryRingPoint(playerPosition, minRadius, maxRadius, out point, unit) == true;
+		if (World.MapManager.Instance is not { IsReady: true } map) return false;
+		float spacing = World.MapManager.BodySize(unit).Radius * 2f + 0.1f;
+		for (int attempt = 0; attempt < 12; attempt++)
+		{
+			if (!map.TryRingPoint(playerPosition, minRadius, maxRadius, out point, unit)) return false;
+			bool overlaps = false;
+			if (reserved != null)
+				foreach (Vector3 existing in reserved)
+					if (new Vector2(point.X - existing.X, point.Z - existing.Z).Length() < spacing) { overlaps = true; break; }
+			if (!overlaps) return true;
+		}
+		point = default;
+		return false;
 	}
 	/// <summary>每波数量下限 / 上限（文档 L241）。</summary>
 	public const int MinWaveSize = 4;

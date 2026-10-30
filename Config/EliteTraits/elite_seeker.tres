@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SeekerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/SeekerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1019
+Id = "elite_seeker"
+Title = "追踪"
+Description = "可改造直射弹先直飞，再有限追踪。"
+NameKey = "elite.seeker.name"
+DescriptionKey = "elite.seeker.description"
+Magnitude = 75
+Radius = 1.8
+Requirements = 2

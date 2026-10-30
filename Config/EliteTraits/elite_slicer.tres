@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SlicerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/SlicerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1022
+Id = "elite_slicer"
+Title = "扫射"
+Description = "光束绕自身缓慢旋转。"
+NameKey = "elite.slicer.name"
+DescriptionKey = "elite.slicer.description"
+Cooldown = 7
+Radius = 5
+Duration = 4
+Magnitude = 35

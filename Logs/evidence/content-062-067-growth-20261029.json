@@ -1,0 +1,392 @@
+{
+  "passed": true,
+  "date": "2026-10-29",
+  "completed": [
+    "巨化1341",
+    "心之钢1342",
+    "062",
+    "063",
+    "064",
+    "066",
+    "067",
+    "阶段精英生成失效重试"
+  ],
+  "independentDelivery": {
+    "061": "原专业美术对话",
+    "065": "原专业美术对话",
+    "数值复核": "原数值策划对话，报告已交付"
+  },
+  "builds": [
+    {
+      "configuration": "Debug",
+      "path": "Logs\\validation\\elites_20261029_163803.Debug.log",
+      "sha256": "002c3ffd2386fa2c5ffc6d2a44f9ba80f03cce4c9ec654984ae011cae69115fa",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "configuration": "ExportRelease",
+      "path": "Logs\\validation\\elites_20261029_163803.ExportRelease.log",
+      "sha256": "323cd67cb1983f4cebbf5060e9b1eef6a59bbda99be4010caa03d7870c56c13c",
+      "warnings": 0,
+      "errors": 0
+    }
+  ],
+  "latestRuns": [
+    {
+      "Name": "Content057060",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 13.22,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_155103.Content057060.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_155103.Content057060.headless.err",
+      "SHA256": "0484EB2F79B6837D751FDF115192295726525F9AF515AADD6B5DF48C97D2B22C",
+      "Family": "elites",
+      "Report": "Logs/evidence/elites/run-20261029_155103.json",
+      "AssertionsPassed": 32
+    },
+    {
+      "Name": "Content057060",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 19.02,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_155103.Content057060.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_155103.Content057060.render.err",
+      "SHA256": "035E1186FAB5F6639B1F0EBDA00AAFB7311A088AD3C9F2C8D4C39F8F0809E636",
+      "Family": "elites",
+      "Report": "Logs/evidence/elites/run-20261029_155103.json",
+      "AssertionsPassed": 35
+    },
+    {
+      "Name": "GrowthBuilds",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 5.13,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_155103.GrowthBuilds.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_155103.GrowthBuilds.headless.err",
+      "SHA256": "68CFE4A1F155A8DFB6EFF98150C4358F33E44316C6DE831DB9AA88E1FEEB59FC",
+      "Family": "elites",
+      "Report": "Logs/evidence/elites/run-20261029_155103.json",
+      "AssertionsPassed": 33
+    },
+    {
+      "Name": "GrowthBuilds",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 6.59,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_155103.GrowthBuilds.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_155103.GrowthBuilds.render.err",
+      "SHA256": "AA6EA666AE0B19072CFF7AF20AAE0D5D2893B18C714BE9A50A1F184045AFB6EE",
+      "Family": "elites",
+      "Report": "Logs/evidence/elites/run-20261029_155103.json",
+      "AssertionsPassed": 35
+    },
+    {
+      "Name": "Content062067",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 6.42,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.Content062067.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.Content062067.headless.err",
+      "SHA256": "5C473143E2AF03B207CF690586543D42D63C9E4294074D0B3F1B402DD4B2460B",
+      "Family": "elites",
+      "Report": "Logs/evidence/elites/run-20261029_163803.json",
+      "AssertionsPassed": 38
+    },
+    {
+      "Name": "Content062067",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 12.3,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.Content062067.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.Content062067.render.err",
+      "SHA256": "BD04181E179FED48070021993CE0695C7C7424B308C5D519ECE0BD58F78209F9",
+      "Family": "elites",
+      "Report": "Logs/evidence/elites/run-20261029_163803.json",
+      "AssertionsPassed": 38
+    },
+    {
+      "Name": "charge_evolution",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_162223.charge_evolution.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_162223.charge_evolution.headless.err",
+      "SHA256": "425F4335244F696E9DA6F59E54FBFD7C73449294C4853BF3DD0DBACCF3A269D6",
+      "Family": "updates",
+      "Report": "Logs/evidence/update-fixes/run-20261029_162223.json",
+      "AssertionsPassed": 187
+    },
+    {
+      "Name": "gameplay_rules",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.91,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.gameplay_rules.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.gameplay_rules.err",
+      "Failure": "",
+      "SHA256": "C53D029455CB361DE2C90EFC16DC860C1AFBDAFADE0B5011B5A31A2C5A82C75B",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_162329.json",
+      "AssertionsPassed": 26
+    },
+    {
+      "Name": "kill_facts",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 9.07,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.kill_facts.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.kill_facts.err",
+      "Failure": "",
+      "SHA256": "F5F24979156C1BE224619C2884FBEE36874AC5D19E8A262E54EADB9A2E266423",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_162329.json",
+      "AssertionsPassed": 40
+    },
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 5.44,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.content.err",
+      "Failure": "",
+      "SHA256": "9FCDBC0BB2D48DEA26437C40A7D6D7E4C80D107E97E7215A55C974CC01069364",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_162329.json",
+      "AssertionsPassed": 24
+    },
+    {
+      "Name": "localization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 3.1,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.localization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.localization.err",
+      "Failure": "",
+      "SHA256": "AD29909CC69FAE2310C2DD7E81227B5F3B3D0AA2838E67677AB07BD51A507298",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_162329.json",
+      "AssertionsPassed": 12
+    },
+    {
+      "Name": "effects",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 2.83,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.effects.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.effects.err",
+      "Failure": "",
+      "SHA256": "FC3FE01876DD72FBBA5F7A5BF446389B029124524E4211C453371E0A985C71AF",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_162329.json",
+      "AssertionsPassed": 85
+    },
+    {
+      "Name": "slots",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 8.93,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.slots.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.slots.err",
+      "Failure": "",
+      "SHA256": "0FB285296F8AB3B22644C8FEB4511DD9E40A1DF5B9C4F3886632BE672B75AA71",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_162329.json",
+      "AssertionsPassed": 55
+    },
+    {
+      "Name": "synergy",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 9.7,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.synergy.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.synergy.err",
+      "Failure": "",
+      "SHA256": "9B0DAAC657BC7638AC3C01AC5852B6ED1F0605EDFE8C6EB7B0C6D300F861FAAA",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_162329.json"
+    },
+    {
+      "Name": "adventure_render",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 41.78,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162951.adventure_render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162951.adventure_render.err",
+      "Failure": "",
+      "SHA256": "B025B807E54ECCCC9AEB2C4D4E28E9182F5B2518BF9282E61E3A207B57D5766D",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_162951.json",
+      "AssertionsPassed": 64
+    },
+    {
+      "Name": "main",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 71.19,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.main.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_162329.main.err",
+      "Failure": "",
+      "SHA256": "71967CD2C60DF9F9470178A7CA0755F11EA49A8813C2D76B1AE64FCAC7F7D19B",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_162329.json"
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 43.73,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_163540.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_163540.survival.err",
+      "Failure": "",
+      "SHA256": "1AD676220511A6E129E67EACC1A566A8BF9EA1B6570B7FD0AA1E97AB1FA2858E",
+      "Family": "integration",
+      "Report": "Logs/evidence/survival/integration-20261029_163540.json",
+      "AssertionsPassed": 72
+    },
+    {
+      "Name": "SurvivalMilestoneRetry",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 5.19,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.SurvivalMilestoneRetry.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.SurvivalMilestoneRetry.headless.err",
+      "SHA256": "AB03AB9758BFE5BFC4DAF9028F554845BB4204AEFE2B1AD1E071AB0FF7E6A079",
+      "Family": "elites",
+      "Report": "Logs/evidence/elites/run-20261029_163803.json",
+      "AssertionsPassed": 6
+    },
+    {
+      "Name": "SurvivalMilestoneRetry",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 6.76,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.SurvivalMilestoneRetry.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_163803.SurvivalMilestoneRetry.render.err",
+      "SHA256": "B4461185007218A619F1324C530C152FD23AEA5E8DCE15340756DB49A32A0FC2",
+      "Family": "elites",
+      "Report": "Logs/evidence/elites/run-20261029_163803.json",
+      "AssertionsPassed": 6
+    }
+  ],
+  "latestRunCount": 19,
+  "sourceReports": [
+    {
+      "path": "Logs/evidence/elites/run-20261029_155103.json",
+      "sha256": "bb471aef2ccd1f1ae561d411f1a3846a3174134dffecaa7df066876cba1ff036",
+      "originalPassed": true
+    },
+    {
+      "path": "Logs/evidence/update-fixes/run-20261029_162223.json",
+      "sha256": "e53f19d4583a61cea3903810fb3afc088c8a493a3b3b910e237af7f71fceb374",
+      "originalPassed": true
+    },
+    {
+      "path": "Logs/evidence/survival/integration-20261029_162329.json",
+      "sha256": "52fb78a65a42a4c0619994d7f01401879e9f7af6168a30b834f6ab5cbdaaf751",
+      "originalPassed": false
+    },
+    {
+      "path": "Logs/evidence/survival/integration-20261029_162951.json",
+      "sha256": "a3286069c27c5c59db9f79d8f1c2d0a426e56eef4269576c54168f33856969af",
+      "originalPassed": false
+    },
+    {
+      "path": "Logs/evidence/survival/integration-20261029_163540.json",
+      "sha256": "136ba4ece01fbe1750c90a0a2b1e6d057c16c1689f2a603d8efcf56938388780",
+      "originalPassed": true
+    },
+    {
+      "path": "Logs/evidence/elites/run-20261029_163803.json",
+      "sha256": "c696b4c1181fd84539e5c07be4c892ac7bd0d588c1ce498d24e7e4dd184d6793",
+      "originalPassed": true
+    }
+  ],
+  "allFinalRunsPassed": true,
+  "allFinalRunStderrEmpty": true,
+  "allEvidenceHashesVerified": true,
+  "allSaveSnapshotsUnchanged": true,
+  "workbook": {
+    "passed": true,
+    "backup": "Logs\\maintenance\\acceptance-20261026\\backup-1793263487116.xlsx",
+    "saved": "F:\\Godot项目\\项目a\\outputs\\acceptance-20261026\\更新与修复验收.xlsx",
+    "sha256": "e0005646e1476b16bdf1bcdf89840c7595565921674df2b31127bd281e4dac4c",
+    "changedIds": [
+      62,
+      63,
+      64,
+      66,
+      67
+    ],
+    "historyAdded": 10,
+    "sourceAndPlayerCellsPreserved": true,
+    "player063PassPreserved": true,
+    "visual061065Unchanged": true,
+    "otherRequirementsPreserved": true,
+    "formulasAndControlsPreserved": true
+  },
+  "sourceSHA256": {
+    "Scripts/Combat/Unit.HealthGrowth.cs": "c381e6de8ecf5dcc72ad545140100fc983be44a0d9e8511eb6877d5a2d5c9cad",
+    "Scripts/Config/RewardEffects/UnitScaleRewardEffect.cs": "6f32787810df4b81beac4c920e8f8d63d382a4aa1bd70a154aa350358533e7ac",
+    "Scripts/Config/RewardEffects/KillHealthGrowthRewardEffect.cs": "9139edb335740545b117808baa98d98c6830054e6e1af235eaf3dd760c236ade",
+    "Scripts/Rewards/KillHealthGrowthRule.cs": "8bee345dd470e0eae2f41e5402102933192ce49692995ff77847dfeb549bb55e",
+    "Config/Tables/Upgrades/reward_1341.tres": "f5a489263ebb65788c194b30968eb1bf2b85a7952ae63965d67a81f3606a5575",
+    "Config/Tables/Upgrades/reward_1342.tres": "e654f977d59db610b7f6d513f13438f7393608bd4c9959746e32d14fb7f86f63",
+    "Config/content-id-ledger.json": "b9b39b64307c64c35ca49481d5f78994f42f9c318b6ada73a0c5fa9b7cd43bad",
+    "Config/ConfigIndex.tres": "8e4c9b7fcf61e095b44ae83127687a4e50083dcb094b74221d7b96b634492846",
+    "Config/Validation/content_inventory.tres": "18356c9051820c6c4cc1839f63aa7a6e714bca146e134aafdace2dd55d9f7f2a",
+    "Scripts/Combat/ProjectileDispatch.cs": "5f7c35bf6d74265ca3a169b7f91948915d20da38b083bd49301e7cac1bce9fb2",
+    "Scripts/Abilities/EnergyWaveAbility.cs": "1a0c44bfd42e931a8c96d4f4bfb3f2756d4cf6d4064ff507d169d9c87f1ab9be",
+    "Scripts/Abilities/ArrowVolleyAbility.cs": "cddfa890e3db5bfc64e4c9832f0a41f4e87acfa4c78325b09452bd28bed28fb9",
+    "Scripts/Abilities/ArrowVolleyAbility.HeldFire.cs": "5c598d07046aeab436d24a27b1e581ce0dc9d97a51e025e6f6a088b198e79638",
+    "Scripts/Abilities/ArrowVolleyAbility.RewardParameters.cs": "b8d7f611a6b91234e7cc6c5e42b719ea8075136b5ffa7f22a97301e854075086",
+    "Scripts/Weapons/Weapon.cs": "f903837894f3b70eea9d190226db0b7fb6e049b7d712855401f144e0389d761e",
+    "Scripts/Player/PlayerLoadout.cs": "8a928b55d1642871ddbac4b8fdd95c7a7a48b19881be8ae273461ac08ac9fa0c",
+    "Scripts/Rewards/RewardPool.cs": "280ef2964e721a4a010a58598d222689aedc54cabf524c868c812dcb8a8c2324",
+    "Scripts/Rewards/RunBuild.cs": "dda894cebc05a453a866a8c440eea4f7e8197f8682f3ff65ff614464fccd6692",
+    "Scripts/Abilities/BackdashAbility.cs": "bde62f7b7e5695ddf992dc3c7b48794d413e9bbc00f06d848e3abb084fdd23e9",
+    "Config/Tables/Skills/skl_a1_skill_1.tres": "31ed82bacfc805a39077a7904688a582fdde0882a74e84b1829a70a6a0919c49",
+    "Config/Tables/Upgrades/evo_focus.tres": "4acc6e7b3b72c4f24068dac191d88fa96df8ffdb8ac84c37fda077cbdb279069",
+    "Scripts/Config/SurvivalDefinition.cs": "24bfdbdbb3e63f7de478f96cfc9a6d510f53d3080edbbcb806377f566b057fcc",
+    "Config/Modes/twilight_survival.tres": "2c5312c24f19e7bfcff7c1ad5adacf46bbbeae37bde4e08200a2f346113a402a",
+    "Scripts/Run/Survival/SurvivalDirector.cs": "4aa9d80be147294d03fd896098722f296759103a4c9699ea6dfb4315b45fb145",
+    "Scripts/Run/Survival/SurvivalDirector.Spawning.cs": "5a32ed4f59c85b594fb39029f54e4e33e7b9b2d94ae4dccd0304836213e8f0a4",
+    "Scripts/Run/Survival/SurvivalDirector.Shards.cs": "dad235fa2b000beae501d5aac3b99559ae00233883cba56bb9ea1fc183a2dc78",
+    "Scripts/Run/Survival/RunShardPickup.cs": "34562a2979523887956573a774a4e8bc32b485143abce9f4c374ce4626896823",
+    "Scripts/Run/Survival/SurvivalHud.cs": "56b77dace1b5c6551407614b2d5b56973ed1bbae51c969b93c5c8c0fe7191a9f",
+    "Scripts/Testing/GrowthBuildsProbe.cs": "5de8d48e066afc180aaf6479efa3334be1c8bab4b25294f3d6fc426394abe974",
+    "Scripts/Testing/Content062067Probe.cs": "ec59cf60d99b419fae251420f321e06918af6a079883dcf1ab3cd3da75d00ce5",
+    "Scripts/Testing/Content057060Probe.cs": "b5fa4bbf5726b6e6c761b0e60db003b632d76685b787e259011e34f1cba9911d",
+    "Scripts/Testing/SurvivalMilestoneRetryProbe.cs": "3cd850b5cbc418f620b04a3fdc0702b1fa63f096a31a7c200d815bb926d43814",
+    "Scripts/Testing/SurvivalModeProbe.cs": "0c0d4559cc6ce67ae64273aea47472e8f672f89cb1dae217b5aea4039d05ae3c",
+    "Scripts/Testing/AdventureCancelProbe.cs": "4b883008c2c2a29eb04c83eac4b6a8fa586efc7ab0f2f9971b77456fa156e317",
+    "Scripts/Testing/ChargeEvolutionProbe.cs": "99566814e2bebc679a3c919014066bb40b7d93dfb5a06fe9107ad5f8a2c819a7",
+    "Scripts/Testing/GameplayRulesProbe.cs": "f79d953a73f4f7922277c6e44bb24d64920d30225a077273ff17b7e71220812a",
+    "_tools/verify_elite_traits.ps1": "2b9a338475c37a23f729f552d1b8fb4c29caa7dd5fccf3130b19b938ae57842b",
+    "docs/content-authoring.md": "e6ec67ecc82f13fe31a30908374445b087e4ea73d0996dc14d736143a6791210",
+    "docs/content-update-062-067-growth-20261029.md": "0cbfa96c679f615f77b1f08547e9d4fda0bcd1d57ccfa32526e108a1cb241567",
+    "Config/Tables/Upgrades/mut_growth.tres": "16ef6940875d427ff17b6e955d8d1ff2f813aff92a73b82f95b55d569e0599a1",
+    "Config/Tables/Upgrades/mut_growth_plus.tres": "c74c988aeadd76f8f1d4f86e9a77b983255b9619a0390b08746f5389f621983a",
+    "Config/Tables/Upgrades/mut_growth_plus2.tres": "8232c8826f95e941a838ad536368211503e8984dfab5fe2badf70748673f429b",
+    "Config/Tables/Upgrades/upg_life.tres": "56aed5a4a39439a765a9a279acebf6bed61f265adccb64dfbd904c5a16a9e2dc",
+    "Config/Tables/Upgrades/upg_life_plus.tres": "2bd8d0849a677d3257cc50a832f02f8dc51fb457db2a45c3a6974481905115b4",
+    "Config/Tables/Upgrades/upg_life_plus2.tres": "14f668a4c6835f6dbb4126a962e52a044a3f1f4722c60dc7e729f3170e85fb80"
+  },
+  "diffCheckPassed": true,
+  "priorFailuresPreserved": [
+    "Logs/evidence/elites/run-20261029_153246.json",
+    "Logs/evidence/update-fixes/run-20261029_160056.json",
+    "Logs/evidence/update-fixes/run-20261029_160431.json",
+    "Logs/evidence/update-fixes/run-20261029_160646.json",
+    "Logs/evidence/update-fixes/run-20261029_161623.json",
+    "Logs/evidence/survival/integration-20261029_162329.json",
+    "Logs/evidence/survival/integration-20261029_162951.json"
+  ],
+  "corrections": [
+    "资源声明与脚本属性加载顺序",
+    "专业视觉探针由原对话修复双配置编译",
+    "旧蓄力夹具纳入真实局外伤害倍率与现行自动滞空规则",
+    "新增死战取消夹具不执行普通冒险专用断言",
+    "阶段精英成功入场后确认名额，失效预警可重试"
+  ]
+}

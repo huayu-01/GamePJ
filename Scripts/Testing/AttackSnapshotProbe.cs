@@ -110,6 +110,19 @@ public partial class AttackSnapshotProbe : Node3D
 			{
 				await Equip(weapon);
 				var ability = (WeaponThrowAbility)PlayerAbilityInput.FindByInputAction(_player, "weapon_skill_2")!;
+				if (ability is SpearThrowAbility { LinearShot: true } lance)
+				{
+					// 正式长枪现为直射投射物，不能继续等待旧抛掷命中盒或伪造回程。
+					var lanceAttack = await FireRanged(lance);
+					Verify(lanceAttack, "长枪直射真实投射物");
+					Check(Mathf.IsEqualApprox(lanceAttack.BaseDamage, lance.LanceDamage * _player.Stats.Get("DamageMultiplier")), "长枪直射读取LanceDamage并只乘一次攻击力");
+					float frozenDamage = lanceAttack.BaseDamage;
+					_player.Stats.SetBase("DamageMultiplier", 2f); _player.Stats.SetBase("CritChanceAdd", -1f); _player.Stats.SetBase("CritMultiplierAdd", 5f);
+					await Wait(.03);
+					Check(Mathf.IsEqualApprox(lanceAttack.BaseDamage, frozenDamage) && Mathf.IsEqualApprox(lanceAttack.CritChance, 1f) && Mathf.IsEqualApprox(lanceAttack.CritMultiplier, 3f), "长枪直射保留出手伤害和暴击快照，不读后续属性");
+					Check(lanceAttack.IsManualWeaponAttack && lanceAttack.Pierce == lance.LanceMaxTargets - 1, "长枪直射保留主武技身份及当前穿透目标限制");
+					continue;
+				}
 				var attack = await Fire(ability);
 				Verify(attack, $"{weapon}投掷");
 				float expected = ability.GetNode<AttackHitbox>("Attack").Damage * _player.Stats.Get("DamageMultiplier")
@@ -176,7 +189,8 @@ public partial class AttackSnapshotProbe : Node3D
 		var hitbox = new AttackHitbox { Damage = 10f, CritChance = 0f }; AddChild(hitbox);
 		hitbox.Activate(_player);
 		Verify(hitbox.CurrentAttack!, "玩家通用命中盒默认路径");
-		Check(Mathf.IsEqualApprox(hitbox.CurrentAttack!.BaseDamage, 15f), "通用玩家命中盒只乘一次攻击力");
+		float expectedHitboxDamage = 10f * _player.Stats.Get("DamageMultiplier");
+		Check(Mathf.IsEqualApprox(hitbox.CurrentAttack!.BaseDamage, expectedHitboxDamage), $"通用玩家命中盒只乘一次完整攻击倍率（含局外成长）：{hitbox.CurrentAttack.BaseDamage:0.###}／{expectedHitboxDamage:0.###}");
 		var enemy = new Unit { Faction = Faction.Enemy }; AddChild(enemy);
 		enemy.Stats.SetBase("DamageMultiplier", 3f); enemy.Stats.SetBase("CritChanceAdd", 1f);
 		hitbox.Activate(enemy);

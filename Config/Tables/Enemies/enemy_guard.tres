@@ -7,6 +7,7 @@
 [resource]
 PressureBehaviors = PackedStringArray("BasicMelee", "FrontalGuard")
 script = ExtResource("1_row")
+NumericId = 1097
 Id = "enemy_guard"
 Slot = 8
 DisplayName = "守卫"

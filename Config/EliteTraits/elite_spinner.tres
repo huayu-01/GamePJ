@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SpinnerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/SpinnerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1026
+Id = "elite_spinner"
+Title = "环星"
+Description = "三颗伤害球环绕本体。"
+NameKey = "elite.spinner.name"
+DescriptionKey = "elite.spinner.description"
+Count = 3
+Radius = 2.5
+Damage = 8
+Magnitude = 55

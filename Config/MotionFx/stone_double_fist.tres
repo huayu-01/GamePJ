@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MotionFxPreset" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/MotionFxPreset.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1035
+Id = "double_fist"
+EventName = "FX_MOTION_HANDS"
+StopEventName = "FX_MOTION_HANDS_STOP"
+Bones = PackedStringArray("RightHand", "LeftHand")
+Offset = Vector3(0, 0.22, 0)
+Duration = 0.22

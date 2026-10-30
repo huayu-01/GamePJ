@@ -59,6 +59,7 @@ Note = "本规则自己的触发间隔（0 = 不额外拦，暴击本身就有�
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1037
 RewardKind = 2
 MaxStacks = 1
 ApplyHandler = "HomingMissileOnCrit"

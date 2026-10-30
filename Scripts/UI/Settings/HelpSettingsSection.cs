@@ -23,7 +23,7 @@ public sealed class HelpSettingsSection : ISettingsSection
 		SettingsUi.AddTitle(page, "探索 → 构筑 → 挑战首领");
 		SettingsUi.AddCaption(page, "1. 探索关卡，按颜色与图标寻找强化、进化、异化等节点。\n2. 走近互动，选择一项奖励，迎接随之发生的战斗。\n3. 打赢后继续探索；首领门随时可以挑战，也可放弃剩余节点。\n4. 免费挑战额度与首领压力以 B「首领状况」中的本关读数为准。");
 		SettingsUi.AddTitle(page, "成长与胜负");
-		SettingsUi.AddCaption(page, "能力矩阵中的卡可解锁、升级与激活；激活占用额度，下局开局生效。空位留白，超过一页可用按钮或 PgUp / PgDn 翻页。\n击败首领即通关，中途阵亡则本局结束；结算后按 Enter 或界面按钮继续。");
+		SettingsUi.AddCaption(page, "能力矩阵中的卡可解锁、升级与激活；激活占用额度，下局开局生效。空位留白，超过一页可用按钮或 PgUp / PgDn 翻页。\n击败本关首领后，互动降临节点进入下一关，构筑保留、生命回满；完成最后一关后结算并返回基地。中途阵亡则本局结束，阅读结算并确认后返回基地。");
 		SettingsUi.AddTitle(page, "看懂战斗反馈");
 		SettingsUi.AddCaption(page, "血条内显示「当前生命/上限 +护甲」，蓝色数字为护甲。敌人受伤后显示血条与伤害数字。\n首领栏的 ◆ 表示技能强化，◇ 表示压力词条。武器大师的下落攻击带有向上掠过身体的风线，落地会扩散冲击圈。");
 	}

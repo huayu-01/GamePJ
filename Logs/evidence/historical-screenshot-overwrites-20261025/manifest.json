@@ -1,0 +1,26 @@
+[
+  {
+    "historical": "docs\\screenshots\\combat_readability_rim.png",
+    "new_capture": "Logs\\evidence\\historical-screenshot-overwrites-20261025\\screenshots\\combat_readability_rim.png",
+    "new_sha256": "4852b8311252c5fc507cb54ece23f7cd77a9f64d1de0074b6179096f2770355c",
+    "restored_sha256": "26f04d0a8c120b1bcbffcb94eb722242f600768065f76af93443618fc0debfc2"
+  },
+  {
+    "historical": "docs\\screenshots\\combat_readability_spear.png",
+    "new_capture": "Logs\\evidence\\historical-screenshot-overwrites-20261025\\screenshots\\combat_readability_spear.png",
+    "new_sha256": "34ef18936b036b8f705c56fe8098d4a403c153ebe8557f48327e6e424de552f3",
+    "restored_sha256": "e72f960f5dd027e623fae92c2528dff79b03589db93821e51c7012473dd42762"
+  },
+  {
+    "historical": "docs\\screenshots\\reward_ui_gm_rewards.png",
+    "new_capture": "Logs\\evidence\\historical-screenshot-overwrites-20261025\\screenshots\\reward_ui_gm_rewards.png",
+    "new_sha256": "1f20482d4399c7a130b0cbd85b566c52ab15f3a717ad82c44c03c8d66d0d1a9c",
+    "restored_sha256": "619f6ae2cacb248edfb1f782d6c5114374b55916187f0ba70dae5619d85d18a2"
+  },
+  {
+    "historical": "docs\\screenshots\\reward_ui_special_reward.png",
+    "new_capture": "Logs\\evidence\\historical-screenshot-overwrites-20261025\\screenshots\\reward_ui_special_reward.png",
+    "new_sha256": "14bf02202a571a66df96eb0b69de03c7cc8b6c2555d37fa855111fd42a0e3ff2",
+    "restored_sha256": "ac0e3e588c61bb33367f30c197675378cc9df84184819b0f0be38275d015b9f6"
+  }
+]

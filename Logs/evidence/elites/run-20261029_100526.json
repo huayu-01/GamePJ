@@ -1,0 +1,7 @@
+{
+  "Date": "2026-10-29T10:05:26",
+  "Passed": false,
+  "Runs": [],
+  "SavesUnchanged": true,
+  "Failure": "Exception calling \"ReadAllText\" with \"1\" argument(s): \"The process cannot access the file 'F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_100526.PauseDive.headless.log' because it is being used by another process.\""
+}

@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1068
 MaxHealth = 900.0
 StartingArmor = 0.0
 KnockbackResistance = 1.0

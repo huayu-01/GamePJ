@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_e0ph0")
+NumericId = 1110
 SaveKey = "quota_level"
 Stat = "AbilityQuotaAdd"
 PerLevel = 1.0

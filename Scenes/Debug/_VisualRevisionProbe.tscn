@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://Scripts/Testing/VisualRevisionProbe.cs" id="probe"]
+[node name="VisualRevisionProbe" type="Node"]
+script = ExtResource("probe")

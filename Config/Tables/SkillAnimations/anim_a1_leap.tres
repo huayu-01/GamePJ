@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1141
 Id = "anim_a1_leap"
 DisplayName = "A1 技能2 跃升 · Action 帧"
 Note = "角色 A 技能2：源段 jump（0.5s），事件帧 Action @0.15s —— 文档原话「帧 Action 时释放效果」，所以强力跳跃与滞空都在这一帧发生。"

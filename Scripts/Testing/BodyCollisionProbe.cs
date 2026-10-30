@@ -43,13 +43,15 @@ public partial class BodyCollisionProbe : Node3D
 	{
 		var weapon = new Weapon(); unit.AddChild(weapon);
 		RewardEffectRegistry.Compile(ConfigRows.ById<RewardConfig>("mut_happy_runner")!)!.Apply(new RewardContext { Player = unit, Weapon = weapon, Build = new RunBuild() });
-		var rule = unit.GetChild<HappyRunnerRule>(unit.GetChildCount() - 1); rule.SetPhysicsProcess(false); return rule;
+		var rule = NodeSearch.FindInSubtree<HappyRunnerRule>(unit)!; rule.SetPhysicsProcess(false); return rule;
 	}
 	public override async void _Ready()
 	{
 		try
 		{
 			await Frame(); await Frame();
+			// 本专项保留原身体碰撞分支的完整回归；新避让分支由CrowdAvoidanceProbe单独验证。
+			EnemyCrowdConfig.Current.Mode = EnemyCrowdMode.Physical;
 			Check(ProjectSettings.GetSetting("layer_names/3d_physics/layer_10").AsString() == "UnitBody", "编辑器第10层命名为单位身体");
 			foreach (Faction from in new[] { Faction.Player, Faction.Enemy })
 			foreach (Faction to in new[] { Faction.Player, Faction.Enemy })

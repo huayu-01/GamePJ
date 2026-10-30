@@ -1,0 +1,62 @@
+{
+  "Date": "2026-10-29T10:29:04",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "Content032037",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 25.39,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.Content032037.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.Content032037.headless.err",
+      "SHA256": "6C2BAB718FD4F035914BE782877D18363D448EFAB72E7DDD151333DF2626D1BE"
+    },
+    {
+      "Name": "Content032037",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 32.11,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.Content032037.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.Content032037.render.err",
+      "SHA256": "63FE29800D6BF722357D0FD96CA5CFE37B3883B113794672C164FF1249C8C622"
+    },
+    {
+      "Name": "PauseDive",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 13.48,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.PauseDive.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.PauseDive.headless.err",
+      "SHA256": "011B35181A08E0B12BDB9FA7EEAF0B58901A4A40F0814C76CC29C125093241C3"
+    },
+    {
+      "Name": "PauseDive",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 15.07,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.PauseDive.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.PauseDive.render.err",
+      "SHA256": "8EB0E1E5F1770FCB21056B5790FDE8E26C4905C62675196F8F8FEDB9A83BF281"
+    },
+    {
+      "Name": "Content057060",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 12.68,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.Content057060.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.Content057060.headless.err",
+      "SHA256": "6FA0BA722F12A5DE5C35AC13690D85D87FC14B7640935D0A9C028ACC34B601DC"
+    },
+    {
+      "Name": "Content057060",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 13.73,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.Content057060.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_102904.Content057060.render.err",
+      "SHA256": "1064BD48CCB105A07594271F7FB38AF22A1825C78E27A92055BD98B2B8658BC3"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

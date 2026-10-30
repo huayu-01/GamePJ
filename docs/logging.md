@@ -1,51 +1,41 @@
-# 游戏日志（分析测试游玩用）
+# 日志与验证输出
 
-用户重点需求：把局内交互全部落盘，方便游玩后分析问题。
+项目日志统一入口为[Logs目录](../Logs/README.md)，该目录用`.gdignore`排除Godot资源扫描。
 
-## 输出位置与格式
-
-- 文件：`user://logs/run_年月日_时分秒.log`
-  （实际路径：`C:\Users\<用户>\AppData\Roaming\Godot\app_userdata\ACT Roguelike\logs\`）
-- 每次启动游戏新开一个文件，格式：`时分秒 [分类] 消息`
-- 同时 `GD.Print` 一份，便于 Godot MCP / 控制台抓取
-
-## 分类
-
-| 分类 | 覆盖内容 |
+| 内容 | 当前输出 |
 |---|---|
-| `Flow` | 开局、选择角色/武器、进入关卡、Boss 阵亡、本局结算 |
-| `Node` | 互动奖励节点（含节点类型）、打开 Boss 门（含已挑战次数 / 免费额度 / 初始压力） |
-| `Reward` | 三选一选了哪一条（名称 + 类型） |
-| `Spawn` | Encounter 开始、每次生成敌人（含剩余预算与场上数量）、清场完成 |
-| `Combat` | 死亡、击杀、暴击、破甲，以及涉及玩家的伤害 |
+| 编辑器／开发工程GameLog | `res://Logs/runtime/run_年月日_时分秒_毫秒.log` |
+| 导出游戏，或开发目录不可写 | `user://logs/run_年月日_时分秒_毫秒.log` |
+| PowerShell验证、构建stdout／stderr及指纹 | `Logs/validation/` |
+| 文档引用的完整验收记录与比较基线 | `Logs/evidence/` |
+| 本轮收拢的旧根目录日志 | `Logs/archive/root-20261024/` |
+| 清理清单、校验和改动前备份 | `Logs/maintenance/` |
 
-战斗事件由 `GameplayEventBus` 自动记录（`GameLog.OnGameplayEvent`），关键流程由各系统显式调用 `ActRoguelike.Core.GameLog.Write(...)`。
+当前原始截图、模型验证JSON及制作源保留原路径。运行日志和临时输出本地忽略，完整证据保留版本管理；不要根据“旧”或“失败”直接删除仍有诊断用途的唯一证据。
 
-## 加日志的方式
+## 加日志
 
 ```csharp
-ActRoguelike.Core.GameLog.Write("Flow", $"进入第 {index + 1} 关：{name}");
+GameLog.Write("Flow", $"进入关卡：{stageId}");
 ```
 
-用全限定名，不需要 using。任何系统都可以直接调用（没有实例时只打印到控制台）。
+同时打印到控制台并写入本次GameLog。格式为`时分秒 [分类] 消息`；分类包括Flow、Node、Reward、Spawn、Combat、Config、UI、Audio。战斗事实由`GameplayEventBus`订阅记录，流程节点显式调用。命中日志中的括号生命是受伤后的值。
 
-## 实测
+开发工具通过`_tools/LogPaths.ps1`创建输出目录，新的验证入口沿用它。不得向工程根目录或`docs/`写入新的日志；文档使用相对链接引用`Logs/evidence/`的报告。
 
-跑一局（Base → 角色/武器 → 关卡 → Boss 门 → 击杀 Boss → 下一关），日志文件 12 行，样例：
+## 整理与检查
 
-```
-22:14:33 [Flow] === 新的一局 ===
-22:14:42 [Flow] 选择角色 Gunner / 武器 Pistol
-22:14:42 [Flow] 进入第 1 关：Stage 1 · 外围
-22:14:53 [Node] 打开 Boss 门：已挑战 0 次 / 免费额度 2 → 初始压力 0
-22:14:57 [Combat] 伤害 Player(260) → Boss(0) 900
-22:14:57 [Combat] 死亡 Boss(0) 击杀者=Player(260)
-22:14:57 [Combat] 击杀 Boss(0) by Player(260)
-22:14:57 [Flow] 本关 Boss 阵亡 → 关卡完成判定
-22:14:57 [Flow] 进入第 2 关：Stage 2 · 内环
+```powershell
+python _tools/maintain_project_files.py
+python _tools/maintain_project_files.py --check
 ```
 
-## 已知可改进点
+默认只预览；`--apply`按清单迁移根目录日志和已分类的历史文档。唯一日志移到独立目录，逐字相同的重复输出只保留一份，重复映射和SHA256记录在maintenance清单；文档链接和验证脚本路径同步迁移。它不删除模型、截图、源文件、`.uid`／`.import`或玩家存档，不跟随旧验证工程的目录链接进行递归删除。
 
-- 运行时生成的单位（Boss 召唤的增援）在日志里显示为 `@CharacterBody3D@8`，没有可读名字，建议改成记录敌人类型（生成项 DisplayName）。
-- `[Combat] 伤害` 里括号中的血量是**受伤后**的值，读起来容易误解。
+日志等级、采样与保留策略可后续单独设计；本轮不改变战斗事件记录规则。
+
+## 2026-10-24整理结果
+
+根目录2655份日志与docs内235份日志，共2890份原始输出均已核对SHA256；唯一内容保留到新位置，删除1072份逐字重复副本。另收拢185份历史存档指纹JSON。70份历史文档归档、5份重复跳转页删除，docs顶层Markdown由124份降到51份，新增内容手册和解耦计划计入其中。
+
+双构建0警告0错误，特化221项及Main八指标／索引核验通过，无新增Main失败，原玩家五存档一致；161份Markdown的文件链接检查无断链，23份PowerShell语法检查通过。开发运行日志实际写入Logs/runtime，验证及引擎输出进入Logs/validation。[运行证据](../Logs/evidence/gameplay-fixes-evidence-20261024_143657.log)、[整理摘要](../Logs/evidence/project-maintenance-20261024.json)。详细迁移映射与改动前备份为本机maintenance数据，不要求随正式游戏导出。

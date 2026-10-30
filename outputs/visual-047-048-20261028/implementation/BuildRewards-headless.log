@@ -1,0 +1,75 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 20:57:31 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 20:57:31 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 20:57:31 [Flow] === 新的一局 ===
+[log] 20:57:31 [Flow] 日志文件：res://Logs/runtime/run_20261028_205731_516.log
+[log] 20:57:31 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 20:57:31 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 20:57:31 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 20:57:31 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波 · 1340（tag_low）1 波
+[log] 20:57:31 [Config] 增幅项表：105 条（来源：表）—— 强化 27 / 进化 35 / 异化 43。
+[log] 20:57:31 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 20:57:31 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 12 个
+[log] 20:57:31 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 20:57:31 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 20:57:31 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=1.75 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 20:57:31 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 20:57:31 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 20:57:31 [Config] 配置表：武器 6 / 角色 2 / 敌人 22 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 9 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 20:57:32 [Combat] 单位动画：RewardPlayer 共 6 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 20:57:32 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 45 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 20:57:32 [Combat] 单位动画：RewardPlayer 共 13 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 20:57:32 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 BuildRewardsProbe
+[log] 20:57:32 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 20:57:32 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 20:57:32 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Hunter（行 Id「chr_hunter」）· 武器 EnergyPalm（PoolId pool_energy_palm）→ 候选 64 条（限定两层之后）
+[BuildRewards] PASS 符合能量掌／猎手限定的发散进入候选
+[BuildRewards] PASS 列表逐项遵守角色和武器限定
+[BuildRewards] PASS 不满足限定的镰刀喜爱不能从列表获取
+[BuildRewards] PASS 未拥有上一级时不能获取灼烧升级
+[log] 20:57:32 [Reward] GM获取增幅 生命（当前 1 层）
+[BuildRewards] PASS 真实授予一级生命立即改变生命上限
+[log] 20:57:32 [Reward] GM获取增幅 灼烧弹（当前 1 层）
+[BuildRewards] PASS 前置实时解锁，同时唯一增幅不能重复获取
+[log] 20:57:32 [Reward] GM获取增幅 穿透（当前 1 层）
+[BuildRewards] PASS 获取穿透后真实互斥项弹射退出列表
+[log] 20:57:32 [Audio] 首次播放「ui_open」→ 总线 UI / res://Assets/Audio/ui/ui_open.ogg
+[BuildRewards] PASS GM打开时暂停世界并释放鼠标
+[BuildRewards] PASS GM默认显示完整当前可获取池
+[BuildRewards] PASS GM分类过滤只显示进化
+[BuildRewards] PASS GM搜索可按稳定ID定位一项
+[log] 20:57:33 [Reward] GM获取增幅 力量（当前 1 层）
+[log] 20:57:33 [Audio] 首次播放「ui_click」→ 总线 UI / res://Assets/Audio/ui/ui_click.ogg
+[BuildRewards] PASS 真实鼠标点击GM列表：增幅进入构筑且真实攻击属性上升
+[log] 20:57:33 [Reward] GM获取增幅 力量（当前 2 层）
+[BuildRewards] PASS 可重复增幅点击叠加，获取后仍可继续测试
+[BuildRewards] PASS GM仍允许原可重复增幅获取，但列表和提示不显示层数
+[BuildRewards] PASS GM关闭恢复暂停、鼠标与路由栈
+[BuildRewards] PASS 构筑库存每种增幅只有一个格子
+[BuildRewards] PASS 真实悬停立即选中并显示对应名称及当前升级等级
+[BuildRewards] PASS 详情显示完整效果描述
+[BuildRewards] PASS 048构筑只展示效果；规则资料仍完整保留给图鉴
+[BuildRewards] PASS 可重复和单次增幅均不显示层数角标，后端真实叠层保留
+[BuildRewards] PASS 详情、汇总和构筑摘要不显示层数
+[BuildRewards] PASS 选中格子具有外部发光圈
+[BuildRewards] PASS 连续帧不重建格子，悬停及选中保持稳定
+[BuildRewards] PASS 键盘焦点进入也更新选中项
+[BuildRewards] PASS 库存与详情各占一半内容宽度（873/873）
+[BuildRewards] PASS 构筑面板关闭恢复游戏
+[BuildRewards] PASS 真实特殊奖励节点入口接受唯一一次选择
+[BuildRewards] PASS 特殊池尊重AnyRewardKind，含符合限定的进化和强化
+[BuildRewards] PASS 特殊池仍排除错误武器与未满足前置
+[log] 20:57:35 [Reward] 选择奖励 专注（Evolution）
+[BuildRewards] PASS 一次选择真实生效并立即完成节点一次
+[BuildRewards] PASS 等待动画结束后奖励页关闭，不再打开第二页
+[BuildRewards] PASS 唯一选择完成后解除模态与暂停
+[BuildRewards] PASS 重复数字键不会再次授予奖励或触发完成回调
+[BuildRewards] PASS 连续奖励完成后恢复世界、输入捕获和路由栈
+[BuildRewards] PASS 只剩一个合格候选时特殊节点仍可领取
+[log] 20:57:36 [Reward] 选择奖励 爆裂火球（Evolution）
+[BuildRewards] PASS 唯一选择用尽池子后正常结束，不吞回调、不暂停卡死
+[BuildRewards] PASS 候选池已空则拒绝开页，不伪造领取回调
+[BuildRewards] SUMMARY pass=37 fail=0
+[log] 20:57:37 [Exit] 音频退出回收：真实等待86ms。
+[log] 20:57:37 [Audio] 音效统计：共 6 次 —— ui_open×4、ui_click×2（缺失 id 0 个）

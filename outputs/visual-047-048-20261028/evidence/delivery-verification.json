@@ -1,0 +1,131 @@
+{
+  "broken_links": [],
+  "board_count": 17,
+  "boards": [
+    {
+      "file": "047-comparison-four.png",
+      "width": 2560,
+      "height": 1536,
+      "bytes": 1002114,
+      "sha256": "0132f8e30aa7bec672f27c9e30dda792a396adee69e714fdfae67a201cd5336b"
+    },
+    {
+      "file": "047-comparison.png",
+      "width": 2048,
+      "height": 1536,
+      "bytes": 940061,
+      "sha256": "357cfb35d9126376c77e6866fb2d7546eaff4a470f34b9b899022713885a511c"
+    },
+    {
+      "file": "047-direction-a.png",
+      "width": 2048,
+      "height": 1536,
+      "bytes": 1194173,
+      "sha256": "3a06fa1fb5584c8fe2ea8fc75ddd7b15b60795bb62047e08520a3b465279038a"
+    },
+    {
+      "file": "047-direction-b.png",
+      "width": 2048,
+      "height": 1536,
+      "bytes": 1077619,
+      "sha256": "e1997a674fd1c1bd6a4d9562255abd373e98963746bf8d72ff4374a48caaf295"
+    },
+    {
+      "file": "047-direction-c.png",
+      "width": 2048,
+      "height": 1536,
+      "bytes": 989980,
+      "sha256": "1b19728887dc0d2f1ecd815b90bdb3e3b8f9ce89fb825e8467843f5feada9171"
+    },
+    {
+      "file": "047-direction-d.png",
+      "width": 2048,
+      "height": 1536,
+      "bytes": 571111,
+      "sha256": "4fa303a74c9b62d04e3fce8b9dd24c05d820b6706ff3ccef6433594620db6315"
+    },
+    {
+      "file": "ui-build-glass-v2.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1686824,
+      "sha256": "a745d8b9b7c2334ca088de36c2f14665fbcc7550cbaf2e841b743e8605b2b95f"
+    },
+    {
+      "file": "ui-build.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2298272,
+      "sha256": "5972a5c3087de03dc38296a832348b91cd2220c52a5324f28e59af185dc64bbe"
+    },
+    {
+      "file": "ui-codex-glass-v2.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1684868,
+      "sha256": "1d1d96f85327901bb4e1735552d93ef872d054122f4fd739adb5e3210ce6d42b"
+    },
+    {
+      "file": "ui-codex.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2202614,
+      "sha256": "e7778cb2516a70b42a2eae8bce3ef24491d2b72ae380bbc93088332b06d38f6b"
+    },
+    {
+      "file": "ui-reward-edge-frost-v3.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1810978,
+      "sha256": "67ec2e293151d1d08c6f12c19205b60019f4e5f80a694e2a900ac35d68976479"
+    },
+    {
+      "file": "ui-reward-glass-v2.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1645258,
+      "sha256": "2091db79ee22a914ea03e85aac762f7fe8a10772470971d55a2119e9fc5add19"
+    },
+    {
+      "file": "ui-reward.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2138901,
+      "sha256": "14ac554852d6599d0a1fbb62ffcb842f6feec6f1831a3b6406a97cd161e8b6a5"
+    },
+    {
+      "file": "vfx-a-atlas.png",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 2260437,
+      "sha256": "bbe5d013adca919192842c69c7408e87eb68e6f4ce19949a3a812b820adf0f23"
+    },
+    {
+      "file": "vfx-b-atlas.png",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 1898951,
+      "sha256": "6a344f366b2a5649d74798a8fab9e8256b3b4dda15db44615ade5baa1517f8ff"
+    },
+    {
+      "file": "vfx-c-atlas.png",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 1741433,
+      "sha256": "e0e61e543d7fa99935198d25926b9293f2a0b47babd6b6be39aa7b1a0451c569"
+    },
+    {
+      "file": "vfx-d-generated-reference.png",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 713327,
+      "sha256": "c3ec41b893f1d29cc2ca9e62ee80b78413af66a2f32756a6d3cdb7fae76be11e"
+    }
+  ],
+  "capture_stderr_bytes": 0,
+  "board_stderr_bytes": 0,
+  "four_board_stderr_bytes": 0,
+  "native_board_visual_qa": "已查看A/B/C/D板；当前采用C方向和正常深度。新版毛玻璃三页及奖励中央灰透/边缘雾化v3均已视觉查看，无状态示例、按键栏可见。",
+  "html_browser_qa": "先前IAB绑定两次超时；当前HTML仅校验资源链接与JS语法，不声称完成浏览器交互验收。",
+  "latest_revision": "C推进；撤销场景顶层。UI简化毛玻璃和图标、页面按键栏；三选一卡牌中央偏灰透明，边缘磨砂。"
+}

@@ -4,6 +4,7 @@
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_2.tres" id="3_skill"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_energy_palm.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="Resource_charge"]
 script = ExtResource("1_tuning")
@@ -11,15 +12,24 @@ TargetAbility = ExtResource("3_skill")
 CooldownScale = 0.5
 AlwaysPerfectRelease = true
 
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("Resource_charge")
+
 [resource]
 script = ExtResource("2_row")
+Excludes = PackedStringArray("1350")
+NumericId = 1232
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "ChargeBehavior"
-ChargeBehavior = SubResource("Resource_charge")
+Effects = [SubResource("Resource_effect_tuning")]
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Id = "evo_perfect_focus"
 DisplayName = "专注"
 DescriptionTemplate = "武技2 间隔减半，现在发射总会是完美时机"
 Note = "J21：仅能量掌武技2冷却间隔乘0.5，基础蓄力完成后总是完美释放。使用明确布尔，不把完美窗口伪装成3600秒；未满基础仍中止，真实释放动画ATK出弹。"
+
+NameKey = "content.evo_perfect_focus.name"
+
+DescriptionKey = "content.evo_perfect_focus.description"

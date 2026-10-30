@@ -1,24 +1,28 @@
 [gd_resource type="Resource" script_class="RuneConfig" format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Script" path="res://Scripts/Config/RuneConfig.cs" id="2_row"]
 
-[sub_resource type="Resource" id="Resource_p0"]
-script = ExtResource("1_param")
-Key = "MaxHealthDamageRatio"
-Value = 0.1
-Note = "额外伤害 = 玩家最大生命值 × 这个比例（文档给了 10%）"
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/MaxHealthDamageRewardEffect.cs" id="effect_0"]
+
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Ratio = 0.08
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1129
 RewardKind = 0
 MaxStacks = 1
-ApplyHandler = "RuneEffect"
-HandlerParams = [SubResource("Resource_p0")]
 Slot = 10
 UnlocksRequires = Array[String]([])
 Id = "rune_giant"
 DisplayName = "巨人"
-DescriptionTemplate = "每次攻击额外造成相当于你最大生命值 10% 的伤害。"
-Note = "[J11 新增行·符文] 文档第 13 行「巨人:攻击时造成最大生命值{10}%的额外伤害」——**文档给了 10%**。实现 = 攻击者侧新增一条**扁平加伤**查询口 `IOutgoingDamageBonus` + `Unit.OutgoingDamageBonusAgainst`（`AttackInstance.RollHit` 里在既有的 `marked` 倍率**之后**加一项；没有登记时那一项是 `+0`，`x + 0f == x` 所以默认逐位不变），新规则 `RuneMaxHealthDamageRule` 每次命中读玩家当前 `MaxHealth × 0.1`。⚠️ 与**雷之印**叠加时按夹过的 30 生命算（= 每次 +3），这是「夹上限之后的最大生命值」，口径一致。"
+DescriptionTemplate = "每次攻击额外造成相当于你最大生命值 {Effects.0.Ratio:0%} 的伤害。"
+Note = "2026-10-27按用户确认小幅削弱：附伤由最大生命10%调整到8%，保留原有每命中附伤和后期联动；附伤在暴击倍率之后加算，按当前最大生命读取，描述共读Ratio。"
 IconPath = "res://Assets/UI/Icons/Runes/rune_giant.svg"
+
+NameKey = "content.rune_giant.name"
+
+DescriptionKey = "content.rune_giant.description"
+
+Effects = [SubResource("Resource_effect_0")]

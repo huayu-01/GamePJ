@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/Projectile.cs" id="1_projectile"]
 [ext_resource type="Material" path="res://Assets/Materials/mat_energy_wave.tres" id="2_mat"]
+[ext_resource type="PackedScene" path="res://Scenes/Combat/EnergyPulseExplosion.tscn" id="3_pulse"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_wave"]
 material = ExtResource("2_mat")
@@ -30,6 +31,7 @@ SweepRadius = 0.14
 GravityScale = 0.0
 MaxLifetime = 1.6
 Pierce = 0
+ExplosionScene = ExtResource("3_pulse")
 
 [node name="Head" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_wave")

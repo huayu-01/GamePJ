@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_akbno")
+NumericId = 1073
 Id = "ChainLightning"
 Slot = 14
 DisplayName = "连锁闪电"

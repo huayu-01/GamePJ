@@ -279,8 +279,12 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 		float shotDamage = (_perfect && PerfectDamage > 0f ? PerfectDamage : Damage) * power * (HoldToCharge ? LastReleaseDamageScale : 1f);
 		float shotSpeed = (_perfect && PerfectSpeed > 0f ? PerfectSpeed : Speed) * power;
 
+		int extras = Mathf.Max(0, Mathf.RoundToInt(stats.Get("ProjectileCountAdd")));
 		var attack = new AttackInstance
 		{
+			IsManualWeaponAttack = true,
+			ProjectileCount = extras + 1,
+			PowerDamageWeight = power * (HoldToCharge ? LastReleaseDamageScale : 1),
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
 			BaseDamage = shotDamage * damageMultiplier,
@@ -302,21 +306,21 @@ public partial class EnergyWaveAbility : ProjectileAttackAbility
 			AbilityKind = AbilityId,
 		};
 
-		Node parent = GetTree().CurrentScene ?? GetTree().Root;
-		var projectile = ProjectileScene.Instantiate<Projectile>();
-		parent.AddChild(projectile);
-		projectile.GlobalPosition = origin;
-		projectile.Speed = shotSpeed;
-		projectile.GravityScale = 0f; // 直线子弹，无下坠（方向朝着准星世界点，见 ResolveShotDirection）
-		projectile.Launch(attack, direction);
+		int followupFrames = Mathf.Max(0, Mathf.RoundToInt(stats.Get("ProjectileFollowupDelayFrames")));
+		for (int i = 0; i <= extras; i++)
+		{
+			var projectile = ProjectileScene.Instantiate<Projectile>();
+			projectile.Speed = shotSpeed; projectile.GravityScale = 0f;
+			ProjectileDispatch.Submit(this, OwnerUnit, projectile, attack, origin, direction, followupFrames * i);
+		}
 
 		LastShotDamage = attack.BaseDamage;
-		LastShotSpeed = projectile.Speed;
+		LastShotSpeed = shotSpeed;
 		LastShotPerfect = _perfect;
 
 		GameLog.Write(
 			"Combat",
-			$"能量波发射：{AbilityId} 伤害 {attack.BaseDamage:0.##} 弹速 {projectile.Speed:0.##}"
+			$"能量波发射：{AbilityId} 伤害 {attack.BaseDamage:0.##} 弹速 {shotSpeed:0.##}"
 			+ $"（{(_perfect ? "完美时机" : "普通")}，蓄力 {ChargeTime:0.##}s/{ChargeBaseSeconds:0.##}s 档 {ChargeSteps} 威力 ×{power:0.###}，"
 			+ $"无视格挡={BypassBlock}，穿透 {attack.Pierce}，方向 {direction}）");
 	}

@@ -15,7 +15,7 @@ namespace ActRoguelike.Config;
 ///   └─ Pool ────────┘
 /// </code>
 /// 即：**武器指池、池不指武器**；"哪个选项属于哪个池"写在**选项行**的 `Pool` 列上
-/// （一个选项占一行 + 一个引用列 —— 见 docs/config-tooling-yard.md §4.3：一栏里塞多个选项的
+/// （一个选项占一行 + 一个引用列 —— 见 docs/archive/design-notes/config-tooling-yard.md §4.3：一栏里塞多个选项的
 /// `Array[StringName]` 恰恰是编辑器拿不到的形态，所以成员关系**不放**在池行里）。
 ///
 /// **这个类是干什么的**：它是"池"的**身份锚点** —— 有了它，武器行与选项行之间才是**资源引用**

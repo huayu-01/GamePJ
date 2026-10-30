@@ -107,12 +107,7 @@ public partial class KillJumpProbe : Node3D
 	private static RewardConfig Copy(int amount, int cap)
 	{
 		var copy = (RewardConfig)ConfigRows.ById<RewardConfig>("mut_stomp_kill")!.Duplicate(true);
-		foreach (var parameter in copy.HandlerParams)
-		{
-			if (parameter.Key == "ExtraAirJumps") parameter.Value = amount;
-			if (parameter.Key == "JumpCap") parameter.Value = cap;
-			if (parameter.Key == "Cooldown") parameter.Value = 0;
-		}
+		var effect = (KillAirJumpRewardEffect)copy.Effects.Single(); effect.ExtraAirJumps = amount; effect.JumpCap = cap;
 		return copy;
 	}
 	public override async void _Ready()

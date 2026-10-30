@@ -5,17 +5,17 @@
 > 窄画布会减少列数，矮画布会减少每页行数，始终不超过 6×3；卡面比例保持 **0.625**。
 > 左侧额度条宽 **64px**，从下至上填充，资源和扩增按钮集中在顶栏。
 > `Base.tscn` 与 `Main.tscn` 均挂此界面。旧 A5 的「占位卡填满、不翻页」需求已被取代，
-> 下文中旧占位卡行为与旧实测图仅供历史查阅。当前证据与复现命令见 [a-batch-verification.md](a-batch-verification.md)。
+> 下文中旧占位卡行为与旧实测图仅供历史查阅。当前证据与复现命令见 [a-batch-verification.md](archive/development-batches/a-batch-verification.md)。
 
 > ⚠️ **2026-10-15 P6a**：两张 `GrantSkill` 卡 `card_summon` / `card_control` **已删除**
 > （它们指向的 `skl_summon` / `skl_control` 随旧角色一起清掉了 —— 用户 Q10-a 的裁定就是"删"）。
 > 所以**现在 6 张卡全是数值卡**，本文件里提到那两张卡的地方（含"能力卡与技能表唯一的接触点"
 > 那一段的实例）读作**历史**；`AbilityCardConfig.Skill` 那一列本身**还在**（以后要加授予技能型卡照用）。
 > 另外基地那页旧的「永久强化」（`BaseScreen`）也整份删除了 —— 局外成长台现在直接开**能力卡界面**。
-> 见 [character-redesign.md](character-redesign.md) §六。
+> 见 [character-redesign.md](archive/design-notes/character-redesign.md) §六。
 
 > **给"要加一张能力卡 / 改额度 / 改矩阵布局"的人看。** 读完这一篇你不需要看别的文档。
-> 需求来源：[requirements-ability-system.md](requirements-ability-system.md) **§一（能力系统）** 与 **§二（矩阵 UI 与交互）**。
+> 需求来源：[requirements-ability-system.md](archive/design-notes/requirements-ability-system.md) **§一（能力系统）** 与 **§二（矩阵 UI 与交互）**。
 > 相关：[config.md](config.md)（配置表体系与纪律）、[ui.md](ui.md)（界面外观唯一入口，**§10 按键提示栏**）、
 > [audio.md](audio.md)（加音效要做什么）。
 >
@@ -110,7 +110,7 @@
 > 用户 2026-10-12 裁定「**没有弹匣的概念了**」，`Weapon` 的装填/弹匣逻辑已整组删除，
 > 这两张卡改的属性键（`ReloadSpeedMultiplier` / `MagazineSizeAdd`）**已经没有任何读取端**。
 > 另 2 张（`card_summon` / `card_control`）是 **P6a** 删的。
-> 见 [character-redesign.md](character-redesign.md) §五。
+> 见 [character-redesign.md](archive/design-notes/character-redesign.md) §五。
 
 | 行 Id | 名字 | 效果 | 额度 | 解锁 | 升级 | 上限 |
 |---|---|---|---|---|---|---|
@@ -593,7 +593,7 @@ Remove-Item "$env:APPDATA\Godot\app_userdata\ACT Roguelike\ability_cards.cfg"
 8. **GDScript 的 `:=` 不能接 `.call(...)` 的返回值**：本项目把 GDScript 警告当错误，
    `var x := node.call(...)` 会因"从 Variant 推导类型"**直接解析失败**，整个拍摄台起不来（实测栽过一次）。
 9. **音频表要一起加**：新音效的 `.tres` 不加进 `ConfigIndex.tres` 的 `Audio` 数组 = "文件在、表在、就是没声音"。
-10. **不要用 `stop_project` / 不要在别的代理跑自测时用 MCP 的 `run_project`**：见 `docs/todo-handoff.md` 末尾。
+10. **不要用 `stop_project` / 不要在别的代理跑自测时用 MCP 的 `run_project`**：见 `docs/archive/handoffs-2026-10-18/todo-handoff.md` 末尾。
 11. **占位卡不是空框，也别把格子尺寸写死回去**（A5 的两条红线）：
     - 占位卡是**真的 `AbilityCardTile`**（`Card == null`）—— 谁在 `_GuiInput` / `RunAction` 里加一句
       `if (Card == null) return;`，占位卡立刻变成"死格子"（用户明确不要这个）；

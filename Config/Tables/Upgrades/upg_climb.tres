@@ -3,18 +3,30 @@
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
+
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
 Stat = "JumpVelocityMultiplier"
 Operation = 1
 Value = 1.08
 
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Modifiers = [SubResource("Resource_m0")]
+
 [resource]
 script = ExtResource("2_row")
+NumericId = 1296
 RewardKind = 0
 MaxStacks = 1
-Modifiers = [SubResource("Resource_m0")]
 Id = "upg_climb"
 DisplayName = "攀高"
 DescriptionTemplate = "跳跃高度 +8%"
 Note = "[P5 新增行] 文档第 239 行「攀高:提升跳跃高度」。角色行给的是起跳速度**固定值**（不做倍率），所以新增一个单位级乘区 JumpVelocityMultiplier，消费者 CharacterMovement.EffectiveJumpVelocity（只作用在单位自己的 TryJump，不动敌人扑击那些场景值）。"
+
+NameKey = "content.upg_climb.name"
+
+DescriptionKey = "content.upg_climb.description"
+
+Effects = [SubResource("Resource_effect_0")]

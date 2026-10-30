@@ -76,6 +76,18 @@ public static class AbilityStore
 	private static bool _loaded;
 	private static bool _suppressSave;
 	private static bool _quietLog;
+	internal static System.Action CaptureRollback()
+	{
+		Load();
+		var levels = new System.Collections.Generic.Dictionary<string, int>(Levels);
+		var active = new System.Collections.Generic.HashSet<string>(ActiveIds);
+		int quota = _quotaLevel;
+		return () =>
+		{
+			Levels.Clear(); foreach (var pair in levels) Levels.Add(pair.Key, pair.Value);
+			ActiveIds.Clear(); ActiveIds.UnionWith(active); _quotaLevel = quota; _loaded = true;
+		};
+	}
 
 	/// <summary>
 	/// 付钱 / 退钱的口子。默认走 <see cref="MetaProgress"/> 的碎片；

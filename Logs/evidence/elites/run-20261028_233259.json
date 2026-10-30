@@ -1,0 +1,44 @@
+{
+  "Date": "2026-10-28T23:33:00",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "Content055056",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 8.6,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_233259.Content055056.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_233259.Content055056.headless.err",
+      "SHA256": "9C1614D90DC4857A3D6F702DBFD1A5B9DE7B15775264CDC5D06AEC30BF8E3D84"
+    },
+    {
+      "Name": "Content055056",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 14.38,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_233259.Content055056.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_233259.Content055056.render.err",
+      "SHA256": "6E2D74C03C242DC9B958186C74B84A80B7F1933A21ED1FAAC0B2907E38C50E9B"
+    },
+    {
+      "Name": "VisualRevision",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 10.46,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_233259.VisualRevision.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_233259.VisualRevision.headless.err",
+      "SHA256": "0194FB8C7D39D60CB368351A16B74987BEA12108909E44E45D8E227444BEB610"
+    },
+    {
+      "Name": "VisualRevision",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 12.37,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_233259.VisualRevision.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_233259.VisualRevision.render.err",
+      "SHA256": "0CF4ED4598F4BDF6224CE53E0E226106AC9C7BD87EC0E626ABC7C18DCD572B7D"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

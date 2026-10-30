@@ -7,6 +7,7 @@ bin/
 obj/
 *.user
 *.suo
+.vs/
 
 # --- 工具与本地残留 ---
 .gdmcp/
@@ -23,8 +24,15 @@ _art_staging/
 # --- 代理跑自测时的临时输出（不该入库）---
 .run_ai_*
 .ai_*
+.ai/
 
 
 # --- 编辑器插件的会话状态（每次打开都会变，不该入库）---
 addons/resources_spreadsheet_view/saved_state.json
+
+# 开发输出集中存放；完整验收证据Logs/evidence仍保留版本管理。
+Logs/runtime/
+Logs/validation/
+Logs/archive/
+Logs/maintenance/
 

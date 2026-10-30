@@ -59,6 +59,7 @@ internal sealed class HealthBarWidget
 		// 新样式里 Color 自己就带染色与透明度（`Color(0.72,0.86,1,0.45)` 那层"塑料"），
 		// modulate 才是额外乘上去的那一层 —— 还原成 Color 会把染色乘两遍，ColorRect 型的护甲条会越闪越暗。
 		ArmorModulate = armorFill?.Modulate ?? Colors.White;
+		if (_delay != null) _delay.Visible = false;
 	}
 
 	/// <summary>满宽（比例 1.0）时填充条的像素宽度/高度，取自预制体。</summary>
@@ -96,9 +97,11 @@ internal sealed class HealthBarWidget
 		}
 	}
 
-	/// <summary>填充比例（0–1）与配色。传 <paramref name="hit"/> 时把受伤前的旧满宽交给延迟条（残影）。</summary>
+	/// <summary>填充比例（0–1）与配色。受伤残影只保留真实受击前的长度，不得回填成满血。</summary>
 	public void SetRatio(float ratio, Color color, bool hit)
 	{
+		float previousWidth = Mathf.Clamp(_fill.Size.X, 0f, FillWidth);
+		float nextWidth = FillWidth * Mathf.Clamp(ratio, 0f, 1f);
 		if (_fill is ColorRect rect)
 		{
 			rect.Color = color;
@@ -109,13 +112,16 @@ internal sealed class HealthBarWidget
 			_fill.Modulate = color;
 		}
 
-		_fill.Size = new Vector2(Mathf.Max(0f, FillWidth * Mathf.Clamp(ratio, 0f, 1f)), FillHeight);
+		_fill.Size = new Vector2(nextWidth, FillHeight);
 
-		if (hit && _delay != null)
+		if (hit && _delay != null && nextWidth < previousWidth)
 		{
-			_delay.Size = new Vector2(FillWidth, FillHeight);
+			// 连续伤害可保留尚未退完的残影；护甲吸收、格挡和零伤害不会重置它。
+			float oldDelay = _delay.Visible ? _delay.Size.X : 0f;
+			_delay.Size = new Vector2(Mathf.Clamp(Mathf.Max(previousWidth, oldDelay), nextWidth, FillWidth), FillHeight);
 			_delay.Visible = true;
 		}
+		else if (_delay != null && nextWidth >= _delay.Size.X) _delay.Visible = false;
 	}
 
 	/// <summary>
@@ -173,7 +179,8 @@ internal sealed class HealthBarWidget
 		}
 
 		float target = FillWidth * Mathf.Clamp(ratio, 0f, 1f);
-		float width = Mathf.MoveToward(_delay.Size.X, target, speed * delta);
+		// speed 是比例/秒，必须换算为像素；否则 64px 血条会错误地花上百秒退完。
+		float width = Mathf.MoveToward(_delay.Size.X, target, FillWidth * Mathf.Max(0f, speed) * Mathf.Max(0f, delta));
 		_delay.Size = new Vector2(width, FillHeight);
 		if (Mathf.IsEqualApprox(width, target))
 		{
@@ -402,6 +409,7 @@ public partial class WorldOverlay : CanvasLayer
 
 	public override void _Process(double delta)
 	{
+		using var frameProfile=ActRoguelike.Core.RuntimeFrameProfiler.Measure("WorldUI");
 		if (!ConfigIndex.Settings.ShowEnemyHealthBars)
 		{
 			ClearBars();

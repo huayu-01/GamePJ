@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://d2ohxtj6vghp8"]
+
+[ext_resource type="Script" uid="uid://dmna6kurtn2yb" path="res://Scripts/Combat/Unit.cs" id="1_tfvh0"]
+[ext_resource type="PackedScene" uid="uid://86nrqqojnvd8" path="res://Assets/Enemies/StoneSlammer/stone_slammer.glb" id="2_70vyf"]
+[ext_resource type="Script" uid="uid://c1om2njjn4vp4" path="res://Scripts/Combat/CharacterMovement.cs" id="3_y5x6y"]
+[ext_resource type="Script" uid="uid://b5nhr2fjicfdy" path="res://Scripts/AI/EnemyBrain.cs" id="4_eyoda"]
+[ext_resource type="Script" uid="uid://wo8gc6edcjdg" path="res://Scripts/AI/Behaviors/UseAbilityBehavior.cs" id="5_p4ad2"]
+[ext_resource type="Script" uid="uid://c3p0gxap4a1j2" path="res://Scripts/AI/Behaviors/KeepDistanceBehavior.cs" id="6_bo0ml"]
+[ext_resource type="Script" uid="uid://bd5yt65mxqyty" path="res://Scripts/Abilities/EnemyPlanAbility.cs" id="7_s7nhe"]
+[ext_resource type="Resource" path="res://Config/EnemyPlans/heavy_slammer.tres" id="8_yowv3"]
+[ext_resource type="Script" uid="uid://c1rmxqbohfw8p" path="res://Scripts/Combat/BlockComponent.cs" id="9_ab0o4"]
+[ext_resource type="Script" uid="uid://7gcupr0uof6f" path="res://Scripts/Combat/UnitAnimator.cs" id="10_usjwq"]
+[ext_resource type="Script" uid="uid://dh01edm2bbmo8" path="res://Scripts/Combat/UnitPresentation.cs" id="11_afexu"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_tfvh0"]
+radius = 0.72
+height = 2.95
+
+[node name="StoneSlammer" type="CharacterBody3D" unique_id=1876613239]
+script = ExtResource("1_tfvh0")
+MaxHealth = 240.0
+MoveSpeed = 2.3
+metadata/enemy_art_source = "stone-slammer-geometric-v1"
+
+[node name="Body" type="CollisionShape3D" parent="." unique_id=561094345]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.475, 0)
+shape = SubResource("CapsuleShape3D_tfvh0")
+
+[node name="Model" type="Node3D" parent="." unique_id=652413064 instance=ExtResource("2_70vyf")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="Movement" type="Node" parent="." unique_id=901438511]
+script = ExtResource("3_y5x6y")
+FaceMovementDirection = false
+
+[node name="Brain" type="Node" parent="." unique_id=1912115597]
+script = ExtResource("4_eyoda")
+
+[node name="Attack" type="Node" parent="Brain" unique_id=870981843]
+script = ExtResource("5_p4ad2")
+AbilityNodeName = "AbilityPlan"
+Priority = 100
+
+[node name="KeepDistance" type="Node" parent="Brain" unique_id=802915521]
+script = ExtResource("6_bo0ml")
+PreferredDistance = 2.3
+Tolerance = 0.4
+Priority = 10
+
+[node name="AbilityPlan" type="Node3D" parent="." unique_id=623219814]
+script = ExtResource("7_s7nhe")
+Plan = ExtResource("8_yowv3")
+AbilityId = "skl_enemy_heavy_slammer"
+
+[node name="Block" type="Node" parent="." unique_id=1094301183]
+script = ExtResource("9_ab0o4")
+Blocking = false
+
+[node name="Animator" type="Node" parent="." unique_id=1596909410]
+script = ExtResource("10_usjwq")
+SkillLibraryDirectory = "res://Assets/Enemies/StoneSlammer/Animations/"
+
+[node name="Presentation" type="Node" parent="." unique_id=269706204]
+script = ExtResource("11_afexu")

@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1_l008i")
+NumericId = 1071
 Kind = 1
 VisualStyle = 3
 VisualIcon = ExtResource("e_visual_icon")

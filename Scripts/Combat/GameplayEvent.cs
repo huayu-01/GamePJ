@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Godot;
 
 namespace ActRoguelike.Combat;
@@ -39,6 +40,8 @@ public enum GameplayEventKind
 	/// 两条都是**表驱动的** <c>TablePulseRule</c>。</para>
 	/// </summary>
 	Parried,
+	/// <summary>所有成功格挡的事实；一次性护罩和主动招架均可触发，但不共享硬直属性。</summary>
+	Blocked,
 }
 
 /// <summary>
@@ -51,6 +54,8 @@ public readonly struct GameplayEvent
 	public Unit? Source { get; init; }
 	public Unit? Target { get; init; }
 	public float Value { get; init; }
+	/// <summary>实际护甲、护盾和生命损失总量；Value保留原生命损失契约。</summary>
+	public float DamageApplied { get; init; }
 	public bool IsDamageOverTime { get; init; }
 	public bool IsSecondary { get; init; }
 	/// <summary>Hit／Damaged携带原始出手快照，追击类效果可在伤害结算后选择目标，不再反查当前技能。</summary>
@@ -69,7 +74,15 @@ public readonly struct GameplayEvent
 /// <summary>轻量事件总线。刻意不做队列与优先级，只用于跨系统广播（阶段 5 的触发效果）。</summary>
 public static class GameplayEventBus
 {
-	public static event Action<GameplayEvent>? Raised;
+	private static readonly object SubscriptionGate = new();
+	private static Action<GameplayEvent>? _raised;
+	private static Delegate[] _handlers = Array.Empty<Delegate>();
+	// 只在订阅变化时建立不可变快照；保留重复订阅、多播移除及广播中增删的委托语义。
+	public static event Action<GameplayEvent>? Raised
+	{
+		add { lock (SubscriptionGate) { _raised += value; Volatile.Write(ref _handlers, _raised?.GetInvocationList() ?? Array.Empty<Delegate>()); } }
+		remove { lock (SubscriptionGate) { _raised -= value; Volatile.Write(ref _handlers, _raised?.GetInvocationList() ?? Array.Empty<Delegate>()); } }
+	}
 
     /// <summary>
     /// 广播事件。**逐个订阅者隔离异常** —— 之前直接 Invoke，
@@ -79,11 +92,8 @@ public static class GameplayEventBus
     /// </summary>
     public static void Raise(in GameplayEvent gameplayEvent)
     {
-        Delegate[]? handlers = Raised?.GetInvocationList();
-        if (handlers == null)
-        {
-            return;
-        }
+		using var profile=ActRoguelike.Core.RuntimeFrameProfiler.Measure("EventBus");
+        Delegate[] handlers = Volatile.Read(ref _handlers);
 
         foreach (Delegate handler in handlers)
         {
@@ -99,5 +109,8 @@ public static class GameplayEventBus
     }
 
 	/// <summary>场景重载前清理静态订阅，避免持有已释放节点。</summary>
-	public static void Clear() => Raised = null;
+	public static void Clear()
+	{
+		lock (SubscriptionGate) { _raised = null; Volatile.Write(ref _handlers, Array.Empty<Delegate>()); }
+	}
 }

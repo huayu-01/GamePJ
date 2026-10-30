@@ -39,7 +39,7 @@ public partial class PlayerWeaponInput : Node3D
 		}
 
 		// 六把武技驱动武器也必须对齐准星；不能放在旧枪械分支的提前返回之后。
-		Vector3 bodyAim = AimUtil.GetCrosshairDirection(GetViewport(), -_unit.GlobalTransform.Basis.Z);
+		Vector3 bodyAim = AimUtil.GetCrosshairDirection(GetViewport(), -_unit.GlobalTransform.Basis.Z, _unit);
 		_unit.Movement?.SetFacing(bodyAim);
 
 		// 技能驱动武器只由技能槽输入层执行，不能让fire再触发一遍左键技能。

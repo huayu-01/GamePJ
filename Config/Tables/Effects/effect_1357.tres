@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EffectConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="stat"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/ic_status_aura.svg" id="icon"]
+[sub_resource type="Resource" id="modifier"]
+script = ExtResource("stat")
+Stat = "MoveSpeedMultiplier"
+Operation = 0
+Value = 0.2
+[resource]
+script = ExtResource("row")
+NumericId = 1357
+DisplayName = "速度药剂"
+NameKey = "content.1357.name"
+DescriptionKey = "content.1357.description"
+DescriptionTemplate = "移速+{Modifiers.0.Value:0%}，持续{Duration}秒；再次拾取刷新时间，不叠加强度。"
+Kind = 4
+Slot = 0
+Duration = 15
+MaxStacks = 1
+VisualStyle = 4
+VisualIcon = ExtResource("icon")
+VisualColor = Color(0.3, 1, 0.75, 0.8)
+Modifiers = [SubResource("modifier")]

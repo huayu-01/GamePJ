@@ -33,6 +33,7 @@ NodeName = "AbilityBuff"
 ClassHint = "BuffAlliesAbility"
 Cooldown = 5.5
 Windup = 0.4
+NumericId = 1193
 Id = "skl_enemy_elite_buff"
 DisplayName = "增益光环"
 Note = "技能精英：给半径内友军挂 Empowered。"

@@ -1,0 +1,32 @@
+{
+  "Date": "2026-10-26T20:39:22",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "content",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203922.content.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203922.content.headless.err",
+      "SHA256": "5A54FA09863BC289A1572EF444312F98C3091E2B53D6A28886DD40D9E1FA5E54"
+    },
+    {
+      "Name": "config_authoring",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203922.config_authoring.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203922.config_authoring.headless.err",
+      "SHA256": "0CBF613D920F683F8073FB010161312A89164E37804BB72EB226D85982DDB63C"
+    },
+    {
+      "Name": "config_authoring",
+      "Mode": "render",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203922.config_authoring.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203922.config_authoring.render.err",
+      "SHA256": "9E0CC09F50CCF6B42987110E2DC1FF007216B91461CD1B22CCEC1E35751B2581"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

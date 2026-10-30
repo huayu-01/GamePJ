@@ -4,27 +4,27 @@
 
 > **2026-10-17 全部计划批次A/E/B/C/D已完成**。D九层命名、World-only身体、阵营攻击盒/弹道已独立全量回归。
 > 双配置编译0/0，完整自测退出0且八条硬指标一致；D94/0、C52/0、读档5/0、B74/0、A23/0、E39/0。
-> [18条需求完成核对](../../roadmap-2-completion.md) · [D批证据与截图](../../d-batch-verification.md)。
+> [18条需求完成核对](roadmap-2-completion.md) · [D批证据与截图](../development-batches/d-batch-verification.md)。
 > 本段为当前状态；以下“现状/建议/需确认”是2026-10-16实施前侦察，用户后续裁定与实际完成状态优先。
 
 > **2026-10-16 C 批已完成**：第2/17条基地真实战斗、第3条独立角色对象与武器归属、第4条角色模型、
-> 各自武器记忆、当前项高亮及即时换武技，均有真实输入验收。[C批证据与截图](../../c-batch-verification.md)。
+> 各自武器记忆、当前项高亮及即时换武技，均有真实输入验收。[C批证据与截图](../development-batches/c-batch-verification.md)。
 > C批交付时剩余D碰撞层，现已完成独立全量回归；整体美术与既有问题继续专项推进。
 
 > **2026-10-16 B 批已完成**：第5条技能HUD、第11/15条可插拔GM已实测；B探针82/0、完整自测退出码0，
-> A/E回归23/0与39/0，八条硬指标一致，Debug/ExportRelease均编译0/0。[B批证据与截图](../../b-batch-verification.md)。
+> A/E回归23/0与39/0，八条硬指标一致，Debug/ExportRelease均编译0/0。[B批证据与截图](../development-batches/b-batch-verification.md)。
 > B批结束时未完成计划为C→D，现C已完成；正式角色交互不依赖GM换装。
 > 用户追加美术方向：以 Toon Nature 为参考的**卡通+低多面体**，现有占位资源后续可替换；
 > 未来像素风仅作为**可选、可插拔的屏幕渲染层**，HUD保持清晰。仅下载免费且许可允许使用的素材。
-> 已建立独立美术任务；来源、许可限制、当前接入范围与尚未接线项见 [美术专项交接](../../art-refresh-handoff.md)。
+> 已建立独立美术任务；来源、许可限制、当前接入范围与尚未接线项见 [美术专项交接](../design-notes/art-refresh-handoff.md)。
 
 > **2026-10-16 E 批已完成**：第13条后台纯效果并用、第14条通用状态表现均已实测。
 > 用户补充确认：刹那之眼保留 **0.3s 无动画软启动及原免伤/免费后撤**。E探针43通过/0失败，
-> 完整自测退出码0，八条硬指标逐字一致；[证据与截图](../../e-batch-verification.md)。E批结束时下一批为B，现已完成。
+> 完整自测退出码0，八条硬指标逐字一致；[证据与截图](../development-batches/e-batch-verification.md)。E批结束时下一批为B，现已完成。
 
 > **2026-10-16 执行进度**：HANDOFF §5 的 **A-1～A-5 已实现并完成实测**（血条合并、左侧额度条、
 > 卡牌 6×3 上限及分页、ESC 设置及帮助分页、下落风线）。第 16 条「做翻页」取代下文早期的待确认项。
-> 证据见 [a-batch-verification.md](../../a-batch-verification.md)。A、E、B、C完成，D待执行。
+> 证据见 [a-batch-verification.md](../development-batches/a-batch-verification.md)。A、E、B、C完成，D待执行。
 
 > 用户原话：「接下来这些可以作为计划**慢慢安排**」
 > 本文档记录 **12 条需求的现状侦察结论 + 分批计划 + 依赖关系**。
@@ -234,9 +234,9 @@ CollisionMask = Faction == Player ? World | UnitMask : ...   // ← 含 UnitMask
 
 ## 5. 与已有文档的关系
 
-- `docs/character-redesign.md` —— 用户对**第一轮重构**的澄清（P1–P6c 的依据）
-- **`docs/roadmap-2.md`（本文档）** —— **第二轮 12 条需求的依据**
-- `docs/todo-handoff.md` —— 每轮的实际执行状态（末尾有"仍然开着的口子"）
+- `docs/archive/design-notes/character-redesign.md` —— 用户对**第一轮重构**的澄清（P1–P6c 的依据）
+- **`docs/archive/handoffs-2026-10-18/roadmap-2.md`（本文档）** —— **第二轮 12 条需求的依据**
+- `docs/archive/handoffs-2026-10-18/todo-handoff.md` —— 每轮的实际执行状态（末尾有"仍然开着的口子"）
 - `docs/architecture.md` —— 11 条铁律；**碰撞层语义建议补进这里**（§3.2 ②）
 
 ---

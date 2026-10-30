@@ -1,0 +1,78 @@
+{
+  "Date": "2026-10-26T01:42:32",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "content_1",
+      "Exit": 0,
+      "Seconds": 3.79,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_1.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_1.err",
+      "StdoutSHA256": "608730846EAC0C47FC48823741A9693E9E5AC2AE541C38021BB5383E834F5A20",
+      "StderrBytes": 0
+    },
+    {
+      "Name": "content_2",
+      "Exit": 0,
+      "Seconds": 3.81,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_2.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_2.err",
+      "StdoutSHA256": "1777E3BA547AE1153AAA34AA0A54C49095D995DB39BF5632AB195E695407E091",
+      "StderrBytes": 0
+    },
+    {
+      "Name": "content_3",
+      "Exit": 0,
+      "Seconds": 3.82,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_3.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_3.err",
+      "StdoutSHA256": "E431C151D550E2A875BDEF0AD27155D407C49DF7114AD0090099D3F914D29CFA",
+      "StderrBytes": 0
+    },
+    {
+      "Name": "content_stress",
+      "Exit": 0,
+      "Seconds": 13.9,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_stress.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_stress.err",
+      "StdoutSHA256": "F04623F52B76CD980864CF68AEE4A77380EB75B941B626CB580A9506582022AF",
+      "StderrBytes": 0
+    },
+    {
+      "Name": "resource_safe",
+      "Exit": 0,
+      "Seconds": 2.02,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.resource_safe.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.resource_safe.err",
+      "StdoutSHA256": "200BECA0159505E02C32656A52AE4359116D11D1026DFF8ECF923FF2B7A090CE",
+      "StderrBytes": 0
+    },
+    {
+      "Name": "native_safe",
+      "Exit": 0,
+      "Seconds": 2.02,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.native_safe.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.native_safe.err",
+      "StdoutSHA256": "2B1E8476D16D69722C2304893D7603544287416BF31FBF2830FAB3547455FCFD",
+      "StderrBytes": 0
+    },
+    {
+      "Name": "content_render",
+      "Exit": 0,
+      "Seconds": 7.59,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_render.err",
+      "StdoutSHA256": "0547A820B677D7E9D7DDEA41B847FE453F1582F6C271883FAF067E4AD093C631",
+      "StderrBytes": 0
+    }
+  ],
+  "SaveSHA256": {
+    "rune.cfg": "CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6",
+    "settings.cfg": "7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1",
+    "loadout.cfg": "CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462",
+    "ability_cards.cfg": "4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D",
+    "meta.cfg": "26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446"
+  },
+  "SavesUnchanged": true,
+  "Failure": ""
+}

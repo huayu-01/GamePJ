@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityReplacementRewardEffect.cs" id="definition"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_w1_2.tres" id="target"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_energy_palm.tres" id="pool"]
+[ext_resource type="PackedScene" path="res://Scenes/Abilities/Builds/EnergyDome.tscn" id="replacement"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+TargetAbility = ExtResource("target")
+ReplacementScene = ExtResource("replacement")
+SkillName = "能量罩"
+SkillNameKey = "skill.1350.name"
+SkillDescriptionKey = "content.1350.description"
+SkillDescription = "武技2撑开半径{Effects.0.ReplacementScene.Radius}米的能量罩，造成一次{Effects.0.ReplacementScene.Damage}伤害，持续{Effects.0.ReplacementScene.Duration}秒，摧毁罩内可摧毁的敌方投掷物；不提供无敌，罩体90%透明。冷却{Effects.0.ReplacementScene.Cooldown}秒。"
+[resource]
+script = ExtResource("row")
+NumericId = 1350
+DisplayName = "能量罩"
+NameKey = "content.1350.name"
+DescriptionKey = "content.1350.description"
+DescriptionTemplate = "武技2撑开半径{Effects.0.ReplacementScene.Radius}米的能量罩，造成一次{Effects.0.ReplacementScene.Damage}伤害，持续{Effects.0.ReplacementScene.Duration}秒，摧毁罩内可摧毁的敌方投掷物；不提供无敌，罩体90%透明。冷却{Effects.0.ReplacementScene.Cooldown}秒。"
+RewardKind = 1
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+Pool = ExtResource("pool")
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Excludes = PackedStringArray("evo_perfect_focus")
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

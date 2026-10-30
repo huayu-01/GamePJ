@@ -1,0 +1,5 @@
+﻿id,name,unlock,upgrade_costs,full_unlock_and_upgrade
+card_crit,锐利直觉,35,25/40/55/70,225
+card_damage,凶戾印记,40,30/50/70/90,280
+card_speed,疾风之靴,30,20/35/50/65,200
+card_vitality,强化肌体,30,20/35/50/65,200

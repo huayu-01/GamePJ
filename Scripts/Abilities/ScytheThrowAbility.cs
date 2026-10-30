@@ -12,18 +12,28 @@ public partial class ScytheThrowAbility : WeaponThrowAbility
 	/// <summary>周期索敌间隔（秒）；默认0不启用，保持原飞镰行为。</summary>
 	[Export] public float SeekIntervalSeconds { get; set; }
 	[Export] public float SeekTargetHeight { get; set; } = 0.9f;
+	[Export] public float SeekFlightSpeedScale { get; set; } = 1f;
 	public int SeekTickCount { get; private set; }
 	public int RedirectCount { get; private set; }
 	public string LastSeekTarget { get; private set; } = string.Empty;
 	public float LastSeekSeconds { get; private set; }
 	private float _seekTimer, _flightSeconds;
-	private float _thunderSpeedScale = 1f, _landingScale = 1f;
+	private float _thunderSpeedScale = 1f, _landingScale = 1f, _thunderDistanceScale = 1f;
+	protected override float EffectiveMaxDistance => base.EffectiveMaxDistance * _thunderDistanceScale;
+	public float FlightRange => EffectiveMaxDistance;
 	private FallAttackAbility? _thunderLanding;
+	public System.Action CaptureThunderRecall()
+	{
+		float speed = _thunderSpeedScale, scale = _landingScale, distance = _thunderDistanceScale; var landing = _thunderLanding;
+		return () => { if (!IsInstanceValid(this)) return; _thunderSpeedScale = speed; _landingScale = scale; _thunderLanding = landing; _thunderDistanceScale = distance; };
+	}
 	public event System.Action<Vector3>? Settled;
-	protected override float EffectiveThrowSpeed => base.EffectiveThrowSpeed * _thunderSpeedScale;
-	public void ConfigureThunderRecall(float speedScale, FallAttackAbility landing, float landingScale)
+	protected override float EffectiveThrowSpeed => base.EffectiveThrowSpeed * _thunderSpeedScale * SeekFlightSpeedScale;
+	protected override float EffectiveReturnSpeed => base.EffectiveReturnSpeed * SeekFlightSpeedScale;
+	public void ConfigureThunderRecall(float speedScale, FallAttackAbility landing, float landingScale, float distanceScale = 1.5f)
 	{
 		_thunderSpeedScale = Mathf.Max(0.01f, speedScale); _thunderLanding = landing; _landingScale = landingScale;
+		_thunderDistanceScale = Mathf.Max(.01f, distanceScale);
 	}
 	public override bool TryPress(Unit? target = null)
 	{
@@ -39,17 +49,18 @@ public partial class ScytheThrowAbility : WeaponThrowAbility
 		}
 		return base.TryPress(target);
 	}
-	public void ConfigureSeeking(float interval, float targetHeight)
+	public void ConfigureSeeking(float interval, float targetHeight, float speedScale = 1f)
 	{
 		SeekIntervalSeconds = Mathf.Max(0f, interval);
 		SeekTargetHeight = targetHeight;
-		_seekTimer = 0f;
+		SeekFlightSpeedScale = Mathf.Max(0.01f, speedScale);
 	}
 	protected override void OnLoadoutReset()
 	{
-		_thunderSpeedScale = _landingScale = 1f; _thunderLanding = null;
+		_thunderSpeedScale = _landingScale = _thunderDistanceScale = 1f; _thunderLanding = null;
 		SeekIntervalSeconds = 0f;
 		SeekTargetHeight = 0.9f;
+		SeekFlightSpeedScale = 1f;
 		_seekTimer = _flightSeconds = LastSeekSeconds = 0f;
 		SeekTickCount = RedirectCount = 0;
 		LastSeekTarget = string.Empty;
@@ -62,16 +73,18 @@ public partial class ScytheThrowAbility : WeaponThrowAbility
 	}
 	protected override void Tick(float delta)
 	{
+		bool wasSettled = HasSettled;
 		base.Tick(delta);
 		if (!IsActive || !InFlight || IsReturning || SeekIntervalSeconds <= 0f || OwnerUnit == null) return;
 		_flightSeconds += delta;
+		// 每次抵达后重新等待；飞行时间不消耗停留间隔，也不在飞行途中切换目标。
+		if (!HasSettled || !wasSettled) return;
 		_seekTimer += delta;
 		if (_seekTimer + 0.00001f < SeekIntervalSeconds) return;
 		_seekTimer = Mathf.Max(0f, _seekTimer - SeekIntervalSeconds);
 		SeekTickCount++;
 		LastSeekSeconds = _flightSeconds;
-		// 原文是离玩家最近，不能从武器当前位置挑最近的敌人。
-		var target = Targeting.FindNearestHostile(OwnerUnit, OwnerUnit);
+		var target = Targeting.FindNearestHostile(WeaponPosition, OwnerUnit);
 		LastSeekTarget = target?.Name.ToString() ?? string.Empty;
 		if (target != null && RedirectFlightTowards(target.GlobalPosition + Vector3.Up * SeekTargetHeight)) RedirectCount++;
 	}
@@ -89,6 +102,7 @@ public partial class ScytheThrowAbility : WeaponThrowAbility
 
 	protected override void OnThrowSettled(Vector3 position)
 	{
+		_seekTimer = 0f;
 		Settled?.Invoke(position);
 		// 停在地面上继续旋转、继续周期伤害（文档："武器会不断旋转并周期性的对武器内的敌人造成伤害"）。
 	}

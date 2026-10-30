@@ -1,0 +1,620 @@
+存档 BEFORE meta.cfg SHA256=7885F3B5E29E723EA045A3118D680718D60C2805B3DA50DAF4EE9F47476F42A2
+存档 BEFORE ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 BEFORE settings.cfg SHA256=BDB209C14A682176C8513E57D49A9B4AFA1DAEBA71AF05348230F99BBB9B8760
+存档 BEFORE loadout.cfg SHA256=5B1931B31E8E64EED8851C9CAF4B741B62135B9FCFD2FEF4C874238C13123C45
+存档 BEFORE rune.cfg SHA256=CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6
+=== Debug ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 1.51 秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:11.23
+
+=== ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 342 毫秒)。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\ExportRelease\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:07.28
+
+interaction_component exit=0 seconds=10.96 stderrBytes=0
+=== interaction_component ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 14:04:23 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 14:04:23 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 14:04:23 [Flow] === 新的一局 ===
+[log] 14:04:23 [Flow] 日志文件：user://logs/run_20261022_140423.log
+[log] 14:04:23 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 14:04:23 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 14:04:23 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 14:04:23 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 14:04:23 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 14:04:23 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 14:04:23 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 14:04:23 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 14:04:23 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 14:04:23 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 14:04:23 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 14:04:23 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 14:04:23 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[InteractionComponent] PASS 使用真实Unit及玩家公共定位服务
+[InteractionComponent] PASS Inspector导出Kind枚举，具备编辑和存储标志
+[InteractionComponent] PASS 组件及Area／宿主引用能打包为内存PackedScene
+[InteractionComponent] PASS 场景往返保留类型、复用模式、半径、提示和目标场景
+[InteractionComponent] PASS 序列化的Area与宿主引用指向新实例，未残留原对象
+[InteractionComponent] PASS 场景实例就绪后创建正确后端并安装真实Area
+[InteractionComponent] PASS 新版Inspector不再导出旧模型／隐藏目标，ModelRoot为只读结果
+[InteractionComponent] PASS 序列化场景就绪后生成新模型并隐藏携带的旧模型
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 类型Enhancement连接RewardNode
+[InteractionComponent] PASS Enhancement保留不生成战斗的配置
+[InteractionComponent] PASS 类型Enhancement自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Evolution连接RewardNode
+[InteractionComponent] PASS Evolution保留不生成战斗的配置
+[InteractionComponent] PASS 类型Evolution自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Mutation连接RewardNode
+[InteractionComponent] PASS Mutation保留不生成战斗的配置
+[InteractionComponent] PASS 类型Mutation自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Resource连接RewardNode
+[InteractionComponent] PASS Resource保留不生成战斗的配置
+[InteractionComponent] PASS 类型Resource自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Heal连接RewardNode
+[InteractionComponent] PASS Heal保留不生成战斗的配置
+[InteractionComponent] PASS 类型Heal自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Special连接RewardNode
+[InteractionComponent] PASS Special保留不生成战斗的配置
+[InteractionComponent] PASS 类型Special自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Shop连接RewardNode
+[InteractionComponent] PASS Shop保留不生成战斗的配置
+[InteractionComponent] PASS 类型Shop自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Exit连接RewardNode
+[InteractionComponent] PASS Exit保留不生成战斗的配置
+[InteractionComponent] PASS 类型Exit自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型BossDoor连接BossDoor
+[InteractionComponent] PASS 类型BossDoor自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Expedition连接BaseTerminal
+[InteractionComponent] PASS 类型Expedition自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型AbilityCards连接BaseTerminal
+[InteractionComponent] PASS 类型AbilityCards自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Loadout连接BaseTerminal
+[InteractionComponent] PASS 类型Loadout自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Help连接BaseTerminal
+[InteractionComponent] PASS 类型Help自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Runes连接RuneTerminal
+[InteractionComponent] PASS 类型Runes自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Character连接CharacterStand
+[InteractionComponent] PASS 类型Character自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 类型Signal连接SignalInteraction
+[InteractionComponent] PASS 类型Signal自动生成归组件所有的新模型及主网格
+[InteractionComponent] PASS 强化／进化／异化具有不同几何形状
+[InteractionComponent] PASS 恢复／材料／商店具有不同几何形状
+[InteractionComponent] PASS 首领门／离场／出击的门体几何可区分
+[InteractionComponent] PASS 能力卡／装备／符文／说明使用不同结构
+[InteractionComponent] PASS 角色展台与信号机关具有不同结构
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 任意Node3D子挂载后，半径Signal被真实输入组件选中
+[InteractionComponent] PASS 真实F按下只转发一次Triggered信号
+[InteractionComponent] PASS 按住F及键盘重复事件不会重复触发
+[InteractionComponent] PASS 松开再按可再次使用Repeatable交互
+[log] 14:04:24 [Audio] 首次播放「ui_card_fail」→ 总线 UI / res://Assets/Audio/ui/ui_card_fail.wav
+[InteractionComponent] PASS 按下时重检半径，旧范围缓存不能跨距离触发
+[InteractionComponent] PASS 隐藏宿主立即拒绝交互，不等待范围缓存刷新
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS Once真实交互后消耗后端并收起新生成模型
+[InteractionComponent] PASS 一次性节点不能重复触发
+[InteractionComponent] PASS ResetNode恢复新模型及交互状态
+[InteractionComponent] PASS 复位后真实F可再次触发一次
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 真实Area包含半径外玩家，范围判定采用物理重叠
+[InteractionComponent] PASS PlayerInteractInput不再以旧3.2米半径二次裁掉Area目标
+[InteractionComponent] PASS 旧半径之外的真实F仍能触发Area交互
+[InteractionComponent] PASS 离开Area后直接Interact仍拒绝
+[InteractionComponent] PASS 仍在Area时隐藏宿主也立即拒绝
+[InteractionComponent] PASS 关闭真实Area的Monitoring失败关闭，不回退半径
+[InteractionComponent] PASS MoveTo移动整个指定祖先宿主，触发器、挂点与外观保持相对位置
+[InteractionComponent] PASS 新模型随宿主MoveTo整体移动，旧模型保持隐藏
+[InteractionComponent] PASS 宿主移走后旧位置不会继续触发
+[InteractionComponent] PASS 移动后触发器在新位置继续接受真实F
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 未显式指定Area时识别宿主唯一直接Area
+[InteractionComponent] PASS 直接挂到Area下时采用父Area
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS None不生成后端，编辑器能说明原因
+[InteractionComponent] PASS 角色缺Character失败关闭并给配置提示
+[InteractionComponent] PASS 多个Area未指定时失败关闭，不擅自选取或退回半径
+[InteractionComponent] PASS 无效配置不污染公共交互注册列表
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 同宿主的重复兄弟组件只注册一个有效后端
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] PASS 不同挂点显式共享HostRoot时也只生成一个有效后端
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[log] 14:04:27 [Node] 奖励节点光圈颜色：Enhancement → 价值标签「tag_mid」（3 波）的 AuraColor (0.15, 0.72, 1, 1)（来源：表 ValueTags）
+[InteractionComponent] PASS 奖励组件隐藏旧模型并自动生成全新的类型主模型
+[InteractionComponent] PASS 高亮描边只附着新模型主网格，未引用旧模型
+[InteractionComponent] PASS Reset恢复新模型及其类型造型，旧模型不会重新出现
+[InteractionComponent] PASS Enabled关闭会收起新模型，旧模型继续隐藏
+[InteractionComponent] PASS Visible关闭会收起新模型，旧模型继续隐藏
+[InteractionComponent] PASS Vanished后新旧模型都不可见
+[InteractionComponent] PASS 消失后Reset只恢复当前类型新模型，不复活历史外观
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[log] 14:04:29 [Audio] 首次播放「music_level_01」→ 总线 Music / res://Assets/Audio/music/music_level_01.ogg
+[log] 14:04:29 [Audio] 音乐：播关卡曲库「music_level_01」（1/2 首）
+[InteractionComponent] PASS Stage实际收集多层宿主中的10个组件后端
+[InteractionComponent] PASS 嵌套组件按高2／中5／低3启用
+[InteractionComponent] PASS 关卡剩余数读取嵌套后端的真实启用状态
+[InteractionComponent] PASS 关卡重新启用能操作同一批嵌套后端
+[log] 14:04:29 [Audio] 音乐：离开关卡 → 淡出停播（基地里没有 BGM）
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[log] 14:04:29 [Audio] 首次播放「music_level_02」→ 总线 Music / res://Assets/Audio/music/music_level_02.ogg
+[log] 14:04:29 [Audio] 音乐：播关卡曲库「music_level_02」（2/2 首）
+[log] 14:04:29 [Node] 奖励节点光圈颜色：Portal → 价值标签「tag_low」（1 波）的 AuraColor (0.4, 0.86, 0.45, 1)（来源：表 ValueTags）
+[InteractionComponent] PASS 预置Exit不占10个普通奖励节点配额
+[InteractionComponent] PASS 首领门可以位于容器与挂点下的嵌套宿主
+[InteractionComponent] PASS 预置出口开局禁用且隐藏后端，不刷怪或提供普通奖励
+[InteractionComponent] PASS 出口开局收起新类型模型，旧外观已隐藏且不会作为当前模型
+[InteractionComponent] PASS 首领未结束前，走近预置出口也不能离场
+[log] 14:04:30 [Node] 降临节点落地：(-10, 0.05, -20)（落地后可交互）
+[InteractionComponent] PASS 首领结束后激活预置出口并采用当前离场提示
+[InteractionComponent] PASS 激活原预置后端，没有因配置PortalScene再生成第二个出口
+[InteractionComponent] PASS 出口保留设计位置，未搬到首领门或传入的死亡位置
+[InteractionComponent] PASS 出口激活时只展示新类型模型，旧外观仍保持隐藏
+[InteractionComponent] PASS 首领结束找到嵌套门并收起其后端与新模型，旧外观不复现
+[InteractionComponent] PASS 离场阶段真实玩家输入能选中同一个预置出口
+[log] 14:04:31 [Node] 互动降临节点 → 前往下一关
+[InteractionComponent] PASS 真实F通过预置出口触发一次Victory，无RunController或收益写入
+[InteractionComponent] PASS 已使用出口收起新模型，旧外观不复现，再按F不会重复离场
+[log] 14:04:31 [Node] Stage 表行：probe_reset（复位验证）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 14:04:31 [Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 / 额外抽 0 次 / 标签 [不限制]
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (-24, 0, 24) 挪到 (-24, 0.25, 24)
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (-12, 0, 24) 挪到 (-12, 0.25, 24)
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (0, 0, 24) 挪到 (0, 0.25, 24)
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (12, 0, 24) 挪到 (12, 0.25, 24)
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (24, 0, 24) 挪到 (24, 0.25, 24)
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (-24, 0, 48) 挪到 (-24, 0.25, 48)
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (-12, 0, 48) 挪到 (-12, 0.25, 48)
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (0, 0, 48) 挪到 (0, 0.25, 48)
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (12, 0, 48) 挪到 (12, 0.25, 48)
+[log] 14:04:31 [Node] 节点避障：Interaction 从 (24, 0, 48) 挪到 (24, 0.25, 48)
+[InteractionComponent] PASS 正式换关复位保留同一预置出口后端并清除一次性使用状态
+[InteractionComponent] PASS 复位后出口原位隐藏／禁用，普通节点仍为10个且没有出口副本
+[log] 14:04:32 [Audio] 音乐：离开关卡 → 淡出停播（基地里没有 BGM）
+[InteractionComponent] PASS 释放宿主后后端退出公共交互列表
+[InteractionComponent] === 交互组件验收结束：通过 119，失败 0 ===
+[log] 14:04:32 [Exit] 音频退出回收：真实等待87ms。
+[log] 14:04:32 [Audio] 音效统计：共 10 次 —— ui_card_fail×8、music_level_01×1、music_level_02×1（缺失 id 0 个）
+
+spawn_flow exit=0 seconds=2.2 stderrBytes=0
+=== spawn_flow ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 14:04:33 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 14:04:33 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 14:04:33 [Flow] === 新的一局 ===
+[log] 14:04:33 [Flow] 日志文件：user://logs/run_20261022_140433.log
+[log] 14:04:33 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 14:04:33 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[SpawnContinuity] PASS 地图未就绪时施法不会伪造落点或增加成功计数
+[log] 14:04:33 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 14:04:33 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 14:04:33 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 14:04:33 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 14:04:33 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 14:04:33 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 14:04:33 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 14:04:33 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 14:04:33 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 14:04:33 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 14:04:33 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 14:04:34 [Map] 区域杀已就位：中心 Y=-38、覆盖 300×300
+[log] 14:04:34 [Map] 导航网格烘焙完成：28 个多边形（半径 0.6 / 高度 1.8 / 最大坡 30°）
+[SpawnContinuity] PASS 真实静态几何完成导航烘焙与同步
+[SpawnContinuity] PASS 孤岛外环没有可达地面，不向另一导航岛或虚空召唤
+[log] 14:04:34 [Combat] 单位动画：Chaser 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 14:04:34 [Config] 敌人倍率：普通 生命×0.75 伤害×0.3 移速×1 / Boss 生命×1 伤害×0.9（来源：表 enemy_global）
+[SpawnContinuity] PASS 合法位置恢复后一次真实召唤3只，只累计成功数量
+[SpawnContinuity] PASS 真实单位落点在指定环带：3m
+[SpawnContinuity] PASS 真实单位与施法者处于同一可达区域
+[SpawnContinuity] PASS 真实身体未与世界或其他单位重叠
+[SpawnContinuity] PASS 真实单位落点在指定环带：3m
+[SpawnContinuity] PASS 真实单位与施法者处于同一可达区域
+[SpawnContinuity] PASS 真实身体未与世界或其他单位重叠
+[SpawnContinuity] PASS 真实单位落点在指定环带：3m
+[SpawnContinuity] PASS 真实单位与施法者处于同一可达区域
+[SpawnContinuity] PASS 真实身体未与世界或其他单位重叠
+[SpawnContinuity] PASS 同一物理帧生成的同批单位保持身体间距
+[SpawnContinuity] PASS 首领技能召唤的敌人先套单位表，再套一次全局生命倍率
+[SpawnContinuity] PASS 召唤普通敌人即使没有Summon标签，也不能越过正数存活上限
+[SpawnContinuity] PASS 存活上限跨越多次施法持续生效，不只截断单次请求
+[log] 14:04:34 [Combat] 单位动画切换：Chaser idle → die（当前速度 0，阈值 0.15/4）
+[log] 14:04:34 [Combat] 死亡 Chaser(0) 击杀者=-
+[log] 14:04:34 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[SpawnContinuity] PASS 本技能普通敌人死亡释放名额，补位后仍不越过上限
+[SpawnContinuity] PASS 压力升级但无合法位置时保留两只增援，不虚增场上单位
+[SpawnContinuity] PASS 同一压力等级下选点失败仍可重试，不丢失也不重复入队
+[SpawnContinuity] PASS 无需再次升级，位置恢复后待生成增援真实入场
+[SpawnContinuity] PASS 真实单位落点在指定环带：3m
+[SpawnContinuity] PASS 真实单位与施法者处于同一可达区域
+[SpawnContinuity] PASS 真实身体未与世界或其他单位重叠
+[SpawnContinuity] PASS 真实单位落点在指定环带：3m
+[SpawnContinuity] PASS 真实单位与施法者处于同一可达区域
+[SpawnContinuity] PASS 真实身体未与世界或其他单位重叠
+[SpawnContinuity] PASS 同一物理帧生成的同批单位保持身体间距
+[SpawnContinuity] PASS 压力增援保留单位配置及全局倍率顺序，不重复放大
+[SpawnContinuity] PASS 待生成数归零后重试不会重复生成
+[SpawnContinuity] PASS 建立带真实身体和Summon标签的上限夹具
+[SpawnContinuity] PASS 上限剩2个名额时，一次请求5只也只补2只
+[SpawnContinuity] PASS 已达存活上限拒绝再次施法
+[log] 14:04:34 [Combat] 死亡 ExistingMinion(0) 击杀者=-
+[SpawnContinuity] PASS 死亡召唤物释放一个名额，只补回一个
+[SpawnContinuity] PASS 预留点排除同批碰撞未同步的重复落点
+[SpawnContinuity] PASS 死亡撤销夹具先形成真实待生成增援
+[log] 14:04:34 [Combat] 死亡 Caster(0) 击杀者=-
+[SpawnContinuity] PASS 首领死亡清空待生成增援，不在收尾后补刷
+[SpawnContinuity] === 增援与召唤验收结束：通过 37，失败 0 ===
+[log] 14:04:34 [Exit] 音频退出回收：真实等待84ms。
+[log] 14:04:34 [Audio] 音效统计：共 3 次 —— sfx_enemy_die×3（缺失 id 0 个）
+
+run_flow exit=0 seconds=7.22 stderrBytes=0
+=== run_flow ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 14:04:36 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 14:04:36 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 14:04:36 [Flow] === 新的一局 ===
+[log] 14:04:36 [Flow] 日志文件：user://logs/run_20261022_140436.log
+[log] 14:04:36 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 14:04:36 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 14:04:36 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 14:04:36 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 14:04:36 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 14:04:36 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 14:04:36 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 14:04:36 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 14:04:36 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 14:04:36 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 14:04:36 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 14:04:36 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 14:04:36 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[RunFlowContinuity] PASS 建立最小首领预制体，后续走真实 SpawnBossNow
+[log] 14:04:36 [Node] Stage 表行：flow_probe_1（验证关卡 1）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 14:04:36 [Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 / 额外抽 0 次 / 标签 [不限制]
+[log] 14:04:36 [Node] 节点避障：Reward0 从 (0, 0, 10) 挪到 (0, 0.25, 10)
+[log] 14:04:36 [Node] 节点避障：Reward1 从 (10, 0, 10) 挪到 (10, 0.25, 10)
+[log] 14:04:36 [Node] 节点避障：Reward2 从 (20, 0, 10) 挪到 (20, 0.25, 10)
+[log] 14:04:36 [Node] 节点避障：Reward3 从 (30, 0, 10) 挪到 (30, 0.25, 10)
+[log] 14:04:36 [Node] 节点避障：Reward4 从 (40, 0, 10) 挪到 (40, 0.25, 10)
+[log] 14:04:36 [Node] 节点避障：Reward5 从 (50, 0, 10) 挪到 (50, 0.25, 10)
+[log] 14:04:36 [Node] 节点避障：Reward6 从 (60, 0, 10) 挪到 (60, 0.25, 10)
+[log] 14:04:36 [Node] 节点避障：Reward7 从 (70, 0, 10) 挪到 (70, 0.25, 10)
+[log] 14:04:36 [Node] 节点避障：Reward8 从 (80, 0, 10) 挪到 (80, 0.25, 10)
+[log] 14:04:36 [Node] 节点避障：Reward9 从 (90, 0, 10) 挪到 (90, 0.25, 10)
+[log] 14:04:36 [Audio] 首次播放「music_level_01」→ 总线 Music / res://Assets/Audio/music/music_level_01.ogg
+[log] 14:04:36 [Audio] 音乐：播关卡曲库「music_level_01」（1/2 首）
+[log] 14:04:36 [Map] 区域杀已就位：中心 Y=-38、覆盖 300×300
+[log] 14:04:37 [Map] 导航网格烘焙完成：2 个多边形（半径 0.6 / 高度 1.8 / 最大坡 30°）
+[RunFlowContinuity] PASS 关卡固定启用 10 个节点，不再经过被覆盖的随机数量开关
+[RunFlowContinuity] PASS 场景树暂停时真实物理帧不会累加有效用时
+[RunFlowContinuity] PASS 首领未结束时拒绝伪造的传送节点请求
+[log] 14:04:37 [Spawn] 第 1 场 Encounter 开始（节点触发的战斗）
+[log] 14:04:37 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[RunFlowContinuity] PASS 第 1 关通过真实 StartEncounter 记录 1 次挑战
+[RunFlowContinuity] PASS 本关有效时间来自真实 Stage 物理计时
+[log] 14:04:37 [Combat] 伤害 - → Player(90) 10
+[log] 14:04:37 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[log] 14:04:37 [Node] 打开 Boss 门：已挑战 1 次 / 隔离次数 1 → 初始压力 0
+[log] 14:04:37 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:37 [Config] 敌人倍率：普通 生命×0.75 伤害×0.3 移速×1 / Boss 生命×1 伤害×0.9（来源：表 enemy_global）
+[log] 14:04:37 [Node] Boss 出生：本关 Pressure 数值强化 0 条（阈值转换 0 次）→ Boss 生命 100 护甲 0 伤害×0.9 攻速×1 移速×1 —— 与 Boss Build 行为词条分开结算（关卡核心文档 §7.1）
+[RunFlowContinuity] PASS 首领门接受开战请求
+[RunFlowContinuity] PASS 开首领门即关闭剩余普通节点
+[RunFlowContinuity] PASS 即使旧引用重新启用，首领战期间也不能领取普通奖励
+[RunFlowContinuity] PASS 真实首领实例已生成且存活
+[log] 14:04:37 [Combat] 死亡 FlowBoss(0) 击杀者=-
+[log] 14:04:37 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 14:04:37 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:37 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:37 [Node] 奖励节点光圈颜色：Portal → 价值标签「tag_low」（1 波）的 AuraColor (0.4, 0.86, 0.45, 1)（来源：表 ValueTags）
+[log] 14:04:37 [Node] Boss 阵亡 → 清空场上敌人；找不到 Boss 之门，退回玩家附近；降临节点「前往下一关」从 12 米高落到 (-1.8147931, 0.75, -1.243594)（下落中不可交互）
+[RunFlowContinuity] PASS 首领死亡解除挑战态，等待离场且尚未提前切关
+[RunFlowContinuity] PASS 首领死亡即冻结本关统计
+[RunFlowContinuity] PASS 首领后的离场等待不计入有效用时，统计不漂移
+[RunFlowContinuity] PASS 首领结束后游离刷怪计时与生成入口均停止
+[RunFlowContinuity] PASS 首领结束后不能重开普通节点
+[RunFlowContinuity] PASS 底层开战入口也不能在离场阶段重启挑战
+[RunFlowContinuity] PASS 降临物下落期间仍不可交互
+[log] 14:04:38 [Node] 降临节点落地：(-1.8147931, 0.75, -1.243594)（落地后可交互）
+[RunFlowContinuity] PASS 降临物落地后可用，普通节点仍被拒绝
+[log] 14:04:38 [Node] 互动降临节点 → 前往下一关
+[log] 14:04:39 [Flow] 进入第 2 关：验证关卡 2
+[log] 14:04:39 [Node] Stage 表行：flow_probe_2（验证关卡 2）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 14:04:39 [Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 / 额外抽 0 次 / 标签 [不限制]
+[RunFlowContinuity] PASS 真实传送请求通过 Victory 事件交给 RunController
+[RunFlowContinuity] PASS 每关快照恰好累计一次
+[RunFlowContinuity] PASS 换关只清本关计数，整局继续
+[RunFlowContinuity] PASS 切关实际回满生命，与玩家提示一致
+[RunFlowContinuity] PASS 之前关卡的挑战次数保留到整局统计
+[log] 14:04:39 [Spawn] 第 1 场 Encounter 开始（节点触发的战斗）
+[log] 14:04:39 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:39 [Spawn] 第 2 场 Encounter 开始（节点触发的战斗）
+[log] 14:04:39 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[RunFlowContinuity] PASS 第 2 关通过真实 StartEncounter 记录 2 次挑战
+[RunFlowContinuity] PASS 本关有效时间来自真实 Stage 物理计时
+[log] 14:04:39 [Combat] 伤害 - → Player(90) 10
+[log] 14:04:39 [Node] 打开 Boss 门：已挑战 2 次 / 隔离次数 2 → 初始压力 0
+[log] 14:04:39 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:39 [Node] Boss 出生：本关 Pressure 数值强化 0 条（阈值转换 0 次）→ Boss 生命 100 护甲 0 伤害×0.9 攻速×1 移速×1 —— 与 Boss Build 行为词条分开结算（关卡核心文档 §7.1）
+[RunFlowContinuity] PASS 首领门接受开战请求
+[RunFlowContinuity] PASS 开首领门即关闭剩余普通节点
+[RunFlowContinuity] PASS 即使旧引用重新启用，首领战期间也不能领取普通奖励
+[RunFlowContinuity] PASS 真实首领实例已生成且存活
+[log] 14:04:39 [Combat] 死亡 @CharacterBody3D@24(0) 击杀者=-
+[log] 14:04:39 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:39 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:39 [Node] Boss 阵亡 → 清空场上敌人；找不到 Boss 之门，退回玩家附近；降临节点「前往下一关」从 12 米高落到 (-0.70554644, 0.75, 2.0837958)（下落中不可交互）
+[RunFlowContinuity] PASS 首领死亡解除挑战态，等待离场且尚未提前切关
+[RunFlowContinuity] PASS 首领死亡即冻结本关统计
+[RunFlowContinuity] PASS 首领后的离场等待不计入有效用时，统计不漂移
+[RunFlowContinuity] PASS 首领结束后游离刷怪计时与生成入口均停止
+[RunFlowContinuity] PASS 首领结束后不能重开普通节点
+[RunFlowContinuity] PASS 底层开战入口也不能在离场阶段重启挑战
+[RunFlowContinuity] PASS 降临物下落期间仍不可交互
+[log] 14:04:40 [Node] 降临节点落地：(-0.70554644, 0.75, 2.0837958)（落地后可交互）
+[RunFlowContinuity] PASS 降临物落地后可用，普通节点仍被拒绝
+[log] 14:04:40 [Node] 互动降临节点 → 前往下一关
+[log] 14:04:40 [Flow] 进入第 3 关：验证关卡 3
+[log] 14:04:40 [Node] Stage 表行：flow_probe_3（验证关卡 3）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 14:04:40 [Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 / 额外抽 0 次 / 标签 [不限制]
+[RunFlowContinuity] PASS 真实传送请求通过 Victory 事件交给 RunController
+[RunFlowContinuity] PASS 每关快照恰好累计一次
+[RunFlowContinuity] PASS 换关只清本关计数，整局继续
+[RunFlowContinuity] PASS 切关实际回满生命，与玩家提示一致
+[RunFlowContinuity] PASS 之前关卡的挑战次数保留到整局统计
+[log] 14:04:40 [Spawn] 第 1 场 Encounter 开始（节点触发的战斗）
+[log] 14:04:40 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:40 [Spawn] 第 2 场 Encounter 开始（节点触发的战斗）
+[log] 14:04:40 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:40 [Spawn] 第 3 场 Encounter 开始（节点触发的战斗）
+[log] 14:04:40 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[RunFlowContinuity] PASS 第 3 关通过真实 StartEncounter 记录 3 次挑战
+[log] 14:04:40 [Combat] 单位动画：MeteorMage 共 4 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 enemy_meteor_mage）
+[log] 14:04:40 [Animation] 技能动画库已加载：MeteorMage ← res://Assets/Animations/enemies/（库「skills」2 段；回调模式 Immediate，查名用全路径如「skills/<动画名>」）
+[log] 14:04:40 [Spawn] 定期刷怪：MeteorMage 落在 (7.290459, 0.55, 8.237062)（强度档位 0 → 生命/伤害 ×1，场上游离怪 1 只）
+[RunFlowContinuity] PASS 本关有效时间来自真实 Stage 物理计时
+[log] 14:04:40 [Combat] 伤害 - → Player(90) 10
+[log] 14:04:40 [Node] 打开 Boss 门：已挑战 3 次 / 隔离次数 2 → 初始压力 1
+[log] 14:04:40 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:40 [Node] Boss 出生：本关 Pressure 数值强化 0 条（阈值转换 0 次）→ Boss 生命 100 护甲 0 伤害×0.9 攻速×1 移速×1 —— 与 Boss Build 行为词条分开结算（关卡核心文档 §7.1）
+[RunFlowContinuity] PASS 首领门接受开战请求
+[RunFlowContinuity] PASS 开首领门即关闭剩余普通节点
+[RunFlowContinuity] PASS 即使旧引用重新启用，首领战期间也不能领取普通奖励
+[RunFlowContinuity] PASS 真实首领实例已生成且存活
+[log] 14:04:40 [Combat] 死亡 @CharacterBody3D@26(0) 击杀者=-
+[log] 14:04:40 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:40 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:40 [Combat] 单位动画切换：MeteorMage idle → die（当前速度 0，阈值 0.15/4）
+[log] 14:04:40 [Combat] 死亡 MeteorMage(0) 击杀者=-
+[log] 14:04:40 [Node] Boss 阵亡 → 清空场上敌人；找不到 Boss 之门，退回玩家附近；降临节点「完成出征 · 返回基地」从 12 米高落到 (-1.5252764, 0.75, 1.5854123)（下落中不可交互）
+[RunFlowContinuity] PASS 首领死亡解除挑战态，等待离场且尚未提前切关
+[RunFlowContinuity] PASS 首领死亡即冻结本关统计
+[RunFlowContinuity] PASS 首领后的离场等待不计入有效用时，统计不漂移
+[RunFlowContinuity] PASS 首领结束后游离刷怪计时与生成入口均停止
+[RunFlowContinuity] PASS 首领结束后不能重开普通节点
+[RunFlowContinuity] PASS 底层开战入口也不能在离场阶段重启挑战
+[RunFlowContinuity] PASS 降临物下落期间仍不可交互
+[log] 14:04:41 [Node] 降临节点落地：(-1.5252764, 0.75, 1.5854123)（落地后可交互）
+[RunFlowContinuity] PASS 降临物落地后可用，普通节点仍被拒绝
+[RunFlowContinuity] PASS 最终关离场提示为完成出征并返回基地
+[log] 14:04:41 [Node] 互动降临节点 → 完成出征 · 返回基地
+[log] 14:04:41 [Flow] 本局结束 victory=True 关卡=验证关卡 3 本局用时=60s 本局挑战=6
+[RunFlowContinuity] PASS 真实传送请求通过 Victory 事件交给 RunController
+[RunFlowContinuity] PASS 每关快照恰好累计一次
+[RunFlowContinuity] PASS 最终结算包含全部 6 次挑战收益
+[RunFlowContinuity] PASS 三关结束保留 60 秒有效用时和 6 次节点挑战
+[RunFlowContinuity] PASS 重复胜利或结束通知不再发碎片、不重复快照
+[RunFlowContinuity] PASS 结算读取实际关卡数，不硬编码三关
+[log] 14:04:41 [Node] Stage 表行：flow_probe_1（验证关卡 1）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 14:04:41 [Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 / 额外抽 0 次 / 标签 [不限制]
+[log] 14:04:41 [Spawn] 第 1 场 Encounter 开始（节点触发的战斗）
+[log] 14:04:41 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:41 [Spawn] 第 2 场 Encounter 开始（节点触发的战斗）
+[log] 14:04:41 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[RunFlowContinuity] PASS 第 1 关通过真实 StartEncounter 记录 2 次挑战
+[RunFlowContinuity] PASS 生产死亡默认返回真实基地
+[log] 14:04:41 [Combat] 死亡 Player(0) 击杀者=-
+[log] 14:04:41 [Flow] 本局结束 victory=False 关卡=验证关卡 1 本局用时=12s 本局挑战=2
+[log] 14:04:41 [Flow] 死亡流程：进死亡动画（1.4s，期间不暂停）→ 演示过渡面板（占位 3.2s）→ 等待确认结算 → res://Scenes/Debug/_RunFlowReturnFixture.tscn
+[RunFlowContinuity] PASS 真实玩家死亡进入结算并冻结当前关统计
+[RunFlowContinuity] PASS 死亡动画期间世界保持运行
+[log] 14:04:41 [Flow] 死亡流程：进演示过渡面板（占位）—— 本局结算已显示，3.2s 后等待确认
+[RunFlowContinuity] PASS 动画结束后进入暂停的过渡面板
+[log] 14:04:41 [Flow] 死亡流程：演出结束 → 等待玩家确认，本局结算不会自动关闭
+[RunFlowContinuity] PASS 过渡完成后等待确认，不自动离场
+[RunFlowContinuity] PASS 结算可持续阅读，超过旧倒计时仍不关闭
+[log] 14:04:41 [Flow] 死亡流程：进死亡动画（1.4s，期间不暂停）→ 演示过渡面板（占位 3.2s）→ 等待确认结算 → res://Scenes/Levels/Base.tscn
+[log] 14:04:41 [Flow] 死亡流程：演出结束 → 等待玩家确认，本局结算不会自动关闭
+[log] 14:04:41 [Flow] 死亡流程：玩家跳过演出 → 等待确认结算
+[RunFlowContinuity] PASS 跳过死亡演出只进入结算，不直接返回
+[log] 14:04:41 [Flow] 死亡流程：演示过渡结束 → 回到基地场景 res://Scenes/Debug/_RunFlowReturnFixture.tscn
+[RunFlowContinuity] PASS 玩家确认后接受返回请求
+[log] 14:04:41 [Audio] 音乐：离开关卡 → 淡出停播（基地里没有 BGM）
+[RunFlowContinuity] PASS 确认后真实切换场景，解除暂停并清除本局选择标记
+[RunFlowContinuity] === 整局与离场验收结束：通过 73，失败 0 ===
+[log] 14:04:41 [Exit] 音频退出回收：真实等待88ms。
+[log] 14:04:41 [Audio] 音效统计：共 8 次 —— music_level_01×1、sfx_combat_hit×3、sfx_enemy_die×4（缺失 id 0 个）
+
+player_flow exit=0 seconds=16.61 stderrBytes=0
+=== player_flow ===
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 14:04:43 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 14:04:43 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 14:04:43 [Flow] === 新的一局 ===
+[log] 14:04:43 [Flow] 日志文件：user://logs/run_20261022_140443.log
+[log] 14:04:43 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 14:04:43 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 14:04:43 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 14:04:43 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波
+[log] 14:04:43 [Config] 增幅项表：91 条（来源：表）—— 强化 23 / 进化 33 / 异化 35。
+[log] 14:04:43 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 14:04:43 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 11 个
+[log] 14:04:43 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 14:04:43 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 14:04:43 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatSet · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatSet · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatSet · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） RuneEffect · HealMultiplier=0 · Armor=20 · ArmorPerKills=10 · ArmorPerTrigger=1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatSet · MoveSpeedMultiplier=2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） RuneEffect · DeathAvoid=1 · DeathAvoidHealFraction=0.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatSet · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatSet · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） RuneEffect · NearRange=3.0 · NearScale=0.5 · FarRange=15.0 · FarScale=1.5 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） RuneEffect · MaxHealthDamageRatio=0.1 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） RuneEffect · PixieIntervalSeconds=5.0 · PixieRadius=8.0 · PixieDamage=20.0 · PixieOrbitRadius=1.6 · PixieOrbitSpeed=90.0 → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 14:04:43 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 14:04:43 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 14:04:43 [Config] 配置表：武器 6 / 角色 2 / 敌人 21 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 14 / 节点 8 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 14:04:44 [Combat] 单位动画：Player 共 31 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 14:04:44 [Art] 卡通化（内置 Toon 漫反射，不是自定义 shader）：ToonPass 面 6（跳过 34）材质 15（源材质去重后）｜高光 内置 Toon（粗糙度 0.85）｜之后出生的节点 继续接管
+[log] 14:04:44 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 14:04:44 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 14:04:44 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 14:04:44 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 14:04:44 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 LoadoutPreview
+[log] 14:04:44 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[PlayerExperience] PASS 指引可跳过，不锁定玩家移动或出击
+[log] 14:04:45 [Combat] 单位动画切换：Player idle → walk（当前速度 1，阈值 0.15/4）
+[log] 14:04:46 [Combat] 单位动画切换：Player walk → sprint（当前速度 4，阈值 0.15/4）
+[log] 14:04:46 [Combat] 单位动画切换：Player sprint → walk（当前速度 3.5，阈值 0.15/4）
+[log] 14:04:46 [Combat] 单位动画切换：Player walk → idle（当前速度 0，阈值 0.15/4）
+[PlayerExperience] PASS 真实移动输入推进练习观察
+[log] 14:04:46 [Combat] 伤害 Player(220) → TrainingDummy(600) 0
+[log] 14:04:46 [Audio] 首次播放「sfx_combat_hit」→ 总线 SFX / res://Assets/Audio/sfx/sfx_combat_hit.ogg
+[PlayerExperience] PASS 真实伤害结算驱动命中指引，基地不发关卡奖励
+[log] 14:04:47 [Audio] 首次播放「ui_open」→ 总线 UI / res://Assets/Audio/ui/ui_open.ogg
+[PlayerExperience] PASS 出击摘要走统一弹层并暂停
+[PlayerExperience] PASS 开启保护期不会误出击
+[PlayerExperience] PASS 摘要共读真实配装并说明先奖励后挑战
+[PlayerExperience] PASS 返回调整恢复基地，不启动加载
+[PlayerExperience] PASS 正式出击门指向森林，Main留作回归入口
+[PlayerExperience] PASS 真实F交互先打开出击摘要
+[PlayerExperience] PASS 真实设置快捷键覆盖出击摘要，路由仅认顶层设置
+[log] 14:04:49 [Audio] 首次播放「ui_click」→ 总线 UI / res://Assets/Audio/ui/ui_click.ogg
+[PlayerExperience] PASS 设置覆盖时真实Enter不会确认底层出击或启动加载
+[PlayerExperience] PASS 底层出击与返回按钮共用顶层闸门，程序回调也不能穿过覆盖层
+[PlayerExperience] PASS 顶层不允许取消时，Esc被顶层消费，不会向下关闭出击摘要
+[PlayerExperience] PASS 真实Esc只关闭顶层设置，摘要仍开且游戏仍暂停
+[log] 14:04:50 [Flow] 基地出击 → res://Scenes/Expedition.tscn（角色 Hunter / 武器 EnergyPalm）
+[log] 14:04:53 [Art] 卡通化（内置 Toon 漫反射，不是自定义 shader）：ToonPass 面 3（跳过 322）材质 61（源材质去重后）｜高光 内置 Toon（粗糙度 0.85）｜之后出生的节点 继续接管
+[log] 14:04:53 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 14:04:53 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 14:04:53 [Audio] 首次播放「music_level_01」→ 总线 Music / res://Assets/Audio/music/music_level_01.ogg
+[log] 14:04:53 [Audio] 音乐：播关卡曲库「music_level_01」（1/2 首）
+[log] 14:04:53 [Map] 区域杀已就位：中心 Y=-38、覆盖 300×300
+[log] 14:04:53 [Map] 复用场景里已烘焙的导航网格：1770 个多边形
+[log] 14:04:53 [Map] 正式森林入场：120米环境，10个奖励节点、0个预置离场节点与1道首领门通过导航／连通性／净空检查；使用正式玩家及配装流程
+[log] 14:04:53 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 14:04:53 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 14:04:53 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 RunController
+[log] 14:04:53 [Rune] 符文：不携带（CarriedRuneId「」，默认） —— 前置判定只有「已拥有」一个来源，与加符文之前逐位一致；玩家没有任何符文修正器。
+[log] 14:04:53 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Hunter（行 Id「chr_hunter」）· 武器 EnergyPalm（PoolId pool_energy_palm）→ 候选 62 条（限定两层之后）
+[log] 14:04:53 [Flow] 关卡表：3 关（来源：表） | stg_outer Stage 1 · 外围 允许敌人[3] 敌伤×1 Boss伤×1 Boss词条1 | stg_inner Stage 2 · 内环 允许敌人[6] 敌伤×1.1 Boss伤×1.1 Boss词条2 | stg_core Stage 3 · 核心（最终 Boss） 允许敌人[0] 敌伤×1.2 Boss伤×1.25 Boss词条3
+[log] 14:04:53 [Flow] 开局配置：角色 Hunter / 武器 EnergyPalm（基地里选过=True）—— 进关卡只是切场景，直接开局
+[log] 14:04:53 [Flow] 选择角色 Hunter / 武器 EnergyPalm
+[log] 14:04:53 [Ability] 能力卡：激活 0/4 张 · 额度 0/8 · 碎片 320 —— 本局没有激活的卡（全部效果为空）
+[log] 14:04:53 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 RunController
+[log] 14:04:53 [Rune] 符文：不携带（CarriedRuneId「」，默认） —— 前置判定只有「已拥有」一个来源，与加符文之前逐位一致；玩家没有任何符文修正器。
+[log] 14:04:53 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Hunter（行 Id「chr_hunter」）· 武器 EnergyPalm（PoolId pool_energy_palm）→ 候选 62 条（限定两层之后）
+[log] 14:04:53 [Flow] 进入第 1 关：Stage 1 · 外围
+[log] 14:04:53 [Node] Stage 表行：stg_outer（Stage 1 · 外围）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 14:04:53 [Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 / 额外抽 0 次 / 标签 [不限制]
+[log] 14:04:53 [Node] 奖励节点光圈颜色：Enhancement → 价值标签「tag_mid」（3 波）的 AuraColor (0.15, 0.72, 1, 1)（来源：表 ValueTags）
+[log] 14:04:53 [Node] 奖励节点光圈颜色：Evolution → 价值标签「tag_high」（4 波）的 AuraColor (1, 0.75, 0.15, 1)（来源：表 ValueTags）
+[log] 14:04:53 [Node] 奖励节点光圈颜色：Mutation → 价值标签「tag_high」（4 波）的 AuraColor (1, 0.75, 0.15, 1)（来源：表 ValueTags）
+[log] 14:04:53 [Node] 奖励节点光圈颜色：Shop → 价值标签「tag_mid」（3 波）的 AuraColor (0.15, 0.72, 1, 1)（来源：表 ValueTags）
+[log] 14:04:53 [Node] 奖励节点光圈颜色：Resource → 价值标签「tag_low」（1 波）的 AuraColor (0.4, 0.86, 0.45, 1)（来源：表 ValueTags）
+[log] 14:04:53 [Node] 奖励节点光圈颜色：Heal → 价值标签「tag_low」（1 波）的 AuraColor (0.4, 0.86, 0.45, 1)（来源：表 ValueTags）
+[log] 14:04:53 [Node] 奖励节点光圈颜色：Special → 价值标签「tag_low」（1 波）的 AuraColor (0.4, 0.86, 0.45, 1)（来源：表 ValueTags）
+[log] 14:04:53 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[PlayerExperience] PASS 正式森林导航和交互点准备完成
+[PlayerExperience] PASS 森林使用固定10节点和唯一全局额度来源
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 节点可达 Interaction
+[PlayerExperience] PASS 正式节点保留描边和交互反馈组件
+[PlayerExperience] PASS 互动前说明挑战波数和本次免费
+[log] 14:04:54 [Node] 互动奖励节点：强化池（Kind=Enhancement，刷怪=True）
+[PlayerExperience] PASS 实际节点先打开奖励，选择前不启动挑战
+[log] 14:04:54 [Reward] 选择奖励 爆伤（Enhancement）
+[log] 14:04:54 [Spawn] 第 1 场 Encounter 开始（节点触发的战斗）
+[log] 14:04:54 [Spawn] 第 1 波开始：3 种类型（快速近战/基础近战/自爆）× 目标 7 只
+[log] 14:04:54 [Combat] 单位动画：FastMelee 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 14:04:54 [Config] 敌人倍率：普通 生命×0.75 伤害×0.3 移速×1 / Boss 生命×1 伤害×0.9（来源：表 enemy_global）
+[log] 14:04:54 [Spawn] 生成 快速近战（剩余预算 9，场上 0）
+[log] 14:04:54 [Combat] 单位动画：Chaser 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 14:04:54 [Spawn] 生成 基础近战（剩余预算 7，场上 1）
+[log] 14:04:54 [Spawn] 生成 快速近战（剩余预算 6，场上 2）
+[log] 14:04:54 [Spawn] 第 1 波已出场，场上 3 只，待生成 0 只
+[log] 14:04:54 [Combat] 单位动画切换：FastMelee idle → walk（当前速度 0.25，阈值 0.15/4）
+[log] 14:04:54 [Combat] 单位动画切换：Chaser idle → walk（当前速度 0.25，阈值 0.15/4）
+[log] 14:04:55 [Combat] 单位动画切换：FastMelee walk → sprint（当前速度 4.5，阈值 0.15/4）
+[log] 14:04:55 [Combat] 单位动画切换：Chaser walk → sprint（当前速度 4.2，阈值 0.15/4）
+[PlayerExperience] PASS 真实数字键领取增幅后开始挑战
+[PlayerExperience] PASS 额度消耗后代价提示随真实状态更新
+[log] 14:04:55 [Combat] 单位动画切换：FastMelee sprint → die（当前速度 5.5，阈值 0.15/4）
+[log] 14:04:55 [Combat] 死亡 FastMelee(0) 击杀者=Player(220)
+[log] 14:04:55 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 14:04:55 [Combat] 击杀 FastMelee(0) by Player(220)
+[log] 14:04:55 [Combat] 单位动画切换：Chaser sprint → die（当前速度 4.2，阈值 0.15/4）
+[log] 14:04:55 [Combat] 死亡 Chaser(0) 击杀者=Player(220)
+[log] 14:04:55 [Combat] 击杀 Chaser(0) by Player(220)
+[log] 14:04:55 [Combat] 死亡 @CharacterBody3D@493(0) 击杀者=Player(220)
+[log] 14:04:55 [Combat] 击杀 @CharacterBody3D@493(0) by Player(220)
+[log] 14:04:55 [Spawn] 白板首领跳过：本关累计才第 1 波（门槛 8），本场直接结算
+[log] 14:04:55 [Spawn] Encounter 清场完成：共生成 3，用时 0s
+[log] 14:04:55 [Node] Pressure 累积：跳过（§8.2 免费挑战）—— 挑战数 1 ≤ 本关免费额度 1（剩余 0）→ 本次不增加 Pressure、也不抽取数值强化
+[log] 14:04:55 [Audio] 首次播放「music_level_02」→ 总线 Music / res://Assets/Audio/music/music_level_02.ogg
+[log] 14:04:55 [Audio] 音乐：播关卡曲库「music_level_02」（2/2 首）
+[PlayerExperience] PASS 测试击杀清场后回到探索，无自动推进关卡
+[log] 14:04:55 [Node] 打开 Boss 门：已挑战 1 次 / 隔离次数 1 → 初始压力 0
+[log] 14:04:55 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[PlayerExperience] PASS 森林接受首领挑战
+[log] 14:04:55 [Combat] 单位动画：Boss 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 14:04:55 [Combat] 单位动画：SkillElite 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 14:04:55 [Node] Boss 出生：本关 Pressure 数值强化 0 条（阈值转换 0 次）→ Boss 生命 900 护甲 0 伤害×0.9 攻速×1 移速×1 —— 与 Boss Build 行为词条分开结算（关卡核心文档 §7.1）
+[PlayerExperience] PASS 首领使用与玩家连通的合法出生点
+[log] 14:04:55 [Combat] 单位动画切换：Boss idle → die（当前速度 0，阈值 0.15/4）
+[log] 14:04:55 [Combat] 死亡 Boss(0) 击杀者=Player(220)
+[log] 14:04:55 [Combat] 击杀 Boss(0) by Player(220)
+[log] 14:04:55 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:55 [Spawn] 冻结生成：波次与预算停止（StopSpawning）
+[log] 14:04:55 [Combat] 单位动画切换：SkillElite idle → die（当前速度 0，阈值 0.15/4）
+[log] 14:04:55 [Combat] 死亡 SkillElite(0) 击杀者=-
+[log] 14:04:55 [Combat] 死亡 @CharacterBody3D@501(0) 击杀者=-
+[log] 14:04:55 [Node] Boss 阵亡 → 清空场上敌人；Boss 之门 (0, 0.55, -20) 已收起；降临节点「前往下一关」从 12 米高落到 (0, 0.75, -20)（下落中不可交互）
+[log] 14:04:55 [Node] 奖励节点光圈颜色：Portal → 价值标签「tag_low」（1 波）的 AuraColor (0.4, 0.86, 0.45, 1)（来源：表 ValueTags）
+[log] 14:04:56 [Audio] 音乐：播关卡曲库「music_level_01」（1/2 首）
+[log] 14:04:56 [Node] 降临节点落地：(0, 0.75, -20)（落地后可交互）
+[PlayerExperience] PASS 首领结束后清理威胁并进入稳定离场
+[PlayerExperience] PASS 离场等待不计入有效游玩时间
+[log] 14:04:57 [Node] 互动降临节点 → 前往下一关
+[log] 14:04:57 [Flow] 进入第 2 关：Stage 2 · 内环
+[log] 14:04:57 [Node] Stage 表行：stg_inner（Stage 2 · 内环）Boss Pressure 规则：增长倍率 1 / 阈值 100 / 数值强化候选 [不限制]
+[log] 14:04:57 [Node] Pressure 节点驱动：节点表 8 行里 2 行配了 → node_evolution 基础 150 / 额外抽 0 次 / 标签 [不限制] · node_mutation 基础 150 / 额外抽 0 次 / 标签 [不限制]
+[PlayerExperience] PASS 实际离场交互推进下一关并保留上一关快照
+[PlayerExperience] PASS 波次加权抽样1:9，1000次高权重=910，零权重=0
+[PlayerExperience] === 玩家流程验收结束：通过 38，失败 0 ===
+[log] 14:04:58 [Exit] 音频退出回收：真实等待85ms。
+[log] 14:04:58 [Audio] 音效统计：共 16 次 —— sfx_combat_hit×1、ui_open×5、ui_click×1、music_level_01×2、sfx_enemy_die×6、music_level_02×1（缺失 id 0 个）
+
+存档 AFTER meta.cfg SHA256=7885F3B5E29E723EA045A3118D680718D60C2805B3DA50DAF4EE9F47476F42A2
+存档 AFTER ability_cards.cfg SHA256=594BD027B7E68FFA16D2F45A6702339E5A5B69185C49B3AB944A7A9EAE7399CA
+存档 AFTER settings.cfg SHA256=BDB209C14A682176C8513E57D49A9B4AFA1DAEBA71AF05348230F99BBB9B8760
+存档 AFTER loadout.cfg SHA256=5B1931B31E8E64EED8851C9CAF4B741B62135B9FCFD2FEF4C874238C13123C45
+存档 AFTER rune.cfg SHA256=CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6
+selftest.flag AFTER=False

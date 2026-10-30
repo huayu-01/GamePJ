@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
 using ActRoguelike.Core;
@@ -21,8 +20,8 @@ public partial class CharacterDisplay : Node3D
 	public string CurrentWeaponPath { get; private set; } = string.Empty;
 	public Node3D? ActiveModel { get; private set; }
 	public Node3D? EquippedWeapon { get; private set; }
-	private readonly List<WeaponThrowAbility> _throws = new();
-	private FallAttackAbility? _fall;
+	private readonly List<IWeaponPresentationSource> _sources = new();
+	private UnitVisualProfile? _activeProfile;
 	private Transform3D _weaponRestTransform;
 	public bool DivePoseActive { get; private set; }
 	[Export] public Vector3 DiveGripOffset { get; set; } = new(0.25f, 0.9f, -0.2f);
@@ -30,11 +29,7 @@ public partial class CharacterDisplay : Node3D
 	public override void _Ready()
 	{
 		_original = GetNode<Node3D>(OriginalModelPath);
-		if (GetParent() is Unit unit)
-		{
-			NodeSearch.CollectInSubtree(unit, _throws);
-			_fall = NodeSearch.FindInSubtree<FallAttackAbility>(unit);
-		}
+		RefreshPresentationSources();
 		_models[_original.SceneFilePath] = _original;
 		foreach (CharacterConfig row in FixedCharacter != null ? new[] { FixedCharacter } : ConfigIndex.Settings.Characters)
 		{
@@ -42,7 +37,7 @@ public partial class CharacterDisplay : Node3D
 			Node3D model = _original;
 			if (!string.IsNullOrEmpty(row.ModelPath) && !_models.TryGetValue(row.ModelPath, out model!))
 			{
-				model = RuntimeResources.Load<PackedScene>(row.ModelPath).Instantiate<Node3D>();
+				model = (row.VisualProfile?.ModelScene ?? RuntimeResources.Load<PackedScene>(row.ModelPath)).Instantiate<Node3D>();
 				model.Transform = row.ModelTransform;
 				model.Position += _original.Position;
 				model.Visible = false;
@@ -58,35 +53,44 @@ public partial class CharacterDisplay : Node3D
 			// 技能库**对"解析到的那个模型"加载**，不限于"新实例化"的那条分支：
 			// 角色行 ModelPath 与场景里 `Model` 节点同一个资源时（例如 chr_hunter 直接指向 Player.tscn 的 Model），
 			// 走的是去重分支、不会新建模型 —— 那时也必须把技能库装进这个播放器，否则技能动画查不到（`LoadInto` 幂等）。
-			if (NodeSearch.FindInSubtree<AnimationPlayer>(model) is { } prepared)
+			if ((row.VisualProfile == null ? NodeSearch.FindInSubtree<AnimationPlayer>(model) : row.VisualProfile.ResolveAnimationPlayer(model)) is { } prepared)
 			{
-				SkillAnimationLibrary.LoadInto(prepared, row.AnimLibraryName, row.AnimLibraryDir);
+				SkillAnimationLibrary.LoadInto(prepared, row.AnimLibraryName, row.AnimLibraryDir, row.VisualProfile?.ResolveSkeleton(model), row.VisualProfile != null);
 			}
 
-			EnsureHand(model, row.WeaponGripScene);
+			EnsureHand(model, row.WeaponGripScene, row.VisualProfile);
 		}
 	}
-	private Node3D EnsureHand(Node3D model, PackedScene? configuredGrip = null)
+	public void RefreshPresentationSources()
+	{
+		_sources.Clear();
+		if (GetParent() is Unit unit) NodeSearch.CollectInSubtree(unit, _sources);
+	}
+	private Node3D EnsureHand(Node3D model, PackedScene? configuredGrip = null, UnitVisualProfile? profile = null)
 	{
 		if (_hands.TryGetValue(model, out var hand)) return hand;
 		var grip = (configuredGrip ?? GripScene).Instantiate<BoneAttachment3D>();
-		if (NodeSearch.FindInSubtree<Skeleton3D>(model) is { } skeleton && skeleton.FindBone(grip.BoneName) >= 0)
+		if (!string.IsNullOrEmpty(profile?.GripBone)) grip.BoneName = profile.GripBone;
+		if ((profile == null ? NodeSearch.FindInSubtree<Skeleton3D>(model) : profile.ResolveSkeleton(model)) is { } skeleton && skeleton.FindBone(grip.BoneName) >= 0)
 			skeleton.AddChild(grip);
 		else { grip.Free(); throw new System.InvalidOperationException($"角色模型缺少武器挂点：{model.SceneFilePath}"); }
-		hand = grip.GetNode<Node3D>("Socket");
+		hand = grip.GetNode<Node3D>(profile?.GripSocketPath ?? new NodePath("Socket"));
 		_hands[model] = hand;
 		return hand;
 	}
 	public void Apply(CharacterConfig character, WeaponConfig weapon)
 	{
+		RefreshPresentationSources();
 		if (EquippedWeapon != null && IsInstanceValid(EquippedWeapon))
 		{
 			EquippedWeapon.TopLevel = false;
 			EquippedWeapon.Transform = _weaponRestTransform;
 		}
 		DivePoseActive = false;
+		_activeProfile = character.VisualProfile;
 		CurrentModelPath = string.IsNullOrEmpty(character.ModelPath) ? _original.SceneFilePath : character.ModelPath;
 		if (!_models.TryGetValue(CurrentModelPath, out var model)) return;
+		EnsureHand(model, character.WeaponGripScene, character.VisualProfile);
 		foreach (var cached in _models.Values) cached.Visible = cached == model;
 		ActiveModel = model;
 		CurrentWeaponPath = weapon.ModelPath;
@@ -107,7 +111,7 @@ public partial class CharacterDisplay : Node3D
 		}
 		if (GetParent() is Unit unit)
 		{
-			unit.GetNode<UnitAnimator>(UnitAnimator.NodeName).BindVisual(model);
+			unit.GetNode<UnitAnimator>(UnitAnimator.NodeName).BindVisual(model, character.VisualProfile);
 			unit.GetNodeOrNull<UnitPresentation>("Presentation")?.BindVisual(model);
 			unit.GetNodeOrNull<ChargeBodyFx>("ChargeBodyFx")?.BindVisual(model);
 			if (unit.GetNodeOrNull<MeshInstance3D>("WeaponMount/Pistol/Body") is { } placeholder)
@@ -122,20 +126,24 @@ public partial class CharacterDisplay : Node3D
 	public override void _PhysicsProcess(double delta)
 	{
 		if (EquippedWeapon == null) return;
-		bool away = false;
-		foreach (var ability in _throws)
-			if (IsInstanceValid(ability) && ability.Enabled && ability.InFlight) { away = true; break; }
+		bool away = false; WeaponPresentationState pose = default;
+		foreach (var source in _sources)
+		{
+			if (source is GodotObject node && !IsInstanceValid(node) || !source.TryReadWeaponPresentation(out var state)) continue;
+			if (state.Hidden) { away = true; break; }
+			if (state.AlignToWorldDirection && state.WorldDirection.IsFinite() && state.WorldDirection.LengthSquared() > .000001f) pose = state with { WorldDirection = state.WorldDirection.Normalized() };
+		}
 		EquippedWeapon.Visible = !away;
-		DivePoseActive = !away && _fall is { Enabled: true, IsDiving: true, HomingMode: FallAttackAbility.DiveMode.Crosshair };
+		DivePoseActive = !away && pose.AlignToWorldDirection;
 		Vector3 worldScale = EquippedWeapon.GlobalBasis.Scale.Abs();
 		EquippedWeapon.TopLevel = DivePoseActive;
 		if (DivePoseActive)
 		{
 			// 只读真实下冲方向，把占位长枪的+Y枪尖朝向落点，不改骨架、速度或命中体。
 			// 临时解除骨骼父变换，避免同帧稍后的骨骼更新再次转偏枪尖。
-			Unit unit = _fall!.OwnerUnit!;
-			EquippedWeapon.GlobalTransform = new Transform3D(new Basis(new Quaternion(Vector3.Up, _fall.LastDiveDirection)) * Basis.FromScale(worldScale),
-				unit.GlobalPosition + unit.GlobalBasis * DiveGripOffset);
+			Unit unit = GetParent<Unit>();
+			EquippedWeapon.GlobalTransform = new Transform3D(new Basis(new Quaternion(Vector3.Up, pose.WorldDirection)) * Basis.FromScale(worldScale),
+				unit.GlobalPosition + unit.GlobalBasis * (_activeProfile?.DiveGripOffset ?? DiveGripOffset));
 		}
 		else EquippedWeapon.Transform = _weaponRestTransform;
 	}

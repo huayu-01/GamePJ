@@ -3,20 +3,34 @@
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
+
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_ricochet.tres" id="previous"]
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
 Stat = "RicochetAdd"
 Operation = 0
-Value = 2
+Value = 4
+
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Modifiers = [SubResource("Resource_m0")]
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1274
 RewardKind = 2
 MaxStacks = 1
-Modifiers = [SubResource("Resource_m0")]
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Requires = PackedStringArray("mut_ricochet")
 Id = "mut_ricochet_plus"
-DisplayName = "弹射+"
-DescriptionTemplate = "子弹额外弹射次数再 +2"
-Note = "[P5 新增行] 文档第 195 行「弹射+:n+2,前置:弹射」。前置 = Requires(mut_ricochet)：没拿到弹射这一条**根本不进候选列表**。与弹射同层叠加后总次数 = n + 2（n 预设 1 → 3）。"
+DisplayName = "升级：弹射"
+DescriptionTemplate = "替换上一级效果：额外弹射次数+{Modifiers.RicochetAdd:0.##}"
+Note = "032：当前级效果替换前级实例，保留历史身份满足前置；不再与上一级重复叠加。"
+
+NameKey = "content.mut_ricochet_plus.name"
+
+DescriptionKey = "content.mut_ricochet_plus.description"
+
+Effects = [SubResource("Resource_effect_0")]
+Replaces = ExtResource("previous")

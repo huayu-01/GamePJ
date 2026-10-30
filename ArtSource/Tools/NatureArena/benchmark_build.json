@@ -1,0 +1,18 @@
+{
+  "backdrop_size": 80.0,
+  "counts": {
+    "backdrop": 34.0,
+    "bush": 8.0,
+    "detail": 195.0,
+    "grass": 19255.0,
+    "rock": 14.0,
+    "tree": 22.0
+  },
+  "foliage_batches": 281.0,
+  "navigation_agent_height": 3.0,
+  "navigation_agent_radius": 0.75,
+  "navigation_polygons": 173,
+  "playable_size": 30.0,
+  "scene": "res://Scenes/Levels/NatureBenchmark/NatureBenchmark.tscn",
+  "seed": 20261021.0
+}

@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "charge",
+      "seconds": 30.55,
+      "passed": true,
+      "log": "F:\\Godot项目\\项目a\\Logs\\validation\\clover_regression_20261025_210612.charge.log",
+      "passed_checks": 80
+    },
+    {
+      "name": "interruption",
+      "seconds": 13.4,
+      "passed": true,
+      "log": "F:\\Godot项目\\项目a\\Logs\\validation\\clover_regression_20261025_210612.interruption.log",
+      "passed_checks": 38
+    },
+    {
+      "name": "replacement",
+      "seconds": 22.36,
+      "passed": true,
+      "log": "F:\\Godot项目\\项目a\\Logs\\validation\\clover_regression_20261025_210612.replacement.log",
+      "passed_checks": 66
+    },
+    {
+      "name": "Main",
+      "seconds": 70.71,
+      "passed": true,
+      "log": "F:\\Godot项目\\项目a\\Logs\\validation\\clover_regression_20261025_210612.main.log",
+      "hard_metrics": 8
+    }
+  ],
+  "original_saves_unchanged": true
+}

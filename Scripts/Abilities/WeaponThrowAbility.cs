@@ -6,8 +6,13 @@ using Godot;
 namespace ActRoguelike.Abilities;
 
 /// <summary>投掷共用状态机：动画事件出手、飞出、真实地形／射程停留、回手。视觉独立只读。</summary>
-public abstract partial class WeaponThrowAbility : Ability
+public abstract partial class WeaponThrowAbility : Ability, ActRoguelike.Visual.IWeaponPresentationSource
 {
+	public bool TryReadWeaponPresentation(out ActRoguelike.Visual.WeaponPresentationState state)
+	{
+		bool active = Enabled && InFlight;
+		state = new(active, false, Vector3.Zero); return active;
+	}
 	[ExportGroup("抛出 / 收回")]
 	/// <summary>抛出速度（m/s）。</summary>
 	[Export] public float ThrowSpeed { get; set; } = 18f;
@@ -81,6 +86,14 @@ public abstract partial class WeaponThrowAbility : Ability
 
 
 	private DashPathIndicator? _path;
+	private Vector3 _restHitboxScale = Vector3.One;
+	public float ThrowSizeScale { get; private set; } = 1;
+	private void UpdateThrowSize()
+	{
+		float range = OwnerUnit?.Stats.Get("AttackRangeMultiplier") ?? 1;
+		ThrowSizeScale = float.IsFinite(range) && range > 0 ? range : 1;
+		if (Hitbox != null) Hitbox.Scale = _restHitboxScale * ThrowSizeScale;
+	}
 	private float _intervalTimer;
 	private float _activeTimer;
 	private bool _damageWindowOpen;
@@ -91,6 +104,7 @@ public abstract partial class WeaponThrowAbility : Ability
 	private bool _leftRecallRange;
 	private Vector3? _redirectDestination;
 	private AttackOffense _throwOffense;
+	private long _throwCastId;
 	private float _throwDamage;
 
 	/// <summary>抛出时的起点（"手上"的位置：胸口高度 + 前方 0.6m）—— 子类画路径/算落地高度要用。</summary>
@@ -99,6 +113,7 @@ public abstract partial class WeaponThrowAbility : Ability
 	protected override void OnReady()
 	{
 		Hitbox = GetNodeOrNull<AttackHitbox>("Attack");
+		if (Hitbox != null) _restHitboxScale = Hitbox.Scale;
 		if (Hitbox != null) Hitbox.ContactFeedbackEnabled = false;
 		_path = GetNodeOrNull<DashPathIndicator>("Path");
 		if (_path != null)
@@ -118,6 +133,7 @@ public abstract partial class WeaponThrowAbility : Ability
 
 	/// <summary>本次抛出的水平速度（子类可以按蓄力改）。</summary>
 	protected virtual float EffectiveThrowSpeed => ThrowSpeed;
+	protected virtual float EffectiveReturnSpeed => ReturnSpeed;
 
 	/// <summary>子类在开始抛出时做点自己的事（记录档位等）。</summary>
 	protected virtual void OnThrowStarted()
@@ -205,12 +221,14 @@ public abstract partial class WeaponThrowAbility : Ability
 		// 只在自身仍占动作时交还动画；回手收尾不能停止其他技能的动画。
 		StopSkillAnimation();
 		SetInFlight(true);
+		UpdateThrowSize();
 		UpdateInputPreview(false);
 		OnThrowStarted();
 
 		Launch(direction);
 		// 子类Launch先冻结蓄力倍率；之后所有周期与回程窗口沿用同一次出手属性。
 		_throwOffense = AttackOffense.Capture(OwnerUnit, Hitbox?.CritChance ?? 0f, Hitbox?.CritMultiplier ?? 2f);
+		_throwCastId = AttackInstance.NextCastId();
 		_throwDamage = (Hitbox?.Damage ?? 0f) * DamageScale * _throwOffense.DamageMultiplier * (HoldToCharge ? LastReleaseDamageScale : 1f);
 		LastFlightDirection = FlightVelocity.Normalized();
 		if (ContinuousPathDamage) OpenDamageWindow();
@@ -241,6 +259,7 @@ public abstract partial class WeaponThrowAbility : Ability
 			return;
 		}
 		if (!InFlight || OwnerUnit == null) return;
+		UpdateThrowSize();
 		if (IsReturning) TickReturning(delta);
 		else TickFlight(delta);
 	}
@@ -359,7 +378,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		Vector3 previous = WeaponPosition;
 		Vector3 hand = HandPosition();
 		Vector3 direction = hand - previous;
-		WeaponPosition = previous.MoveToward(hand, ReturnSpeed * delta);
+		WeaponPosition = previous.MoveToward(hand, EffectiveReturnSpeed * delta);
 		if (direction.LengthSquared() > 0.001f) LastFlightDirection = direction.Normalized();
 		if (DamageOnReturn) TickDamage(delta, previous);
 		if (WeaponPosition.IsEqualApprox(hand)) FinishReturn();
@@ -375,6 +394,7 @@ public abstract partial class WeaponThrowAbility : Ability
 		Hitbox.GlobalPosition = WeaponPosition;
 		Hitbox.Activate(OwnerUnit, new AttackInstance
 		{
+			IsManualWeaponAttack = true, CastId = _throwCastId,
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
 			BaseDamage = _throwDamage * Mathf.Max(0, phaseScale),
@@ -424,6 +444,8 @@ public abstract partial class WeaponThrowAbility : Ability
 		RecallCount++;
 		Hitbox?.Deactivate();
 		_damageWindowOpen = false;
+		ThrowSizeScale = 1;
+		if (Hitbox != null) Hitbox.Scale = _restHitboxScale;
 		GameLog.Write("Combat", $"抛掷：{AbilityId} 武器已回到手上（第 {RecallCount} 次收回，累计周期伤害 {DamageTickCount} 次）");
 		Finish();
 	}

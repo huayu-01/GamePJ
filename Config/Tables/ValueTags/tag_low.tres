@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1319
 Id = "tag_low"
 Slot = 3
 DisplayName = "低价值"

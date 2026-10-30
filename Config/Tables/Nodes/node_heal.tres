@@ -2,8 +2,15 @@
 
 [ext_resource type="Script" path="res://Scripts/Config/NodeConfig.cs" id="1_ujb58"]
 
+[ext_resource type="Script" path="res://Scripts/Config/NodeRewards/HealNodeReward.cs" id="reward_behavior"]
+
+[sub_resource type="Resource" id="Resource_reward_behavior"]
+script = ExtResource("reward_behavior")
+
 [resource]
 script = ExtResource("1_ujb58")
+NumericId = 1114
+RewardBehavior = SubResource("Resource_reward_behavior")
 Kind = 5
 Title = "恢复状态"
 AnyRewardKind = true

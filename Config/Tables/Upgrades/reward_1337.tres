@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/DefenseReactionRewardEffect.cs" id="effect"]
+[sub_resource type="Resource" id="reaction"]
+script = ExtResource("effect")
+Kind = 0
+Duration = 10
+[resource]
+script = ExtResource("row")
+NumericId = 1337
+DisplayName = "盾悟"
+DescriptionTemplate = "护甲破碎后获得一次格挡护罩，保留{Effects.0.Duration:0}秒，消耗或到期后消失；无格挡硬直。"
+NameKey = "content.1337.name"
+DescriptionKey = "content.1337.description"
+RewardKind = 2
+Effects = [SubResource("reaction")]

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="UnitVisualProfile" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/UnitVisualProfile.cs" id="profile"]
+[ext_resource type="PackedScene" path="res://Assets/Enemies/ScaredyShroom/scaredy_shroom.glb" id="model"]
+[resource]
+script = ExtResource("profile")
+ModelScene = ExtResource("model")
+AnimIdle = "idle"
+AnimWalk = "idle"
+AnimRun = "idle"
+AnimDeath = ""
+SkillLibraryDir = "res://Assets/Animations/enemies/"
+SkillLibraryName = "skills"

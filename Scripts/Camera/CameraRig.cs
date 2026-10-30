@@ -1,4 +1,6 @@
 using Godot;
+using ActRoguelike.Abilities;
+using ActRoguelike.Combat;
 
 namespace ActRoguelike.Camera;
 
@@ -32,6 +34,11 @@ public partial class CameraRig : Node3D
 	[Export] public float FollowSharpness { get; set; } = 12f;
 
 	[Export] public bool CaptureMouseOnStart { get; set; } = true;
+	/// <summary>长枪按住输入预览时向右肩平移，给完整抛物线留出侧向视差。</summary>
+	[Export] public float SpearShoulderOffset { get; set; } = .95f;
+	[Export] public float ShoulderBlendSpeed { get; set; } = 8f;
+	public float ShoulderOffset { get; private set; }
+	public bool ShoulderPreviewActive { get; private set; }
 
 	private SpringArm3D _springArm = null!;
 	private float _yawDegrees;
@@ -77,12 +84,16 @@ public partial class CameraRig : Node3D
 	/// </summary>
 	public override void _PhysicsProcess(double delta)
 	{
-		if (Target == null)
+		if (Target == null || !IsInstanceValid(Target))
 		{
+			ShoulderPreviewActive = false; ShoulderOffset = 0;
 			return;
 		}
 
-		Vector3 desired = Target.GlobalPosition + TargetOffset + (Vector3.Up * ScreenHeightLift());
+		ShoulderPreviewActive = HasSpearInputPreview();
+		ShoulderOffset = Mathf.MoveToward(ShoulderOffset, ShoulderPreviewActive ? SpearShoulderOffset : 0f,
+			Mathf.Max(.1f, ShoulderBlendSpeed) * (float)delta);
+		Vector3 desired = Target.GlobalPosition + TargetOffset + (Vector3.Up * ScreenHeightLift()) + FlatRight * ShoulderOffset;
 		if (FollowSharpness <= 0f)
 		{
 			GlobalPosition = desired;
@@ -92,6 +103,18 @@ public partial class CameraRig : Node3D
 			float weight = 1f - Mathf.Exp(-FollowSharpness * (float)delta);
 			GlobalPosition = GlobalPosition.Lerp(desired, weight);
 		}
+	}
+
+	private bool HasSpearInputPreview()
+	{
+		if (Target is not Unit { IsDead: false } unit || GetTree().Paused) return false;
+		foreach (var slot in unit.AbilitySlots.Inputs)
+		{
+			// 只读当前装入槽位的输入预览；换装保护与取消仍由 PlayerAbilityInput/Ability 统一负责。
+			if (unit.AbilitySlots.Resolve(slot.Key) is SpearThrowAbility { InputPreviewShowing: true }
+				&& InputMap.HasAction(slot.Key) && Input.IsActionPressed(slot.Key)) return true;
+		}
+		return false;
 	}
 
 	/// <summary>

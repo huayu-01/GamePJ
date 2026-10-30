@@ -7,6 +7,7 @@
 [resource]
 PressureBehaviors = PackedStringArray("LeapMelee")
 script = ExtResource("1_row")
+NumericId = 1100
 Id = "enemy_jumping_melee"
 Slot = 4
 DisplayName = "跳跃近战"

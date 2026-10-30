@@ -1,0 +1,80 @@
+{
+  "Date": "2026-10-29T21:12:43",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "Content068070",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 7.88,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Content068070.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Content068070.headless.err",
+      "SHA256": "9EFA55BEB109C5BAEEA3689969B4D1FA140CF2BC9CCBEB01A081E5F00AB46CE3"
+    },
+    {
+      "Name": "Content068070",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 12.82,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Content068070.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Content068070.render.err",
+      "SHA256": "AD890E0FC0E2E4C3EB63B4B7EB1DA3EE9E8C0C586180A55ACD2E0E8C3BBE5413"
+    },
+    {
+      "Name": "Builds20General",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 5.9,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20General.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20General.headless.err",
+      "SHA256": "E21ECCDDD706307995C57A67FFAF6FAC59593C9F568BC0E0CA427C9EADABEAD3"
+    },
+    {
+      "Name": "Builds20General",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 7.92,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20General.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20General.render.err",
+      "SHA256": "0CE61F09FC4D9AF92918FB5FF038B8C667391B27E630F529778E5D1A12D838DF"
+    },
+    {
+      "Name": "Builds20Hunter",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 8.13,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20Hunter.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20Hunter.headless.err",
+      "SHA256": "DF5C8E91650808B95C3691E05B00D435B78FDE28BFEA3D13372FBD330A945A67"
+    },
+    {
+      "Name": "Builds20Hunter",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 9.7,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20Hunter.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20Hunter.render.err",
+      "SHA256": "2F77FF0A6EC3D11F7183A333E637E9F6EB0DA89D2E66C96CE010198791B8BA71"
+    },
+    {
+      "Name": "Builds20Master",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 11.16,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20Master.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20Master.headless.err",
+      "SHA256": "9728C4D5E5126B45067B5ACA6799EE2C1CAE9C617FC813ED0A364F5213C60351"
+    },
+    {
+      "Name": "Builds20Master",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 12.97,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20Master.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_211243.Builds20Master.render.err",
+      "SHA256": "5393ECA5AA248B23FB50F3A647B14CDCA712C411B33880D6BAF7192C0AA4A8EA"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

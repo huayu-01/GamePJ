@@ -1,0 +1,6565 @@
+{
+  "label": "stageA_idle",
+  "goalMet": false,
+  "gpu": "NVIDIA GeForce RTX 4070 Ti",
+  "cpu": "AMD Ryzen 7 5800X 8-Core Processor",
+  "engine": "4.7.2-stable (official)",
+  "width": 3840,
+  "height": 2160,
+  "renderScale": 1,
+  "msaa": "Disabled",
+  "minEnemies": 100,
+  "maxEnemies": 100,
+  "playerAttackRequests": 19,
+  "sampleSeconds": 12.011982999999997,
+  "samples": 807,
+  "averageFps": 67.18291226352886,
+  "low1Fps": 12.336236460980485,
+  "p95FrameMs": 23.567,
+  "p99FrameMs": 47.464,
+  "maxFrameMs": 247.958,
+  "gpuMs": 4.577358119402086,
+  "renderCpuMs": 1.1938934323217494,
+  "processMs": 11.050614622056935,
+  "physicsMs": 31.50043122676563,
+  "drawCalls": 1134.5489467162329,
+  "physicsFrames": 717,
+  "frameSetupCpuMs": 0.215,
+  "allocatedMb": 35.98609161376953,
+  "gc0": 4,
+  "gc1": 4,
+  "gc2": 1,
+  "profile": {
+    "Unit": {
+      "calls": 72417,
+      "totalMs": 10.9471,
+      "msPerPhysicsFrame": 0.015267921896792191,
+      "msPerRenderFrame": 0.013565179677819084,
+      "allocatedBytes": 0,
+      "bytesPerCall": 0
+    },
+    "Ability": {
+      "calls": 85323,
+      "totalMs": 131.927,
+      "msPerPhysicsFrame": 0.1839986052998605,
+      "msPerRenderFrame": 0.16347831474597274,
+      "allocatedBytes": 401216,
+      "bytesPerCall": 4.702319421492446
+    },
+    "Animator": {
+      "calls": 72417,
+      "totalMs": 48.7649,
+      "msPerPhysicsFrame": 0.06801241283124128,
+      "msPerRenderFrame": 0.060427385377942996,
+      "allocatedBytes": 233016,
+      "bytesPerCall": 3.21769750196777
+    },
+    "SurvivalPrune": {
+      "calls": 717,
+      "totalMs": 8.6377,
+      "msPerPhysicsFrame": 0.01204700139470014,
+      "msPerRenderFrame": 0.010703469640644362,
+      "allocatedBytes": 0,
+      "bytesPerCall": 0
+    },
+    "Movement": {
+      "calls": 71700,
+      "totalMs": 1602.4022,
+      "msPerPhysicsFrame": 2.234870571827057,
+      "msPerRenderFrame": 1.9856285006195786,
+      "allocatedBytes": 0,
+      "bytesPerCall": 0
+    },
+    "Brain": {
+      "calls": 71700,
+      "totalMs": 2147.5419,
+      "msPerPhysicsFrame": 2.995176987447699,
+      "msPerRenderFrame": 2.6611423791821562,
+      "allocatedBytes": 17591408,
+      "bytesPerCall": 245.3473919107392
+    },
+    "Presentation": {
+      "calls": 1948,
+      "totalMs": 1.765,
+      "msPerPhysicsFrame": 0.0024616457461645743,
+      "msPerRenderFrame": 0.0021871127633209418,
+      "allocatedBytes": 0,
+      "bytesPerCall": 0
+    },
+    "WorldUI": {
+      "calls": 806,
+      "totalMs": 24.3928,
+      "msPerPhysicsFrame": 0.034020641562064156,
+      "msPerRenderFrame": 0.030226517967781908,
+      "allocatedBytes": 24,
+      "bytesPerCall": 0.02977667493796526
+    },
+    "EventBus": {
+      "calls": 255,
+      "totalMs": 22.5568,
+      "msPerPhysicsFrame": 0.03145997210599721,
+      "msPerRenderFrame": 0.027951425030978933,
+      "allocatedBytes": 113320,
+      "bytesPerCall": 444.3921568627451
+    }
+  },
+  "memoryFrames": [
+    {
+      "frame": 0,
+      "frameMs": 40.578,
+      "allocatedBytes": 138600,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 1,
+      "frameMs": 47.088,
+      "allocatedBytes": 130688,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 2,
+      "frameMs": 247.958,
+      "allocatedBytes": 277776,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 3,
+      "frameMs": 88.55,
+      "allocatedBytes": 293920,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 4,
+      "frameMs": 69.641,
+      "allocatedBytes": 236776,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 5,
+      "frameMs": 47.464,
+      "allocatedBytes": 163488,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 6,
+      "frameMs": 46.918,
+      "allocatedBytes": 122488,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 7,
+      "frameMs": 29.835,
+      "allocatedBytes": 81744,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 8,
+      "frameMs": 25.263,
+      "allocatedBytes": 89688,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 9,
+      "frameMs": 29.396,
+      "allocatedBytes": 89944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 10,
+      "frameMs": 18.508,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 11,
+      "frameMs": 35.387,
+      "allocatedBytes": 89944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 12,
+      "frameMs": 26.267,
+      "allocatedBytes": 81744,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 13,
+      "frameMs": 16.012,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 14,
+      "frameMs": 15.37,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 15,
+      "frameMs": 64.246,
+      "allocatedBytes": 45752,
+      "gc0": 1,
+      "gc1": 1,
+      "gc2": 0
+    },
+    {
+      "frame": 16,
+      "frameMs": 56.984,
+      "allocatedBytes": 295200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 17,
+      "frameMs": 37.216,
+      "allocatedBytes": 123000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 18,
+      "frameMs": 34.512,
+      "allocatedBytes": 106600,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 19,
+      "frameMs": 23.567,
+      "allocatedBytes": 73800,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 20,
+      "frameMs": 16.346,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 21,
+      "frameMs": 14.088,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 22,
+      "frameMs": 14.34,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 23,
+      "frameMs": 15.154,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 24,
+      "frameMs": 15.166,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 25,
+      "frameMs": 4.791,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 26,
+      "frameMs": 16.123,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 27,
+      "frameMs": 16.583,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 28,
+      "frameMs": 14.335,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 29,
+      "frameMs": 13.733,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 30,
+      "frameMs": 4.442,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 31,
+      "frameMs": 16.018,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 32,
+      "frameMs": 14.804,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 33,
+      "frameMs": 4.361,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 34,
+      "frameMs": 15.877,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 35,
+      "frameMs": 14.445,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 36,
+      "frameMs": 15.75,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 37,
+      "frameMs": 15.194,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 38,
+      "frameMs": 4.772,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 39,
+      "frameMs": 15.261,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 40,
+      "frameMs": 15.336,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 41,
+      "frameMs": 13.711,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 42,
+      "frameMs": 4.422,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 43,
+      "frameMs": 15.62,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 44,
+      "frameMs": 14.334,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 45,
+      "frameMs": 15.338,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 46,
+      "frameMs": 5.577,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 47,
+      "frameMs": 15.219,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 48,
+      "frameMs": 15.54,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 49,
+      "frameMs": 15.917,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 50,
+      "frameMs": 4.276,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 51,
+      "frameMs": 17.365,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 52,
+      "frameMs": 19.836,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 53,
+      "frameMs": 17.802,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 54,
+      "frameMs": 15.154,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 55,
+      "frameMs": 14.981,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 56,
+      "frameMs": 15.615,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 57,
+      "frameMs": 15.523,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 58,
+      "frameMs": 15.387,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 59,
+      "frameMs": 14.475,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 60,
+      "frameMs": 15.897,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 61,
+      "frameMs": 4.503,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 62,
+      "frameMs": 14.593,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 63,
+      "frameMs": 13.661,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 64,
+      "frameMs": 4.369,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 65,
+      "frameMs": 16.604,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 66,
+      "frameMs": 14.947,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 67,
+      "frameMs": 14.967,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 68,
+      "frameMs": 14.68,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 69,
+      "frameMs": 6.127,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 70,
+      "frameMs": 16.285,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 71,
+      "frameMs": 15.614,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 72,
+      "frameMs": 14.962,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 73,
+      "frameMs": 15.718,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 74,
+      "frameMs": 14.821,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 75,
+      "frameMs": 4.591,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 76,
+      "frameMs": 14.871,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 77,
+      "frameMs": 17.038,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 78,
+      "frameMs": 15.114,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 79,
+      "frameMs": 4.531,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 80,
+      "frameMs": 14.685,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 81,
+      "frameMs": 16.041,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 82,
+      "frameMs": 14.589,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 83,
+      "frameMs": 4.544,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 84,
+      "frameMs": 14.674,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 85,
+      "frameMs": 14.053,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 86,
+      "frameMs": 15.265,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 87,
+      "frameMs": 4.198,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 88,
+      "frameMs": 15.311,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 89,
+      "frameMs": 13.901,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 90,
+      "frameMs": 4.271,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 91,
+      "frameMs": 15.257,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 92,
+      "frameMs": 16.064,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 93,
+      "frameMs": 15.033,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 94,
+      "frameMs": 5.495,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 95,
+      "frameMs": 16.778,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 96,
+      "frameMs": 15.571,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 97,
+      "frameMs": 14.979,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 98,
+      "frameMs": 18.497,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 99,
+      "frameMs": 20.494,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 100,
+      "frameMs": 17.055,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 101,
+      "frameMs": 15.057,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 102,
+      "frameMs": 16.08,
+      "allocatedBytes": 57384,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 103,
+      "frameMs": 15.194,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 104,
+      "frameMs": 15.638,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 105,
+      "frameMs": 14.916,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 106,
+      "frameMs": 17.578,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 107,
+      "frameMs": 14.797,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 108,
+      "frameMs": 14.625,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 109,
+      "frameMs": 4.345,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 110,
+      "frameMs": 15.292,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 111,
+      "frameMs": 14.901,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 112,
+      "frameMs": 15.185,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 113,
+      "frameMs": 4.466,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 114,
+      "frameMs": 15.714,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 115,
+      "frameMs": 16.003,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 116,
+      "frameMs": 14.645,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 117,
+      "frameMs": 4.424,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 118,
+      "frameMs": 14.098,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 119,
+      "frameMs": 15.456,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 120,
+      "frameMs": 4.582,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 121,
+      "frameMs": 14.444,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 122,
+      "frameMs": 14.68,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 123,
+      "frameMs": 4.409,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 124,
+      "frameMs": 15.393,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 125,
+      "frameMs": 14.296,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 126,
+      "frameMs": 14.327,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 127,
+      "frameMs": 4.248,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 128,
+      "frameMs": 15.221,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 129,
+      "frameMs": 15.896,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 130,
+      "frameMs": 15.013,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 131,
+      "frameMs": 4.827,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 132,
+      "frameMs": 14.411,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 133,
+      "frameMs": 16.583,
+      "allocatedBytes": 65600,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 134,
+      "frameMs": 14.639,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 135,
+      "frameMs": 4.291,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 136,
+      "frameMs": 14.575,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 137,
+      "frameMs": 14.428,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 138,
+      "frameMs": 17.648,
+      "allocatedBytes": 65600,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 139,
+      "frameMs": 15.392,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 140,
+      "frameMs": 4.361,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 141,
+      "frameMs": 14.858,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 142,
+      "frameMs": 15.704,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 143,
+      "frameMs": 15.367,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 144,
+      "frameMs": 20.515,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 145,
+      "frameMs": 16.349,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 146,
+      "frameMs": 15.768,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 147,
+      "frameMs": 14.202,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 148,
+      "frameMs": 4.352,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 149,
+      "frameMs": 13.959,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 150,
+      "frameMs": 14.136,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 151,
+      "frameMs": 5.703,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 152,
+      "frameMs": 13.852,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 153,
+      "frameMs": 14.374,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 154,
+      "frameMs": 4.665,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 155,
+      "frameMs": 13.938,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 156,
+      "frameMs": 16.442,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 157,
+      "frameMs": 14.855,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 158,
+      "frameMs": 4.299,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 159,
+      "frameMs": 15.643,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 160,
+      "frameMs": 15.353,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 161,
+      "frameMs": 16.094,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 162,
+      "frameMs": 14.045,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 163,
+      "frameMs": 4.479,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 164,
+      "frameMs": 14.847,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 165,
+      "frameMs": 14.451,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 166,
+      "frameMs": 5.522,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 167,
+      "frameMs": 14.509,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 168,
+      "frameMs": 14.572,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 169,
+      "frameMs": 4.348,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 170,
+      "frameMs": 15.125,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 171,
+      "frameMs": 15.491,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 172,
+      "frameMs": 14.025,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 173,
+      "frameMs": 4.372,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 174,
+      "frameMs": 14.288,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 175,
+      "frameMs": 14.888,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 176,
+      "frameMs": 15.633,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 177,
+      "frameMs": 4.579,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 178,
+      "frameMs": 15.538,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 179,
+      "frameMs": 14.435,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 180,
+      "frameMs": 5.653,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 181,
+      "frameMs": 14.891,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 182,
+      "frameMs": 14.116,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 183,
+      "frameMs": 4.325,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 184,
+      "frameMs": 14.498,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 185,
+      "frameMs": 15.296,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 186,
+      "frameMs": 15.767,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 187,
+      "frameMs": 14.095,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 188,
+      "frameMs": 4.457,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 189,
+      "frameMs": 15.509,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 190,
+      "frameMs": 14.536,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 191,
+      "frameMs": 4.777,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 192,
+      "frameMs": 15.609,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 193,
+      "frameMs": 18.884,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 194,
+      "frameMs": 17.969,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 195,
+      "frameMs": 15.149,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 196,
+      "frameMs": 14.314,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 197,
+      "frameMs": 15.791,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 198,
+      "frameMs": 15.777,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 199,
+      "frameMs": 14.875,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 200,
+      "frameMs": 4.617,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 201,
+      "frameMs": 16.12,
+      "allocatedBytes": 49168,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 202,
+      "frameMs": 14.568,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 203,
+      "frameMs": 15.186,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 204,
+      "frameMs": 4.87,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 205,
+      "frameMs": 15.569,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 206,
+      "frameMs": 14.508,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 207,
+      "frameMs": 14.548,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 208,
+      "frameMs": 4.26,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 209,
+      "frameMs": 14.772,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 210,
+      "frameMs": 15.634,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 211,
+      "frameMs": 4.445,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 212,
+      "frameMs": 15.484,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 213,
+      "frameMs": 14.392,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 214,
+      "frameMs": 15.466,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 215,
+      "frameMs": 4.476,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 216,
+      "frameMs": 14.911,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 217,
+      "frameMs": 15.403,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 218,
+      "frameMs": 14.408,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 219,
+      "frameMs": 5.752,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 220,
+      "frameMs": 15.365,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 221,
+      "frameMs": 14.05,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 222,
+      "frameMs": 14.283,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 223,
+      "frameMs": 4.459,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 224,
+      "frameMs": 15.978,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 225,
+      "frameMs": 14.906,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 226,
+      "frameMs": 14.015,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 227,
+      "frameMs": 4.544,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 228,
+      "frameMs": 16.07,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 229,
+      "frameMs": 16.438,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 230,
+      "frameMs": 15.184,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 231,
+      "frameMs": 14.752,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 232,
+      "frameMs": 4.299,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 233,
+      "frameMs": 15.499,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 234,
+      "frameMs": 15.148,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 235,
+      "frameMs": 4.198,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 236,
+      "frameMs": 15.303,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 237,
+      "frameMs": 14.369,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 238,
+      "frameMs": 16.113,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 239,
+      "frameMs": 4.805,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 240,
+      "frameMs": 15.842,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 241,
+      "frameMs": 20.705,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 242,
+      "frameMs": 16.637,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 243,
+      "frameMs": 14.439,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 244,
+      "frameMs": 14.015,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 245,
+      "frameMs": 15.586,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 246,
+      "frameMs": 14.224,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 247,
+      "frameMs": 4.349,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 248,
+      "frameMs": 14.762,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 249,
+      "frameMs": 13.747,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 250,
+      "frameMs": 5.75,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 251,
+      "frameMs": 16.663,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 252,
+      "frameMs": 14.883,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 253,
+      "frameMs": 14.966,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 254,
+      "frameMs": 15.842,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 255,
+      "frameMs": 15.412,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 256,
+      "frameMs": 4.79,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 257,
+      "frameMs": 15.297,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 258,
+      "frameMs": 16.362,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 259,
+      "frameMs": 14.129,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 260,
+      "frameMs": 4.347,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 261,
+      "frameMs": 15.44,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 262,
+      "frameMs": 15.403,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 263,
+      "frameMs": 15.939,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 264,
+      "frameMs": 14.618,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 265,
+      "frameMs": 4.344,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 266,
+      "frameMs": 14.976,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 267,
+      "frameMs": 15.372,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 268,
+      "frameMs": 4.457,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 269,
+      "frameMs": 15.527,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 270,
+      "frameMs": 14.653,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 271,
+      "frameMs": 15.601,
+      "allocatedBytes": 65600,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 272,
+      "frameMs": 14.409,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 273,
+      "frameMs": 4.4,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 274,
+      "frameMs": 15.994,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 275,
+      "frameMs": 15.49,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 276,
+      "frameMs": 15.648,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 277,
+      "frameMs": 4.649,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 278,
+      "frameMs": 14.523,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 279,
+      "frameMs": 14.325,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 280,
+      "frameMs": 4.425,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 281,
+      "frameMs": 16.506,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 282,
+      "frameMs": 15.608,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 283,
+      "frameMs": 14.414,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 284,
+      "frameMs": 14.223,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 285,
+      "frameMs": 5.838,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 286,
+      "frameMs": 15.649,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 287,
+      "frameMs": 19.979,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 288,
+      "frameMs": 15.566,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 289,
+      "frameMs": 15.873,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 290,
+      "frameMs": 14.8,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 291,
+      "frameMs": 14.29,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 292,
+      "frameMs": 14.295,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 293,
+      "frameMs": 5.893,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 294,
+      "frameMs": 14.816,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 295,
+      "frameMs": 14.139,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 296,
+      "frameMs": 4.841,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 297,
+      "frameMs": 15.243,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 298,
+      "frameMs": 15.518,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 299,
+      "frameMs": 14.557,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 300,
+      "frameMs": 4.55,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 301,
+      "frameMs": 14.605,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 302,
+      "frameMs": 15.32,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 303,
+      "frameMs": 16.296,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 304,
+      "frameMs": 15.759,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 305,
+      "frameMs": 4.861,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 306,
+      "frameMs": 14.424,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 307,
+      "frameMs": 16.185,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 308,
+      "frameMs": 14.487,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 309,
+      "frameMs": 4.428,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 310,
+      "frameMs": 15.948,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 311,
+      "frameMs": 22.585,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 312,
+      "frameMs": 17.015,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 313,
+      "frameMs": 23.324,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 314,
+      "frameMs": 14.577,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 315,
+      "frameMs": 16.707,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 316,
+      "frameMs": 14.525,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 317,
+      "frameMs": 14.105,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 318,
+      "frameMs": 15.457,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 319,
+      "frameMs": 15.837,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 320,
+      "frameMs": 14.33,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 321,
+      "frameMs": 14.429,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 322,
+      "frameMs": 14.405,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 323,
+      "frameMs": 15.401,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 324,
+      "frameMs": 4.489,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 325,
+      "frameMs": 15.59,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 326,
+      "frameMs": 14.185,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 327,
+      "frameMs": 15.446,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 328,
+      "frameMs": 4.544,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 329,
+      "frameMs": 14.779,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 330,
+      "frameMs": 15.426,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 331,
+      "frameMs": 15.5,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 332,
+      "frameMs": 21.261,
+      "allocatedBytes": 90200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 333,
+      "frameMs": 15.894,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 334,
+      "frameMs": 14.431,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 335,
+      "frameMs": 15.578,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 336,
+      "frameMs": 4.654,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 337,
+      "frameMs": 14.334,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 338,
+      "frameMs": 13.991,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 339,
+      "frameMs": 4.39,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 340,
+      "frameMs": 16.592,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 341,
+      "frameMs": 15.02,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 342,
+      "frameMs": 14.051,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 343,
+      "frameMs": 4.551,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 344,
+      "frameMs": 15.335,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 345,
+      "frameMs": 14.429,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 346,
+      "frameMs": 14.98,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 347,
+      "frameMs": 4.787,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 348,
+      "frameMs": 15.041,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 349,
+      "frameMs": 25.997,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 350,
+      "frameMs": 14.657,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 351,
+      "frameMs": 13.722,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 352,
+      "frameMs": 15.818,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 353,
+      "frameMs": 13.92,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 354,
+      "frameMs": 14.907,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 355,
+      "frameMs": 14.38,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 356,
+      "frameMs": 5.575,
+      "allocatedBytes": 24600,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 357,
+      "frameMs": 15.498,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 358,
+      "frameMs": 14.64,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 359,
+      "frameMs": 15.16,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 360,
+      "frameMs": 4.844,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 361,
+      "frameMs": 15.024,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 362,
+      "frameMs": 14.642,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 363,
+      "frameMs": 14.316,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 364,
+      "frameMs": 4.386,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 365,
+      "frameMs": 14.778,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 366,
+      "frameMs": 15.508,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 367,
+      "frameMs": 4.302,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 368,
+      "frameMs": 14.831,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 369,
+      "frameMs": 14.19,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 370,
+      "frameMs": 16.961,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 371,
+      "frameMs": 15.275,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 372,
+      "frameMs": 5.793,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 373,
+      "frameMs": 14.975,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 374,
+      "frameMs": 14.375,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 375,
+      "frameMs": 16.998,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 376,
+      "frameMs": 15.277,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 377,
+      "frameMs": 4.489,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 378,
+      "frameMs": 17.641,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 379,
+      "frameMs": 20.887,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 380,
+      "frameMs": 15.741,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 381,
+      "frameMs": 14.494,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 382,
+      "frameMs": 15.459,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 383,
+      "frameMs": 14.153,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 384,
+      "frameMs": 15.017,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 385,
+      "frameMs": 4.324,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 386,
+      "frameMs": 15.794,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 387,
+      "frameMs": 18.518,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 388,
+      "frameMs": 14.622,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 389,
+      "frameMs": 14.578,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 390,
+      "frameMs": 15.916,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 391,
+      "frameMs": 15.706,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 392,
+      "frameMs": 4.805,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 393,
+      "frameMs": 15.099,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 394,
+      "frameMs": 15.544,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 395,
+      "frameMs": 50.49,
+      "allocatedBytes": 49440,
+      "gc0": 2,
+      "gc1": 2,
+      "gc2": 1
+    },
+    {
+      "frame": 396,
+      "frameMs": 53.385,
+      "allocatedBytes": 147544,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 397,
+      "frameMs": 38.487,
+      "allocatedBytes": 123000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 398,
+      "frameMs": 25.163,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 399,
+      "frameMs": 26.685,
+      "allocatedBytes": 98400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 400,
+      "frameMs": 14.813,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 401,
+      "frameMs": 16.102,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 402,
+      "frameMs": 14.531,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 403,
+      "frameMs": 14.169,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 404,
+      "frameMs": 14.81,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 405,
+      "frameMs": 15.068,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 406,
+      "frameMs": 14.219,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 407,
+      "frameMs": 15.129,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 408,
+      "frameMs": 4.317,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 409,
+      "frameMs": 16.31,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 410,
+      "frameMs": 14.09,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 411,
+      "frameMs": 4.311,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 412,
+      "frameMs": 14.598,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 413,
+      "frameMs": 15.555,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 414,
+      "frameMs": 21.656,
+      "allocatedBytes": 90200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 415,
+      "frameMs": 15.906,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 416,
+      "frameMs": 14.836,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 417,
+      "frameMs": 15.644,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 418,
+      "frameMs": 14.654,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 419,
+      "frameMs": 14.73,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 420,
+      "frameMs": 4.402,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 421,
+      "frameMs": 15.538,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 422,
+      "frameMs": 14.336,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 423,
+      "frameMs": 4.385,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 424,
+      "frameMs": 15.409,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 425,
+      "frameMs": 15.035,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 426,
+      "frameMs": 16.678,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 427,
+      "frameMs": 14.618,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 428,
+      "frameMs": 4.395,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 429,
+      "frameMs": 17.701,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 430,
+      "frameMs": 17.319,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 431,
+      "frameMs": 17.575,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 432,
+      "frameMs": 14.739,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 433,
+      "frameMs": 28.253,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 434,
+      "frameMs": 46.635,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 435,
+      "frameMs": 34.524,
+      "allocatedBytes": 90200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 436,
+      "frameMs": 28.936,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 437,
+      "frameMs": 28.023,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 438,
+      "frameMs": 25.887,
+      "allocatedBytes": 90200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 439,
+      "frameMs": 16.558,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 440,
+      "frameMs": 14.858,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 441,
+      "frameMs": 14.475,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 442,
+      "frameMs": 15.483,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 443,
+      "frameMs": 15.378,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 444,
+      "frameMs": 15.707,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 445,
+      "frameMs": 14.567,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 446,
+      "frameMs": 15.796,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 447,
+      "frameMs": 14.64,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 448,
+      "frameMs": 4.32,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 449,
+      "frameMs": 16.543,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 450,
+      "frameMs": 19.402,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 451,
+      "frameMs": 16.798,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 452,
+      "frameMs": 14.906,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 453,
+      "frameMs": 15.909,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 454,
+      "frameMs": 16.781,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 455,
+      "frameMs": 16.388,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 456,
+      "frameMs": 15.173,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 457,
+      "frameMs": 14.572,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 458,
+      "frameMs": 15.714,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 459,
+      "frameMs": 4.564,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 460,
+      "frameMs": 15.289,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 461,
+      "frameMs": 13.979,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 462,
+      "frameMs": 14.296,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 463,
+      "frameMs": 5.866,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 464,
+      "frameMs": 16.005,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 465,
+      "frameMs": 16.754,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 466,
+      "frameMs": 15.664,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 467,
+      "frameMs": 17.463,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 468,
+      "frameMs": 16.215,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 469,
+      "frameMs": 16.129,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 470,
+      "frameMs": 15.969,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 471,
+      "frameMs": 17.596,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 472,
+      "frameMs": 15.921,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 473,
+      "frameMs": 16.307,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 474,
+      "frameMs": 17.948,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 475,
+      "frameMs": 17.842,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 476,
+      "frameMs": 16.307,
+      "allocatedBytes": 40968,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 477,
+      "frameMs": 16.301,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 478,
+      "frameMs": 16.988,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 479,
+      "frameMs": 27.783,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 480,
+      "frameMs": 17.297,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 481,
+      "frameMs": 18.46,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 482,
+      "frameMs": 28.279,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 483,
+      "frameMs": 17.23,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 484,
+      "frameMs": 16.956,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 485,
+      "frameMs": 16.024,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 486,
+      "frameMs": 17.431,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 487,
+      "frameMs": 20.517,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 488,
+      "frameMs": 27.489,
+      "allocatedBytes": 73800,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 489,
+      "frameMs": 16.805,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 490,
+      "frameMs": 15.778,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 491,
+      "frameMs": 17.813,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 492,
+      "frameMs": 15.847,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 493,
+      "frameMs": 16.198,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 494,
+      "frameMs": 16.178,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 495,
+      "frameMs": 19.097,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 496,
+      "frameMs": 16.569,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 497,
+      "frameMs": 16.576,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 498,
+      "frameMs": 17.917,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 499,
+      "frameMs": 16.718,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 500,
+      "frameMs": 16.229,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 501,
+      "frameMs": 15.944,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 502,
+      "frameMs": 15.07,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 503,
+      "frameMs": 16.883,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 504,
+      "frameMs": 16.845,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 505,
+      "frameMs": 16.329,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 506,
+      "frameMs": 15.314,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 507,
+      "frameMs": 14.637,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 508,
+      "frameMs": 14.309,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 509,
+      "frameMs": 15.719,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 510,
+      "frameMs": 14.017,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 511,
+      "frameMs": 14.674,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 512,
+      "frameMs": 4.331,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 513,
+      "frameMs": 15.46,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 514,
+      "frameMs": 14.75,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 515,
+      "frameMs": 4.383,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 516,
+      "frameMs": 14.649,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 517,
+      "frameMs": 15.055,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 518,
+      "frameMs": 15.785,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 519,
+      "frameMs": 4.435,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 520,
+      "frameMs": 16.442,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 521,
+      "frameMs": 14.814,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 522,
+      "frameMs": 18.029,
+      "allocatedBytes": 65600,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 523,
+      "frameMs": 15.222,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 524,
+      "frameMs": 14.88,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 525,
+      "frameMs": 14.266,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 526,
+      "frameMs": 5.596,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 527,
+      "frameMs": 16.458,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 528,
+      "frameMs": 19.258,
+      "allocatedBytes": 98400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 529,
+      "frameMs": 20.318,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 530,
+      "frameMs": 15.756,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 531,
+      "frameMs": 14.638,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 532,
+      "frameMs": 14.612,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 533,
+      "frameMs": 15.033,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 534,
+      "frameMs": 15.96,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 535,
+      "frameMs": 15.48,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 536,
+      "frameMs": 14.936,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 537,
+      "frameMs": 5.112,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 538,
+      "frameMs": 17.15,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 539,
+      "frameMs": 14.733,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 540,
+      "frameMs": 14.998,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 541,
+      "frameMs": 14.024,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 542,
+      "frameMs": 25.639,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 543,
+      "frameMs": 14.186,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 544,
+      "frameMs": 14.341,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 545,
+      "frameMs": 15.508,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 546,
+      "frameMs": 14.176,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 547,
+      "frameMs": 4.403,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 548,
+      "frameMs": 14.737,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 549,
+      "frameMs": 14.667,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 550,
+      "frameMs": 15.959,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 551,
+      "frameMs": 4.336,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 552,
+      "frameMs": 15.378,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 553,
+      "frameMs": 15.275,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 554,
+      "frameMs": 16.121,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 555,
+      "frameMs": 14.252,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 556,
+      "frameMs": 4.474,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 557,
+      "frameMs": 14.693,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 558,
+      "frameMs": 14.058,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 559,
+      "frameMs": 5.606,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 560,
+      "frameMs": 15.166,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 561,
+      "frameMs": 14.586,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 562,
+      "frameMs": 4.211,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 563,
+      "frameMs": 15.633,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 564,
+      "frameMs": 16.333,
+      "allocatedBytes": 49184,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 565,
+      "frameMs": 14.459,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 566,
+      "frameMs": 14.068,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 567,
+      "frameMs": 5.366,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 568,
+      "frameMs": 15.599,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 569,
+      "frameMs": 14.406,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 570,
+      "frameMs": 4.631,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 571,
+      "frameMs": 15.553,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 572,
+      "frameMs": 15.653,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 573,
+      "frameMs": 17.252,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 574,
+      "frameMs": 19.224,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 575,
+      "frameMs": 15.825,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 576,
+      "frameMs": 15.813,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 577,
+      "frameMs": 22.944,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 578,
+      "frameMs": 14.01,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 579,
+      "frameMs": 16.464,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 580,
+      "frameMs": 14.029,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 581,
+      "frameMs": 14.121,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 582,
+      "frameMs": 14.034,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 583,
+      "frameMs": 16.85,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 584,
+      "frameMs": 5.021,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 585,
+      "frameMs": 14.547,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 586,
+      "frameMs": 14.748,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 587,
+      "frameMs": 15.936,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 588,
+      "frameMs": 4.692,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 589,
+      "frameMs": 14.224,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 590,
+      "frameMs": 13.687,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 591,
+      "frameMs": 4.47,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 592,
+      "frameMs": 15.09,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 593,
+      "frameMs": 14.169,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 594,
+      "frameMs": 4.558,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 595,
+      "frameMs": 15.959,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 596,
+      "frameMs": 14.87,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 597,
+      "frameMs": 16.295,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 598,
+      "frameMs": 15.029,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 599,
+      "frameMs": 23.617,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 600,
+      "frameMs": 13.961,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 601,
+      "frameMs": 15.808,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 602,
+      "frameMs": 13.754,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 603,
+      "frameMs": 4.285,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 604,
+      "frameMs": 14.495,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 605,
+      "frameMs": 13.911,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 606,
+      "frameMs": 17.181,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 607,
+      "frameMs": 14.843,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 608,
+      "frameMs": 4.197,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 609,
+      "frameMs": 15.546,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 610,
+      "frameMs": 16.204,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 611,
+      "frameMs": 16.232,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 612,
+      "frameMs": 14.622,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 613,
+      "frameMs": 4.873,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 614,
+      "frameMs": 15.202,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 615,
+      "frameMs": 13.771,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 616,
+      "frameMs": 4.354,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 617,
+      "frameMs": 16.934,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 618,
+      "frameMs": 22.616,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 619,
+      "frameMs": 16.913,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 620,
+      "frameMs": 14.392,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 621,
+      "frameMs": 14.435,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 622,
+      "frameMs": 15.516,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 623,
+      "frameMs": 15.682,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 624,
+      "frameMs": 14.571,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 625,
+      "frameMs": 13.879,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 626,
+      "frameMs": 5.672,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 627,
+      "frameMs": 14.703,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 628,
+      "frameMs": 15.464,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 629,
+      "frameMs": 15.129,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 630,
+      "frameMs": 5.46,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 631,
+      "frameMs": 14.596,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 632,
+      "frameMs": 14.189,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 633,
+      "frameMs": 4.39,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 634,
+      "frameMs": 14.753,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 635,
+      "frameMs": 15.032,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 636,
+      "frameMs": 14.79,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 637,
+      "frameMs": 4.798,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 638,
+      "frameMs": 14.58,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 639,
+      "frameMs": 15.116,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 640,
+      "frameMs": 16.337,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 641,
+      "frameMs": 4.553,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 642,
+      "frameMs": 14.8,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 643,
+      "frameMs": 14.476,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 644,
+      "frameMs": 15.75,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 645,
+      "frameMs": 16.819,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 646,
+      "frameMs": 4.861,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 647,
+      "frameMs": 14.362,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 648,
+      "frameMs": 15.344,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 649,
+      "frameMs": 15.601,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 650,
+      "frameMs": 4.9,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 651,
+      "frameMs": 14.538,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 652,
+      "frameMs": 16.125,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 653,
+      "frameMs": 14.151,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 654,
+      "frameMs": 4.176,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 655,
+      "frameMs": 14.336,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 656,
+      "frameMs": 13.962,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 657,
+      "frameMs": 5.352,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 658,
+      "frameMs": 14.75,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 659,
+      "frameMs": 15.409,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 660,
+      "frameMs": 4.12,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 661,
+      "frameMs": 15.098,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 662,
+      "frameMs": 15.849,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 663,
+      "frameMs": 15.458,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 664,
+      "frameMs": 14.942,
+      "allocatedBytes": 44992,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 665,
+      "frameMs": 4.254,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 666,
+      "frameMs": 17.497,
+      "allocatedBytes": 57144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 667,
+      "frameMs": 19.37,
+      "allocatedBytes": 81488,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 668,
+      "frameMs": 26.593,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 669,
+      "frameMs": 25.069,
+      "allocatedBytes": 81488,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 670,
+      "frameMs": 16.389,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 671,
+      "frameMs": 15.068,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 672,
+      "frameMs": 14.408,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 673,
+      "frameMs": 17.061,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 674,
+      "frameMs": 14.883,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 675,
+      "frameMs": 14.302,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 676,
+      "frameMs": 14.186,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 677,
+      "frameMs": 5.717,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 678,
+      "frameMs": 14.87,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 679,
+      "frameMs": 14.448,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 680,
+      "frameMs": 4.437,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 681,
+      "frameMs": 14.44,
+      "allocatedBytes": 57144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 682,
+      "frameMs": 15.274,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 683,
+      "frameMs": 15.261,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 684,
+      "frameMs": 4.396,
+      "allocatedBytes": 16144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 685,
+      "frameMs": 14.408,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 686,
+      "frameMs": 15.386,
+      "allocatedBytes": 57144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 687,
+      "frameMs": 16.811,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 688,
+      "frameMs": 15.622,
+      "allocatedBytes": 57144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 689,
+      "frameMs": 5.161,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 690,
+      "frameMs": 14.477,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 691,
+      "frameMs": 16.116,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 692,
+      "frameMs": 14.77,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 693,
+      "frameMs": 4.465,
+      "allocatedBytes": 16144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 694,
+      "frameMs": 14.469,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 695,
+      "frameMs": 14.68,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 696,
+      "frameMs": 17.107,
+      "allocatedBytes": 57144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 697,
+      "frameMs": 15.251,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 698,
+      "frameMs": 4.326,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 699,
+      "frameMs": 14.415,
+      "allocatedBytes": 57144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 700,
+      "frameMs": 26.093,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 701,
+      "frameMs": 14.479,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 702,
+      "frameMs": 14.424,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 703,
+      "frameMs": 16.365,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 704,
+      "frameMs": 13.821,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 705,
+      "frameMs": 14.514,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 706,
+      "frameMs": 14.316,
+      "allocatedBytes": 40744,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 707,
+      "frameMs": 5.639,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 708,
+      "frameMs": 14.615,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 709,
+      "frameMs": 14.291,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 710,
+      "frameMs": 4.306,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 711,
+      "frameMs": 15.353,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 712,
+      "frameMs": 16.136,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 713,
+      "frameMs": 15.56,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 714,
+      "frameMs": 15.087,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 715,
+      "frameMs": 4.447,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 716,
+      "frameMs": 16.593,
+      "allocatedBytes": 57144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 717,
+      "frameMs": 14.705,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 718,
+      "frameMs": 14.696,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 719,
+      "frameMs": 4.402,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 720,
+      "frameMs": 14.847,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 721,
+      "frameMs": 14.461,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 722,
+      "frameMs": 14.549,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 723,
+      "frameMs": 4.197,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 724,
+      "frameMs": 14.61,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 725,
+      "frameMs": 15.304,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 726,
+      "frameMs": 15.425,
+      "allocatedBytes": 57144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 727,
+      "frameMs": 4.394,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 728,
+      "frameMs": 13.988,
+      "allocatedBytes": 40744,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 729,
+      "frameMs": 4.333,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 730,
+      "frameMs": 15.664,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 731,
+      "frameMs": 14.116,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 732,
+      "frameMs": 4.083,
+      "allocatedBytes": 16144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 733,
+      "frameMs": 16.013,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 734,
+      "frameMs": 19.147,
+      "allocatedBytes": 81488,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 735,
+      "frameMs": 18.205,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 736,
+      "frameMs": 15.033,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 737,
+      "frameMs": 14.731,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 738,
+      "frameMs": 15.827,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 739,
+      "frameMs": 14.802,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 740,
+      "frameMs": 13.967,
+      "allocatedBytes": 40744,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 741,
+      "frameMs": 4.477,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 742,
+      "frameMs": 15.998,
+      "allocatedBytes": 57144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 743,
+      "frameMs": 14.205,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 744,
+      "frameMs": 4.367,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 745,
+      "frameMs": 14.305,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 746,
+      "frameMs": 14.256,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 747,
+      "frameMs": 15.526,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 748,
+      "frameMs": 4.735,
+      "allocatedBytes": 16144,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 749,
+      "frameMs": 14.778,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 750,
+      "frameMs": 14.961,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 751,
+      "frameMs": 4.847,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 752,
+      "frameMs": 15.356,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 753,
+      "frameMs": 14.478,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 754,
+      "frameMs": 14.16,
+      "allocatedBytes": 40744,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 755,
+      "frameMs": 4.69,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 756,
+      "frameMs": 14.57,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 757,
+      "frameMs": 15.635,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 758,
+      "frameMs": 15.571,
+      "allocatedBytes": 48944,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 759,
+      "frameMs": 4.718,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 760,
+      "frameMs": 50.84,
+      "allocatedBytes": 37616,
+      "gc0": 1,
+      "gc1": 1,
+      "gc2": 0
+    },
+    {
+      "frame": 761,
+      "frameMs": 40.405,
+      "allocatedBytes": 180400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 762,
+      "frameMs": 27.157,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 763,
+      "frameMs": 24.205,
+      "allocatedBytes": 82000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 764,
+      "frameMs": 15.891,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 765,
+      "frameMs": 14.516,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 766,
+      "frameMs": 13.917,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 767,
+      "frameMs": 16.334,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 768,
+      "frameMs": 13.733,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 769,
+      "frameMs": 14.384,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 770,
+      "frameMs": 14.311,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 771,
+      "frameMs": 15.366,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 772,
+      "frameMs": 4.513,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 773,
+      "frameMs": 15.565,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 774,
+      "frameMs": 18.906,
+      "allocatedBytes": 139400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 775,
+      "frameMs": 15.684,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 776,
+      "frameMs": 17.506,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 777,
+      "frameMs": 15.494,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 778,
+      "frameMs": 15.367,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 779,
+      "frameMs": 15.696,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 780,
+      "frameMs": 17.827,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 781,
+      "frameMs": 15.085,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 782,
+      "frameMs": 14.694,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 783,
+      "frameMs": 5.607,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 784,
+      "frameMs": 16.337,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 785,
+      "frameMs": 15.657,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 786,
+      "frameMs": 15.521,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 787,
+      "frameMs": 15.55,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 788,
+      "frameMs": 15.544,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 789,
+      "frameMs": 4.466,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 790,
+      "frameMs": 14.86,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 791,
+      "frameMs": 13.721,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 792,
+      "frameMs": 4.367,
+      "allocatedBytes": 8200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 793,
+      "frameMs": 15.129,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 794,
+      "frameMs": 13.992,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 795,
+      "frameMs": 4.694,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 796,
+      "frameMs": 15.302,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 797,
+      "frameMs": 13.868,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 798,
+      "frameMs": 17.352,
+      "allocatedBytes": 57400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 799,
+      "frameMs": 14.571,
+      "allocatedBytes": 41000,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 800,
+      "frameMs": 4.263,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 801,
+      "frameMs": 15.469,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 802,
+      "frameMs": 15.575,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 803,
+      "frameMs": 4.366,
+      "allocatedBytes": 16400,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 804,
+      "frameMs": 16.203,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 805,
+      "frameMs": 15.18,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    },
+    {
+      "frame": 806,
+      "frameMs": 16.765,
+      "allocatedBytes": 49200,
+      "gc0": 0,
+      "gc1": 0,
+      "gc2": 0
+    }
+  ],
+  "note": "\u771F\u5B9E\u751F\u4EA7\u573A\u666F\u4E0E\u5BFC\u6F14\uFF0C\u654C\u4EBA\u989D\u5916\u751F\u547D\u907F\u514D\u91C7\u6837\u65F6\u4EBA\u6570\u4E0B\u964D\uFF1BAI\u3001\u52A8\u4F5C\u548C\u7269\u7406\u4FDD\u6301\u5F00\u542F\uFF0C\u73A9\u5BB6\u5B9E\u9645\u5C1D\u8BD5\u53D1\u5C04\u80FD\u91CF\u638C\uFF1B\u5E73\u5747\u4E0E1%\u4F4E\u5E27\u5747\u8FBE60\u624D\u8BB0goalMet\u3002\u8D28\u91CF\u4F7F\u7528\u5F53\u524D\u914D\u7F6E\uFF0C\u5F3A\u5236\u539F\u751F4K\u3001\u65E0MSAA\u3002"
+}

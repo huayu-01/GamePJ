@@ -3,20 +3,40 @@
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
+
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/mut_growth_plus.tres" id="previous"]
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
 Stat = "ProjectileCountAdd"
 Operation = 0
-Value = 1
+Value = 3
+
+[sub_resource type="Resource" id="Resource_followup_delay"]
+script = ExtResource("1_stat")
+Stat = "ProjectileFollowupDelayFrames"
+Operation = 2
+Value = 3
+
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Modifiers = [SubResource("Resource_m0"), SubResource("Resource_followup_delay")]
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1261
 RewardKind = 2
 MaxStacks = 1
-Modifiers = [SubResource("Resource_m0")]
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Requires = PackedStringArray("mut_growth_plus")
 Id = "mut_growth_plus2"
-DisplayName = "增生++"
-DescriptionTemplate = "额外子弹再 +1 发"
-Note = "[P5 新增行] 文档第 204 行「增生++:再多发射n个子弹,前置:增生+」—— n → 预设 1。"
+DisplayName = "升级：增生（2级）"
+DescriptionTemplate = "每次发射后额外连续跟发{Modifiers.ProjectileCountAdd:0}发子弹，保留短暂间隔。"
+Note = "062：原有增加发数保留，额外弹体改为每隔3个游戏物理帧跟发；原发射与攻击快照先冻结，暂停不推进，换装/死亡清空待发队列。"
+
+NameKey = "content.mut_growth_plus2.name"
+
+DescriptionKey = "content.mut_growth_plus2.description"
+
+Effects = [SubResource("Resource_effect_0")]
+Replaces = ExtResource("previous")

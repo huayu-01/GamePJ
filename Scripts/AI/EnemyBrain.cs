@@ -40,6 +40,7 @@ public partial class EnemyBrain : Node
 
 	public override void _PhysicsProcess(double delta)
 	{
+		using var frameProfile=ActRoguelike.Core.RuntimeFrameProfiler.Measure("Brain");
 		float dt = (float)delta;
 		if (OwnerUnit.IsDead || OwnerUnit.Movement?.IsControlDisabled == true)
 		{

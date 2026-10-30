@@ -150,7 +150,9 @@ public partial class EnemyWarningProbe : Node3D
 		}
 		var fastTarget = Target(new Vector3(0, .05f, -8)); var fastEnemy = Enemy("bomb_lobber"); await Wait(3);
 		var fastAbility = fastEnemy.GetNode<EnemyPlanAbility>("AbilityPlan");
-		fastAbility.Plan = (EnemyActionPlan)fastAbility.Plan.Duplicate(true); fastAbility.Plan.Far[0].Speed = 500;
+		fastAbility.Plan = (EnemyActionPlan)fastAbility.Plan.Duplicate(true);
+		if (fastAbility.Plan.Far[0].Action is ProjectileEnemyAction projectileAction) projectileAction.Speed = 500;
+		else fastAbility.Plan.Far[0].Speed = 500;
 		fastAbility.TryActivate(fastTarget); await Until(() => Missile(fastEnemy) != null);
 		var fastProjectile = Missile(fastEnemy)!;
 		Check(Mathf.IsEqualApprox(fastProjectile.Speed, 500) && fastProjectile.ActualSpeed <= ConfigIndex.Settings.ProjectileMaxSpeed + .001f,
@@ -188,6 +190,6 @@ public partial class EnemyWarningProbe : Node3D
 		var label = new Label { Position = new Vector2(24, 20), Text = "敌人攻击预警\n自爆／陨石／重击：实际范围    冲锋：路径与宽度\n复用 SkillIndicator 预制体；多敌人独立显示" }; label.AddThemeFontSizeOverride("font_size", 25); canvas.AddChild(label);
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng("res://docs/screenshots/j37_enemy_warning.png") == Error.Ok, "实际渲染预警截图保存");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/enemy-warning.png")) == Error.Ok, "实际渲染预警截图保存");
 	}
 }

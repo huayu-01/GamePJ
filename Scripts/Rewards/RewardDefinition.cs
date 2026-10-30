@@ -29,9 +29,25 @@ public sealed class RewardContext
 /// </summary>
 public sealed class RewardDefinition
 {
+	public string ReplacesId { get; init; } = string.Empty;
+	public bool ShowUpgradeLevel { get; init; }
+	public string[] RequiredModeIds { get; init; } = Array.Empty<string>();
+	public string IconName { get; init; } = string.Empty;
+	public bool AllowsMode(string modeId) => RequiredModeIds.Length == 0 || Array.IndexOf(RequiredModeIds, modeId) >= 0;
 	public required string Id { get; init; }
-	public required string Name { get; init; }
-	public required string Description { get; init; }
+	private string _name = string.Empty, _description = string.Empty;
+	private string _localizedRevision = string.Empty, _localizedName = string.Empty, _localizedDescription = string.Empty;
+	public required string Name { get { RefreshText(); return NameResolver == null ? _name : _localizedName; } init => _name = value; }
+	public required string Description { get { RefreshText(); return DescriptionResolver == null ? _description : _localizedDescription; } init => _description = value; }
+	public Func<string>? NameResolver { get; init; }
+	public Func<string>? DescriptionResolver { get; init; }
+	private void RefreshText()
+	{
+		if ((NameResolver == null && DescriptionResolver == null) || _localizedRevision == Config.ContentText.Revision) return;
+		_localizedName = NameResolver?.Invoke() ?? _name;
+		_localizedDescription = DescriptionResolver?.Invoke() ?? _description;
+		_localizedRevision = Config.ContentText.Revision;
+	}
 	public RewardKind Kind { get; init; } = RewardKind.Enhancement;
 
 	/// <summary>
@@ -86,16 +102,23 @@ public sealed class RewardDefinition
 	/// 这就是"读不到则使用自身的默认值"在**关联**层面的同一套语义。
 	/// </summary>
 	public bool AllowsWeapon(Weapon weapon)
+		=> AllowsWeapon(weapon.PoolId, weapon.HasTag);
+
+	/// <summary>基地预览按当前表行筛选，与真实武器共用池和标签规则。</summary>
+	public bool AllowsWeapon(ActRoguelike.Config.WeaponConfig weapon)
+		=> AllowsWeapon(weapon.Pool?.Id ?? string.Empty, tag => Array.IndexOf(weapon.AttackTags, tag) >= 0);
+
+	private bool AllowsWeapon(string poolId, Func<string, bool> hasTag)
 	{
 		if (ApplicablePoolIds.Length > 0)
 		{
-			return !string.IsNullOrEmpty(weapon.PoolId)
-				&& Array.IndexOf(ApplicablePoolIds, weapon.PoolId) >= 0;
+			return !string.IsNullOrEmpty(poolId)
+				&& Array.IndexOf(ApplicablePoolIds, poolId) >= 0;
 		}
 
 		foreach (string tag in RequiredWeaponTags)
 		{
-			if (!weapon.HasTag(tag))
+			if (!hasTag(tag))
 			{
 				return false;
 			}

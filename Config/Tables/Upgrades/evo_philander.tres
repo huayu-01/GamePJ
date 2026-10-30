@@ -4,6 +4,7 @@
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a2_w1_2.tres" id="3_skill"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_crossbow.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="Resource_charge"]
 script = ExtResource("1_tuning")
@@ -13,12 +14,16 @@ SeekDistinctHostiles = true
 HomingRange = 40.0
 HomingTurnRateDegrees = 720.0
 
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("Resource_charge")
+
 [resource]
 script = ExtResource("2_row")
+NumericId = 1233
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "ChargeBehavior"
-ChargeBehavior = SubResource("Resource_charge")
+Effects = [SubResource("Resource_effect_tuning")]
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Excludes = PackedStringArray("evo_focus")
@@ -26,3 +31,7 @@ Id = "evo_philander"
 DisplayName = "花心"
 DescriptionTemplate = "武技2后置蓄力时间减半，掷出的飞刀会追踪敌人，优先分配给不同目标"
 Note = "J21：只缩短飞刀武技2后置间隔0.2→0.1秒，基础0.4和3个后置档不变；齐射先给不同有效敌人各一支，剩余飞刀循环分配，失效目标允许重新索敌。无须标记，不影响武技1。追踪40米／每秒720度为文档未给的可调预设；实体仍受World碰撞阻挡。"
+
+NameKey = "content.evo_philander.name"
+
+DescriptionKey = "content.evo_philander.description"

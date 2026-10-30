@@ -1,0 +1,9 @@
+{
+  "applied": true,
+  "changes": [
+    {
+      "path": "Config\\Tables\\Skills\\skl_b_fall.tres",
+      "type": "FallAbilityConfig"
+    }
+  ]
+}

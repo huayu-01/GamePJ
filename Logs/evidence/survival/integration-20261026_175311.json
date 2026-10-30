@@ -1,0 +1,28 @@
+{
+  "Date": "2026-10-26T17:53:11",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "player_flow",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 18.77,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_175311.player_flow.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_175311.player_flow.err",
+      "Failure": "",
+      "SHA256": "32D2FDFD33D4369FD2E27F0C7B0FEE22F96996318A5ED36C0CB53F7C0FEEFB0B"
+    },
+    {
+      "Name": "survival",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_175311.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_175311.survival.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_175311.survival.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_175311.survival.err",
+      "SHA256": "83C2FEE627F31EF416263C097BBC5018DF33FCBE1FAB5BDCF31824CCCCAD355B"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "相关流程回归存在失败，见逐项报告。"
+}

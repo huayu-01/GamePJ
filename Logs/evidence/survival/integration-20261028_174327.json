@@ -1,0 +1,28 @@
+{
+  "Date": "2026-10-28T17:43:27",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "snapshot",
+      "Passed": false,
+      "Exit": 0,
+      "Seconds": 10.93,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174327.snapshot.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174327.snapshot.err",
+      "Failure": "专项未满足完成断言：snapshot",
+      "SHA256": "8F53F00A28AA0065EAABE1586C5A1B1DE3486C2F3EA3C9FEBC9FC23110CCE68B"
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 36.27,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174327.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174327.survival.err",
+      "Failure": "",
+      "SHA256": "AAA68FF5D7E521B8B1D33E7E6DB1085E554D88FB91D0E3AA91EC1662A30EBC37"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "相关流程回归存在失败，见逐项报告。"
+}

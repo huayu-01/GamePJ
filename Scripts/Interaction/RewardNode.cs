@@ -24,6 +24,7 @@ public enum RewardNodeKind
 
 	/// <summary>降临节点（Boss 死后出现）：纯关卡逻辑，不给奖励也不刷怪。</summary>
 	Portal,
+	Armor,
 }
 
 /// <summary>
@@ -97,6 +98,8 @@ public partial class RewardNode : Interactable
 	}
 
 	/// <summary>这个节点在使用后是否触发一场 Encounter（降临节点 / 纯奖励节点设为 false）。</summary>
+	[Export] public NodeConfig? Definition { get; set; }
+	public NodeConfig? Config => Definition ?? ConfigRows.ByKind<NodeConfig, RewardNodeKind>(Kind);
 	[Export] public bool SpawnsEncounter { get; set; } = true;
 
 	private RewardNodeKind _kind = RewardNodeKind.Enhancement;
@@ -105,6 +108,7 @@ public partial class RewardNode : Interactable
 
 	public override void _Ready()
 	{
+		if (Definition != null) { Kind = Definition.Kind; SpawnsEncounter &= Definition.SpawnsEncounter; }
 		base._Ready();
 		OnNameChanged();
 		Appear();
@@ -117,6 +121,7 @@ public partial class RewardNode : Interactable
 	/// </summary>
 	protected override void ApplyIdleVisual()
 	{
+		if (OwnsTypeModel) return;
 		if (VisualMesh is { } mesh)
 		{
 			// ① 形状（用户：不同形状，不是一个模型换色）

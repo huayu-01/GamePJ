@@ -1,0 +1,435 @@
+{
+  "passed": true,
+  "date": "2026-10-26",
+  "implemented": 12,
+  "catalog": 103,
+  "legacy_91_retained": true,
+  "reward_kinds": {
+    "Enhancement": 27,
+    "Evolution": 34,
+    "Mutation": 42
+  },
+  "augment_report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival-builds\\run-20261026_014834.json",
+  "augment": {
+    "Date": "2026-10-26T01:48:34",
+    "Passed": true,
+    "Runs": [
+      {
+        "Name": "headless",
+        "Exit": 0,
+        "Seconds": 26.83,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_014834.headless.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_014834.headless.err",
+        "SHA256": "819EF0D034771F431644ABDEB3690A74B6B20E8CD7C54E70D77F0693A17186F9"
+      },
+      {
+        "Name": "render",
+        "Exit": 0,
+        "Seconds": 31.83,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_014834.render.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_014834.render.err",
+        "SHA256": "8908F17772DB1062037E8455B1636AD660DB8B36B7D067BB63673B821A51FD5B"
+      }
+    ],
+    "SavesUnchanged": true,
+    "Failure": ""
+  },
+  "integration": [
+    {
+      "Name": "replacement",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 22.55,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.replacement.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.replacement.err",
+      "Failure": "",
+      "SHA256": "5D22FAB5915062DA0857F47D04DC20C5AA03118CE88C84AF406952B9B646E478",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "run_flow",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 7.86,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.run_flow.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.run_flow.err",
+      "Failure": "",
+      "SHA256": "F7202ABBC719E25985EEBE3CA3D592D16B83C0B041FDD5D11C291A17A424C1DD",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "player_flow",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 18.21,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.player_flow.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.player_flow.err",
+      "Failure": "",
+      "SHA256": "49B9068EB89EDBDCF451E388971C5AB3BD68401066A9066BFEC0D32686427852",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.64,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.content.err",
+      "Failure": "",
+      "SHA256": "D3F682C2A0B51ACE9D47AE37098AA659A182607B139B9EEED384E1BE46A8FFF2",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_013938.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "effects",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 2.78,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.effects.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.effects.err",
+      "Failure": "",
+      "SHA256": "DA6E8735CEE11A5FBA35EFD7C074EEE856B36EB6C835A371F8A15DB8E303D93E",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_013500.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "reward_rules",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 3.64,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.reward_rules.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.reward_rules.err",
+      "Failure": "",
+      "SHA256": "61E7D7777A930E0382F900FE7CCA71116EC7454D1959802E3AEABF292101378C",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_013938.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "rune",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 10.98,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.rune.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.rune.err",
+      "Failure": "",
+      "SHA256": "4270AD06B352716D1A9B0A2AAE6688EE230EBD16E13B28F85DBBC592FAD23F0C",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_013938.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "decoupling",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.31,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.decoupling.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.decoupling.err",
+      "Failure": "",
+      "SHA256": "DE56548A0511BDE080DD2A57BD71865EC23DAEB15527CBC23858ADDE79908E9C",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_013500.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "interaction",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 11.36,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.interaction.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.interaction.err",
+      "Failure": "",
+      "SHA256": "2D0AD9C854A871200B3DF2A03A1CA1095EE1433A60CAECD95D36E65E83E55444",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "slots",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 10.12,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.slots.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.slots.err",
+      "Failure": "",
+      "SHA256": "7101CFED09D9C01695647D1FA1650B0A0E3621516EDBD0CDE0D90A4D892243BC",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "snapshot",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 11.38,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.snapshot.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.snapshot.err",
+      "Failure": "",
+      "SHA256": "914CCFB31855BBE5749E5D6840F4D54B41E17F1CD251E672139D3536B9968A1A",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "charge",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 30.52,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.charge.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.charge.err",
+      "Failure": "",
+      "SHA256": "C790FE3D778F7E92774560215BD12CEAC4EE8D352A219D047C96080E8D3F43E5",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "interruption",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 13.39,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.interruption.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.interruption.err",
+      "Failure": "",
+      "SHA256": "54545811AFFE11E57F9376F5B55BC7B475C38AB44433771FC8CEB3230679C080",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "specialization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 12.88,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.specialization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.specialization.err",
+      "Failure": "",
+      "SHA256": "FB03296EC4AA89AE253F345F81F5992F5C0F9275AD004BD879C914F28CA2F7B8",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "synergy",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 10.12,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.synergy.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_012741.synergy.err",
+      "Failure": "",
+      "SHA256": "C3643E41DFAE3E7834A8E2F87E3B437ECE92BFA0EC4E0F0130C62A57009F9A7B",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_012741.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "adventure",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 23.02,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.adventure.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.adventure.err",
+      "Failure": "",
+      "SHA256": "C178B920B13625DFF4A1F89C2A23133140E0630F4F31DA34BFA943AB5359B37C",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_013938.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "adventure_render",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 29.4,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.adventure_render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.adventure_render.err",
+      "Failure": "",
+      "SHA256": "77E2D5DFB6E4880DD5CC12921850FDF16766372D0E997483533B4C7F3D009C2C",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_013938.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "main",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 70.79,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.main.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.main.err",
+      "Failure": "",
+      "SHA256": "15A7E9D5A7887E66DCDD5F1BBA5DF5E4CA164E856B803782427012DB04648E55",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_013938.json",
+      "SavesUnchanged": true
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 30.69,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013938.survival.err",
+      "Failure": "",
+      "SHA256": "E0DDFC0DFDBDB31617D5BF2CC1063948C7196904186DA0077362413C4F45B94F",
+      "Report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\integration-20261026_013938.json",
+      "SavesUnchanged": true
+    }
+  ],
+  "mode_report": "F:\\Godot项目\\项目a\\Logs\\evidence\\survival\\run-20261026_013631.json",
+  "mode": {
+    "Date": "2026-10-26T01:36:31",
+    "Passed": true,
+    "Runs": [
+      {
+        "Name": "headless",
+        "Exit": 0,
+        "Seconds": 29.1,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_20261026_013631.headless.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_20261026_013631.headless.err",
+        "SHA256": "D6A2C1CD9E7E2A06034881648980112326C9CBA4C644561DE2A294D8D3328F69"
+      }
+    ],
+    "SavesUnchanged": true,
+    "Failure": ""
+  },
+  "gc_report": "F:\\Godot项目\\项目a\\Logs\\evidence\\content-gc-20261026_014232.json",
+  "gc": {
+    "Date": "2026-10-26T01:42:32",
+    "Passed": true,
+    "Runs": [
+      {
+        "Name": "content_1",
+        "Exit": 0,
+        "Seconds": 3.79,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_1.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_1.err",
+        "StdoutSHA256": "608730846EAC0C47FC48823741A9693E9E5AC2AE541C38021BB5383E834F5A20",
+        "StderrBytes": 0
+      },
+      {
+        "Name": "content_2",
+        "Exit": 0,
+        "Seconds": 3.81,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_2.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_2.err",
+        "StdoutSHA256": "1777E3BA547AE1153AAA34AA0A54C49095D995DB39BF5632AB195E695407E091",
+        "StderrBytes": 0
+      },
+      {
+        "Name": "content_3",
+        "Exit": 0,
+        "Seconds": 3.82,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_3.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_3.err",
+        "StdoutSHA256": "E431C151D550E2A875BDEF0AD27155D407C49DF7114AD0090099D3F914D29CFA",
+        "StderrBytes": 0
+      },
+      {
+        "Name": "content_stress",
+        "Exit": 0,
+        "Seconds": 13.9,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_stress.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_stress.err",
+        "StdoutSHA256": "F04623F52B76CD980864CF68AEE4A77380EB75B941B626CB580A9506582022AF",
+        "StderrBytes": 0
+      },
+      {
+        "Name": "resource_safe",
+        "Exit": 0,
+        "Seconds": 2.02,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.resource_safe.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.resource_safe.err",
+        "StdoutSHA256": "200BECA0159505E02C32656A52AE4359116D11D1026DFF8ECF923FF2B7A090CE",
+        "StderrBytes": 0
+      },
+      {
+        "Name": "native_safe",
+        "Exit": 0,
+        "Seconds": 2.02,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.native_safe.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.native_safe.err",
+        "StdoutSHA256": "2B1E8476D16D69722C2304893D7603544287416BF31FBF2830FAB3547455FCFD",
+        "StderrBytes": 0
+      },
+      {
+        "Name": "content_render",
+        "Exit": 0,
+        "Seconds": 7.59,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_render.log",
+        "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_20261026_014232.content_render.err",
+        "StdoutSHA256": "0547A820B677D7E9D7DDEA41B847FE453F1582F6C271883FAF067E4AD093C631",
+        "StderrBytes": 0
+      }
+    ],
+    "SaveSHA256": {
+      "rune.cfg": "CF91653D2481B893CA1456F1619A4740E01FC69D79364F0D8AAF6F1DEC3D05D6",
+      "settings.cfg": "7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1",
+      "loadout.cfg": "CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462",
+      "ability_cards.cfg": "4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D",
+      "meta.cfg": "26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446"
+    },
+    "SavesUnchanged": true,
+    "Failure": ""
+  },
+  "builds": {
+    "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_014834.Debug.log": "E6F685A0AD5BFD4A14D71DA5305C5A244EDB0528423D61B612628E134ABE3D02",
+    "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261026_014834.ExportRelease.log": "4CFD6D5E45BA646AF099EB1CAAC7D73B64B4FBCC7154CBDBF16E08D0CDA3A383"
+  },
+  "sources": {
+    "Config\\Tables\\Upgrades\\surv_anchor_afterglow.tres": "57F9A7F8E440C57C07D2BE6C446042DA2E9D57B23E3B493BBC1D3771D295B273",
+    "Config\\Tables\\Upgrades\\surv_anchor_core.tres": "EF854E09951B6377340406EBF3C353CE3321A4B7BFFB58B367F0B3F32E220459",
+    "Config\\Tables\\Upgrades\\surv_anchor_pulse.tres": "1C1C55EA0CB3A600EF8B430A3AB83A61423B29BC222C12F69341FAD1B67005AA",
+    "Config\\Tables\\Upgrades\\surv_contract_payoff.tres": "119E6C6D4D068ABC3C776DAEEACD7E5C4650978B316B9027A45AEE819713063C",
+    "Config\\Tables\\Upgrades\\surv_echo_familiar.tres": "D99B45CEFCCB8F373EA14D007A8E95C90DA3E55DAF44B0DA7D096F1A0D056397",
+    "Config\\Tables\\Upgrades\\surv_echo_lance.tres": "57AF64E83A194A01812DEF67D418A4F954A833C22B6F8B252E03491A4F7D3AEC",
+    "Config\\Tables\\Upgrades\\surv_echo_mark.tres": "A7249DB60BBDF676693E9A6751399A58ABF9E24F0BE106183FE244AF5A0210E7",
+    "Config\\Tables\\Upgrades\\surv_energy_echo.tres": "CD00EDAFFED97D4DF4B489F1E9312982E88E2A6F632F8AA1CDE3E171B9343D4A",
+    "Config\\Tables\\Upgrades\\surv_risk_contract.tres": "2C7E339CB3C2BC0939847918D2FD53F9A7BBDE75F1F62298E5C9C95B9FA3CBAC",
+    "Config\\Tables\\Upgrades\\surv_scavenger_compass.tres": "3257FFC7F82E1A3D5D9F30F774A1432881B40D5DEF7D3FA6C8BDEE2D93D8FEDB",
+    "Config\\Tables\\Upgrades\\surv_scavenger_ward.tres": "F63EF59285585784DB69610AC8B413B8087F7E5FA5E21E1598FC8004FBDAA94E",
+    "Config\\Tables\\Upgrades\\surv_timed_hunt.tres": "2AFE6A01978A814F765E9C3523F6B8B6B7D0538D07D813C0124C82F922352F7F",
+    "Scripts\\Config\\RewardEffects\\Survival\\AnchorAfterglowRewardEffect.cs": "2EC30B275F68EEF0475CA376633267E57CDBBE461A092303F8D8C480C7BAC0BB",
+    "Scripts\\Config\\RewardEffects\\Survival\\AnchorCoreRewardEffect.cs": "59428B741A8E5E2DF5B78A98ADBA3712106A854D5C70E383618EE1FCF6CCBCFE",
+    "Scripts\\Config\\RewardEffects\\Survival\\AnchorPulseRewardEffect.cs": "DFB2635835942502404073F8EEB718FCD65772C8E33AE4E82A3B8895B124849C",
+    "Scripts\\Config\\RewardEffects\\Survival\\ContractPayoffRewardEffect.cs": "2B9E1CE3141B0A5397F7E7E65B13F657734544D143A18F14109F465282FE9F37",
+    "Scripts\\Config\\RewardEffects\\Survival\\EchoFamiliarRewardEffect.cs": "922EB336B0A54B67B634624ECA598923D536A86B6828CDFE3028FE411D29B219",
+    "Scripts\\Config\\RewardEffects\\Survival\\EchoLanceRewardEffect.cs": "729102C4F66B43AD7C7FB42E868DEE02410BA70C8F4607998B63900689F933EE",
+    "Scripts\\Config\\RewardEffects\\Survival\\EchoMarkRewardEffect.cs": "9697BBACB60C24AB2B4D5B0DE9D5AB07269461AC3179827BC6B9E3EC132FFC9C",
+    "Scripts\\Config\\RewardEffects\\Survival\\EnergyEchoRewardEffect.cs": "F129684D502DDA1CE2C38A4D50902E9985D2D4442655CF06C07DE4A1A4F524A9",
+    "Scripts\\Config\\RewardEffects\\Survival\\RiskContractRewardEffect.cs": "09740D4D0B47937B62C53D9DE52E20EA32E2C0FC65E357C3D1136EDD80B4167D",
+    "Scripts\\Config\\RewardEffects\\Survival\\ScavengerCompassRewardEffect.cs": "FACF9C49F927E1444CE15FC3C127ED2FA9A7B7A7731CE98F02757EAEDA6913A2",
+    "Scripts\\Config\\RewardEffects\\Survival\\ScavengerWardRewardEffect.cs": "3F363033FFAF9C605B91D2D4D332382E705AD38B51C42BA98D13E86B740A4E05",
+    "Scripts\\Config\\RewardEffects\\Survival\\TimedHuntRewardEffect.cs": "183D5AC117346D77B510861A882D474E90C2B3F82026EAE3D09E9A94E0F65688",
+    "Scripts\\Run\\Survival\\ExperienceField.cs": "EC0AD4AEF0E69CCF6BAD3D234449F826E8BA000324850CA25A44DC7BCA6D0609",
+    "Scripts\\Run\\Survival\\SurvivalAnchorRules.cs": "7102F4900374AD56201E2DF374061F922076B66EE4FEC308613CA48C26F425EE",
+    "Scripts\\Run\\Survival\\SurvivalAugmentDamage.cs": "6B32849B194BA9E343B89DC8B13981C6F2F07A008241D4F83513B480A8C61A59",
+    "Scripts\\Run\\Survival\\SurvivalAugmentFx.cs": "B7AB91EE61F54EEEC0014F6AC45FE94F088B831C8D407F9794B04F1D6E52A83B",
+    "Scripts\\Run\\Survival\\SurvivalBuildRuntime.cs": "5C2D011F1CD3FC5C16B53D8973859EE9AECA9B12D00E88DE2E7DE3C2A2AFD9BA",
+    "Scripts\\Run\\Survival\\SurvivalContractRules.cs": "C5A8E96F503CD4A2C771460C2C150797B4C10D451CB8C76532EC08157F2D7E51",
+    "Scripts\\Run\\Survival\\SurvivalDirector.cs": "C1F19780332666F1781A3B59CEA888F663DB9A16858B1E2A42A5C71C51FB786F",
+    "Scripts\\Run\\Survival\\SurvivalDirector.Spawning.cs": "691D5EAAC342114CD2B9F0049121D5C05108AF1E51CC19C9D473429A4E057D4C",
+    "Scripts\\Run\\Survival\\SurvivalEchoRules.cs": "EF9DB777D3A98DA070FB640D8138378DF56D98E653E949CA7F4A615684A13AC1",
+    "Scripts\\Run\\Survival\\SurvivalExperience.cs": "F40957BE46D4AA473CEF9991BC3F454EB7FC32D10DBB71B246C26E0B14147DD0",
+    "Scripts\\Run\\Survival\\SurvivalHud.cs": "5040E8EB94F6961B56279E27BE4F9159B78D6F8592AD678B779FB87CEFE1F1E5",
+    "Scripts\\Run\\Survival\\SurvivalObjective.cs": "8DEFD3D04FA332AF0DB9AB9C9DA2F425F30019EC41A15D4C8D8C014BD38B4035",
+    "Scripts\\Run\\Survival\\SurvivalScavengerRules.cs": "C048177C983AA31CC29B73A538E5464FCCC2B96E9FD13ADC80D13F2067171ACD",
+    "Scripts\\Run\\Survival\\SurvivalScenery.cs": "076E9BC3225E0379B633807E285B2E1AB86527A528482616E349A1A4DED2397F",
+    "Scripts\\Run\\Survival\\SurvivalWardVisual.cs": "4BF680F35806EA84DFEBB6307020C2D7183233F550034FAA165C231ECCBF1756",
+    "Assets\\UI\\Icons\\ic_surv_anchor_afterglow.svg": "4E3CF6FE62F4FB390B1BBA9F1F1D6DA96FB3EA74E6ECBF8EB47C842A367D9CEB",
+    "Assets\\UI\\Icons\\ic_surv_anchor_core.svg": "5A077D63A3BCFF438F1F4CC6F2BEF2319F98879D25A5C8E566126F9B92B3B9B3",
+    "Assets\\UI\\Icons\\ic_surv_anchor_pulse.svg": "266D779B4AD6415E93D347465E076432592489E5366916E45F038A8382938750",
+    "Assets\\UI\\Icons\\ic_surv_contract_payoff.svg": "641A24DD30D3D43D15F489E2D723BAC1C7BE4BE05A4D5B9AEF8BD08927F07FA4",
+    "Assets\\UI\\Icons\\ic_surv_echo_familiar.svg": "84BB7F9FFA7CF7929D815C2786EFA29C2CB457323B0090FACD32E8F014614AC0",
+    "Assets\\UI\\Icons\\ic_surv_echo_lance.svg": "39226E5C97A450CFEFE23C59D73158EF9BF5209C3F58E28507FD33533AA26A3E",
+    "Assets\\UI\\Icons\\ic_surv_echo_mark.svg": "07392A03EC03359860C0E42EF4150280979460CD7C85E60313D794CEC8BC667C",
+    "Assets\\UI\\Icons\\ic_surv_energy_echo.svg": "4436B1D9839DFEE49C89936175404DBA9ACD12268870EED43F40FB8964ACA727",
+    "Assets\\UI\\Icons\\ic_surv_risk_contract.svg": "403DD42E7DC235D68EECF7FD9D75B1BC5130D02A02C3F6063DC36A2CC9E75F71",
+    "Assets\\UI\\Icons\\ic_surv_scavenger_compass.svg": "AD421F197A50ECF6B4F274056B639352C19CB3CE82F103C737BF5FDB22A5A846",
+    "Assets\\UI\\Icons\\ic_surv_scavenger_ward.svg": "FAB81E6FBCB53A03DD8EED4D8436D06C3F4D494A0AF03D3235A80B4A13DBFA47",
+    "Assets\\UI\\Icons\\ic_surv_timed_hunt.svg": "492BAC055F63D72448D2562564D7B1F36B299B86F591915228D562DCB2257686"
+  },
+  "screenshots": {
+    "contracts.png": "EB3DC05C652451245A2667C57EE823B9899C5941BCD64B44D54727ED74FCB6EB",
+    "echo-and-ward.png": "0BA35EF73C48DEA9EFEBC8BD8E0B17D44C5E280483C1AA6B81A13CCFA9DFBE17",
+    "exclusive-choice.png": "D791F7524B81CB2AC8AEC54D56EDD4D01259CDBDCF8F69C87B63BFF5E3C90247",
+    "hunt-marker.png": "E20FABE635CFD51FC6AB8260B37A067EBDA744A60DE0EB9F0FBC7A5CB5697B91"
+  },
+  "checked_markdown": 149,
+  "broken_links": [],
+  "original_saves_unchanged": true,
+  "main_hard_metrics": 8,
+  "main_historical_red_categories": 5,
+  "limits": [
+    "首版数值和表现；未声称人工12分钟平衡或性能基准",
+    "测试猎令与经验门槛使用副本，生产720秒／50秒／15秒预设保持"
+  ]
+}

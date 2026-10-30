@@ -1,0 +1,5 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://Scripts/Testing/EliteMotionProbe.cs" id="probe"]
+[node name="EliteMotionProbe" type="Node3D"]
+[node name="Probe" type="Node" parent="."]
+script = ExtResource("probe")

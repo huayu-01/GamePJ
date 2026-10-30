@@ -1,0 +1,82 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Player/PlayerController.cs" id="1"]
+[ext_resource type="Script" path="res://Scripts/Combat/CharacterMovement.cs" id="2"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitAnimator.cs" id="3"]
+[ext_resource type="Script" path="res://Scripts/Combat/UnitPresentation.cs" id="4"]
+[ext_resource type="Script" path="res://Scripts/Combat/SprintController.cs" id="5"]
+[ext_resource type="Script" path="res://Scripts/Player/PlayerAbilityInput.cs" id="6"]
+[ext_resource type="PackedScene" path="res://Scenes/Camera/CameraRig.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://Assets/Characters/GeneratedPilot/pilot_ual.glb" id="8"]
+[ext_resource type="Script" path="res://Scripts/Abilities/MeleeComboAbility.cs" id="9"]
+[ext_resource type="PackedScene" path="res://Scenes/Combat/MeleeStrike.tscn" id="10"]
+[ext_resource type="Resource" path="res://Config/Testing/nature_pilot_combo.tres" id="11"]
+
+[sub_resource type="CapsuleShape3D" id="Capsule"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="BoxShape3D" id="SwordShape"]
+size = Vector3(2.6, 1.6, 3.2)
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1")
+Faction = 0
+MaxHealth = 200.0
+MoveSpeed = 7.0
+Tags = PackedStringArray("Player", "Pilot", "Melee")
+
+[node name="Body" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("Capsule")
+
+[node name="Model" parent="." instance=ExtResource("8")]
+rotation = Vector3(0, 3.1415927, 0)
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2")
+TurnSharpness = 16.0
+
+[node name="Animator" type="Node" parent="."]
+script = ExtResource("3")
+AnimIdle = "idle"
+AnimWalk = "walk"
+AnimRun = "sprint"
+AnimDeath = "die"
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("4")
+
+[node name="Sprint" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="CameraRig" parent="." instance=ExtResource("7")]
+PitchDegrees = 32.0
+TargetScreenHeight = 0.4
+
+[node name="SwordAttack" type="Node3D" parent="."]
+script = ExtResource("9")
+Series = ExtResource("11")
+AbilityId = "nature_pilot_sword"
+InputAction = "weapon_skill_1"
+AnimName = "attack"
+AnimEvent = "ATK"
+ComboNextEvent = "ATK"
+StrikeActiveTime = 0.16
+Cooldown = 0.22
+Recover = 0.20
+AnimationEventTimeout = 1.0
+
+[node name="Attack" parent="SwordAttack" instance=ExtResource("10")]
+position = Vector3(0, 0.9, -1.6)
+Damage = 25.0
+Knockback = 2.0
+
+[node name="Shape" parent="SwordAttack/Attack" index="0"]
+shape = SubResource("SwordShape")
+
+[node name="AbilityInput" type="Node" parent="."]
+script = ExtResource("6")
+
+[editable path="CameraRig"]
+[editable path="SwordAttack/Attack"]

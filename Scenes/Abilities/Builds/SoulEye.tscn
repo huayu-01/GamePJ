@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://Scripts/Abilities/SoulEyeAbility.cs" id="script"]
+[node name="EvolvedAbility" type="Node3D"]
+script = ExtResource("script")
+Cooldown = 15
+Duration = 10
+MarkInterval = 0.2
+MarkDuration = 6
+SearchRadius = 12
+StartupSeconds = 0.2

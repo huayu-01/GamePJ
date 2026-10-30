@@ -1,0 +1,46 @@
+{
+  "evidence_level": "现行资源与源码静态核查＋解析推算＋脱离引擎的点质量反例模拟；本轮无Godot实测",
+  "project": "F:\\Godot项目\\项目a",
+  "enemy_count_excluding_global": 21,
+  "acceptance": {
+    "path": "outputs\\acceptance-20261026\\更新与修复验收.xlsx",
+    "sha256": "a2c728451009bbaf7ebf9a8712032926f1010f5d5c78ddfca60a8e5d305b039d",
+    "cells": {
+      "C55": "敌群差异化,需要给不同的敌人定义不同的且有差异的移动速度,当玩家拉着怪的时候不再是所有怪都扎一堆,而是几堆;",
+      "D55": "暂且未下定论,需要分析可行性再执行;"
+    }
+  },
+  "global": {
+    "script": "ExtResource(\"1_j8a3y\")",
+    "NumericId": 1096,
+    "IsGlobal": true,
+    "HealthMultiplier": 1.875,
+    "DamageMultiplier": 0.3,
+    "MoveSpeedMultiplier": 1.0,
+    "EliteChanceMultiplier": 1.0,
+    "Id": "enemy_global",
+    "Slot": 0,
+    "DisplayName": "敌人 · 全局倍率",
+    "Note": "数值逐条抄自 ConfigIndex.tres 的 EnemyHealthMultiplier / EnemyDamageMultiplier / EnemyMoveSpeedMultiplier / EliteChanceMultiplier。⚠️ 这四个值的 C# 回退（ConfigIndexData 的属性初值）必须与这里保持一致，否则表读不到时会静默换一套难度（见 docs/config-tables-inventory.md §5-④）。"
+  },
+  "elite_speed": 0.9,
+  "player_attack_scale": 0.35,
+  "march": 1.75,
+  "quick_per_level": 0.08,
+  "phase_budget_integral": 2572.56,
+  "enemy_experience_supply_reference": 5145.12,
+  "candidate_standard_speed": {
+    "current": 4.2,
+    "candidate": 3.8,
+    "selected": false
+  },
+  "assumptions": [
+    "米是项目世界长度单位，速度米/秒；稳态模型忽略加速度",
+    "接近模型15米初始中心距/2米比较半径不是实际技能射程",
+    "角色B地面Attack策略无移动攻击被动时主动输入锁定；空中与技能位移独立",
+    "普通HP=行HP×1.875×阶段；精英另×2.5；基础甲不乘上述生命倍率",
+    "耐久计算仅无额外减伤/格挡/特性样本",
+    "起步/中期/成型是可控试验配装，不是时间或胜率预测",
+    "简化追逐不模拟RVO、地形、攻击停步、伤害或真实帧时"
+  ]
+}

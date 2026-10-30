@@ -7,53 +7,9 @@ using Godot;
 namespace ActRoguelike.Combat;
 
 /// <summary>
-/// **蓄力时的身体表现 + 蓄力完成反馈**（P7 表现层，用户本轮提的第 ③ 条；设计文档的蓄力机制见
-/// `docs/abilities.md`）。用户原话：
-///
-/// <blockquote>
-/// 「**所有武器的蓄力表现，需要在每次完成蓄力时都有特效 + 音效的表现**，比如**角色闪一下**或者
-/// **有一圈扩大的透明残影或描边**」
-/// </blockquote>
-///
-/// <para><b>触发点只有一个</b>：某个 <see cref="Ability"/> 的 <see cref="Ability.ChargeBaseComplete"/>
-/// **由 false 变 true** 的那一帧 —— **每次完成基础蓄力**都给一次反馈，
-/// 所有蓄力武器（能量掌武技2 / 弓武技1 武技2 / 飞刀武技2 / 长枪武技2）共用这一份实现，
-/// **加武器不用改代码**（它是遍历单位身上的全部 <see cref="Ability"/>，不认类名、不认技能行 Id）。</para>
-///
-/// <para><b>一次反馈由三样东西组成</b>（用户给的三个可选形态全用上了，都是 <c>[Export]</c>）：</para>
-/// <list type="number">
-/// <item><b>角色闪一下</b>：把 <c>Assets/Effects/charge_rim_placeholder.gdshader</c> 包成
-///   <c>ShaderMaterial</c>，挂到模型每个 <c>MeshInstance3D</c> 的 <b><c>MaterialOverlay</c></b>
-///   （**叠加通道**：不改模型资源、不动 <c>MaterialOverride</c>，所以与受击闪色 / 精英染色 /
-///   残影互不干扰），把 <c>flash</c> 从 <see cref="FlashStrength"/> 线性衰减到 0。</item>
-/// <item><b>一圈扩大的透明圈</b>：**直接复用 P6c 的 <see cref="LandingShockwave"/>**（P6d 给它加的
-///   <c>PlayOnce(位置, 半径)</c> 外部入口正是为这种"不是落地"的场合准备的）——
-///   本类按自己的 <c>[Export]</c> 半径 / 颜色 / 时长配置它，不为"一圈"再写第二份实现。</item>
-/// <item><b>音效</b>：<see cref="ChargeCompleteSfxId"/>（默认 <see cref="AudioIds.ChargeComplete"/>
-///   = 音效表里的 <c>sfx_charge_complete</c>）。**代码里没有文件路径** ——
-///   素材 / 音量 / 总线都在 `Config/Tables/Audio/`。</item>
-/// </list>
-///
-/// <para><b>「基础蓄力完成」与「进入完美窗口」怎么区分</b>（这是本轮要判断的地方）：在本项目的状态机里
-/// 这两件事**发生在同一帧** —— <see cref="Ability.IsPerfectWindow"/> 的窗口就是
-/// <c>[ChargeBaseSeconds, +PerfectWindowSeconds]</c>，它的起点正是基础蓄力完成的那一刻。
-/// 所以**不做两次叠加反馈**（同一帧叠两次只会看着像一次更乱的），而是：**同一份反馈里换档** ——
-/// 走完美窗口的那一档用 <see cref="PerfectFlashColor"/>（金）/ <see cref="PerfectStrengthScale"/> 倍强度 /
-/// <see cref="PerfectRingColor"/> 的圈 / <see cref="PerfectRingScale"/> 倍的半径，
-/// 音效仍是同一拍（它就是"蓄力完成"这一个事件）。</para>
-///
-/// <para>⚠️ <b>它只读运行期状态，不参与判定</b>：读的全是 P2 就有的
-/// <see cref="Ability.IsCharging"/> / <see cref="Ability.ChargeBaseComplete"/> /
-/// <see cref="Ability.IsPerfectWindow"/>，**没有**给战斗层加任何东西，`Ability` 基类一个字没动。</para>
-///
-/// <para>⚠️ <b>纯表现要做减法</b>（`docs/vfx.md` §3）：本类**不复制模型子树**（那是残影的做法，
-/// 要摘碰撞体 / 摘 Unit / 退分组），只做两件事 —— 往已有网格上挂一个**叠加材质**、
-/// 让 <see cref="LandingShockwave"/> 在 <c>CurrentScene</c> 下造一个**临时**的圈节点
-/// （它自己没有碰撞体、不进任何分组、tween 完自己 <c>QueueFree</c>）。<see cref="DebugState"/> 会把
-/// 这几项打出来。</para>
-///
-/// <para>挂载：<c>Scenes/Player/Player.tscn</c> → <c>Player/ChargeBodyFx</c>。所有几何量 / 颜色 /
-/// 时长 / 音效 id 都是 <c>[Export]</c>。</para>
+/// 统一蓄力表现：监听当前槽位能力的真实基础完成与强化档位事件，输出短促全身菲涅尔闪光和阶段音效。
+/// 基础完成保留扩张环，强化档位只强调身体轮廓与音高，避免反复铺设范围圈。
+/// 不改原材质/伤害/动画；受击等更高优先级叠加可抢占通道。空闲停止更新，取消/换装/死亡归还材质。
 /// </summary>
 public partial class ChargeBodyFx : Node3D
 {
@@ -64,10 +20,9 @@ public partial class ChargeBodyFx : Node3D
 	/// <summary>找不到模型时用的兜底：直接从单位子树里找全部 <c>MeshInstance3D</c>。</summary>
 	[Export] public bool FallbackToUnitMeshes { get; set; } = true;
 
-	[ExportGroup("占位描边（第 ④ 条 · ⚠️ 美术后期替换）")]
+	[ExportGroup("蓄力边缘光")]
 	/// <summary>
-	/// 菲涅尔边缘光的着色器（**占位版**）。换成正式版就是把这个 <c>.gdshader</c> 文件替换掉 /
-	/// 或者在这里换一个路径 —— **C# 一个字都不用改**。加载失败时写一条警告并退回代码里的内联兜底。
+	/// 菲涅尔与薄层身体闪光的着色器。加载失败时写一条警告并退回相同画法的内联兜底。
 	/// </summary>
 	[Export] public string RimShaderPath { get; set; } = "res://Assets/Effects/charge_rim_placeholder.gdshader";
 
@@ -88,13 +43,13 @@ public partial class ChargeBodyFx : Node3D
 	[Export] public string ChargeCompleteSfxId { get; set; } = AudioIds.ChargeComplete;
 
 	/// <summary>"闪一下"的时长（秒）。</summary>
-	[Export] public float FlashSeconds { get; set; } = 0.22f;
+	[Export] public float FlashSeconds { get; set; } = 0.18f;
 
 	/// <summary>"闪一下"的强度（1 = 满亮；衰减到 0 就是闪完）。</summary>
 	[Export(PropertyHint.Range, "0,2,0.05")] public float FlashStrength { get; set; } = 0.85f;
 
 	/// <summary>闪光的颜色（**基础蓄力完成**那一档）。</summary>
-	[Export] public Color FlashColor { get; set; } = new(0.85f, 0.95f, 1f, 1f);
+	[Export] public Color FlashColor { get; set; } = new(0.65f, 0.88f, 1f, 1f);
 
 	/// <summary>闪光的颜色（**同时进了完美窗口**那一档 —— 只有能量掌武技2 这类有窗口的技能会用）。</summary>
 	[Export] public Color PerfectFlashColor { get; set; } = new(1f, 0.86f, 0.35f, 1f);
@@ -119,16 +74,16 @@ public partial class ChargeBodyFx : Node3D
 	[Export(PropertyHint.Range, "0.01,1,0.01")] public float RingStartScale { get; set; } = 0.35f;
 
 	/// <summary>圈的颜色（基础蓄力完成）。</summary>
-	[Export] public Color RingColor { get; set; } = new(0.5f, 0.9f, 1f, 0.9f);
+	[Export] public Color RingColor { get; set; } = new(0.5f, 0.9f, 1f, 0.6f);
 
 	/// <summary>圈的颜色（完美窗口那一档）。</summary>
 	[Export] public Color PerfectRingColor { get; set; } = new(1f, 0.86f, 0.35f, 0.9f);
 
 	/// <summary>圈里那个薄盘的不透明度（色相跟着圈走）。</summary>
-	[Export(PropertyHint.Range, "0,1,0.01")] public float RingDiscAlpha { get; set; } = 0.16f;
+	[Export(PropertyHint.Range, "0,1,0.01")] public float RingDiscAlpha { get; set; } = 0.08f;
 
 	/// <summary>圈的自发光强度。</summary>
-	[Export] public float RingEmissionEnergy { get; set; } = 2.4f;
+	[Export] public float RingEmissionEnergy { get; set; } = 1.4f;
 
 	[ExportGroup("运行期可读状态（探针 / 自测）")]
 	/// <summary>现在有没有人在蓄力（= 描边该不该亮）。</summary>
@@ -140,7 +95,7 @@ public partial class ChargeBodyFx : Node3D
 	/// <summary>现在实际画出来的闪光强度（0 = 没在闪）。</summary>
 	public float FlashShown { get; private set; }
 
-	/// <summary>一共完成过几次基础蓄力（= 反馈次数 = 音效次数）。</summary>
+	/// <summary>基础完成反馈次数；后置强化档位单独记入ChargeStepCount。</summary>
 	public int ChargeCompleteCount { get; private set; }
 
 	/// <summary>最近一次完成的是哪个技能行 / 有没有走完美那一档。</summary>
@@ -157,34 +112,37 @@ public partial class ChargeBodyFx : Node3D
 
 	/// <summary>挂上叠加材质的网格数（0 = 找不到模型，看着就是"没效果"）。</summary>
 	public int OverlayMeshCount { get; private set; }
+	public Node3D? BoundModel => _model;
 
 	/// <summary>最近一次生成的那圈在世界里的节点名残留数（探针用：圈自己会 tween 完回收）。</summary>
 	public int LiveRingCount
 	{
 		get
 		{
-			Node? scene = GetTree()?.CurrentScene;
-			if (scene == null || !IsInstanceValid(scene))
-			{
-				return 0;
-			}
-
-			return scene.FindChildren($"*{RingNodeName}*", string.Empty, true, false).Count;
+			return _ownedRings.FindAll(ring => IsInstanceValid(ring) && !ring.IsQueuedForDeletion()).Count;
 		}
 	}
-
-	private const string RingNodeName = "LandingShockwaveFx";
 
 	private sealed class MeshBinding
 	{
 		public MeshInstance3D Mesh = null!;
 		public ShaderMaterial Material = null!;
-		public Material? PreviousOverlay;
 	}
 
 	private readonly List<MeshBinding> _bindings = new();
 	private readonly List<Ability> _abilities = new();
-	private readonly List<bool> _wasComplete = new();
+	private readonly List<Node3D> _ownedRings = new();
+	private int _slotRevision = -1;
+	private Ability? _lastPulseSource;
+	private Ability? _chargingSource;
+	[ExportGroup("强化档位反馈")]
+	[Export] public Color StepFlashColor { get; set; } = new(.43f, .95f, .73f);
+	[Export] public float StepFlashScale { get; set; } = 1.15f;
+	[Export] public float StepPitchIncrement { get; set; } = .08f;
+	public int ChargeStepCount { get; private set; }
+	public int LastChargeStage { get; private set; } = -1;
+	public float LastSfxPitch { get; private set; } = 1;
+	public Color LastFlashColor => _flashColor;
 	private Unit? _unit;
 	private Node3D? _model;
 	private LandingShockwave? _ring;
@@ -193,6 +151,7 @@ public partial class ChargeBodyFx : Node3D
 	private bool _warnedNoMeshes;
 	private float _rimShown;
 	private float _flashShown;
+	private float _flashPeak, _flashElapsed;
 	private Color _flashColor = Colors.White;
 
 	// 拍摄台 / 探针用的强制状态（只为截图与取证，不依赖真的按住右键）。
@@ -204,7 +163,7 @@ public partial class ChargeBodyFx : Node3D
 	/// <summary>代码里的**内联兜底着色器**：`RimShaderPath` 读不到时用它（效果相同，只是不便于美术替换）。</summary>
 	private const string FallbackShaderCode = @"
 shader_type spatial;
-render_mode unshaded, blend_add, cull_back, depth_draw_never;
+render_mode unshaded, blend_mix, cull_back, depth_draw_never;
 uniform vec4 rim_color : source_color = vec4(0.45, 0.86, 1.0, 1.0);
 uniform float rim_power : hint_range(0.5, 8.0) = 2.6;
 uniform float rim_strength : hint_range(0.0, 4.0) = 0.0;
@@ -213,27 +172,32 @@ uniform float flash : hint_range(0.0, 2.0) = 0.0;
 void fragment() {
 	float facing = clamp(dot(normalize(NORMAL), normalize(VIEW)), 0.0, 1.0);
 	float fresnel = pow(1.0 - facing, rim_power);
-	ALBEDO = rim_color.rgb * fresnel * rim_strength + flash_color.rgb * flash * flash_color.a;
-	ALPHA = clamp((fresnel * rim_strength * rim_color.a) + (flash * flash_color.a), 0.0, 1.0);
+	float total = max(0.001, rim_strength + flash);
+	ALBEDO = (rim_color.rgb * rim_strength + flash_color.rgb * flash) / total;
+	EMISSION = ALBEDO * 0.85;
+	float body_flash = min(flash, 1.0) * flash_color.a * 0.12;
+	float edge_alpha = fresnel * clamp(rim_strength * rim_color.a * 0.45 + flash * flash_color.a * 0.45, 0.0, 0.52);
+	ALPHA = clamp(body_flash + edge_alpha, 0.0, 0.62);
 }
 ";
 
 	public override void _Ready()
 	{
 		_unit = GetParentOrNull<Unit>();
+		SetProcess(false);
+		if (_unit != null)
+		{
+			EnsureAbilities(); _unit.ChildEnteredTree += HookAbility; _unit.ChildExitingTree += UnhookAbility;
+			_unit.Died += ClearOnDeath;
+		}
 	}
 
 	public override void _ExitTree()
 	{
-		// 退出时把叠加材质**还给原样**（我们只借了这个通道，不能留下痕迹）。
-		foreach (MeshBinding binding in _bindings)
-		{
-			if (binding.Mesh != null && IsInstanceValid(binding.Mesh))
-			{
-				binding.Mesh.MaterialOverlay = binding.PreviousOverlay;
-			}
-		}
-
+		ClearVisuals();
+		foreach (var ability in _abilities.ToArray()) UnhookAbility(ability);
+		if (IsInstanceValid(_unit)) { _unit!.ChildEnteredTree -= HookAbility; _unit.ChildExitingTree -= UnhookAbility; _unit.Died -= ClearOnDeath; }
+		UnitRimOverlay.RemoveSource(this);
 		_bindings.Clear();
 	}
 
@@ -241,15 +205,19 @@ void fragment() {
 	public void BindVisual(Node3D model)
 	{
 		if (_model == model) return;
-		foreach (MeshBinding binding in _bindings)
-			if (IsInstanceValid(binding.Mesh)) binding.Mesh.MaterialOverlay = binding.PreviousOverlay;
+		ClearVisuals();
 		_bindings.Clear();
 		_model = model;
 	}
 
 	public override void _Process(double delta)
 	{
-		float dt = (float)delta;
+		float dt = Mathf.Min((float)delta, .05f);
+		if (!_previewActive && (_unit is not { IsDead: false } || _slotRevision != _unit.AbilitySlots.Revision))
+		{
+			ClearVisuals();
+			return;
+		}
 		EnsureBindings();
 
 		// 拍摄台：钉住不动（只摆视觉，判据与画法一个字都不变）。
@@ -263,10 +231,7 @@ void fragment() {
 		{
 			_unit = GetParentOrNull<Unit>();
 			_abilities.Clear();
-			_wasComplete.Clear();
 		}
-
-		EnsureAbilities();
 
 		bool charging = ScanCharging();
 		Charging = charging;
@@ -277,20 +242,22 @@ void fragment() {
 		float step = dt / fade;
 		_rimShown = Mathf.MoveToward(_rimShown, rimTarget, step);
 
-		// ── 闪光（第 ③ 条）：完成那一帧置满，之后线性衰减到 0。
+		// 峰值不影响持续时间；短暂保持后平滑消退，完美档也不会拖成一整块白光。
 		if (_flashShown > 0f)
 		{
-			_flashShown = Mathf.Max(0f, _flashShown - (dt / Mathf.Max(0.02f, FlashSeconds)));
+			_flashElapsed += dt;
+			float progress = Mathf.Clamp(_flashElapsed / Mathf.Max(.02f, FlashSeconds), 0, 1);
+			_flashShown = _flashPeak * (1 - Mathf.SmoothStep(.18f, 1, progress));
 		}
 
 		RimShown = _rimShown;
 		FlashShown = _flashShown;
 		ApplyUniforms();
+		if (!charging && _rimShown <= 0 && _flashShown <= 0) SetProcess(false);
 	}
 
 	/// <summary>
-	/// 每帧扫一遍单位的全部能力，返回"有没有人在蓄力"，并在
-	/// <see cref="Ability.ChargeBaseComplete"/> 的**上升沿**上发一次反馈（见类注释）。
+	/// 只读取当前槽位的蓄力状态来维持边缘光；阶段声光由真实状态机事件驱动。
 	/// </summary>
 	private bool ScanCharging()
 	{
@@ -298,53 +265,44 @@ void fragment() {
 		for (int i = 0; i < _abilities.Count; i++)
 		{
 			Ability ability = _abilities[i];
-			bool isCharging = IsInstanceValid(ability) && ability.IsCharging;
+			bool isCharging = IsInstanceValid(ability) && ability.Enabled && _unit?.AbilitySlots.Owns(ability) == true && ability.IsCharging;
 			charging |= isCharging;
-
-			bool complete = isCharging && ability.ChargeBaseComplete;
-			bool before = i < _wasComplete.Count && _wasComplete[i];
-			if (i < _wasComplete.Count)
-			{
-				_wasComplete[i] = complete;
-			}
-
-			if (complete && !before)
-			{
-				FireChargeComplete(ability);
-			}
 		}
 
 		return charging;
 	}
 
 	/// <summary>**每次完成基础蓄力**走一次：换档 → 闪一下 + 一圈 + 音效。</summary>
-	private void FireChargeComplete(Ability ability)
+	private void FireChargeComplete(Ability ability, int stage)
 	{
 		// 「进入完美窗口」与「基础蓄力完成」在本项目的状态机里是**同一帧**（窗口就从这一刻起算），
 		// 所以不叠两次反馈：同一份反馈换一档（颜色 / 强度 / 半径），音效仍是同一拍。
-		bool perfect = ability.IsPerfectWindow;
-		float scale = perfect ? Mathf.Max(0.01f, PerfectStrengthScale) : 1f;
+		bool perfect = stage == 0 && ability.IsPerfectWindow;
+		float scale = stage > 0 ? StepFlashScale : perfect ? Mathf.Max(0.01f, PerfectStrengthScale) : 1f;
 
-		_flashColor = perfect ? PerfectFlashColor : FlashColor;
+		_flashColor = stage > 0 ? StepFlashColor : perfect ? PerfectFlashColor : FlashColor;
 		_flashShown = Mathf.Clamp(FlashStrength * scale, 0f, 2f);
+		_flashPeak = _flashShown; _flashElapsed = 0;
 
-		SpawnRing(perfect, scale);
+		if (stage == 0) SpawnRing(perfect, scale);
 
 		LastChargeAbilityId = ability.AbilityId;
 		LastWasPerfect = perfect;
-		ChargeCompleteCount++;
+		LastChargeStage = stage;
+		if (stage == 0) ChargeCompleteCount++; else ChargeStepCount++;
 
 		if (!string.IsNullOrEmpty(ChargeCompleteSfxId))
 		{
-			AudioManager.PlaySfx(ChargeCompleteSfxId);
+			LastSfxPitch = Mathf.Clamp(1 + StepPitchIncrement * Mathf.Min(stage, 5), .4f, 2);
+			AudioManager.PlayImpact(ChargeCompleteSfxId, LastSfxPitch);
 			LastSfxId = ChargeCompleteSfxId;
 		}
 
 		GameLog.Write(
 			"Combat",
-			$"蓄力完成反馈：{ability.AbilityId} 基础蓄力完成{(perfect ? "（同时在完美时机窗口里 → 金色 / ×" + Mathf.Max(0.01f, PerfectStrengthScale).ToString("0.##") + " 档）" : string.Empty)}"
-			+ $" → 角色闪一下 {FlashSeconds:0.##}s（强度 {_flashShown:0.##}）+ 一圈扩大 {RingRadius * scale:0.##}m（{RingDuration:0.##}s）+ 音效「{ChargeCompleteSfxId}」"
-			+ $"（第 {ChargeCompleteCount} 次；纯表现：不改战斗状态 / 无碰撞体 / 不进分组）");
+			$"蓄力阶段反馈：{ability.AbilityId} 阶段{stage}{(perfect ? "（完美）" : string.Empty)}"
+			+ $" → 身体薄层闪光 {FlashSeconds:0.##}s，音效「{ChargeCompleteSfxId}」×{LastSfxPitch:0.##}"
+			+ $"；基础反馈{ChargeCompleteCount}次，强化反馈{ChargeStepCount}次，扩张圈={(stage == 0 ? "有" : "无")}");
 	}
 
 	/// <summary>在角色身体中段生成一圈（**复用 <see cref="LandingShockwave"/>**，不为"一圈"写第二份实现）。</summary>
@@ -373,6 +331,12 @@ void fragment() {
 
 		Vector3 at = _unit != null && IsInstanceValid(_unit) ? _unit.GlobalPosition : GlobalPosition;
 		_ring.PlayOnce(at, Mathf.Max(0.1f, RingRadius) * scale);
+		_ownedRings.RemoveAll(effect => !IsInstanceValid(effect) || effect.IsQueuedForDeletion());
+		if (_ring.LastSpawnedEffect is { } effect)
+		{
+			effect.ProcessMode = ProcessModeEnum.Pausable;
+			_ownedRings.Add(effect);
+		}
 	}
 
 	/// <summary>把"该给谁挂叠加材质"备好：模型子树里的全部 <c>MeshInstance3D</c>（**每个网格一份材质**）。</summary>
@@ -426,12 +390,11 @@ void fragment() {
 			{
 				Mesh = mesh,
 				Material = material,
-				PreviousOverlay = mesh.MaterialOverlay,   // 借通道：退出时原样还回去
 			});
 		}
 
 		OverlayMeshCount = _bindings.Count;
-		GameLog.Write("Combat", $"蓄力身体表现：模型「{ModelNodeName}」上挂了 {_bindings.Count} 份叠加材质（{ShaderSource}；占位描边，美术后期替换）");
+		GameLog.Write("Combat", $"蓄力身体表现：模型「{ModelNodeName}」上绑定 {_bindings.Count} 份半透明叠加材质（{ShaderSource}）");
 	}
 
 	/// <summary>读着色器：先按 <see cref="RimShaderPath"/> 读文件，读不到就用代码里的内联兜底（**不静默**）。</summary>
@@ -473,7 +436,7 @@ void fragment() {
 	/// <summary>把两个可调量写进每一份叠加材质（描边颜色 / 次方也一起，方便运行期调）。</summary>
 	private void ApplyUniforms()
 	{
-		bool active = _rimShown > 0.001f || _flashShown > 0.001f;
+		bool active = RimShown > 0.001f || FlashShown > 0.001f;
 		foreach (MeshBinding binding in _bindings)
 		{
 			if (binding.Mesh == null || !IsInstanceValid(binding.Mesh) || !IsInstanceValid(binding.Material))
@@ -482,39 +445,68 @@ void fragment() {
 			}
 
 			// 只在"要画"的时候占着叠加通道；已经归零就把通道还回去（不影响别人用 MaterialOverlay）。
-			binding.Mesh.MaterialOverlay = active ? binding.Material : binding.PreviousOverlay;
+			UnitRimOverlay.Set(binding.Mesh, this, active ? binding.Material : null, 5);
 
 			binding.Material.SetShaderParameter("rim_color", RimColor);
 			binding.Material.SetShaderParameter("rim_power", Mathf.Max(0.5f, RimPower));
-			binding.Material.SetShaderParameter("rim_strength", _rimShown);
-			binding.Material.SetShaderParameter("flash_color", _flashColor);
-			binding.Material.SetShaderParameter("flash", _flashShown);
+			binding.Material.SetShaderParameter("rim_strength", RimShown);
+			binding.Material.SetShaderParameter("flash_color", _previewActive ? _previewFlashColor : _flashColor);
+			binding.Material.SetShaderParameter("flash", FlashShown);
 		}
 	}
 
 	/// <summary>重新收集单位身上的全部能力（**不认类名 / 技能行 Id**：加武器不用改这里）。</summary>
 	private void EnsureAbilities()
 	{
-		for (int i = 0; i < _abilities.Count; i++)
+		if (_unit == null) return;
+		var abilities = new List<Ability>(); NodeSearch.CollectInSubtree(_unit, abilities);
+		foreach (var ability in abilities) HookAbility(ability);
+	}
+	private void HookAbility(Node node)
+	{
+		if (node is not Ability ability || _abilities.Contains(ability)) return;
+		_abilities.Add(ability); ability.ChargeMilestoneReached += OnMilestone;
+		ability.ChargePresentationChanged += OnChargeState;
+	}
+	private void UnhookAbility(Node node)
+	{
+		if (node is not Ability ability || !_abilities.Remove(ability)) return;
+		if (ReferenceEquals(_chargingSource, ability) || ReferenceEquals(_lastPulseSource, ability)) ClearVisuals();
+		if (IsInstanceValid(ability)) { ability.ChargeMilestoneReached -= OnMilestone; ability.ChargePresentationChanged -= OnChargeState; }
+	}
+	private void OnMilestone(Ability ability, int stage)
+	{
+		if (_unit is not { IsDead: false } || GetTree().Paused || !ability.Enabled || !_unit.AbilitySlots.Owns(ability)) return;
+		_slotRevision = _unit.AbilitySlots.Revision;
+		EnsureBindings(); _lastPulseSource = ability; FireChargeComplete(ability, stage);
+		SetProcess(true);
+	}
+	private void OnChargeState(Ability ability, bool active, bool canceled)
+	{
+		if (active)
 		{
-			if (!IsInstanceValid(_abilities[i]))
+			if (_unit is { IsDead: false } && !GetTree().Paused && ability.Enabled && _unit.AbilitySlots.Owns(ability))
 			{
-				_abilities.Clear();
-				_wasComplete.Clear();
-				break;
+				if (_slotRevision != _unit.AbilitySlots.Revision) ClearVisuals();
+				_slotRevision = _unit.AbilitySlots.Revision;
+				_chargingSource = ability; SetProcess(true);
 			}
 		}
-
-		if (_abilities.Count > 0 || _unit == null || !IsInstanceValid(_unit))
+		else
 		{
-			return;
+			bool wasActive = ReferenceEquals(_chargingSource, ability);
+			if (wasActive) _chargingSource = null;
+			if (canceled && (wasActive || ReferenceEquals(_lastPulseSource, ability))) ClearVisuals();
 		}
-
-		NodeSearch.CollectInSubtree(_unit, _abilities);
-		for (int i = 0; i < _abilities.Count; i++)
-		{
-			_wasComplete.Add(false);
-		}
+	}
+	private void ClearOnDeath(HitInstance _) => ClearVisuals();
+	private void ClearVisuals()
+	{
+		_rimShown = _flashShown = RimShown = FlashShown = 0; Charging = false; _lastPulseSource = _chargingSource = null;
+		_flashPeak = _flashElapsed = 0;
+		foreach (var ring in _ownedRings) if (IsInstanceValid(ring)) { ring.Visible = false; ring.QueueFree(); }
+		_ownedRings.Clear();
+		_previewActive = false; UnitRimOverlay.RemoveSource(this); SetProcess(false);
 	}
 
 	// ───────────────── 拍摄台 / 探针（只摆视觉，不进战斗逻辑） ─────────────────
@@ -523,6 +515,7 @@ void fragment() {
 	/// <paramref name="perfect"/> 只影响用哪一档的闪光颜色。撤掉用 <see cref="DebugClearChargeFxPreview"/>。</summary>
 	public void DebugPreviewChargeFx(float rim, float flash, bool perfect = false)
 	{
+		EnsureBindings(); SetProcess(true);
 		_previewActive = true;
 		_previewRim = Mathf.Clamp(rim, 0f, 4f);
 		_previewFlash = Mathf.Clamp(flash, 0f, 2f);
@@ -550,8 +543,11 @@ void fragment() {
 	/// <summary>拍摄台用：不走按键，直接"完成一次基础蓄力"（音效 + 圈 + 闪，判据与画法一个字都不变）。</summary>
 	public void DebugFireChargeComplete(bool perfect = false)
 	{
+		EnsureBindings(); SetProcess(true);
 		_flashColor = perfect ? PerfectFlashColor : FlashColor;
 		_flashShown = Mathf.Clamp(FlashStrength * (perfect ? Mathf.Max(0.01f, PerfectStrengthScale) : 1f), 0f, 2f);
+		_flashPeak = _flashShown; _flashElapsed = 0;
+		_slotRevision = _unit?.AbilitySlots.Revision ?? -1;
 		SpawnRing(perfect, perfect ? Mathf.Max(0.01f, PerfectStrengthScale) : 1f);
 		LastChargeAbilityId = "（拍摄台强制触发）";
 		LastWasPerfect = perfect;

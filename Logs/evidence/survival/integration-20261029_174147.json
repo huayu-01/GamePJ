@@ -1,0 +1,18 @@
+{
+  "Date": "2026-10-29T17:41:47",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "slots",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 8.93,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_174147.slots.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_174147.slots.err",
+      "Failure": "",
+      "SHA256": "7C0C65A7C6A5D3D33E54BF2232C372047801A99A8A0C293127193868A00963B4"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

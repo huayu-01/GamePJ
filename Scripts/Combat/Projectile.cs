@@ -15,10 +15,16 @@ public partial class Projectile : Area3D
 	[Export] public float Speed { get; set; } = 70f;
 	[Export] public float GravityScale { get; set; }
 	[Export] public float MaxLifetime { get; set; } = 2.5f;
+	[Export] public bool CanBeDestroyed { get; set; } = true;
+	/// <summary>斩弹规则分类别名；外观场景独立后仍可复用既有白名单，真实场景名保持可诊断。</summary>
+	[Export] public string CutSceneClass { get; set; } = string.Empty;
+	public string EffectiveCutSceneClass => string.IsNullOrEmpty(CutSceneClass) ? SourceSceneName : CutSceneClass;
 	public enum DistanceEndMode { Disappear, Drop, Explode }
 	[Export] public float MaxTravelDistance { get; set; }
 	[Export] public DistanceEndMode DistanceEnd { get; set; }
 	[Export] public bool ExplosionOnly { get; set; }
+	/// <summary>可选的同契约爆炸预制体；只替换表现，伤害和半径仍读取本次攻击。</summary>
+	[Export] public PackedScene? ExplosionScene { get; set; }
 	/// <summary>敌方爆炸弹预计落点；随弹体生命周期清理，已经出手后不随施法者收招消失。</summary>
 	[Export] public bool ShowImpactWarning { get; set; }
 	private EnemyAttackWarning? _impactWarning;
@@ -60,9 +66,14 @@ public partial class Projectile : Area3D
 
 	/// <summary>追踪搜索半径（米；≤0 = 不限）。</summary>
 	[Export] public float HomingRange { get; set; }
+	/// <summary>先按初速飞行的距离；到达后才允许索敌，保留清楚的出手方向。</summary>
+	[Export] public float HomingStartDistance { get; set; }
+	/// <summary>使用连续三次贝塞尔制导；敌方旧弹体默认沿用限角转向。</summary>
+	[Export] public bool BezierHoming { get; set; }
 	/// <summary>不要求标记的追踪；齐射可先给每支箭分配不同敌人，失效后重新索敌。</summary>
 	[Export] public bool SeekAnyHostile { get; set; }
 	public Unit? AssignedHomingTarget { get; set; }
+	[Export] public bool AssignedTargetOnly { get; set; }
 
 	/// <summary>可穿透的目标数量，0 = 命中即消失。</summary>
 	[Export] public int Pierce { get; set; }
@@ -89,7 +100,8 @@ public partial class Projectile : Area3D
 	public float TravelledDistance { get; private set; }
 
 	/// <summary>限速后的真实速度（m/s）；Speed 保留技能传入的原始发射值。</summary>
-	public float ActualSpeed => _velocity.Length();
+	public float ActualSpeed => _velocity.Length() * _fieldSpeedMultiplier;
+	private float _fieldSpeedMultiplier = 1;
 
 	/// <summary>当前**速度方向**（自测 / 排障读它；没发射时是零向量）。</summary>
 	public Vector3 VelocityDirection => _velocity.LengthSquared() > 0.0001f ? _velocity.Normalized() : Vector3.Zero;
@@ -155,12 +167,13 @@ public partial class Projectile : Area3D
 				continue;
 			}
 
-			if (node is not Projectile projectile || projectile.SourceSceneName != sceneName)
+			if (node is not Projectile projectile || projectile.EffectiveCutSceneClass != sceneName)
 			{
 				continue;
 			}
 
-			if (excludeSceneNames != null && System.Array.IndexOf(excludeSceneNames, projectile.SourceSceneName) >= 0)
+			if (excludeSceneNames != null && (System.Array.IndexOf(excludeSceneNames, projectile.EffectiveCutSceneClass) >= 0
+				|| System.Array.IndexOf(excludeSceneNames, projectile.SourceSceneName) >= 0))
 			{
 				continue;
 			}
@@ -248,6 +261,8 @@ public partial class Projectile : Area3D
 		_worldSweepShape?.Dispose();
 	}
 
+	/// <summary>出手瞬间的实际初速方向；重力、追踪等后续运动不会改写。</summary>
+	public Vector3 LaunchDirection { get; private set; }
 	public void Launch(AttackInstance attack, Vector3 direction)
 	{
 		_attack = attack;
@@ -255,6 +270,7 @@ public partial class Projectile : Area3D
 		HitMask = CombatLayers.World | (attack.Attacker == null ? CombatLayers.UnitMask : CombatLayers.HostileTo(attack.Attacker.Faction));
 		_velocity = direction.Normalized() * Speed;
 		ClampVelocity();
+		LaunchDirection = _velocity.Normalized();
 		_pierceLeft = Pierce + attack.Pierce;
 		PierceBudgetAtLaunch = _pierceLeft;
 		_ricochetLeft = attack.Ricochet;
@@ -262,6 +278,8 @@ public partial class Projectile : Area3D
 		_excludedBodies.Clear();
 		if (_ownerRid.IsValid) _excludedBodies.Add(_ownerRid);
 		TravelledDistance = 0f;
+		ResetHomingCurve();
+		HomingStartedAtDistance = -1f;
 		_distanceEnded = false;
 		if (ShowImpactWarning && attack.ExplosionRadius > 0) _impactWarning ??= EnemyAttackWarning.Create(this, attack.Attacker);
 		_warningRefresh = 0;
@@ -293,24 +311,29 @@ public partial class Projectile : Area3D
 			return;
 		}
 
-		// 追踪（弓 武技2「刹那之眼」）：朝**最近的一个带标记的敌人**转向。
-		// 默认（HomingStatusId 空 / 转向速度 ≤0）**完全不进这一段** —— 弹道与改动前逐位一致。
-		if ((SeekAnyHostile || !string.IsNullOrEmpty(HomingStatusId)) && HomingTurnRateDegrees > 0f)
-		{
-			SteerTowardsMark();
-		}
+		Vector3 from = GlobalPosition;
+		_fieldSpeedMultiplier = ProjectileInfluenceFields.SpeedMultiplier(from);
+		float travelDt = dt * _fieldSpeedMultiplier;
+		bool guided = false;
+		HomingTargetName = string.Empty;
+		if ((AssignedTargetOnly || SeekAnyHostile || !string.IsNullOrEmpty(HomingStatusId)) && HomingTurnRateDegrees > 0f
+			&& TravelledDistance >= Mathf.Max(0f, HomingStartDistance))
+			guided = BezierHoming ? FollowHomingCurve(travelDt) : SteerTowardsMark(travelDt);
+		else ResetHomingCurve();
 
-		// 下坠：GravityStartDistance ≤ 0 时与改动前同一条路（一发射就受重力）。
-		if (GravityScale != 0f && TravelledDistance >= Mathf.Max(0f, GravityStartDistance))
+		Vector3 previousVelocity = _velocity;
+		// 制导已负责完整三维轨迹，不再叠加把箭拖向脚底的重力；无目标即继续抛物线。
+		bool falling = !guided && GravityScale != 0f && TravelledDistance >= Mathf.Max(0f, GravityStartDistance);
+		if (falling)
 		{
 			float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
-			_velocity.Y -= gravity * GravityScale * dt;
+			_velocity.Y -= gravity * GravityScale * travelDt;
 		}
 		// 无论速度来自技能、派生技能、符文、追踪还是重力，实际位移都经过同一上限。
 		ClampVelocity();
 
-		Vector3 from = GlobalPosition;
-		Vector3 to = from + _velocity * dt;
+		// 匀加速度用步前后速度的平均值积分；不同物理帧率下保持同一条抛物线。
+		Vector3 to = from + (falling ? (previousVelocity + _velocity) * .5f : _velocity) * travelDt;
 		if (MaxTravelDistance > 0 && !_distanceEnded)
 		{
 			float remaining = Mathf.Max(0, MaxTravelDistance - TravelledDistance);
@@ -318,6 +341,7 @@ public partial class Projectile : Area3D
 			if (remaining <= 0.00001f) { EndDistance(); return; }
 		}
 
+		if (ProjectileInfluenceFields.Blocks(this, from, to)) { Cut(); return; }
 		if (QueryGeometry == 1)
 		{
 			SweepFrame(from, to);
@@ -366,60 +390,38 @@ public partial class Projectile : Area3D
 	/// 目标筛选口径与 <c>Targeting.FindNearestHostile</c> 一致（按阵营的组），
 	/// 但额外要求"带标记"—— 这就是文档里"追踪被打上标记的最近目标"。
 	/// </summary>
-	private void SteerTowardsMark()
+	private bool SteerTowardsMark(float delta)
 	{
-		Unit? attacker = _attack?.Attacker;
-		HomingTargetName = string.Empty;
-		if (attacker == null)
-		{
-			return;
-		}
-
-		Unit? best = null;
-		float bestDistance = HomingRange > 0f ? HomingRange * HomingRange : float.MaxValue;
-		if (SeekAnyHostile && AssignedHomingTarget is { } assigned && IsInstanceValid(assigned)
-			&& assigned.IsValidTarget && attacker.IsHostileTo(assigned)
-			&& GlobalPosition.DistanceSquaredTo(assigned.GlobalPosition) <= bestDistance) best = assigned;
-		string group = attacker.Faction == Faction.Player ? "enemy_units" : "player_units";
-		if (best == null) foreach (Node node in GetTree().GetNodesInGroup(group))
-		{
-			if (node is not Unit candidate || !candidate.IsValidTarget || !attacker.IsHostileTo(candidate))
-			{
-				continue;
-			}
-
-			if (!SeekAnyHostile && !candidate.HasStatus(HomingStatusId))
-			{
-				continue;
-			}
-
-			float distance = GlobalPosition.DistanceSquaredTo(candidate.GlobalPosition);
-			if (distance < bestDistance)
-			{
-				bestDistance = distance;
-				best = candidate;
-			}
-		}
-
+		Unit? best = FindHomingTarget();
 		if (best == null || _velocity.LengthSquared() < 0.0001f)
 		{
-			return;
+			return false;
 		}
 
 		HomingTargetName = best.Name;
-
-		Vector3 wanted = (best.GlobalPosition - GlobalPosition).Normalized() * _velocity.Length();
+		if (HomingStartedAtDistance < 0) HomingStartedAtDistance = TravelledDistance;
+		HomingAimPoint = GetTargetCenter(best);
+		Vector3 wanted = (HomingAimPoint - GlobalPosition).Normalized() * _velocity.Length();
 		float angle = _velocity.AngleTo(wanted);
-		float maxRadians = Mathf.DegToRad(HomingTurnRateDegrees) * (float)GetPhysicsProcessDeltaTime();
+		float maxRadians = Mathf.DegToRad(HomingTurnRateDegrees) * delta;
 		float weight = angle > 1e-4f ? Mathf.Min(1f, maxRadians / angle) : 1f;
 		LastHomingWeight = weight;
 		LastHomingAngleDegrees = Mathf.RadToDeg(angle);
 		_velocity = _velocity.Slerp(wanted, weight);
+		return true;
 	}
 
 	/// <summary>两种几何共用命中语义；仅穿透允许继续本帧余程，弹射改向后下一帧续飞。</summary>
 	private bool ResolveImpact(GodotObject collider, Vector3 position)
 	{
+		// 主动招架先于爆炸结算，炸弹也必须能原弹反射，不能先爆炸再倒放一个外观。
+		if (collider is Unit defender && _attack!.Attacker is { } source && source.IsHostileTo(defender))
+			foreach (Node child in defender.GetChildren())
+				if (child is ActRoguelike.Abilities.GuardStanceAbility guard && guard.StanceActive
+					&& guard.TryReflectProjectile(_attack.RollHit(defender, _velocity.Normalized(), position)))
+				{
+					Reflect(defender, source); return false;
+				}
 		if (_attack!.ExplosionRadius > 0f && !_exploded)
 		{
 			_exploded = true;
@@ -604,7 +606,8 @@ public partial class Projectile : Area3D
 		}
 
 		_ricochetLeft--;
-		Vector3 direction = (next.GlobalPosition - GlobalPosition).Normalized();
+		ResetHomingCurve();
+		Vector3 direction = (GetTargetCenter(next) - GlobalPosition).Normalized();
 		_velocity = direction * Speed;
 		ClampVelocity();
 		// 命中身体已排除；不瞬移0.6米，避免跳过薄墙、近靶并伪造飞行距离。
@@ -614,7 +617,7 @@ public partial class Projectile : Area3D
 
 	private void Detonate(Vector3 position)
 	{
-		var scene = RuntimeResources.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn");
+		var scene = ExplosionScene ?? RuntimeResources.Load<PackedScene>("res://Scenes/Combat/Explosion.tscn");
 		if (scene?.Instantiate<Explosion>() is not { } explosion)
 		{
 			return;
@@ -623,7 +626,13 @@ public partial class Projectile : Area3D
 		Node parent = GetTree().CurrentScene ?? GetTree().Root;
 		parent.AddChild(explosion);
 		explosion.GlobalPosition = position;
-		explosion.Detonate(_attack!.Attacker, _attack.ExplosionDamage, _attack.ExplosionRadius, _attack.Tags);
+		string[] tags = _attack!.Tags;
+		if (System.Array.IndexOf(tags, "Explosion") < 0)
+		{
+			var explosionTags = new string[tags.Length + 1]; System.Array.Copy(tags, explosionTags, tags.Length);
+			explosionTags[^1] = "Explosion"; tags = explosionTags;
+		}
+		explosion.Detonate(_attack.Attacker, _attack.ExplosionDamage, _attack.ExplosionRadius, tags);
 	}
 
 	private void Orient()

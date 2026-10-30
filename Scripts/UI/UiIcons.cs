@@ -19,20 +19,38 @@ namespace ActRoguelike.UI;
 /// ⚠️ 读不到图返回 <c>null</c>，调用方要么不显示图标、要么只用文字 —— <b>绝不抛异常</b>
 /// （与"表读不到就用自身默认值"同一条纪律）。
 /// </summary>
-public static class UiIcons
+public static partial class UiIcons
 {
 	private const string Dir = "res://Assets/UI/Icons/";
+	/// <summary>技能图标按身份约定查找；无需在战斗资源中手工绑定或填颜色。</summary>
+	public static Texture2D? ForAbility(AbilityConfig? skill)
+	{
+		if (skill == null || string.IsNullOrWhiteSpace(skill.Id)) return null;
+		string key = "Skills/" + (skill.NumericId > 0 ? "icon_" + skill.NumericId : skill.Id + "_icon");
+		if (_cache.TryGetValue(key, out var cached)) return cached;
+		foreach (string extension in new[] { ".svg", ".png", ".webp" })
+		{
+			string path = Dir + key + extension;
+			if (ResourceLoader.Exists(path)) return _cache[key] = RuntimeResources.Load<Texture2D>(path);
+		}
+		_cache[key] = null;
+		return null;
+	}
 
 	/// <summary>奖励类型 → 图标（强化 / 进化 / 异化）。</summary>
 	public static Texture2D? ForReward(RewardDefinition? definition)
-		=> definition == null ? null : ForRewardKind(definition.Kind);
+	{
+		if (definition == null) return null;
+		string? icon = RewardSymbol(definition.Id);
+		return icon != null ? Named("Tabler/"+icon) : string.IsNullOrEmpty(definition.IconName) ? ForRewardKind(definition.Kind) : Named(definition.IconName);
+	}
 
 	/// <summary>奖励类型 → 图标。</summary>
 	public static Texture2D? ForRewardKind(RewardKind kind) => kind switch
 	{
-		RewardKind.Evolution => Named("ic_ui_reward_evolution"),
-		RewardKind.Mutation => Named("ic_ui_reward_mutation"),
-		_ => Named("ic_ui_reward_enhance"),
+		RewardKind.Evolution => Named("Minimal/evolution"),
+		RewardKind.Mutation => Named("Minimal/mutation"),
+		_ => Named("Minimal/enhancement"),
 	};
 
 	/// <summary>地面节点类型 → 图标（奖励节点 / 商店 / 降临门…）。</summary>

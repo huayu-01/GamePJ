@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/ContractPayoffRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+DamagePerCompletion = 0.03
+MaxCompletions = 5
+[resource]
+script = ExtResource("row")
+NumericId = 1286
+Id = "surv_contract_payoff"
+DisplayName = "破晓清算"
+RewardKind = 0
+MaxStacks = 1
+Weight = 0.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_contract_payoff"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "本局每完成一次刻限猎令，直接攻击伤害+{Effects.0.DamagePerCompletion:0%}，最多计{Effects.0.MaxCompletions:0}次。"
+NameKey = "content.surv_contract_payoff.name"
+DescriptionKey = "content.surv_contract_payoff.description"
+Requires = PackedStringArray("surv_timed_hunt")
+
+Note = "2026-10-28按用户决定退出全部正式获取和图鉴；旧身份与效果资源仅保留追溯，不恢复旧四路线。"

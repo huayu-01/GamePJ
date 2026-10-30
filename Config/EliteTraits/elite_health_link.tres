@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="HealthLinkTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/HealthLinkTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1010
+Id = "elite_health_link"
+Title = "生命链接"
+Description = "同组合法对象分担伤害，转移不再递归。"
+NameKey = "elite.health_link.name"
+DescriptionKey = "elite.health_link.description"
+MaxCarriers = 1
+Radius = 8
+Magnitude = 0.35
+Count = 2

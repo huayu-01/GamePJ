@@ -22,6 +22,8 @@ public partial class ChooseScreen : OverlayScreen
 	private Button _template = null!;
 	private Action<int>? _onChosen;
 	private int _count;
+	private int _choiceEpoch;
+	private bool IsTopOverlay => UiRouter.Instance == null || UiRouter.Instance.IsTopScreen(this);
 
 	/// <summary>允许用 Esc 放弃（回调收到 -1）。商店这类「可以不买」的界面开启它。</summary>
 	public bool AllowCancel { get; set; }
@@ -49,6 +51,7 @@ public partial class ChooseScreen : OverlayScreen
 		}
 
 		_onChosen = onChosen;
+		int epoch = ++_choiceEpoch;
 		_count = options.Count;
 		_title.Text = title;
 		_hint.Text = string.IsNullOrEmpty(hint) ? "按数字键或点击选择（选定后立刻触发战斗）" : hint;
@@ -72,7 +75,7 @@ public partial class ChooseScreen : OverlayScreen
 			card.Icon = UiIcons.ForTitle(title);
 
 			int index = i;
-			card.Pressed += () => Choose(index);
+			card.Pressed += () => { if (epoch == _choiceEpoch) Choose(index); };
 			_cards.AddChild(card);
 		}
 
@@ -85,7 +88,7 @@ public partial class ChooseScreen : OverlayScreen
 
 	private void Cancel()
 	{
-		if (InputBlocked || !AllowCancel)
+		if (!IsOpen || !IsTopOverlay || InputBlocked || !AllowCancel)
 		{
 			return;
 		}
@@ -100,27 +103,28 @@ public partial class ChooseScreen : OverlayScreen
 	{
 		if (IsOpen && !InputBlocked)
 		{
+			_choiceEpoch++; _onChosen = null; _count = 0;
 			BeginClose();
 		}
 	}
 
 	private void Choose(int index)
 	{
-		if (InputBlocked || index < 0 || index >= _count)
+		if (!IsOpen || !IsTopOverlay || InputBlocked || index < 0 || index >= _count)
 		{
 			return;
 		}
 
 		Action<int>? callback = _onChosen;
 		_onChosen = null;
-		EmitSignal(SignalName.OptionChosen, index);
 		Close();
+		EmitSignal(SignalName.OptionChosen, index);
 		callback?.Invoke(index);
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (!IsOpen)
+		if (!IsOpen || !IsTopOverlay)
 		{
 			return;
 		}

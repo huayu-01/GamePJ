@@ -1,0 +1,205 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using ActRoguelike.Combat;
+using ActRoguelike.Combat.Elites;
+using ActRoguelike.Config;
+using ActRoguelike.Core;
+using ActRoguelike.Encounter;
+using ActRoguelike.World;
+using Godot;
+
+namespace ActRoguelike.Run;
+
+public partial class SurvivalDirector
+{
+	private sealed record OwnedEnemy(int Cost, bool Boss, bool Milestone, Action<HitInstance> Died);
+	private sealed class PendingEnemy
+	{
+		public required Unit Unit;
+		public required Node3D Warning;
+		public Vector3 Position;
+		public int Cost;
+		public bool Boss, Milestone;
+		public float Remaining, HealthScale, DamageScale;
+		public EliteTraitWave? TraitWave;
+		public EliteTraitReservation? Trait;
+	}
+	private readonly Dictionary<Unit, OwnedEnemy> _owned = new();
+	private readonly List<Unit> _pruneBuffer = new();
+	private readonly List<PendingEnemy> _pending = new();
+	private Vector3 _spawnGroundAnchor;
+	private bool TrySpawnAnchor(Unit unit, out Vector3 anchor)
+	{
+		// 沿地面延续锚点高度，避免最近点投影被玩家上方的孤立屋顶吸走。
+		Vector3 projected = _player!.GlobalPosition with { Y = _spawnGroundAnchor.Y };
+		if (MapManager.Instance?.TryNavigationAnchor(projected, out anchor, unit) != true) { anchor = default; return false; }
+		_spawnGroundAnchor = anchor;
+		return true;
+	}
+	private void TryQueueWeightedEnemy(SurvivalPhase phase)
+	{
+		float reserved = _pending.Sum(p => p.Cost);
+		var candidates = phase.Enemies.Where(row => row.SpawnResourceCost <= _bank - reserved && row.SpawnResourceCost + AlivePressure + reserved <= phase.MaxAlivePressure).ToArray();
+		float weight = candidates.Sum(row => row.Weight);
+		if (weight <= 0) return;
+		float roll = GD.Randf() * weight;
+		foreach (var row in candidates) { roll -= row.Weight; if (roll <= 0) { TryQueueEnemy(row, GD.Randf() < phase.EliteChance, false); return; } }
+	}
+	private bool TryQueueEnemy(EnemyConfig row, bool elite, bool milestone)
+	{
+		if (State != PhaseState.Surviving || _pending.Count >= 4) return false;
+		var phase = Definition!.Phases[Mathf.Max(0, _phaseIndex)]; int cost = row.SpawnResourceCost;
+		float reserved = _pending.Sum(p => p.Cost);
+		if (_owned.Count + _pending.Count >= phase.MaxAlive || cost > _bank - reserved || cost + AlivePressure + reserved > phase.MaxAlivePressure) return false;
+		var scene = RuntimeResources.Load<PackedScene>(row.ScenePath);
+		if (scene == null) return false;
+		var unit = scene.Instantiate<Unit>(); row.ApplyTo(unit);
+		if (elite) { var modifier = new EliteModifier(); unit.AddChild(modifier); unit.Scale = Vector3.One * modifier.ModelScale; }
+		var wave = EnsureTraitWave(phase);
+		if (wave?.CanAssign(unit, elite) == true && wave.Definition is { } chosen
+			&& cost + chosen.ExtraCost <= phase.MaxAlivePressure
+			&& (_bank - reserved < cost + chosen.ExtraCost || phase.MaxAlivePressure - AlivePressure - reserved < cost + chosen.ExtraCost)) { unit.Free(); return false; }
+		var trait = wave?.Reserve(unit, elite, _bank - reserved - cost, phase.MaxAlivePressure - AlivePressure - reserved - cost);
+		cost += trait?.Cost ?? 0;
+		if (!FindPoint(unit, out Vector3 point)) { trait?.Dispose(); unit.Free(); return false; }
+		_pending.Add(new PendingEnemy { Unit = unit, Position = point, Cost = cost, TraitWave = wave, Trait = trait, Milestone = milestone, Remaining = Definition.SpawnWarningSeconds, HealthScale = phase.HealthScale, DamageScale = phase.DamageScale, Warning = SpawnWarning(point, elite ? new Color(1, .57f, .15f) : new Color(.25f, .85f, 1)) });
+		return true;
+	}
+	private bool FindPoint(Unit unit, out Vector3 point)
+	{
+		point = default;
+		// 玩家跳跃或站在屋顶时，以该敌人体型的导航网格为生成中心；严格落点规则保持不变。
+		return TrySpawnAnchor(unit, out Vector3 anchor)
+			&& SpawnPlanner.TryFindSpawnPoint(anchor, Definition!.SpawnMinDistance, Definition.SpawnMaxDistance, out point, unit, _pending.Select(p => p.Position).ToArray());
+	}
+	private void TryQueueBoss()
+	{
+		var row = Definition!.FinalBoss!;
+		var scene = RuntimeResources.Load<PackedScene>(row.ScenePath); if (scene == null) return;
+		var unit = scene.Instantiate<Unit>(); row.ApplyTo(unit);
+		if (!FindPoint(unit, out Vector3 point)) { unit.Free(); return; }
+		_pending.Add(new PendingEnemy
+		{
+			Unit = unit, Position = point, Boss = true, Remaining = Mathf.Max(1.5f, Definition.SpawnWarningSeconds),
+			HealthScale = Definition.BossHealthScale * (CompletedBeacons == 3 ? Definition.CompletedBeaconsBossScale : 1), DamageScale = 1,
+			Warning = SpawnWarning(point, new Color(1, .3f, .2f), 2.4f)
+		});
+	}
+	private Node3D SpawnWarning(Vector3 point, Color color, float size = 1)
+	{
+		var marker = new Node3D { Name = "SpawnWarning" }; AddChild(marker); marker.GlobalPosition = point + Vector3.Up * .08f;
+		var material = new StandardMaterial3D { AlbedoColor = new Color(color, .65f), Transparency = BaseMaterial3D.TransparencyEnum.Alpha, ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded, EmissionEnabled = true, Emission = color, EmissionEnergyMultiplier = 1.5f };
+		marker.AddChild(new MeshInstance3D { Mesh = new TorusMesh { InnerRadius = .76f * size, OuterRadius = size, Rings = 24, RingSegments = 6, Material = material }, Scale = new Vector3(1, .12f, 1), CastShadow = GeometryInstance3D.ShadowCastingSetting.Off });
+		return marker;
+	}
+	private void TickPendingSpawns(float dt)
+	{
+		for (int i = _pending.Count - 1; i >= 0; i--)
+		{
+			var pending = _pending[i]; pending.Remaining -= dt;
+			if (IsInstanceValid(pending.Warning)) pending.Warning.RotateY(dt * 1.7f);
+			if (pending.Remaining > 0) continue;
+			_pending.RemoveAt(i); if (IsInstanceValid(pending.Warning)) pending.Warning.QueueFree();
+			var map = MapManager.Instance;
+			bool valid = map is { IsReady: true } && TrySpawnAnchor(pending.Unit, out Vector3 anchor)
+				&& map.TryValidPoint(pending.Position, anchor, out Vector3 checkedPoint, pending.Unit)
+				&& checkedPoint.DistanceTo(pending.Position) < .2f
+				&& new Vector2(pending.Position.X - anchor.X, pending.Position.Z - anchor.Z).Length() >= Definition!.SpawnMinDistance;
+			if (!valid) { pending.Trait?.Dispose(); pending.Unit.Free(); continue; }
+			AddChild(pending.Unit); pending.Unit.GlobalPosition = pending.Position + Vector3.Up * .04f; pending.Unit.ResetPhysicsInterpolation();
+			ConfigIndex.ScaleEnemy(pending.Unit, this, pending.Boss);
+			pending.Unit.Stats.AddModifier(new StatModifier { Stat = "MaxHealthMultiplier", Operation = ModifierOperation.Multiply, Value = pending.HealthScale, Source = this });
+			pending.Unit.Stats.AddModifier(new StatModifier { Stat = "DamageMultiplier", Operation = ModifierOperation.Multiply, Value = pending.DamageScale, Source = this });
+			pending.Unit.RefreshStats(); pending.Unit.FillVitals();
+			pending.TraitWave?.Register(pending.Unit); pending.Trait?.Commit(pending.Unit); pending.Trait?.Dispose();
+			if (pending.Trait != null) pending.Unit.FillVitals();
+			RegisterUnit(pending.Unit, pending.Cost, pending.Boss, pending.Milestone); TotalSpawned++;
+			if (pending.Boss) _boss = pending.Unit; else _bank = Mathf.Max(0, _bank - pending.Cost);
+		}
+		SealFinishedTraitWaves();
+	}
+	private void RegisterUnit(Unit unit, int cost, bool boss, bool milestone)
+	{
+		if (_owned.ContainsKey(unit)) return;
+		Action<HitInstance> callback = hit => OnEnemyDied(unit, hit);
+		_owned.Add(unit, new OwnedEnemy(cost, boss, milestone, callback)); unit.Died += callback; AlivePressure += cost;
+	}
+	private void OnEnemyDied(Unit unit, HitInstance hit)
+	{
+		if (!_owned.Remove(unit, out var entry)) return;
+		unit.Died -= entry.Died; AlivePressure = Mathf.Max(0, AlivePressure - entry.Cost);
+		if (!Active) return;
+		if (unit.HasMeta("EliteSummoned")) return;
+		TotalKills++;
+		EnemyDefeated?.Invoke(unit, entry.Cost);
+		Vector3 point = unit.GlobalPosition;
+		if (MapManager.Instance?.TrySnap(point, out Vector3 ground) == true) point = ground;
+		_experience?.Drop(point, Mathf.Max(1, Mathf.RoundToInt(Mathf.Max(1, entry.Cost) * Definition!.ExperiencePerPressure)));
+		if (entry.Milestone)
+		{
+			CompletedObjectives++;
+			var relic = new SurvivalObjective { Name = "EliteRelic", Director = this, Kind = SurvivalObjective.ObjectiveKind.Relic };
+			AddChild(relic); relic.GlobalPosition = point; _objectives.Add(relic); Notice = ContentText.Get("ui.survival.relic_drop", "强敌已击败 · 靠近橙色遗物，按F选择死战专属增幅");
+		}
+		if (entry.Boss && _player is { IsDead: false })
+		{
+			BossDefeated = true; State = PhaseState.AwaitingExit; _frozen = CaptureStatistics(); SceneRune?.Stop();
+			BuildRuntime?.Stop();
+			StopEliteTraits();
+			CancelPendingSpawns(); ClearEnemies(); _rewards.Clear();
+			foreach (var objective in _objectives) if (IsInstanceValid(objective)) objective.Enabled = false;
+			Vector3 desired = new(0, .1f, 38);
+			if (MapManager.Instance?.TryValidPoint(desired, _player.GlobalPosition, out Vector3 exitPoint, _player) == true) desired = exitPoint;
+			var exit = new SurvivalObjective { Name = "SurvivalExit", Director = this, Kind = SurvivalObjective.ObjectiveKind.Exit };
+			AddChild(exit); exit.GlobalPosition = desired; _objectives.Add(exit); Notice = "首领已击败 · 返回南侧金色撤离门，按F完成试炼";
+		}
+	}
+	private void PruneUnits()
+	{
+		using var profile=RuntimeFrameProfiler.Measure("SurvivalPrune");
+		_pruneBuffer.Clear();
+		foreach (var pair in _owned)
+			if (!IsInstanceValid(pair.Key) || pair.Key.IsQueuedForDeletion() || pair.Key.IsDead)
+				_pruneBuffer.Add(pair.Key);
+		foreach (var unit in _pruneBuffer)
+		{
+			var entry = _owned[unit];
+			unit.Died -= entry.Died; _owned.Remove(unit); AlivePressure = Mathf.Max(0, AlivePressure - entry.Cost);
+			if (entry.Boss && !BossDefeated) _boss = null;
+		}
+		_pruneBuffer.Clear();
+	}
+	private void RegisterReinforcements()
+	{
+		if (_sceneOwner == null || !IsInstanceValid(_sceneOwner)) return;
+		foreach (Node node in GetTree().GetNodesInGroup("enemy_units"))
+			if (node is Unit unit && _sceneOwner.IsAncestorOf(unit) && !unit.IsDead && !_owned.ContainsKey(unit))
+			{
+				var row = ConfigRows.ByScenePath<EnemyConfig>(unit.SceneFilePath);
+				RegisterUnit(unit, row?.SpawnResourceCost ?? 1, false, false);
+			}
+	}
+	private void CancelPendingSpawns()
+	{
+		foreach (var pending in _pending)
+		{
+			pending.Trait?.Dispose();
+			if (IsInstanceValid(pending.Warning)) pending.Warning.QueueFree();
+			if (IsInstanceValid(pending.Unit)) pending.Unit.Free();
+		}
+		_pending.Clear();
+	}
+	private void ClearEnemies()
+	{
+		foreach (var pair in _owned)
+		{
+			pair.Key.Died -= pair.Value.Died;
+			if (IsInstanceValid(pair.Key) && !pair.Key.IsQueuedForDeletion()) pair.Key.QueueFree();
+		}
+		_owned.Clear(); AlivePressure = 0;
+		if (_sceneOwner != null && IsInstanceValid(_sceneOwner) && IsInsideTree())
+			foreach (Node node in GetTree().GetNodesInGroup("enemy_units"))
+				if (_sceneOwner.IsAncestorOf(node) && !node.IsQueuedForDeletion()) node.QueueFree();
+	}
+}

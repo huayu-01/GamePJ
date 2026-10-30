@@ -1,4 +1,6 @@
 using ActRoguelike.Run;
+using ActRoguelike.Audio;
+using ActRoguelike.Visual;
 using Godot;
 
 namespace ActRoguelike.Combat;
@@ -32,9 +34,17 @@ public partial class ChallengerMark : Node3D
 	private bool _active;
 	private float _scale = 1f;
 	private float _spin;
+	private StageController? _stage;
+	private Unit? _unit;
+	private Tween? _transition;
+	public bool Active => _active;
+	public GpuParticles3D? Particles { get; private set; }
+	public int EntryCount { get; private set; }
+	public int CompletionCount { get; private set; }
 
 	public override void _Ready()
 	{
+		_unit = GetParentOrNull<Unit>();
 		_mesh = new MeshInstance3D { Name = "Mark" };
 		AddChild(_mesh);
 		Position = new Vector3(0f, Height, 0f);
@@ -46,11 +56,46 @@ public partial class ChallengerMark : Node3D
 			AlbedoColor = new Color(1f, 0.75f, 0.25f, 0f),
 			EmissionEnabled = true,
 			Emission = new Color(1f, 0.6f, 0.15f),
+			CullMode = BaseMaterial3D.CullModeEnum.Disabled,
 		};
 
 		_mesh.Mesh = BuildRing();
 		_mesh.MaterialOverride = _material;
 		_mesh.Visible = false;
+		var ramp = new Gradient();
+		ramp.SetColor(0, new Color(1, .65f, .16f, 0));
+		ramp.SetColor(1, new Color(1, .9f, .45f, 0));
+		ramp.AddPoint(.2f, new Color(1, .8f, .28f, .9f));
+		ramp.AddPoint(.65f, new Color(1, .65f, .15f, .6f));
+		Particles = new GpuParticles3D
+		{
+			Name = "ChallengerParticles", Amount = 48, Lifetime = 1.1, Emitting = false, Visible = false,
+			Position = Vector3.Up * .85f, LocalCoords = true,
+			VisibilityAabb = new Aabb(new Vector3(-2, -1, -2), new Vector3(4, 5, 4)),
+			ProcessMaterial = new ParticleProcessMaterial
+			{
+				EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Sphere, EmissionSphereRadius = .55f,
+				Direction = Vector3.Up, Spread = 45, Gravity = new Vector3(0, .35f, 0),
+				InitialVelocityMin = .4f, InitialVelocityMax = 1.1f, ScaleMin = .35f, ScaleMax = .8f,
+				ColorRamp = new GradientTexture1D { Gradient = ramp },
+			},
+			DrawPass1 = new QuadMesh
+			{
+				Size = Vector2.One * .2f,
+				Material = new StandardMaterial3D
+				{
+					ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded, Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+					BillboardMode = BaseMaterial3D.BillboardModeEnum.Particles, VertexColorUseAsAlbedo = true,
+					EmissionEnabled = true, Emission = new Color(1, .65f, .12f), EmissionEnergyMultiplier = 1.2f,
+				},
+			},
+		};
+		AddChild(Particles);
+	}
+	public override void _ExitTree()
+	{
+		if (_stage != null && IsInstanceValid(_stage)) _stage.ChallengeFinished -= OnChallengeFinished;
+		if (_transition != null && IsInstanceValid(_transition)) _transition.Kill();
 	}
 
 	/// <summary>用代码生成一圈三角形：每个三角形的尖角朝中心。</summary>
@@ -80,13 +125,17 @@ public partial class ChallengerMark : Node3D
 
 	public override void _Process(double delta)
 	{
-		// 状态从关卡管理器读，避免各处重复接线。
-		bool wanted = StageController.Instance is { ChallengerActive: true };
-		if (wanted != _active)
+		StageController? stage = StageController.Instance;
+		if (_stage != stage)
 		{
-			_active = wanted;
-			Play(wanted);
+			if (_stage != null && IsInstanceValid(_stage)) _stage.ChallengeFinished -= OnChallengeFinished;
+			_stage = stage;
+			if (_stage != null) _stage.ChallengeFinished += OnChallengeFinished;
+			SetActive(false);
 		}
+		// 状态从关卡管理器读，避免各处重复接线。
+		bool wanted = _stage is { ChallengerActive: true } && _unit is { IsDead: false };
+		SetActive(wanted);
 
 		if (!_mesh.Visible)
 		{
@@ -101,12 +150,38 @@ public partial class ChallengerMark : Node3D
 		float breath = 1f + (Mathf.Sin(_spin * 3f) * 0.04f);
 		Scale = Vector3.One * (_scale * breath);
 	}
+	private void SetActive(bool active)
+	{
+		if (_active == active) return;
+		_active = active;
+		Particles!.Emitting = active;
+		Particles.Visible = active;
+		if (active)
+		{
+			EntryCount++;
+			WorldPulseFx.Play(this, _unit!.GlobalPosition, new Color(1, .65f, .12f, .8f), 1.6f, .35f, false);
+			AudioManager.Play(AudioIds.ChallengeBegin);
+		}
+		Play(active);
+	}
+	private void OnChallengeFinished(bool completed)
+	{
+		SetActive(false);
+		// 退态可能来自失败、换关或死亡；只有关卡的成功事件才触发庆祝。
+		if (!completed || _unit is not { IsDead: false }) return;
+		CompletionCount++;
+		WorldPulseFx.Play(this, _unit.GlobalPosition, new Color(.2f, 1, .65f, .9f), 2.8f, .65f, false);
+		AudioManager.Play(AudioIds.ChallengeComplete);
+	}
 
 	/// <summary>出现：放大淡入；消失：拉伸并炸开淡出。</summary>
 	private void Play(bool appearing)
 	{
+		// 新一轮开始时取消上一轮淡出的回调，避免把重新激活的标记藏掉。
+		if (_transition != null && IsInstanceValid(_transition)) _transition.Kill();
 		_mesh.Visible = true;
 		Tween tween = CreateTween();
+		_transition = tween;
 		tween.SetParallel(true);
 
 		if (appearing)

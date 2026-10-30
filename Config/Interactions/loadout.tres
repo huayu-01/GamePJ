@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="InteractionDefinition" load_steps=3 format=3]
+[ext_resource type="Script" path="res://Scripts/Config/InteractionDefinition.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Scenes/Interactables/Backends/Loadout.tscn" id="2"]
+[resource]
+script = ExtResource("1")
+BackendScene = ExtResource("2")
+VisualStyle = 12

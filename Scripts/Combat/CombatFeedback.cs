@@ -42,10 +42,15 @@ public static class CombatFeedback
 	};
 	public static void Present(Unit target, HitInstance hit, DamageResult result)
 	{
+		if (hit.Parried && hit.ParryFeedbackPresented) return;
 		ImpactKind kind = Classify(result, hit); LastKind = kind;
 		var profile = Profile;
+		bool playerHurt = target.Faction == Faction.Player && !target.HasTag("Summon");
+		if (playerHurt && profile.Enabled && result.HealthLost + result.ArmorLost + result.ShieldLost > 0)
+			if (PlayerHurtFeedback.Ensure(target).Show(hit, result)) CameraCount++;
 		// 周期伤害仍结算与跳字，但不打断视觉节奏；来源失效时也不冒领玩家反馈。
 		if (!profile.Enabled || kind == ImpactKind.None || hit.Attack?.IsDamageOverTime == true) return;
+		if (kind == ImpactKind.Parry) hit.ParryFeedbackPresented = true;
 		ulong now = Time.GetTicksMsec();
 		bool priority = kind is ImpactKind.ArmorBreak or ImpactKind.Parry || result.Killed;
 		if (now < target.FeedbackReadyAt && !priority) return;
@@ -56,18 +61,26 @@ public static class CombatFeedback
 		if (result.Critical) weight *= profile.CriticalWeight;
 		if (kind == ImpactKind.ArmorBreak) weight *= profile.BreakWeight;
 		if (result.Killed) weight *= profile.KillWeight;
+		if (kind == ImpactKind.Parry) weight *= profile.ParryWeight;
 		weight = Mathf.Clamp(weight, .3f, 2.5f);
 		bool secondary = hit.Attack?.IsSecondary == true;
 		if (secondary) weight *= .45f;
 		target.GetNodeOrNull<UnitPresentation>("Presentation")?.ShowImpact(kind, profile.FlashSeconds);
+		Vector3 point = hit.Position, direction = hit.Direction;
+		if (kind == ImpactKind.Parry)
+		{
+			Vector3 outward = GodotObject.IsInstanceValid(hit.Attacker) ? hit.Attacker!.GlobalPosition - target.GlobalPosition : -hit.Direction;
+			outward.Y = 0; outward = outward.LengthSquared() > .001f ? outward.Normalized() : -target.GlobalBasis.Z;
+			point = Targeting.AimPoint(target) + outward * .55f; direction = -outward;
+		}
 		ulong frame = Engine.GetPhysicsFrames();
 		if (_effectFrame != frame) { _effectFrame = frame; _effectCount = 0; }
 		if (ConfigIndex.Settings.ShowHitEffects && _effectCount < Mathf.Max(0, profile.MaxEffectsPerFrame))
 		{
 			_effectCount++;
-			if (kind == ImpactKind.Flesh) HitEffect.Spawn(target, hit.Position, Mathf.Sqrt(weight));
-			else CombatImpactFx.Spawn(target, hit.Position, hit.Direction, kind, weight);
-			ImpactVisibility.Spawn(target, hit.Position, kind);
+				if (kind == ImpactKind.Flesh) HitEffect.Spawn(target, point, Mathf.Sqrt(weight));
+				else CombatImpactFx.Spawn(target, point, direction, kind, weight);
+				ImpactVisibility.Spawn(target, point, kind);
 		}
 		Unit? source = hit.Attacker is { } owner && GodotObject.IsInstanceValid(owner) ? owner : null;
 		bool playerSource = source?.Faction == Faction.Player && !source.HasTag("Summon");
@@ -86,10 +99,10 @@ public static class CombatFeedback
 			string sound = kind switch { ImpactKind.Armor => profile.ArmorSound, ImpactKind.ArmorBreak => profile.BreakSound,
 				ImpactKind.Block or ImpactKind.Parry => profile.BlockSound, _ => profile.FleshSound };
 			float pitch = kind switch { ImpactKind.Armor => profile.ArmorPitch, ImpactKind.ArmorBreak => profile.BreakPitch,
-				ImpactKind.Block or ImpactKind.Parry => profile.BlockPitch, _ => 1 / Mathf.Sqrt(weight) };
+				ImpactKind.Parry => profile.ParryPitch, ImpactKind.Block => profile.BlockPitch, _ => 1 / Mathf.Sqrt(weight) };
 			if (AudioManager.PlayImpact(sound, pitch, result.Killed ? 1 : 0)) SoundCount++;
 		}
-		if (now >= _cameraAt && frame != _cameraFrame && profile.CameraStrength > 0 && target.GetViewport().GetCamera3D() is { } camera)
+		if ((!playerHurt || kind == ImpactKind.Parry) && now >= _cameraAt && frame != _cameraFrame && profile.CameraStrength > 0 && target.GetViewport().GetCamera3D() is { } camera)
 		{
 			// 镜头必须看得到事件；远处穿透、召唤物或后台击杀不能拖动当前视角。
 			if (camera.IsPositionBehind(hit.Position) || !camera.GetViewport().GetVisibleRect().HasPoint(camera.UnprojectPosition(hit.Position))) return;

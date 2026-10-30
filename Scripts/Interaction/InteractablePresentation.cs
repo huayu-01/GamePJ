@@ -1,6 +1,7 @@
 using ActRoguelike.Audio;
 using ActRoguelike.Core;
 using ActRoguelike.UI;
+using ActRoguelike.Visual;
 using Godot;
 
 namespace ActRoguelike.Interaction;
@@ -56,6 +57,8 @@ public partial class InteractablePresentation : Node3D
 
 	/// <summary>玩家被击退的冲量（走 <c>CharacterMovement.AddImpulse</c>，指数衰减）。</summary>
 	[Export] public float FailKnockback { get; set; } = 4.5f;
+	[Export] public float FailureWaveRadius { get; set; } = 2.6f;
+	[Export] public float FailureWaveSeconds { get; set; } = .55f;
 
 	private Interactable _owner = null!;
 	private MeshInstance3D? _outline;
@@ -64,6 +67,7 @@ public partial class InteractablePresentation : Node3D
 	private Vector3 _meshHome;
 	private bool _meshHomeTaken;
 	private float _bob;
+	private float _failureCooldown;
 
 	/// <summary>这个交互物现在有没有描边 / 按键图标（验证与探针用只读值）。</summary>
 	public bool Highlighted { get; private set; }
@@ -76,6 +80,9 @@ public partial class InteractablePresentation : Node3D
 
 	/// <summary>失败响应播了几次（验证用只读计数器）。</summary>
 	public int FailCount { get; private set; }
+	public int FailureWaveCount { get; private set; }
+	public WorldPulseFx? LastFailureWave { get; private set; }
+	public bool LastFailureSoundPlayed { get; private set; }
 
 	/// <summary>
 	/// 找交互物下的 <c>Presentation</c>；**没有就补一个** —— 这样"新增一个交互物"不需要在场景里手动挂节点
@@ -110,10 +117,14 @@ public partial class InteractablePresentation : Node3D
 			_owner.Rejected -= OnInteractFailed;
 			_owner.Failed -= OnInteractFailed;
 		}
+		// 组合式交互的描边属于组件，即使网格在外部也要成对释放。
+		if (_outline != null && IsInstanceValid(_outline)) _outline.QueueFree();
+		if (_shake != null && IsInstanceValid(_shake)) _shake.Kill();
 	}
 
 	public override void _Process(double delta)
 	{
+		_failureCooldown = Mathf.Max(0, _failureCooldown - (float)delta);
 		bool target = IsTarget();
 		if (target != Highlighted)
 		{
@@ -158,7 +169,7 @@ public partial class InteractablePresentation : Node3D
 	/// <summary>反向外壳描边：同一份 Mesh + 只画背面（<c>CullMode = Front</c>）+ 向外 Grow + 自发光。</summary>
 	private void BuildOutline()
 	{
-		if (_owner.VisualMesh is not { } mesh || mesh.Mesh == null)
+		if ((_owner.HighlightMesh ?? _owner.VisualMesh) is not { } mesh || mesh.Mesh == null)
 		{
 			return;
 		}
@@ -215,12 +226,22 @@ public partial class InteractablePresentation : Node3D
 	/// <summary>图标高度：外观网格顶部再往上 <see cref="IconGap"/>（网格大小由预制体决定，所以按 AABB 算）。</summary>
 	private float IconHeight()
 	{
-		if (_owner.VisualMesh is not { } mesh)
+		if ((_owner.HighlightMesh ?? _owner.VisualMesh) is not { } mesh)
 		{
 			return 2f;
 		}
 
 		Aabb box = mesh.GetAabb();
+		if (_owner.HighlightMesh != null)
+		{
+			float top = float.NegativeInfinity;
+			for (int i = 0; i < 8; i++)
+			{
+				Vector3 corner = box.Position + new Vector3((i & 1) != 0 ? box.Size.X : 0, (i & 2) != 0 ? box.Size.Y : 0, (i & 4) != 0 ? box.Size.Z : 0);
+				top = Mathf.Max(top, ToLocal(mesh.ToGlobal(corner)).Y);
+			}
+			return top + IconGap;
+		}
 		float half = Mathf.Abs(box.Size.Y * mesh.Scale.Y) * 0.5f;
 		return mesh.Position.Y + half + IconGap;
 	}
@@ -232,10 +253,15 @@ public partial class InteractablePresentation : Node3D
 	/// </summary>
 	private void OnInteractFailed()
 	{
+		// 只对玩家真正摸得到的有效物体反馈；快速按键不叠加冲量、音效和光罩。
+		if (_failureCooldown > 0 || !_owner.PlayerInRange || !_owner.Enabled || _owner.Used || _owner.Vanished || !_owner.IsVisibleInTree()) return;
+		_failureCooldown = .2f;
 		FailCount++;
 
 		// 音效：走音效表（表里没有这一行就静默不播，玩法不受影响）。
-		AudioManager.Play(AudioIds.InteractFail);
+		LastFailureSoundPlayed = AudioManager.Play(AudioIds.InteractFail);
+		LastFailureWave = WorldPulseFx.Play(this, _owner.GlobalPosition, new Color(1, .12f, .1f, .85f), FailureWaveRadius, FailureWaveSeconds);
+		FailureWaveCount++;
 
 		Shake();
 		FlashOutline();
@@ -245,7 +271,7 @@ public partial class InteractablePresentation : Node3D
 	/// <summary>抖外观网格（不是根节点：根节点的 scale 被出现/消失补间占用，混着写会互相打断）。</summary>
 	private void Shake()
 	{
-		if (_owner.VisualMesh is not { } mesh)
+		if ((_owner.HighlightMesh ?? _owner.VisualMesh) is not { } mesh)
 		{
 			return;
 		}
@@ -305,6 +331,6 @@ public partial class InteractablePresentation : Node3D
 			direction = Vector3.Back;
 		}
 
-		player.Movement?.AddImpulse(direction.Normalized() * FailKnockback);
+		player.Movement?.AddImpulse(direction.Normalized() * Mathf.Max(0, FailKnockback));
 	}
 }

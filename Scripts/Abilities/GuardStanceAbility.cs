@@ -5,16 +5,22 @@ using Godot;
 namespace ActRoguelike.Abilities;
 
 /// <summary>
-/// 技能2「架」：只有真实GuardOn开启0.75游戏秒的窗口；缺事件只取消。
-/// 第一次敌方命中仅标记该HitInstance无效并退出，不能扩散成同帧无敌。
+/// 技能2「架」：真实GuardOn开启配置时长的持续窗口；缺事件只取消。
+/// 每次命中只无效化对应HitInstance，成功格挡不提前关闭持续窗口。
 /// 用户已确认可以规避能量波；普通BlockComponent仍遵守穿透格挡规则。
 /// 收招后派发Parried，招架反击的冷却刷新不再被收招写回覆盖。
 /// </summary>
-public partial class GuardStanceAbility : Ability
+public partial class GuardStanceAbility : Ability, ILocomotionCancelable
 {
+	public void CancelForLocomotion()
+	{
+		// 走完整收招与冷却，立即关闭防御订阅；已成功格挡产生的自身硬直仍由反应组件管理。
+		if (IsActive) Finish();
+	}
 	[ExportGroup("架势")]
 	/// <summary>架势总时长（秒）。文档：0.75。</summary>
-	[Export] public float StanceSeconds { get; set; } = 0.75f;
+	[Export] public float StanceSeconds { get; set; } = 1.5f;
+	[Export] public bool ReflectProjectiles { get; set; } = true;
 	[Export] public float BlockStunSeconds { get; set; } = 0.15f;
 
 	/// <summary>开架势的真实动画事件名；留空拒绝，不以时间代替。</summary>
@@ -69,7 +75,7 @@ public partial class GuardStanceAbility : Ability
 		_subscribed = true;
 	}
 
-	/// <summary>被命中：架势内 → 规避这次 + 退出架势。</summary>
+	/// <summary>被命中：架势内 → 规避这次并保留窗口。</summary>
 	private void OnOwnerHit(HitInstance hit)
 	{
 		if (!Enabled || !IsBusy || !StanceActive || OwnerUnit == null || hit.Attacker == null || !OwnerUnit.IsHostileTo(hit.Attacker)
@@ -88,16 +94,18 @@ public partial class GuardStanceAbility : Ability
 		hit.Parried = true;
 		ParryCount++;
 		LastParriedDamage = hit.Damage;
+		// 弹体可能在进入ReceiveHit前就被反射；在真实招架事实处请求唯一反馈。
+		CombatFeedback.Present(OwnerUnit, hit, new DamageResult { Hit = true, Invulnerable = true });
 
 		GameLog.Write(
 			"Combat",
-			$"架：{AbilityId} **架住了**（挡下 {hit.Damage:0.##} 点，来源 {hit.Attacker?.Name ?? "（无）"}），规避这次攻击并退出架势（累计 {ParryCount} 次）");
+			$"架：{AbilityId} **架住了**（挡下 {hit.Damage:0.##} 点，来源 {hit.Attacker?.Name ?? "（无）"}），规避这次攻击并保持架势（累计 {ParryCount} 次）");
 
 		// P5 第二批（只加）：把"架住了"这件事抛到事件总线上。
 		// 订阅方是两条**表驱动**的增幅：「招架反击」（刷新技能 2 冷却）、「能量护盾」（对周围敌人造成伤害）。
 		// 没有任何订阅者时这一句什么也不做（Raise 自己判 handlers == null）。
-		EndStance(exitStance: true);
 		OwnerUnit.Reactions?.BlockRecoil(BlockStunSeconds);
+		OwnerUnit.RaiseBlocked(hit);
 		GameplayEventBus.Raise(new GameplayEvent
 		{
 			Kind = GameplayEventKind.Parried,
@@ -109,8 +117,15 @@ public partial class GuardStanceAbility : Ability
 			Context = hit.Context,
 		});
 	}
+	/// <summary>弹体碰撞在爆炸和伤害前请求主动招架；反射本身不伪造一次受伤。</summary>
+	public bool TryReflectProjectile(HitInstance hit)
+	{
+		if (!ReflectProjectiles) return false;
+		OnOwnerHit(hit);
+		return hit.Parried;
+	}
 
-	/// <summary>GuardOn开窗口；GuardOff不得提前截短表内0.75游戏秒。</summary>
+	/// <summary>GuardOn开窗口；GuardOff不得提前截短表内持续窗口。</summary>
 	protected override void OnAnimEvent(string name)
 	{
 		if (!string.IsNullOrEmpty(GuardOnEvent) && name == GuardOnEvent)
@@ -136,7 +151,7 @@ public partial class GuardStanceAbility : Ability
 		_stanceElapsed = 0;
 		_stanceOpenedFrame = Engine.GetPhysicsFrames();
 		StanceCount++;
-		GameLog.Write("Combat", $"架：{AbilityId} 架势开始（{StanceSeconds:0.##}s，期间被命中则规避并退出）");
+		GameLog.Write("Combat", $"架：{AbilityId} 架势开始（{StanceSeconds:0.##}s，期间可以连续格挡）");
 	}
 
 	private void EndStance(bool exitStance)

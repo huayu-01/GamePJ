@@ -1,0 +1,57 @@
+{
+  "server": {
+    "name": "MCP for Blender",
+    "title": null,
+    "version": "1.30.0",
+    "websiteUrl": null,
+    "icons": null
+  },
+  "tools": [
+    "get_addon_status",
+    "disable_telemetry",
+    "get_scene_info",
+    "execute_blender_code",
+    "record_trajectory_feedback",
+    "look",
+    "generate_3d",
+    "search_assets",
+    "import_asset"
+  ],
+  "get_addon_status": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"up_to_date\": true,\n  \"protocol_version\": 13,\n  \"expected_protocol_version\": 13,\n  \"addon_version\": [\n    1,\n    8\n  ],\n  \"capabilities\": [\n    \"bpy_api_lookup\",\n    \"describe_node_type\",\n    \"drain_human_activity\",\n    \"execute_code\",\n    \"get_addon_info\",\n    \"get_object_info\",\n    \"get_scene_info\",\n    \"get_telemetry_consent\",\n    \"get_viewport_screenshot\",\n    \"get_world_state_snapshot\",\n    \"list_scene_items\",\n    \"pick_viewport_object\",\n    \"set_telemetry_consent\"\n  ],\n  \"blender_version\": \"5.2.2 LTS\",\n  \"premium_generators\": [],\n  \"libraries\": {\n    \"polyhaven\": \"off\",\n    \"sketchfab\": \"off\",\n    \"polypizza\": \"off\"\n  },\n  \"generators\": {\n    \"tripo\": \"off (Premium only)\",\n    \"hunyuan3d\": \"off\",\n    \"hyper3d\": \"off\",\n    \"meshy\": \"off\"\n  },\n  \"source\": \"native\",\n  \"warning\": null,\n  \"telemetry_consent\": false,\n  \"update_command\": \"uvx mcp-for-blender install-addon\",\n  \"after_install\": \"If the addon file was updated: in Blender, Preferences \\u2192 Add-ons \\u2192 disable/enable 'Interface: Blender MCP', or restart Blender, then Start MCP Server.\"\n}"
+      }
+    ],
+    "structuredContent": {
+      "result": "{\n  \"up_to_date\": true,\n  \"protocol_version\": 13,\n  \"expected_protocol_version\": 13,\n  \"addon_version\": [\n    1,\n    8\n  ],\n  \"capabilities\": [\n    \"bpy_api_lookup\",\n    \"describe_node_type\",\n    \"drain_human_activity\",\n    \"execute_code\",\n    \"get_addon_info\",\n    \"get_object_info\",\n    \"get_scene_info\",\n    \"get_telemetry_consent\",\n    \"get_viewport_screenshot\",\n    \"get_world_state_snapshot\",\n    \"list_scene_items\",\n    \"pick_viewport_object\",\n    \"set_telemetry_consent\"\n  ],\n  \"blender_version\": \"5.2.2 LTS\",\n  \"premium_generators\": [],\n  \"libraries\": {\n    \"polyhaven\": \"off\",\n    \"sketchfab\": \"off\",\n    \"polypizza\": \"off\"\n  },\n  \"generators\": {\n    \"tripo\": \"off (Premium only)\",\n    \"hunyuan3d\": \"off\",\n    \"hyper3d\": \"off\",\n    \"meshy\": \"off\"\n  },\n  \"source\": \"native\",\n  \"warning\": null,\n  \"telemetry_consent\": false,\n  \"update_command\": \"uvx mcp-for-blender install-addon\",\n  \"after_install\": \"If the addon file was updated: in Blender, Preferences \\u2192 Add-ons \\u2192 disable/enable 'Interface: Blender MCP', or restart Blender, then Start MCP Server.\"\n}"
+    },
+    "isError": false
+  },
+  "get_scene_info": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Scene 'Scene' | 1 camera, 1 light, 1 mesh | active Cube | selected Cube | mode OBJECT\n\nShowing 3 of 3 (name | type | location | size | hidden | children):\nCube | mesh | at (0.0, 0.0, 0.0) | size 2.0x2.0x2.0\nLight | light | at (4.08, 1.01, 5.9)\nCamera | camera | at (7.36, -6.93, 4.96)"
+      }
+    ],
+    "structuredContent": {
+      "result": "Scene 'Scene' | 1 camera, 1 light, 1 mesh | active Cube | selected Cube | mode OBJECT\n\nShowing 3 of 3 (name | type | location | size | hidden | children):\nCube | mesh | at (0.0, 0.0, 0.0) | size 2.0x2.0x2.0\nLight | light | at (4.08, 1.01, 5.9)\nCamera | camera | at (7.36, -6.93, 4.96)"
+    },
+    "isError": false
+  },
+  "smoke": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Code executed successfully: INFO Draco is available, use library at E:\\steam\\steamapps\\common\\Blender\\5.2\\scripts\\addons_core\\io_scene_gltf2\\bf_intern_draco_bridge.dll\nINFO MeshOptimizer is available, use library at E:\\steam\\steamapps\\common\\Blender\\5.2\\scripts\\addons_core\\io_scene_gltf2\\bf_intern_meshopt_bridge.dll\n12:57:13 | INFO: Starting glTF 2.0 export\n12:57:13 | INFO: Extracting primitive: 立方体\n12:57:13 | INFO: Primitives created: 1\n12:57:13 | INFO: Finished glTF 2.0 export in 0.07439827919006348 s\n\n12:57:13 | INFO: Data are loaded, start creating Blender stuff\n12:57:13 | INFO: Blender create Mesh node 立方体\n12:57:13 | INFO: glTF import finished in 0.00s\nFetch rig.\nClear rig animation data.\nCreate widgets collection: 0.002\nDuplicate rig: 0.012\nInstantiate rigs: 0.003\nInitialize rigs: 0.001\nPrepare bones: 0.002\nGenerate bones: 3.878\nParent bones: 0.027\nConfigure bones: 0.027\nPreapply bones: 0.009\nApply bones: 0.004\nRig bones: 0.036\nGenerate widgets: 0.033\nAssign layers: 0.041\nFinalize: 0.041\nThe rest: 0.035\n信息: 成功生成: \"rig\"\nPIPELINE_SMOKE_OK 5.2.2 LTS 706\n"
+      }
+    ],
+    "structuredContent": {
+      "result": "Code executed successfully: INFO Draco is available, use library at E:\\steam\\steamapps\\common\\Blender\\5.2\\scripts\\addons_core\\io_scene_gltf2\\bf_intern_draco_bridge.dll\nINFO MeshOptimizer is available, use library at E:\\steam\\steamapps\\common\\Blender\\5.2\\scripts\\addons_core\\io_scene_gltf2\\bf_intern_meshopt_bridge.dll\n12:57:13 | INFO: Starting glTF 2.0 export\n12:57:13 | INFO: Extracting primitive: 立方体\n12:57:13 | INFO: Primitives created: 1\n12:57:13 | INFO: Finished glTF 2.0 export in 0.07439827919006348 s\n\n12:57:13 | INFO: Data are loaded, start creating Blender stuff\n12:57:13 | INFO: Blender create Mesh node 立方体\n12:57:13 | INFO: glTF import finished in 0.00s\nFetch rig.\nClear rig animation data.\nCreate widgets collection: 0.002\nDuplicate rig: 0.012\nInstantiate rigs: 0.003\nInitialize rigs: 0.001\nPrepare bones: 0.002\nGenerate bones: 3.878\nParent bones: 0.027\nConfigure bones: 0.027\nPreapply bones: 0.009\nApply bones: 0.004\nRig bones: 0.036\nGenerate widgets: 0.033\nAssign layers: 0.041\nFinalize: 0.041\nThe rest: 0.035\n信息: 成功生成: \"rig\"\nPIPELINE_SMOKE_OK 5.2.2 LTS 706\n"
+    },
+    "isError": false
+  },
+  "passed": true
+}

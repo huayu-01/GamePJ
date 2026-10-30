@@ -1,0 +1,289 @@
+{
+  "Passed": true,
+  "Date": "2026-10-29",
+  "Implemented": [
+    49,
+    50,
+    51,
+    52,
+    53,
+    54
+  ],
+  "DedicatedChecks": {
+    "PauseDive-headless": 24,
+    "PauseDive-render": 24,
+    "Content049054-headless": 22,
+    "Content049054-render": 25,
+    "CombatArt-headless": 13,
+    "CombatArt-render": 17
+  },
+  "Reports": [
+    "Logs/evidence/elites/run-20261029_100642.json",
+    "Logs/evidence/survival/integration-20261029_100810.json"
+  ],
+  "FinalRegressions": [
+    {
+      "Name": "base",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 33.14,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.base.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.base.err",
+      "Failure": "",
+      "SHA256": "12DAE7F2A31AA9BA830FD63898D1097EB600B38EDC62A7B62992BDE01248F246"
+    },
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 5.22,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.content.err",
+      "Failure": "",
+      "SHA256": "5C7C061E1C5A0DB83CBAC6C46DE476C2142EB00DC1AAB067EA6859D5F7E00CE6"
+    },
+    {
+      "Name": "enemy_actions",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.44,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.enemy_actions.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.enemy_actions.err",
+      "Failure": "",
+      "SHA256": "CEF6BB2530446375B7218B613F638AF127213862C2401FBB581958C46CFCAF04"
+    },
+    {
+      "Name": "localization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 3.14,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.localization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.localization.err",
+      "Failure": "",
+      "SHA256": "65BCB9FDEF927B3E3A3A1C85251ADBDF130546BA42105372A3DD40B484035959"
+    },
+    {
+      "Name": "effects",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 2.88,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.effects.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.effects.err",
+      "Failure": "",
+      "SHA256": "41CD58E2B25DED2F009305D202C103609DA507B0B3CDE5A206CEEEDD5F2C9422"
+    },
+    {
+      "Name": "slots",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 9.07,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.slots.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.slots.err",
+      "Failure": "",
+      "SHA256": "442038ED4889E72A1AFD26C24729DA4CD2FC8C11E918EFE065BDA44184F7216B"
+    },
+    {
+      "Name": "specialization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 12.48,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.specialization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.specialization.err",
+      "Failure": "",
+      "SHA256": "EA188739B70C6A46695D5FA2C06B09EBBD4D1C8A3AC5FD13870F5CEF6AA2C8ED"
+    },
+    {
+      "Name": "synergy",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 9.63,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.synergy.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.synergy.err",
+      "Failure": "",
+      "SHA256": "6AE391DE9E6DCE4D6A3C1F3B0EB5325BF84800952AFF3582857CE41CA2A49F42"
+    },
+    {
+      "Name": "adventure_render",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 32.73,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.adventure_render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.adventure_render.err",
+      "Failure": "",
+      "SHA256": "9F1F699F03E57A089895F74030A7B7EC6167ADCCAE79CD9C4C2AE5ED520C5C69"
+    },
+    {
+      "Name": "main",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 71.28,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.main.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.main.err",
+      "Failure": "",
+      "SHA256": "616274799C2640D4BB4CE7C4E71A3F9014B1A0D32371FEF5F3A0C04BBEE7C2DE"
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 40.28,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_100810.survival.err",
+      "Failure": "",
+      "SHA256": "D1E8C759CE7B606296BF8E7403396215CBECB9C94687A86FE6C7BC64A46AD160"
+    }
+  ],
+  "Builds": [
+    "Debug: 0 warnings / 0 errors",
+    "ExportRelease: 0 warnings / 0 errors"
+  ],
+  "SavesUnchanged": true,
+  "AcceptanceWorkbook": {
+    "passed": true,
+    "backup": "Logs\\maintenance\\acceptance-20261026\\backup-1793239800758.xlsx",
+    "saved": "F:\\Godot项目\\项目a\\outputs\\acceptance-20261026\\更新与修复验收.xlsx",
+    "sha256": "f095a852d7eac1ddeef2600c04946e139009e19428ea75cf41dc7446d979da28",
+    "changedIds": [
+      49,
+      50,
+      51,
+      52,
+      53,
+      54
+    ],
+    "historyAdded": 6,
+    "sourceAndPlayerCellsPreserved": true,
+    "otherRequirementsPreserved": true,
+    "formulasAndControlsPreserved": true
+  },
+  "StrictStderrEmpty": true,
+  "MaterialComparison": {
+    "resolution": [
+      3840,
+      2160
+    ],
+    "units": 100,
+    "phases": [
+      {
+        "phase": "original",
+        "samples": 394,
+        "averageFrameMs": 7.6192639593908575,
+        "p95FrameMs": 10.489,
+        "maximumFrameMs": 15.48,
+        "gpuMs": 4.232578680600007,
+        "drawCalls": 1743
+      },
+      {
+        "phase": "toon_outline",
+        "samples": 358,
+        "averageFrameMs": 8.383086592178765,
+        "p95FrameMs": 11.113,
+        "maximumFrameMs": 17.379,
+        "gpuMs": 4.325949720830224,
+        "drawCalls": 2499
+      },
+      {
+        "phase": "original_repeat",
+        "samples": 410,
+        "averageFrameMs": 7.321775609756097,
+        "p95FrameMs": 9.939,
+        "maximumFrameMs": 68.447,
+        "gpuMs": 4.265563413573474,
+        "drawCalls": 1743
+      }
+    ],
+    "note": "真实死战中混合当前四类单位，仅禁用本诊断的AI和主动移动；动画/身体/环境保持。只比较材质开关，含末尾原版重复，不代表完整12分钟性能或百敌60帧验收。"
+  },
+  "CombatPerformanceFile": "Logs\\evidence\\update-fixes\\performance-combat_art_049_054-20261029_101244.json",
+  "CombatPerformance": {
+    "label": "combat_art_049_054",
+    "goalMet": false,
+    "gpu": "NVIDIA GeForce RTX 4070 Ti",
+    "cpu": "AMD Ryzen 7 5800X 8-Core Processor",
+    "engine": "4.7.2-stable (official)",
+    "width": 3840,
+    "height": 2160,
+    "renderScale": 1,
+    "msaa": "Disabled",
+    "minEnemies": 100,
+    "maxEnemies": 100,
+    "playerAttackRequests": 19,
+    "crowdMode": "Avoidance",
+    "averageDeepOverlapPairs": 0,
+    "maxDeepOverlapPairs": 0,
+    "sampleSeconds": 12.009705000000006,
+    "samples": 615,
+    "averageFps": 51.20858505683527,
+    "low1Fps": 10.16356073090521,
+    "p95FrameMs": 29.158,
+    "p99FrameMs": 56.262,
+    "maxFrameMs": 270.743,
+    "gpuMs": 5.130829271843763,
+    "renderCpuMs": 1.7399024397377076,
+    "processMs": 12.717564227642326,
+    "physicsMs": 42.39604065040607,
+    "drawCalls": 1732.2260162601626,
+    "physicsFrames": 715,
+    "frameSetupCpuMs": 0.012,
+    "allocatedMb": 40.393333435058594,
+    "gc0": 2,
+    "gc1": 2,
+    "gc2": 1,
+    "note": "真实生产场景与导演，敌人额外生命避免采样时人数下降；AI、动作和物理保持开启，玩家实际尝试发射能量掌；平均与1%低帧均达60才记goalMet。质量使用当前配置，强制原生4K、无MSAA。"
+  },
+  "PerformanceGoalMet": false,
+  "Performance008StatusUnchanged": true,
+  "InitialFailuresRetained": [
+    {
+      "path": "Logs/validation/elites_20261029_000140.PauseDive.headless.log",
+      "reason": "原版离地终点反例卡空，pass23 fail1；修复后24项通过"
+    },
+    {
+      "path": "Logs/evidence/survival/integration-20261029_001233.json",
+      "reason": "联动断言全过但退出有未订阅信号解绑错误；补修动态材质与订阅生命周期后整批11类复跑通过"
+    },
+    {
+      "path": "Logs/evidence/elites/run-20261029_100526.json",
+      "reason": "进程刚退出时日志重定向未关闭导致文件占用；验证器WaitForExit等待输出排空，严格stderr与退出码要求保留"
+    }
+  ],
+  "SourceSHA256": {
+    "Scenes/UI/Hud.tscn": "7003aeefed2817a50815a85a44e47c3498a63f75d3cdb9cb3783e7ddb35bb573",
+    "Scripts/UI/PlayerHud.cs": "5e47931f2f82dc030dcb9aec2ae923c2d73105a92f94794462eb4a0b8f4c9e3c",
+    "Scripts/Config/Specializations/ThunderRecallBehaviorDefinition.cs": "c2900cc36bd85aee9519bc1b29e64c75f3e2844cebe78e1c4f2e7afa5cbaa436",
+    "Scripts/Rewards/Specializations/ContentSpecializationBehaviors.cs": "484c210f23c9a36aa8ab6cd475e8a7874a54b40382319a47a47c30a1dbd7c595",
+    "Scripts/Abilities/ScytheThrowAbility.cs": "523068c87c9edae7c90570c91d6a588ba2fff5d478f12e1d6ce6d14bb04c9ae8",
+    "Config/Tables/Upgrades/evo_thunder_recall.tres": "005d9c804053b72c1fae6c49f68797dfc432a013825c7ab1274ed24aeebc70a2",
+    "Scripts/Abilities/FallAttackAbility.cs": "ff0fc59bb22088885edc278c5b7ad83b470a09c10fe38bcfb5b62ea037a213b4",
+    "Scripts/Config/CombatArtStyleConfig.cs": "09f4390e478dfe0e5153da77c3406ca520626e09be5b502a1f57a74cb4069a4f",
+    "Config/CombatArtStyle.tres": "113f26f8c1a6368fdb09a598d10da3ab72bbe062113c1311450fd1ffde4abd93",
+    "Assets/Effects/combat_toon.gdshader": "f18ce8846ada57da18b14fa1a5145ef4c9c1fbfaae769797713e9be2fef94614",
+    "Scripts/Combat/UnitArtStyle.cs": "5359b99f82626fda16c5023d2ef4e2299abd09fd91134477383fcc2812c43dc3",
+    "Scripts/Combat/UnitPresentation.cs": "77e1eddd411338c82ec0fa228b4593ae934d98036b3d719ae8e101a9d667e6c3",
+    "Scripts/Visual/UnitCastGlow.cs": "ce390ceedc98e33d86dd4f6c1fea94a8efa1c058be369f9c1067e04f95fe9698",
+    "Config/VisualProfiles/ghost_mage.tres": "a2bcaa876cd67c67fbe48ea6dc5f3253ec7302ff3da241ed72554b0f6f681e63",
+    "Config/Tables/Enemies/enemy_meteor_mage.tres": "28413195dbb646a5de8fad2700ca717c09227cfa57528bdbfb9c51af5cea3fd9",
+    "Scripts/Player/AimAssistController.cs": "13a6377d087b121533fb509d6900c63fb485563435af7f53da3817ee86e7892f",
+    "Scripts/Combat/Targeting.cs": "ca4e27dc658389483d56771f356df35311b0bc531ef498ab72d52580a5039688",
+    "Scripts/Combat/AimUtil.cs": "644ff66cfecc623eca58a6346435319f0bf85cba5ec827ac69105d81250312db",
+    "Scripts/Abilities/Ability.cs": "56142d37cfbb6da6ec3dd04994f8aa26b3060c7469bc808ef6943147d5dc0b8e",
+    "Scripts/Player/PlayerWeaponInput.cs": "93bc154731c704dd0d3a770bceff4dfc7df1b7edbec49ac2b9eb9ac4cbec6f65",
+    "Scripts/Player/PlayerAbilityInput.cs": "d1d045b2bcc5f878cd6e1b20f98397db616a073c3098c55a5d2f63058d1711b3",
+    "Scripts/Player/PlayerController.cs": "f871db6ae19612e73a22258d1704625960ce0c5ec4aa1e2e10e70921303118d3",
+    "Scripts/UI/AimAssistMarker.cs": "b1deed9f0bf0eae2ab2dc8382cd965a4822755d0e113d9f997f22e0f06e54961",
+    "Config/Localization/zh.tres": "9fdb69191250ff6c0bc7591e6c77bcc1fd967234324c32cf6827954d8efe3ada",
+    "Config/Localization/en.tres": "a6eaf29fe19656a4dff9c05cfa8de561cd8aa1a5f7cdaab6085b1159329af61a",
+    "Scripts/Testing/PauseDiveProbe.cs": "964caa484fb6dfb52168922b016a82fac3e184663330d9fd8b9e0a60904e3945",
+    "Scripts/Testing/Content049054Probe.cs": "9526720ed5439541f8445d0f591b1857528dbebb200f4d44f019f39796dc88ce",
+    "Scripts/Testing/CombatArtProbe.cs": "0764c61d916a497a941530a9e1acce5a0cac85d2e28accf0cd9e2fbe2d377c4b",
+    "Scenes/Debug/_PauseDiveProbe.tscn": "d01451d359322fc869118998f9a7bdb3a165973775da507ee7959bbd2d7e8a8d",
+    "Scenes/Debug/_Content049054Probe.tscn": "a3b9e1cd90889b4c3f2be693c878cc570335f69859b8696674193d9c20f2b46a",
+    "Scenes/Debug/_CombatArtProbe.tscn": "d2181327c899166e077b2fa8f2cc3c92bc4d2176e6e86237550bbef74c6b9e0e",
+    "_tools/verify_elite_traits.ps1": "c936236bcbf3ccdb11f4a2ade67fbf72839db7a1080d372583b428404e1fccea",
+    "_tools/Validation.Common.ps1": "e5308c4da39afbfdef3b9b61f4a3851af9e0f1b966560b07c8ebe80b03901c7c",
+    "docs/content-update-049-054-20261029.md": "761e013d54f6b32fb97c52f19bbf886745dd1bdb7d389edc503468544109948d",
+    "docs/acceptance-tracker.md": "590d7e094434c21b86d663dc63b5453e823e9e8eceaa43ece0151c3ff4815c65",
+    "docs/ui.md": "5b79b951c7a270fd952fd937a9234e5d9d44ce5300da704223f3fc8de83488e6",
+    "Assets/Enemies/GhostMage/README.md": "2c7735170b36bda7f9ec66ed7bb67a5b4211cfabeccb107eca1638174a840857"
+  }
+}

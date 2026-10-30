@@ -45,8 +45,9 @@ namespace ActRoguelike.Abilities;
 /// "一段"**：<see cref="AnimName"/> 一个名字、<see cref="AnimEvent"/> 一个事件帧、
 /// <see cref="StrikeActiveTime"/> 一个判定窗口 —— 与既有 <c>MeleeAttackAbility</c> 的时间轴同形。</para>
 /// </summary>
-public partial class MeleeComboAbility : Ability
+public partial class MeleeComboAbility : Ability, IAbilityConfigConsumer
 {
+	public void ConfigureBeforeParameters(AbilityConfig config) { if (config.ComboSeries != null) Series = config.ComboSeries; }
 	[ExportGroup("连招表（**每一段一段动画**：武技1 的三把武器共用这一组列）")]
 	/// <summary>
 	/// **这个技能的连招参数行**（表列 <c>AbilityConfig.ComboSeries</c>，类型 <see cref="AbilitySeries"/>）：
@@ -516,6 +517,7 @@ public partial class MeleeComboAbility : Ability
 		AttackOffense offense = AttackOffense.Capture(OwnerUnit, _hitbox.CritChance, _hitbox.CritMultiplier);
 		var attack = new AttackInstance
 		{
+			IsManualWeaponAttack = true,
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
 			FeedbackWeight = _hitbox.FeedbackWeight,

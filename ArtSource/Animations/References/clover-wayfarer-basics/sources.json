@@ -1,0 +1,37 @@
+{
+  "review_date": "2026-10-25",
+  "sources": [
+    {
+      "name": "KayKit Character Animations",
+      "page": "https://kaylousberg.itch.io/kaykit-character-animations",
+      "video": "https://www.youtube.com/watch?v=zSzzEmdIiXI",
+      "role": "偏卡通的动作风格参考；优先观察短身形角色的步态与重心。",
+      "license": "作者页标注CC0",
+      "local_render": false
+    },
+    {
+      "name": "Quaternius Universal Animation Library 1",
+      "page": "https://quaternius.itch.io/universal-animation-library",
+      "video": "https://www.youtube.com/watch?v=-VXFlXhvD6A",
+      "role": "本批11段源动作；本地Standard包有43个条目（含参考姿势）。",
+      "license": "本地许可与作者页均标注CC0",
+      "local_render": true
+    },
+    {
+      "name": "Quaternius Universal Animation Library 2",
+      "page": "https://quaternius.itch.io/universal-animation-library-2",
+      "video": "https://www.youtube.com/watch?v=2Hd5nH122OE",
+      "role": "本批Hit_Knockback源动作；本地Standard包有43个条目。",
+      "license": "本地许可与作者页均标注CC0",
+      "local_render": true
+    },
+    {
+      "name": "ORICUT Forest Spirit Nori",
+      "page": "https://oricutstudios.itch.io/low-poly-forest-spirit-nori",
+      "video": "https://www.youtube.com/watch?v=nb_wj9aTnOM",
+      "role": "最接近当前角色比例与斗篷的风格参照；只引用作者公开展示。",
+      "license": "付费角色资产；本次未获取或使用其模型与动作文件",
+      "local_render": false
+    }
+  ]
+}

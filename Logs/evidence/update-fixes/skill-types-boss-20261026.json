@@ -1,0 +1,21 @@
+{
+  "applied": true,
+  "changes": [
+    {
+      "path": "Config\\Tables\\Skills\\bhv_awakened.tres",
+      "type": "BossBehaviorConfig"
+    },
+    {
+      "path": "Config\\Tables\\Skills\\bhv_charging.tres",
+      "type": "BossBehaviorConfig"
+    },
+    {
+      "path": "Config\\Tables\\Skills\\bhv_screaming.tres",
+      "type": "BossBehaviorConfig"
+    },
+    {
+      "path": "Config\\Tables\\Skills\\bhv_summoner.tres",
+      "type": "BossBehaviorConfig"
+    }
+  ]
+}

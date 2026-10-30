@@ -41,7 +41,7 @@ public partial class FallAttackProbe : Node3D
 		_camera.LookAt(_player.GlobalPosition + Vector3.Up * 0.6f);
 		_camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"截图{name}");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"截图{name}");
 	}
 	private async Task StartFall()
 	{
@@ -126,11 +126,13 @@ public partial class FallAttackProbe : Node3D
 			await Equip(WeaponPresetKind.Scythe);
 			float h = _player.Movement!.StandardJumpHeight * spec.Item1;
 			await Lift(h);
+			// 数值样本轻微上抛，给当前0.3秒真实Action留足空中时间；低高度提前落地取消另测。
+			_player.Velocity = Vector3.Up * 2;
 			Fall.DiveSpeed = spec.Item2;
 			var target = Target(new Vector3(20, 1, 20));
 			var friendly = Target(new Vector3(20, 1, 20), faction: Faction.Player);
-			int hits = 0; float damage = 0;
-			target.HitReceived += hit => { if (hit.Attack?.Ability == Fall.AbilityId) { hits++; damage = hit.Damage; } };
+			int hits = 0; float damage = 0, baseDamage = 0;
+			target.HitReceived += hit => { if (hit.Attack?.Ability == Fall.AbilityId) { hits++; damage = hit.Damage; baseDamage = hit.Attack.BaseDamage; } };
 			int before = _lands;
 			await StartFall();
 			Check(await Until(() => Fall.LastDamage > 0), $"{spec.Item1}份高度/{spec.Item2}m/s等待真实Action起动");
@@ -140,7 +142,7 @@ public partial class FallAttackProbe : Node3D
 			Check(await Until(() => Fall.HasLanded), "真实落地派发事件");
 			await Wait(0.03);
 			Check(_lands == before + 1 && !_player.Movement.HasVelocityOverride, "落地事件仅一次并释放速度覆盖");
-			Check(hits == 1 && Mathf.Abs(damage - Fall.LastDamage) < 0.001f && Mathf.Abs(target.Health - (10000 - damage)) < 0.002f,
+			Check(hits == 1 && Mathf.Abs(baseDamage - Fall.LastDamage) < 0.001f && Mathf.Abs(target.Health - (10000 - damage)) < 0.002f,
 				$"Area与扫掠共享间隔：命中{hits}次，伤害{damage:0.####}，生命{target.Health:0.####}");
 			Check(friendly.Health == 10000, "下冲扫掠不伤同阵营");
 			target.QueueFree(); friendly.QueueFree();
@@ -182,11 +184,11 @@ public partial class FallAttackProbe : Node3D
 			Press("fall_attack", false);
 			float angle = Mathf.RadToDeg(Fall.LastDiveDirection.AngleTo(Vector3.Down));
 			Vector3 destination = Fall.LastAimPoint;
-			Check(Fall.HasGroundAim && Fall.LastDiveDirection.X > 0.1f && angle <= Fall.MaxDiveAngleDegrees + 0.01f,
+			Check(Fall.HasGroundAim && Fall.LastDiveDirection.X > 0.1f && angle <= 45.01f,
 				$"同方向选地面，夹角{angle:0.###}°，落点{destination}");
-			Check(Mathf.Abs(Fall.LastDownwardSpeed - Fall.DiveSpeed * -Fall.LastDiveDirection.Y) < 0.001f,
+			Check(Mathf.Abs(Fall.LastDownwardSpeed - Fall.EffectiveDiveSpeed * -Fall.LastDiveDirection.Y) < 0.001f,
 				$"伤害仅取垂直速度{Fall.LastDownwardSpeed:0.####}，总速{Fall.DiveSpeed}");
-			if (distance > 10) Check(Mathf.Abs(angle - Fall.MaxDiveAngleDegrees) < 0.01f, "超范围按最大角度截到同方向");
+			if (distance > 10) Check(Mathf.Abs(angle - 45) < 0.1f, "039超范围按实时离地高度半径截到同方向");
 			await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 			await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 			var display = _player.GetNode<CharacterDisplay>("Appearance");
@@ -307,7 +309,7 @@ public partial class FallAttackProbe : Node3D
 		await Until(() => _player.Velocity.Y <= 0);
 		var target = Target(new Vector3(20, 1, 20));
 		float damage = 0;
-		target.HitReceived += hit => { if (hit.Attack?.Ability == Fall.AbilityId) damage = hit.Damage; };
+		target.HitReceived += hit => { if (hit.Attack?.Ability == Fall.AbilityId) damage = hit.Attack.BaseDamage; };
 		await StartFall(); await Until(() => Fall.LastDamage > 0);
 		Check(Mathf.Abs(Fall.LastDamageMultiplier - 1.5f) < 0.08f, $"武器大师真实二段跳后按Ctrl：起手{Fall.LastFallHeight:0.####}m，倍率{Fall.LastDamageMultiplier:0.####}");
 		await Shot("j4_double_jump_fall");

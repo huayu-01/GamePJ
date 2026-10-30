@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_7qqoa")
+NumericId = 1107
 SaveKey = "crit_level"
 Stat = "CritChanceAdd"
 PerLevel = 0.03

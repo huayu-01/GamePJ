@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/AnchorAfterglowRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+RadiusBonus = 1
+LingerSeconds = 2
+[resource]
+script = ExtResource("row")
+NumericId = 1283
+Id = "surv_anchor_afterglow"
+DisplayName = "守望余火"
+RewardKind = 0
+MaxStacks = 1
+Weight = 1.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_anchor_afterglow"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "锚圈半径增加{Effects.0.RadiusBonus:0.#}米；离圈后直接攻击增伤保留{Effects.0.LingerSeconds:0.#}秒，不叠加。"
+NameKey = "content.surv_anchor_afterglow.name"
+DescriptionKey = "content.surv_anchor_afterglow.description"
+Requires = PackedStringArray("surv_anchor_core")

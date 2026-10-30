@@ -80,6 +80,9 @@ public partial class ConfigIndex : Node
 		// 独立 Rebuild 的另一个原因：`ConfigRows` 按 `typeof(T).Name` 分桶，
 		// `RuneConfig` 虽然继承 `RewardConfig`，两边的 Count 与 ById 互不串台。
 		ConfigRows.Rebuild(Config.Runes);
+		ConfigRows.Rebuild(Config.SceneRunes);
+		ContentIdentity.Rebuild(Config.Runes);
+		ContentText.Initialize(Config.ContentLocales);
 		ConfigRows.Rebuild(Config.UpgradePools);
 		ConfigRows.Rebuild(Config.MetaUpgrades);
 		// 能力卡（局外装备层，见 docs/ability-cards.md）：**与 Skills 是两层**，
@@ -463,7 +466,7 @@ public partial class ConfigIndex : Node
 	private static string HandlerSummary(RuneConfig rune)
 	{
 		var text = new System.Text.StringBuilder();
-		text.Append(' ').Append(rune.ApplyHandler);
+		text.Append(' ').Append(rune.Effects.Length > 0 ? string.Join("+", System.Linq.Enumerable.Select(rune.Effects, effect => effect.GetType().Name)) : rune.ApplyHandler);
 		foreach (StatOverride entry in rune.Modifiers)
 		{
 			text.Append(" · ").Append(entry.Stat).Append('=').Append(entry.Value.ToString("0.###"));

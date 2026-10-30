@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityReplacementRewardEffect.cs" id="definition"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_2.tres" id="target"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_scythe.tres" id="pool"]
+[ext_resource type="PackedScene" path="res://Scenes/Abilities/Builds/ReapingSpin.tscn" id="replacement"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+TargetAbility = ExtResource("target")
+ReplacementScene = ExtResource("replacement")
+SkillName = "厌恶"
+SkillNameKey = "skill.1348.name"
+SkillDescriptionKey = "content.1348.description"
+SkillDescription = "武技2替换为厌恶：点按旋转造成{Effects.0.ReplacementScene.TapDamage}伤害；蓄力{Effects.0.ReplacementScene.ChargeBaseSeconds}～{Effects.0.ReplacementScene.ChargeMaxSeconds}秒，基础冲刺{Effects.0.ReplacementScene.BaseDashDistance}米、旋转{Effects.0.ReplacementScene.BaseSpinSeconds}秒；每档再增加{Effects.0.ReplacementScene.DashDistancePerStep}米与{Effects.0.ReplacementScene.SpinSecondsPerStep}秒。每{Effects.0.ReplacementScene.HitInterval}秒造成{Effects.0.ReplacementScene.SpinDamage}伤害。可被其它主动技能打断，冷却{Effects.0.ReplacementScene.Cooldown}秒。"
+[resource]
+script = ExtResource("row")
+NumericId = 1348
+DisplayName = "死亡收割"
+NameKey = "content.1348.name"
+DescriptionKey = "content.1348.description"
+DescriptionTemplate = "武技2替换为厌恶：点按旋转造成{Effects.0.ReplacementScene.TapDamage}伤害；蓄力{Effects.0.ReplacementScene.ChargeBaseSeconds}～{Effects.0.ReplacementScene.ChargeMaxSeconds}秒，基础冲刺{Effects.0.ReplacementScene.BaseDashDistance}米、旋转{Effects.0.ReplacementScene.BaseSpinSeconds}秒；每档再增加{Effects.0.ReplacementScene.DashDistancePerStep}米与{Effects.0.ReplacementScene.SpinSecondsPerStep}秒。每{Effects.0.ReplacementScene.HitInterval}秒造成{Effects.0.ReplacementScene.SpinDamage}伤害。可被其它主动技能打断，冷却{Effects.0.ReplacementScene.Cooldown}秒。"
+RewardKind = 1
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+Pool = ExtResource("pool")
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Excludes = PackedStringArray("evo_thunder_recall", "evo_affection")
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

@@ -1,0 +1,76 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Levels/Base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://Scripts/Interaction/InteractionComponent.cs" id="2_component"]
+[ext_resource type="Script" path="res://Scripts/Testing/InteractionComponentLab.cs" id="3_lab"]
+
+[sub_resource type="BoxShape3D" id="Shape_signal"]
+size = Vector3(3, 3, 3)
+
+[sub_resource type="BoxShape3D" id="Shape_help"]
+size = Vector3(7, 3, 3)
+
+[node name="InteractionComponentLab" type="Node3D"]
+script = ExtResource("3_lab")
+
+[node name="Base" parent="." instance=ExtResource("1_base")]
+
+[node name="AreaMechanism" type="Node3D" parent="."]
+position = Vector3(-4, 0, 7)
+
+[node name="Trigger" type="Area3D" parent="AreaMechanism"]
+position = Vector3(0, 1.2, 0)
+collision_layer = 0
+collision_mask = 512
+
+[node name="Shape" type="CollisionShape3D" parent="AreaMechanism/Trigger"]
+shape = SubResource("Shape_signal")
+
+[node name="InteractionComponent" type="Node3D" parent="AreaMechanism" node_paths=PackedStringArray("TriggerArea")]
+script = ExtResource("2_component")
+Kind = 16
+Prompt = "机关：交互后收起装置"
+UseMode = 1
+TriggerArea = NodePath("../Trigger")
+
+[node name="Label" type="Label3D" parent="AreaMechanism"]
+position = Vector3(0, 2.6, 0)
+billboard = 1
+text = "机关（F收起）"
+font_size = 28
+
+[node name="AreaHelp" type="Node3D" parent="."]
+position = Vector3(4, 0, 7)
+
+[node name="Trigger" type="Area3D" parent="AreaHelp"]
+position = Vector3(0, 1.2, 0)
+collision_layer = 0
+collision_mask = 512
+
+[node name="Shape" type="CollisionShape3D" parent="AreaHelp/Trigger"]
+shape = SubResource("Shape_help")
+
+[node name="InteractionComponent" type="Node3D" parent="AreaHelp"]
+script = ExtResource("2_component")
+Kind = 14
+Prompt = "查看操作说明"
+
+[node name="Label" type="Label3D" parent="AreaHelp"]
+position = Vector3(0, 2.6, 0)
+billboard = 1
+text = "长触发区：操作说明"
+font_size = 28
+
+[node name="RadiusRunes" type="Node3D" parent="."]
+position = Vector3(-9, 0, 7)
+
+[node name="InteractionComponent" type="Node3D" parent="RadiusRunes"]
+script = ExtResource("2_component")
+Kind = 13
+InteractRadius = 3.2
+
+[node name="Label" type="Label3D" parent="RadiusRunes"]
+position = Vector3(0, 2.6, 0)
+billboard = 1
+text = "半径交互：符文"
+font_size = 28

@@ -6,7 +6,7 @@ using Godot;
 namespace ActRoguelike.Editor;
 
 /// <summary>
-/// **技能动画生成器**（`docs/refactor-survey.md` §1.4 的落地实现）：
+/// **技能动画生成器**（`docs/archive/design-notes/refactor-survey.md` §1.4 的落地实现）：
 /// 按 <see cref="SkillAnimationConfig"/> 表逐行「复制现有素材动画 → 改名 → 挂事件帧 → 存 `.tres`」。
 ///
 /// <b>为什么是生成而不是运行期现造</b>：`.glb` 里的 32 段 <c>Animation</c> 是**导入的子资源**，

@@ -94,41 +94,30 @@ public partial class LoadoutSlotsProbe : Node3D
 	}
 	private async Task Throws()
 	{
-		await Equip(WeaponPresetKind.Spear); var manual = (SpearThrowAbility)_player.AbilitySlots.Resolve("weapon_skill_2")!;
-		manual.TryActivate(); manual.OnInputHeld(.1f); await Wait(5);
-		Check(manual.IsActive && manual.IsCharging, "程序接口启动的蓄力不被输入层误认为物理松手");
+		await Equip(WeaponPresetKind.Spear); var spear = (SpearThrowAbility)_player.AbilitySlots.Resolve("weapon_skill_2")!;
+		int shots = spear.LanceShots; spear.TryActivate(); spear.OnInputHeld(.1f); await Until(() => spear.LanceShots > shots);
+		Check(spear.LanceShots == shots + 1 && !spear.IsCharging, "程序接口按真实ATK发射一次投枪，不进入旧蓄力");
 		await Equip(WeaponPresetKind.Scythe); var scythe = (ScytheThrowAbility)_player.AbilitySlots.Resolve("weapon_skill_2")!;
 		Press("weapon_skill_2", true); await Until(() => scythe.InFlight); Press("weapon_skill_2", false);
 		Check(scythe.InFlight, "镰刀先真实抛出，覆盖在飞时切武器");
-		await Equip(WeaponPresetKind.Spear); var spear = (SpearThrowAbility)_player.AbilitySlots.Resolve("weapon_skill_2")!;
-		Check(!scythe.Enabled && !scythe.InFlight && spear.SpinDegreesPerSecond == 0, "切长枪时镰刀飞行清理，长枪保留不自转配置");
+		await Equip(WeaponPresetKind.Spear); spear = (SpearThrowAbility)_player.AbilitySlots.Resolve("weapon_skill_2")!;
+		Check(!scythe.Enabled && !scythe.InFlight && spear.LinearShot && !spear.HoldToCharge, "切长枪时清理镰刀飞行，当前右键使用直线投枪");
 		scythe.Enabled = true; scythe.InputAction = "weapon_skill_2";
-		Press("weapon_skill_2", true); await Until(() => spear.ChargeTime >= 1.25f);
-		var path = spear.GetNode<DashPathIndicator>("Path"); var mesh = path.GetNode<MeshInstance3D>("Path");
-		Check(path.IsShowing && mesh.TopLevel && mesh.GlobalTransform.IsEqualApprox(Transform3D.Identity), "长枪右键蓄力路径在世界坐标绘制，角色偏移与旋转不二次叠加");
-		var vertices = mesh.Mesh!.SurfaceGetArrays(0)[(int)Mesh.ArrayType.Vertex].AsVector3Array();
-		Vector3 flat = AimUtil.GetCrosshairDirection(GetViewport(), Vector3.Forward); flat.Y = 0; flat = flat.Normalized();
-		Vector3 expected = _player.GlobalPosition + Vector3.Up * (.9f + path.GroundOffset) + flat * .6f;
-		Check(vertices.Length > 2 && vertices[0].DistanceTo(expected) < .1f, "平移到12米外的真实玩家，预览起点仍贴实际出手位置");
-		if (DisplayServer.GetName() != "headless")
-		{
-			await InputFrame(); await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-			Check(GetViewport().GetTexture().GetImage().SavePng("res://docs/screenshots/j39_spear_preview.png") == Error.Ok, "长枪真实蓄力路径截图保存");
-		}
-		var hitTarget = Box(vertices[Mathf.Min(5, vertices.Length - 1)] - Vector3.Up); hitTarget.ApplyBaseStats(1000, 0, 0, 0);
-		await Wait(3);
-		int pauseCount = _player.ImpactPause!.AcceptedCount;
-		Press("weapon_skill_2", false); await Until(() => spear.InFlight);
-		Check(spear.InFlight && !scythe.InFlight && !scythe.IsActive, "释放蓄力只抛长枪，旧镰刀即使同键启用也不执行");
-		await Until(() => hitTarget.Health < 1000, 60);
-		Check(hitTarget.Health < 1000 && _player.ImpactPause!.AcceptedCount == pauseCount, "真实脱手长枪命中仍扣血，不让玩家进入近战顿帧"); hitTarget.QueueFree();
-		await Wait(8); int recalls = spear.RecallCount; Press("weapon_skill_2", true); await InputFrame(); Press("weapon_skill_2", false);
-		await Until(() => spear.IsReturning || spear.RecallCount == recalls + 1, 30);
-		Check((spear.IsReturning || spear.RecallCount == recalls + 1) && !scythe.InFlight && !scythe.IsActive, "再次右键只召回长枪，不启动旋转镰刀逻辑");
-		await Until(() => !spear.InFlight); Check(!spear.InFlight && spear.RecallCount == recalls + 1 && !path.IsShowing, "长枪真实回手并清理路径");
-		await Equip(WeaponPresetKind.Spear); Press("weapon_skill_2", true); await Wait(10);
+		_camera.GlobalPosition = _player.GlobalPosition + Vector3.Up * .9f + Vector3.Back * 6;
+		_camera.LookAt(_player.GlobalPosition + Vector3.Up * .9f + Vector3.Forward * 20);
+		Vector3 direction = AimUtil.GetCrosshairDirection(GetViewport(), Vector3.Forward);
+		var target = Box(_player.GlobalPosition + Vector3.Up * .9f + direction * 5 - Vector3.Up); target.ApplyBaseStats(1000, 0, 0, 0); target.FillVitals();
+		await Wait(3); shots = spear.LanceShots; int pause = _player.ImpactPause!.AcceptedCount;
+		Press("weapon_skill_2", true); await Until(() => spear.LanceShots > shots); await Until(() => target.Health < 1000);
+		Check(spear.LanceShots == shots + 1 && !scythe.InFlight && !scythe.IsActive, "即使旧镰刀同键启用，槽位也只发射当前投枪");
+		Check(!spear.InputPreviewShowing && !spear.InFlight && !spear.IsCharging, "直线投枪没有旧蓄力曲线或召回状态");
+		Check(target.Health < 1000 && _player.ImpactPause!.AcceptedCount == pause, $"真实直线投枪命中扣血，不产生近战接触顿帧：HP={target.Health:0.##}，顿帧{pause}→{_player.ImpactPause!.AcceptedCount}"); target.QueueFree();
+		Press("weapon_skill_2", false); await InputFrame(); shots = spear.LanceShots;
+		Press("weapon_skill_2", true); await Wait(5); Press("weapon_skill_2", false);
+		Check(spear.LanceShots == shots && !scythe.InFlight, "10秒冷却期间再次右键不发枪，也不串到镰刀");
+		await Equip(WeaponPresetKind.Spear); Press("weapon_skill_2", true); await Wait(1);
 		new PlayerLoadout().Apply(_player, this, PlayerCharacterKind.Hunter, WeaponPresetKind.Crossbow); await Wait(4);
-		Check(!_player.AbilitySlots.Resolve("weapon_skill_2")!.IsActive, "蓄力按住中换角色，新右键不继承旧蓄力");
+		Check(!_player.AbilitySlots.Resolve("weapon_skill_2")!.IsActive, "投枪前摇中换角色，新右键不继承旧动作");
 		Press("weapon_skill_2", false); await Wait(4);
 		Check(!_player.AbilitySlots.Resolve("weapon_skill_2")!.IsActive && !spear.InFlight, "旧右键松开不释放新角色技能或残留长枪");
 	}
@@ -156,7 +145,7 @@ public partial class LoadoutSlotsProbe : Node3D
 			for (int i = 0; i < 2; i++) { var box = Box(new Vector3((i == 0 ? -1 : 1) * 1.8f, 0, 0)); Vector3 hit = box.GlobalPosition + point;
 				CombatImpactFx.Spawn(this, hit, Vector3.Forward, ImpactKind.Block, 1); if (i == 1) ImpactVisibility.Spawn(box, hit, ImpactKind.Block); }
 			await InputFrame(); await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-			Check(GetViewport().GetTexture().GetImage().SavePng("res://docs/screenshots/j39_contact_visibility.png") == Error.Ok, "接触点遮挡对照截图保存");
+			Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j39_contact_visibility.png")) == Error.Ok, "接触点遮挡对照截图保存");
 		}
 		finally { CombatFeedback.Profile.ContactCoreSeconds = duration; }
 	}

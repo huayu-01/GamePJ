@@ -5,6 +5,7 @@ using ActRoguelike.Interaction;
 using ActRoguelike.Rewards;
 using ActRoguelike.Run;
 using ActRoguelike.Core;
+using ActRoguelike.Config;
 using System;
 using System.Collections.Generic;
 using Godot;
@@ -37,10 +38,15 @@ public partial class PlayerHud : CanvasLayer
 
 	[Export] public Color ArmorTextColor { get; set; } = new(0.52f, 0.82f, 1f);
 	[Export] public Color ShieldTextColor { get; set; } = new(0.7f, 0.6f, 1f);
+	[Export] public int BuildIconLimit { get; set; } = 6;
+	public int HiddenBuildCount { get; private set; }
 
 	private RichTextLabel _health = null!;
 	private Label _status = null!;
 	private Control _root = null!;
+	private AimAssistMarker _aimMarker = null!;
+	private Label _aimState = null!;
+	private ActRoguelike.Player.AimAssistController? _aimAssist;
 	/// <summary>首领血条是否展开为完整形态（验证用只读状态）。</summary>
 	public bool BossBarExpanded { get; private set; }
 
@@ -62,6 +68,11 @@ public partial class PlayerHud : CanvasLayer
 	private RunController? _run;
 	private StageController? _stage;
 	private float _healthRatio = 1f;
+	private TextureRect _runeIcon = null!;
+	private Label _runeName = null!;
+	private PanelContainer _runePanel = null!;
+	private string _runeSignature = "uninitialized";
+	public string DisplayedRuneId { get; private set; } = string.Empty;
 
 	public override void _Ready()
 	{
@@ -70,6 +81,17 @@ public partial class PlayerHud : CanvasLayer
 		_build = GetNode<Label>("Root/Build");
 		_buildIcons = GetNode<HBoxContainer>("Root/BuildIcons");
 		_root = GetNode<Control>("Root");
+		_aimMarker = new AimAssistMarker { Name = "AimAssistTarget", Visible = false }; _root.AddChild(_aimMarker);
+		_aimState = new Label { Name = "AimAssistState", Visible = false, MouseFilter = Control.MouseFilterEnum.Ignore,
+			HorizontalAlignment = HorizontalAlignment.Left, AnchorLeft = 0, AnchorRight = 0, AnchorTop = 1, AnchorBottom = 1,
+			OffsetLeft = 24, OffsetRight = 430, OffsetTop = -150, OffsetBottom = -118 };
+		_root.AddChild(_aimState);
+		GlassUi.Typography(_aimState,18);
+		_aimState.AddThemeColorOverride("font_color",new Color("c4eaf0"));
+		_aimState.AddThemeColorOverride("font_shadow_color",new Color(0,0,0,.8f));
+		_aimState.AddThemeConstantOverride("shadow_offset_y",1);
+		_root.AddChild(new ChallengeStatusPanel());
+		BuildCarriedRune();
 
 		// 血条只按名字取节点、只当 Control 用 —— 美术可以把填充换成贴图/NinePatch，类型不再被写死。
 		_healthBar = HealthBarWidget.Bind(GetNode<Control>(PlayerBarNode));
@@ -92,6 +114,8 @@ public partial class PlayerHud : CanvasLayer
 
 	public override void _Process(double delta)
 	{
+		// 标记只做一次投影，逐渲染帧跟随；血条和文字仍保留20Hz刷新。
+		if (IsInstanceValid(_player)) RefreshAimAssist();
 		// HUD 不需要 60Hz：20Hz 足够，文本只在变化时写（Godot 的 Text setter 有开销）。
 		_hudAccum += (float)delta;
 		if (_hudAccum < 0.05f)
@@ -100,6 +124,7 @@ public partial class PlayerHud : CanvasLayer
 		}
 
 		_hudAccum = 0f;
+		RefreshCarriedRune();
 
 		if (_player == null || !IsInstanceValid(_player))
 		{
@@ -128,9 +153,9 @@ public partial class PlayerHud : CanvasLayer
 
 		string extra = $" [color=#{ArmorTextColor.ToHtml(false)}]+{_player.Armor:0}[/color]";
 
-		if (_player.Shield > 0f)
+		if (_player.Shield + _player.TemporaryShield > 0f)
 		{
-			extra += $" [color=#{ShieldTextColor.ToHtml(false)}]盾 {_player.Shield:0}[/color]";
+			extra += $" [color=#{ShieldTextColor.ToHtml(false)}]盾 {_player.Shield + _player.TemporaryShield:0}[/color]";
 		}
 
 		string vitals = $"[center]{_player.Health:0}/{_player.MaxHealth:0}{extra}[/center]";
@@ -155,6 +180,8 @@ public partial class PlayerHud : CanvasLayer
 		// 站在可交互物旁边（= "交互时"）顺带提示首领状况 / 角色持有 / 设置的快捷键。
 		string interactHint = prompt.Length > 0 ? $"   {BossPreviewHint}" : string.Empty;
 		_build.Text = prompt.Length > 0 ? $"{prompt}{interactHint}" : string.Empty;
+		if (_stage != null && PlayerInteractInput.Current is RewardNode rewardNode)
+			_build.Text += "\n" + NodeChallengeInfo.Describe(rewardNode, _stage);
 
 		// 构筑**不再写成一串文字**（用户需求：构筑元素都用图标）：
 		// HUD 只放一行小图标，名字与说明去 C 面板（那里鼠标能用，悬停才有意义）。
@@ -189,11 +216,39 @@ public partial class PlayerHud : CanvasLayer
 			// 召唤物数量（角色 3 的召唤与控制，策划文档 §7.3/§13）。
 			int summons = GetTree().GetNodesInGroup("summon_units").Count;
 			string summonInfo = summons > 0 ? $"召唤 {summons}   " : string.Empty;
-			_status.Text = $"{stageInfo}{summonInfo}敌人 {_encounter.AliveCount}";
+			_status.Text = _stage?.AwaitingExit == true
+				? $"首领已击败 · {_stage.ExitPrompt}"
+				: $"{stageInfo}{summonInfo}挑战敌人 {_encounter.AliveCount}   游离敌人 {_stage?.AmbientAliveCount ?? 0}";
 		}
 	}
 
 	// === 构筑图标条（用户需求：「构筑元素都用图标」「说明只在选取界面和鼠标悬停时显示」）===
+	private void BuildCarriedRune()
+	{
+		_runePanel = new PanelContainer { Name = "CarriedRune", Position = new Vector2(24, 20), CustomMinimumSize = new Vector2(230, 64), MouseFilter = Control.MouseFilterEnum.Ignore };
+		_root.AddChild(_runePanel);
+		_runePanel.Resized += () => _buildIcons.Position = new Vector2(24, _runePanel.Position.Y + _runePanel.Size.Y + 12);
+		var row = new HBoxContainer { Name = "Layout" }; row.AddThemeConstantOverride("separation", 10); _runePanel.AddChild(row);
+		_runeIcon = new TextureRect { Name = "Icon", CustomMinimumSize = new Vector2(48, 48), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered };
+		row.AddChild(_runeIcon);
+		var words = new VBoxContainer(); row.AddChild(words);
+		var caption = new Label { Text = "携带符文" }; caption.AddThemeFontSizeOverride("font_size", 14); words.AddChild(caption);
+		_runeName = new Label { Name = "RuneName" }; _runeName.AddThemeFontSizeOverride("font_size", 21); words.AddChild(_runeName);
+		RefreshCarriedRune();
+	}
+	private void RefreshCarriedRune()
+	{
+		RunController? run = RunController.Instance;
+		string id = run == null ? RuneCarry.Current : run.CarriedRuneId;
+		if (id + ContentText.Revision == _runeSignature) return;
+		_runeSignature = id + ContentText.Revision;
+		DisplayedRuneId = id;
+		RuneConfig? rune = ConfigRows.ById<RuneConfig>(id);
+		_runeName.Text = rune?.LocalizedName ?? "未携带";
+		_runeIcon.Texture = rune != null && !string.IsNullOrEmpty(rune.IconPath) ? RuntimeResources.Load<Texture2D>(rune.IconPath) : null;
+		_runeIcon.Visible = _runeIcon.Texture != null;
+		_runePanel.TooltipText = rune == null ? "本次没有携带符文" : rune.LocalizedName + "\n" + (RewardEffectRegistry.Compile(rune)?.Description ?? rune.LocalizedDescription);
+	}
 
 	/// <summary>
 	/// 本局构筑在 HUD 上只放**一行图标**（不写名字）：名字与说明在 <see cref="BuildScreen"/>（快捷键 C）里，
@@ -214,6 +269,7 @@ public partial class PlayerHud : CanvasLayer
 		}
 
 		_buildSignature = signature;
+		HiddenBuildCount = 0;
 		foreach (Node child in _buildIcons.GetChildren())
 		{
 			_buildIcons.RemoveChild(child);
@@ -225,10 +281,21 @@ public partial class PlayerHud : CanvasLayer
 			return;
 		}
 
-		foreach (RewardDefinition definition in build.Acquired)
-		{
-			_buildIcons.AddChild(BuildIcon(definition, build.StacksOf(definition.Id)));
-		}
+		int shown = Mathf.Min(Mathf.Max(0, BuildIconLimit), build.Acquired.Count);
+		HiddenBuildCount = build.Acquired.Count - shown;
+		// 只常驻最近获得的少量图标；完整库存仍由C面板呈现，不在战斗HUD展开鼠标面板。
+		for (int i = build.Acquired.Count - shown; i < build.Acquired.Count; i++) _buildIcons.AddChild(BuildIcon(build.Acquired[i]));
+		if (HiddenBuildCount > 0) _buildIcons.AddChild(new Label { Name = "BuildOverflow", Text = $"+{HiddenBuildCount}  [C]", MouseFilter = Control.MouseFilterEnum.Ignore, VerticalAlignment = VerticalAlignment.Center });
+	}
+	private void RefreshAimAssist()
+	{
+		_aimAssist ??= _player?.GetNodeOrNull<ActRoguelike.Player.AimAssistController>("AimAssist");
+		var assist = _aimAssist;
+		_aimState.Visible = assist?.Enabled == true;
+		string hint = ContentText.Get("ui.hud.aim_assist", "辅助瞄准 · 中键关闭"); if (_aimState.Text != hint) _aimState.Text = hint;
+		var camera = GetViewport().GetCamera3D();
+		_aimMarker.Visible = IsInstanceValid(assist?.Selected) && assist!.Selected is { IsValidTarget: true } && camera != null && !camera.IsPositionBehind(Targeting.AimPoint(assist.Selected));
+		if (_aimMarker.Visible) _aimMarker.Position = camera!.UnprojectPosition(Targeting.AimPoint(assist!.Selected!)) - _aimMarker.Size * .5f;
 	}
 
 	private static string BuildSignature(RunBuild? build)
@@ -241,14 +308,15 @@ public partial class PlayerHud : CanvasLayer
 		var parts = new List<string>(build.Acquired.Count);
 		foreach (RewardDefinition definition in build.Acquired)
 		{
-			parts.Add($"{definition.Id}×{build.StacksOf(definition.Id)}");
+			parts.Add(definition.Id);
 		}
 
-		return string.Join("|", parts);
+		return string.Join("|", parts) + "#" + ContentText.Revision;
 	}
 
-	/// <summary>一格：图标 + 叠层数（与 <see cref="BuildScreen"/> 同一套图标表）。</summary>
-	private static Control BuildIcon(RewardDefinition definition, int stacks)	{
+	/// <summary>每项增幅一个图标（与 <see cref="BuildScreen"/> 同一套图标表）。</summary>
+	private static Control BuildIcon(RewardDefinition definition)
+	{
 		var tile = new PanelContainer
 		{
 			ThemeTypeVariation = "UiTile",
@@ -264,22 +332,7 @@ public partial class PlayerHud : CanvasLayer
 			MouseFilter = Control.MouseFilterEnum.Ignore,
 		};
 
-		var count = new Label
-		{
-			Text = stacks > 1 ? $"×{stacks}" : string.Empty,
-			HorizontalAlignment = HorizontalAlignment.Right,
-			VerticalAlignment = VerticalAlignment.Bottom,
-			MouseFilter = Control.MouseFilterEnum.Ignore,
-		};
-
-		// ⚠️ 外层是普通 Control（不是容器）：子节点**必须自己锚满**，否则尺寸是 0×0 → 图标看不见
-		//（踩过一次：HUD 上只看到 6 个空底板）。
-		var stack = new Control { MouseFilter = Control.MouseFilterEnum.Ignore };
-		stack.AddChild(icon);
-		stack.AddChild(count);
-		icon.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-		count.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-		tile.AddChild(stack);
+		tile.AddChild(icon);
 		return tile;
 	}
 
@@ -300,7 +353,7 @@ public partial class PlayerHud : CanvasLayer
 		int shown = Mathf.Min(count, all.Length);
 		for (int i = 0; i < shown; i++)
 		{
-			_buildIcons.AddChild(BuildIcon(all[i], i % 3 == 0 ? 2 : 1));
+			_buildIcons.AddChild(BuildIcon(all[i]));
 		}
 	}
 
@@ -372,6 +425,7 @@ public partial class PlayerHud : CanvasLayer
 		}
 
 		_boundPlayer = player;
+		_aimAssist = IsInstanceValid(player) ? player!.GetNodeOrNull<ActRoguelike.Player.AimAssistController>("AimAssist") : null;
 		_armorBroke = null;
 		_lastHealth = player != null && IsInstanceValid(player) ? player.Health : 0f;
 
@@ -430,7 +484,7 @@ public partial class PlayerHud : CanvasLayer
 
 		ActRoguelike.Config.ConfigIndexData config = ActRoguelike.Config.ConfigIndex.Settings;
 		DamageNumbers.ShowHeal(_root, camera.UnprojectPosition(world), gained,
-			config.DamageNumberFontSize, config.DamageNumberRise, config.DamageNumberLifetime);
+			config.DamageNumberFontSize, config.DamageNumberRise, config.DamageNumberLifetime, player);
 	}
 
 	private void UpdateBossPanel()

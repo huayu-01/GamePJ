@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/TimedHuntRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+Interval = 50
+Duration = 15
+SpeedScale = 1.2
+ExperienceReward = 14
+[resource]
+script = ExtResource("row")
+NumericId = 1294
+Id = "surv_timed_hunt"
+DisplayName = "刻限猎令"
+RewardKind = 2
+MaxStacks = 1
+Weight = 0.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_timed_hunt"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "每{Effects.0.Interval:0}秒标记一只可达普通敌人{Effects.0.Duration:0}秒，其移速×{Effects.0.SpeedScale:0.##}；限时击败获得{Effects.0.ExperienceReward:0}额外经验。"
+NameKey = "content.surv_timed_hunt.name"
+DescriptionKey = "content.surv_timed_hunt.description"
+Requires = PackedStringArray("surv_risk_contract")
+
+Note = "2026-10-28按用户决定退出全部正式获取和图鉴；旧身份与效果资源仅保留追溯，不恢复旧四路线。"

@@ -20,6 +20,10 @@ public partial class CombatFeedbackProfile : Resource
 	[Export] public float CameraBaseOffset { get; set; } = .035f;
 	[Export] public float CameraMaxOffset { get; set; } = .085f;
 	[Export] public float CameraSeconds { get; set; } = .14f;
+	[Export] public float PlayerHurtSeconds { get; set; } = .25f;
+	[Export] public float PlayerHurtOpacity { get; set; } = .22f;
+	[Export] public float PlayerHurtCooldownSeconds { get; set; } = .2f;
+	[Export] public float PlayerHurtCameraWeight { get; set; } = 1.75f;
 	[Export] public float ContactCoreSeconds { get; set; } = .07f;
 	[Export] public float ContactCoreSize { get; set; } = .16f;
 	[Export] public float CameraCooldownSeconds { get; set; } = .07f;
@@ -27,6 +31,9 @@ public partial class CombatFeedbackProfile : Resource
 	[Export] public float TargetCooldownSeconds { get; set; } = .035f;
 	[Export] public float FlashSeconds { get; set; } = .075f;
 	[Export] public float BurstSeconds { get; set; } = .18f;
+	[Export] public float ParryBurstSeconds { get; set; } = .3f;
+	[Export] public float ParryWeight { get; set; } = 1.4f;
+	[Export] public float ParryPitch { get; set; } = 1.7f;
 	[Export] public int MaxEffectsPerFrame { get; set; } = 12;
 	[Export] public string FleshSound { get; set; } = "sfx_combat_hit";
 	[Export] public string ArmorSound { get; set; } = "sfx_combat_hit";

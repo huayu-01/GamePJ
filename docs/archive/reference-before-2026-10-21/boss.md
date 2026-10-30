@@ -1,0 +1,284 @@
+> **历史原文：2026-10-21归档。** 当前维护请读[现行文档](../../boss.md)。以下保留整理前正文、当时判断与证据；旧阶段、旧字段和旧授权不能覆盖当前代码或最新用户要求。仅正文中的实际Markdown相对链接按归档位置调整，代码示例保持原样。
+
+# Boss（阶段 6）
+
+对应策划文档 §12-13、执行文档 §七。Boss 同样是「Unit + Controller/Behavior + Ability + Modifier」的组合，没有专用基类。
+
+## Boss 单位
+
+`Scenes/Enemies/Boss.tscn`：900 HP / 200 护甲 / 击退免疫 / 移速 3.6，标签 `Boss, Melee`。
+
+| 能力 | 阶段 | 说明 |
+|---|---|---|
+| AbilityMelee | 全程 | 重型挥击（24 伤害、击退 6） |
+| AbilityScream | 阶段 2 解锁 | 范围尖啸（14 伤害、击退 8、附加 Weaken） |
+| AbilityCharge | 阶段 2 解锁 | 直线冲锋（20 伤害、击退 10） |
+| AbilitySummon | 阶段 3 解锁 | 召唤 3 个近战增援 |
+
+行为组合：`UseAbilityBehavior`（尖啸/冲锋/召唤，各自绑定能力节点名）+ `MeleeAttackBehavior` + `ChaseBehavior`。
+能力默认 `Enabled = false`，由阶段控制器解锁；`Ability.IsReady` 已包含 `Enabled`，所以行为会自动跳过未解锁技能。
+
+## 阶段切换（BossPhaseController）
+
+- 按**剩余生命比例**切阶段：`PhaseFractions = [1, 0.65, 0.33]`。
+- 每次切阶段：先移除自己上次加的 Modifier，再按 `PhaseDamageMultipliers` / `PhaseAttackSpeedMultipliers` 重新加（Source = 组件自身，可干净叠加与替换）。
+- 解锁对应阶段的能力名单（`Phase2Abilities` / `Phase3Abilities`）。
+- 实测：0.65 以下 → 尖啸+冲锋解锁；0.33 以下 → 攻速 ×1.2、召唤解锁。
+
+## Boss 构筑（技能 + 词条，策划文档 §12；关卡核心文档 §7.1）
+
+Boss 也有自己的「构筑」：生成时按 Stage 配置随机抽 N 个**开场技能**（BossPerkCatalog），让同一个 Boss 每局不一样。
+
+> **术语（用户 2026-10 拍板）**：**行为型 = 技能**（`bhv_*.tres`，它本来就是技能表里的行，
+> 首领"学会/觉醒一个技能"）、**数值型 = 词条**（Pressure 池里"一个参数一栏"的数值强化）。
+> 两者**不能统称"词条"** —— HUD / 预览面板 / 日志 / 文档都按这个口径写。
+> 标记保持 `◆` = 技能、`◇` = 词条。
+
+**两套来源必须能分开（关卡核心文档 §7.1 的硬约束），配置表阶段 6 起有各自的抽取点**：
+
+| 来源 | 表 | 候选 | 抽取点 | 效果 |
+|---|---|---|---|---|
+| **Boss Build**（**技能** = 行为型） | `Config/Tables/Skills/bhv_*.tres`（4 行） | 4 | `BossPerkCatalog.Roll(BossPerkCount)`（Boss 出生时） | 提前觉醒 / 召唤师 / 尖啸强化 / 冲锋强化 |
+| **Boss Pressure**（**词条** = 数值型） | `Config/Tables/Pressure/pmod_*.tres`（**7 行**） | **7**（按 `Tags` 过滤 + 按 `Weight` 加权；**限定词留到出生时判**） | `BossPerkCatalog.RollPressure(tags)`（**每跨过一次 Pressure 阈值立即抽一次**）→ 排队；**Boss 出生时** `perk.Apply` 判限定词后套用 | **一栏一个参数**：狂暴·伤害(×1.25·3) / 狂暴·攻速(×1.2·3) / 铁壁·生命(×1.4·2) / 疾行(×1.35·2) / 尖啸回响(尖啸冷却 ×0.8·1) / 冲锋冲击(冲锋伤害 ×1.25·1) / 召唤急速(召唤冷却 ×0.75·1) |
+
+> **2026-10 后续修正（用户 ②）**：原 **`pmod_fortress_armor`「铁壁·护甲」(+150 甲) 已整行删除**
+> （原话：「**护甲目前就只给精英怪使用就好了，首领不需要**」）—— 池子 **8 → 7 条**，
+> 表行 + `ConfigIndex.tres` 的数组项/ext_resource + `BossPerkCatalog` 的**代码兜底**同一次改动一起下线
+> （只删表行不改兜底 = 表读不到时首领又会吃护甲，是静默换挡）。
+> **精英怪的护甲不受影响**：它来自 `Scripts/Combat/EliteModifier.cs`（`ArmorAdd = 120`），
+> 与 Pressure 无关；改动后全项目这一族的生产者只剩它一个（C1 之后走 `Unit.GrantArmor`，不再用 `MaxArmorAdd` 修正器）。
+> 权重分母 15 → 13，所以**每条的概率都变了**（20% → 23.1% 等）、抽取的随机序列也会漂。
+> 细节见 [config.md](../../config.md) 的「用户三项修正实测」§一。
+
+> **2026-10 再一轮（用户「去掉首领的甲」）**：**首领本体的 200 基甲也去掉了** ——
+> `Config/Tables/Bosses/boss_final.tres` 的那一列现在是 **0**（C1 之后列名叫 `StartingArmor`），
+> `Scenes/Enemies/Boss.tscn` 那份同值导出一并归零（行是权威、场景是回退，两处不同值就是静默换挡）。
+> ⚠️ 当时"护甲字段一个都没删"（`Unit`/`UnitConfig` 基类上的 `MaxArmor` / `Armor` / `ArmorDamageReduction` 都在）——
+> 用户澄清「护甲是**所有单位**都能有的通用属性，只是首领**默认没有获取手段**」。
+> **2026-10-12 第三轮 C1 覆盖了后半句**：用户改口「护甲没有上限额度，所以可以删除掉 `MaxArmor`」→
+> 那一列改名为 **`StartingArmor`**、`MaxArmorMultiplier` / `MaxArmorAdd` 删除（`Armor` / `ArmorDamageReduction` /
+> `ArmorBroke` 保留）；首领的值仍是 0，`BarBoss.tscn` 依然没有护甲节点，所以画面上**一点变化都没有**。
+> 首领现在也没有别的加甲途径（`EliteModifier` 只挂在普通敌人上；`BossPressure` / `ConfigIndex.ScaleEnemy` / Pressure 池
+> 都不碰护甲 —— grep 结论见 [config.md](../../config.md) 的「首领去甲 + 单位动画实测」§一）。
+> 伤害管线因此走 `…→ Block → DR(护甲减伤自动取 0) → Armor 段跳过 → Shield 0 → HP`，
+> **首领的有效血量明显下降**（少 200 点吸收 + 少 30% 减免），本轮**没有**做补偿性调参。
+
+> **2026-10 配置表阶段 7（用户要求）**：原来 3 条（狂暴 = 伤害+攻速挤一栏、铁壁 = 生命+护甲挤一栏、疾行）
+> **拆成"每个参数单独一个词条栏"**，并把**技能参数**（尖啸冷却 / 冲锋伤害 / 召唤冷却）也做成词条 —— 共 **8 条**
+> （**后续一轮按用户指示删掉了其中的「铁壁·护甲」，现在是 7 条**，见上面的 ② 说明）。
+> 权重依据、强度换算（每抽期望强度 = 原来的 **58.9%**，且理论上界决定了**调权重补不回来**）、
+> 叠加语义（"3 次狂暴·**伤害**" 仍是 ×1.25³ = 1.953，逐位不变）见 [config.md](../../config.md) 的「配置表阶段 7 实测」。
+
+**限定词与刷新判定（阶段 7）**：词条行可以带 **`BossIds`**（只对某个首领生效）、**`StageIds`**（只对某几关生效），
+技能参数词条还隐含 **"这个首领必须真的有这个技能节点"**（`AbilityNode`）。
+判定**只在 Boss 出生时做**（`BossPerkCatalog.ApplyWithRefresh`；`EncounterController` 与
+`StageController` 两条出生路径都经过 `perk.Apply`）——抽签时**不判**（那时首领还不存在），
+也**不复用**抽签时的结论；判不成立就当场**换抽**另一条。
+⚠️ **`StageIds` 现在池里没有行再用它了**（它是已删除的 `pmod_fortress_armor` 独有的限定词）——
+字段与判定逻辑保留（以后要给某条加关卡限定不用重写判定），自测改用一个**合成限定词**继续验证它，
+`DebugStageIdOverride` 因此仍有消费者。
+
+实测（真实出生，`run_20261011_233032.log`，**当时池里还有护甲那一栏**）：第 1 关抽到「铁壁·护甲」→ 出生时判不成立（限定 `stg_inner/stg_core`）
+→ 换抽「狂暴·伤害」→ `套用 3 条 [狂暴·攻速、铁壁·护甲→狂暴·伤害、尖啸回响] → Boss 生命 900 护甲 200 伤害×1.485`。
+**护甲停在 200**（不是 350）证明那一栏真的没生效；`伤害×1.485 = 0.9（Boss 全局）× 1.25（换抽到的）× 1.32（压力 4 级）`
+证明换抽到的效果真的落了地。名字里的 `→` 是刻意保留的：既有日志与 HUD 因此显示的是**真正生效**的那一条。
+（护甲那一栏下线后，这条样本仍然说明"限定词 + 换抽"机制本身是好的，只是换抽的起因不再是护甲。）
+
+- **开场技能**数量由每个 Stage 配置：Stage 1 = 1 个、Stage 2 = 2 个、Stage 3 = 3 个（**只数行为型 = 技能**）。
+- 效果只走 StatSheet 的 Modifier 或直接改组件参数，不往 Boss 脚本里加分支；加一条只加一行 `.tres`。
+- **HUD 血条栏会列出本关的全部强化（两套来源都显示，且能一眼区分）**，例如：
+  `BOSS 900/900   阶段 1   压力 0   技能 2 · 词条 2 ◆提前觉醒 ◆冲锋强化 ◇狂暴 ◇疾行×2`
+  —— `◆` = **技能**（行为型 Boss Build，来自这一场遭遇），`◇` = **词条**（数值型 Pressure，来自本关的阈值转换）。
+  计数带名词由 `BossPerkText.Summary()` 生成；文案统一由 `Scripts/UI/BossPerkText.cs` 生成（HUD 与预览面板共用一份），规则：
+  **同名折叠成 `名字×N`**（Pressure 会重复抽到同一条）、**不同条目超过上限就折叠成 `…+N`**
+  （血条栏 5 个 / 顶部状态行 4 个），所以条目再多也不会把血条挤爆。
+- **快捷键 B 打开「首领状况」预览面板**（`BossPreviewScreen`，走 `OverlayScreen` + `UiService` + `UiRouter`，
+  分层 = `Panel`：暂停 + 放开鼠标，与帮助界面同类）：本关免费额度与闸门状态 / 攒了多少 Pressure、跨了几次阈值、
+  转换池候选与权重 / **【技能】**与**【词条】**分成两节逐条列出（带 `.tres` 里的说明）/ 首领当前生命护甲阶段与乘区。
+  站在可交互物旁边时 HUD 会顺带提示这个键；后期做词典图鉴时与它合并（用户原话）。
+- ⚠️ **改动记录**：阶段 6 之前开场技能是从"数值型 + 行为型合并的 7 条"里抽的（过渡态），
+  现在数值型改由 Pressure 转换产出 —— 所以**开场技能的结果会变**，这是 §7.1 要求的分离，不是回归。
+- ⚠️ **没有**为 Pressure 设计"可被玩家增幅修改"的接口（§7.2 明令禁止）。
+
+### Pressure 累积 → 转换 → 套用（配置表阶段 6）
+
+```
+挑战完成（清场）
+  → §8.2 闸门：这次挑战是不是「免费挑战」（挑战序号 ≤ 本关免费额度）？
+        是 → 直接返回：不增加 Pressure、也不抽取数值强化（额度在挑战开始时就扣掉了）
+        否 ↓
+  → 基础点数：节点表 NodeConfig.BossPressurePoints（挑战类型）
+              → 关卡表按价值层的 PressurePerNodeHighValue / Normal
+              → ConfigIndex.PressurePerHighValueNode（150）
+  → × 关卡表 PressureGrowthMultiplier（固定倍率表）
+  → × 关卡表 PressureEvolutionBonus(1.25) / PressureMutationBonus(1.5)
+  → 每满 PressureThreshold（100）点【立即】抽一次数值强化（逐次检查，跨多个阈值就抽多次）
+  → 余数清零、不结转（§7.3 第 5 条）
+  → 抽到的强化排队；Boss 出生（EncounterController.BossSpawned 信号）时套到它的 StatSheet 上
+```
+
+实测（阶段 6 时期，**3 条池**的样本；阶段 7 拆成 8 条后的样本见下面第二块）：
+
+```
+Pressure 累积：+187.5（基础 150（来源：节点表 node_evolution）× 本关倍率 1 × 类型比例 1.25）阈值 100 → 本次跨阈值 1 次 / 本关累计 1 次 / 余数 0 / 立即抽取 [狂暴]
+Pressure 累积：+225（基础 150（来源：节点表 node_mutation）× 本关倍率 1 × 类型比例 1.5）阈值 100 → 本次跨阈值 2 次 / 本关累计 3 次 / 余数 0 / 立即抽取 [疾行、狂暴]
+Boss 出生：套用本关 Pressure 数值强化 3 条 [铁壁、疾行、疾行]（阈值转换 3 次，来源：表 Pressure）→ Boss 生命 1260 护甲 350 伤害×0.972 攻速×1.06 移速×1.914
+Boss 出生：套用本关 Pressure 数值强化 3 条 [铁壁、狂暴、狂暴] → Boss 生命 1260 护甲 350 伤害×1.406 攻速×1.44 移速×1
+```
+
+数字对得上：铁壁 900×1.4 = 1260、护甲 200+150 = 350；疾行 ×2 → 1.35² = 1.8225（再乘 BossPressure 1 级的 +5% = 1.914）；
+狂暴 ×2 → 伤害 0.9×1.25² = 1.406、攻速 1.2² = 1.44。
+
+实测（**阶段 7，8 条池**；下面两次都是**真实出生**，含一次限定词换抽。
+⚠️ 样本里的「铁壁·护甲」那一栏**已按用户指示删除**，现在池子是 **7 条** —— 日志保留原样作为历史证据）：
+
+```
+Pressure 累积：+225（基础 150（来源：节点表 node_mutation）× 本关倍率 1 × 类型比例 1.5）阈值 100 → 本次跨阈值 2 次 / 本关累计 3 次 / 余数 0 / 立即抽取 [铁壁·护甲、尖啸回响]
+词条限定词（Boss 出生时判定）：pmod_fortress_armor「铁壁·护甲」限定 [关卡 [stg_inner,stg_core]] → **不成立**（这一关是 stg_outer）→ 换抽另一条
+Pressure 技能参数：pmod_scream_echo「尖啸回响」→ 技能 AbilityScream.Cooldown 7 → 5.6（×0.8）
+Boss 出生：套用本关 Pressure 数值强化 3 条 [狂暴·攻速、铁壁·护甲→狂暴·伤害、尖啸回响]（阈值转换 3 次，来源：表 Pressure）→ Boss 生命 900 护甲 200 伤害×1.485 攻速×1.488 移速×1.2
+```
+
+```
+Boss 出生：套用本关 Pressure 数值强化 3 条 [尖啸回响、狂暴·伤害、狂暴·攻速] → Boss 生命 900 护甲 200 伤害×1.485 攻速×1.488 移速×1.2
+Boss 出生：套用本关 Pressure 数值强化 3 条 [疾行、铁壁·生命、铁壁·护甲→狂暴·攻速] → Boss 生命 1260 护甲 200 伤害×1.26 攻速×1.56 移速×1.688
+```
+
+**逐项对账**（压力等级 4 级 = 伤害 ×1.32 / 攻速 ×1.24 / 移速 ×1.2）：
+`伤害×1.485 = 0.9 × 1.25 × 1.32`、`攻速×1.488 = 1.2 × 1.24`、`生命 1260 = 900 × 1.4`、
+`移速×1.688 = 1.35 × 1.2`（压力 4 级）；**护甲 200 出现在"抽到护甲但被判不成立"的那两次** —— 正是换抽生效的证据。
+`+187.5 → 1 次` / `+225 → 3 次`（累计）这两个硬指标与阶段 6 **逐位相同**（它们只由点数与阈值决定，与池子无关）。
+
+> ⚠️ **初始压力只由「超出免费挑战额度」决定**（§8.1/§8.2）：`BossInitialPressure = max(0, ChallengesUsed - FreeChallengeQuota)`。
+> 阶段 6 之前它还叠加"节点累积 Pressure 折算出的压力等级"，那是 §7.5 转换池没落地时的替身，现已移除（不能与随机强化两头都算）。
+>
+> ✅ **§8.2 的「免费挑战不加 Pressure」闸门已接（2026-10）**：`AddPressureForNode` 第一件事就是读
+> `StageController.CurrentChallengeFree`（= 挑战数 ≤ 本关免费额度），免费挑战**直接返回、一点都不累积**
+> （连节点行配的 `BossModifierRolls` 额外抽取也一起拦，它们同属 Pressure 结算）。
+> 额度在 `StartEncounter` 里随挑战数一起扣（§8.2 第 1–2 步），Pressure 只在挑战**正常完成**时增加（第 4–5 步）。
+> 细节与自测证据见 [config.md](../../config.md) 的「免费挑战额度（§8.2）」一节。
+
+## Boss 压力（BossPressure）
+
+拖得越久越强：每 `Interval` 秒升一级（上限 `MaxLevel`），每级 +8% 伤害 / +6% 攻速 / +5% 移速；
+达到 `AddSpawnLevel` 后每次升级额外召唤增援。
+
+**数值曲线目前是原型值**（策划文档 §16 把 Boss Pressure 曲线列为待定项），全部在 Inspector 可调。
+
+## Boss Skill Elite
+
+`Scenes/Enemies/SkillElite.tscn`：带格挡的护卫，独有能力是**增益光环**（`BuffAlliesAbility`）——
+每隔数秒给半径 11 内的友军（含 Boss）挂 `Empowered` 状态（攻速 ×1.3、伤害 ×1.15）。
+
+技能精英现在有**两种技能**挂在同一个预制体上，生成时由 `EliteSkillRandomizer` 随机启用一个：
+
+- **增益光环**（BuffAlliesAbility）：给半径内友军挂 Empowered（攻速 ×1.3、伤害 ×1.15）
+- **范围定身**（AreaAttackAbility + Stun）：半径 6 内敌人移速 ×0.12、攻速 ×0.5，持续 2 秒
+
+于是同一波护卫里会同时出现不同种类的技能精英。候选技能名写在 ``SkillElite.tscn`` 的 ``SkillRandomizer.Skills`` 上，代码不认具体技能。
+
+精英标记复用 `EliteModifier`（这里只用它的体型与配色）。
+
+## 登场流程
+
+`EncounterController` 新增：`BossScene` / `BossGuardScene` / `BossGuardCount` / `BossSpawnDelay` / `BossSpawnDistance`。
+Encounter 完成（预算耗尽且场上清空）→ 延迟数秒在玩家前方出场 Boss 与护卫，发出 `BossSpawned`。
+`SpawnBossNow()` 是公开接口，阶段 7 的 Node 流程可以直接调用。
+
+## 白板首领副本（需求包 #5：**只在第 8 波出现**，2026-10）
+
+「白板首领副本」是**普通节点 Encounter** 末尾那个无压力、无词条、无开场技能的弱化首领
+（`EliteBossScene`，血量 ×0.35 —— 独立于 Boss Door 的最终首领）。它现在**不再每场都出**：
+
+| 项目 | 值 |
+|---|---|
+| 门槛 | 关卡表 `EliteBossMinWave`（三关都是 **8**）→ `EncounterController.MinWaveForEliteBoss`；**留 0 = 闸门关掉** |
+| 判定的量 | **本关累计波数** = `WavesOpenedBefore`（本场之前开过的波数）+ 本场 `WaveIndex` |
+| 为什么按"本关累计" | 一场 Encounter 的波数只有 1～4（低 1 / 中 3 / 高 4），按单场算门槛取 8 **永远到不了** —— 会从"每场都出"变成"永远不出" |
+| 门槛没过时 | 本场照常正常结算，累计波数在下一场继续长 |
+| 累计复位 | 每关清零（`StageController.ResetStage()`），每次开战前重新写入 |
+
+实测（同一轮自测里两种分支都跑到了）：
+
+```
+白板首领跳过：本关累计才第 1 波（门槛 8），本场直接结算
+白板首领跳过：本关累计才第 3 波（门槛 8），本场直接结算
+常规波已清空 → 进入白板首领副本（本关累计第 1 波，门槛 1）     ← 自测把门槛临时压到 1 做正向验证
+白板首领降临（血量倍率 0.35（来源：表 boss_final），无压力 / 无词条 / 本关累计第 1 波）
+```
+
+> 🐛 **顺带修掉一个真 bug**：`SpawnEliteBossNow()` 里原来手写了一句 `AliveCount++`。
+> `AliveCount` 是 `_spawned` 的缓存、只在 `PruneSpawned()` 里重算 —— 同帧多写一次，下一帧就被算回真实值，
+> 于是 `CheckCompleted()` 开头的 `if (AliveCount > 0) return;` 会让**"白板首领被打死之后本场永远结算不了"**。
+> 现在改成生成后直接 `PruneSpawned()`。详细说明见 [config.md](../../config.md) 的「白板首领副本」一节。
+
+## 打 Boss 之后的「挑战者状态」（需求包 #12，真 bug，2026-10）
+
+**症状**：直接开门打 Boss → 打完进不了下一关，提示"还在挑战中"。
+
+**根因**：`StageController.ChallengerActive` 原来的式子是 `_encounterRunning || (_bossFight && !IsVictory)`，
+而 `IsVictory` **只有互动降临节点那一下才会变 true**：
+
+```
+开 Boss 门 → _bossFight = true
+Boss 阵亡  → _bossCleared = true（但 _bossFight 仍 true、IsVictory 仍 false）
+           → ChallengerActive 仍 true → 脚下「挑战中」标记一直亮
+           → 按 F 想进降临节点被 Interactable 的挑战者闸门拒掉
+           → 而 IsVictory 只能靠这次交互翻 → 死锁
+```
+
+**修法**：`ChallengerActive` 把 `_bossCleared` 也算成"这一战结束了"：
+
+```csharp
+!IsVictory && (_encounterRunning
+    || (_bossFight && !_bossCleared && _bossEncounter?.Boss is { } boss && !boss.IsDead))
+```
+
+语义上 **Boss 战从来不是节点挑战**（它和 `_encounterRunning` 是两条线），只有"还有 Boss 活着"期间才算挑战中。
+
+**实测（自测阶段 18–22，就是用户那三步）**：
+
+```
+Boss 门：打开=True … 挑战者状态=True（期望 True：Boss 还活着）
+🔴 Boss 阵亡 → 挑战者状态=False（期望 False，这就是 bug #12 的修复点） 已通关=False（期望 False）
+降临节点：找到=True 提示=[按 F 使用：前往下一关]
+🔴 互动降临节点：接受=True（期望 True）→ 本关通关=True 关卡 1→2（期望 +1）挑战者状态=False（期望 False）
+```
+
+## 实测补充（脚本挂载问题修复后）
+
+| 检查项 | 结果 |
+|---|---|
+| 技能精英随机化 | 一次开门的 2 个护卫都随机到 AbilityControl：光环 False、控制 True ✓（候选被正确关闭、随机一个被启用） |
+| 技能精英光环 | Boss 状态变成 Empowered；攻速倍率 1.378 = 1.3（Empowered）× 1.06（压力 1 级），逐项吻合 ✓ |
+| Boss 构筑（开场技能） | HUD 显示 `BOSS 610/900  阶段 1  压力 1  技能 1 ◆疾行` ✓（**当时 `◆` 还写成"词条"**；现口径见上文术语表） |
+| Boss 第三阶段召唤 | 血量 900→890→590→290（32%）时阶段升到 2、AbilitySummon 解锁；随后计数器 Summoned = 3，召出 3 个增援 ✓ |
+## 实测（Main）
+
+- Boss 出场：`boss_units` 组 1 个，HP 900/900、护甲 200、护卫 2 个（`elite_units` = 2）。
+- 伤害链路：320 伤害先被护甲吸收（只掉 24 点生命），护甲破后同伤害一次掉 320 点 —— 与护甲优先、破甲后减伤消失的规则一致。
+- 阶段：`phase 0 → 1`（尖啸/冲锋 `Enabled=true`）→ `2`（`AttackSpeedMultiplier=1.2`、召唤解锁）。
+- 压力：按间隔升级后 `DamageMultiplier` 明显高于阶段基础值。
+- HUD：`BOSS 900/900  阶段 1  压力 0`。
+- Boss 与护卫会把玩家打死（120 血），需要构筑成长才能对抗 —— 阶段 7 调曲线。
+
+## 已知限制
+
+- 没有 Boss 专属演出（登场警告、阶段切换提示）。
+- 压力曲线、阶段阈值、Boss 血量都还是原型值。
+- 技能精英只有一种（增益光环），没有按 Encounter 随机组合。
+- ⚠️ **Pressure 的强度需要一轮平衡测试**：转换的产出从"压力等级"换成了"随机数值强化"（见上），
+  §7.5 的池内容（**7 条、权重 3/3/2/2/1/1/1** —— 用户下线「铁壁·护甲」前是 8 条 / 3/3/2/2/2/1/1/1）是原型值。
+  **阶段 7 拆分带来的已知变化**：一抽只买一个参数 → 每抽期望强度是拆分前的 **58.9%**
+  （而且"最强的那一条"仍小于原来的每抽总量，**调权重补不回来**）；
+  要补只能提高单条数值或降低阈值（§7.3 的 100 点）。详见 [config.md](../../config.md) 的阶段 7 实测 §1.2。
+- ⚠️ **限定词现在只有数值型词条（3 条技能参数）有**（`Pressure/` 的 `BossIds` + `AbilityNode`）；
+  `StageIds` 字段还在但**池里已无行使用**（唯一用它的是已删除的「铁壁·护甲」）。
+  行为型（**技能**，`bhv_*`）要带限定词得给 `AbilityConfig` 加列 —— 本轮没做（见 config.md 阶段 7 §七）。
+- ⚠️ **首领本体的 200 基甲没动**：用户说的是"护甲只给精英怪、首领不需要"，本轮按题面只下线了
+  Pressure 池里的**护甲词条**；`boss_final.tres` / `Boss.tscn` 的 200 基甲仍在（护甲优先/破甲的整条链路
+  都建立在它上面）。要不要连基甲一起去掉是**数值决策**，见 [config.md](../../config.md)「用户三项修正实测」§四。
+- ⚠️ **命中特效的位置口径变了**（用户 ⑤）：首领的挥击/尖啸/冲锋/召唤与爆炸打到的单位，特效现在落在
+  **目标碰撞体表面的实际命中点**（不再是"目标原点 +1.0"）。见 [config.md](../../config.md) 同节 §三。
+- ⚠️ 首领状况预览面板目前只有**快捷键 B**（用户拍板：先这样，后期与词典图鉴合并）；
+  "与交互节点互动时自动弹一次"没有做 —— 只在 HUD 的交互提示里加了 `[B 首领状况]` 一行。

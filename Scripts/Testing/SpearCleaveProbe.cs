@@ -147,7 +147,7 @@ public partial class SpearCleaveProbe : Node3D
 		_camera.GlobalPosition = new Vector3(26, 6, 25); _camera.LookAt(new Vector3(20, 0.8f, 17)); _camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
 		using var screenshot = GetViewport().GetTexture().GetImage();
-		Check(screenshot.SavePng("res://docs/screenshots/j17_golden_road.png") == Error.Ok, "截图 j17_golden_road");
+		Check(screenshot.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j17_golden_road.png")) == Error.Ok, "截图 j17_golden_road");
 		label.QueueFree(); _camera.GlobalTransform = before; _camera.ResetPhysicsInterpolation();
 	}
 }

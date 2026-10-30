@@ -24,9 +24,9 @@ public static class NodePlacement
 	/// 再没有 `Kind = Weapon` 的行，这个分支就是它唯一的价值层来源（不加就会退化成 Layer 0 / 1 波，
 	/// 与"进化池 = 高价值"自相矛盾）。场景里本来就没有 `Weapon` 实例，所以数字一个都不变。
 	/// </summary>
-	public static int LayerOf(RewardNodeKind kind)
+	public static int LayerOf(RewardNodeKind kind) => LayerOf(ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind), kind);
+	public static int LayerOf(NodeConfig? row, RewardNodeKind kind)
 	{
-		NodeConfig? row = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
 		if (row != null)
 		{
 			return row.Layer;
@@ -53,9 +53,9 @@ public static class NodePlacement
 	/// ⚠️ 加一种新奖励（彩蛋之类）时**不用改这个方法**：给它的节点行挂一个已有的价值标签
 	/// （或往价值标签表里加一行）。这就是"按标签驱动"而不是"按 <see cref="RewardNodeKind"/> 枚举硬编码"的意义。
 	/// </summary>
-	public static int WavesFor(RewardNodeKind kind)
+	public static int WavesFor(RewardNodeKind kind) => WavesFor(ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind), kind);
+	public static int WavesFor(NodeConfig? row, RewardNodeKind kind)
 	{
-		NodeConfig? row = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
 		if (row == null)
 		{
 			return LayerOf(kind) switch { 2 => 4, 1 => 3, _ => 1 };
@@ -108,7 +108,8 @@ public static class NodePlacement
 		// 2) 有导航网格就直接吸附（比探测更准）。
 		if (World.MapManager.Instance is { IsReady: true } map)
 		{
-			node.GlobalPosition = map.NodeAnchor(new Vector3(origin.X, groundY, origin.Z));
+			Vector3 anchor = map.NodeAnchor(new Vector3(origin.X, groundY, origin.Z));
+			if (node is Interactable interaction) interaction.MoveTo(anchor); else node.GlobalPosition = anchor;
 			return;
 		}
 
@@ -136,7 +137,7 @@ public static class NodePlacement
 					Core.GameLog.Write("Node", $"节点避障：{node.Name} 从 {origin} 挪到 {candidate}");
 				}
 
-				node.GlobalPosition = candidate;
+				if (node is Interactable interaction) interaction.MoveTo(candidate); else node.GlobalPosition = candidate;
 				return;
 			}
 		}

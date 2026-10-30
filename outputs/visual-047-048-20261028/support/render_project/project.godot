@@ -1,0 +1,14 @@
+config_version=5
+
+[application]
+config/name="Visual Review 047 048"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="CodexValidation/visual_review_boards_20261028"
+
+[display]
+window/size/viewport_width=2048
+window/size/viewport_height=1536
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.95,0.94,0.89,1)

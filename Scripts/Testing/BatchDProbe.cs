@@ -40,7 +40,7 @@ public partial class BatchDProbe : Node3D
 	{
 		if (DisplayServer.GetName() == "headless") return;
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"截图 {name}");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"截图 {name}");
 	}
 	private Unit Spawn(string path, Vector3 position, Faction? faction = null, bool frozen = true)
 	{
@@ -124,7 +124,8 @@ public partial class BatchDProbe : Node3D
 			Unit enemy = Spawn($"res://Scenes/Enemies/{name}.tscn", new Vector3(0, 0.05f, 4));
 			Place(enemy.GlobalPosition + Vector3.Forward * (BodyRadius(enemy) + BodyRadius(_player) + 0.02f));
 			await Wait(0.12);
-			Check(enemy.CollisionLayer == CombatLayers.BodyLayerOf(Faction.Enemy) && enemy.CollisionMask == CombatLayers.BodyMask, $"{name}身体共用阻挡层与敌人受击层");
+			uint enemyBodyMask = EnemyCrowdConfig.Current.Mode == EnemyCrowdMode.Physical ? CombatLayers.BodyMask : CombatLayers.World | CombatLayers.Player;
+			Check(enemy.CollisionLayer == CombatLayers.BodyLayerOf(Faction.Enemy) && enemy.CollisionMask == enemyBodyMask, $"{name}身体阻挡遵循拥挤策略，敌人受击层保留");
 			var boxes = new List<AttackHitbox>();
 			NodeSearch.CollectInSubtree(enemy, boxes);
 			_player.IsInvulnerable = false;

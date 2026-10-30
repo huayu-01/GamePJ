@@ -1,0 +1,134 @@
+[
+  {
+    "path": "Scenes/Enemies/MeteorMage.tscn",
+    "sha256": "51a839931710eaecb7a73ee1d20555eb4708d2d8c4615828611529d258aa58db"
+  },
+  {
+    "path": "Scripts/Config/UnitConfig.cs",
+    "sha256": "96a2e27360dd08cd752da9787f70f445cd3d0917a4879d15b2684d80b16bf1c7"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalDirector.cs",
+    "sha256": "cd286ae16ae97f11c6daeb05fc0c27c83beafd2324e756ee48437193d0cb0c0b"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalDirector.Spawning.cs",
+    "sha256": "7d75a5dcc73b4de8985f812244c54344395ae8247fc9a229431d398bb0371303"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalObjective.cs",
+    "sha256": "af178234d2e5ea7991b05967a22e1fb0b891c11c012ff3a5c121ea9749129e42"
+  },
+  {
+    "path": "Config/Localization/zh.tres",
+    "sha256": "eabf891758c4855a00798479e1c0598f421f63caa487883b4fb76e0895850aa8"
+  },
+  {
+    "path": "Config/Localization/en.tres",
+    "sha256": "d5911e47ec805fac982da6c63ec2988339c38d9bd2935ebb6eb069e411e823a5"
+  },
+  {
+    "path": "Scripts/Testing/SurvivalAugmentsProbe.cs",
+    "sha256": "d62b885309c47246036810d0d75785aa709564e731a609267f3c1647ba6404a2"
+  },
+  {
+    "path": "Scripts/Testing/SurvivalModeProbe.cs",
+    "sha256": "1b48cf889a936cf636592302d7d8ff2eb621b3c366f7adc199951990e2c8d23c"
+  },
+  {
+    "path": "Scripts/Testing/CodexProbe.cs",
+    "sha256": "9b68679ac902e088435501a95399b3899f2b431cf1ce7deebb5f583f1dd23182"
+  },
+  {
+    "path": "_tools/build_survival_augments.py",
+    "sha256": "4b3e2619dc0eb9bfd270edbaca3cc31b9084c512ccc2a0e9382d64cb6f0f1935"
+  },
+  {
+    "path": "docs/enemy-roster.md",
+    "sha256": "f0162045302f011e16a52661974ca821d021165fbd187bcf635ac9b8c600ec78"
+  },
+  {
+    "path": "docs/config-authoring.md",
+    "sha256": "f0225cc7e36bf3905f7b36a8591ae51283e6f8a60983533be5832f7eb79f2432"
+  },
+  {
+    "path": "docs/combat.md",
+    "sha256": "428a80004cd87f49c67ebd24852c9539156b4099e3d28e7c126189a1bf6d1211"
+  },
+  {
+    "path": "docs/README.md",
+    "sha256": "14943b5b39b4c7ea658d9665ea63b250828ea28e0ac96fca0c536012aa94dec9"
+  },
+  {
+    "path": "docs/SESSION-SNAPSHOT.md",
+    "sha256": "cd28d85d88ee31152fef6466b3355abf2cd1206112fe9d9b4c2796ed76a969fa"
+  },
+  {
+    "path": "docs/survival-mode.md",
+    "sha256": "8dd5920f902bf38d7c6b7bc1bbb6dce2ee609cee467c4bb45894a6bf963506e6"
+  },
+  {
+    "path": "docs/survival-builds.md",
+    "sha256": "a202c74f14f0a36303bd492f44f60e9760e165088a42a097b7653f024f54a874"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_anchor_afterglow.tres",
+    "sha256": "514ffb6dbceb735a451b543dd28945df9d125a1715837cdaf62d59a049e6936e"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_anchor_core.tres",
+    "sha256": "28e554875d57a52f1abb10ee26d8f897c8ce96bd5f57fcb9cd7b17c7bc5da49f"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_anchor_pulse.tres",
+    "sha256": "4fcf4bbd3972beee2a3887b0c316bfbace09eb05490dc851a5659a8c6605a853"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_contract_payoff.tres",
+    "sha256": "f04eae649ed65365674e66dd304279aadf2f32e2615bf5f4a99f9d62ebe782ee"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_echo_familiar.tres",
+    "sha256": "0b9a3cbe2d952ab3968fd0a0ec87b25888ce590216d6e1752f13963d8d36aa75"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_echo_lance.tres",
+    "sha256": "f0fd3367ecebfcb05962ca0856a356547103c3aa4fb2e3e4035bf9c95f58d1af"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_echo_mark.tres",
+    "sha256": "4a78f7870af4b057653bdc81e48d77a389a7f47106c969434d289d7c4d74ff1b"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_energy_echo.tres",
+    "sha256": "0dc3aa407f909b26ca46896b08594d0493125003a5ad6e8e7d84db9675bda44b"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_risk_contract.tres",
+    "sha256": "b9f74aebe2a7b5767bbc2a862684be45ab16877590ba94f5faa13734eca506d7"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_scavenger_compass.tres",
+    "sha256": "0d702a1e53a8132c8075d2cfd531941f43cf9e9ca15a690fef7d39395c270361"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_scavenger_ward.tres",
+    "sha256": "c2a98ad4164641c2682a92a0d86e7c534e9e05c57e97cd20eff5d1cf928c99c7"
+  },
+  {
+    "path": "Config\\Tables\\Upgrades\\surv_timed_hunt.tres",
+    "sha256": "b5fce61eec746e0076ca4b7421a5d8b487944b7b074b775081dd5583c35f530d"
+  },
+  {
+    "path": "Scripts/Testing/AttackSnapshotProbe.cs",
+    "sha256": "4c34f447e0dd8e8cbb6215b187676deaed2689ddff4ee0126883c70347aa1a64"
+  },
+  {
+    "path": "_tools/verify_survival_integration.ps1",
+    "sha256": "2010b53015e4d012b8ee320885d193cc29bb018da4e461cce2c361205ff1f0df"
+  },
+  {
+    "path": "Scripts/Debug/GmConsole.cs",
+    "sha256": "00ddad2b6e19a801ffd70ebf5f9d830ab4be2eb5311d385b4a6b677f5ac03ec7"
+  }
+]

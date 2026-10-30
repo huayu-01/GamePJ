@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ActRoguelike.Weapons;
 using Godot;
 
@@ -20,6 +21,7 @@ public sealed partial class RewardPool : RefCounted
 {
 	private readonly List<RewardDefinition> _candidates = new();
 	private readonly RandomNumberGenerator _rng = new();
+	private readonly Dictionary<string, int> _exclusiveOfferCounts = new();
 
 	public int CandidateCount => _candidates.Count;
 
@@ -28,23 +30,26 @@ public sealed partial class RewardPool : RefCounted
 	/// 空 = 角色未知 → 角色限定项不进池（`RewardDefinition.AllowsCharacter` 的语义）。
 	/// </summary>
 	public string CharacterId { get; set; } = string.Empty;
+	public string ModeId { get; set; } = string.Empty;
 
 	/// <summary>
 	/// 建候选池。`characterId` 给 null 表示"不改已有的 <see cref="CharacterId"/>" ——
 	/// 这样既有的单参调用点（自测里手搓的池）一行都不用改。
 	/// </summary>
-	public void Initialize(Weapon weapon, string? characterId = null)
+	public void Initialize(Weapon weapon, string? characterId = null, string? modeId = null)
 	{
+		if (modeId != null) ModeId = modeId;
 		if (characterId != null)
 		{
 			CharacterId = characterId;
 		}
 
 		_candidates.Clear();
+		_exclusiveOfferCounts.Clear();
 		foreach (RewardDefinition definition in RewardCatalog.All)
 		{
 			// 限定（角色层）：角色行 Id 不在名单里 → 根本不进池。
-			if (!definition.AllowsCharacter(CharacterId))
+			if (!definition.AllowsCharacter(CharacterId) || !definition.AllowsMode(ModeId))
 			{
 				continue;
 			}
@@ -63,9 +68,34 @@ public sealed partial class RewardPool : RefCounted
 
 	public List<RewardDefinition> Roll(RunBuild build, int count, RewardKind? kindFilter = null, RewardKind[]? kindSet = null)
 	{
+		// 浏览与随机奖励共用资格判断，浏览本身不推进抽样随机序列。
+		return ActRoguelike.Config.WeightedPick.Pick(Available(build, kindFilter, kindSet), definition => definition.Weight, count, _rng);
+	}
+	public List<RewardDefinition> RollMode(RunBuild build, int count, RewardKind? kind, bool preferExclusive)
+	{
+		var available = Available(build, kind);
+		var selected = new List<RewardDefinition>();
+		if (preferExclusive)
+		{
+			// 先展示本局较少出现的合格专属项；同档仍按配置权重抽取，不绕过前置／互斥。
+			foreach (var group in available.Where(r => r.RequiredModeIds.Length > 0)
+				.GroupBy(r => _exclusiveOfferCounts.GetValueOrDefault(r.Id)).OrderBy(g => g.Key))
+			{
+				ActRoguelike.Config.WeightedPick.Pick(group.ToList(), r => r.Weight, count - selected.Count, _rng, selected);
+				if (selected.Count >= count) break;
+			}
+			foreach (var row in selected) _exclusiveOfferCounts[row.Id] = _exclusiveOfferCounts.GetValueOrDefault(row.Id) + 1;
+		}
+		selected.AddRange(ActRoguelike.Config.WeightedPick.Pick(available.Where(r => r.RequiredModeIds.Length == 0).ToList(), r => r.Weight, count-selected.Count, _rng));
+		return selected;
+	}
+
+	public List<RewardDefinition> Available(RunBuild build, RewardKind? kindFilter = null, RewardKind[]? kindSet = null)
+	{
 		var available = new List<RewardDefinition>();
 		foreach (RewardDefinition definition in _candidates)
 		{
+			if (definition.Weight <= 0f || !definition.AllowsMode(ModeId)) continue;
 			// 地面节点分类型（强化池 / 进化池 / 异化池），所以抽取支持按 Kind 过滤；
 			// kindSet 用于「稀有池」这种多类型限定（特殊奖励节点）。
 			if (kindFilter.HasValue && definition.Kind != kindFilter.Value)
@@ -111,9 +141,7 @@ public sealed partial class RewardPool : RefCounted
 			}
 		}
 
-		// 加权抽样走公共工具（Config/WeightedPick.cs）。⚠️ 必须把本池自己的 _rng 传进去：
-		// 抽公共工具之前这里是内联的同一段算法，换成共用一把 RNG 会让随机序列变、自测基线漂。
-		return ActRoguelike.Config.WeightedPick.Pick(available, definition => definition.Weight, count, _rng);
+		return available;
 	}
 	/// <summary>
 	/// **前置判定**（P5 三层判定的第三层）：<c>Requires</c> 里的 Id **全部**已拥有才放行。
@@ -142,13 +170,14 @@ public sealed partial class RewardPool : RefCounted
 	{
 		foreach (string banned in candidate.Excludes)
 		{
-			if (build.StacksOf(banned) > 0)
+			// 当前携带的符文也可声明为互斥条件，和符文前置共用稳定身份解析。
+			if (build.SatisfiesPrerequisite(banned))
 			{
 				return true;
 			}
 		}
 
-		foreach (RewardDefinition owned in _candidates)
+		foreach (RewardDefinition owned in build.Acquired)
 		{
 			if (build.StacksOf(owned.Id) > 0 && System.Array.IndexOf(owned.Excludes, candidate.Id) >= 0)
 			{

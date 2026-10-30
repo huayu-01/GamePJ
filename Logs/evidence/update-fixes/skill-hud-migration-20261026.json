@@ -1,0 +1,74 @@
+[
+  {
+    "skill": "skl_a1_passive",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_a1_passive_icon.svg"
+  },
+  {
+    "skill": "skl_a1_skill_1",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_a1_skill_1_icon.svg"
+  },
+  {
+    "skill": "skl_a1_skill_2",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_a1_skill_2_icon.svg"
+  },
+  {
+    "skill": "skl_a1_w1_1",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_a1_w1_1_icon.svg"
+  },
+  {
+    "skill": "skl_a1_w1_2",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_a1_w1_2_icon.svg"
+  },
+  {
+    "skill": "skl_a2_w1_1",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_a2_w1_1_icon.svg"
+  },
+  {
+    "skill": "skl_a2_w1_2",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_a2_w1_2_icon.svg"
+  },
+  {
+    "skill": "skl_a3_w1_1",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_a3_w1_1_icon.svg"
+  },
+  {
+    "skill": "skl_a3_w1_2",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_a3_w1_2_icon.svg"
+  },
+  {
+    "skill": "skl_b1_w1_1",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_b1_w1_1_icon.svg"
+  },
+  {
+    "skill": "skl_b1_w1_3",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_b1_w1_3_icon.svg"
+  },
+  {
+    "skill": "skl_b2_w1_1",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_b2_w1_1_icon.svg"
+  },
+  {
+    "skill": "skl_b2_w1_2",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_b2_w1_2_icon.svg"
+  },
+  {
+    "skill": "skl_b3_w1_1",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_b3_w1_1_icon.svg"
+  },
+  {
+    "skill": "skl_b3_w1_2",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_b3_w1_2_icon.svg"
+  },
+  {
+    "skill": "skl_b_fall",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_b_fall_icon.svg"
+  },
+  {
+    "skill": "skl_b_skill_1",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_b_skill_1_icon.svg"
+  },
+  {
+    "skill": "skl_b_skill_2",
+    "icon": "Assets\\UI\\Icons\\Skills\\skl_b_skill_2_icon.svg"
+  }
+]

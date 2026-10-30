@@ -13,18 +13,23 @@ public partial class CharacterStand : Interactable
 	public override void _Ready()
 	{
 		SingleUse = false;
-		Prompt = Character.DisplayName;
+		Prompt = Character?.DisplayName ?? "未配置角色";
+		Enabled = Character != null;
 		base._Ready();
-		GetNode<Label3D>("Name").Text = Character.DisplayName;
-		GetNode<Label3D>("Name").Visible = true;
+		if (Nameplate is { } label)
+		{
+			label.Text = Prompt;
+			label.Visible = true;
+		}
 	}
 	public override void _Process(double delta)
 	{
-		if (LoadoutMemory.WeaponFor(Character) is not { } weapon || weapon.Id == _weaponId) return;
+		if (Character == null || LoadoutMemory.WeaponFor(Character) is not { } weapon || weapon.Id == _weaponId) return;
 		_weaponId = weapon.Id;
-		GetNode<ActRoguelike.Visual.CharacterDisplay>("Visual").Apply(Character, weapon);
-		GetNode<Label3D>("Name").Text = $"{Character.DisplayName}\n{weapon.DisplayName}";
+		(GetNodeOrNull<ActRoguelike.Visual.CharacterDisplay>("TypeModel/Visual") ?? GetNodeOrNull<ActRoguelike.Visual.CharacterDisplay>("Visual"))?.Apply(Character, weapon);
+		if (Nameplate is { } label) label.Text = $"{Character.DisplayName}\n{weapon.DisplayName}";
 	}
+	private Label3D? Nameplate => GetNodeOrNull<Label3D>("TypeModel/Name") ?? GetNodeOrNull<Label3D>("Name");
 	protected override bool OnInteract()
 	{
 		if (!LoadoutSelection.SelectCharacter(Character)) return false;

@@ -1,0 +1,24 @@
+{
+  "Date": "2026-10-26T20:32:14",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "fall",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203214.fall.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203214.fall.headless.err",
+      "SHA256": "09460D479873F1304A0D802709580EB550F912BF473E6C9AF7E3CE3D9D407F44"
+    },
+    {
+      "Name": "charge",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203214.charge.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_203214.charge.headless.err",
+      "SHA256": "BA9AF3601D8468B1703562F8B1D4BC9908BAFF884789A2B48FF0417FDB8FF0CF"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

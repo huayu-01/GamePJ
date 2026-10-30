@@ -4,19 +4,7 @@ using Godot;
 
 namespace ActRoguelike.Rewards;
 
-/// <summary>
-/// **符文规则集合（J11）** —— 「死铠 / 生死 / 狙神 / 巨人 / 小精灵」这 5 枚符文里
-/// "需要一个行为"的那几件，全部由 <c>RewardEffectRegistry</c> 的 **`RuneEffect`** 处理器用
-/// <c>new</c> 建出来（与 `MarkedBonusRule` / `StompOnLandRule` 同一条纪律）。
-///
-/// <para><b>一个类服务所有同类符文行</b>：数值全在符文行的 `HandlerParams` 里，代码里一个数字都没有。
-/// 这些类没有任何 `.tscn` 挂载（全部运行期 `new`），所以同文件放多个类是安全的
-/// （`architecture.md` 第 10 条限制的是"能被场景挂载"的脚本类）。</para>
-///
-/// <para>⚠️ 符文的**纯数值效果**（雷之印 / 战神印 / 风之印 / 行军 / 大力符 / 飞翼）根本不进这里 ——
-/// 它们走既有的 `StatSet` 处理器 + `Modifiers` 列，一条 C# 都不用加。这里只放
-/// "改 StatSheet 表达不了"的那几件（击杀计数、死亡避免、按距离/最大生命值加伤、轨道实体）。</para>
-/// </summary>
+/// <summary>符文逐杀加甲规则；由独立效果定义创建，来源宿主负责停用和清理。</summary>
 public partial class RuneArmorOnKillRule : TriggerRule
 {
 	/// <summary>每多少击杀加一次甲（0 = 每次击杀都加）。</summary>
@@ -40,13 +28,15 @@ public partial class RuneArmorOnKillRule : TriggerRule
 		GameplayEventBus.Raised += OnKill;
 	}
 
-	public override void _ExitTree()
+	public override void _ExitTree() => Stop();
+	public override void Stop()
 	{
+		base.Stop();
 		GameplayEventBus.Raised -= OnKill;
 		_owner = null;
 	}
 
-	private void OnKill(GameplayEvent fact) { if (Matches(fact)) Execute(fact); }
+	private void OnKill(GameplayEvent fact) { if (!IsStopped && Matches(fact)) Execute(fact); }
 
 	/// <summary>只认**自己打出来的击杀**（与「连锁闪电」「灵魂收割」同一条判据）。</summary>
 	public override bool Matches(GameplayEvent gameplayEvent)
@@ -87,7 +77,7 @@ public partial class RuneArmorOnKillRule : TriggerRule
 /// <para>钩子在 <see cref="Unit.ReceiveHit"/> 的"死不死"判定处（<see cref="IDeathAvoid"/> 的注释里写了
 /// 为什么不能事后靠 <c>Damaged</c> 事件复活）。次数与恢复比例全部来自符文行。</para>
 /// </summary>
-public partial class RuneDeathAvoidRule : Node, IDeathAvoid
+public partial class RuneDeathAvoidRule : Node, IDeathAvoid, IStoppableRewardRule
 {
 	/// <summary>还能无效化几次致命伤。</summary>
 	public int Charges { get; set; } = 1;
@@ -109,7 +99,8 @@ public partial class RuneDeathAvoidRule : Node, IDeathAvoid
 		_owner?.AddDeathAvoid(this);
 	}
 
-	public override void _ExitTree()
+	public override void _ExitTree() => Stop();
+	public void Stop()
 	{
 		_owner?.RemoveDeathAvoid(this);
 		_owner = null;
@@ -117,7 +108,7 @@ public partial class RuneDeathAvoidRule : Node, IDeathAvoid
 
 	public bool TryAvoidDeath(Unit unit)
 	{
-		if (Charges <= 0)
+		if (_owner == null || Charges <= 0)
 		{
 			return false;
 		}
@@ -150,7 +141,7 @@ public partial class RuneDeathAvoidRule : Node, IDeathAvoid
 /// <see cref="FarRange"/> 之间线性插值，两端外各自夹住（文档只给了近端 50%，
 /// 远端与两个距离阈值是预设值，见行 `Note`）。</para>
 /// </summary>
-public partial class RuneDistanceDamageRule : Node, IOutgoingDamageScale
+public partial class RuneDistanceDamageRule : Node, IOutgoingDamageScale, IStoppableRewardRule
 {
 	/// <summary>近距离判定的距离（米）。</summary>
 	public float NearRange { get; set; } = 3f;
@@ -178,7 +169,8 @@ public partial class RuneDistanceDamageRule : Node, IOutgoingDamageScale
 		_owner?.AddOutgoingDamageScale(this);
 	}
 
-	public override void _ExitTree()
+	public override void _ExitTree() => Stop();
+	public void Stop()
 	{
 		_owner?.RemoveOutgoingDamageScale(this);
 		_owner = null;
@@ -206,13 +198,13 @@ public partial class RuneDistanceDamageRule : Node, IOutgoingDamageScale
 }
 
 /// <summary>
-/// **按最大生命值加伤**（符文「巨人」= 每次攻击额外造成玩家最大生命值 10% 的伤害）。
+/// 按最大生命值加伤，比例读取符文配置，命中频率和后期联动保持不变。
 ///
 /// <para>走 J11 新加的扁平加伤口 <see cref="IOutgoingDamageBonus"/>（为什么不能复用倍率口，
 /// 见那个接口的注释）。读的是**玩家当前**的 <c>MaxHealth</c>，所以与「雷之印」的 30 上限叠加时
 /// 按夹过之后的值算（口径一致：都是"最大生命值"）。</para>
 /// </summary>
-public partial class RuneMaxHealthDamageRule : Node, IOutgoingDamageBonus
+public partial class RuneMaxHealthDamageRule : Node, IOutgoingDamageBonus, IStoppableRewardRule
 {
 	/// <summary>额外伤害 = 最大生命值 × 这个比例。</summary>
 	public float Ratio { get; set; } = 0.1f;
@@ -228,7 +220,8 @@ public partial class RuneMaxHealthDamageRule : Node, IOutgoingDamageBonus
 		_owner?.AddOutgoingDamageBonus(this);
 	}
 
-	public override void _ExitTree()
+	public override void _ExitTree() => Stop();
+	public void Stop()
 	{
 		_owner?.RemoveOutgoingDamageBonus(this);
 		_owner = null;
@@ -261,8 +254,10 @@ public partial class RuneMaxHealthDamageRule : Node, IOutgoingDamageBonus
 ///
 /// <para>⚠️ 没有模型/动画资源：本批用一颗自发光小球当**占位表现**（行 `Note` 已登记）。</para>
 /// </summary>
-public partial class PixieCompanion : Node3D
+public partial class PixieCompanion : Node3D, IStoppableRewardRule
 {
+	public void Stop() { _owner = null; SetPhysicsProcess(false); Hide(); }
+	public override void _ExitTree() => Stop();
 	/// <summary>攻击间隔（秒）。</summary>
 	public float IntervalSeconds { get; set; } = 5f;
 

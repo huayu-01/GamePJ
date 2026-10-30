@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 [ext_resource type="Script" path="res://Scripts/Config/SkillEnhancementTuning.cs" id="3_tuning"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_1.tres" id="4_skill"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="Enhancement"]
 script = ExtResource("3_tuning")
@@ -11,15 +12,23 @@ TargetAbility = ExtResource("4_skill")
 ComboStepIndex = -1
 DamageScale = 1.5
 
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("Enhancement")
+
 [resource]
 script = ExtResource("2_row")
+NumericId = 1229
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "SkillEnhancement"
-SkillEnhancement = SubResource("Enhancement")
+Effects = [SubResource("Resource_effect_tuning")]
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Pool = ExtResource("1_pool")
 Id = "evo_mercy"
 DisplayName = "怜悯"
 DescriptionTemplate = "武技1 只释放最后一刀，这一刀伤害增加50%"
 Note = "J14：只用憎恶原连招的末段动画／360度判定，该段伤害×1.5；不改玩家全局伤害。负数段号选择当前连招表的最后一段，单次施法不再推进其他段。"
+
+NameKey = "content.evo_mercy.name"
+
+DescriptionKey = "content.evo_mercy.description"

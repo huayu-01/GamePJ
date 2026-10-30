@@ -11,6 +11,7 @@ Value = 1.4
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1123
 Id = "pmod_fortress_hp"
 DisplayName = "铁壁·生命"
 DescriptionTemplate = "最大生命 ×1.4"

@@ -12,7 +12,7 @@ namespace ActRoguelike.Interaction;
 /// </summary>
 public abstract partial class Interactable : Node3D
 {
-	/// <summary>外观网格的节点名。场景里必须叫这个名字（见 docs/visual-inventory.md §8.3），改名会静默失效。</summary>
+	/// <summary>外观网格的节点名。场景里必须叫这个名字（见 docs/archive/design-notes/visual-inventory.md §8.3），改名会静默失效。</summary>
 	protected const string MeshNodeName = "Mesh";
 
 	/// <summary>动画占位节点的名字（场景里的 AnimationPlayer，可以留空动画）。</summary>
@@ -50,6 +50,9 @@ public abstract partial class Interactable : Node3D
 	/// （原来 `if (!CanInteract || !OnInteract()) return false;` 的语义完全不变）。</para>
 	/// </summary>
 	public event System.Action? Failed;
+	/// <summary>成功交互及复位通知；挂载组件据此转发信号和恢复自己的外观。</summary>
+	public event System.Action? Succeeded;
+	public event System.Action? ResetPerformed;
 
 	/// <summary>提示文字，例如「强化池」。改它会让头顶名牌跟着刷新（见 OnNameChanged）。</summary>
 	[Export]
@@ -64,6 +67,29 @@ public abstract partial class Interactable : Node3D
 	}
 
 	[Export] public float InteractRadius { get; set; } = 3.2f;
+	/// <summary>指定时以真实触发器重叠为准；为空时沿用交互半径。</summary>
+	[Export] public Area3D? TriggerArea { get; set; }
+	/// <summary>外部模型只用于交互反馈，不参与奖励节点默认造型替换。</summary>
+	public MeshInstance3D? HighlightMesh { get; set; }
+	/// <summary>由类型组件提供模型时，奖励后端不再套旧宝石造型。</summary>
+	public bool OwnsTypeModel { get; set; }
+	/// <summary>组合式交互在场景布点时移动整个宿主，旧交互物默认移动自身。</summary>
+	public Node3D? PlacementTarget { get; set; }
+	public void MoveTo(Vector3 point)
+	{
+		Node3D target = PlacementTarget is { } host && IsInstanceValid(host) ? host : this;
+		target.GlobalPosition += point - GlobalPosition;
+	}
+	/// <summary>收集当前关卡子树的交互物，不跨入另一个关卡的管理范围。</summary>
+	public static IEnumerable<Interactable> InSubtree(Node root)
+	{
+		foreach (Node child in root.GetChildren())
+		{
+			if (child is StageController) continue;
+			if (child is Interactable item) yield return item;
+			foreach (Interactable nested in InSubtree(child)) yield return nested;
+		}
+	}
 
 	/// <summary>是否只能用一次（策划文档 §6.2：节点通常只能使用一次）。</summary>
 	[Export] public bool SingleUse { get; set; } = true;
@@ -74,12 +100,13 @@ public abstract partial class Interactable : Node3D
 	/// <summary>已经消失收场（不可见、不在 Interactable.All 里），连动画播到一半时也算。</summary>
 	public bool Vanished { get; private set; }
 
-	public bool CanInteract => !Used && !Vanished && PlayerInRange && Enabled;
+	public bool CanInteract => !Used && !Vanished && PlayerInRange && Enabled && IsVisibleInTree();
 
 	/// <summary>被关卡临时启用的节点才可交互（每局随机布置时关掉没抽中的）。</summary>
 	public bool Enabled { get; set; } = true;
 
-	public string CurrentPrompt => Used ? $"{Prompt}（已用）" : $"按 F 使用：{Prompt}";
+	public string CurrentPrompt => Used ? $"{Prompt}（已用）"
+		: StageController.Instance?.ChallengerActive == true ? $"挑战中，暂不可使用：{Prompt} [F]" : $"按 F 使用：{Prompt}";
 
 	/// <summary>
 	/// 外观网格（场景里必须叫 <c>Mesh</c>）。**public** 是为了让"只加表现"的
@@ -141,13 +168,25 @@ public abstract partial class Interactable : Node3D
 		}
 
 		_rangeCheckAccum = 0f;
-		PlayerInRange = PlayerLocator.Player is { } player
-			&& player.GlobalPosition.DistanceTo(GlobalPosition) <= InteractRadius;
+		RefreshPlayerRange();
+	}
+	private void RefreshPlayerRange()
+	{
+		PlayerInRange = false;
+		if (PlayerLocator.Player is not { IsDead: false } player || !IsInstanceValid(player)) return;
+		if (TriggerArea != null)
+		{
+			PlayerInRange = IsInstanceValid(TriggerArea) && TriggerArea.IsInsideTree() && TriggerArea.Monitoring && TriggerArea.OverlapsBody(player);
+			return;
+		}
+		PlayerInRange = player.GlobalPosition.DistanceTo(GlobalPosition) <= InteractRadius;
 	}
 
 	/// <summary>玩家按下交互键时调用。返回 true 表示这次互动被接受（会消耗节点）。</summary>
 	public bool Interact()
 	{
+		// 按下时复核，避免范围缓存尚未刷新时从触发器外触发。
+		RefreshPlayerRange();
 		// 挑战者状态：挑战进行中拒绝一切交互（用户要求：表现上就是「按 F 但被拒绝」）。
 		// 判定放在这里，所有交互物共用一份，节点也不会被消耗。
 		if (StageController.Instance is { ChallengerActive: true })
@@ -170,6 +209,7 @@ public abstract partial class Interactable : Node3D
 			OnUsed();
 		}
 
+		Succeeded?.Invoke();
 		return true;
 	}
 
@@ -182,6 +222,7 @@ public abstract partial class Interactable : Node3D
 		PlayerInRange = false;
 		_vanishing = false;
 		Appear();
+		ResetPerformed?.Invoke();
 	}
 
 	/// <summary>

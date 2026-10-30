@@ -1,0 +1,57 @@
+正式索引数量 {'ContentLocales': 2, 'Stages': 3, 'Weapons': 6, 'Characters': 2, 'Enemies': 21, 'Bosses': 1, 'Summons': 1, 'AiProfiles': 11, 'Skills': 39, 'SkillAnimations': 25, 'PressureMods': 7, 'Effects': 15, 'Nodes': 8, 'ValueTags': 3, 'Upgrades': 103, 'Runes': 11, 'UpgradePools': 6, 'MetaUpgrades': 5, 'AbilityCards': 4, 'SkillSeries': 3, 'Audio': 14}
+独立资源 Counter({'EnemyActionPlan': 11, 'EliteTraitCatalog': 1, 'ShifterTraitDefinition': 1, 'BruiserTraitDefinition': 1, 'SluggerTraitDefinition': 1, 'SaviorTraitDefinition': 1, 'SpeederTraitDefinition': 1, 'LinkerTraitDefinition': 1, 'BurnerTraitDefinition': 1, 'SeekerTraitDefinition': 1, 'BurrowerTraitDefinition': 1, 'ClangerTraitDefinition': 1, 'SlicerTraitDefinition': 1, 'SpillerTraitDefinition': 1, 'SpinnerTraitDefinition': 1, 'ArcaneTraitDefinition': 1, 'FrozenTraitDefinition': 1, 'MoltenTraitDefinition': 1, 'KnockbackTraitDefinition': 1, 'ShieldingTraitDefinition': 1, 'HealthLinkTraitDefinition': 1, 'AvengerTraitDefinition': 1, 'JuggernautTraitDefinition': 1, 'MultishotTraitDefinition': 1, 'SummonerTraitDefinition': 1, 'SuppressorTraitDefinition': 1, 'VampiricTraitDefinition': 1, 'PressureReboundTraitDefinition': 1, 'ArmorRecoilTraitDefinition': 1, 'ReforgeTraitDefinition': 1, 'TidalTraitDefinition': 1, 'AftershockTraitDefinition': 1, 'TrailBrandTraitDefinition': 1, 'FlankerTraitDefinition': 1, 'ThornGridTraitDefinition': 1, 'SurvivalDefinition': 1, 'EnemyBehaviorPressure': 1})
+相关类型 ['BackHopEnemyAction', 'BurrowEnemyAction', 'ChargeEnemyAction', 'DiveEnemyAction', 'EliteTraitCatalog', 'EnemyActionPlan', 'EnemyActionStep', 'EnemyBehaviorPressure', 'EnemyConfig', 'EnemyCrowdConfig', 'GuardEnemyAction', 'HoverEnemyAction', 'JumpEnemyAction', 'MeleeEnemyAction', 'PressureModConfig', 'PressureReboundTraitDefinition', 'ProjectileEnemyAction', 'SpecializationRewardEffect', 'WaitEnemyAction']
+全局 {'ProjectileMaxSpeed': 200, 'EnemyHealthMultiplier': 1.875, 'EnemyDamageMultiplier': 0.3, 'EnemyMoveSpeedMultiplier': 1, 'EliteChanceMultiplier': 1, 'NodeBudgetMultiplier': 1, 'SpawnIntervalMultiplier': 1, 'AmbientSpawnInterval': 30, 'AmbientSpawnEscalateSeconds': 120, 'AmbientSpawnStrengthStep': 0.25, 'AmbientSpawnMaxAlive': 6, 'BossHealthMultiplier': 2.5, 'BossDamageMultiplier': 0.9, 'BossPressureInterval': 12, 'BossPressureDamagePerLevel': 0.08, 'BossPressureAttackSpeedPerLevel': 0.06, 'AbilityQuotaBase': 6, 'RewardChoiceCount': 3, 'ShowDamageNumbers': True, 'DamageNumberLifetime': 0.8, 'DamageNumberRise': 70, 'DamageNumberFontSize': 24, 'ShowEnemyHealthBars': True, 'EnemyHealthBarWidth': 64, 'EnemyHealthBarHeight': 7, 'EnemyHealthBarTopOffset': 0.25, 'BossBarFullRange': 22, 'ShowHitEffects': True, 'HitEffectLifetime': 1.8, 'MinNodeSpacing': 8, 'PressurePerHighValueNode': 150, 'PressureEvolutionBonus': 1.25, 'PressureMutationBonus': 1.5, 'PressurePerPoint': 100, 'NodeHealRatio': 0.3, 'FreeChallengeBaseQuota': 1, 'FreeChallengeMaxQuota': 2, 'KillPlaneY': -8}
+TABLE Runes
+rune_lei_seal 雷之印 MaxStacks=1；Weight=1；Effects[0].Modifiers[0].Value=30；Modifiers[0].Value=30
+rune_war_seal 战神印 MaxStacks=1；Weight=1；Effects[0].Modifiers[0].Value=0.1；Effects[0].Modifiers[1].Value=4；Modifiers[0].Value=0.1；Modifiers[1].Value=4
+rune_wind_seal 风之印 MaxStacks=1；Weight=1；Effects[0].Modifiers[0].Value=1.5；Modifiers[0].Value=1.5
+rune_death_armor 死铠 MaxStacks=1；Weight=1；Effects[0].Modifiers[0].Value=0；Effects[1].Armor=20；Effects[2].KillsPerTrigger=10；Effects[2].ArmorPerTrigger=1；Modifiers[0].Value=0
+rune_march 行军 MaxStacks=1；Weight=1；Effects[0].Modifiers[0].Value=2；Modifiers[0].Value=2
+rune_life_death 生死 MaxStacks=1；Weight=1；Effects[0].Charges=1；Effects[0].HealFraction=0.3
+rune_strength_talisman 大力符 MaxStacks=1；Weight=1；Effects[0].Modifiers[0].Value=1.2；Modifiers[0].Value=1.2
+rune_flying_wing 飞翼 MaxStacks=1；Weight=1；Effects[0].Modifiers[0].Value=1.3；Effects[0].Modifiers[1].Value=0.8；Effects[0].Modifiers[2].Value=1.3；Modifiers[0].Value=1.3；Modifiers[1].Value=0.8；Modifiers[2].Value=1.3
+rune_sniper 狙神 MaxStacks=1；Weight=1；Effects[0].NearRange=3；Effects[0].NearScale=0.5；Effects[0].FarRange=15；Effects[0].FarScale=1.5
+rune_giant 巨人 MaxStacks=1；Weight=1；Effects[0].Ratio=0.1
+rune_pixie 小精灵 MaxStacks=1；Weight=1；Effects[0].IntervalSeconds=5；Effects[0].SearchRadius=8；Effects[0].Damage=20；Effects[0].OrbitRadius=1.6；Effects[0].OrbitDegreesPerSecond=90；Effects[0].HoverHeight=1.2
+TABLE MetaUpgrades
+meta_health 强化肌体 PerLevel=10；BaseCost=10；CostGrowth=10；MaxLevel=0
+meta_damage 增伤训练 PerLevel=0.05；BaseCost=10；CostGrowth=10；MaxLevel=0
+meta_speed 轻装步法 PerLevel=0.03；BaseCost=10；CostGrowth=10；MaxLevel=0
+meta_crit 瞄准训练 PerLevel=0.03；BaseCost=10；CostGrowth=10；MaxLevel=0
+meta_quota 容量扩容 PerLevel=1；BaseCost=30；CostGrowth=20；MaxLevel=0
+TABLE AbilityCards
+card_vitality 强化肌体 QuotaCost=2；MaxLevel=5；UnlockCost=30；UpgradeBaseCost=20；UpgradeCostGrowth=15；PerLevel=20
+card_damage 凶戾印记 QuotaCost=3；MaxLevel=5；UnlockCost=40；UpgradeBaseCost=30；UpgradeCostGrowth=20；PerLevel=0.06
+card_speed 疾风之靴 QuotaCost=2；MaxLevel=5；UnlockCost=30；UpgradeBaseCost=20；UpgradeCostGrowth=15；PerLevel=0.05
+card_crit 锐利直觉 QuotaCost=2；MaxLevel=5；UnlockCost=35；UpgradeBaseCost=25；UpgradeCostGrowth=15；PerLevel=0.04
+TABLE PressureMods
+pmod_berserk_dmg 狂暴·伤害 Weight=3；Modifiers[0].Value=1.25
+pmod_berserk_speed 狂暴·攻速 Weight=3；Modifiers[0].Value=1.2
+pmod_fortress_hp 铁壁·生命 Weight=2；Modifiers[0].Value=1.4
+pmod_swift 疾行 Weight=2；Modifiers[0].Value=1.35
+pmod_scream_echo 尖啸回响 Weight=1；AbilityScales[0].Value=0.8
+pmod_charge_impact 冲锋冲击 Weight=1；AttackScales[0].Value=1.25
+pmod_summon_haste 召唤急速 Weight=1；AbilityScales[0].Value=0.75
+TABLE Stages
+stg_outer Stage 1 · 外围 CombatBudget=10；MaxConcurrent=3；SpawnInterval=2；EnemyHealthMultiplier=1；EnemyDamageMultiplier=1；EliteChanceScale=0；BossGuardCount=2；BossHealthMultiplier=1；BossDamageMultiplier=1；BossPerkCount=1；EliteBossMinWave=8；PressureGrowthMultiplier=1；PressureThreshold=0；PressurePerNodeNormal=0；PressurePerNodeHighValue=0；PressureEvolutionBonus=0；PressureMutationBonus=0
+stg_inner Stage 2 · 内环 CombatBudget=16；MaxConcurrent=4；SpawnInterval=1.8；EnemyHealthMultiplier=1.15；EnemyDamageMultiplier=1.1；EliteChanceScale=0.15；BossGuardCount=2；BossHealthMultiplier=1.4；BossDamageMultiplier=1.1；BossPerkCount=2；EliteBossMinWave=8；PressureGrowthMultiplier=1；PressureThreshold=0；PressurePerNodeNormal=0；PressurePerNodeHighValue=0；PressureEvolutionBonus=0；PressureMutationBonus=0
+stg_core Stage 3 · 核心（最终 Boss） CombatBudget=22；MaxConcurrent=5；SpawnInterval=1.6；EnemyHealthMultiplier=1.3；EnemyDamageMultiplier=1.2；EliteChanceScale=0.25；BossGuardCount=3；BossHealthMultiplier=2.2；BossDamageMultiplier=1.25；BossPerkCount=3；EliteBossMinWave=8；PressureGrowthMultiplier=1；PressureThreshold=0；PressurePerNodeNormal=0；PressurePerNodeHighValue=0；PressureEvolutionBonus=0；PressureMutationBonus=0
+SAMPLES
+EnergyPalm weapon_skill_1 2.1 full False 16.23 13
+EnergyPalm weapon_skill_1 10 full False 16.24 13
+EnergyPalm weapon_skill_2 2.1 full False 23.31 7
+EnergyPalm weapon_skill_2 2.1 partial False 11.24 9
+Crossbow weapon_skill_1 2.1 full False 35.96 24
+Crossbow weapon_skill_1 10 full False 10.49 7
+Crossbow weapon_skill_2 2.1 full False 34.96 35
+Bow weapon_skill_1 2.1 full False 22.77 6
+Bow weapon_skill_1 10 full False 22.76 6
+Bow weapon_skill_2 2.1 full True 22.78 6
+Bow weapon_skill_1 2.1 partial False 16.99 17
+SpiritSword weapon_skill_1 2.1 full False 55.6 17
+SpiritSword weapon_skill_2 2.1 full True 68.02 43
+Scythe weapon_skill_1 2.1 full False 53.23 12
+Scythe weapon_skill_2 2.1 full False 13.18 6
+Spear weapon_skill_1 2.1 full False 63.9 21
+Spear weapon_skill_2 2.1 full False 21.57 6

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="FrozenTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/FrozenTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1009
+Id = "elite_frozen"
+Title = "冰冻"
+Description = "冰晶延迟爆炸，短暂冻结范围内玩家。"
+NameKey = "elite.frozen.name"
+DescriptionKey = "elite.frozen.description"
+Cooldown = 8
+Radius = 2.5
+Duration = 1
+Count = 2
+Damage = 10

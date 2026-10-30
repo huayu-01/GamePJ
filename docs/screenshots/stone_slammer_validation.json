@@ -1,0 +1,12 @@
+{
+  "animation_timing_aligned": true,
+  "animations_present": true,
+  "attack_events": 1,
+  "bones": 23,
+  "collision_height": 2.95000004768372,
+  "executed_slams": 1,
+  "movement_meters": 2.23485255241394,
+  "navigation_ready": true,
+  "passed": true,
+  "player_damage": 25.0
+}

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Godot;
 
@@ -94,7 +95,7 @@ public static class ConfigText
 		if (source is RewardConfig reward && key.StartsWith(modifierPrefix, System.StringComparison.Ordinal))
 		{
 			string stat = key.Substring(modifierPrefix.Length);
-			foreach (StatOverride modifier in reward.Modifiers)
+			foreach (StatOverride modifier in reward.DeclaredModifiers)
 			{
 				if (modifier.Stat != stat) continue;
 				text = NumberText(modifier.Value, modifier.Value.ToString("0.##", CultureInfo.InvariantCulture), spec);
@@ -106,11 +107,23 @@ public static class ConfigText
 
 		// 再找行自身的 [Export] 属性（引擎自带 Get，不需要维护映射）。
 		// 强类型子资源也可作为说明数值来源，例如SkillEnhancement.KillExtensionSeconds。
-		int dot = key.IndexOf('.');
-		Variant value;
-		if (dot > 0 && source.Get(key.Substring(0, dot)).AsGodotObject() is Resource resource)
-			value = resource.Get(key.Substring(dot + 1));
-		else value = source.Get(key);
+		Variant value = default;
+		GodotObject? current = source;
+		foreach (string segment in key.Split('.'))
+		{
+			if (current is PackedScene prototype)
+			{
+				using var state = prototype.GetState(); bool found = false; value = default;
+				if (state.GetNodeCount() > 0)
+					for (int i = 0; i < state.GetNodePropertyCount(0); i++)
+						if (state.GetNodePropertyName(0, i).ToString() == segment) { value = state.GetNodePropertyValue(0, i); found = true; break; }
+				current = null; if (!found) { text = string.Empty; return false; }
+			}
+			else if (current != null) { value = current.Get(segment); current = null; }
+			else if (value.VariantType == Variant.Type.Array && int.TryParse(segment, out int index) && index >= 0 && index < value.AsGodotArray().Count) value = value.AsGodotArray()[index];
+			else { text = string.Empty; return false; }
+			if (value.VariantType == Variant.Type.Object) current = value.AsGodotObject();
+		}
 		if (value.VariantType != Variant.Type.Nil)
 		{
 			text = value.VariantType switch
@@ -133,6 +146,10 @@ public static class ConfigText
 	/// 格式串写错（<c>FormatException</c>）时同样退回 <paramref name="fallback"/> ——
 	/// 模板是给人写的，写错格式**只影响这一处显示**，绝不能让它变成异常或刷屏警告。
 	/// </summary>
+	public static string[] ParameterKeys(string template) => System.Text.RegularExpressions.Regex.Matches(template, @"\{([^{}]+)\}")
+		.Select(match => match.Groups[1].Value.Split(':')[0]).Distinct().ToArray();
+	public static string[] UnresolvedParameters(string template, GodotObject source, System.Collections.Generic.IReadOnlyList<ParamEntry>? extra = null)
+		=> ParameterKeys(template).Where(key => !TryResolve(source, extra, key, null, out _)).ToArray();
 	private static string NumberText(double number, string fallback, string? spec)
 	{
 		if (string.IsNullOrEmpty(spec))

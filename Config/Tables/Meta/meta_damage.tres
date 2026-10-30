@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_vl1a6")
+NumericId = 1108
 SaveKey = "damage_level"
 Stat = "DamageMultiplier"
 Operation = 1

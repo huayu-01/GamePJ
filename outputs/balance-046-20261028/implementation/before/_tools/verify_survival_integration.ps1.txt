@@ -1,0 +1,82 @@
+﻿# 新模式与正式换模的相关旧流程回归，全部在独立用户目录，保留原始失败日志。
+param([switch]$SkipBuild,[string[]]$Only=@(),[int]$LockWaitSeconds=120)
+$ErrorActionPreference='Stop'
+$projectDir=Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'Validation.Common.ps1')
+. (Join-Path $PSScriptRoot 'LogPaths.ps1')
+Initialize-ProjectLogPaths -ProjectRoot $projectDir
+$engine='F:\Godot项目\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe'
+$profile=Join-Path $env:APPDATA 'Godot/app_userdata/ACT Roguelike'
+$cases=@(
+    @{Name='clover';Scene='CloverCombatLab';Pattern='\[CloverCombat\] SUMMARY pass=\d+ fail=0';Render=$true;Extra=@('--clover-verify')},
+    @{Name='replacement';Scene='_CharacterReplacementProbe';Pattern='\[CharacterReplacement\] 完成：通过 \d+，失败 0';Render=$true},
+    @{Name='base';Scene='_BatchCProbe';Pattern='C批验收结束：通过 \d+，失败 0';Extra=@('--loadout-test')},
+    @{Name='base_memory';Scene='_BatchCProbe';Pattern='C批验收结束：通过 \d+，失败 0';Extra=@('--loadout-test','--memory-check')},
+    @{Name='run_flow';Scene='_RunFlowContinuityProbe';Pattern='整局与离场验收结束：通过 \d+，失败 0'},
+    @{Name='player_flow';Scene='_PlayerExperienceProbe';Pattern='玩家流程验收结束：通过 \d+，失败 0';Extra=@('--flow-robustness')},
+    @{Name='content';Scene='_ContentValidationProbe';Pattern='\[ContentValidation\] SUMMARY pass=\d+ fail=0'},
+    @{Name='enemy_actions';Scene='_EnemyActionExecutionProbe';Pattern='\[EnemyActions\] SUMMARY pass=\d+ fail=0'},
+    @{Name='localization';Scene='_ContentLocalizationProbe';Pattern='\[ContentLocalization\] SUMMARY pass=\d+ fail=0'},
+    @{Name='effects';Scene='_RewardEffectsProbe';Pattern='\[RewardEffects\] SUMMARY pass=\d+ fail=0'},
+    @{Name='reward_rules';Scene='_RewardRulesProbe';Pattern='获取规则验收结束：通过 \d+，失败 0'},
+    @{Name='rune';Scene='_RuneProbe';Pattern='验收结束：通过 83，失败 0'},
+    @{Name='rune_ui';Scene='_RuneUiProbe';Pattern='符文界面验收结束：通过 \d+，失败 0'},
+    @{Name='decoupling';Scene='_ContentDecouplingProbe';Pattern='\[Decoupling\] SUMMARY pass=\d+ fail=0'},
+    @{Name='interaction';Scene='_InteractionComponentProbe';Pattern='交互组件验收结束：通过 \d+，失败 0'},
+    @{Name='slots';Scene='_LoadoutSlotsProbe';Pattern='换装与技能槽验收结束：通过 \d+，失败 0'},
+    @{Name='snapshot';Scene='_AttackSnapshotProbe';Pattern='攻击快照验收结束：通过 45，失败 0'},
+    @{Name='charge';Scene='_ChargeReleaseProbe';Pattern='蓄力释放验收结束：通过 80，失败 0'},
+    @{Name='interruption';Scene='_ActionInterruptionProbe';Pattern='动作交接验收结束：通过 \d+，失败 0'},
+    @{Name='specialization';Scene='_SpecializationProbe';Pattern='特化验收结束：通过 \d+，失败 0'},
+    @{Name='synergy';Scene='_SynergyMatrixProbe';Pattern='\[SynergyMatrix\] SUMMARY combinations=\d+ pass=\d+ fail=0'},
+    @{Name='adventure';Scene='_AdventureCancelProbe';Pattern='\[AdventureCancel\] SUMMARY pass=\d+ fail=0'},
+    @{Name='adventure_render';Scene='_AdventureCancelProbe';Pattern='\[AdventureCancel\] SUMMARY pass=\d+ fail=0';Render=$true},
+    @{Name='main';Scene='../Main';Pattern='=== 自测结束 ===';Extra=@('--selftest')},
+    @{Name='survival';Scene='_SurvivalModeProbe';Pattern='\[Survival\] SUMMARY pass=\d+ fail=0';Render=$true}
+)
+foreach($name in $Only){if($name -notin $cases.Name){throw "未知专项：$name"}}
+$tag=Get-Date -Format 'yyyyMMdd_HHmmss'
+$lease=Open-ProjectValidationLease $projectDir $LockWaitSeconds
+$saves=Get-ValidationSaveSnapshot $profile
+$runs=[Collections.Generic.List[object]]::new()
+$report=[ordered]@{Date=(Get-Date -Format 's');Passed=$false;Runs=$runs;SavesUnchanged=$false;Failure=''}
+try {
+    if(-not $SkipBuild){foreach($configuration in @('Debug','ExportRelease')){$null=Invoke-ValidationBuild $projectDir $configuration (Join-Path $projectDir "Logs/validation/survival_integration_$tag.$configuration.log")}}
+    $mirror=New-ValidationMirror $projectDir 'survival_integration' -ShareAssembly
+    foreach($file in @('validation.json','regression.json')){
+        $previous=Join-Path $projectDir "Logs/evidence/clover-combat/$file"
+        if(Test-Path -LiteralPath $previous){Copy-Item -LiteralPath $previous -Destination (Join-Path $projectDir "Logs/evidence/survival/clover-before-$tag-$file")}
+    }
+    foreach($case in $cases){
+        if($Only.Count -and $case.Name -notin $Only){continue}
+        $out=Join-Path $projectDir "Logs/validation/survival_integration_$tag.$($case.Name).log"
+        $err=Join-Path $projectDir "Logs/validation/survival_integration_$tag.$($case.Name).err"
+        $record=[ordered]@{Name=$case.Name;Passed=$false;Exit=$null;Seconds=$null;Stdout=$out;Stderr=$err;Failure=''}
+        try{
+            $runArgs=@('--path',$mirror.Project,'--resolution','1600x900',"res://Scenes/Debug/$($case.Scene).tscn")
+            if(-not $case.Render){$runArgs+='--headless'}
+            if($case.Extra){$runArgs+='--';$runArgs+=$case.Extra}
+            $result=Invoke-ValidationEngine $engine $runArgs $projectDir $out $err 210
+            $record.Exit=$result.ExitCode;$record.Seconds=$result.Seconds
+            if($result.Output -notmatch $case.Pattern){throw "专项未满足完成断言：$($case.Name)"}
+            if($case.Name -eq 'main'){Assert-MainValidation $projectDir $result.Output | Out-Host}
+            $record.Passed=$true
+        }catch{$record.Failure=$_.ToString();Write-Output "FAIL $($case.Name): $_"}
+        finally{
+            if(Test-Path -LiteralPath $out){$record.SHA256=(Get-FileHash -LiteralPath $out).Hash}
+            $runs.Add($record);Assert-ValidationSaves $profile $saves
+        }
+        if($record.Passed){Write-Output "PASS $($case.Name)"}
+    }
+    if(@($runs|Where-Object {-not $_.Passed}).Count){throw '相关流程回归存在失败，见逐项报告。'}
+    $report.Passed=$true
+}catch{$report.Failure=$_.ToString();throw}
+finally{
+    try{Assert-ValidationSaves $profile $saves;$report.SavesUnchanged=$true}
+    finally{
+        $path=Join-Path $projectDir "Logs/evidence/survival/integration-$tag.json"
+        try{$report|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $path -Encoding utf8}
+        finally{$lease.Dispose()}
+        Write-Output "整合验证：$path"
+    }
+}

@@ -1,6 +1,32 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Combat/SkillIndicator.cs" id="1_skill"]
+[ext_resource type="Shader" path="res://Assets/UI/Shaders/indicator_brush.gdshader" id="2_brush"]
+
+[sub_resource type="ShaderMaterial" id="brush_circle"]
+shader = ExtResource("2_brush")
+
+[sub_resource type="ShaderMaterial" id="brush_line"]
+shader = ExtResource("2_brush")
+shader_parameter/line_shape = true
+
+[sub_resource type="ImmediateMesh" id="brush_area_mesh"]
+resource_local_to_scene = true
+
+[sub_resource type="ImmediateMesh" id="brush_contour_mesh"]
+resource_local_to_scene = true
+
+[sub_resource type="ImmediateMesh" id="brush_shadow_mesh"]
+resource_local_to_scene = true
+
+[sub_resource type="PlaneMesh" id="brush_plane"]
+size = Vector2(1,1)
+
+[sub_resource type="StandardMaterial3D" id="brush_shadow"]
+shading_mode = 0
+transparency = 1
+cull_mode = 2
+albedo_color = Color(0.13,0.055,0.10,0.86)
 
 [sub_resource type="StandardMaterial3D" id="mat_band"]
 shading_mode = 0
@@ -95,3 +121,27 @@ visible = false
 cast_shadow = 0
 mesh = SubResource("mesh_line")
 material_override = SubResource("mat_line")
+
+[node name="BrushArea" type="MeshInstance3D" parent="DrawRoot"]
+visible = false
+cast_shadow = 0
+mesh = SubResource("brush_area_mesh")
+material_override = SubResource("brush_circle")
+
+[node name="BrushContour" type="MeshInstance3D" parent="DrawRoot"]
+visible = false
+cast_shadow = 0
+mesh = SubResource("brush_contour_mesh")
+material_override = SubResource("mat_ring")
+
+[node name="BrushShadow" type="MeshInstance3D" parent="DrawRoot"]
+visible = false
+cast_shadow = 0
+mesh = SubResource("brush_shadow_mesh")
+material_override = SubResource("brush_shadow")
+
+[node name="BrushLine" type="MeshInstance3D" parent="DrawRoot"]
+visible = false
+cast_shadow = 0
+mesh = SubResource("brush_plane")
+material_override = SubResource("brush_line")

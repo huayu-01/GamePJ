@@ -1,0 +1,145 @@
+{
+  "Date": "2026-10-28T22:25:03",
+  "Qa": "passed",
+  "Builds": "Debug / ExportRelease 0 warnings 0 errors",
+  "VisualHeadless": 21,
+  "VisualRenderEach": 26,
+  "ActualResolutions": [
+    "1920x1080",
+    "1280x720",
+    "3840x2160"
+  ],
+  "RealSavesUnchanged": true,
+  "Screenshots": [
+    {
+      "Path": "final/048-build-glass.png",
+      "Width": 1920,
+      "Height": 1080,
+      "SHA256": "1D0B83A876E02F95D40D17385064DD06E472AB84131547FFFE5E9D627AE74B14"
+    },
+    {
+      "Path": "final/048-codex-creature.png",
+      "Width": 1920,
+      "Height": 1080,
+      "SHA256": "610DBABE3825415E0BB24545136FFAF935A1E3F494970E035440DB6AD2CA815B"
+    },
+    {
+      "Path": "final/048-codex-glass.png",
+      "Width": 1920,
+      "Height": 1080,
+      "SHA256": "0EBF17BFD8A3F473F17FABD09529BC070057AE173C1E23A6EA0099E8E647FFC3"
+    },
+    {
+      "Path": "final/048-reward-glass.png",
+      "Width": 1920,
+      "Height": 1080,
+      "SHA256": "D47DCFD0329F7D5416A01634D7789704269BE31B37A077E361C1DA67DF41915D"
+    },
+    {
+      "Path": "final-720/048-build-glass.png",
+      "Width": 1280,
+      "Height": 720,
+      "SHA256": "AF508BC9A683FDB9CB158622F28945E3FE90C5A273A8419051EE62840C243520"
+    },
+    {
+      "Path": "final-720/048-codex-creature.png",
+      "Width": 1280,
+      "Height": 720,
+      "SHA256": "CCF24AFFE0AAFD57648D01211E9B213BFC1967B1FAB96D1A7CA525F37DDD5F1D"
+    },
+    {
+      "Path": "final-720/048-codex-glass.png",
+      "Width": 1280,
+      "Height": 720,
+      "SHA256": "0D295BF222C0ED082C6EFA5AE60BA32FDF1184DCBAEFDE89A37B5313B815A372"
+    },
+    {
+      "Path": "final-720/048-reward-glass.png",
+      "Width": 1280,
+      "Height": 720,
+      "SHA256": "E0591BAD604FA143239F25A91929C8D22EEF1B231609F87CA8265537E6D2618C"
+    },
+    {
+      "Path": "final-4k/048-build-glass.png",
+      "Width": 3840,
+      "Height": 2160,
+      "SHA256": "8E7B565DCEECF76DB1912B134509B5EF8564C2EFCB5C769EEB525C9A94343E4D"
+    },
+    {
+      "Path": "final-4k/048-codex-creature.png",
+      "Width": 3840,
+      "Height": 2160,
+      "SHA256": "4139EBA65CAEE75B430CA8D1D5F6C9DB5BE6957247FFD9264D670B3230E78BAB"
+    },
+    {
+      "Path": "final-4k/048-codex-glass.png",
+      "Width": 3840,
+      "Height": 2160,
+      "SHA256": "0FA71FCA739A2654AD69C2AECF809A2657EB3AF80A0413A939A94AE284ED8EFD"
+    },
+    {
+      "Path": "final-4k/048-reward-glass.png",
+      "Width": 3840,
+      "Height": 2160,
+      "SHA256": "2D093911AD341CB3DCA1A14F8EB5375BA069ECD63235B5647B1B8A5B894DAE88"
+    }
+  ],
+  "Checks": [
+    {
+      "Case": "BuildRewards",
+      "Mode": "headless",
+      "Seconds": 7.94,
+      "Exit": 0,
+      "StderrBytes": 0
+    },
+    {
+      "Case": "BuildRewards",
+      "Mode": "render",
+      "Seconds": 9.9,
+      "Exit": 0,
+      "StderrBytes": 0
+    },
+    {
+      "Case": "Codex",
+      "Mode": "headless",
+      "Seconds": 8.99,
+      "Exit": 0,
+      "StderrBytes": 0
+    },
+    {
+      "Case": "Codex",
+      "Mode": "render",
+      "Seconds": 10.77,
+      "Exit": 0,
+      "StderrBytes": 0
+    },
+    {
+      "Case": "ContentLocalization",
+      "Mode": "headless",
+      "Seconds": 3.05,
+      "Exit": 0,
+      "StderrBytes": 0
+    },
+    {
+      "Case": "ContentLocalization",
+      "Mode": "render",
+      "Seconds": 4.44,
+      "Exit": 0,
+      "StderrBytes": 0
+    },
+    {
+      "Case": "RewardRules",
+      "Mode": "headless",
+      "Seconds": 3.88,
+      "Exit": 0,
+      "StderrBytes": 0
+    },
+    {
+      "Case": "BatchE",
+      "Mode": "headless",
+      "Seconds": 21.41,
+      "Exit": 0,
+      "StderrBytes": 0
+    }
+  ]
+}

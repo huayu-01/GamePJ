@@ -14,20 +14,15 @@ public partial class EnemyPlanAbility
 	/// <summary>发射与前摇预览共读同一初速，不能各算一套弹道。</summary>
 	private void ProjectileMotion(out Vector3 origin, out Vector3 velocity, out float gravityScale)
 	{
-		origin = OwnerUnit!.GlobalPosition + Vector3.Up;
-		Vector3 target = Target!.GlobalPosition + Vector3.Up * .8f;
-		gravityScale = 0; velocity = (target - origin).Normalized() * _step!.Speed;
-		if (_step.Kind is Kind.ArcShot or Kind.ArcBomb)
-		{
-			gravityScale = 1.5f; float flight = Mathf.Max(.2f, _step.FlightSeconds);
-			velocity = (target - origin) / flight + Vector3.Up * ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle() * gravityScale * flight * .5f;
-		}
-		if (_step.Kind == Kind.Meteor) { origin = Target.GlobalPosition + Vector3.Up * 8; velocity = Vector3.Down * _step.Speed; gravityScale = 1; }
+		var motion = EnemyProjectileMotion.Resolve(_step!, OwnerUnit!, Target!);
+		origin = motion.Origin; velocity = motion.Velocity; gravityScale = motion.GravityScale;
 	}
 	private void UpdateWarning(float delta)
 	{
 		if (_warning == null || _step == null || _phase == 2) return;
+		if (_execution?.SuppressWarning == true) { _warning.HideAll(); return; }
 		_warningRefresh -= delta;
+		_warning.SetProgress(_phase==0 ? _elapsed/Mathf.Max(.001f,_step.WindupSeconds) : 1);
 		Vector3 center = OwnerUnit!.GlobalTransform * HitboxOffset();
 		Vector3 scale = OwnerUnit.GlobalBasis.Scale.Abs();
 		float radius = Mathf.Max(.2f, _step.Radius) * Mathf.Max(scale.X, scale.Z);
@@ -55,8 +50,9 @@ public partial class EnemyPlanAbility
 			foreach (var next in Plan.Far)
 				if (next.Kind == Kind.Dive)
 				{
-					Vector3 offset = next.Centered ? Vector3.Zero : -OwnerUnit.GlobalBasis.Z * .7f;
-					_warning.Circle(Target!.GlobalPosition + offset, next.Radius * Mathf.Max(scale.X, scale.Z)); break;
+					var landing = EnemyActionState.From(next, OwnerUnit.GlobalPosition);
+					Vector3 offset = landing.Centered ? Vector3.Zero : -OwnerUnit.GlobalBasis.Z * .7f;
+					_warning.Circle(Target!.GlobalPosition + offset, landing.Radius * Mathf.Max(scale.X, scale.Z)); break;
 				}
 		}
 		else if (_step.Kind == Kind.Dive)
@@ -64,7 +60,7 @@ public partial class EnemyPlanAbility
 			Vector3 landing = Target!.GlobalPosition;
 			if (_phase == 1 && _warningRefresh <= 0)
 			{
-				landing = EnemyAttackWarning.PredictImpact(OwnerUnit, OwnerUnit.GlobalPosition + Vector3.Up * .02f, _warningDiveVelocity, 0, _step.Speed * _step.ActiveSeconds, _step.ActiveSeconds, CombatLayers.World);
+				landing = EnemyAttackWarning.PredictImpact(OwnerUnit, OwnerUnit.GlobalPosition + Vector3.Up * .02f, _execution?.WarningVelocity ?? _warningDiveVelocity, 0, _step.Speed * _step.ActiveSeconds, _step.ActiveSeconds, CombatLayers.World);
 				_warningRefresh = .1f;
 			}
 			else if (_phase == 1) return;

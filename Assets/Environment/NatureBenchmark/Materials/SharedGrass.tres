@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cqy4q4ukmwyh1"]
+
+[ext_resource type="Shader" uid="uid://cemelobwn5vsk" path="res://Assets/Environment/NatureBenchmark/Shaders/grass.gdshader" id="1_00esd"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_00esd")
+shader_parameter/root_color = Color(0.32, 0.49, 0.075, 1)
+shader_parameter/tip_color = Color(0.66, 0.81, 0.22, 1)
+shader_parameter/wind_strength = 0.16

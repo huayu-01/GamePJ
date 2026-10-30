@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-29T16:22:23",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "charge_evolution",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_162223.charge_evolution.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_162223.charge_evolution.headless.err",
+      "SHA256": "425F4335244F696E9DA6F59E54FBFD7C73449294C4853BF3DD0DBACCF3A269D6"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

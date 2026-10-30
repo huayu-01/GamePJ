@@ -1,0 +1,49 @@
+{
+  "Date": "2026-10-28T00:23:33.281116+08:00",
+  "Passed": true,
+  "Implemented": [
+    39,
+    40,
+    41,
+    43,
+    44,
+    45
+  ],
+  "DeferredAnimation": [
+    42
+  ],
+  "NotAuthorizedForImplementation": [
+    46
+  ],
+  "Codex": {
+    "Entries": 266,
+    "Categories": 18,
+    "ModelPreviews": 30,
+    "HeadlessChecks": 49,
+    "RenderChecks": 52
+  },
+  "CombatChecks": {
+    "Content039044": {
+      "headless": 37,
+      "render": 40
+    },
+    "Content032037": {
+      "headless": 47,
+      "render": 48
+    }
+  },
+  "RegressionCases": 11,
+  "Reports": {
+    "combat_and_prior_content": "Logs/evidence/elites/run-20261027_233304.json",
+    "codex": "Logs/evidence/elites/run-20261028_001553.json",
+    "regression": "Logs/evidence/survival/integration-20261028_001707.json",
+    "workbook": "Logs/maintenance/acceptance-20261026/result-039-045.json"
+  },
+  "UserSaveFilesUnchanged": true,
+  "UserWorkbookValuesPreserved": true,
+  "WorkbookNewHistoryRecords": 8,
+  "TemporaryImageMetadataCandidateRestored": true,
+  "ValidationNote": "图鉴程序查询测试避免激活本机QQ拼音；原生输入法路径单独留证。生产搜索可编辑，未放宽错误检查。",
+  "ImeEvidence": "Logs/validation/codex-ime-confirmation.log",
+  "Documentation": "docs/content-update-039-045-20261028.md"
+}

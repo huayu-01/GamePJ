@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "source_clips": 12,
+  "render_frames": 388,
+  "media_files": 36,
+  "reel_seconds": 29.083333333333332,
+  "video_decode_passed": true,
+  "checks": [
+    {
+      "id": "01-idle",
+      "gif_frames": 60,
+      "mp4_bytes": 37554
+    },
+    {
+      "id": "02-walk",
+      "gif_frames": 32,
+      "mp4_bytes": 65522
+    },
+    {
+      "id": "03-jog",
+      "gif_frames": 23,
+      "mp4_bytes": 64462
+    },
+    {
+      "id": "04-sprint",
+      "gif_frames": 16,
+      "mp4_bytes": 53411
+    },
+    {
+      "id": "05-jump-start",
+      "gif_frames": 32,
+      "mp4_bytes": 38834
+    },
+    {
+      "id": "06-air-loop",
+      "gif_frames": 60,
+      "mp4_bytes": 40174
+    },
+    {
+      "id": "07-land",
+      "gif_frames": 31,
+      "mp4_bytes": 42168
+    },
+    {
+      "id": "08-hit",
+      "gif_frames": 8,
+      "mp4_bytes": 19275
+    },
+    {
+      "id": "09-knockback",
+      "gif_frames": 20,
+      "mp4_bytes": 38194
+    },
+    {
+      "id": "10-death",
+      "gif_frames": 51,
+      "mp4_bytes": 53889
+    },
+    {
+      "id": "11-roll",
+      "gif_frames": 36,
+      "mp4_bytes": 61005
+    },
+    {
+      "id": "12-cast",
+      "gif_frames": 12,
+      "mp4_bytes": 17391
+    }
+  ]
+}

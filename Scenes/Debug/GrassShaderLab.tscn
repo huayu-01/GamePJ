@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://Scripts/Testing/GrassShaderLab.cs" id="lab"]
+[node name="GrassShaderLab" type="Node3D"]
+script = ExtResource("lab")

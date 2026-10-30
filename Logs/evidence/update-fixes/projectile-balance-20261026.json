@@ -1,0 +1,12 @@
+{
+  "scope": "验收005：只调整资源字面值，未添加运行时全局倍率。",
+  "changes": [
+    {"path":"Config/Tables/Skills/skl_enemy_ranged_shot.tres","field":"ProjectileSpeed","before":38,"after":22.8},
+    {"path":"Config/EnemyPlans/burrow_hunter.tres","field":"Speed","before":11,"after":6.6},
+    {"path":"Config/EnemyPlans/bomb_lobber.tres","field":"Speed","before":13,"after":7.8},
+    {"path":"Config/EnemyPlans/meteor_mage.tres","field":"Speed","before":10,"after":6},
+    {"path":"Config/EnemyPlans/arc_thrower.tres","field":"FlightSeconds","before":1,"after":1.6666667},
+    {"path":"Config/EnemyPlans/arc_bomber.tres","field":"FlightSeconds","before":1.1,"after":1.8333333}
+  ],
+  "arc_note":"抛射原实现由落点和飞行时间决定初速度，不读取Speed决定水平速度；增加飞行时间使水平推进降为60%。Speed也显式存为4.8。保留原重力，弧线随现有弹道计算变化；陨石下落仍受重力加速。"
+}

@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Testing/AnimeMotionLab.cs" id="1"]
+
+[node name="AnimeMotionLab" type="Node3D"]
+script = ExtResource("1")

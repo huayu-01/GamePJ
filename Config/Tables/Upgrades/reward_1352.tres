@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityReplacementRewardEffect.cs" id="definition"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a3_w1_2.tres" id="target"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_bow.tres" id="pool"]
+[ext_resource type="PackedScene" path="res://Scenes/Abilities/Builds/SoulEye.tscn" id="replacement"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+TargetAbility = ExtResource("target")
+ReplacementScene = ExtResource("replacement")
+SkillName = "灵魂之眼"
+SkillNameKey = "skill.1352.name"
+SkillDescriptionKey = "content.1352.description"
+SkillDescription = "武技2召唤头顶灵魂眼，持续{Effects.0.ReplacementScene.Duration}秒，每{Effects.0.ReplacementScene.MarkInterval}秒给{Effects.0.ReplacementScene.SearchRadius}米内一个未标记的可见敌人加标记；标记持续{Effects.0.ReplacementScene.MarkDuration}秒，不重复叠加。冷却{Effects.0.ReplacementScene.Cooldown}秒，保留手动攻击。"
+[resource]
+script = ExtResource("row")
+NumericId = 1352
+DisplayName = "灵魂之眼"
+NameKey = "content.1352.name"
+DescriptionKey = "content.1352.description"
+DescriptionTemplate = "武技2召唤头顶灵魂眼，持续{Effects.0.ReplacementScene.Duration}秒，每{Effects.0.ReplacementScene.MarkInterval}秒给{Effects.0.ReplacementScene.SearchRadius}米内一个未标记的可见敌人加标记；标记持续{Effects.0.ReplacementScene.MarkDuration}秒，不重复叠加。冷却{Effects.0.ReplacementScene.Cooldown}秒，保留手动攻击。"
+RewardKind = 1
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+Pool = ExtResource("pool")
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

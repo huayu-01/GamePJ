@@ -3,18 +3,31 @@
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
+
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
 Stat = "MoveSpeedMultiplier"
-Operation = 1
-Value = 1.08
+Operation = 0
+Value = 0.08
+
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Modifiers = [SubResource("Resource_m0")]
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1312
 RewardKind = 0
 MaxStacks = 0
-Modifiers = [SubResource("Resource_m0")]
 Id = "upg_swift"
 DisplayName = "快速"
-DescriptionTemplate = "移动速度 +8%"
-Note = "[P5 新增行] 文档第 231 行「快速:加移动速度」。消费者：CharacterMovement._PhysicsProcess。"
+DescriptionTemplate = "每级增加8个百分点移速加成，按固定值相加。"
+Note = "032：固定逐级成长，第二次获取起显示升级和等级；界面不显示堆叠角标。"
+
+NameKey = "content.upg_swift.name"
+
+DescriptionKey = "content.upg_swift.description"
+
+Effects = [SubResource("Resource_effect_0")]
+ShowUpgradeLevel = true

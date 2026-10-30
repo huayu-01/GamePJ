@@ -55,6 +55,7 @@ Enabled = false
 ApproachMinRange = 0.0
 ApproachMaxRange = 8.0
 AttackParams = [SubResource("a_skl_boss_scream_0"), SubResource("a_skl_boss_scream_1"), SubResource("a_skl_boss_scream_2"), SubResource("a_skl_boss_scream_3"), SubResource("a_skl_boss_scream_4")]
+NumericId = 1188
 Id = "skl_boss_scream"
 DisplayName = "尖啸"
 Note = "Boss 阶段 2 解锁（Phases.Phase2Abilities），也可以被「尖啸强化」词条开场解锁。"

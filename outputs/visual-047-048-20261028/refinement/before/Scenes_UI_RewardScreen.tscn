@@ -1,0 +1,69 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/RewardScreen.cs" id="1_screen"]
+[ext_resource type="Theme" path="res://Assets/UI/Themes/ui_theme.tres" id="2_theme"]
+
+[node name="RewardScreen" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_screen")
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("2_theme")
+
+[node name="Dim" type="ColorRect" parent="Root"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="Panel" type="PanelContainer" parent="Root"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 32.0
+offset_right = -48.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root/Panel"]
+alignment = 1
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="Root/Panel/VBox"]
+theme_type_variation = &"UiTitle"
+text = "选择奖励"
+horizontal_alignment = 1
+
+[node name="ChoicesScroll" type="ScrollContainer" parent="Root/Panel/VBox"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0,340)
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="Cards" type="GridContainer" parent="Root/Panel/VBox/ChoicesScroll"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+columns = 3
+
+[node name="CardTemplate" type="Button" parent="Root/Panel/VBox/ChoicesScroll/Cards"]
+visible = false
+custom_minimum_size = Vector2(1000, 92)
+alignment = 0
+
+[node name="Hint" type="Label" parent="Root/Panel/VBox"]
+theme_type_variation = &"UiCaption"
+text = "按 1 / 2 / 3 或点击选择"
+horizontal_alignment = 1

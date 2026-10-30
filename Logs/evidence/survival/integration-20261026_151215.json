@@ -1,0 +1,18 @@
+{
+  "Date": "2026-10-26T15:12:15",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "interruption",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 13.45,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_151215.interruption.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_151215.interruption.err",
+      "Failure": "",
+      "SHA256": "3668837B11B02FF3ADA261B252C815E92196295C947116A701771EEB695F7F7E"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

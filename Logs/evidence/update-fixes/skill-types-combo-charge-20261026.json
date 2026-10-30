@@ -1,0 +1,33 @@
+{
+  "applied": true,
+  "changes": [
+    {
+      "path": "Config\\Tables\\Skills\\skl_a1_w1_2.tres",
+      "type": "ChargedAbilityConfig"
+    },
+    {
+      "path": "Config\\Tables\\Skills\\skl_a2_w1_2.tres",
+      "type": "ChargedAbilityConfig"
+    },
+    {
+      "path": "Config\\Tables\\Skills\\skl_a3_w1_1.tres",
+      "type": "ChargedAbilityConfig"
+    },
+    {
+      "path": "Config\\Tables\\Skills\\skl_b1_w1_1.tres",
+      "type": "ComboAbilityConfig"
+    },
+    {
+      "path": "Config\\Tables\\Skills\\skl_b2_w1_1.tres",
+      "type": "ComboAbilityConfig"
+    },
+    {
+      "path": "Config\\Tables\\Skills\\skl_b3_w1_1.tres",
+      "type": "ComboAbilityConfig"
+    },
+    {
+      "path": "Config\\Tables\\Skills\\skl_b3_w1_2.tres",
+      "type": "ChargedAbilityConfig"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Testing/EliteHazardsProbe.cs" id="probe"]
+
+[node name="EliteHazardsProbe" type="Node3D"]
+[node name="Probe" type="Node" parent="."]
+script = ExtResource("probe")

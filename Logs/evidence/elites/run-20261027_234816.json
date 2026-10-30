@@ -1,0 +1,17 @@
+{
+  "Date": "2026-10-27T23:48:17",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "Codex",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 9.13,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_234816.Codex.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_234816.Codex.headless.err",
+      "SHA256": "366D1FADE24BBFF7A37840D28E919B36488203D0D2A0D451F69DF948E4241D73"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "引擎验证未通过：exit=0；F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_234816.Codex.render.log / F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_234816.Codex.render.err"
+}

@@ -1,0 +1,26 @@
+{
+  "Date": "2026-10-29T00:04:44",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "PauseDive",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 12.88,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_000444.PauseDive.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_000444.PauseDive.headless.err",
+      "SHA256": "1301B9E3B000C28B5EA37BE4A2A6322F5743D42FDF7B51F09B75D7742C9257E3"
+    },
+    {
+      "Name": "PauseDive",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 18.44,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_000444.PauseDive.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_000444.PauseDive.render.err",
+      "SHA256": "9C8821748796CE229708801397AF13D099D65F0E9ADDBD5DFF8414D477168FA3"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_000444.Content049054.headless.log / F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_000444.Content049054.headless.err"
+}

@@ -54,7 +54,7 @@ public partial class ProjectileAttackAbility : Ability
 			return;
 		}
 
-		if (_fired && StateTime >= Windup + Recover)
+		if (_fired && StateTime >= Windup + Recover / ActRoguelike.Combat.Elites.EliteProjectileRules.RecoveryScale(OwnerUnit))
 		{
 			Finish();
 		}

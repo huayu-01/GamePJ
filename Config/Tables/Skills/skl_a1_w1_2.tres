@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://bqnq3362kk45d"]
+[gd_resource type="Resource" script_class="ChargedAbilityConfig" format=3 uid="uid://bqnq3362kk45d"]
 
-[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_nova.svg" id="e_hud_icon"]
+[ext_resource type="Script" uid="uid://dri773em3nt3t" path="res://Scripts/Config/ChargedAbilityConfig.cs" id="1_row"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_a1_w1_2_0"]
@@ -13,8 +12,8 @@ Note = "能量波预制体（直线 / 无下坠 / 穿透格挡）"
 [sub_resource type="Resource" id="p_a1_w1_2_1"]
 script = ExtResource("2_param")
 Key = "Speed"
-Value = 250.0
-Note = "弹速（文档 武技2[憋个大的] 蓄力满：250）"
+Value = 60.0
+Note = "当前普通蓄力弹速预设60米/秒。"
 
 [sub_resource type="Resource" id="p_a1_w1_2_2"]
 script = ExtResource("2_param")
@@ -31,8 +30,8 @@ Note = "★ 完美时机那一发的伤害**绝对值**（文档：40）。≤0 
 [sub_resource type="Resource" id="p_a1_w1_2_4"]
 script = ExtResource("2_param")
 Key = "PerfectSpeed"
-Value = 400.0
-Note = "★ 完美时机那一发的弹速**绝对值**（文档：400）"
+Value = 85.0
+Note = "当前完美时机弹速绝对值85米/秒，保留比普通释放更快的反馈。"
 
 [sub_resource type="Resource" id="p_a1_w1_2_5"]
 script = ExtResource("2_param")
@@ -66,25 +65,21 @@ Note = "求「准星打到的世界点」时射线的最大长度（无命中时
 
 [resource]
 script = ExtResource("1_row")
-ActionMovement = 2
-HudIcon = ExtResource("e_hud_icon")
-HudColor = Color(1, 0.76, 0.4, 1)
-HudOrder = 40
+ChargeBaseSeconds = 0.5
+AllowEarlyChargeRelease = true
+PerfectWindowSeconds = 0.2
 NodeName = "AbilityWeaponSkill2"
 ClassHint = "EnergyWaveAbility"
 InputAction = "weapon_skill_2"
-HoldToCharge = true
-AllowEarlyChargeRelease = true
-EarlyReleaseDamageScale = 0.5
+ActionMovement = 2
 AnimName = "Skill_A1_ATK2"
 AnimEvent = "ATK"
 AnimSpeedScale = 0.2
-ChargeBaseSeconds = 0.5
-PerfectWindowSeconds = 0.2
 Aim = 2
 Cooldown = 1.0
 Windup = 1.7
 Recover = 0.1
+NumericId = 1171
 Id = "skl_a1_w1_2"
 DisplayName = "憋个大的"
 DescriptionTemplate = "按住右键蓄力：蓄满 {ChargeBaseSeconds:0.##}s 后松手 = 伤害 {Damage:0} / 弹速 {Speed:0}；刚蓄满的 {PerfectWindowSeconds:0.##}s 内松手 = 完美时机（伤害 {PerfectDamage:0} / 弹速 {PerfectSpeed:0}）；未完成基础蓄力也可松手，造成基础伤害的 {EarlyReleaseDamageScale:0%}。"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SceneRuneDefinition" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/SceneRuneDefinition.cs" id="row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/SceneRunes/icon_1332.svg" id="icon"]
+[resource]
+script = ExtResource("row")
+NumericId = 1332
+DisplayName = "快乐飞弹·冲击"
+NameKey = "scene_rune.1332.name"
+DescriptionKey = "scene_rune.1332.description"
+DescriptionTemplate = "每{Interval:0}秒发射穿墙飞弹，仅命中玩家并造成{Damage:0}伤害；可跳跃或位移躲避。"
+Kind = 0
+Impact = 3
+Icon = ExtResource("icon")
+Tint = Color(1.000000, 0.552941, 0.537255, 1)
+Interval = 12
+MinDistance = 10
+MaxDistance = 16
+Radius = 0.65
+MaxActive = 1

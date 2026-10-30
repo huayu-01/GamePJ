@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "pass": 18,
+  "fail": 0,
+  "mode": "action",
+  "max_pose_difference": 0.0009765625,
+  "active_physics_samples": 39,
+  "ribbon_triangles_per_effect": 28,
+  "echo_pool_size": 0,
+  "peak_echoes": 0,
+  "total_echoes": 0,
+  "source_model_triangles": 4584,
+  "pixel_motion_blur": true,
+  "blur_taps": 13,
+  "capture_frames": 62,
+  "capture_width": 512,
+  "capture_height": 288,
+  "benchmark": false,
+  "contour_only": true,
+  "interior_pixels_checked": 6250,
+  "changed_interior_pixels": 0,
+  "changed_outside_pixels": 1609
+}

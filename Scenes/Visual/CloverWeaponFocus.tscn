@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[node name="CloverWeaponFocus" type="BoneAttachment3D"]
+bone_name = "Chest"
+
+[node name="FocusSocket" type="Node3D" parent="."]
+position = Vector3(0.64, 0.10, 0.50)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="Socket" type="Node3D" parent="FocusSocket"]
+rotation_degrees = Vector3(0, 180, 0)

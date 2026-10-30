@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ReforgeTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/ReforgeTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1017
+Id = "elite_reforge"
+Title = "重铸"
+Description = "破甲后可被打断地修甲，每只最多成功一次。"
+NameKey = "elite.reforge.name"
+DescriptionKey = "elite.reforge.description"
+Damage = 60
+Duration = 2
+MaxCarriers = 1

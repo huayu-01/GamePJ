@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="RewardConfig" load_steps=6 format=3]
-
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
 [ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="stat"]
+
+[ext_resource type="Script" path="res://Scripts/Config/Specializations/ViolenceBehaviorDefinition.cs" id="behavior_definition"]
+
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/SpecializationRewardEffect.cs" id="specialization_effect"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="specialization_stats"]
 
 [sub_resource type="Resource" id="m_0"]
 script = ExtResource("stat")
@@ -16,16 +19,32 @@ Stat = "CritOverflowToDamage"
 Operation = 0
 Value = 1
 
+[sub_resource type="Resource" id="behavior_definition"]
+script = ExtResource("behavior_definition")
+
+
+
+[sub_resource type="Resource" id="specialization_effect"]
+script = ExtResource("specialization_effect")
+Definition = SubResource("behavior_definition")
+
+[sub_resource type="Resource" id="specialization_stats"]
+script = ExtResource("specialization_stats")
+Modifiers = [SubResource("m_0"), SubResource("m_1")]
+
 [resource]
 script = ExtResource("row")
+NumericId = 1315
 Id = "upg_violence"
 DisplayName = "暴力"
 RewardKind = 0
 MaxStacks = 1
-ApplyHandler = "Specialization"
+Effects = [SubResource("specialization_stats"), SubResource("specialization_effect")]
 Specialization = 20
-HandlerParams = []
 DescriptionTemplate = "暴击率增加{Modifiers.CritChanceAdd:0%}；超过100%的暴击率按1:{Modifiers.CritOverflowToDamage}转为攻击力加成。"
-Requires = PackedStringArray("战神刻印")
-Modifiers = [SubResource("m_0"), SubResource("m_1")]
+Requires = PackedStringArray("rune_war_seal")
 Note = "J32：后续构筑23项特化；明确数值遵循原文，n与未给尺寸／伤害采用本行可调预设。"
+
+NameKey = "content.upg_violence.name"
+
+DescriptionKey = "content.upg_violence.description"

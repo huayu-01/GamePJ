@@ -44,5 +44,20 @@ public sealed class AbilitySlots
 		=> _inputs.TryGetValue(action, out Entry? entry) && GodotObject.IsInstanceValid(entry.Ability)
 			&& entry.Ability.Enabled && entry.Ability.AbilityId == entry.Row.Id ? entry.Ability : null;
 	public bool Owns(Ability ability) => _equipped.Exists(entry => entry.Ability == ability && ability.AbilityId == entry.Row.Id);
+	/// <summary>替换当前槽的唯一实例；行身份不变，输入仍只查这个槽。</summary>
+	public Entry? Replace(Entry expected, AbilityConfig row, Ability ability)
+	{
+		int index = _equipped.IndexOf(expected);
+		if (index < 0 || ability.AbilityId != row.Id || row.Id != expected.Row.Id) return null;
+		var entry = new Entry(row, ability, expected.InputSlot); _equipped[index] = entry;
+		if (!string.IsNullOrEmpty(entry.InputSlot)) _inputs[entry.InputSlot] = entry;
+		Revision++; return entry;
+	}
+	public bool Restore(Entry expected, Entry original)
+	{
+		int index = _equipped.IndexOf(expected); if (index < 0) return false;
+		_equipped[index] = original; if (!string.IsNullOrEmpty(original.InputSlot)) _inputs[original.InputSlot] = original;
+		Revision++; return true;
+	}
 	public bool Press(string action, Unit? target = null) => Resolve(action)?.TryPress(target) ?? false;
 }

@@ -55,6 +55,12 @@ public static class MetaProgress
 	public static int SpeedCost => CostOf("meta_speed", _speedLevel);
 	public static int CritCost => CostOf("meta_crit", _critLevel);
 	public static int CritLevel => _critLevel;
+	internal static System.Action CaptureRollback()
+	{
+		Load();
+		int shards = _shards, health = _healthLevel, damage = _damageLevel, speed = _speedLevel, crit = _critLevel;
+		return () => { _shards = shards; _healthLevel = health; _damageLevel = damage; _speedLevel = speed; _critLevel = crit; _loaded = true; };
+	}
 
 	public static void Load()
 	{

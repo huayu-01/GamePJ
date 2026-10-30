@@ -1,0 +1,243 @@
+{
+  "passed": true,
+  "pass": 59,
+  "fail": 0,
+  "checks": [
+    {
+      "passed": true,
+      "message": "\u4E0D\u5B89\u88C5\u65E7\u56DB\u8DEF\u7EBF\u547D\u4E2D\u4E0E\u7ECF\u9A8C\u534F\u8C03\u5668"
+    },
+    {
+      "passed": true,
+      "message": "\u5341\u4E8C\u9879\u65E7\u4E13\u5C5E\u5168\u90E8\u505C\u7528\uFF0C\u5305\u542B\u5951\u7EA6\u8DEF\u7EBF"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_scavenger_compass"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_energy_echo"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_scavenger_ward"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_anchor_core"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_anchor_pulse"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_anchor_afterglow"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_echo_familiar"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_echo_mark"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_echo_lance"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_risk_contract"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_timed_hunt"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9EGM\u83B7\u53D6\u4E5F\u62D2\u7EDD surv_contract_payoff"
+    },
+    {
+      "passed": true,
+      "message": "\u5B9E\u9645\u5F00\u53D1\u63A7\u5236\u53F0\u53EF\u7528\uFF0C\u547D\u4EE4\u6D4B\u8BD5\u4E0D\u9760\u5173\u95EDGM\u4F2A\u901A\u8FC7"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_scavenger_compass"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_energy_echo"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_scavenger_ward"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_anchor_core"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_anchor_pulse"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_anchor_afterglow"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_echo_familiar"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_echo_mark"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_echo_lance"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_risk_contract"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_timed_hunt"
+    },
+    {
+      "passed": true,
+      "message": "\u547D\u4EE4\u884Cgive\u4E5F\u62D2\u7EDD\u9000\u7528\u9879 surv_contract_payoff"
+    },
+    {
+      "passed": true,
+      "message": "\u6B63\u5F0F\u56FE\u9274\u4E0D\u663E\u793A\u5341\u4E8C\u9879\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_energy_palm\u6B7B\u6218\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_energy_palm\u539F\u5192\u9669\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_crossbow\u6B7B\u6218\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_crossbow\u539F\u5192\u9669\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_bow\u6B7B\u6218\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_bow\u539F\u5192\u9669\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_spirit_sword\u6B7B\u6218\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_spirit_sword\u539F\u5192\u9669\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_scythe\u6B7B\u6218\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_scythe\u539F\u5192\u9669\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_spear\u6B7B\u6218\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "wpn_spear\u539F\u5192\u9669\u5019\u9009\u4E0D\u542B\u65E7\u4E13\u5C5E"
+    },
+    {
+      "passed": true,
+      "message": "\u7ECF\u9A8C\u4E0D\u5E26\u5951\u7EA6\u500D\u7387\uFF0C\u5347\u7EA7\u4ECD\u6682\u505C\u6218\u573A"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u5956\u52B1\u754C\u9762\u4EC5\u663E\u793A\u901A\u7528\u589E\u5E45"
+    },
+    {
+      "passed": true,
+      "message": "\u901A\u7528\u5956\u52B1\u5B9E\u9645\u9886\u53D6\u4E00\u6B21\uFF0C\u91CD\u590D\u70B9\u51FB\u4E0D\u91CD\u590D\u53D1\u5956"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u5956\u52B1\u754C\u9762\u4EC5\u663E\u793A\u901A\u7528\u589E\u5E45"
+    },
+    {
+      "passed": true,
+      "message": "\u901A\u7528\u5956\u52B1\u5B9E\u9645\u9886\u53D6\u4E00\u6B21\uFF0C\u91CD\u590D\u70B9\u51FB\u4E0D\u91CD\u590D\u53D1\u5956"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u5956\u52B1\u754C\u9762\u4EC5\u663E\u793A\u901A\u7528\u589E\u5E45"
+    },
+    {
+      "passed": true,
+      "message": "\u901A\u7528\u5956\u52B1\u5B9E\u9645\u9886\u53D6\u4E00\u6B21\uFF0C\u91CD\u590D\u70B9\u51FB\u4E0D\u91CD\u590D\u53D1\u5956"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u5956\u52B1\u754C\u9762\u4EC5\u663E\u793A\u901A\u7528\u589E\u5E45"
+    },
+    {
+      "passed": true,
+      "message": "\u901A\u7528\u5956\u52B1\u5B9E\u9645\u9886\u53D6\u4E00\u6B21\uFF0C\u91CD\u590D\u70B9\u51FB\u4E0D\u91CD\u590D\u53D1\u5956"
+    },
+    {
+      "passed": true,
+      "message": "\u7ECF\u8FC7\u539F\u4E13\u5C5E\u7B49\u7EA75\u4ECD\u6709\u6B63\u5E38\u5956\u52B1\uFF0C\u65E0\u7A7A\u961F\u5217"
+    },
+    {
+      "passed": true,
+      "message": "\u5F3A\u654C\u9057\u7269\u53EA\u53D1\u4E00\u4EFD\u5956\u52B1"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u5956\u52B1\u754C\u9762\u4EC5\u663E\u793A\u901A\u7528\u589E\u5E45"
+    },
+    {
+      "passed": true,
+      "message": "\u901A\u7528\u5956\u52B1\u5B9E\u9645\u9886\u53D6\u4E00\u6B21\uFF0C\u91CD\u590D\u70B9\u51FB\u4E0D\u91CD\u590D\u53D1\u5956"
+    },
+    {
+      "passed": true,
+      "message": "\u9057\u7269\u901A\u7528\u5956\u52B1\u540E\u961F\u5217\u6E05\u7A7A"
+    },
+    {
+      "passed": true,
+      "message": "B1\u6B63\u5F0F\u573A\u666F\u5B9E\u4F8B\u52A0\u8F7D11\u00B11\u7C73\u9A7B\u4F4D"
+    },
+    {
+      "passed": true,
+      "message": "B1\u4E0D\u6539\u57FA\u7840\u901F\u5EA6\u6216\u542F\u7528\u6A2A\u79FB"
+    },
+    {
+      "passed": true,
+      "message": "\u6CD5\u5E08\u89E6\u53D1\u8303\u56F4\u4E0E\u51C6\u5907\u65F6\u5E8F\u4E0D\u53D8"
+    },
+    {
+      "passed": true,
+      "message": "\u6B7B\u4EA1\u505C\u6B62\u6A21\u5F0F\u5E76\u6E05\u7A7A\u5956\u52B1\u961F\u5217"
+    },
+    {
+      "passed": true,
+      "message": "\u6A21\u5F0F\u505C\u6B62\u540E\u5B8C\u6574GC\u6B63\u5E38\u7ED3\u675F"
+    }
+  ]
+}

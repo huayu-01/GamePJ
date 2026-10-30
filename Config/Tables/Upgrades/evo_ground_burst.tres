@@ -3,20 +3,29 @@
 [ext_resource type="Script" path="res://Scripts/Config/SkillEnhancementTuning.cs" id="1_tuning"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_fall.tres" id="3_skill"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="Landing"]
 script = ExtResource("1_tuning")
 TargetAbility = ExtResource("3_skill")
 LandingKnockback = 6.0
 
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("Landing")
+
 [resource]
 script = ExtResource("2_row")
+NumericId = 1227
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "SkillEnhancement"
-SkillEnhancement = SubResource("Landing")
+Effects = [SubResource("Resource_effect_tuning")]
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Id = "evo_ground_burst"
 DisplayName = "地爆"
 DescriptionTemplate = "下落攻击落地时把命中的敌人击退"
 Note = "J19：强类型目标为武器大师共通落skl_b_fall，覆盖灵剑／镰刀／长枪。只在真实落地时复用共通落的实际球形判定（当前半径3.2m）对敌对存活单位施加一次纯击退，不追加伤害或命中事件；抗性、无敌与World身体碰撞保持。强度6沿用原行预设，原文未给数值。普通落地／打断不触发，换装清理。"
+
+NameKey = "content.evo_ground_burst.name"
+
+DescriptionKey = "content.evo_ground_burst.description"

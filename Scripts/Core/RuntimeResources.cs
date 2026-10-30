@@ -7,6 +7,7 @@ namespace ActRoguelike.Core;
 /// <summary>
 /// 运行期资源读取入口：只复用仍存活的托管包装器；失效时深度绕过原生缓存。
 /// Godot 4.7.2 的原生缓存可能复活已收集但尚未终结的 C# Resource（上游 #83762）。
+/// 必须从首次读取起统一使用本入口；IgnoreDeep仍可能短暂引用其他加载器已写入的缓存。
 /// 弱引用不延长资源寿命；不禁用 GC、不拦截终结器异常、不使用无限强引用池。
 /// </summary>
 public static class RuntimeResources

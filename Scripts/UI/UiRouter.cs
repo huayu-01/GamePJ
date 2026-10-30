@@ -7,7 +7,7 @@ namespace ActRoguelike.UI;
 /// 弹出界面路由（autoload）。统一负责：
 /// - 维护界面栈：栈里有界面就暂停游戏，栈空就恢复；
 /// - 鼠标捕获：有界面时释放鼠标，没有时捕获（Esc 不再直接切换鼠标模式）；
-/// - Esc：关闭当前最顶层可关闭的界面；没有界面时打开菜单（当前用帮助界面占位，等 UI 框架）。
+/// - Esc：只尝试关闭当前顶层弹层；顶层暂不可关闭时消费按键，没有弹层时打开菜单。
 /// </summary>
 public partial class UiRouter : Node
 {
@@ -19,8 +19,25 @@ public partial class UiRouter : Node
 	private readonly List<OverlayScreen> _stack = new();
 	private Window? _window;
 
-	public bool AnyOpen => _stack.Count > 0;
+	/// <summary>当前能阻挡底层输入的有效弹层；HUD、已关闭或已退树的界面不参与。</summary>
+	public OverlayScreen? TopScreen
+	{
+		get
+		{
+			for (int i = _stack.Count - 1; i >= 0; i--)
+			{
+				OverlayScreen screen = _stack[i];
+				if (IsInstanceValid(screen) && screen.IsInsideTree() && screen.IsOpen && screen.ScreenLayer != OverlayScreen.UiLayer.Hud)
+				{
+					return screen;
+				}
+			}
+			return null;
+		}
+	}
+	public bool AnyOpen => TopScreen != null;
 	public int StackDepth => _stack.Count;
+	public bool IsTopScreen(OverlayScreen screen) => ReferenceEquals(TopScreen, screen);
 
 	public override void _Ready()
 	{
@@ -77,15 +94,8 @@ public partial class UiRouter : Node
 
 	public bool TryCloseTop()
 	{
-		for (int i = _stack.Count - 1; i >= 0; i--)
-		{
-			if (_stack[i].TryCloseByCancel())
-			{
-				return true;
-			}
-		}
-
-		return false;
+		// 顶层处于保护期或必须确认时，不得继续向下关闭其他面板。
+		return TopScreen?.TryCloseByCancel() ?? false;
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -95,8 +105,15 @@ public partial class UiRouter : Node
 			return;
 		}
 
-		if (TryCloseTop())
+		if (TopScreen != null)
 		{
+			// 奖励／商店选择不能用Esc直接跳过，但仍可进入暂停菜单取消整局冒险。
+			if (!TopScreen.CloseOnCancel && !TopScreen.InputBlocked
+				&& ActRoguelike.Rewards.RunController.Instance?.CanCancelAdventure == true && OpenMenu != null)
+			{
+				OpenMenu(); GetViewport().SetInputAsHandled(); return;
+			}
+			TryCloseTop();
 			GetViewport().SetInputAsHandled();
 			return;
 		}
@@ -110,16 +127,10 @@ public partial class UiRouter : Node
 
 	private void Sync()
 	{
+		_stack.RemoveAll(screen => !IsInstanceValid(screen) || !screen.IsInsideTree() || !screen.IsOpen);
 		// 分层：只有 Panel / Modal 才暂停游戏与切鼠标模式，Hud 层常驻不影响。
-		bool blocking = false;
-		foreach (OverlayScreen screen in _stack)
-		{
-			if (screen.ScreenLayer != OverlayScreen.UiLayer.Hud)
-			{
-				blocking = true;
-				break;
-			}
-		}
+		bool blocking = TopScreen != null;
+		GlassUi.SyncWorldHud(GetTree().Root,_stack.Exists(screen=>screen is RewardScreen or BuildScreen or CodexScreen));
 
 		GetTree().Paused = blocking;
 		Input.MouseMode = blocking ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;

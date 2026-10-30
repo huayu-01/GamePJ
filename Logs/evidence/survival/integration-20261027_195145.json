@@ -1,0 +1,78 @@
+{
+  "Date": "2026-10-27T19:51:45",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 5.06,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.content.err",
+      "Failure": "",
+      "SHA256": "55AB96C19D279358ADE164D6455D912DAB656FD0B8C0A6793D409EB0CE207CC0"
+    },
+    {
+      "Name": "localization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 3.05,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.localization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.localization.err",
+      "Failure": "",
+      "SHA256": "C781EC413CE0E5DCE31058A5A51D20CE08DA4EDE742EFB7EBECDB17D3302E40D"
+    },
+    {
+      "Name": "effects",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 2.79,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.effects.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.effects.err",
+      "Failure": "",
+      "SHA256": "C7B10509A60534D47183DF7399FEF537693FEFB6DAAD3840DFC12C8DD2E1F23D"
+    },
+    {
+      "Name": "reward_rules",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 3.54,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.reward_rules.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.reward_rules.err",
+      "Failure": "",
+      "SHA256": "8937B5051F8DF09A0F161E79AD63BE08F7C2D0BD38BECF053AE514031D6781D9"
+    },
+    {
+      "Name": "slots",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.slots.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.slots.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.slots.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.slots.err",
+      "SHA256": "AE05939F13595D7A13BB279E07DE1731DCD7057D12FB63A5FCA0E24B50EEAB9D"
+    },
+    {
+      "Name": "specialization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 12.41,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.specialization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.specialization.err",
+      "Failure": "",
+      "SHA256": "97DE3350E470C587FF2DC09A4844DB2F11DBA5CC45BBDCEB55BAABF665E40063"
+    },
+    {
+      "Name": "main",
+      "Passed": false,
+      "Exit": 0,
+      "Seconds": 70.98,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.main.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_195145.main.err",
+      "Failure": "Main新增红标：[log] 19:52:39 [SelfTest] 🔴 P5b·实测表参数落到机制上（探测技能节点，不进树）：有备无患 → 后撤 MaxCharges 3（期望 3）Recharge 0.5s（期望 0.5）｜气贯长虹 → 长枪武技2 基础蓄力 0s（期望 0.5）每档 0s（期望 0.125）总上限 0s（期望1）手动召回 True／落地自动召回 False（期望False／True）｜变奏 + 龙之箭 → 弓武技1 RampMaxCount 3（期望 3）RampWindow 1.2s（期望 1.2）蓄力上限 3s（期望 3）｜灵能汲取 → 每杀续时 2秒（期望2）单剑伤害比例0.3（期望0.3）全局伤害乘区 1（期望1；真实协同与击杀见灵剑专项）｜地爆 → 共通落落地击退 6（期望6）／落剑式额外击退 0（期望0）｜神降术 → 落剑式 Cooldown 2s（期望2）DamageScale 1.6（期望1.6）\r",
+      "SHA256": "E1CBF3D25C4AF02EAC5C2ECD63F4AA2DA54F726D28B9904BE821DDFCC80A2B05"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "相关流程回归存在失败，见逐项报告。"
+}

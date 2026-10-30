@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://ccmhfq22aou0"]
 
 [ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_spin.svg" id="e_hud_icon"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_ThrowSpeed"]
@@ -83,19 +82,16 @@ Note = "移动路径伤害为原周期伤害的80%；悬停周期仍为原伤害
 
 [resource]
 script = ExtResource("1_row")
-ActionMovement = 2
-HudIcon = ExtResource("e_hud_icon")
-HudColor = Color(1, 0.76, 0.4, 1)
-HudOrder = 40
 NodeName = "AbilityWeapon5Skill2"
 ClassHint = "ScytheThrowAbility"
 InputAction = "weapon_skill_2"
-Aim = 0
+ActionMovement = 2
 AnimName = "Skill_B2_Scythe3"
 AnimEvent = "ATK"
 Cooldown = 1.0
 Windup = 0.0
 Recover = 0.05
+NumericId = 1180
 Id = "skl_b2_w1_2"
 DisplayName = "无情"
 DescriptionTemplate = "将武器扔向前方，飞出和回程各对沿途敌人造成一次原伤害 {TravelDamageScale:0%} 的路径伤害；悬停旋转时每 {DamageInterval:0.##} 秒造成原伤害。武器在外期间武技1无法使用；再次使用或靠近武器时收回。"

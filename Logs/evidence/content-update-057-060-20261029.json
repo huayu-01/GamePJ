@@ -1,0 +1,178 @@
+{
+  "Passed": true,
+  "Date": "2026-10-29",
+  "Implemented": [
+    57,
+    58,
+    59,
+    60
+  ],
+  "DedicatedChecks": {
+    "Content057060-headless": 32,
+    "Content057060-render": 35,
+    "Content032037-headless": 47,
+    "Content032037-render": 48,
+    "PauseDive-headless": 24,
+    "PauseDive-render": 24
+  },
+  "Reports": [
+    "Logs/evidence/elites/run-20261029_103911.json",
+    "Logs/evidence/elites/run-20261029_102904.json",
+    "Logs/evidence/survival/integration-20261029_103223.json"
+  ],
+  "FinalRegressions": [
+    {
+      "Name": "gameplay_rules",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.74,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.gameplay_rules.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.gameplay_rules.err",
+      "Failure": "",
+      "SHA256": "E6AFA0F6353676D7E3EC9E39884F66B73361BDD663BDC599265638E3BA1853A2"
+    },
+    {
+      "Name": "kill_facts",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 9.09,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.kill_facts.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.kill_facts.err",
+      "Failure": "",
+      "SHA256": "A3270C6F3B812727B14E614108C1D31B0E6D100E138E235B156F4A73508A290F"
+    },
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 5.48,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.content.err",
+      "Failure": "",
+      "SHA256": "9E168C191FCBEF062DFB2DB721EFB2766DB216C5006574B6B706BC4DBB9B3033"
+    },
+    {
+      "Name": "localization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 3.08,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.localization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.localization.err",
+      "Failure": "",
+      "SHA256": "81060921C17A248D90379B7A77D01129918FB607FB97AEDD72159AE83A9D98E4"
+    },
+    {
+      "Name": "effects",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 2.87,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.effects.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.effects.err",
+      "Failure": "",
+      "SHA256": "D95B4EAF56BCBA878288A7D47565B2AC6FF278B91F886F5A75BB261863B0E2D8"
+    },
+    {
+      "Name": "slots",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 8.86,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.slots.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.slots.err",
+      "Failure": "",
+      "SHA256": "DF46F4E4B13A36D4C940E760ABFC65559078B1E4E1A926724D6E2B133A466813"
+    },
+    {
+      "Name": "synergy",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 9.63,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.synergy.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.synergy.err",
+      "Failure": "",
+      "SHA256": "96B939214FB15664E65FAC923136E1E0E388D59063605D069714412D3BF9D628"
+    },
+    {
+      "Name": "adventure_render",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 32.51,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.adventure_render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.adventure_render.err",
+      "Failure": "",
+      "SHA256": "95B4A6154F1F0C962DBC1D40B7D59BFCB8F8776B4D9F9B552CF546F2D7B74310"
+    },
+    {
+      "Name": "main",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 71.34,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.main.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.main.err",
+      "Failure": "",
+      "SHA256": "0CCD18F132228F76C0242990BA47E5B9A33F839140C2C6BDFF916BDD372C0CC1"
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 40.01,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_103223.survival.err",
+      "Failure": "",
+      "SHA256": "FEBE742E2BB9DE822B2DE1449D2F20E1FCA6FCC7663309FDD2867B8BC471F0E1"
+    }
+  ],
+  "Builds": [
+    "Debug: 0 warnings / 0 errors",
+    "ExportRelease: 0 warnings / 0 errors"
+  ],
+  "SavesUnchanged": true,
+  "StrictStderrEmpty": true,
+  "AcceptanceWorkbook": {
+    "passed": true,
+    "backup": "Logs\\maintenance\\acceptance-20261026\\backup-1793241385995.xlsx",
+    "saved": "F:\\Godot项目\\项目a\\outputs\\acceptance-20261026\\更新与修复验收.xlsx",
+    "sha256": "d60efe46524894cf8e923f289acfff615b068c85b445ae569f6c023e11eb38eb",
+    "changedIds": [
+      57,
+      58,
+      59,
+      60
+    ],
+    "historyAdded": 4,
+    "sourceAndPlayerCellsPreserved": true,
+    "otherRequirementsPreserved": true,
+    "formulasAndControlsPreserved": true
+  },
+  "ExperienceInvestigation": "未复现灵魂收割阻止经验生成；原两路独立。真实授予、必掉/不掉、独立落点、真实拾取与964组构筑联动通过，修正共点视觉重叠。",
+  "DashMeasurement": "60Hz空地旧冲量实移3.00米，新定距6.00米/0.50秒；碰墙、空中重力、取消及真实动画事件验证通过。",
+  "FollowupFixtureOnly": "整批回归后的专项重跑仅调整取证相机、死亡特效等待与避开场景信标的位置，生产实现未改变，断言未放宽。",
+  "Images": [
+    "Logs/evidence/elites/057-following-damage-number.png",
+    "Logs/evidence/elites/058-independent-spread-drops.png",
+    "Logs/evidence/elites/060-parry-success.png"
+  ],
+  "SourceSHA256": {
+    "Scripts/UI/DamageNumberLabel.cs": "7ce59443617abcbacee9c67181fe4940604271d74c5bcc0de59a71489cdb59b9",
+    "Scripts/UI/DamageNumbers.cs": "b53b2f3e4b7201fde69de351e98fdc2f2b3b5395d0cb9fde51fdd35d6e897481",
+    "Scripts/UI/PlayerHud.cs": "a2672bfe56bbd57c1d87c68cec2d45c4989f1d767201fbf8c2c58d53a7f34c34",
+    "Scripts/Combat/PickupDropLayout.cs": "2afa12050ad48d5e014cf0e7657cc9beeaa8d907bfa5df5c827cc29f19f8443d",
+    "Scripts/Run/Survival/SurvivalDirector.Spawning.cs": "edf317e7c7b51d2cc099b3e0b057af4043f3d56badc5b4b8ddb27a71afcda3f6",
+    "Scripts/Rewards/RewardCatalog.cs": "a26a7d48f2b19b7b1d690dc418cda0e687e952430ffa7aabcecd890d61a834c0",
+    "Scripts/Abilities/BackdashAbility.cs": "ab8eb639bb27a0e4e34806118fa4a0c38bfb63edcdb7293a7923b1a1e2fcf6f7",
+    "Scripts/Combat/CharacterMovement.cs": "e168687a2e08fa7f1a4b5aabd5ba844a035cb419bc946c5fc911679c0cf64b0e",
+    "Config/Tables/Skills/skl_a1_skill_1.tres": "a572f98c8ea0e2a9d60cfc1649d23fec89fff81c4441b81468b925413acc2236",
+    "Scripts/Combat/HitInstance.cs": "1af140a5bb2f338b50597539dc611e4770011a6ee9af64aa745bcb83c79f579b",
+    "Scripts/Abilities/GuardStanceAbility.cs": "a88a50d51c966447e3a0cf476790c11234e64122840eabc2a7c05224d6eb4790",
+    "Scripts/Combat/CombatFeedback.cs": "8b3a141a76fbfa7aaf91d59604ad44e68c361a486e75cff021a305ac6c5d8b03",
+    "Scripts/Combat/CombatFeedbackProfile.cs": "ffadf1e5fc573b7f605d5349c5a45a4a75978f2ab8800e5833d434fe6f8d6598",
+    "Scripts/Combat/CombatImpactFx.cs": "d6654253df78b0a8ce1953dc1b13de36dc5f4c3586c43a2459f2c939103b1a89",
+    "Scripts/Testing/Content057060Probe.cs": "e77a4d33858e131e6712daf9c9a656f21785aa6b3c8fb0b6aba03bdecd3537f8",
+    "Scenes/Debug/_Content057060Probe.tscn": "fad0ccfee518989e36a379461ec6d50c90d76a6cce55065b341858df92ebe396",
+    "Scripts/Testing/GameplayRulesProbe.cs": "ab624535a653b9e180164fad111a39f2f2ed822aefd5919bd09d133bf66a048a",
+    "_tools/verify_elite_traits.ps1": "43ebbbecc0551413b92c15c35b6a8790a6f6b8866fb5b7e316de79d646c9e2f8",
+    "_tools/verify_survival_integration.ps1": "46ba395baa776cf973d8caa7b6fe88ef929cea404879ea58de9e18e04db68eff",
+    "docs/content-update-057-060-20261029.md": "8e308e352ca4ede7143abef21fde1afe71d9e0611b7460c6abe0ead4b0c22f09",
+    "docs/acceptance-tracker.md": "4a6eb9db4e40af62a481e17941adf345ecfe49014ccb0619a51af3635013bcc6"
+  }
+}

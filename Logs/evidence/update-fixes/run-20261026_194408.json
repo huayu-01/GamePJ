@@ -1,0 +1,24 @@
+{
+  "Date": "2026-10-26T19:44:08",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "enemy_roster",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_194408.enemy_roster.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_194408.enemy_roster.headless.err",
+      "SHA256": "7D104DE77522E849219D80949AB1234B9EBEC89571217B25E57830DE1B6C3C5F"
+    },
+    {
+      "Name": "content",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_194408.content.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_194408.content.headless.err",
+      "SHA256": "CB3ED771CE2B7F1128F7582ED567B14392989B5906A62CA2C137ECE1090F5543"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "pass": 8,
+  "fail": 0,
+  "checks": [
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u751F\u5B58\u6A21\u5F0F\u3001\u73A9\u5BB6\u548C\u5BFC\u822A\u5DF2\u51C6\u5907"
+    },
+    {
+      "passed": true,
+      "message": "\u65E7\u5B57\u7B26\u4E32\u548C\u65B0\u6570\u5B57\u5B58\u6863\u952E\u89E3\u6790\u5230\u540C\u4E00\u6280\u80FD\u5BF9\u8C61"
+    },
+    {
+      "passed": true,
+      "message": "\u6570\u5B57\u8EAB\u4EFD\u8DE8\u8868\u552F\u4E00\u4E14\u67E5\u9519\u5185\u5BB9\u7C7B\u578B\u4E0D\u4F1A\u4E32\u884C"
+    },
+    {
+      "passed": true,
+      "message": "Inspector\u53EA\u7F16\u8F91\u6570\u5B57ID\uFF0C\u65E7\u522B\u540D\u7EE7\u7EED\u53EF\u5E8F\u5217\u5316"
+    },
+    {
+      "passed": true,
+      "message": "\u65B0\u6280\u80FD\u65E0\u9700\u63CF\u8FF0\u578B\u5B57\u7B26\u4E32ID\uFF0C\u6309skill_\u6570\u5B57\u89C4\u5219\u4FDD\u5B58"
+    },
+    {
+      "passed": true,
+      "message": "\u6570\u5B57\u8EAB\u4EFD\u548C\u771F\u5B9E\u53C2\u6570\u5F80\u8FD4\u4FDD\u5B58\u4FDD\u6301\u4E00\u81F4"
+    },
+    {
+      "passed": true,
+      "message": "\u5236\u4F5C\u6821\u9A8C\u62D2\u7EDD\u4E0D\u540C\u5185\u5BB9\u4F7F\u7528\u76F8\u540C\u6570\u5B57ID"
+    },
+    {
+      "passed": true,
+      "message": "\u6570\u5B57\u8EAB\u4EFD\u6821\u9A8C\u8986\u76D6\u6280\u80FD\u4E0E\u7CBE\u82F1\u7279\u6027\u4E4B\u95F4\u7684\u8DE8\u57DF\u51B2\u7A81"
+    }
+  ]
+}

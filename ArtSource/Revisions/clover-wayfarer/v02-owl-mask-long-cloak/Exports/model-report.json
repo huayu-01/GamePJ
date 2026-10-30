@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "asset": "clover-wayfarer",
+  "revision": "v02-owl-mask-long-cloak",
+  "triangles": 4108,
+  "meshes": 22,
+  "bones": 21,
+  "materials": 12,
+  "animations": [
+    {
+      "name": "idle",
+      "duration_seconds": 1.9999999664723873,
+      "channels": 63
+    },
+    {
+      "name": "walk",
+      "duration_seconds": 1.2000000141561031,
+      "channels": 63
+    }
+  ],
+  "max_weight_sum_error": 1.2665987014770508e-07,
+  "glb_bytes": 516488,
+  "includes_backpack": false,
+  "back_pattern": "three-leaf clover",
+  "candidate_only": true,
+  "geometry_check": {
+    "passed": true,
+    "asset_meshes": 22,
+    "triangles": 4108,
+    "bones": 21,
+    "empty_mask_interior": true,
+    "two_open_eye_holes": true,
+    "mask_manifold": true,
+    "cloak_surface_only": true,
+    "hem_min_z": 0.18045859038829803,
+    "hem_max_z": 0.28569743037223816,
+    "hood_lining": "dark thin fabric surface; no head or eye fillers"
+  },
+  "references": [
+    "https://oricutstudios.itch.io/low-poly-forest-spirit-nori",
+    "https://oricutstudios.itch.io/low-poly-campfire-scout-niko"
+  ],
+  "blender_roundtrip": {
+    "passed": true,
+    "asset_meshes": 22,
+    "triangles": 4108,
+    "bones": 21,
+    "importer_bone_display_helpers": 0
+  }
+}

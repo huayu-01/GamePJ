@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/AnchorPulseRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+Interval = 2
+Radius = 2.8
+DamageScale = 0.35
+Push = 2
+[resource]
+script = ExtResource("row")
+NumericId = 1285
+Id = "surv_anchor_pulse"
+DisplayName = "净域震荡"
+RewardKind = 2
+MaxStacks = 1
+Weight = 1.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_anchor_pulse"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "圈内每{Effects.0.Interval:0.#}秒准备脉冲，下一次主武技命中造成{Effects.0.Radius:0.#}米、基础伤害{Effects.0.DamageScale:0%}的冲击并轻推普通敌人。"
+NameKey = "content.surv_anchor_pulse.name"
+DescriptionKey = "content.surv_anchor_pulse.description"
+Requires = PackedStringArray("surv_anchor_core")

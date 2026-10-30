@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityReplacementRewardEffect.cs" id="definition"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b3_w1_2.tres" id="target"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_spear.tres" id="pool"]
+[ext_resource type="PackedScene" path="res://Scenes/Abilities/Builds/SlantSun.tscn" id="replacement"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+TargetAbility = ExtResource("target")
+ReplacementScene = ExtResource("replacement")
+SkillName = "斜阳穿隙"
+SkillNameKey = "skill.1349.name"
+SkillDescriptionKey = "content.1349.description"
+SkillDescription = "武技2按住瞄准、松开沿表面法线刺落；下落{Effects.0.ReplacementScene.FallDamage}伤害，落点半径{Effects.0.ReplacementScene.Radius}米造成{Effects.0.ReplacementScene.ImpactDamage}伤害；枪身每{Effects.0.ReplacementScene.ContactInterval}秒接触造成{Effects.0.ReplacementScene.ContactDamage}伤害。靠近收回，离手仅锁武技1，武技2可重定位。冷却{Effects.0.ReplacementScene.Cooldown}秒，本体自带穿透，兼容气贯长虹减冷却。"
+[resource]
+script = ExtResource("row")
+NumericId = 1349
+DisplayName = "斜阳穿隙"
+NameKey = "content.1349.name"
+DescriptionKey = "content.1349.description"
+DescriptionTemplate = "武技2按住瞄准、松开沿表面法线刺落；下落{Effects.0.ReplacementScene.FallDamage}伤害，落点半径{Effects.0.ReplacementScene.Radius}米造成{Effects.0.ReplacementScene.ImpactDamage}伤害；枪身每{Effects.0.ReplacementScene.ContactInterval}秒接触造成{Effects.0.ReplacementScene.ContactDamage}伤害。靠近收回，离手仅锁武技1，武技2可重定位。冷却{Effects.0.ReplacementScene.Cooldown}秒，本体自带穿透，兼容气贯长虹减冷却。"
+RewardKind = 1
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+Pool = ExtResource("pool")
+RequiredCharacterIds = PackedStringArray("chr_weapon_master")
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

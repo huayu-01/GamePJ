@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://d32j3tw7j6utx"]
+[gd_resource type="Resource" script_class="ComboAbilityConfig" format=3 uid="uid://d32j3tw7j6utx"]
 
-[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_sword.svg" id="e_hud_icon"]
+[ext_resource type="Script" uid="uid://xai8birfgw2a" path="res://Scripts/Config/ComboAbilityConfig.cs" id="1_row"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 [ext_resource type="Resource" uid="uid://cwriiq810bbqx" path="res://Config/Tables/SkillSeries/ser_b1_combo.tres" id="3_series"]
 
@@ -13,14 +12,11 @@ Note = "单段模式下的判定时长（本行是多段，用 StepActiveTimes�
 
 [resource]
 script = ExtResource("1_row")
-ActionMovement = 2
-HudIcon = ExtResource("e_hud_icon")
-HudColor = Color(1, 0.76, 0.4, 1)
-HudOrder = 30
+ComboSeries = ExtResource("3_series")
 NodeName = "AbilityWeapon4Skill1"
 ClassHint = "MeleeComboAbility"
 InputAction = "weapon_skill_1"
-ComboSeries = ExtResource("3_series")
+ActionMovement = 2
 AnimName = "Skill_B1_Sword1"
 AnimEvent = "ATK"
 AnimEventEnd = "Combo"
@@ -28,6 +24,7 @@ AnimSpeedScale = 1.44
 Cooldown = 0.3
 Windup = 0.05
 Recover = 0.05
+NumericId = 1176
 Id = "skl_b1_w1_1"
 DisplayName = "破剑式"
 DescriptionTemplate = "一段连招，连续按键可连续释放 5 段；每段都可以摧毁碰撞盒内的子弹（包括友军的，但无法斩断能量波）。"

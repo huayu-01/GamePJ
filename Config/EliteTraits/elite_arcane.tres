@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ArcaneTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/ArcaneTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1001
+Id = "elite_arcane"
+Title = "秘法强化"
+Description = "预警后放置固定节点旋转激光。"
+NameKey = "elite.arcane.name"
+DescriptionKey = "elite.arcane.description"
+MaxCarriers = 1
+Cooldown = 8
+Radius = 5
+Duration = 4
+Count = 1
+Magnitude = 35
+ExtraCost = 3

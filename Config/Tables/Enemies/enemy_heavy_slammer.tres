@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://Config/Physics/ground_heavy.tres" id="heavy"]
 [resource]
 script = ExtResource("1")
+NumericId = 1098
 Id = "enemy_heavy_slammer"
 DisplayName = "重击敌人"
 ScenePath = "res://Scenes/Enemies/HeavySlammer.tscn"

@@ -1,0 +1,18 @@
+{
+  "Ghost_Charcoal": {"lit":"#30283d","shade":"#161525","high":"#59516c","brush":0.025,"rim":0.075},
+  "Ghost_IndigoHat": {"lit":"#8b57d0","shade":"#503781","high":"#c590ef","brush":0.045},
+  "Ghost_HatBand": {"lit":"#d695e7","shade":"#9a65b9","high":"#f4c0f0","brush":0.035},
+  "Ghost_WarmEyes": {"lit":"#fff2b0","shade":"#fff0aa","high":"#fff8cd","emission":0.7,"outline":false,"brush":0.0},
+  "Ghost_StaffWood": {"lit":"#bc7b46","shade":"#785070","high":"#edb96b","brush":0.05},
+  "Ghost_StaffOrb": {"lit":"#ffe794","shade":"#ffdf83","high":"#fff3bd","emission":0.75,"outline":false,"brush":0.0},
+  "ShroomGeneratedSurface": {"lit":"#bb61e3","shade":"#773bab","high":"#e0a1f6","brush":0.045,"mushroom":true},
+  "Shroom_CapSpots": {"lit":"#6b3d97","shade":"#4a2c75","high":"#925cba","brush":0.035,"outline":false},
+  "Slammer_Stone": {"lit":"#d2e5cb","shade":"#87a6a0","high":"#ecf4ce","brush":0.045},
+  "Slammer_LightStone": {"lit":"#e3eccd","shade":"#a0b8ae","high":"#faf2cf","brush":0.04},
+  "Slammer_Joints": {"lit":"#677f72","shade":"#435368","high":"#98b592","brush":0.04},
+  "Slammer_Moss": {"lit":"#b1d94c","shade":"#558c67","high":"#d9ee71","brush":0.05},
+  "Slammer_Leather": {"lit":"#bd814a","shade":"#80546b","high":"#e3b76b","brush":0.05},
+  "Slammer_LeatherLight": {"lit":"#f0c478","shade":"#a68364","high":"#ffe3a2","brush":0.04},
+  "Slammer_FaceDark": {"lit":"#354552","shade":"#242c41","high":"#5b7573","brush":0.02},
+  "Slammer_AmberEyes": {"lit":"#ffd969","shade":"#e4a843","high":"#fff0ab","emission":0.22,"outline":false,"brush":0.0}
+}

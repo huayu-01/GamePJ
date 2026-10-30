@@ -11,6 +11,7 @@ Value = 1.25
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1120
 Id = "pmod_berserk_dmg"
 DisplayName = "狂暴·伤害"
 DescriptionTemplate = "伤害 ×1.25"

@@ -1,0 +1,10 @@
+{
+  "Date": "2026-10-25T08:31:30",
+  "Mode": "修改前实际ContentValidator目录扫描",
+  "Failure": "引擎验证未通过：exit=-1073741795；F:\\Godot项目\\项目a\\Logs\\validation\\gc_before_20261025_083107.log / F:\\Godot项目\\项目a\\Logs\\validation\\gc_before_20261025_083107.err",
+  "WeakCollected": true,
+  "ValidatorCompleted": true,
+  "FatalGcHandle": true,
+  "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_before_20261025_083107.log",
+  "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_before_20261025_083107.err"
+}

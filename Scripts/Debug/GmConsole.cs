@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using ActRoguelike.Abilities;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
@@ -25,6 +26,13 @@ public partial class GmConsole : OverlayScreen
 	public int CommandCount { get; private set; }
 	private LineEdit _input = null!;
 	private RichTextLabel _output = null!;
+	private TabContainer _tabs = null!;
+	private OptionButton _rewardCategory = null!;
+	private LineEdit _rewardSearch = null!;
+	private VBoxContainer _rewardList = null!;
+	private Label _rewardStatus = null!;
+	private string _rewardSignature = string.Empty;
+	public int RewardButtonCount => _rewardList?.GetChildCount() ?? 0;
 	private readonly List<string> _history = new();
 	private readonly Queue<string> _lines = new();
 	private int _historyIndex;
@@ -52,7 +60,17 @@ public partial class GmConsole : OverlayScreen
 		}
 		_input = GetNode<LineEdit>("Root/Panel/Margin/Layout/Command/Input");
 		_input.KeepEditingOnTextSubmit = true;
-		_output = GetNode<RichTextLabel>("Root/Panel/Margin/Layout/Output");
+		_output = GetNode<RichTextLabel>("Root/Panel/Margin/Layout/Tabs/Console/Output");
+		_tabs = GetNode<TabContainer>("Root/Panel/Margin/Layout/Tabs");
+		_tabs.SetTabTitle(0, "可获取增幅");
+		_tabs.SetTabTitle(1, "命令记录");
+		_rewardCategory = GetNode<OptionButton>("Root/Panel/Margin/Layout/Tabs/Rewards/Filters/Category");
+		_rewardSearch = GetNode<LineEdit>("Root/Panel/Margin/Layout/Tabs/Rewards/Filters/Search");
+		_rewardList = GetNode<VBoxContainer>("Root/Panel/Margin/Layout/Tabs/Rewards/Scroll/List");
+		_rewardStatus = GetNode<Label>("Root/Panel/Margin/Layout/Tabs/Rewards/Status");
+		foreach (string label in new[] { "全部", "强化", "进化", "异化" }) _rewardCategory.AddItem(label);
+		_rewardCategory.ItemSelected += _ => RefreshRewards(true);
+		_rewardSearch.TextChanged += _ => RefreshRewards(true);
 		_input.TextSubmitted += Submit;
 		_input.GuiInput += InputKeys;
 		GetNode<Button>("Root/Panel/Margin/Layout/Command/Run").Pressed += () => Submit(_input.Text);
@@ -62,13 +80,61 @@ public partial class GmConsole : OverlayScreen
 		BindQuick("Refill", "refill");
 		BindQuick("God", "invincible");
 		BindQuick("Skills", "list skills");
-		BindQuick("Upgrades", "list upgrades");
+		GetNode<Button>("Root/Panel/Margin/Layout/Quick/Upgrades").Pressed += () => { _tabs.CurrentTab = 0; RefreshRewards(true); };
 		BindQuick("Enemies", "list enemies");
 		BindQuick("Interactions", "list interactions");
 		InitializeOverlay();
 		SetKeyHints(KeyHint.Text("Enter", "执行"), KeyHint.Text("Tab", "补全"), KeyHint.Text("↑ / ↓", "历史"), (Key.Escape, "关闭"));
 		Log("GM 测试台就绪 · G 打开 / Esc 关闭。输入 help 查看命令，list 可查询当前表中的真实ID。");
-		Log("碎片会保存到玩家进度；增幅、CD倍率、层数等只影响当前实例。give 为GM直接发放，跳过抽取限定。");
+		Log("碎片会保存到玩家进度；增幅、CD倍率、技能充能次数等只影响当前实例。give 为GM直接发放，跳过抽取限定。");
+	}
+
+	public override void _Process(double delta)
+	{
+		if (Available && IsOpen) RefreshRewards();
+	}
+
+	private void RefreshRewards(bool force = false)
+	{
+		RunController? run = RunController.Instance;
+		RewardKind? category = _rewardCategory.Selected == 0 ? null : (RewardKind)(_rewardCategory.Selected - 1);
+		List<RewardDefinition> available = run?.AvailableRewards(category) ?? new();
+		string search = _rewardSearch.Text.Trim();
+		available.RemoveAll(row => search.Length > 0 && !row.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+			&& !row.Id.Contains(search, StringComparison.OrdinalIgnoreCase) && !row.Description.Contains(search, StringComparison.OrdinalIgnoreCase));
+		available.Sort((a, b) => a.Kind != b.Kind ? a.Kind.CompareTo(b.Kind) : string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+		string signature = string.Join("|", available.Select(row => row.Id)) + "#" + ContentText.Revision;
+		if (!force && signature == _rewardSignature) return;
+		_rewardSignature = signature;
+		foreach (Node child in _rewardList.GetChildren()) { _rewardList.RemoveChild(child); child.QueueFree(); }
+		_rewardStatus.Text = run == null ? "进入关卡后可选择当前角色／武器可获取的增幅。"
+			: $"当前可获取 {available.Count} 项 · 点击立即生效 · 前置、互斥、限定均生效";
+		foreach (RewardDefinition row in available)
+		{
+			var button = new Button
+			{
+				Name = row.Id, Text = $"{run!.Build.DisplayName(row, true)}　[{RewardPresentation.KindLabel(row.Kind)}]\n{row.Description}",
+				Icon = UiIcons.ForReward(row), ExpandIcon = true, Alignment = HorizontalAlignment.Left,
+				CustomMinimumSize = new Vector2(0, 74), SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis,
+				ClipText = true,
+				TooltipText = row.Name + "\n" + row.Description + "\n\n" + RewardPresentation.Details(row, run!.Build),
+			};
+			button.AddThemeConstantOverride("icon_max_width", 40);
+			button.Pressed += () => AcquireReward(row.Id);
+			_rewardList.AddChild(button);
+		}
+	}
+
+	private void AcquireReward(string id)
+	{
+		if (!IsOpen || InputBlocked || UiRouter.Instance != null && !UiRouter.Instance.IsTopScreen(this)) return;
+		bool granted = RunController.Instance?.TryAcquireReward(id) == true;
+		LastCommandSucceeded = granted;
+		LastResult = granted ? $"已获取 {RewardCatalog.Find(id)?.Name}。"
+			: "当前条件已经变化，这项增幅暂不可获取。";
+		Log(LastResult);
+		RefreshRewards(true);
 	}
 	private void BindQuick(string node, string command)
 		=> GetNode<Button>($"Root/Panel/Margin/Layout/Quick/{node}").Pressed += () => Submit(command);
@@ -94,6 +160,7 @@ public partial class GmConsole : OverlayScreen
 	{
 		if (!Available || IsOpen) return;
 		BeginOpen();
+		RefreshRewards(true);
 		_input.Clear();
 		_input.GrabFocus();
 		_input.Edit();
@@ -178,6 +245,7 @@ public partial class GmConsole : OverlayScreen
 	private void Submit(string command)
 	{
 		if (string.IsNullOrWhiteSpace(command)) return;
+		_tabs.CurrentTab = 1;
 		_history.Add(command.Trim());
 		if (_history.Count > 64) _history.RemoveAt(0);
 		_historyIndex = _history.Count;
@@ -243,8 +311,9 @@ public partial class GmConsole : OverlayScreen
 				return $"碎片 +{amount} → {MetaProgress.Shards}（已保存）。";
 			case "give":
 				if (p.Length != 2) throw new ArgumentException("用法：give 增幅ID");
+				if (RewardCatalog.Find(p[1]) is not { Weight: > 0 }) throw new ArgumentException("增幅已停用或不存在。");
 				if (RunController.Instance?.GrantReward(p[1]) != true) throw new ArgumentException("增幅不存在或当前不在局内；list upgrades 可查ID。");
-				return $"已发放 {p[1]}，当前 {RunController.Instance.Build.StacksOf(p[1])} 层（GM直接发放）。";
+				return $"已发放 {p[1]}（GM直接发放）。";
 			case "cdr":
 				if (p.Length != 2 || !float.TryParse(p[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float multiplier)
 					|| !float.IsFinite(multiplier) || multiplier < 0.01f || multiplier > 10) throw new ArgumentException("用法：cdr 倍率，范围0.01～10。");

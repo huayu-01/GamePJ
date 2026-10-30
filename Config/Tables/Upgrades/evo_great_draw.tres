@@ -4,21 +4,31 @@
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 [ext_resource type="Script" path="res://Scripts/Config/SkillEnhancementTuning.cs" id="3_tuning"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_2.tres" id="4_skill"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="Enhancement"]
 script = ExtResource("3_tuning")
 TargetAbility = ExtResource("4_skill")
 KillExtensionSeconds = 2.0
 
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("Enhancement")
+
 [resource]
 script = ExtResource("2_row")
+Excludes = PackedStringArray("1347")
+NumericId = 1226
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "SkillEnhancement"
-SkillEnhancement = SubResource("Enhancement")
+Effects = [SubResource("Resource_effect_tuning")]
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Pool = ExtResource("1_pool")
 Id = "evo_great_draw"
 DisplayName = "灵能汲取"
 DescriptionTemplate = "击杀敌人后，延长当前灵剑持续时间{SkillEnhancement.KillExtensionSeconds:0.##}秒。"
 Note = "J42替换大拔刀术，保留原Id和灵剑进化池引用。仅本人的真实敌对击杀续时；没有灵剑或已到期时不储存、不复活。不会修改伤害或范围。"
+
+NameKey = "content.evo_great_draw.name"
+
+DescriptionKey = "content.evo_great_draw.description"

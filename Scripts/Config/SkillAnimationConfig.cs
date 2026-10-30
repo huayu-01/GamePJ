@@ -11,7 +11,7 @@ namespace ActRoguelike.Config;
 /// 「项目 → 工具 → 生成技能动画」）按这张表**批量生成**成 `Assets/Animations/<库>/<动画名>.tres`。
 ///
 /// <b>为什么是"表 + 生成器"而不是写死一段代码</b>：用户要求"后续能继续加"，而 13 个 `.glb` 里
-/// 只有 10 段可用素材、却有 ~26 段技能动画要造（见 docs/refactor-survey.md §1.5）。
+/// 只有 10 段可用素材、却有 ~26 段技能动画要造（见 docs/archive/design-notes/refactor-survey.md §1.5）。
 /// 加一段新技能动画 = **加一行表 + 跑一次生成器**，不改任何 C# 代码。
 ///
 /// <b>为什么生成而不是运行期现造</b>：运行期对 `.glb` 里**共享**的 <c>Animation</c> 子资源

@@ -29,6 +29,7 @@ Recover = 0.1
 ApproachMinRange = 0.0
 ApproachMaxRange = 2.4
 AttackParams = [SubResource("a_skl_enemy_exploder_blow_0")]
+NumericId = 1196
 Id = "skl_enemy_exploder_blow"
 DisplayName = "自爆"
 Note = "自爆兵：TriggerRadius 2.4 由单位行的攻击范围给（AttackRange → TriggerRadius）。"

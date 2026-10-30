@@ -7,6 +7,7 @@
 [resource]
 PressureBehaviors = PackedStringArray("FastMelee")
 script = ExtResource("1_row")
+NumericId = 1095
 Id = "enemy_fast_melee"
 Slot = 2
 DisplayName = "快速近战"

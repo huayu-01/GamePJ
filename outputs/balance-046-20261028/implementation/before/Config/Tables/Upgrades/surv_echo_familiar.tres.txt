@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/EchoFamiliarRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+Interval = 1.5
+DamageScale = 0.35
+Speed = 30
+[resource]
+script = ExtResource("row")
+NumericId = 1287
+Id = "surv_echo_familiar"
+DisplayName = "回声灵偶"
+RewardKind = 2
+MaxStacks = 1
+Weight = 1.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_echo_familiar"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "主武技命中后两枚灵偶依次协击同一目标，每枚造成基础伤害{Effects.0.DamageScale:0%}；触发间隔{Effects.0.Interval:0.#}秒，每次出手最多一轮。"
+NameKey = "content.surv_echo_familiar.name"
+DescriptionKey = "content.surv_echo_familiar.description"

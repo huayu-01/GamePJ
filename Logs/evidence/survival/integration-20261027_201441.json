@@ -1,0 +1,18 @@
+{
+  "Date": "2026-10-27T20:14:41",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 5.35,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_201441.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_201441.content.err",
+      "Failure": "",
+      "SHA256": "FD698CD5CDCAAF84C9D61E91FCDEF31AE682780CDCFC04E394ED6099BFF2DB15"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

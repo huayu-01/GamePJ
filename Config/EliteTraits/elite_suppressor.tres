@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SuppressorTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/SuppressorTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1028
+Id = "elite_suppressor"
+Title = "压制"
+Description = "周期阻挡来自罩外的指定远程投射物。"
+NameKey = "elite.suppressor.name"
+DescriptionKey = "elite.suppressor.description"
+MaxCarriers = 1
+Radius = 4
+Duration = 3
+Cooldown = 8

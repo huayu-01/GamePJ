@@ -1,0 +1,17 @@
+{
+  "Date": "2026-10-26T14:35:17",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "EliteDefense",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 5.57,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_143517.EliteDefense.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_143517.EliteDefense.headless.err",
+      "SHA256": "3149A52580109C0058CCE6A244CC7AB8BDB3F96C0E169FFF9D0C50043EF093C8"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_143517.EliteHazards.headless.log / F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_143517.EliteHazards.headless.err"
+}

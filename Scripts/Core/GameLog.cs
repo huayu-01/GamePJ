@@ -7,7 +7,7 @@ namespace ActRoguelike.Core;
 /// <summary>
 /// 游戏日志：把局内交互全部落盘，方便游玩后分析问题（用户新重点需求）。
 ///
-/// - 文件：``user://logs/run_年月日_时分秒.log``，同时 ``GD.Print`` 一份便于 MCP/控制台抓取。
+/// - 开发工程写``res://Logs/runtime/``；导出游戏或工程目录不可写时使用``user://logs/``。
 /// - 战斗事件通过 ``GameplayEventBus`` 自动记录（死亡/击杀/暴击/破甲，以及涉及玩家的伤害）。
 /// - 关键流程（选角色、进关、节点互动、奖励选择、生成、清场、结算）由各系统显式 ``GameLog.Write``。
 /// - 分类：Flow 流程 / Node 节点 / Reward 奖励 / Combat 战斗 / Spawn 生成 / Input 输入。
@@ -16,7 +16,7 @@ public partial class GameLog : Node
 {
 	public static GameLog? Instance { get; private set; }
 
-	/// <summary>本次日志文件路径（user:// 相对路径）。</summary>
+	/// <summary>本次日志文件路径；开发工程为res://Logs/runtime，导出游戏为user://logs。</summary>
 	public static string Path { get; private set; } = string.Empty;
 
 	private FileAccess? _file;
@@ -35,10 +35,10 @@ public partial class GameLog : Node
 		Instance = this;
 		ProcessMode = ProcessModeEnum.Always;
 
-		DirAccess.MakeDirRecursiveAbsolute("user://logs");
-		string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-		Path = $"user://logs/run_{stamp}.log";
-		_file = FileAccess.Open(Path, FileAccess.ModeFlags.Write);
+		string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
+		// 编辑器程序运行开发工程时统一收拢；导出模板不依赖可写的res目录。
+		if (!OS.HasFeature("editor") || !TryOpenLog("res://Logs/runtime", stamp))
+			TryOpenLog("user://logs", stamp);
 		if (_file == null)
 		{
 			GD.PushWarning($"[GameLog] 无法创建日志文件 {Path}");
@@ -47,6 +47,14 @@ public partial class GameLog : Node
 		GameplayEventBus.Raised += OnGameplayEvent;
 		Write("Flow", "=== 新的一局 ===");
 		Write("Flow", $"日志文件：{Path}");
+	}
+	private bool TryOpenLog(string directory, string stamp)
+	{
+		Path = $"{directory}/run_{stamp}.log";
+		Error result = DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath(directory));
+		if (result is not (Error.Ok or Error.AlreadyExists)) return false;
+		_file = FileAccess.Open(Path, FileAccess.ModeFlags.Write);
+		return _file != null;
 	}
 
 	public override void _ExitTree()
@@ -105,5 +113,5 @@ public partial class GameLog : Node
 	}
 
 	private static string Describe(Unit? unit)
-		=> unit == null ? "-" : $"{unit.Name}({unit.Health:0.#})";
+		=> unit == null ? "-" : !IsInstanceValid(unit) ? "已退场来源" : $"{unit.Name}({unit.Health:0.#})";
 }

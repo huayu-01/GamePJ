@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1039
 IconName = "ic_ui_card_crit"
 QuotaCost = 2
 MaxLevel = 5

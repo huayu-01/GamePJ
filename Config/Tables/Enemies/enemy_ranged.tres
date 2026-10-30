@@ -7,6 +7,7 @@
 [resource]
 PressureBehaviors = PackedStringArray("DirectShot")
 script = ExtResource("1_row")
+NumericId = 1102
 Id = "enemy_ranged"
 Slot = 5
 DisplayName = "远程"

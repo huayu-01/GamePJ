@@ -92,13 +92,13 @@ public partial class StartScreen : OverlayScreen
 	/// </summary>
 	private static string WeaponCardText(WeaponConfig row)
 	{
-		string title = string.IsNullOrEmpty(row.DisplayName) ? row.Id : row.DisplayName;
+		string title = row.LocalizedName;
 		if (string.IsNullOrEmpty(row.DescriptionTemplate))
 		{
 			return title;
 		}
 
-		return $"{title}（{ConfigText.Format(row.DescriptionTemplate, row, row.Params)}）";
+		return $"{title}（{row.LocalizedDescription}）";
 	}
 
 	public override void Close()

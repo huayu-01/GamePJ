@@ -1,0 +1,80 @@
+{
+  "Date": "2026-10-26T15:04:51",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "EliteDefense",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 5.12,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteDefense.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteDefense.headless.err",
+      "SHA256": "8F02EFBD3AF0EBB80FA807814658A44921B552255232ABC3CA4204C21A273D5B"
+    },
+    {
+      "Name": "EliteDefense",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 10.02,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteDefense.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteDefense.render.err",
+      "SHA256": "26976A7B818BC5FAD9C357D2B7559907F944C6DFEAD8DC40D9061490D408A0E0"
+    },
+    {
+      "Name": "EliteHazards",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 24.87,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteHazards.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteHazards.headless.err",
+      "SHA256": "E66C317237701CBE644BF7D8CDCC1EE04C87229B74A238068656D455730B327B"
+    },
+    {
+      "Name": "EliteHazards",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 26.05,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteHazards.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteHazards.render.err",
+      "SHA256": "88B39B8E794DBC082B280C688F3C180D506676D40197E8AC32E9306BCC4970B4"
+    },
+    {
+      "Name": "EliteMotion",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 20.17,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteMotion.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteMotion.headless.err",
+      "SHA256": "40630D2807BE5C260F83DD2F378C8B72A0DC2BC9FA6BBB424D77B54824916CBE"
+    },
+    {
+      "Name": "EliteMotion",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 21.59,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteMotion.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteMotion.render.err",
+      "SHA256": "9C932F6AF041C776FE9065F6A851F04CB78E0BD503D8481F31441D02525A1DF1"
+    },
+    {
+      "Name": "EliteIntegration",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 10.67,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteIntegration.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteIntegration.headless.err",
+      "SHA256": "390A367032EFAA906D69949BA984088B2A7A0D38582B041271B0AC503788C515"
+    },
+    {
+      "Name": "EliteIntegration",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 12.24,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteIntegration.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_150451.EliteIntegration.render.err",
+      "SHA256": "6ACC5097A8C1E872B0CB9834814D010C759F771DA8A18DF982B3EC0B6B6BFF6B"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

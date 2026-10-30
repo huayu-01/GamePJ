@@ -3,19 +3,18 @@ using Godot;
 namespace ActRoguelike.Config;
 
 /// <summary>
-/// 增幅项表的一行 —— 一个 `.tres` 文件就是一行（`Config/Tables/Upgrades/upg_*.tres`）。
-/// 索引用 <see cref="ConfigIndexData.Upgrades"/>。
-///
-/// **两层结构**（设计文档 config-schema.md §2.2）：磁盘行（本类）→ 运行期视图
-/// （<c>RewardDefinition</c>，带 <c>Action&lt;RewardContext&gt;</c> 委托）。
-/// 委托不可能序列化进 `.tres`，所以效果用 <see cref="ApplyHandler"/> 字符串 +
-/// C# 处理器注册表（<c>RewardEffectRegistry</c>）表达 —— 表仍是**可校验的数据**，
-/// 读表时就能把"handler 未注册"抓出来并警告。
+/// 增幅或符文的一行：身份与资格、完整文本键，以及可组合效果资源。
+/// 生产内容仅执行Effects；旧ApplyHandler和顶层专用参数通过兼容层读取，编辑器隐藏且不重复保存。
 /// </summary>
 [Tool]
 [GlobalClass]
 public partial class RewardConfig : ConfigRow
 {
+	[Export] public RewardConfig? Replaces { get; set; }
+	[Export] public bool ShowUpgradeLevel { get; set; }
+	/// <summary>空为通用；非空仅在指定模式可获取，使用稳定Id而非显示名称。</summary>
+	[Export] public string[] RequiredModeIds { get; set; } = System.Array.Empty<string>();
+	[Export] public string IconName { get; set; } = string.Empty;
 	[ExportGroup("身份与出率（强化 / 进化 / 异化；能叠几层；抽中概率）")]
 	/// <summary>强化 / 进化 / 异化（对应 <c>Rewards.RewardKind</c>）。</summary>
 	[Export] public Rewards.RewardKind RewardKind { get; set; } = Rewards.RewardKind.Enhancement;
@@ -23,11 +22,13 @@ public partial class RewardConfig : ConfigRow
 	/// <summary>最多叠几层（0 = 不限；1 = 只能拿一次）。</summary>
 	[Export] public int MaxStacks { get; set; } = 1;
 
-	/// <summary>抽中概率（与 <c>BossPerk</c> 共用 <see cref="WeightedPick"/>；当前 19 条都是 1.0 = 等概率）。</summary>
+	/// <summary>抽中概率权重（与 <c>BossPerk</c> 共用 <see cref="WeightedPick"/>；0表示不抽取）。</summary>
 	[Export] public float Weight { get; set; } = 1f;
 
 	[ExportGroup("效果")]
-	/// <summary>处理器 id（见 <c>Rewards.RewardEffectRegistry</c> 的注册表）。未注册会在读表时警告并跳过这一行。</summary>
+	/// <summary>组合效果列表；非空时作为唯一效果入口，旧ApplyHandler保留兼容。</summary>
+	[Export] public RewardEffectDefinition[] Effects { get; set; } = System.Array.Empty<RewardEffectDefinition>();
+	/// <summary>历史处理器Id，仅由RewardEffectCompatibility翻译；新内容使用Effects。</summary>
 	[Export] public string ApplyHandler { get; set; } = "StatSet";
 	/// <summary>只接受该技能造成的事件；资源引用在编译时转为运行期技能Id。</summary>
 	[Export] public AbilityConfig? RequiredEventAbility { get; set; }
@@ -40,23 +41,37 @@ public partial class RewardConfig : ConfigRow
 	/// </summary>
 	[Export] public AbilityConfig? BonusAgainstAbility { get; set; }
 	/// <summary>点按连射进化；参数及目标技能均为强类型资源。</summary>
-	[Export] public VolleyRampTuning? VolleyRamp { get; set; }
+	private VolleyRampTuning? _volleyRamp;
+	[Export] public VolleyRampTuning? VolleyRamp { get => _volleyRamp ?? FindTuning<VolleyRampTuning>(); set => _volleyRamp = value; }
 
 	/// <summary>蓄力阈值弹进化（J9「龙之箭」）：蓄力上限 / 阈值 / 尺寸 / 穿透数及目标技能均为强类型资源。</summary>
-	[Export] public ChargedShotTuning? ChargedShot { get; set; }
+	private ChargedShotTuning? _chargedShot;
+	[Export] public ChargedShotTuning? ChargedShot { get => _chargedShot ?? FindTuning<ChargedShotTuning>(); set => _chargedShot = value; }
 	/// <summary>只改变指定技能的蓄力、单箭与分配追踪，不写全局数值。</summary>
-	[Export] public ChargeBehaviorTuning? ChargeBehavior { get; set; }
+	private ChargeBehaviorTuning? _chargeBehavior;
+	[Export] public ChargeBehaviorTuning? ChargeBehavior { get => _chargeBehavior ?? FindTuning<ChargeBehaviorTuning>(); set => _chargeBehavior = value; }
 
 	/// <summary>近战每段真实 ATK 额外出弹（金光术）。</summary>
-	[Export] public MeleeProjectileTuning? MeleeProjectile { get; set; }
+	private MeleeProjectileTuning? _meleeProjectile;
+	[Export] public MeleeProjectileTuning? MeleeProjectile { get => _meleeProjectile ?? FindTuning<MeleeProjectileTuning>(); set => _meleeProjectile = value; }
 	/// <summary>只调整目标技能自身（灵能汲取／神降术等）。</summary>
-	[Export] public SkillEnhancementTuning? SkillEnhancement { get; set; }
+	private SkillEnhancementTuning? _skillEnhancement;
+	[Export] public SkillEnhancementTuning? SkillEnhancement { get => _skillEnhancement ?? FindTuning<SkillEnhancementTuning>(); set => _skillEnhancement = value; }
 	/// <summary>飞出武器的周期索敌（喜爱）。</summary>
-	[Export] public WeaponSeekTuning? WeaponSeek { get; set; }
+	private WeaponSeekTuning? _weaponSeek;
+	[Export] public WeaponSeekTuning? WeaponSeek { get => _weaponSeek ?? FindTuning<WeaponSeekTuning>(); set => _weaponSeek = value; }
 	/// <summary>长枪落地召回与蓄力缩时（气贯长虹）。</summary>
-	[Export] public WeaponRecallTuning? WeaponRecall { get; set; }
+	private WeaponRecallTuning? _weaponRecall;
+	[Export] public WeaponRecallTuning? WeaponRecall { get => _weaponRecall ?? FindTuning<WeaponRecallTuning>(); set => _weaponRecall = value; }
 	/// <summary>特化机制；数值共读HandlerParams，None不建立规则。</summary>
 	[Export] public SpecializationKind Specialization { get; set; }
+	/// <summary>已迁移特化的参数与运行组件；留空兼容旧枚举及HandlerParams。</summary>
+	private SpecializationBehaviorDefinition? _specializationBehavior;
+	[Export] public SpecializationBehaviorDefinition? SpecializationBehavior
+	{
+		get => _specializationBehavior ?? System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OfType<SpecializationRewardEffect>(Effects))?.Definition;
+		set => _specializationBehavior = value;
+	}
 	/// <summary>特化绑定的技能资源（雷池的角色技能2、无情及下落攻击）。</summary>
 	[Export] public AbilityConfig[] SpecializationTargets { get; set; } = System.Array.Empty<AbilityConfig>();
 	/// <summary>特化发射的投射物预制体。</summary>
@@ -107,7 +122,7 @@ public partial class RewardConfig : ConfigRow
 	/// 留空 = 落到第二层（标签匹配）与第三层（通用池：现有 10 条强化 + 5 条异化）。
 	///
 	/// **选项行是"池成员"的唯一真源**：池行不反过来列选项（一个选项占一行 + 一个引用列；
-	/// "一栏里塞多个选项"的数组形态恰恰是编辑器拿不到的，见 docs/config-tooling-yard.md §4.3）。
+	/// "一栏里塞多个选项"的数组形态恰恰是编辑器拿不到的，见 docs/archive/design-notes/config-tooling-yard.md §4.3）。
 	/// </summary>
 	[Export] public UpgradePoolConfig? Pool { get; set; }
 
@@ -129,8 +144,31 @@ public partial class RewardConfig : ConfigRow
 	/// <summary>
 	/// 属性修正（<c>StatSet</c> 处理器用）。取代 `RewardCatalog` 里 <c>Mod(c, "DamageMultiplier", Multiply, 1.15f)</c> 这类闭包。
 	/// </summary>
-	[Export] public StatOverride[] Modifiers { get; set; } = System.Array.Empty<StatOverride>();
+	private StatOverride[] _modifiers = System.Array.Empty<StatOverride>();
+	[Export] public StatOverride[] Modifiers
+	{
+		get => _modifiers.Length > 0 || Effects.Length == 0 ? _modifiers : System.Linq.Enumerable.ToArray(System.Linq.Enumerable.SelectMany(System.Linq.Enumerable.OfType<StatRewardEffect>(Effects), e => e.Modifiers));
+		set => _modifiers = value;
+	}
+	private T? FindTuning<T>() where T : Resource => System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OfType<T>(System.Linq.Enumerable.Select(System.Linq.Enumerable.OfType<AbilityTuningRewardEffect>(Effects), e => e.Tuning)));
+	public override void _ValidateProperty(Godot.Collections.Dictionary property)
+	{
+		base._ValidateProperty(property);
+		if (Effects.Length == 0) return;
+		string name = property["name"].AsString();
+		if (name is "VolleyRamp" or "ChargedShot" or "ChargeBehavior" or "MeleeProjectile" or "SkillEnhancement" or "WeaponSeek" or "WeaponRecall" or "Modifiers" or "SpecializationBehavior" or "SpecializationTargets" or "SpecializationProjectile" or "ConvertedRewards" or "ApplyHandler" or "HandlerParams" or "RequiredEventAbility" or "BonusAgainstAbility" or "RequireFinalComboStep")
+			property["usage"] = (long)((PropertyUsageFlags)property["usage"].AsInt64() & ~(PropertyUsageFlags.Storage | PropertyUsageFlags.Editor));
+	}
 
 	/// <summary>该处理器是否已注册（读表时用来抓拼错的 handler id）。</summary>
-	public bool HasKnownHandler => Rewards.RewardEffectRegistry.IsRegistered(ApplyHandler);
+	public bool HasKnownHandler => Effects.Length > 0 || Rewards.RewardEffectRegistry.IsRegistered(ApplyHandler);
+	/// <summary>统一说明与校验的数据视图，不要求制作人员把数值复制到两处。</summary>
+	public System.Collections.Generic.IEnumerable<StatOverride> DeclaredModifiers
+	{
+		get
+		{
+			if (Effects.Length == 0) { foreach (var modifier in Modifiers) yield return modifier; yield break; }
+			foreach (var effect in Effects) if (effect is StatRewardEffect stats) foreach (var modifier in stats.Modifiers) yield return modifier;
+		}
+	}
 }

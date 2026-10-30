@@ -1,0 +1,49 @@
+{
+  "rows": [
+    {
+      "variant": "Ground",
+      "meanFrameMs": 1.9635,
+      "medianFrameMs": 1.848,
+      "p95FrameMs": 2.6455,
+      "gpuMs": 1.0658,
+      "renderCpuMs": 0.564,
+      "drawCalls": 720.3811,
+      "primitives": 413053.7693
+    },
+    {
+      "variant": "Batched",
+      "meanFrameMs": 2.0462,
+      "medianFrameMs": 1.9345,
+      "p95FrameMs": 2.741,
+      "gpuMs": 1.1134,
+      "renderCpuMs": 0.604,
+      "drawCalls": 763.3256,
+      "primitives": 435693.7691
+    },
+    {
+      "variant": "Individual",
+      "meanFrameMs": 2.1621,
+      "medianFrameMs": 2.018,
+      "p95FrameMs": 2.818,
+      "gpuMs": 1.1203,
+      "renderCpuMs": 0.7099,
+      "drawCalls": 721.3189,
+      "primitives": 431755.8416
+    },
+    {
+      "variant": "Dense",
+      "meanFrameMs": 2.0499,
+      "medianFrameMs": 1.9355,
+      "p95FrameMs": 2.756,
+      "gpuMs": 1.1345,
+      "renderCpuMs": 0.606,
+      "drawCalls": 763.3576,
+      "primitives": 448267.0017
+    }
+  ],
+  "normal": 2103,
+  "dense": 3269,
+  "gpu": "NVIDIA GeForce RTX 4070 Ti",
+  "resolution": "1920x1080",
+  "note": "同一镜头、场景、角色和3个静态真实敌人，草地无投影但接收原场景光影；每段暖场1.5秒采样3秒，正反序各一次；不代表满场AI战斗性能。"
+}

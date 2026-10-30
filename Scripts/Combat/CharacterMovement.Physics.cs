@@ -11,7 +11,7 @@ public partial class CharacterMovement
 	[Export] public UnitPhysicsProfile? PhysicsProfile { get; set; }
 	public bool CanFly => PhysicsProfile?.CanFly == true;
 	public bool IsControlDisabled => FlightState is FlightPhase.Falling or FlightPhase.Recovering || _unit?.Reactions?.IsStaggered == true;
-	public bool IsControlImmune => PhysicsProfile?.ControlImmune == true;
+	public bool IsControlImmune => PhysicsProfile?.ControlImmune == true || _unit?.HasTag("Boss") == true;
 	public float Mass => Mathf.Max(0.01f, PhysicsProfile?.Mass ?? 1f);
 	public FlightPhase FlightState { get; private set; }
 	public float EffectiveHoverHeight { get; private set; }
@@ -19,13 +19,31 @@ public partial class CharacterMovement
 	public event Action<FlightPhase>? FlightStateChanged;
 	/// <summary>实际打落着地事实，数值为碰撞前向下速度；不自动伤害或触发主动跳跃。</summary>
 	public event Action<float>? KnockdownLanded;
-	private sealed record TimedForce(Vector3 Value, float Remaining);
-	private sealed record HeightLimit(float Height, float Remaining);
+	private readonly record struct TimedForce(Vector3 Value, float Remaining);
+	private readonly record struct HeightLimit(float Height, float Remaining);
 	private readonly Dictionary<object, TimedForce> _forces = new(ReferenceEqualityComparer.Instance);
 	private readonly Dictionary<object, HeightLimit> _heightLimits = new(ReferenceEqualityComparer.Instance);
 	private readonly List<object> _physicsKeys = new();
 	private float _previousExternalY, _recoveryLeft, _lastGroundY;
 	private bool _flightInitialized;
+	private Vector3 _crowdVelocity;
+	/// <summary>同阵营身体推挤：不造成伤害／受击，普通技能位移也能受到水平推力。</summary>
+	public bool ReceiveCrowdImpulse(Vector3 impulse)
+	{
+		if (!impulse.IsFinite() || IsControlImmune || _unit?.HasTraitControlImmunity == true) return false;
+		impulse.Y = 0;
+		Vector3 velocity = impulse / Mass * (1f - Mathf.Clamp(_unit?.KnockbackResistance ?? 0f, 0, 1));
+		if (velocity.IsZeroApprox()) return false;
+		_crowdVelocity += velocity; return true;
+	}
+	private void ClipCrowdPush()
+	{
+		for (int i = 0; _crowdVelocity != Vector3.Zero && i < _body.GetSlideCollisionCount(); i++)
+		{
+			Vector3 normal = _body.GetSlideCollision(i).GetNormal();
+			if (_crowdVelocity.Dot(normal) < 0) _crowdVelocity = _crowdVelocity.Slide(normal);
+		}
+	}
 
 	/// <summary>换装／运动模式切换时清理临时受力和控制；不修改资源或阵营。</summary>
 	public void ConfigurePhysics(UnitPhysicsProfile? profile)
@@ -33,9 +51,11 @@ public partial class CharacterMovement
 		PhysicsProfile = profile;
 		_forces.Clear(); _heightLimits.Clear();
 		_externalVelocity = Vector3.Zero; _previousExternalY = 0f;
+		_crowdVelocity = Vector3.Zero;
 		_recoveryLeft = 0f; _flightInitialized = false;
 		if (IsInstanceValid(_body)) _body.Velocity = _body.Velocity with { Y = 0f };
 		SetFlightState(CanFly ? FlightPhase.Flying : FlightPhase.Ground);
+		_unit?.Navigation?.RefreshCrowd();
 	}
 
 	/// <summary>真实冲量（质量×速度），与旧AddImpulse的速度增量接口区分。</summary>
@@ -95,6 +115,7 @@ public partial class CharacterMovement
 		}
 		// 已有速度先衰减，再累计本帧持续力；默认地面水平击退保留原衰减公式。
 		_externalVelocity *= Mathf.Max(0f, 1f - ImpulseDamping * dt);
+		_crowdVelocity *= Mathf.Max(0f, 1f - ImpulseDamping * dt);
 		_externalVelocity += deltaVelocity;
 		EffectiveHoverHeight = Mathf.Max(0f, PhysicsProfile?.HoverHeight ?? 0f);
 		_physicsKeys.Clear(); _physicsKeys.AddRange(_heightLimits.Keys);
@@ -129,8 +150,10 @@ public partial class CharacterMovement
 	}
 	private void FinishPhysicsMove(float downwardSpeed)
 	{
+		ClipCrowdPush();
 		// 接触面消去朝墙／地板内的残留外力，离墙后不释放蓄积的旧推力。
-		for (int i = 0; i < _body.GetSlideCollisionCount(); i++)
+		// 零外力与所有法线点积恒为零，无需取得碰撞包装对象；仍每帧执行移动和落地恢复。
+		for (int i = 0; _externalVelocity != Vector3.Zero && i < _body.GetSlideCollisionCount(); i++)
 		{
 			Vector3 normal = _body.GetSlideCollision(i).GetNormal();
 			if (_externalVelocity.Dot(normal) < 0f) _externalVelocity = _externalVelocity.Slide(normal);

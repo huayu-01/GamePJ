@@ -70,7 +70,7 @@ public partial class FlightPhysicsLab : Node3D
 	{
 		for (int i = 0; i < 120; i++) await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Error result = GetViewport().GetTexture().GetImage().SavePng("res://docs/screenshots/j34_flight_lab.png");
+		Error result = GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j34_flight_lab.png"));
 		GD.Print($"[FlightLab] 截图={result}"); GameExit.Request(GetTree(), result == Error.Ok ? 0 : 1);
 	}
 }

@@ -66,8 +66,11 @@ public enum PlayerCharacterKind
 [GlobalClass]
 public partial class ConfigIndexData : Resource
 {
+	[ExportGroup("内容文本 · 显式语言目录")]
+	[Export] public ContentLocale[] ContentLocales { get; set; } = System.Array.Empty<ContentLocale>();
 	[ExportGroup("表现 · 战斗反馈")]
 	[Export] public ActRoguelike.Combat.CombatFeedbackProfile? CombatFeedback { get; set; }
+	[Export] public ActRoguelike.Combat.EnemyCrowdConfig? EnemyCrowd { get; set; }
 
 	[ExportGroup("战斗 · 投射物")]
 	/// <summary>所有 Projectile 的实际速度上限（m/s）；≤0 不限速。发射、转向及重力后统一夹取。</summary>
@@ -79,7 +82,7 @@ public partial class ConfigIndexData : Resource
 	/// 优先来源是那一行；这里只是"表读不到"时的兜底。两个值不一样就会出现**没有日志的静默换挡**
 	/// （旧代码这里是 1f / 0.8f，表一丢敌人伤害直接 ×2.67，见 config-tables-inventory.md §5-④）。
 	/// </summary>
-	[Export] public float EnemyHealthMultiplier { get; set; } = 0.75f;
+	[Export] public float EnemyHealthMultiplier { get; set; } = 1.875f;
 
 	/// <summary>所有普通敌人的伤害倍率（难度总开关；回退值，语义见上一条）。</summary>
 	[Export] public float EnemyDamageMultiplier { get; set; } = 0.3f;
@@ -131,7 +134,7 @@ public partial class ConfigIndexData : Resource
 
 	[ExportGroup("Boss（倍率与压力曲线）")]
 	/// <summary>Boss 生命倍率。</summary>
-	[Export] public float BossHealthMultiplier { get; set; } = 1f;
+	[Export] public float BossHealthMultiplier { get; set; } = 2.5f;
 
 	/// <summary>Boss 伤害倍率。</summary>
 	[Export] public float BossDamageMultiplier { get; set; } = 0.9f;
@@ -155,7 +158,7 @@ public partial class ConfigIndexData : Resource
 	// 每一张表在磁盘上是 `Config/Tables/<分组>/` 下一堆"一行一个文件"的 `.tres`，
 	// 这里只放**索引数组**：元素指向那些行文件的独立 `ExtResource`。
 	// 为什么是显式数组而不是扫目录：① 只被目录扫描引用的资源在导出时可能掉出打包范围；
-	// ② 扫目录会让"ConfigIndex 是唯一数值入口"这条约定失效（见 docs/todo-handoff.md）。
+	// ② 扫目录会让"ConfigIndex 是唯一数值入口"这条约定失效（见 docs/archive/handoffs-2026-10-18/todo-handoff.md）。
 	//
 	// ⚠️ 操作纪律（上一轮实测的坑，见 config-schema.md §5 阶段 1）：
 	// **不要单独删/改被引用到的行文件** —— 只要 ConfigIndex.tres 引用的任何一个行文件缺失/改名，
@@ -258,6 +261,7 @@ public partial class ConfigIndexData : Resource
 	/// 空 = 没有任何符文可携带 → 一切都是"没带符文"的既有行为（逐位不变）。</para>
 	/// </summary>
 	[Export] public RuneConfig[] Runes { get; set; } = System.Array.Empty<RuneConfig>();
+	[Export] public SceneRuneDefinition[] SceneRunes { get; set; } = System.Array.Empty<SceneRuneDefinition>();
 
 	[ExportGroup("表索引 · 升级池")]
 	/// <summary>

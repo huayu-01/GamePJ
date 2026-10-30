@@ -1,51 +1,59 @@
 using System.Collections.Generic;
+using System.Linq;
 using ActRoguelike.Rewards;
+using ActRoguelike.Config;
 using Godot;
 
 namespace ActRoguelike.UI;
 
-/// <summary>
-/// **「角色持有」面板**（用户需求第四节 4）：本局构筑（<see cref="RunBuild"/>）用**图标矩阵**铺开，
-/// 鼠标悬停才出说明文字。
-///
-/// 为什么长这样：
-/// <list type="bullet">
-/// <item>「构筑元素都用图标」→ 一格 = 一个图标 + 叠层数（×N），不写名字；</item>
-/// <item>「只有选取界面和鼠标悬停时显示说明」→ 名字 / 描述 / 类型只在 <c>TooltipText</c> 里
-///   （面板是 <see cref="OverlayScreen.UiLayer.Panel"/>：打开即暂停 + 放开鼠标，悬停真的能悬停）；</item>
-/// <item>「一个面板来显示角色持有」→ 全屏铺开，空格子直接铺底色，几件东西一眼看完。</item>
-/// </list>
-///
-/// 与 HUD 的分工：HUD 只放**一行小图标**（战斗中扫一眼），要看说明按 <see cref="ToggleKey"/> 开这个面板。
-/// </summary>
+/// <summary>左半库存、右半完整详情；内容改变才重建，保留悬停与键盘选择。</summary>
 public partial class BuildScreen : OverlayScreen
 {
-	/// <summary>默认快捷键（HUD 的构筑图标条也读它，两处不写死同一个键）。</summary>
 	public const Key DefaultToggleKey = Key.C;
-
 	[Export] public Key ToggleKey { get; set; } = DefaultToggleKey;
-
 	protected override Control Root => _root;
-
 	private Control _root = null!;
 	private Label _summary = null!;
 	private GridContainer _grid = null!;
+	private ScrollContainer _inventory = null!;
 	private Label _empty = null!;
+	private Label _name = null!;
+	private Label _description = null!;
+	private Label _information = null!;
+	private TextureRect _detailIcon = null!;
+	private readonly Dictionary<string, Button> _tiles = new();
+	private readonly Dictionary<string, RewardDefinition> _items = new();
+	private RunBuild? _renderedBuild;
+	private string _signature = "uninitialized";
 	private bool _keyHeld;
-
-	/// <summary>拍图 / 探针塞了示例格（这时不再被真实构筑状态覆盖）。</summary>
 	private bool _debugSample;
-
-	/// <summary>面板里画出来的图标格数（验证用只读属性）。</summary>
-	public int TileCount => _grid.GetChildCount();
+	private string _textRevision = string.Empty;
+	public int TileCount => _tiles.Count;
+	public string SelectedRewardId { get; private set; } = string.Empty;
+	public string SelectedName => _name.Text;
+	public string SelectedDescription => _description.Text;
+	public string SelectedInformation => _information.Text;
 
 	public override void _Ready()
 	{
 		_root = GetNode<Control>("Root");
 		InitializeOverlay();
+		GlassUi.Prepare(_root);
+		var panel = GetNode<PanelContainer>("Root/Panel"); GlassUi.EmptyPanel(panel);
+		GetNode<Control>("Root/Panel/VBox/Divider").Visible = false;
 		_summary = GetNode<Label>("Root/Panel/VBox/Summary");
-		_grid = GetNode<GridContainer>("Root/Panel/VBox/Grid");
-		_empty = GetNode<Label>("Root/Panel/VBox/Empty");
+		_inventory = GetNode<ScrollContainer>("Root/Panel/VBox/Content/Inventory/Scroll");
+		_grid = _inventory.GetNode<GridContainer>("Grid");
+		_empty = GetNode<Label>("Root/Panel/VBox/Content/Inventory/Empty");
+		var details = GetNode<VBoxContainer>("Root/Panel/VBox/Content/Details/Scroll/Sections");
+		_name = details.GetNode<Label>("Name");
+		_description = details.GetNode<Label>("Description");
+		_information = details.GetNode<Label>("Information");
+		_detailIcon = details.GetNode<TextureRect>("Icon");
+		details.GetNode<Control>("NameHeading").Visible = false;
+		details.GetNode<Control>("InformationHeading").Visible = false;
+		details.GetNode<Control>("Divider2").Visible = false;
+		RefineLayout(details);
 	}
 
 	public override void _Process(double delta)
@@ -53,157 +61,133 @@ public partial class BuildScreen : OverlayScreen
 		bool held = Input.IsPhysicalKeyPressed(ToggleKey);
 		if (held && !_keyHeld)
 		{
-			Toggle();
+			if (IsOpen && (UiRouter.Instance == null || UiRouter.Instance.IsTopScreen(this))) Close();
+			else if (UiRouter.Instance?.AnyOpen != true) Open();
 		}
-
 		_keyHeld = held;
-
-		if (IsOpen)
-		{
-			Refresh();
-		}
-	}
-
-	private void Toggle()
-	{
-		if (IsOpen)
-		{
-			Close();
-		}
-		else
-		{
-			Open();
-		}
+		if (!IsOpen) return;
+		Refresh();
+		_grid.Columns = Mathf.Max(1, Mathf.FloorToInt((_inventory.Size.X - 48f + 12f) / 136f));
 	}
 
 	public void Open()
 	{
-		if (IsOpen)
-		{
-			return;
-		}
-
-		SetKeyHints(KeyHint.Of(ToggleKey, "关闭"), (Key.Escape, "关闭"), KeyHint.Text("悬停", "看说明"));
+		if (IsOpen) return;
+		Refresh();
+		SetKeyHints(KeyHint.Of(ToggleKey, "关闭"), (Key.Escape, "关闭"), KeyHint.Text("方向键", "浏览 / 查看详情"),KeyHint.Text("悬停","查看详情"), KeyHint.Text("滚轮","滚动"));
 		BeginOpen();
+		if (_tiles.TryGetValue(SelectedRewardId, out Button? tile)) tile.GrabFocus();
 	}
 
 	public override void Close()
 	{
-		if (IsOpen && !InputBlocked)
-		{
-			BeginClose();
-		}
+		if (IsOpen && !InputBlocked) BeginClose();
 	}
-
-	// ───────────────────────── 内容：RunBuild → 图标格 ─────────────────────────
 
 	private void Refresh()
 	{
-		if (_debugSample)
+		if (_textRevision != ContentText.Revision)
 		{
-			return;   // 拍图 / 探针塞的示例格，不要被真实状态覆盖
+			_textRevision = ContentText.Revision;
+			foreach (var tile in _tiles) if (_items.TryGetValue(tile.Key, out var row)) tile.Value.TooltipText = _renderedBuild?.DisplayName(row) ?? row.Name;
+			RestoreSelection();
 		}
-
+		if (_debugSample) return;
 		RunBuild? build = RunController.Instance?.Build;
-
-		foreach (Node child in _grid.GetChildren())
-		{
-			_grid.RemoveChild(child);
-			child.QueueFree();
-		}
-
+		string signature = build == null ? string.Empty : string.Join("|", build.Acquired.Select(row => row.Id + (row.ShowUpgradeLevel ? ":" + build.StacksOf(row.Id) : "")))
+			+ "#" + string.Join("|", build.RuneUnlocks) + "#" + ContentText.Revision;
+		if (ReferenceEquals(build, _renderedBuild) && signature == _signature) return;
+		_renderedBuild = build;
+		_signature = signature;
+		ClearTiles();
 		if (build == null)
 		{
-			_summary.Text = "还没有开局 —— 进入关卡后，这里显示本局拿到的全部构筑。";
-			_empty.Visible = false;
+			_summary.Text = "进入关卡后，这里显示本局获得的全部构筑。";
+			_empty.Visible = true;
+			ClearSelection();
 			return;
 		}
-
-		IReadOnlyList<RewardDefinition> acquired = build.Acquired;
-		int total = 0;
-		foreach (RewardDefinition definition in acquired)
-		{
-			total += build.StacksOf(definition.Id);
-		}
-
-		_summary.Text = acquired.Count == 0
-			? "本局还没有拿到任何构筑：去地面上的节点按 F（强化池 / 进化池 / 异化池…）。"
-			: $"本局持有 {acquired.Count} 种（共 {total} 层）　鼠标悬停看说明";
-		_empty.Visible = acquired.Count == 0;
-
-		foreach (RewardDefinition definition in acquired)
-		{
-			_grid.AddChild(BuildTile(definition, build.StacksOf(definition.Id)));
-		}
+		foreach (RewardDefinition row in build.Acquired) AddTile(row);
+		_summary.Text = $"本局持有 {build.Acquired.Count} 项增幅";
+		_empty.Visible = build.Acquired.Count == 0;
+		RestoreSelection();
+		FilterCategory(_categoryFilter);
 	}
 
-	/// <summary>一格：图标 + 叠层数；名字与说明只在悬停提示里。</summary>
-	private static Control BuildTile(RewardDefinition definition, int stacks)
+	private void ClearTiles()
 	{
-		var tile = new PanelContainer
-		{
-			ThemeTypeVariation = "UiTile",
-			CustomMinimumSize = new Vector2(112, 112),
-			TooltipText = $"{definition.Name} ×{stacks}（{KindLabel(definition.Kind)}）\n{definition.Description}",
-		};
-
-		var column = new VBoxContainer();
-		column.AddThemeConstantOverride("separation", 4);
-		column.MouseFilter = Control.MouseFilterEnum.Ignore;
-
-		var icon = new TextureRect
-		{
-			Texture = UiIcons.ForReward(definition),
-			CustomMinimumSize = new Vector2(56, 56),
-			ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-			StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-			SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-			MouseFilter = Control.MouseFilterEnum.Ignore,
-		};
-
-		var count = new Label
-		{
-			Text = stacks > 1 ? $"×{stacks}" : string.Empty,
-			HorizontalAlignment = HorizontalAlignment.Center,
-			MouseFilter = Control.MouseFilterEnum.Ignore,
-		};
-
-		column.AddChild(icon);
-		column.AddChild(count);
-		tile.AddChild(column);
-		return tile;
+		foreach (Node child in _grid.GetChildren()) { _grid.RemoveChild(child); child.QueueFree(); }
+		_tiles.Clear();
+		_items.Clear();
 	}
 
-	private static string KindLabel(RewardKind kind) => kind switch
+	private void AddTile(RewardDefinition row)
 	{
-		RewardKind.Evolution => "进化",
-		RewardKind.Mutation => "异化",
-		_ => "强化",
-	};
+		var tile = new Button
+		{
+			Name = row.Id, CustomMinimumSize = new Vector2(124, 132), Icon = UiIcons.ForReward(row),
+			ExpandIcon = true, IconAlignment = HorizontalAlignment.Center, FocusMode = Control.FocusModeEnum.All,
+			TooltipText = _renderedBuild?.DisplayName(row) ?? row.Name,
+		};
+		tile.AddThemeConstantOverride("icon_max_width", 82);
+		foreach(string state in new[]{"icon_normal_color","icon_hover_color","icon_focus_color","icon_pressed_color"})tile.AddThemeColorOverride(state,GlassUi.RewardColor(row));
+		tile.AddThemeStyleboxOverride("normal", TileStyle(false));
+		tile.AddThemeStyleboxOverride("hover", TileStyle(true));
+		tile.AddThemeStyleboxOverride("focus", new StyleBoxEmpty());
+		tile.AddThemeStyleboxOverride("pressed", TileStyle(true));
+		tile.MouseEntered += () => Select(row.Id);
+		tile.FocusEntered += () => Select(row.Id);
+		tile.Pressed += () => Select(row.Id);
+		_tiles[row.Id] = tile;
+		_items[row.Id] = row;
+		_grid.AddChild(tile);
+		GlassUi.SelectionDot(tile);
+		var category = new TextureRect { Name="CategoryIcon", Texture=GlassUi.CategoryIcon(row), MouseFilter=Control.MouseFilterEnum.Ignore,
+			ExpandMode=TextureRect.ExpandModeEnum.IgnoreSize, StretchMode=TextureRect.StretchModeEnum.KeepAspectCentered, Modulate=GlassUi.RewardColor(row) };
+		tile.AddChild(category); category.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopRight);
+		category.OffsetLeft=-24; category.OffsetTop=5; category.OffsetRight=-5; category.OffsetBottom=24;
+	}
 
-	/// <summary>
-	/// 验证 / 拍图用：用**真实的奖励目录**（<see cref="RewardCatalog.All"/>）填几格 ——
-	/// 不依赖本局状态，所以拍摄台与探针都能看到"图标矩阵"真正的样子。
-	/// </summary>
+	private static StyleBoxFlat TileStyle(bool selected) => GlassUi.Tile(selected);
+
+	private void Select(string id)
+	{
+		if (!_items.TryGetValue(id, out var item)) return;
+		SelectedRewardId = id;
+		// 悬停选择同时移动键盘焦点，避免焦点仍留在旧格时再选旧格却不触发FocusEntered。
+		if (IsOpen && (UiRouter.Instance == null || UiRouter.Instance.IsTopScreen(this)) && _tiles.TryGetValue(id, out Button? selected) && !selected.HasFocus()) selected.GrabFocus();
+		foreach (var pair in _tiles) {pair.Value.AddThemeStyleboxOverride("normal", TileStyle(pair.Key == id));pair.Value.GetNode<Control>("SelectionDot").Visible=pair.Key==id;}
+		_name.Text = _renderedBuild?.DisplayName(item) ?? item.Name;
+		_name.AddThemeColorOverride("font_color",GlassUi.RewardColor(item));
+		_description.Text = item.Description;
+		_information.Text = string.Empty;
+		_detailIcon.Texture = UiIcons.ForReward(item);
+		_detailIcon.Modulate=GlassUi.RewardColor(item);
+	}
+
+	private void RestoreSelection()
+	{
+		if (_items.Count == 0) { ClearSelection(); return; }
+		Select(_items.ContainsKey(SelectedRewardId) ? SelectedRewardId : _items.Keys.First());
+	}
+
+	private void ClearSelection()
+	{
+		SelectedRewardId = string.Empty;
+		_name.Text = "尚未获得增幅";
+		_name.AddThemeColorOverride("font_color",GlassUi.Ink);
+		_description.Text = "获得增幅后，悬停或用方向键选择左侧格子。";
+		_information.Text = string.Empty;
+		_detailIcon.Texture = null;
+	}
+
 	public void DebugShowSample(int count = 12)
 	{
 		_debugSample = true;
-		foreach (Node child in _grid.GetChildren())
-		{
-			_grid.RemoveChild(child);
-			child.QueueFree();
-		}
-
-		RewardDefinition[] all = RewardCatalog.All;
-		int shown = Mathf.Min(count, all.Length);
-		for (int i = 0; i < shown; i++)
-		{
-			// 每 4 格叠 2 层：截图里能同时看到"×N"与不显示层数两种形态。
-			_grid.AddChild(BuildTile(all[i], i % 4 == 0 ? 2 : 1));
-		}
-
-		_summary.Text = $"示例：奖励目录前 {shown} 条（真实数据，共 {all.Length} 条）　鼠标悬停看说明";
-		_empty.Visible = false;
+		ClearTiles();
+		foreach (RewardDefinition row in RewardCatalog.All.Take(count)) AddTile(row);
+		_summary.Text = $"示例：真实奖励目录中的 {TileCount} 条";
+		_empty.Visible = TileCount == 0;
+		RestoreSelection();
 	}
 }

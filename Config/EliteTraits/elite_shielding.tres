@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShieldingTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/ShieldingTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1020
+Id = "elite_shielding"
+Title = "间歇无敌"
+Description = "无敌与开放期交替，保护来源独立。"
+NameKey = "elite.shielding.name"
+DescriptionKey = "elite.shielding.description"
+MaxCarriers = 1
+Cooldown = 8
+Duration = 2

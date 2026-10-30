@@ -36,6 +36,16 @@ public partial class MapManager : Node3D
 
 	private NavigationRegion3D? _region;
 	private Rid _map;
+	private Rid _crowdMap;
+	/// <summary>不同体型路径地图共享地面避让；避让不依赖烘焙多边形。</summary>
+	public Rid CrowdMap
+	{
+		get
+		{
+			if (!_crowdMap.IsValid) { _crowdMap = NavigationServer3D.MapCreate(); NavigationServer3D.MapSetActive(_crowdMap, true); }
+			return _crowdMap;
+		}
+	}
 	private bool _baked;
 	private int _polygonCount;
 	private SceneTreeTimer? _bakeTimer;
@@ -51,6 +61,8 @@ public partial class MapManager : Node3D
 
 	public override void _ExitTree()
 	{
+		ClearClearanceQuery();
+		if (_crowdMap.IsValid) { NavigationServer3D.FreeRid(_crowdMap); _crowdMap = default; }
 		ClearNavigationProfiles();
 		if (_bakeTimer != null && IsInstanceValid(_bakeTimer)) _bakeTimer.Timeout -= Bake;
 		_bakeTimer = null;

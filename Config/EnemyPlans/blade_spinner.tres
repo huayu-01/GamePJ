@@ -1,13 +1,17 @@
-[gd_resource type="Resource" script_class="EnemyActionPlan" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyActionPlan" load_steps=6 format=3]
 [ext_resource type="Script" path="res://Scripts/Config/EnemyActionPlan.cs" id="plan"]
 [ext_resource type="Script" path="res://Scripts/Config/EnemyActionStep.cs" id="step"]
+[ext_resource type="Script" path="res://Scripts/Config/EnemyActions/MeleeEnemyAction.cs" id="action_melee_script"]
+[sub_resource type="Resource" id="action_s0"]
+script = ExtResource("action_melee_script")
+Damage = 16
+Radius = 2.3
+Speed = 7
+Spin = true
 [sub_resource type="Resource" id="s0"]
 script = ExtResource("step")
-Kind = 8
+Action = SubResource("action_s0")
 WindupSeconds = 0.5
-Damage = 16
-Speed = 7
-Radius = 2.3
 ActiveSeconds = 0.4
 RecoverSeconds = 0.4
 [resource]

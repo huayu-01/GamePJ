@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Assets/Enemies/StoneGolemPlus/stone_golem_plus.glb" id="1"]
+[ext_resource type="Script" path="res://Scripts/Testing/StoneGolemPlusPreview.gd" id="2"]
+
+[node name="StoneGolemPlusVisual" type="Node3D"]
+script = ExtResource("2")
+metadata/art_source = "stone-golem-plus-v1"
+
+[node name="Model" parent="." instance=ExtResource("1")]

@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1213
 Id = "pool_spear"
 Slot = 9
 DisplayName = "长枪升级池"

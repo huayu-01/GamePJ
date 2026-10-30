@@ -1,6 +1,29 @@
-# 用 Godot MCP（端口 9082）跑自动化验证的经验
+# 验证与调试
 
-编辑器必须开着目标工程，MCP 插件在编辑器面板里启动服务器。以下都是实际踩过的坑。
+当前统一验证优先使用 `_tools/verify_gameplay_fixes.ps1`，不带 `-Only` 运行维护中的全部机制与渲染专项；旧 `_tools/verify_projectile_capsule.ps1` 保留历史开关组合；先遵守[快照](SESSION-SNAPSHOT.md)的独占锁、进程与存档保护约定。本轮命令为：
+
+所有维护中的验证脚本通过`_tools/LogPaths.ps1`初始化日志目录。构建与进程输出、引擎日志及存档指纹在`Logs/validation/`，完整报告和J11等历史比较基线在`Logs/evidence/`；原`docs/*.log`已迁移，不在docs继续生成报告。`run_selftest.ps1`现在复用同一Main入口及锁／存档保护。
+
+```powershell
+pwsh ./_tools/verify_gameplay_fixes.ps1 -Only content,effects,decoupling,interaction
+pwsh ./_tools/verify_gameplay_fixes.ps1
+pwsh ./_tools/verify_adventure_rollback.ps1
+pwsh ./_tools/test_validation_infrastructure.ps1
+```
+
+历史 `verify_projectile_capsule.ps1 -ChallengeFeedback` 组合仍串行执行双构建、挑战反馈、隔离编辑器模型预览、交互组件、增援与召唤、整局及玩家流程、基地真实输入和角色展示、实际渲染、导航、敌人、符文UI、原五项回归和Main比对，保存stdout/stderr、当前截图及存档指纹。编辑器检查使用相同源码与程序集的最小隔离工程，不启用用户编辑器插件，不占用MCP端口；`Scenes/Debug/_InteractionEditorProbe.tscn`仅专用命令行参数才执行并退出自建编辑器，正常打开不会自动运行。可F6运行`Scenes/Debug/InteractionComponentLab.tscn`观察类型和新模型，接入见[交互组件](interaction-authoring.md)。加`-ProbeOnly`跳过图形和原五项回归。正式玩家入口为Base → Expedition；Main自测始终显式指定`res://Scenes/Main.tscn -- --selftest`。
+
+J48在此基础上增加真实挑战反馈专项及实际渲染：检查预算耗尽仍有活怪、真实F拒绝与碰撞弹开、清场解除与完成提示、暂停／失败／停止／换关／死亡，以及限定多波的波间空场。最新证据见[J48](archive/development-batches/character-design-j48.md)，`-InteractionModels`保留J47组合。
+
+2026-10-24新增冒险与组合验证：`_tools/verify_gameplay_fixes.ps1 -Only synergy,specialization,specialization_render,landing,reward_ui,reward_ui_render`。取消冒险专项需要真实落盘，使用`_tools/verify_adventure_rollback.ps1`自动创建独立工程、独立程序集和`CodexValidation`用户目录；不能在玩家真实目录直接运行`AdventureCancelProbe`。两套入口共用原工程验证锁，并比较运行前后的五份存档。机制和原始证据见[冒险回退与联动](adventure-synergy-20261024.md)。
+
+公共设施在 `_tools/Validation.Common.ps1`：独占锁、双构建0/0、只管理自己启动的进程、严格空stderr、五份存档检查、独立工程与用户目录、Main八项硬指标和显式内容数量核验。拼错 `-Only` 名称会在构建前失败。`Validation.Legacy.ps1` 为较早的批次入口复用这些设施；可能写盘的旧入口统一在隔离用户目录运行，保留各自场景、机制断言和截图核对。
+
+`test_validation_infrastructure.ps1` 需要先有一次Main日志，或用 `-MainLog` 指定；覆盖错误数量、存档变化保留现场、锁冲突、非零退出、stderr、超时、错误选择器与新增红标。新增内容只更新 `Config/Validation/content_inventory.tres` 的相关表与奖励类别基线；不要自动按当前运行结果更新期望值。
+
+GC缓存竞态回归使用 `./_tools/verify_content_gc.ps1 -Render`：从生产读取入口首次加载真实增幅，阻塞专用进程的终结器，确认弱引用已失效后再调用实际内容校验器，默认重复三次；另跑八轮完整扫描与强制GC、基础资源和原生包装器对照、实际基地渲染。屏障有超时，只用于测试，不在游戏里暂停GC。所有正例必须退出0且stderr为空，五份存档逐次核对；输出在`Logs/validation/gc_*`与`Logs/evidence/content-gc-*`。根因与历史负例见[资源生命周期](resource-lifetime.md)。
+
+以下保留早期通过Godot MCP插件调试的经验，仅适用于确实使用对应插件与接口时。那种方式要求编辑器开着目标工程，并从编辑器面板启动MCP服务器；它不是上述命令行验证的前置条件。
 
 ## 先跑 TestLab，不要临时传送敌人
 

@@ -1,0 +1,26 @@
+{
+  "Date": "2026-10-27T19:08:49",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "SceneRunes",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 10.16,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_190849.SceneRunes.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_190849.SceneRunes.headless.err",
+      "SHA256": "C54C30095EC582581D8BF93C9933DA5275FCFC9606627E370D6063578C50557D"
+    },
+    {
+      "Name": "SceneRunes",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 16.76,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_190849.SceneRunes.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_190849.SceneRunes.render.err",
+      "SHA256": "DEEC150D5BBCB87539EBA69ACCFF085142F9DD5083BECFECF5E7BCE8C927B6FD"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

@@ -1,0 +1,54 @@
+# 三叶旅童 · Clover Wayfarer
+
+2026-10-25，第十版：木面具由平板改为浅球面脸罩，中央微鼓、两侧后收，眼睛与额头三叶草同步贴合弧面。圆墩身体、长斗篷和第九版六项试绑动作保留。用户认为这套动作目前可以，待装入游戏后测试，尚未完成生产接入验收；见[真实模型动作预览](../../Animations/clover-wayfarer/basic-trial/README.md)。
+
+## 文件
+
+当前已进入[角色A森林战斗试装](../../../docs/clover-combat-trial.md)，额头与背部三叶草跟随真实攻击／技能释放同步缓动闪光，三把武器采用悬浮焦点。正式角色A配置仍保留原模型；本目录继续作为可编辑源和导出候选。
+
+- `front-back-preview.png`：同一模型的正背面对照，Blender实际渲染。
+- `front-three-quarter.png`、`back-three-quarter.png`：单独三分之四视角。
+- `head-detail.png`：碧绿小眼睛、额头三叶草、木板面具与领围特写。
+- `head-side-profile.png`：正侧面帽顶轮廓。
+- `head-front-side-preview.png`：同一模型的正面／正侧面头部对照，Blender直接渲染。
+- `body-under-cloak-preview.png`：临时隐藏下半斗篷，展示躯干、内衫、裤腿与短靴；最终模型的斗篷仍完整可见。
+- `clover-wayfarer.glb`：角色本体、骨架与六项60fps试绑动作；不包含摄影棚、地台、灯光或相机。
+- `mask-curvature-review.png`：浅球面脸罩的正面、侧面、三分之四视角。
+- `mask-curve-validation.json`：与v09对比，动作关键帧及静止骨架保持一致。
+- `model-report.json`：导出结构、三角面、权重与动画检查。
+- 可编辑主工程：`../../Blender/clover-wayfarer/clover-wayfarer.blend`。
+
+## 当前造型
+
+按用户标注的轮廓制作明显上挑的两侧尖角、宽直脸颊与尖下颌，面具使用暖木色大色块。木面具具有实际厚度、外缘倒角、八边形雕刻眼孔和四条浅凿痕。本版给板面增加浅球面弧度，中央略向外鼓、两侧后收，保持X／Z正面轮廓；眼孔、碧绿眼睛和额头图案一同贴合弧面。只为跨度大的面补必要顶点，保留雕刻木头的低模面片。两个深色眼孔内增加小巧的竖向碧绿眼睛，额头贴一枚三心叶加短茎的三叶草，两处共享 `CW_Jade` 材质，基础色为 `#2bc98e`，跟随Head骨骼。中央凿痕向旁边挪开以完整呈现图案，没有鼻、喙、嘴或实体头部填块。
+
+角色具有完整闭合的内衫躯干、腰臀和两条裤腿，双腿延伸进短靴，不加双手。内衫最宽处从约0.56米增加到0.73米，腰部不再明显收细；裤腿根部半径由0.092增加到0.128米，靴子中心间距从0.33增加到0.41米。下半身垂向缩为上一版的88%，内衫高度约0.559米，形成更短、更饱满的大头孩童比例。
+
+头部形体不压缩，仅整体下移0.132米；斗篷随胸腹和骨盆适当放宽。骨架和权重同步调整，躯干仍由Hips／Spine／Chest控制，双腿由Thigh／Shin控制。十个待机／行走姿态抽样、权重归一化、衣摆上方裤腿包覆检查均通过；采样身体顶点与斗篷最小净空约0.044米。面具后面仍不增加头球。
+
+帽顶前沿约1.633米，略低于木面具额头中央上缘约1.653米；后帽顶约1.738米，再沿后脑回落，侧面弧线保持不变。帽侧下垂布角与略不对称的叠褶领围继续保留。
+
+整件斗篷包住肩部后松垂，褶皱宽窄、深浅和走向不同，颈部附近有牵拉褶，前襟随长度自然松开，下摆轻微翻折。布面使用柔和明暗，木面具继续保留清楚的棱角。按新身形调整后，斗篷仍到脚踝上方，平均下摆约0.216米，高低范围约0.172至0.251米，没有新增包或装备。
+
+背面三叶草按加宽后的布面三角形裁分、贴合褶皱。当前3362个三角面、24个网格、14个导出材质、15骨；文件大小与动作实测以模型报告为准。权重归一化误差小于0.000001，导出结构与Blender回读一致。整体模型高度约1.788米，作为候选源尺寸，后续可按项目角色档案统一缩放。
+
+六项动作沿用用户筛选的人形参考节奏，针对短腿缩步、减小身体摆动与起伏，校正足底；受击保持站立、跳跃去掉长蓄力，死亡末姿态适配大头卧地。慢跑、击倒式击退及其他特项没有加入。跳跃预览的升降轨迹只在展示层，实际资产保存姿态；正式高度交给运行重力。三根斗篷辅助骨只做跟随回摆，尚未做实时布料碰撞或正式Godot接入验收。
+
+第一版源工程、导出与预览已保存在 `../../Revisions/clover-wayfarer/v01-round-mask/`，可随时对照。
+第二版保存在 `../../Revisions/clover-wayfarer/v02-owl-mask-long-cloak/`。本次用户标注参考保存在 `../../Concepts/clover-wayfarer/references/user-owl-outline-v03.png`。
+未加碧绿眼睛与额头图案的第三版保存在 `../../Revisions/clover-wayfarer/v03-carved-wood-owl-draped-hood/`。
+收小兜帽前的第四版保存在 `../../Revisions/clover-wayfarer/v04-jade-eyes-forehead-clover/`。
+整体压得过低的第五版保存在 `../../Revisions/clover-wayfarer/v05-smaller-upper-hood/`。
+未补身体的第六版保存在 `../../Revisions/clover-wayfarer/v06-arched-hood-soft-cloth/`。
+身形偏细的第七版保存在 `../../Revisions/clover-wayfarer/v07-body-under-cloak/`。
+本轮试绑前的第八版造型、原始两个草稿动作及源工程保存在 `../../Revisions/clover-wayfarer/v08-stocky-child-proportions/`。
+
+## 风格参考
+
+- ORICUT：[Forest Spirit Nori](https://oricutstudios.itch.io/low-poly-forest-spirit-nori)
+- ORICUT：[Campfire Scout Niko](https://oricutstudios.itch.io/low-poly-campfire-scout-niko)
+
+参考公开展示中的头身比例、低面数大形体、帽顶纵向弧线与布片自由边。侧面与线框参考检查图保存在 `../../Concepts/clover-wayfarer/references/nori-gallery-review.jpg`，原始公开图链接保留在同目录的 `sources.json`。制作工具为 `../../Tools/build_clover_wayfarer.py`，全部预览由 `../../Tools/preview_clover_wayfarer.py` 生成，导出使用 `../../Tools/export_clover_wayfarer.py`；均可直接作为Blender脚本执行。MCP安全模式下直接提交脚本内容，保存与导出使用Blender自带操作。
+
+第九版平板面具、六项动作、导出和媒体备份在 `../../Revisions/clover-wayfarer/v09-basic-motion-trial/`。
+本版面具增加274个三角面。造型重建后先运行 `../../Tools/curve_clover_mask.py` 再制作／恢复动作；此步骤只改变面具、眼睛、额头图案，保留当前动作。脚本保存未弯曲基准顶点，可重复调整弧度而不叠加变形。弧面检查图由 `../../Tools/preview_clover_mask.py` 渲染。

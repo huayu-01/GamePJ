@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PressureReboundTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/PressureReboundTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1016
+Id = "elite_pressure_rebound"
+Title = "蓄压回震"
+Description = "累计有效伤害后预警释放冲击波。"
+NameKey = "elite.pressure_rebound.name"
+DescriptionKey = "elite.pressure_rebound.description"
+Magnitude = 100
+Radius = 3
+Damage = 12
+Cooldown = 5

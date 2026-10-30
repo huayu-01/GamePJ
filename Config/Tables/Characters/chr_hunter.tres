@@ -1,35 +1,28 @@
-[gd_resource type="Resource" script_class="CharacterConfig" format=3]
+[gd_resource type="Resource" script_class="CharacterConfig" format=3 uid="uid://c6d1h15nv7nj4"]
 
-[ext_resource type="Script" path="res://Scripts/Config/CharacterConfig.cs" id="1_row"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_skill_1.tres" id="2_skl"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_skill_2.tres" id="3_skl"]
-[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a1_passive.tres" id="4_skl"]
-[ext_resource type="PackedScene" path="res://Scenes/Visual/MeshyWeaponGrip.tscn" id="6_grip"]
+[ext_resource type="Script" uid="uid://devihivkj700s" path="res://Scripts/Config/CharacterConfig.cs" id="1_row"]
+[ext_resource type="Resource" uid="uid://dndijekrbflx8" path="res://Config/Tables/Skills/skl_a1_skill_1.tres" id="2_skl"]
+[ext_resource type="Resource" uid="uid://cukkands5i0ti" path="res://Config/Tables/Skills/skl_a1_skill_2.tres" id="3_skl"]
+[ext_resource type="Resource" uid="uid://crnwfxnlab3ca" path="res://Config/Tables/Skills/skl_a1_passive.tres" id="4_skl"]
+[ext_resource type="Resource" path="res://Config/VisualProfiles/clover_wayfarer.tres" id="visual"]
 
 [resource]
 script = ExtResource("1_row")
-ModelPath = "res://Assets/Characters/Lyra/lyra.glb"
-ModelTransform = Transform3D(-1.0588235, 0, 0, 0, 1.0588235, 0, 0, 0, -1.0588235, 0, 0, 0)
-WeaponGripScene = ExtResource("6_grip")
-DisabledAbilityIds = PackedStringArray()
 EnabledAbilityIds = PackedStringArray("skl_a1_skill_1", "skl_a1_skill_2", "skl_a1_passive")
+JumpVelocity = 13.0
+JumpGravityScale = 3.6
+SprintInputAction = "sprint"
+SprintSpeedMultiplier = 1.5
 MaxHealth = 200.0
 StartingArmor = 20.0
 MoveSpeed = 6.5
-AttackDamage = 0.0
-AttackInterval = 0.0
-AttackRange = 0.0
-AttackKnockback = 0.0
-JumpVelocity = 13.0
-JumpGravityScale = 3.6
-AirJumpHeightRatio = 0.5
-SprintInputAction = "sprint"
-SprintSpeedMultiplier = 1.5
-AnimLibraryDir = "res://Assets/Characters/Lyra/skills/"
-AnimLibraryName = "skills"
 Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("4_skl")]
+VisualProfile = ExtResource("visual")
+NumericId = 1069
 Id = "chr_hunter"
 Slot = 4
 DisplayName = "猎手"
+NameKey = "content.chr_hunter.name"
 DescriptionTemplate = "{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 移速 {MoveSpeed:0.#}"
-Note = "[P1 新增行 · P3 扩充 · P6a 清理] 角色 A［猎手］。★★ **生命 200 / 护甲 20 / 移速 6.5 是 P3 代理自拟的预设值** —— 设计文档（3d肉鸽雨中哈迪斯/角色设计.txt）**没有写**角色 A 的这三项，**等用户确认**；在那之前不要当成经过设计的平衡值。★ 本行只放**与武器无关**的技能：技能1[后撤]（skl_a1_skill_1）/ 技能2[跃升]（skl_a1_skill_2）/ 被动[灵动]（skl_a1_passive）；三把武器的**武技**改由武器行自己的 Skills 列指向（wpn_energy_palm → skl_a1_w1_*、wpn_crossbow → skl_a2_w1_*、wpn_bow → skl_a3_w1_*）—— 理由见 WeaponConfig.Skills 的注释：一个角色的 3 把武器都用同样的两个按键（weapon_skill_1/2），武技行挂在角色行上会让「换武器」时上一把的武技留在能力节点上抢同一个按键（正是 docs/anim-pipeline.md §6.4.6 那类残留）。★ EnabledAbilityIds 按**技能行 Id** 匹配（P3 起首选键是 AbilityId，其次才是类名）。★ 这里原来有一列 `WeaponEnabled = false`（「角色行决定收不收枪」）—— **P6a 已删**：用户 2026-10-15 说他没设计过"出征时按角色行把枪收起来"，而且进关卡"相当于只是切场景"。现在"左键归谁"由**武器行**的 `WeaponConfig.UsesWeaponComponent` 决定（6 把新武器都是 false = 武技驱动），基地预览与关卡同源。★ AnimLibraryDir 指向技能动画库目录（生成器的产物）。"
+DescriptionKey = "content.chr_hunter.description"
+Note = "[P1 新增行 · P3 扩充 · P6a 清理] 角色 A［猎手］。★★ **生命 200 / 护甲 20 / 移速 6.5 是 P3 代理自拟的预设值** —— 设计文档（3d肉鸽雨中哈迪斯/角色设计.txt）**没有写**角色 A 的这三项，**等用户确认**；在那之前不要当成经过设计的平衡值。★ 本行只放**与武器无关**的技能：技能1[后撤]（skl_a1_skill_1）/ 技能2[跃升]（skl_a1_skill_2）/ 被动[灵动]（skl_a1_passive）；三把武器的**武技**改由武器行自己的 Skills 列指向（wpn_energy_palm → skl_a1_w1_*、wpn_crossbow → skl_a2_w1_*、wpn_bow → skl_a3_w1_*）—— 理由见 WeaponConfig.Skills 的注释：一个角色的 3 把武器都用同样的两个按键（weapon_skill_1/2），武技行挂在角色行上会让「换武器」时上一把的武技留在能力节点上抢同一个按键（正是 docs/anim-pipeline.md §6.4.6 那类残留）。★ EnabledAbilityIds 按**技能行 Id** 匹配（P3 起首选键是 AbilityId，其次才是类名）。★ 这里原来有一列 `WeaponEnabled = false`（「角色行决定收不收枪」）—— **P6a 已删**：用户 2026-10-15 说他没设计过"

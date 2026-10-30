@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BruiserTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/BruiserTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1004
+Id = "elite_bruiser"
+Title = "巨壮"
+Description = "体型与生命提高，最终身体参与导航净空。"
+NameKey = "elite.bruiser.name"
+DescriptionKey = "elite.bruiser.description"
+Magnitude = 1.35
+PreSpawnScale = 1.2

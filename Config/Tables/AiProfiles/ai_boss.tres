@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1043
 Id = "ai_boss"
 DisplayName = "最终首领"
 SearchRange = 60.0

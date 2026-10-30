@@ -9,6 +9,11 @@ public static class LoadoutMemory
 {
 	private static readonly ConfigFile File = new();
 	private static bool _loaded;
+	internal static System.Action CaptureRollback()
+	{
+		Load(); string content = File.EncodeToText();
+		return () => { File.Clear(); File.Parse(content); _loaded = true; };
+	}
 	public static bool LastSaveSucceeded { get; private set; } = true;
 	public static string SavePath
 	{

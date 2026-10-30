@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "mesh_count": 24,
+  "bones": 15,
+  "triangles": 3362,
+  "animations": [
+    {
+      "name": "idle",
+      "duration_seconds": 2.5,
+      "sampled_frames": 25,
+      "minimum_mesh_z": 0.01395683828741312,
+      "loop_seam_matrix_error": 0.0
+    },
+    {
+      "name": "walk",
+      "duration_seconds": 1.3333333333333333,
+      "sampled_frames": 25,
+      "minimum_mesh_z": 0.012229353189468384,
+      "loop_seam_matrix_error": 0.0
+    },
+    {
+      "name": "sprint",
+      "duration_seconds": 0.6666666666666666,
+      "sampled_frames": 25,
+      "minimum_mesh_z": 0.012238796800374985,
+      "loop_seam_matrix_error": 0.0
+    },
+    {
+      "name": "hit",
+      "duration_seconds": 0.4666666666666667,
+      "sampled_frames": 25,
+      "minimum_mesh_z": 0.011957446113228798,
+      "loop_seam_matrix_error": null
+    },
+    {
+      "name": "die",
+      "duration_seconds": 2.4,
+      "sampled_frames": 25,
+      "minimum_mesh_z": 0.011998658068478107,
+      "loop_seam_matrix_error": null
+    },
+    {
+      "name": "jump",
+      "duration_seconds": 0.8,
+      "sampled_frames": 25,
+      "minimum_mesh_z": 0.01199968159198761,
+      "loop_seam_matrix_error": null
+    }
+  ],
+  "unbound_vertices": 0,
+  "max_weight_sum_error": 1.126900315284729e-07
+}

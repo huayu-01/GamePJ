@@ -10,19 +10,19 @@ using Godot;
 
 namespace ActRoguelike.Run;
 
+/// <summary>一关的不可变统计；挑战次数统计实际启动的节点战斗，时间不含暂停与首领结束后的离场等待。</summary>
+public readonly record struct StageStatistics(int StageNumber, string StageId, string StageName, float ElapsedSeconds, int ChallengesStarted, bool BossDefeated);
+
 /// <summary>
 /// Stage：一个可自由探索的关卡（策划文档 §6.2）。
-/// 地面上散布可交互节点（每局随机启用若干）：走近互动 → 拿奖励 → 触发一场 Encounter；
-/// Boss Door 随时可开，玩家可以放弃剩余节点直接挑战 Boss；Boss 阵亡即 Stage 完成。
+/// 地面上按高／中／低价值启用 2／5／3 个交互节点：走近互动 → 拿奖励 → 触发一场 Encounter；
+/// Boss Door 随时可开，玩家可以放弃剩余节点直接挑战 Boss；Boss 阵亡后交互降临节点才离开本关。
 /// </summary>
 public partial class StageController : Node3D
 {
 	public static StageController? Instance { get; private set; }
 
-	/// <summary>每局从候选位置里随机启用多少个奖励节点。</summary>
-	[Export] public int ActiveNodeCount { get; set; } = 3;
-
-	/// <summary>Boss 死后降临的可交互节点（在 Main.tscn 里指向 RewardNode.tscn）。</summary>
+	/// <summary>旧 Main／专项的出口预制体兼容入口；留空时创建当前 Exit 组件与新类型模型。</summary>
 	[Export] public PackedScene? PortalScene { get; set; }
 
 	/// <summary>隔离次数：超出的次数会变成 Boss 战的初始压力等级（策划文档 §6.3）。</summary>
@@ -30,7 +30,7 @@ public partial class StageController : Node3D
 	/// 免费挑战额度 —— **玩家侧显示为「隔离次数」**（关卡核心文档 L405-416：
 	/// 初始 1 次、每关 +1、上限 2；非战斗节点不扣额度）。
 	/// </summary>
-	[Export] public int FreeChallengeQuota { get; set; } = 2;
+	public int FreeChallengeQuota { get; private set; }
 
 	/// <summary>降临物：从多高处落下来（米）、下落时长、落地回弹的高度与时长。</summary>
 	private const float PortalDropHeight = 12f;
@@ -40,6 +40,9 @@ public partial class StageController : Node3D
 
 	public event Action<int, EncounterController>? NodeStarted;
 	public event Action<int, EncounterController>? NodeCleared;
+	/// <summary>每次挑战只通知一次：true为真实清场，false为停止、复位、死亡或退树。</summary>
+	public event Action<bool>? ChallengeFinished;
+	private bool _challengeOpen;
 	public event Action? Victory;
 
 	public bool IsVictory { get; private set; }
@@ -56,15 +59,33 @@ public partial class StageController : Node3D
 	/// 现在把 <see cref="_bossCleared"/> 也算进"这一战结束了"：Boss 阵亡的那一刻
 	/// （<see cref="_PhysicsProcess"/> 的 <c>_bossCleared = true</c>）挑战者状态立刻解除，
 	/// 降临节点落地的提示与交互才走得通。语义上 Boss 战**从来不是**节点挑战，
-	/// 它和 <see cref="_encounterRunning"/>（节点挑战）本来就是两条线，只有"还有 Boss 活着"期间算挑战中。
+	/// 它和 <see cref="_encounterRunning"/>（节点挑战）本来就是两条线；开门后等待首领生成期间也保持挑战态。
 	///
 	/// <c>!IsVictory</c> 仍然在最前面（本关已经通关时任何挑战态都不算数），只是它**不能**再兼任
 	/// "Boss 打完了吗"的判断。
 	/// </summary>
-	public bool ChallengerActive => !IsVictory && (_encounterRunning || (_bossFight && !_bossCleared && _bossEncounter?.Boss is { } boss && !boss.IsDead));
+	public bool ChallengerActive => !IsVictory && ActRoguelike.Core.PlayerLocator.Player is not { IsDead: true }
+		&& (_encounterRunning || (_bossFight && !_bossCleared && (_bossEncounter?.Boss == null || (IsInstanceValid(_bossEncounter.Boss) && !_bossEncounter.Boss.IsDead))));
+	public EncounterController? ActiveChallengeEncounter => ChallengerActive ? (_encounterRunning ? _encounter : _bossEncounter) : null;
 	public bool BossOpened { get; private set; }
 	public int ChallengesUsed { get; private set; }
 	public float ElapsedSeconds { get; private set; }
+	/// <summary>首领已击败、等待离场：普通节点和游离刷怪已关闭，传送节点仍可交互。</summary>
+	public bool AwaitingExit => _bossCleared && !IsVictory;
+	public bool IsFinalStage { get; private set; }
+	public string ExitPrompt => IsFinalStage ? "完成出征 · 返回基地" : "前往下一关";
+	public StageStatistics? CompletedStatistics { get; private set; }
+
+	/// <summary>读取实时统计，不改变流程；引导、结算和探针共用这一份来源。</summary>
+	public StageStatistics CaptureStatistics() => CompletedStatistics ?? new StageStatistics(
+		StageNumber, Definition?.Id ?? string.Empty, Definition?.DisplayName ?? "关卡", ElapsedSeconds, ChallengesUsed, _bossCleared);
+
+	/// <summary>冻结本关有效游玩统计；重复调用返回同一结果，直到下一次 ApplyStage。</summary>
+	public StageStatistics CompleteStatistics()
+	{
+		CompletedStatistics ??= CaptureStatistics();
+		return CompletedStatistics.Value;
+	}
 
 	/// <summary>还剩几个没用过的奖励节点。</summary>
 	public int RemainingNodes
@@ -159,15 +180,23 @@ public partial class StageController : Node3D
 	// 兼容旧 HUD/流程代码的最小壳。
 	public int CurrentIndex => BossOpened ? 1 : 0;
 	public int NodeCount => _nodes.Count;
+	/// <summary>本关的普通奖励候选，包含嵌套组件后端；不含预置或运行期离场节点。</summary>
+	public IReadOnlyList<RewardNode> RewardNodes => _nodes.AsReadOnly();
+	public BossDoor? BossDoor => FindBossDoor();
 	public EncounterController? CurrentNode => _bossFight ? _bossEncounter : _encounter;
 
 	private readonly List<RewardNode> _nodes = new();
+	private readonly List<RewardNode> _placedPortals = new();
+	private readonly List<BossDoor> _bossDoors = new();
+	private RewardNode? _spawnedPortal;
+	private Node3D? _spawnedPortalRoot;
 	private EncounterController? _encounter;
 	private EncounterController? _bossEncounter;
 	private bool _encounterRunning;
 	private bool _bossFight;
 	private bool _bossCleared;
 	private RewardNodeKind? _currentNodeKind;
+	private NodeConfig? _currentNodeConfig;
 
 	/// <summary>Pressure 的"银行"：还没凑够一个阈值的余数。凑够一个阈值就清零（§7.3 第 5 条：不结转）。</summary>
 	private float _pressureBank;
@@ -228,12 +257,11 @@ public partial class StageController : Node3D
 	public int StageNumber { get; private set; } = 1;
 
 	/// <summary>应用一关的配置并重置关卡状态（开局与切关都走这里）。</summary>
-	public void ApplyStage(StageDefinition definition, int stageNumber)
+	public void ApplyStage(StageDefinition definition, int stageNumber, bool isFinalStage = false)
 	{
 		Definition = definition;
 		StageNumber = stageNumber;
-		ActiveNodeCount = definition.RewardNodeCount;
-		FreeChallengeQuota = definition.FreeChallengeQuota;
+		IsFinalStage = isFinalStage;
 
 		// 证明"这一关用的是表里的哪一行、哪套 Pressure 规则"（配置表回退纪律：回退/来源要留痕）。
 		string tags = definition.PressureUpgradeTags.Length == 0
@@ -267,6 +295,8 @@ public partial class StageController : Node3D
 	/// <summary>重置关卡：节点重新随机布置、挑战计数清零、门重新关闭、场上清空。</summary>
 	private void ResetStage()
 	{
+		FinishChallenge(false);
+		CompletedStatistics = null;
 		ChallengesUsed = 0;
 		BossOpened = false;
 		IsVictory = false;
@@ -291,14 +321,14 @@ public partial class StageController : Node3D
 			ActRoguelike.Config.ConfigIndex.Settings.FreeChallengeMaxQuota,
 			ActRoguelike.Config.ConfigIndex.Settings.FreeChallengeBaseQuota + (StageNumber - 1));
 
-		// 清掉上一关 Boss 死后降临的节点。
-		foreach (Node child in GetChildren())
+		// 只回收上一关生成的出口；预置出口属于场景宿主，不能删除其组件后端。
+		if (_spawnedPortal != null && IsInstanceValid(_spawnedPortal))
 		{
-			if (child is RewardNode { Kind: RewardNodeKind.Portal } portal)
-			{
-				portal.QueueFree();
-			}
+			_spawnedPortal.Enabled = false;
 		}
+		if (_spawnedPortalRoot != null && IsInstanceValid(_spawnedPortalRoot)) _spawnedPortalRoot.QueueFree();
+		_spawnedPortal = null;
+		_spawnedPortalRoot = null;
 		_encounterRunning = false;
 		_rewardPending = false;
 		ElapsedSeconds = 0f;
@@ -309,17 +339,13 @@ public partial class StageController : Node3D
 			NodePlacement.PlaceSafely(node);
 		}
 
-		// Boss 门也要复位，否则切关后按 F 没反应（用掉一次就废了）。
-		// 注意：用过的门会"消失"并退出 Interactable.All，所以要按 Stage 的子节点找（门的父节点就是 Stage）。
-		foreach (Node child in GetChildren())
-		{
-			if (child is BossDoor door)
-			{
-				door.ResetNode();
-			}
-		}
+		ResetPlacedPortals();
 
-		PlaceNodes();
+		// 消失过的门会退出 Interactable.All，使用本关子树收集的清单复位，兼容组件宿主。
+		foreach (BossDoor door in _bossDoors)
+		{
+			door.ResetNode();
+		}
 
 		// 关卡核心文档 L87-93：每个 Stage 固定 10 个节点 —— 高价值 2 / 中价值 5 / 低价值 3。
 		EnableByLayer(high: 2, mid: 5, low: 3);
@@ -348,6 +374,9 @@ public partial class StageController : Node3D
 		Instance = this;
 		AddToGroup("stage");
 		CollectChildren();
+		if (_encounter != null) _encounter.Aborted += OnNodeAborted;
+		if (_bossEncounter != null) _bossEncounter.Aborted += OnBossAborted;
+		ResetPlacedPortals();
 
 		// 关卡核心文档 §7.5：Pressure 转换出的**数值强化**在 Boss 出生时才套得上（挑战发生时它还不存在）。
 		// 用 EncounterController 的 BossSpawned 信号挂钩，而不是让 EncounterController 认识 Pressure ——
@@ -357,14 +386,15 @@ public partial class StageController : Node3D
 			_bossEncounter.BossSpawned += ApplyPendingPressurePerks;
 		}
 
-		PlaceNodes();
-
 		// 关卡核心文档 L87-93：每个 Stage 固定 10 个节点 —— 高价值 2 / 中价值 5 / 低价值 3。
 		EnableByLayer(high: 2, mid: 5, low: 3);
 	}
 
 	public override void _ExitTree()
 	{
+		FinishChallenge(false);
+		if (_encounter != null && IsInstanceValid(_encounter)) _encounter.Aborted -= OnNodeAborted;
+		if (_bossEncounter != null && IsInstanceValid(_bossEncounter)) _bossEncounter.Aborted -= OnBossAborted;
 		// 订阅必须成对（项目纪律）：信号发在已释放的 StageController 上会直接报错。
 		if (_bossEncounter != null)
 		{
@@ -380,8 +410,6 @@ public partial class StageController : Node3D
 	/// <summary>兼容旧调用：节点布置已在 _Ready 完成，这里只是确保战斗模板处于待命状态。</summary>
 	public void StartRun()
 	{
-		PlaceNodes();
-
 		// 关卡核心文档 L87-93：每个 Stage 固定 10 个节点 —— 高价值 2 / 中价值 5 / 低价值 3。
 		EnableByLayer(high: 2, mid: 5, low: 3);
 	}
@@ -393,13 +421,32 @@ public partial class StageController : Node3D
 
 	private void CollectChildren()
 	{
+		_nodes.Clear();
+		_placedPortals.Clear();
+		_bossDoors.Clear();
+		// 交互组件会在宿主子节点的 _Ready 建立后端，此时可按关卡子树统一收集。
+		// InSubtree 不进入另一个 StageController，避免误用其候选、首领门或离场节点。
+		foreach (Interactable item in Interactable.InSubtree(this))
+		{
+			switch (item)
+			{
+				case RewardNode { Kind: RewardNodeKind.Portal } portal:
+					_placedPortals.Add(portal);
+					break;
+				case RewardNode node:
+					_nodes.Add(node);
+					break;
+				case BossDoor door:
+					_bossDoors.Add(door);
+					break;
+			}
+		}
+
+		// 遭遇模板沿用原有直接子节点契约，交互嵌套不改变战斗模板的选择。
 		foreach (Node child in GetChildren())
 		{
 			switch (child)
 			{
-				case RewardNode node:
-					_nodes.Add(node);
-					break;
 				case EncounterController { IsBossNode: true } boss:
 					_bossEncounter = boss;
 					break;
@@ -410,21 +457,16 @@ public partial class StageController : Node3D
 		}
 	}
 
-	/// <summary>每局随机布置：只启用 ActiveNodeCount 个节点，其余禁用并隐藏（生成后固定）。</summary>
-	private void PlaceNodes()
+	/// <summary>预置出口留在设计位置；每关首领结束前不可使用，不消耗普通奖励节点配额。</summary>
+	private void ResetPlacedPortals()
 	{
-		var pool = new List<RewardNode>(_nodes);
-		for (int i = pool.Count - 1; i > 0; i--)
+		foreach (RewardNode portal in _placedPortals)
 		{
-			int j = (int)(GD.Randi() % (uint)(i + 1));
-			(pool[i], pool[j]) = (pool[j], pool[i]);
-		}
-
-		int active = Mathf.Min(ActiveNodeCount, pool.Count);
-		for (int i = 0; i < pool.Count; i++)
-		{
-			pool[i].Enabled = i < active;
-			pool[i].Visible = i < active;
+			portal.ResetNode();
+			portal.Enabled = false;
+			portal.Visible = false;
+			portal.SpawnsEncounter = false;
+			portal.Prompt = ExitPrompt;
 		}
 	}
 
@@ -439,10 +481,20 @@ public partial class StageController : Node3D
 		// 降临节点（Boss 死后的传送门）：纯关卡逻辑，不弹奖励、不刷怪。
 		if (node.Kind == RewardNodeKind.Portal)
 		{
-			ActRoguelike.Core.GameLog.Write("Node", "互动降临节点 → 进入下一关");
+			if (!AwaitingExit)
+			{
+				return false;
+			}
+			ActRoguelike.Core.GameLog.Write("Node", $"互动降临节点 → {ExitPrompt}");
 			IsVictory = true;
 			Victory?.Invoke();
 			return true;
+		}
+
+		// 开首领门即放弃剩余普通节点；首领死亡后的离场阶段也不能重新领取奖励。
+		if (BossOpened || CompletedStatistics != null)
+		{
+			return false;
 		}
 
 		if (RunController.Instance is not { } run)
@@ -452,12 +504,12 @@ public partial class StageController : Node3D
 
 		_rewardPending = true;
 		ActRoguelike.Core.GameLog.Write("Node", $"互动奖励节点：{node.Prompt}（Kind={node.Kind}，刷怪={node.SpawnsEncounter}）");
-		bool accepted = run.OpenRewardForNode(node.Kind, () =>
+		bool accepted = run.OpenRewardForNode(node.Config ?? new NodeConfig { Kind = node.Kind }, () =>
 		{
 			_rewardPending = false;
 
 			// 节点可配置是否刷怪：不刷怪的节点拿了奖励就直接回到探索。
-			if (node.SpawnsEncounter)
+			if (node.SpawnsEncounter && !BossOpened && CompletedStatistics == null)
 			{
 				StartEncounter(node);
 			}
@@ -473,11 +525,13 @@ public partial class StageController : Node3D
 
 	private void StartEncounter(RewardNode? node = null)
 	{
-		if (_encounter == null || IsVictory)
+		if (_encounter == null || IsVictory || BossOpened || CompletedStatistics != null)
 		{
 			return;
 		}
 
+		// 先结束旧战，再建立新战状态，避免Reset的中止通知清掉本轮开战标记。
+		_encounter.ResetEncounter();
 		ChallengesUsed++;
 		_encounterRunning = true;
 
@@ -485,15 +539,14 @@ public partial class StageController : Node3D
 		// ⚠️ 曾经漏了这一行：字段存在于 _PhysicsProcess 的结算分支里，却从来没人赋值，
 		// 于是**正常游玩时 Pressure 一次都不会累积**（只有自测直接调 AddPressureForNode 才有数字）。
 		_currentNodeKind = node?.Kind;
+		_currentNodeConfig = node?.Config;
 		ActRoguelike.Core.GameLog.Write("Spawn", $"第 {ChallengesUsed} 场 Encounter 开始（节点触发的战斗）");
 		// 每一场新 Encounter 都要复位上一场的状态（IsCompleted / 波次 / 预算），
 		// 否则第二次交互时 EncounterController 会以为自己已经打完、直接不刷怪。
 
-		_encounter.ResetEncounter();
-
 		// 波数按节点价值（关卡核心文档 L225-227；波数映射见 docs/stages.md 的「波数按价值标签」一节）。
 		// 必须在 ResetEncounter 之后设置：Reset 会把 WaveCount 清掉。
-		_encounter.WaveCount = node == null ? 0 : NodePlacement.WavesFor(node.Kind);
+		_encounter.WaveCount = node == null ? 0 : NodePlacement.WavesFor(node.Config, node.Kind);
 
 		// 白板首领的波次门槛（用户需求：只在第 8 波这类高波次出现）：把"本关之前已经开过的波数"
 		// 交给这条 Encounter，它按 `WavesOpenedBefore + 本场已开波数` 判定。
@@ -501,7 +554,22 @@ public partial class StageController : Node3D
 		_encounter.WavesOpenedBefore = _wavesOpenedInStage;
 		_encounter.MinWaveForEliteBoss = Definition?.EliteBossMinWave ?? 0;
 		_encounter.Start();
+		_challengeOpen = true;
 		NodeStarted?.Invoke(ChallengesUsed, _encounter);
+	}
+	private void OnNodeAborted() { if (_encounterRunning) FinishChallenge(false); }
+	private void OnBossAborted() { if (_bossFight && !_bossCleared) FinishChallenge(false); }
+	private void FinishChallenge(bool completed)
+	{
+		if (!_challengeOpen) return;
+		_challengeOpen = false;
+		if (!completed)
+		{
+			bool wasNodeChallenge = _encounterRunning;
+			_encounterRunning = false;
+			if (!wasNodeChallenge && !_bossCleared) _bossFight = false;
+		}
+		ChallengeFinished?.Invoke(completed);
 	}
 
 	/// <summary>
@@ -535,7 +603,8 @@ public partial class StageController : Node3D
 	/// 见 docs/config.md「免费挑战额度（§8.2）」一节。
 	/// </summary>
 	/// <param name="kind">这次完成的是哪种奖励节点（决定基础点数、额外比例与候选标签）。</param>
-	public void AddPressureForNode(RewardNodeKind kind)
+	public void AddPressureForNode(RewardNodeKind kind) => AddPressureForNode(kind, null);
+	private void AddPressureForNode(RewardNodeKind kind, NodeConfig? definition)
 	{
 		// §8.2 闸门：免费挑战（在本关免费额度之内的那几次）完成后**不**增加 Pressure。
 		// 额度已在 StartEncounter 里扣过，所以这里只看"这次挑战的序号是否还在额度内"。
@@ -549,7 +618,7 @@ public partial class StageController : Node3D
 
 		ConfigIndexData config = ConfigIndex.Settings;
 		StageDefinition? stage = Definition;
-		NodeConfig? nodeRow = ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
+		NodeConfig? nodeRow = definition ?? ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind);
 
 		// ① 基础点数（§7.2：不同挑战类型各自的增加值）。
 		(float basePoints, string source) = ResolveBasePressure(kind, nodeRow, stage, config);
@@ -652,7 +721,7 @@ public partial class StageController : Node3D
 			return (row.BossPressurePoints, $"节点表 {row.Id}");
 		}
 
-		if (LayerOf(kind) >= 2)
+		if (NodePlacement.LayerOf(nodeRow, kind) >= 2)
 		{
 			return stage is { PressurePerNodeHighValue: > 0f } high
 				? (high.PressurePerNodeHighValue, $"关卡表 {high.Id}")
@@ -754,9 +823,9 @@ public partial class StageController : Node3D
 	/// <summary>仅供自测：按类型触发一次节点交互（走正常 RequestRewardNode 路径）。</summary>
 	public bool DebugTriggerNode(RewardNodeKind kind)
 	{
-		foreach (Node child in GetChildren())
+		foreach (RewardNode node in _nodes)
 		{
-			if (child is RewardNode node && node.Kind == kind && !node.Used)
+			if (node.Kind == kind && !node.Used)
 			{
 				node.Enabled = true;
 				node.Visible = true;
@@ -802,12 +871,16 @@ public partial class StageController : Node3D
 	/// <summary>Boss Door：随时可开（策划文档 §6.2）。</summary>
 	public bool OpenBossDoor()
 	{
-		if (IsVictory || BossOpened || _bossEncounter == null)
+		if (IsVictory || BossOpened || CompletedStatistics != null || _rewardPending || _bossEncounter == null)
 		{
 			return false;
 		}
 
 		BossOpened = true;
+		foreach (RewardNode node in _nodes)
+		{
+			node.Enabled = false;
+		}
 		ActRoguelike.Core.GameLog.Write("Node", $"打开 Boss 门：已挑战 {ChallengesUsed} 次 / 隔离次数 {FreeChallengeQuota} → 初始压力 {Mathf.Max(0, ChallengesUsed - FreeChallengeQuota)}");
 		_bossFight = true;
 
@@ -821,13 +894,16 @@ public partial class StageController : Node3D
 		// 那是 §7.5 转换池没落地时的**替身**。现在转换的结果是"从数值池里抽一条强化并套到 Boss 身上"
 		// （§7.3 第 3 条），所以那一段被移除，不能两头都算。
 		_bossEncounter.BossInitialPressure = Mathf.Max(0, ChallengesUsed - FreeChallengeQuota);
+		_challengeOpen = true;
 		_bossEncounter.SpawnBossNow();
 		return true;
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (IsVictory)
+		if (ActRoguelike.Core.PlayerLocator.Player is { IsDead: true } || RunController.Instance?.RunEnded == true) FinishChallenge(false);
+		if (Definition == null || IsVictory || CompletedStatistics != null || RunController.Instance?.RunEnded == true
+			|| ActRoguelike.Core.PlayerLocator.Player is { IsDead: true })
 		{
 			return;
 		}
@@ -843,11 +919,13 @@ public partial class StageController : Node3D
 			_wavesOpenedInStage += _encounter.WaveIndex;
 			if (_currentNodeKind.HasValue)
 			{
-				AddPressureForNode(_currentNodeKind.Value);
+				AddPressureForNode(_currentNodeKind.Value, _currentNodeConfig);
 				_currentNodeKind = null;
+				_currentNodeConfig = null;
 			}
 
 			NodeCleared?.Invoke(ChallengesUsed, _encounter);
+			FinishChallenge(true);
 		}
 
 		// 区域杀改由 MapManager 创建的碰撞区域处理（进入即杀），不再每帧遍历单位组。
@@ -863,9 +941,14 @@ public partial class StageController : Node3D
 			// Boss 阵亡：清空所有还在战斗的怪，并在 Boss 位置降临一个可交互节点，
 			// 由玩家互动后才进入下一关（用户需求）。
 			_bossCleared = true;
+			FinishChallenge(true);
+			CompleteStatistics();
+			_encounter?.StopSpawning();
+			_bossEncounter?.StopSpawning();
 			Vector3 where = IsInstanceValid(boss) ? boss.GlobalPosition : GlobalPosition;
 			ClearField();
 			SpawnPortal(where);
+			return;
 		}
 
 		// 关卡内的定期刷怪（需求 #6）：与节点的 Encounter 并行，互不干扰。
@@ -886,7 +969,7 @@ public partial class StageController : Node3D
 	private void UpdateAmbientSpawns(float dt)
 	{
 		ConfigIndexData config = ConfigIndex.Settings;
-		if (config.AmbientSpawnInterval <= 0f || Definition == null || _encounter == null)
+		if (config.AmbientSpawnInterval <= 0f || Definition == null || _encounter == null || _bossCleared || CompletedStatistics != null)
 		{
 			return;
 		}
@@ -933,6 +1016,10 @@ public partial class StageController : Node3D
 	/// </summary>
 	private Unit? SpawnAmbientNow()
 	{
+		if (_bossCleared || IsVictory || CompletedStatistics != null || RunController.Instance?.RunEnded == true)
+		{
+			return null;
+		}
 		float strength = 1f + (ConfigIndex.Settings.AmbientSpawnStrengthStep * _ambientSteps);
 		Unit? spawned = _encounter?.SpawnAmbient(strength);
 		if (spawned == null)
@@ -981,52 +1068,84 @@ public partial class StageController : Node3D
 	}
 
 	/// <summary>
-	/// Boss 死后降临的节点：纯关卡逻辑（进入下一关），不刷怪也不给奖励。
+	/// Boss 死后的离场节点：纯关卡逻辑（进入下一关），不刷怪也不给奖励。
 	///
-	/// 降临点是 **Boss 之门消失后的位置**（用户要求）：门先收起，节点从高处落到门原来的位置上，
+	/// 预置出口在设计位置激活；未预置时，降临点是 **Boss 之门消失后的位置**：门先收起，节点落到门原位，
 	/// 落地前不可交互（避免玩家在半空中按 F）；找不到门时退回"玩家周围"的可行走点（原逻辑，保留作兜底）。
 	/// </summary>
 	private void SpawnPortal(Vector3 where)
 	{
-		if (PortalScene == null)
+		BossDoor? door = FindBossDoor();
+		// 场景明确布置了出口时，首领结束后在原位激活；不搬动宿主或重复生成一份出口。
+		foreach (RewardNode placed in _placedPortals)
 		{
-			// 没有配置降临节点时退化为直接完成本关。
-			IsVictory = true;
-			Victory?.Invoke();
+			if (!IsInstanceValid(placed) || !placed.IsInsideTree()) continue;
+			door?.Disappear();
+			placed.Prompt = ExitPrompt;
+			LandPortal(placed);
 			return;
 		}
 
-		BossDoor? door = FindBossDoor();
 		Vector3 landing = door != null ? door.GlobalPosition : NearbyDropPoint(where);
 		door?.Disappear();
 
-		var portal = PortalScene.Instantiate<RewardNode>();
+		RewardNode portal;
+		if (PortalScene != null)
+		{
+			// 旧 Main 和历史专项显式指定的 RewardNode 根场景仍保持原契约。
+			portal = PortalScene.Instantiate<RewardNode>();
+			portal.Kind = RewardNodeKind.Portal;
+			portal.Prompt = ExitPrompt;
+			portal.SpawnsEncounter = false;
+			portal.Enabled = false;
+			AddChild(portal);
+			_spawnedPortalRoot = portal;
+		}
+		else
+		{
+			var host = new Node3D { Name = "ExitPortal" };
+			var component = new InteractionComponent
+			{
+				Name = "InteractionComponent", Kind = InteractionKind.Exit, Prompt = ExitPrompt, SpawnsEncounter = false,
+			};
+			host.AddChild(component);
+			AddChild(host);
+			if (component.Backend is not RewardNode backend)
+			{
+				host.QueueFree();
+				GD.PushError("[StageController] Exit 组件没有建立离场后端，不能完成本关离场。");
+				return;
+			}
+			portal = backend;
+			_spawnedPortalRoot = host;
+		}
 		portal.Kind = RewardNodeKind.Portal;
-		portal.Prompt = "前往下一关";
+		portal.Prompt = ExitPrompt;
 		portal.SpawnsEncounter = false;
 		portal.Enabled = false;   // 下落过程中不可交互（落地时 LandPortal 再打开）
-		AddChild(portal);
+		_spawnedPortal = portal;
 
 		// 用寻路网格吸附到**可行走**的位置：纯随机点可能落在建筑里，玩家进不去就交互不了（用户指出）。
-		portal.GlobalPosition = landing;
+		portal.MoveTo(landing);
 		NodePlacement.PlaceSafely(portal);
 		landing = portal.GlobalPosition;
 
 		// 从高处落至目标位置 + 轻微回弹，落地后才变成可交互。
-		portal.GlobalPosition = landing + (Vector3.Up * PortalDropHeight);
+		portal.MoveTo(landing + (Vector3.Up * PortalDropHeight));
 		Tween drop = portal.CreateTween();
-		drop.TweenProperty(portal, "global_position:y", landing.Y, PortalDropSeconds)
+		Callable moveHeight = Callable.From<float>(height => portal.MoveTo(new Vector3(landing.X, height, landing.Z)));
+		drop.TweenMethod(moveHeight, landing.Y + PortalDropHeight, landing.Y, PortalDropSeconds)
 			.SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.In);
-		drop.TweenProperty(portal, "global_position:y", landing.Y + PortalBounceHeight, PortalBounceSeconds)
+		drop.TweenMethod(moveHeight, landing.Y, landing.Y + PortalBounceHeight, PortalBounceSeconds)
 			.SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
-		drop.TweenProperty(portal, "global_position:y", landing.Y, PortalBounceSeconds)
+		drop.TweenMethod(moveHeight, landing.Y + PortalBounceHeight, landing.Y, PortalBounceSeconds)
 			.SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.In);
 		drop.TweenCallback(Callable.From(() => LandPortal(portal)));
 
 		string source = door != null ? $"Boss 之门 {door.GlobalPosition} 已收起" : "找不到 Boss 之门，退回玩家附近";
 		ActRoguelike.Core.GameLog.Write(
 			"Node",
-			$"Boss 阵亡 → 清空场上敌人；{source}；降临节点「前往下一关」从 {PortalDropHeight:0.#} 米高落到 {landing}（下落中不可交互）");
+			$"Boss 阵亡 → 清空场上敌人；{source}；降临节点「{ExitPrompt}」从 {PortalDropHeight:0.#} 米高落到 {landing}（下落中不可交互）");
 	}
 
 	/// <summary>降临物落地：这时才允许交互。</summary>
@@ -1044,14 +1163,14 @@ public partial class StageController : Node3D
 
 	/// <summary>
 	/// 关卡里的 Boss 之门（降临点要用它消失后的位置）。
-	/// 只在 Stage 的直接子节点里找：门的父节点就是 Stage（Main.tscn），
-	/// 而且**消失过的门会退出 Interactable.All**，不能靠那张表反查。
+	/// 使用本关子树收集的首领门，兼容节点容器和组件宿主；不会跨入另一个 Stage。
+	/// 消失过的门会退出 Interactable.All，不能靠那张表反查。
 	/// </summary>
 	private BossDoor? FindBossDoor()
 	{
-		foreach (Node child in GetChildren())
+		foreach (BossDoor door in _bossDoors)
 		{
-			if (child is BossDoor door)
+			if (IsInstanceValid(door) && door.IsInsideTree())
 			{
 				return door;
 			}
@@ -1113,7 +1232,7 @@ public partial class StageController : Node3D
 		var pool = new List<RewardNode>();
 		foreach (RewardNode node in _nodes)
 		{
-			if (NodePlacement.LayerOf(node.Kind) == layer)
+			if (NodePlacement.LayerOf(node.Config, node.Kind) == layer)
 			{
 				pool.Add(node);
 			}

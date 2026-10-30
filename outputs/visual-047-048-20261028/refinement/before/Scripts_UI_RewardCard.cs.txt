@@ -1,0 +1,42 @@
+using ActRoguelike.Rewards;
+using Godot;
+
+namespace ActRoguelike.UI;
+
+/// <summary>卡名与类别独立着色；正文只用统一正文色，保留按钮原生焦点和点击。</summary>
+public partial class RewardCard : Button
+{
+	private Label _title = null!, _description = null!, _key = null!;
+	private TextureRect _category = null!, _artwork = null!;
+	private ShaderMaterial _glass = null!;
+	public string RewardId { get; private set; } = "";
+	public string DisplayTitle => _title.Text;
+	public Color TitleColor => _title.GetThemeColor("font_color");
+	public Color DescriptionColor => _description.GetThemeColor("font_color");
+	public void Configure(RewardDefinition row, int index, string displayName)
+	{
+		RewardId = row.Id; ClipText = true; Text = $"[{index + 1}] {displayName}\n{row.Description}";
+		CustomMinimumSize = new Vector2(280, 340); SizeFlagsHorizontal = SizeFlags.ExpandFill; SizeFlagsVertical = SizeFlags.ExpandFill;
+		foreach (string state in new[] { "normal", "hover", "pressed", "focus" }) AddThemeStyleboxOverride(state, new StyleBoxEmpty());
+		foreach (string state in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color" }) AddThemeColorOverride(state, Colors.Transparent);
+		_glass = GlassUi.Background(this, false);
+		var inset = new MarginContainer { MouseFilter = MouseFilterEnum.Ignore }; AddChild(inset); inset.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+		foreach (string side in new[] { "left", "right", "top", "bottom" }) inset.AddThemeConstantOverride("margin_" + side, 24);
+		var column = new VBoxContainer { MouseFilter = MouseFilterEnum.Ignore }; column.AddThemeConstantOverride("separation", 16); inset.AddChild(column);
+		var heading = new HBoxContainer { MouseFilter = MouseFilterEnum.Ignore }; column.AddChild(heading);
+		_key = new Label { Text = (index + 1).ToString(), MouseFilter = MouseFilterEnum.Ignore, SizeFlagsHorizontal = SizeFlags.ExpandFill }; heading.AddChild(_key);
+		_category = new TextureRect { Name = "CategoryIcon", Texture = GlassUi.CategoryIcon(row), CustomMinimumSize = new Vector2(28,28), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered, MouseFilter = MouseFilterEnum.Ignore, Modulate = GlassUi.RewardColor(row,true) }; heading.AddChild(_category);
+		_artwork = new TextureRect { Texture = UiIcons.ForReward(row), CustomMinimumSize = new Vector2(0,72), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered, MouseFilter = MouseFilterEnum.Ignore, Modulate = GlassUi.Paper }; column.AddChild(_artwork);
+		_title = new Label { Name = "RewardName", Text = displayName, AutowrapMode = TextServer.AutowrapMode.WordSmart, HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = MouseFilterEnum.Ignore }; _title.AddThemeFontSizeOverride("font_size",28); _title.AddThemeColorOverride("font_color", GlassUi.RewardColor(row,true)); column.AddChild(_title);
+		column.AddChild(new HSeparator { MouseFilter = MouseFilterEnum.Ignore });
+		_description = new Label { Name = "Description", Text = row.Description, AutowrapMode = TextServer.AutowrapMode.WordSmart, MouseFilter = MouseFilterEnum.Ignore, SizeFlagsVertical = SizeFlags.ExpandFill }; _description.AddThemeFontSizeOverride("font_size",21); _description.AddThemeColorOverride("font_color", GlassUi.Paper); column.AddChild(_description);
+		MouseEntered += () => Emphasize(true); MouseExited += () => Emphasize(HasFocus());
+		FocusEntered += () => Emphasize(true); FocusExited += () => Emphasize(IsHovered());
+	}
+	public void UpdateContent(RewardDefinition row, int index, string displayName)
+	{
+		Text = $"[{index+1}] {displayName}\n{row.Description}"; _title.Text = displayName; _description.Text = row.Description;
+		_title.AddThemeColorOverride("font_color",GlassUi.RewardColor(row,true)); _category.Modulate = GlassUi.RewardColor(row,true);
+	}
+	private void Emphasize(bool selected) => _glass.SetShaderParameter("emphasis", selected ? 1f : 0f);
+}

@@ -1,0 +1,1438 @@
+{
+  "elite_aftershock": {
+    "number": 1000,
+    "path": "Config/EliteTraits/elite_aftershock.tres"
+  },
+  "elite_arcane": {
+    "number": 1001,
+    "path": "Config/EliteTraits/elite_arcane.tres"
+  },
+  "elite_armor_recoil": {
+    "number": 1002,
+    "path": "Config/EliteTraits/elite_armor_recoil.tres"
+  },
+  "elite_avenger": {
+    "number": 1003,
+    "path": "Config/EliteTraits/elite_avenger.tres"
+  },
+  "elite_bruiser": {
+    "number": 1004,
+    "path": "Config/EliteTraits/elite_bruiser.tres"
+  },
+  "elite_burner": {
+    "number": 1005,
+    "path": "Config/EliteTraits/elite_burner.tres"
+  },
+  "elite_burrower": {
+    "number": 1006,
+    "path": "Config/EliteTraits/elite_burrower.tres"
+  },
+  "elite_clanger": {
+    "number": 1007,
+    "path": "Config/EliteTraits/elite_clanger.tres"
+  },
+  "elite_flanker": {
+    "number": 1008,
+    "path": "Config/EliteTraits/elite_flanker.tres"
+  },
+  "elite_frozen": {
+    "number": 1009,
+    "path": "Config/EliteTraits/elite_frozen.tres"
+  },
+  "elite_health_link": {
+    "number": 1010,
+    "path": "Config/EliteTraits/elite_health_link.tres"
+  },
+  "elite_juggernaut": {
+    "number": 1011,
+    "path": "Config/EliteTraits/elite_juggernaut.tres"
+  },
+  "elite_knockback": {
+    "number": 1012,
+    "path": "Config/EliteTraits/elite_knockback.tres"
+  },
+  "elite_linker": {
+    "number": 1013,
+    "path": "Config/EliteTraits/elite_linker.tres"
+  },
+  "elite_molten": {
+    "number": 1014,
+    "path": "Config/EliteTraits/elite_molten.tres"
+  },
+  "elite_multishot": {
+    "number": 1015,
+    "path": "Config/EliteTraits/elite_multishot.tres"
+  },
+  "elite_pressure_rebound": {
+    "number": 1016,
+    "path": "Config/EliteTraits/elite_pressure_rebound.tres"
+  },
+  "elite_reforge": {
+    "number": 1017,
+    "path": "Config/EliteTraits/elite_reforge.tres"
+  },
+  "elite_savior": {
+    "number": 1018,
+    "path": "Config/EliteTraits/elite_savior.tres"
+  },
+  "elite_seeker": {
+    "number": 1019,
+    "path": "Config/EliteTraits/elite_seeker.tres"
+  },
+  "elite_shielding": {
+    "number": 1020,
+    "path": "Config/EliteTraits/elite_shielding.tres"
+  },
+  "elite_shifter": {
+    "number": 1021,
+    "path": "Config/EliteTraits/elite_shifter.tres"
+  },
+  "elite_slicer": {
+    "number": 1022,
+    "path": "Config/EliteTraits/elite_slicer.tres"
+  },
+  "elite_slugger": {
+    "number": 1023,
+    "path": "Config/EliteTraits/elite_slugger.tres"
+  },
+  "elite_speeder": {
+    "number": 1024,
+    "path": "Config/EliteTraits/elite_speeder.tres"
+  },
+  "elite_spiller": {
+    "number": 1025,
+    "path": "Config/EliteTraits/elite_spiller.tres"
+  },
+  "elite_spinner": {
+    "number": 1026,
+    "path": "Config/EliteTraits/elite_spinner.tres"
+  },
+  "elite_summoner": {
+    "number": 1027,
+    "path": "Config/EliteTraits/elite_summoner.tres"
+  },
+  "elite_suppressor": {
+    "number": 1028,
+    "path": "Config/EliteTraits/elite_suppressor.tres"
+  },
+  "elite_thorn_grid": {
+    "number": 1029,
+    "path": "Config/EliteTraits/elite_thorn_grid.tres"
+  },
+  "elite_tidal": {
+    "number": 1030,
+    "path": "Config/EliteTraits/elite_tidal.tres"
+  },
+  "elite_trail_brand": {
+    "number": 1031,
+    "path": "Config/EliteTraits/elite_trail_brand.tres"
+  },
+  "elite_vampiric": {
+    "number": 1032,
+    "path": "Config/EliteTraits/elite_vampiric.tres"
+  },
+  "survival_twilight": {
+    "number": 1033,
+    "path": "Config/Modes/twilight_survival.tres"
+  },
+  "body_dash": {
+    "number": 1034,
+    "path": "Config/MotionFx/stone_body_dash.tres"
+  },
+  "double_fist": {
+    "number": 1035,
+    "path": "Config/MotionFx/stone_double_fist.tres"
+  },
+  "mut_chain": {
+    "number": 1036,
+    "path": "Config/Retired/Upgrades/mut_chain.tres"
+  },
+  "mut_homing_missile": {
+    "number": 1037,
+    "path": "Config/Retired/Upgrades/mut_homing_missile.tres"
+  },
+  "mut_sunset_sword": {
+    "number": 1038,
+    "path": "Config/Retired/Upgrades/mut_sunset_sword.tres"
+  },
+  "card_crit": {
+    "number": 1039,
+    "path": "Config/Tables/AbilityCards/card_crit.tres"
+  },
+  "card_damage": {
+    "number": 1040,
+    "path": "Config/Tables/AbilityCards/card_damage.tres"
+  },
+  "card_speed": {
+    "number": 1041,
+    "path": "Config/Tables/AbilityCards/card_speed.tres"
+  },
+  "card_vitality": {
+    "number": 1042,
+    "path": "Config/Tables/AbilityCards/card_vitality.tres"
+  },
+  "ai_boss": {
+    "number": 1043,
+    "path": "Config/Tables/AiProfiles/ai_boss.tres"
+  },
+  "ai_charger": {
+    "number": 1044,
+    "path": "Config/Tables/AiProfiles/ai_charger.tres"
+  },
+  "ai_chaser": {
+    "number": 1045,
+    "path": "Config/Tables/AiProfiles/ai_chaser.tres"
+  },
+  "ai_drone": {
+    "number": 1046,
+    "path": "Config/Tables/AiProfiles/ai_drone.tres"
+  },
+  "ai_exploder": {
+    "number": 1047,
+    "path": "Config/Tables/AiProfiles/ai_exploder.tres"
+  },
+  "ai_fast_melee": {
+    "number": 1048,
+    "path": "Config/Tables/AiProfiles/ai_fast_melee.tres"
+  },
+  "ai_guard": {
+    "number": 1049,
+    "path": "Config/Tables/AiProfiles/ai_guard.tres"
+  },
+  "ai_jumping_melee": {
+    "number": 1050,
+    "path": "Config/Tables/AiProfiles/ai_jumping_melee.tres"
+  },
+  "ai_ranged": {
+    "number": 1051,
+    "path": "Config/Tables/AiProfiles/ai_ranged.tres"
+  },
+  "ai_screamer": {
+    "number": 1052,
+    "path": "Config/Tables/AiProfiles/ai_screamer.tres"
+  },
+  "ai_skill_elite": {
+    "number": 1053,
+    "path": "Config/Tables/AiProfiles/ai_skill_elite.tres"
+  },
+  "music_challenge_01": {
+    "number": 1054,
+    "path": "Config/Tables/Audio/audio_music_challenge_01.tres"
+  },
+  "music_challenge_02": {
+    "number": 1055,
+    "path": "Config/Tables/Audio/audio_music_challenge_02.tres"
+  },
+  "music_level_01": {
+    "number": 1056,
+    "path": "Config/Tables/Audio/audio_music_level_01.tres"
+  },
+  "music_level_02": {
+    "number": 1057,
+    "path": "Config/Tables/Audio/audio_music_level_02.tres"
+  },
+  "sfx_charge_complete": {
+    "number": 1058,
+    "path": "Config/Tables/Audio/audio_sfx_charge_complete.tres"
+  },
+  "sfx_combat_hit": {
+    "number": 1059,
+    "path": "Config/Tables/Audio/audio_sfx_combat_hit.tres"
+  },
+  "sfx_enemy_die": {
+    "number": 1060,
+    "path": "Config/Tables/Audio/audio_sfx_enemy_die.tres"
+  },
+  "sfx_weapon_fire": {
+    "number": 1061,
+    "path": "Config/Tables/Audio/audio_sfx_weapon_fire.tres"
+  },
+  "ui_card_fail": {
+    "number": 1062,
+    "path": "Config/Tables/Audio/audio_ui_card_fail.tres"
+  },
+  "ui_card_reset": {
+    "number": 1063,
+    "path": "Config/Tables/Audio/audio_ui_card_reset.tres"
+  },
+  "ui_card_unlock": {
+    "number": 1064,
+    "path": "Config/Tables/Audio/audio_ui_card_unlock.tres"
+  },
+  "ui_card_upgrade": {
+    "number": 1065,
+    "path": "Config/Tables/Audio/audio_ui_card_upgrade.tres"
+  },
+  "ui_click": {
+    "number": 1066,
+    "path": "Config/Tables/Audio/audio_ui_click.tres"
+  },
+  "ui_open": {
+    "number": 1067,
+    "path": "Config/Tables/Audio/audio_ui_open.tres"
+  },
+  "boss_final": {
+    "number": 1068,
+    "path": "Config/Tables/Bosses/boss_final.tres"
+  },
+  "chr_hunter": {
+    "number": 1069,
+    "path": "Config/Tables/Characters/chr_hunter.tres"
+  },
+  "chr_weapon_master": {
+    "number": 1070,
+    "path": "Config/Tables/Characters/chr_weapon_master.tres"
+  },
+  "Burn": {
+    "number": 1071,
+    "path": "Config/Tables/Effects/eff_burn.tres"
+  },
+  "BurnPlus": {
+    "number": 1072,
+    "path": "Config/Tables/Effects/eff_burn_plus.tres"
+  },
+  "ChainLightning": {
+    "number": 1073,
+    "path": "Config/Tables/Effects/eff_chain_lightning.tres"
+  },
+  "Empowered": {
+    "number": 1074,
+    "path": "Config/Tables/Effects/eff_empowered.tres"
+  },
+  "Explosion": {
+    "number": 1075,
+    "path": "Config/Tables/Effects/eff_explosion.tres"
+  },
+  "Freeze": {
+    "number": 1076,
+    "path": "Config/Tables/Effects/eff_freeze.tres"
+  },
+  "FreezePlus": {
+    "number": 1077,
+    "path": "Config/Tables/Effects/eff_freeze_plus.tres"
+  },
+  "Lifesteal": {
+    "number": 1078,
+    "path": "Config/Tables/Effects/eff_lifesteal.tres"
+  },
+  "Mark": {
+    "number": 1079,
+    "path": "Config/Tables/Effects/eff_mark.tres"
+  },
+  "MissileBeacon": {
+    "number": 1080,
+    "path": "Config/Tables/Effects/eff_missile_beacon.tres"
+  },
+  "Slow": {
+    "number": 1081,
+    "path": "Config/Tables/Effects/eff_slow.tres"
+  },
+  "Stun": {
+    "number": 1082,
+    "path": "Config/Tables/Effects/eff_stun.tres"
+  },
+  "SummonOnKill": {
+    "number": 1083,
+    "path": "Config/Tables/Effects/eff_summon_on_kill.tres"
+  },
+  "ThunderMark": {
+    "number": 1084,
+    "path": "Config/Tables/Effects/eff_thunder_mark.tres"
+  },
+  "Weaken": {
+    "number": 1085,
+    "path": "Config/Tables/Effects/eff_weaken.tres"
+  },
+  "enemy_arc_bomber": {
+    "number": 1086,
+    "path": "Config/Tables/Enemies/enemy_arc_bomber.tres"
+  },
+  "enemy_arc_thrower": {
+    "number": 1087,
+    "path": "Config/Tables/Enemies/enemy_arc_thrower.tres"
+  },
+  "enemy_blade_spinner": {
+    "number": 1088,
+    "path": "Config/Tables/Enemies/enemy_blade_spinner.tres"
+  },
+  "enemy_bomb_lobber": {
+    "number": 1089,
+    "path": "Config/Tables/Enemies/enemy_bomb_lobber.tres"
+  },
+  "enemy_burrow_hunter": {
+    "number": 1090,
+    "path": "Config/Tables/Enemies/enemy_burrow_hunter.tres"
+  },
+  "enemy_charger": {
+    "number": 1091,
+    "path": "Config/Tables/Enemies/enemy_charger.tres"
+  },
+  "enemy_chaser": {
+    "number": 1092,
+    "path": "Config/Tables/Enemies/enemy_chaser.tres"
+  },
+  "enemy_combo_fighter": {
+    "number": 1093,
+    "path": "Config/Tables/Enemies/enemy_combo_fighter.tres"
+  },
+  "enemy_exploder": {
+    "number": 1094,
+    "path": "Config/Tables/Enemies/enemy_exploder.tres"
+  },
+  "enemy_fast_melee": {
+    "number": 1095,
+    "path": "Config/Tables/Enemies/enemy_fast_melee.tres"
+  },
+  "enemy_global": {
+    "number": 1096,
+    "path": "Config/Tables/Enemies/enemy_global.tres"
+  },
+  "enemy_guard": {
+    "number": 1097,
+    "path": "Config/Tables/Enemies/enemy_guard.tres"
+  },
+  "enemy_heavy_slammer": {
+    "number": 1098,
+    "path": "Config/Tables/Enemies/enemy_heavy_slammer.tres"
+  },
+  "enemy_hover_diver": {
+    "number": 1099,
+    "path": "Config/Tables/Enemies/enemy_hover_diver.tres"
+  },
+  "enemy_jumping_melee": {
+    "number": 1100,
+    "path": "Config/Tables/Enemies/enemy_jumping_melee.tres"
+  },
+  "enemy_meteor_mage": {
+    "number": 1101,
+    "path": "Config/Tables/Enemies/enemy_meteor_mage.tres"
+  },
+  "enemy_ranged": {
+    "number": 1102,
+    "path": "Config/Tables/Enemies/enemy_ranged.tres"
+  },
+  "enemy_screamer": {
+    "number": 1103,
+    "path": "Config/Tables/Enemies/enemy_screamer.tres"
+  },
+  "enemy_skill_elite": {
+    "number": 1104,
+    "path": "Config/Tables/Enemies/enemy_skill_elite.tres"
+  },
+  "enemy_spear_guard": {
+    "number": 1105,
+    "path": "Config/Tables/Enemies/enemy_spear_guard.tres"
+  },
+  "enemy_tracking_charger": {
+    "number": 1106,
+    "path": "Config/Tables/Enemies/enemy_tracking_charger.tres"
+  },
+  "meta_crit": {
+    "number": 1107,
+    "path": "Config/Tables/Meta/meta_crit.tres"
+  },
+  "meta_damage": {
+    "number": 1108,
+    "path": "Config/Tables/Meta/meta_damage.tres"
+  },
+  "meta_health": {
+    "number": 1109,
+    "path": "Config/Tables/Meta/meta_health.tres"
+  },
+  "meta_quota": {
+    "number": 1110,
+    "path": "Config/Tables/Meta/meta_quota.tres"
+  },
+  "meta_speed": {
+    "number": 1111,
+    "path": "Config/Tables/Meta/meta_speed.tres"
+  },
+  "node_enhance": {
+    "number": 1112,
+    "path": "Config/Tables/Nodes/node_enhance.tres"
+  },
+  "node_evolution": {
+    "number": 1113,
+    "path": "Config/Tables/Nodes/node_evolution.tres"
+  },
+  "node_heal": {
+    "number": 1114,
+    "path": "Config/Tables/Nodes/node_heal.tres"
+  },
+  "node_mutation": {
+    "number": 1115,
+    "path": "Config/Tables/Nodes/node_mutation.tres"
+  },
+  "node_portal": {
+    "number": 1116,
+    "path": "Config/Tables/Nodes/node_portal.tres"
+  },
+  "node_resource": {
+    "number": 1117,
+    "path": "Config/Tables/Nodes/node_resource.tres"
+  },
+  "node_shop": {
+    "number": 1118,
+    "path": "Config/Tables/Nodes/node_shop.tres"
+  },
+  "node_special": {
+    "number": 1119,
+    "path": "Config/Tables/Nodes/node_special.tres"
+  },
+  "pmod_berserk_dmg": {
+    "number": 1120,
+    "path": "Config/Tables/Pressure/pmod_berserk_dmg.tres"
+  },
+  "pmod_berserk_speed": {
+    "number": 1121,
+    "path": "Config/Tables/Pressure/pmod_berserk_speed.tres"
+  },
+  "pmod_charge_impact": {
+    "number": 1122,
+    "path": "Config/Tables/Pressure/pmod_charge_impact.tres"
+  },
+  "pmod_fortress_hp": {
+    "number": 1123,
+    "path": "Config/Tables/Pressure/pmod_fortress_hp.tres"
+  },
+  "pmod_scream_echo": {
+    "number": 1124,
+    "path": "Config/Tables/Pressure/pmod_scream_echo.tres"
+  },
+  "pmod_summon_haste": {
+    "number": 1125,
+    "path": "Config/Tables/Pressure/pmod_summon_haste.tres"
+  },
+  "pmod_swift": {
+    "number": 1126,
+    "path": "Config/Tables/Pressure/pmod_swift.tres"
+  },
+  "rune_death_armor": {
+    "number": 1127,
+    "path": "Config/Tables/Runes/rune_death_armor.tres"
+  },
+  "rune_flying_wing": {
+    "number": 1128,
+    "path": "Config/Tables/Runes/rune_flying_wing.tres"
+  },
+  "rune_giant": {
+    "number": 1129,
+    "path": "Config/Tables/Runes/rune_giant.tres"
+  },
+  "rune_lei_seal": {
+    "number": 1130,
+    "path": "Config/Tables/Runes/rune_lei_seal.tres"
+  },
+  "rune_life_death": {
+    "number": 1131,
+    "path": "Config/Tables/Runes/rune_life_death.tres"
+  },
+  "rune_march": {
+    "number": 1132,
+    "path": "Config/Tables/Runes/rune_march.tres"
+  },
+  "rune_pixie": {
+    "number": 1133,
+    "path": "Config/Tables/Runes/rune_pixie.tres"
+  },
+  "rune_sniper": {
+    "number": 1134,
+    "path": "Config/Tables/Runes/rune_sniper.tres"
+  },
+  "rune_strength_talisman": {
+    "number": 1135,
+    "path": "Config/Tables/Runes/rune_strength_talisman.tres"
+  },
+  "rune_war_seal": {
+    "number": 1136,
+    "path": "Config/Tables/Runes/rune_war_seal.tres"
+  },
+  "rune_wind_seal": {
+    "number": 1137,
+    "path": "Config/Tables/Runes/rune_wind_seal.tres"
+  },
+  "anim_a1_atk1": {
+    "number": 1138,
+    "path": "Config/Tables/SkillAnimations/anim_a1_atk1.tres"
+  },
+  "anim_a1_atk2": {
+    "number": 1139,
+    "path": "Config/Tables/SkillAnimations/anim_a1_atk2.tres"
+  },
+  "anim_a1_backdash": {
+    "number": 1140,
+    "path": "Config/Tables/SkillAnimations/anim_a1_backdash.tres"
+  },
+  "anim_a1_leap": {
+    "number": 1141,
+    "path": "Config/Tables/SkillAnimations/anim_a1_leap.tres"
+  },
+  "anim_a2_charged_volley": {
+    "number": 1142,
+    "path": "Config/Tables/SkillAnimations/anim_a2_charged_volley.tres"
+  },
+  "anim_a2_scatter": {
+    "number": 1143,
+    "path": "Config/Tables/SkillAnimations/anim_a2_scatter.tres"
+  },
+  "anim_a3_draw": {
+    "number": 1144,
+    "path": "Config/Tables/SkillAnimations/anim_a3_draw.tres"
+  },
+  "anim_a3_hawkeye": {
+    "number": 1145,
+    "path": "Config/Tables/SkillAnimations/anim_a3_hawkeye.tres"
+  },
+  "anim_b1_sword1": {
+    "number": 1146,
+    "path": "Config/Tables/SkillAnimations/anim_b1_sword1.tres"
+  },
+  "anim_b1_sword2": {
+    "number": 1147,
+    "path": "Config/Tables/SkillAnimations/anim_b1_sword2.tres"
+  },
+  "anim_b1_sword3": {
+    "number": 1148,
+    "path": "Config/Tables/SkillAnimations/anim_b1_sword3.tres"
+  },
+  "anim_b1_sword4": {
+    "number": 1149,
+    "path": "Config/Tables/SkillAnimations/anim_b1_sword4.tres"
+  },
+  "anim_b1_sword5": {
+    "number": 1150,
+    "path": "Config/Tables/SkillAnimations/anim_b1_sword5.tres"
+  },
+  "anim_b1_swordqi": {
+    "number": 1151,
+    "path": "Config/Tables/SkillAnimations/anim_b1_swordqi.tres"
+  },
+  "anim_b2_scythe1": {
+    "number": 1152,
+    "path": "Config/Tables/SkillAnimations/anim_b2_scythe1.tres"
+  },
+  "anim_b2_scythe2": {
+    "number": 1153,
+    "path": "Config/Tables/SkillAnimations/anim_b2_scythe2.tres"
+  },
+  "anim_b2_scythe3": {
+    "number": 1154,
+    "path": "Config/Tables/SkillAnimations/anim_b2_scythe3.tres"
+  },
+  "anim_b3_spear1": {
+    "number": 1155,
+    "path": "Config/Tables/SkillAnimations/anim_b3_spear1.tres"
+  },
+  "anim_b3_spear2": {
+    "number": 1156,
+    "path": "Config/Tables/SkillAnimations/anim_b3_spear2.tres"
+  },
+  "anim_b3_spear3": {
+    "number": 1157,
+    "path": "Config/Tables/SkillAnimations/anim_b3_spear3.tres"
+  },
+  "anim_b3_spear4": {
+    "number": 1158,
+    "path": "Config/Tables/SkillAnimations/anim_b3_spear4.tres"
+  },
+  "anim_b3_spear5": {
+    "number": 1159,
+    "path": "Config/Tables/SkillAnimations/anim_b3_spear5.tres"
+  },
+  "anim_b_fall": {
+    "number": 1160,
+    "path": "Config/Tables/SkillAnimations/anim_b_fall.tres"
+  },
+  "anim_b_skill1": {
+    "number": 1161,
+    "path": "Config/Tables/SkillAnimations/anim_b_skill1.tres"
+  },
+  "anim_b_skill2": {
+    "number": 1162,
+    "path": "Config/Tables/SkillAnimations/anim_b_skill2.tres"
+  },
+  "bhv_awakened": {
+    "number": 1163,
+    "path": "Config/Tables/Skills/bhv_awakened.tres"
+  },
+  "bhv_charging": {
+    "number": 1164,
+    "path": "Config/Tables/Skills/bhv_charging.tres"
+  },
+  "bhv_screaming": {
+    "number": 1165,
+    "path": "Config/Tables/Skills/bhv_screaming.tres"
+  },
+  "bhv_summoner": {
+    "number": 1166,
+    "path": "Config/Tables/Skills/bhv_summoner.tres"
+  },
+  "skl_a1_passive": {
+    "number": 1167,
+    "path": "Config/Tables/Skills/skl_a1_passive.tres"
+  },
+  "skl_a1_skill_1": {
+    "number": 1168,
+    "path": "Config/Tables/Skills/skl_a1_skill_1.tres"
+  },
+  "skl_a1_skill_2": {
+    "number": 1169,
+    "path": "Config/Tables/Skills/skl_a1_skill_2.tres"
+  },
+  "skl_a1_w1_1": {
+    "number": 1170,
+    "path": "Config/Tables/Skills/skl_a1_w1_1.tres"
+  },
+  "skl_a1_w1_2": {
+    "number": 1171,
+    "path": "Config/Tables/Skills/skl_a1_w1_2.tres"
+  },
+  "skl_a2_w1_1": {
+    "number": 1172,
+    "path": "Config/Tables/Skills/skl_a2_w1_1.tres"
+  },
+  "skl_a2_w1_2": {
+    "number": 1173,
+    "path": "Config/Tables/Skills/skl_a2_w1_2.tres"
+  },
+  "skl_a3_w1_1": {
+    "number": 1174,
+    "path": "Config/Tables/Skills/skl_a3_w1_1.tres"
+  },
+  "skl_a3_w1_2": {
+    "number": 1175,
+    "path": "Config/Tables/Skills/skl_a3_w1_2.tres"
+  },
+  "skl_b1_w1_1": {
+    "number": 1176,
+    "path": "Config/Tables/Skills/skl_b1_w1_1.tres"
+  },
+  "skl_b1_w1_2": {
+    "number": 1177,
+    "path": "Config/Tables/Skills/skl_b1_w1_2.tres"
+  },
+  "skl_b1_w1_3": {
+    "number": 1178,
+    "path": "Config/Tables/Skills/skl_b1_w1_3.tres"
+  },
+  "skl_b2_w1_1": {
+    "number": 1179,
+    "path": "Config/Tables/Skills/skl_b2_w1_1.tres"
+  },
+  "skl_b2_w1_2": {
+    "number": 1180,
+    "path": "Config/Tables/Skills/skl_b2_w1_2.tres"
+  },
+  "skl_b3_w1_1": {
+    "number": 1181,
+    "path": "Config/Tables/Skills/skl_b3_w1_1.tres"
+  },
+  "skl_b3_w1_2": {
+    "number": 1182,
+    "path": "Config/Tables/Skills/skl_b3_w1_2.tres"
+  },
+  "skl_b_fall": {
+    "number": 1183,
+    "path": "Config/Tables/Skills/skl_b_fall.tres"
+  },
+  "skl_b_skill_1": {
+    "number": 1184,
+    "path": "Config/Tables/Skills/skl_b_skill_1.tres"
+  },
+  "skl_b_skill_2": {
+    "number": 1185,
+    "path": "Config/Tables/Skills/skl_b_skill_2.tres"
+  },
+  "skl_boss_charge": {
+    "number": 1186,
+    "path": "Config/Tables/Skills/skl_boss_charge.tres"
+  },
+  "skl_boss_melee": {
+    "number": 1187,
+    "path": "Config/Tables/Skills/skl_boss_melee.tres"
+  },
+  "skl_boss_scream": {
+    "number": 1188,
+    "path": "Config/Tables/Skills/skl_boss_scream.tres"
+  },
+  "skl_boss_summon": {
+    "number": 1189,
+    "path": "Config/Tables/Skills/skl_boss_summon.tres"
+  },
+  "skl_drone_melee": {
+    "number": 1190,
+    "path": "Config/Tables/Skills/skl_drone_melee.tres"
+  },
+  "skl_enemy_charger_charge": {
+    "number": 1191,
+    "path": "Config/Tables/Skills/skl_enemy_charger_charge.tres"
+  },
+  "skl_enemy_chaser_melee": {
+    "number": 1192,
+    "path": "Config/Tables/Skills/skl_enemy_chaser_melee.tres"
+  },
+  "skl_enemy_elite_buff": {
+    "number": 1193,
+    "path": "Config/Tables/Skills/skl_enemy_elite_buff.tres"
+  },
+  "skl_enemy_elite_control": {
+    "number": 1194,
+    "path": "Config/Tables/Skills/skl_enemy_elite_control.tres"
+  },
+  "skl_enemy_elite_melee": {
+    "number": 1195,
+    "path": "Config/Tables/Skills/skl_enemy_elite_melee.tres"
+  },
+  "skl_enemy_exploder_blow": {
+    "number": 1196,
+    "path": "Config/Tables/Skills/skl_enemy_exploder_blow.tres"
+  },
+  "skl_enemy_fast_melee_melee": {
+    "number": 1197,
+    "path": "Config/Tables/Skills/skl_enemy_fast_melee_melee.tres"
+  },
+  "skl_enemy_guard_melee": {
+    "number": 1198,
+    "path": "Config/Tables/Skills/skl_enemy_guard_melee.tres"
+  },
+  "skl_enemy_jumping_leap": {
+    "number": 1199,
+    "path": "Config/Tables/Skills/skl_enemy_jumping_leap.tres"
+  },
+  "skl_enemy_ranged_shot": {
+    "number": 1200,
+    "path": "Config/Tables/Skills/skl_enemy_ranged_shot.tres"
+  },
+  "skl_enemy_screamer_scream": {
+    "number": 1201,
+    "path": "Config/Tables/Skills/skl_enemy_screamer_scream.tres"
+  },
+  "ser_b1_combo": {
+    "number": 1202,
+    "path": "Config/Tables/SkillSeries/ser_b1_combo.tres"
+  },
+  "ser_b2_combo": {
+    "number": 1203,
+    "path": "Config/Tables/SkillSeries/ser_b2_combo.tres"
+  },
+  "ser_b3_combo": {
+    "number": 1204,
+    "path": "Config/Tables/SkillSeries/ser_b3_combo.tres"
+  },
+  "stg_core": {
+    "number": 1205,
+    "path": "Config/Tables/Stages/stg_core.tres"
+  },
+  "stg_inner": {
+    "number": 1206,
+    "path": "Config/Tables/Stages/stg_inner.tres"
+  },
+  "stg_outer": {
+    "number": 1207,
+    "path": "Config/Tables/Stages/stg_outer.tres"
+  },
+  "summon_drone": {
+    "number": 1208,
+    "path": "Config/Tables/Summons/summon_drone.tres"
+  },
+  "pool_bow": {
+    "number": 1209,
+    "path": "Config/Tables/UpgradePools/pool_bow.tres"
+  },
+  "pool_crossbow": {
+    "number": 1210,
+    "path": "Config/Tables/UpgradePools/pool_crossbow.tres"
+  },
+  "pool_energy_palm": {
+    "number": 1211,
+    "path": "Config/Tables/UpgradePools/pool_energy_palm.tres"
+  },
+  "pool_scythe": {
+    "number": 1212,
+    "path": "Config/Tables/UpgradePools/pool_scythe.tres"
+  },
+  "pool_spear": {
+    "number": 1213,
+    "path": "Config/Tables/UpgradePools/pool_spear.tres"
+  },
+  "pool_spirit_sword": {
+    "number": 1214,
+    "path": "Config/Tables/UpgradePools/pool_spirit_sword.tres"
+  },
+  "evo_affection": {
+    "number": 1215,
+    "path": "Config/Tables/Upgrades/evo_affection.tres"
+  },
+  "evo_blast_palm": {
+    "number": 1216,
+    "path": "Config/Tables/Upgrades/evo_blast_palm.tres"
+  },
+  "evo_bloodthirst": {
+    "number": 1217,
+    "path": "Config/Tables/Upgrades/evo_bloodthirst.tres"
+  },
+  "evo_dash_reset": {
+    "number": 1218,
+    "path": "Config/Tables/Upgrades/evo_dash_reset.tres"
+  },
+  "evo_divergence": {
+    "number": 1219,
+    "path": "Config/Tables/Upgrades/evo_divergence.tres"
+  },
+  "evo_divine_descent": {
+    "number": 1220,
+    "path": "Config/Tables/Upgrades/evo_divine_descent.tres"
+  },
+  "evo_dragon_arrow": {
+    "number": 1221,
+    "path": "Config/Tables/Upgrades/evo_dragon_arrow.tres"
+  },
+  "evo_flow": {
+    "number": 1222,
+    "path": "Config/Tables/Upgrades/evo_flow.tres"
+  },
+  "evo_focus": {
+    "number": 1223,
+    "path": "Config/Tables/Upgrades/evo_focus.tres"
+  },
+  "evo_golden_qi": {
+    "number": 1224,
+    "path": "Config/Tables/Upgrades/evo_golden_qi.tres"
+  },
+  "evo_golden_road": {
+    "number": 1225,
+    "path": "Config/Tables/Upgrades/evo_golden_road.tres"
+  },
+  "evo_great_draw": {
+    "number": 1226,
+    "path": "Config/Tables/Upgrades/evo_great_draw.tres"
+  },
+  "evo_ground_burst": {
+    "number": 1227,
+    "path": "Config/Tables/Upgrades/evo_ground_burst.tres"
+  },
+  "evo_light_leap": {
+    "number": 1228,
+    "path": "Config/Tables/Upgrades/evo_light_leap.tres"
+  },
+  "evo_mercy": {
+    "number": 1229,
+    "path": "Config/Tables/Upgrades/evo_mercy.tres"
+  },
+  "evo_mindseye": {
+    "number": 1230,
+    "path": "Config/Tables/Upgrades/evo_mindseye.tres"
+  },
+  "evo_parry_refresh": {
+    "number": 1231,
+    "path": "Config/Tables/Upgrades/evo_parry_refresh.tres"
+  },
+  "evo_perfect_focus": {
+    "number": 1232,
+    "path": "Config/Tables/Upgrades/evo_perfect_focus.tres"
+  },
+  "evo_philander": {
+    "number": 1233,
+    "path": "Config/Tables/Upgrades/evo_philander.tres"
+  },
+  "evo_rainbow": {
+    "number": 1234,
+    "path": "Config/Tables/Upgrades/evo_rainbow.tres"
+  },
+  "evo_salvation": {
+    "number": 1235,
+    "path": "Config/Tables/Upgrades/evo_salvation.tres"
+  },
+  "evo_spare_dodge": {
+    "number": 1236,
+    "path": "Config/Tables/Upgrades/evo_spare_dodge.tres"
+  },
+  "evo_stall_kill": {
+    "number": 1237,
+    "path": "Config/Tables/Upgrades/evo_stall_kill.tres"
+  },
+  "evo_thunder_heart": {
+    "number": 1238,
+    "path": "Config/Tables/Upgrades/evo_thunder_heart.tres"
+  },
+  "evo_thunder_pool": {
+    "number": 1239,
+    "path": "Config/Tables/Upgrades/evo_thunder_pool.tres"
+  },
+  "evo_thunder_recall": {
+    "number": 1240,
+    "path": "Config/Tables/Upgrades/evo_thunder_recall.tres"
+  },
+  "evo_variation": {
+    "number": 1241,
+    "path": "Config/Tables/Upgrades/evo_variation.tres"
+  },
+  "evo_war_afterimage": {
+    "number": 1242,
+    "path": "Config/Tables/Upgrades/evo_war_afterimage.tres"
+  },
+  "evo_war_spear": {
+    "number": 1243,
+    "path": "Config/Tables/Upgrades/evo_war_spear.tres"
+  },
+  "evo_wind_domain": {
+    "number": 1244,
+    "path": "Config/Tables/Upgrades/evo_wind_domain.tres"
+  },
+  "evo_wind_field": {
+    "number": 1245,
+    "path": "Config/Tables/Upgrades/evo_wind_field.tres"
+  },
+  "evo_wind_sword": {
+    "number": 1246,
+    "path": "Config/Tables/Upgrades/evo_wind_sword.tres"
+  },
+  "evo_wind_trail": {
+    "number": 1247,
+    "path": "Config/Tables/Upgrades/evo_wind_trail.tres"
+  },
+  "mut_blood_armor": {
+    "number": 1248,
+    "path": "Config/Tables/Upgrades/mut_blood_armor.tres"
+  },
+  "mut_blood_battle": {
+    "number": 1249,
+    "path": "Config/Tables/Upgrades/mut_blood_battle.tres"
+  },
+  "mut_burn": {
+    "number": 1250,
+    "path": "Config/Tables/Upgrades/mut_burn.tres"
+  },
+  "mut_burn_plus": {
+    "number": 1251,
+    "path": "Config/Tables/Upgrades/mut_burn_plus.tres"
+  },
+  "mut_cleave": {
+    "number": 1252,
+    "path": "Config/Tables/Upgrades/mut_cleave.tres"
+  },
+  "mut_cleave_plus": {
+    "number": 1253,
+    "path": "Config/Tables/Upgrades/mut_cleave_plus.tres"
+  },
+  "mut_cleave_plus2": {
+    "number": 1254,
+    "path": "Config/Tables/Upgrades/mut_cleave_plus2.tres"
+  },
+  "mut_death_duel": {
+    "number": 1255,
+    "path": "Config/Tables/Upgrades/mut_death_duel.tres"
+  },
+  "mut_energy_shield": {
+    "number": 1256,
+    "path": "Config/Tables/Upgrades/mut_energy_shield.tres"
+  },
+  "mut_freeze": {
+    "number": 1257,
+    "path": "Config/Tables/Upgrades/mut_freeze.tres"
+  },
+  "mut_freeze_plus": {
+    "number": 1258,
+    "path": "Config/Tables/Upgrades/mut_freeze_plus.tres"
+  },
+  "mut_growth": {
+    "number": 1259,
+    "path": "Config/Tables/Upgrades/mut_growth.tres"
+  },
+  "mut_growth_plus": {
+    "number": 1260,
+    "path": "Config/Tables/Upgrades/mut_growth_plus.tres"
+  },
+  "mut_growth_plus2": {
+    "number": 1261,
+    "path": "Config/Tables/Upgrades/mut_growth_plus2.tres"
+  },
+  "mut_guard": {
+    "number": 1262,
+    "path": "Config/Tables/Upgrades/mut_guard.tres"
+  },
+  "mut_happy_runner": {
+    "number": 1263,
+    "path": "Config/Tables/Upgrades/mut_happy_runner.tres"
+  },
+  "mut_haste": {
+    "number": 1264,
+    "path": "Config/Tables/Upgrades/mut_haste.tres"
+  },
+  "mut_haste_plus": {
+    "number": 1265,
+    "path": "Config/Tables/Upgrades/mut_haste_plus.tres"
+  },
+  "mut_haste_plus2": {
+    "number": 1266,
+    "path": "Config/Tables/Upgrades/mut_haste_plus2.tres"
+  },
+  "mut_lunge": {
+    "number": 1267,
+    "path": "Config/Tables/Upgrades/mut_lunge.tres"
+  },
+  "mut_lunge_plus": {
+    "number": 1268,
+    "path": "Config/Tables/Upgrades/mut_lunge_plus.tres"
+  },
+  "mut_lunge_plus2": {
+    "number": 1269,
+    "path": "Config/Tables/Upgrades/mut_lunge_plus2.tres"
+  },
+  "mut_pierce": {
+    "number": 1270,
+    "path": "Config/Tables/Upgrades/mut_pierce.tres"
+  },
+  "mut_pierce_plus": {
+    "number": 1271,
+    "path": "Config/Tables/Upgrades/mut_pierce_plus.tres"
+  },
+  "mut_pierce_plus2": {
+    "number": 1272,
+    "path": "Config/Tables/Upgrades/mut_pierce_plus2.tres"
+  },
+  "mut_ricochet": {
+    "number": 1273,
+    "path": "Config/Tables/Upgrades/mut_ricochet.tres"
+  },
+  "mut_ricochet_plus": {
+    "number": 1274,
+    "path": "Config/Tables/Upgrades/mut_ricochet_plus.tres"
+  },
+  "mut_ricochet_plus2": {
+    "number": 1275,
+    "path": "Config/Tables/Upgrades/mut_ricochet_plus2.tres"
+  },
+  "mut_soul_harvest": {
+    "number": 1276,
+    "path": "Config/Tables/Upgrades/mut_soul_harvest.tres"
+  },
+  "mut_stomp": {
+    "number": 1277,
+    "path": "Config/Tables/Upgrades/mut_stomp.tres"
+  },
+  "mut_stomp_kill": {
+    "number": 1278,
+    "path": "Config/Tables/Upgrades/mut_stomp_kill.tres"
+  },
+  "mut_thunder_armor": {
+    "number": 1279,
+    "path": "Config/Tables/Upgrades/mut_thunder_armor.tres"
+  },
+  "mut_thunder_mark": {
+    "number": 1280,
+    "path": "Config/Tables/Upgrades/mut_thunder_mark.tres"
+  },
+  "mut_wind_armor": {
+    "number": 1281,
+    "path": "Config/Tables/Upgrades/mut_wind_armor.tres"
+  },
+  "mut_wind_heart": {
+    "number": 1282,
+    "path": "Config/Tables/Upgrades/mut_wind_heart.tres"
+  },
+  "surv_anchor_afterglow": {
+    "number": 1283,
+    "path": "Config/Tables/Upgrades/surv_anchor_afterglow.tres"
+  },
+  "surv_anchor_core": {
+    "number": 1284,
+    "path": "Config/Tables/Upgrades/surv_anchor_core.tres"
+  },
+  "surv_anchor_pulse": {
+    "number": 1285,
+    "path": "Config/Tables/Upgrades/surv_anchor_pulse.tres"
+  },
+  "surv_contract_payoff": {
+    "number": 1286,
+    "path": "Config/Tables/Upgrades/surv_contract_payoff.tres"
+  },
+  "surv_echo_familiar": {
+    "number": 1287,
+    "path": "Config/Tables/Upgrades/surv_echo_familiar.tres"
+  },
+  "surv_echo_lance": {
+    "number": 1288,
+    "path": "Config/Tables/Upgrades/surv_echo_lance.tres"
+  },
+  "surv_echo_mark": {
+    "number": 1289,
+    "path": "Config/Tables/Upgrades/surv_echo_mark.tres"
+  },
+  "surv_energy_echo": {
+    "number": 1290,
+    "path": "Config/Tables/Upgrades/surv_energy_echo.tres"
+  },
+  "surv_risk_contract": {
+    "number": 1291,
+    "path": "Config/Tables/Upgrades/surv_risk_contract.tres"
+  },
+  "surv_scavenger_compass": {
+    "number": 1292,
+    "path": "Config/Tables/Upgrades/surv_scavenger_compass.tres"
+  },
+  "surv_scavenger_ward": {
+    "number": 1293,
+    "path": "Config/Tables/Upgrades/surv_scavenger_ward.tres"
+  },
+  "surv_timed_hunt": {
+    "number": 1294,
+    "path": "Config/Tables/Upgrades/surv_timed_hunt.tres"
+  },
+  "upg_armor": {
+    "number": 1295,
+    "path": "Config/Tables/Upgrades/upg_armor.tres"
+  },
+  "upg_climb": {
+    "number": 1296,
+    "path": "Config/Tables/Upgrades/upg_climb.tres"
+  },
+  "upg_crit": {
+    "number": 1297,
+    "path": "Config/Tables/Upgrades/upg_crit.tres"
+  },
+  "upg_crit_plus": {
+    "number": 1298,
+    "path": "Config/Tables/Upgrades/upg_crit_plus.tres"
+  },
+  "upg_crit_plus2": {
+    "number": 1299,
+    "path": "Config/Tables/Upgrades/upg_crit_plus2.tres"
+  },
+  "upg_critdmg": {
+    "number": 1300,
+    "path": "Config/Tables/Upgrades/upg_critdmg.tres"
+  },
+  "upg_critdmg_plus": {
+    "number": 1301,
+    "path": "Config/Tables/Upgrades/upg_critdmg_plus.tres"
+  },
+  "upg_critdmg_plus2": {
+    "number": 1302,
+    "path": "Config/Tables/Upgrades/upg_critdmg_plus2.tres"
+  },
+  "upg_hard": {
+    "number": 1303,
+    "path": "Config/Tables/Upgrades/upg_hard.tres"
+  },
+  "upg_hard_plus": {
+    "number": 1304,
+    "path": "Config/Tables/Upgrades/upg_hard_plus.tres"
+  },
+  "upg_hard_plus2": {
+    "number": 1305,
+    "path": "Config/Tables/Upgrades/upg_hard_plus2.tres"
+  },
+  "upg_insight": {
+    "number": 1306,
+    "path": "Config/Tables/Upgrades/upg_insight.tres"
+  },
+  "upg_life": {
+    "number": 1307,
+    "path": "Config/Tables/Upgrades/upg_life.tres"
+  },
+  "upg_life_plus": {
+    "number": 1308,
+    "path": "Config/Tables/Upgrades/upg_life_plus.tres"
+  },
+  "upg_life_plus2": {
+    "number": 1309,
+    "path": "Config/Tables/Upgrades/upg_life_plus2.tres"
+  },
+  "upg_power": {
+    "number": 1310,
+    "path": "Config/Tables/Upgrades/upg_power.tres"
+  },
+  "upg_storm": {
+    "number": 1311,
+    "path": "Config/Tables/Upgrades/upg_storm.tres"
+  },
+  "upg_swift": {
+    "number": 1312,
+    "path": "Config/Tables/Upgrades/upg_swift.tres"
+  },
+  "upg_thunder_blast": {
+    "number": 1313,
+    "path": "Config/Tables/Upgrades/upg_thunder_blast.tres"
+  },
+  "upg_thunder_mastery": {
+    "number": 1314,
+    "path": "Config/Tables/Upgrades/upg_thunder_mastery.tres"
+  },
+  "upg_violence": {
+    "number": 1315,
+    "path": "Config/Tables/Upgrades/upg_violence.tres"
+  },
+  "upg_war_heart": {
+    "number": 1316,
+    "path": "Config/Tables/Upgrades/upg_war_heart.tres"
+  },
+  "upg_wild_wind": {
+    "number": 1317,
+    "path": "Config/Tables/Upgrades/upg_wild_wind.tres"
+  },
+  "tag_high": {
+    "number": 1318,
+    "path": "Config/Tables/ValueTags/tag_high.tres"
+  },
+  "tag_low": {
+    "number": 1319,
+    "path": "Config/Tables/ValueTags/tag_low.tres"
+  },
+  "tag_mid": {
+    "number": 1320,
+    "path": "Config/Tables/ValueTags/tag_mid.tres"
+  },
+  "wpn_bow": {
+    "number": 1321,
+    "path": "Config/Tables/Weapons/wpn_bow.tres"
+  },
+  "wpn_crossbow": {
+    "number": 1322,
+    "path": "Config/Tables/Weapons/wpn_crossbow.tres"
+  },
+  "wpn_energy_palm": {
+    "number": 1323,
+    "path": "Config/Tables/Weapons/wpn_energy_palm.tres"
+  },
+  "wpn_scythe": {
+    "number": 1324,
+    "path": "Config/Tables/Weapons/wpn_scythe.tres"
+  },
+  "wpn_spear": {
+    "number": 1325,
+    "path": "Config/Tables/Weapons/wpn_spear.tres"
+  },
+  "wpn_spirit_sword": {
+    "number": 1326,
+    "path": "Config/Tables/Weapons/wpn_spirit_sword.tres"
+  },
+  "nature_pilot_combo": {
+    "number": 1327,
+    "path": "Config/Testing/nature_pilot_combo.tres"
+  },
+  "enemy_heavy_slammer_art_preview": {
+    "number": 1328,
+    "path": "Config/Testing/stone_slammer_preview.tres"
+  },
+  "numeric:1329": {
+    "number": 1329,
+    "path": "Config/Tables/SceneRunes/scene_rune_1329.tres"
+  },
+  "numeric:1330": {
+    "number": 1330,
+    "path": "Config/Tables/SceneRunes/scene_rune_1330.tres"
+  },
+  "numeric:1331": {
+    "number": 1331,
+    "path": "Config/Tables/SceneRunes/scene_rune_1331.tres"
+  },
+  "numeric:1332": {
+    "number": 1332,
+    "path": "Config/Tables/SceneRunes/scene_rune_1332.tres"
+  },
+  "numeric:1333": {
+    "number": 1333,
+    "path": "Config/Tables/SceneRunes/scene_rune_1333.tres"
+  },
+  "numeric:1334": {
+    "number": 1334,
+    "path": "Config/Tables/SceneRunes/scene_rune_1334.tres"
+  },
+  "numeric:1335": {
+    "number": 1335,
+    "path": "Config/Tables/SceneRunes/scene_rune_1335.tres"
+  },
+  "numeric:1336": {
+    "number": 1336,
+    "path": "Config/Tables/SceneRunes/scene_rune_1336.tres"
+  },
+  "numeric:1339": {
+    "number": 1339,
+    "path": "Config/Tables/Enemies/enemy_scaredy_shroom.tres"
+  },
+  "numeric:1340": {
+    "number": 1340,
+    "path": "Config/Tables/Nodes/node_armor.tres"
+  },
+  "numeric:1337": {
+    "number": 1337,
+    "path": "Config/Tables/Upgrades/reward_1337.tres"
+  },
+  "numeric:1338": {
+    "number": 1338,
+    "path": "Config/Tables/Upgrades/reward_1338.tres"
+  },
+  "numeric:1341": {
+    "number": 1341,
+    "path": "Config/Tables/Upgrades/reward_1341.tres"
+  },
+  "numeric:1342": {
+    "number": 1342,
+    "path": "Config/Tables/Upgrades/reward_1342.tres"
+  },
+  "supply_status_1356": {
+    "number": 1356,
+    "path": "Config/Tables/Effects/effect_1356.tres"
+  },
+  "supply_status_1357": {
+    "number": 1357,
+    "path": "Config/Tables/Effects/effect_1357.tres"
+  },
+  "supply_status_1358": {
+    "number": 1358,
+    "path": "Config/Tables/Effects/effect_1358.tres"
+  },
+  "build_2_0_1343": {
+    "number": 1343,
+    "path": "Config/Tables/Upgrades/reward_1343.tres"
+  },
+  "build_2_0_1344": {
+    "number": 1344,
+    "path": "Config/Tables/Upgrades/reward_1344.tres"
+  },
+  "build_2_0_1345": {
+    "number": 1345,
+    "path": "Config/Tables/Upgrades/reward_1345.tres"
+  },
+  "build_2_0_1346": {
+    "number": 1346,
+    "path": "Config/Tables/Upgrades/reward_1346.tres"
+  },
+  "build_2_0_1347": {
+    "number": 1347,
+    "path": "Config/Tables/Upgrades/reward_1347.tres"
+  },
+  "build_2_0_1348": {
+    "number": 1348,
+    "path": "Config/Tables/Upgrades/reward_1348.tres"
+  },
+  "build_2_0_1349": {
+    "number": 1349,
+    "path": "Config/Tables/Upgrades/reward_1349.tres"
+  },
+  "build_2_0_1350": {
+    "number": 1350,
+    "path": "Config/Tables/Upgrades/reward_1350.tres"
+  },
+  "build_2_0_1351": {
+    "number": 1351,
+    "path": "Config/Tables/Upgrades/reward_1351.tres"
+  },
+  "build_2_0_1352": {
+    "number": 1352,
+    "path": "Config/Tables/Upgrades/reward_1352.tres"
+  },
+  "build_2_0_1353": {
+    "number": 1353,
+    "path": "Config/Tables/Upgrades/reward_1353.tres"
+  },
+  "build_2_0_1354": {
+    "number": 1354,
+    "path": "Config/Tables/Upgrades/reward_1354.tres"
+  },
+  "build_2_0_1355": {
+    "number": 1355,
+    "path": "Config/Tables/Upgrades/reward_1355.tres"
+  }
+}

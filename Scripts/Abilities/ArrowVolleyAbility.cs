@@ -107,6 +107,10 @@ public partial class ArrowVolleyAbility : Ability
 
 	/// <summary>追踪搜索半径（米；0 = 不限）。</summary>
 	[Export] public float HomingRange { get; set; }
+	/// <summary>追踪启用前保留的真实飞行距离。</summary>
+	[Export] public float HomingStartDistance { get; set; } = 2.5f;
+	/// <summary>玩家箭与飞刀使用三次贝塞尔追踪；无目标沿正常抛物线飞行。</summary>
+	[Export] public bool BezierHoming { get; set; } = true;
 
 	[ExportGroup("其余命中参数")]
 	/// <summary>可穿透的目标数量（0 = 命中即消失）。</summary>
@@ -196,7 +200,6 @@ public partial class ArrowVolleyAbility : Ability
 		RampMaxCount = Mathf.Max(1, maxCount);
 		RampWindowSeconds = Mathf.Max(0.01f, window);
 		RampShotIntervalSeconds = Mathf.Max(0.01f, interval);
-		_rampCount = 0; _rampTimer = 0;
 	}
 	protected override bool CanReleaseBeforeBase => base.CanReleaseBeforeBase || RampMaxCount > 0;
 
@@ -262,6 +265,7 @@ public partial class ArrowVolleyAbility : Ability
 		_releasedPower = 1; _releasedSteps = 0;
 		_releasedChargeSeconds = 0f;
 		_burstRemaining = 0; _burstAttack = null;
+		_heldFireTimer = _heldFireInterval;
 
 		if (!ResolveProjectileScene())
 		{
@@ -271,7 +275,7 @@ public partial class ArrowVolleyAbility : Ability
 			return;
 		}
 
-		if (PlaySkillAnimation().Length == 0) { Cancel(); return; }
+		if (PlayVolleyAnimation().Length == 0) { Cancel(); return; }
 		if (ActRoguelike.Debug.SelfTest.DebugSkipSkillAnimation)
 		{
 			GameLog.Write("Combat", $"⚠ 技能 {AbilityId} 按排障开关跳过了动画事件帧，直接发射。");
@@ -357,6 +361,7 @@ public partial class ArrowVolleyAbility : Ability
 
 		if (_fired)
 		{
+			if (_heldFireInterval > 0) { TickHeldFire(delta); return; }
 			if (_burstRemaining > 0 && _burstAttack != null)
 			{
 				if (Engine.GetPhysicsFrames() == _burstFrame) return;
@@ -371,6 +376,7 @@ public partial class ArrowVolleyAbility : Ability
 			return;
 		}
 
+		if (_heldFireInterval > 0) { TickHeldFire(delta); return; }
 		float eventSpeed = HoldToCharge ? ChargeReleaseAnimSpeedScale : AnimSpeedScale;
 		if ((!HoldToCharge || _releasePending) && StateTime > AnimationEventTimeout / Mathf.Max(0.01f, eventSpeed))
 		{
@@ -386,6 +392,8 @@ public partial class ArrowVolleyAbility : Ability
 	{
 		_rampCount = 0; _rampTimer = 0;
 		_volleyCountOverride = 0; _damagePerLostArrow = _seekRange = _seekTurnRate = 0f; _seekDistinctHostiles = false;
+		_heldFireInterval = _heldFireTimer = 0; _heldFireDamageScale = 1;
+		_heldFireCount = 0;
 	}
 	protected virtual void PrepareShot() { }
 
@@ -448,16 +456,22 @@ public partial class ArrowVolleyAbility : Ability
 		}
 		else if (RampMaxCount > 0) { _rampCount = 0; _rampTimer = 0; }
 
-		// **发数覆盖**（P5 `<A2限定>`「专一」：只会射出一箭，但原先每多出一箭就 +80% 伤害）。
+		// **发数覆盖**（P5 `<A2限定>`「专一」：只射一把，合并本次被减少飞刀的全部直接伤害）。
 		// 覆盖值 ≤ 0 → 一行都不进（既有四把武器逐位不变）；被"砍掉"的那几发按**每一发**乘一个倍率
 		// （`VolleyDamagePerLostArrow`，默认 0 → 不乘）。
 		float lostArrowDamageMultiplier = 1f;
 		float countOverride = _volleyCountOverride > 0 ? _volleyCountOverride : stats.Get("VolleyCountOverride");
-		if (countOverride > 0f && countOverride < count)
+		bool focused = _damagePerLostArrow + stats.Get("VolleyDamagePerLostArrow") > 0;
+		if (_heldFireInterval > 0) count = Mathf.Max(1, _heldFireCount);
+		else if (!focused && countOverride > 0) count = Mathf.Min(count, Mathf.Max(1, Mathf.RoundToInt(countOverride)));
+		int primaryCount = count;
+		int extraCount = Mathf.Max(0, Mathf.RoundToInt(stats.Get("ProjectileCountAdd")));
+		count += extraCount;
+		if (focused)
 		{
-			int lost = count - Mathf.RoundToInt(countOverride);
+			int lost = count - 1;
 			lostArrowDamageMultiplier = 1f + (lost * Mathf.Max(0f, _damagePerLostArrow + stats.Get("VolleyDamagePerLostArrow")));
-			count = Mathf.Max(1, Mathf.RoundToInt(countOverride));
+			count = primaryCount = 1; extraCount = 0;
 		}
 
 		// 伤害：绝对值 × 档位倍率（A2 的 ChargeStepScale = 1 → 不变；A3 = 1.3^档）。
@@ -478,9 +492,11 @@ public partial class ArrowVolleyAbility : Ability
 
 		var attack = new AttackInstance
 		{
+			IsManualWeaponAttack = true,
+			PowerDamageWeight = power * (HoldToCharge ? LastReleaseDamageScale : 1) * _heldFireDamageScale,
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
-			BaseDamage = shotDamage * damageMultiplier * lostArrowDamageMultiplier,
+			BaseDamage = shotDamage * damageMultiplier * lostArrowDamageMultiplier * _heldFireDamageScale,
 			CanCrit = true,
 			CritChance = offense.CritChance,
 			CritMultiplier = offense.CritMultiplier,
@@ -492,6 +508,7 @@ public partial class ArrowVolleyAbility : Ability
 			Ricochet = (int)stats.Get("RicochetAdd"),
 			BypassBlock = BypassBlock,
 			AbilityKind = AbilityId,
+			ProjectileCount = count,
 		};
 
 		List<Unit>? seekTargets = null;
@@ -510,18 +527,20 @@ public partial class ArrowVolleyAbility : Ability
 			});
 		}
 		// 固定总角度在最终发数确定后均分；追踪目标只影响出手后的转向，不改变初速散射范围。
-		float spreadStep = count <= 1 || burst ? 0f
-			: SpreadAngleDegrees >= 0f ? Mathf.Clamp(SpreadAngleDegrees, 0f, 180f) / (count - 1)
+		float spreadStep = primaryCount <= 1 || burst ? 0f
+			: SpreadAngleDegrees >= 0f ? Mathf.Clamp(SpreadAngleDegrees, 0f, 180f) / (primaryCount - 1)
 			: SpreadStepDegrees;
-		for (int i = 0; i < (burst ? 1 : count); i++)
+		for (int i = 0; i < (burst ? 1 : primaryCount); i++)
 		{
-			float offset = (i - ((count - 1) * 0.5f)) * spreadStep;
+			float offset = (i - ((primaryCount - 1) * 0.5f)) * spreadStep;
 			Unit? seekTarget = seekTargets is { Count: > 0 } ? seekTargets[i % seekTargets.Count] : null;
 			FireProjectile(attack, direction, shotSpeed, shotSize, offset, seekTarget);
 		}
-		if (burst && count > 1)
+		int followupFrames = Mathf.Max(0, Mathf.RoundToInt(stats.Get("ProjectileFollowupDelayFrames")));
+		for (int i = 0; i < extraCount; i++) FireProjectile(attack, direction, shotSpeed, shotSize, 0, null, followupFrames * (i + 1));
+		if (burst && primaryCount > 1)
 		{
-			_burstAttack = attack; _burstRemaining = count - 1;
+			_burstAttack = attack; _burstRemaining = primaryCount - 1;
 			_burstSpeed = shotSpeed; _burstSize = shotSize;
 			_burstInterval = Mathf.Max(0.01f, RampShotIntervalSeconds); _burstTimer = _burstInterval;
 			_burstFrame = Engine.GetPhysicsFrames();
@@ -531,7 +550,7 @@ public partial class ArrowVolleyAbility : Ability
 		LastShotSpeed = shotSpeed;
 		LastShotCount = count;
 		LastSpreadDegrees = spreadStep;
-		LastSpreadAngleDegrees = spreadStep * (count - 1);
+		LastSpreadAngleDegrees = spreadStep * (primaryCount - 1);
 		LastShotDirection = direction;
 		LastShotPerfect = _perfect;
 		LastShotChargedShot = chargedShot;
@@ -547,7 +566,7 @@ public partial class ArrowVolleyAbility : Ability
 				: string.Empty)
 			+ $"下坠起点 {GravityStartDistance:0.##}m 重力 {GravityScale:0.##} 击退 {knockback:0.##} 追踪 [{HomingStatusId}]，方向 {direction}）");
 	}
-	private void FireProjectile(AttackInstance attack, Vector3 direction, float speed, float size, float offset, Unit? seekTarget = null)
+	private void FireProjectile(AttackInstance attack, Vector3 direction, float speed, float size, float offset, Unit? seekTarget = null, int delayFrames = 0)
 	{
 		if (OwnerUnit == null || ProjectileScene == null) return;
 		Vector3 origin = OwnerUnit.GlobalPosition + Vector3.Up * 0.9f + direction * 0.6f;
@@ -561,11 +580,10 @@ public partial class ArrowVolleyAbility : Ability
 		}
 		Vector3 dir = Mathf.Abs(offset) < 0.0001f ? direction : direction.Rotated(spreadAxis, Mathf.DegToRad(offset));
 		var arrow = ProjectileScene.Instantiate<Projectile>();
-		(GetTree().CurrentScene ?? GetTree().Root).AddChild(arrow);
-		arrow.GlobalPosition = origin;
 		if (size > 0) arrow.Scale = Vector3.One * size;
 		arrow.Speed = speed; arrow.GravityScale = GravityScale; arrow.GravityStartDistance = GravityStartDistance;
 		arrow.HomingStatusId = HomingStatusId; arrow.HomingTurnRateDegrees = HomingTurnRateDegrees; arrow.HomingRange = HomingRange;
+		arrow.HomingStartDistance = HomingStartDistance; arrow.BezierHoming = BezierHoming;
 		if (_seekDistinctHostiles)
 		{
 			arrow.SeekAnyHostile = true; arrow.AssignedHomingTarget = seekTarget;
@@ -576,6 +594,6 @@ public partial class ArrowVolleyAbility : Ability
 		if (QueryGeometry >= 0) arrow.QueryGeometry = QueryGeometry;
 		arrow.SweepMaxHits = SweepMaxHits;
 		arrow.SweepRadius = SweepRadius;
-		arrow.Launch(attack, dir);
+		ProjectileDispatch.Submit(this, OwnerUnit, arrow, attack, origin, dir, delayFrames);
 	}
 }

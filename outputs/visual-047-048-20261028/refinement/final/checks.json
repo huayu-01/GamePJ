@@ -1,0 +1,58 @@
+[
+  {
+    "Case": "BuildRewards",
+    "Mode": "headless",
+    "Seconds": 7.94,
+    "Exit": 0,
+    "StderrBytes": 0
+  },
+  {
+    "Case": "BuildRewards",
+    "Mode": "render",
+    "Seconds": 9.9,
+    "Exit": 0,
+    "StderrBytes": 0
+  },
+  {
+    "Case": "Codex",
+    "Mode": "headless",
+    "Seconds": 8.99,
+    "Exit": 0,
+    "StderrBytes": 0
+  },
+  {
+    "Case": "Codex",
+    "Mode": "render",
+    "Seconds": 10.77,
+    "Exit": 0,
+    "StderrBytes": 0
+  },
+  {
+    "Case": "ContentLocalization",
+    "Mode": "headless",
+    "Seconds": 3.05,
+    "Exit": 0,
+    "StderrBytes": 0
+  },
+  {
+    "Case": "ContentLocalization",
+    "Mode": "render",
+    "Seconds": 4.44,
+    "Exit": 0,
+    "StderrBytes": 0
+  },
+  {
+    "Case": "RewardRules",
+    "Mode": "headless",
+    "Seconds": 3.88,
+    "Exit": 0,
+    "StderrBytes": 0
+  },
+  {
+    "Case": "BatchE",
+    "Mode": "headless",
+    "Seconds": 21.41,
+    "Exit": 0,
+    "StderrBytes": 0
+  }
+]

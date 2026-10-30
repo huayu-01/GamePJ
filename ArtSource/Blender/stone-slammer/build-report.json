@@ -1,0 +1,22 @@
+{
+  "asset": "stone-slammer-geometric-v1",
+  "date": "2026-10-21",
+  "creation_method": "Blender MCP procedural modeling",
+  "height_meters": 2.956,
+  "body_triangles": 1848,
+  "hammer_triangles": 144,
+  "total_triangles": 1992,
+  "vertices": 1088,
+  "bones": 23,
+  "maximum_weights_per_vertex": 1,
+  "unweighted_vertices": 0,
+  "animations": ["idle", "walk", "sprint", "slam", "hit", "die"],
+  "impact_time_seconds": 0.55,
+  "animation_sample_fps": 60,
+  "animation_start_seconds": 0,
+  "slam_duration_seconds": 0.9,
+  "hammer_lowest_point_at_impact_meters": 0.052,
+  "godot_hammer_lowest_point_at_impact_meters": 0.0516252,
+  "runtime": "Assets/Enemies/StoneSlammer/stone_slammer.glb",
+  "source": "ArtSource/Blender/stone-slammer/stone-slammer.blend"
+}

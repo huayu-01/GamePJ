@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EffectConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="stat"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/ic_status_aura.svg" id="icon"]
+[sub_resource type="Resource" id="modifier"]
+script = ExtResource("stat")
+Stat = "AttackPowerAdd"
+Operation = 0
+Value = 30
+[resource]
+script = ExtResource("row")
+NumericId = 1356
+DisplayName = "力量药剂"
+NameKey = "content.1356.name"
+DescriptionKey = "content.1356.description"
+DescriptionTemplate = "基础攻击+{Modifiers.0.Value:0}，持续{Duration}秒，按一次直接出手在多弹/组成段间分配；再次拾取刷新时间，不叠加强度。"
+Kind = 4
+Slot = 0
+Duration = 30
+MaxStacks = 1
+VisualStyle = 4
+VisualIcon = ExtResource("icon")
+VisualColor = Color(1, 0.45, 0.15, 0.8)
+Modifiers = [SubResource("modifier")]

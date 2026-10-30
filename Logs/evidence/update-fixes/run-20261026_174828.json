@@ -1,0 +1,7 @@
+{
+  "Date": "2026-10-26T17:48:28",
+  "Passed": false,
+  "Runs": [],
+  "SavesUnchanged": true,
+  "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_174828.ui_guard.headless.log / F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_174828.ui_guard.headless.err"
+}

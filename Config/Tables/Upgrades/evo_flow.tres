@@ -1,27 +1,35 @@
 [gd_resource type="Resource" script_class="RewardConfig" format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/ChargeBehaviorTuning.cs" id="1_tuning"]
+[ext_resource type="Script" path="res://Scripts/Config/HeldFireTuning.cs" id="1_tuning"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a2_w1_2.tres" id="3_skill"]
 [ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_crossbow.tres" id="1_pool"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="Resource_charge"]
 script = ExtResource("1_tuning")
 TargetAbility = ExtResource("3_skill")
-BaseSecondsOverride = 0.1
-StepSecondsOverride = 0.1
-AutoReleaseOnFullCharge = true
-VolleyCountOverride = 1
+IntervalSeconds = 0.3
+DamageScale = 0.5
+ProjectileCount = 1
+
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("Resource_charge")
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1222
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "ChargeBehavior"
-ChargeBehavior = SubResource("Resource_charge")
+Effects = [SubResource("Resource_effect_tuning")]
 RequiredCharacterIds = PackedStringArray("chr_hunter")
 Pool = ExtResource("1_pool")
 Id = "evo_flow"
 DisplayName = "心流"
-DescriptionTemplate = "武技2所有蓄力时间变为 0.1s，且蓄力完成立刻掷出 1 把飞刀"
-Note = "J21：仅飞刀武技2基础和每档后置蓄力覆盖0.1秒，保留3个后置档（当前总满蓄0.4秒），满蓄自动提交一次释放，真实释放动画ATK才出1把飞刀。与花心组合时固定覆盖优先于缩时；按住不自动开始下一次。各时间和开关可直接改此资源。"
+DescriptionTemplate = "武技2改为按住每{Effects.0.Tuning.IntervalSeconds:0.#}秒掷出{Effects.0.Tuning.ProjectileCount}把飞刀，伤害为原来的{Effects.0.Tuning.DamageScale:0%}；松开停止。"
+Note = "心流不再蓄力，按住持续发射；每轮依赖真实ATK，松开或被打断立即停止。参数仅作用于飞刀武技2，来源撤销／换装恢复普通蓄力。"
+
+NameKey = "content.evo_flow.name"
+
+DescriptionKey = "content.evo_flow.description"

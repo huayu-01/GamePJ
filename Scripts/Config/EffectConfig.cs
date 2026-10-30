@@ -85,6 +85,8 @@ public partial class EffectConfig : ConfigRow
 	[Export] public float VisualSpeed { get; set; } = 1.5f;
 	[Export] public int VisualCount { get; set; } = 6;
 	[Export] public bool VisualShowStacks { get; set; }
+	/// <summary>纯内部索敌信标可明确关闭表现；其他附加状态没有配置时仍显示通用提示。</summary>
+	[Export] public bool HideStatusVisual { get; set; }
 
 	[ExportGroup("通用数值（按 Kind 选用，用不到的就留默认值）")]
 	/// <summary>
@@ -112,12 +114,12 @@ public partial class EffectConfig : ConfigRow
 	[Export] public int MaxStacks { get; set; } = 1;
 
 	/// <summary>
-	/// 本行是不是一条"可被挂到单位身上的状态"（有 Modifiers / 有持续伤害 / 或**是可叠加的纯标记**）。
+	/// 本行是不是一条"可被挂到单位身上的状态"（有 Modifiers / 持续伤害 / 可叠加标记 / 纯视觉提示）。
 	///
 	/// ⚠️ 第三个条件是「标记」这类**没有数值修正**的纯计数 buff 所需要的：它没有任何 Modifier，
 	/// 却必须能被挂上（心眼那条增幅读的就是层数）。
 	/// </summary>
-	public bool IsStatus => Modifiers.Length > 0 || DamagePerSecond > 0f || MaxStacks > 1;
+	public bool IsStatus => Modifiers.Length > 0 || DamagePerSecond > 0f || MaxStacks > 1 || VisualStyle != StatusVisualStyle.None;
 
 	/// <summary>
 	/// 转成运行期的 <see cref="StatusEffect"/>（状态类效果用）。

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ArmorRecoilTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/ArmorRecoilTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1002
+Id = "elite_armor_recoil"
+Title = "裂甲反冲"
+Description = "非致死破甲后预警反冲，再短暂易伤。"
+NameKey = "elite.armor_recoil.name"
+DescriptionKey = "elite.armor_recoil.description"
+Radius = 3
+Damage = 10
+Duration = 2
+Magnitude = 1.25

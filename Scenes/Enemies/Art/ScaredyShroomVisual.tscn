@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Assets/Enemies/ScaredyShroom/scaredy_shroom.glb" id="1"]
+[ext_resource type="Script" path="res://Scripts/Testing/EnemyVisualPreview.gd" id="2"]
+
+[node name="ScaredyShroomVisual" type="Node3D"]
+script = ExtResource("2")
+metadata/art_source = "hunyuan-scaredy-shroom-v1"
+
+[node name="Model" parent="." instance=ExtResource("1")]

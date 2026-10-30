@@ -1,0 +1,20 @@
+[
+  {
+    "Name": "collect_only",
+    "Failure": "",
+    "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.collect_only.log",
+    "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.collect_only.err"
+  },
+  {
+    "Name": "direct_reload",
+    "Failure": "引擎验证未通过：exit=-1073741795；F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.direct_reload.log / F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.direct_reload.err",
+    "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.direct_reload.log",
+    "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.direct_reload.err"
+  },
+  {
+    "Name": "original_safe",
+    "Failure": "",
+    "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.original_safe.log",
+    "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\gc_isolate_20261025_083430.original_safe.err"
+  }
+]

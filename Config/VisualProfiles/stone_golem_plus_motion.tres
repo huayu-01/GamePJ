@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UnitVisualProfile" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/UnitVisualProfile.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Assets/Enemies/StoneGolemPlus/stone_golem_plus.glb" id="2"]
+[ext_resource type="Resource" path="res://Config/MotionFx/stone_body_dash.tres" id="3"]
+[ext_resource type="Resource" path="res://Config/MotionFx/stone_double_fist.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+ModelScene = ExtResource("2")
+ModelTransform = Transform3D(-0.67, 0, 0, 0, 0.67, 0, 0, 0, -0.67, 0, 0, 0)
+AnimRun = "walk"
+MotionEffects = [ExtResource("3"), ExtResource("4")]

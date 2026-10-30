@@ -61,7 +61,8 @@ public partial class PlayerInteractInput : Node
 			}
 
 			float distance = item.GlobalPosition.DistanceSquaredTo(_player!.GlobalPosition);
-			if (distance <= item.InteractRadius * item.InteractRadius && distance < bestDistance)
+			// CanInteract 已按触发器或半径判定，不能再用半径裁掉较大的触发器。
+			if (distance < bestDistance)
 			{
 				bestDistance = distance;
 				best = item;

@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1140
 Id = "anim_a1_backdash"
 DisplayName = "A1 技能1 后撤 · Dodge→Dodger 无敌区间"
 Note = "角色 A 技能1：源段 jump（0.5s）缩到 0.35s（scale = 0.7）。两个事件帧夹出无敌区间：Dodge @0.00（开无敌 + 给向后的力）、Dodger @0.35（关无敌 + 收招）。文档原话「帧 Dodge 到 Dodger 期间无敌」。"

@@ -1,0 +1,22 @@
+{
+  "Date": "2026-10-27T19:23:07",
+  "Passed": true,
+  "MigratedItems": 216,
+  "RootAiStrays": 0,
+  "MigrationPassed": true,
+  "ValidationInfrastructure": "Logs/evidence/validation-infrastructure-20261027_191401.json",
+  "SceneRunes": "Logs/evidence/elites/run-20261027_191503.json",
+  "RegressionPassed": [
+    "content",
+    "rune",
+    "specialization",
+    "adventure",
+    "main",
+    "rune_ui",
+    "survival"
+  ],
+  "RetainedInitialFailure": "Logs/evidence/survival/integration-20261027_191554.json",
+  "SuccessfulRetry": "Logs/evidence/survival/integration-20261027_191957.json",
+  "AcceptanceRecord": "Logs/maintenance/acceptance-20261026/scene-runes-update-result.json",
+  "SavesUnchanged": true
+}

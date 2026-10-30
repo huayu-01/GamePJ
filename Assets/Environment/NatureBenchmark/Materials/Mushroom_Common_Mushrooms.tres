@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://coka6qjppa7k1"]
+
+[ext_resource type="Texture2D" uid="uid://b6467568bg1bx" path="res://Assets/Environment/StylizedNature/Models/Mushrooms.png" id="1_21rgl"]
+
+[resource]
+resource_name = "Mushrooms"
+cull_mode = 2
+specular_mode = 2
+albedo_texture = ExtResource("1_21rgl")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0

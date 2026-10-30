@@ -51,6 +51,10 @@ public partial class NavigationFoundationProbe : Node3D
 		for (int i = 0; i < path.Length; i++) { maxZ = Mathf.Max(maxZ, Mathf.Abs(path[i].Z)); if (i > 0) length += path[i].DistanceTo(path[i - 1]); }
 		Check(length > 15 && maxZ > 5, $"路径真实绕过长墙，长度={length:0.##}／绕行z={maxZ:0.##}");
 		Check(!_map.TryPath(new Vector3(6, 0.05f, 0), new Vector3(35, 0.05f, 0), out _), "隔离导航岛不能因最近点存在而判可达");
+		Check(_map.TryApproachPath(new Vector3(-6,.05f,0),new Vector3(35,.05f,0),out var partial)
+			&& partial[^1].X>10 && partial[^1].X<21,"追击隔离岛保留本连通区最靠近目标的实际部分路径");
+		Check(_map.TryApproachPath(new Vector3(-6,.05f,0),new Vector3(0,9,0),out partial)
+			&& partial[^1].Y<1 && Mathf.Abs(partial[^1].X)<2,"高处不可达目标仍能投影到地面可接近边界");
 		Check(!_map.TryValidPoint(Vector3.Zero, new Vector3(-6, 0.05f, 0), out _, snapTolerance: 0.1f), "墙内候选点投影超差时拒绝");
 		Check(!_map.TryRingPoint(new Vector3(35, 0.05f, 0), 10, 12, out _), "范围内没有连通可站点时返回失败");
 		var occupant = Actor(new Vector3(-5, 0.05f, 5)); await Wait(3);
@@ -74,12 +78,34 @@ public partial class NavigationFoundationProbe : Node3D
 		_map.TryPath(walker.GlobalPosition, new Vector3(10, 0.05f, 10), out _, walker); await Wait(5);
 		Check(_map.TryPath(walker.GlobalPosition, new Vector3(10, 0.05f, 10), out _, walker), "大型单位使用独立净空导航档案");
 		walker.QueueFree(); await Wait(2);
+		await ElevatedTargets();
 		Pressure(); await Budget();
 		int revision = _map.NavigationRevision;
 		Solid(new Vector3(26, -0.5f, 0), new Vector3(18, 1, 5)); await Wait(2); _map.Rebuild();
 		Check(!_map.IsReady && _map.NavigationRevision > revision, "重烘失效旧路径，等待导航同步后才标记可用");
 		for (int i = 0; i < 60 && !_map.IsReady; i++) await Frame();
 		Check(_map.TryPath(new Vector3(6, 0.05f, 0), new Vector3(35, 0.05f, 0), out _), "添加桥梁并重烘后原隔离岛真实连通");
+	}
+	private async Task ElevatedTargets()
+	{
+		var walker=Actor(new Vector3(-6,.05f,0)); var navigation=walker.GetNode<UnitNavigation>("Navigation");
+		for(int i=0;i<100;i++){navigation.MoveTo(new Vector3(0,9,0),5);await Frame();}
+		Check(walker.GlobalPosition.X>-2 && walker.GlobalPosition.X<-.4f,"真实身体追近高处目标，保持在墙前而不原地停下或穿墙");
+		walker.QueueFree(); await Wait(2);
+		var enemy=RuntimeResources.Load<PackedScene>("res://Scenes/Enemies/Chaser.tscn").Instantiate<Unit>();
+		AddChild(enemy); enemy.GlobalPosition=new Vector3(-8,.05f,-14);
+		enemy.GetNode<Node>("Brain").ProcessMode=ProcessModeEnum.Disabled; enemy.Movement!.SetPhysicsProcess(false);
+		var target=Actor(enemy.GlobalPosition+new Vector3(0,1.8f,-.05f),Faction.Player); target.Movement!.SetPhysicsProcess(false);
+		var melee=enemy.GetNode<ActRoguelike.Abilities.MeleeAttackAbility>("AbilityMelee");
+		melee.Windup=.05f; melee.ActiveTime=.25f; melee.Cooldown=0; melee.Diagnose(target);
+		float health=target.Health;
+		Check(melee.IsInRange(target) && melee.TryActivate(target),"头顶且真实可攻击的目标仍能发动近战");
+		await Wait(30); Check(target.Health<health,"头顶近战实际向上命中身体，不只是播放空攻击");
+		target.GlobalPosition=enemy.GlobalPosition+Vector3.Up*8;
+		Check(!melee.IsInRange(target) && !melee.TryActivate(target),"过高目标在实际射程外不反复空挥");
+		target.GlobalPosition=new Vector3(.8f,.05f,0); enemy.GlobalPosition=new Vector3(-.8f,.05f,0);
+		Check(!melee.IsInRange(target),"攻击范围内隔着真实墙体也不能近战穿墙");
+		enemy.QueueFree(); target.QueueFree(); await Wait(3);
 	}
 	private void Pressure()
 	{

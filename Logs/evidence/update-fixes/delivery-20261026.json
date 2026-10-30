@@ -1,0 +1,185 @@
+{
+  "Date": "2026-10-26T21:04:12",
+  "Scope": "更新与修复清单001至020；性能008等待用户决断",
+  "FixedItems": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "PlayerAcceptance": "全部留为未验收",
+  "PerformanceImplemented": false,
+  "PerformanceProposal": "docs/performance-proposal.md",
+  "Integration": {
+    "Passed": true,
+    "UniqueCases": 22,
+    "Sources": [
+      "Logs/evidence/survival/integration-20261026_204742.json",
+      "Logs/evidence/survival/integration-20261026_205615.json"
+    ],
+    "Cases": [
+      {
+        "Name": "adventure",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.adventure.log",
+        "SHA256": "BAE62F1F150FC7DE676736CA74FBD0AD601D3B373C75EF0F1B0FB96EFC989753"
+      },
+      {
+        "Name": "adventure_render",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.adventure_render.log",
+        "SHA256": "778808D8E13D82E492F158A3506F18EF62FB0431649B154B8FCD7FD94C6F49DB"
+      },
+      {
+        "Name": "base",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_205615.base.log",
+        "SHA256": "CC9D58A24B7BBBCFDEC033B2F61B90B81EE65A858809719A236E20AFDC7EDECA"
+      },
+      {
+        "Name": "base_memory",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.base_memory.log",
+        "SHA256": "082960E8C082AB29BF5A37346C31A25BE53AB6B02F7ACDF36810C85F37EB7A7C"
+      },
+      {
+        "Name": "charge",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.charge.log",
+        "SHA256": "B0EF0B4B8D34292CA9D878C1B7450DED20ECAF037732400AA9C5459C7E6D887E"
+      },
+      {
+        "Name": "clover",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.clover.log",
+        "SHA256": "A567B664BCBF04B21491BD40CA513326CC3483065D6753108E13ACF51E33FE55"
+      },
+      {
+        "Name": "content",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.content.log",
+        "SHA256": "73B5ED80A31BEE7CF859C89C622A2B09AE4CE7F862FCD8CDCA51864F26DE99F9"
+      },
+      {
+        "Name": "decoupling",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.decoupling.log",
+        "SHA256": "B20BF4D288B74EEC92275AC040D900F2D5B8301C5697B8AFE962F4BF06445E50"
+      },
+      {
+        "Name": "effects",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.effects.log",
+        "SHA256": "2B6968630851E518AF2BFBC252339FF002254B04725BF55B5966D0CCBDA8AA4E"
+      },
+      {
+        "Name": "interaction",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.interaction.log",
+        "SHA256": "4FC24BDBE6377C50273D4F155A2A5334D019462A5B93ADA082FF4850BBCF4545"
+      },
+      {
+        "Name": "interruption",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.interruption.log",
+        "SHA256": "FB4E4C6E2A3B1097E7F4FEB3396B4DC85865EBA7ED4147872B88A04AB61A66E8"
+      },
+      {
+        "Name": "main",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.main.log",
+        "SHA256": "3A776F9AF3D9A3C350AA79C11F912F16474084A75A44809015C0B1A8197E065B"
+      },
+      {
+        "Name": "player_flow",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.player_flow.log",
+        "SHA256": "8FA4BCFD865ADA6A2AA9D36201A347D3831FBCC03CBDC04CD8E58B00887FC823"
+      },
+      {
+        "Name": "replacement",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.replacement.log",
+        "SHA256": "78F7E848F6EECF3082E524C1752BD12193A97B7921B4C8497B57F961496C3044"
+      },
+      {
+        "Name": "reward_rules",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.reward_rules.log",
+        "SHA256": "D1ECA433354D5A6B48592B2A97DD5120E694A1CB20E0B7ED46E9AD081971E25E"
+      },
+      {
+        "Name": "run_flow",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_205615.run_flow.log",
+        "SHA256": "783B941603D1EBA17D050B65CB267EE1F6A026C3F95F2998BA5AAE14F668657F"
+      },
+      {
+        "Name": "rune",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.rune.log",
+        "SHA256": "994F000242B62B66FFBF37CEE8D463D7E47008B28923F4696162784C29EBC473"
+      },
+      {
+        "Name": "slots",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.slots.log",
+        "SHA256": "86607FD10A8801DE149E465653C4DF018A8BD9268707EB6C99DA468B5B28428C"
+      },
+      {
+        "Name": "snapshot",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.snapshot.log",
+        "SHA256": "37A94D02B489274633D805B850A43419136DA9534A8394AE18D044AD32AFC623"
+      },
+      {
+        "Name": "specialization",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_205615.specialization.log",
+        "SHA256": "26B8870B623E0A10DD3D8DB5429C4CE08DD3BEED749713E3327DA3D42E465C0D"
+      },
+      {
+        "Name": "survival",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.survival.log",
+        "SHA256": "70ED54546E8A4F6652D4150F43BA8963AFCA71F0D854707BA47949E23ACEE96B"
+      },
+      {
+        "Name": "synergy",
+        "Passed": true,
+        "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_204742.synergy.log",
+        "SHA256": "826B438FEF4791109BA0DDB0FE69C5BA53713FBAFA3716A42C710EFFE088FCBE"
+      }
+    ]
+  },
+  "Gc": {
+    "Passed": true,
+    "Cases": 7,
+    "SavesUnchanged": true,
+    "Report": "Logs/evidence/content-gc-20261026_205757.json"
+  },
+  "Elites": {
+    "Passed": true,
+    "Cases": 4,
+    "SavesUnchanged": true,
+    "Report": "Logs/evidence/elites/run-20261026_205941.json"
+  },
+  "IdentityCompatibility": "NumericId是新制作入口；既有业务代码、旧存档键和语义资源路径保留兼容别名。",
+  "FinalAuthoringReport": "Logs/evidence/update-fixes/run-20261026_205511.json",
+  "Workbook": "outputs/acceptance-20261026/更新与修复验收.xlsx"
+}

@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://duj7yj06a1axs"]
+
+[ext_resource type="Texture2D" uid="uid://bepfj5a52p0m1" path="res://Assets/Environment/StylizedNature/Models/Leaves_TwistedTree_C.png" id="1_fpieb"]
+
+[resource]
+resource_name = "Leaves_TwistedTree"
+transparency = 2
+alpha_scissor_threshold = 0.2
+alpha_antialiasing_mode = 0
+cull_mode = 2
+diffuse_mode = 3
+specular_mode = 2
+albedo_texture = ExtResource("1_fpieb")
+roughness = 0.95
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0

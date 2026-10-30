@@ -1,0 +1,228 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using ActRoguelike.Combat;
+using ActRoguelike.Config;
+using ActRoguelike.Core;
+using ActRoguelike.Rewards;
+using ActRoguelike.World;
+using Godot;
+
+namespace ActRoguelike.Run;
+
+/// <summary>生存模式只编排节奏和目标；战斗、奖励、导航与结算复用正式入口。</summary>
+public partial class SurvivalDirector : RunModeController
+{
+	public enum PhaseState { Dormant, Preparing, Surviving, FinalBoss, AwaitingExit, Stopped }
+	[Export(PropertyHint.File, "*.tres")] public string DefinitionPath { get; set; } = "res://Config/Modes/twilight_survival.tres";
+	public SurvivalDefinition? Definition { get; set; }
+	public override string ModeId => (Definition ??= RuntimeResources.Load<SurvivalDefinition>(DefinitionPath)).Id;
+	public SurvivalBuildRuntime? BuildRuntime { get; private set; }
+	[Export] public bool EnableSceneRunes { get; set; } = true;
+	public SceneRuneController? SceneRune { get; private set; }
+	public event Action? SceneRuneChanged;
+	public event Action<SurvivalExperienceReceipt>? ExperienceCollected;
+	public event Action<Unit, int>? EnemyDefeated;
+	public Unit[] LivingEnemies => _owned.Keys.Where(u => IsInstanceValid(u) && !u.IsDead && !u.IsQueuedForDeletion()).ToArray();
+	public bool OwnsEnemy(Unit unit) => _owned.ContainsKey(unit);
+	private double _experienceRemainder;
+	public override string DisplayName => Definition?.Title ?? "死战";
+	public PhaseState State { get; private set; }
+	public bool Active => State is PhaseState.Preparing or PhaseState.Surviving or PhaseState.FinalBoss;
+	public float ElapsedSeconds { get; private set; }
+	public int Level { get; private set; } = 1;
+	public int Experience { get; private set; }
+	public int NextLevelExperience => Definition?.ExperienceForLevel(Level) ?? 1;
+	public int CompletedBeacons { get; private set; }
+	public int CompletedObjectives { get; private set; }
+	public int PendingRewards => _rewards.Count;
+	public int AliveCount => _owned.Count;
+	public float AlivePressure { get; private set; }
+	public int PendingSpawns => _pending.Count;
+	public float SpendableBudget => _bank;
+	public int TotalSpawned { get; private set; }
+	public int TotalKills { get; private set; }
+	public bool BossDefeated { get; private set; }
+	public Unit? Player => _player;
+	public Unit? Boss => _boss;
+	public ExperienceField? ExperienceField => _experience;
+	public IReadOnlyList<SurvivalObjective> Objectives => _objectives.AsReadOnly();
+	public string Notice { get; private set; } = "准备试炼";
+	public string PhaseTitle => State == PhaseState.FinalBoss ? "终局首领" : State == PhaseState.AwaitingExit ? "试炼完成 · 前往撤离门" : Definition?.Phases.ElementAtOrDefault(_phaseIndex)?.Title ?? "准备入场";
+	private RunController? _run;
+	private Unit? _player, _boss;
+	private Node _sceneOwner = null!;
+	private ExperienceField? _experience;
+	private SurvivalHud? _hud;
+	private readonly List<SurvivalObjective> _objectives = new();
+	private readonly Queue<(RewardKind? Kind, string Title)> _rewards = new();
+	private readonly HashSet<SurvivalObjective> _claimedObjectives = new();
+	private bool _choicePending;
+	private int _generation, _phaseIndex = -1, _milestoneIndex;
+	private float _bank, _spawnTimer, _preparationTime, _scanTimer;
+	private StageStatistics? _frozen;
+	private ProcessModeEnum _playerProcessMode;
+	private bool _heldPlayer;
+
+	public override void Begin(RunController run, Unit player)
+	{
+		Stop(); _generation++; _frozen = null; _run = run; _player = player; _sceneOwner = GetParent();
+		Definition ??= RuntimeResources.Load<SurvivalDefinition>(DefinitionPath);
+		if (Definition == null) throw new InvalidOperationException("生存模式缺少设置。");
+		string[] errors = Definition.Validate().ToArray();
+		if (errors.Length > 0) throw new InvalidOperationException(string.Join("；", errors));
+		ElapsedSeconds = 0; Level = 1; Experience = 0; CompletedBeacons = 0; CompletedObjectives = 0;
+		_experienceRemainder = 0;
+		CollectedCombatShards = DroppedCombatShards = PendingCombatShards = 0;
+		TotalSpawned = 0; TotalKills = 0; BossDefeated = false; _boss = null; _phaseIndex = -1; _milestoneIndex = 0;
+		_bank = 0; _spawnTimer = 0; _preparationTime = 0; _scanTimer = 0; _choicePending = false; _claimedObjectives.Clear();
+		State = PhaseState.Preparing; Notice = "正在准备导航与入场点…";
+		_playerProcessMode = player.ProcessMode; player.ProcessMode = ProcessModeEnum.Disabled; _heldPlayer = true;
+		_experience = new ExperienceField { Name = "ExperienceField", Player = player, Capacity = Definition.MaxExperienceMotes, PickupRadius = Definition.PickupRadius };
+		AddChild(_experience); _experience.Collected += GrantExperience;
+		// 旧十二项死战专属已退出获取，不再安装其命中/经验协调器。
+		if (EnableSceneRunes)
+		{
+			var selected = Definition.FixedSceneRune;
+			if (selected == null)
+			{
+				using var random = new RandomNumberGenerator(); random.Randomize();
+				float total = Definition.SceneRunePool.Sum(r => r.Weight), roll = random.Randf() * total;
+				foreach (var rune in Definition.SceneRunePool) if (rune.Weight > 0 && (roll -= rune.Weight) <= 0) { selected = rune; break; }
+			}
+			if (selected != null) { SceneRune = new SceneRuneController { Name = "SceneRune", Definition = selected, Player = player }; AddChild(SceneRune); }
+		}
+		_hud = new SurvivalHud { Director = this }; AddChild(_hud);
+		SceneRuneChanged?.Invoke();
+	}
+	public override void _PhysicsProcess(double delta)
+	{
+		if (!Active || _player == null || !IsInstanceValid(_player) || _player.IsDead || _run == null || _run.RunEnded) return;
+		float dt = (float)delta;
+		if (State == PhaseState.Preparing)
+		{
+			_preparationTime += dt;
+			if (MapManager.Instance is { IsReady: true } map && map.TryValidPoint(new Vector3(0, .1f, 38), new Vector3(0, .1f, 38), out Vector3 start, _player))
+			{
+				_spawnGroundAnchor = start;
+				_player.GlobalPosition = start + Vector3.Up * .08f; _player.ResetPhysicsInterpolation(); ReleasePlayer();
+				for (int i = 0; i < Definition!.BeaconPositions.Length; i++)
+				{
+					Vector3 desired = Definition.BeaconPositions[i];
+					if (!map.TryValidPoint(desired, start, out Vector3 point, _player)) throw new InvalidOperationException($"信标{i + 1}没有可达位置。");
+					var beacon = new SurvivalObjective { Name = $"Beacon{i + 1}", Director = this, Kind = SurvivalObjective.ObjectiveKind.Beacon, Index = i };
+					AddChild(beacon); beacon.GlobalPosition = point; _objectives.Add(beacon);
+				}
+				State = PhaseState.Surviving; Notice = ContentText.Get("ui.survival.objective_help", "蓝绿色圆锥＋圆环：靠近按F净化信标，启动后留在圈内。\n橙色遗物：靠近按F选择增幅。");
+			}
+			else if (_preparationTime > 15) { Notice = "入场准备失败，已取消本次试炼。"; _run.CancelAdventure(out _); }
+			return;
+		}
+		ElapsedSeconds += dt; PruneUnits();
+		SceneRune?.Tick(dt);
+		if (!Active || _run.RunEnded || _player.IsDead) return;
+		_scanTimer -= dt; if (_scanTimer <= 0) { _scanTimer = .5f; RegisterReinforcements(); }
+		TickPendingSpawns(dt);
+		if (State == PhaseState.Surviving)
+		{
+			int index = 0;
+			for (int i = 1; i < Definition!.Phases.Length; i++) if (ElapsedSeconds >= Definition.DurationSeconds * Definition.Phases[i].StartFraction) index = i;
+			if (index != _phaseIndex) { _phaseIndex = index; Notice = $"新阶段 · {PhaseTitle}"; }
+			if (ElapsedSeconds >= Definition.DurationSeconds)
+			{
+				CancelPendingSpawns(); State = PhaseState.FinalBoss; _spawnTimer = 0; Notice = "终局首领降临！击败后前往撤离门。";
+				StopEliteTraits();
+			}
+			else
+			{
+				var phase = Definition.Phases[_phaseIndex];
+				_bank = Mathf.Min(Mathf.Max(32, phase.MaxAlivePressure), _bank + phase.BudgetPerSecond * dt);
+				_spawnTimer -= dt;
+				if (_spawnTimer <= 0)
+				{
+					_spawnTimer = Definition.SpawnInterval;
+					bool milestone = _milestoneIndex < Definition.MilestoneFractions.Length && ElapsedSeconds >= Definition.DurationSeconds * Definition.MilestoneFractions[_milestoneIndex];
+					// 预警可能因玩家靠近或落点失效撤销；成功入场才消耗阶段名额。
+					if (milestone) { if (!_pending.Any(p => p.Milestone)) TryQueueEnemy(Definition.MilestoneEnemy!, true, true); }
+					else TryQueueWeightedEnemy(phase);
+				}
+			}
+		}
+		if (State == PhaseState.FinalBoss && _boss == null && !_pending.Any(p => p.Boss))
+		{
+			_spawnTimer -= dt; if (_spawnTimer <= 0) { _spawnTimer = .5f; TryQueueBoss(); }
+		}
+		TryOpenReward();
+	}
+	public void GrantExperience(int value)
+		=> GrantExperience(value, SurvivalExperienceSource.Enemy);
+	public void GrantExperience(int value, SurvivalExperienceSource source)
+	{
+		if (!Active || State == PhaseState.Preparing || value <= 0 || _run?.RunEnded != false) return;
+		double adjusted = value * (source == SurvivalExperienceSource.Enemy ? BuildRuntime?.ExperienceScale ?? 1 : 1) + _experienceRemainder;
+		int granted = (int)Math.Floor(adjusted + .000001); _experienceRemainder = adjusted - granted;
+		Experience += granted;
+		while (Experience >= NextLevelExperience)
+		{
+			Experience -= NextLevelExperience; Level++;
+			// 保留原强化/混合奖励节拍，旧专属轮次改用通用混合池，不减少升级奖励。
+			_rewards.Enqueue((Level % 3 == 1 ? RewardKind.Enhancement : null, $"等级 {Level} · 选择增幅"));
+		}
+		ExperienceCollected?.Invoke(new SurvivalExperienceReceipt(value, granted, source));
+	}
+	private void TryOpenReward()
+	{
+		if (_choicePending || _rewards.Count == 0 || !Active || State == PhaseState.Preparing || _run == null) return;
+		var ticket = _rewards.Peek(); RewardKind? filter = ticket.Kind;
+		if (!_run.CanOfferModeReward(filter, false)) filter = null;
+		if (!_run.CanOfferModeReward(filter, false))
+		{
+			_player!.Heal(_player.MaxHealth * .15f); _rewards.Dequeue(); Notice = "可用增幅已全部取得，本次成长转为恢复15%生命。"; return;
+		}
+		int generation = _generation;
+		_choicePending = true;
+		bool opened = _run.OfferModeReward(filter, ticket.Title, () =>
+		{
+			if (generation != _generation || !Active || _run.RunEnded) return;
+			_choicePending = false; if (_rewards.Count > 0) _rewards.Dequeue();
+			_traitWorld?.SuspendDamage(false);
+		});
+		if (!opened) _choicePending = false;
+		else _traitWorld?.SuspendDamage(true);
+	}
+	public bool CompleteBeacon(SurvivalObjective objective)
+	{
+		if (State != PhaseState.Surviving || objective.Kind != SurvivalObjective.ObjectiveKind.Beacon || !_objectives.Contains(objective) || !_claimedObjectives.Add(objective)) return false;
+		CompletedBeacons++; CompletedObjectives++;
+		_player!.Heal(_player.MaxHealth * .15f);
+		_rewards.Enqueue((null, "信标净化 · 选择增幅"));
+		Notice = CompletedBeacons == 3 ? "三座信标已净化 · 终局首领生命降低" : $"信标已净化 {CompletedBeacons}/3 · 恢复生命并获得增幅";
+		return true;
+	}
+	public bool ClaimRelic(SurvivalObjective objective)
+	{
+		if (!Active || State == PhaseState.Preparing || objective.Kind != SurvivalObjective.ObjectiveKind.Relic || !_objectives.Contains(objective) || !_claimedObjectives.Add(objective)) return false;
+		_rewards.Enqueue((null, "强敌遗物 · 选择增幅")); return true;
+	}
+	public bool Extract() => State == PhaseState.AwaitingExit && _run?.CompleteMode(this, true) == true;
+	public override StageStatistics CaptureStatistics() => _frozen ?? new StageStatistics(1, "survival_twilight", DisplayName, ElapsedSeconds, CompletedObjectives, BossDefeated);
+	private void ReleasePlayer()
+	{
+		if (_heldPlayer && _player != null && IsInstanceValid(_player)) _player.ProcessMode = _playerProcessMode;
+		_heldPlayer = false;
+	}
+	public override void Stop()
+	{
+		if (State is PhaseState.Dormant or PhaseState.Stopped) return;
+		_frozen ??= CaptureStatistics(); State = PhaseState.Stopped; _generation++; _choicePending = false; _rewards.Clear(); ReleasePlayer();
+		BuildRuntime?.Stop(); if (BuildRuntime != null && IsInstanceValid(BuildRuntime)) BuildRuntime.QueueFree();
+		SceneRune?.Stop(); if (SceneRune != null && IsInstanceValid(SceneRune)) SceneRune.QueueFree(); SceneRune = null; SceneRuneChanged?.Invoke();
+		StopEliteTraits();
+		CancelPendingSpawns(); ClearEnemies();
+		ClearShardPickups();
+		if (_experience != null && IsInstanceValid(_experience)) { _experience.Collected -= GrantExperience; _experience.Clear(); _experience.QueueFree(); }
+		foreach (var objective in _objectives) if (IsInstanceValid(objective)) objective.QueueFree(); _objectives.Clear();
+		if (_hud != null && IsInstanceValid(_hud)) _hud.QueueFree();
+	}
+	public override void _ExitTree() => Stop();
+}

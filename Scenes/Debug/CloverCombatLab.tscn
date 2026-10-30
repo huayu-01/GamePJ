@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dlulju0eq5ovc"]
+
+[ext_resource type="Script" uid="uid://c8fy35uqe6m0m" path="res://Scripts/Testing/CloverCombatLab.cs" id="1"]
+
+[node name="CloverCombatLab" type="Node3D" unique_id=1250127790]
+script = ExtResource("1")

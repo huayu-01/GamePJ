@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyConfig" format=3 uid="uid://v58gqdfm7ows"]
+
+[ext_resource type="Script" uid="uid://10b6kkpgdrrb" path="res://Scripts/Config/EnemyConfig.cs" id="1_iqh8v"]
+
+[resource]
+script = ExtResource("1_iqh8v")
+NumericId = 1328
+ScenePath = "res://Scenes/Enemies/Art/StoneSlammer.tscn"
+Cost = 3
+PressureBehaviors = PackedStringArray("GroundSlam")
+MinElapsedSeconds = 20.0
+EliteChance = 0.1
+MaxHealth = 240.0
+MoveSpeed = 2.3
+Tags = PackedStringArray("Ground", "heavy_slammer")
+AnimLibraryDir = "res://Assets/Enemies/StoneSlammer/Animations/"
+Id = "enemy_heavy_slammer_art_preview"
+DisplayName = "重击敌人（几何样件）"
+Note = "美术样板用；沿用重击敌人机制，使用自制几何模型和真实砸地事件。"

@@ -71,7 +71,7 @@ public partial class KnifeVolleyProbe : Node3D
 	}
 	private void CheckFan(float span, string name)
 	{
-		var dirs = _shots.Where(IsInstanceValid).Select(s => s.VelocityDirection).ToArray();
+		var dirs = _shots.Where(IsInstanceValid).Select(s => s.LaunchDirection).ToArray();
 		Vector3 center = Volley.LastShotDirection;
 		float actual = dirs.Length > 1 ? Mathf.RadToDeg(dirs[0].AngleTo(dirs[^1])) : 0;
 		float expected = dirs.Length > 1 ? span : 0;

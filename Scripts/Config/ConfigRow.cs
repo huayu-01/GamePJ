@@ -17,20 +17,31 @@ namespace ActRoguelike.Config;
 /// ② <b><c>[ExportGroup("中文分组 · 一句话说明")]</c></b> —— 编辑器右侧 Inspector 里**真的能看到中文标题**
 /// （每个参数都落在某个中文标题下面）。改字段名会破坏另外两个并行代理正在用的东西，所以只加说明、不改名。
 /// </summary>
-public abstract partial class ConfigRow : Resource, IConfigRow
+public abstract partial class ConfigRow : Resource, IConfigRow, INumericContentIdentity
 {
 	[ExportGroup("身份与文案（所有表通用）")]
-	/// <summary>稳定键（小写 snake_case，与行文件名同语义名）。一次定好不再改。用途：关卡白名单、互斥列表、日志与自测。</summary>
-	[Export] public string Id { get; set; } = string.Empty;
+	/// <summary>全局唯一正整数身份，由内容账本分配；定好后不重排或复用。</summary>
+	[Export(PropertyHint.Range, "1,2147483647,1")] public int NumericId { get; set; }
+	private string _legacyId = string.Empty;
+	/// <summary>隐藏的旧存档与条件兼容键；新内容未提供旧键时自动使用数字文本。</summary>
+	[Export] public string Id { get => NumericContentIdentity.Key(_legacyId, NumericId); set => _legacyId = value; }
+	public override void _ValidateProperty(Godot.Collections.Dictionary property) => NumericContentIdentity.HideLegacy(property);
 
 	/// <summary>槽位号（1 起；0 = 不进槽位）。用于按 "武器1/武器2/角色1/角色2" 这种表现层顺序寻址。</summary>
 	[Export] public int Slot { get; set; }
 
-	/// <summary>界面标题 / 卡片名（**只影响界面与日志**，不要拿它当身份键 —— 身份键是 <see cref="Id"/>）。</summary>
+	/// <summary>界面标题／卡片名，只影响显示；身份使用NumericId，旧调用通过Id兼容。</summary>
 	[Export] public string DisplayName { get; set; } = string.Empty;
+	/// <summary>稳定的整句文本键；留空兼容旧资源，缺译回退 DisplayName。</summary>
+	[Export] public string NameKey { get; set; } = string.Empty;
 
 	/// <summary>说明模板，支持 <c>{字段名}</c> 与 <c>{Params 键}</c> 占位符（见 <see cref="ConfigText"/>）。</summary>
 	[Export(PropertyHint.MultilineText)] public string DescriptionTemplate { get; set; } = string.Empty;
+	[Export] public string DescriptionKey { get; set; } = string.Empty;
+	/// <summary>运行期展示行可借用原内容的参数源；不写入资源，译文仍在读取时按当前语言解析。</summary>
+	public GodotObject? RuntimeDescriptionSource { get; set; }
+	public string LocalizedName => ContentText.Name(this);
+	public string LocalizedDescription => ContentText.Description(this);
 
 	/// <summary>策划备注（也可以被 <see cref="ConfigText"/> 当占位符来源）。只给人看，代码不读。</summary>
 	[Export(PropertyHint.MultilineText)] public string Note { get; set; } = string.Empty;

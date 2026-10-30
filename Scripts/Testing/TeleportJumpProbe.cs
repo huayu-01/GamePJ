@@ -145,7 +145,7 @@ public partial class TeleportJumpProbe : Node3D
 		_camera.GlobalPosition = new Vector3(28, 10, 29); _camera.LookAt(new Vector3(20, 4, 20)); _camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
 		using var screenshot = GetViewport().GetTexture().GetImage();
-		Check(screenshot.SavePng("res://docs/screenshots/j18_light_leap.png") == Error.Ok, "截图 j18_light_leap");
+		Check(screenshot.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j18_light_leap.png")) == Error.Ok, "截图 j18_light_leap");
 		label.QueueFree(); _camera.GlobalTransform = before; _camera.ResetPhysicsInterpolation();
 	}
 }

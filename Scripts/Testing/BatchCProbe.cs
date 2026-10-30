@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using ActRoguelike.Abilities;
+using ActRoguelike.AbilityCards;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
 using ActRoguelike.Core;
@@ -42,10 +43,11 @@ public partial class BatchCProbe : Node
 	{
 		if (DisplayServer.GetName() == "headless") return;
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"截图 {name}");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"截图 {name}");
 	}
 	private async Task KeyPress(Key key)
 	{
+		await UiProbeWait.Interactive(this);
 		Input.ParseInputEvent(new InputEventKey { Keycode = key, PhysicalKeycode = key, Pressed = true });
 		await Wait(0.06);
 		Input.ParseInputEvent(new InputEventKey { Keycode = key, PhysicalKeycode = key, Pressed = false });
@@ -89,6 +91,12 @@ public partial class BatchCProbe : Node
 			Check(freshBase.GetNode<CharacterDisplay>("Player/Appearance").CurrentModelPath == ConfigRows.ById<CharacterConfig>("chr_weapon_master")!.ModelPath, "新进程基地实际玩家模型与存档一致");
 			return;
 		}
+		// 固定独立测试档的初始选择，重复运行不能把“点当前已选项”误当成换装成功。
+		if (LoadoutMemory.SavePath != "user://batch_c_loadout_test.cfg") throw new InvalidOperationException("基地探针必须使用独立装备测试档。");
+		LoadoutMemory.Remember(ConfigRows.ById<CharacterConfig>("chr_weapon_master")!, ConfigRows.ById<WeaponConfig>("wpn_spirit_sword")!);
+		LoadoutMemory.Remember(ConfigRows.ById<CharacterConfig>("chr_hunter")!, ConfigRows.ById<WeaponConfig>("wpn_energy_palm")!);
+		// 本专项单独核对局外加成；只在内存停用玩家已激活卡，不保存能力卡文件。
+		foreach (var row in AbilityStore.Rows) AbilityStore.DebugSetState(row.Id, AbilityStore.LevelOf(row.Id), false);
 		RunSetup.Character = PlayerCharacterKind.Hunter;
 		RunSetup.Weapon = WeaponPresetKind.EnergyPalm;
 		RunSetup.HasSelection = true;
@@ -127,7 +135,7 @@ public partial class BatchCProbe : Node
 		Check(_base.GetNode("CharacterRoster").GetChildCount() == ConfigIndex.Settings.Characters.Length, "每个角色有独立交互实例，数量读取角色表");
 		foreach (string characterId in new[] { "chr_hunter", "chr_weapon_master" })
 		{
-			var stand = _base.GetNode<CharacterStand>($"CharacterRoster/{characterId}");
+			var stand = (CharacterStand)_base.GetNode<InteractionComponent>($"CharacterRoster/{characterId}/InteractionComponent").Backend!;
 			_player.GlobalPosition = stand.GlobalPosition + new Vector3(0, 0.05f, 1.4f);
 			await Wait(0.2);
 			await KeyPress(Key.F);
@@ -136,7 +144,7 @@ public partial class BatchCProbe : Node
 			Check(screen.IsOpen && screen.OptionCount == 3 && RunController.CharacterRow(RunSetup.Character)?.Id == characterId,
 				$"真实F与{characterId}交互：直接换角色且只列其3把武器 [{screen.OptionIds}]");
 			foreach (string id in screen.OptionIds.Split(',')) Check(LoadoutSelection.Allows(stand.Character, ConfigRows.ById<WeaponConfig>(id)), $"列表武器{id}归属正确");
-			screen.Close();
+			await UiProbeWait.Interactive(this, screen); screen.Close();
 			await Wait(0.25);
 		}
 		WeaponPresetKind prior = RunSetup.Weapon;
@@ -162,9 +170,9 @@ public partial class BatchCProbe : Node
 		Check(RunSetup.Weapon == WeaponPresetKind.SpiritSword && !choices.IsOpen, "点灵剑后关闭面板并立刻切换装备");
 		var display = _player.GetNode<CharacterDisplay>("Appearance");
 		Check(display.CurrentWeaponPath.EndsWith("spirit_sword.tscn") && _base.GetNode<AbilityHud>("Hud/Root/Abilities").DisplayedIds.Contains("skl_b1_w1_1"), "灵剑握持模型与武技组同步");
-		Check(_base.GetNode<CharacterDisplay>("CharacterRoster/chr_weapon_master/Visual").CurrentWeaponPath == display.CurrentWeaponPath, "交互对象自己也显示最后选择的灵剑");
+		Check(_base.GetNode<CharacterDisplay>("CharacterRoster/chr_weapon_master/InteractionComponent/Interaction/TypeModel/Visual").CurrentWeaponPath == display.CurrentWeaponPath, "交互对象自己也显示最后选择的灵剑");
 		Check(LoadoutMemory.LastSaveSucceeded, "角色分别记忆的选择真实落盘成功");
-		foreach (string id in new[] { "chr_hunter", "chr_weapon_master" }) Check(SafeVisual(_base.GetNode($"CharacterRoster/{id}/Visual")), $"{id}展示子树无单位/碰撞/分组");
+		foreach (string id in new[] { "chr_hunter", "chr_weapon_master" }) Check(SafeVisual(_base.GetNode($"CharacterRoster/{id}/InteractionComponent/Interaction/TypeModel/Visual")), $"{id}展示子树无单位/碰撞/分组");
 		Aim();
 		await Wait(0.3);
 		before = _target.Target.Health + _target.Target.Armor;
@@ -232,9 +240,11 @@ public partial class BatchCProbe : Node
 		_player.Velocity = Vector3.Zero;
 		await Wait(0.25);
 		await KeyPress(Key.F);
-		await Wait(1.5);
+		await Wait(.35);
+		Check(UiService.Instance?.Screen<ExpeditionScreen>()?.IsOpen != true && AdventureCheckpoint.IsActive, "新出击组件通过真实F直接加载，并保存配装回退点");
+		for (int i = 0; i < 100 && GetTree().CurrentScene is not ForestExpedition { EntryReady: true }; i++) await Wait(.1);
 		Node level = GetTree().CurrentScene;
-		Check(level.SceneFilePath == "res://Scenes/Main.tscn" && RunController.Instance?.CurrentWeapon == WeaponPresetKind.SpiritSword && RunController.Instance.CurrentCharacter == PlayerCharacterKind.WeaponMaster, "真实F出击门带B+灵剑进入关卡");
+		Check(level.SceneFilePath == "res://Scenes/Expedition.tscn" && RunController.Instance?.CurrentWeapon == WeaponPresetKind.SpiritSword && RunController.Instance.CurrentCharacter == PlayerCharacterKind.WeaponMaster, "真实F直接带B+灵剑进入正式森林");
 		Check(level.GetNode<CharacterDisplay>("Player/Appearance").CurrentModelPath == ConfigRows.ById<CharacterConfig>("chr_weapon_master")!.ModelPath, "基地与关卡使用相同角色模型");
 		await Shot("c_enter_level");
 		GmConsole levelGm = level.GetNode<GmConsole>("GmConsole");
@@ -253,7 +263,7 @@ public partial class BatchCProbe : Node
 	}
 	private async Task SwitchAtStand(string id, Key choice = Key.None)
 	{
-		var stand = _base.GetNode<CharacterStand>($"CharacterRoster/{id}");
+		var stand = (CharacterStand)_base.GetNode<InteractionComponent>($"CharacterRoster/{id}/InteractionComponent").Backend!;
 		_player.GlobalPosition = stand.GlobalPosition + new Vector3(0, 0.05f, 1.4f);
 		_player.Velocity = Vector3.Zero;
 		_player.ResetPhysicsInterpolation();

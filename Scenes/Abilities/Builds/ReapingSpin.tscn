@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://Scripts/Abilities/ReapingSpinAbility.cs" id="script"]
+[node name="EvolvedAbility" type="Node3D"]
+script = ExtResource("script")
+Cooldown = 3
+Radius = 2.4
+TapDamage = 32
+DashDamage = 16
+SpinDamage = 10
+HoldToCharge = true
+AllowEarlyChargeRelease = true
+EarlyReleaseDamageScale = 1
+ChargeBaseSeconds = 0.5
+ChargeStepSeconds = 0.5
+ChargeMaxSteps = 3
+ChargeMaxSeconds = 2
+BaseDashDistance = 3
+DashDistancePerStep = 3
+DashSpeed = 18
+BaseSpinSeconds = 1
+SpinSecondsPerStep = 1
+HitInterval = 0.5

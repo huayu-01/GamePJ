@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_6hhuv")
+NumericId = 1075
 Kind = 6
 Id = "Explosion"
 Slot = 11

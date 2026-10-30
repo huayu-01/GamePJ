@@ -1,0 +1,32 @@
+{
+  "Date": "2026-10-29T21:23:08",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "navigation",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_212308.navigation.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_212308.navigation.headless.err",
+      "SHA256": "6A40238F9486D37E8B7E18C2A8286661B0C7E4985504F1F10BC9118661EF2515"
+    },
+    {
+      "Name": "charge_evolution",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_212308.charge_evolution.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_212308.charge_evolution.headless.err",
+      "SHA256": "42EA3193C0BC090650371A1A04F9EB151C1E8A5F090443401129566756750408"
+    },
+    {
+      "Name": "numeric_identity",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_212308.numeric_identity.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261029_212308.numeric_identity.headless.err",
+      "SHA256": "A9816618F607F876F3800B0E442CE79B609D2181620126F70E1F64FEA2788A6D"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

@@ -62,15 +62,76 @@ theme_override_font_sizes/font_size = 20
 text = ""
 horizontal_alignment = 1
 
-[node name="Grid" type="GridContainer" parent="Root/Panel/VBox"]
-size_flags_horizontal = 4
+[node name="Content" type="HBoxContainer" parent="Root/Panel/VBox"]
 size_flags_vertical = 3
+theme_override_constants/separation = 30
+
+[node name="Inventory" type="VBoxContainer" parent="Root/Panel/VBox/Content"]
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+
+[node name="Heading" type="Label" parent="Root/Panel/VBox/Content/Inventory"]
+text = "已获增幅"
+theme_override_font_sizes/font_size = 24
+
+[node name="Scroll" type="ScrollContainer" parent="Root/Panel/VBox/Content/Inventory"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="Grid" type="GridContainer" parent="Root/Panel/VBox/Content/Inventory/Scroll"]
+size_flags_horizontal = 3
+size_flags_vertical = 0
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
-columns = 7
+columns = 4
 
-[node name="Empty" type="Label" parent="Root/Panel/VBox"]
+[node name="Empty" type="Label" parent="Root/Panel/VBox/Content/Inventory"]
 theme_type_variation = &"UiCaption"
-text = "图标 = 构筑元素；鼠标悬停看名字与说明（说明只在选取界面与悬停时出现）。"
-horizontal_alignment = 1
+text = "本局还没有获得增幅。"
+autowrap_mode = 2
+
+[node name="Details" type="VBoxContainer" parent="Root/Panel/VBox/Content"]
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+
+[node name="Scroll" type="ScrollContainer" parent="Root/Panel/VBox/Content/Details"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Sections" type="VBoxContainer" parent="Root/Panel/VBox/Content/Details/Scroll"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="Icon" type="TextureRect" parent="Root/Panel/VBox/Content/Details/Scroll/Sections"]
+custom_minimum_size = Vector2(64, 64)
+size_flags_horizontal = 0
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="NameHeading" type="Label" parent="Root/Panel/VBox/Content/Details/Scroll/Sections"]
+text = "名称"
+theme_type_variation = &"UiCaption"
+
+[node name="Name" type="Label" parent="Root/Panel/VBox/Content/Details/Scroll/Sections"]
+theme_override_font_sizes/font_size = 30
+autowrap_mode = 2
+
+[node name="Divider1" type="HSeparator" parent="Root/Panel/VBox/Content/Details/Scroll/Sections"]
+
+[node name="EffectHeading" type="Label" parent="Root/Panel/VBox/Content/Details/Scroll/Sections"]
+text = "效果描述"
+theme_type_variation = &"UiCaption"
+
+[node name="Description" type="Label" parent="Root/Panel/VBox/Content/Details/Scroll/Sections"]
+autowrap_mode = 2
+
+[node name="Divider2" type="HSeparator" parent="Root/Panel/VBox/Content/Details/Scroll/Sections"]
+
+[node name="InformationHeading" type="Label" parent="Root/Panel/VBox/Content/Details/Scroll/Sections"]
+text = "其他信息"
+theme_type_variation = &"UiCaption"
+
+[node name="Information" type="Label" parent="Root/Panel/VBox/Content/Details/Scroll/Sections"]
 autowrap_mode = 2

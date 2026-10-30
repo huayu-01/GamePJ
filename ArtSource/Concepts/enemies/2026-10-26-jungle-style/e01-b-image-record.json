@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-26",
+  "enemy": "E01",
+  "variant": "B",
+  "version": 1,
+  "status": "concept_pending_user_review",
+  "tool": "image_gen.imagegen",
+  "file": "e01-b-fruit-shell-v1.png",
+  "prompt_file": "e01-b-prompt.md",
+  "source": "C:/Users/huayu/.codex/generated_images/01a15d4b-b82a-7943-ae1e-2ead191d2e93/exec-31c89196-53fd-4880-b790-95b20da43bc7.png",
+  "sha256": "fff4c0d2a03d547d6d6a6fd25f920ebc1881bb728ba1200f2ad1065d7bbf97a5",
+  "bytes": 1769097,
+  "transparent_background": false
+}

@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1208
 Id = "summon_drone"
 Slot = 1
 DisplayName = "无人机"

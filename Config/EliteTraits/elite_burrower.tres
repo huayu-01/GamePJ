@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BurrowerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/BurrowerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1006
+Id = "elite_burrower"
+Title = "蔓生"
+Description = "预警后生成短暂限制行动的藤蔓。"
+NameKey = "elite.burrower.name"
+DescriptionKey = "elite.burrower.description"
+MaxCarriers = 1
+Cooldown = 8
+Radius = 3
+Duration = 2

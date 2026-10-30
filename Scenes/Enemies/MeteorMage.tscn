@@ -53,8 +53,8 @@ AbilityNodeName = "AbilityPlan"
 [node name="KeepDistance" type="Node" parent="Brain"]
 script = ExtResource("keep")
 Priority = 10
-PreferredDistance = 8
-Tolerance = 0.4
+PreferredDistance = 11
+Tolerance = 1.0
 [node name="AbilityPlan" type="Node3D" parent="."]
 script = ExtResource("ability")
 Plan = ExtResource("plan")

@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://Scripts/Abilities/ArcaneSliceAbility.cs" id="script"]
+[node name="EvolvedAbility" type="Node3D"]
+script = ExtResource("script")
+Cooldown = 5
+Damage = 36
+SearchRadius = 12
+BounceRadius = 6
+Bounces = 4
+FlightSpeed = 45
+MaxFlightSeconds = 0.9
+SlideDistance = 0.9
+SlideSeconds = 0.15
+CanBeInterrupted = false

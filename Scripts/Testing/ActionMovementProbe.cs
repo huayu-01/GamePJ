@@ -96,7 +96,7 @@ public partial class ActionMovementProbe : Node3D
 		Check(Agility.Enabled && Agility.GrantAttackMovement && ConfigRows.ById<AbilityConfig>("skl_a1_passive")!.GrantAttackMovement, "移动攻击授权来自灵动表行与启用的真实被动");
 		await Start(action); Vector3 start = _player.GlobalPosition; await Wait(0.15);
 		Check(Skill(action).IsBusy && !Movement.IsActionMovementLocked && Skill(action).ActionMovement == Ability.MovementPolicy.Attack, $"{weapon} 真实攻击动画／蓄力期间由灵动放行");
-		Check(Distance(_player.GlobalPosition, start) > 0.4f && Movement.PlanarVelocity.Length() > 3f && !Sprint.IsSprinting, "可边移动边攻击，但出招仍退出奔跑加速");
+		Check(Distance(_player.GlobalPosition, start) > 0.1f && Movement.PlanarVelocity.Length() > 1f && Movement.PlanarVelocity.Length() < 3f && Mathf.IsEqualApprox(Movement.ActionMovementSpeedScale, .35f) && !Sprint.IsSprinting, $"可边移动边攻击，攻击移速降至35%并退出奔跑（{weapon} 距离{Distance(_player.GlobalPosition, start):0.###} 速度{Movement.PlanarVelocity.Length():0.###} 倍率{Movement.ActionMovementSpeedScale:0.###} 奔跑{Sprint.IsSprinting}）");
 		if (weapon == WeaponPresetKind.EnergyPalm)
 		{
 			using var row = (AbilityConfig)ConfigRows.ById<AbilityConfig>("skl_a1_passive")!.Duplicate(true);
@@ -161,7 +161,7 @@ public partial class ActionMovementProbe : Node3D
 		AddChild(label); _camera.GlobalPosition = _player.GlobalPosition + new Vector3(-5, 7, -5); _camera.LookAt(_player.GlobalPosition + Vector3.Up); _camera.ResetPhysicsInterpolation();
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
 		using var screenshot = GetViewport().GetTexture().GetImage();
-		Check(screenshot.SavePng("res://docs/screenshots/j20_action_movement.png") == Error.Ok, "截图 j20_action_movement");
+		Check(screenshot.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/j20_action_movement.png")) == Error.Ok, "截图 j20_action_movement");
 		label.QueueFree(); _camera.GlobalTransform = before; _camera.ResetPhysicsInterpolation();
 	}
 }

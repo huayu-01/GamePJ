@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Testing/NatureCombatLab.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Scenes/Levels/NatureBenchmark/NatureBenchmark.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://Scenes/Player/GeneratedPilot.tscn" id="3"]
+[ext_resource type="Script" path="res://Scripts/World/MapManager.cs" id="4"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/Visuals/NaturePilotSword.tscn" id="5"]
+[ext_resource type="Script" path="res://Scripts/Testing/StoneSlammerShowcase.cs" id="6"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Art/StoneSlammer.tscn" id="7"]
+[ext_resource type="Resource" path="res://Config/Testing/stone_slammer_preview.tres" id="8"]
+[ext_resource type="Script" path="res://Scripts/Testing/EnemyModelShowcase.gd" id="9"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Art/ScaredyShroomVisual.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Art/GhostMageVisual.tscn" id="11"]
+[ext_resource type="Script" path="res://Scripts/Testing/EnemyAnimePreview.gd" id="12"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Art/StoneGolemPlusVisual.tscn" id="13"]
+
+[node name="NatureArtLab" type="Node3D"]
+script = ExtResource("1")
+PilotWeapon = ExtResource("5")
+LabTitle = "林间美术样板 · 30×30 米 · 免费素材 / 自制材质"
+SpawnTrainingTargets = false
+ArenaHalfSize = 16.0
+CapturePrefix = "nature_benchmark"
+EnableArtAntialiasing = true
+EnemySpawnMinRadius = 7.0
+EnemySpawnMaxRadius = 12.0
+
+[node name="NatureArena" parent="." instance=ExtResource("2")]
+
+[node name="MapManager" type="Node3D" parent="."]
+script = ExtResource("4")
+AgentRadius = 0.75
+AgentHeight = 3.0
+
+[node name="Player" parent="." instance=ExtResource("3")]
+position = Vector3(0, 0.1, 6)
+
+[node name="Overview" type="Camera3D" parent="."]
+position = Vector3(32, 40, 36)
+projection = 1
+size = 58.0
+far = 180.0
+
+[node name="StoneSlammerShowcase" type="Node3D" parent="."]
+script = ExtResource("6")
+EnemyScene = ExtResource("7")
+EnemyRow = ExtResource("8")
+
+[node name="EnemyModelShowcase" type="Node3D" parent="."]
+script = ExtResource("9")
+
+[node name="ScaredyShroom" parent="EnemyModelShowcase" instance=ExtResource("10")]
+position = Vector3(-2.2, 0, 0.8)
+
+[node name="GhostMage" parent="EnemyModelShowcase" instance=ExtResource("11")]
+position = Vector3(2.0, 0, 0.8)
+
+[node name="EnemyAnimePreview" type="Node" parent="."]
+script = ExtResource("12")
+
+[node name="StoneGolemPlus" parent="." instance=ExtResource("13")]
+position = Vector3(-3.0, 0, 2.4)
+showcase_controls = true

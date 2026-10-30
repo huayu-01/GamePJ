@@ -1,0 +1,58 @@
+{
+  "Date": "2026-10-26T01:35:00",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "effects",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 2.78,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.effects.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.effects.err",
+      "Failure": "",
+      "SHA256": "DA6E8735CEE11A5FBA35EFD7C074EEE856B36EB6C835A371F8A15DB8E303D93E"
+    },
+    {
+      "Name": "decoupling",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.31,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.decoupling.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.decoupling.err",
+      "Failure": "",
+      "SHA256": "DE56548A0511BDE080DD2A57BD71865EC23DAEB15527CBC23858ADDE79908E9C"
+    },
+    {
+      "Name": "adventure",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 22.85,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.adventure.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.adventure.err",
+      "Failure": "",
+      "SHA256": "CCA463FCDFE1F25D48F9588AA25DB86D5B868553CCDF5DEA1036FC7C76C51854"
+    },
+    {
+      "Name": "adventure_render",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 29.51,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.adventure_render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.adventure_render.err",
+      "Failure": "",
+      "SHA256": "A215FE5DB9A0218B74F764736D7C92F302A0B7573464673A19D377D9EBEF3706"
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 30.6,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_013500.survival.err",
+      "Failure": "",
+      "SHA256": "72B8AAC504F60E7B48AACBA096479B7CD3FC32065A0697830B0BBC94A4B92D55"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

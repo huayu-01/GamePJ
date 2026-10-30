@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/EchoMarkRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+Duration = 4
+DamageBonus = 0.15
+[resource]
+script = ExtResource("row")
+NumericId = 1289
+Id = "surv_echo_mark"
+DisplayName = "共鸣刻印"
+RewardKind = 0
+MaxStacks = 1
+Weight = 0.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_echo_mark"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "协击命中留下{Effects.0.Duration:0.#}秒刻印，玩家直接攻击刻印目标伤害+{Effects.0.DamageBonus:0%}，不叠加。"
+NameKey = "content.surv_echo_mark.name"
+DescriptionKey = "content.surv_echo_mark.description"
+Requires = PackedStringArray("surv_echo_familiar")
+Excludes = PackedStringArray("surv_echo_lance")
+
+Note = "2026-10-28按用户决定退出全部正式获取和图鉴；旧身份与效果资源仅保留追溯，不恢复旧四路线。"

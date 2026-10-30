@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/DamageBlinkRewardEffect.cs" id="definition"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+DamageThreshold = 20
+MinRadius = 3
+MaxRadius = 6
+Cooldown = 2
+[resource]
+script = ExtResource("row")
+NumericId = 1345
+DisplayName = "金蝉脱壳"
+NameKey = "content.1345.name"
+DescriptionKey = "content.1345.description"
+DescriptionTemplate = "累计受到敌方{Effects.0.DamageThreshold}点生命伤害后，在{Effects.0.MinRadius}～{Effects.0.MaxRadius}米内随机瞬移到有效位置；触发间隔{Effects.0.Cooldown}秒，成功后清空累计。"
+RewardKind = 2
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

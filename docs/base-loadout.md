@@ -3,6 +3,8 @@
 基地现在使用真实技能、动画事件、命中与伤害结算。`BaseCamp`管理练习场生命周期，基地没有RunController、StageController或奖励结算。
 `PracticeTarget`复用TrainingDummy真实单位；有护甲、会死亡，2秒后重建。基地死亡会重建基地，越界回出生点，均不发碎片。
 
+基地左上指引观察实际移动、命中和武器页使用，F1收起／展开，可直接出击。出击门先展示当前角色、武器、携带符文与激活能力卡，确认后进入正式森林，返回可继续配装。符文效果仍在进关时施加，基地练习尚不完整应用携带效果；详见[J44](archive/development-batches/character-design-j44.md)。
+
 ## 单一装备入口
 
 `PlayerLoadout.Apply`供关卡RunController和基地LoadoutPreview共同调用，顺序如下：
@@ -16,7 +18,7 @@ J39：配装默认值与当前槽位由玩家实例持有，重新创建PlayerLo
 
 `AbilityConfig.InputAction`用于安装默认槽，InputMap负责Q／鼠标等实际按键。`AbilitySlots.AssignToSlot(unit, "skill_1", row)`可将任意技能索引显式装入技能1；其原本的InputAction不影响该槽路由。仓库可以保留其它角色技能，只有当前装槽对象响应输入。换装前排队、按住或尚未释放的旧输入必须先松开，不能穿越到新技能。
 
-玩家投掷路径通过当前槽位的`UpdateInputPreview(held)`消费实际输入：按住瞄准时更新，松手、换装和死亡隐藏；不能以长期保持的`IsActive/InFlight`决定玩家预览显隐。程序接口蓄力与玩家按键预览独立，详见[J40](character-design-j40.md)。
+玩家投掷路径通过当前槽位的`UpdateInputPreview(held)`消费实际输入：按住瞄准时更新，松手、换装和死亡隐藏；不能以长期保持的`IsActive/InFlight`决定玩家预览显隐。程序接口蓄力与玩家按键预览独立，详见[J40](archive/development-batches/character-design-j40.md)。
 
 `Ability.ResetForLoadout`只在装备重配时调用，沿用取消生命周期；后撤、闪和架补齐其持有的无敌/碰撞/订阅清理。
 本轮纠正原始设计归属：落剑式只在灵剑的武器技能行引用，不再放在角色B共通技能中。灵剑6格；镰刀和长枪没有额外落剑式，为5格。共通“落”仍保留，长枪专属方向改型另行核验。
@@ -52,4 +54,4 @@ GM临时配置和自动化测试不改玩家的正式选择记忆。
 两套新骨架各自使用离线生成的技能库，灵剑5段使用作者原生攻击片段并对齐事件，其余技能按全局rest差值适配。详见[角色替换验收](character-replacement.md)。
 受击闪色、蓄力身体表现与后撤残影跟随当前可见模型，旧材质通道在切换时归还。
 
-验收、截图和未解决问题见 [c-batch-verification.md](c-batch-verification.md)。
+验收、截图和未解决问题见 [c-batch-verification.md](archive/development-batches/c-batch-verification.md)。

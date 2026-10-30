@@ -1,0 +1,10 @@
+# 本地安装包、备份、缓存和运行日志不进入版本控制。
+Tools/downloads/
+Tools/backups/
+Tools/cache/
+Tools/*.log
+Tools/*.pid
+Tools/.venv/
+**/__pycache__/
+*.blend1
+*.blend2

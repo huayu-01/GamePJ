@@ -1,0 +1,22 @@
+{
+  "bones": 23,
+  "clips": [
+    {
+      "duration": 2.03333330154419,
+      "name": "Idle_Pilot",
+      "tracks": 13
+    },
+    {
+      "duration": 3.03333330154419,
+      "name": "JointCheck_Pilot",
+      "tracks": 13
+    },
+    {
+      "duration": 1.03333330154419,
+      "name": "Walk_Pilot",
+      "tracks": 13
+    }
+  ],
+  "passed": true,
+  "walk_pose_delta": 2.97006402909756
+}

@@ -1,15 +1,15 @@
 # 动画管线（技能动画：生成 → 加载 → 事件帧 → 技能）
 
-> **J5修正**：同一方法轨道的两个事件不能放在同一时刻，否则后写入者覆盖前一个。旧架的GuardOn/GuardOff均在0.75秒，实际只剩GuardOff；源配置现分开，原始／Lyra／Samurai资源同步为GuardOn@0.15、GuardOff@0.9。闪已接真实Action后才开始三维位移，架已移除时间兜底开窗；缺事件只取消。[实测与边界](character-design-j5.md)。
+> **J5修正**：同一方法轨道的两个事件不能放在同一时刻，否则后写入者覆盖前一个。旧架的GuardOn/GuardOff均在0.75秒，实际只剩GuardOff；源配置现分开，原始／Lyra／Samurai资源同步为GuardOn@0.15、GuardOff@0.9。闪已接真实Action后才开始三维位移，架已移除时间兜底开窗；缺事件只取消。[实测与边界](archive/development-batches/character-design-j5.md)。
 
 > **本轮范围**：动画管线地基 + 角色 A［猎手］武器 1「能量掌」的最小闭环。
-> **总纲**：`docs/refactor-survey.md`（§1 动画普查 / §5 阶段划分）；**需求权威**：`docs/character-redesign.md`；
+> **总纲**：`docs/archive/design-notes/refactor-survey.md`（§1 动画普查 / §5 阶段划分）；**需求权威**：`docs/archive/design-notes/character-redesign.md`；
 > **设计权威**：`F:\Godot项目\3d肉鸽雨中哈迪斯\角色设计.txt`。
 >
 > 本轮**只加不删**：旧的 3 角色 / 3 武器 / 19 条增幅 / 25 条技能行全部保留，新内容全是**新增行文件**。
 > ⚠️ **2026-10-15 P6a 起解禁**：上面那些旧行**已经清掉**（"只加不删"只是 P1→P5 的阶段纪律）。
 > 本文件 §7 的"旧硬指标对比"记的是**当时**的读数，保留作历史；当前值见
-> [character-redesign.md](character-redesign.md) §六。
+> [character-redesign.md](archive/design-notes/character-redesign.md) §六。
 
 ---
 
@@ -32,7 +32,7 @@
 
 | 列 | 说明 |
 |---|---|
-| `SourceModelPath` | 源模型 `.glb`（当前所有角色共用 `Assets/Models/player/mesh_player_body.glb`） |
+| `SourceModelPath` | 生成配方的源模型 `.glb`；旧配方使用 `Assets/Models/player/mesh_player_body.glb`。角色最终播放的重定向库由 `UnitVisualProfile.SkillLibraryDir` 指定 |
 | `SourceAnimation` | 源片段名（32 段之一：`holding-right-shoot` / `attack-melee-right` / `interact-right` / `pick-up` …） |
 | `TargetName` | 目标动画名（`Skill_A1_ATK1`） |
 | `Library` | 命名库名（当前统一 `skills`）→ 查名要写 **`skills/Skill_A1_ATK1`** |

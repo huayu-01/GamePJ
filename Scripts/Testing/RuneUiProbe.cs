@@ -37,10 +37,10 @@ public partial class RuneUiProbe : Node
 			Check(screen.IsOpen && GetTree().Paused && Input.MouseMode == Input.MouseModeEnum.Visible, "打开暂停并显示鼠标");
 			Check(screen.OptionCount == 12, "11枚表内符文加不携带");
 			screen.EquipPreview(); Check(RuneCarry.Current == "", "开启保护期不误选");
-			await Wait();
+			await UiProbeWait.Interactive(this, screen);
 			foreach (RuneConfig row in ConfigIndex.Settings.Runes)
 			{
-				Check(ResourceLoader.Exists(row.IconPath) && ResourceLoader.Load<Texture2D>(row.IconPath) != null, $"图标 {row.Id}");
+				Check(ResourceLoader.Exists(row.IconPath) && ActRoguelike.Core.RuntimeResources.Load<Texture2D>(row.IconPath) != null, $"图标 {row.Id}");
 				var button = screen.GetNode<Control>("Root").FindChildren("*", "Button", true, false).OfType<Button>().Single(b => b.Text == row.DisplayName);
 				button.GrabFocus();
 				Check(screen.PreviewId == row.Id, $"焦点预览 {row.DisplayName}");
@@ -53,18 +53,22 @@ public partial class RuneUiProbe : Node
 			Input.ParseInputEvent(new InputEventKey { Keycode = Key.Escape, PhysicalKeycode = Key.Escape, Pressed = true });
 			await Wait();
 			Check(!screen.IsOpen && !GetTree().Paused, "真实Esc关闭并恢复游戏");
-			Check(terminal.Interact(), "关闭后可重复打开"); await Wait();
+			Check(terminal.Interact(), "关闭后可重复打开"); await UiProbeWait.Interactive(this, screen);
 			if (DisplayServer.GetName() != "headless")
 			{
 				var thunder = screen.GetNode<Control>("Root").FindChildren("*", "Button", true, false).OfType<Button>().Single(b => b.Text == "雷之印"); thunder.GrabFocus();
 				await Wait();
-				string batch = ConfigIndex.Settings.Upgrades.Any(r => r.Specialization != SpecializationKind.None) ? "j32" : "j31";
-				GetViewport().GetTexture().GetImage().SavePng($"res://docs/character-design-{batch}-rune-ui.png");
+				string batch = OS.GetCmdlineUserArgs().Contains("--challenge-feedback") ? "j48"
+					: OS.GetCmdlineUserArgs().Contains("--interaction-models") ? "j47"
+					: OS.GetCmdlineUserArgs().Contains("--interaction-components") ? "j46"
+					: OS.GetCmdlineUserArgs().Contains("--flow-robustness") ? "j45"
+					: ConfigIndex.Settings.Upgrades.Any(r => r.Specialization != SpecializationKind.None) ? "j32" : "j31";
+				GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/character-design-{batch}-rune-ui.png"));
 				Check(true, "符文面板渲染截图");
 			}
 			screen.Close(); await Wait();
 			var cfg = new ConfigFile(); cfg.SetValue("rune", "carried", "rune_lei_seal");
-			string path = "res://.ai_rune_roundtrip.cfg";
+			string path = ValidationArtifacts.Path("res://Logs/validation/rune-roundtrip.cfg");
 			Check(cfg.Save(path) == Error.Ok, "独立临时目录写入正式ConfigFile格式");
 			var loaded = new ConfigFile();
 			Check(loaded.Load(path) == Error.Ok && loaded.GetValue("rune", "carried").AsString() == "rune_lei_seal", "携带字段磁盘往返");

@@ -307,6 +307,10 @@ public partial class DragonArrowProbe : Node3D
 	/// <summary>②③④ 阈值边界 + 全穿透 + 不锁存。</summary>
 	private async Task PiercingShots()
 	{
+		// 本段单独验证穿透与松手阈值；真实重力曲线由PlayerBallisticsProbe覆盖。
+		// 靶子共线时显式使用零重力夹具，避免45米后的真实下坠导致第三靶脱离路径。
+		float gravityBefore = _bow.GravityScale;
+		_bow.GravityScale = 0;
 		// 三个靶在 x=20 这条直线上；间距 18m 远大于"一帧飞行距离"（大箭几 m/物理帧），
 		// 这样每个靶都必然落在**不同**的一帧扫掠里（穿透的真实语义：一箭连续命中多个目标）。
 		var t1 = MakeTarget("T1", new Vector3(20f, 0.9f, 11.4f));
@@ -375,6 +379,7 @@ public partial class DragonArrowProbe : Node3D
 		t1.QueueFree();
 		t2.QueueFree();
 		t3.QueueFree();
+		_bow.GravityScale = gravityBefore;
 		await Wait(0.15);
 	}
 

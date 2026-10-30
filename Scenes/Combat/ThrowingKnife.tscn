@@ -1,0 +1,44 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Projectile.cs" id="1_projectile"]
+
+[sub_resource type="StandardMaterial3D" id="BladeMaterial"]
+albedo_color = Color(0.72, 0.81, 0.86, 1)
+metallic = 0.85
+roughness = 0.24
+
+[sub_resource type="StandardMaterial3D" id="GripMaterial"]
+albedo_color = Color(0.13, 0.18, 0.22, 1)
+roughness = 0.7
+
+[sub_resource type="CylinderMesh" id="Blade"]
+material = SubResource("BladeMaterial")
+top_radius = 0.0
+bottom_radius = 0.075
+height = 0.68
+radial_segments = 4
+rings = 1
+
+[sub_resource type="BoxMesh" id="Grip"]
+material = SubResource("GripMaterial")
+size = Vector3(0.045, 0.03, 0.18)
+
+[node name="ThrowingKnife" type="Area3D"]
+collision_layer = 32
+collision_mask = 7
+monitoring = false
+monitorable = false
+script = ExtResource("1_projectile")
+Speed = 36.0
+QueryGeometry = 0
+GravityScale = 1.0
+MaxLifetime = 12.0
+CutSceneClass = "Arrow"
+
+[node name="Blade" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 0.35, 0, 0, 0, -0.17)
+mesh = SubResource("Blade")
+
+[node name="Grip" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0, 0.26)
+mesh = SubResource("Grip")

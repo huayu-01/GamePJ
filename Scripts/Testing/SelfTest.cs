@@ -214,6 +214,8 @@ public partial class SelfTest : Node
 
 			case 9 when _timer > 1.0f:
 				var reward = GetTree().Root.GetNodeOrNull<RewardScreen>("Main/RunController/RewardScreen");
+				// 自测累计帧时不等于真实时钟；必须等正式保护结束，不能用早到的数字键跳过奖励。
+				if (reward?.IsOpen == true && reward.InputBlocked) break;
 				GameLog.Write("SelfTest", $"端到端：按 F 之后 奖励界面打开 = {reward?.IsOpen}  Paused = {GetTree().Paused}");
 				PressKey(Key.Key1);
 				Next();
@@ -308,9 +310,13 @@ public partial class SelfTest : Node
 				}
 
 				GameLog.Write("SelfTest", $"🔴 白板首领闸门·正向：本场第 {_eliteProbe?.WaveIndex} 波后降临={_eliteProbe?.EliteBossSpawned}（期望 True）场上存活={_eliteProbe?.AliveCount}（期望 1）");
+				float expectedEliteHealth = (ActRoguelike.Config.ConfigIndex.Settings.Bosses.FirstOrDefault()?.MaxHealth ?? 900f)
+					* (ActRoguelike.Config.ConfigIndex.Settings.Bosses.FirstOrDefault()?.EliteCopyHealthScale ?? .35f)
+					* ActRoguelike.Config.ConfigIndex.Settings.BossHealthMultiplier;
+				GameLog.Write("SelfTest", $"{(elite != null && Mathf.IsEqualApprox(elite.MaxHealth, expectedEliteHealth) ? "✅" : "🔴")} 白板首领生命公式核对：实际 {elite?.MaxHealth:0.###}，期望 {expectedEliteHealth:0.###}（首领基值×白板倍率×全局生命倍率）");
 				GameLog.Write("SelfTest", elite == null
 					? "🔴 白板首领闸门·正向：boss_units 组里找不到它（期望找到一个）"
-					: $"🔴 白板首领实例：生命 {elite.MaxHealth:0.#}（首领行 900 × 0.35 = 315，期望 315）护甲 {elite.Armor:0.#}（期望 0）标签 [{string.Join(",", elite.Tags)}]");
+					: $"🔴 白板首领实例：生命 {elite.MaxHealth:0.#}（期望 {expectedEliteHealth:0.#}，按当前配置公式）护甲 {elite.Armor:0.#}（期望 0）标签 [{string.Join(",", elite.Tags)}]");
 				Next();
 				break;
 
@@ -1895,7 +1901,7 @@ public partial class SelfTest : Node
 	///   "第 1 击不加伤（那时 0 层）、第 2 击起按层数加伤"；再覆盖多目标 / 层数封顶 / 过期 / 其它技能。</item>
 	/// <item><b>B·心眼</b>（角色 A + 弓）：同上拿「心眼」→ 真实箭两连发，量出 +50% 从第二击起；
 	///   再让**另一个单位**打这个被标记的目标，读数必须不吃加成。</item>
-	/// <item><b>C·两种伤害与组合</b>（换回能量掌，规则仍在玩家身上）：能量掌**武技2**（不是箭）打被标记目标
+	/// <item><b>C·两种伤害与组合</b>（换回能量掌后重新通过奖励入口组装两条规则）：能量掌**武技2**（不是箭）打被标记目标
 	///   = ×1.5（心眼对"各种伤害"生效、而发散只提高波波）→ 证明加伤不是写死在箭上；
 	///   同时量出「发散 × 心眼」的相乘组合。</item>
 	/// </list>
@@ -2196,8 +2202,14 @@ public partial class SelfTest : Node
 		J8ClearField();
 		wave = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_1") as EnergyWaveAbility;
 		bigWave = PlayerAbilityInput.FindByInputAction(player, "weapon_skill_2") as EnergyWaveAbility;
+		// 换装会撤销上一套效果；组合探针必须重新走真实奖励入口，不能依赖旧规则泄漏。
+		foreach (string id in new[] { "evo_divergence", "evo_mindseye" })
+		{
+			if (FindMarkRule(player, id) == null) RunController.Instance?.GrantReward(id);
+		}
 		divergence = FindMarkRule(player, "evo_divergence");
 		mindseye = FindMarkRule(player, "evo_mindseye");
+		GameLog.Write("SelfTest", $"{(divergence != null && mindseye != null ? "✅" : "🔴")} J8·组合重新获取：换装后通过真实奖励入口持有发散与心眼，两条规则均在当前玩家上。");
 		Unit? targetD = J8SpawnTarget(player, "J8MarkD");
 		Unit? targetE = J8SpawnTarget(player, "J8MarkE");
 		if (targetD == null || targetE == null || wave == null || bigWave == null)
@@ -2260,14 +2272,11 @@ public partial class SelfTest : Node
 
 		J8FreeTargets(targetD, targetE);
 
-		// 还原：把两条规则节点摘掉（`_ExitTree` 会注销攻击者侧登记），把场上清干净。
-		foreach (TriggerRule rule in CollectRules(player))
+		// 还原：由持有者撤销本次效果，同时注销伤害接口、触发登记与节点。
+		if (RunController.Instance is { } activeRun && player.GetNodeOrNull<RewardEffectHost>(RewardEffectHost.NodeName) is { } effects)
 		{
-			if (rule is MarkedBonusRule)
-			{
-				player.RemoveChild(rule);
-				rule.Free();
-			}
+			effects.ReleaseReward(activeRun.Build, "evo_divergence");
+			effects.ReleaseReward(activeRun.Build, "evo_mindseye");
 		}
 
 		J8ClearField();
@@ -2836,6 +2845,12 @@ public partial class SelfTest : Node
 
 		var player = PlayerLocator.Player;
 		ActRoguelike.Weapons.Weapon? weapon = player == null ? null : NodeSearch.FindInSubtree<ActRoguelike.Weapons.Weapon>(player);
+		if (player != null)
+		{
+			float configuredHealth = ConfigRows.ById<CharacterConfig>("chr_hunter")?.MaxHealth ?? 200f;
+			float expectedHealth = Mathf.Max(1f, (configuredHealth + MetaProgress.BonusMaxHealth) * player.Stats.Get("MaxHealthMultiplier") + player.Stats.Get("MaxHealthAdd"));
+			GameLog.Write("SelfTest", $"{(Mathf.IsEqualApprox(player.MaxHealth, expectedHealth) ? "✅" : "🔴")} 配装生命核对：实际 {player.MaxHealth:0.###} / 期望 {expectedHealth:0.###}（角色表 {configuredHealth:0.###} + 局外 {MetaProgress.BonusMaxHealth:0.###}，倍率 {player.Stats.Get("MaxHealthMultiplier"):0.###}，能力卡等加值 {player.Stats.Get("MaxHealthAdd"):0.###}）");
+		}
 
 		// ⚠️ P6a：基准角色/武器换成清旧之后剩下的**角色 A［猎手］+ 能量掌**（旧的 3 角色 3 武器已删）。
 		// 角色 A 的生命/护甲/移速**是 P3 代理自拟的预设值**（设计文档 `3d肉鸽雨中哈迪斯/角色设计.txt`
@@ -2859,8 +2874,10 @@ public partial class SelfTest : Node
 		//   敌人 10 / 首领 1 / 召唤物 1 / Pressure 7 / 效果 13 / 节点 8 / 局外 6 / AI 档案 11 **一条没动**。
 		//   增幅项不在这一行（见下面「配置表比对·增幅项」）：74 → 57（删了 17 条旧行 = 旧强化 10 + 旧进化 4 + 旧异化 3），
 		//   剩下强化 9（= 设计文档 §227-243 那 9 条）/ 进化 23 / 异化 25。
+		var inventoryIssues = ActRoguelike.Config.ContentInventorySnapshot.Current.Check(ActRoguelike.Config.ConfigIndex.Settings);
+        GameLog.Write("SelfTest", $"{(inventoryIssues.Count == 0 ? "✅" : "🔴")} 内容数量基线：问题{inventoryIssues.Count}，{string.Join("；", inventoryIssues)}");
 		GameLog.Write("SelfTest",
-			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}/符文 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.RuneConfig>()}（期望J36：6/2/21/1/1/39/7/14/8/5/6/11/4/11；相对J11仅新增11条敌人行，其余索引不变）");
+			$"配置表比对·索引：武器 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.WeaponConfig>()}/角色 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.CharacterConfig>()}/敌人 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EnemyConfig>()}/首领 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.BossConfig>()}/召唤物 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.SummonConfig>()}/技能 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()}/Pressure {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.PressureModConfig>()}/效果 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.EffectConfig>()}/节点 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.NodeConfig>()}/局外 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.MetaUpgradeConfig>()}/升级池 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()}/AI 档案 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AiProfileConfig>()}/能力卡 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityCardConfig>()}/符文 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.RuneConfig>()}（期望：由Config/Validation/content_inventory.tres统一核对）");
 
 		// 能力卡（局外装备层，`docs/ability-cards.md`）：卡表读数 + 状态层全流程
 		// （解锁 → 重复解锁 → 升级 → 上限 → 重置归还 → 激活额度记账 → 未解锁/额度不足/碎片不足 → 额度扩增）。
@@ -2926,7 +2943,7 @@ public partial class SelfTest : Node
 		string poolIds = GetTree().Root.GetNodeOrNull<RunController>("Main/RunController")?.PoolPreview ?? string.Empty;
 		string poolSize = poolIds.Length == 0 ? "空" : $"{poolIds.Split(',').Length} 条";
 		GameLog.Write("SelfTest",
-			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，期望J33后91 = 23/33/35；J32基础上补快乐小子） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，当前表实测值）");
+			$"配置表比对·增幅项：共 {RewardCatalog.All.Length} 条（强化 {enhancement} / 进化 {evolution} / 异化 {mutation}，分类与总数由唯一内容基线核对） 表已接上={RewardCatalog.Find("upg_power") != null && RewardCatalog.Find("upg_dmg_up") == null}（新行在、旧行已清） 当前池子={poolSize}（猎手+能量掌，当前表实测值）");
 
 		// 武器 → 升级池 → 选项（配置表阶段 4）：三级回退各层的条数 + 武器实际带上的池 Id。
 		// 这是设计文档 §4.5.5 要求的"顺藤摸瓜"只读校验。回退路径（武器行没填 Pool / 池表读不到）时
@@ -2985,7 +3002,7 @@ public partial class SelfTest : Node
 		}
 
 		GameLog.Write("SelfTest",
-			$"配置表比对·升级池：武器 PoolId「{poolIdText}」（期望 pool_energy_palm） 池表 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()} 行（期望 6；P6a 之前 9） / 选项行里指定了池的 {pooledOptions} 条 ｜ 专属层 {exactLayer} 条（命中 {exactHit}）· 类别层 {tagLayer} 条（命中 {tagHit}）· 通用层 {genericLayer} 条 ｜ 同池复量 {repeatCount}");
+			$"配置表比对·升级池：武器 PoolId「{poolIdText}」（期望 pool_energy_palm） 池表 {ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.UpgradePoolConfig>()} 行（规模由唯一内容基线核对） / 选项行里指定了池的 {pooledOptions} 条 ｜ 专属层 {exactLayer} 条（命中 {exactHit}）· 类别层 {tagLayer} 条（命中 {tagHit}）· 通用层 {genericLayer} 条 ｜ 同池复量 {repeatCount}");
 
 		// ── P5：三层判定（限定 / 互斥 / 前置）取证 ──
 		ReportP5Layers(player, weapon);
@@ -3005,7 +3022,7 @@ public partial class SelfTest : Node
 		// ⚠️ P6a：探针行从 `skl_dash`（已随旧角色删除）换成清旧后仍在的 `skl_a1_skill_1`（后撤）。
 		ActRoguelike.Config.AbilityConfig? backdashRow = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AbilityConfig>("skl_a1_skill_1");
 		GameLog.Write("SelfTest",
-			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（期望 P6a 清旧后 39 = 19 玩家 + 16 单位 + 4 首领行为；P6a 之前 44，删的是 5 条旧角色技能行；只打印、不比对） 后撤行：冷却 {backdashRow?.Cooldown:0.##}（期望 10） 节点 {backdashRow?.NodeName}（期望 AbilitySkill1） 类 {backdashRow?.ClassHint}（期望 BackdashAbility） ｜ 首领强化来源：Boss Build 行为型（**技能**）{ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型（**词条**）{ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）");
+			$"配置表比对·技能表：{ActRoguelike.Config.ConfigRows.Count<ActRoguelike.Config.AbilityConfig>()} 行（规模由唯一内容基线核对） 后撤行：冷却 {backdashRow?.Cooldown:0.##}（期望 10） 节点 {backdashRow?.NodeName}（期望 AbilitySkill1） 类 {backdashRow?.ClassHint}（期望 BackdashAbility） ｜ 首领强化来源：Boss Build 行为型（**技能**）{ActRoguelike.Boss.BossPerkCatalog.BehaviorOnly.Count} 条（期望 4）/ Pressure 数值型（**词条**）{ActRoguelike.Boss.BossPerkCatalog.PressureOnly.Count} 条（期望 7 = 4 数值型参数栏 + 3 技能参数栏）");
 
 		// AI 行为表（阶段 5）：行数 + "敌人行 → 档案"的关联 + **真的写进去了**的硬证据。
 		ActRoguelike.Config.AiProfileConfig? chaserAi = ActRoguelike.Config.ConfigRows.ById<ActRoguelike.Config.AiProfileConfig>("ai_chaser");
@@ -3265,6 +3282,7 @@ public partial class SelfTest : Node
 		var probePlayer = new Unit();
 		var probeBackdash = new ChargeAttackAbility { AbilityId = "skl_a1_skill_1", MaxCharges = 1 };
 		var probeSpear = new SpearThrowAbility { AbilityId = "skl_b3_w1_2" };
+		ConfigRows.ById<AbilityConfig>("skl_b3_w1_2")!.ApplyTo(probeSpear);
 		var probeBowSkill = new ArrowVolleyAbility { AbilityId = "skl_a3_w1_1" };
 		var probeDraw = new SpiritSwordsAbility { AbilityId = "skl_b1_w1_2" };
 		var probeLanding = new LandingBurstAbility { AbilityId = "skl_b1_w1_3" };
@@ -3292,10 +3310,7 @@ public partial class SelfTest : Node
 
 		bool overrideOk =
 			probeBackdash.MaxCharges == 3 && Mathf.Abs(probeBackdash.RechargeSeconds - 0.5f) < 0.0001f
-			&& Mathf.Abs(probeSpear.ChargeBaseSeconds - 0.5f) < 0.0001f
-			&& Mathf.Abs(probeSpear.ChargeStepSeconds - 0.125f) < 0.0001f
-			&& Mathf.Abs(probeSpear.ChargeMaxSeconds - 1f) < 0.0001f
-			&& !probeSpear.RecallOnSecondPress && probeSpear.AutoRecallOnSettle
+			&& probeSpear.LinearShot && !probeSpear.HoldToCharge && probeSpear.LanceUnlimitedTargets && Mathf.IsEqualApprox(probeSpear.Cooldown, 3f)
 			&& probeBowSkill.RampMaxCount == 3 && Mathf.Abs(probeBowSkill.RampWindowSeconds - 1.2f) < 0.0001f
 			&& Mathf.Abs(probeBowSkill.ChargeMaxSeconds - 3f) < 0.0001f
 			// J42：旧大拔刀术迁为灵能汲取，续时参数来自实际奖励行。
@@ -3307,7 +3322,7 @@ public partial class SelfTest : Node
 			&& Mathf.Abs(probeLanding.DamageScale - 1.6f) < 0.0001f;
 		GameLog.Write("SelfTest",
 			$"{(overrideOk ? "✅" : "🔴")} P5b·实测表参数落到机制上（探测技能节点，不进树）：有备无患 → 后撤 MaxCharges {probeBackdash.MaxCharges}（期望 3）Recharge {probeBackdash.RechargeSeconds:0.###}s（期望 0.5）"
-			+ $"｜气贯长虹 → 长枪武技2 基础蓄力 {probeSpear.ChargeBaseSeconds:0.###}s（期望 0.5）每档 {probeSpear.ChargeStepSeconds:0.###}s（期望 0.125）总上限 {probeSpear.ChargeMaxSeconds:0.###}s（期望1）手动召回 {probeSpear.RecallOnSecondPress}／落地自动召回 {probeSpear.AutoRecallOnSettle}（期望False／True）"
+			+ $"｜气贯长虹 → 直线投枪={probeSpear.LinearShot}，无限穿透={probeSpear.LanceUnlimitedTargets}，冷却{probeSpear.Cooldown:0.##}秒（期望3）"
 			+ $"｜变奏 + 龙之箭 → 弓武技1 RampMaxCount {probeBowSkill.RampMaxCount}（期望 3）RampWindow {probeBowSkill.RampWindowSeconds:0.###}s（期望 1.2）蓄力上限 {probeBowSkill.ChargeMaxSeconds:0.###}s（期望 3）"
 			+ $"｜灵能汲取 → 每杀续时 {probeDraw.KillExtensionSeconds:0.###}秒（期望2）单剑伤害比例{probeDraw.SwordDamageScale:0.###}（期望0.3）全局伤害乘区 {probePlayer.Stats.Get("DamageMultiplier"):0.###}（期望1；真实协同与击杀见灵剑专项）"
 			+ $"｜地爆 → 共通落落地击退 {probeFall.LandingKnockback:0.###}（期望6）／落剑式额外击退 {probeLanding.Knockback:0.###}（期望0）｜神降术 → 落剑式 Cooldown {probeLanding.Cooldown:0.###}s（期望2）DamageScale {probeLanding.DamageScale:0.###}（期望1.6）");
@@ -4770,7 +4785,7 @@ public partial class SelfTest : Node
 		});
 
 		float healthAfter = _p4Player.Health;
-		bool exited = !guard.StanceActive;
+		bool exited = guard.StanceActive;
 		int parriesAfter = guard.ParryCount;
 		bool ok = stanceActive && result.Invulnerable && Mathf.IsEqualApprox(healthBefore, healthAfter)
 			&& parriesAfter == parriesBefore + 1 && exited;
@@ -4778,7 +4793,7 @@ public partial class SelfTest : Node
 			"SelfTest",
 			$"{(ok ? "✅" : "🔴")} P4·技能2 架：真实GuardOn后架势中={stanceActive} 窗口{guard.StanceSeconds:0.##}s CD {guard.Cooldown:0.##}"
 			+ $"｜架势内挨 40 点：无效化={result.Invulnerable}（期望 True） 掉血 {healthBefore - healthAfter:0.#}（期望 0） 生命 {healthBefore:0.#} → {healthAfter:0.#}"
-			+ $"｜退出架势={exited}（期望 True） 架住计数 {parriesBefore} → {parriesAfter}（期望 +1） 挡下的伤害={guard.LastParriedDamage:0.##}（期望 40）");
+			+ $"｜保持架势={exited}（期望 True） 架住计数 {parriesBefore} → {parriesAfter}（期望 +1） 挡下的伤害={guard.LastParriedDamage:0.##}（期望 40）");
 		return true;
 	}
 
@@ -4957,18 +4972,13 @@ public partial class SelfTest : Node
 			maxStepSeen = Mathf.Max(maxStepSeen, w1.ComboStep);
 		}
 
-		// 本同步探针只核查蓄力与配置；真实ATK、落点与回程伤害由CharacterDesignProbe覆盖。
+		// 同步探针核查新投枪契约；真实事件、俯仰与多目标碰撞由Content032037专项覆盖。
 		w2.ResetForLoadout();
-		bool charged = w2.TryPress();
-		w2.OnInputHeld(w2.ChargeBaseSeconds + w2.ChargeStepSeconds * 3 + 0.01f);
-		int steps = w2.ChargeSteps;
-		float power = w2.ChargePowerScale;
-		w2.ResetForLoadout();
-		bool contract = w2.AnimName.Length > 0 && w2.AnimEvent == "ATK" && w2.ContinuousPathDamage
-			&& w2.RecallDistance == 0 && w2.RecallOnSecondPress && !w2.AutoRecallOnSettle;
-		bool ok = started && w1.ComboStepCount == 4 && advanced >= 5 && maxStepSeen <= 3
-			&& charged && steps == 3 && Mathf.IsEqualApprox(power, 1.6f) && contract;
-		GameLog.Write("SelfTest", $"{(ok ? "✅" : "🔴")} P4·长枪：四段循环，最大索引{maxStepSeen}，三档加算倍率{power:0.###}（期望1.6），留枪与动画契约={contract}；准星落点、地形碰撞与往返命中见原始设计真实输入探针。");
+		bool pressed = w2.TryPress(); bool notCharging = !w2.IsCharging; w2.ResetForLoadout();
+		bool contract = w2.LinearShot && !w2.HoldToCharge && w2.LanceMaxTargets == 2 && w2.Cooldown == 10
+			&& w2.AnimName.Length > 0 && w2.AnimEvent == "ATK";
+		bool ok = started && w1.ComboStepCount == 4 && advanced >= 5 && maxStepSeen <= 3 && pressed && notCharging && contract;
+		GameLog.Write("SelfTest", $"{(ok ? "✅" : "🔴")} P4·长枪：四段循环最大索引{maxStepSeen}，无蓄力直线投枪与动画契约={contract}；真实穿透与击退见032～037专项。");
 	}
 
 	/// <summary>取单位下的 <see cref="CharacterMovement"/>（自测探针要同步推它的物理帧）。</summary>

@@ -8,26 +8,29 @@ namespace ActRoguelike.Config;
 /// </summary>
 [Tool]
 [GlobalClass]
-public partial class StageDefinition : Resource
+public partial class StageDefinition : Resource, INumericContentIdentity
 {
 	[ExportGroup("身份")]
 	/// <summary>
 	/// Stage 的稳定键（关卡核心文档 §7.4「Stage 标识」）。存档 / 分支 / 别的表引用都用它，
 	/// 定好不再改；与行文件名（<c>Config/Tables/Stages/stg_*.tres</c>）取同一个语义名便于人肉对照。
 	/// </summary>
-	[Export] public string Id { get; set; } = "stage_1";
+	[Export] public int NumericId { get; set; }
+	private string _legacyId = string.Empty;
+	[Export] public string Id { get => NumericContentIdentity.Key(_legacyId, NumericId); set => _legacyId = value; }
+	public override void _ValidateProperty(Godot.Collections.Dictionary property) => NumericContentIdentity.HideLegacy(property);
 
 	/// <summary>界面显示名（只影响界面与日志，不要拿它当身份键）。</summary>
 	[Export] public string DisplayName { get; set; } = "Stage 1";
 
-	[ExportGroup("战斗（预算 / 并发 / 生成间隔 / 本关敌人倍率 / 白名单）")]
+	[ExportGroup("战斗（预算 / 非波次并发 / 生成间隔 / 本关敌人倍率 / 白名单）")]
 	/// <summary>本关的生成预算（决定这一关总共出多少怪；全局还有 <c>NodeBudgetMultiplier</c> 再乘一次）。</summary>
 	[Export] public float CombatBudget { get; set; } = 10f;
 
-	/// <summary>同时在场的最多敌人数。</summary>
+	/// <summary>非波次逐只生成的并发上限；WaveMode整波出场不使用此上限。</summary>
 	[Export] public int MaxConcurrent { get; set; } = 3;
 
-	/// <summary>生成间隔（秒；全局还有 <c>SpawnIntervalMultiplier</c> 再乘一次）。</summary>
+	/// <summary>逐只生成间隔（秒）；整波出场不按此值拆批。全局还有SpawnIntervalMultiplier。</summary>
 	[Export] public float SpawnInterval { get; set; } = 2f;
 
 	/// <summary>本关敌人生命倍率（与敌人表的全局倍率相乘）。</summary>
@@ -47,13 +50,6 @@ public partial class StageDefinition : Resource
 	/// 未知 Id 会在开局由 <see cref="ConfigIndex"/> 校验并写警告（不再静默失效）。
 	/// </summary>
 	[Export] public string[] AllowedEnemyIds { get; set; } = System.Array.Empty<string>();
-
-	[ExportGroup("节点与挑战（本关放几个奖励节点 / 免费挑战额度）")]
-	/// <summary>本关放几个奖励节点（价值层配比由 `NodePlacement` 决定）。</summary>
-	[Export] public int RewardNodeCount { get; set; } = 3;
-
-	/// <summary>本关开局的免费挑战额度（额度内挑战节点不加 Pressure）。</summary>
-	[Export] public int FreeChallengeQuota { get; set; } = 2;
 
 	[ExportGroup("Boss（护卫数量 / 倍率 / 开场技能数）")]
 	/// <summary>Boss 出生时带的护卫数量。</summary>

@@ -1,0 +1,43 @@
+shader_type canvas_item;
+render_mode unshaded;
+
+uniform sampler2D scene_texture : hint_screen_texture, repeat_disable, filter_linear_mipmap;
+uniform sampler2D frost_texture : repeat_enable, filter_linear;
+uniform vec2 panel_size = vec2(400.0, 400.0);
+uniform bool light_surface = false;
+uniform bool backdrop = false;
+uniform float corner_radius = 18.0;
+uniform float edge_width = 68.0;
+uniform float emphasis = 0.0;
+
+void fragment() {
+	if (backdrop) {
+		vec3 scene = textureLod(scene_texture,SCREEN_UV,light_surface ? 3.5 : 0.8).rgb;
+		scene=pow(scene,vec3(light_surface ? 0.82 : 0.96));
+		COLOR=vec4(mix(scene,vec3(0.47,0.63,0.70),light_surface ? 0.08 : 0.03),1.0)*COLOR;
+	} else {
+	vec2 p = UV * panel_size;
+	vec2 q = abs(p - panel_size * 0.5) - (panel_size * 0.5 - vec2(corner_radius));
+	float sd = length(max(q, vec2(0.0))) + min(max(q.x, q.y), 0.0) - corner_radius;
+	float coverage = 1.0 - smoothstep(-0.8, 0.8, sd);
+	vec2 near_edge=min(p,panel_size-p);
+	vec2 frost_edge=vec2(1.0)-smoothstep(vec2(0.0),vec2(edge_width),near_edge);
+	float edge=1.0-(1.0-frost_edge.x)*(1.0-frost_edge.y);
+	vec3 sharp = textureLod(scene_texture, SCREEN_UV, 0.8).rgb;
+	vec3 blurred = textureLod(scene_texture, SCREEN_UV, light_surface ? 4.0 : 4.8).rgb;
+	float blur_mix = light_surface ? 1.0 : mix(0.12, 0.96, edge);
+	vec3 scene = mix(sharp, blurred, blur_mix);
+	vec3 tint = light_surface ? vec3(0.94, 0.98, 1.0) : vec3(0.54, 0.65, 0.71);
+	float opacity = light_surface ? 0.84 : 0.30;
+	vec3 glass = mix(scene, tint, opacity);
+	float frost=texture(frost_texture,SCREEN_UV*vec2(1.7,1.0)).r;
+	glass+=(frost-0.5)*(light_surface ? 0.08 : edge*0.08);
+	float sheen = pow(1.0-UV.y,3.0)*0.22+pow(UV.y,4.0)*0.12;
+	glass=mix(glass,vec3(0.94,0.98,1.0),sheen+edge*(light_surface ? 0.12 : 0.48));
+	float border = 1.0 - smoothstep(1.0, 2.4+emphasis*1.8, -sd);
+	vec3 border_color = mix(vec3(0.89, 0.97, 1.0), vec3(0.28, 0.96, 1.0), emphasis);
+	glass = mix(glass, border_color, border * mix(0.88, 1.0, emphasis));
+	glass=mix(glass,vec3(0.30,0.97,1.0),edge*emphasis*0.08);
+	COLOR = vec4(glass, coverage) * COLOR;
+	}
+}

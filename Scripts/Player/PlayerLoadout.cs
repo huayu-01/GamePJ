@@ -17,7 +17,9 @@ public sealed class PlayerLoadout
 {
 	public void Apply(Unit player, Node owner, PlayerCharacterKind characterKind, WeaponPresetKind weaponKind)
 	{
+		ProjectileDispatch.CancelFor(player);
 		var slots = player.AbilitySlots; slots.CaptureDefaults(player); slots.Clear();
+		player.GetNodeOrNull<RewardEffectHost>(RewardEffectHost.NodeName)?.ReleaseForLoadout();
 		if (player.GetNodeOrNull<SpecializationRuntime>(SpecializationRuntime.NodeName) is { } specialization)
 		{
 			player.RemoveChild(specialization); specialization.QueueFree();

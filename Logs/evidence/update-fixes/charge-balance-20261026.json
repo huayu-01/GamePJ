@@ -1,0 +1,10 @@
+{
+ "scope":"验收006：仅将明确冲锋、追踪冲锋和俯冲的速度字面值增加50%，没有运行时倍率。",
+ "changes":[
+  {"path":"Config/Tables/Skills/skl_enemy_charger_charge.tres","field":"ChargeSpeed","before":16,"after":24},
+  {"path":"Config/Tables/Skills/skl_boss_charge.tres","field":"ChargeSpeed","before":18,"after":27},
+  {"path":"Config/EnemyPlans/spear_guard.tres","field":"Speed","before":13,"after":19.5},
+  {"path":"Config/EnemyPlans/tracking_charger.tres","field":"Speed","before":13,"after":19.5},
+  {"path":"Config/EnemyPlans/hover_diver.tres","field":"Dive.Speed","before":18,"after":27}
+ ]
+}

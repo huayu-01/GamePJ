@@ -20,10 +20,16 @@ namespace ActRoguelike.Rewards;
 public partial class RunController : Node
 {
 	[Export] public bool AutoStartStage { get; set; } = true;
+	[Export] public NodePath ModeControllerPath { get; set; } = "";
+	private RunModeController? _mode;
+	public RunModeController? Mode => _mode;
+	public bool GameplayReady => _boot == 2 && !_runEnded;
 
 	private readonly RunBuild _build = new();
 	private readonly RewardPool _pool = new();
-	private readonly List<RewardDefinition> _current = new();
+	private readonly RewardOfferFlow _rewardFlow = new();
+	private Action? _refreshRewardOffer;
+	private NodeRewardContext? _nodeRewardContext;
 
 	private readonly ActRoguelike.Player.PlayerLoadout _loadout = new();
 
@@ -34,7 +40,6 @@ public partial class RunController : Node
 	private bool _poolReady;
 	private bool _runEnded;
 	private bool _awaitingAdvance;
-	private Action? _chosenCallback;
 	private StageDefinition[] _stages = Array.Empty<StageDefinition>();
 	private int _stageIndex;
 	private bool _restartOnDismiss;
@@ -42,6 +47,10 @@ public partial class RunController : Node
 	private ChooseScreen? _chooseScreen;
 	private PlayerCharacterKind _character = PlayerCharacterKind.Hunter;
 	private int _boot;
+	private readonly List<StageStatistics> _stageStatistics = new();
+	private float _recordedSeconds;
+	private int _recordedChallenges;
+	private int _recordedStageNumber;
 
 	// ── J11：符文（开局携带一件的信物）────────────────────────────────────────────
 	/// <summary>当前携带的符文行 Id（空 = 不携带，默认）。来源：`RuneCarry`（`user://rune.cfg`）。</summary>
@@ -55,7 +64,7 @@ public partial class RunController : Node
 	private readonly RunBuild _runeBuild = new();
 
 	/// <summary>这枚符文建出来的规则节点（击杀加甲 / 死亡避免 / 小精灵…）—— 换符文时按清单摘掉。</summary>
-	private readonly List<Node> _runeNodes = new();
+
 
 	public RunBuild Build => _build;
 	/// <summary>当前装备的只读身份，供HUD按表筛选技能；不暴露可变的配装状态。</summary>
@@ -63,6 +72,39 @@ public partial class RunController : Node
 	public WeaponPresetKind CurrentWeapon => _weaponKind;
 	public int CandidateCount => _pool.CandidateCount;
 	public bool RunEnded => _runEnded;
+	public bool CanCancelAdventure => !_runEnded && _boot == 2 && AdventureCheckpoint.IsActive;
+	public bool CancelAdventure(out string error)
+	{
+		error = string.Empty;
+		if (!CanCancelAdventure) { error = "当前没有进行中的冒险。"; return false; }
+		PackedScene home = RuntimeResources.Load<PackedScene>("res://Scenes/Levels/Base.tscn");
+		if (home == null || !home.CanInstantiate()) { error = "基地尚未加载成功，请稍后重试。"; return false; }
+		if (!AdventureCheckpoint.TryRestore(out error)) return false;
+		_runEnded = true; _restartOnDismiss = false; _awaitingAdvance = false; _rewardFlow.Cancel(); _nodeRewardContext?.Cancel(); _refreshRewardOffer = null;
+		_mode?.Stop();
+		_screen?.Close();
+		UiRouter.Instance?.ResetForSceneChange();
+		GameLog.Write("Flow", "取消本次冒险：已恢复出击前的资源、配装和基地状态，不进行本局结算。");
+		Error result = GetTree().ChangeSceneToPacked(home);
+		if (result != Error.Ok) { error = "返回基地失败，请重新载入基地。"; return false; }
+		return true;
+	}
+	/// <summary>已完结关卡的快照；换关前收集，死亡时也收集当前关，关卡序号只入账一次。</summary>
+	public IReadOnlyList<StageStatistics> StageStatistics => _stageStatistics.AsReadOnly();
+	public float TotalElapsedSeconds => _recordedSeconds + (_mode != null && _recordedStageNumber == 0 ? _mode.CaptureStatistics().ElapsedSeconds : _stage != null && _stage.StageNumber != _recordedStageNumber ? _stage.ElapsedSeconds : 0f);
+	public int TotalChallengesStarted => _recordedChallenges + (_mode != null && _recordedStageNumber == 0 ? _mode.CaptureStatistics().ChallengesStarted : _stage != null && _stage.StageNumber != _recordedStageNumber ? _stage.ChallengesUsed : 0);
+	public int SettlementEarnedShards { get; private set; }
+	public int CollectedBonusShards { get; private set; }
+	public bool IsCombatActive => GameplayReady && (_mode is ActRoguelike.Run.SurvivalDirector survival
+		? survival.State is ActRoguelike.Run.SurvivalDirector.PhaseState.Surviving or ActRoguelike.Run.SurvivalDirector.PhaseState.FinalBoss
+		: _stage?.CurrentNode?.IsRunning == true);
+	/// <summary>补给和资源强化的本局账本；只在正式结束时兑现，取消冒险不写局外。</summary>
+	public bool CollectBonusShards(Unit player, int amount)
+	{
+		if (_player != player || !GameplayReady || amount <= 0) return false;
+		CollectedBonusShards += amount; return true;
+	}
+	internal void RollbackBonusShards(int amount) => CollectedBonusShards = Mathf.Max(0, CollectedBonusShards - amount);
 
 	/// <summary>当前携带的符文行 Id（空 = 不携带；J11 第 ⑤ 步的运行期字段）。</summary>
 	public string CarriedRuneId => _carriedRuneId;
@@ -76,6 +118,7 @@ public partial class RunController : Node
 	public override void _Ready()
 	{
 		Instance = this;
+		if (!ModeControllerPath.IsEmpty) _mode = GetNodeOrNull<RunModeController>(ModeControllerPath);
 		AddToGroup("run_controller");
 		_screen = UiService.Instance?.Screen<RewardScreen>();
 		if (_screen != null)
@@ -90,6 +133,7 @@ public partial class RunController : Node
 
 	private void BindStage()
 	{
+		if (_mode != null) return;
 		_stage = GetTree().GetFirstNodeInGroup("stage") as StageController;
 		if (_stage == null)
 		{
@@ -142,6 +186,8 @@ public partial class RunController : Node
 
 	public override void _ExitTree()
 	{
+		if (_mode != null && IsInstanceValid(_mode)) _mode.Stop();
+		_rewardFlow.Cancel(); _nodeRewardContext?.Cancel(); _refreshRewardOffer = null;
 		if (Instance == this)
 		{
 			Instance = null;
@@ -175,14 +221,14 @@ public partial class RunController : Node
 		}
 
 		// 开局引导：等玩家、武器、Stage 都就绪 → 套用平衡配置 → 应用第一关配置。
-		if (_boot == 0 && _player != null && _weapon != null && _stage != null)
+		if (_boot == 0 && _player != null && _weapon != null && (_stage != null || _mode != null))
 		{
 			_boot = 1;
 			// J11：**先**读"当前携带的符文"（`user://rune.cfg`），再套配置 —— 这样第一次 `ApplyBalance`
 			// 就已经带着符文了。读不到 = 不携带，与加符文之前逐位一致。
 			_carriedRuneId = RuneCarry.Current;
 			ApplyBalance();
-			_stages = ResolveStages();
+			_stages = _mode == null ? ResolveStages() : Array.Empty<StageDefinition>();
 			MetaProgress.Load();
 
 			// ⚠️ **命令行旁路必须判在「基地已经选过一局」之前**（`docs/anim-pipeline.md` §6.4-2）：
@@ -224,6 +270,11 @@ public partial class RunController : Node
 
 	private void OnVictory()
 	{
+		if (_runEnded)
+		{
+			return;
+		}
+		RecordCurrentStage();
 		// 打完一关的 Boss：还有下一关就推进，否则通关。
 		int cleared = _stageIndex;
 		if (_stageIndex + 1 < _stages.Length)
@@ -232,7 +283,7 @@ public partial class RunController : Node
 			_restartOnDismiss = false;
 			_screen?.OpenMessage(
 				$"{_stages[cleared].DisplayName} 完成",
-				$"第 {cleared + 1} 关结束，构筑与生命保留。\n{_build.Describe()}\n\n进入 {_stages[_stageIndex].DisplayName}",
+				$"第 {cleared + 1} 关结束，构筑保留，生命回满。\n{_build.Describe()}\n\n进入 {_stages[_stageIndex].DisplayName}",
 				"按 Enter 或点击继续");
 			return;
 		}
@@ -245,11 +296,12 @@ public partial class RunController : Node
 	{
 		_stageIndex = index;
 		ActRoguelike.Core.GameLog.Write("Flow", $"进入第 {index + 1} 关：{_stages[index].DisplayName}");
-		_stage?.ApplyStage(_stages[index], index + 1);
+		_stage?.ApplyStage(_stages[index], index + 1, index == _stages.Length - 1);
 
 		if (_player != null && IsInstanceValid(_player))
 		{
-			_player.GlobalPosition = new Vector3(0f, 0.8f, 0f);
+			_player.GlobalPosition = GetTree().GetFirstNodeInGroup("run_spawn") is Node3D spawn
+				? spawn.GlobalPosition : new Vector3(0f, 0.8f, 0f);
 			_player.FillVitals();
 		}
 	}
@@ -393,6 +445,28 @@ public partial class RunController : Node
 		return stages.ToArray();
 	}
 
+	/// <summary>在 Stage 重置之前入账；防止首领通知与最终结算重复收集同一关。</summary>
+	private void RecordCurrentStage()
+	{
+		if (_mode != null)
+		{
+			if (_recordedStageNumber != 0) return;
+			var captured = _mode.CaptureStatistics();
+			_stageStatistics.Add(captured); _recordedStageNumber = captured.StageNumber;
+			_recordedSeconds += captured.ElapsedSeconds; _recordedChallenges += captured.ChallengesStarted;
+			return;
+		}
+		if (_stage == null || _stage.Definition == null || _recordedStageNumber == _stage.StageNumber)
+		{
+			return;
+		}
+		StageStatistics statistics = _stage.CompleteStatistics();
+		_stageStatistics.Add(statistics);
+		_recordedStageNumber = statistics.StageNumber;
+		_recordedSeconds += statistics.ElapsedSeconds;
+		_recordedChallenges += statistics.ChallengesStarted;
+	}
+
 	private void EndRun(bool victory)
 	{
 		if (_runEnded)
@@ -401,15 +475,18 @@ public partial class RunController : Node
 		}
 
 		_runEnded = true;
-		ActRoguelike.Core.GameLog.Write("Flow", $"本局结束 victory={victory} 关卡={_stage?.Definition?.DisplayName} 用时={(_stage?.ElapsedSeconds ?? 0f):0}s");
+		_rewardFlow.Cancel(); _nodeRewardContext?.Cancel(); _refreshRewardOffer = null;
+		RecordCurrentStage();
+		ActRoguelike.Core.GameLog.Write("Flow", $"本局结束 victory={victory} 关卡={_stage?.Definition?.DisplayName} 本局用时={TotalElapsedSeconds:0}s 本局挑战={TotalChallengesStarted}");
+		_mode?.Stop();
 		_restartOnDismiss = true;
-		float seconds = _stage?.ElapsedSeconds ?? 0f;
-		string body = victory
-			? $"通关！三关全部清理，用时 {seconds:0} 秒\n{_build.Describe()}"
-			: $"你在 {_stage?.Definition?.DisplayName ?? "关卡"} 阵亡\n用时 {seconds:0} 秒\n{_build.Describe()}";
-		int earned = RunSettlement.ShardsFor(_stageIndex, _stage?.ChallengesUsed ?? 0, victory);
+		int earned = (_mode?.SettlementShards(victory) ?? RunSettlement.ShardsFor(_stageIndex, TotalChallengesStarted, victory)) + CollectedBonusShards;
+		SettlementEarnedShards = earned;
 		MetaProgress.AddShards(earned);
-		body += $"\n获得碎片 +{earned}（累计 {MetaProgress.Shards}）";
+		AdventureCheckpoint.Complete();
+		string body = _mode?.DescribeSettlement(victory, _build.Describe(), earned, MetaProgress.Shards) ?? RunSettlement.Describe(victory, _stage?.Definition?.DisplayName ?? "关卡", _build.Describe(),
+			earned, MetaProgress.Shards, TotalElapsedSeconds, TotalChallengesStarted, _stages.Length);
+		if (CollectedBonusShards > 0) body += "\n" + string.Format(ContentText.Get("ui.run.bonus_shards", "补给与资源强化碎片 +{0}（已包含在本局总收益中）"), CollectedBonusShards);
 
 		// 阵亡 → **死亡流程**（用户需求 §五 #3）：死亡动画 → 演示过渡面板（占位）→ 回基地。
 		// 这一段**替代**原来的"立刻弹结算消息、按 Enter 回基地"，所以要在 OpenMessage 之前返回；
@@ -424,7 +501,7 @@ public partial class RunController : Node
 			return;
 		}
 
-		_screen?.OpenMessage(victory ? "胜利" : "本局结束", body, "按 Enter 或点击重新开始");
+		_screen?.OpenMessage(victory ? "胜利" : "本局结束", body, "按 Enter 或点击返回基地");
 	}
 
 	private void OnMessageDismissed()
@@ -453,12 +530,30 @@ public partial class RunController : Node
 		}
 
 		RewardDefinition? definition = RewardCatalog.Find(id);
-		if (definition == null || _player == null || _weapon == null)
+		if (definition == null || !definition.AllowsMode(_mode?.ModeId ?? string.Empty) || _player == null || _weapon == null)
 		{
 			return false;
 		}
 
 		_build.Add(definition, new RewardContext { Player = _player, Weapon = _weapon, Build = _build });
+		return true;
+	}
+
+	/// <summary>当前真正可获取的增幅；GM浏览与正式抽取使用同一限定、前置和互斥规则。</summary>
+	public List<RewardDefinition> AvailableRewards(RewardKind? kind = null)
+	{
+		if (_runEnded || _player == null || !IsInstanceValid(_player) || _player.IsDead || _weapon == null) return new();
+		EnsurePool();
+		return _pool.Available(_build, kind);
+	}
+
+	/// <summary>GM列表点击获取：点击时重新核对资格，再走真实应用路径。</summary>
+	public bool TryAcquireReward(string id)
+	{
+		RewardDefinition? definition = AvailableRewards().Find(row => row.Id == id);
+		if (definition == null || _player == null || _weapon == null) return false;
+		_build.Add(definition, new RewardContext { Player = _player, Weapon = _weapon, Build = _build });
+		GameLog.Write("Reward", $"GM获取增幅 {definition.Name}（当前 {_build.StacksOf(id)} 层）");
 		return true;
 	}
 
@@ -526,11 +621,22 @@ public partial class RunController : Node
 	/// <summary>选好角色与武器 → 套用数值并进入第一关。</summary>
 	public void BeginRunWithCharacter(PlayerCharacterKind character, WeaponPresetKind kind)
 	{
+		AdventureCheckpoint.EnsureCaptured();
+		_runEnded = false;
+		_rewardFlow.Cancel(); _nodeRewardContext?.Cancel(); _refreshRewardOffer = null;
+		_stageStatistics.Clear();
+		_recordedSeconds = 0f;
+		_recordedChallenges = 0;
+		_recordedStageNumber = 0;
+		SettlementEarnedShards = 0;
+		CollectedBonusShards = 0;
+		_restartOnDismiss = false;
 		_character = character;
 		ActRoguelike.Core.GameLog.Write("Flow", $"选择角色 {character} / 武器 {kind}");
 		_weaponKind = kind;
 		ApplyBalance();
 
+		if (_mode != null) { _mode.Begin(this, _player!); return; }
 		if (_stages.Length == 0)
 		{
 			_stages = ResolveStages();
@@ -557,7 +663,7 @@ public partial class RunController : Node
 		//    `<A1限定>` = 这一列 + 选项行 Pool 指向该武器行的 Pool（资源引用，见 RewardConfig.RequiredCharacterIds）。
 		string characterId = CharacterRow(_character)?.Id ?? string.Empty;
 		// ② 限定（武器层）：专属池（ApplicablePoolIds）→ 武器标签（RequiredWeaponTags）→ 通用。
-		_pool.Initialize(_weapon, characterId);
+		_pool.Initialize(_weapon, characterId, _mode?.ModeId ?? string.Empty);
 		_poolReady = true;
 
 		// 留痕（用户 C2 问的就是"池是什么时候定的"）：这一行只在进关卡初始化时出现，
@@ -628,8 +734,8 @@ public partial class RunController : Node
 		}
 
 		// ① 先摘掉上一枚符文留下的一切（修正器按 Source 摘、规则节点按清单摘、前置名单清空）。
+		_player.GetNodeOrNull<RewardEffectHost>(RewardEffectHost.NodeName)?.ReleaseBuild(_runeBuild);
 		_player.Stats.RemoveBySource(_runeBuild);
-		FreeRuneNodes();
 		_build.SetRuneUnlocks(null);
 
 		RuneConfig? row = ConfigRows.ById<RuneConfig>(_carriedRuneId);
@@ -664,16 +770,6 @@ public partial class RunController : Node
 
 		compiled.Apply(new RewardContext { Player = _player, Weapon = _weapon, Build = _runeBuild });
 
-		// ④ 把这次建出来的规则节点记下来（换符文时按清单摘掉，避免重复叠加）。
-		string prefix = $"Rune_{row.Id}";
-		foreach (Node child in _player.GetChildren())
-		{
-			if (child.Name.ToString().StartsWith(prefix, StringComparison.Ordinal))
-			{
-				_runeNodes.Add(child);
-			}
-		}
-
 		_player.RefreshStats();
 		GameLog.Write(
 			"Rune",
@@ -682,65 +778,54 @@ public partial class RunController : Node
 			+ $"｜解锁前置 {_build.DescribeRuneUnlocks()}");
 	}
 
-	/// <summary>把上一枚符文建出来的规则节点全部摘掉（先 `RemoveChild` 再 `QueueFree`：这一帧就不再 tick）。</summary>
-	private void FreeRuneNodes()
-	{
-		foreach (Node node in _runeNodes)
-		{
-			if (!IsInstanceValid(node))
-			{
-				continue;
-			}
-
-			node.GetParent()?.RemoveChild(node);
-			node.QueueFree();
-		}
-
-		_runeNodes.Clear();
-	}
-
-	/// <summary>稀有池三选一（特殊奖励节点）：只出进化与异化。</summary>
+	/// <summary>特殊池尊重节点表的类型配置；其余资格与所有奖励完全一致。</summary>
 	private bool OfferRareRewards(Action onChosen)
-	{
-		if (_player == null || _weapon == null || _screen == null || _screen.IsOpen || _runEnded)
-		{
-			return false;
-		}
-
-		EnsurePool();
-
-		_current.Clear();
-		_current.AddRange(_pool.Roll(_build, ConfigIndex.Settings.RewardChoiceCount, null, new[] { RewardKind.Evolution, RewardKind.Mutation }));
-		if (_current.Count == 0)
-		{
-			return false;
-		}
-
-		_chosenCallback = onChosen;
-		_screen.Open(_current, "特殊奖励 · 稀有");
-		return true;
-	}
+		=> TryOfferRewards(RewardNodeKind.Special, onChosen);
 
 	/// <summary>打开一次强化三选一（商店购买、保底奖励用）。</summary>
 	private bool OfferRewards()
+		=> TryOfferRewards(RewardNodeKind.Enhancement, null);
+
+	private bool TryOfferRewards(RewardNodeKind kind, Action? onChosen, NodeConfig? config = null)
+		=> OfferModeReward(config == null ? RewardService.FilterFor(kind) : config.AnyRewardKind ? null : config.RewardKind,
+			config == null || string.IsNullOrEmpty(config.Title) ? RewardService.TitleFor(kind) : config.Title, onChosen);
+
+	/// <summary>模式沿用同一候选过滤与单次领取会话，不绕开前置或角色武器限定。</summary>
+	public List<RewardDefinition> ModeRewardOptions(RewardKind? kind, bool preferExclusive)
 	{
-		if (_player == null || _weapon == null || _screen == null || _screen.IsOpen || _runEnded)
+		EnsurePool();
+		return _pool.RollMode(_build, ConfigIndex.Settings.RewardChoiceCount, kind, preferExclusive);
+	}
+	public bool CanOfferModeReward(RewardKind? kind, bool preferExclusive)
+	{
+		foreach (var row in AvailableRewards(kind)) if (preferExclusive || row.RequiredModeIds.Length == 0) return true;
+		return false;
+	}
+	public bool OfferModeReward(RewardKind? kind, string title, Action? onChosen, bool preferExclusive = false)
+	{
+		if (_player == null || !IsInstanceValid(_player) || _weapon == null || _screen == null || _screen.IsOpen || _runEnded || _rewardFlow.Current?.IsPending == true)
 		{
 			return false;
 		}
 
 		EnsurePool();
 
-		_current.Clear();
-		_current.AddRange(_pool.Roll(_build, ConfigIndex.Settings.RewardChoiceCount));
-		if (_current.Count == 0)
+		var options = ModeRewardOptions(kind, preferExclusive);
+		if (!_rewardFlow.TryBegin(options, onChosen)) return false;
+		_refreshRewardOffer = () =>
 		{
-			return false;
-		}
-
-		_chosenCallback = null;
-		_screen.Open(_current, RewardService.TitleFor(RewardNodeKind.Enhancement));
+			_rewardFlow.Cancel(); _screen.Close();
+			if (!OfferModeReward(kind, title, onChosen, preferExclusive)) { _refreshRewardOffer = null; _player.Heal(_player.MaxHealth * .15f); onChosen?.Invoke(); }
+		};
+		try { _screen.Open(_rewardFlow.Current!.Options, title); }
+		catch { _rewardFlow.Cancel(); _nodeRewardContext?.Cancel(); _refreshRewardOffer = null; throw; }
 		return true;
+	}
+
+	public bool CompleteMode(RunModeController mode, bool victory)
+	{
+		if (_mode != mode || !GameplayReady || _runEnded) return false;
+		EndRun(victory); return true;
 	}
 
 	/// <summary>通用多选一界面（进化池、商店等）。allowCancel = 允许 Esc 放弃（回调收到 -1）。</summary>
@@ -776,104 +861,42 @@ public partial class RunController : Node
 
 	/// <summary>按节点类型决定池过滤，选完之后回调（由 Stage 接着开一场 Encounter）。</summary>
 	public bool OpenRewardForNode(RewardNodeKind kind, Action onChosen)
-	{
-		if (_player == null || !IsInstanceValid(_player) || _weapon == null || _screen == null || _screen.IsOpen || _runEnded)
-		{
-			return false;
-		}
+        => OpenRewardForNode(ConfigRows.ByKind<NodeConfig, RewardNodeKind>(kind) ?? new NodeConfig { Kind = kind, AnyRewardKind = RewardService.FilterFor(kind) == null, RewardKind = RewardService.FilterFor(kind) ?? RewardKind.Enhancement }, onChosen);
 
-		// 商店节点：花局外碎片买局内收益（策划文档 §6.2 的节点类型扩展）。
-		// 无论买不买都会触发本场 Encounter（节点 = 一次收益 + 一次挑战）。
-		if (kind == RewardNodeKind.Shop)
-		{
-			// 价目来自节点表的 node_shop 行（`Config/Tables/Nodes/node_shop.tres`）。
-			int healCost = RewardService.ShopCost(0);
-			int rewardCost = RewardService.ShopCost(1);
-			int weaponCost = RewardService.ShopCost(2);
-
-			return OpenChoice(RewardService.ShopTitle(MetaProgress.Shards), RewardService.ShopOffers(MetaProgress.Shards), index =>
-			{
-				if (index == 0 && MetaProgress.TrySpend(healCost))
-				{
-					_player?.FillVitals();
-				}
-				else if (index == 1 && MetaProgress.TrySpend(rewardCost))
-				{
-					OfferRewards();
-				}
-				else if (index == 2 && MetaProgress.TrySpend(weaponCost))
-				{
-					if (!OpenRewardForNode(RewardNodeKind.Evolution, onChosen))
-					{
-						onChosen();
-					}
-
-					return;
-				}
-
-				onChosen();
-			}, false);
-		}
-
-		// 局外资源节点：直接给碎片（策划文档 §6.2 的「局外资源」）。
-		if (kind == RewardNodeKind.Resource)
-		{
-			MetaProgress.AddShards(5);
-			onChosen();
-			return true;
-		}
-
-		// 特殊奖励节点：连着开两次「稀有池」（进化 / 异化），相当于双倍且有保底价值。
-		if (kind == RewardNodeKind.Special)
-		{
-			return OfferRareRewards(() => OfferRareRewards(onChosen));
-		}
-
-		// 战斗型回复节点：先免费恢复一部分生命值，随后照常进 Encounter（关卡核心文档 L180-183）。
-		if (kind == RewardNodeKind.Heal)
-		{
-			_player.Heal(_player.MaxHealth * ConfigIndex.Settings.NodeHealRatio);
-			onChosen();
-			return true;
-		}
-
-		EnsurePool();
-
-		// 进化（没有「武器池」这个类型，见用户 A3）/ 局外资源 / 特殊奖励暂时没有独立系统，先走通用池。
-		RewardKind? filter = RewardService.FilterFor(kind);
-
-		_current.Clear();
-		_current.AddRange(_pool.Roll(_build, ConfigIndex.Settings.RewardChoiceCount, filter));
-		if (_current.Count == 0)
-		{
-			return false;
-		}
-
-		_chosenCallback = onChosen;
-		_screen.Open(_current, RewardService.TitleFor(kind));
-		return true;
-	}
+    public bool OpenRewardForNode(NodeConfig config, Action onChosen)
+    {
+        if (_player == null || !IsInstanceValid(_player) || _weapon == null || _screen == null || _screen.IsOpen || _runEnded || _nodeRewardContext?.IsPending == true) return false;
+        var context = new NodeRewardContext
+        {
+            Player = _player, Config = config, IsActive = () => !_runEnded && IsInsideTree() && _player != null && IsInstanceValid(_player) && !_player.IsDead,
+            Offer = (row, complete) => TryOfferRewards(row.Kind, complete, row),
+            Choice = (title, options, selected) => OpenChoice(title, options, selected, false), OnCompleted = onChosen
+        };
+        _nodeRewardContext = context;
+        try
+        {
+            bool accepted = (config.RewardBehavior ?? NodeRewardCompatibility.Behavior(config.Kind)).Begin(context);
+            if (!accepted) context.Cancel(); return accepted;
+        }
+        catch { context.Cancel(); throw; }
+    }
 
 
 	private void OnRewardChosen(int index)
 	{
-		if (index >= 0 && index < _current.Count && _player != null && _weapon != null)
+		RewardOfferSession? offer = _rewardFlow.Current;
+		if (!_runEnded && offer != null && index >= 0 && index < offer.Options.Count && !_pool.Available(_build).Exists(row => row.Id == offer.Options[index].Id))
 		{
-			_build.Add(_current[index], new RewardContext { Player = _player, Weapon = _weapon, Build = _build });
-		ActRoguelike.Core.GameLog.Write("Reward", $"选择奖励 {_current[index].Name}（{_current[index].Kind}）");
+			_refreshRewardOffer?.Invoke(); return;
 		}
-
+		if (_runEnded || _player == null || !IsInstanceValid(_player) || _weapon == null || offer == null
+			|| !offer.TryApply(index, definition => _build.Add(definition, new RewardContext { Player = _player, Weapon = _weapon, Build = _build }))) return;
+		GameLog.Write("Reward", $"选择奖励 {offer.Selected!.Name}（{offer.Selected.Kind}）");
+		bool advance = _awaitingAdvance; _awaitingAdvance = false;
+		_refreshRewardOffer = null;
 		_screen?.Close();
-
-		Action? callback = _chosenCallback;
-		_chosenCallback = null;
-		callback?.Invoke();
-
-		if (_awaitingAdvance)
-		{
-			_awaitingAdvance = false;
-			_stage?.Advance();
-		}
+		offer.Complete();
+		if (advance && !_runEnded) _stage?.Advance();
 	}
 
 	private void ResolvePlayer()

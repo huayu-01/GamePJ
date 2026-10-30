@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "pass": 7,
+  "fail": 0,
+  "checks": [
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u751F\u5B58\u6A21\u5F0F\u3001\u73A9\u5BB6\u548C\u5BFC\u822A\u5DF2\u51C6\u5907"
+    },
+    {
+      "passed": true,
+      "message": "\u540C\u5E27\u591A\u76EE\u6807\u547D\u4E2D\u4EC5\u89E6\u53D1\u4E00\u6B21\u771F\u5B9E\u95EA\u7535\u94FE"
+    },
+    {
+      "passed": true,
+      "message": "0.999\u6E38\u620F\u79D2\u5C1A\u672A\u51B7\u5374"
+    },
+    {
+      "passed": true,
+      "message": "\u6EE11\u6E38\u620F\u79D2\u6062\u590D\u89E6\u53D1"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u547D\u4E2D\u603B\u7EBF\u63A5\u5165\u51B7\u5374\u884C\u4E3A"
+    },
+    {
+      "passed": true,
+      "message": "\u6682\u505C1.1\u79D2\u4E0D\u63A8\u8FDB\u6E38\u620F\u51B7\u5374"
+    },
+    {
+      "passed": true,
+      "message": "\u6062\u590D\u6E38\u620F\u540E\u5B9E\u9645\u51B7\u5374\u5230\u671F\u53EF\u518D\u6B21\u89E6\u53D1"
+    }
+  ]
+}

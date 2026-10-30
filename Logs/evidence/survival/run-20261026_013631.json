@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-26T01:36:31",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "headless",
+      "Exit": 0,
+      "Seconds": 29.1,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_20261026_013631.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_20261026_013631.headless.err",
+      "SHA256": "D6A2C1CD9E7E2A06034881648980112326C9CBA4C644561DE2A294D8D3328F69"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

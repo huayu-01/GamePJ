@@ -11,6 +11,7 @@ Note = "冲锋命中体伤害的倍率（20 → 25）"
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1122
 Id = "pmod_charge_impact"
 DisplayName = "冲锋冲击"
 DescriptionTemplate = "冲锋伤害 ×1.25（20 → 25）"

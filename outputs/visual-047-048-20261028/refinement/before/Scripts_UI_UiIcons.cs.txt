@@ -1,0 +1,212 @@
+using System.Collections.Generic;
+using ActRoguelike.Config;
+using ActRoguelike.Core;
+using ActRoguelike.Interaction;
+using ActRoguelike.Rewards;
+using Godot;
+
+namespace ActRoguelike.UI;
+
+/// <summary>
+/// 界面图标表（用户需求：「尽量使用图标去代替文字」）。
+///
+/// **一处映射，多处复用**：构筑面板（<see cref="BuildScreen"/>）、HUD 的构筑图标条、
+/// 奖励三选一卡片、设置菜单的分类 Tab 都从这里取图，所以"换一张图"只改一个文件名。
+///
+/// 图是**手写 SVG**（`Assets/UI/Icons/ic_ui_*.svg`，项目自制，可商用、零依赖）：
+/// SVG 走 Godot 原生导入，改一个数字就是新图标，不需要任何图片工具链。
+///
+/// ⚠️ 读不到图返回 <c>null</c>，调用方要么不显示图标、要么只用文字 —— <b>绝不抛异常</b>
+/// （与"表读不到就用自身默认值"同一条纪律）。
+/// </summary>
+public static class UiIcons
+{
+	private const string Dir = "res://Assets/UI/Icons/";
+	/// <summary>技能图标按身份约定查找；无需在战斗资源中手工绑定或填颜色。</summary>
+	public static Texture2D? ForAbility(AbilityConfig? skill)
+	{
+		if (skill == null || string.IsNullOrWhiteSpace(skill.Id)) return null;
+		string key = "Skills/" + (skill.NumericId > 0 ? "icon_" + skill.NumericId : skill.Id + "_icon");
+		if (_cache.TryGetValue(key, out var cached)) return cached;
+		foreach (string extension in new[] { ".svg", ".png", ".webp" })
+		{
+			string path = Dir + key + extension;
+			if (ResourceLoader.Exists(path)) return _cache[key] = RuntimeResources.Load<Texture2D>(path);
+		}
+		_cache[key] = null;
+		return null;
+	}
+
+	/// <summary>奖励类型 → 图标（强化 / 进化 / 异化）。</summary>
+	public static Texture2D? ForReward(RewardDefinition? definition)
+	{
+		if (definition == null) return null;
+		string? icon = definition.Id switch {
+			"mut_burn" or "mut_burn_plus" => "fire", "mut_bleed" => "bleed",
+			"mut_pierce" or "mut_pierce_plus" or "mut_pierce_plus2" => "pierce",
+			"mut_ricochet" or "mut_ricochet_plus" or "mut_ricochet_plus2" => "ricochet",
+			"upg_life" or "upg_life_plus" or "upg_life_plus2" => "life",
+			"upg_power" => "power", "upg_armor" or "upg_reinforce" => "armor", "upg_swift" or "upg_fast" or "upg_speed" => "speed",
+			"surv_risk_contract" => "contract", "surv_scavenger_compass" => "compass", "surv_echo_familiar" => "echo",
+			_ => null
+		};
+		return icon != null ? Named("Minimal/"+icon) : string.IsNullOrEmpty(definition.IconName) ? ForRewardKind(definition.Kind) : Named(definition.IconName);
+	}
+
+	/// <summary>奖励类型 → 图标。</summary>
+	public static Texture2D? ForRewardKind(RewardKind kind) => kind switch
+	{
+		RewardKind.Evolution => Named("Minimal/evolution"),
+		RewardKind.Mutation => Named("Minimal/mutation"),
+		_ => Named("Minimal/enhancement"),
+	};
+
+	/// <summary>地面节点类型 → 图标（奖励节点 / 商店 / 降临门…）。</summary>
+	public static Texture2D? ForNodeKind(RewardNodeKind kind) => kind switch
+	{
+		RewardNodeKind.Weapon => Named("ic_ui_node_weapon"),
+		RewardNodeKind.Evolution => Named("ic_ui_reward_evolution"),
+		RewardNodeKind.Mutation => Named("ic_ui_reward_mutation"),
+		RewardNodeKind.Resource => Named("ic_ui_node_resource"),
+		RewardNodeKind.Heal => Named("ic_ui_node_heal"),
+		RewardNodeKind.Special => Named("ic_ui_node_special"),
+		RewardNodeKind.Shop => Named("ic_ui_node_shop"),
+		RewardNodeKind.Portal => Named("ic_ui_node_portal"),
+		_ => Named("ic_ui_reward_enhance"),
+	};
+
+	/// <summary>武器 → 图标（三种武器共用一件，靠卡片文字区分 —— 选取界面允许有文字）。</summary>
+	public static Texture2D? ForWeapon(WeaponPresetKind kind) => Named("ic_ui_node_weapon");
+
+	/// <summary>「角色持有」面板 / HUD 图标条的标题图标。</summary>
+	public static Texture2D? Holdings => Named("ic_ui_build_holdings");
+
+	/// <summary>
+	/// 交互物的**按键图标**（用户需求 §五 #13：「靠近可交互对象时目标有一圈描边和一个按键图标」）。
+	/// 一张键帽 + 「F」；换键位时改这个 SVG（文件名不变）或改这里的映射。
+	/// </summary>
+	public static Texture2D? InteractKey => Named("ic_ui_key_f");
+
+	/// <summary>设置菜单的分类图标（分类 id → 图标，新增 section 时在这里加一行即可）。</summary>
+	public static Texture2D? ForSection(string id) => id switch
+	{
+		"graphics" => Named("ic_ui_set_graphics"),
+		// 控制分类的 id 是 "input"（= settings.cfg 的节名，与 project.godot 的 [input] 同名）。
+		"input" or "controls" => Named("ic_ui_set_controls"),
+		"audio" => Named("ic_ui_set_audio"),
+		"help" => Named("ic_ui_set_help"),
+		_ => Holdings,
+	};
+
+	/// <summary>
+	/// **能力卡** → 图标（卡行的 <see cref="ActRoguelike.Config.AbilityCardConfig.IconName"/> 列，
+	/// 不含目录与扩展名）。加一张卡 = 在卡行里写一个图标名；没有对应 SVG 时返回 <c>null</c>
+	/// （界面只显示文字，不报错）。用 <see cref="Named"/> 直查，所以卡表**不需要**在这里加 switch 分支。
+	///
+	/// <para><paramref name="card"/> 为 <c>null</c> = **占位卡**（矩阵空位，用户 A5）：返回
+	/// <see cref="AbilityCardPlaceholder"/> 那张"待添加的卡"图，所以占位卡看起来也是一张卡、不是空格子。</para>
+	/// </summary>
+	public static Texture2D? ForAbilityCard(ActRoguelike.Config.AbilityCardConfig? card)
+		=> card == null ? AbilityCardPlaceholder : Named(card.IconName);
+
+	/// <summary>占位卡（矩阵空位）的图标：`Assets/UI/Icons/ic_ui_card_placeholder.svg`。</summary>
+	public static Texture2D? AbilityCardPlaceholder => Named("ic_ui_card_placeholder");
+
+	/// <summary>
+	/// 按**界面标题**取图标（通用多选一 <see cref="ChooseScreen"/> 只拿得到标题字符串）。
+	/// 标题来自 <c>RewardService.TitleFor</c> 那张表，所以节点加一种类型时这里自动跟着走。
+	/// </summary>
+	public static Texture2D? ForTitle(string? title)
+	{
+		if (string.IsNullOrEmpty(title))
+		{
+			return null;
+		}
+
+		foreach (KeyValuePair<string, Texture2D?> entry in TitleMap())
+		{
+			if (title.StartsWith(entry.Key, System.StringComparison.Ordinal))
+			{
+				return entry.Value;
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>按文件名取图（不带扩展名），找不到返回 null 并只写一次日志。</summary>
+	public static Texture2D? Named(string name)
+	{
+		if (string.IsNullOrEmpty(name))
+		{
+			return null;
+		}
+
+		if (_cache.TryGetValue(name, out Texture2D? cached))
+		{
+			return cached;
+		}
+
+		string path = Dir + name + ".svg";
+		Texture2D? texture = ResourceLoader.Exists(path) ? RuntimeResources.Load<Texture2D>(path) : null;
+		_cache[name] = texture;
+
+		if (texture == null)
+		{
+			GameLog.Write("UI", $"图标缺失：{path}（界面照常显示，只是没有图标）");
+		}
+
+		return texture;
+	}
+
+	/// <summary>本类一共能解析出几张图（验证用；放在这里当作"图标表是否接上"的自检指标）。</summary>
+	public static int DebugLoadedCount()
+	{
+		int count = 0;
+		foreach (string name in Names())
+		{
+			if (Named(name) != null)
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	/// <summary>本类引用到的全部图标名（自检与文档共用一份清单）。</summary>
+	public static IEnumerable<string> Names() => new[]
+	{
+		"ic_ui_reward_enhance", "ic_ui_reward_evolution", "ic_ui_reward_mutation",
+		"ic_ui_node_weapon", "ic_ui_node_resource", "ic_ui_node_heal", "ic_ui_node_special",
+		"ic_ui_node_shop", "ic_ui_node_portal", "ic_ui_build_holdings", "ic_ui_key_f",
+		"ic_ui_set_graphics", "ic_ui_set_controls", "ic_ui_set_audio",
+		// 能力卡（第三批）：一张卡一个图标，名字写在卡行的 IconName 列上。
+		// ⚠️ P6b：`ic_ui_card_reload` / `ic_ui_card_magazine` 随两张卡下线（svg 文件保留在 Assets 里）。
+		"ic_ui_card_vitality", "ic_ui_card_damage", "ic_ui_card_speed", "ic_ui_card_crit",
+		"ic_ui_card_summon", "ic_ui_card_control",
+	};
+
+	private static readonly Dictionary<string, Texture2D?> _cache = new();
+	private static Dictionary<string, Texture2D?>? _titleMap;
+
+	private static Dictionary<string, Texture2D?> TitleMap()
+	{
+		if (_titleMap != null)
+		{
+			return _titleMap;
+		}
+
+		_titleMap = new Dictionary<string, Texture2D?>();
+		foreach (RewardNodeKind kind in System.Enum.GetValues<RewardNodeKind>())
+		{
+			string title = RewardService.TitleFor(kind);
+			if (!string.IsNullOrEmpty(title) && !_titleMap.ContainsKey(title))
+			{
+				_titleMap[title] = ForNodeKind(kind);
+			}
+		}
+
+		return _titleMap;
+	}
+}

@@ -15,6 +15,7 @@ ClassHint = "MeleeAttackAbility"
 Windup = 0.22
 Recover = 0.2
 AttackParams = [SubResource("a_skl_enemy_fast_melee_melee_0")]
+NumericId = 1197
 Id = "skl_enemy_fast_melee_melee"
 DisplayName = "快速挥砍"
 Note = "快速近战：前摇/后摇最短。"

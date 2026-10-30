@@ -1,7 +1,10 @@
-[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=3 format=3]
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1"]
+[ext_resource type="Resource" path="res://Config/VisualProfiles/ghost_mage.tres" id="visual"]
 [resource]
 script = ExtResource("1")
+NumericId = 1101
+VisualProfile = ExtResource("visual")
 Id = "enemy_meteor_mage"
 DisplayName = "落弹法师"
 ScenePath = "res://Scenes/Enemies/MeteorMage.tscn"
@@ -14,4 +17,4 @@ EliteChance = 0.1
 PressureBehaviors = PackedStringArray("MeteorCast")
 AnimLibraryDir = "res://Assets/Animations/enemies/"
 Tags = PackedStringArray("Ground", "meteor_mage")
-Note = "机制原型；模型为占位。成本由行为压力表求和，Cost只作旧配置回退。"
+Note = "使用已定稿小黑法师外观，沿用落弹法师行为与11±1米站位。漂浮仅属模型表现，仍走地面导航。成本由行为压力表求和，Cost只作旧配置回退。"

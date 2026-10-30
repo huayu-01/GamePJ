@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1157
 SourceModelPath = "res://Assets/Models/player/mesh_player_body.glb"
 SourceAnimation = "attack-kick-right"
 TargetName = "Skill_B3_Spear3"

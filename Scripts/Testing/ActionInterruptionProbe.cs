@@ -25,7 +25,7 @@ public partial class ActionInterruptionProbe : Node3D
 	{
 		if (DisplayServer.GetName() == "headless") return;
 		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-		Check(GetViewport().GetTexture().GetImage().SavePng($"res://docs/screenshots/{name}.png") == Error.Ok, $"截图{name}");
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path($"res://Logs/evidence/screenshots/{name}.png")) == Error.Ok, $"截图{name}");
 	}
 	private Unit Spawn(string name, Vector3 position)
 	{
@@ -134,7 +134,10 @@ public partial class ActionInterruptionProbe : Node3D
 		await Shot("j3_windup_unlock");
 		await Equip(PlayerCharacterKind.Hunter, WeaponPresetKind.EnergyPalm);
 		row.AnimSpeedScale = 2; row.ApplyTo(right);
-		Press("weapon_skill_2", true); await Wait(0.14);
+		Press("weapon_skill_2", true);
+		// 输入与动画在物理帧生效；固定墙钟等待会在慢帧时过早取样，仍按原0.2秒动画阈值检查。
+		for (int frame = 0; frame < 20 && right.ActionTimelineTime < .2; frame++)
+			await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 		Check(right.ActionTimelineTime >= 0.2 && right.IsInterruptibleNow, $"2倍动画提前解锁：动画时间={right.ActionTimelineTime:0.###}s");
 		Press("weapon_skill_1", true); await Wait(0.03); Press("weapon_skill_1", false);
 		Check(!right.IsActive && left.IsActive, "加速后锁定随动画时间轴缩短");

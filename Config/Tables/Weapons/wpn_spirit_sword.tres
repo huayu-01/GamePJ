@@ -10,6 +10,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1326
 OwnerCharacter = ExtResource("10_owner")
 ModelPath = "res://Scenes/Weapons/Visuals/spirit_sword.tscn"
 IconPath = "res://Assets/UI/Icons/Skills/ic_skill_sword.svg"
@@ -19,9 +20,6 @@ UsesWeaponComponent = false
 AttackTags = PackedStringArray("Melee", "Sword", "Physical")
 Damage = 0.0
 FireInterval = 0.5
-MagazineSize = 1
-ReloadTime = 0.1
-AutoReloadDelay = 999.0
 SpreadDegrees = 0.0
 AimSpreadScale = 0.0
 MultiShotSpreadDegrees = 0.0
@@ -38,5 +36,9 @@ Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("11_passive")]
 Id = "wpn_spirit_sword"
 Slot = 7
 DisplayName = "灵剑"
-DescriptionTemplate = "近战武器：武技1 破剑式（5 段连招，可斩断子弹）/ 武技2 拔刀式（蓄力 1 秒发射剑气）。武技3 落剑式是被动。"
+DescriptionTemplate = "近战武器：武技1破剑式为可斩断子弹的连续攻击；武技2三才灵剑在攻击命中后依次追击目标，全部归位后可再次追击；被动落剑式强化下落攻击。"
 Note = "[P4 新增行] 角色 B 武器1 灵剑（正式名待定）。⚠️ 它**不走** Weapon 组件的开火（那套有弹匣/装填）：攻击全部由本行 Skills 里那两个武技技能完成。这一行的作用是身份 + 攻击标签 + 暴击基准 + 指向自己的武技行（P3 起武技归属武器行，理由见 WeaponConfig.Skills 的注释）。ScenePath 暂用 Pistol.tscn（手上模型，近战武器其实用不到枪的模型）。"
+
+NameKey = "content.wpn_spirit_sword.name"
+
+DescriptionKey = "content.wpn_spirit_sword.description"

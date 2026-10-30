@@ -4,22 +4,33 @@
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 [ext_resource type="Script" path="res://Scripts/Config/WeaponSeekTuning.cs" id="3_tuning"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b2_w1_2.tres" id="4_skill"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="Seeking"]
 script = ExtResource("3_tuning")
 TargetAbility = ExtResource("4_skill")
-IntervalSeconds = 2.0
+IntervalSeconds = 1.0
 TargetHeight = 0.9
+FlightSpeedScale = 2.0
+
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("Seeking")
 
 [resource]
 script = ExtResource("2_row")
+Excludes = PackedStringArray("1348")
+NumericId = 1215
 RewardKind = 1
 MaxStacks = 1
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Pool = ExtResource("1_pool")
 Id = "evo_affection"
 DisplayName = "喜爱"
-DescriptionTemplate = "武器飞出后每2秒飞向离玩家最近的敌人"
-ApplyHandler = "WeaponSeek"
-WeaponSeek = SubResource("Seeking")
-Note = "J15：真实离手后每2游戏秒选择离玩家最近的有效敌对单位，悬停可重新飞行，到目标点或每段原射程后停留；周期伤害、手动与靠近召回保持。目标高度0.9m为可配预设，间隔2秒来自原文。"
+DescriptionTemplate = "武器飞行速度提高100%；抵达目的地停留1秒后，再飞向武器最近的敌人。"
+Effects = [SubResource("Resource_effect_tuning")]
+Note = "2026-10-23：出手、重定向和回程速度乘2；到达后才开始计算1秒停留，按武器位置选择最近的有效敌人。保留周期伤害、地形阻挡和手动／靠近召回。"
+
+NameKey = "content.evo_affection.name"
+
+DescriptionKey = "content.evo_affection.description"

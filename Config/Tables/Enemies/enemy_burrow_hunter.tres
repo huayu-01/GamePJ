@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1"]
 [resource]
 script = ExtResource("1")
+NumericId = 1090
 Id = "enemy_burrow_hunter"
 DisplayName = "地鼠追踪远程"
 ScenePath = "res://Scenes/Enemies/BurrowHunter.tscn"

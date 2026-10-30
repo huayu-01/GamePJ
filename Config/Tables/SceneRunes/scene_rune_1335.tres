@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SceneRuneDefinition" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/SceneRuneDefinition.cs" id="row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/SceneRunes/icon_1335.svg" id="icon"]
+[resource]
+script = ExtResource("row")
+NumericId = 1335
+DisplayName = "治疗泉水"
+NameKey = "scene_rune.1335.name"
+DescriptionKey = "scene_rune.1335.description"
+DescriptionTemplate = "周期生成半径{Radius:0.#}米的泉水，范围内所有单位每秒恢复{HealPerSecond:0}生命。"
+Kind = 3
+Impact = 0
+Icon = ExtResource("icon")
+Tint = Color(0.450980, 0.909804, 0.780392, 1)
+Interval = 16
+HealPerSecond = 6
+MaxActive = 1

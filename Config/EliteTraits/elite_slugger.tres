@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SluggerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/SluggerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1023
+Id = "elite_slugger"
+Title = "强击"
+Description = "攻击伤害提高。"
+NameKey = "elite.slugger.name"
+DescriptionKey = "elite.slugger.description"
+Magnitude = 1.3

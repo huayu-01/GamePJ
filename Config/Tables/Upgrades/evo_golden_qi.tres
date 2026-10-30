@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/MeleeProjectileTuning.cs" id="3_tuning"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b1_w1_1.tres" id="4_skill"]
 [ext_resource type="PackedScene" path="res://Scenes/Combat/SwordQi.tscn" id="5_scene"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs" id="effect_tuning"]
 
 [sub_resource type="Resource" id="ExtraQi"]
 script = ExtResource("3_tuning")
@@ -18,8 +19,13 @@ SizeRatio = 0.5
 SweepMaxHits = 8
 AttackTags = Array[String](["Projectile", "SwordQi", "Physical"])
 
+[sub_resource type="Resource" id="Resource_effect_tuning"]
+script = ExtResource("effect_tuning")
+Tuning = SubResource("ExtraQi")
+
 [resource]
 script = ExtResource("2_row")
+NumericId = 1224
 RewardKind = 1
 MaxStacks = 1
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
@@ -27,6 +33,9 @@ Pool = ExtResource("1_pool")
 Id = "evo_golden_qi"
 DisplayName = "金光术"
 DescriptionTemplate = "武技1 每次攻击额外发射一道剑气"
-ApplyHandler = "MeleeProjectile"
-MeleeProjectile = SubResource("ExtraQi")
+Effects = [SubResource("Resource_effect_tuning")]
 Note = "J13：每段真实ATK后额外一道剑气，包括挥空；伤害继承当段快照，来源仍为武技1。原文未给参数，暂用当段伤害×1／60m每秒／0.45秒／穿透8／尺寸按当段最长边×0.5，均可在强类型子资源调整。"
+
+NameKey = "content.evo_golden_qi.name"
+
+DescriptionKey = "content.evo_golden_qi.description"

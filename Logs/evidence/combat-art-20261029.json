@@ -1,0 +1,37 @@
+{
+  "resolution": [
+    3840,
+    2160
+  ],
+  "units": 100,
+  "phases": [
+    {
+      "phase": "original",
+      "samples": 394,
+      "averageFrameMs": 7.6192639593908575,
+      "p95FrameMs": 10.489,
+      "maximumFrameMs": 15.48,
+      "gpuMs": 4.232578680600007,
+      "drawCalls": 1743
+    },
+    {
+      "phase": "toon_outline",
+      "samples": 358,
+      "averageFrameMs": 8.383086592178765,
+      "p95FrameMs": 11.113,
+      "maximumFrameMs": 17.379,
+      "gpuMs": 4.325949720830224,
+      "drawCalls": 2499
+    },
+    {
+      "phase": "original_repeat",
+      "samples": 410,
+      "averageFrameMs": 7.321775609756097,
+      "p95FrameMs": 9.939,
+      "maximumFrameMs": 68.447,
+      "gpuMs": 4.265563413573474,
+      "drawCalls": 1743
+    }
+  ],
+  "note": "\u771F\u5B9E\u6B7B\u6218\u4E2D\u6DF7\u5408\u5F53\u524D\u56DB\u7C7B\u5355\u4F4D\uFF0C\u4EC5\u7981\u7528\u672C\u8BCA\u65AD\u7684AI\u548C\u4E3B\u52A8\u79FB\u52A8\uFF1B\u52A8\u753B/\u8EAB\u4F53/\u73AF\u5883\u4FDD\u6301\u3002\u53EA\u6BD4\u8F83\u6750\u8D28\u5F00\u5173\uFF0C\u542B\u672B\u5C3E\u539F\u7248\u91CD\u590D\uFF0C\u4E0D\u4EE3\u8868\u5B8C\u657412\u5206\u949F\u6027\u80FD\u6216\u767E\u654C60\u5E27\u9A8C\u6536\u3002"
+}

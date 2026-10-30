@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://Assets/Characters/CloverWayfarer/clover-wayfarer.glb" id="model"]
+[ext_resource type="Script" path="res://Scripts/Visual/UnitCastGlow.cs" id="glow"]
+
+[node name="CloverWayfarer" type="Node3D"]
+
+[node name="Character" parent="." instance=ExtResource("model")]
+
+[node name="CastGlow" type="Node" parent="."]
+script = ExtResource("glow")
+MeshNames = PackedStringArray("CW_ForeheadClover", "CW_CloverLeaf1", "CW_CloverLeaf2", "CW_CloverLeaf3", "CW_CloverStem")
+FocusName = "FocusSocket"
+Duration = 0.44
+RiseSeconds = 0.12
+PeakHoldSeconds = 0.025
+Energy = 5.0
+KickOffset = Vector3(0, 0.025, 0.10)

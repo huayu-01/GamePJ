@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1051
 Id = "ai_ranged"
 DisplayName = "远程"
 SearchRange = 32.0

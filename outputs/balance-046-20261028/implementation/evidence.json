@@ -1,0 +1,211 @@
+{
+  "date": "2026-10-28",
+  "scope": "B1；十二项死战专属退出；护甲说明；最后风险表P2；不实施其他战斗候选",
+  "checks": {
+    "retirement_headless": 59,
+    "retirement_render": 60,
+    "snapshot": 46,
+    "survival_render": 72,
+    "armor_headless": 17,
+    "armor_render": 17,
+    "codex_headless": 50,
+    "codex_render": 53
+  },
+  "scripts": [
+    {
+      "path": "Logs/evidence/survival-builds/run-20261028_175408.json",
+      "sha256": "344314622dc688b3609b4c9e703100c150fd62e1fc851a94702d720095bffe8b",
+      "passed": true,
+      "saves_unchanged": true,
+      "runs": [
+        {
+          "Name": "headless",
+          "Exit": 0,
+          "Seconds": 6.57,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261028_175408.headless.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261028_175408.headless.err",
+          "SHA256": "AB41B38DAFBEB8DAB8A6867912AA3B2B878EF117AB16C222F6A459F478D1CA3C"
+        },
+        {
+          "Name": "render",
+          "Exit": 0,
+          "Seconds": 12.86,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261028_175408.render.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_builds_20261028_175408.render.err",
+          "SHA256": "77133055F618F544EA3F0FEF9BA60398FF773238FE4B1B4DDD5F37D8636ED8AF"
+        }
+      ]
+    },
+    {
+      "path": "Logs/evidence/survival/integration-20261028_173654.json",
+      "sha256": "5b6b9ac306cc047ba375c88ee82d5fcfab9402b4b94aa331c7defe2eab69f175",
+      "passed": false,
+      "saves_unchanged": true,
+      "runs": [
+        {
+          "Name": "content",
+          "Passed": true,
+          "Exit": 0,
+          "Seconds": 5.06,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.content.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.content.err",
+          "Failure": "",
+          "SHA256": "B794CF3EB0ACF0D6E5736BBF0424C46FAEB3FD5D7D1CAD4463C946DA0EAFFFD0"
+        },
+        {
+          "Name": "enemy_actions",
+          "Passed": true,
+          "Exit": 0,
+          "Seconds": 4.33,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.enemy_actions.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.enemy_actions.err",
+          "Failure": "",
+          "SHA256": "A0ECC6F7120CFD87FEF7F7CD32EFCDE32B19799587377D7896A5615B060431D8"
+        },
+        {
+          "Name": "localization",
+          "Passed": true,
+          "Exit": 0,
+          "Seconds": 3.05,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.localization.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.localization.err",
+          "Failure": "",
+          "SHA256": "441B826C059DD78C8E327F43FE0E883C46E9608D34F725CB23BCCBC5E2C3C698"
+        },
+        {
+          "Name": "reward_rules",
+          "Passed": true,
+          "Exit": 0,
+          "Seconds": 3.81,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.reward_rules.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.reward_rules.err",
+          "Failure": "",
+          "SHA256": "129C01F9165099DC8612020DDEC565504CE71E2B6895AB52FC761640EE89195F"
+        },
+        {
+          "Name": "snapshot",
+          "Passed": false,
+          "Exit": null,
+          "Seconds": null,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.snapshot.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.snapshot.err",
+          "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.snapshot.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.snapshot.err",
+          "SHA256": "8F79B7A4970CC991F354777FEE3C33D2D588B6BEB7292A32CCAEFEDE15E76D77"
+        },
+        {
+          "Name": "survival",
+          "Passed": false,
+          "Exit": null,
+          "Seconds": null,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.survival.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.survival.err",
+          "Failure": "Exception calling \"ReadAllText\" with \"1\" argument(s): \"The process cannot access the file 'F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_173654.survival.log' because it is being used by another process.\"",
+          "SHA256": "55EA9A3AD6B4B4157DB5E150A779BE393688CB43734ACC47374B3682A40ADA3B"
+        }
+      ]
+    },
+    {
+      "path": "Logs/evidence/survival/integration-20261028_174327.json",
+      "sha256": "fbbe3d5aeceb92d99d856d3e600e76b2d76f463bc8eda256095c9f009a98d059",
+      "passed": false,
+      "saves_unchanged": true,
+      "runs": [
+        {
+          "Name": "snapshot",
+          "Passed": false,
+          "Exit": 0,
+          "Seconds": 10.93,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174327.snapshot.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174327.snapshot.err",
+          "Failure": "专项未满足完成断言：snapshot",
+          "SHA256": "8F53F00A28AA0065EAABE1586C5A1B1DE3486C2F3EA3C9FEBC9FC23110CCE68B"
+        },
+        {
+          "Name": "survival",
+          "Passed": true,
+          "Exit": 0,
+          "Seconds": 36.27,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174327.survival.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174327.survival.err",
+          "Failure": "",
+          "SHA256": "AAA68FF5D7E521B8B1D33E7E6DB1085E554D88FB91D0E3AA91EC1662A30EBC37"
+        }
+      ]
+    },
+    {
+      "path": "Logs/evidence/survival/integration-20261028_174553.json",
+      "sha256": "1270d85e6b8b4b10261f417a27dc6bd80e200421b69606a1d6de3b0e04dd96aa",
+      "passed": true,
+      "saves_unchanged": true,
+      "runs": [
+        {
+          "Name": "snapshot",
+          "Passed": true,
+          "Exit": 0,
+          "Seconds": 11.34,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174553.snapshot.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261028_174553.snapshot.err",
+          "Failure": "",
+          "SHA256": "0EAF7AC21B8FF1DE2902AA219C13EC3F2C6C3AFEB412092229BB5F875F42FD5F"
+        }
+      ]
+    },
+    {
+      "path": "Logs/evidence/elites/run-20261028_174604.json",
+      "sha256": "f59d62be50c8657b382ea45cad8d270ba1e75d9eb624360b797b5762e4f0bd47",
+      "passed": true,
+      "saves_unchanged": true,
+      "runs": [
+        {
+          "Name": "BalanceTuning",
+          "Mode": "headless",
+          "Exit": 0,
+          "Seconds": 6.31,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_174604.BalanceTuning.headless.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_174604.BalanceTuning.headless.err",
+          "SHA256": "234F797788F632285D07C3BD7329F6BDBF2A7D8B829B926BC7D5D33F3D3E0A88"
+        },
+        {
+          "Name": "BalanceTuning",
+          "Mode": "render",
+          "Exit": 0,
+          "Seconds": 12.46,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_174604.BalanceTuning.render.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_174604.BalanceTuning.render.err",
+          "SHA256": "8419AB8D8E27CF6ED88E35DA9A38B7F57D3831FC6FD1A4641DC37888A6304D73"
+        },
+        {
+          "Name": "Codex",
+          "Mode": "headless",
+          "Exit": 0,
+          "Seconds": 9.27,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_174604.Codex.headless.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_174604.Codex.headless.err",
+          "SHA256": "4D766073EC8A4ED5DB768FD306AD347B1E22FBF3F3E6316B3A94928DD4945C0E"
+        },
+        {
+          "Name": "Codex",
+          "Mode": "render",
+          "Exit": 0,
+          "Seconds": 11.01,
+          "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_174604.Codex.render.log",
+          "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_174604.Codex.render.err",
+          "SHA256": "D41898441CB1C34FA2B62D80B916F07B2F27EAF94656710A5A93178AAE12D2A6"
+        }
+      ]
+    }
+  ],
+  "debug_build_warnings": 0,
+  "debug_build_errors": 0,
+  "release_build_warnings": 0,
+  "release_build_errors": 0,
+  "all_validation_scripts_saves_unchanged": true,
+  "acceptance_workbook_matches_initial_review": true,
+  "limitations": [
+    "B1验证正式场景加载，未声称玩家压力分层已验收",
+    "72项死战流程使用加速夹具，不是完整720秒性能/平衡",
+    "40组武器评估矩阵待实战采样",
+    "初次回归失败日志保留，后续独立严格复跑通过；未放宽stderr规则"
+  ],
+  "source_diff_scope": "changes.diff仅覆盖已采集before的文件；after-manifest另列新文件和未采集前值的报告更新"
+}

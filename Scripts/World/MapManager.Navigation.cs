@@ -10,13 +10,23 @@ public partial class MapManager
 	public int NavigationRevision { get; private set; }
 	private sealed record NavigationProfile(Rid Map, NavigationRegion3D Region);
 	private readonly Dictionary<(float Radius, float Height), NavigationProfile> _navigationProfiles = new();
+	private CapsuleShape3D? _clearanceShape;
+	private PhysicsShapeQueryParameters3D? _clearanceQuery;
+	private Godot.Collections.Array<Rid>? _clearanceExclude;
+	private void ClearClearanceQuery()
+	{
+		_clearanceQuery?.Dispose(); _clearanceQuery = null;
+		_clearanceShape?.Dispose(); _clearanceShape = null;
+		_clearanceExclude?.Clear(); _clearanceExclude = null;
+	}
 	public static (float Radius, float Height) BodySize(Unit? unit)
 	{
 		if (unit == null) return (0.45f, 1.8f);
 		Vector3 scale = unit.IsInsideTree() ? unit.GlobalTransform.Basis.Scale.Abs() : unit.Scale.Abs();
 		float radius = 0.1f, top = 0.2f;
-		foreach (Node child in unit.GetChildren())
+		for (int i = 0, count = unit.GetChildCount(); i < count; i++)
 		{
+			Node child = unit.GetChild(i);
 			if (child is not CollisionShape3D { Disabled: false, Shape: { } shape } collider) continue;
 			(float r, float h) = shape switch
 			{
@@ -88,17 +98,57 @@ public partial class MapManager
 		if (path.Length == 0 || path[^1].DistanceTo(end) > 0.2f) { path = Array.Empty<Vector3>(); return false; }
 		return true;
 	}
+	/// <summary>追击允许终点不可达：保留导航求解器给出的最接近目标的可达路径，不改变严格选点规则。</summary>
+	public bool TryApproachPath(Vector3 from, Vector3 destination, out Vector3[] path, Unit? unit = null)
+	{
+		path = Array.Empty<Vector3>(); Rid map = NavigationMapFor(unit);
+		if (!map.IsValid || !from.IsFinite() || !destination.IsFinite()) return false;
+		Vector3 start = NavigationServer3D.MapGetClosestPoint(map, from);
+		if (start.DistanceTo(from) > 1.5f || !NavigationServer3D.MapGetClosestPointOwner(map, from).IsValid) return false;
+		Vector3 end = NavigationServer3D.MapGetClosestPoint(map, destination);
+		path = NavigationServer3D.MapGetPath(map, start, end, true);
+		return path.Length > 0;
+	}
+	/// <summary>仅投影导航锚点，供高处玩家周围的刷怪规划使用；不代表落点净空或原位置可达。</summary>
+	public bool TryNavigationAnchor(Vector3 position, out Vector3 anchor, Unit? unit = null)
+	{
+		anchor = default;
+		Rid map = NavigationMapFor(unit);
+		if (!map.IsValid || !position.IsFinite() || !NavigationServer3D.MapGetClosestPointOwner(map, position).IsValid) return false;
+		anchor = NavigationServer3D.MapGetClosestPoint(map, position);
+		return anchor.IsFinite();
+	}
+	/// <summary>查找脚下的导航地面；空中最近点可能偏向远处屋顶，不能直接拿它当局部范围中心。</summary>
+	public bool TryGroundAnchor(Vector3 position, out Vector3 anchor, Unit? unit = null, float maxDrop = 64, float horizontalTolerance = 1.5f)
+	{
+		anchor = default; Rid map = NavigationMapFor(unit);
+		if (!map.IsValid || !position.IsFinite() || !float.IsFinite(maxDrop) || maxDrop <= 0 || !float.IsFinite(horizontalTolerance)
+			|| horizontalTolerance <= 0 || !NavigationServer3D.MapGetClosestPointOwner(map, position).IsValid) return false;
+		for (int i = 0; i <= 32; i++)
+		{
+			Vector3 point = NavigationServer3D.MapGetClosestPoint(map, position + Vector3.Down * (maxDrop * i / 32));
+			float drop = position.Y - point.Y;
+			if (drop < -.1f || drop > maxDrop || new Vector2(point.X - position.X, point.Z - position.Z).LengthSquared() > horizontalTolerance * horizontalTolerance) continue;
+			anchor = point; return true;
+		}
+		return false;
+	}
 	public bool HasBodyClearance(Vector3 ground, Unit? unit = null, bool includeUnits = true)
 	{
+		using var profile = ActRoguelike.Core.RuntimeFrameProfiler.Measure("BodyClearance");
 		var size = BodySize(unit);
-		using var capsule = new CapsuleShape3D { Radius = size.Radius, Height = size.Height };
-		using var query = new PhysicsShapeQueryParameters3D
-		{
-			Shape = capsule, Transform = new Transform3D(Basis.Identity, ground + Vector3.Up * (size.Height * 0.5f + 0.04f)),
-			CollisionMask = CombatLayers.World | (includeUnits ? CombatLayers.UnitBody : 0),
-			Exclude = unit != null && unit.IsInsideTree() ? new Godot.Collections.Array<Rid> { unit.GetRid() } : new Godot.Collections.Array<Rid>(),
-		};
-		return GetWorld3D().DirectSpaceState.IntersectShape(query, 1).Count == 0;
+		// 查询同步完成且不调用游戏回调；按地图复用参数，每次仍检查实时占用与当前体型。
+		_clearanceShape ??= new CapsuleShape3D(); _clearanceExclude ??= new Godot.Collections.Array<Rid>();
+		_clearanceQuery ??= new PhysicsShapeQueryParameters3D { Shape = _clearanceShape };
+		if (_clearanceShape.Radius != size.Radius) _clearanceShape.Radius = size.Radius;
+		float height = Mathf.Max(size.Height, size.Radius * 2);
+		if (_clearanceShape.Height != height) _clearanceShape.Height = height;
+		_clearanceExclude.Clear(); if (unit != null && unit.IsInsideTree()) _clearanceExclude.Add(unit.GetRid());
+		_clearanceQuery.Transform = new Transform3D(Basis.Identity, ground + Vector3.Up * (size.Height * 0.5f + 0.04f));
+		_clearanceQuery.CollisionMask = CombatLayers.World | (includeUnits ? CombatLayers.UnitBody : 0);
+		_clearanceQuery.Exclude = _clearanceExclude;
+		var intersections = GetWorld3D().DirectSpaceState.IntersectShape(_clearanceQuery, 1);
+		return intersections.Count == 0;
 	}
 	public bool TryValidPoint(Vector3 preferred, Vector3 connectedTo, out Vector3 point, Unit? unit = null, float snapTolerance = 1.5f, float maxHeightDifference = 3f)
 	{

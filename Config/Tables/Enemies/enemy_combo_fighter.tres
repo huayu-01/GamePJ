@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1"]
 [resource]
 script = ExtResource("1")
+NumericId = 1093
 Id = "enemy_combo_fighter"
 DisplayName = "连招敌人"
 ScenePath = "res://Scenes/Enemies/ComboFighter.tscn"

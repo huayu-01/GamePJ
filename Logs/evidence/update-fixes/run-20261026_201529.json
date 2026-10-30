@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-26T20:15:29",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "navigation",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_201529.navigation.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_201529.navigation.headless.err",
+      "SHA256": "42B9C9200D36E9CA4C8FBF96E872CB6CD9E3A0F8E57C0E74718650D1E7201C3C"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_201529.spawn_height.headless.log / F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_201529.spawn_height.headless.err"
+}

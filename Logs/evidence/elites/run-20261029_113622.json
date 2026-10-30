@@ -1,0 +1,26 @@
+{
+  "Date": "2026-10-29T11:36:22",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "GrowthBuilds",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 5.49,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_113622.GrowthBuilds.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_113622.GrowthBuilds.headless.err",
+      "SHA256": "47CE65318A5A222127E6019459C41524EB270F7AAF70498B104F166FE3151B23"
+    },
+    {
+      "Name": "GrowthBuilds",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 11.5,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_113622.GrowthBuilds.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_113622.GrowthBuilds.render.err",
+      "SHA256": "438F74F3AB936D58DC0E7B1896295FD953AAFAA3AE4DE60F4B167ABE19822041"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

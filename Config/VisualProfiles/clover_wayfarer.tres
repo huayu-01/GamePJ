@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UnitVisualProfile" load_steps=4 format=3]
+[ext_resource type="Script" path="res://Scripts/Config/UnitVisualProfile.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Scenes/Visual/CloverWayfarer.tscn" id="model"]
+[ext_resource type="PackedScene" path="res://Scenes/Visual/CloverWeaponFocus.tscn" id="grip"]
+
+[resource]
+script = ExtResource("1")
+ModelScene = ExtResource("model")
+SkeletonPath = NodePath("Character/CW_Rig/Skeleton3D")
+AnimationPlayerPath = NodePath("Character/AnimationPlayer")
+ModelTransform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -0.012, 0)
+GripScene = ExtResource("grip")
+GripBone = "Chest"
+GripSocketPath = NodePath("FocusSocket/Socket")
+AnimJump = "jump"
+AnimHit = "hit"
+JumpAirPoseTime = 0.38
+JumpLandingTime = 0.61
+SkillLibraryDir = "res://Assets/Characters/CloverWayfarer/skills/"

@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://Scripts/Abilities/EnergyDomeAbility.cs" id="script"]
+[node name="EvolvedAbility" type="Node3D"]
+script = ExtResource("script")
+Cooldown = 3
+Radius = 3
+Damage = 24
+Duration = 2
+StartupSeconds = 0.15

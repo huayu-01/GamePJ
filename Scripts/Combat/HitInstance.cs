@@ -14,6 +14,8 @@ public sealed class HitInstance
 	public required EventContext Context { get; init; }
 
 	public float Damage { get; init; }
+	/// <summary>防御前链接分配的伤害；保留原攻击者，不再分摊或冒充一次新出手。</summary>
+	public bool Transferred { get; init; }
 	public bool Critical { get; init; }
 	public Vector3 Direction { get; init; }
 	public Vector3 Position { get; init; }
@@ -22,6 +24,8 @@ public sealed class HitInstance
 	public bool Negated { get; set; }
 	/// <summary>主动招架事实；一次性效果护罩只写Negated，不冒充招架。</summary>
 	public bool Parried { get; set; }
+	/// <summary>同一命中在反弹前与规避结算后可经过同一路由，成功招架只表现一次。</summary>
+	internal bool ParryFeedbackPresented { get; set; }
 	/// <summary>命中体仍附着在出手单位上；远程、爆炸与脱手区域不使出手者停顿。</summary>
 	public bool ContactFeedback { get; set; }
 

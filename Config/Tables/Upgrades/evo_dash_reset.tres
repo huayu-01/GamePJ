@@ -1,42 +1,32 @@
 [gd_resource type="Resource" script_class="RewardConfig" format=3]
 
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="1_param"]
 [ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_skill_1.tres" id="3_source"]
 
-[sub_resource type="Resource" id="Resource_p0"]
-script = ExtResource("1_param")
-Key = "Trigger"
-Value = "Kill"
-Note = "订阅击杀"
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_skill_1.tres" id="pulse_target"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/EventPulseRewardEffect.cs" id="effect_0"]
 
-[sub_resource type="Resource" id="Resource_p1"]
-script = ExtResource("1_param")
-Key = "AbilityId"
-Value = "skl_b_skill_1"
-Note = "减谁的冷却（技能1 闪）"
-
-[sub_resource type="Resource" id="Resource_p2"]
-script = ExtResource("1_param")
-Key = "CooldownFraction"
-Value = 0.8
-Note = "剩余冷却 ×(1-0.8)"
-
-[sub_resource type="Resource" id="Resource_p3"]
-script = ExtResource("1_param")
-Key = "Cooldown"
-Value = 0.2
-Note = "本规则自己的触发间隔（防一次多杀重复触发）"
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Events = 1
+Cooldown = 0.2
+CooldownFraction = 0.8
+TargetAbility = ExtResource("pulse_target")
+RequiredAbility = ExtResource("3_source")
 
 [resource]
 script = ExtResource("2_row")
+NumericId = 1218
 RewardKind = 1
 MaxStacks = 1
-ApplyHandler = "TablePulse"
-RequiredEventAbility = ExtResource("3_source")
-HandlerParams = [SubResource("Resource_p0"), SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3")]
 RequiredCharacterIds = PackedStringArray("chr_weapon_master")
 Id = "evo_dash_reset"
 DisplayName = "闪身步"
 DescriptionTemplate = "技能1「闪」击杀敌人时冷却缩短 80%"
 Note = "J5：RequiredEventAbility资源引用闪，仅其实际击杀触发80%减CD；施法期间触发会保留到收招，不能被完整CD覆盖。规则0.2秒间隔沿用既有预设，避免一次群杀重复触发。"
+
+NameKey = "content.evo_dash_reset.name"
+
+DescriptionKey = "content.evo_dash_reset.description"
+
+Effects = [SubResource("Resource_effect_0")]

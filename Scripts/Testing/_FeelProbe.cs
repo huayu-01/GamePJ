@@ -154,7 +154,7 @@ public partial class _FeelProbe : Node3D
 			return;
 		}
 
-		Error err = image.SavePng("res://docs/screenshots/" + file);
+		Error err = image.SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/screenshots/" + file));
 		GD.Print($"[Feel] {file}  {image.GetWidth()}x{image.GetHeight()}  err={err}");
 	}
 
@@ -659,6 +659,8 @@ public partial class _FeelProbe : Node3D
 	/// </summary>
 	private void BuildDeath()
 	{
+		// 死亡拍摄会触发真实结算，收益只留在本进程，不能改写玩家的局外存档。
+		MetaProgress.UseInMemoryStoreForSelfTest();
 		// 走"从基地出征"那条路，跳过开局界面，让 RunController 立刻开局（它的 `_Process` 第一帧才读这个开关）。
 		// ⚠️ P6a：角色/武器换成清旧之后剩下的角色 A［猎手］+ 能量掌。
 		RunSetup.Character = PlayerCharacterKind.Hunter;
@@ -702,7 +704,7 @@ public partial class _FeelProbe : Node3D
 			Shot("feel_10_death_anim.png");
 		});
 
-		// ② 演示过渡面板（占位）：淡入 + 倒计时。
+		// ② 演示过渡面板（占位）：淡入 + 演出进度，结束后保留结算等待确认。
 		Later(1.4f, () =>
 		{
 			GD.Print($"[Feel] 死亡流程②演示面板：{DeathState()}（期望 阶段=panel）暂停={GetTree().Paused}");
@@ -714,12 +716,21 @@ public partial class _FeelProbe : Node3D
 			Shot("feel_12_death_panel_full.png");
 		});
 
-		// ③ 回基地：等它自己切场景（ChangeSceneToFile），再看当前场景是谁。
+		// ③ 结算持续显示：超过旧自动返回时间仍应留在真实关卡，随后显式确认。
 		Later(2.6f, () =>
+		{
+			GD.Print($"[Feel] 死亡流程③等待确认：{DeathState()}（期望 阶段=summary 等待确认=True）等待确认={_death?.AwaitingConfirmation} 暂停={GetTree().Paused}");
+			Shot("feel_12b_death_summary.png");
+			bool accepted = _death != null && IsInstanceValid(_death) && _death.ContinueDeathFlow();
+			GD.Print($"[Feel] 死亡流程③玩家确认返回：接受={accepted}（期望 True）");
+		});
+
+		// ④ 确认后由真实返回路径切到基地，再核对场景、选择标记与暂停状态。
+		Later(0.6f, () =>
 		{
 			Node? scene = GetTree().CurrentScene;
 			GD.Print(
-				$"[Feel] 死亡流程③回到基地：当前场景={scene?.Name} 文件={scene?.SceneFilePath} "
+				$"[Feel] 死亡流程④回到基地：当前场景={scene?.Name} 文件={scene?.SceneFilePath} "
 				+ $"（期望 Base / res://Scenes/Levels/Base.tscn）HasSelection={RunSetup.HasSelection}（期望 False）暂停={GetTree().Paused}");
 			Shot("feel_13_back_to_base.png");
 		});

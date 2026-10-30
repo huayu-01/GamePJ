@@ -35,6 +35,7 @@ Recover = 0.5
 ApproachMinRange = 3.5
 ApproachMaxRange = 9.0
 AttackParams = [SubResource("a_skl_enemy_jumping_leap_0")]
+NumericId = 1199
 Id = "skl_enemy_jumping_leap"
 DisplayName = "跳劈"
 Note = "跳跃近战：没有"

@@ -1,0 +1,159 @@
+{
+  "passed": true,
+  "pass": 38,
+  "fail": 0,
+  "checks": [
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u751F\u5B58\u6A21\u5F0F\u3001\u73A9\u5BB6\u548C\u5BFC\u822A\u5DF2\u51C6\u5907"
+    },
+    {
+      "passed": true,
+      "message": "062\u6B63\u5F0F\u589E\u751F\u914D\u7F6E\u91C7\u7528\u4E09\u4E2A\u6E38\u620F\u7269\u7406\u5E27\u95F4\u9694"
+    },
+    {
+      "passed": true,
+      "message": "062\u771F\u5B9E\u80FD\u91CF\u638C\u6B66\u6280\u53EF\u542F\u52A8"
+    },
+    {
+      "passed": true,
+      "message": "062\u771F\u5B9EATK\u540E\u4E3B\u5F39\u4E0E\u589E\u751F\u8DDF\u53D1\u5747\u51FA\u624B"
+    },
+    {
+      "passed": true,
+      "message": "062\u4E3B\u5F39\u540E\u6070\u9694\u4E09\u4E2A\u7269\u7406\u5E27\u8DDF\u53D1\uFF0C\u4E0D\u540C\u5E27\u9F50\u5C04"
+    },
+    {
+      "passed": true,
+      "message": "062\u8DDF\u53D1\u6CBF\u7528\u5DF2\u51BB\u7ED3\u653B\u51FB\u4F24\u5BB3\uFF0C\u4E0D\u91CD\u65B0\u89E6\u53D1\u6280\u80FD"
+    },
+    {
+      "passed": true,
+      "message": "062\u6682\u505C\u671F\u95F4\u5F85\u53D1\u5F39\u4F53\u4E0D\u5165\u573A\uFF0C\u6E38\u620F\u5E27\u5012\u8BA1\u65F6\u51BB\u7ED3"
+    },
+    {
+      "passed": true,
+      "message": "062\u7B49\u5F85\u671F\u95F4\u5C5E\u6027\u6216\u4F4D\u7F6E\u53D8\u5316\u4E0D\u6539\u5DF2\u627F\u8BFA\u7684\u4F24\u5BB3\u4E0E\u7784\u51C6\u65B9\u5411"
+    },
+    {
+      "passed": true,
+      "message": "062\u6362\u88C5\u540C\u6B65\u91CA\u653E\u672A\u5165\u6811\u5F39\u4F53\uFF0C\u4E0D\u5411\u65B0\u6280\u80FD\u4E32\u53D1"
+    },
+    {
+      "passed": true,
+      "message": "062\u7A7A\u961F\u5217\u505C\u6B62\u7269\u7406\u66F4\u65B0"
+    },
+    {
+      "passed": true,
+      "message": "062\u62E5\u6709\u8005\u6B7B\u4EA1\u540C\u6B65\u6E05\u7A7A\u8DDF\u53D1\u961F\u5217"
+    },
+    {
+      "passed": true,
+      "message": "063\u65E0\u7B26\u6587\u65F6\u751F\u547D\u5F3A\u5316\u4ECD\u53EF\u6B63\u5E38\u83B7\u53D6"
+    },
+    {
+      "passed": true,
+      "message": "063\u65E0\u96F7\u4E4B\u5370\u65F6\u4E24\u6B21\u751F\u547D\u5F3A\u5316\u4ECD\u5B9E\u9645\u589E\u52A020\u002B20\u751F\u547D"
+    },
+    {
+      "passed": true,
+      "message": "063\u96F7\u4E4B\u5370\u6392\u9664\u751F\u547D\u5F3A\u5316\uFF0C\u540C\u65F6\u4FDD\u7559\u5176\u96F7\u7CFB\u524D\u7F6E\u89E3\u9501"
+    },
+    {
+      "passed": true,
+      "message": "063\u751F\u547D\u4E09\u6863\u4E00\u81F4\u58F0\u660E\u7B26\u6587\u4E92\u65A5\uFF1Aupg_life"
+    },
+    {
+      "passed": true,
+      "message": "063\u751F\u547D\u4E09\u6863\u4E00\u81F4\u58F0\u660E\u7B26\u6587\u4E92\u65A5\uFF1Aupg_life_plus"
+    },
+    {
+      "passed": true,
+      "message": "063\u751F\u547D\u4E09\u6863\u4E00\u81F4\u58F0\u660E\u7B26\u6587\u4E92\u65A5\uFF1Aupg_life_plus2"
+    },
+    {
+      "passed": true,
+      "message": "063\u6B63\u5F0FGM\u6388\u4E88\u5165\u53E3\u4E5F\u62D2\u7EDD\u4E92\u65A5\u9879\uFF0C\u4E0D\u53EA\u662F\u9690\u85CF\u5217\u8868"
+    },
+    {
+      "passed": true,
+      "message": "063\u5176\u5B83\u7B26\u6587\u4E0D\u4F1A\u8BEF\u7981\u751F\u547D\u5F3A\u5316"
+    },
+    {
+      "passed": true,
+      "message": "067\u6B63\u5F0F\u6B7B\u6218\u914D\u7F6E\u7CBE\u82F110\u3001\u9996\u988650\u788E\u7247"
+    },
+    {
+      "passed": true,
+      "message": "067\u6B63\u5F0F\u5BFC\u6F14\u767B\u8BB0\u6B7B\u4EA1\u56DE\u8C03"
+    },
+    {
+      "passed": true,
+      "message": "067\u666E\u901A\u654C\u4EBA\u4E0D\u6389\u6218\u5229\u54C1\u788E\u7247"
+    },
+    {
+      "passed": true,
+      "message": "067\u6B63\u5F0F\u5BFC\u6F14\u767B\u8BB0\u6B7B\u4EA1\u56DE\u8C03"
+    },
+    {
+      "passed": true,
+      "message": "067\u7CBE\u82F1\u6B7B\u4EA1\u53EA\u751F\u621010\u788E\u7247\uFF0C\u672A\u62FE\u53D6\u4E0D\u5165\u8D26"
+    },
+    {
+      "passed": true,
+      "message": "067\u91CD\u590D\u5904\u7406\u540C\u4E00\u6B7B\u8005\u4E0D\u4F1A\u91CD\u590D\u6389\u843D"
+    },
+    {
+      "passed": true,
+      "message": "067\u6B63\u5F0F\u5BFC\u6F14\u767B\u8BB0\u6B7B\u4EA1\u56DE\u8C03"
+    },
+    {
+      "passed": true,
+      "message": "067\u514D\u8D39\u53EC\u5524\u7684\u7CBE\u82F1\u4E0D\u4EA7\u751F\u788E\u7247"
+    },
+    {
+      "passed": true,
+      "message": "067\u540C\u65F6\u6807\u8BB0\u7CBE\u82F1\u548C\u9996\u9886\u53EA\u638950\uFF0C\u4E0D\u53E0\u52A0\u621060"
+    },
+    {
+      "passed": true,
+      "message": "067\u5B9E\u9645\u9760\u8FD1\u62FE\u53D6\u4E00\u6B21\uFF0C\u8D26\u672C\u4ECE\u5F85\u62FE\u53D6\u8F6C\u4E3A\u672C\u5C40\u5DF2\u6536\u96C6"
+    },
+    {
+      "passed": true,
+      "message": "067\u505C\u7559\u539F\u5904\u4E0D\u4F1A\u91CD\u590D\u62FE\u53D6"
+    },
+    {
+      "passed": true,
+      "message": "067\u53CD\u590D\u8BFB\u53D6\u7ED3\u7B97\u53EA\u5305\u542B\u5DF2\u62FE\u53D6\u788E\u7247\u4E00\u6B21\uFF0C\u672A\u62FE\u53D650\u4E0D\u8BA1"
+    },
+    {
+      "passed": true,
+      "message": "067\u771F\u5B9E\u7EC8\u5C40\u9996\u9886\u7ECF\u5BFC\u6F14\u4E0E\u5BFC\u822A\u751F\u6210"
+    },
+    {
+      "passed": true,
+      "message": "067\u7EC8\u5C40\u80DC\u5229\u8F6C\u64A4\u79BB\u65F6\u751F\u621050\u788E\u7247"
+    },
+    {
+      "passed": true,
+      "message": "067\u64A4\u79BB\u9636\u6BB5\u5BFC\u6F14\u505C\u6B62\u5237\u602A\u540E\u4ECD\u80FD\u5B9E\u9645\u62FE\u53D6\u9996\u9886\u788E\u7247"
+    },
+    {
+      "passed": true,
+      "message": "067\u51FB\u6740\u4E0E\u62FE\u53D6\u53EA\u589E\u52A0\u672C\u5C40\u8D26\u672C\uFF0C\u672A\u7ED3\u7B97\u4E0D\u5199\u5C40\u5916\u788E\u7247"
+    },
+    {
+      "passed": true,
+      "message": "067\u771F\u5B9E\u7ED3\u7B97\u5165\u53E3\u5C06\u57FA\u7840\u6536\u76CA\u4E0E\u5DF2\u62FE\u53D6\u6218\u5229\u54C1\u6070\u597D\u53D1\u653E\u4E00\u6B21"
+    },
+    {
+      "passed": true,
+      "message": "067\u91CD\u590D\u7ED3\u675F\u8BF7\u6C42\u4E0D\u4F1A\u518D\u6B21\u53D1\u653E\u788E\u7247"
+    },
+    {
+      "passed": true,
+      "message": "067\u505C\u6B62\u6A21\u5F0F\u6E05\u7406\u672A\u62FE\u53D6\u7269\uFF0C\u5DF2\u62FE\u53D6\u8D26\u672C\u4FDD\u7559\u4F9B\u5355\u6B21\u7ED3\u7B97"
+    }
+  ]
+}

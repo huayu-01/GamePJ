@@ -18,6 +18,7 @@ public partial class EnemyAttackWarning : Node3D
 		var warning = new EnemyAttackWarning { Name = "AttackWarning" }; parent.AddChild(warning); return warning;
 	}
 	public void HideAll() => Indicator.HideAll();
+	public void SetProgress(float progress) => Indicator.SetWarningProgress(progress);
 	public void Circle(Vector3 center, float radius) => Indicator.ShowAreaPoint(center, radius);
 	public void SweepCircle(Vector3 center, Vector3 direction, float distance, float radius)
 	{

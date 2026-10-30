@@ -1,0 +1,236 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[log] 21:05:42 [UI] 设置：套用了 1 条按键重绑（来自 user://settings.cfg）
+[log] 21:05:42 [UI] 设置：user://settings.cfg ｜ 窗口模式 0 画质 1 glow 开×1.05 ｜ 最大帧率 0 ｜ 总线 4 条
+[log] 21:05:42 [Flow] === 新的一局 ===
+[log] 21:05:42 [Flow] 日志文件：res://Logs/runtime/run_20261028_210542_111.log
+[log] 21:05:42 [Audio] 配置表：音效 14（来源：表 Audio）—— 总线 Master(Master) / SFX(16 声部) / UI(4 声部) / Music(1 声部)；sfx_weapon_fire(Sfx)、sfx_combat_hit(Sfx)、sfx_enemy_die(Sfx)、ui_click(Ui)、ui_open(Ui)、ui_card_unlock(Ui)、ui_card_upgrade(Ui)、ui_card_fail(Ui)、ui_card_reset(Ui)、music_level_01(Music)、music_level_02(Music)、music_challenge_01(Music)、music_challenge_02(Music)、sfx_charge_complete(Sfx)
+[log] 21:05:42 [Audio] 音乐曲库：关卡 2 首[music_level_01、music_level_02] / 挑战 2 首[music_challenge_01、music_challenge_02]（前缀 music_level_* / music_challenge_*，表内顺序 = 轮播顺序）
+[log] 21:05:42 [Combat] 单位动画：Player 共 6 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 21:05:42 [Art] 卡通化（内置 Toon 漫反射，不是自定义 shader）：ToonPass 面 160（跳过 114）材质 25（源材质去重后）｜高光 内置 Toon（粗糙度 0.85）｜之后出生的节点 继续接管
+[Survival] PASS 生产配置：12分钟、六阶段、首领和敌人引用有效
+[Survival] PASS 拒绝倒序阶段与零经验门槛，配置副本彼此隔离
+[Survival] PASS 拒绝倒序强化节点、非有限信标坐标和无法容纳敌人的阶段压力
+[log] 21:05:42 [Config] 奔跑：角色行暂时读不到（RunSetup.Character=Hunter / 角色表 0 行）→ 先按「sprint」/ 倍率 1 跑，表就绪后会再套一次
+[log] 21:05:42 [Config] 价值标签（节点波数来源）：3 行（来源：表 ValueTags）—— [tag_high→4 波、tag_mid→3 波、tag_low→1 波]
+[log] 21:05:42 [Config] 节点波数（高 4 / 中 3 / 低 1）：node_enhance（tag_mid）3 波 · node_evolution（tag_high）4 波 · node_mutation（tag_high）4 波 · node_resource（tag_low）1 波 · node_heal（tag_low）1 波 · node_special（tag_low）1 波 · node_shop（tag_mid）3 波 · node_portal（tag_low）1 波 · 1340（tag_low）1 波
+[log] 21:05:42 [Config] 增幅项表：105 条（来源：表）—— 强化 27 / 进化 35 / 异化 43。
+[log] 21:05:42 [Config] 升级池：6 个（来源：表 UpgradePools）—— 武器指向 [wpn_energy_palm→pool_energy_palm、wpn_crossbow→pool_crossbow、wpn_bow→pool_bow、wpn_spirit_sword→pool_spirit_sword、wpn_scythe→pool_scythe、wpn_spear→pool_spear]；选项行里指定了池的 20 条，其余走「标签匹配 → 通用」两层
+[log] 21:05:42 [Config] AI 档案：11 个（来源：表 AiProfiles）—— 单位指向 [enemy_chaser→ai_chaser、enemy_fast_melee→ai_fast_melee、enemy_exploder→ai_exploder、enemy_jumping_melee→ai_jumping_melee、enemy_ranged→ai_ranged、enemy_charger→ai_charger、enemy_screamer→ai_screamer、enemy_guard→ai_guard、enemy_skill_elite→ai_skill_elite、boss_final→ai_boss、summon_drone→ai_drone]；有预制体但没挂档案的 12 个
+[log] 21:05:42 [Config] 连招参数：3 行（来源：表 SkillSeries）—— 技能指向 [skl_b1_w1_1→ser_b1_combo（5 段）、skl_b2_w1_1→ser_b2_combo（3 段）、skl_b3_w1_1→ser_b3_combo（4 段）]；ClassHint=MeleeComboAbility 的技能行 3 条（其中填了连招行的 3 条，其余走单段模式）
+[log] 21:05:42 [Config] 能力卡（局外装备层，与 Skills 是两层）：4 张（来源：表 AbilityCards）—— [card_vitality（2 点/解锁 30/上限 Lv5）、card_damage（3 点/解锁 40/上限 Lv5）、card_speed（2 点/解锁 30/上限 Lv5）、card_crit（2 点/解锁 35/上限 Lv5）]；额度上限 = 基础 6 + 扩增行 meta_quota 每级 +1（1 级价格 30，每级 +20）
+[log] 21:05:43 [Config] 符文表（开局携带一件的信物，**不进奖励池**）：11 枚（来源：表 Runes）—— [rune_lei_seal（雷之印） StatRewardEffect · MaxHealthCap=30 → 解锁前置的增幅 [mut_thunder_mark、mut_thunder_armor、evo_thunder_heart、evo_thunder_pool、evo_thunder_recall、upg_thunder_mastery、upg_thunder_blast]、rune_war_seal（战神印） StatRewardEffect · CritChanceAdd=0.1 · IncomingDamageMultiplier=4 → 解锁前置的增幅 [mut_blood_battle、mut_blood_armor、mut_death_duel、evo_war_spear、evo_war_afterimage、evo_bloodthirst、upg_violence、upg_war_heart]、rune_wind_seal（风之印） StatRewardEffect · CooldownMultiplier=1.5 → 解锁前置的增幅 [mut_wind_heart、mut_wind_armor、evo_wind_domain、evo_wind_sword、evo_wind_trail、evo_wind_field、upg_wild_wind]、rune_death_armor（死铠） StatRewardEffect+GrantArmorRewardEffect+ArmorOnKillRewardEffect · HealMultiplier=0 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_march（行军） StatRewardEffect · MoveSpeedMultiplier=1.75 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_life_death（生死） DeathAvoidRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_strength_talisman（大力符） StatRewardEffect · DamageMultiplier=1.2 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_flying_wing（飞翼） StatRewardEffect · JumpVelocityMultiplier=1.3 · MaxFallSpeedMultiplier=0.8 · DiveSpeedMultiplier=1.3 → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_sniper（狙神） DistanceDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_giant（巨人） MaxHealthDamageRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]、rune_pixie（小精灵） CompanionRewardEffect → 解锁前置的增幅 [（暂无增幅以此为前置）]]
+[log] 21:05:43 [Config] 首领强化来源（关卡核心文档 §7.1：两套来源必须能分开）：数值型 Pressure（**词条**）7 条（来源：表 Pressure）/ 行为型 Boss Build（**技能**，用户拍板：行为型的那些本来就是技能）4 条（来源：表 Skills）
+[log] 21:05:43 [Config] Pressure 转换池（§7.5，阈值达成后立即抽取；只出数值型 = 词条）：候选 7 条 [pmod_berserk_dmg 权重 3 标签 [Offense] → 23.1% · pmod_berserk_speed 权重 3 标签 [Offense] → 23.1% · pmod_fortress_hp 权重 2 标签 [Defense] → 15.4% · pmod_swift 权重 2 标签 [Mobility] → 15.4% · pmod_scream_echo 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityScream] → 7.7% · pmod_charge_impact 权重 1 标签 [Offense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilityCharge] → 7.7% · pmod_summon_haste 权重 1 标签 [Defense,Skill] 限定 [首领 [boss_final] · 技能节点 AbilitySummon] → 7.7%]；抽取点 2 个：Boss 开场**技能** Roll() 只抽行为型（4 条），Pressure RollPressure() 只抽数值型（词条）
+[log] 21:05:43 [Config] 配置表：武器 6 / 角色 2 / 敌人 22 / 首领 1 / 召唤物 1 / 技能 39 / 连招参数 3 / Pressure 7 / 效果 15 / 节点 9 / 局外成长 5 / AI 档案 11 / 能力卡 4（ConfigIndex.tres 已加载）
+[log] 21:05:43 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:05:43 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:05:43 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:05:43 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 45 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:05:43 [Combat] 单位动画：Player 共 13 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_hunter）
+[log] 21:05:43 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 RunController
+[log] 21:05:43 [Rune] 符文：不携带（CarriedRuneId「」，默认） —— 前置判定只有「已拥有」一个来源，与加符文之前逐位一致；玩家没有任何符文修正器。
+[log] 21:05:43 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Hunter（行 Id「chr_hunter」）· 武器 EnergyPalm（PoolId pool_energy_palm）→ 候选 76 条（限定两层之后）
+[log] 21:05:43 [Flow] 开局配置：角色 Hunter / 武器 EnergyPalm（基地里选过=True）—— 进关卡只是切场景，直接开局
+[log] 21:05:43 [Flow] 选择角色 Hunter / 武器 EnergyPalm
+[log] 21:05:43 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 45 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:05:43 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 RunController
+[log] 21:05:43 [Rune] 符文：不携带（CarriedRuneId「」，默认） —— 前置判定只有「已拥有」一个来源，与加符文之前逐位一致；玩家没有任何符文修正器。
+[log] 21:05:43 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Hunter（行 Id「chr_hunter」）· 武器 EnergyPalm（PoolId pool_energy_palm）→ 候选 76 条（限定两层之后）
+[log] 21:05:43 [Map] 区域杀已就位：中心 Y=-38、覆盖 300×300
+[log] 21:05:43 [Map] 导航网格烘焙完成：1092 个多边形（半径 0.6 / 高度 1.8 / 最大坡 30°）
+[log] 21:05:43 [Combat] 蓄力身体表现：模型「Model」上挂了 27 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:05:43 [Combat] 被动·灵动：skl_a1_passive 生效（场景基线额外跳跃 0 次 + 授予 1 次，上限 3 次）
+[Survival] PASS 独立庭院真实烘焙导航网格
+[Survival] PASS 整局服务绑定独立模式，不误挂旧冒险阶段
+[Survival] PASS 角色A正式配置已使用三叶旅童档案
+[Survival] PASS 三处信标实际可达
+[Survival] PASS 新模式开局已有整局回退点
+[Survival] PASS 经验达到显示上限时合并数值，累计经验不丢失
+[log] 21:05:43 [Combat] 单位动画：Chaser 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[log] 21:05:43 [Config] 敌人倍率：普通 生命×1.88 伤害×0.3 移速×1 / Boss 生命×2.5 伤害×0.9（来源：表 enemy_global）
+[log] 21:05:43 [Combat] 单位动画切换：Chaser idle → walk（当前速度 0.25，阈值 0.15/4）
+[Survival] PASS 生成同时受人数、压力与待生成上限约束
+[log] 21:05:43 [Combat] 单位动画切换：Chaser walk → die（当前速度 0.25，阈值 0.15/4）
+[log] 21:05:43 [Combat] 死亡 Chaser(0) 击杀者=Player(320)
+[log] 21:05:43 [Audio] 首次播放「sfx_enemy_die」→ 总线 SFX / res://Assets/Audio/sfx/sfx_enemy_die.ogg
+[log] 21:05:43 [Combat] 击杀 Chaser(0) by Player(320)
+[Survival] PASS 真实死亡掉落经验，重复死亡不重复计数
+[log] 21:05:44 [Audio] 首次播放「ui_open」→ 总线 UI / res://Assets/Audio/ui/ui_open.ogg
+[Survival] PASS 升级选择暂停战场与生存计时
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:44 [Audio] 首次播放「ui_click」→ 总线 UI / res://Assets/Audio/ui/ui_click.ogg
+[log] 21:05:44 [Reward] 选择奖励 爆裂火球（Evolution）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:44 [Reward] 选择奖励 快速（Enhancement）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 连升与目标奖励依次领取，队列清空后继续战斗
+[log] 21:05:45 [Combat] 单位动画切换：@CharacterBody3D@250 walk → sprint（当前速度 4.2，阈值 0.15/4）
+[log] 21:05:46 [Combat] 单位动画切换：@CharacterBody3D@250 sprint → walk（当前速度 3.96，阈值 0.15/4）
+[log] 21:05:47 [Combat] 单位动画切换：@CharacterBody3D@250 sprint → die（当前速度 4.2，阈值 0.15/4）
+[log] 21:05:47 [Combat] 死亡 @CharacterBody3D@250(0) 击杀者=Player(320)
+[log] 21:05:47 [Combat] 击杀 @CharacterBody3D@250(0) by Player(320)
+[log] 21:05:47 [Combat] 死亡 @CharacterBody3D@253(0) 击杀者=Player(320)
+[log] 21:05:47 [Combat] 击杀 @CharacterBody3D@253(0) by Player(320)
+[log] 21:05:47 [Combat] 死亡 @CharacterBody3D@256(0) 击杀者=Player(320)
+[log] 21:05:47 [Combat] 击杀 @CharacterBody3D@256(0) by Player(320)
+[log] 21:05:47 [Combat] 死亡 @CharacterBody3D@259(0) 击杀者=Player(320)
+[log] 21:05:47 [Combat] 击杀 @CharacterBody3D@259(0) by Player(320)
+[Survival] PASS 阶段强化敌人沿用正式护甲与精英表现
+[log] 21:05:47 [Combat] 单位动画切换：Chaser idle → die（当前速度 0，阈值 0.15/4）
+[log] 21:05:47 [Combat] 死亡 Chaser(0) 击杀者=Player(320)
+[log] 21:05:47 [Combat] 击杀 Chaser(0) by Player(320)
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:47 [Reward] 选择奖励 力量（Enhancement）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:48 [Reward] 选择奖励 乱金柝（Evolution）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:48 [Reward] 选择奖励 暴风（Enhancement）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 连升与目标奖励依次领取，队列清空后继续战斗
+[Survival] PASS 044遗物显示收益说明、F键与目标描边
+[Survival] PASS 044真实F领取强化敌人遗物，重复请求不再发奖
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:49 [Reward] 选择奖励 灵魂收割（Mutation）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 连升与目标奖励依次领取，队列清空后继续战斗
+[Survival] PASS 044信标提示说明净化方式、收益和首领削弱
+[Survival] PASS 044真实F启动信标，显示净化进度
+[log] 21:05:49 [Combat] 单位动画切换：@CharacterBody3D@321 sprint → idle（当前速度 0，阈值 0.15/4）
+[Survival] PASS 信标按实际停留完成一次，重复完成不发奖
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:49 [Reward] 选择奖励 弹射（Mutation）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 连升与目标奖励依次领取，队列清空后继续战斗
+[Survival] PASS 044信标提示说明净化方式、收益和首领削弱
+[Survival] PASS 044真实F启动信标，显示净化进度
+[Survival] PASS 信标按实际停留完成一次，重复完成不发奖
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:50 [Reward] 选择奖励 生命（Enhancement）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 连升与目标奖励依次领取，队列清空后继续战斗
+[Survival] PASS 044信标提示说明净化方式、收益和首领削弱
+[Survival] PASS 044真实F启动信标，显示净化进度
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:51 [Reward] 选择奖励 攀高（Enhancement）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 连升与目标奖励依次领取，队列清空后继续战斗
+[Survival] PASS 信标按实际停留完成一次，重复完成不发奖
+[Survival] PASS 升级候选来自当前角色、武器及前置规则
+[log] 21:05:51 [Reward] 选择奖励 能量护盾（Mutation）
+[Survival] PASS 同一奖励按钮重复触发只获取一次
+[Survival] PASS 连升与目标奖励依次领取，队列清空后继续战斗
+[Survival] PASS 三处可选目标全部完成，终局首领削弱条件成立
+[log] 21:06:00 [Combat] 单位动画切换：@CharacterBody3D@486 walk → idle（当前速度 0，阈值 0.15/4）
+[log] 21:06:00 [Combat] 单位动画：Boss 共 32 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：组件默认值）
+[Survival] PASS 生存时长结束后实际生成终局首领
+[log] 21:06:00 [Combat] 单位动画切换：Boss idle → die（当前速度 0，阈值 0.15/4）
+[log] 21:06:00 [Combat] 死亡 Boss(0) 击杀者=Player(340)
+[log] 21:06:00 [Combat] 击杀 Boss(0) by Player(340)
+[log] 21:06:00 [Reward] 增幅·事件规则：mut_soul_harvest 击杀掉了点（概率 0.3，第 1 次）—— 这一次没有灵魂。
+[Survival] PASS 击败首领后等待主动撤离，不提前结算
+[Survival] PASS 首领结束撤销敌人、召唤增援与待生成预告
+[log] 21:06:00 [Flow] 本局结束 victory=True 关卡= 本局用时=14s 本局挑战=4
+[Survival] PASS 044真实F启动出口共享单次结算
+[Survival] PASS 重复完成不会重复入账，模式统计只记录一次
+[log] 21:06:01 [Flow] 本局结束 → 返回基地场景
+[log] 21:06:02 [Art] 卡通化（内置 Toon 漫反射，不是自定义 shader）：ToonPass 面 71（跳过 34）材质 59（源材质去重后）｜高光 内置 Toon（粗糙度 0.85）｜之后出生的节点 继续接管
+[log] 21:06:02 [Config] 跳跃：角色行 chr_hunter → 起跳速度 13 m/s / 重力缩放 3.6（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:02 [Config] 奔跑：角色行 chr_hunter → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:02 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:06:02 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 107 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:06:02 [Combat] 单位动画：Player 共 33 段 · idle=idle walk=walk run=sprint die=die · 阈值 0.15/4（来源：表 chr_weapon_master）
+[log] 21:06:02 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LoadoutPreview
+[log] 21:06:02 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, -5.9604645E-08, 8.16151) 半径 3.2m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 21:06:02 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, -5.9604645E-08, 9) 半径 0.84m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 21:06:02 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 21:06:02 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[Survival] PASS 基地新增独立入口指向生存场景
+[Survival] PASS 出击摘要显示实际模式、时长和成长机制
+[Survival] PASS 返回调整不出征也不建立回退点
+[log] 21:06:03 [Flow] 基地出击 → res://Scenes/Survival.tscn（角色 WeaponMaster / 武器 Spear）
+[log] 21:06:03 [Flow] 加载页面：准备进入 res://Scenes/Survival.tscn
+[Survival] PASS 生存入口F直接加载并捕获回退点，无中间选择
+[log] 21:06:03 [Flow] 加载页面：切换到 res://Scenes/Survival.tscn
+[log] 21:06:04 [Art] 卡通化（内置 Toon 漫反射，不是自定义 shader）：ToonPass 面 160（跳过 114）材质 76（源材质去重后）｜高光 内置 Toon（粗糙度 0.85）｜之后出生的节点 继续接管
+[log] 21:06:04 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:04 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:04 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:06:04 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 107 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:06:04 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 RunController
+[log] 21:06:04 [Rune] 符文：不携带（CarriedRuneId「」，默认） —— 前置判定只有「已拥有」一个来源，与加符文之前逐位一致；玩家没有任何符文修正器。
+[log] 21:06:04 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Hunter（行 Id「chr_hunter」）· 武器 EnergyPalm（PoolId pool_energy_palm）→ 候选 76 条（限定两层之后）
+[log] 21:06:04 [Flow] 开局配置：角色 WeaponMaster / 武器 Spear（基地里选过=True）—— 进关卡只是切场景，直接开局
+[log] 21:06:04 [Flow] 选择角色 WeaponMaster / 武器 Spear
+[log] 21:06:04 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 107 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:06:04 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 RunController
+[log] 21:06:04 [Rune] 符文：不携带（CarriedRuneId「」，默认） —— 前置判定只有「已拥有」一个来源，与加符文之前逐位一致；玩家没有任何符文修正器。
+[log] 21:06:04 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 WeaponMaster（行 Id「chr_weapon_master」）· 武器 Spear（PoolId pool_spear）→ 候选 77 条（限定两层之后）
+[log] 21:06:04 [Map] 区域杀已就位：中心 Y=-38、覆盖 300×300
+[log] 21:06:05 [Map] 导航网格烘焙完成：1092 个多边形（半径 0.6 / 高度 1.8 / 最大坡 30°）
+[log] 21:06:05 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:06:05 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, 0, 37.37) 半径 3.2m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 21:06:05 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, 0, 38) 半径 0.63m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 21:06:05 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[Survival] PASS 正常入口的试炼仍支持本局构筑与消耗回退
+[log] 21:06:05 [Flow] 取消本次冒险：已恢复出击前的资源、配装和基地状态，不进行本局结算。
+[Survival] PASS 取消生存试炼：
+[log] 21:06:06 [Art] 卡通化（内置 Toon 漫反射，不是自定义 shader）：ToonPass 面 71（跳过 34）材质 102（源材质去重后）｜高光 内置 Toon（粗糙度 0.85）｜之后出生的节点 继续接管
+[log] 21:06:06 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:06 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:06 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:06:06 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 107 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:06:06 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LoadoutPreview
+[log] 21:06:06 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:06:06 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[Survival] PASS 取消还原出击前资源，不进行试炼结算
+[Survival] PASS 取消与退树停止生成、经验和迟到奖励回调
+[log] 21:06:06 [Flow] 基地出击 → res://Scenes/Survival.tscn（角色 WeaponMaster / 武器 Spear）
+[log] 21:06:06 [Flow] 加载页面：准备进入 res://Scenes/Survival.tscn
+[log] 21:06:06 [Flow] 加载页面：切换到 res://Scenes/Survival.tscn
+[log] 21:06:07 [Art] 卡通化（内置 Toon 漫反射，不是自定义 shader）：ToonPass 面 160（跳过 114）材质 102（源材质去重后）｜高光 内置 Toon（粗糙度 0.85）｜之后出生的节点 继续接管
+[log] 21:06:07 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:07 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:07 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:06:07 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 107 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:06:07 [Flow] 装备应用：chr_hunter/wpn_energy_palm · 已套角色/武技/能力卡，来源 RunController
+[log] 21:06:07 [Rune] 符文：不携带（CarriedRuneId「」，默认） —— 前置判定只有「已拥有」一个来源，与加符文之前逐位一致；玩家没有任何符文修正器。
+[log] 21:06:07 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 Hunter（行 Id「chr_hunter」）· 武器 EnergyPalm（PoolId pool_energy_palm）→ 候选 76 条（限定两层之后）
+[log] 21:06:07 [Flow] 开局配置：角色 WeaponMaster / 武器 Spear（基地里选过=True）—— 进关卡只是切场景，直接开局
+[log] 21:06:07 [Flow] 选择角色 WeaponMaster / 武器 Spear
+[log] 21:06:07 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 107 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:06:07 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 RunController
+[log] 21:06:07 [Rune] 符文：不携带（CarriedRuneId「」，默认） —— 前置判定只有「已拥有」一个来源，与加符文之前逐位一致；玩家没有任何符文修正器。
+[log] 21:06:07 [Reward] 奖励池按当前角色/武器定下来了（进关卡初始化）：角色 WeaponMaster（行 Id「chr_weapon_master」）· 武器 Spear（PoolId pool_spear）→ 候选 77 条（限定两层之后）
+[log] 21:06:07 [Map] 区域杀已就位：中心 Y=-38、覆盖 300×300
+[log] 21:06:07 [Map] 导航网格烘焙完成：1092 个多边形（半径 0.6 / 高度 1.8 / 最大坡 30°）
+[log] 21:06:07 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:06:07 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, 0, 37.37) 半径 3.2m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 21:06:07 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, 0, 38) 半径 0.63m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 21:06:07 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 21:06:07 [Combat] 单位动画切换：Player idle → die（当前速度 0，阈值 0.15/4）
+[log] 21:06:07 [Combat] 死亡 Player(0) 击杀者=-
+[log] 21:06:07 [Flow] 本局结束 victory=False 关卡= 本局用时=0s 本局挑战=0
+[log] 21:06:07 [Flow] 死亡流程：进死亡动画（1.4s，期间不暂停）→ 演示过渡面板（占位 3.2s）→ 等待确认结算 → res://Scenes/Levels/Base.tscn
+[Survival] PASS 死亡只结算一次并关闭生成、奖励与取消入口
+[log] 21:06:07 [Flow] 死亡流程：演出结束 → 等待玩家确认，本局结算不会自动关闭
+[log] 21:06:07 [Flow] 死亡流程：玩家跳过演出 → 等待确认结算
+[log] 21:06:07 [Flow] 死亡流程：演示过渡结束 → 回到基地场景 res://Scenes/Levels/Base.tscn
+[log] 21:06:08 [Art] 卡通化（内置 Toon 漫反射，不是自定义 shader）：ToonPass 面 71（跳过 34）材质 131（源材质去重后）｜高光 内置 Toon（粗糙度 0.85）｜之后出生的节点 继续接管
+[Survival] PASS 实际死亡演出与结算确认返回基地
+[Survival] PASS 模式往返后完整GC与终结器正常完成
+[Survival] SUMMARY pass=68 fail=0
+[log] 21:06:08 [Config] 跳跃：角色行 chr_weapon_master → 起跳速度 12 m/s / 重力缩放 3.2（两列都是**固定值**、直接套用，没有任何倍率运算）｜ 空中加速 15 / 最大下落 60 保持场景值（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:08 [Config] 奔跑：角色行 chr_weapon_master → 按键「sprint」（project.godot 里有这个动作）/ 移速倍率 1.5（来源：表 Characters，读不到则用场景导出值）
+[log] 21:06:08 [Combat] 蓄力身体表现：模型「Model」上挂了 1 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:06:08 [Ability] 能力卡：激活 3/4 张 · 额度 6/8 · 碎片 107 —— 强化肌体 MaxHealthAdd +100、疾风之靴 MoveSpeedMultiplier ×1.25、锐利直觉 CritChanceAdd +0.04
+[log] 21:06:08 [Flow] 装备应用：chr_weapon_master/wpn_spear · 已套角色/武技/能力卡，来源 LoadoutPreview
+[log] 21:06:08 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, 5.9604645E-08, 8.122311) 半径 3.2m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 21:06:08 [Combat] 技能指示器：② 区域指向（区域指向：圆心 (0, 5.9604645E-08, 9) 半径 0.88m（贴地 0.05m）；纯表现 无碰撞 无单位 无分组）
+[log] 21:06:08 [Combat] 武器门：skl_b3_w1_2（抛掷）在飞 → 锁住 skl_b3_w1_1（武技1）—— 文档「武器飞出去这期间武技1无法使用」
+[log] 21:06:08 [Combat] 蓄力身体表现：模型「Model」上挂了 4 份叠加材质（文件 res://Assets/Effects/charge_rim_placeholder.gdshader；占位描边，美术后期替换）
+[log] 21:06:08 [Exit] 音频退出回收：真实等待92ms。
+[log] 21:06:08 [Audio] 音效统计：共 39 次 —— sfx_enemy_die×7、ui_open×12、ui_click×20（缺失 id 0 个）

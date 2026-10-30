@@ -11,6 +11,7 @@ Note = "尖啸冷却的倍率（相对当前值；14 秒→不适用，本行作
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1124
 Id = "pmod_scream_echo"
 DisplayName = "尖啸回响"
 DescriptionTemplate = "尖啸冷却 ×0.8（7 秒 → 5.6 秒）"

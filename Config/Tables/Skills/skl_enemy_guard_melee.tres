@@ -15,6 +15,7 @@ ClassHint = "MeleeAttackAbility"
 Windup = 0.5
 Recover = 0.4
 AttackParams = [SubResource("a_skl_enemy_guard_melee_0")]
+NumericId = 1198
 Id = "skl_enemy_guard_melee"
 DisplayName = "重锤"
 Note = "守卫：厚甲 + 正面格挡（Block 节点不在表里）。"

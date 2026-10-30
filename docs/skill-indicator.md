@@ -1,5 +1,7 @@
 # 技能指示器（SkillIndicator）接入契约
 
+2026-10-28：正式预制体增加C版稀疏笔触、固定细轮廓与深色底边，采用正常3D深度测试；不再执行旧场景置顶设想。`SkillIndicator.Brush.cs` 和 `indicator_brush.gdshader` 只绘制原范围及调用方传入的前摇进度，各实例动态网格／材质独立，隐藏与打断立即清理。圆形九点地表缓存用于缓坡贴合，不代表所有桥梁／跨楼层已逐一验收；直线与曲线沿原几何输入。详见[当前实施与实拍](reviews/20261028/visual-047-048-current.md)，下文旧截图仅供历史接入参考。
+
 > **一句话**：**玩家与敌人共用同一个组件** —— 敌人技能示警（红圈 / 红矩形）与玩家长按技能的命中区预览
 > （青蓝曲线 / 青蓝圈）都是它。四种样式靠 `[Export] IndicatorStyle Style` + `IsHostile` 区分，
 > **几何量 / 颜色 / 透明度全部 `[Export]`**，运行期只读、只画。
@@ -7,7 +9,7 @@
 > 脚本 `Scripts/Combat/SkillIndicator.cs` · 预制体 `Scenes/Combat/SkillIndicator.tscn` ·
 > 截图表见 §8。表现层总纪律见 [vfx.md](vfx.md)（本组件是那张表里的一行）。
 
-2026-10-20（J37）已接入敌人攻击：自爆／尖啸、陨石、冲锋、重击、跳跃／俯冲落地、回旋和炸弹。入口为EnemyAttackWarning，能力与已发射弹体各自持有独立预制体实例。此前只有Main下默认隐藏的共享实例，实际技能尚未调用；详见[J37接入与验收](character-design-j37.md)。
+2026-10-20（J37）已接入敌人攻击：自爆／尖啸、陨石、冲锋、重击、跳跃／俯冲落地、回旋和炸弹。入口为EnemyAttackWarning，能力与已发射弹体各自持有独立预制体实例。此前只有Main下默认隐藏的共享实例，实际技能尚未调用；详见[J37接入与验收](archive/development-batches/character-design-j37.md)。
 
 ---
 
@@ -145,7 +147,7 @@ SkillIndicator (Node3D, SkillIndicator.cs)
 ```
 
 - ⚠️ **`TopLevel` 是为了"挂哪都画在同一个世界位置"**：组件挂在 `Main` / 玩家 / 敌人身上都一样。
-  它改的是**子节点的一个开关**，不是自己的 `GlobalPosition` —— `docs/HANDOFF.md` §6 第 7 条
+  它改的是**子节点的一个开关**，不是自己的 `GlobalPosition` —— `docs/archive/handoffs-2026-10-18/HANDOFF.md` §6 第 7 条
   （`_Ready` 里改自己 `GlobalPosition` 会被生成方覆盖）因此与它无关。
 - ⚠️ **`TorusMesh` 的 `Rings` / `RingSegments` 别写反**（反了圆画成菱形）：环 = `Rings 64` / `RingSegments 6`。
 - ⚠️ **`.tscn` 的 `parent` 必须引用已定义过的节点**（否则节点被静默丢弃）；本预制体按

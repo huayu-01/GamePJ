@@ -10,22 +10,10 @@ Key = "FireInterval"
 Value = 2.0
 Note = "射击间隔"
 
-[sub_resource type="Resource" id="a_skl_enemy_ranged_shot_1"]
-script = ExtResource("2_param")
-Key = "MagazineSize"
-Value = 3
-Note = "弹匣"
-
-[sub_resource type="Resource" id="a_skl_enemy_ranged_shot_2"]
-script = ExtResource("2_param")
-Key = "ReloadTime"
-Value = 2.5
-Note = "装填"
-
 [sub_resource type="Resource" id="a_skl_enemy_ranged_shot_3"]
 script = ExtResource("2_param")
 Key = "ProjectileSpeed"
-Value = 38.0
+Value = 22.8
 Note = "弹速"
 
 [sub_resource type="Resource" id="a_skl_enemy_ranged_shot_4"]
@@ -69,7 +57,8 @@ NodeName = "AbilityRanged"
 ClassHint = "ProjectileAttackAbility"
 Windup = 0.45
 Recover = 0.35
-AttackParams = [SubResource("a_skl_enemy_ranged_shot_0"), SubResource("a_skl_enemy_ranged_shot_1"), SubResource("a_skl_enemy_ranged_shot_2"), SubResource("a_skl_enemy_ranged_shot_3"), SubResource("a_skl_enemy_ranged_shot_4"), SubResource("a_skl_enemy_ranged_shot_5"), SubResource("a_skl_enemy_ranged_shot_6"), SubResource("a_skl_enemy_ranged_shot_7")]
+AttackParams = [SubResource("a_skl_enemy_ranged_shot_0"), SubResource("a_skl_enemy_ranged_shot_3"), SubResource("a_skl_enemy_ranged_shot_4"), SubResource("a_skl_enemy_ranged_shot_5"), SubResource("a_skl_enemy_ranged_shot_6"), SubResource("a_skl_enemy_ranged_shot_7")]
+NumericId = 1200
 Id = "skl_enemy_ranged_shot"
 DisplayName = "远程射击"
 Note = "远程兵：主攻击没有命中体，伤害 8 / 击退 1.2 由单位行写进武器组件；MaxRange 18 由单位行的攻击范围给。"

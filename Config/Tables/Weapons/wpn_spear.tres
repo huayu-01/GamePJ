@@ -17,9 +17,13 @@ MaxDiveAngleDegrees = 35.0
 MaxAimDistance = 60.0
 GroundProbeDistance = 512.0
 GroundMinNormalY = 0.6
+AimRadiusHeightRatio = 1.0
+DiveSpeedScale = 1.8
+ShowLandingIndicator = true
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1325
 OwnerCharacter = ExtResource("10_owner")
 FallAttackAim = SubResource("fall_aim")
 ModelPath = "res://Scenes/Weapons/Visuals/spear.tscn"
@@ -30,9 +34,6 @@ UsesWeaponComponent = false
 AttackTags = PackedStringArray("Melee", "Spear", "Physical")
 Damage = 0.0
 FireInterval = 0.5
-MagazineSize = 1
-ReloadTime = 0.1
-AutoReloadDelay = 999.0
 SpreadDegrees = 0.0
 AimSpreadScale = 0.0
 MultiShotSpreadDegrees = 0.0
@@ -49,5 +50,9 @@ Skills = [ExtResource("2_skl"), ExtResource("3_skl")]
 Id = "wpn_spear"
 Slot = 9
 DisplayName = "长枪"
-DescriptionTemplate = "中距离武器：武技1 横扫千军（挥砍>上挑>下劈>突刺，四段循环）/ 武技2 长虹贯日（蓄力抛掷，抛物线 + 路径可视化，可收回再伤害）。专属被动落日余晖改变共通下落方向。"
+DescriptionTemplate = "中距离武器：武技1 横扫千军（四段循环）；武技2 长虹贯日（无蓄力直线投枪）。被动落日余晖：空中显示落点与可选范围，水平半径为离地高度的{FallAttackAim.AimRadiusHeightRatio:0}倍，下落速度增加{FallAttackAim.DiveSpeedBonus:0%}。"
 Note = "[P4 新增行] 角色 B 武器3 长枪（中距离范围）。攻击全部由本行 Skills 里那两个武技技能完成（Weapon 组件不开火）。"
+
+NameKey = "content.wpn_spear.name"
+
+DescriptionKey = "content.wpn_spear.description"

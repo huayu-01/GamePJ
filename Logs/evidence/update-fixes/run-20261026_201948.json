@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-26T20:19:48",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "scythe_jump",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_201948.scythe_jump.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_201948.scythe_jump.headless.err",
+      "SHA256": "2491843CDAA42B31B3631FF76AB61A1C9B4614271E5A344616982399A4CE122F"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

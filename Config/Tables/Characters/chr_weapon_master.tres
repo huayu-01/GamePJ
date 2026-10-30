@@ -1,35 +1,28 @@
-[gd_resource type="Resource" script_class="CharacterConfig" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="CharacterConfig" load_steps=6 format=3 uid="uid://bvf8lwq0vi60j"]
 
-[ext_resource type="Script" path="res://Scripts/Config/CharacterConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://devihivkj700s" path="res://Scripts/Config/CharacterConfig.cs" id="1_row"]
+[ext_resource type="Resource" path="res://Config/VisualProfiles/samurai.tres" id="visual"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_skill_1.tres" id="2_skl"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_skill_2.tres" id="3_skl"]
 [ext_resource type="Resource" path="res://Config/Tables/Skills/skl_b_fall.tres" id="4_skl"]
-[ext_resource type="PackedScene" path="res://Scenes/Visual/MeshyWeaponGrip.tscn" id="6_grip"]
 
 [resource]
 script = ExtResource("1_row")
-ModelPath = "res://Assets/Characters/Samurai/samurai.glb"
-ModelTransform = Transform3D(-1.0588235, 0, 0, 0, 1.0588235, 0, 0, 0, -1.0588235, 0, 0, 0)
-WeaponGripScene = ExtResource("6_grip")
-DisabledAbilityIds = PackedStringArray()
 EnabledAbilityIds = PackedStringArray("skl_b_skill_1", "skl_b_skill_2", "skl_b_fall")
+JumpVelocity = 12.0
+JumpGravityScale = 3.2
+SprintInputAction = "sprint"
+SprintSpeedMultiplier = 1.5
 MaxHealth = 220.0
 StartingArmor = 25.0
 MoveSpeed = 6.8
-AttackDamage = 0.0
-AttackInterval = 0.0
-AttackRange = 0.0
-AttackKnockback = 0.0
-JumpVelocity = 12.0
-JumpGravityScale = 3.2
-AirJumpHeightRatio = 0.5
-SprintInputAction = "sprint"
-SprintSpeedMultiplier = 1.5
-AnimLibraryDir = "res://Assets/Characters/Samurai/skills/"
-AnimLibraryName = "skills"
 Skills = [ExtResource("2_skl"), ExtResource("3_skl"), ExtResource("4_skl")]
+VisualProfile = ExtResource("visual")
+NumericId = 1070
 Id = "chr_weapon_master"
 Slot = 5
 DisplayName = "武器大师"
+NameKey = "content.chr_weapon_master.name"
 DescriptionTemplate = "{MaxHealth:0} 生命 / {StartingArmor:0} 护甲 / 移速 {MoveSpeed:0.#}"
+DescriptionKey = "content.chr_weapon_master.description"
 Note = "角色B武器大师：本行只持有共通的闪、架与落；落剑式属于灵剑武器，不能让镰刀和长枪继承。基础生命220、护甲25、移速6.8由用户确认暂保留，后续平衡另测。跳跃列为固定值。"

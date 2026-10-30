@@ -69,7 +69,14 @@ public partial class KillFactProbe : Node3D
 	{
 		RewardConfig row = ConfigRows.ById<RewardConfig>(id) ?? (RewardConfig?)ConfigRows.ById<RuneConfig>(id) ?? throw new InvalidOperationException(id);
 		var copy = (RewardConfig)row.Duplicate(true);
-		foreach (var (key, value) in values) foreach (var parameter in copy.HandlerParams) if (parameter.Key == key) parameter.Value = value;
+		foreach (var (key, value) in values)
+        {
+            string field = key == "ArmorPerKills" ? "KillsPerTrigger" : key;
+            var targets = copy.Effects.Where(effect => effect.GetType().GetProperty(field) != null).ToArray();
+            if (targets.Length != 1) throw new InvalidOperationException($"{id}.{field}必须对应一个实际效果参数");
+            var property = targets[0].GetType().GetProperty(field)!;
+            property.SetValue(targets[0], property.PropertyType == typeof(int) ? (object)(int)value : value);
+        }
 		return copy;
 	}
 	private Unit Target(float x = 30, float health = 1, float z = 30)

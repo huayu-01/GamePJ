@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EffectConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/EffectConfig.cs" id="row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Runes/rune_lei_seal.svg" id="icon"]
+
+[resource]
+script = ExtResource("row")
+NumericId = 1084
+Kind = 10
+VisualStyle = 4
+VisualIcon = ExtResource("icon")
+VisualColor = Color(1, 0.86, 0.2, 0.85)
+VisualRadius = 0.7
+VisualHeight = 2.4
+VisualSize = 0.2
+VisualSpeed = 3.0
+VisualCount = 5
+Duration = 4.0
+Id = "ThunderMark"
+DisplayName = "引雷"
+DescriptionTemplate = "引雷符附加的延迟落雷印记"
+Note = "仅记录状态和显示金色电光环及符文图标；伤害与延迟由引雷符特化参数决定，不额外叠加数值。"

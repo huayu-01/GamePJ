@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TidalTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/TidalTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1030
+Id = "elite_tidal"
+Title = "潮汐领域"
+Description = "内圈与外环交替爆发，保留安全带。"
+NameKey = "elite.tidal.name"
+DescriptionKey = "elite.tidal.description"
+MaxCarriers = 1
+Cooldown = 7
+Radius = 5
+Duration = 2
+Damage = 12

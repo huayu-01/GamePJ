@@ -1,14 +1,13 @@
 [gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://d38bwvoaamqkn"]
 
 [ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_bolts.svg" id="e_hud_icon"]
 [ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="2_param"]
 
 [sub_resource type="Resource" id="p_a2_w1_1_0"]
 script = ExtResource("2_param")
 Key = "ProjectileScenePath"
-Value = "res://Scenes/Combat/Arrow.tscn"
-Note = "飞刀当前共用的投射物预制体（子弹特性：飞行一段距离后下坠 / 弹速够高才击退）"
+Value = "res://Scenes/Combat/ThrowingKnife.tscn"
+Note = "独立飞刀外观；斩弹规则仍属于旧Arrow分类。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_1"]
 script = ExtResource("2_param")
@@ -19,14 +18,14 @@ Note = "★ 文档为 n（没给具体值）→ 这里是**能跑起来的最小
 [sub_resource type="Resource" id="p_a2_w1_1_2"]
 script = ExtResource("2_param")
 Key = "Speed"
-Value = 200.0
-Note = "★ 文档为 n → 预设 200"
+Value = 36.0
+Note = "飞刀散掷初速预设36米/秒。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_3"]
 script = ExtResource("2_param")
 Key = "MaxLifetime"
-Value = 3.0
-Note = "存活时间（秒）"
+Value = 12.0
+Note = "允许近竖直上掷自然升降；接触地形仍立即结束。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_4"]
 script = ExtResource("2_param")
@@ -43,14 +42,13 @@ Note = "★ 相邻两发的夹角（文档：角度 20）"
 [sub_resource type="Resource" id="p_a2_w1_1_6"]
 script = ExtResource("2_param")
 Key = "GravityStartDistance"
-Value = 10.0
-Note = "★ 子弹特性：飞行一段距离后下坠（文档为 n → 预设 10m；射速决定飞完这段要多久）"
+Note = "从出手即受重力，连续抛物线；初始速度使近距离下坠较小。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_7"]
 script = ExtResource("2_param")
 Key = "GravityScale"
-Value = 0.9
-Note = "★ 下坠强度（文档为 n → 预设 0.9 × 引擎重力）"
+Value = 1.0
+Note = "使用引擎重力的真实加速度。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_8"]
 script = ExtResource("2_param")
@@ -61,7 +59,7 @@ Note = "★ 子弹特性：射速较高时造成击退（文档为 n → 预设 
 [sub_resource type="Resource" id="p_a2_w1_1_9"]
 script = ExtResource("2_param")
 Key = "KnockbackMinSpeed"
-Value = 200.0
+Value = 36.0
 Note = "★ 弹速门槛：实际弹速 ≥ 它才吃上面的击退（「射速较高的时候才击退」就是这个门槛）"
 
 [sub_resource type="Resource" id="p_a2_w1_1_10"]
@@ -84,19 +82,17 @@ Note = "暴击率基准（角色基础 5%）"
 
 [resource]
 script = ExtResource("1_row")
-ActionMovement = 2
-HudIcon = ExtResource("e_hud_icon")
-HudColor = Color(1, 0.76, 0.4, 1)
-HudOrder = 30
 NodeName = "AbilityWeapon2Skill1"
 ClassHint = "ArrowVolleyAbility"
 InputAction = "weapon_skill_1"
+ActionMovement = 2
 AnimName = "ATK_A2_Scatter"
 AnimEvent = "ATK"
 Aim = 2
 Cooldown = 1.0
 Windup = 0.08
 Recover = 0.42
+NumericId = 1172
 Id = "skl_a2_w1_1"
 DisplayName = "飞刀散掷"
 DescriptionTemplate = "朝准星方向同时掷出 {Count:0} 把飞刀（相邻夹角 {SpreadStepDegrees:0}°）：每把伤害 {Damage:0} / 飞行速度 {Speed:0}。"

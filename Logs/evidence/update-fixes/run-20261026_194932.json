@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-26T19:49:32",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "content",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_194932.content.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_194932.content.headless.err",
+      "SHA256": "59BAEF17895965BFE7E6705E1DA3D16FF3B159D9967043A26D0D6F41EF9C4C53"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

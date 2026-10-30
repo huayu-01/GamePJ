@@ -1,0 +1,18 @@
+{
+  "Date": "2026-10-26T00:37:53",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "player_flow",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 18.26,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003753.player_flow.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_003753.player_flow.err",
+      "Failure": "",
+      "SHA256": "62151D1A63A2AE4DAE132EDE9B33CD18FFB40B95F69CAC92323AA3016F991A14"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

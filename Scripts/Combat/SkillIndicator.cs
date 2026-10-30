@@ -51,7 +51,7 @@ namespace ActRoguelike.Combat;
 /// <see cref="Node3D.TopLevel"/> 并把变换清成单位阵 —— 于是它的子节点坐标**就是世界坐标**，
 /// 组件挂在哪（<c>Main</c> 下 / 玩家身上 / 敌人身上）都画在同一个世界位置上，也不会被
 /// 「生成方在 <c>AddChild</c> 之后才写 <c>GlobalPosition</c>」那条坑影响
-/// （`docs/HANDOFF.md` §6 第 7 条：本类**不**在 <c>_Ready</c> 里改自己的位置）。</para>
+/// （`docs/archive/handoffs-2026-10-18/HANDOFF.md` §6 第 7 条：本类**不**在 <c>_Ready</c> 里改自己的位置）。</para>
 /// </summary>
 public partial class SkillIndicator : Node3D
 {
@@ -100,7 +100,7 @@ public partial class SkillIndicator : Node3D
 
 	[ExportGroup("几何 / 透明度（米）")]
 	/// <summary>整条指示器的**半透明**（0~1）。曲线的带、圈、矩形填充都乘它。</summary>
-	[Export(PropertyHint.Range, "0,1,0.01")] public float Alpha { get; set; } = 0.45f;
+	[Export(PropertyHint.Range, "0,1,0.01")] public float Alpha { get; set; } = 0.84f;
 
 	/// <summary>**宽度**（米）：① 曲线带的宽度、④ 矩形的宽度。</summary>
 	[Export] public float Width { get; set; } = 0.35f;
@@ -115,7 +115,7 @@ public partial class SkillIndicator : Node3D
 	[Export] public float GroundOffset { get; set; } = 0.05f;
 
 	/// <summary>④ 矩形描边的粗细（米）。</summary>
-	[Export] public float EdgeWidth { get; set; } = 0.14f;
+	[Export] public float EdgeWidth { get; set; } = 0.07f;
 
 	/// <summary>① 曲线的采样段数（传给 <see cref="DashPathIndicator.SampleParabola"/>，越大越圆滑）。</summary>
 	[Export(PropertyHint.Range, "4,128,1")] public int CurveSteps { get; set; } = 32;
@@ -128,7 +128,7 @@ public partial class SkillIndicator : Node3D
 	[Export(PropertyHint.Range, "0,1,0.01")] public float FillAlphaScale { get; set; } = 0.35f;
 
 	/// <summary>自发光强度（颜色只由导出色决定，不看场景光照）。</summary>
-	[Export] public float EmissionEnergy { get; set; } = 1.8f;
+	[Export] public float EmissionEnergy { get; set; } = 0.15f;
 
 	[ExportGroup("示警呼吸（Pulse）")]
 	/// <summary>**呼吸 / 闪烁**开关（示警用：敌人红圈一直亮着太扎眼，呼吸一下更像"危险提示"）。</summary>
@@ -138,7 +138,7 @@ public partial class SkillIndicator : Node3D
 	[Export] public float PulsePeriod { get; set; } = 1.2f;
 
 	/// <summary>呼吸的最暗处相对最亮处的差额（0 = 不呼吸，1 = 完全灭到透明）。</summary>
-	[Export(PropertyHint.Range, "0,1,0.01")] public float PulseDepth { get; set; } = 0.35f;
+	[Export(PropertyHint.Range, "0,1,0.01")] public float PulseDepth { get; set; } = 0.12f;
 
 	[ExportGroup("运行期可读状态（探针 / 自测）")]
 	/// <summary>现在显示着吗（<see cref="HideAll"/> 之后为 <c>false</c>）。</summary>
@@ -217,6 +217,7 @@ public partial class SkillIndicator : Node3D
 			_edge.MaterialOverride = _bandMaterial;   // 描边与曲线带同色同一份材质
 		}
 
+		InitializeBrush();
 		HideAll();
 	}
 
@@ -332,12 +333,14 @@ public partial class SkillIndicator : Node3D
 		};
 
 		FillBand(_edgeMesh, _edge, outline, EdgeWidth, Vector3.Up, _bandMaterial);
+		DrawBrushLine(start,flat,len,wide);
 		Complete($"直线区域：起点 {start} 方向 {flat} 长 {len:0.##}m 宽 {wide:0.##}m（贴地投影）");
 	}
 
 	/// <summary>隐藏全部（技能收招 / 示警结束时调用）。不显示时每帧开销为零。</summary>
 	public void HideAll()
 	{
+		HideBrush();
 		IsShowing = false;
 		SetProcess(false);
 		if (_curve != null)
@@ -472,6 +475,7 @@ public partial class SkillIndicator : Node3D
 			_fill.Position = ground;
 			_fill.Scale = new Vector3(r, 1f, r);
 		}
+		DrawBrushArea(ground-Vector3.Up*GroundOffset,r);
 	}
 
 	/// <summary>
@@ -560,7 +564,9 @@ public partial class SkillIndicator : Node3D
 	{
 		bool continuing = IsShowing && CurrentStyle == style;
 		float previousPulse = _pulseTime;
+		float previousProgress = _warningProgress;
 		HideAll();
+		_warningProgress=continuing ? previousProgress : -1;
 		CurrentStyle = style;
 		LastRadius = 0f;
 		LastSamplePoints = 0;
@@ -586,6 +592,7 @@ public partial class SkillIndicator : Node3D
 	/// <summary>把"颜色 + 透明度 + 呼吸"落到四份材质上（**只改材质，不碰任何战斗状态**）。</summary>
 	private void ApplyTint(float pulse)
 	{
+		UpdateBrushTint();
 		Color baseColor = ResolvedColor;
 		float alpha = Mathf.Clamp(Alpha, 0f, 1f) * Mathf.Clamp(pulse, 0f, 1f) * baseColor.A;
 		Color tint = new(baseColor.R, baseColor.G, baseColor.B, alpha);

@@ -1,0 +1,7 @@
+﻿phase,start_s,end_s,budget_per_s,budget_integral,elite_chance,max_alive,max_pressure,weighted_base_cost,forced_elites,enemies
+0,0.0,72.0,2,144.0,0,18,36,2.076923076923077,0,chaser/fast_melee/scaredy_shroom
+1,72.0,201.60000000000002,2.6,336.9600000000001,0,24,48,1.8958333333333333,1,chaser/fast_melee/exploder/ranged/scaredy_shroom
+2,201.60000000000002,360.0,3.1,491.03999999999996,0.03,28,64,3.0396039603960396,0,chaser/exploder/ranged/spear_guard/arc_thrower/burrow_hunter/scaredy_shroom
+3,360.0,525.6,3.8,629.2800000000001,0.05,32,84,2.8333333333333335,1,chaser/heavy_slammer/blade_spinner/hover_diver/ranged/bomb_lobber/scaredy_shroom
+4,525.6,648.0,4.7,575.2799999999999,0.08,38,108,3.4705882352941178,1,fast_melee/meteor_mage/tracking_charger/combo_fighter/heavy_slammer/arc_bomber/scaredy_shroom
+5,648.0,720.0,5.5,396.0,0.1,42,132,2.4545454545454546,0,chaser/fast_melee/exploder/tracking_charger/meteor_mage/heavy_slammer/scaredy_shroom

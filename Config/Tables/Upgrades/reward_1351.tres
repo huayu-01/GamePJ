@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/AbilityReplacementRewardEffect.cs" id="definition"]
+[ext_resource type="Resource" path="res://Config/Tables/Skills/skl_a2_w1_1.tres" id="target"]
+[ext_resource type="Resource" path="res://Config/Tables/UpgradePools/pool_crossbow.tres" id="pool"]
+[ext_resource type="PackedScene" path="res://Scenes/Abilities/Builds/KnifeDance.tscn" id="replacement"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+TargetAbility = ExtResource("target")
+ReplacementScene = ExtResource("replacement")
+SkillName = "刀舞"
+SkillNameKey = "skill.1351.name"
+SkillDescriptionKey = "content.1351.description"
+SkillDescription = "武技1改成一把{Effects.0.ReplacementScene.Damage}伤害飞刀，首次有效命中施加标记，再从背后依次发射{Effects.0.ReplacementScene.FollowupCount}枚{Effects.0.ReplacementScene.FollowupDamage}伤害追击刀，随机展开后拐向目标，可被其它目标或地形拦截，追击不递归。"
+[resource]
+script = ExtResource("row")
+NumericId = 1351
+DisplayName = "刀舞"
+NameKey = "content.1351.name"
+DescriptionKey = "content.1351.description"
+DescriptionTemplate = "武技1改成一把{Effects.0.ReplacementScene.Damage}伤害飞刀，首次有效命中施加标记，再从背后依次发射{Effects.0.ReplacementScene.FollowupCount}枚{Effects.0.ReplacementScene.FollowupDamage}伤害追击刀，随机展开后拐向目标，可被其它目标或地形拦截，追击不递归。"
+RewardKind = 1
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+Pool = ExtResource("pool")
+RequiredCharacterIds = PackedStringArray("chr_hunter")
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

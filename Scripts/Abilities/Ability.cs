@@ -365,6 +365,8 @@ public abstract partial class Ability : Node3D
 	protected bool AnimEventReached { get; private set; }
 
 	public event Action<Ability>? Activated;
+	/// <summary>本实例的释放表现通知；不参与伤害、冷却或输入判定。</summary>
+	public event Action<Ability>? PresentationTriggered;
 
 	/// <summary>动画事件帧的分发（`UnitAnimator.AnimationEvent`）。在拥有者解析出来时挂、退树时摘。</summary>
 	private bool _initialized;
@@ -414,6 +416,7 @@ public abstract partial class Ability : Node3D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		using var frameProfile=ActRoguelike.Core.RuntimeFrameProfiler.Measure("Ability");
 		EnsureInitialized();
 		if (OwnerUnit == null)
 		{
@@ -430,6 +433,12 @@ public abstract partial class Ability : Node3D
 		}
 		SyncCharges();
 		TickCooldown(dt);
+		// 控制效果阻止主动动作，背景被动与独立冷却仍按原契约运行。
+		if (OwnerUnit.HasActionLock && !IsBackground)
+		{
+			if (IsBusy) InterruptByControl();
+			return;
+		}
 		// 命中停顿只延长动作，不吞输入、不延长独立技能的冷却。
 		if (OwnerUnit.ImpactPause?.IsHolding == true) return;
 
@@ -514,7 +523,7 @@ public abstract partial class Ability : Node3D
 	{
 		EnsureInitialized();
 		EnsureAnimEventHooked();
-		if (OwnerUnit is null or { IsDead: true } || OwnerUnit.Movement?.IsControlDisabled == true || !IsReady || !CanActivate(target))
+		if (OwnerUnit is null or { IsDead: true } || (!IsBackground && OwnerUnit.HasActionLock) || OwnerUnit.Movement?.IsControlDisabled == true || !IsReady || !CanActivate(target))
 		{
 			return false;
 		}
@@ -538,6 +547,8 @@ public abstract partial class Ability : Node3D
 		StateTime = 0f;
 		AnimEventReached = false;
 		OnActivate(target);
+		if (string.IsNullOrEmpty(AnimEvent) && !HoldToCharge && !string.IsNullOrEmpty(InputAction))
+			PresentationTriggered?.Invoke(this);
 		if (WarnOnActivate && IsActive && !IsBackground && OwnerUnit.Faction == Faction.Enemy)
 			OwnerUnit.GetNodeOrNull<UnitPresentation>("Presentation")?.FlashAttack();
 		Activated?.Invoke(this);
@@ -610,6 +621,8 @@ public abstract partial class Ability : Node3D
 			return null;
 		}
 
+		foreach (var entry in unit.AbilitySlots.Equipped)
+			if (entry.Row.Id == abilityId && IsInstanceValid(entry.Ability) && entry.Ability.Enabled) return entry.Ability;
 		var abilities = new List<Ability>();
 		NodeSearch.CollectInSubtree(unit, abilities);
 		foreach (Ability ability in abilities)
@@ -750,7 +763,9 @@ public abstract partial class Ability : Node3D
 		}
 
 		AnimEventReached = true;
+		bool present = first && (!HoldToCharge || (ChargeReleased && !LastReleaseAborted));
 		OnAnimEvent(name);
+		if (present) PresentationTriggered?.Invoke(this);
 	}
 
 	/// <summary>
@@ -789,12 +804,14 @@ public abstract partial class Ability : Node3D
 			IsCharging = true;
 			ChargeTime = 0f;
 			ChargeSteps = 0;
+			BeginChargePresentation();
 		}
 
 		// ⚠️ 这里**不封顶**：封了顶就永远"在完美时机窗口里"（松开也分不出"刚闭合"与"按住很久"）。
 		// 上限只作用在后置蓄力的**档数**上（ChargeMaxStepsEffective）。
 		ChargeTime += delta;
 		RecountChargeSteps();
+		PublishChargeMilestone();
 		// 自动提交与松手共用一次性快照，仍由子类等待释放动画的真实ATK。
 		if (AutoReleaseOnFullCharge && ChargeBaseComplete && ChargeSteps >= ChargeMaxStepsEffective) OnInputReleased();
 	}
@@ -827,6 +844,7 @@ public abstract partial class Ability : Node3D
 		LastReleaseAborted = !released;
 		LastReleaseEarly = released && !ChargeBaseComplete;
 		LastReleaseDamageScale = LastReleaseEarly && AllowEarlyChargeRelease ? Mathf.Clamp(EarlyReleaseDamageScale, 0f, 1f) : 1f;
+		EndChargePresentation(LastReleaseAborted);
 		int steps = ChargeSteps;
 		float power = ChargePowerScale;
 		IsCharging = false;
@@ -871,6 +889,7 @@ public abstract partial class Ability : Node3D
 	/// <summary>下一次施法前把蓄力状态清干净（<see cref="TryActivate"/> 调用）。</summary>
 	private void ResetChargeState()
 	{
+		EndChargePresentation(true, force: true); _presentedChargeStage = -1;
 		ChargeReleased = false;
 		IsCharging = false;
 		ChargeTime = 0f;
@@ -1009,7 +1028,7 @@ public abstract partial class Ability : Node3D
 		switch (Aim)
 		{
 			case AimSource.Crosshair:
-				return AimUtil.GetCrosshairDirection(GetViewport(), facing);
+				return AimUtil.GetCrosshairDirection(GetViewport(), facing, OwnerUnit);
 			case AimSource.MovementIntent:
 				Vector3 intent = Movement?.IntentDirection ?? Vector3.Zero;
 				return intent.LengthSquared() > 0.04f ? intent : facing;
@@ -1026,6 +1045,7 @@ public abstract partial class Ability : Node3D
 
 	protected void Finish()
 	{
+		EndChargePresentation(!ChargeReleased);
 		IsActive = false;
 		IsCharging = false;
 		_maintainHeld = false;
@@ -1050,6 +1070,7 @@ public abstract partial class Ability : Node3D
 	/// <summary>换装前释放本能力持有的状态，保留正常技能的取消生命周期。</summary>
 	public void ResetForLoadout()
 	{
+		ClearRewardParameters();
 		UpdateInputPreview(false);
 		if (IsActive) Cancel();
 		if (_chargeCooldownBaseline.HasValue) CooldownMultiplier = _chargeCooldownBaseline.Value;
@@ -1061,11 +1082,16 @@ public abstract partial class Ability : Node3D
 		RefreshCooldown();
 	}
 	protected virtual void OnLoadoutReset() { }
+	/// <summary>已经产生效果的新动作即使被后续主动技能打断，也须进入冷却。</summary>
+	protected void StartCommittedCooldown() { if (MaxCharges <= 1) CooldownRemaining = Mathf.Max(CooldownRemaining, EffectiveCooldown); }
+	/// <summary>武技进化交接动作，保留本局已经附着的参数增强以支持撤销和兼容联动。</summary>
+	public void StopForReplacement() { if (IsBusy) Cancel(); UpdateInputPreview(false); ResetChargeState(); }
 	/// <summary>明确的硬控制可终止动作；霸体在单位受控入口判断，收尾与普通技能交接一致。</summary>
-	public void InterruptByControl() { if (IsBusy) Finish(); }
+	public void InterruptByControl() { if (IsBusy && OwnerUnit?.Movement?.IsControlImmune != true && OwnerUnit?.HasTraitControlImmunity != true) Finish(); }
 
 	protected void Cancel()
 	{
+		EndChargePresentation(true);
 		IsActive = false;
 		IsCharging = false;
 		_finishCooldownScale = 1;

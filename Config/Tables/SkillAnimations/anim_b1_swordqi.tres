@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1151
 SourceModelPath = "res://Assets/Models/player/mesh_player_body.glb"
 SourceAnimation = "holding-both"
 TargetName = "Skill_B1_SwordQi"

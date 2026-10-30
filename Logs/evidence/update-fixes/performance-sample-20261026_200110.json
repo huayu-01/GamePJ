@@ -1,0 +1,71 @@
+{
+  "label": "sample",
+  "goalMet": false,
+  "gpu": "NVIDIA GeForce RTX 4070 Ti",
+  "cpu": "AMD Ryzen 7 5800X 8-Core Processor",
+  "engine": "4.7.2-stable (official)",
+  "width": 3840,
+  "height": 2160,
+  "renderScale": 1,
+  "msaa": "Disabled",
+  "minEnemies": 100,
+  "maxEnemies": 100,
+  "playerAttackRequests": 18,
+  "sampleSeconds": 12.026267999999996,
+  "samples": 157,
+  "averageFps": 13.054756471417406,
+  "low1Fps": 3.9461508258307143,
+  "p99FrameMs": 131.263,
+  "maxFrameMs": 375.56,
+  "gpuMs": 14.390165635734606,
+  "renderCpuMs": 1.697477705919059,
+  "processMs": 12.788146496815283,
+  "physicsMs": 51.42428662420376,
+  "drawCalls": 1131.6624203821657,
+  "physicsFrames": 712,
+  "profile": {
+    "Unit": {
+      "calls": 71912,
+      "totalMs": 13.7775,
+      "msPerPhysicsFrame": 0.019350421348314606,
+      "msPerRenderFrame": 0.0877547770700637
+    },
+    "Ability": {
+      "calls": 84728,
+      "totalMs": 166.8172,
+      "msPerPhysicsFrame": 0.23429382022471912,
+      "msPerRenderFrame": 1.0625299363057326
+    },
+    "Animator": {
+      "calls": 71912,
+      "totalMs": 53.9101,
+      "msPerPhysicsFrame": 0.07571643258426966,
+      "msPerRenderFrame": 0.3433764331210191
+    },
+    "Movement": {
+      "calls": 71200,
+      "totalMs": 2167.7043,
+      "msPerPhysicsFrame": 3.044528511235955,
+      "msPerRenderFrame": 13.807033757961783
+    },
+    "Brain": {
+      "calls": 71200,
+      "totalMs": 2761.382,
+      "msPerPhysicsFrame": 3.8783455056179776,
+      "msPerRenderFrame": 17.588420382165605
+    },
+    "Presentation": {
+      "calls": 15756,
+      "totalMs": 6.4012,
+      "msPerPhysicsFrame": 0.008990449438202248,
+      "msPerRenderFrame": 0.040771974522292996
+    },
+    "WorldUI": {
+      "calls": 156,
+      "totalMs": 6.2715,
+      "msPerPhysicsFrame": 0.008808286516853931,
+      "msPerRenderFrame": 0.03994585987261146
+    }
+  },
+  "note": "\u771F\u5B9E\u751F\u4EA7\u573A\u666F\u4E0E\u5BFC\u6F14\uFF0C\u654C\u4EBA\u989D\u5916\u751F\u547D\u907F\u514D\u91C7\u6837\u65F6\u4EBA\u6570\u4E0B\u964D\uFF1BAI\u3001\u52A8\u4F5C\u548C\u7269\u7406\u4FDD\u6301\u5F00\u542F\uFF0C\u73A9\u5BB6\u5B9E\u9645\u5C1D\u8BD5\u53D1\u5C04\u80FD\u91CF\u638C\uFF1B\u5E73\u5747\u4E0E1%\u4F4E\u5E27\u5747\u8FBE60\u624D\u8BB0goalMet\u3002\u8D28\u91CF\u4F7F\u7528\u5F53\u524D\u914D\u7F6E\uFF0C\u5F3A\u5236\u539F\u751F4K\u3001\u65E0MSAA\u3002"
+}

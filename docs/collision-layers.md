@@ -32,4 +32,4 @@ Unit._Ready统一配置身体层和Mask，AttackHitbox与Projectile按攻击来�
 - 质量、抗性和控制免疫分开。首领不靠名字或Boss标签获得隐式免疫；具体档案显式设置ControlImmune或CanBeKnockedDown。环境力与战斗控制免疫独立。当前为CharacterBody的可控游戏物理，没有实现布娃娃、动态刚体相撞或导航寻路。
 - 画面／模型设计时同步确定身体体积、脚底原点、受击高度、悬停高度和落地动作；纯视觉缩放与实际碰撞尺寸分开验收。
 
-验证见[J33记录](character-design-j33.md)与[J34记录](character-design-j34.md)。交互验证场为Scenes/Debug/_FlightPhysicsLab.tscn：方向键移动；1向下冲量、2压低、3打落、4相同力推动轻／重单位、5复位。旧D批的“所有单位可互穿”契约已由用户裁定替换，历史证据保留。
+验证见[J33记录](archive/development-batches/character-design-j33.md)与[J34记录](archive/development-batches/character-design-j34.md)。交互验证场为Scenes/Debug/_FlightPhysicsLab.tscn：方向键移动；1向下冲量、2压低、3打落、4相同力推动轻／重单位、5复位。旧D批的“所有单位可互穿”契约已由用户裁定替换，历史证据保留。

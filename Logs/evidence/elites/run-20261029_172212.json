@@ -1,0 +1,26 @@
+{
+  "Date": "2026-10-29T17:22:12",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "Content068070",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 7.7,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_172212.Content068070.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_172212.Content068070.headless.err",
+      "SHA256": "3D57F9EE8F29277FF0263B1B18319CB68ADED097361A0DC6655746D8458BACAE"
+    },
+    {
+      "Name": "Content068070",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 12.77,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_172212.Content068070.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_172212.Content068070.render.err",
+      "SHA256": "884635EF3369B9A0A59B567BB671E2A391FAE255701841D8008EFC6DE1B35FFA"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

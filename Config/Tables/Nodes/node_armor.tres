@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NodeConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/NodeConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/NodeRewards/ArmorNodeReward.cs" id="behavior"]
+[sub_resource type="Resource" id="reward"]
+script = ExtResource("behavior")
+Armor = 30
+[resource]
+script = ExtResource("row")
+NumericId = 1340
+DisplayName = "补充护甲"
+Title = "补充护甲"
+Kind = 9
+Layer = 0
+WaveCount = 1
+ValueTags = PackedStringArray("tag_low")
+RewardBehavior = SubResource("reward")

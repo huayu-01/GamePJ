@@ -1,0 +1,19 @@
+{
+  "source": "ArtSource/Blender/ghost-mage/ghost-mage.blend",
+  "glb_bytes": 174316,
+  "animations": [
+    "idle",
+    "cast"
+  ],
+  "materials": 6,
+  "glb_sha256": "2FED7C088F45BA9D6D0663D6896D4781AFF3DB17DFE869AFF3CEFBFE13148EEE",
+  "runtime": "Assets/Enemies/GhostMage/ghost_mage.glb",
+  "generation_credits": 0,
+  "report": "ArtSource/Blender/ghost-mage/build-report.json",
+  "vertices": 2312,
+  "preview_scale": 0.82,
+  "bones": 7,
+  "triangles": 4584,
+  "visible_hands": false,
+  "staff_mode": "floating"
+}

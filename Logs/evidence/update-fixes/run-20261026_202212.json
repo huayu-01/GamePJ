@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-26T20:22:12",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "thunder_cooldown",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_202212.thunder_cooldown.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_202212.thunder_cooldown.headless.err",
+      "SHA256": "4D1EAD574A68A5D67754353BBF1393971DAB1A419A747A884F4299B3A810C481"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "asset": "clover-wayfarer",
+  "revision": "v08-stocky-child-proportions",
+  "triangles": 3088,
+  "meshes": 24,
+  "bones": 15,
+  "materials": 14,
+  "animations": [
+    {
+      "name": "idle",
+      "duration_seconds": 1.9999999664723873,
+      "channels": 45
+    },
+    {
+      "name": "walk",
+      "duration_seconds": 1.2000000141561031,
+      "channels": 45
+    }
+  ],
+  "max_weight_sum_error": 1.126900315284729e-07,
+  "glb_bytes": 275080,
+  "includes_hands": false,
+  "includes_backpack": false,
+  "back_pattern": "three-leaf clover",
+  "candidate_only": true,
+  "geometry_check": {
+    "passed": true,
+    "asset_meshes": 24,
+    "triangles": 3088,
+    "bones": 15,
+    "mask_manifold": true,
+    "no_hands_or_arms": true,
+    "same_jade_material": true,
+    "no_head_filler": true,
+    "jade_color_srgb": "#2bc98e",
+    "head_binding_verified": true,
+    "front_hood_crown_z": 1.633,
+    "front_mask_forehead_z": 1.653,
+    "rear_hood_crown_z": 1.738,
+    "front_lip_below_mask": true,
+    "raised_curved_rear_crown": true,
+    "side_render_reviewed": true,
+    "cloth_folds": "irregular drifting folds, shoulder tension, asymmetric opening",
+    "cloth_edges": "thin turned front edges and hem",
+    "cloth_shading": "smooth body cloth and scarf; faceted wood",
+    "hem_min_z": 0.17174365997314453,
+    "hem_max_z": 0.2508616805076599,
+    "back_clover": "clipped onto individual cloth triangles",
+    "head_shape_preserved_with_vertical_translation": true
+  },
+  "references": [
+    "user-owl-outline-v03.png",
+    "https://oricutstudios.itch.io/low-poly-forest-spirit-nori",
+    "https://oricutstudios.itch.io/low-poly-campfire-scout-niko"
+  ],
+  "includes_body": true,
+  "body_check": {
+    "passed": true,
+    "body_meshes": [
+      "CW_Tunic",
+      "CW_Pelvis",
+      "CW_LeftLeg",
+      "CW_RightLeg"
+    ],
+    "closed_body_volume_m3": {
+      "CW_Tunic": 0.12605690922752125,
+      "CW_Pelvis": 0.02644187683950211,
+      "CW_LeftLeg": 0.010283161655726942,
+      "CW_RightLeg": 0.01028316157812336
+    },
+    "skin_weights_normalized": true,
+    "idle_and_walk_deformation_samples": 10,
+    "legs_inside_tunic_above_hem": true,
+    "minimum_sampled_cloak_clearance_m": 0.044485073536634445,
+    "body_height_scale": 0.88,
+    "head_vertical_offset": -0.132,
+    "tunic_width_m": 0.7300000190734863,
+    "tunic_height_m": 0.5587999224662781,
+    "body_style": "stocky child; broad chest and pelvis, minimal waist taper, thick short legs",
+    "stance_centers_x": [
+      -0.205,
+      0.205
+    ],
+    "hands": false
+  },
+  "height_m": 1.788,
+  "blender_roundtrip": {
+    "passed": true,
+    "asset_meshes": 24,
+    "triangles": 3088,
+    "bones": 15,
+    "body_meshes_present": true,
+    "importer_bone_display_helpers": 0
+  }
+}

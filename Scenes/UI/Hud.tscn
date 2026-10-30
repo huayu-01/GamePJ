@@ -31,6 +31,9 @@ mouse_filter = 2
 script = ExtResource("7_scope")
 
 [node name="PlayerBar" parent="Root" instance=ExtResource("2_bar")]
+anchor_top = 1.0
+offset_top = -112.0
+offset_bottom = 0.0
 
 [node name="Crosshair" type="TextureRect" parent="Root"]
 anchor_left = 0.5
@@ -84,11 +87,13 @@ text = ""
 horizontal_alignment = 1
 
 [node name="Build" type="Label" parent="Root"]
+anchor_left = 0.5
+anchor_right = 0.5
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 24.0
+offset_left = -360.0
 offset_top = -64.0
-offset_right = 900.0
+offset_right = 360.0
 offset_bottom = -20.0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 20
@@ -96,12 +101,12 @@ text = ""
 vertical_alignment = 1
 
 [node name="BuildIcons" type="HBoxContainer" parent="Root"]
-anchor_top = 1.0
-anchor_bottom = 1.0
+anchor_top = 0.0
+anchor_bottom = 0.0
 offset_left = 24.0
-offset_top = -118.0
-offset_right = 900.0
-offset_bottom = -70.0
+offset_top = 104.0
+offset_right = 474.0
+offset_bottom = 148.0
 grow_vertical = 0
 mouse_filter = 2
 theme_override_constants/separation = 6

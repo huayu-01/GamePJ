@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ClangerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/ClangerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1007
+Id = "elite_clanger"
+Title = "压境"
+Description = "固定同波保护对象死亡后解除无敌。"
+NameKey = "elite.clanger.name"
+DescriptionKey = "elite.clanger.description"
+MaxCarriers = 1
+ExtraCost = 3

@@ -15,6 +15,7 @@ ClassHint = "MeleeAttackAbility"
 Windup = 0.45
 Recover = 0.35
 AttackParams = [SubResource("a_skl_enemy_elite_melee_0")]
+NumericId = 1195
 Id = "skl_enemy_elite_melee"
 DisplayName = "精英近战"
 Note = "技能精英：Boss 护卫。"

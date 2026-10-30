@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-27T00:59:32",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "navigation",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261027_005932.navigation.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261027_005932.navigation.headless.err",
+      "SHA256": "A758F44FDB90FC78B9F7139C6B8F27BFE0E8B065A224D61728CBDD0D0F71B95C"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261027_005932.enemy_roster.headless.log / F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261027_005932.enemy_roster.headless.err"
+}

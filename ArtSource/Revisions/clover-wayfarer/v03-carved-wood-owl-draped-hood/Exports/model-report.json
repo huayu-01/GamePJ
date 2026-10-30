@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "asset": "clover-wayfarer",
+  "revision": "v03-carved-wood-owl-draped-hood",
+  "triangles": 3284,
+  "meshes": 17,
+  "bones": 15,
+  "materials": 13,
+  "animations": [
+    {
+      "name": "idle",
+      "duration_seconds": 1.9999999664723873,
+      "channels": 45
+    },
+    {
+      "name": "walk",
+      "duration_seconds": 1.2000000141561031,
+      "channels": 45
+    }
+  ],
+  "max_weight_sum_error": 1.2665987014770508e-07,
+  "glb_bytes": 426636,
+  "includes_hands": false,
+  "includes_backpack": false,
+  "back_pattern": "three-leaf clover",
+  "candidate_only": true,
+  "geometry_check": {
+    "passed": true,
+    "asset_meshes": 17,
+    "triangles": 3284,
+    "bones": 15,
+    "no_hands_or_arms": true,
+    "empty_mask_interior": true,
+    "two_open_eye_holes": true,
+    "mask_manifold": true,
+    "mask_width": 1.0700000524520874,
+    "mask_depth": 0.12000000476837158,
+    "mask_surface": "faceted wooden board with bevel and four shallow chisel cuts",
+    "user_outline_reference": "user-owl-outline-v03.png",
+    "draped_hood": true,
+    "scarf_cowl": true,
+    "cloak_surface_only": true,
+    "hem_min_z": 0.18045859038829803,
+    "hem_max_z": 0.28569743037223816
+  },
+  "references": [
+    "user-owl-outline-v03.png",
+    "https://oricutstudios.itch.io/low-poly-forest-spirit-nori",
+    "https://oricutstudios.itch.io/low-poly-campfire-scout-niko"
+  ],
+  "blender_roundtrip": {
+    "passed": true,
+    "asset_meshes": 17,
+    "triangles": 3284,
+    "bones": 15,
+    "importer_bone_display_helpers": 0,
+    "no_hand_or_arm_bones": true
+  }
+}

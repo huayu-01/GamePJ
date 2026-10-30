@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Testing/RunFlowContinuityProbe.cs" id="1"]
+
+[node name="RunFlowContinuity" type="Node3D"]
+
+[node name="Probe" type="Node3D" parent="."]
+script = ExtResource("1")

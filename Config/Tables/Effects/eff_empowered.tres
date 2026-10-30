@@ -16,6 +16,7 @@ Value = 1.15
 
 [resource]
 script = ExtResource("2_vvii0")
+NumericId = 1074
 Kind = 4
 VisualStyle = 4
 VisualIcon = ExtResource("e_visual_icon")

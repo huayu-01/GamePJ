@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dya10alwkew3p"]
+
+[ext_resource type="Shader" uid="uid://y84254hjnq5q" path="res://Assets/Environment/StylizedNature/arena_ground.gdshader" id="1_b80p7"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_b80p7")
+shader_parameter/grass_color = null
+shader_parameter/grass_light = null
+shader_parameter/soil_color = null

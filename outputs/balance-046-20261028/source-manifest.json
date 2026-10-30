@@ -1,0 +1,3522 @@
+[
+  {
+    "path": "Config/ConfigIndex.tres",
+    "sha256": "c7a436d5cef9c410bfefbcb848432aea54d0334e74bc909cf9a87cbb89604b28"
+  },
+  {
+    "path": "Config/EliteTraits/catalog.tres",
+    "sha256": "2b68cbcc87f7697360b6876055c78abd917ce2dfa8ff6087bf15870f8c22484a"
+  },
+  {
+    "path": "Config/EliteTraits/elite_aftershock.tres",
+    "sha256": "2a46e8ff719f1dc715fea3c6014f10edb6444b18c82b2941433ea62acdfb4c9d"
+  },
+  {
+    "path": "Config/EliteTraits/elite_arcane.tres",
+    "sha256": "226ac6d3e2af2f7d5398670521081226749968d6022fd37b52ef6b5e2f154ac7"
+  },
+  {
+    "path": "Config/EliteTraits/elite_armor_recoil.tres",
+    "sha256": "e22fd73ad0849e601b0248e30e781642fd37771a98260d930a523a8220f53ffb"
+  },
+  {
+    "path": "Config/EliteTraits/elite_avenger.tres",
+    "sha256": "5b98137952a887b1767b4010b38fd6eb7dc417647e71a271e7cf17d3f45312b3"
+  },
+  {
+    "path": "Config/EliteTraits/elite_bruiser.tres",
+    "sha256": "ffeb11634cc417785645201ea30275f5ac438bde87daa4545dd4f1af70901391"
+  },
+  {
+    "path": "Config/EliteTraits/elite_burner.tres",
+    "sha256": "a26b875b415462364e342eec9cae8d54c0530176b8f62a576eb99f157e65991d"
+  },
+  {
+    "path": "Config/EliteTraits/elite_burrower.tres",
+    "sha256": "1e9641248cc9a45dd28bb79a2dc0f22373614b89034dd8e54e02b1874dbe47d2"
+  },
+  {
+    "path": "Config/EliteTraits/elite_clanger.tres",
+    "sha256": "6cac0e061515aebe2346b364204bc8e9278f4e7aafdc20147cf6563befff8372"
+  },
+  {
+    "path": "Config/EliteTraits/elite_flanker.tres",
+    "sha256": "4de09c2e3d128ceef86b9b2694aed862d1776c2be75b1faa5e4f8a2d7b0b04e9"
+  },
+  {
+    "path": "Config/EliteTraits/elite_frozen.tres",
+    "sha256": "690516bc3733a2bb4dad7d33b9044c8d6c1d440df46566abbd4333da1729b3e3"
+  },
+  {
+    "path": "Config/EliteTraits/elite_health_link.tres",
+    "sha256": "6f89ce47e6a2d41045b29ba71caee7efd21426cf33498130a7c98c1a01794a6a"
+  },
+  {
+    "path": "Config/EliteTraits/elite_juggernaut.tres",
+    "sha256": "fda2377708e33a75417c39775b2a90c89abbd51787a696d8a62a59f796e5f177"
+  },
+  {
+    "path": "Config/EliteTraits/elite_knockback.tres",
+    "sha256": "3ab5fdcd650d9e2b68377c2fa1e61863e2b4c705d7ababaa3c5108e8213ef467"
+  },
+  {
+    "path": "Config/EliteTraits/elite_linker.tres",
+    "sha256": "836a954d45ddc6b5cb1e14d99266204cc8bd83f7777effe054e7aea094077747"
+  },
+  {
+    "path": "Config/EliteTraits/elite_molten.tres",
+    "sha256": "9e96107a284889ca9c02347f3b6c005f57b5ac907aec41862a07282a02f2cf37"
+  },
+  {
+    "path": "Config/EliteTraits/elite_multishot.tres",
+    "sha256": "413118869dac39cb118a259b4a2c6e159907e8302871948e0aca70f3146aea3a"
+  },
+  {
+    "path": "Config/EliteTraits/elite_pressure_rebound.tres",
+    "sha256": "f3500844f1aec16cfe38f486fe577d4d950457fb4a2e8b0bf9df2e307bda5242"
+  },
+  {
+    "path": "Config/EliteTraits/elite_reforge.tres",
+    "sha256": "14fbcd0d17b68b0171d59d5674874391bfe0fb1c0d67c7f03233c46323e6c5ab"
+  },
+  {
+    "path": "Config/EliteTraits/elite_savior.tres",
+    "sha256": "9e4e94c630e920f43d8870de63d6cfe346ba316b1102b0b7ee07d7542c2c0c93"
+  },
+  {
+    "path": "Config/EliteTraits/elite_seeker.tres",
+    "sha256": "b9088127e27841daf35241c8ab574f2f360b04bedc2e482af713435ea73ca493"
+  },
+  {
+    "path": "Config/EliteTraits/elite_shielding.tres",
+    "sha256": "7ee5e2afeb9e27c3fc77bf221ae9a12a5076be4e9cf6ab25e6c026b768b57020"
+  },
+  {
+    "path": "Config/EliteTraits/elite_shifter.tres",
+    "sha256": "a4d42b9149b04ff396a757f41287f7e191de235b9afe7657cf7e8d06814b7ca7"
+  },
+  {
+    "path": "Config/EliteTraits/elite_slicer.tres",
+    "sha256": "1ecc41fee6a47ac1ae5311c35f94352c166d210c6ecb50610e36b0a09ffe677c"
+  },
+  {
+    "path": "Config/EliteTraits/elite_slugger.tres",
+    "sha256": "c99fbc3a5e5ec8a13c32b40b6c9c03538f26f0b01a505f2116868d41e1159985"
+  },
+  {
+    "path": "Config/EliteTraits/elite_speeder.tres",
+    "sha256": "8f529103ed4d3b52467858debb52ff91c1e64c678c4444f43e0ac7836f592540"
+  },
+  {
+    "path": "Config/EliteTraits/elite_spiller.tres",
+    "sha256": "f823da7880538bc321bd1f70f9101f80ec367bbd2bda2546aea7efc40ff8eff4"
+  },
+  {
+    "path": "Config/EliteTraits/elite_spinner.tres",
+    "sha256": "4aa14eff527972139fb5d33599b3e10983feb3198166035443a5798d3b6a7ef1"
+  },
+  {
+    "path": "Config/EliteTraits/elite_summoner.tres",
+    "sha256": "975f8b65b372051f0d7669f8910a44975af9e298640ab282d28e966d32141f9d"
+  },
+  {
+    "path": "Config/EliteTraits/elite_suppressor.tres",
+    "sha256": "c8078f1f6b6cfdc0b3e371b47aaae7a5fab18d92f5b1a8e2ea38a4747361f9d8"
+  },
+  {
+    "path": "Config/EliteTraits/elite_thorn_grid.tres",
+    "sha256": "83a0d4c6d4672c3a1a183386794be40e92fc7e60bef43ae2ee53cb45a5bf1c34"
+  },
+  {
+    "path": "Config/EliteTraits/elite_tidal.tres",
+    "sha256": "10541e8f1f3339ee7ddf6d471a197e16a4aa9987486e4b9a087a868deaaf48cd"
+  },
+  {
+    "path": "Config/EliteTraits/elite_trail_brand.tres",
+    "sha256": "7fa159671f54b336fb83ff344f93c5dae94e3cd8fcf63c86108cff525c4b6028"
+  },
+  {
+    "path": "Config/EliteTraits/elite_vampiric.tres",
+    "sha256": "0142e07602638d3f4d0cb6cf5db762acf2d3f65a37a8db35d7b7338aec2e2584"
+  },
+  {
+    "path": "Config/EnemyActions/guard.tres",
+    "sha256": "77d749b69336cd1dceb6126864a1708f9010dba38c04730d994b00cb0c53315d"
+  },
+  {
+    "path": "Config/EnemyActions/hover.tres",
+    "sha256": "490097144d30f7455294ae8f12dc85665ccdd295060cd304b4366870c8f68c27"
+  },
+  {
+    "path": "Config/EnemyActions/wait.tres",
+    "sha256": "95e7881ac98264257dc32e8214c17153cb6a24cf363d06c3a746ccd81f45f6f5"
+  },
+  {
+    "path": "Config/EnemyCrowd.tres",
+    "sha256": "b297fbadd357311f758d1daff1fda52922954b849bc9e75b713d410f78bb6f0b"
+  },
+  {
+    "path": "Config/EnemyPlans/arc_bomber.tres",
+    "sha256": "b063c4b567e37a44cafa4abec0ef372774f7e63b8d5b5daa2a852158fdc3fb67"
+  },
+  {
+    "path": "Config/EnemyPlans/arc_thrower.tres",
+    "sha256": "6bea9840f811d7c3468cd243aa9c6e0376312cee2fe073f3b885cc5790950f96"
+  },
+  {
+    "path": "Config/EnemyPlans/blade_spinner.tres",
+    "sha256": "11cbde485efbd0d2fb157c6e7101ae7383ea994799f6ce38f013e2cbf65b3acd"
+  },
+  {
+    "path": "Config/EnemyPlans/bomb_lobber.tres",
+    "sha256": "6b8b4edf3aef1282cead5e49c060dace1df06ef6702dc3d320a20720f4f91efa"
+  },
+  {
+    "path": "Config/EnemyPlans/burrow_hunter.tres",
+    "sha256": "a027db47b519ac9a34de611de5f50245aa73bd093486a4ca091156187d99da00"
+  },
+  {
+    "path": "Config/EnemyPlans/combo_fighter.tres",
+    "sha256": "f6cfbc77bed453dc8557505f8a3b1364bac7769f2dee33d7ef98294fa6227ba1"
+  },
+  {
+    "path": "Config/EnemyPlans/heavy_slammer.tres",
+    "sha256": "8d0d6b73a8d373c2217ae9c6b1cc33cdfda4656c8734a64aea446ee156616d27"
+  },
+  {
+    "path": "Config/EnemyPlans/hover_diver.tres",
+    "sha256": "72ad6d4158a383b517bba889d0097febeaa55add69e91e6e773307e5f18c207f"
+  },
+  {
+    "path": "Config/EnemyPlans/meteor_mage.tres",
+    "sha256": "170ad842e7cbd448882d5b9b35e3f59a728ce90dd244d894374f43a65294cdf4"
+  },
+  {
+    "path": "Config/EnemyPlans/scaredy_shroom.tres",
+    "sha256": "10cf15ff71a596fbee964e6ee4c33840a6818ba3714cc8f15ea6508dd4c68f4c"
+  },
+  {
+    "path": "Config/EnemyPlans/spear_guard.tres",
+    "sha256": "d7af4d9e84195b8e613a4d9c20cdfe7a8202cf4aca96bf8ea877f3b9ac0bb851"
+  },
+  {
+    "path": "Config/EnemyPlans/tracking_charger.tres",
+    "sha256": "4659bc038e91c3aab916bcf47651c57832cc0572ef089da82b5d9c8e59308024"
+  },
+  {
+    "path": "Config/Modes/survival_destination.tres",
+    "sha256": "0f948ed5e78d48f8ce1eae5e1698f3056986e80895bd850b5c16e9b6fa94e352"
+  },
+  {
+    "path": "Config/Modes/twilight_survival.tres",
+    "sha256": "d1b915fc0fab564c4684191f29da79b0dab694eda351ad8e43141665aab9b433"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_boss.tres",
+    "sha256": "fa034adbc1266b6df9fb2a002c75766a424e66b0abf8809d7d24541636be6089"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_charger.tres",
+    "sha256": "a9a449385ac1692e8bfd9f646d01c9789e7bd016b2eb1173b237119d7d10c365"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_chaser.tres",
+    "sha256": "f8356d96278a0d439b38c4376aa0db6464bf33ff57e24b245b7ea48251de9322"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_drone.tres",
+    "sha256": "dfc84794f467ca6d9c959ca8717cfb54533474958e3d39d503233dfc5f3d5753"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_exploder.tres",
+    "sha256": "c25541a32779d75708f03894f2983af00cec0ec552106f19d5580dc308b5ba07"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_fast_melee.tres",
+    "sha256": "7ba9687a416b85c73161c65086073dc0f5f94e20af0d19cd66b05f032faf39ec"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_guard.tres",
+    "sha256": "7b5a86e71da82525bdf0be627224869fa155a283821be2bab43cc5e4b19e44c7"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_jumping_melee.tres",
+    "sha256": "e7b4a16f5c4d09ddcc3a7457e386b9665877f90c7d1204f36c27362c8b9262b0"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_ranged.tres",
+    "sha256": "4766089988516677037631ddc28a4d6f1b2e7d1adfab12c956838f2d4d6f9804"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_screamer.tres",
+    "sha256": "45b9c3f4ab94a7f9299c16b02c23df52a9214faca02df35f048fb78d6f44d3d8"
+  },
+  {
+    "path": "Config/Tables/AiProfiles/ai_skill_elite.tres",
+    "sha256": "a91e26cef9cf413eace41b825c4eea1c05a90032ccdd4d9d9e4553c5b18a0dcc"
+  },
+  {
+    "path": "Config/Tables/Characters/chr_hunter.tres",
+    "sha256": "729dfe050ae36ec2ad276591351d7425671a6b9e4bd67490637c4fd1040babce"
+  },
+  {
+    "path": "Config/Tables/Characters/chr_weapon_master.tres",
+    "sha256": "0637b58be299763aa06b2c9c17c1bb71b1c7ad9dd7048f18420baa6d4cb0cbc6"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_burn.tres",
+    "sha256": "4a6a206286f7b39e47601cb76e01c6bee0162c42611833b738e5c844088a572d"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_burn_plus.tres",
+    "sha256": "2796f9b8b477e1b8cf623a48d8af2e080ced213abcc289ae8a1f90b877a36c83"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_chain_lightning.tres",
+    "sha256": "3ed938aa08e4655635daf75ac478e0d8a13f3542d780a4c20a11bd4153af5b96"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_empowered.tres",
+    "sha256": "259cf968da9b47c2a3668eb8ab0a60f9280046e1cfe6635b093d5907b0e5d9eb"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_explosion.tres",
+    "sha256": "dfb0cc83a55d6dc708253a50ca22d1a38fb5036ab107757eb7cadba0761dafe0"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_freeze.tres",
+    "sha256": "75a80e6c3fafb12297281f072854f51fddf8b710c67de5d4224d82cfc797c370"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_freeze_plus.tres",
+    "sha256": "4de6715194af74ecfd1d137508f3bbf4a17755ddeb64fab3d06b9dd2e639b81e"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_lifesteal.tres",
+    "sha256": "0e5ef40ce9c3f550b7122393d86d9f67bc33b881d57e616b7d4be87699040b8b"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_mark.tres",
+    "sha256": "afc8bd5fd826db1d47b2130f38787924030fd2ce126829117ba11b7f5a51e831"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_missile_beacon.tres",
+    "sha256": "bf454b80f76b7242ff4f1338771069cb782d396fa991b47c060ac313ec603e3c"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_slow.tres",
+    "sha256": "040d9bedbb0a014cb2a92bacb958045d23dd6bcec2650dce66dc6244e9d2eea2"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_stun.tres",
+    "sha256": "20ab09309b37186b4e7b6ed469a6c8167c199a09d2c9c1d6207bc4d7e927cb2e"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_summon_on_kill.tres",
+    "sha256": "dd89145dd01c0d413071c4141874b5a93d92b27a806b8f74575ad125b7c77be5"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_thunder_mark.tres",
+    "sha256": "6722ff5adf03fef0fb5834bbfcce1ea5cd5945bb20a89408c79d5bda4750833e"
+  },
+  {
+    "path": "Config/Tables/Effects/eff_weaken.tres",
+    "sha256": "4f1b57682fa86004a3ca5efa22588790a210090f5fd9e4c0ce433a749bdf397e"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_arc_bomber.tres",
+    "sha256": "47ce7d35cb354dc547a82d3696b21f1d3572e0e4ca496b8751f07e115da5c5d2"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_arc_thrower.tres",
+    "sha256": "061aa4d11b1021263772186a1f0b159dff349ce1b8ab43276c0c44552b9b87b1"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_blade_spinner.tres",
+    "sha256": "c12aef4fb11b665a274989e45f0c9ddd4b36ba4485fc1f695e0d9a77d1366073"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_bomb_lobber.tres",
+    "sha256": "d4ab3c53f276133a4997fbcbf081f3ad61c32908e628f07b287bfb8fd9c82b43"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_burrow_hunter.tres",
+    "sha256": "e33e35ca05ba08c02cdc13c6bb04092fdfbd4903c5b085e7840ba5fac0663d24"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_charger.tres",
+    "sha256": "c8b947bc9f0e15be6654e1896a94054073b3c64e9ed4da8cd89e0a51ae775774"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_chaser.tres",
+    "sha256": "c1a83ae1ebb9dab817c705a9235406a6099573be00fed25d49c6f6df196f8950"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_combo_fighter.tres",
+    "sha256": "37227f0bc823432e2c45bb1a5e6cbc4604f1baf41b42e528aec9dde7f3b5b06f"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_exploder.tres",
+    "sha256": "bb17c5b0fa8f2a567c993f7803153a7caa9358d38491b9d37328fc347bf00757"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_fast_melee.tres",
+    "sha256": "cb3cb8ede3e4af8dfdd48154d920b865d996e73325d54d05231c3aefcd60ff2f"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_global.tres",
+    "sha256": "b16dec18cf19b04371e8bf7f2c7c43ad84cfed853fb3ee31977dd1ec69ecf92b"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_guard.tres",
+    "sha256": "76c3f43ae66075ecbbe5a4d0ea6827a1548d4d1a0065f17fa0b48de5fb2487d5"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_heavy_slammer.tres",
+    "sha256": "f53786f91f259a9ccf2158b26a5ebd3c682d94a78761a846827758c9a3a8604d"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_hover_diver.tres",
+    "sha256": "28cf5be7669c8622599eda6687b93cdabedeac0f540afe9d043cceaa882e4c59"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_jumping_melee.tres",
+    "sha256": "0b083fe7629cf1062678c98eb7eb5e08e55f138feff08d7a202d669f85c3c310"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_meteor_mage.tres",
+    "sha256": "d129399a75ca2fe1c3c2e4d40a3659c679e216ee265b5646112d8c78d49e99eb"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_ranged.tres",
+    "sha256": "73c2ab1011451ab37a8f8a130b379a6a8ba860c45d801ddc877c2fc7a49b95bd"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_scaredy_shroom.tres",
+    "sha256": "8cad59c88c9e1828786ecfed4ec06dab75649c2ec6e56146c3a28157f9c1e51d"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_screamer.tres",
+    "sha256": "980d57aade44ff03d362f09f9519d191b34cfc24ad6383eaf2daaa940dc1e98e"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_skill_elite.tres",
+    "sha256": "1029f7b37388949babdee71c5068aeb77c46149d582ef19fb1d171592a143a5d"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_spear_guard.tres",
+    "sha256": "f6072a52a123cc56722fa4bfccef2e44b6c4bc06a739f626e53a50d972c2da2e"
+  },
+  {
+    "path": "Config/Tables/Enemies/enemy_tracking_charger.tres",
+    "sha256": "4af2a41b26318d83af02185bbf7c90c4fd41536c67232c0c44254e6e2b4e9b3e"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_death_armor.tres",
+    "sha256": "7cac5cd807afb78360cc9e69b19a8362c5e44c2ca77212ba77a9a26163d92ec9"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_flying_wing.tres",
+    "sha256": "b66a9ef1b84132faa854b93729c088f30c8312ca8324589bdaf1f22681bd7823"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_giant.tres",
+    "sha256": "0b63a0af724b70cb9d4eca9263c597c562871ddf3f0385838ef0d59c89112bd3"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_lei_seal.tres",
+    "sha256": "399e4503f5bfd75323bc576ba4dd53a674cae856bd54b016fd6e15b5dc51ecbb"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_life_death.tres",
+    "sha256": "da6baa56ba24326007418dc910c9bb23770abf18a45a0420f34ae8778f54e1f7"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_march.tres",
+    "sha256": "375d60bd31cf2802a109c1140970fa33ae39977eefa4ad21174e175e1b95b18a"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_pixie.tres",
+    "sha256": "3f2795e3fd29390eb94fc19a699a83becdc0f648397b80e617bc0394e90bb658"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_sniper.tres",
+    "sha256": "e63eeb3296876b119c3660df929364ce7f3d84507a068e2559897a9fcf4944a6"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_strength_talisman.tres",
+    "sha256": "f65c4136a2943ead6dd624a679edd79511283a65d13cc582c76756cfcbda3b1f"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_war_seal.tres",
+    "sha256": "591e891ddcff9bd6bb16afbbbe584ab108aa003d2454f140fdf9a7cc4a7bb94a"
+  },
+  {
+    "path": "Config/Tables/Runes/rune_wind_seal.tres",
+    "sha256": "8ad4f9ad95cf264c7527997de15a3f8f71fec22de30f489b80aa223614ea4d1a"
+  },
+  {
+    "path": "Config/Tables/Skills/bhv_awakened.tres",
+    "sha256": "25733a4d5328d2b79915e433687de04896487ce5a797bb845d7becf0f104da28"
+  },
+  {
+    "path": "Config/Tables/Skills/bhv_charging.tres",
+    "sha256": "bb1855b1aa9e962732df0e97abe95c78e8ca36eb96a73d0f9735de1b6cdfa1ca"
+  },
+  {
+    "path": "Config/Tables/Skills/bhv_screaming.tres",
+    "sha256": "ebe90a34d2cedad411a3371e54753da9395095b46c265f6cd69fd6f08a6d17fb"
+  },
+  {
+    "path": "Config/Tables/Skills/bhv_summoner.tres",
+    "sha256": "e7b191492b86201369758304795e5d28eb6b19d7bf99761aa29d4e776d35be76"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_a1_passive.tres",
+    "sha256": "31b7c523b809bca292aad449a2e88047df1ca5dd3d27f7f5bd82f99289fb98fd"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_a1_skill_1.tres",
+    "sha256": "2ad3723557bd42408ef7276230c64cfef6aed1b0c1de7f972caf0d80c0d58b77"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_a1_skill_2.tres",
+    "sha256": "f1b64ba6e334c76a40587da23edde6e0b8fc04082cc89c5fe38995b8360ca6be"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_a1_w1_1.tres",
+    "sha256": "79d587d35f5f03ab7330e90fd8e965d65a3354657b22f89a31ec705df4026091"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_a1_w1_2.tres",
+    "sha256": "0f3842462eb813212211bf14a505d2c4c320d8be705bae52cac25fd2f2fef645"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_a2_w1_1.tres",
+    "sha256": "e07c6e4d1c896fdea21537e178adaef14365d1d2f372aff3188153fbbc3a2d23"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_a2_w1_2.tres",
+    "sha256": "9612e7d212b1e2788699b6392d4011126856eddcea48dc170dfe92823ff3c017"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_a3_w1_1.tres",
+    "sha256": "3a6677274f3ff6d351560f6fe3c10b2d7e3cd6b2521958b7942ade5214636365"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_a3_w1_2.tres",
+    "sha256": "4fac8eb84b8cc5800f47b76615ccd4c96bcf72dc2465ca07faf2e99b9b3199eb"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b1_w1_1.tres",
+    "sha256": "f5c5a71613465e78e228920cb8f5a459a7fc8706ae8899bb3605b4e537c8d2e1"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b1_w1_2.tres",
+    "sha256": "812bc8a30e26c57884b693bce51c84be046a1c4927b58c51fb6899ef74b279b4"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b1_w1_3.tres",
+    "sha256": "377097bfacffe8d9699b0de256c863107e2fc661353f993db9f613f35ecfec48"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b2_w1_1.tres",
+    "sha256": "8f673659fc0427d803b41ee131e4e78d3dd88aa2b90e940e5581ceffbfd5fc48"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b2_w1_2.tres",
+    "sha256": "4053d84ea4eb9150160f7b2a228e6ab750f83904c83342d7149acf5980044090"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b3_w1_1.tres",
+    "sha256": "c7f65b41198e6556228c7ff7c43a3687e596116a9a5614f635fa439ff1bfd87f"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b3_w1_2.tres",
+    "sha256": "f5e9238535fe65df7804a93e3b6e3f1de4ebdb600a37e001172a77bfb06dce7e"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b_fall.tres",
+    "sha256": "781bc499e4023c3315421f8b433aa8abb4e59b2c69c149f7a0d48eba37dfad00"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b_skill_1.tres",
+    "sha256": "386353fb6901fe75f878aad1231e76e3742633e251c95d75bd234435cea38d3d"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_b_skill_2.tres",
+    "sha256": "323ecd21d01226153516e381deeddc65f9017a80bd2884a03659a228e59b83d0"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_boss_charge.tres",
+    "sha256": "1744e7b4e17ff4ed62658f1be83d8340ba83bb6ba99fe4cf3df55c37616de78a"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_boss_melee.tres",
+    "sha256": "ca69088e5b4d3733d6abe830fb993cdb742e6a1d6d2e874d8a04688d08682b6f"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_boss_scream.tres",
+    "sha256": "fcc6beb85edd04f8ba4642df34a30f63cf2f44b3a19c423d58844f8bcebb0024"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_boss_summon.tres",
+    "sha256": "adf125d07fdb51e386520dfa0bdc5e1ec62a36ef73a94211bade4ca62fc5205c"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_drone_melee.tres",
+    "sha256": "6cdcfc4b931b5a1ccad92ff6ecb5a21363ad2b4d95086e369a46a9b60d0de950"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_charger_charge.tres",
+    "sha256": "bbb283eb811ef3cd2b36924d0c0887448649bd688d910d56e42706d26a50fdc9"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_chaser_melee.tres",
+    "sha256": "3d3d5102b99fa333edc620f60f0f772b9583a2972de557d4a5ce1d45a4dd7359"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_elite_buff.tres",
+    "sha256": "14260cb10bdaaaf7b422e7bf62479217dce80b120a3a3a453e6920e62536eff4"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_elite_control.tres",
+    "sha256": "5ffb1628e93244b13b6459a868529c9a9cb28b00e1ca3438912e47d302feb61c"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_elite_melee.tres",
+    "sha256": "836b70aef320c9b13deee8520d9fdf3632a18b4c6f0cacdf5f955fcae5ab3e3e"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_exploder_blow.tres",
+    "sha256": "b50b3132d9890cc08382212787791746da18cfb5dd246aa9de7b2be9da0b9b28"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_fast_melee_melee.tres",
+    "sha256": "93638d9ab4aca71938b465f4fe7a98b276d9d7a941900f1c22ab92afe479c57b"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_guard_melee.tres",
+    "sha256": "3055ddb357f7f7373a7ac75832c727260b2ba8c3903243ff4115e4df536e151b"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_jumping_leap.tres",
+    "sha256": "e09c7be8cacf36b26e80a69cc65c95c6fbf214a1944645c44d2bcd63ae53c64f"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_ranged_shot.tres",
+    "sha256": "04656045fc9090f5b3f552817965b6021c7280bac700d7e5ed17b05c32c37b1a"
+  },
+  {
+    "path": "Config/Tables/Skills/skl_enemy_screamer_scream.tres",
+    "sha256": "ec1ce665081c9adcebe089c4854045f250fb062b3482b5f704889f98379df82e"
+  },
+  {
+    "path": "Config/Tables/SkillSeries/ser_b1_combo.tres",
+    "sha256": "be57c4dee7e72f9094237875ed3e91f0ef5fc97f016d9763d7c7b3d332fd338b"
+  },
+  {
+    "path": "Config/Tables/SkillSeries/ser_b2_combo.tres",
+    "sha256": "71de1dd98de4accebfba87893fc95309ffdbf89ec524d8c943f09c068df30e7b"
+  },
+  {
+    "path": "Config/Tables/SkillSeries/ser_b3_combo.tres",
+    "sha256": "28e5f328f96021aac4cd6a1f9b0dd533fc08bc38def3c26fd86023d112f3adff"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_affection.tres",
+    "sha256": "a46a995542c21296c0640005972e46fb1fbac92823d5ec2462a60609b77b5103"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_blast_palm.tres",
+    "sha256": "0854c4a38299083967463bff31bdda0bb553aaf9c708835d222381e4bd1d98f2"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_bloodthirst.tres",
+    "sha256": "7011e215f4a36daa34f47921e4e8707e61723b5cb6c4ee9f5a7276dcb66dd6e7"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_dash_reset.tres",
+    "sha256": "6efb8994d829354b373443fe2edd410be4252171c7f906869d4b709bc5251567"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_divergence.tres",
+    "sha256": "cfca0edb3c6f40c9c9457367acef98c5cceb3b0e5a0570e8819fa39c9feb5ea7"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_divine_descent.tres",
+    "sha256": "ee9f26f89a3166deeceaf82c93c0276e530df5ac0b9ce2344d3c8b7964fbd6fa"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_dragon_arrow.tres",
+    "sha256": "111c5aee744f978eb8195898b86fb8b74c0c5926f0a110dde4457b7cb84ade0b"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_flow.tres",
+    "sha256": "19f39dbb5fc7d0d07f64c34970b55e0b6969b5530c3a8c6b3bc3995c536029eb"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_focus.tres",
+    "sha256": "e6850f4a6f6aeb6e400deda07b2c9e0d1202ee7f0d08ebe3a3a3e6cfd23ed149"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_golden_qi.tres",
+    "sha256": "f1a0f2c29d5abbc58523c1f85f372f3e62f756f5b9811ab64f67c7292a2a02ed"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_golden_road.tres",
+    "sha256": "2ac93397ebc66c0ba4645504072810bcc0fcb1115b778c8393f55abd3a3fc27d"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_great_draw.tres",
+    "sha256": "6362b4ec06a1a39a8191404070dbeb8241e812ab57d1376c0873cb2f6511aa90"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_ground_burst.tres",
+    "sha256": "038a201b85412905b60b1e22486e98dd6ba6e26a89005d1667168b6609157d34"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_light_leap.tres",
+    "sha256": "736532ec5aad7526c05a30e12c6bf5fa3da4745608d89b0ceb18cacdf9f8c9fb"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_mercy.tres",
+    "sha256": "dd0ab3ca46b44056e22674f06c8bfa018e998c3adfd9f2bb71ac74e5393da5d6"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_mindseye.tres",
+    "sha256": "3a818815d9db747f4e663ab28341a4f29160a72e7e0141625386be9776549d5a"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_parry_refresh.tres",
+    "sha256": "065123917bb7508b430fe5f3e406f1caaf7d2a4033ec44bcbdb7ab6db1d5d0e5"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_perfect_focus.tres",
+    "sha256": "8ac08970d1f8f884e08d8b6279717a4f4840f981af76108225e573f440c454fe"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_philander.tres",
+    "sha256": "d604c5ce5d12f198f9ea982576c4e96573a2fd31e6bb1b266600d082807e94b6"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_rainbow.tres",
+    "sha256": "7e760c6736450726d5d0bdc0a6629dfd071f908eb32c74b1da6b7f6122d2f9a0"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_salvation.tres",
+    "sha256": "b6e98a70e214443e90934b15a0bb13856a4a4880d3f311dd585634bc34179bbd"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_spare_dodge.tres",
+    "sha256": "6ac96751278ce7131101517e69a47150093d354cc1f6cf45c11f25db639939c7"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_stall_kill.tres",
+    "sha256": "577ba4862bcf1e76c0927bd154adbe7a21f0de9ddae01781a87fe18d76953b28"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_thunder_heart.tres",
+    "sha256": "7f8981457c4d1818c73282ab20b2c9c3e085d2708f8956f1fff0388d382c67ee"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_thunder_pool.tres",
+    "sha256": "828b05943e50a76c0ae794fd7bb70add0d3358ec23b875dd0608251e9e630678"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_thunder_recall.tres",
+    "sha256": "579f27e72231fc1611e3906af75546da456a41d2ad2e682199cbe000028676c4"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_variation.tres",
+    "sha256": "b4eaae90c87a45975bd6cddf8468d10473dc5ac85cdea1fef6169847f8ce8b31"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_war_afterimage.tres",
+    "sha256": "2c785275db678c2d7de52438843f90de02ff3d887212ccb83d8a6b63965efde8"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_war_spear.tres",
+    "sha256": "fc5166d8ce6c81713f6b0f8735792a7d813877494b2bc04614380365f54092cb"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_wind_domain.tres",
+    "sha256": "58d656f6561193839e7d4c14ef4d1204f0ca99b58073522d2a594c58cd92073e"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_wind_field.tres",
+    "sha256": "26a1de316ef4301f40b0ebaa50361c3d10bfed68cf714e1ac592a2c891b459e8"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_wind_sword.tres",
+    "sha256": "8fef1bbfcdc5fa8b6c9fe4e08db19a827ebd8013e8d891a4d2b02db3752685e4"
+  },
+  {
+    "path": "Config/Tables/Upgrades/evo_wind_trail.tres",
+    "sha256": "8f5e872ab403d457a159834e69e502f8cd5c0cdba704552637673a03a9da3edf"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_blood_armor.tres",
+    "sha256": "61e14ada86d3f260790b6ba48fbe408b64a68ff25898c60d669f2133efe76f7a"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_blood_battle.tres",
+    "sha256": "b69b6db7f973178f002efba8b5ebd3aa70077d3111c376b40a741067e58daa3f"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_burn.tres",
+    "sha256": "a3d275b225188c86f87b44e6f077b171a98894fce39ede6561e4d69d534c6677"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_burn_plus.tres",
+    "sha256": "365ca2fab8bb7ad4ffc611e2c3c705c8c879ee39a130aabcbaac28fa1340fada"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_cleave.tres",
+    "sha256": "baba5717a33d911b641b075729cf60d4ca3405cd99c3eda84b65eea13177ce29"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_cleave_plus.tres",
+    "sha256": "b47c79870afc1a0399dd790d2f923b026230bd91b80c6cd9abe088a033ca37c7"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_cleave_plus2.tres",
+    "sha256": "b7c74136bb75a06432461de18554a30cf81be377c5d963eaf45dc8e61dced2f3"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_death_duel.tres",
+    "sha256": "2db9ec2a1848fc9be4940bc34945fbf8136a2b4ff780992ae7f88bd473440281"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_energy_shield.tres",
+    "sha256": "7b943a744b8820de7eed9d643814190dbe269bfd931bf67bcfdf098be67300d9"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_freeze.tres",
+    "sha256": "b115d234b9c594f7b3ec3953b46617b574be324ad09144756569248a8671bedb"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_freeze_plus.tres",
+    "sha256": "448552a3ce549b4dede416f5245d2e02c402501ac19c995c38fa583f196636c5"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_growth.tres",
+    "sha256": "b2e44279b235a9bc2f1925cd99b9e6a6f62b077a43777ba43bc5d5cd1dfd161c"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_growth_plus.tres",
+    "sha256": "c676d07f3d9d598be31c0fa5d4bcaa5545a65bb64dee05ec1d162a9d596dec2d"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_growth_plus2.tres",
+    "sha256": "8775caf2be9a4aae4542e660cf58b8e4ad22d19a50622edf8137cd68b03d1bd5"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_guard.tres",
+    "sha256": "46912d41741e54132faeee11090f6fcd1a17850572664e051a559d641615b9c3"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_happy_runner.tres",
+    "sha256": "b7cfeb38d3095461074189ce90956e58685df43232e3524062a564ea9eac5fde"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_haste.tres",
+    "sha256": "a422d74a633551b3a946a68cde0f1a31e5f5332469e1246c00ad9c6f8821a0d5"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_haste_plus.tres",
+    "sha256": "2a649c49601403123e8529ac8c46bba19828066e66769d8010c3d90d17ff66bc"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_haste_plus2.tres",
+    "sha256": "2b6ecc032e7bd8ce19189fd4d527e6f05654a3ee85388b7a7d18754da302b7bd"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_lunge.tres",
+    "sha256": "baa0110f70b67775d833b7a022dc17cdfdeab93d0ce93e7e3b9bfa682e606e4a"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_lunge_plus.tres",
+    "sha256": "c87e1f2af25b4db349fe6dcb29ad98f7f0ad396caf829db8dc1b1be2908458ce"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_lunge_plus2.tres",
+    "sha256": "36e8b67c6f5cdae89a104614adca3af65d51ad0c8a21a3d3af9a2312fd0438ff"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_pierce.tres",
+    "sha256": "476689ab539d58b34a92324523696856c0cf7d21cfe4ab88aefb09c3f9f185f6"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_pierce_plus.tres",
+    "sha256": "33b6c8df62cb2056655147a8ff3897888e0a1b1b2ea904d965b5fe653d9426d7"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_pierce_plus2.tres",
+    "sha256": "abe4ca85575751531e3132560428b0d789f879850f444bb80593d2786d96e9a9"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_ricochet.tres",
+    "sha256": "d2a3269da019271d5c831c162ef73128df6ec66bb56afc2eaabf426f0f266bb5"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_ricochet_plus.tres",
+    "sha256": "bd6bc8593264642c8e625d38f42caadd48c9d90128e7ceb5c2d889e837982ca0"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_ricochet_plus2.tres",
+    "sha256": "40b082933436f1621a7b3b201cd47dd33b7b0b44d527813f044d04bb4ec4e75b"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_soul_harvest.tres",
+    "sha256": "10614c234e1c9c23e6a431a556739b40df151fb221dadf4b932f6e9843c83469"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_stomp.tres",
+    "sha256": "e2875137cdb1e529f2642b09d26df7948d0b3f8f04748db74828ce28c4d2c60a"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_stomp_kill.tres",
+    "sha256": "d73c76f33d29e0c2a60ded7c2896259d4bab416eacaa62db619feb76dc8f29fe"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_thunder_armor.tres",
+    "sha256": "4590e9f8d66a248cc44c0168db9027cfff963e95895862f720e645c93495035f"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_thunder_mark.tres",
+    "sha256": "b19d30b40e56feca159a5ac8e18a158f145cd9c94c7ad1cb2922b1d1b09067c2"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_wind_armor.tres",
+    "sha256": "30ece57dfc4cb0fa9d72f92759f5907fbdcf6b216e4583af2781fcf221adc48c"
+  },
+  {
+    "path": "Config/Tables/Upgrades/mut_wind_heart.tres",
+    "sha256": "0279f572655c07c72a6d31bacaa0fa0f861b4cdc755f4d0ed4afb012b6dec836"
+  },
+  {
+    "path": "Config/Tables/Upgrades/reward_1337.tres",
+    "sha256": "f9c336d72249c9f06c4eb55f2293d233a173bb5e528bd46f23436b9c29a3763c"
+  },
+  {
+    "path": "Config/Tables/Upgrades/reward_1338.tres",
+    "sha256": "04199852205992378f59fef7da9fa74c30b17640853103efa619b45b2f281b07"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_anchor_afterglow.tres",
+    "sha256": "514ffb6dbceb735a451b543dd28945df9d125a1715837cdaf62d59a049e6936e"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_anchor_core.tres",
+    "sha256": "28e554875d57a52f1abb10ee26d8f897c8ce96bd5f57fcb9cd7b17c7bc5da49f"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_anchor_pulse.tres",
+    "sha256": "4fcf4bbd3972beee2a3887b0c316bfbace09eb05490dc851a5659a8c6605a853"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_contract_payoff.tres",
+    "sha256": "f04eae649ed65365674e66dd304279aadf2f32e2615bf5f4a99f9d62ebe782ee"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_echo_familiar.tres",
+    "sha256": "0b9a3cbe2d952ab3968fd0a0ec87b25888ce590216d6e1752f13963d8d36aa75"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_echo_lance.tres",
+    "sha256": "f0fd3367ecebfcb05962ca0856a356547103c3aa4fb2e3e4035bf9c95f58d1af"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_echo_mark.tres",
+    "sha256": "4a78f7870af4b057653bdc81e48d77a389a7f47106c969434d289d7c4d74ff1b"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_energy_echo.tres",
+    "sha256": "0dc3aa407f909b26ca46896b08594d0493125003a5ad6e8e7d84db9675bda44b"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_risk_contract.tres",
+    "sha256": "b9f74aebe2a7b5767bbc2a862684be45ab16877590ba94f5faa13734eca506d7"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_scavenger_compass.tres",
+    "sha256": "0d702a1e53a8132c8075d2cfd531941f43cf9e9ca15a690fef7d39395c270361"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_scavenger_ward.tres",
+    "sha256": "c2a98ad4164641c2682a92a0d86e7c534e9e05c57e97cd20eff5d1cf928c99c7"
+  },
+  {
+    "path": "Config/Tables/Upgrades/surv_timed_hunt.tres",
+    "sha256": "b5fce61eec746e0076ca4b7421a5d8b487944b7b074b775081dd5583c35f530d"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_armor.tres",
+    "sha256": "77306298cd05a65bd8ae6498b25972d5fac9c98db60b85322cc74cc40ae1916f"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_climb.tres",
+    "sha256": "80aa9f29272a10de8bab96b8397a2d44ee7e7a51e8ffdfaf31ce3bf4cfc59ea4"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_crit.tres",
+    "sha256": "992c08c38f9bd45c24741e3f8a6ee161631e2860ff36d3bd05e2e46f933fdcc0"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_crit_plus.tres",
+    "sha256": "3a3ec204cf7339c9e88bbcbd236b9eae03953c734cba5e5e52a16c9bec077250"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_crit_plus2.tres",
+    "sha256": "124b9ca8c2fc38dd15abd1722502009cf986a9a5a899acfabe4dea4c7cd5be3e"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_critdmg.tres",
+    "sha256": "2bcfe04152f7ad42eeb5175c9bd8014f17628e6a043958cd7eb7de1575dc951b"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_critdmg_plus.tres",
+    "sha256": "b31f64686f45df718693da6513ce118fd00ba9404199fdab51c879fdf2ba0aa8"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_critdmg_plus2.tres",
+    "sha256": "7006e00f6294fcb2fb2c67efc0965f2e8ed06e85e85d1df8dfe33612ba108f35"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_hard.tres",
+    "sha256": "8ecdc5b884289c8e170c5777cbb14346aa49877f547623d51a0d4bbac9c44809"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_hard_plus.tres",
+    "sha256": "2683fff69e712ef01a2daff69afd512b3a9c41f87c8091ca75af733ba4740954"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_hard_plus2.tres",
+    "sha256": "d115a203595631b77eea3c850f840d47dade2b83ceb4f168eab33bb6782a5301"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_insight.tres",
+    "sha256": "b7f40933583c91fcf33c8912241c6d6d6c1fc78a2a82756d0e68ac2c2531055d"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_life.tres",
+    "sha256": "2f05b2299ab1f59fb5da0f081e250423511b0961ca5f83da943ad63f340b8188"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_life_plus.tres",
+    "sha256": "e0a10171616a584b541c65e84993b70757014ffe2a5e3a0575c0a9b3a0b78594"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_life_plus2.tres",
+    "sha256": "9988d34a41e299b0cdd73db0d2701c7a536288569d1c1990dc0255dba64141ff"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_power.tres",
+    "sha256": "feea4fe2fe49c62f3dfc5172c1aa1ee406d9692eebed3c913b4a97f1c9aaaba9"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_storm.tres",
+    "sha256": "5ceceb7bafb3c2d55d8918716f46ddf3e2548b9fd55f5ae4064e72ccc11eafc8"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_swift.tres",
+    "sha256": "4846f7036cf22de6f2bf62cf6cc5247ef1f4800857326ce943c7fd93a5773351"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_thunder_blast.tres",
+    "sha256": "b09d77aba28a4afbb8e0b64828f11e37ab82430b47821dd573a7984c5d8a127a"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_thunder_mastery.tres",
+    "sha256": "debc4a5fcac506b7694fea432193af0b560610948654de073a1947b179f854ef"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_violence.tres",
+    "sha256": "801a38d653c3632460f7066fb005d91f81ad2dcd43bc2da02f921c3ab7391f35"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_war_heart.tres",
+    "sha256": "c9bc720e8c7aaf30f4d1e1d06329b09827e8601223d14ebcdbae7e19cd1fa523"
+  },
+  {
+    "path": "Config/Tables/Upgrades/upg_wild_wind.tres",
+    "sha256": "60fbd74208b12ba884e141874305b59c7065b76eb73349f35fe174cad3a92b5f"
+  },
+  {
+    "path": "Config/Tables/Weapons/wpn_bow.tres",
+    "sha256": "e453ff5ab88189dc4da48a6bd66e869780bb26220a0cc2840fc86ede34ee986e"
+  },
+  {
+    "path": "Config/Tables/Weapons/wpn_crossbow.tres",
+    "sha256": "d1745df0d40c0c7b86f5b560bd3cea419f5454484cf91322df2e5263de883d1a"
+  },
+  {
+    "path": "Config/Tables/Weapons/wpn_energy_palm.tres",
+    "sha256": "16a612c527b8044961b20a077ac05a5e3d8a1a6767ea6c6b1551c38481aa7771"
+  },
+  {
+    "path": "Config/Tables/Weapons/wpn_scythe.tres",
+    "sha256": "57fdc2ba596c7e09e3d0b5b07199ef61ab6be2f9dd7b684194be8a7acc85bde3"
+  },
+  {
+    "path": "Config/Tables/Weapons/wpn_spear.tres",
+    "sha256": "e6a8dee73a592aad29c7e9b2cb3b902a5dc9bdda0a96d881983f39c52cb0bd3d"
+  },
+  {
+    "path": "Config/Tables/Weapons/wpn_spirit_sword.tres",
+    "sha256": "97078c29f303194a55fd7a2a8328efed20122551367141e6492825fe6a6183f5"
+  },
+  {
+    "path": "Scenes/Combat/MeleeStrike.tscn",
+    "sha256": "9b2b8380ea868820f1da3b0d06d8c332b4ad05b314940c6726d3b292b1dd99fa"
+  },
+  {
+    "path": "Scenes/Enemies/_AnimShowcase.tscn",
+    "sha256": "2faa5bc1ae06c6cb601f0947d7eb396f5f4626be97fc33087a19dee3533e5a25"
+  },
+  {
+    "path": "Scenes/Enemies/_ArtShowcase.tscn",
+    "sha256": "6cd86895dcfd6bacba9fcc69f00052d22bc493280bb6196e5f117ac985e00d19"
+  },
+  {
+    "path": "Scenes/Enemies/ArcBomber.tscn",
+    "sha256": "bf3d6bbccffe17d6ee346f157555697c6c593a09340aa995a0a76b27e4dafdfc"
+  },
+  {
+    "path": "Scenes/Enemies/ArcThrower.tscn",
+    "sha256": "8d79d392f58727b9d16d0f5205bd81d6ec7d2b624a542fad8560d59566525912"
+  },
+  {
+    "path": "Scenes/Enemies/BladeSpinner.tscn",
+    "sha256": "255c355d236593a1a610df0c272425f19754f86b785c2c4b921d87741fdc4124"
+  },
+  {
+    "path": "Scenes/Enemies/BombLobber.tscn",
+    "sha256": "6f9c1967e2dc13d4550e6a74622626aa27419fe58ad79a5c244a96f7eb0ac0a1"
+  },
+  {
+    "path": "Scenes/Enemies/Boss.tscn",
+    "sha256": "be79cbcf087cab8b20fd7f3f8927fb561d82d51706bf54e806ad210068e437cf"
+  },
+  {
+    "path": "Scenes/Enemies/BurrowHunter.tscn",
+    "sha256": "2a7a461a0a63ee212466bfb00c67aa28ede7ff32261ec7ae471823f6162da254"
+  },
+  {
+    "path": "Scenes/Enemies/Charger.tscn",
+    "sha256": "b8d49e51a18244c1652ce84d50c24fa7e9db6aa40a77b8f333f192b0bc355746"
+  },
+  {
+    "path": "Scenes/Enemies/Chaser.tscn",
+    "sha256": "ffd1bfa02b74961eb90a60497b9aa72ca5d296a4be997de671a209db24cfce20"
+  },
+  {
+    "path": "Scenes/Enemies/ComboFighter.tscn",
+    "sha256": "6606feef2802a0a1959faef37b8f0ea2d178be1bd731148f61ce3d97ed038e4b"
+  },
+  {
+    "path": "Scenes/Enemies/Exploder.tscn",
+    "sha256": "32c761f5502347fda49970f0081f6f27aa489838c78b9eb1b8b5d0fdbdb6f9aa"
+  },
+  {
+    "path": "Scenes/Enemies/FastMelee.tscn",
+    "sha256": "a6ac6c20ac5182d1984bf2e4d2a90f237cbeeeb11cd6b19eddd0bc89083ee9cc"
+  },
+  {
+    "path": "Scenes/Enemies/Guard.tscn",
+    "sha256": "f83d9c1596098e773da3a58b69cff9657b649cefb0969c032482e69cf632bc5f"
+  },
+  {
+    "path": "Scenes/Enemies/HeavySlammer.tscn",
+    "sha256": "9a07c15766d8cd37eb666cc4d1358367a5b0f162ed959e5d5d3393503fc47a98"
+  },
+  {
+    "path": "Scenes/Enemies/HoverDiver.tscn",
+    "sha256": "550c0e7da5805ee4ab69fa78751ca8111907083271c3e6e53b99a58463545a37"
+  },
+  {
+    "path": "Scenes/Enemies/JumpingMelee.tscn",
+    "sha256": "0e9d71f0fb17b8921466f606a63f4f3a450ca73f043bc9a6d49019cddfe123c1"
+  },
+  {
+    "path": "Scenes/Enemies/MeteorMage.tscn",
+    "sha256": "51a839931710eaecb7a73ee1d20555eb4708d2d8c4615828611529d258aa58db"
+  },
+  {
+    "path": "Scenes/Enemies/RangedEnemy.tscn",
+    "sha256": "ef3a9f775ed8cb5761ca1a0f082161effef86b54d82ac21e34b5012a0189de06"
+  },
+  {
+    "path": "Scenes/Enemies/ScaredyShroom.tscn",
+    "sha256": "8ef902873074b38305b8c6df01baf29bc8a29b6f8f698909fc3b0bd2a07d5a03"
+  },
+  {
+    "path": "Scenes/Enemies/Screamer.tscn",
+    "sha256": "22ec35e506419e435b82982b028003da252fd323d31e1f9f7db1a8c84eaaac9c"
+  },
+  {
+    "path": "Scenes/Enemies/SkillElite.tscn",
+    "sha256": "0cc699c71b623de54c16d1a46302886f3771be77541d47c43ba1802a04329f85"
+  },
+  {
+    "path": "Scenes/Enemies/SpearGuard.tscn",
+    "sha256": "1731f1f5d32774e78ae4c69da334eabdf2839931a9028caea4894e717df49178"
+  },
+  {
+    "path": "Scenes/Enemies/TrackingCharger.tscn",
+    "sha256": "bfa2f21e232b030dc729979642d0261afb640982040eaa613df9275b75d932d3"
+  },
+  {
+    "path": "Scenes/Player/Player.tscn",
+    "sha256": "ae2027a1ab9a1f9e98c07eb4eb15d32047c1620754ddad7aac31f8b9859d41b9"
+  },
+  {
+    "path": "Scripts/Abilities/Ability.cs",
+    "sha256": "843e0e948869a7b4b48c7cb4fe87c681e8466e66495c40ad4f3843fb87d2212c"
+  },
+  {
+    "path": "Scripts/Abilities/Ability.RewardParameters.cs",
+    "sha256": "326b529a31f4f702e9f76461d98d6274ca030ab183299a5e5f32d4d15db24e22"
+  },
+  {
+    "path": "Scripts/Abilities/AbilitySlots.cs",
+    "sha256": "f226a0d4f7317020143d2aeea4abf4107fb8e10cfe81e6aac305c21efe28490b"
+  },
+  {
+    "path": "Scripts/Abilities/AirJumpPassiveAbility.cs",
+    "sha256": "5c9c4df47043b072790d27dc2f8c1210bf1404751268fb80cceab56040708c69"
+  },
+  {
+    "path": "Scripts/Abilities/AreaAttackAbility.cs",
+    "sha256": "6288fa707fde284f48e542ff6c2a83a663f18c3f25fc1dcd9ea0534eff9a6a4a"
+  },
+  {
+    "path": "Scripts/Abilities/ArrowVolleyAbility.cs",
+    "sha256": "56051cdeb648f69ff25906d992b81e7ced7255b7a2de1885a5cf5e5ea7d3267d"
+  },
+  {
+    "path": "Scripts/Abilities/ArrowVolleyAbility.HeldFire.cs",
+    "sha256": "c418044060898535bc328c05b38174d0dc1bee362aeeba069ccbb73c8325f00d"
+  },
+  {
+    "path": "Scripts/Abilities/ArrowVolleyAbility.RewardParameters.cs",
+    "sha256": "dfd30d51e8fc9d5c22a1136651408fac55d26e76253f622cc3dca4db4ca6df43"
+  },
+  {
+    "path": "Scripts/Abilities/BackdashAbility.cs",
+    "sha256": "b63824fde886a0ee57d0f262c8f8bd6a661a9fd1b0b9f5d1d7cbe7ec75ba6b2d"
+  },
+  {
+    "path": "Scripts/Abilities/BlinkDashAbility.cs",
+    "sha256": "c3d0ec0c37e0dd03b701cf178a511a042fcdefa7afacb0e3510d42a27e5d09b9"
+  },
+  {
+    "path": "Scripts/Abilities/BuffAlliesAbility.cs",
+    "sha256": "ee6d421d3f6ea48b67d0fa276ec8da65759f230f930e5f0373543e9fd444e18e"
+  },
+  {
+    "path": "Scripts/Abilities/ChargeAttackAbility.cs",
+    "sha256": "3407d61d6037b61c17b0e036060906cde6c6a4f93e35401e8858d92279135c03"
+  },
+  {
+    "path": "Scripts/Abilities/EnemyActions/EnemyActionExecution.cs",
+    "sha256": "80f1e47abba90be55eebbfd53a8ccef4ec679aaac03c7f1527e5ead05e8a9cbd"
+  },
+  {
+    "path": "Scripts/Abilities/EnemyActions/EnemyActionState.cs",
+    "sha256": "4f942e78ddf3c4ac9d6609dd9c0a8d81cb2ccec44423e4b35e031b4805867715"
+  },
+  {
+    "path": "Scripts/Abilities/EnemyActions/EnemyDiveExecution.cs",
+    "sha256": "d6cf0b9f980410426c350e215e8e80da339f6f60bb42520e6e91dd53e5cc2e2d"
+  },
+  {
+    "path": "Scripts/Abilities/EnemyActions/EnemyHitboxExecution.cs",
+    "sha256": "34b6cd44dfa077af7a42d43863f54b0e7da46b716bd5472f0eced2edff711618"
+  },
+  {
+    "path": "Scripts/Abilities/EnemyActions/EnemyMovementExecution.cs",
+    "sha256": "b1db0ce4a003467e13613ce3b2f1d5e6c535a458544e1efbf5033396984eda87"
+  },
+  {
+    "path": "Scripts/Abilities/EnemyActions/EnemyProjectileExecution.cs",
+    "sha256": "a1ff9d7d479c3982b37ffa82191bdd37475f2a82400d1db84d05cc66aad7fef4"
+  },
+  {
+    "path": "Scripts/Abilities/EnemyPlanAbility.cs",
+    "sha256": "645f1f5b2c3dff785ef94d8102fa84fba99ebcfca39fb6574fa68cca29d31826"
+  },
+  {
+    "path": "Scripts/Abilities/EnemyPlanAbility.Warning.cs",
+    "sha256": "01abdf4ee2b129f35738329ddad95dc5994320c39083471d100853e7f463935c"
+  },
+  {
+    "path": "Scripts/Abilities/EnergyWaveAbility.cs",
+    "sha256": "667cfcb660a0ed65f61f2f7cf2f67c97f9a79e68ad485d81a2c213089d45cc34"
+  },
+  {
+    "path": "Scripts/Abilities/FallAttackAbility.cs",
+    "sha256": "db1db4bec8b42db37f2a1bc5ffe40940209bbd2cc653cc066b5cacd2279cc4ef"
+  },
+  {
+    "path": "Scripts/Abilities/FallAttackAbility.Preview.cs",
+    "sha256": "dc09159df1c2d414b9d217f03a132579d4bafeef42397f8dfc2112804c51a96a"
+  },
+  {
+    "path": "Scripts/Abilities/FallAttackAbility.RewardParameters.cs",
+    "sha256": "c1c0b82b6b3b8bcf9c686223b73d36cbe493a86e582e2c138e7676f873d0b71d"
+  },
+  {
+    "path": "Scripts/Abilities/GuardStanceAbility.cs",
+    "sha256": "8b91ab81f8bb5da4af3942213bfcce57329eceecceaed6101f92403ae7fb0075"
+  },
+  {
+    "path": "Scripts/Abilities/HawkEyeAbility.cs",
+    "sha256": "070e0ed1b0b960cd11ba8ce6ccce3b90e7a8f654602489af61cdd2ae48033481"
+  },
+  {
+    "path": "Scripts/Abilities/IAbilityConfigConsumer.cs",
+    "sha256": "ec9d8366fb25a8f443b89cbc6391fe78bd7b94a5f030de0f8928a02ddc8f31c1"
+  },
+  {
+    "path": "Scripts/Abilities/ILocomotionCancelable.cs",
+    "sha256": "77f69461642a524d0508dd055569ff9863f5f8d2063612ff4995803092cf4068"
+  },
+  {
+    "path": "Scripts/Abilities/LandingBurstAbility.cs",
+    "sha256": "b9f04c1090e2318a177eabdd20628ddc672981152860af99513c38c907f1d33e"
+  },
+  {
+    "path": "Scripts/Abilities/LandingBurstAbility.RewardParameters.cs",
+    "sha256": "43bc9717d3ebbd026ac47f3cc63f51ad7d1005c5e6c99ce2b261070fe5aa025b"
+  },
+  {
+    "path": "Scripts/Abilities/LeapAbility.cs",
+    "sha256": "433ecfee8903f7cca01ea34f05f20e5d2d4ff5ca1fa02ecf15b7966401e147d3"
+  },
+  {
+    "path": "Scripts/Abilities/LeapAttackAbility.cs",
+    "sha256": "4b12d78dd13682450844b325de264c597476589cdf617d79ea59efb9eb7be35c"
+  },
+  {
+    "path": "Scripts/Abilities/MeleeAttackAbility.cs",
+    "sha256": "e66e881f46abef69046967cfca9be9b82379daa3021c6f7f9665d5c8383c5c6b"
+  },
+  {
+    "path": "Scripts/Abilities/MeleeComboAbility.cs",
+    "sha256": "54c49e8641851e612d301d1b542bf920b18a20e84be4b522f1cbd572d9c8237d"
+  },
+  {
+    "path": "Scripts/Abilities/MeleeComboAbility.RewardParameters.cs",
+    "sha256": "a89bcf5f0bdaa4a0044c74c907aba83c36df9936b962888951ead6b83c5f8a47"
+  },
+  {
+    "path": "Scripts/Abilities/ProjectileAttackAbility.cs",
+    "sha256": "18d1944bc5a254ee665b568b0b7afbe2804730ce8eb2a77fa02bb18128884677"
+  },
+  {
+    "path": "Scripts/Abilities/ScytheThrowAbility.cs",
+    "sha256": "3c64f72e09e13b8ce1827cd4cde2f8a2fb89a6047208b309df0ca46818c04f9a"
+  },
+  {
+    "path": "Scripts/Abilities/ScytheThrowAbility.RewardParameters.cs",
+    "sha256": "2b03f87a5e58324ac708fe589bf10898093594116c22f767fbf7d6401f4c70af"
+  },
+  {
+    "path": "Scripts/Abilities/SpearThrowAbility.cs",
+    "sha256": "a12c1067b3973ec3ed400c25be2ea2ed88c3b0d4b31f3cefa0c926d39027e202"
+  },
+  {
+    "path": "Scripts/Abilities/SpearThrowAbility.Lance.cs",
+    "sha256": "a3073852e36ea13d7d5ded4a095aa98aa7e8d8d0eb0762d70c9013a7b3d682dd"
+  },
+  {
+    "path": "Scripts/Abilities/SpearThrowAbility.RewardParameters.cs",
+    "sha256": "ce01ee8fc003f7df7b3acc0a23e4681482e7347573a4c2643c1d88530e969d65"
+  },
+  {
+    "path": "Scripts/Abilities/SpiritSwordsAbility.cs",
+    "sha256": "07260f69da3c13892aa6f03c4d6a965efd381a1d55cc7034275b2296ade16782"
+  },
+  {
+    "path": "Scripts/Abilities/SpiritSwordsAbility.RewardParameters.cs",
+    "sha256": "dbad4669bd00e31a6a56fb57d35e8ab06640e4b05b6ae1eb25b0de2ef78ee19f"
+  },
+  {
+    "path": "Scripts/Abilities/SummonAbility.cs",
+    "sha256": "41b266431908f59314dec53673e20c6e57e257823167950cd0a2aa64a0dc3f18"
+  },
+  {
+    "path": "Scripts/Abilities/SwordQiAbility.cs",
+    "sha256": "fada9b06271aad61f05530158faffab0014bd412f5e9bb44c7607b36f238162a"
+  },
+  {
+    "path": "Scripts/Abilities/SwordQiAbility.RewardParameters.cs",
+    "sha256": "5a4c920228a3652da491917367117a4354e8f679dc07f4cf04091374139d6573"
+  },
+  {
+    "path": "Scripts/Abilities/WeaponThrowAbility.cs",
+    "sha256": "d4256197ae074e48c52eedd4c1bdb0d493f36e1adbc32ebc8051fa2c73ed1630"
+  },
+  {
+    "path": "Scripts/AbilityCards/AbilityAudioIds.cs",
+    "sha256": "f7dd85af57d4e251cba0828639c48d44f40f8bb033eea7ef8174bafc4332e252"
+  },
+  {
+    "path": "Scripts/AbilityCards/AbilityEffects.cs",
+    "sha256": "e4705436e95f47c95c1e64e9894c8342b0de4c849eebc00446737ad57846353c"
+  },
+  {
+    "path": "Scripts/AbilityCards/AbilityStore.cs",
+    "sha256": "d4f4aaa851dad3f4c42a64307290b834795249fe0fdba3f367777ba18364bfc4"
+  },
+  {
+    "path": "Scripts/AI/Behavior.cs",
+    "sha256": "c58a1b35bb5b8fa2ad59c00b2381ace9d8345e661526fd413edfcfc99d4b55a3"
+  },
+  {
+    "path": "Scripts/AI/Behaviors/ChaseBehavior.cs",
+    "sha256": "ca22953e4f0d57cc654a06a9ee3496206e35198ed855997d99fa3a87f376ddab"
+  },
+  {
+    "path": "Scripts/AI/Behaviors/KeepDistanceBehavior.cs",
+    "sha256": "f10d0fbda0317d5e677c5ce19100d7f56d3e971d6f63239e2c42fe7cbd0e0180"
+  },
+  {
+    "path": "Scripts/AI/Behaviors/MeleeAttackBehavior.cs",
+    "sha256": "62780fac679830ad57b5a58ec569fbf398ff561818a344eaa74a80f68c9bdd97"
+  },
+  {
+    "path": "Scripts/AI/Behaviors/RangedAttackBehavior.cs",
+    "sha256": "fee134862c997ddedae8dc259961eb8917a13aeba1ced8018ed726c392eb5f88"
+  },
+  {
+    "path": "Scripts/AI/Behaviors/RepositionBehavior.cs",
+    "sha256": "524c41b77fab0d9d9b2fe7697c26f7c61e93512f4683a0eb848280568456dd9f"
+  },
+  {
+    "path": "Scripts/AI/Behaviors/RetreatBehavior.cs",
+    "sha256": "515bcdedf4fb4d6cd3bb4cbe8ca71574e89a6006376b61105448264993f3df50"
+  },
+  {
+    "path": "Scripts/AI/Behaviors/UseAbilityBehavior.cs",
+    "sha256": "773db3a67c99747ba630574218b2b91224abbc477d040df531b44671e3b7e2c2"
+  },
+  {
+    "path": "Scripts/AI/EnemyBrain.cs",
+    "sha256": "cf9ff3486ba32768e9449fc9b2199ddb5ba1cc9e2215c0920e9cb16aa4df40b4"
+  },
+  {
+    "path": "Scripts/AI/UnitNavigation.Avoidance.cs",
+    "sha256": "b6ac86d9f955f420622503a791743786447521466406e8f318130caf2e9cbffb"
+  },
+  {
+    "path": "Scripts/AI/UnitNavigation.cs",
+    "sha256": "9b32a329217d4c264b30347bfdb62807e6e3bc3d716685d52bd7f18b14c2eb3e"
+  },
+  {
+    "path": "Scripts/Audio/AudioIds.cs",
+    "sha256": "0635c3119414b221bbd7c2e40c4201a08ca3993332213cebe50d62ae88982f87"
+  },
+  {
+    "path": "Scripts/Audio/AudioManager.cs",
+    "sha256": "7e7b54b1cb32c46b10085e1b8be62f22ca9bd66fe0a502accd5ab870d6a17698"
+  },
+  {
+    "path": "Scripts/Audio/MusicDirector.cs",
+    "sha256": "67b62c2f64b20b73a5ab68f3229f4a43e06e02a00dce9937fa0fa91bf6b97aa8"
+  },
+  {
+    "path": "Scripts/Boss/BossPerk.cs",
+    "sha256": "d99b6b8e37e3f6874ab8d563d634a978a25118c4219a505dad0293d6f24522c9"
+  },
+  {
+    "path": "Scripts/Boss/BossPerkProbe.cs",
+    "sha256": "b5769ad67038eb2e83105bd64e78e419701ffcc7b587ec70787adbfe03687978"
+  },
+  {
+    "path": "Scripts/Boss/BossPhaseController.cs",
+    "sha256": "6982dc5198166b0c09d914ab5ae583e07fd2992c53a4fe5c0c20b93051831ebc"
+  },
+  {
+    "path": "Scripts/Boss/BossPressure.cs",
+    "sha256": "4834075baeb3f24de17c04db901cb69896b4686bcd6c61abf6e7504e274547ac"
+  },
+  {
+    "path": "Scripts/Boss/PerkQualifier.cs",
+    "sha256": "c62618a9272c98179f78a3f7573df8db8460f97c09b1692902d9c290b4aa4a92"
+  },
+  {
+    "path": "Scripts/Camera/CameraRig.cs",
+    "sha256": "25bfae9128547d455d6438284dc0f5bc32c7e9773f0e47aed4dc151e7f4938d6"
+  },
+  {
+    "path": "Scripts/Combat/AfterimageTrail.cs",
+    "sha256": "f737f0b20308e478ead7199271df4b53389a05ee242a609962b3fb233cda7586"
+  },
+  {
+    "path": "Scripts/Combat/AimUtil.cs",
+    "sha256": "c66a81f464fea96ffe003274f1eaf03f11b07720feb649bd42b0e56fd8e60ddc"
+  },
+  {
+    "path": "Scripts/Combat/AirHoverController.cs",
+    "sha256": "c36f9c7a2795748dd34fbab219809c8a5144195bd34bfe26db592928b87124de"
+  },
+  {
+    "path": "Scripts/Combat/AttackHitbox.cs",
+    "sha256": "00e9c876be581e803694b92bffde311cd1c3aa1851d5f3978bcb6defb8ebf842"
+  },
+  {
+    "path": "Scripts/Combat/AttackInstance.cs",
+    "sha256": "80e9602738713b20f9301a120fa4a6c1c1fd8c04c88500511c804281a4cda108"
+  },
+  {
+    "path": "Scripts/Combat/BlockComponent.cs",
+    "sha256": "b64e21278d8b45047fcdaa7eca5fbb96c02aa061404f830c52aa1d3069d4ba3f"
+  },
+  {
+    "path": "Scripts/Combat/BossCrowdPush.cs",
+    "sha256": "29084da799c8cacc38b3504bb70cc91d172dd2888aa698a737215c8cee61e9e2"
+  },
+  {
+    "path": "Scripts/Combat/CameraImpact.cs",
+    "sha256": "536878f435bda78e262ab6b6d3ccfcf31d097819784956a6918a6fe55a56fb52"
+  },
+  {
+    "path": "Scripts/Combat/ChallengerMark.cs",
+    "sha256": "013fa4927f9af9d7c2909b355770eed9f678837d7af2f0c7b470dbfe0d8898d0"
+  },
+  {
+    "path": "Scripts/Combat/CharacterMovement.cs",
+    "sha256": "8486d83d167aa2d2566c3a24d34cbebdcf570c3e15638691377a056d16408f56"
+  },
+  {
+    "path": "Scripts/Combat/CharacterMovement.Physics.cs",
+    "sha256": "424d97e3ff2754cc206beac3d5050f61859578a4882b4605966e1c4e34f020e3"
+  },
+  {
+    "path": "Scripts/Combat/CharacterMovement.Rewards.cs",
+    "sha256": "fea592a3a16f08b882e4c19567097d5f35ed397d315e8abfb6eb4dbb0c280b39"
+  },
+  {
+    "path": "Scripts/Combat/ChargeBodyFx.cs",
+    "sha256": "01f380fd5338b7ddb6e06937789bf865b0a052c6ccc98ee664b159faaead3a0f"
+  },
+  {
+    "path": "Scripts/Combat/CombatFeedback.cs",
+    "sha256": "6b2d95b1c58930c3718ad94bc9f3a47befd11507576ff7fda658d0108b6797bd"
+  },
+  {
+    "path": "Scripts/Combat/CombatFeedbackProfile.cs",
+    "sha256": "a09c8835a371a9372d1cdf88fa855dd1735f1995c453c83508767b25f1a7816b"
+  },
+  {
+    "path": "Scripts/Combat/CombatImpactFx.cs",
+    "sha256": "5d89524f3c3e2b709b542f24f7de1cfd32183bf935dfd3a203f734241e33c895"
+  },
+  {
+    "path": "Scripts/Combat/CombatReaction.cs",
+    "sha256": "f275de53fb0d48d1fe326a1352e34011ae1ac317e669890a130205d7cfc362bb"
+  },
+  {
+    "path": "Scripts/Combat/CombatTypes.cs",
+    "sha256": "be0aa3daeee37ba7a4da55368072c1861b3cc3339d754fbef7f0fa2b8725f193"
+  },
+  {
+    "path": "Scripts/Combat/DashPathIndicator.cs",
+    "sha256": "a3988fd5cb4c019ab9371842717680c48fbc7b206c53c0e0d2b87668d1409211"
+  },
+  {
+    "path": "Scripts/Combat/DiveWindFx.cs",
+    "sha256": "481f3bbb433d468f30e6a2336a8afd8687ca7474840331e9c7fca69d9637b0e8"
+  },
+  {
+    "path": "Scripts/Combat/EliteModifier.cs",
+    "sha256": "a66742530730d05fff7738c7dfca1f3f0b0de1904376a03b798bcd6dd5b36469"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/AftershockTraitDefinition.cs",
+    "sha256": "9065c66846a07c5e2cedceed3a064f41901ed0e49011c2677a6d3666ecffc57f"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/ArcaneTraitDefinition.cs",
+    "sha256": "7d3e292c83f2f219ec20c9321fc8da66f681995804a4d0f2dcc959b68330188d"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/ArmorRecoilTraitDefinition.cs",
+    "sha256": "6c5573c48e9c9f3ebfd72a8428d79f8b90251925d6b9182e9ad67b37f6056902"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/AvengerTraitDefinition.cs",
+    "sha256": "509daf2d726fb78d90638c187cc59f31f12b0c4bb9b55b59f238ea8a6bae9227"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/BruiserTraitDefinition.cs",
+    "sha256": "dff542cbe1501d034d06ed9f29e08e8de096b547fbfd191b11d57409402b2571"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/BurnerTraitDefinition.cs",
+    "sha256": "759ed857d1d908b97892be235c63421b7a054f3ce902999acb3e9b7a380019d3"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/BurrowerTraitDefinition.cs",
+    "sha256": "4f856e3a2195ce997959e7ffda3a25459f7630f9c38be34a0adf523b1e9501ca"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/ClangerTraitDefinition.cs",
+    "sha256": "bf51fb1a696003723b0f34e03795239784f53055752edacf61acb57c05b83b3e"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/FlankerTraitDefinition.cs",
+    "sha256": "02da985e5fb7c397b4a4b518ddf5fefb4f16930d09aa2b77d685ecd8ad05cda3"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/FrozenTraitDefinition.cs",
+    "sha256": "22b724ca1e13cc670802effaf2ffa7d75c11e7365d2fc5921c90b490b5a75aac"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/HealthLinkTraitDefinition.cs",
+    "sha256": "07f9da1f6f6ac988b747c21a2de76f935a4b768a10e5445c58251b217b79641d"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/JuggernautTraitDefinition.cs",
+    "sha256": "a6ca69e6a017461871f06a87e8967f3c56fb06d7070953560497f3096c42ed80"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/KnockbackTraitDefinition.cs",
+    "sha256": "758c3ecce1793cffa1a6f2637a85f291772c0c9160b7f732d53577b54f5d972f"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/LinkerTraitDefinition.cs",
+    "sha256": "62ae32d1725ef8c7e8baab42f1e18fc1226f24b737f2d1fd09ed9ec77c8e9a9c"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/MoltenTraitDefinition.cs",
+    "sha256": "6672b21779ef6383d659e5be8f2c8213663961977e1512dc58a055096c1afc91"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/MultishotTraitDefinition.cs",
+    "sha256": "b2c26137c02cf79c559e3e4893d26b1a64c41d7f0e5d739e7dd6bcbc14ebe34b"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/PressureReboundTraitDefinition.cs",
+    "sha256": "bb479b41093c6cee7947e92b53af553e901a660de473aaad70930f9e3fbaf5ec"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/ReforgeTraitDefinition.cs",
+    "sha256": "3c368a6a7e055f1f9f7355469f84535cc72bed37d4782cbada3e592678923888"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/SaviorTraitDefinition.cs",
+    "sha256": "bf31be19e8fe944781580199b0ada23389158b6ab17ae973809cee93720dc0ac"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/SeekerTraitDefinition.cs",
+    "sha256": "1bdf689e25ce982600b5a5d9000229c401d029afc35dcbcf220c34007c05da65"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/ShieldingTraitDefinition.cs",
+    "sha256": "9c1a5df2adc2c1dc25bc16e1b3be7e87cb5646bf5db467b2d4e5c12bf8283782"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/ShifterTraitDefinition.cs",
+    "sha256": "daee93f0ba42109aaa2dd6dfd1c0135e2f33d7c3c7ed3084e1e2df6dff9590f7"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/SlicerTraitDefinition.cs",
+    "sha256": "ab8c10884c6bf79ff5d5be1c1aa34cfb60acd8649a8688ad478452247a0e582d"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/SluggerTraitDefinition.cs",
+    "sha256": "99d82e6c1cc84d19cf2ccc68c3f53d653ea647fbfd4695b26b7c91f08c11e28c"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/SpeederTraitDefinition.cs",
+    "sha256": "0b339e46a6b45106992d980f334e5e64ca1c8fcd7f222c446425f505c50cb475"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/SpillerTraitDefinition.cs",
+    "sha256": "554429d2b2e5d645a3b96f43d090d1d222030563f9ffd423f99f3463948a396f"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/SpinnerTraitDefinition.cs",
+    "sha256": "2d41df21fbd2127bb0ccc7a5708a832471703e9ab9fe213cf67374c0b0df7aea"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/SummonerTraitDefinition.cs",
+    "sha256": "cb2fb98aadad26bdeab82246f8592e41f268b4dd16d8eae892f722b39bd6a1f6"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/SuppressorTraitDefinition.cs",
+    "sha256": "0b36868ac77964f7f562006479bc6db903fd07cd6a5eea7eee322d1232c6d0ce"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/ThornGridTraitDefinition.cs",
+    "sha256": "b04e10a0f0ca600a1367fb908b687ac0a48efa70a1c05b5050c290958d6f6f7e"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/TidalTraitDefinition.cs",
+    "sha256": "24f58c969eeadf6326689668c1470af37b46dd990ec6c08f62e3400a51fccfd6"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/TrailBrandTraitDefinition.cs",
+    "sha256": "13df5634d3df2bd014b4bfa78b057c94fc9c567436a18bf94621e05d7ca6daaa"
+  },
+  {
+    "path": "Scripts/Combat/Elites/Definitions/VampiricTraitDefinition.cs",
+    "sha256": "c935c24e2f163f4a7cecb761e9efdf995f7b72c1aa7838082708aef88bbc71a3"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteAttributeTraits.cs",
+    "sha256": "1dc35603dca2ea6f301b8e6d151fe4f8ad549ad1b159787799f70d08c25228a8"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteBarrierTraits.cs",
+    "sha256": "8b082bec1a2b2ca89763895da3b0d06e11cf5356ae9cfe3df1b34994568bd403"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteDefenseTraitBehavior.cs",
+    "sha256": "7e1c88c53988b2ae269c5ecd03d391b02fd8a30128d8042bbb3fdbee6120dfe0"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteHazardBehaviors.cs",
+    "sha256": "1bd461cffadee44676a57fbb1283deaf1cd66f0c0d7189ee2e954dcaf25f88d4"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteHazardWorld.cs",
+    "sha256": "144fa8a8e51e243a1ac379221617460467d4001631eaae25be15743ea6ac2b7d"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteMotionBehaviors.cs",
+    "sha256": "77e558411684b097f1ded27a984e96421e8f4939ac3029f5dbb4341af77f356c"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteReactiveTraits.cs",
+    "sha256": "0ba4c025adba15f4bbcafa1e965b617a40cc242bce1058d88d488da48e9ba137"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteTraitBehavior.cs",
+    "sha256": "8f8d253854e68d7ee76339f36ab5f50211e11fdc7cf3eed4a9cf9269eddea348"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteTraitCatalog.cs",
+    "sha256": "cf427ab3ad8b304d245f9ca1b5af1f7b7d209f2443d8ca777c89c68fe81c380c"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteTraitDefinition.cs",
+    "sha256": "6decafe33ef613839296e4386ebcdac59389d21407e44a5d5b517a59226c40cc"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteTraitRuntime.cs",
+    "sha256": "1814918d14197782bed7c8628cd15f869a68e7eb476e9c07a5fd7fc54ba7dacd"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteTraitWave.cs",
+    "sha256": "9d1495b77d8ff5744d1ff192ce72fc639c86a4b7f6d465d7ef62705a7b0710f9"
+  },
+  {
+    "path": "Scripts/Combat/Elites/EliteWardTraits.cs",
+    "sha256": "67b5c3665e14a507ba858d16227ff6a1b7b3d420d90ab30b1707b9596b89ce1b"
+  },
+  {
+    "path": "Scripts/Combat/EliteSkillRandomizer.cs",
+    "sha256": "047be3529a295e04267201e3161d583d9ccd381172c6041e9d71d3e683aab0ab"
+  },
+  {
+    "path": "Scripts/Combat/EnemyAttackWarning.cs",
+    "sha256": "ee05d4dbb4d2248e83780734e8479856100628f317e9750184e92f9162e9cbfa"
+  },
+  {
+    "path": "Scripts/Combat/EnemyCrowdConfig.cs",
+    "sha256": "3ed0e45e054c89c3d3f54440d1674930e33b9368d4afae8ccb26bd0bc95d4288"
+  },
+  {
+    "path": "Scripts/Combat/Explosion.cs",
+    "sha256": "7ee675698ecbadeee98dd9fb517bcf12b029414828ffa4fc37bd94fd06e2eaa8"
+  },
+  {
+    "path": "Scripts/Combat/GameplayEvent.cs",
+    "sha256": "496f8b2d0cd41826dd3e214fda6a109687217705aa31fb75b12fc853e6960495"
+  },
+  {
+    "path": "Scripts/Combat/HitEffect.cs",
+    "sha256": "cd320383897fb36a8faf0f540df52b27c831125c7e3322e05714ba97662a9c86"
+  },
+  {
+    "path": "Scripts/Combat/HitInstance.cs",
+    "sha256": "b2ea46d01a1ad3a7204cf9f62a51ac4183f0539eecd500d62edf4feb75cc5a42"
+  },
+  {
+    "path": "Scripts/Combat/IDeathAvoid.cs",
+    "sha256": "16e9cc1f1da8ea6c8b8c4dd91a6cc9bb00cf4bac94af3966825bf138cf38626c"
+  },
+  {
+    "path": "Scripts/Combat/IInitialArmorBonus.cs",
+    "sha256": "828ed94d528152f678d13726cee85427fb8ea5b25f0498f3f7b5f0e3ac33c5a8"
+  },
+  {
+    "path": "Scripts/Combat/ImpactPause.cs",
+    "sha256": "4e0b97d1fc5a7cdb12afc6066a8ece7b20cdbe57754a8a5d4b9d99d350b2ea09"
+  },
+  {
+    "path": "Scripts/Combat/ImpactVisibility.cs",
+    "sha256": "3fad08e38dedab9ca59dee68e9b4fa66dfb180f72a382438c9d4ebb71a79e950"
+  },
+  {
+    "path": "Scripts/Combat/IOutgoingDamageBonus.cs",
+    "sha256": "08b23032b7049f183b6a8c54f873a2cef215e34c3f444b278c4f9604e3fd4101"
+  },
+  {
+    "path": "Scripts/Combat/IOutgoingDamageScale.cs",
+    "sha256": "d8ed820bc10a27b9beab8f0ad909f8cbc93b043a785369ce0bf8e41168ea13ee"
+  },
+  {
+    "path": "Scripts/Combat/IStatusVisualSource.cs",
+    "sha256": "1428794783595c24b76a0e83fa27180f2e45240ca795a577d3b864b5a3453422"
+  },
+  {
+    "path": "Scripts/Combat/LandingShockwave.cs",
+    "sha256": "a2a35d0202416eea102a9ec745cd4bc8e3c43659e6edfb2acc412102fa94d6b5"
+  },
+  {
+    "path": "Scripts/Combat/NodeSearch.cs",
+    "sha256": "b430168ec539a1a4467563129bf72073d0ab04d19010730ec805e23e38062661"
+  },
+  {
+    "path": "Scripts/Combat/PlayerHurtFeedback.cs",
+    "sha256": "5cbd4cf34fb40be2aad4f24a8bc13bf195de7949522fbf6168559a5e86fb9743"
+  },
+  {
+    "path": "Scripts/Combat/Projectile.cs",
+    "sha256": "a5e2b7f0d6df458e7ad7bd4e0caca3c8f3cdb45a6ccd21c10cb4fe0c7962ceb2"
+  },
+  {
+    "path": "Scripts/Combat/Projectile.Homing.cs",
+    "sha256": "f7e8c41efd84c8e9502a8424d55ee72cdcb76390a648cf14203d4a47cd07d8d2"
+  },
+  {
+    "path": "Scripts/Combat/Projectile.Reflection.cs",
+    "sha256": "5cd97a9c9660751014337c5b99a67bcb58cdadcd17cb824ba3d6942bb3db4398"
+  },
+  {
+    "path": "Scripts/Combat/ProjectileTrail.cs",
+    "sha256": "346be93d3d8447d2f82c4743e33f2841ebe334bb04faa77946e6b73e0a0a49fa"
+  },
+  {
+    "path": "Scripts/Combat/SkillAnimationLibrary.cs",
+    "sha256": "801978ba4a17439e6c5013acc124de1fef18d3e9e50ee5d17a1b993df813e417"
+  },
+  {
+    "path": "Scripts/Combat/SkillIndicator.cs",
+    "sha256": "1be6f8f919a3c05391de5d1a8b668719114dd3ecb64c16a5142868e814a9acd5"
+  },
+  {
+    "path": "Scripts/Combat/SoulPickup.cs",
+    "sha256": "abd4bb450ea8774bddf25c2748ee3fe30bbf20f6efb74e3c9bba80c216d19293"
+  },
+  {
+    "path": "Scripts/Combat/SprintController.cs",
+    "sha256": "0af69ba7a7834879d1d1888760447f6bbd9c0b5cef9377aa7a885c13237ac07f"
+  },
+  {
+    "path": "Scripts/Combat/StatSheet.cs",
+    "sha256": "13d5546f2f827e7a3c9a6794d35a91616e75869f820c4e46d364db2877588c73"
+  },
+  {
+    "path": "Scripts/Combat/StatusEffect.cs",
+    "sha256": "27893f226b0da43ab7c3fbdedf2b12388e434ce8576f3fb66b1fe778ae9e749d"
+  },
+  {
+    "path": "Scripts/Combat/StatusEffectFx.cs",
+    "sha256": "34a528a286291c3d0edc550f1e5979038d357ca3f0dfdd0e835081f56fa896f7"
+  },
+  {
+    "path": "Scripts/Combat/SummonLifetime.cs",
+    "sha256": "450a397a73422d888fd332532930c0855665c7812bda4a2b33778a97aa5cf207"
+  },
+  {
+    "path": "Scripts/Combat/Targeting.cs",
+    "sha256": "f80a1f5a2eec60510aaba50121271907f0faddba42eeb104dcc07501d9b0d036"
+  },
+  {
+    "path": "Scripts/Combat/Unit.cs",
+    "sha256": "91735af10575f9b041850e235607a2c81c5dc215301c9356554d28f56acb2371"
+  },
+  {
+    "path": "Scripts/Combat/Unit.EliteWard.cs",
+    "sha256": "e294060abdddb92ea1ba32c6a7c26bdebcb81b39205b4513cd972841dc404f24"
+  },
+  {
+    "path": "Scripts/Combat/Unit.IncomingRules.cs",
+    "sha256": "a6c34f5774ccc05ecd08b6747fe4371f8f79cc424874f3f53601229ee542bfb8"
+  },
+  {
+    "path": "Scripts/Combat/Unit.RewardTransaction.cs",
+    "sha256": "b24f61b5f7222b58db38e56cec54e7eec62da03de975a3c894c088e79808ecfa"
+  },
+  {
+    "path": "Scripts/Combat/Unit.TemporaryShields.cs",
+    "sha256": "941b41daedb820bcba7851ab9c9997c4057297603849c1b9c5eeefed42305444"
+  },
+  {
+    "path": "Scripts/Combat/UnitAnimator.cs",
+    "sha256": "64eb0329307d498ff28a60a89d7600f64f08f2addc9f5e71baafe533da6f029e"
+  },
+  {
+    "path": "Scripts/Combat/UnitPresentation.cs",
+    "sha256": "61db7a1c3dbd5577307e3887bbdc5a80fbcd4de21222ebd02014be55e8ef9a31"
+  },
+  {
+    "path": "Scripts/Combat/UnitRimOverlay.cs",
+    "sha256": "98006631964e59e719e7c58b54c3333dbcf3ac2489010d6759bef428870abb96"
+  },
+  {
+    "path": "Scripts/Combat/WeaponGate.cs",
+    "sha256": "0e26dee0cfad2022a1bf7167fddb45293e1619cd8896c600a9627822d2056da0"
+  },
+  {
+    "path": "Scripts/Config/AbilityCardConfig.cs",
+    "sha256": "869b4b8541d63d99ccb2a954138c6680bdef3c368f166dc88f8a6eb9eb8f1e76"
+  },
+  {
+    "path": "Scripts/Config/AbilityChargesTuning.cs",
+    "sha256": "9c1b93bd276a03a93ba861f9a9482de70cb32d48bf0f7b1d5b4664d1d791e112"
+  },
+  {
+    "path": "Scripts/Config/AbilityConfig.cs",
+    "sha256": "52630bc578817b68e9e58eec2a7188a133b6018ac2ec1f7be1f4533287cf0b2d"
+  },
+  {
+    "path": "Scripts/Config/AbilityRewardTuning.cs",
+    "sha256": "c5eabb0bf7e1b5ecd7e29a14b8d745cc569442dcf045730078983f19f5835e31"
+  },
+  {
+    "path": "Scripts/Config/AbilitySeries.cs",
+    "sha256": "1be5be21c8f5e9686c7062530b604fd281c95d14ad226a109ea010ba8d9a392b"
+  },
+  {
+    "path": "Scripts/Config/AiProfileConfig.cs",
+    "sha256": "cbd12eddee48d9a9a63e807a51e7ae40dc1335e22f8738076b2484ac385d674a"
+  },
+  {
+    "path": "Scripts/Config/AudioConfig.cs",
+    "sha256": "881e615882ffe2152ba06c0ef911b88e94a75c4b57ed3a1d047775c31ca31650"
+  },
+  {
+    "path": "Scripts/Config/BossBehaviorConfig.cs",
+    "sha256": "f4926e1c56a03863faa8e27957f7986663ffcc9774dcb32e0a4c8579e88d8702"
+  },
+  {
+    "path": "Scripts/Config/BossConfig.cs",
+    "sha256": "1a40796c760baa17361f1513645000ffa8790d51c30acc2e7a5bdc11992423e8"
+  },
+  {
+    "path": "Scripts/Config/CharacterConfig.cs",
+    "sha256": "185503e611d367166ac3195524ec82e1554ec7b8f9c341284ab02e9d6a6d284b"
+  },
+  {
+    "path": "Scripts/Config/ChargeBehaviorTuning.cs",
+    "sha256": "7e4484de89093dbd64ce05b777e151bad16e8ab18c265781182fa9356a1da0e6"
+  },
+  {
+    "path": "Scripts/Config/ChargedAbilityConfig.cs",
+    "sha256": "b0356d539994f4fcacaed142bcf1e281836699c3ed78eaec889730675f0b49b8"
+  },
+  {
+    "path": "Scripts/Config/ChargedShotTuning.cs",
+    "sha256": "3e2f1abab70445d539a407eb6b5ec8afbabf63280e7e504389b0732a2b5996d2"
+  },
+  {
+    "path": "Scripts/Config/ComboAbilityConfig.cs",
+    "sha256": "993bc27f2b23510303676818329b09051220e8c61af76f173d1ce49a267b569c"
+  },
+  {
+    "path": "Scripts/Config/ConfigIndex.cs",
+    "sha256": "639dd7808b1e97721fd185512743823c7d1bf1db7a1471a792beba1aad2a5a3e"
+  },
+  {
+    "path": "Scripts/Config/ConfigIndexData.cs",
+    "sha256": "30b03a8930ccdcf1bd9507c6933b24bba61542e15cb71038f71ce4c10040b763"
+  },
+  {
+    "path": "Scripts/Config/ConfigRow.cs",
+    "sha256": "f58b368825c6653afde577e3190c8d880c895838af8457698be4cac2475c5a13"
+  },
+  {
+    "path": "Scripts/Config/ConfigRows.cs",
+    "sha256": "dbff8743143b61ff90f2668147f16a64c1297f8656c7bb90b7019f3ce37d6926"
+  },
+  {
+    "path": "Scripts/Config/ConfigTable.cs",
+    "sha256": "c1b577b4fc7b46aa15f34aed85e9397d92dddf16303632354f7733f910895be4"
+  },
+  {
+    "path": "Scripts/Config/ConfigText.cs",
+    "sha256": "c74c021906438c5b035c248e85da64a63849cd802bebb4318b1fdd71a8ab22d6"
+  },
+  {
+    "path": "Scripts/Config/ContentIdentity.cs",
+    "sha256": "668fd55d61bc23c6545fe04355a0f051cd787d2eb7f4928a4eb299ac6938f95f"
+  },
+  {
+    "path": "Scripts/Config/EffectConfig.cs",
+    "sha256": "bd40a0a9a7c197ac98d3c2d8e62ce908a9360c909ea2c9683a6739b4ce3866f8"
+  },
+  {
+    "path": "Scripts/Config/EnemyActionPlan.cs",
+    "sha256": "8165b48f8dae96a4fb80a387584da452402b4030a71a4d7eb435ba0734bd21b6"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/BackHopEnemyAction.cs",
+    "sha256": "4fe96c081f638d1f11920b8c7a3162f4c9ecf882120c4d080ba62d3d2309287c"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/BurrowEnemyAction.cs",
+    "sha256": "c82a818fdadb15dfd4db38d840d9b8a5bcb294094e95a0da929370d1a58c87c1"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/ChargeEnemyAction.cs",
+    "sha256": "e13ffb61e76abba6710ee0d9a4c7df8a2c0727835a73b2e4d734da02fd3e6159"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/DiveEnemyAction.cs",
+    "sha256": "dbe041e2ca18fa25b73090681eb7530ad986f8fabe487ac8dfe924b1d9837831"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/EnemyActionDefinition.cs",
+    "sha256": "47718b86279454f10508b8dc93e52a36e18eadfba608478d5ff4b4cbeb4a1014"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/EnemyHitboxAction.cs",
+    "sha256": "3c843dfe3aa56180597a69e9ad13e03e4a8afcd36f35034526afb6aca5e614d2"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/GuardEnemyAction.cs",
+    "sha256": "ea64b788f15645aa2444bf4b1e16221ad341fc7a16714db579da4bf3cc30abd5"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/HoverEnemyAction.cs",
+    "sha256": "8369b79e16c4de198142a3f52720aa4f4ae6b45cc3e5a91b8da502039023d599"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/JumpEnemyAction.cs",
+    "sha256": "a9fb06dca4b90248b250d78d3948184ad1477db718b00e5c0ea7f6aaf70ae848"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/MeleeEnemyAction.cs",
+    "sha256": "5f04e82e2d6426eb0bd5bc8b1e6a248b40f90306dffa42c04937a867a8fd8aeb"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/ProjectileEnemyAction.cs",
+    "sha256": "4b04f545b8cfae058482bbf89c076e4a9bc40c7d127c665489aa36710f93d758"
+  },
+  {
+    "path": "Scripts/Config/EnemyActions/WaitEnemyAction.cs",
+    "sha256": "e7dd986b9f9aad28b778b7ddfc517c30303aca573d2a5d3e3e9113945d94b70c"
+  },
+  {
+    "path": "Scripts/Config/EnemyActionStep.cs",
+    "sha256": "1add281fd5b7e64a445549c7cdebdd2725b2435d6a2b305f0dc2378a410f63a8"
+  },
+  {
+    "path": "Scripts/Config/EnemyBehaviorPressure.cs",
+    "sha256": "959d9bbb137e22b8af4d9defea4d0b23f83e8111d05bd34e33d8b08c106d9439"
+  },
+  {
+    "path": "Scripts/Config/EnemyConfig.cs",
+    "sha256": "82d17c93c450b2c365f528e86ed9bcc30145015b4498a158f245853b806caf3f"
+  },
+  {
+    "path": "Scripts/Config/ExpeditionDestination.cs",
+    "sha256": "d96afcc21abf375776e90999af5f951625f92e4e35251bbe3b55de6dd545f032"
+  },
+  {
+    "path": "Scripts/Config/FallAbilityConfig.cs",
+    "sha256": "17058bfce87c020ce26f2f10f2fa79c0692228994a9b281eafee61d5ccc2287f"
+  },
+  {
+    "path": "Scripts/Config/FallAttackTuning.cs",
+    "sha256": "7f4b9ebe9248a69c6c9142c6bedd8e53b332482eb63feac277915261ae1885e4"
+  },
+  {
+    "path": "Scripts/Config/HeldFireTuning.cs",
+    "sha256": "339a1f10d57d3a8ce7bb96ce2667194403fce93466ac3083eb9b0031d7f9ea7e"
+  },
+  {
+    "path": "Scripts/Config/IAbilityRewardTuning.cs",
+    "sha256": "7a160b75fa7b50af157fce14269cd682bc48bd65b7c7392ec26ce31727c4328d"
+  },
+  {
+    "path": "Scripts/Config/InteractionDefinition.cs",
+    "sha256": "7a8ab519c6c5e57ae62733f5e40189b62d3347eebc3824fe66f3db84f8f685aa"
+  },
+  {
+    "path": "Scripts/Config/Localization/ContentLocale.cs",
+    "sha256": "4c7de9294a6509c6210bb7cbc173d44fbc894fa23b42bb5cfb54bbdae72de847"
+  },
+  {
+    "path": "Scripts/Config/Localization/ContentText.cs",
+    "sha256": "4280a91b105ae6a73768e477d0be7f73b7619f52879ee7a73036d5e55fd88719"
+  },
+  {
+    "path": "Scripts/Config/MeleeProjectileTuning.cs",
+    "sha256": "7103f39f7cdc98a284835089af434504b038b7e6db971b6737774d6f9331eb63"
+  },
+  {
+    "path": "Scripts/Config/MetaUpgradeConfig.cs",
+    "sha256": "b3944854acb10f9996834b3df989d67e15ac02e6e0778b849a858abcde9e46e8"
+  },
+  {
+    "path": "Scripts/Config/MotionFxPreset.cs",
+    "sha256": "f4a11f2d67c57072a862896b78d3679e1f3aed21977e9d925e2a3603c01ff724"
+  },
+  {
+    "path": "Scripts/Config/NodeConfig.cs",
+    "sha256": "790cecdeb1d915fa53d69592fe37bdf1a1c788e61159b0e2c1b4d5a1d79d9893"
+  },
+  {
+    "path": "Scripts/Config/NodeRewards/ArmorNodeReward.cs",
+    "sha256": "4619fee1f69bcded250ca9d4ef151a8dd9e428f84cf739a8892371932d487744"
+  },
+  {
+    "path": "Scripts/Config/NodeRewards/ChoiceNodeReward.cs",
+    "sha256": "fbe0107fe072f4e223d9d2f419d6dac56bdc0a522cb2b05ec96cfe0ee564b635"
+  },
+  {
+    "path": "Scripts/Config/NodeRewards/HealNodeReward.cs",
+    "sha256": "352524d253a8da85f09cda2d95f81f9c6fd3f82bb020e0b89ecf44feb3298a5e"
+  },
+  {
+    "path": "Scripts/Config/NodeRewards/NodeRewardBehavior.cs",
+    "sha256": "5fbbf54023891b6a7260aad4b35bc74e8670de8ff47ca920b3374fbbb4f13b16"
+  },
+  {
+    "path": "Scripts/Config/NodeRewards/ResourceNodeReward.cs",
+    "sha256": "9278175308f4f92b4238e0d6e0cf44bad16aa2d15bb1523d9dbec2234429cbcf"
+  },
+  {
+    "path": "Scripts/Config/NodeRewards/ShopNodeReward.cs",
+    "sha256": "927920de23e3ecf63b95eba2c5a69a6f9929363882caaffa8c85579ed4b704d5"
+  },
+  {
+    "path": "Scripts/Config/NumericContentIdentity.cs",
+    "sha256": "8eaa43bedf3f51dec3e19bc2be7c214006747eb385ca9b616a7b3339e4bbc18f"
+  },
+  {
+    "path": "Scripts/Config/ParamEntry.cs",
+    "sha256": "5a792b1813b89a503ecb8ffd1ad5a236b7ef3b1bb90d57938967be8f66006edb"
+  },
+  {
+    "path": "Scripts/Config/PressureModConfig.cs",
+    "sha256": "4d9ddd5ad58256bf9f3f9da9dadb4625883cc861959858172ed661979bfac64b"
+  },
+  {
+    "path": "Scripts/Config/RewardConfig.cs",
+    "sha256": "8cbb990e3d1e6a082682aafb7fb6f8ae03a33df4b4fe24d922b1cde5370ac3df"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/AbilityTuningRewardEffect.cs",
+    "sha256": "98b6abeb682e096e16aae966530e2812957c1af68617601111e2ff1c0334024d"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/ArmorOnKillRewardEffect.cs",
+    "sha256": "26f37f783f555db14363e5fb15c9b8de2bacf21d85ad3afe39753df2cc412943"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/ChainLightningRewardEffect.cs",
+    "sha256": "7b5d47c50893d6b6d6af79035d13a8792b5bcaf2f487c1833b8a881639f3b5ba"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/CompanionRewardEffect.cs",
+    "sha256": "2819cbd8e6bd8ed383172c56a848e4a89659e6a27eb635dde761df7fb3471f8c"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/DeathAvoidRewardEffect.cs",
+    "sha256": "28012d3582962537517726dcd8de308faf8d343ef948cdd89da467e51f9c3f55"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/DefenseReactionRewardEffect.cs",
+    "sha256": "1649129a425ba45312f783de6dff713016318610d33b1028e2f6af788ed82b41"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/DistanceDamageRewardEffect.cs",
+    "sha256": "3e5ee1ec032a7460efb1fd93c61d59bfb4ebabf0cd470ba5fe36145ddb88e6e2"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/EventPulseRewardEffect.cs",
+    "sha256": "9a484fc910ae26e7b378f96a4161bde7a9b863660231a57c2bbb71a8469a2f9f"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/GrantArmorRewardEffect.cs",
+    "sha256": "d74a04f7d06e612329188091a9b211a69229e512e63b23f366e0a2dbe9bc989a"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/GuardOnSprintRewardEffect.cs",
+    "sha256": "0acce0abd39388f42f2283b840c57c5da221656d310c55a4aee370f082ed0643"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/HappyRunnerRewardEffect.cs",
+    "sha256": "4d7263f0184310d10099fad8cc5c03d243203ff500f65dc7e72f6cbee0b7b9da"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/JumpPulseRewardEffect.cs",
+    "sha256": "13ce6bcf7f9a1d32af3a67838410084c8b74e5a0f3a714dd5176c40f5dbd603b"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/KillAirJumpRewardEffect.cs",
+    "sha256": "c3d7b8eaabe2f61ee7e791cb36ec7cc47b1312f37e020c5ac5c9db09105add52"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/LifestealRewardEffect.cs",
+    "sha256": "af42512058264df7352a2a38b20b0e155070bcce080c33be763bdfed6c6f974e"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/MarkedBonusRewardEffect.cs",
+    "sha256": "47cff659448e184e0bedd90f50a10d06384d21afda0cba1bb8a788ab8cd05bac"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/MaxHealthDamageRewardEffect.cs",
+    "sha256": "6760cf2697aea78f9ddfc979bc3db88a942a4088e783bba83076c1b916b80a0e"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/RewardEffectDefinition.cs",
+    "sha256": "0012b6a2bc014b0a43a631173c93702007f260b447d0c3e403f895c55c871ffd"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/RewardEffectValidation.cs",
+    "sha256": "0af5acbfbfebf8ebd3d1d4e4590b6cdbab47af4e1702fe19e2a9a404005e4f84"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/SoulHarvestRewardEffect.cs",
+    "sha256": "639e46ab2c9eac98d51bd14b7e7dee244ec1289761f26e33621f2fc2075f1451"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/SpecializationRewardEffect.cs",
+    "sha256": "b5455d9cbeb1ed64398e36c9623a1290340f6766c5fcccfe03d4fd23c6af3a2c"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/StatRewardEffect.cs",
+    "sha256": "503225a1cab38816c0378df7153c692d4532012fa48e33eb990ef23c0f66b519"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/StatusOnHitRewardEffect.cs",
+    "sha256": "f5879300bba6a265153171cd3be5ff5812ca0c3cbdb3c8edd60ed242d730dbd6"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/AnchorAfterglowRewardEffect.cs",
+    "sha256": "2ec30b275f68eef0475ca376633267e57cdbbe461a092303f8d8c480c7bac0bb"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/AnchorCoreRewardEffect.cs",
+    "sha256": "59428b741a8e5e2df5b78a98adba3712106a854d5c70e383618ee1fcf6ccbcfe"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/AnchorPulseRewardEffect.cs",
+    "sha256": "dfb2635835942502404073f8eeb718fcd65772c8e33ae4e82a3b8895b124849c"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/ContractPayoffRewardEffect.cs",
+    "sha256": "2b9e1ce3141b0a5397f7e7e65b13f657734544d143a18f14109f465282fe9f37"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/EchoFamiliarRewardEffect.cs",
+    "sha256": "922eb336b0a54b67b634624eca598923d536a86b6828cdfe3028fe411d29b219"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/EchoLanceRewardEffect.cs",
+    "sha256": "729102c4f66b43ad7c7fb42e868dee02410ba70c8f4607998b63900689f933ee"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/EchoMarkRewardEffect.cs",
+    "sha256": "9697bbacb60c24ab2b4d5b0de9d5ab07269461ac3179827bc6b9e3ec132ffc9c"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/EnergyEchoRewardEffect.cs",
+    "sha256": "f129684d502dda1ce2c38a4d50902e9985d2d4442655cf06c07de4a1a4f524a9"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/RiskContractRewardEffect.cs",
+    "sha256": "09740d4d0b47937b62c53d9de52e20ea32e2c0fc65e357c3d1136edd80b4167d"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/ScavengerCompassRewardEffect.cs",
+    "sha256": "facf9c49f927e1444ce15fc3c127ed2fa9a7b7a7731ce98f02757eaeda6913a2"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/ScavengerWardRewardEffect.cs",
+    "sha256": "3f363033ffaf9c605b91d2d4d332382e705ad38b51c42ba98d13e86b740a4e05"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/Survival/TimedHuntRewardEffect.cs",
+    "sha256": "183d5ac117346d77b510861a882d474e90c2b3f82026eae3d09e9a94e0f65688"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/SurvivalRewardEffect.cs",
+    "sha256": "03b2bc452e615df0b3c7b33c86cbe95dac30eeb7d2a3f3c3cf2ce2149df5d8ef"
+  },
+  {
+    "path": "Scripts/Config/RewardEffects/TeleportJumpRewardEffect.cs",
+    "sha256": "7287f9388c0897e142e8f654361358718976785e692521fe0ee5dc20356932e7"
+  },
+  {
+    "path": "Scripts/Config/RuneConfig.cs",
+    "sha256": "072cbbcb2f8bc8b7d421b2b2b389182c3d0e89b6b5837c53f88a99b0345fe784"
+  },
+  {
+    "path": "Scripts/Config/RunModeDefinition.cs",
+    "sha256": "7fbad7567ff4c83b872291d30f681f84eeefa2741a5b54f728f497f04470e1a3"
+  },
+  {
+    "path": "Scripts/Config/SceneRuneDefinition.cs",
+    "sha256": "52d2b10839351171af36b9adb5be433ccfc26c7c07d461f064f4844ad1c997bf"
+  },
+  {
+    "path": "Scripts/Config/SkillAnimationConfig.cs",
+    "sha256": "1bc29118511439c2e386faf558f80332071ef3d57d565629eb292749cfe87f4d"
+  },
+  {
+    "path": "Scripts/Config/SkillEnhancementTuning.cs",
+    "sha256": "476e989ad6a4f6966f8b4b721d3ab3d7ed17b0a41ff3dacd56eb56601029def8"
+  },
+  {
+    "path": "Scripts/Config/SpearLanceTuning.cs",
+    "sha256": "9b49167d3735c04409ea3b171ac288826a51899172b46728aa96b697ab5656b5"
+  },
+  {
+    "path": "Scripts/Config/SpecializationKind.cs",
+    "sha256": "2ff9fbb236912541350d3c830abdb9f7263c31b46c9cbdfcfa6bbe561c579887"
+  },
+  {
+    "path": "Scripts/Config/Specializations/BloodArmorBehaviorDefinition.cs",
+    "sha256": "393c4d19136f472a453dbcfafd650e801b3db99d92c70a77c4c8e23030a9314a"
+  },
+  {
+    "path": "Scripts/Config/Specializations/BloodBattleBehaviorDefinition.cs",
+    "sha256": "f1b10f8cc1b82b879704d81f0e163cc46af69c53ecc740b20de4bc66933cde18"
+  },
+  {
+    "path": "Scripts/Config/Specializations/BloodthirstBehaviorDefinition.cs",
+    "sha256": "e15f62a274d3a0349b321eedc26d1f45a04722b0bc7ce72dd9e6dbdc05400724"
+  },
+  {
+    "path": "Scripts/Config/Specializations/DeathDuelBehaviorDefinition.cs",
+    "sha256": "2d384b4941f249780c619fedd6b235821a80b1a652ab065dcfe5ae6fa45cd399"
+  },
+  {
+    "path": "Scripts/Config/Specializations/SpecializationBehaviorDefinition.cs",
+    "sha256": "9d7ed1f992c9a5b205e47343eabd5dc84b449a40dbaf564321d5cd1e4aaad4dd"
+  },
+  {
+    "path": "Scripts/Config/Specializations/StormBehaviorDefinition.cs",
+    "sha256": "79055eb051bab9ca08d181743dec66be098dd350d17abe3f78c442575ab57e72"
+  },
+  {
+    "path": "Scripts/Config/Specializations/ThunderArmorBehaviorDefinition.cs",
+    "sha256": "be40e6e45d92eb5c1c7f8351f322f1d089624ad169313517b4fad32c4e81c8b5"
+  },
+  {
+    "path": "Scripts/Config/Specializations/ThunderBlastBehaviorDefinition.cs",
+    "sha256": "7fdf61b4f2ccee7543d83f3c742959d3574e96833582d8467d9fd7841c240828"
+  },
+  {
+    "path": "Scripts/Config/Specializations/ThunderHeartBehaviorDefinition.cs",
+    "sha256": "e5b5747bc1d063b7fe3d06b19ddbbe07dcc7aced33f43c8decb0bce27788bac6"
+  },
+  {
+    "path": "Scripts/Config/Specializations/ThunderMarkBehaviorDefinition.cs",
+    "sha256": "1f4e8fe68545401315a419ec2fe61e34280f33e53be39a804286594ab2745877"
+  },
+  {
+    "path": "Scripts/Config/Specializations/ThunderMasteryBehaviorDefinition.cs",
+    "sha256": "403b65aaefd70e10f0b432167c73f1d82d15f7226f412ecf14a13fd324395476"
+  },
+  {
+    "path": "Scripts/Config/Specializations/ThunderPoolBehaviorDefinition.cs",
+    "sha256": "3791d4126c9acd022a7ca4681d65f2cf717f3fc7caa73e6bb82cb84a5603fd65"
+  },
+  {
+    "path": "Scripts/Config/Specializations/ThunderRecallBehaviorDefinition.cs",
+    "sha256": "c41b473482144ff79e129840b3759945d1747a920d3aebefbda47fc776000cdc"
+  },
+  {
+    "path": "Scripts/Config/Specializations/ViolenceBehaviorDefinition.cs",
+    "sha256": "df0e19b43978ce7a2e95c0abf3a82aa9271ae0934c0e3f9b6e10c71e2f877a72"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WarAfterimageBehaviorDefinition.cs",
+    "sha256": "ce3a00c7a5e2f612c7e3e41647f3d3e5316f4814f4b6e2259c9a514222ca1ccf"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WarHeartBehaviorDefinition.cs",
+    "sha256": "a463b90dcd9ffdadec5d42063851cdd7c51b98c5d6b269834a9685b092189e41"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WarSpearBehaviorDefinition.cs",
+    "sha256": "214da9fdd2fa595e637d75dedad261dfcfd88eef0120eabcd226151450db57f8"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WildWindBehaviorDefinition.cs",
+    "sha256": "e95939af4ac489fcfb2578d7d8389744c4753505745c8f9360a83f8f28eea9a5"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WindArmorBehaviorDefinition.cs",
+    "sha256": "8612ab58fcc3314b13ebaf110130367654e888fdd4979dc80fd81a1732710e42"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WindDomainBehaviorDefinition.cs",
+    "sha256": "167563505d604ffb87bc8c60ac031fbaa45f0b8e600701a79a9c30b5421b1b23"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WindFieldBehaviorDefinition.cs",
+    "sha256": "f238b65cf1f19ee56de98abe973e061e695f33059901cf9b6476f399f4293dc8"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WindHeartBehaviorDefinition.cs",
+    "sha256": "f654b08f04c72d201d50d9a3590ecabbeafe313a5beef8cde7c4e22150db866f"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WindSwordBehaviorDefinition.cs",
+    "sha256": "683605a87cfee1897cb42f59cf854c85ca5e756f2be817eeba9be8e1ab2a9415"
+  },
+  {
+    "path": "Scripts/Config/Specializations/WindTrailBehaviorDefinition.cs",
+    "sha256": "801ef9f2b6371faf77ab7445884299a359626a9010544de9cc020f25edc99ba2"
+  },
+  {
+    "path": "Scripts/Config/StageDefinition.cs",
+    "sha256": "d9345ef70f32ae0ba4a9136b1046615df8a532321041445722383d8675d7d3f5"
+  },
+  {
+    "path": "Scripts/Config/StatOverride.cs",
+    "sha256": "58209c04287c56a6ec984854a81590fe4812ca86707379fd15e74d71b4c2a640"
+  },
+  {
+    "path": "Scripts/Config/SummonConfig.cs",
+    "sha256": "fdb7f6a0ccc07ffb6429cc500bbe03acf9f15e0585d819a6ca10390f550333fe"
+  },
+  {
+    "path": "Scripts/Config/SurvivalDefinition.cs",
+    "sha256": "8b6a777ba1c113ea36b78d8a513550b96526462c070737a2db0bfedb0df921a0"
+  },
+  {
+    "path": "Scripts/Config/SurvivalPhase.cs",
+    "sha256": "d029aeabc551f169d0c85e1e4afaf1038fa12cade54c660ddade3d34750dcd0f"
+  },
+  {
+    "path": "Scripts/Config/UnitConfig.cs",
+    "sha256": "96a2e27360dd08cd752da9787f70f445cd3d0917a4879d15b2684d80b16bf1c7"
+  },
+  {
+    "path": "Scripts/Config/UnitPhysicsProfile.cs",
+    "sha256": "168958559c772bc142b6a7bf530824a8cb6b57ca18d71c9d3215605856f02ab4"
+  },
+  {
+    "path": "Scripts/Config/UnitVisualProfile.cs",
+    "sha256": "1fc3b2aeabb6f78079419029ea3463a59cd252ed4ca699150aeecd66ee086021"
+  },
+  {
+    "path": "Scripts/Config/UpgradePoolConfig.cs",
+    "sha256": "667d5bdd684c9241925b74d94c613dd58f04d981f15beb6d2076a61db3c32446"
+  },
+  {
+    "path": "Scripts/Config/Validation/ContentInventorySnapshot.cs",
+    "sha256": "b73d780143f896a55777a6d56ce4a3adf3d68a15953a25f7aa5fe68d97eaace2"
+  },
+  {
+    "path": "Scripts/Config/Validation/ContentValidator.cs",
+    "sha256": "cebb0111090446251fd530ccb5528113d8dec235a6ca4f9d959221660dcfff84"
+  },
+  {
+    "path": "Scripts/Config/Validation/IContentValidatable.cs",
+    "sha256": "08d621aeb5c58595a4625a891c83c6f0e0ee6afca9ffc9d7b5a2447068f62992"
+  },
+  {
+    "path": "Scripts/Config/ValueTagConfig.cs",
+    "sha256": "0dbe8789db745af339fd4712bce494be3ebcf7490bab3d2857231f6747acaf2b"
+  },
+  {
+    "path": "Scripts/Config/VolleyRampTuning.cs",
+    "sha256": "57056a0a2d466e927c57a7a3a6daaef725162651f3a2dbf8fb6592b17c356d3c"
+  },
+  {
+    "path": "Scripts/Config/WeaponConfig.cs",
+    "sha256": "98a8062a79b68ea419cb75478fbccb8242b105859e3ac766e12ba93ad159cec2"
+  },
+  {
+    "path": "Scripts/Config/WeaponRecallTuning.cs",
+    "sha256": "4136ca2aaf5798d5283549b8ecaa6fb470322b1723e3f014525efd7594b1f70b"
+  },
+  {
+    "path": "Scripts/Config/WeaponSeekTuning.cs",
+    "sha256": "96ed820cebe6ab94e0c6350a0701ff0f8dee86ba461d1279b69bba692122d288"
+  },
+  {
+    "path": "Scripts/Config/WeightedPick.cs",
+    "sha256": "0f8e459fcefac8ccc4e30fae93eca670ed52162fa85d42528ce157a53eed2c4d"
+  },
+  {
+    "path": "Scripts/Core/GameExit.cs",
+    "sha256": "3f924e18cd309939cd41ece1cb7c98942bf8c00cdb393bf35f6abfe97ce43dc0"
+  },
+  {
+    "path": "Scripts/Core/GameLog.cs",
+    "sha256": "91c8c485974e6ae65d01e6c190ce927c180c24bcf32a06250add3dd05c0b84ab"
+  },
+  {
+    "path": "Scripts/Core/PlayerLocator.cs",
+    "sha256": "4c8dace61551c184512b316c9699348b00a01276a539c7fdda6b1aa5ddd7f601"
+  },
+  {
+    "path": "Scripts/Core/RuntimeFrameProfiler.cs",
+    "sha256": "88aa286b9f59b63a1fb72bd3dd6489412eb2fb62fd83892c3aa96aa2f89347c0"
+  },
+  {
+    "path": "Scripts/Core/RuntimeResources.cs",
+    "sha256": "39ae37abc9d430f5f7ff824fb6e89533ff17bcd4bf86dc13f9a90091fd22a2bb"
+  },
+  {
+    "path": "Scripts/Debug/GmConsole.cs",
+    "sha256": "00ddad2b6e19a801ffd70ebf5f9d830ab4be2eb5311d385b4a6b677f5ac03ec7"
+  },
+  {
+    "path": "Scripts/Editor/GenerateSkillAnimations.cs",
+    "sha256": "02a40af04ea198c4414ca9d9258ff603fbbdc3a794206effb23979d47cee5035"
+  },
+  {
+    "path": "Scripts/Editor/SkillAnimationGenerator.cs",
+    "sha256": "7e055479ca897a35562c12b404abc41923b1751ee5e4829b48f390c9cfebf2eb"
+  },
+  {
+    "path": "Scripts/Encounter/EncounterController.cs",
+    "sha256": "4681a2ab5d1b716a7c2e7b36ad2360ea0b67fa1dfdaa23e16c3629f9eff4cdcf"
+  },
+  {
+    "path": "Scripts/Encounter/EncounterController.EliteTraits.cs",
+    "sha256": "2203f79e77891fa69745be6602b437f25bbe31355514b6859d18008bdad8702b"
+  },
+  {
+    "path": "Scripts/Encounter/EnemySpawnEntry.cs",
+    "sha256": "2442759010a08bf5e85912c84a2ea36b0bdd8a4dc526155b8eaa5728d3026f26"
+  },
+  {
+    "path": "Scripts/Encounter/SpawnPlanner.cs",
+    "sha256": "7fe1d858a254260e672ab2eb304282d78870592b164753fd6592b8f4955c1b02"
+  },
+  {
+    "path": "Scripts/Interaction/BaseTerminal.cs",
+    "sha256": "f4221e7f4f4050d74c030972091f27977954e7832b48ca0d8e63a28a22b27243"
+  },
+  {
+    "path": "Scripts/Interaction/BossDoor.cs",
+    "sha256": "8014c13c4c4e4c1626b6ee656b04c22e438d3ea65eb4e57508d714803962cb08"
+  },
+  {
+    "path": "Scripts/Interaction/CharacterStand.cs",
+    "sha256": "b08ef6333e400e2d0d2f1c1df3408972e584e78c03b8acaaef1931beebf5d446"
+  },
+  {
+    "path": "Scripts/Interaction/Interactable.cs",
+    "sha256": "c76a5601ed912be8ef4e7a234fd9d3b88c26d221efb5aac6de4784fc9a00b2d9"
+  },
+  {
+    "path": "Scripts/Interaction/InteractablePresentation.cs",
+    "sha256": "8e73658596a78621e65cf9cfbb41637f836e53a325704fad350533b6372e3285"
+  },
+  {
+    "path": "Scripts/Interaction/InteractionComponent.cs",
+    "sha256": "fb472638d359b24d8a12f91c73b0c582c36b244165192ca198f3009f0cc746f2"
+  },
+  {
+    "path": "Scripts/Interaction/InteractionConfigurationConsumers.cs",
+    "sha256": "c68e79ad408d9c225865709d48ac9e9fd6240f6ad6e4a94e9cd40226a89d50f3"
+  },
+  {
+    "path": "Scripts/Interaction/InteractionDefinitionCatalog.cs",
+    "sha256": "c9525e25cfe059dfc65edd9a25171ca5f9b80fef9dc050c1f094c7c8b49388f7"
+  },
+  {
+    "path": "Scripts/Interaction/InteractionModel.cs",
+    "sha256": "c5c5318be9cf12f9bc21a011b099d835a4b8975299eabc2826e200e28223206a"
+  },
+  {
+    "path": "Scripts/Interaction/PlayerInteractInput.cs",
+    "sha256": "81c9a17bee20cd53920b93c9aec8371b07748a40e6bcb04490153d91d3ac3e94"
+  },
+  {
+    "path": "Scripts/Interaction/RewardNode.cs",
+    "sha256": "afa5e710523449c4076a84273a2deb5bcbd158fed209f9f25ca3bab0c3a0c8e8"
+  },
+  {
+    "path": "Scripts/Interaction/RuneTerminal.cs",
+    "sha256": "67dfefbee663c16d71d12ee995d00411804e297638a9214ec3ef327bd9c8ccf9"
+  },
+  {
+    "path": "Scripts/Interaction/SignalInteraction.cs",
+    "sha256": "cb49c24249fcf3581161f41050fbb69820776358d4fed9482af40ff019fd8be9"
+  },
+  {
+    "path": "Scripts/Player/PlayerAbilityInput.cs",
+    "sha256": "647341d58511ec908294492945ba0b96f13e2ac338563d62e02ab0a40960a066"
+  },
+  {
+    "path": "Scripts/Player/PlayerController.cs",
+    "sha256": "6fa09ed1ebfc4920b7898562e079213dc945790384a2ac061522d163114fae14"
+  },
+  {
+    "path": "Scripts/Player/PlayerController.JumpInput.cs",
+    "sha256": "077d4d7aae64208a74ee3bfc41cfdf4d20afe544630bff0bf92cebd519f0d878"
+  },
+  {
+    "path": "Scripts/Player/PlayerLoadout.cs",
+    "sha256": "bfa4c0a5d87289a5f989858037227fe2d80e7fb3b347070377f1296ef0af4e41"
+  },
+  {
+    "path": "Scripts/Player/PlayerWeaponInput.cs",
+    "sha256": "406dc6629ba05bfd22c9d13bfefcc5b5c7e6000f13778bfa767b16e8aef170b2"
+  },
+  {
+    "path": "Scripts/Rewards/Effects/DefenseReactionRule.cs",
+    "sha256": "2cbae69f2c54f656aab7a6a078e39eb2e1405735832920d337510b6544ffacd3"
+  },
+  {
+    "path": "Scripts/Rewards/Effects/NodeRewardEffectInstance.cs",
+    "sha256": "6307d385b336d76999d8e8c5fbdc9a1c0d921f48ce780cb5d66cfa91fa3e7901"
+  },
+  {
+    "path": "Scripts/Rewards/Effects/RewardEffectCompatibility.cs",
+    "sha256": "cde864d359d63e45eac952fa23a073785f5f866901a4817f49fa737557eff905"
+  },
+  {
+    "path": "Scripts/Rewards/Effects/RewardEffectCompatibility.Dedicated.cs",
+    "sha256": "1a3d2bb7ada0564eab3a5c2563e4e8f1bcde3a944a69288666f1b9c3ceedbf67"
+  },
+  {
+    "path": "Scripts/Rewards/Effects/RewardEffectCompiler.cs",
+    "sha256": "a3a8e3e1eae74acb85c72e7cb93ed992eeb5d48a4ce6e441c5efe8044b2dba3e"
+  },
+  {
+    "path": "Scripts/Rewards/Effects/RewardEffectHost.cs",
+    "sha256": "e3053ca741bdaf98b692617069b550bcf7709116382a7187f1309af989f74584"
+  },
+  {
+    "path": "Scripts/Rewards/Effects/RewardEffectInstance.cs",
+    "sha256": "2f99c4b3ed4781d6e413955fdeeb1e7756a3ec24905cc89f46d9753bc2acb910"
+  },
+  {
+    "path": "Scripts/Rewards/Flow/NodeRewardCompatibility.cs",
+    "sha256": "8622b2ea2c716bf53a9cf36b54456170aaa8ad121081eaa0997bdac0c0e93c59"
+  },
+  {
+    "path": "Scripts/Rewards/Flow/NodeRewardContext.cs",
+    "sha256": "4a73d81296a5777beab2e7e65094aa4b1d8d3ef9e41cd566113d5e149264040a"
+  },
+  {
+    "path": "Scripts/Rewards/Flow/RewardOfferFlow.cs",
+    "sha256": "c906f749a5b0dd0a42c494aa4e6acf26985b37d785aece7ce3711e114eb08b3b"
+  },
+  {
+    "path": "Scripts/Rewards/HappyRunnerRule.cs",
+    "sha256": "d5dfcb9a5dd723907a63ef45b8550e92eb90c4b772687a46efe67efbff4fd24a"
+  },
+  {
+    "path": "Scripts/Rewards/IRewardRuntimeDetails.cs",
+    "sha256": "1000b66da686ecf51a5ee0539ef47aeb3e697e334b6a928a77c9b09ecc1ef41b"
+  },
+  {
+    "path": "Scripts/Rewards/MarkedBonusRule.cs",
+    "sha256": "529e5c1caa57707d9b448ccd62c2c7bcca595f6ae334c822811e797b1a9c75e9"
+  },
+  {
+    "path": "Scripts/Rewards/RewardCatalog.cs",
+    "sha256": "0f3ef59e317f58551502466f6739187efce6d015dc0ce3ae19b72ba6c2dd1a76"
+  },
+  {
+    "path": "Scripts/Rewards/RewardDefinition.cs",
+    "sha256": "46606425ed5e1690111948f4936e053d5a7035b0226c2aa3df5c99808a1f04cc"
+  },
+  {
+    "path": "Scripts/Rewards/RewardEffectRegistry.cs",
+    "sha256": "ca678deb51d430bd6145eb764bdbe033f6cdf55026164275012e93ef04192787"
+  },
+  {
+    "path": "Scripts/Rewards/RewardPool.cs",
+    "sha256": "6593a120a82376fabf0f43f6371c05bd9a6cad1090f9411efb4338e08243340f"
+  },
+  {
+    "path": "Scripts/Rewards/RewardService.cs",
+    "sha256": "8316beeeffb974a93f0e04668384573906d55c41fc7f17e93b8592e03b04f5fc"
+  },
+  {
+    "path": "Scripts/Rewards/RewardTable.cs",
+    "sha256": "4a96fe974b3eadebc1878d74782036c638bb9faf8e6408d1247a22a2d34a112a"
+  },
+  {
+    "path": "Scripts/Rewards/RunBuild.cs",
+    "sha256": "5327fb2c3ae6be468c9fa159aa8a25e4b4efaec8e1ac62f46afa9f89943ceef8"
+  },
+  {
+    "path": "Scripts/Rewards/RunController.cs",
+    "sha256": "1e43adaf4279dcfc0444bfd62d08114c2826def0e10e6ae277847b6e91c64d46"
+  },
+  {
+    "path": "Scripts/Rewards/RuneRules.cs",
+    "sha256": "abf3b5f5c6b6de418967aafa2249f24b82d8d9d513e7141cfb5e26aebca5a88e"
+  },
+  {
+    "path": "Scripts/Rewards/RunSettlement.cs",
+    "sha256": "f3da3080ac78fda2075539cdddf4095fafa0ca150d21ead48f328cd3800bfb1e"
+  },
+  {
+    "path": "Scripts/Rewards/SpecializationField.cs",
+    "sha256": "aaf1740aab431c812d709f876491ed4a798a62d50102c945f0c0c7db166dcf30"
+  },
+  {
+    "path": "Scripts/Rewards/SpecializationFx.cs",
+    "sha256": "61fb8c1ecab030a4b7853e9399b1e8e8e223500caafaf66e3184c3ac2335ca8c"
+  },
+  {
+    "path": "Scripts/Rewards/SpecializationRuntime.cs",
+    "sha256": "4761bcbe3e8bac9341092e243a054683e96716122471d624df3b4aa8fe30b8e5"
+  },
+  {
+    "path": "Scripts/Rewards/SpecializationRuntime.Thunder.cs",
+    "sha256": "1e9af36ac4bcc917826f618a19d0b7c043e89d00506747faaad2cd5b240f5088"
+  },
+  {
+    "path": "Scripts/Rewards/SpecializationRuntime.Visuals.cs",
+    "sha256": "ef81316f87b84c07a383877a9d0327b5db61193fa141f51a77c11a187eeefe19"
+  },
+  {
+    "path": "Scripts/Rewards/SpecializationRuntime.War.cs",
+    "sha256": "16c546b93cec9f791fa8c7e1162b766bcd2d19990fa9c15968e12a9c3fdabe8a"
+  },
+  {
+    "path": "Scripts/Rewards/SpecializationRuntime.Wind.cs",
+    "sha256": "c7a464fa14d1f9e8463be177c92ff738b7b7284a0fbb28ba3650f6d4bbb543ea"
+  },
+  {
+    "path": "Scripts/Rewards/Specializations/BloodthirstBehavior.cs",
+    "sha256": "da0dd10ec9ae6e6c23bdb78368d9a385a581e43d81d8f758e7f451cf66ca6ad4"
+  },
+  {
+    "path": "Scripts/Rewards/Specializations/ContentSpecializationBehaviors.cs",
+    "sha256": "e80d61d07d3b9260de95a8fd77c4afb163270fc9ef0162e629367cb2b43b9a10"
+  },
+  {
+    "path": "Scripts/Rewards/Specializations/DeathDuelBehavior.cs",
+    "sha256": "e303add65c918ec6a4324e26a490ae0b4dce658e95f59fdea95832fc6a1464e3"
+  },
+  {
+    "path": "Scripts/Rewards/Specializations/SpecializationBehavior.cs",
+    "sha256": "efd6cf5b289e95de887221f9ada70dd70925ec0f8534918103d8623d334648d7"
+  },
+  {
+    "path": "Scripts/Rewards/Specializations/SpecializationBehaviorCompatibility.cs",
+    "sha256": "0b9f1c0acd91a0b3e6d133b2424aab1e84c7d84a4fcc29acd4eba483cc459d8b"
+  },
+  {
+    "path": "Scripts/Rewards/Specializations/SpecializationContext.cs",
+    "sha256": "53b37e911ab5608b86931fdb33b39540a8298e7d4089b5aba43c024329952be2"
+  },
+  {
+    "path": "Scripts/Rewards/Specializations/SpecializationServices.cs",
+    "sha256": "af0d518a8fdd002693ca9ae9d36ca537a7c6626586a47d3d942e3ca282099e92"
+  },
+  {
+    "path": "Scripts/Rewards/SunsetSwordMarker.cs",
+    "sha256": "f48d037d919b68ac2a5e446e14dd6bdc09fc000a50e02de86ea37487b34a8d24"
+  },
+  {
+    "path": "Scripts/Run/AdventureCheckpoint.cs",
+    "sha256": "57f9bc87e1906e6e1ebf11ed9cf9140406831213c5a1ff1ff7a0be88cb602e3f"
+  },
+  {
+    "path": "Scripts/Run/BaseCamp.cs",
+    "sha256": "5369480ed9cc2fed6935d18f1746b3914c0d268e8d270b70421860d364000dd8"
+  },
+  {
+    "path": "Scripts/Run/CharacterRoster.cs",
+    "sha256": "2cb246601f28530ab626c8bc4de5b552a4a6488db50930471b35fa5e443a3207"
+  },
+  {
+    "path": "Scripts/Run/ForestExpedition.cs",
+    "sha256": "e813977e408f7ac3ed9bcafae34e0305e34fe5843c7c25083d41c63e3fc7f10d"
+  },
+  {
+    "path": "Scripts/Run/LoadoutMemory.cs",
+    "sha256": "82cadcb19de08847fde3bac376bc1941329300feaacec8ffbc9e999b9fb95539"
+  },
+  {
+    "path": "Scripts/Run/LoadoutSelection.cs",
+    "sha256": "8dd364e02b1cea261f5eeed584aad630234ed1fd484104449e27d5c955de2fae"
+  },
+  {
+    "path": "Scripts/Run/MetaProgress.cs",
+    "sha256": "e8c54afbb050966b644117bb50bfd13ba8bb74476792ec9c0217a31182ae4acd"
+  },
+  {
+    "path": "Scripts/Run/NodePlacement.cs",
+    "sha256": "d3ca386ad223b84e197b9eee07012db55b58adf2cbcb333f97d1bb67d1848541"
+  },
+  {
+    "path": "Scripts/Run/PracticeTarget.cs",
+    "sha256": "8e858b1bd57ed04f54fe51a217b2cfd75e14f515cd6629134104492f9d7c03c9"
+  },
+  {
+    "path": "Scripts/Run/RuneCarry.cs",
+    "sha256": "b6fd7673acd0b75d884ecbb63fa4e6289584243257bd595c14a2e42461506317"
+  },
+  {
+    "path": "Scripts/Run/RunModeController.cs",
+    "sha256": "84d5a92eb438bdb2c570322a06d36b71fdbb0db0c8029c09f50ab65c2637ebc8"
+  },
+  {
+    "path": "Scripts/Run/RunSetup.cs",
+    "sha256": "057b946d5dd1614b417c84df2963064133960319354b582d1be979619f227b3f"
+  },
+  {
+    "path": "Scripts/Run/StageController.cs",
+    "sha256": "590e6d708edf3af4b58790ee836b3b729884bd870c81455d38fe44f4ff584cd1"
+  },
+  {
+    "path": "Scripts/Run/Survival/ExperienceField.cs",
+    "sha256": "ec0ad4aef0e69ccf6bad3d234449f826e8ba000324850ca25a44dc7bca6d0609"
+  },
+  {
+    "path": "Scripts/Run/Survival/SceneRuneActor.cs",
+    "sha256": "81ee60640bf869d74ebb320a9f50889279e24506451c8b0ebcfd3a4d18329990"
+  },
+  {
+    "path": "Scripts/Run/Survival/SceneRuneController.cs",
+    "sha256": "050fcb9fde81411a400ae5f9fc42fbbe85e7a07acf019f268242255691ad2c19"
+  },
+  {
+    "path": "Scripts/Run/Survival/SceneRuneField.cs",
+    "sha256": "7d6f2b5deb6d9e81537be567c1bacc588068e6d96dd5f142aa7b780654c845f9"
+  },
+  {
+    "path": "Scripts/Run/Survival/SceneRuneMeteor.cs",
+    "sha256": "925e305b1106714e3aa41b8a4e91de2f4275a3bd9b28025980fae876627be112"
+  },
+  {
+    "path": "Scripts/Run/Survival/SceneRuneMissile.cs",
+    "sha256": "9935bbbe304d418d4aa56f3f566b22af76b469f2cb1bae6a5c81b624d1529e10"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalAnchorRules.cs",
+    "sha256": "7102f4900374ad56201e2df374061f922076b66ee4fec308613ca48c26f425ee"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalAugmentDamage.cs",
+    "sha256": "6b32849b194ba9e343b89dc8b13981c6f2f07a008241d4f83513b480a8c61a59"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalAugmentFx.cs",
+    "sha256": "b7ab91ee61f54eeec0014f6ac45fe94f088b831c8d407f9794b04f1d6e52a83b"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalBuildRuntime.cs",
+    "sha256": "acc3b345d87f838db7e66e5b3d7fe15e745ab967e17c48f956fbfa78903230d8"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalContractRules.cs",
+    "sha256": "dd70374107a7c946653e2aaac77c1e9d5f023b175bbc4dfd9033a9c8f157cd6f"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalDirector.cs",
+    "sha256": "cd286ae16ae97f11c6daeb05fc0c27c83beafd2324e756ee48437193d0cb0c0b"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalDirector.EliteTraits.cs",
+    "sha256": "197abc48964280a3a21d3c53861840606751a202a9cfd1d000657038d0a5016b"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalDirector.Spawning.cs",
+    "sha256": "7d75a5dcc73b4de8985f812244c54344395ae8247fc9a229431d398bb0371303"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalEchoRules.cs",
+    "sha256": "ef9db777d3a98da070fb640d8138378df56d98e653e949ca7f4a615684a13ac1"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalExperience.cs",
+    "sha256": "f40957be46d4aa473cef9991bc3f454eb7fc32d10dbb71b246c26e0b14147dd0"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalHud.cs",
+    "sha256": "82b0b7388364de6c073608ae91368dc59f480c47d37a41133dbd184eaf61811f"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalObjective.cs",
+    "sha256": "af178234d2e5ea7991b05967a22e1fb0b891c11c012ff3a5c121ea9749129e42"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalScavengerRules.cs",
+    "sha256": "c048177c983aa31cc29b73a538e5464fccc2b96e9fd13adc80d13f2067171acd"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalScenery.cs",
+    "sha256": "076e9bc3225e0379b633807e285b2e1ab86527a528482616e349a1a4ded2397f"
+  },
+  {
+    "path": "Scripts/Run/Survival/SurvivalWardVisual.cs",
+    "sha256": "4bf680f35806ea84dfebb6307020c2d7183233f550034faa165c231eccbf1756"
+  },
+  {
+    "path": "Scripts/Testing/_FeelProbe.cs",
+    "sha256": "6670645399950c3509f80def742e8b0293755879662aefcdc0018aa3f54a5367"
+  },
+  {
+    "path": "Scripts/Testing/ActionInterruptionProbe.cs",
+    "sha256": "326c8468f344bf5a966666d15ab85e29515c3962e954076b38dcea55fa24d5bd"
+  },
+  {
+    "path": "Scripts/Testing/ActionMovementProbe.cs",
+    "sha256": "00ff2dce70810e74531f3022977fc099b0b13d86a3944cc34aae7070114f74e9"
+  },
+  {
+    "path": "Scripts/Testing/AdventureCancelProbe.cs",
+    "sha256": "0cf6e6ee036bd075ea64a7a4a4657ed80df7df81339adc2ead9564f1f5ba36c9"
+  },
+  {
+    "path": "Scripts/Testing/AimAndThrowProbe.cs",
+    "sha256": "164490b7f49929d98d3c8acaa503bd4e42c01ca352d93f7a19b9a3a978d0ed2f"
+  },
+  {
+    "path": "Scripts/Testing/AnimationCostProbe.cs",
+    "sha256": "af0af63dcb4820a7331695999512966ce550c01afc33b0ef0a318ca5326c1a9f"
+  },
+  {
+    "path": "Scripts/Testing/AnimeMotionCombatLab.cs",
+    "sha256": "97114eddc7fc4b127956b3c5fa3f616f9e9eb34715ae35e07fc9032af7389d3c"
+  },
+  {
+    "path": "Scripts/Testing/AnimeMotionLab.cs",
+    "sha256": "4ca561271e9d50f9a7f3b5a04bc7c0a5e9363395ed15921931867fff96f4656c"
+  },
+  {
+    "path": "Scripts/Testing/AttackSnapshotProbe.cs",
+    "sha256": "4c34f447e0dd8e8cbb6215b187676deaed2689ddff4ee0126883c70347aa1a64"
+  },
+  {
+    "path": "Scripts/Testing/BalanceAuditProbe.cs",
+    "sha256": "cd3d5b4bdc2562834097b653aebbd1e2450e5b0804f31c1d1c5ba0490cc5a60b"
+  },
+  {
+    "path": "Scripts/Testing/BalanceProbe.cs",
+    "sha256": "2a8f71cb8f2548d0bbf941dc55e333834cf7087f8259b45d3ac8be6366850120"
+  },
+  {
+    "path": "Scripts/Testing/BalanceTuningProbe.cs",
+    "sha256": "efa6c7363ec6dbdbb845d95063ef9c8f5fceac16ea98fd72f9dc38c4605a6e32"
+  },
+  {
+    "path": "Scripts/Testing/BatchBProbe.cs",
+    "sha256": "3dabe89fd9e23e5c5cd701a9b45789be14e3f9e14196bb2bd7e606950ad2fc46"
+  },
+  {
+    "path": "Scripts/Testing/BatchCProbe.cs",
+    "sha256": "d5cc36f6012fa3e1bc1ff5b9cc0502287eb3705e9d0dda03d30935ccaba3320d"
+  },
+  {
+    "path": "Scripts/Testing/BatchDProbe.cs",
+    "sha256": "f269b3a3983285d8935460a54d654d9077b968ec9cfafc509e36a80e5b736463"
+  },
+  {
+    "path": "Scripts/Testing/BatchEProbe.cs",
+    "sha256": "4a699f65fd5cf1b204d45730649bb3bcfe2e93021c407834b23ab56064148034"
+  },
+  {
+    "path": "Scripts/Testing/BlinkGuardProbe.cs",
+    "sha256": "932cb8ffa11ff403a1f93625baaa62d2eeed34f2e0b5b3964933eea99e14824f"
+  },
+  {
+    "path": "Scripts/Testing/BodyCollisionProbe.cs",
+    "sha256": "7f1500821fff013765cf33bc11e7468e2dc69104ba6b9c90992b4feead1c7cfa"
+  },
+  {
+    "path": "Scripts/Testing/BowSweepProbe.cs",
+    "sha256": "5e2013198049bcd5effa81daec2a4e8628517c64d840acc0189f3924e82f6811"
+  },
+  {
+    "path": "Scripts/Testing/BuildRewardsProbe.cs",
+    "sha256": "97c2e87c3303f58880ee1089a29373e1eb8299aa0cfcb80e381b85e408b91435"
+  },
+  {
+    "path": "Scripts/Testing/ChallengeFeedbackProbe.cs",
+    "sha256": "536b698ffb82d5c9126af8a0f1b97f39e60d764d3386b53c3c852f3faa3e8a84"
+  },
+  {
+    "path": "Scripts/Testing/CharacterDesignProbe.cs",
+    "sha256": "344d710c7d649966761fcb36670d81a13b4e56c524162debbfe2305311a7c3ef"
+  },
+  {
+    "path": "Scripts/Testing/CharacterReplacementProbe.cs",
+    "sha256": "2dcc92754fd1d7e3330559c62923bb7aafad0130ca57c888375199eaba6c2672"
+  },
+  {
+    "path": "Scripts/Testing/ChargeEvolutionProbe.cs",
+    "sha256": "9209930f44c995d647aef2dad5388d9c3650a5563301e153564048003852e4bc"
+  },
+  {
+    "path": "Scripts/Testing/ChargeReleaseProbe.cs",
+    "sha256": "328d022d49fdefef988c75a11a154420f61baa9bc16aacc502a4882e4ed538cb"
+  },
+  {
+    "path": "Scripts/Testing/CloverCombatLab.cs",
+    "sha256": "752042f5481a6f01b014f809d144ae288cd57c3c0bafe048514d2e05b3a13931"
+  },
+  {
+    "path": "Scripts/Testing/CodexProbe.cs",
+    "sha256": "9b68679ac902e088435501a95399b3899f2b431cf1ce7deebb5f583f1dd23182"
+  },
+  {
+    "path": "Scripts/Testing/CombatFeedbackLab.cs",
+    "sha256": "85cbcb1ddd3dce517d3699ce3643147cb884fcf0f32a79372b4894daef20d0a6"
+  },
+  {
+    "path": "Scripts/Testing/CombatFeedbackProbe.cs",
+    "sha256": "81ddc43507e0bd436aff8400b4b0f38cb8bdfcf6a759867c18fdee6e045eec89"
+  },
+  {
+    "path": "Scripts/Testing/ConfigAuthoringProbe.cs",
+    "sha256": "89289fc7884607766795dcb5efc3e2a72838698aa903c439338eff4f00ae842a"
+  },
+  {
+    "path": "Scripts/Testing/Content032037Probe.cs",
+    "sha256": "65f8bd891d30f60b6beb29d85bd166b92d48a13ce0f6337e75181e9834832db8"
+  },
+  {
+    "path": "Scripts/Testing/Content039044Probe.cs",
+    "sha256": "d67e537f0f83dddd92c0b46abbb8d40308660dd222a4529254f8561fe53e8650"
+  },
+  {
+    "path": "Scripts/Testing/ContentDecouplingProbe.cs",
+    "sha256": "8d1aeecaadc5c29f7d7b60b117c3b38d4072a6da844e1d3309857fd7d4e6fe2e"
+  },
+  {
+    "path": "Scripts/Testing/ContentDecouplingProbe.Nodes.cs",
+    "sha256": "57d082dfeda60a434e90ee9af66482743b1edeec5ee599f236a6580c777184f0"
+  },
+  {
+    "path": "Scripts/Testing/ContentLocalizationProbe.cs",
+    "sha256": "c0fa69b0f3d969b9c3c796602a8812c73dcd7ec6d1e943c8379c1a7e63471ab9"
+  },
+  {
+    "path": "Scripts/Testing/ContentValidationProbe.cs",
+    "sha256": "6a1c1dfc78221c9968d9a47037e679c77ef89c5e6011360b8f6bd4bd32f82c23"
+  },
+  {
+    "path": "Scripts/Testing/CrowdAvoidanceProbe.cs",
+    "sha256": "366e230d4c30421e58599617b1f3c7522f87d384eec17ed3b7346fe64b767a0f"
+  },
+  {
+    "path": "Scripts/Testing/DotAttributionProbe.cs",
+    "sha256": "d9a7630a2a76aaedbd397807c176984908bc1a5a5d8be0858c029e292a982ef8"
+  },
+  {
+    "path": "Scripts/Testing/DragonArrowProbe.cs",
+    "sha256": "8a67d1abad9fdcd3c5db5ee510d2e86195b5cbeebfa2bed48be717562194bb9a"
+  },
+  {
+    "path": "Scripts/Testing/EarlyChargeProbe.cs",
+    "sha256": "46d5f97cf7b3de7f2d4b1e40eca122e6210c2dad1044f6aece6b27e1fedd584f"
+  },
+  {
+    "path": "Scripts/Testing/EliteDefenseProbe.cs",
+    "sha256": "c01a38b427627f6174fa7accc9c891052c5005915d44897cffef72134f37897a"
+  },
+  {
+    "path": "Scripts/Testing/EliteHazardsProbe.cs",
+    "sha256": "d79c6fa79c3a8b10ade185500521474c25b82811401ab9ebd01ef9de3ecbce28"
+  },
+  {
+    "path": "Scripts/Testing/EliteIntegrationProbe.cs",
+    "sha256": "de5291c5097021083c02e7f4eea7ba303ca09972174b0ea0c62bf9c41bce1383"
+  },
+  {
+    "path": "Scripts/Testing/EliteMotionProbe.cs",
+    "sha256": "eb8162690802a3924beb97cb62d196560fab287af5cbe6542f1b761701238075"
+  },
+  {
+    "path": "Scripts/Testing/EliteTraitProbeSupport.cs",
+    "sha256": "3aa58b79b23b4c5453a22fd70b74428225b9576cbd966faf0a364dfe993f3fcc"
+  },
+  {
+    "path": "Scripts/Testing/EnemyActionExecutionProbe.Advanced.cs",
+    "sha256": "2a3562315dd3fa3b4676e3ef1b49f38cbd377aea3c714ff54adc69e4e33308a3"
+  },
+  {
+    "path": "Scripts/Testing/EnemyActionExecutionProbe.cs",
+    "sha256": "92d2625316937fe4e11bf7c56d339e483fbcb9366cd4f3eea682fbd7b7d46665"
+  },
+  {
+    "path": "Scripts/Testing/EnemyRosterLab.cs",
+    "sha256": "450c87872c22d9c142eda30defa3f977204dacbc4f181b1d9e81616ace290234"
+  },
+  {
+    "path": "Scripts/Testing/EnemyRosterProbe.cs",
+    "sha256": "8f4e1d6f09cc614eac99c37275ee78e62830c23c8cbb58d8587e7d6141be9880"
+  },
+  {
+    "path": "Scripts/Testing/EnemyWarningProbe.cs",
+    "sha256": "140efd496b420ff9dbae394bca0190d659e962a76efa67e47905aca0f24de5fb"
+  },
+  {
+    "path": "Scripts/Testing/FallAttackProbe.cs",
+    "sha256": "c7047cd8a29653bcc08261b1174b02181992a9bf02d3c7ed03a12fcb81a2a23e"
+  },
+  {
+    "path": "Scripts/Testing/FeedbackProbe.cs",
+    "sha256": "6a7fc9a6975fd4b73f434eb3d65109dcab35bc6269a2eb0e40ca9cd9d418b2b6"
+  },
+  {
+    "path": "Scripts/Testing/FlightPhysicsLab.cs",
+    "sha256": "8563494bcf5184b6123efb0301e113874240ccc8b00a75d3a1b237112e15ff23"
+  },
+  {
+    "path": "Scripts/Testing/FlightPhysicsProbe.cs",
+    "sha256": "81f26a1f785b1ef270a614177e4af715cb0eda022f37779a61dd71c7b693eab3"
+  },
+  {
+    "path": "Scripts/Testing/FollowupProbe.cs",
+    "sha256": "86c826b781044dd80cb6517c1bead8efd4a9708a66fd7224f84fd6117d942614"
+  },
+  {
+    "path": "Scripts/Testing/GameplayRulesProbe.cs",
+    "sha256": "b9ac30eb096382c225ea0e1d3317e75215aa8052fa1dbdef19f2766764362610"
+  },
+  {
+    "path": "Scripts/Testing/GuardLocomotionProbe.cs",
+    "sha256": "9c5b2e68dfbd4f67202bb8be81ff3ff8df79ffad2a10b1302f3c684ba1587d91"
+  },
+  {
+    "path": "Scripts/Testing/InteractionComponentLab.cs",
+    "sha256": "afd4a39b0e79993d2e3e673dc4b65c576ce877f9842385316be9fd50fbb47a02"
+  },
+  {
+    "path": "Scripts/Testing/InteractionComponentProbe.cs",
+    "sha256": "83f675b5b60ec8c9ee099b5c55a8effccb1be88f24f0d4738e2626a4019817bd"
+  },
+  {
+    "path": "Scripts/Testing/JumpStompProbe.cs",
+    "sha256": "d97273ed9cccd9d2211352af7a3820f56b89dfdd961630fa26578171dc9607c0"
+  },
+  {
+    "path": "Scripts/Testing/KillFactProbe.cs",
+    "sha256": "9c585168c073ee3b7c1dd72a3875887eda17e5ad62f822847f0859ad14e64de4"
+  },
+  {
+    "path": "Scripts/Testing/KillJumpProbe.cs",
+    "sha256": "845516269d0b797b765ddb57ef2cba0a7a71eb1cd340d47c08c629707d7eab47"
+  },
+  {
+    "path": "Scripts/Testing/KnifeVolleyProbe.cs",
+    "sha256": "3912dbdd2113b18fddc85a8f3e23e65b603e1d7b375b59fc401995dad384f38f"
+  },
+  {
+    "path": "Scripts/Testing/LandingKnockbackProbe.cs",
+    "sha256": "e3521484d8bd2bf7c7cedafaff6b69369397f74dc961bb8b462b1b72a7aa9537"
+  },
+  {
+    "path": "Scripts/Testing/LoadoutSlotsProbe.cs",
+    "sha256": "97a908ecc7fd5a4ff9493086f883edb2c35073758aed9659751d5943d607c8c9"
+  },
+  {
+    "path": "Scripts/Testing/MotionFxIntegrationProbe.cs",
+    "sha256": "783817cc8ed7f683ba8672b062deecbbb6aa7f4d1fa28431b74fc7a03ef97c27"
+  },
+  {
+    "path": "Scripts/Testing/NatureCombatLab.cs",
+    "sha256": "86d53469dc7feed0f8550b02ba7c431ed1fb3e60b4b6a920a95c2956ddbc76a9"
+  },
+  {
+    "path": "Scripts/Testing/NavigationFoundationProbe.cs",
+    "sha256": "5c992da12c11b03a071609878ac121ab0caf8ca964d4b07d3a50d6aa1978e0d3"
+  },
+  {
+    "path": "Scripts/Testing/NumericIdentityProbe.cs",
+    "sha256": "42adfc91b43ba2c21d94e4f94f1ae027540a248a836f6e8ff8093f0f17d89d90"
+  },
+  {
+    "path": "Scripts/Testing/PerformanceSafetyProbe.cs",
+    "sha256": "0158c33dcc4fee1a35cc6fdd5cdda15ffe0e91aea8ae1753bccfe7cef25f94fe"
+  },
+  {
+    "path": "Scripts/Testing/PlayerBallisticsProbe.cs",
+    "sha256": "40a781fde1a36904d6a46799fec6191ca1f9c7918eb294eebcd3acc981bcffcc"
+  },
+  {
+    "path": "Scripts/Testing/PlayerExperienceProbe.cs",
+    "sha256": "c1f1ba53517d4d8df0c1b4c77fad1496a1732fc475e09a057caaefc10cfeb6a9"
+  },
+  {
+    "path": "Scripts/Testing/PlayerHurtFeedbackProbe.cs",
+    "sha256": "80f5a6bb26bdb0e0bbaee9d62ebdd76625f127b9e298b3dc91a3042ae4e15421"
+  },
+  {
+    "path": "Scripts/Testing/ProjectileQueryProbe.cs",
+    "sha256": "cc0b30dad66d2dd3036b2f4f4419b5f5a34afc769a1e06fe5419cafc655a99d9"
+  },
+  {
+    "path": "Scripts/Testing/ResourceLifetimeProbe.cs",
+    "sha256": "ddd431ad63aba0784dadf1cddaf9112027a5cb9229802b91826d802f32977119"
+  },
+  {
+    "path": "Scripts/Testing/RewardEffectsProbe.cs",
+    "sha256": "058494afb4c0b2db28035ba61a86633d3592442976c7a604cbca8bbf7e759d69"
+  },
+  {
+    "path": "Scripts/Testing/RewardEffectsProbe.Dedicated.cs",
+    "sha256": "3e36beffb81eb144a5f94cfb89f9f04073c708dbcbaa6f19a5fd834f60fade37"
+  },
+  {
+    "path": "Scripts/Testing/RewardEffectsProbe.Remaining.cs",
+    "sha256": "e30305b204ea56552373b19be6bbc191fe1a5a5191dbfdf82db30b02bdb6a418"
+  },
+  {
+    "path": "Scripts/Testing/RewardRulesProbe.cs",
+    "sha256": "92831475500eb764e782758ac56787537bfba315ac59ad4f01df33aae4843262"
+  },
+  {
+    "path": "Scripts/Testing/RuneProbe.cs",
+    "sha256": "9b9bb0018f085de9faf47490ea084f7cb8de937f4b17f2d544b179fbb5888118"
+  },
+  {
+    "path": "Scripts/Testing/RuneUiProbe.cs",
+    "sha256": "029e68d29dc15e98c8f529e6647088827d52db79adec00a7feab7d8661b2d68a"
+  },
+  {
+    "path": "Scripts/Testing/RunFlowContinuityProbe.cs",
+    "sha256": "e379bfab234eb79bb6c855de2e9dfed9822c26735c3bdd93dce7cb72b754fecb"
+  },
+  {
+    "path": "Scripts/Testing/RuntimeCostAudit.cs",
+    "sha256": "45f320031e0417eb652cf508ea327c07af9782695347b2328957de2da2aa1ba7"
+  },
+  {
+    "path": "Scripts/Testing/SceneRunesProbe.cs",
+    "sha256": "f730a515e1a918ca28c9dc6032b3aa9fc725d623721470f18666e5589059727c"
+  },
+  {
+    "path": "Scripts/Testing/ScytheEvolutionProbe.cs",
+    "sha256": "f00df46a200c042cf68748cac9373e77ed4dd17465aa8aa6489f196ee0e72d69"
+  },
+  {
+    "path": "Scripts/Testing/ScytheLandingJumpProbe.cs",
+    "sha256": "cf0ff4d72ea1a3b1cd0eb247478b0ab94802221d7649243906b6aebf9fa90cff"
+  },
+  {
+    "path": "Scripts/Testing/ScytheSeekProbe.cs",
+    "sha256": "93b0e1fc0235b86694f39141be77c186f0d281563d9440e1e85961093476b30f"
+  },
+  {
+    "path": "Scripts/Testing/SelfTest.cs",
+    "sha256": "7b583823496ce7bd573ca1a66755f75a7fd5f646195e684cbde31b68201fb112"
+  },
+  {
+    "path": "Scripts/Testing/SeriesArrayProbe.cs",
+    "sha256": "14bc965a1330241331f0e1f626f464951316d7fd7c06ff49f357dae3b5c7f684"
+  },
+  {
+    "path": "Scripts/Testing/SlotCounterAbility.cs",
+    "sha256": "99bb012a791095036871118c54efe4b26729799b7194812b73ef8ef86e6d971e"
+  },
+  {
+    "path": "Scripts/Testing/SpawnContinuityProbe.cs",
+    "sha256": "709ef5808e9c6aed67ee69eabed827af3f9bda7319cf9c7b647ed7d58457e3cc"
+  },
+  {
+    "path": "Scripts/Testing/SpearCleaveProbe.cs",
+    "sha256": "6a98b7cdd5a889c758cb6adc96805b301065bdf7048645d85500594a4d9357f2"
+  },
+  {
+    "path": "Scripts/Testing/SpearRecallProbe.cs",
+    "sha256": "89222c3e4949e8bbd0b7062ba26fa7f78d4315d7548022992513c63ce2b8b9bb"
+  },
+  {
+    "path": "Scripts/Testing/SpecializationProbe.cs",
+    "sha256": "c0bd429e82366839b53077b6f15cc4efa842242e64afd8967512d497289292c3"
+  },
+  {
+    "path": "Scripts/Testing/SpiritSwordEvolutionProbe.cs",
+    "sha256": "2347e8383e43330927a249c9807e2a80c08060213223087c2537ed4b94982268"
+  },
+  {
+    "path": "Scripts/Testing/SpiritSwordsProbe.cs",
+    "sha256": "8186293534afd9e52b7fc03c03f38974a3f5353b40eff2624f05894cc1d0a0f9"
+  },
+  {
+    "path": "Scripts/Testing/StoneSlammerShowcase.cs",
+    "sha256": "e83753b9dfc329dc3107259a33b6949b39a040d38261714e1320d74cf876c48e"
+  },
+  {
+    "path": "Scripts/Testing/SurvivalAugmentsProbe.cs",
+    "sha256": "d62b885309c47246036810d0d75785aa709564e731a609267f3c1647ba6404a2"
+  },
+  {
+    "path": "Scripts/Testing/SurvivalModeProbe.cs",
+    "sha256": "1b48cf889a936cf636592302d7d8ff2eb621b3c366f7adc199951990e2c8d23c"
+  },
+  {
+    "path": "Scripts/Testing/SurvivalPerformanceProbe.cs",
+    "sha256": "6c58532194f2d3f1107e7749d8dc66587bc57409f3fdd997d4a0da5ab9dd6d2d"
+  },
+  {
+    "path": "Scripts/Testing/SurvivalRewardVarietyProbe.cs",
+    "sha256": "b3500850130c262c0d01fa69d6943936dbcd640faa1b80aee3e52fcb67d5d92b"
+  },
+  {
+    "path": "Scripts/Testing/SurvivalSpawnHeightProbe.cs",
+    "sha256": "f567cbda7a1b5e550a4ac47dbac02e0965f11632e7045d4a0a2d8072d9bd562f"
+  },
+  {
+    "path": "Scripts/Testing/SynergyMatrixProbe.cs",
+    "sha256": "6be55cc005309395cb5163c2ec6395422598a0f1274cbf55829e1d01eef59db5"
+  },
+  {
+    "path": "Scripts/Testing/TeleportJumpProbe.cs",
+    "sha256": "67a902f20e87db72a4187705595e2d1d6ad1628c7dcb41a62ac2a608a884e3ca"
+  },
+  {
+    "path": "Scripts/Testing/ThrowSizeProbe.cs",
+    "sha256": "c18a32b9efe14dd245596ff01301b0674ca75bf18e6dc704eb98d4471f568223"
+  },
+  {
+    "path": "Scripts/Testing/ThunderHeartCooldownProbe.cs",
+    "sha256": "833ab1afbe652c47aa89efb1bd74d18d775fc849fdf76cbbbd036870684e8e1b"
+  },
+  {
+    "path": "Scripts/Testing/UiChoiceGuardProbe.cs",
+    "sha256": "99b55f1197f62eb0ed66cf2dc964254d9f34029b3aa511a35d3be7f4bb13b205"
+  },
+  {
+    "path": "Scripts/Testing/ValidationArtifacts.cs",
+    "sha256": "7e9a3b3cdc5b6ad88cd63efb46be5458430ab9c33fb8e6df15f6a242e8a8e76d"
+  },
+  {
+    "path": "Scripts/Testing/VisualReadabilityProbe.cs",
+    "sha256": "7d85f955316268a7aa151c85c47ecbc19383b66300dad6d941a43c0a8589a682"
+  },
+  {
+    "path": "Scripts/Testing/WingDiveProbe.cs",
+    "sha256": "306c92379d76d860b2aadbaf9d958be90096e80c8d26c7c3a616b1549c449a4a"
+  },
+  {
+    "path": "Scripts/UI/AbilityCardTile.cs",
+    "sha256": "278ee8c38573e60f844ecb57efe2ff5fe9a192f5bd8ad69ef82f7dc83d88bc35"
+  },
+  {
+    "path": "Scripts/UI/AbilityHud.cs",
+    "sha256": "dcd59c2b122dabbfec7a254d1d1ac1cd89b040f51149c1bc81a9b86fe568ce9d"
+  },
+  {
+    "path": "Scripts/UI/AbilityHudStyle.cs",
+    "sha256": "7b224f3f847f58ae2162d4d7235f9d5c3f5a619fea823b178c3cf8a3ff40e65c"
+  },
+  {
+    "path": "Scripts/UI/AbilityMatrixScreen.cs",
+    "sha256": "6cc8645443b5b761588a9212aff9dcb729721ca527c91b3c7b42044c08cb49f6"
+  },
+  {
+    "path": "Scripts/UI/ArmorBreakFx.cs",
+    "sha256": "7c5b0e1db8e06f31888e512d816251643dc270d5694feec2a1f8a4247abf2b61"
+  },
+  {
+    "path": "Scripts/UI/BaseGuide.cs",
+    "sha256": "03748bdaf361524299bd476d5b7f84ec6a46d711b49f9aa6a17d87b248e09351"
+  },
+  {
+    "path": "Scripts/UI/BossPerkText.cs",
+    "sha256": "e0575e46b7fa35876e5a4dc4c20c8374954cbe9df991401163e27c97acf33b9b"
+  },
+  {
+    "path": "Scripts/UI/BossPreviewScreen.cs",
+    "sha256": "2ca5dee035228cb79e36d3eb3d9398315cbac918656873c1d6711cb3990d60a5"
+  },
+  {
+    "path": "Scripts/UI/BuildScreen.cs",
+    "sha256": "aa8e7536b3a0369674bfea0172ced3b49d3de22f7047393b44ae3d4c5d09f653"
+  },
+  {
+    "path": "Scripts/UI/ChallengeStatusPanel.cs",
+    "sha256": "a2223333695bc8a46f6974ad905c85f17d0c50109b82d2d788fd5effac4a9823"
+  },
+  {
+    "path": "Scripts/UI/ChargeIndicator.cs",
+    "sha256": "fd4b2aff7b5bc1b95c30798008902430d6ad248c9b8ed1ffdbda65ef53e6d71f"
+  },
+  {
+    "path": "Scripts/UI/ChooseScreen.cs",
+    "sha256": "3205c1d7e00a909465e753e47fb3166258d052c59d97d611aa06aff75a811305"
+  },
+  {
+    "path": "Scripts/UI/Codex/CodexCatalog.cs",
+    "sha256": "083e2361ad3054ea401f0134f752e28b6c1a424070eaa8e29969c2cf8eced301"
+  },
+  {
+    "path": "Scripts/UI/Codex/CodexModelPreview.cs",
+    "sha256": "f70217171ba8fbbe5a6b3c6ca2494749d855bb53b40370281939d2ede9148cd8"
+  },
+  {
+    "path": "Scripts/UI/Codex/CodexScreen.cs",
+    "sha256": "bec1080c74b5b1dc6ad21c6997b442f99b2c52ef8f513734c1fb7973d50881de"
+  },
+  {
+    "path": "Scripts/UI/DamageNumbers.cs",
+    "sha256": "bbff67bd9b73fbbadf7c1f3010c744e57148bca130babc8221a6142a33261f8d"
+  },
+  {
+    "path": "Scripts/UI/DeathScreen.cs",
+    "sha256": "5df7878caa16b2743a649aa147a5c0705fbd342eeb63db7b7cb18a1e761e3ae1"
+  },
+  {
+    "path": "Scripts/UI/ExpeditionScreen.cs",
+    "sha256": "01ad28a284824cf9b38081b9c9535816ce83f14131c737717123c63963201e49"
+  },
+  {
+    "path": "Scripts/UI/KeyHint.cs",
+    "sha256": "c87ec08c912c85999bf3c86ed364d32021693eb06dc2ab4b2622baecabb69ada"
+  },
+  {
+    "path": "Scripts/UI/LoadingScreen.cs",
+    "sha256": "dfc6e1d77e53d34c34d5945b94c5d8bcf122ee753efbbe9e7d785e45b3af6fcb"
+  },
+  {
+    "path": "Scripts/UI/LoadoutPreview.cs",
+    "sha256": "f9124a88c18fe352eecd846b9aee1d977981fccd320248c62955e939ee986f72"
+  },
+  {
+    "path": "Scripts/UI/NodeChallengeInfo.cs",
+    "sha256": "7a9aebb157728736d3a80b365d1e436eefc613e20e0c35485ee366ff0a4c4dcf"
+  },
+  {
+    "path": "Scripts/UI/OverlayScreen.cs",
+    "sha256": "bf47f565071a98f508260a23e421421320df6026de794aa39e5bb54a2e7ebf3a"
+  },
+  {
+    "path": "Scripts/UI/PlayerHud.cs",
+    "sha256": "5287e498e0bfc759f445d9494fa862f12ccb06c58b9016efd932f216335e561b"
+  },
+  {
+    "path": "Scripts/UI/RewardPresentation.cs",
+    "sha256": "b1dcbff32b37c638a9638853305448a68d31dc43c2e2f4ad7f1ee95aa452cdfa"
+  },
+  {
+    "path": "Scripts/UI/RewardScreen.cs",
+    "sha256": "0ad796d7249879085a551e34ebbc420c267cae9495d4f28802c0b09aa55090ac"
+  },
+  {
+    "path": "Scripts/UI/RuneScreen.cs",
+    "sha256": "8d878442c0882974d616ad43b29603681af2a7c4d31437290b79a293f4e87c39"
+  },
+  {
+    "path": "Scripts/UI/ScopeOverlay.cs",
+    "sha256": "46494b9d924964280b7be1376888bc9baf973fc4a48fd872fd2848e8ceecb067"
+  },
+  {
+    "path": "Scripts/UI/Settings/HelpSettingsSection.cs",
+    "sha256": "b0600b41cee198b16a8dc18f5992bc2367bcaac8788d05047f42ffa754a2e57f"
+  },
+  {
+    "path": "Scripts/UI/Settings/SettingsScreen.cs",
+    "sha256": "770002888768f88d765bcba72dda4d68d4480c71fea160c62a1e57a69a9f071b"
+  },
+  {
+    "path": "Scripts/UI/Settings/SettingsSections.cs",
+    "sha256": "d88ee395710437a4efd4d069a2ce70873b918a8d76d5936f30d4b57b36839321"
+  },
+  {
+    "path": "Scripts/UI/Settings/SettingsStore.cs",
+    "sha256": "e833eaa5e296ec6591dd9277165038b78b9e400352f9f61340db3a04f6e8a24d"
+  },
+  {
+    "path": "Scripts/UI/StartScreen.cs",
+    "sha256": "e82e0306e9d5f906f4a5d0088e83f8ba253c76f1a7482e8a04ad3a33a8ec3cbe"
+  },
+  {
+    "path": "Scripts/UI/UiIcons.cs",
+    "sha256": "b6d6a89fee24a27e31e9fd31d1c79c19c37014f108457d778805992f300bb6f7"
+  },
+  {
+    "path": "Scripts/UI/UiRouter.cs",
+    "sha256": "4bd67cd652ab9d59f6c2ecd012f1fb8f2c2ef794469d3b2f4be3e8e430fbdebd"
+  },
+  {
+    "path": "Scripts/UI/UiService.cs",
+    "sha256": "714529af117660af1d71312b27396927c579c5721821eba35488bc3e35b340e6"
+  },
+  {
+    "path": "Scripts/UI/WorldOverlay.cs",
+    "sha256": "dc1fcac0bcee94cfc350fefda9b666a031a8c0fbc672ffd7bdadd9ecc159fa78"
+  },
+  {
+    "path": "Scripts/Visual/AnimeMotionCapture.cs",
+    "sha256": "22371bb6a2fd6fbf74f65be5ee7a03f3a2725f42acca228250909138fbea25ec"
+  },
+  {
+    "path": "Scripts/Visual/AnimeMotionFx.cs",
+    "sha256": "136b1925e8abda8b34e4cf6fc5419d565763456102a7efcd54bd16a6ff87d243"
+  },
+  {
+    "path": "Scripts/Visual/CharacterDisplay.cs",
+    "sha256": "9233ca0bd45d06856969660bf8a2a735b94e13867633537b3fa0397e714c0f2c"
+  },
+  {
+    "path": "Scripts/Visual/FxPalette.cs",
+    "sha256": "99d8013c2c29f6743a373b8e4a1df51a108fe508ff2aa135764882836a7fafa2"
+  },
+  {
+    "path": "Scripts/Visual/IWeaponPresentationSource.cs",
+    "sha256": "22deea39a3e994cb4cdfe78b8de5465a7ef4b585ae7b25ad556048599d4336fe"
+  },
+  {
+    "path": "Scripts/Visual/MeleeSwingFx.cs",
+    "sha256": "b93dd0d983a7524d7ca1c64999b790aaddb34c6b0c16b81905c66c11780eed7f"
+  },
+  {
+    "path": "Scripts/Visual/RewardBeaconFx.cs",
+    "sha256": "c31eca05a41fbc7b7eb53ce2c250a747a915a0c844770e8c033917a049dd48c2"
+  },
+  {
+    "path": "Scripts/Visual/SpiritSwordFx.cs",
+    "sha256": "6e91d8b04808f3e1780ad6229fb5d754a37c3215d30e4da85a37a8fc50c3b60a"
+  },
+  {
+    "path": "Scripts/Visual/ThrownWeaponDisplay.cs",
+    "sha256": "1d66ccdac4a48c1b37349b76734699a540d102ae22b1002bcec4dc5b9d78ad72"
+  },
+  {
+    "path": "Scripts/Visual/ToonPass.cs",
+    "sha256": "5b1e39560e09f3d0ac421b968d04b65a26c29a8e69fa8aebb587222a38c10f68"
+  },
+  {
+    "path": "Scripts/Visual/UnitCastGlow.cs",
+    "sha256": "9a20ee7445a0eb74d116b155f8f3b635c69bbc0cd87eaa8a4c49d2ff958bbd61"
+  },
+  {
+    "path": "Scripts/Visual/UnitMotionFx.cs",
+    "sha256": "8dd4b901ef36e37a04f71fcffb7a64c9b0e8cb38470d33fe6642ae8217650398"
+  },
+  {
+    "path": "Scripts/Visual/WorldPulseFx.cs",
+    "sha256": "8ce9c8034bdeae5e4a1140686e55d1958b105df479e277638c8b85b7fc058977"
+  },
+  {
+    "path": "Scripts/Weapons/Weapon.cs",
+    "sha256": "ea5b88ed1e914e58307828df5eb5aa4e217f895b1c11aa46fa43ad8aefb2e13a"
+  },
+  {
+    "path": "Scripts/World/KillZone.cs",
+    "sha256": "936d887b09bb927f58ba01fbf0b4606befcfceb45bb62be183442554b23c17ec"
+  },
+  {
+    "path": "Scripts/World/MapManager.cs",
+    "sha256": "c37110c99d22b7f1103a8039c0cb62b7db26bc1b90bbe184965c975921f4adad"
+  },
+  {
+    "path": "Scripts/World/MapManager.Navigation.cs",
+    "sha256": "f514cd261ec2c14c00d2797c5130c6ffa712a8fc34b3973a3a903555474c66fe"
+  }
+]

@@ -1,0 +1,44 @@
+{
+  "Date": "2026-10-27T11:56:02",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "EliteIntegration",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 11.38,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_115602.EliteIntegration.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_115602.EliteIntegration.headless.err",
+      "SHA256": "3826911BE43A4B14B59E56B82886A66E9930788996C7C777BE84A5BD472C683B"
+    },
+    {
+      "Name": "EliteIntegration",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 21.09,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_115602.EliteIntegration.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_115602.EliteIntegration.render.err",
+      "SHA256": "CF36B8EDD722A929C5E2DBD39E7FB3E0AACAA5FCA14C8B443754BDDB59A079CA"
+    },
+    {
+      "Name": "BalanceTuning",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 6.02,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_115602.BalanceTuning.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_115602.BalanceTuning.headless.err",
+      "SHA256": "C89B23D7A14A922DA01DD584C352BA7121A45A478654B5C759571AB1D69638FF"
+    },
+    {
+      "Name": "BalanceTuning",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 7.56,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_115602.BalanceTuning.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261027_115602.BalanceTuning.render.err",
+      "SHA256": "15D97C3D4DF2CFF71B47466EA0ACDA2CAE36CE9816E1BA68EDBCF56A8FC79285"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

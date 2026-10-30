@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using ActRoguelike.Combat;
 using ActRoguelike.Config;
+using ActRoguelike.Encounter;
 using Godot;
 
 namespace ActRoguelike.Boss;
@@ -24,6 +26,8 @@ public partial class BossPressure : Node
 
 	public int Level { get; private set; }
 	public float Elapsed { get; private set; }
+	public int PendingAdds { get; private set; }
+	private float _spawnRetry;
 
 	/// <summary>
 	/// 战斗开始时的初始压力等级（由 Stage 的免费挑战额度超出部分决定，策划文档 §6.3）。
@@ -57,23 +61,26 @@ public partial class BossPressure : Node
 	{
 		if (_unit.IsDead)
 		{
+			PendingAdds = 0;
 			return;
 		}
 
 		Elapsed += (float)delta;
 		int level = Mathf.Min(MaxLevel, _initialLevel + (int)(Elapsed / Mathf.Max(1f, Interval)));
-		if (level == Level)
+		if (level != Level)
 		{
-			return;
+			bool leveled = level > Level;
+			Level = level;
+			ApplyModifiers();
+			if (leveled && AddSpawnLevel > 0 && level >= AddSpawnLevel && AddScene != null)
+				PendingAdds += Mathf.Max(0, AddsPerLevel);
 		}
 
-		bool leveled = level > Level;
-		Level = level;
-		ApplyModifiers();
-
-		if (leveled && AddSpawnLevel > 0 && level >= AddSpawnLevel)
+		_spawnRetry -= (float)delta;
+		if (PendingAdds > 0 && _spawnRetry <= 0f)
 		{
 			SpawnAdds();
+			_spawnRetry = 0.3f;
 		}
 	}
 
@@ -94,26 +101,28 @@ public partial class BossPressure : Node
 		}
 
 		Node parent = GetTree().CurrentScene ?? GetTree().Root;
-		for (int i = 0; i < AddsPerLevel; i++)
+		var reserved = new List<Vector3>();
+		while (PendingAdds > 0)
 		{
 			var add = AddScene.Instantiate<Unit>();
 
-			// ⚠️ 与其它 4 处生成路径**同一条**：实例化 → **套单位表** → `AddChild`
-			// （见 `EncounterController.cs:571/383/856/895` 与 `SummonAbility.cs:61`）。
-			// 顺序不能反：`Unit._EnterTree` 在 `AddChild` 时捕获基础值。
-			//
-			// 改前这里**只 `AddChild`**，于是首领召唤的小怪用的是场景值（Chaser **60 血**），
-			// 既漏掉全局倍率（`enemy_global` 的 ×0.75 → **45 血**），也漏掉敌人行上的 AI 档案。
-			// → 现在与波次刷怪出来的同类小怪**完全一致**（45 血 + `ai_chaser`）。
+			// 单位表先套用，避免进树捕获错误基础值；失败不消耗本次增援。
 			ConfigRows.ByScenePath<EnemyConfig>(AddScene.ResourcePath)?.ApplyTo(add);
+			float radius = Mathf.Max(0f, AddSpawnRadius);
+			if (!SpawnPlanner.TryFindSpawnPoint(_unit.GlobalPosition, radius * 0.5f, radius, out Vector3 point, add, reserved))
+			{
+				add.Free();
+				return;
+			}
 
 			parent.AddChild(add);
-			float angle = (float)GD.RandRange(0d, Mathf.Tau);
-			add.GlobalPosition = _unit.GlobalPosition + new Vector3(Mathf.Cos(angle) * AddSpawnRadius, 0.6f, Mathf.Sin(angle) * AddSpawnRadius);
+			add.GlobalPosition = point;
 
 			// 全局难度倍率：与 `EncounterController` 一样在**进树之后**套用（会回满生命）。
 			// ⚠️ 反过来（进树前套）会让 `_EnterTree` 把乘过倍率的生命捕获成基础值，`_Ready` 再乘一次。
 			ConfigIndex.ScaleEnemy(add, this, false);
+			reserved.Add(point);
+			PendingAdds--;
 		}
 	}
 }

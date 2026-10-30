@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-21",
+  "generator": "built-in image_gen",
+  "mode": "edit",
+  "enemy_id": "enemy_meteor_mage",
+  "reference": "e13-meteor-mage-v3.png",
+  "output": "e13-meteor-mage-v3-staff.png",
+  "user_request": "保持已认可的小法师形象，拿一根小法杖。",
+  "prompt": "Use case: precise-object-edit.\nAsset type: game enemy appearance reference, approved black ghost wizard with one added accessory.\nInput image: the supplied image is the EDIT TARGET. The user has approved this exact character. Preserve its identity, proportions, round near-black head, two equal warm ivory oval eyes, purple wizard hat and band, rounded black upper body, flowing tapered ghost tail, floating pose, lighting, framing, plain warm-gray background and render style.\nPrimary request: keep this character and let it HOLD A SMALL SIMPLE MAGIC STAFF.\nMake only the minimum local change needed: use the existing little side flame lobe beside the torso as a short ghostly appendage ending in a tiny rounded black mitten-like hand, visibly gripping a slender little staff upright beside the body. Keep this grip compact and unobtrusive; do not add ordinary human arms or alter the main body silhouette. The staff is modest in size, approximately half the full character height, with a thin dark-brown wooden shaft and one small simple warm ivory glowing bead at the top, matching the eyes. Keep the bead small, with no dramatic glow. Place the staff where it is clearly visible and does not cover the face, eyes or hat.\nConstraints: this is an accessory edit, not a redesign. Preserve the existing hat shape, face, body shape, tail and colors as faithfully as possible. Do not add legs, feet, clothes, a robe, pumpkin, skull, elaborate ornaments, multiple weapons or excessive effects. Do not change the eyes, change the pose, turn the body into cyan flame, enlarge the staff into a heavy weapon, or introduce deliberate asymmetry. No text, no labels, no watermark."
+}

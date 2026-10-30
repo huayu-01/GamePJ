@@ -1,0 +1,102 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/SupplyDropRewardEffect.cs" id="definition"]
+[ext_resource type="Script" path="res://Scripts/Config/SupplyOptionDefinition.cs" id="option"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/effect_1356.tres" id="status1356"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/effect_1357.tres" id="status1357"]
+[ext_resource type="Resource" path="res://Config/Tables/Effects/effect_1358.tres" id="status1358"]
+
+[sub_resource type="Resource" id="supply_heal"]
+script = ExtResource("option")
+Kind = 0
+DisplayName = "生命药剂"
+NameKey = "supply.heal.name"
+Amount = 10
+Duration = 0
+AdventureWeight = 25
+SurvivalWeight = 25
+Color = Color(1, 0.3, 0.35, 1)
+[sub_resource type="Resource" id="supply_power"]
+script = ExtResource("option")
+Kind = 2
+DisplayName = "力量药剂"
+NameKey = "supply.power.name"
+Amount = 30
+Duration = 30
+AdventureWeight = 20
+SurvivalWeight = 20
+Color = Color(1, 0.55, 0.2, 1)
+Status = ExtResource("status1356")
+[sub_resource type="Resource" id="supply_armor"]
+script = ExtResource("option")
+Kind = 1
+DisplayName = "护甲片"
+NameKey = "supply.armor.name"
+Amount = 20
+Duration = 0
+AdventureWeight = 20
+SurvivalWeight = 15
+Color = Color(0.6, 0.75, 1, 1)
+[sub_resource type="Resource" id="supply_speed"]
+script = ExtResource("option")
+Kind = 2
+DisplayName = "速度药剂"
+NameKey = "supply.speed.name"
+Amount = 0.2
+Duration = 15
+AdventureWeight = 15
+SurvivalWeight = 10
+Color = Color(0.3, 1, 0.7, 1)
+Status = ExtResource("status1357")
+[sub_resource type="Resource" id="supply_haste"]
+script = ExtResource("option")
+Kind = 2
+DisplayName = "急速药剂"
+NameKey = "supply.haste.name"
+Amount = 0.5
+Duration = 15
+AdventureWeight = 10
+SurvivalWeight = 10
+Color = Color(0.6, 0.65, 1, 1)
+Status = ExtResource("status1358")
+[sub_resource type="Resource" id="supply_experience"]
+script = ExtResource("option")
+Kind = 3
+DisplayName = "经验药剂"
+NameKey = "supply.experience.name"
+Amount = 20
+Duration = 0
+AdventureWeight = 0
+SurvivalWeight = 15
+Color = Color(0.25, 0.9, 1, 1)
+[sub_resource type="Resource" id="supply_shards"]
+script = ExtResource("option")
+Kind = 4
+DisplayName = "碎片包"
+NameKey = "supply.shards.name"
+Amount = 5
+Duration = 0
+AdventureWeight = 10
+SurvivalWeight = 5
+Color = Color(1, 0.85, 0.3, 1)
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+IntervalSeconds = 10
+MinRadius = 6
+MaxRadius = 10
+PickupLifetime = 30
+MaxOutstanding = 5
+Options = [SubResource("supply_heal"), SubResource("supply_power"), SubResource("supply_armor"), SubResource("supply_speed"), SubResource("supply_haste"), SubResource("supply_experience"), SubResource("supply_shards")]
+[resource]
+script = ExtResource("row")
+NumericId = 1346
+DisplayName = "天降空投"
+NameKey = "content.1346.name"
+DescriptionKey = "content.1346.description"
+DescriptionTemplate = "战斗中每{Effects.0.IntervalSeconds}秒在周围{Effects.0.MinRadius}～{Effects.0.MaxRadius}米有效位置落下一份补给，留场{Effects.0.PickupLifetime}秒。补给包含生命、力量、护甲、速度、急速、碎片；死战还可出现经验。"
+RewardKind = 2
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

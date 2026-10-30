@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "pass": 7,
+  "fail": 0,
+  "checks": [
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u751F\u5B58\u6A21\u5F0F\u3001\u73A9\u5BB6\u548C\u5BFC\u822A\u5DF2\u51C6\u5907"
+    },
+    {
+      "passed": true,
+      "message": "100\u4E2A\u5F53\u524D\u654C\u4EBA\u6A21\u578B\u5B50\u6811\uFF0C\u65E0\u654C\u4EBAAI\uFF0F\u653B\u51FB\u811A\u672C\uFF1B\u52A8\u753B\u64AD\u653E\u5668100\u3001\u9AA8\u9ABC469\u3001Mesh167\u3001\u8868\u9762167"
+    },
+    {
+      "passed": true,
+      "message": "\u8BCA\u65AD\u9636\u6BB5visible_animated\u6709\u6548\u91C7\u68371238\u5E27\uFF0C\u5E73\u57472.42ms\uFF0FGPU2.03ms"
+    },
+    {
+      "passed": true,
+      "message": "\u8BCA\u65AD\u9636\u6BB5visible_frozen\u6709\u6548\u91C7\u68371216\u5E27\uFF0C\u5E73\u57472.47ms\uFF0FGPU2.10ms"
+    },
+    {
+      "passed": true,
+      "message": "\u8BCA\u65AD\u9636\u6BB5hidden_animated\u6709\u6548\u91C7\u68371253\u5E27\uFF0C\u5E73\u57472.39ms\uFF0FGPU2.06ms"
+    },
+    {
+      "passed": true,
+      "message": "\u8BCA\u65AD\u9636\u6BB5hidden_frozen\u6709\u6548\u91C7\u68371265\u5E27\uFF0C\u5E73\u57472.37ms\uFF0FGPU2.06ms"
+    },
+    {
+      "passed": true,
+      "message": "\u8BCA\u65AD\u9636\u6BB5visible_animated_repeat\u6709\u6548\u91C7\u68371195\u5E27\uFF0C\u5E73\u57472.51ms\uFF0FGPU2.12ms"
+    }
+  ]
+}

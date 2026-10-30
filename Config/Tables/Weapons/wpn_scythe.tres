@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1324
 OwnerCharacter = ExtResource("10_owner")
 ModelPath = "res://Scenes/Weapons/Visuals/scythe.tscn"
 IconPath = "res://Assets/UI/Icons/Skills/ic_skill_scythe.svg"
@@ -18,9 +19,6 @@ UsesWeaponComponent = false
 AttackTags = PackedStringArray("Melee", "Scythe", "Physical")
 Damage = 0.0
 FireInterval = 0.5
-MagazineSize = 1
-ReloadTime = 0.1
-AutoReloadDelay = 999.0
 SpreadDegrees = 0.0
 AimSpreadScale = 0.0
 MultiShotSpreadDegrees = 0.0
@@ -39,3 +37,7 @@ Slot = 8
 DisplayName = "镰刀"
 DescriptionTemplate = "近战武器：武技1 憎恶（3 连招，最后一刀大回旋）/ 武技2 无情（抛出武器，旋转并周期性伤害；再次使用或靠近收回）。"
 Note = "[P4 新增行] 角色 B 武器2 镰刀（攻击范围较大）。攻击全部由本行 Skills 里那两个武技技能完成（Weapon 组件不开火）。"
+
+NameKey = "content.wpn_scythe.name"
+
+DescriptionKey = "content.wpn_scythe.description"

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AbilityConfig" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_wbb8i"]
+
+[resource]
+script = ExtResource("1_wbb8i")
+Cooldown = 2.5
+NumericId = 9000001
+Id = "9000001"

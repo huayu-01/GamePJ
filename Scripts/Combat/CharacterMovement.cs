@@ -17,6 +17,23 @@ public partial class CharacterMovement : Node
 	private readonly List<Ability> _movementAbilities = new();
 	public void RegisterAbility(Ability ability) { if (!_movementAbilities.Contains(ability)) _movementAbilities.Add(ability); }
 	public void UnregisterAbility(Ability ability) => _movementAbilities.Remove(ability);
+	/// <summary>允许移动攻击的被动可配置主动移速；只影响输入，不削减技能位移或外力。</summary>
+	public float ActionMovementSpeedScale
+	{
+		get
+		{
+			bool attacking = false;
+			float scale = 1f;
+			foreach (var ability in _movementAbilities)
+			{
+				if (!IsInstanceValid(ability) || !ability.Enabled) continue;
+				if (ability.IsBusy && ability.ActionMovement == Ability.MovementPolicy.Attack) attacking = true;
+				if (ability is AirJumpPassiveAbility { GrantAttackMovement: true } agility)
+					scale = Mathf.Min(scale, Mathf.Clamp(agility.AttackMoveSpeedScale, 0.05f, 1f));
+			}
+			return attacking ? scale : 1f;
+		}
+	}
 	/// <summary>只限制地面主动输入；空中、技能自身位移和外力仍由原运动流程消费。</summary>
 	public bool IsActionMovementLocked
 	{
@@ -58,10 +75,14 @@ public partial class CharacterMovement : Node
 	public bool TeleportJumpEnabled { get; private set; }
 	public int TeleportJumpCount { get; private set; }
 	public float LastTeleportJumpHeight { get; private set; }
+	public float TeleportJumpHeightMultiplier { get; private set; }
+	public float TeleportJumpHoverSeconds { get; private set; }
 	private bool _teleportJumpConsumed, _teleportAwaitAir;
-	public void ConfigureTeleportJump(bool enabled)
+	public void ConfigureTeleportJump(bool enabled, float heightMultiplier = 0, float hoverSeconds = 0)
 	{
 		TeleportJumpEnabled = enabled;
+		TeleportJumpHeightMultiplier = heightMultiplier;
+		TeleportJumpHoverSeconds = hoverSeconds;
 		TeleportJumpCount = 0;
 		LastTeleportJumpHeight = 0f;
 		_teleportJumpConsumed = _teleportAwaitAir = false;
@@ -106,6 +127,7 @@ public partial class CharacterMovement : Node
 
 	private CharacterBody3D _body = null!;
 	private Unit? _unit;
+	private AirHoverController? _hover;
 	private float _gravity;
 
 	private Vector3 _intentDirection;
@@ -121,18 +143,20 @@ public partial class CharacterMovement : Node
 	private Vector3 _overrideVelocity;
 	private float _overrideTimeLeft = -1;
 	private bool _overrideIsDash;
+	private bool _overridePlanarOnly;
 	public bool HasVelocityOverride => _velocityOverrideSource != null;
 	public bool VelocityOverrideFinished(object source) => ReferenceEquals(source, _velocityOverrideSource) && _overrideTimeLeft == 0;
 
 	/// <summary>动作持有完整三维速度；结束时只能释放自己持有的覆盖。</summary>
-	public bool BeginVelocityOverride(object source, Vector3 velocity, float duration = -1, bool isDash = false)
+	public bool BeginVelocityOverride(object source, Vector3 velocity, float duration = -1, bool isDash = false, bool planarOnly = false)
 	{
-		if (IsControlDisabled) return false;
+		if (IsControlDisabled || _unit?.HasActionLock == true) return false;
 		if (_velocityOverrideSource != null && !ReferenceEquals(_velocityOverrideSource, source)) return false;
 		_velocityOverrideSource = source;
 		_overrideVelocity = velocity;
 		_overrideTimeLeft = duration;
 		_overrideIsDash = isDash;
+		_overridePlanarOnly = planarOnly;
 		return true;
 	}
 	public void EndVelocityOverride(object source)
@@ -142,6 +166,7 @@ public partial class CharacterMovement : Node
 		_overrideVelocity = Vector3.Zero;
 		_overrideTimeLeft = -1;
 		_overrideIsDash = false;
+		_overridePlanarOnly = false;
 		_inputVelocity = Vector3.Zero;
 		if (IsInstanceValid(_body)) _body.Velocity = Vector3.Zero;
 		_previousExternalY = 0f;
@@ -181,7 +206,7 @@ public partial class CharacterMovement : Node
 	/// <summary>位移技能用：在持续时间内以固定速度沿方向移动，忽略常规加速度。</summary>
 	public void BeginDash(Vector3 direction, float speed)
 	{
-		if (IsControlDisabled) return;
+		if (IsControlDisabled || _unit?.HasActionLock == true) return;
 		_dashDirection = direction.LengthSquared() < 0.0001f ? -_body.GlobalTransform.Basis.Z : direction.Normalized();
 		_dashSpeed = speed;
 	}
@@ -206,6 +231,7 @@ public partial class CharacterMovement : Node
 	public event Action<Vector3>? JumpStarted;
 	public void BeginJump(float velocity)
 	{
+		if (_unit?.HasActionLock == true) return;
 		SetVerticalVelocity(velocity);
 		if (velocity > 0f) JumpStarted?.Invoke(_body.GlobalPosition);
 	}
@@ -214,6 +240,7 @@ public partial class CharacterMovement : Node
 	{
 		_body = GetParent<CharacterBody3D>();
 		_unit = _body as Unit;
+		_hover = _unit?.GetNodeOrNull<AirHoverController>("AirHover");
 		// 初始只收集一次；后加的能力由Ability注册，避免每物理帧遍历模型整棵子树。
 		if (_unit != null) NodeSearch.CollectInSubtree(_unit, _movementAbilities);
 		_gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
@@ -292,6 +319,7 @@ public partial class CharacterMovement : Node
 	/// <summary>设置水平移动意图。direction 不需要归一化，speed 为 0 即停下。</summary>
 	public void SetIntent(Vector3 direction, float speed)
 	{
+		if (_unit?.HasActionLock == true) { Stop(); return; }
 		_intentDirection = direction.LengthSquared() > 1f ? direction.Normalized() : direction;
 		_intentSpeed = speed;
 	}
@@ -327,7 +355,7 @@ public partial class CharacterMovement : Node
 
 	public bool TryJump()
 	{
-		if (CanFly || IsControlDisabled) return false;
+		if (CanFly || IsControlDisabled || _unit?.HasActionLock == true) return false;
 		if (HasVelocityOverride) return false;
 		if (TeleportJumpEnabled) return TryTeleportJump();
 		if (_body.IsOnFloor())
@@ -350,8 +378,8 @@ public partial class CharacterMovement : Node
 	{
 		if (!_body.IsOnFloor() || _teleportJumpConsumed) return false;
 		// 每份额外次数换一份完整地面跳高，不能套普通空中跳的0.5高度比例。
-		float height = EffectiveJumpVelocity * EffectiveJumpVelocity / (2f * Mathf.Max(0.001f, _gravity * GravityScale))
-			* (1 + Mathf.Max(0, ExtraAirJumps));
+		float height = TeleportJumpHeightMultiplier > 0 ? StandardJumpHeight * TeleportJumpHeightMultiplier
+			: EffectiveJumpVelocity * EffectiveJumpVelocity / (2f * Mathf.Max(0.001f, _gravity * GravityScale)) * (1 + Mathf.Max(0, ExtraAirJumps));
 		using var collision = new KinematicCollision3D();
 		float travel = _body.TestMove(_body.GlobalTransform, Vector3.Up * height, collision)
 			? Mathf.Clamp(collision.GetTravel().Y, 0f, height) : height;
@@ -370,8 +398,9 @@ public partial class CharacterMovement : Node
 		FallHeight = 0f;
 		LastTeleportJumpHeight = travel;
 		TeleportJumpCount++;
+		if (TeleportJumpHoverSeconds > 0) _unit?.GetNodeOrNull<AirHoverController>("AirHover")?.Grant(TeleportJumpHoverSeconds);
 		JumpStarted?.Invoke(origin);
-		ActRoguelike.Core.GameLog.Write("Combat", $"浮光跃金：额外{ExtraAirJumps}次 → {1 + ExtraAirJumps}份完整地面跳高，目标{height:0.###}m／实际瞬移{travel:0.###}m");
+		ActRoguelike.Core.GameLog.Write("Combat", $"浮光跃金：目标{height:0.###}m／实际瞬移{travel:0.###}m，浮空{TeleportJumpHoverSeconds:0.##}秒");
 		return true;
 	}
 
@@ -384,6 +413,7 @@ public partial class CharacterMovement : Node
 
 	public override void _PhysicsProcess(double delta)
 	{
+		using var frameProfile=ActRoguelike.Core.RuntimeFrameProfiler.Measure("Movement");
 		if (_unit?.ImpactPause?.IsHolding == true) return;
 		float dt = (float)delta;
 		if (_unit is { IsDead: true })
@@ -428,12 +458,16 @@ public partial class CharacterMovement : Node
 			FallHeight = Mathf.Max(0f, _apexY - nowY);
 		}
 
-		if (HasVelocityOverride && _unit?.Reactions?.IsStaggered != true)
+		if (HasVelocityOverride && _unit?.Reactions?.IsStaggered != true && _unit?.HasActionLock != true)
 		{
 			float fraction = _overrideTimeLeft < 0 ? 1 : Mathf.Clamp(_overrideTimeLeft / Mathf.Max(0.000001f, dt), 0, 1);
 			_body.Velocity = _overrideVelocity * fraction;
+			if (_overridePlanarOnly)
+				_body.Velocity = new Vector3(_body.Velocity.X, velocity.Y, _body.Velocity.Z) + _externalVelocity;
+			_body.Velocity += _crowdVelocity;
 			_body.MoveAndSlide();
-			_previousExternalY = 0f;
+			if (_overridePlanarOnly) FinishPhysicsMove(Mathf.Max(0, -_body.Velocity.Y));
+			else { ClipCrowdPush(); _previousExternalY = 0f; }
 			if (_overrideTimeLeft >= 0)
 			{
 				_overrideTimeLeft = Mathf.Max(0, _overrideTimeLeft - dt);
@@ -445,12 +479,12 @@ public partial class CharacterMovement : Node
 
 		// 输入速度单独维护：不能从刚体速度里读回来，否则击退会叠加上一帧的击退形成正反馈。
 		Vector3 planar;
-		if (_dashSpeed > 0f && !IsControlDisabled)
+		if (_dashSpeed > 0f && !IsControlDisabled && _unit?.HasActionLock != true)
 		{
 			planar = _dashDirection * _dashSpeed;
 			_inputVelocity = planar;
 		}
-		else if (IsActionMovementLocked || IsControlDisabled)
+		else if (IsActionMovementLocked || IsControlDisabled || _unit?.HasActionLock == true)
 		{
 			// 进入锁定动作立即收住主动惯性；不清外力，避免抵消击退或技能突进。
 			_inputVelocity = planar = Vector3.Zero;
@@ -458,14 +492,23 @@ public partial class CharacterMovement : Node
 		else
 		{
 			float speedMultiplier = _unit?.Stats.Get("MoveSpeedMultiplier") ?? 1f;
-			Vector3 desired = _intentDirection * (_intentSpeed * speedMultiplier);
+			float actionScale = ActionMovementSpeedScale;
+			// 浮空只改主动输入：忽略奔跑和成长倍率，技能位移与外力仍走原通道。
+			bool fixedHoverSpeed = !_body.IsOnFloor() && _hover is { IsHovering: true, Maintaining: true }
+				&& (string.IsNullOrEmpty(_hover.CancelAction) || !Input.IsActionJustPressed(_hover.CancelAction));
+			float desiredSpeed = fixedHoverSpeed ? (_intentSpeed > 0 ? (_unit?.MoveSpeed ?? 0) * .5f : 0) : _intentSpeed * speedMultiplier * actionScale;
+			// 进入攻击时即时限制主动惯性，避免从奔跑带着高速滑过蓄力前段。
+			if ((fixedHoverSpeed || actionScale < 1f) && _inputVelocity.Length() > desiredSpeed)
+				_inputVelocity = _inputVelocity.Normalized() * Mathf.Max(0f, desiredSpeed);
+			Vector3 desired = _intentDirection * desiredSpeed;
 			float acceleration = (_body.IsOnFloor() ? GroundAcceleration : AirAcceleration) * dt;
 			_inputVelocity = _inputVelocity.MoveToward(desired, acceleration);
+			_inputVelocity = _unit?.Navigation?.Avoid(_inputVelocity) ?? _inputVelocity;
 			planar = _inputVelocity;
 		}
 
-		velocity.X = planar.X + _externalVelocity.X;
-		velocity.Z = planar.Z + _externalVelocity.Z;
+		velocity.X = planar.X + _externalVelocity.X + _crowdVelocity.X;
+		velocity.Z = planar.Z + _externalVelocity.Z + _crowdVelocity.Z;
 		velocity.Y += _externalVelocity.Y;
 		_body.Velocity = velocity;
 		_body.MoveAndSlide();

@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1046
 Id = "ai_drone"
 DisplayName = "无人机（召唤物）"
 SearchRange = 22.0

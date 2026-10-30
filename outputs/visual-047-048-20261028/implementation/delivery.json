@@ -1,0 +1,94 @@
+{
+  "Created": "2026-10-28T21:11:43",
+  "Builds": {
+    "Debug": "0 warnings / 0 errors",
+    "ExportRelease": "0 warnings / 0 errors"
+  },
+  "RelatedChecksPassed": true,
+  "HistoricalRegressionAllPassed": false,
+  "HistoricalFailures": [
+    "CharacterDesign: 62 pass / 53 fail; old foot bones and spear assertions",
+    "BowSweep: 38 pass / 1 fail; old spear charge tier assertion"
+  ],
+  "RealSavesUnchanged": true,
+  "Screenshots": [
+    {
+      "File": "047-brush-current-1080p.png",
+      "Width": 1920,
+      "Height": 1080,
+      "SHA256": "AE4AFCB0BA70A2388593D95BAB111A3A5B5C09010502CD5E1700E403621A2202"
+    },
+    {
+      "File": "047-brush-current-1280x720.png",
+      "Width": 1280,
+      "Height": 720,
+      "SHA256": "CE9F647E905384A03F1A334DD032F27E551F7866AC7828C21674CE071248AF60"
+    },
+    {
+      "File": "047-brush-current-3840x2160.png",
+      "Width": 3840,
+      "Height": 2160,
+      "SHA256": "1B04AC7F37AFD76A2CBF66F01A6CBD9FC5339B7E4727729A8294239EB493F22B"
+    },
+    {
+      "File": "048-build-glass-1080p.png",
+      "Width": 1920,
+      "Height": 1080,
+      "SHA256": "41D1EBFF78C46B2010B19350366349E1919646206576FAE9482AA34E1920C21C"
+    },
+    {
+      "File": "048-build-glass-1280x720.png",
+      "Width": 1280,
+      "Height": 720,
+      "SHA256": "87FCD5E5996F4C7224359A824D4560B9E91BDF927711186ACDF50496F1740291"
+    },
+    {
+      "File": "048-build-glass-3840x2160.png",
+      "Width": 3840,
+      "Height": 2160,
+      "SHA256": "C27277B368E6681820E3F98A27FDB1D2703CB9193036920D9E25500B5D18043A"
+    },
+    {
+      "File": "048-codex-glass-1080p.png",
+      "Width": 1920,
+      "Height": 1080,
+      "SHA256": "641921C3A443A664EA51C3C391EF45B1C4DA6698850BFA48BDF8CDB948983C40"
+    },
+    {
+      "File": "048-codex-glass-1280x720.png",
+      "Width": 1280,
+      "Height": 720,
+      "SHA256": "9AD373A864FAE4436160C782AA09882808C22EFB9554D6F087BA23EFD46CE9A4"
+    },
+    {
+      "File": "048-codex-glass-3840x2160.png",
+      "Width": 3840,
+      "Height": 2160,
+      "SHA256": "F150BF564FF81E51F52B7467B0EB26C06D3062ED2F5C1140CCAC8D9F160A8DD7"
+    },
+    {
+      "File": "048-reward-english-1080p.png",
+      "Width": 1920,
+      "Height": 1080,
+      "SHA256": "E568C42AFEBE7D8E06E9F39F75BCB7957916CD309A95A8AC3E892F99EAAADFCA"
+    },
+    {
+      "File": "048-reward-glass-1080p.png",
+      "Width": 1920,
+      "Height": 1080,
+      "SHA256": "7B0EFFB52823DB4AC56783FAA74A2D1D6134483686F8355401C0BA3F3B9B2785"
+    },
+    {
+      "File": "048-reward-glass-1280x720.png",
+      "Width": 1280,
+      "Height": 720,
+      "SHA256": "1D20055A38BA9697150E8D3C3A59BAC1D98837E308729069AFB12D3915081A3A"
+    },
+    {
+      "File": "048-reward-glass-3840x2160.png",
+      "Width": 3840,
+      "Height": 2160,
+      "SHA256": "271F0D9CB36F1C7A8D4BDE3CB9B2CA87E2ABE25808A334AE68A4D38FAC124B79"
+    }
+  ]
+}

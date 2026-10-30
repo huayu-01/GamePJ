@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ActRoguelike.Audio;
 using Godot;
 
@@ -40,9 +41,12 @@ public abstract partial class OverlayScreen : CanvasLayer
 	[Export] public UiLayer ScreenLayer { get; set; } = UiLayer.Panel;
 
 	/// <summary>打开后的输入保护时间（秒），防误触。</summary>
-	[Export] public float OpenGuardSeconds { get; set; } = 0.3f;
+	[Export] public float OpenGuardSeconds { get; set; } = 1f;
 
-	/// <summary>开合缓动时长（秒）。0 = 不做动画。</summary>
+	/// <summary>打开淡入与缩放的时长；关闭继续使用 FadeSeconds，避免退出拖沓。</summary>
+	[Export] public float OpenFadeSeconds { get; set; } = 1f;
+
+	/// <summary>关闭缓动时长（秒）。0 = 不做关闭动画。</summary>
 	[Export] public float FadeSeconds { get; set; } = 0.16f;
 
 	/// <summary>打开动画的起始缩放（1 = 不缩放）。</summary>
@@ -61,9 +65,14 @@ public abstract partial class OverlayScreen : CanvasLayer
 	public bool IsOpen { get; private set; }
 
 	/// <summary>保护期是否还没结束（true = 现在不接受输入）。</summary>
-	public bool InputBlocked => Time.GetTicksMsec() < _interactiveAt;
+	public bool InputBlocked => _openingGuard.IsBlocked;
+	private readonly UiOpeningGuard _openingGuard = new();
 
-	private ulong _interactiveAt;
+	public override void _Input(InputEvent @event)
+	{
+		bool top = IsOpen && ScreenLayer != UiLayer.Hud && UiRouter.Instance?.IsTopScreen(this) != false;
+		if (_openingGuard.Filter(@event, top)) GetViewport().SetInputAsHandled();
+	}
 
 	/// <summary>按键提示栏的节点名。场景里可以手写同名节点覆盖样式；没有就由基类建一份。</summary>
 	public const string KeyHintBarNodeName = "KeyHintBar";
@@ -75,6 +84,7 @@ public abstract partial class OverlayScreen : CanvasLayer
 	private HBoxContainer? _keyHintBar;
 	private bool _keyHintsEnabled = true;
 	private bool _overlayInitialized;
+	private Tween? _fadeTween;
 
 	protected abstract Control Root { get; }
 
@@ -248,14 +258,19 @@ public abstract partial class OverlayScreen : CanvasLayer
 		EnsureKeyHintBar();
 		foreach (Node child in _keyHintBar!.GetChildren())
 		{
+			// 装饰背景不参与键帽排版，更新提示时保留。
+			if (child is not Control) continue;
 			// 先摘再删：QueueFree 要等帧末才生效，同一帧重建两次会看到旧键帽还挂在那儿。
 			_keyHintBar.RemoveChild(child);
 			child.QueueFree();
 		}
 
+		bool glass = _keyHintBar.HasMeta("glass_hints");
 		foreach (KeyHint hint in _keyHints)
 		{
-			_keyHintBar.AddChild(BuildChip(hint));
+			if (glass && _keyHintBar.GetChildren().OfType<Control>().Any())
+				_keyHintBar.AddChild(new VSeparator { CustomMinimumSize=new Vector2(1,40),SizeFlagsVertical=Control.SizeFlags.ShrinkCenter,MouseFilter=Control.MouseFilterEnum.Ignore });
+			_keyHintBar.AddChild(glass ? GlassUi.HintChip(hint,_keyHintBar.GetMeta("glass_dark",false).AsBool()) : BuildChip(hint));
 		}
 
 		ApplyKeyHintVisibility();
@@ -319,7 +334,7 @@ public abstract partial class OverlayScreen : CanvasLayer
 	{
 		IsOpen = true;
 		Root.Visible = true;
-		_interactiveAt = Time.GetTicksMsec() + (ulong)(Mathf.Max(OpenGuardSeconds, FadeSeconds) * 1000f);
+		_openingGuard.Begin(Mathf.Max(OpenGuardSeconds, OpenFadeSeconds));
 
 		// 先登记再播动画，保证暂停/鼠标模式立刻生效。
 		UiRouter.Instance?.Push(this);
@@ -341,7 +356,11 @@ public abstract partial class OverlayScreen : CanvasLayer
 	/// <summary>统一的淡入 + 缩放动画。</summary>
 	private void PlayFade(bool open, Action? onDone)
 	{
-		if (FadeSeconds <= 0.01f)
+		// 连续奖励会同帧关闭再打开；取消旧动画，不能让旧关闭回调隐藏新一页。
+		_fadeTween?.Kill();
+		_fadeTween = null;
+		float duration = open ? OpenFadeSeconds : FadeSeconds;
+		if (duration <= 0.01f)
 		{
 			Root.Modulate = new Color(1f, 1f, 1f, open ? 1f : 0f);
 			Root.Scale = Vector2.One;
@@ -353,10 +372,11 @@ public abstract partial class OverlayScreen : CanvasLayer
 		Root.PivotOffset = Root.Size * 0.5f;
 
 		Tween tween = CreateTween();
+		_fadeTween = tween;
 		tween.SetParallel(true);
-		tween.TweenProperty(Root, "modulate:a", open ? 1f : 0f, FadeSeconds)
+		tween.TweenProperty(Root, "modulate:a", open ? 1f : 0f, duration)
 			.SetTrans(Tween.TransitionType.Sine);
-		tween.TweenProperty(Root, "scale", open ? Vector2.One : Vector2.One * OpenScaleFrom, FadeSeconds)
+		tween.TweenProperty(Root, "scale", open ? Vector2.One : Vector2.One * OpenScaleFrom, duration)
 			.SetTrans(Tween.TransitionType.Cubic)
 			.SetEase(open ? Tween.EaseType.Out : Tween.EaseType.In);
 

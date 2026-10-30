@@ -9,6 +9,7 @@ using ActRoguelike.Core;
 using ActRoguelike.Player;
 using ActRoguelike.Rewards;
 using ActRoguelike.Run;
+using ActRoguelike.UI;
 using ActRoguelike.Weapons;
 using Godot;
 using K = ActRoguelike.Config.SpecializationKind;
@@ -60,6 +61,7 @@ public partial class SpecializationProbe : Node3D
 	public override async void _Ready()
 	{
 #if DEBUG
+		DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://Logs/evidence"));
 		try
 		{
 			RuneCarry.UseInMemoryStoreForSelfTest(); RunSetup.HasSelection = true;
@@ -69,6 +71,11 @@ public partial class SpecializationProbe : Node3D
 			await War(); await Clear();
 			await Wind(); await Clear();
 			await RealAbilities(); await Clear();
+			await ScytheLinks(true); await Clear();
+			await ScytheLinks(false); await Clear();
+			await ActualEnemyLanding(); await Clear();
+			await TemporaryVisuals(); await Clear();
+			if (DisplayServer.GetName() != "headless") { await ThunderVisual(); await Clear(); }
 		}
 		catch (Exception ex) { Check(false, ex.ToString()); }
 		GD.Print($"[Specialization] === 特化验收结束：通过 {_pass}，失败 {_fail} ===");
@@ -78,8 +85,9 @@ public partial class SpecializationProbe : Node3D
 	private void Catalogue()
 	{
 		var rows = ConfigIndex.Settings.Upgrades.Where(r => r.Specialization != K.None).ToArray();
-		Check(rows.Length == 23 && rows.Select(r => r.Specialization).Distinct().Count() == 23, "23项特化全部进生产索引且类型唯一");
-		Check(RewardCatalog.All.Length == 91 && RewardCatalog.Find("mut_chain") == null && RewardCatalog.Find("mut_sunset_sword") == null && RewardCatalog.Find("mut_homing_missile") == null, "旧三项退出生产目录，J33补快乐小子后91");
+		int count = ContentInventorySnapshot.Current.Count("Specializations");
+		Check(rows.Length == count && rows.Select(r => r.Specialization).Distinct().Count() == count, $"{count}项特化全部进生产索引且类型唯一");
+		Check(RewardCatalog.All.Length == ContentInventorySnapshot.Current.Count("Upgrades") && RewardCatalog.Find("mut_chain") == null && RewardCatalog.Find("mut_sunset_sword") == null && RewardCatalog.Find("mut_homing_missile") == null, "奖励总数符合唯一基线，旧三项仍退出生产目录");
 		Check(rows.Count(r => r.Requires.Length == 1) == 22 && rows.Single(r => r.Specialization == K.Storm).Requires.Length == 0, "22项有明确符文前置，暴风没有额外前置");
 		foreach (var row in rows) Check(RewardCatalog.Find(row.Id) is { MaxStacks: 1 } definition && !definition.Description.Contains('{'), $"真实行可编译且说明参数展开 {row.DisplayName}");
 		var owner = CreateOwner(); var weapon = _contexts[owner].Weapon;
@@ -94,7 +102,7 @@ public partial class SpecializationProbe : Node3D
 			{
 				build.SetRuneUnlocks(new[] { token }); var rolled = pool.Roll(build, 200);
 				bool b2 = character.Id == "chr_weapon_master" && weaponRow.Pool?.Id == "pool_scythe";
-				var expected = rows.Where(r => r.Requires.Length == 0 || r.Requires.Contains(token)).Where(r => r.Specialization is not (K.ThunderRecall or K.WindDomain) || b2).Select(r => r.Id).Order().ToArray();
+				var expected = rows.Where(r => r.Requires.Length == 0 || r.Requires.Contains(ContentIdentity.Prerequisite(token))).Where(r => r.Specialization != K.ThunderRecall || b2).Select(r => r.Id).Order().ToArray();
 				var actual = rolled.Where(d => rows.Any(r => r.Id == d.Id)).Select(d => d.Id).Order().ToArray();
 				Check(actual.SequenceEqual(expected), $"真实候选与派系／B2双限定 {character.Id}/{weaponRow.Id}/{token}");
 				foreach (var item in rolled.Where(d => actual.Contains(d.Id))) build.DebugGrantWithoutApplying(item);
@@ -124,6 +132,8 @@ public partial class SpecializationProbe : Node3D
 		Check(runtime.MarkCount == 0 && runtime.ChainCount == chains + 1, "主动引爆消标，派生链不递归");
 		chains = runtime.ChainCount; Hit(owner, owner, 0); Step(runtime, 0.01f); Check(runtime.ChainCount == chains, "自身或友军命中不能触发敌对攻击特化");
 		for (int i = 0; i < 5; i++) Enemy(x: 5 + i);
+		// 雷之心已有1游戏秒冷却；该样本验证跳数，先推进实际协调器至冷却结束。
+		Step(runtime, 1.01f);
 		float totalBefore = _owned.Where(u => u.Faction == Faction.Enemy).Sum(u => u.Health);
 		Hit(owner, target, 0); Step(runtime, 0.01f);
 		float chainDamage = totalBefore - _owned.Where(u => u.Faction == Faction.Enemy).Sum(u => u.Health);
@@ -153,7 +163,7 @@ public partial class SpecializationProbe : Node3D
 		_contexts[heart].Build.Add(RewardCatalog.Find("upg_hard")!, _contexts[heart]);
 		_contexts[heart].Build.Add(RewardCatalog.Find("upg_hard_plus")!, _contexts[heart]);
 		_contexts[heart].Build.Add(RewardCatalog.Find("upg_hard_plus2")!, _contexts[heart]);
-		Near(heart.Stats.Get("DamageReductionAdd"), 0, "战斗之心将后获得的三档坚硬全部转走"); Near(heart.Stats.Get("CritMultiplierAdd"), 0.6f, "5%＋10%＋15%坚硬按1:2转60%爆伤");
+		Near(heart.Stats.Get("DamageReductionAdd"), 0, "战斗之心将后获得的三档坚硬全部转走"); Near(heart.Stats.Get("CritMultiplierAdd"), 0.3f, "坚硬升级仅保留最高15%减伤，按1:2转30%爆伤");
 		heart.Stats.AddModifier(new StatModifier { Stat = "DamageReductionAdd", Value = 0.2f, OriginId = "other" }); Near(heart.Stats.Get("DamageReductionAdd"), 0.2f, "不吞其他来源减伤");
 		Near(heart.Stats.Get("MoveSpeedMultiplier"), 1.3f, "战斗之心移速"); Near(heart.Stats.Get("DamageMultiplier"), 1.5f, "战斗之心攻击"); Near(heart.Stats.Get("CritChanceAdd"), 0.2f, "战斗之心暴击");
 		var reversed = CreateOwner(); _contexts[reversed].Build.Add(RewardCatalog.Find("upg_hard")!, _contexts[reversed]); Grant(reversed, "upg_war_heart"); Near(reversed.Stats.Get("CritMultiplierAdd"), 0.1f, "先坚硬再战斗之心结果一致");
@@ -200,8 +210,7 @@ public partial class SpecializationProbe : Node3D
 		{
 			sprint.DebugSprintOverride = true; Step(runtime, 0.01f); Pulse(runtime, 0.01f);
 			var camera = new Camera3D { Position = new Vector3(10, 12, 12), Current = true }; AddChild(camera); camera.LookAt(owner.GlobalPosition);
-			await Wait(0.15); GetViewport().GetTexture().GetImage().SavePng("res://docs/character-design-j32-wind.png");
-			Check(true, "风系区域真实渲染截图"); camera.QueueFree();
+			await Wait(0.15); Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/specialization-wind.png")) == Error.Ok, "风系区域真实渲染截图"); camera.QueueFree();
 		}
 		trail._PhysicsProcess(3.1); Check(trail.IsQueuedForDeletion(), "风痕到3秒按游戏时间消失");
 		field._PhysicsProcess(18.1); Check(field.IsQueuedForDeletion(), "风场到18秒按游戏时间消失");
@@ -219,6 +228,109 @@ public partial class SpecializationProbe : Node3D
 		player.GetNode<Node3D>("CameraRig").ProcessMode = ProcessModeEnum.Disabled; player.GlobalPosition = new Vector3(0, 0.05f, 0);
 		await Wait(0.15); new PlayerLoadout().Apply(player, this, character, weapon);
 		_contexts[player] = new RewardContext { Player = player, Weapon = NodeSearch.FindInSubtree<Weapon>(player)!, Build = new RunBuild() }; return player;
+	}
+	private async Task ScytheLinks(bool groundFirst)
+	{
+		var player = await RealPlayer(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.Scythe);
+		void Ground() => _contexts[player].Build.Add(RewardCatalog.Find("evo_ground_burst")!, _contexts[player]);
+		if (groundFirst) Ground();
+		var runtime = Grant(player, "evo_thunder_recall", "evo_thunder_pool", "mut_thunder_mark", "evo_thunder_heart", "upg_thunder_mastery", "upg_thunder_blast");
+		if (!groundFirst) Ground();
+		var scythe = (ScytheThrowAbility)Ability.FindByAbilityId(player, "skl_b2_w1_2")!;
+		var fall = (FallAttackAbility)Ability.FindByAbilityId(player, "skl_b_fall")!;
+		Check(Mathf.IsEqualApprox(fall.LandingKnockback, 6f), $"联动顺序地爆先={groundFirst}：地爆参数保留");
+		Input.ParseInputEvent(new InputEventAction { Action = "weapon_skill_2", Pressed = true }); await Wait(.04);
+		Input.ParseInputEvent(new InputEventAction { Action = "weapon_skill_2", Pressed = false });
+		for (int i = 0; i < 40 && !scythe.InFlight; i++) await Wait(.025);
+		Check(scythe.InFlight, "联动通过真实武技2输入让镰刀离手");
+		Input.ParseInputEvent(new InputEventAction { Action = "skill_2", Pressed = true }); await Wait(.04);
+		Input.ParseInputEvent(new InputEventAction { Action = "skill_2", Pressed = false });
+		Check(Fields(runtime).Any(f => f.Kind == K.ThunderPool), $"镰刀离手期间真实角色技能2输入触发雷池，顺序={groundFirst}");
+		await Wait(.8);
+		Vector3 destination = scythe.WeaponPosition;
+		var victim = Enemy(10000); victim.GlobalPosition = destination + Vector3.Right * 1.5f;
+		var movement = new CharacterMovement { Name = "Movement" }; victim.AddChild(movement);
+		var impulses = new List<Vector3>(); victim.KnockbackReceived += impulses.Add;
+		await Wait(.04);
+		int thunders = runtime.ThunderCount;
+		Check(scythe.TryPress(), "联动第二次使用镰刀执行落雷术");
+		Check(fall.LandingKnockbackPulseCount == 1 && impulses.Any(v => Mathf.IsEqualApprox(v.Length(), 6f)),
+			$"落雷术与地爆复用真实范围击退，顺序={groundFirst}，脉冲={fall.LandingKnockbackPulseCount}，冲量=[{string.Join(",", impulses.Select(v => v.Length()))}]");
+		Step(runtime, .02f);
+		Check(victim.HasStatus("ThunderMark") || runtime.ThunderCount > thunders, "落雷术主攻击附加引雷，雷法可立即引爆，多个雷系特化不丢失");
+		Vector3 before = victim.GlobalPosition;
+		await Wait(.15);
+		Check(victim.GlobalPosition.DistanceTo(before) > .08f, "落雷术＋地爆使有物理身体的存活普通目标真实位移");
+	}
+	private Unit ActualChaser(Vector3 position)
+	{
+		var row = ConfigRows.ById<EnemyConfig>("enemy_chaser")!;
+		var enemy = RuntimeResources.Load<PackedScene>(row.ScenePath).Instantiate<Unit>();
+		row.ApplyTo(enemy); enemy.GetNode<Node>("Brain").ProcessMode = ProcessModeEnum.Disabled;
+		AddChild(enemy); enemy.GlobalPosition = position; ConfigIndex.ScaleEnemy(enemy, this, false); _owned.Add(enemy);
+		return enemy;
+	}
+	private async Task ActualEnemyLanding()
+	{
+		var player = await RealPlayer(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.Scythe);
+		_contexts[player].Build.Add(RewardCatalog.Find("evo_ground_burst")!, _contexts[player]);
+		Grant(player, "evo_thunder_recall");
+		player.Stats.SetBase("BaseCritChance", 0); player.Stats.SetBase("CritChanceAdd", -100);
+		var scythe = (ScytheThrowAbility)Ability.FindByAbilityId(player, "skl_b2_w1_2")!;
+		var fall = (FallAttackAbility)Ability.FindByAbilityId(player, "skl_b_fall")!;
+		Check(scythe.TryPress(), "正式普通敌人专项：实际镰刀投出");
+		for (int i = 0; i < 60 && !scythe.HasSettled; i++) await Wait(.05);
+		Check(scythe.HasSettled, "正式敌人专项等待镰刀到位");
+		var normal = ActualChaser(scythe.WeaponPosition + Vector3.Right * 1.8f);
+		var fragile = ActualChaser(scythe.WeaponPosition + Vector3.Left * 1.8f);
+		fragile.ApplyBaseStats(1, 0, 0, fragile.MoveSpeed);
+		HitInstance? death = null; fragile.Died += hit => death = hit;
+		int pushes = 0; normal.KnockbackReceived += impulse => { if (Mathf.IsEqualApprox(impulse.Length(), 6)) pushes++; };
+		await Wait(.04); Vector3 before = normal.GlobalPosition; float health = normal.Health;
+		Check(scythe.TryPress(), "正式敌人专项落雷术执行下落攻击");
+		Check(!normal.IsDead && normal.Health < health && pushes == 1, $"真实基础近战存活并收到地爆击退：生命{health:0.##}→{normal.Health:0.##}");
+		await Wait(.2);
+		Check(normal.GlobalPosition.DistanceTo(before) > .08f, "真实普通敌人的移动组件产生外推位移");
+		Check(fragile.IsDead && death?.Attack?.AbilityKind == fall.AbilityId && !fragile.ReceiveKnockback(Vector3.Right * 6), "同圈1血普通敌人由落雷术击杀，死亡后不再执行活体击退");
+	}
+	private async Task TemporaryVisuals()
+	{
+		var player = await RealPlayer(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.Scythe);
+		var runtime = Grant(player, "evo_bloodthirst", "mut_death_duel", "mut_wind_armor");
+		await Wait(.1); var fx = player.GetChildren().OfType<StatusEffectFx>().Single();
+		void Sync() => fx._PhysicsProcess(.11);
+		Enemy(1).ForceKill(player); Step(runtime, .01f); Sync();
+		Check(fx.HasNode("SpecializationBuff_Bloodthirst") && !player.HasStatus("SpecializationBuff_Bloodthirst"), "嗜血有持续图标，纯表现不伪造单位状态");
+		Step(runtime, 5.1f); Sync(); await Wait(.02);
+		Check(!fx.HasNode("SpecializationBuff_Bloodthirst"), "嗜血到期后图标同步消失");
+		Hit(Enemy(), player, 100000); Sync();
+		Check(runtime.DuelActive && fx.HasNode("SpecializationBuff_DeathDuel"), "死斗触发后显示独立持续提示");
+		for (int i = 0; i < 3; i++) Enemy(1).ForceKill(player);
+		Sync(); await Wait(.02); Check(!runtime.DuelActive && !fx.HasNode("SpecializationBuff_DeathDuel"), "死斗成功后撤去提示");
+		var sprint = player.GetNode<SprintController>("Sprint"); sprint.DebugSprintOverride = true; Step(runtime, .01f); Sync();
+		Check(fx.HasNode("SpecializationBuff_WindArmor"), "奔跑期间风凯有临时护甲提示");
+		sprint.DebugSprintOverride = false; Step(runtime, .01f); Sync(); await Wait(.02);
+		Check(!fx.HasNode("SpecializationBuff_WindArmor"), "停止奔跑后风凯提示清除");
+		player.RemoveChild(runtime); runtime.QueueFree(); Sync(); await Wait(.02);
+		Check(fx.VisualCount == 0, "移除特化规则后临时提示全部回收");
+	}
+	private async Task ThunderVisual()
+	{
+		var player = await RealPlayer(PlayerCharacterKind.WeaponMaster, WeaponPresetKind.Scythe);
+		var runtime = Grant(player, "evo_thunder_pool", "mut_thunder_mark");
+		var enemy = ActualChaser(new Vector3(2, .05f, 0)); enemy.Movement!.SetPhysicsProcess(false);
+		Hit(player, enemy, 1); Step(runtime, .01f);
+		var skill = Ability.FindByAbilityId(player, "skl_b_skill_2")!;
+		Check(skill.TryPress(), "雷池可见性使用实际角色技能2触发");
+		var field = Fields(runtime).Single(f => f.Kind == K.ThunderPool); field.SetPhysicsProcess(false); field._PhysicsProcess(.1);
+		var camera = new Camera3D { Position = new Vector3(9, 9, 12), Current = true }; AddChild(camera); camera.LookAt(new Vector3(0, 1, 0));
+		RuneCarry.Set("rune_lei_seal");
+		var hud = RuntimeResources.Load<PackedScene>("res://Scenes/UI/Hud.tscn").Instantiate<PlayerHud>(); AddChild(hud);
+		await Wait(.18);
+		Check(field.GetNode<MeshInstance3D>("ThunderBoundary").Visible && enemy.HasStatus("ThunderMark"), "同画面保留雷池发光边界与正式敌人的引雷图标");
+		await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+		Check(GetViewport().GetTexture().GetImage().SavePng(ActRoguelike.Testing.ValidationArtifacts.Path("res://Logs/evidence/adventure-thunder-rune.png")) == Error.Ok, "雷池、引雷与携带符文HUD真实渲染截图");
+		camera.QueueFree(); hud.QueueFree();
 	}
 	private async Task RealAbilities()
 	{
@@ -251,12 +363,8 @@ public partial class SpecializationProbe : Node3D
 		Near(healthBefore - landingVictim.Health, landingHits.Sum(h => h.Damage), "落地实际扣血与命中伤害总和一致");
 		await Wait(0.15); Check(!scythe.InFlight, "接触武器后真实回手解除锁门");
 		await Clear();
-		player = await RealPlayer(master, scytheKind); runtime = Grant(player, "evo_wind_domain"); scythe = (ScytheThrowAbility)Ability.FindByAbilityId(player, "skl_b2_w1_2")!;
-		Check(scythe.TryPress(), "风之领域无情开始出手");
-		for (int i = 0; i < 60 && !scythe.HasSettled; i++) await Wait(0.05);
-		Step(runtime, 0.01f); var domain = Fields(runtime).Single(f => f.Kind == K.WindDomain);
-		Check(scythe.HasSettled && domain.Active, "武器停止后才产生领域"); Near(domain.Radius, 5, "领域大于普通旋风");
-		Grant(player, "upg_wild_wind"); Near(domain.Radius, 7.5f, "狂风覆盖无情领域"); scythe.TryPress(); Step(runtime, 0.01f); Check(!domain.Active, "武器回程时领域停止伤害");
+		player = await RealPlayer(PlayerCharacterKind.Hunter, WeaponPresetKind.EnergyPalm); runtime = Grant(player, "evo_wind_domain");
+		Step(runtime, .01f); Check(!Fields(runtime).Any(f => f.Kind == K.WindDomain && f.Active), "068地面静止不凭空生成浮空旋风，风之领域不再依赖镰刀");
 		await Clear();
 		player = await RealPlayer(master, scytheKind); runtime = Grant(player, "evo_thunder_pool");
 		var masterSkill = Ability.FindByAbilityId(player, "skl_b_skill_2")!;

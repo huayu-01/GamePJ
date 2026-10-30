@@ -17,7 +17,9 @@ public partial class EnemyPlanAbility : Ability
 	public int StepIndex { get; private set; }
 	public Kind CurrentKind => _step?.Kind ?? Kind.Wait;
 	private readonly List<EnemyActionStep> _steps = new();
-	private EnemyActionStep? _step;
+	private EnemyActionState? _step;
+	private EnemyActionExecution? _execution;
+	public string CurrentExecutor => _execution == null ? string.Empty : _execution.GetType().DeclaringType?.Name ?? _execution.GetType().Name;
 	private int _phase;
 	private float _elapsed;
 	private Vector3 _direction, _startPosition;
@@ -53,11 +55,12 @@ public partial class EnemyPlanAbility : Ability
 			_steps.AddRange(Plan.Closing);
 		}
 		if (StepIndex >= _steps.Count || !IsInstanceValid(Target) || Target is not { IsDead: false }) { Finish(); return; }
-		_step = _steps[StepIndex]; _elapsed = 0; _phase = 0; _contact = false; _stepEvent = false;
+		_step = EnemyActionState.From(_steps[StepIndex], OwnerUnit!.GlobalPosition); _elapsed = 0; _phase = 0; _contact = false; _stepEvent = false;
+		_execution = _step.Action?.Create(new EnemyActionContext(OwnerUnit!, () => Target, FaceTarget, _step, AbilityId, () => _direction, value => _direction = value));
 		_startPosition = OwnerUnit!.GlobalPosition;
-		if (OwnerUnit.Block is { } block) block.Blocking = _step.Kind == Kind.Guard || _step.Blocking;
+		if (OwnerUnit.Block is { } block) block.Blocking = (_step.Action?.BlocksDuringStep ?? _step.Kind == Kind.Guard) || _step.Blocking;
 		FaceTarget(1);
-		if (IsAttack(_step.Kind))
+		if (_step.Action?.RequiresAttackEvent ?? IsAttack(_step.Kind))
 		{
 			OwnerUnit.GetNodeOrNull<UnitPresentation>("Presentation")?.FlashAttack();
 			if (PlaySkillAnimationNamed("EnemyAction", 0.55f / Mathf.Max(0.06f, _step.WindupSeconds)).Length == 0) { Cancel(); return; }
@@ -86,9 +89,15 @@ public partial class EnemyPlanAbility : Ability
 			else if (_elapsed > Mathf.Max(2, _step.WindupSeconds * 3)) Cancel();
 			return;
 		}
-		if (_phase == 2) { if (_elapsed >= _step.RecoverSeconds) Advance(); return; }
-		bool done = _elapsed >= _step.ActiveSeconds;
-		switch (_step.Kind)
+		if (_phase == 2)
+		{
+			// 迅捷只加快收招，不挪动ATK动画事件和蓄势／自爆的预警窗口。
+			if (_elapsed >= _step.RecoverSeconds / ActRoguelike.Combat.Elites.EliteProjectileRules.RecoveryScale(OwnerUnit)) Advance();
+			return;
+		}
+		bool done = _execution?.ControlsDuration != true && _elapsed >= _step.ActiveSeconds;
+		if (_execution != null) { _execution.Tick(delta); done |= _execution.IsComplete; }
+		else switch (_step.Kind)
 		{
 			case Kind.Guard: FaceTarget(delta); break;
 			case Kind.Charge:
@@ -111,8 +120,8 @@ public partial class EnemyPlanAbility : Ability
 			case Kind.Dive:
 				if (OwnerUnit!.IsOnFloor() && _elapsed > 0.03f)
 				{
-					Movement!.EndVelocityOverride(this); OpenHitbox(_step.Radius); _step = _step.Duplicate() as EnemyActionStep ?? _step;
-					_step.Kind = Kind.Melee; _step.Speed = 0; _step.ActiveSeconds = 0.12f; _elapsed = 0; done = false;
+					Movement!.EndVelocityOverride(this); OpenHitbox(_step.Radius);
+					_step = _step with { Kind = Kind.Melee, Speed = 0, ActiveSeconds = .12f }; _elapsed = 0; done = false;
 				}
 				break;
 			case Kind.Burrow:
@@ -122,15 +131,11 @@ public partial class EnemyPlanAbility : Ability
 				break;
 		}
 		if (_hitbox != null && IsInstanceValid(_hitbox)) _hitbox.SweepSphere(_hitbox.GlobalPosition, _hitbox.GlobalPosition);
+		if (_execution?.SuppressWarning == true) _warning?.HideAll();
 		if (done) { ClearStep(); _phase = 2; _elapsed = 0; }
 	}
 	private AttackInstance Attack(float damage, bool bomb = false)
-	{
-		float scale = OwnerUnit!.Stats.Get("DamageMultiplier");
-		return new AttackInstance { Attacker = OwnerUnit, Ability = AbilityId, AbilityKind = AbilityId,
-			BaseDamage = bomb ? 0 : damage * scale, ExplosionDamage = damage * scale, ExplosionRadius = bomb ? _step!.Radius : 0,
-			Knockback = 3, Lifetime = 12, Tags = bomb ? new[] { "Projectile", "Explosion" } : new[] { "EnemyAttack" } };
-	}
+		=> EnemyAttackFactory.Create(OwnerUnit!, AbilityId, damage, _step!.Radius, bomb);
 	private void OpenHitbox(float radius)
 	{
 		if (_hitbox != null) return;
@@ -143,6 +148,12 @@ public partial class EnemyPlanAbility : Ability
 	{
 		if (_step == null) return;
 		if (_step.Kind is Kind.Melee or Kind.Meteor or Kind.Bomb or Kind.ArcBomb) _warning?.HideAll();
+		if (_execution != null)
+		{
+			_execution.Begin();
+			if (_execution.IsComplete) { ClearStep(); _phase = 2; _elapsed = 0; }
+			return;
+		}
 		switch (_step.Kind)
 		{
 			case Kind.Shot: case Kind.ArcShot: case Kind.Bomb: case Kind.ArcBomb: case Kind.Meteor: Fire(); break;
@@ -162,29 +173,11 @@ public partial class EnemyPlanAbility : Ability
 	private void Fire()
 	{
 		if (_step == null || Target == null) return;
-		bool bomb = _step.Kind is Kind.Bomb or Kind.ArcBomb or Kind.Meteor;
-		var projectile = RuntimeResources.Load<PackedScene>("res://Scenes/Combat/Bullet.tscn").Instantiate<Projectile>();
-		projectile.Pierce = 0; projectile.GravityScale = 0; projectile.MaxTravelDistance = _step.TravelDistance;
-		projectile.DistanceEnd = bomb ? Projectile.DistanceEndMode.Explode : Projectile.DistanceEndMode.Disappear;
-		projectile.ExplosionOnly = bomb;
-		projectile.QueryGeometry = 1;
-		projectile.SweepRadius = _step.Kind == Kind.Meteor ? 0.7f : bomb ? 0.2f : 0.1f;
-		projectile.AddChild(new MeshInstance3D { Mesh = new SphereMesh
-		{
-			Radius = projectile.SweepRadius, Height = projectile.SweepRadius * 2,
-			Material = new StandardMaterial3D { AlbedoColor = bomb ? new Color(1, 0.35f, 0.1f) : new Color(0.8f, 0.3f, 1), EmissionEnabled = true, Emission = new Color(0.7f, 0.2f, 0.1f) },
-		} });
-		ProjectileMotion(out Vector3 origin, out Vector3 velocity, out float gravityScale);
-		projectile.GravityScale = gravityScale;
-		projectile.ShowImpactWarning = bomb;
-		if (_step.Kind == Kind.Shot)
-		{ projectile.SeekAnyHostile = true; projectile.AssignedHomingTarget = Target; projectile.HomingTurnRateDegrees = _step.TurnDegreesPerSecond; }
-		projectile.Speed = velocity.Length();
-		(GetTree().CurrentScene ?? GetTree().Root).AddChild(projectile); projectile.GlobalPosition = origin;
-		projectile.Launch(Attack(_step.Damage, bomb), velocity.Normalized());
+		EnemyProjectileExecution.Launch(OwnerUnit!, Target, _step, AbilityId);
 	}
 	private void ClearStep()
 	{
+		_execution?.Dispose(); _execution = null;
 		_warning?.HideAll();
 		Movement?.EndVelocityOverride(this); Movement?.EndDash(); Movement?.Stop();
 		if (IsInstanceValid(_hitbox)) { _hitbox!.Deactivate(); _hitbox.QueueFree(); } _hitbox = null;

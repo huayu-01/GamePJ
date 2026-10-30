@@ -1,0 +1,24 @@
+{
+  "Date": "2026-10-27T01:02:15",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "enemy_roster",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261027_010215.enemy_roster.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261027_010215.enemy_roster.headless.err",
+      "SHA256": "BF716C8017A311665696DFFCF46AE366B6F0F8FD682F40166E1F4BD49D4EBA58"
+    },
+    {
+      "Name": "spawn_height",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261027_010215.spawn_height.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261027_010215.spawn_height.headless.err",
+      "SHA256": "6DD40AFB2E31934C3D80A2BC842364AFEF87AB40D915EBE47D93E4BAD14253FD"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

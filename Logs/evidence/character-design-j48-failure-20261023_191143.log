@@ -1,0 +1,31 @@
+存档 BEFORE meta.cfg SHA256=AFDF471AA97A31701A6C3EF56220E2D410CA92EA0B37A194345BF8FD94B1545F
+存档 BEFORE ability_cards.cfg SHA256=4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D
+存档 BEFORE settings.cfg SHA256=7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1
+存档 BEFORE loadout.cfg SHA256=4E8485C2134B42DA70852CD62872D835CFC2B5D13900548AE47F1652380E3104
+存档 BEFORE rune.cfg SHA256=F34C39C26F362F8B417B0AA8391833FDD874794AAAC4546D21914F3D0CF42A0E
+ExportRelease 构建失败
+=== 失败现场构建 Debug ===
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  ActRoguelike -> F:\Godot项目\项目a\.godot\mono\temp\bin\Debug\ActRoguelike.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:10.79
+
+=== 失败现场构建 ExportRelease ===
+  正在确定要还原的项目…
+  已还原 F:\Godot项目\项目a\ActRoguelike.csproj (用时 1.6 秒)。
+F:\Godot项目\项目a\Scripts\Testing\ChallengeFeedbackProbe.cs(59,17): error CS0117: “MetaProgress”未包含“UseInMemoryStoreForSelfTest”的定义 [F:\Godot项目\项目a\ActRoguelike.csproj]
+F:\Godot项目\项目a\Scripts\Testing\ChallengeFeedbackProbe.cs(59,58): error CS0117: “RuneCarry”未包含“UseInMemoryStoreForSelfTest”的定义 [F:\Godot项目\项目a\ActRoguelike.csproj]
+
+生成失败。
+
+F:\Godot项目\项目a\Scripts\Testing\ChallengeFeedbackProbe.cs(59,17): error CS0117: “MetaProgress”未包含“UseInMemoryStoreForSelfTest”的定义 [F:\Godot项目\项目a\ActRoguelike.csproj]
+F:\Godot项目\项目a\Scripts\Testing\ChallengeFeedbackProbe.cs(59,58): error CS0117: “RuneCarry”未包含“UseInMemoryStoreForSelfTest”的定义 [F:\Godot项目\项目a\ActRoguelike.csproj]
+    0 个警告
+    2 个错误
+
+已用时间 00:00:09.15

@@ -20,6 +20,10 @@ public partial class FallAttackTuning : Resource
 	[Export] public float MaxAimDistance { get; set; } = 60f;
 	[Export] public float GroundProbeDistance { get; set; } = 512f;
 	[Export] public float GroundMinNormalY { get; set; } = 0.6f;
+	[Export] public float AimRadiusHeightRatio { get; set; }
+	[Export] public float DiveSpeedScale { get; set; } = 1f;
+	[Export] public bool ShowLandingIndicator { get; set; }
+	public float DiveSpeedBonus => DiveSpeedScale - 1f;
 
 	public void ApplyTo(FallAttackAbility ability)
 	{
@@ -38,5 +42,8 @@ public partial class FallAttackTuning : Resource
 		ability.MaxAimDistance = MaxAimDistance;
 		ability.GroundProbeDistance = GroundProbeDistance;
 		ability.GroundMinNormalY = GroundMinNormalY;
+		ability.AimRadiusHeightRatio = AimRadiusHeightRatio;
+		ability.DiveSpeedScale = DiveSpeedScale;
+		ability.ShowLandingIndicator = ShowLandingIndicator;
 	}
 }

@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1139
 Id = "anim_a1_atk2"
 DisplayName = "A1 武技2 憋个大的 · ATK 帧"
 Note = "角色 A 武器 1（能量掌）武技2：源段双手射击，事件帧 ATK @0.10s（= 源段 50% 处）。蓄力期用 speed_scale 拉伸这段动画（0.2s ÷ speed_scale = 蓄力时长），所以逻辑帧跟着动画走。"

@@ -1,0 +1,66 @@
+[
+  {
+    "Name": "读取显式基线而非当前运行数量",
+    "Passed": true
+  },
+  {
+    "Name": "合法规模字段经过核对才归一化",
+    "Passed": true
+  },
+  {
+    "Name": "错误敌人数在归一化前拒绝",
+    "Passed": true
+  },
+  {
+    "Name": "错误效果数不能被历史兼容替换吞掉",
+    "Passed": true
+  },
+  {
+    "Name": "五份存档含不存在状态均受保护",
+    "Passed": true
+  },
+  {
+    "Name": "检测到变化后保留现场，不自动恢复",
+    "Passed": true
+  },
+  {
+    "Name": "互斥锁拒绝第二个验证者",
+    "Passed": true
+  },
+  {
+    "Name": "正常进程返回真实输出与退出状态",
+    "Passed": true
+  },
+  {
+    "Name": "即使退出码为零也拒绝stderr",
+    "Passed": true
+  },
+  {
+    "Name": "拒绝非零退出状态",
+    "Passed": true
+  },
+  {
+    "Name": "超时只终止本次创建的进程",
+    "Passed": true
+  },
+  {
+    "Name": "无效专项和正则片段必须显式失败",
+    "Passed": true
+  },
+  {
+    "Name": "选择器失败发生在构建之前",
+    "Passed": true
+  },
+  {
+    "Name": "原八项硬指标全部比较",
+    "Passed": true
+  },
+  {
+    "Name": "Main实际规模错误仍失败",
+    "Passed": true
+  },
+  {
+    "Name": "Main拒绝新增红标",
+    "Passed": true
+  }
+]

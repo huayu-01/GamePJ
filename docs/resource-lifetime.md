@@ -1,5 +1,19 @@
 # GCHandle：可复现资源缓存竞态与项目侧规避
 
+## 2026-10-25：内容校验回归修复
+
+本次原生崩溃已经定位到新增内容校验路径重新使用默认资源缓存。`ContentValidator`的配置行扫描、压力表、单位预制和动画加载，以及`UnitVisualProfile`的动画读取，均从首次读取起统一使用`RuntimeResources`；符文图标测试也改用同一入口。目录扫描的`LoadAuthoredRow`同时作为真实回归测试入口。
+
+修复前，在专用进程中从默认缓存加载真实增幅`evo_spare_dodge`，阻塞终结器并强制GC，确认包装器弱引用已失效后调用实际`ContentValidator.Validate(..., scanUnindexed:true)`。校验本身报告问题0，释放终结器随即出现`gchandle.is_released()`与退出码`-1073741795`，与原故障一致。[修复前原始证据](../Logs/evidence/gc-before-20261025_083107.json)保留。
+
+对照进一步确认：同一对象只回收、不再次加载时退出0；再次加载时会崩溃，原基础安全入口用例退出0。参见[隔离对照](../Logs/evidence/gc-isolate-20261025_083430.json)。只把第二次读取改为`IgnoreDeep`仍不足以修复已经存在的危险缓存，[这轮失败](../Logs/evidence/content-gc-20261025_083318.json)保留。相应[引擎文本加载器源码](https://github.com/godotengine/godot/blob/ed1daf0bf/scene/resources/resource_format_text.cpp#L735)在判断缓存模式前仍会取得缓存引用；项目实测也确认了这一边界。因此修复覆盖首次读取，不能先用默认缓存预热，再切换安全加载。
+
+回归从生产`LoadAuthoredRow`首次读取同一真实增幅，在包装器已收集、终结器尚未执行的窗口运行实际目录校验，再等待终结器完成。三次独立进程、八轮扫描／完整GC压力、基础资源／原生包装器和实际基地渲染均退出0、stderr为空，弱引用确实失效，排除了永久强引用隐藏问题。结果见[GC回归](../Logs/evidence/content-gc-20261025_083625.json)。常规命令为 `./_tools/verify_content_gc.ps1 -Render`。
+
+这是项目加载路径的修复，没有修改或替换Godot引擎。专用探针中的`--unsafe-cache`仍用于隔离负例，不能用于正常流程；禁止以默认缓存加载新的运行期C#资源。新测试的终结器屏障有超时，GC与屏障只存在于专用验证进程，游戏运行不暂停或关闭GC。PNG颜色配置告警属于另一问题，不据此宣称修复。
+
+## 2026-10-17：原始复现与历史验收
+
 2026-10-17，Godot 4.7.2 mono，实际版本 `ed1daf0bf`。
 
 ## 复现方法与证据
@@ -29,7 +43,7 @@ Godot.GodotObject.Dispose(bool) → Godot.GodotObject.Finalize()
 ## 读取入口契约
 
 - 运行期显式加载统一用`RuntimeResources.Load<T>`。仅在`WeakReference.TryGetTarget`取得仍存活且有效的托管对象时复用。
-- 包装器已失效时使用`IgnoreDeep`，连同依赖资源一起绕过原生缓存；只忽略根资源无法覆盖依赖复活。
+- 包装器已失效时使用`IgnoreDeep`读取独立资源图，且首次读取也必须使用相同入口；只忽略根资源，或先用默认缓存预热，均不能保证安全。2026-10-25对照补充了文本加载器短暂取得已有缓存引用的边界。
 - 缓存只保存弱引用，并定期移除死键；不会阻止资源回收。没有禁用GC，没有吞掉终结器异常。
 - 场景切换及基地死亡重载统一走`RuntimeResources.ChangeScene`，仍由引擎`ChangeSceneToPacked`负责退出与延迟加入。
 - 深度加载的资源图彼此独立；不要用两个独立图的对象地址判断“同一个字体文件”。字体回归改为核查实际控件使用的字体、字重、字形与资源路径。
@@ -39,19 +53,19 @@ Godot.GodotObject.Dispose(bool) → Godot.GodotObject.Finalize()
 
 ## 验收与复现
 
-常规验收脚本：`_tools/verify_resource_lifetime.ps1`。每次构建/运行独占验证锁；每个子进程前把四份玩家存档备份到本地`.ai_i_<名称>.profile.json`。C探针在脚本与C#入口两处强制要求`--loadout-test`。
+原I专项入口保留为`_tools/verify_resource_lifetime.ps1`，已使用公共设施和独立用户目录；新增内容竞态入口为`_tools/verify_content_gc.ps1`。构建／运行独占验证锁，五份玩家存档逐次核验，变化保留现场。C探针继续在脚本与C#入口两处要求`--loadout-test`，新输出统一进入`Logs/`。以下数量和截图为当时验收记录。
 
 负例独立启动参数：`res://Scenes/Debug/_ResourceLifetimeProbe.tscn -- --unsafe-cache`，会刻意触发进程崩溃；不能把其非零退出当作常规回归结果。
 
-最终构建、八条硬指标、回归计数与截图哈希见[实测证据](resource-lifetime-evidence.log)。
+最终构建、八条硬指标、回归计数与截图哈希见[实测证据](../Logs/evidence/resource-lifetime-evidence.log)。
 
 最终结果：默认缓存负例3次均按预期FATAL；新入口正例3次均退出0、stderr为空，另有原生包装器正例和真实基地渲染截图。Debug/ExportRelease均0警告/0错误；Main完整自测退出0、8条指标逐字一致。F渲染33/0、F无头31/0（均12轮场景卸载与GC）、C52/0、读档5/0、D90/0、G50/0、角色63/0、H48/0、B74/0、A23/0、E39/0，正向运行stderr为空。
 
-负例原文见[三次崩溃证据](resource-lifetime-negative.log)。当前没有调整角色基础数值，也没有以GC测试代替武器原始设计验收。
+负例原文见[三次崩溃证据](../Logs/evidence/resource-lifetime-negative.log)。当前没有调整角色基础数值，也没有以GC测试代替武器原始设计验收。
 
 ## 中间问题记录
 
-- J16气贯长虹首轮渲染专项90/0后，退出时临时查询／截图资源报unsafe reference并在GodotObject.Finalize中原生访问违规。长枪高频预览与实际投掷、AttackHitbox扫掠查询参数改为及时Dispose，截图Image同样及时释放；后续先行与完整复验均正常退出。完整失败堆栈和真实读数见 [J16](character-design-j16.md)。⚠️ 仅为项目侧资源释放和该场景复验，不据此认定旧变体同源或引擎问题根治。
+- J16气贯长虹首轮渲染专项90/0后，退出时临时查询／截图资源报unsafe reference并在GodotObject.Finalize中原生访问违规。长枪高频预览与实际投掷、AttackHitbox扫掠查询参数改为及时Dispose，截图Image同样及时释放；后续先行与完整复验均正常退出。完整失败堆栈和真实读数见 [J16](archive/development-batches/character-design-j16.md)。⚠️ 仅为项目侧资源释放和该场景复验，不据此认定旧变体同源或引擎问题根治。
 - 一次临时C验收漏传`--loadout-test`，误写装备偏好，随后因已有选中项导致连锁失败（37通过/22失败），未计为通过。
 - 该次运行前没有落盘完整备份，不能宣称装备文件逐字未变。按用户最近正常游玩日志`run_20261017_122410.log`末尾的武器大师/镰刀，以及C首次读取到的猎手/弓、武器大师/镰刀，恢复选择。恢复后装备SHA256为`CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462`。另外三份玩家存档未改。后续验证均比较这一恢复点，并新增入口硬检查与磁盘备份。
 - 一次额外F无头运行31/0但退出有4个ObjectDB对象告警；未作为无告警通过。随后同一测试加verbose重跑31/0，stderr为空，没有复现该退出告警。

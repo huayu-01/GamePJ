@@ -311,7 +311,7 @@ public sealed class ControlsSettingsSection : ISettingsSection
 		// "重绑"那一行去读一个不存在的动作（`CurrentKeys` 会显示"InputMap 里没有这个动作"）。
 		("skill_1", "技能 1", Key.Q),
 		("skill_2", "技能 2", Key.E),
-		("fall_attack", "下落攻击", Key.Ctrl),
+		("fall_attack", "下落攻击 / 取消浮空", Key.Ctrl),
 		// ⚠️ P6b：`reload`（装填 R）随"没有弹匣的概念了"从 `project.godot` 删除，这里同步移除 ——
 		// 与上面四条旧角色按键同一个道理：列一个不存在的动作会让重绑那一行读不到键。
 		("interact", "互动（节点 / Boss 门）", Key.F),
@@ -331,6 +331,9 @@ public sealed class ControlsSettingsSection : ISettingsSection
 	public void Build(VBoxContainer page, SettingsScreen screen)
 	{
 		SettingsUi.AddTitle(page, "控制");
+		SettingsUi.AddOption(page, "移动方式", new[] { "直接操控（默认）", "归一化锚点" },
+			(int)SettingsStore.PlayerMovementMode, mode => SettingsStore.Set(SettingsStore.ControlsSection, SettingsStore.KeyMovementMode, mode));
+		SettingsUi.AddCaption(page, "锚点模式：方向键控制角色周围固定距离的锚点，角色追随锚点；松键停止，鼠标仍自由转动镜头。");
 
 		foreach ((string Action, string Name, Key Default) row in KeyActions)
 		{

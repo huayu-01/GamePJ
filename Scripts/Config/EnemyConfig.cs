@@ -25,7 +25,7 @@ public partial class EnemyConfig : UnitConfig
 	/// <summary>这一行是"所有敌人通用的全局倍率行"（只能有一行；<c>enemy_global.tres</c>）。</summary>
 	[Export] public bool IsGlobal { get; set; }
 
-	/// <summary>所有普通敌人的生命倍率（1 = 原值；当前 0.75）。只影响普通敌人，不影响 Boss。</summary>
+	/// <summary>所有普通敌人的生命倍率（当前1.875，为此前0.75的2.5倍）。首领使用独立倍率。</summary>
 	[Export] public float HealthMultiplier { get; set; } = 1f;
 
 	/// <summary>所有普通敌人的伤害倍率（**难度总开关**，1 = 原值；当前 0.3）。只影响普通敌人，不影响 Boss。</summary>

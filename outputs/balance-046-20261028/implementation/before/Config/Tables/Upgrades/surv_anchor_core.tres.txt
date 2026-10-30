@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/Survival/AnchorCoreRewardEffect.cs" id="behavior"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("behavior")
+StationarySeconds = 1
+Radius = 5
+DamageBonus = 0.15
+ExpirySeconds = 3
+[resource]
+script = ExtResource("row")
+NumericId = 1284
+Id = "surv_anchor_core"
+DisplayName = "驻点核心"
+RewardKind = 2
+MaxStacks = 1
+Weight = 1.0
+RequiredModeIds = PackedStringArray("survival_twilight")
+IconName = "ic_surv_anchor_core"
+Effects = [SubResource("effect")]
+DescriptionTemplate = "地面停留{Effects.0.StationarySeconds:0.#}秒建立{Effects.0.Radius:0.#}米锚圈，圈内直接攻击伤害+{Effects.0.DamageBonus:0%}；离圈{Effects.0.ExpirySeconds:0.#}秒消失。"
+NameKey = "content.surv_anchor_core.name"
+DescriptionKey = "content.surv_anchor_core.description"

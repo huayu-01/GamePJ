@@ -1,0 +1,30 @@
+{
+  "blender": {
+    "version": "5.2.2 LTS",
+    "executable": "E:/steam/steamapps/common/Blender/blender.exe"
+  },
+  "mcp_for_blender": {
+    "version": "2.2.0",
+    "source": "https://github.com/ahujasid/mcp-for-blender",
+    "command": "C:/Users/huayu/.local/bin/mcp-for-blender.exe"
+  },
+  "retarget": {
+    "version": "5.2.0",
+    "source": "https://extensions.blender.org/add-ons/retarget/"
+  },
+  "bundled_addons": [
+    "rigify",
+    "node_wrangler"
+  ],
+  "checks": {
+    "mcp_protocol": true,
+    "scene_read": true,
+    "code_execution": true,
+    "rigify_generate": true,
+    "glb_roundtrip": true
+  },
+  "download_hashes": {
+    "mcp_for_blender-2.2.0-py3-none-any.whl": "160eb5e075b3933ed70d2de58445e27e08db0d5cc589f8f122d6027998ab9ce1",
+    "retarget-5.2.0.zip": "521ec8ff5c2373893ea8022b3f71d27ed191fb73f3a5634cac31585e0dcb7af3"
+  }
+}

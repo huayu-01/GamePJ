@@ -1,37 +1,25 @@
-[gd_resource type="Resource" script_class="AbilityConfig" load_steps=5 format=3 uid="uid://fblwg0hytn5o"]
+[gd_resource type="Resource" script_class="FallAbilityConfig" format=3 uid="uid://fblwg0hytn5o"]
 
-[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_fall.svg" id="e_hud_icon"]
-[ext_resource type="Script" path="res://Scripts/Config/FallAttackTuning.cs" id="3_fall"]
+[ext_resource type="Script" uid="uid://n7jy4svj63x4" path="res://Scripts/Config/FallAbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://bh2qahh84aikh" path="res://Scripts/Config/FallAttackTuning.cs" id="3_fall"]
 
 [sub_resource type="Resource" id="fall_tuning"]
 script = ExtResource("3_fall")
-Mode = 0
-DiveSpeed = 34.0
-StandardDiveSpeed = 34.0
-MaxDamageMultiplier = 2.0
-MaxDiveSeconds = 4.0
-LandRecoverSeconds = 0.08
-EventWaitSeconds = 2.0
-GroundProbeDistance = 512.0
-GroundMinNormalY = 0.6
 
 [resource]
 script = ExtResource("1_row")
-ActionMovement = 2
-HudIcon = ExtResource("e_hud_icon")
-HudColor = Color(1, 0.76, 0.4, 1)
-HudOrder = 50
+FallAttack = SubResource("fall_tuning")
 NodeName = "AbilityFallAttack"
 ClassHint = "FallAttackAbility"
 InputAction = "fall_attack"
+ActionMovement = 2
 AnimName = "Skill_B_Fall"
 AnimEvent = "Action"
 Cooldown = 1.0
 Windup = 0.0
 Recover = 0.08
+NumericId = 1183
 Id = "skl_b_fall"
 DisplayName = "落"
 DescriptionTemplate = "在空中按 Ctrl 使用下落攻击，碰到敌人造成伤害；起手高度越高、垂直下落速度越快，伤害越高。"
 Note = "2026-10-17用户更新：倍率=min(上限, 起手离地高度/普通单跳高度 × 垂直下落速度/标准速度)。普通单跳标准速度1倍；普通额外空中跳高默认50%，同速二段跳高度1.5倍。Action才下冲；真实World落地才派发事件。长枪由武器FallAttackAim资源仅覆盖方向，镰刀与灵剑保持直落。"
-FallAttack = SubResource("fall_tuning")

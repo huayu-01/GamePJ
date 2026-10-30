@@ -5,29 +5,20 @@ using Godot;
 namespace ActRoguelike.Abilities;
 
 /// <summary>
-/// **技能 1「后撤」**（角色 A，设计文档第 26/28 行）：
-///
-/// <list type="bullet">
-/// <item>「角色快速向后移动（**不改变角色朝向**，只向后移动，表现相当于给角色一个**向后的力**，
-///   产生碰撞存在被挤开或停下的情况），**有无敌帧**」 —— 所以这里给的是
-///   <see cref="CharacterMovement.AddImpulse"/>（外力），不是 <c>BeginDash</c>（位移技能会强制覆盖
-///   输入速度、也不会被挡住）。外力会被 <c>MoveAndSlide</c> 正常挤开/停下，且**不参与朝向计算**
-///   （`CharacterMovement` 的转身只读输入速度，见 <see cref="CharacterMovement.FaceDirection"/> 的调用处）。</item>
-/// <item>「动画：帧 <c>Dodge</c> 到 <c>Dodger</c> 期间无敌（相当于 <c>Dodge</c> 开无敌、<c>Dodger</c> 关无敌）」
-///   —— 两个事件帧夹一个区间，靠 <see cref="Ability.AnimEventEnd"/>（本类读名字分支）。</item>
-/// </list>
-///
-/// <para><b>「不消耗层数的后撤」</b>（弓 武技2「刹那之眼」的"基础蓄力期间被击中会强制触发一次"）：
-/// 调用方用 <c>RefreshCooldown() → TryActivate() → RefreshCooldown()</c> 达成（技能层数立刻补满），
-/// 本类不需要知道"谁在强制触发它"。</para>
-///
-/// <para>所有数值（后撤力、动画名、两个事件帧、CD）都在技能行里；代码里没有力的字面量。</para>
+/// 角色A后撤：真实Dodge事件起步，当前默认在0.3秒内向后移动12米。
+/// 只覆盖水平速度，保留重力、地形碰撞、外力与起手朝向；动画不重新制作。
+/// 无敌仍由Dodge/Dodger开关，动画先结束时等待位移完成再收招；取消或换装立即释放。
+/// BackwardDistance设为0可兼容旧冲量模式。弓的免费后撤仍复用同一能力与层数规则。
 /// </summary>
 public partial class BackdashAbility : Ability
 {
+	[ExportGroup("定距后撤")]
+	/// <summary>正值启用定距移动；设为0可兼容旧冲量配置。碰撞仍由MoveAndSlide处理。</summary>
+	[Export] public float BackwardDistance { get; set; } = 12f;
+	[Export] public float TravelSeconds { get; set; } = .3f;
 	[ExportGroup("后撤（向后的力）")]
 	/// <summary>向后的力（冲量，m/s）。文档写「{100 或 N}」—— 表里给一个能跑起来的预设值。</summary>
-	[Export] public float BackwardForce { get; set; } = 12f;
+	[Export] public float BackwardForce { get; set; } = 20f;
 
 	/// <summary>额外抬高一点的垂直分量（0 = 纯水平后撤）。</summary>
 	[Export] public float UpwardForce { get; set; }
@@ -50,12 +41,14 @@ public partial class BackdashAbility : Ability
 	public Vector3 LastImpulse { get; private set; }
 
 	private float _invulnerableTime;
+	private bool _traveling, _finishAfterTravel;
 
 	protected override void OnActivate(Unit? target)
 	{
 		InvulnerableOwned = false;
 		_invulnerableTime = 0f;
 		LastImpulse = Vector3.Zero;
+		_finishAfterTravel = false;
 		Movement?.LockFacing(this);
 
 		// 动画必须存在（基类 TryActivate 已经查过），这里开播；效果等 Dodge 事件帧（= 动画开头那一帧）。
@@ -76,7 +69,7 @@ public partial class BackdashAbility : Ability
 		if (name == InvulnerableToEvent)
 		{
 			EndInvulnerable();
-			Finish();
+			if (_traveling) _finishAfterTravel = true; else Finish();
 			return;
 		}
 
@@ -96,8 +89,18 @@ public partial class BackdashAbility : Ability
 		back.Y = 0f;
 		back = back.LengthSquared() > 0.0001f ? back.Normalized() : Vector3.Back;
 
-		LastImpulse = (back * BackwardForce) + (Vector3.Up * UpwardForce);
-		Movement.AddImpulse(LastImpulse);
+		if (BackwardDistance > 0)
+		{
+			LastImpulse = back * (BackwardDistance / Mathf.Max(.01f, TravelSeconds));
+			if (!Movement.BeginVelocityOverride(this, LastImpulse, Mathf.Max(.01f, TravelSeconds), isDash: true, planarOnly: true)) { Cancel(); return; }
+			_traveling = true;
+			if (UpwardForce != 0) Movement.AddImpulse(Vector3.Up * UpwardForce);
+		}
+		else
+		{
+			LastImpulse = (back * BackwardForce) + (Vector3.Up * UpwardForce);
+			Movement.AddImpulse(LastImpulse);
+		}
 
 		OwnerUnit.IsInvulnerable = true;
 		InvulnerableOwned = true;
@@ -105,7 +108,7 @@ public partial class BackdashAbility : Ability
 
 		GameLog.Write(
 			"Combat",
-			$"后撤：{AbilityId} 后撤力 {BackwardForce:0.##}（方向 {LastImpulse}，**不改变朝向**）｜无敌帧开（{InvulnerableFromEvent}）");
+			$"后撤：{AbilityId} 距离 {BackwardDistance:0.##}m / {TravelSeconds:0.##}s（速度 {LastImpulse}，不改变朝向，保留物理碰撞）｜无敌帧开（{InvulnerableFromEvent}）");
 	}
 
 	private void EndInvulnerable()
@@ -127,6 +130,11 @@ public partial class BackdashAbility : Ability
 	/// <summary>超时兜底：动画事件帧没来（生成表配错）时也要收招并**把无敌关掉**。</summary>
 	protected override void Tick(float delta)
 	{
+		if (_traveling && Movement?.VelocityOverrideFinished(this) == true)
+		{
+			Movement.EndVelocityOverride(this); _traveling = false;
+			if (_finishAfterTravel) { Finish(); return; }
+		}
 		if (!InvulnerableOwned)
 		{
 			if (IsBusy && !HoldToCharge && StateTime > Windup + Recover + 1.5f)
@@ -149,6 +157,7 @@ public partial class BackdashAbility : Ability
 	public override void _ExitTree()
 	{
 		EndInvulnerable();
+		Movement?.EndVelocityOverride(this);
 		Movement?.UnlockFacing(this);
 		base._ExitTree();
 	}
@@ -156,6 +165,8 @@ public partial class BackdashAbility : Ability
 	protected override void OnFinishOrCancel()
 	{
 		EndInvulnerable();
+		Movement?.EndVelocityOverride(this);
+		_traveling = _finishAfterTravel = false;
 		Movement?.UnlockFacing(this);
 	}
 

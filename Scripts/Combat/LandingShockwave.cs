@@ -97,6 +97,8 @@ public partial class LandingShockwave : Node3D
 	[ExportGroup("运行期可读状态（探针 / 自测）")]
 	/// <summary>一共画了几圈（自测取证）。</summary>
 	public int SpawnCount { get; private set; }
+	/// <summary>最近一次生成的临时圈；调用方可只清理自己的表现，不按名称清除全场特效。</summary>
+	public Node3D? LastSpawnedEffect { get; private set; }
 
 	/// <summary>最近一次画的半径（米）—— 应该与上游命中体的半径一致。</summary>
 	public float LastRadius { get; private set; }
@@ -217,6 +219,7 @@ public partial class LandingShockwave : Node3D
 
 		var holder = new Node3D { Name = "LandingShockwaveFx" };
 		host.AddChild(holder);
+		LastSpawnedEffect = holder;
 		holder.GlobalPosition = center + (Vector3.Up * (GroundOffset + ExtraHeight));
 		holder.Scale = Vector3.One * Mathf.Clamp(StartScale, 0.01f, 1f);
 

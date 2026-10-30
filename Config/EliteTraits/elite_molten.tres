@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MoltenTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/MoltenTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1014
+Id = "elite_molten"
+Title = "熔火"
+Description = "移动留火路，自然死亡后预警爆炸。"
+NameKey = "elite.molten.name"
+DescriptionKey = "elite.molten.description"
+Cooldown = 1.5
+Radius = 1.3
+Duration = 2.5
+Damage = 6

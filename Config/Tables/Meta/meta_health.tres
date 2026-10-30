@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_e0ph0")
+NumericId = 1109
 SaveKey = "health_level"
 Stat = "MaxHealthAdd"
 PerLevel = 10.0

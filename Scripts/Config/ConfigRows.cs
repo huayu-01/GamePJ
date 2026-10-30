@@ -17,6 +17,7 @@ namespace ActRoguelike.Config;
 public static class ConfigRows
 {
 	private static readonly Dictionary<string, Dictionary<string, ConfigRow>> ByIdMap = new();
+	private static readonly Dictionary<string, Dictionary<int, ConfigRow>> ByNumberMap = new();
 	private static readonly Dictionary<string, Dictionary<int, ConfigRow>> BySlotMap = new();
 	private static readonly Dictionary<string, List<ConfigRow>> RowsMap = new();
 	private static readonly Dictionary<string, string> KindMap = new();
@@ -31,6 +32,7 @@ public static class ConfigRows
 	{
 		string key = KeyOf<T>();
 		var ids = new Dictionary<string, ConfigRow>();
+		var numbers = new Dictionary<int, ConfigRow>();
 		var slots = new Dictionary<int, ConfigRow>();
 		var all = new List<ConfigRow>();
 
@@ -58,6 +60,7 @@ public static class ConfigRows
 				}
 
 				ids[row.Id] = row;
+				if (row.NumericId > 0 && !numbers.TryAdd(row.NumericId, row)) GD.PushWarning($"[Config] 数字ID {row.NumericId} 重复：{row.ResourcePath}");
 				if (row.Slot > 0)
 				{
 					slots.TryAdd(row.Slot, row);
@@ -66,6 +69,7 @@ public static class ConfigRows
 		}
 
 		ByIdMap[key] = ids;
+		ByNumberMap[key] = numbers;
 		BySlotMap[key] = slots;
 		RowsMap[key] = all;
 	}
@@ -78,11 +82,14 @@ public static class ConfigRows
 			return null;
 		}
 
+		if (int.TryParse(id, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int number) && ByNumericId<T>(number) is { } numbered) return numbered;
 		return ByIdMap.TryGetValue(KeyOf<T>(), out Dictionary<string, ConfigRow>? ids)
 			&& ids.TryGetValue(id, out ConfigRow? row)
 			? (T)row
 			: null;
 	}
+	public static T? ByNumericId<T>(int number) where T : ConfigRow
+		=> ByNumberMap.TryGetValue(KeyOf<T>(), out var rows) && rows.TryGetValue(number, out var row) ? row as T : null;
 
 	/// <summary>按槽位号取行（1 起；<see cref="IConfigRow.Slot"/> 语义见各表）。</summary>
 	public static T? BySlot<T>(int slot) where T : ConfigRow

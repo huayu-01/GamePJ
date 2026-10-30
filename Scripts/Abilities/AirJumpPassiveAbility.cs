@@ -19,11 +19,13 @@ namespace ActRoguelike.Abilities;
 /// <para>上限（3）是**参数**不是常量：设计文档说的是"上限最多 3 次"，而未来的
 /// 异化「践踏死亡」（每次击杀获得额外跳跃次数）也要共用这条上限。</para>
 /// </summary>
-public partial class AirJumpPassiveAbility : Ability
+public partial class AirJumpPassiveAbility : Ability, IAbilityConfigConsumer
 {
+	public void ConfigureBeforeParameters(Config.AbilityConfig config) => GrantAttackMovement = config.GrantAttackMovement;
 	/// <summary>由技能表授予：允许在攻击动作期间保持主动移动。</summary>
 	[Export] public bool GrantAttackMovement { get; set; }
-	protected override void OnLoadoutReset() => GrantAttackMovement = false;
+	[Export(PropertyHint.Range, "0.05,1,0.05")] public float AttackMoveSpeedScale { get; set; } = 1f;
+	protected override void OnLoadoutReset() { GrantAttackMovement = false; AttackMoveSpeedScale = 1f; }
 	[ExportGroup("额外跳跃次数")]
 	/// <summary>这个被动**授予几次**额外空中跳跃（文档：1 次）。</summary>
 	[Export] public int Grant { get; set; } = 1;

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SpillerTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/SpillerTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1025
+Id = "elite_spiller"
+Title = "黑雾"
+Description = "进入暗影罩内才可伤害本体。"
+NameKey = "elite.spiller.name"
+DescriptionKey = "elite.spiller.description"
+MaxCarriers = 1
+Radius = 5
+Requirements = 8
+ExtraCost = 3

@@ -64,7 +64,7 @@ public static class SkillAnimationLibrary
 	/// 目录为空 / 读不到 → 返回 0 并**不报错**（"没有技能动画"是合法状态，只是技能不会执行）。
 	/// </summary>
 	/// <returns>实际加载进库的动画段数。</returns>
-	public static int LoadInto(AnimationPlayer player, string library, string dir)
+	public static int LoadInto(AnimationPlayer player, string library, string dir, Skeleton3D? preferredSkeleton = null, bool requireBindings = false)
 	{
 		if (string.IsNullOrEmpty(library) || string.IsNullOrEmpty(dir))
 		{
@@ -92,8 +92,13 @@ public static class SkillAnimationLibrary
 				GD.PushWarning($"[SkillAnimation] {path} 不是 Animation，已跳过。");
 				continue;
 			}
+			if (requireBindings)
+			{
+				var bindingIssues = ValidateBindings(animation, player, preferredSkeleton);
+				if (preferredSkeleton == null || bindingIssues.Count > 0) { GD.PushWarning($"[SkillAnimation] {path} 不能绑定当前档案骨架：{string.Join("；", bindingIssues)}"); continue; }
+			}
 
-			lib.AddAnimation(animation.ResourceName, PrepareForRuntime(animation, path, player));
+			lib.AddAnimation(animation.ResourceName, PrepareForRuntime(animation, path, player, preferredSkeleton));
 		}
 
 		if (lib.GetAnimationList().Count == 0)
@@ -128,19 +133,17 @@ public static class SkillAnimationLibrary
 	/// 复制一份再禁用（不动 `ResourceLoader` 缓存里的那份），所以自测里那套"靠引擎回调触发"的
 	/// 验证路径照样成立 —— 两条路都被覆盖到。
 	/// </summary>
-	private static Animation PrepareForRuntime(Animation source, string path, AnimationPlayer player)
+	private static Animation PrepareForRuntime(Animation source, string path, AnimationPlayer player, Skeleton3D? preferredSkeleton)
 	{
 		var copy = (Animation)source.Duplicate(true);
 		Node root = player.GetNodeOrNull(player.RootNode) ?? player.GetParent();
-		Skeleton3D? skeleton = NodeSearch.FindInSubtree<Skeleton3D>(root);
+		Skeleton3D? skeleton = preferredSkeleton ?? NodeSearch.FindInSubtree<Skeleton3D>(root);
 		for (int track = 0; track < copy.GetTrackCount(); track++)
 		{
 			// 角色模型的导入根名不同；仅在私有副本中重定向同名骨骼，关键帧和方法事件不变。
 			if (skeleton != null && copy.TrackGetType(track) is Animation.TrackType.Position3D or Animation.TrackType.Rotation3D or Animation.TrackType.Scale3D)
 			{
-				NodePath target = copy.TrackGetPath(track);
-				if (target.GetSubNameCount() == 1 && skeleton.FindBone(target.GetSubName(0)) >= 0)
-					copy.TrackSetPath(track, new NodePath($"{root.GetPathTo(skeleton)}:{target.GetSubName(0)}"));
+				copy.TrackSetPath(track, ResolveTransformPath(copy.TrackGetPath(track), root, skeleton));
 			}
 			if (copy.TrackGetType(track) == Animation.TrackType.Method && copy.TrackIsEnabled(track))
 			{
@@ -154,6 +157,31 @@ public static class SkillAnimationLibrary
 		}
 
 		return copy;
+	}
+
+	/// <summary>按与运行期相同的路径规则验证骨骼绑定；不更改源动画，不假定具体骨名或模型根名。</summary>
+	public static System.Collections.Generic.IReadOnlyList<string> ValidateBindings(Animation animation, AnimationPlayer player, Skeleton3D? preferredSkeleton = null)
+	{
+		var issues = new System.Collections.Generic.List<string>();
+		Node root = player.GetNodeOrNull(player.RootNode) ?? player.GetParent();
+		Skeleton3D? skeleton = preferredSkeleton ?? NodeSearch.FindInSubtree<Skeleton3D>(root);
+		for (int track = 0; track < animation.GetTrackCount(); track++)
+		{
+			if (!animation.TrackIsEnabled(track) || animation.TrackGetType(track) is not (Animation.TrackType.Position3D or Animation.TrackType.Rotation3D or Animation.TrackType.Scale3D)) continue;
+			NodePath path = ResolveTransformPath(animation.TrackGetPath(track), root, skeleton);
+			string nodePath = path.ToString().Split(':')[0];
+			Node3D? target = root.GetNodeOrNull<Node3D>(string.IsNullOrEmpty(nodePath) ? "." : nodePath);
+			if (target == null) issues.Add($"轨道 {track} 的目标节点不存在：{path}");
+			else if (path.GetSubNameCount() > 0 && (path.GetSubNameCount() != 1 || target is not Skeleton3D rig || rig.FindBone(path.GetSubName(0)) < 0))
+				issues.Add($"轨道 {track} 的骨骼不存在：{path}；需要重定向动画或修正动画库");
+		}
+		return issues;
+	}
+	private static NodePath ResolveTransformPath(NodePath path, Node root, Skeleton3D? skeleton)
+	{
+		if (skeleton != null && path.GetSubNameCount() == 1 && skeleton.FindBone(path.GetSubName(0)) >= 0)
+			return new NodePath($"{root.GetPathTo(skeleton)}:{path.GetSubName(0)}");
+		return path;
 	}
 
 	/// <summary>列出一个目录下的动画文件（`*.tres`），**按名字排序**保证结果稳定可复现。</summary>

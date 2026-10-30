@@ -1,0 +1,14 @@
+{
+  "blender_version": "5.2.2 LTS",
+  "enabled_addons": [
+    "rigify",
+    "node_wrangler",
+    "bl_ext.user_default.retarget",
+    "blender_mcp"
+  ],
+  "asset_library": "F:\\Godot项目\\项目a\\ArtSource\\Blender",
+  "telemetry_consent": false,
+  "rigify_operator": "OBJECT_OT_armature_human_metarig_add",
+  "gltf_export_operator": "EXPORT_SCENE_OT_gltf",
+  "gltf_import_operator": "IMPORT_SCENE_OT_gltf"
+}

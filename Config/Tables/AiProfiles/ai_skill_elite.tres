@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1053
 Id = "ai_skill_elite"
 DisplayName = "技能精英"
 SearchRange = 45.0

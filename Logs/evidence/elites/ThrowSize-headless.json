@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "pass": 17,
+  "fail": 0,
+  "checks": [
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u751F\u5B58\u6A21\u5F0F\u3001\u73A9\u5BB6\u548C\u5BFC\u822A\u5DF2\u51C6\u5907"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u6295\u63B7\u8D77\u624B\uFF1AScythe"
+    },
+    {
+      "passed": true,
+      "message": "\u6295\u63B7\u5B9E\u9645\u5230\u8FBE\u505C\u7559\u4F4D\u7F6E\uFF1AScythe"
+    },
+    {
+      "passed": true,
+      "message": "\u7A84\u76EE\u6807\u5904\u4E8E\u539F\u59CB\u5224\u5B9A\u4E4B\u5916\uFF1AScythe"
+    },
+    {
+      "passed": true,
+      "message": "\u6A21\u578B\u4E0E\u4F24\u5BB3\u4F53\u79EF\u5747\u6269\u5927\u52301.3\u500D\uFF1AScythe"
+    },
+    {
+      "passed": true,
+      "message": "\u6269\u5927\u7684\u771F\u5B9E\u5224\u5B9A\u80FD\u547D\u4E2D\u539F\u8303\u56F4\u5916\u76EE\u6807\uFF1AScythe"
+    },
+    {
+      "passed": true,
+      "message": "\u89D2\u8272\u6A21\u578B\u548C\u8EAB\u4F53\u78B0\u649E\u4E0D\u968F\u79BB\u624B\u6B66\u5668\u653E\u5927"
+    },
+    {
+      "passed": true,
+      "message": "\u6765\u6E90\u64A4\u9500\u540E\u6A21\u578B\u548C\u78B0\u649E\u4E00\u8D77\u6062\u590D\uFF1AScythe"
+    },
+    {
+      "passed": true,
+      "message": "\u53D6\u6D88\uFF0F\u6362\u88C5\u4E0D\u6B8B\u7559\u653E\u5927\uFF1AScythe"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u6295\u63B7\u8D77\u624B\uFF1ASpear"
+    },
+    {
+      "passed": true,
+      "message": "\u6295\u63B7\u5B9E\u9645\u5230\u8FBE\u505C\u7559\u4F4D\u7F6E\uFF1ASpear"
+    },
+    {
+      "passed": true,
+      "message": "\u7A84\u76EE\u6807\u5904\u4E8E\u539F\u59CB\u5224\u5B9A\u4E4B\u5916\uFF1ASpear"
+    },
+    {
+      "passed": true,
+      "message": "\u6A21\u578B\u4E0E\u4F24\u5BB3\u4F53\u79EF\u5747\u6269\u5927\u52301.3\u500D\uFF1ASpear"
+    },
+    {
+      "passed": true,
+      "message": "\u6269\u5927\u7684\u771F\u5B9E\u5224\u5B9A\u80FD\u547D\u4E2D\u539F\u8303\u56F4\u5916\u76EE\u6807\uFF1ASpear"
+    },
+    {
+      "passed": true,
+      "message": "\u89D2\u8272\u6A21\u578B\u548C\u8EAB\u4F53\u78B0\u649E\u4E0D\u968F\u79BB\u624B\u6B66\u5668\u653E\u5927"
+    },
+    {
+      "passed": true,
+      "message": "\u6765\u6E90\u64A4\u9500\u540E\u6A21\u578B\u548C\u78B0\u649E\u4E00\u8D77\u6062\u590D\uFF1ASpear"
+    },
+    {
+      "passed": true,
+      "message": "\u53D6\u6D88\uFF0F\u6362\u88C5\u4E0D\u6B8B\u7559\u653E\u5927\uFF1ASpear"
+    }
+  ]
+}

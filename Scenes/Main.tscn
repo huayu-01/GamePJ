@@ -71,9 +71,7 @@ script = ExtResource("9_run")
 
 [node name="Stage" type="Node3D" parent="." unique_id=387874497]
 script = ExtResource("6_stage")
-ActiveNodeCount = 6
 PortalScene = ExtResource("11_node")
-FreeChallengeQuota = 1
 
 [node name="Combat" type="Node3D" parent="Stage" unique_id=272288677]
 script = ExtResource("7_encounter")
@@ -196,6 +194,11 @@ Prompt = "恢复状态"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -10)
 Kind = 6
 Prompt = "特殊奖励"
+
+[node name="NodeArmor" parent="Stage" instance=ExtResource("11_node")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 10)
+Kind = 9
+Prompt = "补充护甲"
 
 [node name="Door" parent="Stage" unique_id=1913413718 instance=ExtResource("12_door")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)

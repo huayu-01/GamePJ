@@ -1,0 +1,58 @@
+{
+  "Date": "2026-10-29T21:22:00",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 5.59,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.content.err",
+      "Failure": "",
+      "SHA256": "380D5CF5E02860C33BC43934ED6BABE23FE820878E7A000C037AF5A8E49B806E"
+    },
+    {
+      "Name": "localization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 3.32,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.localization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.localization.err",
+      "Failure": "",
+      "SHA256": "0BBFF35A02C25D83204B160846BD7150CDFE3FA83993B3DC1C0D3C724F02AF67"
+    },
+    {
+      "Name": "effects",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 3.03,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.effects.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.effects.err",
+      "Failure": "",
+      "SHA256": "A8345471C929F63CEC05C4D75CD4EC2A7540DFAE81BD799B5A652A81571CA06D"
+    },
+    {
+      "Name": "slots",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 9.15,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.slots.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.slots.err",
+      "Failure": "",
+      "SHA256": "CFCC45AC65F768C483386DEAB5854B0A5EE0F151CAF3B51E749A091DA0549CA8"
+    },
+    {
+      "Name": "snapshot",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 10.68,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.snapshot.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261029_212200.snapshot.err",
+      "Failure": "",
+      "SHA256": "B548C321F47BCED2B9DB00C5DD5111EDCE909AD159660DDAAC6510E9243514FE"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

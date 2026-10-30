@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "asset": "clover-wayfarer",
+  "triangles": 4430,
+  "meshes": 32,
+  "bones": 21,
+  "materials": 16,
+  "animations": [
+    {
+      "name": "idle",
+      "duration_seconds": 1.9999999664723873,
+      "channels": 63
+    },
+    {
+      "name": "walk",
+      "duration_seconds": 1.2000000141561031,
+      "channels": 63
+    }
+  ],
+  "max_weight_sum_error": 1.1548399925231934e-07,
+  "glb_bytes": 525852,
+  "includes_backpack": false,
+  "back_pattern": "three-leaf clover",
+  "candidate_only": true,
+  "blender_roundtrip": {
+    "passed": true,
+    "asset_meshes": 32,
+    "triangles": 4430,
+    "bones": 21,
+    "importer_bone_display_helpers": 1
+  },
+  "references": [
+    "https://oricutstudios.itch.io/low-poly-forest-spirit-nori",
+    "https://oricutstudios.itch.io/low-poly-campfire-scout-niko"
+  ]
+}

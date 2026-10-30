@@ -18,8 +18,9 @@ public partial class AbilityHud : Control
 	[Export] public float EdgeMargin { get; set; } = 26;
 	[Export] public Color PanelColor { get; set; } = new(0.045f, 0.075f, 0.105f, 0.94f);
 	[Export] public Color TextColor { get; set; } = new(0.91f, 0.96f, 0.94f);
+	[Export] public AbilityHudStyle DisplayStyle { get; set; } = new();
 
-	private sealed record Slot(Ability Ability, AbilityConfig Row, string InputAction);
+	private sealed record Slot(Ability Ability, AbilityConfig Row, string InputAction, Texture2D Icon);
 	private readonly List<Slot> _slots = new();
 	private readonly StyleBoxFlat _panel = new();
 	private readonly StyleBoxFlat _key = new();
@@ -49,13 +50,13 @@ public partial class AbilityHud : Control
 		{
 			foreach (var equipped in player.AbilitySlots.Equipped)
 			{
-				if (equipped.Ability is { Enabled: true } ability && equipped.Row is { HudIcon: not null } row)
+				if (equipped.Ability is { Enabled: true } ability && equipped.Row is { } row && UiIcons.ForAbility(row) is { } icon)
 				{
-					_slots.Add(new Slot(ability, row, equipped.InputSlot));
+					_slots.Add(new Slot(ability, row, equipped.InputSlot, icon));
 				}
 			}
-			_slots.Sort((a, b) => a.Row.HudOrder != b.Row.HudOrder
-				? a.Row.HudOrder.CompareTo(b.Row.HudOrder)
+			_slots.Sort((a, b) => DisplayStyle.Order(a.InputAction) != DisplayStyle.Order(b.InputAction)
+				? DisplayStyle.Order(a.InputAction).CompareTo(DisplayStyle.Order(b.InputAction))
 				: string.Compare(a.Row.Id, b.Row.Id, StringComparison.Ordinal));
 		}
 		QueueRedraw();
@@ -80,13 +81,14 @@ public partial class AbilityHud : Control
 			Ability ability = slot.Ability;
 			Rect2 rect = TileRect(i);
 			Vector2 center = rect.GetCenter() + new Vector2(0, -4);
-			Color accent = slot.Row.HudColor;
+			Color accent = DisplayStyle.Accent;
 			bool effectActive = ability.IsActive || ability.EffectRemainingSeconds > 0f;
 			_panel.BorderColor = effectActive ? accent : new Color(accent, 0.35f);
 			_panel.Draw(GetCanvasItem(), rect);
 			float radius = TileSize * 0.34f;
 			var iconRect = new Rect2(center - Vector2.One * radius * 0.72f, Vector2.One * radius * 1.44f);
-			DrawTextureRect(slot.Row.HudIcon!, iconRect, false, ability.IsReady || effectActive ? accent : accent.Darkened(0.35f));
+			// 图标保留图片自己的颜色；冷却时只降低亮度，不用战斗配置给它染色。
+			DrawTextureRect(slot.Icon, iconRect, false, ability.IsReady || effectActive ? Colors.White : Colors.White.Darkened(.35f));
 			float cooldown = Fraction(ability);
 			DrawArc(center, radius, -Mathf.Pi / 2, Mathf.Tau - Mathf.Pi / 2, 64, new Color(accent, 0.14f), 2, true);
 			if (cooldown > 0)
@@ -102,22 +104,22 @@ public partial class AbilityHud : Control
 			{
 				DrawArc(center, radius, -Mathf.Pi / 2, Mathf.Tau - Mathf.Pi / 2, 64, accent, 2.5f, true);
 			}
-			if (ability.IsCharging)
+			if (DisplayStyle.ShowChargeMeter && ability.IsCharging)
 			{
 				Rect2 track = new(rect.Position + new Vector2(8, TileSize - 10), new Vector2(TileSize - 16, 3));
 				DrawRect(track, new Color(accent, 0.2f));
 				DrawRect(new Rect2(track.Position, track.Size * new Vector2(ability.ChargeProgress, 1)), accent);
 			}
-			if (ability.IsMaintaining) Text(font, rect.Position + new Vector2(5, 18), TileSize - 10, "维持", 13, accent);
-			if (ability.EffectRemainingSeconds > 0f) Text(font, rect.Position + new Vector2(5, 18), TileSize - 10, $"{ability.EffectRemainingSeconds:0.0}s", 13, accent);
-			if (ability.MaxCharges > 1)
+			if (DisplayStyle.ShowHoldStatus && ability.IsMaintaining) Text(font, rect.Position + new Vector2(5, 18), TileSize - 10, "维持", 13, accent);
+			if (DisplayStyle.ShowEffectTimer && ability.EffectRemainingSeconds > 0f) Text(font, rect.Position + new Vector2(5, 18), TileSize - 10, $"{ability.EffectRemainingSeconds:0.0}s", 13, accent);
+			if (DisplayStyle.ShowCharges && ability.MaxCharges > 1)
 			{
 				Text(font, rect.Position + new Vector2(TileSize - 43, 19), 36, $"{ability.ChargesRemaining}/{ability.MaxCharges}", 15, TextColor);
 			}
 			Rect2 keyRect = new(rect.Position + new Vector2(TileSize * 0.25f, TileSize - 17), new Vector2(TileSize * 0.5f, 22));
 			_key.Draw(GetCanvasItem(), keyRect);
 			Text(font, keyRect.Position + new Vector2(0, 16), keyRect.Size.X, KeyCaption(slot.InputAction), 13, TextColor);
-			Text(font, rect.Position + new Vector2(-4, TileSize + 24), TileSize + 8, slot.Row.DisplayName, 14, TextColor);
+			Text(font, rect.Position + new Vector2(-4, TileSize + 24), TileSize + 8, slot.Row.LocalizedName, 14, TextColor);
 		}
 	}
 	private void Text(Font font, Vector2 baseline, float width, string text, int size, Color color)
@@ -166,6 +168,6 @@ public partial class AbilityHud : Control
 	}
 	public float CooldownFraction(string id) => _slots.Find(s => s.Ability.AbilityId == id) is { } slot ? Fraction(slot.Ability) : 0;
 	public Rect2 BoundsOf(string id) => _slots.FindIndex(s => s.Ability.AbilityId == id) is int index && index >= 0 ? TileRect(index) : new Rect2();
-	public string IconPathOf(string id) => _slots.Find(s => s.Ability.AbilityId == id)?.Row.HudIcon?.ResourcePath ?? string.Empty;
+	public string IconPathOf(string id) => _slots.Find(s => s.Ability.AbilityId == id)?.Icon.ResourcePath ?? string.Empty;
 	public string DebugState() => $"技能栏{SlotCount}格 [{DisplayedIds}] 鼠标穿透={MouseFilter == MouseFilterEnum.Ignore}";
 }

@@ -19,7 +19,7 @@ namespace ActRoguelike.Abilities;
 /// <item><b>每 0.5s 给准星附近的一个目标上标记</b>：<see cref="MarkIntervalSeconds"/> 到点就在
 ///   "准星世界点 <see cref="MarkRadius"/> 米内"挑**最近**的敌对单位，挂上
 ///   <see cref="MarkStatusId"/> 那条状态。标记是**可叠加、不限单目标**的（`Unit.ApplyStatus`
-///   的 `MaxStacks` 路径，见 `docs/refactor-survey.md` 硬编码审计第 6 条）。</item>
+///   的 `MaxStacks` 路径，见 `docs/archive/design-notes/refactor-survey.md` 硬编码审计第 6 条）。</item>
 /// <item><b>软启动期间被击中 → 无效化 + 免费的"后撤"</b>：订阅 <c>Unit.HitReceived</c>
 ///   （它在 <c>ReceiveHit</c> 里**先于无敌判定**触发），把 <c>IsInvulnerable</c> 置位 → 这一次命中被判为
 ///   无敌而不掉血；随后按表里的 <see cref="DodgeAbilityId"/> 找到「后撤」技能并强制触发一次

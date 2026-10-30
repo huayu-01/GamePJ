@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1"]
 [resource]
 script = ExtResource("1")
+NumericId = 1087
 Id = "enemy_arc_thrower"
 DisplayName = "远程投掷兵"
 ScenePath = "res://Scenes/Enemies/ArcThrower.tscn"

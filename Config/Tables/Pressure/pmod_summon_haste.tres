@@ -11,6 +11,7 @@ Note = "召唤冷却的倍率（14 秒 → 10.5 秒 = 增援来得更密）"
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1125
 Id = "pmod_summon_haste"
 DisplayName = "召唤急速"
 DescriptionTemplate = "召唤冷却 ×0.75（14 秒 → 10.5 秒）"

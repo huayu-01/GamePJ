@@ -1,0 +1,55 @@
+{
+  "models": 100,
+  "animationPlayers": 100,
+  "bones": 469,
+  "meshes": 167,
+  "surfaces": 167,
+  "phases": [
+    {
+      "phase": "visible_animated",
+      "samples": 1238,
+      "frameMs": 2.4243941841680123,
+      "p99FrameMs": 3.835,
+      "gpuMs": 2.034299678005194,
+      "processMs": 21.366360258481247,
+      "drawCalls": 850
+    },
+    {
+      "phase": "visible_frozen",
+      "samples": 1216,
+      "frameMs": 2.468492598684211,
+      "p99FrameMs": 3.723,
+      "gpuMs": 2.103127463573688,
+      "processMs": 7.738338815789481,
+      "drawCalls": 850
+    },
+    {
+      "phase": "hidden_animated",
+      "samples": 1253,
+      "frameMs": 2.3949130087789325,
+      "p99FrameMs": 3.534,
+      "gpuMs": 2.063903430130419,
+      "processMs": 17.166202713487806,
+      "drawCalls": 537
+    },
+    {
+      "phase": "hidden_frozen",
+      "samples": 1265,
+      "frameMs": 2.372972332015809,
+      "p99FrameMs": 3.168,
+      "gpuMs": 2.058745461396078,
+      "processMs": 14.995598418972062,
+      "drawCalls": 537
+    },
+    {
+      "phase": "visible_animated_repeat",
+      "samples": 1195,
+      "frameMs": 2.5121087866108835,
+      "p99FrameMs": 3.906,
+      "gpuMs": 2.118557319381746,
+      "processMs": 23.079888702928777,
+      "drawCalls": 850
+    }
+  ],
+  "note": "\u8BCA\u65AD\u9694\u79BB\u6A21\u578B\u5B50\u6811\uFF0C\u53EA\u64AD\u653Eidle\uFF1B\u9636\u6BB5\u505C\u6B62\u52A8\u753B\uFF0F\u9690\u85CF\u53EA\u4F5C\u7528\u4E8E\u8BCA\u65AD\u526F\u672C\uFF0C\u4E0D\u4EE3\u8868\u5B9E\u6218\u53EF\u4EE5\u505C\u6389\u6280\u80FD\u52A8\u753B\u6216\u903B\u8F91\uFF1B\u77ED\u65F6\u987A\u5E8F\u8BD5\u9A8C\uFF0C\u672B\u5C3E\u91CD\u590D\u9996\u9636\u6BB5\u68C0\u67E5\u6F02\u79FB\u3002"
+}

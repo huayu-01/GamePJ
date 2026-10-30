@@ -1,0 +1,28 @@
+{
+  "Date": "2026-10-27T23:39:35",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "enemy_actions",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.3,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_233935.enemy_actions.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_233935.enemy_actions.err",
+      "Failure": "",
+      "SHA256": "DD265112769D76366B193A7C3F723998D43DED1CE24762BB49B084B745CBDE6A"
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 34.97,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_233935.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_233935.survival.err",
+      "Failure": "",
+      "SHA256": "18CFA64D31BD08650C03526A12A990C498FEABB1B64230167478F215E11E5E2F"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

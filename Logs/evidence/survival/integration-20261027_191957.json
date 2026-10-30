@@ -1,0 +1,28 @@
+{
+  "Date": "2026-10-27T19:19:57",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "rune_ui",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 6.59,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191957.rune_ui.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191957.rune_ui.err",
+      "Failure": "",
+      "SHA256": "612E10A38207DED9CE061516450F6C4C057B02C7E64E2DC581D03098ED4DA92C"
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 34.73,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191957.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191957.survival.err",
+      "Failure": "",
+      "SHA256": "73942742A992CF937BF4FF1694F0FB5B70D0AB608E28C6449F53E3274E7C455B"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

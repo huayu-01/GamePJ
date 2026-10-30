@@ -1,0 +1,54 @@
+{
+  "libraries": [
+    {
+      "animation_count": 43,
+      "bones": 65,
+      "file": "UAL1_Standard.glb"
+    },
+    {
+      "animation_count": 43,
+      "bones": 65,
+      "file": "UAL1_Standard_RM.glb"
+    },
+    {
+      "animation_count": 43,
+      "bones": 65,
+      "file": "UAL2_Standard.glb"
+    },
+    {
+      "animation_count": 43,
+      "bones": 65,
+      "file": "UAL2_Standard_RM.glb"
+    }
+  ],
+  "retarget_samples": [
+    {
+      "clip": "Walk_Loop",
+      "file": "UAL1_Standard.glb",
+      "mapped_bones": 23,
+      "passed": true,
+      "target_pose_delta": 4.57263472676277
+    },
+    {
+      "clip": "Sword_Attack",
+      "file": "UAL1_Standard.glb",
+      "mapped_bones": 23,
+      "passed": true,
+      "target_pose_delta": 14.9522146414965
+    },
+    {
+      "clip": "Sword_Regular_Combo",
+      "file": "UAL2_Standard.glb",
+      "mapped_bones": 23,
+      "passed": true,
+      "target_pose_delta": 11.1367832943797
+    },
+    {
+      "clip": "Hit_Knockback",
+      "file": "UAL2_Standard.glb",
+      "mapped_bones": 23,
+      "passed": true,
+      "target_pose_delta": 13.0673524821177
+    }
+  ]
+}

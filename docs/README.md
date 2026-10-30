@@ -1,29 +1,38 @@
 # 项目文档入口
 
-飞刀最新规则见[飞刀名称与60°固定散射](throwing-knife-volley.md)。
+先读[当前开发快照](SESSION-SNAPSHOT.md)，再按任务选专题；无需顺序阅读历史批次或迁移长文。
 
-日常接续只读[当前快照](SESSION-SNAPSHOT.md)，再按任务打开对应专题。不再依次重读旧交接单，也不在每份文档顶部重复追加批次历史。
-
-| 目的 | 文档 |
+| 任务 | 当前入口 |
 |---|---|
-| 灵剑武技2命中后三连刺／灵能汲取 | [J43有序突刺与瘦长剑体](character-design-j43.md)、[J42持续与续时基础](character-design-j42.md) |
-| 当前任务、约定和验收 | [SESSION-SNAPSHOT](SESSION-SNAPSHOT.md) |
-| 本轮完成的符文与特化 | [J31携带界面](character-design-j31.md)、[J32特化接入](character-design-j32.md) |
-| 符文机制与接入 | [符文系统](rune-system.md) |
-| 23项特化权威接收清单 | [后续构筑](followup-build-updates.md) |
-| 地面敌人清单与当前规则 | [20项敌人清单、预警／护甲／格挡／导航](enemy-roster.md)、[J36机制与试玩](character-design-j36.md) |
-| 敌人攻击范围与路径预警 | [原指示器位置与契约](skill-indicator.md)、[J37敌人接入](character-design-j37.md) |
-| 战斗流程、参考拆解与打击反馈 | [打击感框架与调参](combat-feel.md)、[J38交付与验证](character-design-j38.md) |
-| 换装串技能、长枪路径与命中遮挡修复 | [J39技能槽修复](character-design-j39.md)、[当前槽位与输入约定](base-loadout.md) |
-| 长枪／短弩立体瞄准、输入预览与飞镰路径伤害 | [J40修复与验证](character-design-j40.md) |
-| 弓武技1／能量掌武技2／长枪武技2未蓄满释放 | [J41低伤点按](character-design-j41.md) |
-| 地图导航与生成资源基础 | [J35导航／有效点／行为压力](character-design-j35.md) |
-| 架构、战斗与表结构 | [架构](architecture.md)、[战斗](combat.md)、[配置](config-schema.md) |
-| 身体碰撞、飞行与受力约定 | [当前碰撞约定](collision-layers.md) |
-| 飞行、压低、打落与持续力接入 | [J34系统与验证场](character-design-j34.md) |
-| 基地与界面 | [基地配装](base-loadout.md)、[UI](ui.md) |
-| 原始角色需求核对 | [原文审计](original-design-audit.md) |
-| 验证与排障 | [测试](testing.md)、[CodeGraph](codegraph-usage.md) |
-| 旧交接和路线图 | [历史归档](archive/README.md) |
+| 启动、操作与项目范围 | [根README](../README.md) |
+| 自己新增增幅、敌人、模型和脚本 | [新增内容操作](content-authoring.md) |
+| 本轮更新与修复、玩家自行追加验收项 | [可编辑验收表说明](acceptance-tracker.md) |
+| 技能专用类型、数字ID与技能栏资源规则 | [内容编辑入口更新](content-authoring-update.md) |
+| 4K／100敌人的性能实测与待选措施 | [性能方案（等待决断）](performance-proposal.md) |
+| 效果组件、内容校验、文本键与解耦验证 | [内容扩展与实施状态](content-extension-plan.md) |
+| 日志在哪里、怎样清理与保留 | [日志说明](logging.md)、[统一日志目录](../Logs/README.md) |
+| Q键、操控、弹道、构筑、特殊奖励与续波修复 | [十四项修复与验收](gameplay-fixes-20261023.md) |
+| 取消整局冒险、携带符文HUD、雷池与组合验证 | [冒险回退与联动](adventure-synergy-20261024.md) |
+| 本轮体验目标与地形能力门槛设想 | [玩家体验计划](player-experience-plan.md) |
+| 基地、探索、节点、首领与整局结算 | [关卡流程](stages.md) |
+| 12分钟手动战斗、经验升级和信标撤离 | [暮光回廊生存试炼](survival-mode.md) |
+| 已移除的死战四路线、当前通用奖励与验证 | [专属构筑退用说明](survival-builds.md) |
+| 物体交互类型选择、触发器与机关信号 | [交互组件接入](interaction-authoring.md) |
+| 配置怎么改、哪些字段有效 | [配置编辑入口](config-authoring.md) |
+| 旧资源能否清理、动态与测试依赖 | [资源生命周期](resource-lifecycle-audit.md) |
+| 架构与接入边界 | [架构](architecture.md)、[战斗](combat.md) |
+| 奖励、构筑、符文与特化 | [成长](rewards.md)、[符文](rune-system.md)、[23项特化](followup-build-updates.md) |
+| 地面敌人、导航、护甲与格挡 | [敌人清单](enemy-roster.md)、[碰撞层](collision-layers.md) |
+| 精英单特性波次、免费单批召唤与33项设计 | [精英特性规则](elite-traits.md) |
+| 敌人与三叶旅童统一风格，先挑描述再生图 | [敌人美术计划书](enemy-art-plan.md)、[建模参考与细节拆解](../ArtSource/modeling-notes.md) |
+| 敌人范围预警和打击反馈 | [预警契约](skill-indicator.md)、[反馈框架](combat-feel.md) |
+| 配装、模型、界面 | [基地配装](base-loadout.md)、[UI](ui.md)、[美术接入](art-onboarding.md)、[资源规范](assets.md) |
+| 森林资源、展示与制作源 | [120米环境](../Scenes/Levels/NatureArena/README.md)、[美术样板](../Scenes/Levels/NatureBenchmark/README.md)、[ArtSource](../ArtSource/README.md) |
+| 三叶旅童、角色A试装与额头施法发光 | [森林战斗试玩](clover-combat-trial.md) |
+| 验证、排障与索引 | [测试](testing.md)、[CodeGraph](codegraph-usage.md) |
+| 最近交付及证据 | [J48挑战状态与拒绝反馈](archive/development-batches/character-design-j48.md)、[J47替换交互模型](archive/development-batches/character-design-j47.md)、[J46交互类型组件](archive/development-batches/character-design-j46.md)、[J45增援与弹层隔离](archive/development-batches/character-design-j45.md)、[J44整理与玩家流程](archive/development-batches/character-design-j44.md) |
+| 最近灵剑机制 | [J43命中追击](archive/development-batches/character-design-j43.md)、[J42持续与续时基础](archive/development-batches/character-design-j42.md) |
+| 飞刀名称与右键固定散射 | [飞刀与60°总夹角](throwing-knife-volley.md) |
+| 追溯旧设计与迁移 | [本轮归档](archive/reference-before-2026-10-21/README.md)、[更早归档](archive/README.md) |
 
-批次报告与原始证据保留在原路径，避免破坏复验脚本及既有引用；例如[J28弹道](character-design-j28.md)、[J29攻击快照](character-design-j29.md)、[J30持续伤害](character-design-j30.md)。失败现场、存档指纹和截图也保留，不能把它们作为重复文案删除。
+完整验收与基线集中在`Logs/evidence/`；临时运行输出、旧日志和清理清单分别收进`Logs/`子目录。开发批次及旧方案位于`docs/archive/`，正文入口只描述当前契约。截图、原始需求和模型源文件保持原路径；历史待办和数值不作为当前规则。

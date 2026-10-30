@@ -1,0 +1,88 @@
+{
+  "Date": "2026-10-27T19:47:03",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "content",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.content.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.content.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.content.err",
+      "SHA256": "4793D15017E49851201AB1E2243FCD31DE8905DCD666FB6111D652B94E8612EA"
+    },
+    {
+      "Name": "effects",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.effects.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.effects.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.effects.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.effects.err",
+      "SHA256": "258D4D89B3984948A9783829CB4824760C8DBBFFE6B0AFA04C93EA7FBCB4BBB3"
+    },
+    {
+      "Name": "reward_rules",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.reward_rules.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.reward_rules.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.reward_rules.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.reward_rules.err",
+      "SHA256": "EB8B38C609F173902168499C504DF22DCDC8E22670FDA26C33FAA412A9BD89D4"
+    },
+    {
+      "Name": "slots",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.slots.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.slots.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.slots.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.slots.err",
+      "SHA256": "07CF8A0DDCFCBC863F75C655A6F28BC37ED5AA9FC44B586116A5353F242639BC"
+    },
+    {
+      "Name": "specialization",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.specialization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.specialization.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.specialization.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.specialization.err",
+      "SHA256": "EC903345302DE37351EE3C7C51609EE5C6F48BFC1C580D69F57C83CA36C2519B"
+    },
+    {
+      "Name": "adventure",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 19.45,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.adventure.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.adventure.err",
+      "Failure": "",
+      "SHA256": "FADE001303B4FFFCAEAD93E2360D688D7777D335E9B48F8B4B63F523F7140AF1"
+    },
+    {
+      "Name": "main",
+      "Passed": false,
+      "Exit": 0,
+      "Seconds": 71.04,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.main.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.main.err",
+      "Failure": "Main新增红标：[log] 19:48:11 [SelfTest] 🔴 内容数量基线：问题2，res://Config/Validation/content_inventory.tres → ExpectedCounts.RewardKinds.Evolution → ConfigIndexData：奖励分类数量与显式基线不符；修复：核对新增／移除内容是否有意，再更新唯一基线；不要在验收时自动接受当前数量；res://Config/Validation/content_inventory.tres → ExpectedCounts.RewardKinds.Mutation → ConfigIndexData：奖励分类数量与显式基线不符；修复：核对新增／移除内容是否有意，再更新唯一基线；不要在验收时自动接受当前数量\r",
+      "SHA256": "C3867A8A8BE275B2906A8A7221AD3C1C33921CB3CBBA9909A7A54E634FB45B95"
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 36.42,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_194703.survival.err",
+      "Failure": "",
+      "SHA256": "903D643445799C6D74A8487E18B531931FF37CD54028AE3F0EBF02A9F65B09A7"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "相关流程回归存在失败，见逐项报告。"
+}

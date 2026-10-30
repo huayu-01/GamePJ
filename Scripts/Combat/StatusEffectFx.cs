@@ -31,6 +31,7 @@ public partial class StatusEffectFx : Node3D
 	}
 
 	private static PackedScene? _scene;
+	private readonly Dictionary<string, EffectConfig> _fallbacks = new();
 	private Unit _unit = null!;
 	private readonly Dictionary<string, Visual> _visuals = new();
 	private readonly HashSet<string> _present = new();
@@ -38,6 +39,7 @@ public partial class StatusEffectFx : Node3D
 	private StandardMaterial3D _material = null!;
 	private float _pollTimer;
 	private float _time;
+	private int _visualSources;
 	public int VisualCount => _visuals.Count;
 
 	/// <summary>由 UnitPresentation 统一接入；新增单位无需逐个挂节点。</summary>
@@ -72,10 +74,28 @@ public partial class StatusEffectFx : Node3D
 			VertexColorUseAsAlbedo = true,
 			CullMode = BaseMaterial3D.CullModeEnum.Disabled,
 		};
+		_unit.StatusesChanged += Wake;
+		_unit.Died += OnDied;
+		_unit.ChildEnteredTree += OnChildEntered;
+		_unit.ChildExitingTree += OnChildExiting;
+		for (int i = 0, count = _unit.GetChildCount(); i < count; i++)
+			if (_unit.GetChild(i) is IStatusVisualSource) _visualSources++;
+		SetPhysicsProcess(_unit.Statuses.Count > 0 || _visualSources > 0);
+	}
+	private void Wake() { if (_unit.IsDead) return; _pollTimer = 0; SetPhysicsProcess(true); }
+	private void OnChildEntered(Node child) { if (child is IStatusVisualSource) { _visualSources++; Wake(); } }
+	private void OnChildExiting(Node child) { if (child is IStatusVisualSource) { _visualSources = Mathf.Max(0, _visualSources - 1); Wake(); } }
+	private void OnDied(HitInstance hit) { ClearVisuals(); SetPhysicsProcess(false); }
+	public override void _ExitTree()
+	{
+		if (!IsInstanceValid(_unit)) return;
+		_unit.StatusesChanged -= Wake; _unit.Died -= OnDied;
+		_unit.ChildEnteredTree -= OnChildEntered; _unit.ChildExitingTree -= OnChildExiting;
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
+		using var profile=RuntimeFrameProfiler.Measure("StatusFx");
 		if (_unit.IsDead)
 		{
 			ClearVisuals();
@@ -88,7 +108,10 @@ public partial class StatusEffectFx : Node3D
 		{
 			_pollTimer = Mathf.Max(0.01f, PollSeconds);
 			SyncStatuses();
+			// 普通状态由事件唤醒；独立规则的只读来源仍保留原轮询契约。
+			if (_visuals.Count == 0 && _visualSources == 0) SetPhysicsProcess(false);
 		}
+		if (_visuals.Count == 0) return;
 		int slot = 0;
 		Camera3D? camera = GetViewport().GetCamera3D();
 		Vector3 right = camera == null ? Vector3.Right : GlobalBasis.Inverse() * camera.GlobalBasis.X;
@@ -105,22 +128,34 @@ public partial class StatusEffectFx : Node3D
 	private void SyncStatuses()
 	{
 		_present.Clear();
-		foreach (string id in _unit.GetStatusIds())
+		foreach (ActiveStatus status in _unit.Statuses)
 		{
+			string id = status.Effect.Id;
 			EffectConfig? row = ConfigRows.ById<EffectConfig>(id);
-			if (row == null || row.VisualStyle == StatusVisualStyle.None)
+			if (row?.HideStatusVisual == true)
 			{
 				continue;
 			}
-			_present.Add(id);
-			if (!_visuals.TryGetValue(id, out Visual? visual))
+			if (row == null || row.VisualStyle == StatusVisualStyle.None)
 			{
-				visual = CreateVisual(row);
-				_visuals.Add(id, visual);
+				if (!_fallbacks.TryGetValue(id, out row))
+				{
+					row = new EffectConfig { Id = id, DisplayName = id, VisualStyle = StatusVisualStyle.Orbit,
+						VisualColor = new Color(.55f, .85f, 1f, .8f), VisualIcon = ActRoguelike.UI.UiIcons.Named("ic_ui_reward_mutation") };
+					_fallbacks.Add(id, row);
+				}
 			}
-			visual.StackCount = _unit.GetStatusStacks(id);
-			visual.Stacks.Visible = row.VisualShowStacks;
-			visual.Stacks.Text = visual.StackCount.ToString();
+			_present.Add(id);
+			SyncVisual(row, Mathf.Max(1, status.Stacks));
+		}
+		for (int i = 0, count = _unit.GetChildCount(); i < count; i++)
+		{
+			Node child = _unit.GetChild(i);
+			if (child is IStatusVisualSource source)
+				foreach (EffectConfig row in source.ActiveStatusVisuals())
+				{
+					_present.Add(row.Id); SyncVisual(row, 1);
+				}
 		}
 		_removed.Clear();
 		foreach (string id in _visuals.Keys)
@@ -136,6 +171,15 @@ public partial class StatusEffectFx : Node3D
 			_visuals.Remove(id);
 		}
 	}
+	private void SyncVisual(EffectConfig row, int stacks)
+	{
+		if (!_visuals.TryGetValue(row.Id, out Visual? visual))
+		{
+			visual = CreateVisual(row); _visuals.Add(row.Id, visual);
+		}
+		visual.StackCount = stacks; visual.Stacks.Visible = row.VisualShowStacks;
+		visual.Stacks.Text = stacks.ToString();
+	}
 
 	private Visual CreateVisual(EffectConfig row)
 	{
@@ -145,6 +189,7 @@ public partial class StatusEffectFx : Node3D
 			Name = "Icon",
 			Texture = row.VisualIcon,
 			Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
+			NoDepthTest = true,
 			Modulate = row.VisualColor,
 			PixelSize = BadgeWorldSize / Mathf.Max(1, row.VisualIcon?.GetWidth() ?? 1),
 			CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
@@ -154,6 +199,7 @@ public partial class StatusEffectFx : Node3D
 		{
 			Name = "Stacks",
 			Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
+			NoDepthTest = true,
 			FontSize = StackFontSize,
 			PixelSize = StackPixelSize,
 			Modulate = StackColor,

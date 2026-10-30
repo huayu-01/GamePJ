@@ -1,0 +1,7 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://Scenes/Survival.tscn" id="mode"]
+[ext_resource type="Script" path="res://Scripts/Testing/SurvivalModeProbe.cs" id="probe"]
+[node name="SurvivalModeProbe" type="Node3D"]
+[node name="Mode" parent="." instance=ExtResource("mode")]
+[node name="Probe" type="Node" parent="."]
+script = ExtResource("probe")

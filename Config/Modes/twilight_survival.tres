@@ -1,0 +1,119 @@
+[gd_resource type="Resource" script_class="SurvivalDefinition" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/SurvivalDefinition.cs" id="definition"]
+[ext_resource type="Script" path="res://Scripts/Config/SurvivalPhase.cs" id="phase"]
+[ext_resource type="PackedScene" path="res://Scenes/Combat/ShardPickup.tscn" id="shard_pickup"]
+[ext_resource type="Resource" path="res://Config/Tables/Bosses/boss_final.tres" id="boss"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_arc_bomber.tres" id="arc_bomber"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_arc_thrower.tres" id="arc_thrower"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_blade_spinner.tres" id="blade_spinner"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_bomb_lobber.tres" id="bomb_lobber"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_burrow_hunter.tres" id="burrow_hunter"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_chaser.tres" id="chaser"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_combo_fighter.tres" id="combo_fighter"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_exploder.tres" id="exploder"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_fast_melee.tres" id="fast_melee"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_heavy_slammer.tres" id="heavy_slammer"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_hover_diver.tres" id="hover_diver"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_meteor_mage.tres" id="meteor_mage"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_ranged.tres" id="ranged"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_spear_guard.tres" id="spear_guard"]
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_tracking_charger.tres" id="tracking_charger"]
+
+[ext_resource type="Resource" path="res://Config/Tables/SceneRunes/scene_rune_1329.tres" id="scene_rune_1329"]
+[ext_resource type="Resource" path="res://Config/Tables/SceneRunes/scene_rune_1330.tres" id="scene_rune_1330"]
+[ext_resource type="Resource" path="res://Config/Tables/SceneRunes/scene_rune_1331.tres" id="scene_rune_1331"]
+[ext_resource type="Resource" path="res://Config/Tables/SceneRunes/scene_rune_1332.tres" id="scene_rune_1332"]
+[ext_resource type="Resource" path="res://Config/Tables/SceneRunes/scene_rune_1333.tres" id="scene_rune_1333"]
+[ext_resource type="Resource" path="res://Config/Tables/SceneRunes/scene_rune_1334.tres" id="scene_rune_1334"]
+[ext_resource type="Resource" path="res://Config/Tables/SceneRunes/scene_rune_1335.tres" id="scene_rune_1335"]
+[ext_resource type="Resource" path="res://Config/Tables/SceneRunes/scene_rune_1336.tres" id="scene_rune_1336"]
+
+[ext_resource type="Resource" path="res://Config/Tables/Enemies/enemy_scaredy_shroom.tres" id="shroom1339"]
+[sub_resource type="Resource" id="phase_0"]
+script = ExtResource("phase")
+Title = "薄暮 · 拾取与成长"
+StartFraction = 0
+BudgetPerSecond = 2
+MaxAlivePressure = 36
+MaxAlive = 18
+HealthScale = 0.65
+DamageScale = 0.65
+EliteChance = 0
+Enemies = [ExtResource("chaser"), ExtResource("fast_melee"), ExtResource("shroom1339")]
+
+[sub_resource type="Resource" id="phase_1"]
+script = ExtResource("phase")
+Title = "余火 · 近远交织"
+StartFraction = 0.1
+BudgetPerSecond = 2.6
+MaxAlivePressure = 48
+MaxAlive = 24
+HealthScale = 0.75
+DamageScale = 0.75
+EliteChance = 0
+Enemies = [ExtResource("chaser"), ExtResource("fast_melee"), ExtResource("exploder"), ExtResource("ranged"), ExtResource("shroom1339")]
+
+[sub_resource type="Resource" id="phase_2"]
+script = ExtResource("phase")
+Title = "回廊 · 追踪与盾阵"
+StartFraction = 0.28
+BudgetPerSecond = 3.1
+MaxAlivePressure = 64
+MaxAlive = 28
+HealthScale = 0.85
+DamageScale = 0.8
+EliteChance = 0.03
+Enemies = [ExtResource("chaser"), ExtResource("exploder"), ExtResource("ranged"), ExtResource("spear_guard"), ExtResource("arc_thrower"), ExtResource("burrow_hunter"), ExtResource("shroom1339")]
+
+[sub_resource type="Resource" id="phase_3"]
+script = ExtResource("phase")
+Title = "暗涌 · 重击与突围"
+StartFraction = 0.5
+BudgetPerSecond = 3.8
+MaxAlivePressure = 84
+MaxAlive = 32
+HealthScale = 1
+DamageScale = 0.9
+EliteChance = 0.05
+Enemies = [ExtResource("chaser"), ExtResource("heavy_slammer"), ExtResource("blade_spinner"), ExtResource("hover_diver"), ExtResource("ranged"), ExtResource("bomb_lobber"), ExtResource("shroom1339")]
+
+[sub_resource type="Resource" id="phase_4"]
+script = ExtResource("phase")
+Title = "长夜 · 陨落与连斩"
+StartFraction = 0.73
+BudgetPerSecond = 4.7
+MaxAlivePressure = 108
+MaxAlive = 38
+HealthScale = 1.15
+DamageScale = 1
+EliteChance = 0.08
+Enemies = [ExtResource("fast_melee"), ExtResource("meteor_mage"), ExtResource("tracking_charger"), ExtResource("combo_fighter"), ExtResource("heavy_slammer"), ExtResource("arc_bomber"), ExtResource("shroom1339")]
+
+[sub_resource type="Resource" id="phase_5"]
+script = ExtResource("phase")
+Title = "破晓前 · 最后防线"
+StartFraction = 0.9
+BudgetPerSecond = 5.5
+MaxAlivePressure = 132
+MaxAlive = 42
+HealthScale = 1.3
+DamageScale = 1.1
+EliteChance = 0.1
+Enemies = [ExtResource("chaser"), ExtResource("fast_melee"), ExtResource("exploder"), ExtResource("tracking_charger"), ExtResource("meteor_mage"), ExtResource("heavy_slammer"), ExtResource("shroom1339")]
+
+
+[resource]
+script = ExtResource("definition")
+ShardPickupScene = ExtResource("shard_pickup")
+EliteKillShardDrop = 10
+BossKillShardDrop = 50
+ShardPickupRadius = 1.4
+NumericId = 1033
+Id = "survival_twilight"
+Title = "暮光回廊 · 死战"
+DurationSeconds = 720.0
+FinalBoss = ExtResource("boss")
+MilestoneEnemy = ExtResource("blade_spinner")
+Phases = [SubResource("phase_0"), SubResource("phase_1"), SubResource("phase_2"), SubResource("phase_3"), SubResource("phase_4"), SubResource("phase_5")]
+
+SceneRunePool = [ExtResource("scene_rune_1329"), ExtResource("scene_rune_1330"), ExtResource("scene_rune_1331"), ExtResource("scene_rune_1332"), ExtResource("scene_rune_1333"), ExtResource("scene_rune_1334"), ExtResource("scene_rune_1335"), ExtResource("scene_rune_1336")]

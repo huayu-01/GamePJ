@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1138
 Id = "anim_a1_atk1"
 DisplayName = "A1 武技1 波波 · ATK 帧"
 Note = "角色 A 武器 1（能量掌）武技1：源段单手射击，事件帧 ATK @0.08s（= 源段 40% 处）。子弹在这一帧发射。"

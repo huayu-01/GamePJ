@@ -30,6 +30,7 @@ Cooldown = 14.0
 Windup = 0.6
 Recover = 0.4
 Enabled = false
+NumericId = 1189
 Id = "skl_boss_summon"
 DisplayName = "召唤增援"
 Note = "Boss 阶段 3 解锁；MaxAlive 留空 = 不限（与玩家的 3 架不同）。"

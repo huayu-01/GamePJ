@@ -145,6 +145,7 @@ public partial class BlinkDashAbility : Ability
 		AttackOffense offense = AttackOffense.Capture(OwnerUnit, _hitbox?.CritChance ?? 0f, _hitbox?.CritMultiplier ?? 2f);
 		_hitbox?.Activate(OwnerUnit, new AttackInstance
 		{
+			IsDirectAbilityAttack = true,
 			Attacker = OwnerUnit,
 			Ability = AbilityId,
 			BaseDamage = (_hitbox?.Damage ?? 0f) * offense.DamageMultiplier,

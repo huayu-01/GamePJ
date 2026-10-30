@@ -1,0 +1,17 @@
+{
+  "Date": "2026-10-26T14:47:06",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "EliteIntegration",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 9.9,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_144706.EliteIntegration.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261026_144706.EliteIntegration.headless.err",
+      "SHA256": "1007C89C942F3B78347A42A8358FB6A403A73BC0B18CE83A6DAA3C71C695A751"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

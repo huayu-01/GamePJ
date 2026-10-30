@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/KillHealthGrowthRewardEffect.cs" id="growth"]
+[sub_resource type="Resource" id="growth"]
+script = ExtResource("growth")
+KillsPerTrigger = 5
+HealthPerTrigger = 1
+BossBonusHealth = 20
+FillNewHealth = true
+[resource]
+script = ExtResource("row")
+NumericId = 1342
+DisplayName = "心之钢"
+DescriptionTemplate = "每累计{Effects.0.KillsPerTrigger:0}次本人敌方击杀，永久增加本局{Effects.0.HealthPerTrigger:0}点最大生命；击杀首领额外增加{Effects.0.BossBonusHealth:0}点。当前生命同步补足实际新增上限。"
+NameKey = "content.1342.name"
+DescriptionKey = "content.1342.description"
+RewardKind = 1
+MaxStacks = 1
+Weight = 1
+Effects = [SubResource("growth")]
+Note = "后续构筑.txt：通用进化，无符文/武器前置，唯一获取。按本局最大生命成长实施；首领计入击杀数并额外+20。撤销停止未来成长，不追缴已挣得的生命；新冒险实例从零开始。"

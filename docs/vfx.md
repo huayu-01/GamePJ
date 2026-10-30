@@ -2,7 +2,7 @@
 
 J38新增[统一命中反馈与局部时钟](combat-feel.md)：`CombatFeedback`只读结算结果并调度视觉／音效／镜头；`ImpactPause`是独立、明确的战斗时序能力，由Ability、UnitAnimator和CharacterMovement共同遵守，不属于纯VFX。敌人预警与全局时间不暂停。
 
-> **原文纠偏J4**：下落风线继续读取真实下冲状态与逆速度方向。`CharacterDisplay`仅在长枪共通落的Crosshair模式且真实IsDiving时，将同源握持模型的枪尖+Y对齐真实方向，点积实测1；临时TopLevel解除骨骼父变换防二次转偏，结束／换装还原局部握持变换。没有复制单位或创建额外碰撞，逻辑不读取模型结果。截图和未完成动画边界见[下落专项](character-design-j4.md)。
+> **原文纠偏J4**：下落风线继续读取真实下冲状态与逆速度方向。`CharacterDisplay`仅在长枪共通落的Crosshair模式且真实IsDiving时，将同源握持模型的枪尖+Y对齐真实方向，点积实测1；临时TopLevel解除骨骼父变换防二次转偏，结束／换装还原局部握持变换。没有复制单位或创建额外碰撞，逻辑不读取模型结果。截图和未完成动画边界见[下落专项](archive/development-batches/character-design-j4.md)。
 
 > **原文纠偏J2**：`ThrownWeaponDisplay`只读投掷位置／方向／阶段和当前武器模型路径，飞出模型复用手持资源；`CharacterDisplay`只读尚未回手状态隐藏握持物，回手恢复。长枪沿弹道朝向、尖端锚定落点，落地不旋转；镰刀水平旋转。姿态／模型偏移用Export配置；两个显示分支都不含单位或碰撞，逻辑不读取显示结果。
 
@@ -19,7 +19,7 @@ J38新增[统一命中反馈与局部时钟](combat-feel.md)：`CombatFeedback`�
 > `Mark` 用金色标记、数字层数及逐层填亮的五枚菱形；冻结用蓝色冰晶与细环，燃烧用升腾火星与亮色火芯。
 > 9 条现有状态有表现，索敌用 `MissileBeacon` 按原定义保持隐形。状态过期至多 `PollSeconds=0.08s`
 > 后清理，死亡在下一物理帧清理，退树随父节点回收；子树仅含 Node3D/Sprite3D/Label3D/MeshInstance3D，
-> 没有物理体、Unit 或分组。图标始终朝向镜头，多状态横排。截图和生命周期验收见 [E 批验收](e-batch-verification.md)。
+> 没有物理体、Unit 或分组。图标始终朝向镜头，多状态横排。截图和生命周期验收见 [E 批验收](archive/development-batches/e-batch-verification.md)。
 
 > 给接手的人看：**加一个新的特效要做什么**、**表现层凭什么"不改战斗逻辑"**、以及本项目在
 > 特效这一层踩过的坑。代码在 `Scripts/UI/`（屏幕/2D）与 `Scripts/Combat/`（世界里的一次性特效），
@@ -52,7 +52,7 @@ J38新增[统一命中反馈与局部时钟](combat-feel.md)：`CombatFeedback`�
 | **灵魂收割掉的"灵魂"**（P6d，**不是纯表现** —— 拾取会回血） | `Scripts/Combat/SoulPickup.cs` | 无（掉落物自己就是"事实"）；拾取是**每帧距离轮询** `player_units`，**没有 `Area3D`** | `CurrentScene` → `Soul`（异化「灵魂收割」击杀时掉） |
 | 滞空光环（P3，写在机制描述里的那条） | `Scripts/Combat/AirHoverController.cs` 的光环部分 | 滞空状态本身 | 玩家脚下 |
 | 破甲特效（更早） | `Scripts/UI/ArmorBreakFx.cs`（静态工具） | `Unit.ArmorBroke` 事件 | 一次性，挂 `CurrentScene` |
-| **技能指示器**（曲线路径／范围圈／曲线＋范围／直线区域） | `Scripts/Combat/SkillIndicator.cs`，预制体`Scenes/Combat/SkillIndicator.tscn` | 纯几何入参；EnemyAttackWarning从能力／弹体传入实际范围、世界缩放和预计落点，指示器本身不改变战斗 | J37敌人已接入：自爆、陨石、冲锋、重击、跳扑／俯冲、回旋、炸弹；每次攻击独立实例。Main历史共享实例仍默认隐藏。见[契约](skill-indicator.md)与[J37](character-design-j37.md) |
+| **技能指示器**（曲线路径／范围圈／曲线＋范围／直线区域） | `Scripts/Combat/SkillIndicator.cs`，预制体`Scenes/Combat/SkillIndicator.tscn` | 纯几何入参；EnemyAttackWarning从能力／弹体传入实际范围、世界缩放和预计落点，指示器本身不改变战斗 | J37敌人已接入：自爆、陨石、冲锋、重击、跳扑／俯冲、回旋、炸弹；每次攻击独立实例。Main历史共享实例仍默认隐藏。见[契约](skill-indicator.md)与[J37](archive/development-batches/character-design-j37.md) |
 
 **新增表现层时照这张表办**：先问"我要读的那个事实，战斗层有没有公开只读的入口？"
 - **有** → 直接用，一行战斗代码都不要碰（`AfterimageTrail` / `ProjectileTrail` 就是这么做的）。

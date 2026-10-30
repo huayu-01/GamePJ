@@ -1,0 +1,15 @@
+{
+  "Date": "2026-10-26T17:40:20",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "navigation",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_174020.navigation.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_174020.navigation.err",
+      "SHA256": "FF641373DBA2D3895EA8ED597883C959458914D25EE58C8527A613E1DAF09EC4"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

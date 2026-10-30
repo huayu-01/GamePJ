@@ -29,6 +29,7 @@ Note = "最多跳几次"
 
 [resource]
 script = ExtResource("2_w66ww")
+NumericId = 1036
 RewardKind = 2
 ApplyHandler = "ChainLightning"
 HandlerParams = [SubResource("Resource_t3jhm"), SubResource("Resource_me0ce"), SubResource("Resource_pn2yf"), SubResource("Resource_0xw2v")]

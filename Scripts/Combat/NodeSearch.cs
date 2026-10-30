@@ -8,8 +8,9 @@ public static class NodeSearch
 {
 	public static T? FindInSubtree<T>(Node root) where T : class
 	{
-		foreach (Node child in root.GetChildren())
+		for (int i = 0, count = root.GetChildCount(); i < count; i++)
 		{
+			Node child = root.GetChild(i);
 			if (child is T found)
 			{
 				return found;
@@ -27,8 +28,9 @@ public static class NodeSearch
 
 	public static void CollectInSubtree<T>(Node root, List<T> results) where T : class
 	{
-		foreach (Node child in root.GetChildren())
+		for (int i = 0, count = root.GetChildCount(); i < count; i++)
 		{
+			Node child = root.GetChild(i);
 			if (child is T found)
 			{
 				results.Add(found);

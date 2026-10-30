@@ -1,0 +1,83 @@
+Debug 编译：0 warning / 0 error
+probe_final 退出码=0 stderr字节=0
+[BatchC] PASS 基地没有关卡/奖励/结算控制器
+[BatchC] PASS 基地猎手技能与武技5格已就绪
+[BatchC] PASS 基地局外加成与关卡同源且只加一次
+[BatchC] PASS 基地真实左键→动画事件→命中：生命+护甲660→652.5，命中1
+[BatchC] PASS 截图 c_base_combat
+[BatchC] PASS 基地Q后撤进入真实冷却
+[BatchC] PASS 基地换武器大师后即时切为6格
+[BatchC] PASS 换角色同步跳跃固定值
+[BatchC] PASS 基地真实灵剑近战命中：生命+护甲652.5→622.5
+[BatchC] PASS 截图 c_base_melee
+[BatchC] PASS 每个角色有独立交互实例，数量读取角色表
+[BatchC] PASS 真实F与chr_hunter交互：直接换角色且只列其3把武器 [wpn_energy_palm,wpn_crossbow,wpn_bow]
+[BatchC] PASS 列表武器wpn_energy_palm归属正确
+[BatchC] PASS 列表武器wpn_crossbow归属正确
+[BatchC] PASS 列表武器wpn_bow归属正确
+[BatchC] PASS 真实F与chr_weapon_master交互：直接换角色且只列其3把武器 [wpn_spirit_sword,wpn_scythe,wpn_spear]
+[BatchC] PASS 列表武器wpn_spirit_sword归属正确
+[BatchC] PASS 列表武器wpn_scythe归属正确
+[BatchC] PASS 列表武器wpn_spear归属正确
+[BatchC] PASS 跨角色武器调用被拒绝且不改当前装备
+[BatchC] PASS 截图 c_character_stands
+[BatchC] PASS 真实F打开chr_hunter的武器页
+[BatchC] PASS 猎手真实数字键选择弓
+[BatchC] PASS 真实F打开chr_weapon_master的武器页
+[BatchC] PASS 武器大师真实数字键选择镰刀
+[BatchC] PASS 真实F打开chr_hunter的武器页
+[BatchC] PASS 回猎手还原弓，当前武器有选中标识且不可重复点
+[BatchC] PASS 选中项数字键不会重复确认或关闭面板
+[BatchC] PASS 真实F打开chr_weapon_master的武器页
+[BatchC] PASS A交互B：切换B，恢复镰刀并高亮
+[BatchC] PASS 玩家真实换成武器大师模型
+[BatchC] PASS 截图 c_scythe_selected
+[BatchC] PASS 点灵剑后关闭面板并立刻切换装备
+[BatchC] PASS 灵剑握持模型与武技组同步
+[BatchC] PASS 交互对象自己也显示最后选择的灵剑
+[BatchC] PASS 角色分别记忆的选择真实落盘成功
+[BatchC] PASS chr_hunter展示子树无单位/碰撞/分组
+[BatchC] PASS chr_weapon_master展示子树无单位/碰撞/分组
+[BatchC] PASS 切模型后可见角色的真实动画事件继续命中木桩
+[BatchC] PASS 截图 c_sword_equipped
+[BatchC] PASS 换到B后不残留A的额外跳跃或滞空
+[BatchC] PASS 基地真实空格起跳
+[BatchC] PASS 基地下落起手等待真实Action
+[BatchC] PASS 基地真实Action后下落攻击加速
+[BatchC] PASS 截图 c_base_dive
+[BatchC] PASS 下落攻击真实落地
+[BatchC] PASS 基地真实移动+Shift奔跑提速：奔跑=True 实速=10.2 基速=6.8
+[BatchC] PASS 松开Shift退出奔跑
+[BatchC] PASS 基地入站伤害走真实生命护甲结算
+[BatchC] PASS 高伤测试装备经真实左键击破木桩
+[BatchC] PASS 木桩击破后自动重建且可继续练习
+[BatchC] PASS 基地击破木桩不发结算碎片
+[BatchC] PASS 基地死亡后重建练习场，不生成关卡结算或资源
+[BatchC] PASS 练习死亡后仍保留各角色已选装备
+[BatchC] PASS 新出击组件通过真实F打开配装摘要
+[BatchC] PASS 真实F与摘要确认带B+灵剑进入正式森林
+[BatchC] PASS 基地与关卡使用相同角色模型
+[BatchC] PASS 截图 c_enter_level
+[BatchC] PASS GM跨角色武器命令也拒绝且不留下部分配装修改
+[BatchC] PASS GM辅助返回基地走正常场景切换
+[BatchC] PASS 关卡往返后装备选择与暂停状态正确
+[BatchC] === C批验收结束：通过 61，失败 0 ===
+memory 退出码=0 stderr字节=0
+[BatchC] PASS 新进程读回猎手上次的弓
+[BatchC] PASS 新进程读回武器大师上次的灵剑
+[BatchC] PASS 新进程还原最后选择的角色与合法武器
+[BatchC] PASS 新进程基地启动自动恢复保存的选择
+[BatchC] PASS 新进程基地实际玩家模型与存档一致
+[BatchC] === C批验收结束：通过 5，失败 0 ===
+存档恢复 meta.cfg=26E0CA136BF20B16969E1A64B2ED7E91C832B41528CDFD21BF20DB6B4BA5C446
+存档恢复 ability_cards.cfg=4A17F92190D5743751C8F2AB6D474082FCAAB271F9BA76874DD855D9AC8FF19D
+存档恢复 settings.cfg=7C5C91763D717A48C923E8F7CE5E83DEE802A2C287301D9FB62A94189B860BF1
+存档恢复 loadout.cfg=CD92D4BD7DE10BF7D3B76DC4DF11E440FDC0F3C00174AA40068A771097A95462
+截图 c_base_combat.png SHA256=E118BA743B9C3AE6EEA79A05FE1DECADD682CF854FE371639E0702121D0D69AA
+截图 c_base_melee.png SHA256=F3B3AECBA8554C9E775E1D4E76C61A3612A948067F18E41A57E0D1AA684CFF2E
+截图 c_character_stands.png SHA256=E322519556488FE46C408A76ADCD718F46B43E74979EFE21E59FCFCF6C3D15FC
+截图 c_scythe_selected.png SHA256=8E44CC96D0DCD62A8A5C9B34D3628E1A0C0FA3AC95D9EB3820B1786B70119E29
+截图 c_sword_equipped.png SHA256=C9312575121E64236DC8832A890AB398CF45691177AF82D4932A49DB733A0D33
+截图 c_base_dive.png SHA256=834D85BF6BEB2212B4B7597AC2A7AE3CD1051CD959ED8F7E2C09EAB11E233E66
+截图 c_enter_level.png SHA256=4DDC1881FD2D02A2806F4942CC761D87FDC34C67DE63D1C47AC729993E2B9F4A
+selftest.flag 不存在=True

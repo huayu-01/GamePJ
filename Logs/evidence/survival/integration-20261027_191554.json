@@ -1,0 +1,68 @@
+{
+  "Date": "2026-10-27T19:15:54",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.81,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.content.err",
+      "Failure": "",
+      "SHA256": "7A12B730E07B0D7F82592AA41280A14C2C1C8E2BC94DD5B3F758F240A5E28FCE"
+    },
+    {
+      "Name": "rune",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 11.16,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.rune.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.rune.err",
+      "Failure": "",
+      "SHA256": "0701BE1137E7D49CF60BEDB55618F47F473F3A4F9DE12DE758696517ECDEE3C8"
+    },
+    {
+      "Name": "specialization",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 12.68,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.specialization.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.specialization.err",
+      "Failure": "",
+      "SHA256": "8AF364AF3AFDF32D9F6AE9D775537334FA707C4B8B7724CEE669B7AA4EDCDA1F"
+    },
+    {
+      "Name": "adventure",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 22.17,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.adventure.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.adventure.err",
+      "Failure": "",
+      "SHA256": "49AC764B8685A835EAE45744AF577107EA5FA76877C62B92A1DEE8C058093A81"
+    },
+    {
+      "Name": "main",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 70.84,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.main.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.main.err",
+      "Failure": "",
+      "SHA256": "AD7FB6A4EA67850166248E3796F43CC987321BD8DF09C9F65FDCD0B1E26D9473"
+    },
+    {
+      "Name": "survival",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.survival.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.survival.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_191554.survival.err",
+      "SHA256": "1F1BFFAF2538B056C241966E013A2C57DBBC526E4655B06870A2CFC8BD6E852F"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "相关流程回归存在失败，见逐项报告。"
+}

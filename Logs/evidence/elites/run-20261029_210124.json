@@ -1,0 +1,26 @@
+{
+  "Date": "2026-10-29T21:01:24",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "Builds20Hunter",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 8.41,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_210124.Builds20Hunter.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_210124.Builds20Hunter.headless.err",
+      "SHA256": "0EC9709DE630D31B95950DE2E09C091EF6B118209C2100A93BE993DAA14D4B45"
+    },
+    {
+      "Name": "Builds20Hunter",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 15.16,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_210124.Builds20Hunter.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261029_210124.Builds20Hunter.render.err",
+      "SHA256": "8DE8F7F3B3EDC481C2EB1B86B3456CF95A999B72E6819560B9C85C42461638C1"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

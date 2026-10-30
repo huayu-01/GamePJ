@@ -5,7 +5,7 @@ using Godot;
 namespace ActRoguelike.Abilities;
 
 /// <summary>长虹贯日：准星选择空间目标，按蓄力射程截断；预览与飞行共用弹道求解，真实World碰撞停留。</summary>
-public partial class SpearThrowAbility : WeaponThrowAbility
+public partial class SpearThrowAbility : WeaponThrowAbility, IPiercingSpearAbility
 {
 	[ExportGroup("长虹贯日（抛物线抛掷 + 蓄力放大路径）")]
 	/// <summary>抛物线重力（m/s²；越大弧越"拱"）。</summary>
@@ -19,6 +19,19 @@ public partial class SpearThrowAbility : WeaponThrowAbility
 
 	/// <summary>路径采样段数（表列 <c>PathSteps</c> 之外，这里给抛物线的细分）。</summary>
 	[Export] public int ArcPathSteps { get; set; } = 32;
+	/// <summary>可读的路径带宽（米），与伤害盒大小独立。</summary>
+	[Export] public float PreviewWidth { get; set; } = 0.34f;
+	public bool InputPreviewShowing => GetNodeOrNull<DashPathIndicator>("Path")?.IsShowing == true;
+
+	protected override void OnReady()
+	{
+		base.OnReady();
+		if (GetNodeOrNull<DashPathIndicator>("Path") is { } path)
+		{
+			path.Configure(PathColor, PreviewWidth, 0f);
+			path.OverlayPath = true;
+		}
+	}
 
 	[ExportGroup("运行期可读状态（自测）")]
 	/// <summary>本次抛掷的水平速度（含蓄力放大）。</summary>

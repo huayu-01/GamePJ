@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3]
+[ext_resource type="Script" path="res://Scripts/Run/Survival/RunShardPickup.cs" id="script"]
+[sub_resource type="StandardMaterial3D" id="gold"]
+shading_mode = 0
+albedo_color = Color(1, 0.65, 0.15, 1)
+emission_enabled = true
+emission = Color(1, 0.55, 0.08, 1)
+emission_energy_multiplier = 1.4
+[sub_resource type="PrismMesh" id="crystal"]
+material = SubResource("gold")
+size = Vector3(0.32, 0.45, 0.32)
+[node name="ShardPickup" type="Node3D"]
+script = ExtResource("script")
+[node name="Visual" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.4, 0)
+rotation_degrees = Vector3(0, 35, 0)
+mesh = SubResource("crystal")
+cast_shadow = 0
+[node name="Amount" type="Label3D" parent="."]
+position = Vector3(0, 0.8, 0)
+billboard = 1
+font_size = 32
+outline_size = 6
+modulate = Color(1, 0.83, 0.4, 1)

@@ -22,6 +22,12 @@ public partial class DashPathIndicator : Node3D
 	private MeshInstance3D? _mesh;
 	private ImmediateMesh? _geometry;
 	private StandardMaterial3D? _material;
+	private readonly List<Vector3> _points = new();
+	/// <summary>弹道中心采样，验证弹道时不依赖绘制网格的顶点排布。</summary>
+	public IReadOnlyList<Vector3> Points => _points;
+	/// <summary>玩家瞄准辅助可透过自身模型显示；真实障碍截断仍由弹道采样负责。</summary>
+	public bool OverlayPath { get; set; }
+	public int RibbonVertexCount { get; private set; }
 
 	/// <summary>现在显示着吗（自测 / UI）。</summary>
 	public bool IsShowing { get; private set; }
@@ -68,6 +74,8 @@ public partial class DashPathIndicator : Node3D
 		}
 
 		_geometry.ClearSurfaces();
+		_points.Clear();
+		RibbonVertexCount = 0;
 		PointCount = points?.Count ?? 0;
 		if (points == null || points.Count < 2)
 		{
@@ -76,10 +84,25 @@ public partial class DashPathIndicator : Node3D
 			return;
 		}
 
-		_geometry.SurfaceBegin(Mesh.PrimitiveType.LineStrip, _material);
-		foreach (Vector3 point in points)
+		_points.AddRange(points);
+		if (_material != null) _material.NoDepthTest = OverlayPath;
+		// LineStrip 的宽度由图形驱动固定为一个像素，旧 Width 参数因而从未生效。
+		// 改为朝向相机的真实世界宽度三角带，俯视、侧视和竖直瞄准都有完整带宽。
+		Camera3D? camera = GetViewport().GetCamera3D();
+		_geometry.SurfaceBegin(Mesh.PrimitiveType.TriangleStrip, _material);
+		Vector3 previousSide = Vector3.Right;
+		for (int i = 0; i < points.Count; i++)
 		{
-			_geometry.SurfaceAddVertex(point + Vector3.Up * GroundOffset);
+			Vector3 tangent = points[Mathf.Min(points.Count - 1, i + 1)] - points[Mathf.Max(0, i - 1)];
+			Vector3 view = camera != null ? camera.GlobalPosition - points[i] : Vector3.Up;
+			Vector3 side = tangent.Cross(view).Normalized();
+			if (side.LengthSquared() < .001f) side = previousSide;
+			if (side.Dot(previousSide) < 0) side = -side;
+			previousSide = side;
+			Vector3 center = points[i] + Vector3.Up * GroundOffset;
+			_geometry.SurfaceAddVertex(center - side * Width * .5f);
+			_geometry.SurfaceAddVertex(center + side * Width * .5f);
+			RibbonVertexCount += 2;
 		}
 
 		_geometry.SurfaceEnd();
@@ -92,6 +115,8 @@ public partial class DashPathIndicator : Node3D
 	{
 		IsShowing = false;
 		PointCount = 0;
+		_points.Clear();
+		RibbonVertexCount = 0;
 		if (_mesh != null)
 		{
 			_mesh.Visible = false;
@@ -188,6 +213,7 @@ public partial class DashPathIndicator : Node3D
 			Emission = new Color(0.6f, 0.9f, 1f),
 			VertexColorUseAsAlbedo = false,
 			NoDepthTest = false,
+			CullMode = BaseMaterial3D.CullModeEnum.Disabled,
 		};
 
 		_mesh = new MeshInstance3D

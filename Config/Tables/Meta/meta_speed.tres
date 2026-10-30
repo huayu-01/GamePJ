@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_8c27w")
+NumericId = 1111
 SaveKey = "speed_level"
 Stat = "MoveSpeedMultiplier"
 Operation = 1

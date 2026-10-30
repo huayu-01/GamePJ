@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MultishotTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/MultishotTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1015
+Id = "elite_multishot"
+Title = "多重射击"
+Description = "适用射击改为三发，总伤害受限。"
+NameKey = "elite.multishot.name"
+DescriptionKey = "elite.multishot.description"
+Count = 3
+Radius = 40
+Magnitude = 1.35
+Requirements = 2

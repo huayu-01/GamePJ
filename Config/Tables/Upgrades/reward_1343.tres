@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/ElectromagneticRingRewardEffect.cs" id="definition"]
+[sub_resource type="Resource" id="effect"]
+script = ExtResource("definition")
+Radius = 3
+Damage = 3
+LinkRadius = 4
+Targets = 3
+TargetInterval = 1
+ChainInterval = 0.5
+[resource]
+script = ExtResource("row")
+NumericId = 1343
+DisplayName = "电磁圈"
+NameKey = "content.1343.name"
+DescriptionKey = "content.1343.description"
+DescriptionTemplate = "周围{Effects.0.Radius}米形成电磁圈，接触敌人引发最多{Effects.0.Targets}个目标的闪电链，每跳{Effects.0.Damage}伤害；同一目标每{Effects.0.TargetInterval}秒至多受电圈伤害一次。"
+RewardKind = 2
+Weight = 1
+MaxStacks = 1
+Effects = [SubResource("effect")]
+
+Note = "构筑2.0，验收069。未明确距离按米设可调首版；来源、派生与单次结算由独立效果组件维护。"

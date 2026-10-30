@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SummonerTraitDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/SummonerTraitDefinition.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/Chaser.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1027
+Id = "elite_summoner"
+Title = "召唤"
+Description = "免费召唤有限一批普通随从，不补员。"
+NameKey = "elite.summoner.name"
+DescriptionKey = "elite.summoner.description"
+MaxCarriers = 1
+Cooldown = 3
+Count = 3
+ExtraCost = 3
+SummonScene = ExtResource("2")

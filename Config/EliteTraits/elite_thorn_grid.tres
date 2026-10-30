@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ThornGridTraitDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Elites/Definitions/ThornGridTraitDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+NumericId = 1029
+Id = "elite_thorn_grid"
+Title = "荆棘棋盘"
+Description = "地板接触触发荆棘效果，跳跃可以躲避。"
+NameKey = "elite.thorn_grid.name"
+DescriptionKey = "elite.thorn_grid.description"
+MaxCarriers = 1
+Cooldown = 7
+Radius = 1.7
+Duration = 4
+Count = 3
+Damage = 8

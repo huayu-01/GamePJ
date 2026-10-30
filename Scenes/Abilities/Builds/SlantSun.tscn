@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://Scripts/Abilities/SlantSunAbility.cs" id="script"]
+[node name="EvolvedAbility" type="Node3D"]
+script = ExtResource("script")
+Cooldown = 2
+Radius = 2.6
+HoldToCharge = true
+AllowEarlyChargeRelease = true
+EarlyReleaseDamageScale = 1
+AimDistance = 16
+SpawnHeight = 5
+FallSpeed = 20
+FallDamage = 18
+ImpactDamage = 40
+ContactDamage = 12
+ContactInterval = 0.75
+RecallRadius = 1.5

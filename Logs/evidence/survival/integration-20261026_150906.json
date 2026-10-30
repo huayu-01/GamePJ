@@ -1,0 +1,18 @@
+{
+  "Date": "2026-10-26T15:09:06",
+  "Passed": false,
+  "Runs": [
+    {
+      "Name": "interruption",
+      "Passed": false,
+      "Exit": null,
+      "Seconds": null,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_150906.interruption.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_150906.interruption.err",
+      "Failure": "引擎验证未通过：exit=1；F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_150906.interruption.log / F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261026_150906.interruption.err",
+      "SHA256": "9EA93FA85E7003666A333A6529EC1B36914182CA18CA80A50C378E8AFC4AE83A"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": "相关流程回归存在失败，见逐项报告。"
+}

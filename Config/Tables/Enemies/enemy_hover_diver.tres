@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/EnemyConfig.cs" id="1"]
 [resource]
 script = ExtResource("1")
+NumericId = 1099
 Id = "enemy_hover_diver"
 DisplayName = "俯冲近战"
 ScenePath = "res://Scenes/Enemies/HoverDiver.tscn"

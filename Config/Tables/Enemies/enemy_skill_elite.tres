@@ -9,6 +9,7 @@
 [resource]
 PressureBehaviors = PackedStringArray("BasicMelee", "SupportAura")
 script = ExtResource("1_row")
+NumericId = 1104
 Id = "enemy_skill_elite"
 Slot = 9
 DisplayName = "技能精英"

@@ -1,0 +1,49 @@
+{
+  "rows": [
+    {
+      "variant": "follow_ground",
+      "meanFrameMs": 1.8699,
+      "medianFrameMs": 1.7485,
+      "p95FrameMs": 2.5995,
+      "gpuMs": 1.5185,
+      "renderCpuMs": 0.5616,
+      "drawCalls": 445.3226,
+      "primitives": 681795.914
+    },
+    {
+      "variant": "follow_grass",
+      "meanFrameMs": 2.3623,
+      "medianFrameMs": 2.208,
+      "p95FrameMs": 3.02,
+      "gpuMs": 1.6746,
+      "renderCpuMs": 0.7651,
+      "drawCalls": 787.3884,
+      "primitives": 812438.855
+    },
+    {
+      "variant": "overview_ground",
+      "meanFrameMs": 1.6917,
+      "medianFrameMs": 1.5915,
+      "p95FrameMs": 2.4035,
+      "gpuMs": 0.8706,
+      "renderCpuMs": 0.5081,
+      "drawCalls": 242,
+      "primitives": 396844
+    },
+    {
+      "variant": "overview_grass",
+      "meanFrameMs": 2.6692,
+      "medianFrameMs": 2.485,
+      "p95FrameMs": 3.3795,
+      "gpuMs": 1.2067,
+      "renderCpuMs": 0.8941,
+      "drawCalls": 865,
+      "primitives": 628328
+    }
+  ],
+  "normal": 19289,
+  "chunks": 623,
+  "gpu": "NVIDIA GeForce RTX 4070 Ti",
+  "resolution": "1920x1080",
+  "note": "同一丛林场景、玩家和3个静态真敌人；游戏镜头草地66至80米收缩渐隐，全景取消距离剔除；各暖场1.5秒采样3秒，正反序各一次；不代表满场AI战斗。"
+}

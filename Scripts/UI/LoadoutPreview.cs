@@ -46,5 +46,6 @@ public partial class LoadoutPreview : Node
 		_character = character;
 		_weapon = weapon;
 		_loadout.Apply(_player, this, character, weapon);
+		AdventureCheckpoint.RestoreBasePlayer(_player);
 	}
 }

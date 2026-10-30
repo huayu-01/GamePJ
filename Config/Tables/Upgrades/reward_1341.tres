@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/UnitScaleRewardEffect.cs" id="scale"]
+[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="stats"]
+[ext_resource type="Script" path="res://Scripts/Config/StatOverride.cs" id="modifier"]
+[sub_resource type="Resource" id="size"]
+script = ExtResource("scale")
+SizeIncrease = 0.2
+[sub_resource type="Resource" id="health_value"]
+script = ExtResource("modifier")
+Stat = "MaxHealthAdd"
+Operation = 0
+Value = 100
+[sub_resource type="Resource" id="health"]
+script = ExtResource("stats")
+Modifiers = [SubResource("health_value")]
+[resource]
+script = ExtResource("row")
+NumericId = 1341
+DisplayName = "巨化"
+DescriptionTemplate = "体型增加{Effects.0.SizeIncrease:0%}，最大生命值增加{Effects.1.Modifiers.0.Value:0}。"
+NameKey = "content.1341.name"
+DescriptionKey = "content.1341.description"
+RewardKind = 2
+MaxStacks = 1
+Weight = 1
+Effects = [SubResource("size"), SubResource("health")]
+Note = "后续构筑.txt：通用异化，无符文或武器前置，只能获取一次。放大单位身体/模型/攻击体，TopLevel镜头独立；撤销时只移除自己的体型和生命修正。"

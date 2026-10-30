@@ -1,8 +1,7 @@
 [gd_resource type="Resource" script_class="AbilityConfig" format=3 uid="uid://ba4hyf4e4w1yn"]
 
-[ext_resource type="Script" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
-[ext_resource type="Texture2D" path="res://Assets/UI/Icons/Skills/ic_skill_slash.svg" id="icon"]
-[ext_resource type="Script" path="res://Scripts/Config/ParamEntry.cs" id="param"]
+[ext_resource type="Script" uid="uid://c12mw26vliwue" path="res://Scripts/Config/AbilityConfig.cs" id="1_row"]
+[ext_resource type="Script" uid="uid://5glog82xi77o" path="res://Scripts/Config/ParamEntry.cs" id="param"]
 
 [sub_resource type="Resource" id="Duration"]
 script = ExtResource("param")
@@ -46,14 +45,12 @@ Value = 18.0
 
 [resource]
 script = ExtResource("1_row")
-HudIcon = ExtResource("icon")
-HudColor = Color(0.2, 0.9, 1, 1)
-HudOrder = 40
 NodeName = "AbilityWeapon4Skill2"
 ClassHint = "SpiritSwordsAbility"
 InputAction = "weapon_skill_2"
 IsBackground = true
 Cooldown = 15.0
+NumericId = 1177
 Id = "skl_b1_w1_2"
 DisplayName = "三才灵剑"
 DescriptionTemplate = "在头顶召唤3柄灵剑，持续{DurationSeconds:0.##}秒。攻击命中敌人后，灵剑依次高速突刺该目标，随后缓慢归位，完全归位后才能再次追击。冷却{Cooldown:0.##}秒，从召唤时开始。"

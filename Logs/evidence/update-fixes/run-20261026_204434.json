@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-26T20:44:34",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "throw_size",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_204434.throw_size.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261026_204434.throw_size.headless.err",
+      "SHA256": "239C778277BEA74D6933ACACD9A548E6C490D1B3B7CF1605BA6529936672C173"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

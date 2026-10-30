@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_row")
+NumericId = 1146
 SourceModelPath = "res://Assets/Models/player/mesh_player_body.glb"
 SourceAnimation = "attack-melee-right"
 TargetName = "Skill_B1_Sword1"

@@ -1,0 +1,26 @@
+{
+  "Date": "2026-10-28T23:57:33",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "PauseDive",
+      "Mode": "headless",
+      "Exit": 0,
+      "Seconds": 10.86,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_235733.PauseDive.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_235733.PauseDive.headless.err",
+      "SHA256": "C65027A0261F232B8F413441A43B3E836A37814CBD1658E7C5688B7DA4A5A965"
+    },
+    {
+      "Name": "PauseDive",
+      "Mode": "render",
+      "Exit": 0,
+      "Seconds": 15.99,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_235733.PauseDive.render.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\elites_20261028_235733.PauseDive.render.err",
+      "SHA256": "B7BAA7B78EDAD9958E4889AB573A51093C715F1D1B9143189C4573D0816059B4"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

@@ -157,7 +157,7 @@ internal static class DamageNumbers
 		Color color = ColorOf(kind);
 		Vector2 start = screen + new Vector2(0f, SlotOffsetOf(kind));
 
-		var label = new Label
+		var label = new DamageNumberLabel
 		{
 			Text = TextOf(kind, value, target),
 			Position = start,
@@ -171,18 +171,13 @@ internal static class DamageNumbers
 		label.AddThemeColorOverride("font_outline_color", byPlayer ? new Color(0f, 0f, 0f, 0.85f) : new Color(0.25f, 0f, 0f, 0.85f));
 		label.AddThemeConstantOverride("outline_size", kind == DamageNumberKind.Critical ? 7 : 5);
 		layer.AddChild(label);
-
-		Tween tween = label.CreateTween();
-		tween.SetParallel(true);
-		tween.TweenProperty(label, "position", start + new Vector2(0f, -rise), lifetime);
-		tween.TweenProperty(label, "modulate:a", 0f, lifetime);
-		tween.Chain().TweenCallback(Callable.From(label.QueueFree));
+		label.Configure(target, screen, SlotOffsetOf(kind), rise, lifetime);
 	}
 
 	/// <summary>
 	/// 恢复跳字（唯一没有事件的来源，由 UI 侧发现血量上升时调用）。
 	/// 直接挂在目标头顶，和伤害跳字走同一套外观。
 	/// </summary>
-	public static void ShowHeal(Control layer, Vector2 screen, float amount, int baseFontSize, float rise, float lifetime)
-		=> Spawn(layer, screen, DamageNumberKind.Heal, amount, null, true, baseFontSize, rise, lifetime);
+	public static void ShowHeal(Control layer, Vector2 screen, float amount, int baseFontSize, float rise, float lifetime, Unit? target = null)
+		=> Spawn(layer, screen, DamageNumberKind.Heal, amount, target, true, baseFontSize, rise, lifetime);
 }

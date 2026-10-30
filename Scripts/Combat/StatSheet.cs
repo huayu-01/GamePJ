@@ -36,6 +36,8 @@ public sealed partial class StatSheet : RefCounted
 	private readonly Dictionary<string, float> _baseValues = new();
 	private readonly List<StatModifier> _modifiers = new();
 	private readonly List<StatConversion> _conversions = new();
+	/// <summary>成组清理通知；效果持有者可同步释放该来源的节点和订阅。</summary>
+	public event System.Action<object>? SourceRemoved;
 	public void AddConversion(StatConversion conversion) => _conversions.Add(conversion);
 
 	public void SetBase(string stat, float value) => _baseValues[stat] = value;
@@ -43,11 +45,19 @@ public sealed partial class StatSheet : RefCounted
 	public float GetBase(string stat) => _baseValues.TryGetValue(stat, out float value) ? value : 0f;
 
 	public void AddModifier(StatModifier modifier) => _modifiers.Add(modifier);
+	/// <summary>撤销某次效果自己的修正，保留同构筑其他效果；Source成组移除仍兼容。</summary>
+	public bool RemoveModifier(StatModifier modifier) => _modifiers.Remove(modifier);
+	internal StatModifier[] ModifiersFrom(object source) => System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(_modifiers, m => ReferenceEquals(m.Source, source)));
+	internal void RestoreModifiersFrom(object source, StatModifier[] modifiers)
+	{
+		_modifiers.RemoveAll(m => ReferenceEquals(m.Source, source)); _modifiers.AddRange(modifiers);
+	}
 
 	public void RemoveBySource(object source)
 	{
 		_modifiers.RemoveAll(m => ReferenceEquals(m.Source, source));
 		_conversions.RemoveAll(c => ReferenceEquals(c.Source, source));
+		SourceRemoved?.Invoke(source);
 	}
 
 	public float Get(string stat)

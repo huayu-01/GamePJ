@@ -1,0 +1,16 @@
+{
+  "Date": "2026-10-28T23:34:28",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "ui_guard",
+      "Mode": "headless",
+      "Exit": 0,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261028_233428.ui_guard.headless.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\update_fixes_20261028_233428.ui_guard.headless.err",
+      "SHA256": "555222DAD0FF616155C8CE289AA1A3CDC7D2312B6357412FC0347C77EFED0E80"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

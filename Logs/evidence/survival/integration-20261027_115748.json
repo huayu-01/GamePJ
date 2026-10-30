@@ -1,0 +1,58 @@
+{
+  "Date": "2026-10-27T11:57:48",
+  "Passed": true,
+  "Runs": [
+    {
+      "Name": "content",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 5.49,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.content.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.content.err",
+      "Failure": "",
+      "SHA256": "B4F3AEE20C3C72BB28770CB7F9D1E12444085C8FD70462D6087D8AC04852558C"
+    },
+    {
+      "Name": "enemy_actions",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 4.97,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.enemy_actions.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.enemy_actions.err",
+      "Failure": "",
+      "SHA256": "D75428D8A775BB347CDF791B8043DBF2BB93C9B7AE4C277CDE4516BEC38AD1E8"
+    },
+    {
+      "Name": "rune",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 11.77,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.rune.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.rune.err",
+      "Failure": "",
+      "SHA256": "FFDA9EAACA9BC4821DF2CE139C88DA4CC9F7985C9FD8C5D1F471A309868C1581"
+    },
+    {
+      "Name": "main",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 71.61,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.main.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.main.err",
+      "Failure": "",
+      "SHA256": "6E5190AC038DC71F4F23CB1F9F7701136E4C81355A93BB9CE729D1707A9E620D"
+    },
+    {
+      "Name": "survival",
+      "Passed": true,
+      "Exit": 0,
+      "Seconds": 40.02,
+      "Stdout": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.survival.log",
+      "Stderr": "F:\\Godot项目\\项目a\\Logs\\validation\\survival_integration_20261027_115748.survival.err",
+      "Failure": "",
+      "SHA256": "83FB43A61B724BD1806EA00296A0371406A33E0CD6B33BDBEEFBECE33DDD9B3C"
+    }
+  ],
+  "SavesUnchanged": true,
+  "Failure": ""
+}

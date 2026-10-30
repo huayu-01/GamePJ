@@ -1,0 +1,51 @@
+{
+  "Date": "2026-10-27T20:16:40",
+  "Passed": true,
+  "CompletedItems": [
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38
+  ],
+  "AlsoResolved": 25,
+  "SupersededNotes": [
+    26,
+    27
+  ],
+  "DesignOnly": 33,
+  "CandidateSceneRunes": 16,
+  "ActiveSceneRunes": 8,
+  "NewEnemy": 1339,
+  "NewRewards": [
+    1337,
+    1338
+  ],
+  "NewArmorNode": 1340,
+  "HeadlessChecks": 47,
+  "RenderedChecks": 48,
+  "RegressionCases": [
+    "content",
+    "localization",
+    "effects",
+    "reward_rules",
+    "slots",
+    "specialization",
+    "adventure",
+    "main",
+    "survival"
+  ],
+  "ValidationInfrastructureChecks": 21,
+  "SavesUnchanged": true,
+  "WorkbookReadback": true,
+  "PlayerAcceptanceCount": 9.0,
+  "Evidence": [
+    "Logs/evidence/elites/run-20261027_200351.json",
+    "Logs/evidence/survival/integration-20261027_200715.json",
+    "Logs/evidence/survival/integration-20261027_201441.json",
+    "Logs/evidence/validation-infrastructure-20261027_201107.json",
+    "Logs/maintenance/acceptance-20261026/content-032-038-update-result.json"
+  ]
+}

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SceneRuneDefinition" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/SceneRuneDefinition.cs" id="row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/SceneRunes/icon_1331.svg" id="icon"]
+[resource]
+script = ExtResource("row")
+NumericId = 1331
+DisplayName = "快乐飞弹·护盾"
+NameKey = "scene_rune.1331.name"
+DescriptionKey = "scene_rune.1331.description"
+DescriptionTemplate = "每{Interval:0}秒发射穿墙飞弹，命中给予最大生命{ShieldRatio:0%}的护盾，持续{ShieldSeconds:0}秒。"
+Kind = 0
+Impact = 2
+Icon = ExtResource("icon")
+Tint = Color(0.478431, 0.850980, 1.000000, 1)
+Interval = 12
+MinDistance = 10
+MaxDistance = 16
+Radius = 0.65
+MaxActive = 1

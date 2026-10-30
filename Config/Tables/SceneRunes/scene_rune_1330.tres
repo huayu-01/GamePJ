@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SceneRuneDefinition" format=3]
+[ext_resource type="Script" path="res://Scripts/Config/SceneRuneDefinition.cs" id="row"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/SceneRunes/icon_1330.svg" id="icon"]
+[resource]
+script = ExtResource("row")
+NumericId = 1330
+DisplayName = "快乐飞弹·治疗"
+NameKey = "scene_rune.1330.name"
+DescriptionKey = "scene_rune.1330.description"
+DescriptionTemplate = "每{Interval:0}秒发射穿墙飞弹，命中为玩家恢复{Heal:0}生命。"
+Kind = 0
+Impact = 1
+Icon = ExtResource("icon")
+Tint = Color(0.501961, 0.905882, 0.658824, 1)
+Interval = 12
+MinDistance = 10
+MaxDistance = 16
+Radius = 0.65
+MaxActive = 1

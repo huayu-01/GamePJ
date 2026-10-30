@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ActRoguelike.Config;
 using ActRoguelike.Core;
+using ActRoguelike.Visual;
 using Godot;
 
 namespace ActRoguelike.Combat;
@@ -26,8 +27,8 @@ namespace ActRoguelike.Combat;
 /// </list>
 ///
 /// ⚠️ <b>不碰两处已有的递归表现</b>：受击闪色（<see cref="UnitPresentation"/>）与精英染色
-/// （<see cref="EliteModifier.TintRecursive"/>）改的是 <c>MeshInstance3D.MaterialOverride</c>，
-/// 本组件改的是 <c>AnimationPlayer</c> 的骨骼轨道，两者互不影响（实测见 docs/art-integration-log.md）。
+/// （<see cref="EliteModifier"/>）使用统一的半透明边缘叠加通道，保留主体材质；
+/// 本组件改的是 <c>AnimationPlayer</c> 的骨骼轨道，两者互不影响（实测见 docs/archive/design-notes/art-integration-log.md）。
 /// </summary>
 public partial class UnitAnimator : Node
 {
@@ -70,10 +71,17 @@ public partial class UnitAnimator : Node
 
 	private Unit _unit = null!;
 	private AnimationPlayer? _player;
+	private UnitVisualProfile? _visualProfile;
+	private UnitVisualProfile? _boundVisualProfile;
+	private Node? _visualRoot;
 	private string _idle = string.Empty;
 	private string _walk = string.Empty;
 	private string _run = string.Empty;
 	private string _death = string.Empty;
+	private string _jump = string.Empty;
+	private CharacterMovement? _movement;
+	private bool _jumpRequested;
+	private int _jumpPhase;
 	private string _current = string.Empty;
 	private string _source = "组件默认值";
 	private float _speed;
@@ -92,7 +100,7 @@ public partial class UnitAnimator : Node
 	public void PlayHitReaction()
 	{
 		if (_player == null || _skillPlaying || _dead) return;
-		foreach (string name in new[] { "hit", "hurt", "damage" })
+		foreach (string name in new[] { _visualProfile?.AnimHit ?? "hit", "hit", "hurt", "damage" })
 			if (_player.HasAnimation(name)) { _player.SpeedScale = 1; _player.Play(name, 0.04); _current = name; _reactionPlaying = true; return; }
 	}
 
@@ -163,6 +171,7 @@ public partial class UnitAnimator : Node
 	/// </summary>
 	public void ApplyRow(UnitConfig row)
 	{
+		_visualProfile = row.VisualProfile;
 		bool applied = false;
 
 		if (!string.IsNullOrEmpty(row.AnimIdle))
@@ -226,6 +235,8 @@ public partial class UnitAnimator : Node
 	public double SkillPlaybackPosition => Mathf.Max(0, _skillPlaying && _player != null
 		&& _player.CurrentAnimation == _skillName ? _player.CurrentAnimationPosition : _skillLastPosition);
 	public event System.Action<string, ulong>? SkillEvent;
+	public event System.Action? VisualActionChanged;
+	public float PlaybackSpeed => _player == null ? 1 : Mathf.Abs(_player.GetPlayingSpeed());
 
 	/// <summary>
 	/// 技能动画事件帧的**分发口**（用户在动画里挂的 `anim_event` 帧会走到这里）。
@@ -271,6 +282,9 @@ public partial class UnitAnimator : Node
 		_unit = GetParent<Unit>();
 		if (!string.IsNullOrEmpty(SkillLibraryDirectory)) _skillDir = SkillLibraryDirectory;
 		_unit.Died += OnDied;
+		_unit.Damaged += OnDamaged;
+		_movement = _unit.GetNodeOrNull<CharacterMovement>("Movement");
+		if (_movement != null) _movement.JumpStarted += OnJumpStarted;
 		_currentAnimator = this;
 		Bind();
 	}
@@ -285,11 +299,14 @@ public partial class UnitAnimator : Node
 		if (IsInstanceValid(_unit))
 		{
 			_unit.Died -= OnDied;
+			_unit.Damaged -= OnDamaged;
 		}
+		if (IsInstanceValid(_movement)) _movement!.JumpStarted -= OnJumpStarted;
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
+		using var frameProfile=ActRoguelike.Core.RuntimeFrameProfiler.Measure("Animator");
 		if (_unit.ImpactPause?.IsHolding == true) return;
 		if (_dead || _player == null)
 		{
@@ -300,6 +317,7 @@ public partial class UnitAnimator : Node
 		if (_reactionPlaying)
 		{
 			if (_unit.Reactions?.IsStaggered == true) return;
+			if (_player.CurrentAnimation == _current && _player.IsPlaying()) return;
 			_reactionPlaying = false; _current = string.Empty;
 		}
 		_speed = new Vector2(velocity.X, velocity.Z).Length();
@@ -329,6 +347,7 @@ public partial class UnitAnimator : Node
 				_skillPlaying = false;
 				_current = string.Empty;
 				_player.SpeedScale = 1f;
+				VisualActionChanged?.Invoke();
 			}
 			else
 			{
@@ -336,22 +355,71 @@ public partial class UnitAnimator : Node
 			}
 		}
 
+		if (DriveJump()) return;
 		Play(_speed >= RunMinSpeed ? _run : _speed >= WalkMinSpeed ? _walk : _idle, BlendSeconds);
+	}
+
+	private void OnJumpStarted(Vector3 _) => _jumpRequested = true;
+
+	/// <summary>跳跃只播放姿态：空中保持收腿，真实接地后再播放缓冲段。</summary>
+	private bool DriveJump()
+	{
+		if (_jump.Length == 0 || _movement == null || _player == null) return false;
+		bool airborne = !_movement.IsGrounded || _unit.Velocity.Y > .1f;
+		if (_jumpRequested || (airborne && _jumpPhase == 0))
+		{
+			_player.SpeedScale = 1;
+			_player.Play(_jump, .05);
+			_player.Seek(_jumpRequested ? .08 : _visualProfile!.JumpAirPoseTime);
+			_current = _jump; _jumpPhase = 1; _jumpRequested = false;
+		}
+		if (_jumpPhase == 1)
+		{
+			if (!airborne)
+			{
+				_player.SpeedScale = 1;
+				_player.Play(_jump, .03);
+				_player.Seek(_visualProfile!.JumpLandingTime);
+				_jumpPhase = 2;
+			}
+			else if (_player.CurrentAnimation == _jump && _player.CurrentAnimationPosition >= _visualProfile!.JumpAirPoseTime)
+			{
+				_player.Seek(_visualProfile.JumpAirPoseTime); _player.SpeedScale = 0;
+			}
+			return true;
+		}
+		if (_jumpPhase == 2)
+		{
+			if (_player.CurrentAnimation == _jump && _player.IsPlaying()) return true;
+			_jumpPhase = 0; _current = string.Empty; _player.SpeedScale = 1;
+		}
+		return false;
 	}
 
 	/// <summary>死亡：切成倒地动画（一次性，停在最后一帧），之后不再按速度切。</summary>
 	private void OnDied(HitInstance hit)
 	{
 		_unit.ImpactPause?.Clear();
+		_jumpPhase = 0; _jumpRequested = false;
+		if (_player != null) _player.SpeedScale = 1;
 		_dead = true;
+		VisualActionChanged?.Invoke();
 		Play(_death, 0f);
+	}
+
+	private void OnDamaged(DamageResult result, HitInstance hit)
+	{
+		// 档案显式选择受击表现；玩家只播姿态，不改变原有硬直与控制规则。
+		if (_unit.Faction == Faction.Player && !string.IsNullOrEmpty(_visualProfile?.AnimHit)
+			&& result.FinalDamage > 0 && !result.Blocked && hit.Attack?.IsDamageOverTime != true && !_unit.IsDead)
+			PlayHitReaction();
 	}
 
 	/// <summary>
 	/// 绑定 <c>Model</c> 子树里的 <c>AnimationPlayer</c>，并把用到的几段都调成**循环**。
 	///
 	/// ⚠️ 必须自己设循环：`.glb` 导入的动画全是 `LOOP_NONE`（"播一遍停在最后一帧"），
-	/// 所以场景里那句 <c>autoplay="idle"</c> 只是摆了个静止姿势（docs/art-integration-log.md §6.3）。
+	/// 所以场景里那句 <c>autoplay="idle"</c> 只是摆了个静止姿势（docs/archive/design-notes/art-integration-log.md §6.3）。
 	/// 死亡那段**故意保持不循环** —— 停在倒地帧正好。
 	///
 	/// ⚠️ <b>技能动画库不在这里加载</b>：角色行的 <see cref="UnitConfig.AnimLibraryDir"/> 有可能
@@ -360,9 +428,11 @@ public partial class UnitAnimator : Node
 	/// 不再去改 `.glb` 的共享 <c>Animation</c> 资源。
 	/// </summary>
 	/// <summary>换角色时把真实动画事件驱动切到可见模型，不释放旧播放器。</summary>
-	public void BindVisual(Node model)
+	public void BindVisual(Node model, UnitVisualProfile? profile = null)
 	{
-		if (_player == NodeSearch.FindInSubtree<AnimationPlayer>(model)) return;
+		_visualProfile = profile;
+		if (ReferenceEquals(_boundVisualProfile, profile) && _player == (profile == null ? NodeSearch.FindInSubtree<AnimationPlayer>(model) : profile.ResolveAnimationPlayer(model))) return;
+		_boundVisualProfile = profile;
 		StopSkillAnimation();
 		_player = null;
 		_skillLibraryLoaded = false;
@@ -373,24 +443,29 @@ public partial class UnitAnimator : Node
 	{
 		if ((visual ?? GetParent().GetNodeOrNull<Node>(ModelNodeName)) is { } model)
 		{
-			_player = NodeSearch.FindInSubtree<AnimationPlayer>(model);
+			_visualRoot = model;
+			_player = _visualProfile == null ? NodeSearch.FindInSubtree<AnimationPlayer>(model) : _visualProfile.ResolveAnimationPlayer(model);
 		}
 
 		if (_player == null)
 		{
 			// 没有模型 / 没有动画的单位（木桩、无人机…）：静默不参与，不报错、也没有每帧开销。
+			UnitMotionFx.Configure(_unit, null, null);
 			return;
 		}
 
 		_idle = Resolve(AnimIdle, null);
 		_walk = Resolve(AnimWalk, _idle);
 		_run = Resolve(AnimRun, _walk);
-		_death = Resolve(AnimDeath, null);
+		_death = _visualProfile != null && string.IsNullOrEmpty(_visualProfile.AnimDeath) ? string.Empty : Resolve(AnimDeath, null);
+		_jump = string.IsNullOrEmpty(_visualProfile?.AnimJump) ? string.Empty : Resolve(_visualProfile.AnimJump, null);
+		_jumpPhase = 0; _jumpRequested = false;
 
 		SetLoop(_idle, true);
 		SetLoop(_walk, true);
 		SetLoop(_run, true);
 		SetLoop(_death, false);
+		SetLoop(_jump, false);
 
 		LogOnce();
 		Play(_idle, 0f);
@@ -400,6 +475,14 @@ public partial class UnitAnimator : Node
 		// 会让引擎在下一帧崩掉（exit -1073741819）；在 _Ready 里一次加载好就没事
 		// （自测里的独立探针也是"加载完再播"这条顺序，一直正常）。
 		PrepareSkillLibrary();
+		if (_unit.IsNodeReady()) ConfigureMotionFx();
+		else CallDeferred(nameof(ConfigureMotionFx));
+	}
+
+	private void ConfigureMotionFx()
+	{
+		if (IsInstanceValid(_unit) && IsInstanceValid(_visualRoot))
+			UnitMotionFx.Configure(_unit, _visualRoot as Node3D, _visualProfile);
 	}
 
 	/// <summary>
@@ -492,6 +575,7 @@ public partial class UnitAnimator : Node
 		// `Stop()` 之后紧接 `Seek()/Play()` 会把进程直接搞崩（exit -1073741819，访问违规）；
 		// 只 `Seek(0)` + `Play()` 就足够把技能动画从头播（`Play` 本身会重置到该段的起点）。
 		_player.SpeedScale = speedScale <= 0f ? 1f : speedScale;
+		_jumpPhase = 0; _jumpRequested = false; _reactionPlaying = false;
 		_player.Play(full);
 		// Godot对正在播放的同名动画会继续旧位置；新动作必须重新从0开始，且不调用有崩溃历史的Stop。
 		_player.Seek(0);
@@ -503,6 +587,7 @@ public partial class UnitAnimator : Node
 		_skillLoops = _player.GetAnimation(full)?.LoopMode != Animation.LoopModeEnum.None;
 		_current = full;
 		ReadSkillEvents(full);
+		VisualActionChanged?.Invoke();
 		GameLog.Write(
 			"Animation",
 			$"技能动画开播：{_unit.Name} → {full}（speed_scale={_player.SpeedScale:0.##}，循环={_skillLoops}，"
@@ -525,6 +610,7 @@ public partial class UnitAnimator : Node
 		{
 			_player.SpeedScale = 1f;
 		}
+		VisualActionChanged?.Invoke();
 	}
 
 	/// <summary>
@@ -680,7 +766,7 @@ public partial class UnitAnimator : Node
 			return;
 		}
 
-		int loaded = SkillAnimationLibrary.LoadInto(_player, _skillLibrary, _skillDir);
+		int loaded = SkillAnimationLibrary.LoadInto(_player, _skillLibrary, _skillDir, _visualRoot == null ? null : _visualProfile?.ResolveSkeleton(_visualRoot), _visualProfile != null);
 		if (loaded > 0)
 		{
 			_skillLibraryLoaded = true;
