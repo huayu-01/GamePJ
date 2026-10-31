@@ -12,8 +12,8 @@ Note = "独立飞刀外观；斩弹规则仍属于旧Arrow分类。"
 [sub_resource type="Resource" id="p_a2_w1_1_1"]
 script = ExtResource("2_param")
 Key = "Damage"
-Value = 12.0
-Note = "★ 文档为 n（没给具体值）→ 这里是**能跑起来的最小预设值**，实际开发后再调"
+Value = 16.2
+Note = "第三轮：猎手全武器基础伤害 +35%（12→16.2）。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_2"]
 script = ExtResource("2_param")

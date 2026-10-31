@@ -18,8 +18,8 @@ Note = "当前手感预设45米/秒，能清楚看到出手到命中的过程。
 [sub_resource type="Resource" id="p_a1_w1_1_2"]
 script = ExtResource("2_param")
 Key = "Damage"
-Value = 10.0
-Note = "伤害（文档 武技1[波波]：10）"
+Value = 13.5
+Note = "第三轮：猎手全武器基础伤害 +35%（10→13.5）。"
 
 [sub_resource type="Resource" id="p_a1_w1_1_3"]
 script = ExtResource("2_param")

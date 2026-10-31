@@ -180,7 +180,7 @@ public partial class BowSweepProbe : Node3D
 		float dmgMul = _player.Stats.Get("DamageMultiplier");
 		int tiers = _bow.ChargeMaxStepsEffective;
 		Check(
-			Mathf.IsEqualApprox(_bow.ChargeBaseSeconds, 0.5f)
+			Mathf.IsEqualApprox(_bow.ChargeBaseSeconds, 0.35f)
 				&& Mathf.IsEqualApprox(_bow.ChargeStepSeconds, 0.3f)
 				&& Mathf.IsEqualApprox(_bow.ChargeStepScale, 1.3f)
 				&& Mathf.IsEqualApprox(_bow.ChargeMaxSeconds, 1.4f)
@@ -195,7 +195,7 @@ public partial class BowSweepProbe : Node3D
 		for (int s = 0; s <= tiers; s++)
 		{
 			float power = 1f + (_bow.ChargeStepScale - 1f) * s;
-			GD.Print($"[BowSweep] INFO 威力阶梯：后置 {s} 档（蓄 {0.5f + (0.3f * s):0.##}s）→ 威力 ×{power:0.###} 单发伤害 {_bow.Damage * power * dmgMul:0.##} 弹速 {_bow.Speed + (_bow.SpeedPerChargeStep * s):0.##}");
+			GD.Print($"[BowSweep] INFO 威力阶梯：后置 {s} 档（蓄 {_bow.ChargeBaseSecondsEffective + (0.3f * s):0.##}s）→ 威力 ×{power:0.###} 单发伤害 {_bow.Damage * power * dmgMul:0.##} 弹速 {_bow.Speed + (_bow.SpeedPerChargeStep * s):0.##}");
 		}
 
 		await Wait(0.05);
@@ -224,7 +224,7 @@ public partial class BowSweepProbe : Node3D
 		int before = _spawned.Count;
 		await Until(() => _bow.CooldownRemaining <= 0.0001f, 6);
 		Press(_bow.InputAction, true);
-		bool mid = await Until(() => _bow.IsCharging && _bow.ChargeTime >= 0.35f, 6);
+		bool mid = await Until(() => _bow.IsCharging && _bow.ChargeTime >= 0.20f, 6);
 		float held = _bow.ChargeTime;
 		int stepsMid = _bow.ChargeSteps;
 		float powerMid = _bow.ChargePowerScale;
@@ -242,7 +242,7 @@ public partial class BowSweepProbe : Node3D
 
 		// ⓑ 真实箭：**刚过基础**那一发一点档位加成都不吃。
 		int baseSpawn = _spawned.Count;
-		bool okBase = await FireHolding(0.505);
+		bool okBase = await FireHolding(_bow.ChargeBaseSecondsEffective + 0.005f);
 		Check(
 			okBase && _bow.ChargeSteps == 0 && Mathf.IsEqualApprox(_bow.LastShotDamage, _bow.Damage * dmgMul)
 				&& Mathf.IsEqualApprox(_bow.LastShotSpeed, _bow.Speed),
@@ -251,7 +251,7 @@ public partial class BowSweepProbe : Node3D
 			$"基础箭真实初速 {SpeedAt(baseSpawn):0.##}（表定45，不受200全局上限影响）");
 
 		// ⓒ 过 1 个后置档才开始涨。
-		bool okOne = await FireHolding(0.5f + (_bow.ChargeStepSecondsEffective * 1f) + 0.005f);
+		bool okOne = await FireHolding(_bow.ChargeBaseSecondsEffective + (_bow.ChargeStepSecondsEffective * 1f) + 0.005f);
 		Check(
 			okOne && _bow.ChargeSteps == 1
 				&& Mathf.IsEqualApprox(_bow.LastShotDamage, _bow.Damage * 1.3f * dmgMul)

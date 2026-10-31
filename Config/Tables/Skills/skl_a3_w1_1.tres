@@ -12,8 +12,8 @@ Note = "箭的预制体"
 [sub_resource type="Resource" id="p_a3_w1_1_1"]
 script = ExtResource("2_param")
 Key = "Damage"
-Value = 24.0
-Note = "★ 基础伤害（文档：每 0.3s 增加 30% —— 那个 30% 是 ChargeStepScale 列，不是这一列；J10 用户裁定后置蓄力间隔是 0.3s，原文旧填的 0.1 是笔误）"
+Value = 32.4
+Note = "第三轮：猎手全武器基础伤害 +35%（24→32.4）。"
 
 [sub_resource type="Resource" id="p_a3_w1_1_2"]
 script = ExtResource("2_param")
@@ -108,7 +108,7 @@ Note = "三次贝塞尔保留出手切线，终点取目标身体中部。"
 [resource]
 script = ExtResource("1_row")
 ChargeReleaseAnimSpeedScale = 2.0
-ChargeBaseSeconds = 0.5
+ChargeBaseSeconds = 0.35
 AllowEarlyChargeRelease = true
 ChargeStepSeconds = 0.3
 ChargeStepScale = 1.3

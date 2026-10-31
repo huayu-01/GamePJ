@@ -2,7 +2,7 @@
 [ext_resource type="Script" path="res://Scripts/Config/Validation/ContentInventorySnapshot.cs" id="snapshot"]
 [resource]
 script = ExtResource("snapshot")
-ExpectedRewardKinds = { "Enhancement": 30, "Evolution": 42, "Mutation": 48 }
+ExpectedRewardKinds = { "Enhancement": 41, "Evolution": 42, "Mutation": 48 }
 ExpectedCounts = {
 "ContentLocales": 2,
 "Stages": 3,
@@ -18,7 +18,7 @@ ExpectedCounts = {
 "Effects": 18,
 "Nodes": 9,
 "ValueTags": 3,
-"Upgrades": 120,
+"Upgrades": 131,
 "Runes": 11,
 "SceneRunes": 8,
 "UpgradePools": 6,

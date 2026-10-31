@@ -79,12 +79,16 @@ public partial class SurvivalModeProbe : Node
 			RunSetup.Character = PlayerCharacterKind.Hunter; RunSetup.Weapon = WeaponPresetKind.EnergyPalm; RunSetup.HasSelection = true; RuneCarry.Set(string.Empty);
 			_mode = GetParent().GetNode<Node3D>("Mode"); _director = _mode.GetNode<SurvivalDirector>("Director"); _run = _mode.GetNode<RunController>("RunController");
 			var original = RuntimeResources.Load<SurvivalDefinition>("res://Config/Modes/twilight_survival.tres");
-			Check(!original.Validate().Any() && original.DurationSeconds == 720 && original.Phases.Length == 6, "生产配置：12分钟、六阶段、首领和敌人引用有效");
+			Check(!original.Validate().Any() && original.DurationSeconds == 1200 && original.Phases.Length == 6
+				&& original.BossSpawnFractions.Length == 4 && original.BossHealthScales.Length == 4,
+				"生产配置：20分钟、六阶段、四首领时间表和敌人引用有效");
 			var bad = (SurvivalDefinition)original.Duplicate(true); bad.Phases[1].StartFraction = 0; bad.BaseLevelExperience = 0;
 			Check(bad.Validate().Count() >= 2 && !original.Validate().Any(), "拒绝倒序阶段与零经验门槛，配置副本彼此隔离");
 			bad.MilestoneFractions = new[] { .5f, .25f }; bad.BeaconPositions[0] = new Vector3(float.NaN, 0, 0); bad.Phases[0].MaxAlivePressure = .01f;
 			Check(bad.Validate().Count() >= 5, "拒绝倒序强化节点、非有限信标坐标和无法容纳敌人的阶段压力");
 			var settings = (SurvivalDefinition)original.Duplicate(true); settings.DurationSeconds = 12; settings.SpawnWarningSeconds = .12f; settings.SpawnInterval = .16f; settings.ExperiencePerPressure = 24; settings.BeaconCaptureSeconds = .25f;
+			// 12 秒副本只验证终局首领流程；生产四首领时间表由上方配置断言覆盖，避免副本里插入三只中间首领。
+			settings.BossSpawnFractions = new[] { 1f }; settings.BossHealthScales = new[] { 1f };
 			EnemyConfig chaser = settings.Phases[0].Enemies.First(e => e.Id == "enemy_chaser");
 			foreach (var phase in settings.Phases) { phase.Enemies = new[] { chaser }; phase.BudgetPerSecond = 20; phase.MaxAlive = 4; phase.MaxAlivePressure = 16; phase.EliteChance = 0; }
 			settings.MilestoneEnemy = chaser; settings.MilestoneFractions = new[] { .25f };
@@ -157,6 +161,7 @@ public partial class SurvivalModeProbe : Node
 			if (_director.Boss == null) throw new InvalidOperationException("终局首领未生成");
 			await Shot("boss"); _director.Boss.ForceKill(_director.Player); await Wait(.15);
 			Check(_director.State == SurvivalDirector.PhaseState.AwaitingExit && _director.BossDefeated && !_run.RunEnded, "击败首领后等待主动撤离，不提前结算");
+			await DrainRewards();
 			Check(_director.AliveCount == 0 && _director.PendingSpawns == 0, "首领结束撤销敌人、召唤增援与待生成预告");
 			var exit = _director.Objectives.Single(o => o.Kind == SurvivalObjective.ObjectiveKind.Exit);
 			_director.Player.GlobalPosition = exit.GlobalPosition; _director.Player.ResetPhysicsInterpolation(); await Wait(.15);
@@ -171,7 +176,7 @@ public partial class SurvivalModeProbe : Node
 			Check(gate.Backend is BaseTerminal { Destination.ScenePath: "res://Scenes/Survival.tscn" }, "基地新增独立入口指向生存场景");
 			var brief = UiService.Instance!.Screen<ExpeditionScreen>()!;
 			brief.OpenDestination(()=>{},((BaseTerminal)gate.Backend!).Destination); await Until(() => !brief.InputBlocked,3,"手动查看模式说明");
-			Check(brief.SummaryText.Contains("死战") && brief.SummaryText.Contains("12") && brief.SummaryText.Contains("经验"), "出击摘要显示实际模式、时长和成长机制");
+			Check(brief.SummaryText.Contains("死战") && brief.SummaryText.Contains("20") && brief.SummaryText.Contains("经验"), "出击摘要显示实际模式、时长和成长机制");
 			brief.Close(); await Wait(.12); Check(GetTree().CurrentScene == home && !AdventureCheckpoint.IsActive, "返回调整不出征也不建立回退点");
 			Unit basePlayer = PlayerLocator.Player!; basePlayer.GlobalPosition = gate.GlobalPosition + new Vector3(0, 0, 1); basePlayer.ResetPhysicsInterpolation(); await Wait(.15); await InteractInput();
 			Check(!brief.IsOpen && AdventureCheckpoint.IsActive,"生存入口F直接加载并捕获回退点，无中间选择");

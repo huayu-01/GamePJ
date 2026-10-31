@@ -21,6 +21,12 @@ Key = "AttackMoveSpeedScale"
 Value = 0.35
 Note = "角色A可移动攻击，出招和蓄力期间主动移速降至35%，不影响后撤冲量。"
 
+[sub_resource type="Resource" id="p_airborne_damage"]
+script = ExtResource("2_param")
+Key = "AirborneDamageBonus"
+Value = 0.2
+Note = "第三轮：灵动新增，处于空中时造成伤害 +20%；落地立即移除。"
+
 [resource]
 script = ExtResource("1_row")
 NodeName = "AbilityPassive"
@@ -29,6 +35,6 @@ GrantAttackMovement = true
 NumericId = 1167
 Id = "skl_a1_passive"
 DisplayName = "灵动"
-DescriptionTemplate = "被动：可以边移动边攻击，攻击期间移速降至35%；空中可以额外跳跃 {Grant:0} 次（额外跳跃次数上限 {MaxExtraAirJumps:0} 次）。"
+DescriptionTemplate = "被动：可以边移动边攻击，攻击期间移速降至35%；空中可以额外跳跃 {Grant:0} 次（额外跳跃次数上限 {MaxExtraAirJumps:0} 次）；处于空中时造成伤害 +20%。"
 Note = "[新增行·P3] 角色 A 被动「灵动」（文档第 24 行）。★ 没写按键 = 被动（用户裁定：被动可以有 CD，也可以没有按键）→ InputAction 留空，AirJumpPassiveAbility 不靠 TryActivate，而是每帧把「场景基线 + 授予次数」幂等写进 CharacterMovement.SetExtraAirJumps（只有 Enabled=true 时才生效，而 Enabled 由**本行**写进来）。★ 上限 3 是**表里的参数**，不是代码常量（未来异化「践踏死亡」共用它）。★ 被动不需要动画（AnimName 留空 = 这个技能不需要动画），所以不受「没有动画就不执行」那条闸门影响。"
-Params = [SubResource("p_a1_passive_0"), SubResource("p_a1_passive_1"), SubResource("p_attack_move")]
+Params = [SubResource("p_a1_passive_0"), SubResource("p_a1_passive_1"), SubResource("p_attack_move"), SubResource("p_airborne_damage")]

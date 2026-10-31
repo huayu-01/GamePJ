@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RewardConfig" format=3]
+
+[ext_resource type="Script" uid="uid://da28h1nkpc5p6" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
+[ext_resource type="Script" uid="uid://puhrw2j2dgut" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
+[ext_resource type="Script" uid="uid://btd62ngfrwmyp" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
+[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_crit_plus5.tres" id="previous"]
+
+[sub_resource type="Resource" id="Resource_m0"]
+script = ExtResource("1_stat")
+Stat = "CritChanceAdd"
+Operation = 0
+Value = 35.0
+
+[sub_resource type="Resource" id="Resource_effect_0"]
+script = ExtResource("effect_0")
+Modifiers = [SubResource("Resource_m0")]
+
+[resource]
+script = ExtResource("2_row")
+Replaces = ExtResource("previous")
+Effects = [SubResource("Resource_effect_0")]
+Requires = PackedStringArray("upg_crit_plus5")
+NumericId = 1366
+Id = "upg_crit_plus6"
+DisplayName = "升级：暴击（6级）"
+NameKey = "content.upg_crit_plus6.name"
+DescriptionTemplate = "替换上一级效果：暴击率增加+{Modifiers.CritChanceAdd:0.#%}"
+DescriptionKey = "content.upg_crit_plus6.description"
+Note = "第四轮强化扩级：crit 第 7 级，替换前级。"

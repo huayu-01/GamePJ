@@ -25,7 +25,15 @@ public partial class AirJumpPassiveAbility : Ability, IAbilityConfigConsumer
 	/// <summary>由技能表授予：允许在攻击动作期间保持主动移动。</summary>
 	[Export] public bool GrantAttackMovement { get; set; }
 	[Export(PropertyHint.Range, "0.05,1,0.05")] public float AttackMoveSpeedScale { get; set; } = 1f;
-	protected override void OnLoadoutReset() { GrantAttackMovement = false; AttackMoveSpeedScale = 1f; }
+	/// <summary>空中伤害加成（0.2 = ×1.20）；落地立即移除，不叠加。</summary>
+	[Export(PropertyHint.Range, "0,2,0.01")] public float AirborneDamageBonus { get; set; } = .2f;
+	protected override void OnLoadoutReset()
+	{
+		GrantAttackMovement = false;
+		AttackMoveSpeedScale = 1f;
+		AirborneDamageBonus = 0f;
+		ClearAirborneBonus();
+	}
 	[ExportGroup("额外跳跃次数")]
 	/// <summary>这个被动**授予几次**额外空中跳跃（文档：1 次）。</summary>
 	[Export] public int Grant { get; set; } = 1;
@@ -41,6 +49,22 @@ public partial class AirJumpPassiveAbility : Ability, IAbilityConfigConsumer
 	public int SceneBaseline { get; private set; } = -1;
 
 	private bool _baselineCaptured;
+	private bool _airborneBonusActive;
+	private StatModifier? _airborneBonusModifier;
+
+	private void ClearAirborneBonus()
+	{
+		if (!_airborneBonusActive || OwnerUnit == null || _airborneBonusModifier == null)
+		{
+			_airborneBonusActive = false;
+			_airborneBonusModifier = null;
+			return;
+		}
+
+		OwnerUnit.Stats.RemoveModifier(_airborneBonusModifier);
+		_airborneBonusActive = false;
+		_airborneBonusModifier = null;
+	}
 
 	/// <summary>
 	/// 被动**不会**被 <c>TryActivate</c> 触发（没有按键），所以这个抽象成员只是必须实现：
@@ -50,17 +74,43 @@ public partial class AirJumpPassiveAbility : Ability, IAbilityConfigConsumer
 	{
 	}
 
+	public override void _ExitTree()
+	{
+		ClearAirborneBonus();
+		base._ExitTree();
+	}
+
 	protected override void Tick(float delta)
 	{
 		if (!Enabled || OwnerUnit == null)
 		{
+			ClearAirborneBonus();
 			return;
 		}
 
 		CharacterMovement? movement = Movement;
 		if (movement == null)
 		{
+			ClearAirborneBonus();
 			return;
+		}
+
+		bool airborne = movement.IsAirborne;
+		if (airborne && !_airborneBonusActive && AirborneDamageBonus > 0f)
+		{
+			_airborneBonusModifier = new StatModifier
+			{
+				Stat = "DamageMultiplier",
+				Operation = ModifierOperation.Multiply,
+				Value = 1f + AirborneDamageBonus,
+				Source = this,
+			};
+			OwnerUnit.Stats.AddModifier(_airborneBonusModifier);
+			_airborneBonusActive = true;
+		}
+		else if (!airborne && _airborneBonusActive)
+		{
+			ClearAirborneBonus();
 		}
 
 		if (!_baselineCaptured)

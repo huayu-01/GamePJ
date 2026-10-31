@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExpeditionDestination" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Config/ExpeditionDestination.cs" id="script"]
+
+[resource]
+script = ExtResource("script")
+Title = "测试场 · 木桩与增幅"
+Instructions = "单区域训练场：靠近召唤终端，按 F 选择木桩或敌人；可三选一增幅、重置状态。训练不结算、不写存档。"
+ScenePath = "res://Scenes/Training/TrainingGround.tscn"

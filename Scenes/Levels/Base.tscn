@@ -1,25 +1,24 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene format=3 uid="uid://8xut8kxiyqdp"]
 
-[ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://Scripts/Interaction/InteractionComponent.cs" id="2_interaction"]
+[ext_resource type="PackedScene" uid="uid://2goeb0wrmdmo" path="res://Scenes/Player/Player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://imhlyviycymj" path="res://Scripts/Interaction/InteractionComponent.cs" id="2_interaction"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/StartScreen.tscn" id="4_start"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/LoadingScreen.tscn" id="6_loading"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/BossPreviewScreen.tscn" id="7_preview"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/SettingsScreen.tscn" id="8_settings"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/BuildScreen.tscn" id="9_build"]
-[ext_resource type="Script" path="res://Scripts/UI/LoadoutPreview.cs" id="10_loadout"]
+[ext_resource type="Script" uid="uid://dvdw5prlwtf0c" path="res://Scripts/UI/LoadoutPreview.cs" id="10_loadout"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/ChooseScreen.tscn" id="11_choose"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/AbilityMatrixScreen.tscn" id="12_matrix"]
-[ext_resource type="Environment" path="res://Assets/ArtRefresh/env_level_garden.tres" id="20_env"]
+[ext_resource type="Environment" uid="uid://bik24wh30dt6b" path="res://Assets/ArtRefresh/env_level_garden.tres" id="20_env"]
 [ext_resource type="Material" path="res://Assets/ArtRefresh/mat_level_ground.tres" id="21_ground"]
 [ext_resource type="PackedScene" path="res://Scenes/ArtRefresh/GardenDressing.tscn" id="22_garden"]
 [ext_resource type="PackedScene" path="res://Scenes/Debug/GmConsole.tscn" id="23_gm"]
-[ext_resource type="Script" path="res://Scripts/Run/BaseCamp.cs" id="24_camp"]
-[ext_resource type="PackedScene" path="res://Scenes/Training/BasePracticeTarget.tscn" id="25_target"]
+[ext_resource type="Script" uid="uid://dyprtva6m4ri1" path="res://Scripts/Run/BaseCamp.cs" id="24_camp"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="26_hud"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/WorldOverlay.tscn" id="27_world"]
-[ext_resource type="Script" path="res://Scripts/Run/CharacterRoster.cs" id="28_roster"]
-[ext_resource type="Script" path="res://Scripts/Visual/ToonPass.cs" id="30_toon"]
+[ext_resource type="Script" uid="uid://dnh0gm0axkvb6" path="res://Scripts/Run/CharacterRoster.cs" id="28_roster"]
+[ext_resource type="Script" uid="uid://br3ehfcdlxjcq" path="res://Scripts/Visual/ToonPass.cs" id="30_toon"]
 
 [sub_resource type="BoxShape3D" id="Shape_ground"]
 size = Vector3(26, 1, 26)
@@ -28,43 +27,38 @@ size = Vector3(26, 1, 26)
 material = ExtResource("21_ground")
 size = Vector3(26, 1, 26)
 
-[node name="Base" type="Node3D"]
+[node name="Base" type="Node3D" unique_id=414739485]
 
-[node name="BaseCamp" type="Node" parent="."]
+[node name="BaseCamp" type="Node" parent="." unique_id=1478705051]
 script = ExtResource("24_camp")
 
-[node name="PracticeTarget" parent="." instance=ExtResource("25_target")]
-position = Vector3(0, 0, -7)
+[node name="Hud" parent="." unique_id=1174645167 instance=ExtResource("26_hud")]
 
-[node name="Hud" parent="." instance=ExtResource("26_hud")]
+[node name="WorldOverlay" parent="." unique_id=1686756435 instance=ExtResource("27_world")]
 
-[node name="WorldOverlay" parent="." instance=ExtResource("27_world")]
-
-[node name="Ground" type="StaticBody3D" parent="."]
-collision_layer = 1
+[node name="Ground" type="StaticBody3D" parent="." unique_id=434569837]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="Ground"]
+[node name="Shape" type="CollisionShape3D" parent="Ground" unique_id=743847183]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("Shape_ground")
 
-[node name="Mesh" type="MeshInstance3D" parent="Ground"]
-position = Vector3(0, -0.5, 0)
+[node name="Mesh" type="MeshInstance3D" parent="Ground" unique_id=1391524292]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("Mesh_ground")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=545767156]
 transform = Transform3D(0.86, -0.35, 0.36, 0, 0.71, 0.7, -0.5, -0.6, 0.61, 0, 12, 0)
+light_color = Color(1, 0.88, 0.7, 1)
 light_energy = 1.1
-light_color = Color(1, 0.88, 0.70, 1)
 shadow_enabled = true
-directional_shadow_max_distance = 80.0
-light_angular_distance = 0.0
 shadow_blur = 0.0
+directional_shadow_max_distance = 80.0
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=302163260]
 environment = ExtResource("20_env")
 
-[node name="GardenDressing" parent="." instance=ExtResource("22_garden")]
+[node name="GardenDressing" parent="." unique_id=390578391 instance=ExtResource("22_garden")]
 base_mode = true
 tree_count = 24
 perimeter_radius = 18.0
@@ -73,49 +67,53 @@ rock_count = 18
 rock_scale = 2.6
 distant_radius = 65.0
 
-[node name="Player" parent="." instance=ExtResource("1_player")]
+[node name="Player" parent="." unique_id=616118068 instance=ExtResource("1_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 9)
 
-[node name="LoadoutPreview" type="Node" parent="Player"]
+[node name="LoadoutPreview" type="Node" parent="Player" unique_id=212548473]
 script = ExtResource("10_loadout")
 
-[node name="TerminalUpgrades" type="Node3D" parent="."]
+[node name="TerminalUpgrades" type="Node3D" parent="." unique_id=450074879]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 0)
 
-[node name="InteractionComponent" type="Node3D" parent="TerminalUpgrades"]
+[node name="InteractionComponent" type="Node3D" parent="TerminalUpgrades" unique_id=976707840]
 script = ExtResource("2_interaction")
 Kind = 11
 
-[node name="CharacterRoster" type="Node3D" parent="."]
+[node name="CharacterRoster" type="Node3D" parent="." unique_id=1170632121]
 script = ExtResource("28_roster")
 
-[node name="TerminalHelp" type="Node3D" parent="."]
+[node name="TerminalHelp" type="Node3D" parent="." unique_id=360662820]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 4)
 
-[node name="InteractionComponent" type="Node3D" parent="TerminalHelp"]
+[node name="InteractionComponent" type="Node3D" parent="TerminalHelp" unique_id=1565854586]
 script = ExtResource("2_interaction")
 Kind = 14
 
-[node name="TerminalGate" type="Node3D" parent="."]
+[node name="TerminalGate" type="Node3D" parent="." unique_id=1052711886]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 0)
 
-[node name="InteractionComponent" type="Node3D" parent="TerminalGate"]
+[node name="InteractionComponent" type="Node3D" parent="TerminalGate" unique_id=1497997380]
 script = ExtResource("2_interaction")
 Kind = 10
-TargetScene = "res://Scenes/Expedition.tscn"
 
-[node name="Screens" type="Node" parent="."]
+[node name="Screens" type="Node" parent="." unique_id=1483559797]
 
-[node name="StartScreen" parent="Screens" instance=ExtResource("4_start")]
+[node name="StartScreen" parent="Screens" unique_id=1302619759 instance=ExtResource("4_start")]
 
-[node name="BossPreviewScreen" parent="Screens" instance=ExtResource("7_preview")]
-[node name="SettingsScreen" parent="Screens" instance=ExtResource("8_settings")]
-[node name="BuildScreen" parent="Screens" instance=ExtResource("9_build")]
-[node name="ChooseScreen" parent="Screens" instance=ExtResource("11_choose")]
-[node name="AbilityMatrixScreen" parent="Screens" instance=ExtResource("12_matrix")]
-[node name="LoadingScreen" parent="." instance=ExtResource("6_loading")]
+[node name="BossPreviewScreen" parent="Screens" unique_id=583102176 instance=ExtResource("7_preview")]
 
-[node name="GmConsole" parent="." instance=ExtResource("23_gm")]
+[node name="SettingsScreen" parent="Screens" unique_id=1065557336 instance=ExtResource("8_settings")]
 
-[node name="ToonPass" type="Node" parent="."]
+[node name="BuildScreen" parent="Screens" unique_id=1367014661 instance=ExtResource("9_build")]
+
+[node name="ChooseScreen" parent="Screens" unique_id=593138140 instance=ExtResource("11_choose")]
+
+[node name="AbilityMatrixScreen" parent="Screens" unique_id=968973435 instance=ExtResource("12_matrix")]
+
+[node name="LoadingScreen" parent="." unique_id=1148964687 instance=ExtResource("6_loading")]
+
+[node name="GmConsole" parent="." unique_id=1891168596 instance=ExtResource("23_gm")]
+
+[node name="ToonPass" type="Node" parent="." unique_id=417847727]
 script = ExtResource("30_toon")

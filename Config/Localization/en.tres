@@ -218,4 +218,27 @@ Messages = {
 
 "content.mut_burn.name": "Scorching Hits",
 "content.mut_burn.description": "Hits burn the target for {Effects.0.Duration:0.##} seconds."
+,
+  "content.upg_crit_plus3.name": "Upgrade: Crit (tier 3)",
+  "content.upg_crit_plus4.name": "Upgrade: Crit (tier 4)",
+  "content.upg_crit_plus5.name": "Upgrade: Crit (tier 5)",
+  "content.upg_crit_plus6.name": "Upgrade: Crit (tier 6)",
+  "content.upg_crit_plus7.name": "Upgrade: Crit (tier 7)",
+  "content.upg_critdmg_plus3.name": "Upgrade: Crit Damage (tier 3)",
+  "content.upg_critdmg_plus4.name": "Upgrade: Crit Damage (tier 4)",
+  "content.upg_critdmg_plus5.name": "Upgrade: Crit Damage (tier 5)",
+  "content.upg_hard_plus3.name": "Upgrade: Toughness (tier 3)",
+  "content.upg_hard_plus4.name": "Upgrade: Toughness (tier 4)",
+  "content.upg_hard_plus5.name": "Upgrade: Toughness (tier 5)",
+  "content.upg_crit_plus3.description": "Replaces the previous tier: critical chance +{Modifiers.CritChanceAdd:0.#%}",
+  "content.upg_crit_plus4.description": "Replaces the previous tier: critical chance +{Modifiers.CritChanceAdd:0.#%}",
+  "content.upg_crit_plus5.description": "Replaces the previous tier: critical chance +{Modifiers.CritChanceAdd:0.#%}",
+  "content.upg_crit_plus6.description": "Replaces the previous tier: critical chance +{Modifiers.CritChanceAdd:0.#%}",
+  "content.upg_crit_plus7.description": "Replaces the previous tier: critical chance +{Modifiers.CritChanceAdd:0.#%}",
+  "content.upg_critdmg_plus3.description": "Replaces the previous tier: critical damage +{Modifiers.CritMultiplierAdd:0.#%}",
+  "content.upg_critdmg_plus4.description": "Replaces the previous tier: critical damage +{Modifiers.CritMultiplierAdd:0.#%}",
+  "content.upg_critdmg_plus5.description": "Replaces the previous tier: critical damage +{Modifiers.CritMultiplierAdd:0.#%}",
+  "content.upg_hard_plus3.description": "Replaces the previous tier: damage reduction +{Modifiers.DamageReductionAdd:0.#%}",
+  "content.upg_hard_plus4.description": "Replaces the previous tier: damage reduction +{Modifiers.DamageReductionAdd:0.#%}",
+  "content.upg_hard_plus5.description": "Replaces the previous tier: damage reduction +{Modifiers.DamageReductionAdd:0.#%}"
 }

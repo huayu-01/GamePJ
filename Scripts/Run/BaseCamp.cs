@@ -36,6 +36,13 @@ public partial class BaseCamp : Node
 			Destination = RuntimeResources.Load<ExpeditionDestination>("res://Config/Modes/survival_destination.tres")
 		});
 		GetParent().AddChild(trial);
+		var training = new Node3D { Name = "TrainingGate", Position = new Vector3(0, 0, -7) };
+		training.AddChild(new InteractionComponent
+		{
+			Name = "InteractionComponent", Kind = InteractionKind.Expedition, Prompt = "测试场 · 木桩与增幅",
+			Destination = RuntimeResources.Load<ExpeditionDestination>("res://Config/Modes/training_destination.tres")
+		});
+		GetParent().AddChild(training);
 	}
 	public override void _Process(double delta)
 	{

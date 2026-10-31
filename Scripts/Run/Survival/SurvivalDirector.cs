@@ -58,8 +58,8 @@ public partial class SurvivalDirector : RunModeController
 	private readonly Queue<(RewardKind? Kind, string Title)> _rewards = new();
 	private readonly HashSet<SurvivalObjective> _claimedObjectives = new();
 	private bool _choicePending;
-	private int _generation, _phaseIndex = -1, _milestoneIndex;
-	private float _bank, _spawnTimer, _preparationTime, _scanTimer;
+	private int _generation, _phaseIndex = -1, _milestoneIndex, _bossScheduleIndex;
+	private float _bank, _spawnTimer, _preparationTime, _scanTimer, _bossRetryTimer;
 	private StageStatistics? _frozen;
 	private ProcessModeEnum _playerProcessMode;
 	private bool _heldPlayer;
@@ -74,8 +74,8 @@ public partial class SurvivalDirector : RunModeController
 		ElapsedSeconds = 0; Level = 1; Experience = 0; CompletedBeacons = 0; CompletedObjectives = 0;
 		_experienceRemainder = 0;
 		CollectedCombatShards = DroppedCombatShards = PendingCombatShards = 0;
-		TotalSpawned = 0; TotalKills = 0; BossDefeated = false; _boss = null; _phaseIndex = -1; _milestoneIndex = 0;
-		_bank = 0; _spawnTimer = 0; _preparationTime = 0; _scanTimer = 0; _choicePending = false; _claimedObjectives.Clear();
+		TotalSpawned = 0; TotalKills = 0; BossDefeated = false; _boss = null; _phaseIndex = -1; _milestoneIndex = 0; _bossScheduleIndex = 0;
+		_bank = 0; _spawnTimer = 0; _preparationTime = 0; _scanTimer = 0; _bossRetryTimer = 0; _choicePending = false; _claimedObjectives.Clear();
 		State = PhaseState.Preparing; Notice = "正在准备导航与入场点…";
 		_playerProcessMode = player.ProcessMode; player.ProcessMode = ProcessModeEnum.Disabled; _heldPlayer = true;
 		_experience = new ExperienceField { Name = "ExperienceField", Player = player, Capacity = Definition.MaxExperienceMotes, PickupRadius = Definition.PickupRadius };
@@ -128,6 +128,17 @@ public partial class SurvivalDirector : RunModeController
 			int index = 0;
 			for (int i = 1; i < Definition!.Phases.Length; i++) if (ElapsedSeconds >= Definition.DurationSeconds * Definition.Phases[i].StartFraction) index = i;
 			if (index != _phaseIndex) { _phaseIndex = index; Notice = $"新阶段 · {PhaseTitle}"; }
+			int lastBoss = Mathf.Max(0, Definition.BossSpawnFractions.Length - 1);
+			if (_bossScheduleIndex < lastBoss && ElapsedSeconds >= Definition.DurationSeconds * Definition.BossSpawnFractions[_bossScheduleIndex]
+				&& _boss == null && !_pending.Any(p => p.Boss))
+			{
+				_bossRetryTimer -= dt;
+				if (_bossRetryTimer <= 0)
+				{
+					_bossRetryTimer = .5f;
+					if (TryQueueBoss(_bossScheduleIndex)) _bossScheduleIndex++;
+				}
+			}
 			if (ElapsedSeconds >= Definition.DurationSeconds)
 			{
 				CancelPendingSpawns(); State = PhaseState.FinalBoss; _spawnTimer = 0; Notice = "终局首领降临！击败后前往撤离门。";
@@ -150,7 +161,7 @@ public partial class SurvivalDirector : RunModeController
 		}
 		if (State == PhaseState.FinalBoss && _boss == null && !_pending.Any(p => p.Boss))
 		{
-			_spawnTimer -= dt; if (_spawnTimer <= 0) { _spawnTimer = .5f; TryQueueBoss(); }
+			_spawnTimer -= dt; if (_spawnTimer <= 0) { _spawnTimer = .5f; TryQueueBoss(Mathf.Max(0, Definition!.BossSpawnFractions.Length - 1)); }
 		}
 		TryOpenReward();
 	}
@@ -172,7 +183,7 @@ public partial class SurvivalDirector : RunModeController
 	}
 	private void TryOpenReward()
 	{
-		if (_choicePending || _rewards.Count == 0 || !Active || State == PhaseState.Preparing || _run == null) return;
+		if (_choicePending || _rewards.Count == 0 || State is PhaseState.Dormant or PhaseState.Stopped or PhaseState.Preparing || _run == null) return;
 		var ticket = _rewards.Peek(); RewardKind? filter = ticket.Kind;
 		if (!_run.CanOfferModeReward(filter, false)) filter = null;
 		if (!_run.CanOfferModeReward(filter, false))
@@ -183,7 +194,7 @@ public partial class SurvivalDirector : RunModeController
 		_choicePending = true;
 		bool opened = _run.OfferModeReward(filter, ticket.Title, () =>
 		{
-			if (generation != _generation || !Active || _run.RunEnded) return;
+			if (generation != _generation || State is PhaseState.Dormant or PhaseState.Stopped || _run.RunEnded) return;
 			_choicePending = false; if (_rewards.Count > 0) _rewards.Dequeue();
 			_traitWorld?.SuspendDamage(false);
 		});

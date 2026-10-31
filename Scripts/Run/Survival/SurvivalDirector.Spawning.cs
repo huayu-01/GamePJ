@@ -6,6 +6,7 @@ using ActRoguelike.Combat.Elites;
 using ActRoguelike.Config;
 using ActRoguelike.Core;
 using ActRoguelike.Encounter;
+using ActRoguelike.Rewards;
 using ActRoguelike.World;
 using Godot;
 
@@ -13,14 +14,15 @@ namespace ActRoguelike.Run;
 
 public partial class SurvivalDirector
 {
-	private sealed record OwnedEnemy(int Cost, bool Boss, bool Milestone, Action<HitInstance> Died);
+	private sealed record OwnedEnemy(int Cost, bool Boss, bool Milestone, bool FinalBoss, Action<HitInstance> Died);
 	private sealed class PendingEnemy
 	{
 		public required Unit Unit;
 		public required Node3D Warning;
 		public Vector3 Position;
 		public int Cost;
-		public bool Boss, Milestone;
+		public bool Boss, Milestone, FinalBoss;
+		public int BossIndex = -1;
 		public float Remaining, HealthScale, DamageScale;
 		public EliteTraitWave? TraitWave;
 		public EliteTraitReservation? Trait;
@@ -73,18 +75,24 @@ public partial class SurvivalDirector
 		return TrySpawnAnchor(unit, out Vector3 anchor)
 			&& SpawnPlanner.TryFindSpawnPoint(anchor, Definition!.SpawnMinDistance, Definition.SpawnMaxDistance, out point, unit, _pending.Select(p => p.Position).ToArray());
 	}
-	private void TryQueueBoss()
+	private bool TryQueueBoss(int bossIndex)
 	{
 		var row = Definition!.FinalBoss!;
-		var scene = RuntimeResources.Load<PackedScene>(row.ScenePath); if (scene == null) return;
+		var scene = RuntimeResources.Load<PackedScene>(row.ScenePath); if (scene == null) return false;
 		var unit = scene.Instantiate<Unit>(); row.ApplyTo(unit);
-		if (!FindPoint(unit, out Vector3 point)) { unit.Free(); return; }
+		if (!FindPoint(unit, out Vector3 point)) { unit.Free(); return false; }
+		int last = Mathf.Max(0, Definition.BossSpawnFractions.Length - 1);
+		bossIndex = Mathf.Clamp(bossIndex, 0, last);
+		float scale = Definition.BossHealthScales[bossIndex] * Definition.BossHealthScale;
+		bool final = bossIndex == last;
+		if (final && CompletedBeacons == 3) scale *= Definition.CompletedBeaconsBossScale;
 		_pending.Add(new PendingEnemy
 		{
-			Unit = unit, Position = point, Boss = true, Remaining = Mathf.Max(1.5f, Definition.SpawnWarningSeconds),
-			HealthScale = Definition.BossHealthScale * (CompletedBeacons == 3 ? Definition.CompletedBeaconsBossScale : 1), DamageScale = 1,
+			Unit = unit, Position = point, Boss = true, BossIndex = bossIndex, FinalBoss = final,
+			Remaining = Mathf.Max(1.5f, Definition.SpawnWarningSeconds), HealthScale = scale, DamageScale = 1,
 			Warning = SpawnWarning(point, new Color(1, .3f, .2f), 2.4f)
 		});
+		return true;
 	}
 	private Node3D SpawnWarning(Vector3 point, Color color, float size = 1)
 	{
@@ -114,17 +122,17 @@ public partial class SurvivalDirector
 			pending.Unit.RefreshStats(); pending.Unit.FillVitals();
 			pending.TraitWave?.Register(pending.Unit); pending.Trait?.Commit(pending.Unit); pending.Trait?.Dispose();
 			if (pending.Trait != null) pending.Unit.FillVitals();
-			RegisterUnit(pending.Unit, pending.Cost, pending.Boss, pending.Milestone); TotalSpawned++;
+			RegisterUnit(pending.Unit, pending.Cost, pending.Boss, pending.Milestone, pending.FinalBoss, pending.BossIndex); TotalSpawned++;
 			if (pending.Milestone) _milestoneIndex++;
 			if (pending.Boss) _boss = pending.Unit; else _bank = Mathf.Max(0, _bank - pending.Cost);
 		}
 		SealFinishedTraitWaves();
 	}
-	private void RegisterUnit(Unit unit, int cost, bool boss, bool milestone)
+	private void RegisterUnit(Unit unit, int cost, bool boss, bool milestone, bool finalBoss = false, int bossIndex = -1)
 	{
 		if (_owned.ContainsKey(unit)) return;
 		Action<HitInstance> callback = hit => OnEnemyDied(unit, hit);
-		_owned.Add(unit, new OwnedEnemy(cost, boss, milestone, callback)); unit.Died += callback; AlivePressure += cost;
+		_owned.Add(unit, new OwnedEnemy(cost, boss, milestone, finalBoss, callback)); unit.Died += callback; AlivePressure += cost;
 	}
 	private void OnEnemyDied(Unit unit, HitInstance hit)
 	{
@@ -136,7 +144,7 @@ public partial class SurvivalDirector
 		EnemyDefeated?.Invoke(unit, entry.Cost);
 		Vector3 point = unit.GlobalPosition;
 		if (MapManager.Instance?.TrySnap(point, out Vector3 ground) == true) point = ground;
-		DropCombatShards(unit, entry.Boss, entry.Milestone, point);
+		DropCombatShards(unit, entry.FinalBoss, entry.Milestone, point);
 		_experience?.Drop(PickupDropLayout.Claim(unit, point), Mathf.Max(1, Mathf.RoundToInt(Mathf.Max(1, entry.Cost) * Definition!.ExperiencePerPressure)));
 		if (entry.Milestone)
 		{
@@ -146,15 +154,26 @@ public partial class SurvivalDirector
 		}
 		if (entry.Boss && _player is { IsDead: false })
 		{
-			BossDefeated = true; State = PhaseState.AwaitingExit; _frozen = CaptureStatistics(); SceneRune?.Stop();
-			BuildRuntime?.Stop();
-			StopEliteTraits();
-			CancelPendingSpawns(); ClearEnemies(); _rewards.Clear();
-			foreach (var objective in _objectives) if (IsInstanceValid(objective)) objective.Enabled = false;
-			Vector3 desired = new(0, .1f, 38);
-			if (MapManager.Instance?.TryValidPoint(desired, _player.GlobalPosition, out Vector3 exitPoint, _player) == true) desired = exitPoint;
-			var exit = new SurvivalObjective { Name = "SurvivalExit", Director = this, Kind = SurvivalObjective.ObjectiveKind.Exit };
-			AddChild(exit); exit.GlobalPosition = desired; _objectives.Add(exit); Notice = "首领已击败 · 返回南侧金色撤离门，按F完成试炼";
+			if (Definition!.BossDropsEvolution)
+				_rewards.Enqueue((RewardKind.Evolution, entry.FinalBoss ? "终局首领 · 进化" : "首领 · 进化"));
+			if (!entry.FinalBoss)
+			{
+				_boss = null;
+				Notice = "首领已击败 · 继续清场，下一只首领在后续波次";
+			}
+			else
+			{
+				BossDefeated = true; State = PhaseState.AwaitingExit; _frozen = CaptureStatistics(); SceneRune?.Stop();
+				BuildRuntime?.Stop();
+				StopEliteTraits();
+				CancelPendingSpawns(); ClearEnemies();
+				foreach (var objective in _objectives) if (IsInstanceValid(objective)) objective.Enabled = false;
+				Vector3 desired = new(0, .1f, 38);
+				if (MapManager.Instance?.TryValidPoint(desired, _player.GlobalPosition, out Vector3 exitPoint, _player) == true) desired = exitPoint;
+				var exit = new SurvivalObjective { Name = "SurvivalExit", Director = this, Kind = SurvivalObjective.ObjectiveKind.Exit };
+				AddChild(exit); exit.GlobalPosition = desired; _objectives.Add(exit); Notice = "首领已击败 · 返回南侧金色撤离门，按F完成试炼";
+				TryOpenReward();
+			}
 		}
 	}
 	private void PruneUnits()

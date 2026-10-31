@@ -31,7 +31,7 @@ radius = 7.5
 [node name="Boss" type="CharacterBody3D"]
 script = ExtResource("1_unit")
 Faction = 1
-MaxHealth = 900.0
+MaxHealth = 1800.0
 ArmorDamageReduction = 0.3
 KnockbackResistance = 1.0
 MoveSpeed = 3.6

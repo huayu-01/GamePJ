@@ -6,13 +6,19 @@ namespace ActRoguelike.Config;
 [Tool, GlobalClass]
 public partial class SurvivalDefinition : RunModeDefinition
 {
-	[Export] public float DurationSeconds { get; set; } = 720;
+	[Export] public float DurationSeconds { get; set; } = 1200;
 	[Export] public SceneRuneDefinition[] SceneRunePool { get; set; } = System.Array.Empty<SceneRuneDefinition>();
 	[Export] public SceneRuneDefinition? FixedSceneRune { get; set; }
 	[Export] public SurvivalPhase[] Phases { get; set; } = System.Array.Empty<SurvivalPhase>();
 	[Export] public BossConfig? FinalBoss { get; set; }
 	[Export] public EnemyConfig? MilestoneEnemy { get; set; }
 	[Export] public float[] MilestoneFractions { get; set; } = new[] { .25f, .5f, .75f };
+	/// <summary>多首领时间表：每项是 DurationSeconds 的比例，最后一项必须是 1（终局首领）。</summary>
+	[Export] public float[] BossSpawnFractions { get; set; } = new[] { .25f, .5f, .75f, 1f };
+	/// <summary>与 BossSpawnFractions 一一对应的首领生命倍率；最后一项通常为 1。</summary>
+	[Export] public float[] BossHealthScales { get; set; } = new[] { .4f, .6f, .8f, 1f };
+	/// <summary>首领死亡时是否额外掉落一次进化池选择。</summary>
+	[Export] public bool BossDropsEvolution { get; set; } = true;
 	[Export] public float SpawnMinDistance { get; set; } = 15;
 	[Export] public float SpawnMaxDistance { get; set; } = 25;
 	[Export] public float SpawnWarningSeconds { get; set; } = .75f;
@@ -57,6 +63,24 @@ public partial class SurvivalDefinition : RunModeDefinition
 		}
 		if (FinalBoss == null || !ResourceLoader.Exists(FinalBoss.ScenePath)) yield return "FinalBoss：必须指定有效首领。";
 		if (MilestoneEnemy == null || MilestoneEnemy.IsGlobal || !ResourceLoader.Exists(MilestoneEnemy.ScenePath)) yield return "MilestoneEnemy：必须指定有效强化敌人。";
+		if (BossSpawnFractions.Length == 0 || BossSpawnFractions.Length != BossHealthScales.Length)
+			yield return "BossSpawnFractions / BossHealthScales：必须非空且等长。";
+		else
+		{
+			float lastBossFraction = 0;
+			for (int i = 0; i < BossSpawnFractions.Length; i++)
+			{
+				float fraction = BossSpawnFractions[i];
+				float scale = BossHealthScales[i];
+				if (!float.IsFinite(fraction) || fraction <= lastBossFraction || fraction > 1)
+					yield return $"BossSpawnFractions[{i}]：必须在上一项之后且不超过1。";
+				if (!float.IsFinite(scale) || scale <= 0)
+					yield return $"BossHealthScales[{i}]：必须为有限正数。";
+				lastBossFraction = fraction;
+			}
+			if (!Mathf.IsEqualApprox(lastBossFraction, 1f))
+				yield return "BossSpawnFractions：最后一项必须是1，作为终局首领。";
+		}
 		previous = 0;
 		foreach (float time in MilestoneFractions)
 		{

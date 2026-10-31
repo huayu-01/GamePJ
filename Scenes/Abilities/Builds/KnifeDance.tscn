@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/Combat/ThrowingKnife.tscn" id="projectile"]
 [node name="EvolvedAbility" type="Node3D"]
 script = ExtResource("script")
-Cooldown = 1
+Cooldown = 0.5
 Damage = 12
 FollowupDamage = 8
 FollowupCount = 3
