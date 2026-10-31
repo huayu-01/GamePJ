@@ -6,9 +6,12 @@ using Godot;
 
 namespace ActRoguelike.Visual;
 
-/// <summary>只在草地样板实例中将庭院改为丛林；保留全部原有碰撞和导航几何。</summary>
+/// <summary>将生存庭院视觉改为丛林；正式入口与草地样板复用，保留原碰撞和导航几何。</summary>
 public partial class JungleGrassScenery : Node3D
 {
+	[Export] public PackedScene? TreePrototype { get; set; }
+	[Export] public SoftFoliageStyle FoliageStyle { get; set; } = new();
+	public int StyledLeafSurfaces { get; private set; }
 	public int ReplacedStructures { get; private set; }
 	public int BoundaryRockCount { get; private set; }
 	public int FernCount { get; private set; }
@@ -37,7 +40,7 @@ public partial class JungleGrassScenery : Node3D
 			{
 				var tree=(Node3D)child;
 				foreach(var mesh in Walk(tree).OfType<MeshInstance3D>()) mesh.Visible=false;
-				var broad=VisualOnly("CommonTree_3"); AddChild(broad); broad.GlobalTransform=tree.GlobalTransform;
+				var broad=TreeVisual(); AddChild(broad); broad.GlobalTransform=tree.GlobalTransform;
 			}
 			else if(name.StartsWith("RuinWall",StringComparison.Ordinal))
 			{
@@ -97,7 +100,7 @@ public partial class JungleGrassScenery : Node3D
 		{
 			for(int i=0;i<3;i++)
 			{
-				var tree=VisualOnly("CommonTree_3"); AddChild(tree); tree.Position=center+new Vector3(i*2.2f-2.2f,0,(i%2)*3.6f);
+				var tree=TreeVisual(); AddChild(tree); tree.Position=center+new Vector3(i*2.2f-2.2f,0,(i%2)*3.6f);
 				tree.Scale=Vector3.One*_random.RandfRange(.85f,1.15f); tree.Rotation=Vector3.Up*_random.Randf()*Mathf.Tau;
 			}
 		}
@@ -118,10 +121,11 @@ public partial class JungleGrassScenery : Node3D
 	{
 		foreach(var mesh in Walk(this).OfType<MeshInstance3D>().Where(mesh=>mesh.Mesh==_leafMesh)) mesh.VisibilityRangeEnd=enabled?0:80;
 	}
-	private Node3D VisualOnly(string name)
+	private Node3D TreeVisual()
 	{
-		var root=RuntimeResources.Load<PackedScene>($"res://Scenes/Levels/NatureArena/Prefabs/{name}.tscn").Instantiate<Node3D>();
+		var root=(TreePrototype??RuntimeResources.Load<PackedScene>("res://Scenes/Levels/NatureArena/Prefabs/CommonTree_3.tscn")).Instantiate<Node3D>();
 		foreach(var collider in Walk(root).OfType<CollisionObject3D>().ToArray()) { collider.GetParent().RemoveChild(collider); collider.Free(); }
+		StyledLeafSurfaces+=FoliageStyle.Apply(root);
 		return root;
 	}
 	private void Rock(Vector3 center,Vector3 size,float angle=0)

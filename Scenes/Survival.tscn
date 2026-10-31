@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://Scripts/Run/Survival/SurvivalDirector.cs" id="director"]
 [ext_resource type="Script" path="res://Scripts/Rewards/RunController.cs" id="run"]
 [ext_resource type="Script" path="res://Scripts/Visual/ToonPass.cs" id="toon"]
+[ext_resource type="Script" path="res://Scripts/Visual/SurvivalMeadow.cs" id="meadow"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/Hud.tscn" id="Hud"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/WorldOverlay.tscn" id="WorldOverlay"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/SettingsScreen.tscn" id="SettingsScreen"]
@@ -17,6 +18,8 @@
 [ext_resource type="PackedScene" path="res://Scenes/Debug/GmConsole.tscn" id="gm"]
 [node name="Survival" type="Node3D"]
 [node name="Arena" parent="." instance=ExtResource("arena")]
+[node name="Meadow" type="Node3D" parent="."]
+script = ExtResource("meadow")
 [node name="MapManager" type="Node3D" parent="."]
 script = ExtResource("map")
 [node name="Player" parent="." instance=ExtResource("player")]

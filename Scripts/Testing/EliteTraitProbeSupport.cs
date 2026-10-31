@@ -9,6 +9,7 @@ using ActRoguelike.Combat.Elites;
 using ActRoguelike.Config;
 using ActRoguelike.Core;
 using ActRoguelike.Run;
+using ActRoguelike.Visual;
 using Godot;
 
 namespace ActRoguelike.Testing;
@@ -21,6 +22,7 @@ public abstract partial class EliteTraitProbeSupport : Node
 	protected virtual PlayerCharacterKind TestCharacter => PlayerCharacterKind.Hunter;
 	protected virtual WeaponPresetKind TestWeapon => WeaponPresetKind.EnergyPalm;
 	protected virtual string? TestRune => null;
+	protected virtual bool SceneMeadowEnabled => true;
 	protected Node3D Mode { get; private set; } = null!;
 	protected Unit Player { get; private set; } = null!;
 	protected SurvivalDirector Director { get; private set; } = null!;
@@ -76,6 +78,7 @@ public abstract partial class EliteTraitProbeSupport : Node
 			if (TestRune != null) RuneCarry.Set(TestRune);
 			RunSetup.Character = TestCharacter; RunSetup.Weapon = TestWeapon; RunSetup.HasSelection = true;
 			Mode = RuntimeResources.Load<PackedScene>("res://Scenes/Survival.tscn").Instantiate<Node3D>();
+			Mode.GetNode<SurvivalMeadow>("Meadow").Enabled=SceneMeadowEnabled;
 			Director = Mode.GetNode<SurvivalDirector>("Director"); Director.EnableEliteTraits = false; Director.EnableSceneRunes = false;
 			var definition = (SurvivalDefinition)RuntimeResources.Load<SurvivalDefinition>("res://Config/Modes/twilight_survival.tres").Duplicate(true);
 			definition.DurationSeconds = 1800; definition.BaseLevelExperience = 100000; definition.MilestoneFractions = Array.Empty<float>();

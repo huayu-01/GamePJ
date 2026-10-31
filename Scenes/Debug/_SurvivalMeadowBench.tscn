@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Testing/SurvivalMeadowBench.cs" id="bench"]
+
+[node name="SurvivalMeadowBench" type="Node"]
+script = ExtResource("bench")

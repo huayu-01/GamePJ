@@ -1,0 +1,17 @@
+{
+  "renderer": "NVIDIA GeForce RTX 4070 Ti",
+  "measurements": [
+    {
+      "variant": "before",
+      "maxBoundaryJump": 0.95686275,
+      "largeJumps": 7497,
+      "samples": 30720
+    },
+    {
+      "variant": "after",
+      "maxBoundaryJump": 0.003921572,
+      "largeJumps": 0,
+      "samples": 30720
+    }
+  ]
+}

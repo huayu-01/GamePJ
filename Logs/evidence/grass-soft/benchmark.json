@@ -1,0 +1,111 @@
+{
+  "engine": "4.7.2-stable (official)",
+  "gpu": "NVIDIA GeForce RTX 4070 Ti",
+  "resolution": "1920x1080",
+  "msaa": "2x",
+  "grassNormal": 19289,
+  "chunks": 623,
+  "trianglesPerClump": 12,
+  "seed": 29102026,
+  "density": 6,
+  "windFrequency": 0.45,
+  "note": "\u540C\u4E00\u4E1B\u6797\u573A\u666F\u3001\u73A9\u5BB6\u548C3\u4E2A\u9759\u6001\u771F\u654C\u4EBA\uFF1B\u6E38\u620F\u955C\u5934\u8349\u573066\u81F380\u7C73\u6536\u7F29\u6E10\u9690\uFF0C\u5168\u666F\u53D6\u6D88\u8DDD\u79BB\u5254\u9664\uFF1B\u5404\u6696\u573A1.5\u79D2\u91C7\u68373\u79D2\uFF0C\u6B63\u53CD\u5E8F\u5404\u4E00\u6B21\uFF1B\u4E0D\u4EE3\u8868\u6EE1\u573AAI\u6218\u6597\u3002",
+  "phases": [
+    {
+      "run": 0,
+      "variant": "follow_ground",
+      "samples": 1297,
+      "meanFrameMs": 2.3132922127987716,
+      "medianFrameMs": 2.089,
+      "p95FrameMs": 3.376,
+      "gpuMs": 1.5723176569596748,
+      "renderCpuMs": 0.6509067075658782,
+      "drawCalls": 445.3153430994603,
+      "primitives": 683809.8188126446
+    },
+    {
+      "run": 1,
+      "variant": "follow_grass",
+      "samples": 1067,
+      "meanFrameMs": 2.81166166822868,
+      "medianFrameMs": 2.621,
+      "p95FrameMs": 3.782,
+      "gpuMs": 2.197944703231711,
+      "renderCpuMs": 0.9007263354531156,
+      "drawCalls": 1145.4058106841612,
+      "primitives": 817723.8734770385
+    },
+    {
+      "run": 2,
+      "variant": "overview_ground",
+      "samples": 1610,
+      "meanFrameMs": 1.863650310559009,
+      "medianFrameMs": 1.632,
+      "p95FrameMs": 2.79,
+      "gpuMs": 0.9255291907683663,
+      "renderCpuMs": 0.5314987577821897,
+      "drawCalls": 242,
+      "primitives": 396844
+    },
+    {
+      "run": 3,
+      "variant": "overview_grass",
+      "samples": 878,
+      "meanFrameMs": 3.41836332574032,
+      "medianFrameMs": 3.252,
+      "p95FrameMs": 4.531,
+      "gpuMs": 1.4519681110468976,
+      "renderCpuMs": 1.1297744865569548,
+      "drawCalls": 1488,
+      "primitives": 628328
+    },
+    {
+      "run": 4,
+      "variant": "overview_grass",
+      "samples": 997,
+      "meanFrameMs": 3.009242728184551,
+      "medianFrameMs": 2.741,
+      "p95FrameMs": 4.162,
+      "gpuMs": 1.3977743258088857,
+      "renderCpuMs": 1.0259057181768694,
+      "drawCalls": 1488,
+      "primitives": 628328
+    },
+    {
+      "run": 5,
+      "variant": "overview_ground",
+      "samples": 1405,
+      "meanFrameMs": 2.136244839857652,
+      "medianFrameMs": 1.9,
+      "p95FrameMs": 3.229,
+      "gpuMs": 0.9609131667961853,
+      "renderCpuMs": 0.5734206409853124,
+      "drawCalls": 242,
+      "primitives": 396844
+    },
+    {
+      "run": 6,
+      "variant": "follow_grass",
+      "samples": 1038,
+      "meanFrameMs": 2.890947013487477,
+      "medianFrameMs": 2.674,
+      "p95FrameMs": 4.211,
+      "gpuMs": 2.2496955700233032,
+      "renderCpuMs": 0.9174238924575908,
+      "drawCalls": 1145.3795761078998,
+      "primitives": 817716.3179190751
+    },
+    {
+      "run": 7,
+      "variant": "follow_ground",
+      "samples": 1382,
+      "meanFrameMs": 2.1713523878437044,
+      "medianFrameMs": 1.996,
+      "p95FrameMs": 2.982,
+      "gpuMs": 1.6088697535946814,
+      "renderCpuMs": 0.60850651115826,
+      "drawCalls": 445.29522431259045,
+      "primitives": 683804.0246020261
+    }
+  ]
+}

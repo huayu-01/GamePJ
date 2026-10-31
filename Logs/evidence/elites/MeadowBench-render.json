@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "pass": 19,
+  "fail": 0,
+  "checks": [
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u751F\u5B58\u6A21\u5F0F\u3001\u73A9\u5BB6\u548C\u5BFC\u822A\u5DF2\u51C6\u5907"
+    },
+    {
+      "passed": true,
+      "message": "\u6B63\u5F0F\u573A\u666F\u8349\u5730\u5DF2\u6784\u5EFA\uFF1A830.1ms\uFF0C\u5206\u914D 40.71MB"
+    },
+    {
+      "passed": true,
+      "message": "\u8349\u5730\u89C4\u6A21\uFF1A\u666E\u901A 19020 \u7C07\uFF0F623 \u4E2A\u5206\u5757\uFF0F40 \u4E2A\u7981\u8349\u533A\uFF0812 \u4E09\u89D2\u9762\u6BCF\u7C07\uFF09"
+    },
+    {
+      "passed": true,
+      "message": "arena \u5730\u9762\u4ECD\u5728\uFF0C\u8349\u5730\u53EA\u505A\u89C6\u89C9\uFF0C\u78B0\u649E\u4E0E\u5BFC\u822A\u7531 Arena \u63D0\u4F9B"
+    },
+    {
+      "passed": true,
+      "message": "static_ground\uFF1A1367 \u5E27\uFF0C\u5E73\u5747 2.19ms\uFF0Cp95 3.08ms\uFF0CGPU 1.82ms\uFF0Cdraw 569\uFF0C\u654C\u4EBA 0"
+    },
+    {
+      "passed": true,
+      "message": "static_grass\uFF1A1036 \u5E27\uFF0C\u5E73\u5747 2.90ms\uFF0Cp95 4.06ms\uFF0CGPU 2.39ms\uFF0Cdraw 1381\uFF0C\u654C\u4EBA 0"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u6E32\u67D3\u622A\u56FE static_grass"
+    },
+    {
+      "passed": true,
+      "message": "combat_ground\uFF1A1022 \u5E27\uFF0C\u5E73\u5747 2.94ms\uFF0Cp95 4.72ms\uFF0CGPU 1.87ms\uFF0Cdraw 824\uFF0C\u654C\u4EBA 12"
+    },
+    {
+      "passed": true,
+      "message": "combat_ground \u6218\u6597\u8D1F\u8F7D\u771F\u5B9E\uFF1A\u73A9\u5BB6\u5728\u91C7\u6837\u7A97\u53E3\u5185\u88AB\u547D\u4E2D 16 \u6B21"
+    },
+    {
+      "passed": true,
+      "message": "combat_grass\uFF1A814 \u5E27\uFF0C\u5E73\u5747 3.69ms\uFF0Cp95 5.89ms\uFF0CGPU 2.40ms\uFF0Cdraw 1634\uFF0C\u654C\u4EBA 12"
+    },
+    {
+      "passed": true,
+      "message": "combat_grass \u6218\u6597\u8D1F\u8F7D\u771F\u5B9E\uFF1A\u73A9\u5BB6\u5728\u91C7\u6837\u7A97\u53E3\u5185\u88AB\u547D\u4E2D 16 \u6B21"
+    },
+    {
+      "passed": true,
+      "message": "\u771F\u5B9E\u6E32\u67D3\u622A\u56FE combat_grass"
+    },
+    {
+      "passed": true,
+      "message": "combat_grass\uFF1A856 \u5E27\uFF0C\u5E73\u5747 3.51ms\uFF0Cp95 5.33ms\uFF0CGPU 2.41ms\uFF0Cdraw 1635\uFF0C\u654C\u4EBA 12"
+    },
+    {
+      "passed": true,
+      "message": "combat_grass \u6218\u6597\u8D1F\u8F7D\u771F\u5B9E\uFF1A\u73A9\u5BB6\u5728\u91C7\u6837\u7A97\u53E3\u5185\u88AB\u547D\u4E2D 17 \u6B21"
+    },
+    {
+      "passed": true,
+      "message": "combat_ground\uFF1A1088 \u5E27\uFF0C\u5E73\u5747 2.76ms\uFF0Cp95 4.52ms\uFF0CGPU 1.88ms\uFF0Cdraw 824\uFF0C\u654C\u4EBA 12"
+    },
+    {
+      "passed": true,
+      "message": "combat_ground \u6218\u6597\u8D1F\u8F7D\u771F\u5B9E\uFF1A\u73A9\u5BB6\u5728\u91C7\u6837\u7A97\u53E3\u5185\u88AB\u547D\u4E2D 16 \u6B21"
+    },
+    {
+      "passed": true,
+      "message": "static_grass\uFF1A1057 \u5E27\uFF0C\u5E73\u5747 2.84ms\uFF0Cp95 4.25ms\uFF0CGPU 2.34ms\uFF0Cdraw 1381\uFF0C\u654C\u4EBA 0"
+    },
+    {
+      "passed": true,
+      "message": "static_ground\uFF1A1406 \u5E27\uFF0C\u5E73\u5747 2.13ms\uFF0Cp95 3.00ms\uFF0CGPU 1.81ms\uFF0Cdraw 569\uFF0C\u654C\u4EBA 0"
+    },
+    {
+      "passed": true,
+      "message": "\u57FA\u51C6 JSON \u5DF2\u5199\u76D8 F:/Godot\u9879\u76EE/\u9879\u76EEa/Logs/evidence/grass-production/benchmark.json"
+    }
+  ]
+}

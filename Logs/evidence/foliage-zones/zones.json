@@ -1,0 +1,33 @@
+{
+  "field": {
+    "NormalCount": 19020,
+    "ChunkCount": 623,
+    "ExclusionCount": 40,
+    "ExcludedCandidates": 1924,
+    "FullyExcludedChunks": 2,
+    "GroundRaycastCount": 29712
+  },
+  "fieldWithoutExclusions": {
+    "NormalCount": 19124,
+    "ChunkCount": 623,
+    "GroundRaycastCount": 31543
+  },
+  "baseline": {
+    "FullCount": 334,
+    "GroundRaycastCount": 335
+  },
+  "rotated": {
+    "FullCount": 185,
+    "GroundRaycastCount": 186
+  },
+  "full": {
+    "FullCount": 0,
+    "ChunkCount": 0,
+    "GroundRaycastCount": 0,
+    "FullyExcludedChunks": 9
+  },
+  "foliage": {
+    "StyledLeafSurfaces": 74,
+    "SharedMaterialCount": 2
+  }
+}
