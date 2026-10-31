@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ActRoguelike.Combat;
 using ActRoguelike.Core;
 using Godot;
@@ -13,6 +14,12 @@ public partial class ShaderGrassPatch : Node3D
 	[Export] public Vector2 FieldSize { get; set; } = new(100,100);
 	[Export] public Vector2 FieldCenter { get; set; } = Vector2.Zero;
 	[Export] public float ChunkSize { get; set; } = 4;
+	/// <summary>
+	/// **生成粒度**（米）：草地长相只由它、<see cref="Seed"/> 和 <see cref="Density"/> 决定，
+	/// 与 <see cref="ChunkSize"/> 无关 —— 改 <see cref="ChunkSize"/> 只改"多少棵草装进一次绘制"。
+	/// 默认 4 米沿用旧版的块格，所以旧场景的草地布局逐簇不变；调大只减少 draw call，不动草的位置。
+	/// </summary>
+	[Export] public float GenerationCell { get; set; } = 4;
 	[Export] public float Density { get; set; } = 6;
 	[Export] public float WindFrequency { get; set; } = .45f;
 	[Export] public int Seed { get; set; } = 29102026;
@@ -30,7 +37,7 @@ public partial class ShaderGrassPatch : Node3D
 	public Variant CurrentVariant { get; private set; }
 	public float WindTime { get; private set; }
 	public ShaderMaterial GrassMaterial { get; private set; } = null!;
-	private readonly List<(MultiMeshInstance3D Batch, Node3D? Singles, int Count)> _chunks = new();
+	private readonly List<(MultiMeshInstance3D Batch, Node3D? Singles, int Count, int Visible)> _chunks = new();
 	private ArrayMesh _mesh = null!;
 	private bool _built;
 	private readonly List<ExclusionBox> _exclusions = new();
@@ -82,12 +89,18 @@ public partial class ShaderGrassPatch : Node3D
 		GrassMaterial.SetShaderParameter("blade_texture",RuntimeResources.Load<Texture2D>("res://Assets/Effects/grass_soft_blades.svg"));
 		_mesh=BladeMesh();
 		var space=GetWorld3D().DirectSpaceState;
+		float cell=GenerationCell>0?GenerationCell:ChunkSize;
+		float startX=FieldCenter.X-FieldSize.X*.5f, startZ=FieldCenter.Y-FieldSize.Y*.5f;
+		float endX=FieldCenter.X+FieldSize.X*.5f, endZ=FieldCenter.Y+FieldSize.Y*.5f;
+		// 先按"生成格"种出全部草（坐标相对草地根），再按 ChunkSize 分桶装车：
+		// 生成种子只认生成格索引，所以调 ChunkSize 不会重排草，只改每次绘制装多少。
+		var buckets=new SortedDictionary<(int Row,int Column),List<(Transform3D Local,Color Color,bool Keep)>>();
 		// 节点原点指定地面基准，不能拿中心井台的顶面作为整片地面的高度。
 		bool firstPoint=true;
-		for(float z=FieldCenter.Y-FieldSize.Y*.5f;z<FieldCenter.Y+FieldSize.Y*.5f;z+=ChunkSize)
-		for(float x=FieldCenter.X-FieldSize.X*.5f;x<FieldCenter.X+FieldSize.X*.5f;x+=ChunkSize)
+		for(float z=startZ;z<endZ;z+=cell)
+		for(float x=startX;x<endX;x+=cell)
 		{
-			float width=Mathf.Min(ChunkSize,FieldCenter.X+FieldSize.X*.5f-x), depth=Mathf.Min(ChunkSize,FieldCenter.Y+FieldSize.Y*.5f-z);
+			float width=Mathf.Min(cell,endX-x), depth=Mathf.Min(cell,endZ-z);
 			var bounds=GlobalTransform*new Aabb(new Vector3(x,-.4f,z),new Vector3(width,.8f,depth));
 			var exclusions=_exclusions.FindAll(box=>box.Bounds.Intersects(bounds));
 			bool ColumnInside(ExclusionBox box,float px,float pz)=>box.Contains(ToGlobal(new Vector3(px,-.4f,pz)))&&box.Contains(ToGlobal(new Vector3(px,.4f,pz)));
@@ -95,10 +108,9 @@ public partial class ShaderGrassPatch : Node3D
 			{
 				FullyExcludedChunks++; ExcludedCandidates+=(int)Mathf.Ceil(width*depth*Density); continue;
 			}
-			// 各块独立种子、每候选固定随机步数，排除建筑不会让场外的草重新洗牌。
-			int column=Mathf.RoundToInt((x-FieldCenter.X+FieldSize.X*.5f)/ChunkSize),row=Mathf.RoundToInt((z-FieldCenter.Y+FieldSize.Y*.5f)/ChunkSize);
+			// 各格独立种子、每候选固定随机步数，排除建筑不会让场外的草重新洗牌。
+			int column=Mathf.RoundToInt((x-startX)/cell),row=Mathf.RoundToInt((z-startZ)/cell);
 			using var random=new RandomNumberGenerator { Seed=unchecked((ulong)(uint)Seed*73856093UL^(ulong)(uint)column*19349663UL^(ulong)(uint)row*83492791UL) };
-			var instances=new List<(Transform3D Transform, Color Color)>();
 			for(int i=0;i<width*depth*Density;i++)
 			{
 				float px=x+random.Randf()*width,pz=z+random.Randf()*depth;
@@ -119,25 +131,42 @@ public partial class ShaderGrassPatch : Node3D
 				local.Y+=.012f;
 				InstanceBounds=firstPoint?new Aabb(local,Vector3.Zero):InstanceBounds.Expand(local); firstPoint=false;
 				var basis=new Basis(Vector3.Up,angle).Scaled(new Vector3(scale,height,scale));
-				instances.Add((new Transform3D(basis,local-new Vector3(x,0,z)),Colors.White));
+				// 按**渲染块**分桶；实例坐标存成相对自己那块的原点，块的划分不参与随机数。
+				int keyColumn=Mathf.FloorToInt((local.X-startX)/ChunkSize),keyRow=Mathf.FloorToInt((local.Z-startZ)/ChunkSize);
+				if(!buckets.TryGetValue((keyRow,keyColumn),out var bucket)) buckets[(keyRow,keyColumn)]=bucket=new List<(Transform3D Local,Color Color,bool Keep)>();
+				Vector3 chunkOrigin=new(keyColumn*ChunkSize+startX,0,keyRow*ChunkSize+startZ);
+				// 半密档"留哪 65%"由**世界坐标哈希**决定，不看块：换绘制块大小，可见的那批草逐簇不变。
+				bucket.Add((new Transform3D(basis,local-chunkOrigin),Colors.White,StableKeep(local,Seed)));
 			}
-			if(instances.Count==0) continue;
+		}
+
+		foreach(var (key,unsorted) in buckets)
+		{
+			if(unsorted.Count==0) continue;
+			// 可见的排前面（VisibleInstanceCount 只能画前缀），其余留给全密档。
+			var instances=unsorted.OrderByDescending(instance=>instance.Keep).ToList();
+			int visible=instances.Count(instance=>instance.Keep);
+			Vector3 origin=new(key.Column*ChunkSize+startX,0,key.Row*ChunkSize+startZ);
+			float width=Mathf.Min(ChunkSize,endX-origin.X), depth=Mathf.Min(ChunkSize,endZ-origin.Z);
 			var multi=new MultiMesh { TransformFormat=MultiMesh.TransformFormatEnum.Transform3D,Mesh=_mesh,InstanceCount=instances.Count };
-			var batch=new MultiMeshInstance3D { Name="GrassChunk"+_chunks.Count,Multimesh=multi,Position=new Vector3(x,0,z),MaterialOverride=GrassMaterial,
+			var batch=new MultiMeshInstance3D { Name="GrassChunk"+_chunks.Count,Multimesh=multi,Position=origin,MaterialOverride=GrassMaterial,
 				CastShadow=GeometryInstance3D.ShadowCastingSetting.Off,VisibilityRangeEnd=80,
 				CustomAabb=new Aabb(new Vector3(-.8f,-.5f,-.8f),new Vector3(width+1.6f,1.8f,depth+1.6f)) };
+			// 草是静态装饰：写 MultiMesh 变换不发生在物理帧里，关掉物理插值避免引擎告警（画面也更有必要保持稳定）。
+			batch.PhysicsInterpolationMode=Node.PhysicsInterpolationModeEnum.Off;
 			Node3D? singles=BuildReference?new Node3D { Name="ReferenceChunk"+_chunks.Count,Position=batch.Position,Visible=false }:null;
 			AddChild(batch); if(singles!=null) AddChild(singles);
 			for(int i=0;i<instances.Count;i++)
 			{
-				var instance=instances[i]; multi.SetInstanceTransform(i,instance.Transform);
+				var instance=instances[i]; multi.SetInstanceTransform(i,instance.Local);
 				if(singles==null) continue;
 				// 独立网格共享同一网格、材质；颜色与风动都由世界坐标计算，保持公平对照。
-				var single=new MeshInstance3D { Mesh=_mesh,Transform=instance.Transform,MaterialOverride=GrassMaterial,CastShadow=GeometryInstance3D.ShadowCastingSetting.Off,VisibilityRangeEnd=80 };
+				var single=new MeshInstance3D { Mesh=_mesh,Transform=instance.Local,MaterialOverride=GrassMaterial,CastShadow=GeometryInstance3D.ShadowCastingSetting.Off,VisibilityRangeEnd=80 };
 				singles.AddChild(single);
 			}
-			FullCount+=instances.Count; NormalCount+=(int)(instances.Count*.65f);
-			_chunks.Add((batch,singles,instances.Count));
+			FullCount+=instances.Count;
+			NormalCount+=visible;
+			_chunks.Add((batch,singles,instances.Count,visible));
 		}
 		ApplyVariant(Variant.Batched);
 	}
@@ -147,7 +176,7 @@ public partial class ShaderGrassPatch : Node3D
 		CurrentVariant=variant;
 		foreach(var chunk in _chunks)
 		{
-			int visible=(int)(chunk.Count*.65f);
+			int visible=chunk.Visible;
 			chunk.Batch.Visible=variant is Variant.Batched or Variant.Dense;
 			chunk.Batch.Multimesh!.VisibleInstanceCount=variant==Variant.Dense?-1:visible;
 			if(chunk.Singles!=null)
@@ -162,6 +191,16 @@ public partial class ShaderGrassPatch : Node3D
 	{
 		foreach(var chunk in _chunks) chunk.Batch.VisibilityRangeEnd=enabled?0:80;
 		GrassMaterial.SetShaderParameter("draw_distance",enabled?0.0f:80.0f);
+	}
+	/// <summary>
+	/// 半密档「留哪 65%」的稳定判据：只看**世界坐标**（2 米格）与 <see cref="Seed"/>，
+	/// 与绘制块划分无关 —— 所以把 <see cref="ChunkSize"/> 从 4 米调到 8 米，可见的那批草逐簇不变。
+	/// </summary>
+	private static bool StableKeep(Vector3 local,int seed)
+	{
+		uint hash=unchecked((uint)seed*2654435761u^(uint)Mathf.FloorToInt(local.X*2f)*2246822519u^(uint)Mathf.FloorToInt(local.Z*2f)*3266489917u);
+		hash^=hash>>15; hash*=0x2c1b3c6du; hash^=hash>>12; hash*=0x297a2d39u; hash^=hash>>15;
+		return hash%1000u<650u;
 	}
 	public override void _Process(double delta)
 	{
