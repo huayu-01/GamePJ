@@ -447,6 +447,12 @@ public partial class InteractionComponentProbe : Node3D
 		await Frames(40);
 		Check(stage.AwaitingExit && portal.Enabled && portal.Visible && !stage.IsVictory && portal.Prompt == stage.ExitPrompt,
 			"首领结束后激活预置出口并采用当前离场提示");
+		typeof(StageController).GetMethod("UpdateExitMarker", privateInstance)!.Invoke(stage, null);
+		Node3D? exitMarker = stage.GetNodeOrNull<Node3D>("ExitMarker");
+		Check(exitMarker != null && exitMarker.Visible
+			&& ActRoguelike.Core.PlayerLocator.Player is { } markerPlayer
+			&& exitMarker.GlobalPosition.DistanceTo(markerPlayer.GlobalPosition) < 1f,
+			"首领结束后玩家脚下出现指向出口的角标");
 		Check(ReferenceEquals(exitComponent.Backend, portal) && portal.GetInstanceId() == portalId
 			&& Interactable.InSubtree(stage).OfType<RewardNode>().Count(node => node.Kind == RewardNodeKind.Portal) == 1,
 			"激活原预置后端，没有因配置PortalScene再生成第二个出口");

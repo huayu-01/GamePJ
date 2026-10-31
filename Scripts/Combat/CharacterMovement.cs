@@ -46,6 +46,8 @@ public partial class CharacterMovement : Node
 			foreach (var ability in _movementAbilities)
 			{
 				if (!IsInstanceValid(ability) || !ability.Enabled || !ability.IsBusy) continue;
+				// 镰刀旋转落地后允许半速移动；本技能自身仍占动作，但不锁主动输入。
+				if (ability is ReapingSpinAbility { IsSpinning: true }) continue;
 				if (ability.ActionMovement == Ability.MovementPolicy.Allowed) continue;
 				if (ability.ActionMovement == Ability.MovementPolicy.Attack && movingAttack) continue;
 				return true;
@@ -493,9 +495,12 @@ public partial class CharacterMovement : Node
 		{
 			float speedMultiplier = _unit?.Stats.Get("MoveSpeedMultiplier") ?? 1f;
 			float actionScale = ActionMovementSpeedScale;
-			// 浮空只改主动输入：忽略奔跑和成长倍率，技能位移与外力仍走原通道。
-			bool fixedHoverSpeed = !_body.IsOnFloor() && _hover is { IsHovering: true, Maintaining: true }
-				&& (string.IsNullOrEmpty(_hover.CancelAction) || !Input.IsActionJustPressed(_hover.CancelAction));
+			bool spinning = false;
+			foreach (var ability in _movementAbilities)
+				if (IsInstanceValid(ability) && ability is ReapingSpinAbility { IsSpinning: true }) { spinning = true; break; }
+			// 浮空/镰刀旋转只改主动输入：忽略奔跑和成长倍率，技能位移与外力仍走原通道。
+			bool fixedHoverSpeed = spinning || (!_body.IsOnFloor() && _hover is { IsHovering: true, Maintaining: true }
+				&& (string.IsNullOrEmpty(_hover.CancelAction) || !Input.IsActionJustPressed(_hover.CancelAction)));
 			float desiredSpeed = fixedHoverSpeed ? (_intentSpeed > 0 ? (_unit?.MoveSpeed ?? 0) * .5f : 0) : _intentSpeed * speedMultiplier * actionScale;
 			// 进入攻击时即时限制主动惯性，避免从奔跑带着高速滑过蓄力前段。
 			if ((fixedHoverSpeed || actionScale < 1f) && _inputVelocity.Length() > desiredSpeed)

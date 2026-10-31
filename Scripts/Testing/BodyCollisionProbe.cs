@@ -120,11 +120,13 @@ public partial class BodyCollisionProbe : Node3D
 		var rule = Happy(player); player.GetNode<SprintController>("Sprint").DebugSprintOverride = true;
 		await Drive(player, Vector3.Right, 40, rule, enemy);
 		Check(rule.PushCount is > 0 and <= 3 && enemy.GlobalPosition.X > 1.4f, "奔跑真实身体接触轻推敌人，有重复触发间隔");
-		Check(enemy.Health == 100 && player.Health == 100 && player.CollisionMask == CombatLayers.BodyMask, "轻推无伤害，不改身体阻挡、不赋予无敌");
+		float expectedHealth = 100f - rule.ImpactDamage * rule.PushCount;
+		Check(Mathf.Abs(enemy.Health - expectedHealth) < .1f && player.Health == 100 && player.CollisionMask == CombatLayers.BodyMask,
+			$"碰撞造成伤害 {rule.ImpactDamage:0.#}×{rule.PushCount}，不改身体阻挡、不赋予无敌");
 		int pushes = rule.PushCount; rule._PhysicsProcess(0.001); rule._PhysicsProcess(0.001); Check(rule.PushCount == pushes, "同一接触不会每帧重复施力");
 		await Clear(); player = Spawn(Faction.Player, new Vector3(0, 0.05f, 0)); enemy = Spawn(Faction.Enemy, new Vector3(1.2f, 0.05f, 0)); enemy.Tags = new[] { "Boss" };
 		rule = Happy(player); player.GetNode<SprintController>("Sprint").DebugSprintOverride = true; await Drive(player, Vector3.Right, 30, rule, enemy);
-		Check(rule.PushCount == 0 && enemy.GlobalPosition.X < 1.3f, "奔跑轻推不移动首领");
+		Check(rule.PushCount == 0 && enemy.GlobalPosition.X < 1.3f && enemy.Health == 100, "奔跑碰撞不移动/不伤害首领");
 	}
 	private async Task Regeneration()
 	{

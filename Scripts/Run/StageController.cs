@@ -190,6 +190,7 @@ public partial class StageController : Node3D
 	private readonly List<BossDoor> _bossDoors = new();
 	private RewardNode? _spawnedPortal;
 	private Node3D? _spawnedPortalRoot;
+	private Node3D? _exitMarker;
 	private EncounterController? _encounter;
 	private EncounterController? _bossEncounter;
 	private bool _encounterRunning;
@@ -388,6 +389,75 @@ public partial class StageController : Node3D
 
 		// 关卡核心文档 L87-93：每个 Stage 固定 10 个节点 —— 高价值 2 / 中价值 5 / 低价值 3。
 		EnableByLayer(high: 2, mid: 5, low: 3);
+		CreateExitMarker();
+	}
+
+	public override void _Process(double delta) => UpdateExitMarker();
+
+	private void CreateExitMarker()
+	{
+		if (_exitMarker != null) return;
+		_exitMarker = new Node3D { Name = "ExitMarker", TopLevel = true };
+		var material = new StandardMaterial3D
+		{
+			AlbedoColor = new Color(1f, .78f, .18f),
+			EmissionEnabled = true,
+			Emission = new Color(1f, .55f, .08f),
+			EmissionEnergyMultiplier = 1.6f,
+			ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
+		};
+		// 平躺在地上的箭头：圆锥轴 +Y 转到 -Z；不用外部贴图，训练/正式场景都能显示。
+		_exitMarker.AddChild(new MeshInstance3D
+		{
+			Name = "Arrow",
+			Mesh = new CylinderMesh { TopRadius = 0f, BottomRadius = .22f, Height = .62f, RadialSegments = 3 },
+			MaterialOverride = material,
+			Rotation = new Vector3(-Mathf.Pi * .5f, 0f, 0f),
+		});
+		_exitMarker.AddChild(new MeshInstance3D
+		{
+			Name = "Ring",
+			Mesh = new TorusMesh { InnerRadius = .28f, OuterRadius = .34f, Rings = 24, RingSegments = 4 },
+			MaterialOverride = material,
+			Position = Vector3.Down * .02f,
+		});
+		_exitMarker.AddChild(new Label3D
+		{
+			Name = "Label",
+			Text = "出口",
+			Position = Vector3.Up * .72f,
+			Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
+			FontSize = 34,
+			OutlineSize = 8,
+			Modulate = new Color(1f, .86f, .35f),
+		});
+		AddChild(_exitMarker);
+		_exitMarker.Visible = false;
+	}
+
+	private void UpdateExitMarker()
+	{
+		if (_exitMarker == null) return;
+		Unit? player = ActRoguelike.Core.PlayerLocator.Player;
+		if (!AwaitingExit || player == null || !IsInstanceValid(player))
+		{
+			_exitMarker.Visible = false;
+			return;
+		}
+		Vector3? target = null;
+		if (_spawnedPortal != null && IsInstanceValid(_spawnedPortal) && _spawnedPortal.Visible)
+			target = _spawnedPortal.GlobalPosition;
+		else
+		{
+			foreach (RewardNode portal in _placedPortals)
+				if (IsInstanceValid(portal) && portal.Visible && portal.Enabled) { target = portal.GlobalPosition; break; }
+		}
+		if (target == null) { _exitMarker.Visible = false; return; }
+		Vector3 flat = target.Value - player.GlobalPosition; flat.Y = 0f;
+		if (flat.LengthSquared() < .01f) { _exitMarker.Visible = false; return; }
+		_exitMarker.Visible = true;
+		_exitMarker.GlobalPosition = player.GlobalPosition + Vector3.Up * .06f;
+		_exitMarker.LookAt(_exitMarker.GlobalPosition + flat, Vector3.Up);
 	}
 
 	public override void _ExitTree()

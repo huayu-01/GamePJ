@@ -1,23 +1,20 @@
-[gd_resource type="Resource" script_class="RewardConfig" format=3]
-[ext_resource type="Script" path="res://Scripts/Config/RewardConfig.cs" id="row"]
-[ext_resource type="Script" path="res://Scripts/Config/RewardEffects/HappyRunnerRewardEffect.cs" id="definition"]
+[gd_resource type="Resource" script_class="RewardConfig" format=3 uid="uid://ttd2pkhwh8rw"]
+
+[ext_resource type="Script" uid="uid://hol0ako2ojo5" path="res://Scripts/Config/RewardEffects/HappyRunnerRewardEffect.cs" id="definition"]
+[ext_resource type="Script" uid="uid://puhrw2j2dgut" path="res://Scripts/Config/RewardConfig.cs" id="row"]
+
 [sub_resource type="Resource" id="definition"]
 script = ExtResource("definition")
-DamageFreeSeconds = 10
-HealPerSecond = 1
-PushSpeed = 5
-PushCooldown = 0.5
+ImpactDamage = 8.0
+
 [resource]
 script = ExtResource("row")
+RewardKind = 2
+Effects = [SubResource("definition")]
 NumericId = 1263
 Id = "mut_happy_runner"
 DisplayName = "快乐小子"
-RewardKind = 2
-MaxStacks = 1
-Effects = [SubResource("definition")]
-DescriptionTemplate = "奔跑时接触普通敌人会轻推开对方，不造成伤害；同一敌人每{Effects.0.PushCooldown}秒最多推一次。连续{Effects.0.DamageFreeSeconds}秒未受伤后，奔跑每秒恢复{Effects.0.HealPerSecond}点生命。"
-Note = "J33用户确认：单位恢复实体碰撞，快乐小子以奔跑轻推普通敌人替换穿透；不推动首领。10秒／每秒1生命来自原文；推力5米每秒与单目标0.5秒间隔为表内可调预设。"
-
 NameKey = "content.mut_happy_runner.name"
-
+DescriptionTemplate = "奔跑时接触普通敌人会短距离击退并造成{Effects.0.ImpactDamage}点碰撞伤害；同一敌人每{Effects.0.PushCooldown}秒最多触发一次。连续{Effects.0.DamageFreeSeconds}秒未受伤后，奔跑每秒恢复{Effects.0.HealPerSecond}点生命。"
 DescriptionKey = "content.mut_happy_runner.description"
+Note = "J33用户确认：单位恢复实体碰撞，快乐小子以奔跑轻推普通敌人替换穿透；不推动首领。10秒／每秒1生命来自原文；推力5米每秒与单目标0.5秒间隔为表内可调预设；碰撞伤害8点为可调预设。"

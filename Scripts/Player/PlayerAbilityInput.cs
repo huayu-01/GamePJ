@@ -61,7 +61,7 @@ public partial class PlayerAbilityInput : Node
 			Ability? ability = _unit.AbilitySlots.Resolve(action);
 			if (ability == null) continue;
 			if (Input.IsActionJustPressed(action) && !_handledPresses.Contains(action)) Activate(action);
-			ability.UpdateInputPreview(Input.IsActionPressed(action));
+			ability.UpdateInputPreview(Input.IsActionPressed(action) && (ability.IsReady || ability.IsActive));
 			if (!ability.HoldToCharge && !ability.HoldToMaintain) continue;
 			if (ability.IsActive && Input.IsActionPressed(action)) ability.OnInputHeld((float)delta);
 			// 暂停期间松手也可收尾；同帧重按以当前按住状态为准。

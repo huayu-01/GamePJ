@@ -19,6 +19,7 @@ public partial class ReapingSpinAbility : EvolvedAttackAbility
 	public float LastDashDistance { get; private set; }
 	public float LastSpinSeconds { get; private set; }
 	public int PulseCount { get; private set; }
+	public bool IsSpinning => IsActive && _phase == Phase.Spin;
 	public float CurrentAttackRadius => EffectiveRadius;
 	private enum Phase { Charging, Tap, Dash, Spin }
 	private Phase _phase;

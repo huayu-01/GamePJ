@@ -12,6 +12,7 @@ public partial class HappyRunnerRule : Node, IStoppableRewardRule
 	public float HealPerSecond { get; set; } = 1f;
 	public float PushSpeed { get; set; } = 5f;
 	public float PushCooldown { get; set; } = 0.5f;
+	public float ImpactDamage { get; set; } = 8f;
 	private Unit _owner = null!;
 	private SprintController? _sprint;
 	private float _safeSeconds;
@@ -44,6 +45,7 @@ public partial class HappyRunnerRule : Node, IStoppableRewardRule
 			Vector3 direction = target.GlobalPosition - _owner.GlobalPosition; direction.Y = 0f;
 			if (direction.LengthSquared() < 0.0001f) continue;
 			if (!target.ReceiveKnockback(direction.Normalized() * PushSpeed)) continue;
+			target.ApplyDirectDamage(ImpactDamage, _owner);
 			_cooldowns[target.GetInstanceId()] = Mathf.Max(0.05f, PushCooldown); PushCount++;
 		}
 	}

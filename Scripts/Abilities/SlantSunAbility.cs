@@ -16,7 +16,9 @@ public partial class SlantSunAbility : EvolvedAttackAbility, IPiercingSpearAbili
 	[Export] public float ContactDamage { get; set; } = 12;
 	[Export] public float ContactInterval { get; set; } = .75f;
 	[Export] public float RecallRadius { get; set; } = 1.5f;
+	[Export] public float ReturnSpeed { get; set; } = 20f;
 	public bool LanceUnlimitedTargets { get; set; } = true;
+	public bool PinReturning => Pin?.Returning == true;
 	public SurfaceSpearPin? Pin => IsInstanceValid(_pin) ? _pin : null;
 	public bool PreviewShowing => _preview?.Visible == true;
 	public bool TryGetAimSurface(out Vector3 point, out Vector3 normal) => Surface(out point, out normal);
@@ -48,6 +50,14 @@ public partial class SlantSunAbility : EvolvedAttackAbility, IPiercingSpearAbili
 	protected override void OnActivate(Unit? target) { }
 	protected override void OnChargeReleased(bool perfect, int steps, float powerScale)
 	{
+		_inputHeld = false; if (IsInstanceValid(_preview)) _preview!.Hide();
+		// 长枪已落地：再次使用只召回，不再读取鼠标/相机，也不生成第二根枪。
+		if (IsInstanceValid(_pin))
+		{
+			_pin!.Recall();
+			Finish();
+			return;
+		}
 		if (!Surface(out var point, out var normal)) { Finish(); return; }
 		Snapshot(); if (IsInstanceValid(_pin)) { _pin!.Removed -= Reclaimed; _pin.Stop(); }
 		float offset = SpawnHeight;
@@ -56,7 +66,7 @@ public partial class SlantSunAbility : EvolvedAttackAbility, IPiercingSpearAbili
 		float total = Mathf.Max(.01f, FallDamage + ImpactDamage);
 		_pin = new SurfaceSpearPin { OwnerUnit = OwnerUnit!, Destination = point, SurfaceNormal = normal, Speed = FallSpeed, Radius = EffectiveRadius,
 			SizeScale = Mathf.Max(.1f, OwnerUnit!.Stats.Get("AttackRangeMultiplier")) * OwnerUnit.GlobalBasis.Scale.Abs().X,
-			RecallRadius = RecallRadius, ContactInterval = ContactInterval, FallingAttack = Attack(FallDamage, FallDamage / total), ImpactAttack = Attack(ImpactDamage, ImpactDamage / total), ContactAttack = Attack(ContactDamage, 0) };
+			RecallRadius = RecallRadius, ReturnSpeed = ReturnSpeed, ContactInterval = ContactInterval, FallingAttack = Attack(FallDamage, FallDamage / total), ImpactAttack = Attack(ImpactDamage, ImpactDamage / total), ContactAttack = Attack(ContactDamage, 0) };
 		_pin.Removed += Reclaimed; AddChild(_pin); _pin.GlobalPosition = point + normal * offset;
 		if (_lockedPrimary == null)
 		{

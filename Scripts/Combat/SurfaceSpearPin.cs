@@ -13,6 +13,7 @@ public partial class SurfaceSpearPin : Node3D
 	public Vector3 Destination { get; set; }
 	public Vector3 SurfaceNormal { get; set; } = Vector3.Up;
 	public float Speed { get; set; } = 20;
+	public float ReturnSpeed { get; set; } = 20;
 	public float Radius { get; set; } = 2.6f;
 	public float SizeScale { get; set; } = 1;
 	public float RecallRadius { get; set; } = 1.5f;
@@ -21,6 +22,7 @@ public partial class SurfaceSpearPin : Node3D
 	public AttackInstance ImpactAttack { get; set; } = null!;
 	public AttackInstance ContactAttack { get; set; } = null!;
 	public bool Landed { get; private set; }
+	public bool Returning { get; private set; }
 	public event Action<SurfaceSpearPin>? Removed;
 	private readonly HashSet<ulong> _fallHits = new(); private readonly Dictionary<ulong, float> _nextContact = new();
 	private float _age, _scan;
@@ -43,6 +45,13 @@ public partial class SurfaceSpearPin : Node3D
 	{
 		if (_stopped) return; if (!IsInstanceValid(OwnerUnit) || OwnerUnit.IsDead) { Stop(); return; }
 		float dt = (float)delta; _age += dt;
+		if (Returning)
+		{
+			Vector3 home = OwnerUnit.GlobalPosition + Vector3.Up * .9f;
+			GlobalPosition = GlobalPosition.MoveToward(home, ReturnSpeed * dt);
+			if (GlobalPosition.DistanceSquaredTo(home) <= .04f) Stop();
+			return;
+		}
 		if (!Landed)
 		{
 			Vector3 before = GlobalPosition, after = before.MoveToward(Destination, Speed * dt);
@@ -70,6 +79,14 @@ public partial class SurfaceSpearPin : Node3D
 			_nextContact[id] = _age + Mathf.Max(.05f, ContactInterval); Hit(enemy, ContactAttack);
 		}
 	}
+	/// <summary>落地后召回：以独立 ReturnSpeed 飞回玩家，期间不产生接触伤害。</summary>
+	public bool Recall()
+	{
+		if (_stopped || Returning || !Landed) return false;
+		Returning = true;
+		return true;
+	}
+
 	public void Stop() { if (_stopped) return; _stopped = true; Hide(); SetPhysicsProcess(false); Removed?.Invoke(this); Removed = null; QueueFree(); }
 	public override void _ExitTree() { Removed?.Invoke(this); Removed = null; _nextContact.Clear(); _fallHits.Clear(); }
 }

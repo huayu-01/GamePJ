@@ -297,7 +297,7 @@ Messages = {
   "content.mut_growth.name": "增生",
   "content.mut_guard.description": "奔跑时获得一次格挡，格挡破碎 5 秒后才可再次获取",
   "content.mut_guard.name": "护卫",
-  "content.mut_happy_runner.description": "奔跑时接触普通敌人会轻推开对方，不造成伤害；同一敌人每{Effects.0.PushCooldown}秒最多推一次。连续{Effects.0.DamageFreeSeconds}秒未受伤后，奔跑每秒恢复{Effects.0.HealPerSecond}点生命。",
+  "content.mut_happy_runner.description": "奔跑时接触普通敌人会短距离击退并造成{Effects.0.ImpactDamage}点碰撞伤害；同一敌人每{Effects.0.PushCooldown}秒最多触发一次。连续{Effects.0.DamageFreeSeconds}秒未受伤后，奔跑每秒恢复{Effects.0.HealPerSecond}点生命。",
   "content.mut_happy_runner.name": "快乐小子",
   "content.mut_haste.description": "近战武技冷却 -10%",
   "content.mut_haste.name": "速攻",

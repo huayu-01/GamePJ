@@ -41,10 +41,17 @@ public partial class Builds20MasterProbe : Builds20ProbeSupport
 			"069下刺路径和落地AOE各实际命中一次，未重复开窗");
 		Check(Player.AbilitySlots.Resolve("weapon_skill_1") == null && Player.AbilitySlots.Resolve("weapon_skill_2") == skill,
 			"069留枪期间只锁武技1，武技2仍保有当前槽实例");
-		Press("weapon_skill_2", true); await Wait(.05); Check(skill.PreviewShowing, "069长枪离手时按住仍显示瞄准区域，不绑定武器在手状态");
-		Press("weapon_skill_2", false);
-		skill.UpdateInputPreview(false); Check(!skill.PreviewShowing, "069输入松开立即隐藏新指示器");
+		skill.UpdateInputPreview(true); Check(!skill.PreviewShowing, "069冷却中不显示技能指示器");
+		Node abilityInput = Player.GetNode("AbilityInput"); abilityInput.SetProcess(false);
+		skill.RefreshCooldown(); skill.UpdateInputPreview(true); await Wait(.05); Check(skill.PreviewShowing, "069冷却结束才允许显示指示器");
+		skill.UpdateInputPreview(false); Check(!skill.PreviewShowing, "069输入松开立即隐藏新指示器"); abilityInput.SetProcess(true);
 		await Shot("build20-slant-sun-ground");
+		Check(Mathf.IsEqualApprox(skill.ReturnSpeed, 20f), "069召回速度为20米/秒");
+		skill.RefreshCooldown(); await Tap("weapon_skill_2");
+		Check(await Until(() => pin.Returning), "069长枪落地后再次使用改为召回，不读取新落点");
+		Check(skill.Pin == pin, "069召回期间不生成第二根枪");
+		Check(await Until(() => skill.Pin == null, 4) && Player.AbilitySlots.Resolve("weapon_skill_1")?.Enabled == true,
+			"069长枪以20米/秒飞回，收回后武技1解锁");
 		var wall = new StaticBody3D { CollisionLayer = CombatLayers.World, CollisionMask = 0 };
 		wall.AddChild(new CollisionShape3D { Shape = new BoxShape3D { Size = new Vector3(8, 6, .3f) } });
 		wall.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(8, 6, .3f) }, MaterialOverride = new StandardMaterial3D { AlbedoColor = new Color(.25f, .3f, .4f) } });
@@ -99,6 +106,13 @@ public partial class Builds20MasterProbe : Builds20ProbeSupport
 		Check(await Until(() => skill.ChargeTime >= 2.02f), "069真实长按达到2秒满蓄"); Press("weapon_skill_2", false);
 		Check(await Until(() => skill.LastDashDistance == 12 && skill.LastSpinSeconds == 4), "069满蓄按可调首版前冲12米、旋转4秒");
 		Check(await Until(() => skill.PulseCount >= 2), "069前冲后进入持续旋转伤害阶段");
+		Check(skill.IsSpinning && !Player.Movement.IsActionMovementLocked, "069旋转落地阶段允许主动移动");
+		Vector3 spinStart = Player.GlobalPosition;
+		Input.ActionPress("move_right");
+		await Wait(.25);
+		Input.ActionRelease("move_right");
+		float spinMoved = Player.GlobalPosition.DistanceTo(spinStart);
+		Check(spinMoved > .1f && spinMoved < Player.MoveSpeed * .2f, $"069旋转移动按浮空半速（{spinMoved:0.##}m / 0.25s）");
 		await Shot("build20-reaping-spin"); await Tap("skill_1");
 		Check(await Until(() => !skill.IsActive) && skill.CooldownRemaining > 0, "069其它主动技能可打断旋转，但已产生效果的本次仍消耗冷却");
 		int pulses = skill.PulseCount; await Wait(.8); Check(skill.PulseCount == pulses, "069打断后停止剩余旋转伤害，没有后台漏伤");
