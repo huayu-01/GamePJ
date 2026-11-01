@@ -21,8 +21,9 @@ func _ready() -> void:
 		var image := get_viewport().get_texture().get_image()
 		image.save_png(dir + "/reward-1351-flat.png")
 
-		dock.call("_show_path", "res://Config/Tables/Skills/skl_a3_w1_1.tres")
-		await get_tree().create_timer(.4).timeout
+		# 走“打开”按钮同一条延迟路径，验证不会在信号发射期间 free 表单。
+		dock.call("_open_external", "res://Config/Tables/Skills/skl_a3_w1_1.tres")
+		await get_tree().create_timer(.6).timeout
 		dock.call("scroll_bottom")
 		await get_tree().create_timer(.3).timeout
 		await RenderingServer.frame_post_draw

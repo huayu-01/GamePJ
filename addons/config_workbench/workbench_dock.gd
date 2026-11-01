@@ -1,11 +1,11 @@
 @tool
 extends Control
 
-## 配置工作台 0.1：只读平铺原型。
+## 配置工作台 0.2：平铺编辑。
 ## - 左侧按表筛选资源；右侧把当前资源的全部可编辑属性铺开，不折叠。
 ## - Effects / TargetAbility / Params / ParamEntry 递归展开，直接看到深层参数。
-## - Note 按“参数用途”展示，旧变更说明标黄提示。
-## 下一步才接编辑/保存；当前不改任何 .tres。
+## - Note 按“参数用途”展示/编辑，旧变更说明标黄提示。
+## - 标量、ParamEntry 可直接编辑；保存写回原 .tres。
 
 const TABLES := [
 	{"id": "skills", "label": "技能", "path": "res://Config/Tables/Skills"},
@@ -33,6 +33,9 @@ var _form: VBoxContainer
 var _targets: Array[VBoxContainer] = []
 var _status: Label
 var _title: Label
+var _save_button: Button
+var _revert_button: Button
+var _dirty: Dictionary = {}
 var _entries: Array[Dictionary] = []
 var _visible: Array[Dictionary] = []
 var _selected_path := ""
@@ -73,6 +76,18 @@ func _fit_split() -> void:
 	_split.split_offset = target - int(_split.size.x * 0.5)
 
 
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not visible or not (event is InputEventKey) or not event.pressed:
+		return
+	var key := event as InputEventKey
+	if key.ctrl_pressed and key.keycode == KEY_S:
+		_save_all()
+		get_viewport().set_input_as_handled()
+	elif key.ctrl_pressed and key.keycode == KEY_R:
+		_revert_current()
+		get_viewport().set_input_as_handled()
+
+
 func _process(_delta: float) -> void:
 	if not Engine.is_editor_hint():
 		return
@@ -102,15 +117,32 @@ func _build_ui() -> void:
 	root.add_child(top)
 	var title := Label.new()
 	title.text = "配置工作台"
-	title.add_theme_font_size_override("font_size", 19)
+	title.add_theme_font_size_override("font_size", 25)
+	title.add_theme_color_override("font_color", Color(0.84, 0.9, 1.0))
+	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.65))
+	title.add_theme_constant_override("shadow_offset_x", 1)
+	title.add_theme_constant_override("shadow_offset_y", 1)
 	top.add_child(title)
 	var badge := Label.new()
-	badge.text = "只读预览"
+	badge.text = "编辑模式"
+	badge.add_theme_font_size_override("font_size", 13)
 	badge.add_theme_color_override("font_color", Color(1, 0.72, 0.28))
 	top.add_child(badge)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(spacer)
+	_save_button = Button.new()
+	_save_button.text = "保存"
+	_save_button.tooltip_text = "写回当前打开的所有 .tres"
+	_save_button.disabled = true
+	_save_button.pressed.connect(_save_all)
+	top.add_child(_save_button)
+	_revert_button = Button.new()
+	_revert_button.text = "还原"
+	_revert_button.tooltip_text = "丢弃未保存修改并重新加载"
+	_revert_button.disabled = true
+	_revert_button.pressed.connect(_revert_current)
+	top.add_child(_revert_button)
 	_table_filter = OptionButton.new()
 	_table_filter.add_item("全部")
 	for table in TABLES:
@@ -129,7 +161,8 @@ func _build_ui() -> void:
 	top.add_child(refresh)
 
 	_status = Label.new()
-	_status.text = "只读原型：所有字段平铺；Effects / TargetAbility / Params 递归展开"
+	_status.text = "编辑模式：所有字段平铺；Effects / TargetAbility / Params 递归展开"
+	_status.add_theme_font_size_override("font_size", 13)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_status)
 
@@ -168,7 +201,7 @@ func _refresh() -> void:
 		_scan_dir(str(table["path"]), str(table["label"]))
 	_entries.sort_custom(func(a, b): return str(a["path"]) < str(b["path"]))
 	_rebuild_list()
-	_status.text = "只读原型：%d 个资源；所有字段平铺，Effects / TargetAbility / Params 递归展开" % _entries.size()
+	_status.text = "编辑模式：%d 个资源；所有字段平铺，Effects / TargetAbility / Params 递归展开" % _entries.size()
 
 
 func _scan_dir(path: String, table_label: String) -> void:
@@ -257,8 +290,50 @@ func _show_path(path: String) -> void:
 	type_line.add_theme_color_override("font_color", Color(0.62, 0.72, 0.85))
 	type_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_form.add_child(type_line)
-	_render_resource(res, 0, [], false)
+	_render_resource(res, 0, [], false, path, res)
 	_form.add_child(HSeparator.new())
+
+
+func _mark_dirty(path: String, save_res: Resource) -> void:
+	if path.is_empty() or save_res == null:
+		return
+	_dirty[path] = save_res
+	_save_button.disabled = false
+	_revert_button.disabled = false
+	_status.text = "有未保存修改：%d 个文件；Ctrl+S 或右上角保存" % _dirty.size()
+
+
+func _save_all() -> void:
+	if _dirty.is_empty():
+		return
+	var failed: Array[String] = []
+	for path in _dirty.keys():
+		var save_res: Resource = _dirty[path]
+		if not is_instance_valid(save_res):
+			failed.append("%s（资源已释放）" % path)
+			continue
+		var error := ResourceSaver.save(save_res, str(path))
+		if error != OK:
+			failed.append("%s（%s）" % [path, error_string(error)])
+	if failed.is_empty():
+		_dirty.clear()
+		_save_button.disabled = true
+		_revert_button.disabled = true
+		_status.text = "已保存；重新加载当前资源"
+		if not _selected_path.is_empty():
+			_show_path(_selected_path)
+	else:
+		_status.text = "保存失败：" + "；".join(failed)
+
+
+func _revert_current() -> void:
+	_dirty.clear()
+	_save_button.disabled = true
+	_revert_button.disabled = true
+	if not _selected_path.is_empty():
+		_show_path(_selected_path)
+	else:
+		_status.text = "已丢弃未保存修改"
 
 
 func _clear_form() -> void:
@@ -311,7 +386,7 @@ func _small_card_style() -> StyleBoxFlat:
 	return style
 
 
-func _render_resource(res: Resource, depth: int, stack: Array, draw_header: bool = true) -> void:
+func _render_resource(res: Resource, depth: int, stack: Array, draw_header: bool = true, owner_path: String = "", owner_save: Resource = null) -> void:
 	if res == null:
 		return
 	if depth > 10:
@@ -323,6 +398,10 @@ func _render_resource(res: Resource, depth: int, stack: Array, draw_header: bool
 		return
 	var next_stack := stack.duplicate()
 	next_stack.append(key)
+	var current_path := res.resource_path if not res.resource_path.is_empty() else owner_path
+	var current_save: Resource = res if not res.resource_path.is_empty() else owner_save
+	if current_save == null:
+		current_save = res
 
 	var body := _target()
 	if draw_header and depth > 0:
@@ -368,26 +447,109 @@ func _render_resource(res: Resource, depth: int, stack: Array, draw_header: bool
 		if prop_name.begins_with("_") or prop_name in SKIP_FIELDS:
 			continue
 		var value: Variant = res.get(prop_name)
-		_render_property(prop_name, value, int(prop.get("type", TYPE_NIL)), int(prop.get("hint", 0)), str(prop.get("hint_string", "")), depth, next_stack)
+		_render_property(prop_name, value, int(prop.get("type", TYPE_NIL)), int(prop.get("hint", 0)), str(prop.get("hint_string", "")), depth, next_stack, current_path, res, current_save)
 	_targets.pop_back()
 
 
-func _render_property(prop_name: String, value: Variant, type: int, hint: int, hint_string: String, depth: int, stack: Array) -> void:
+func _render_property(prop_name: String, value: Variant, type: int, hint: int, hint_string: String, depth: int, stack: Array, owner_path: String, owner_res: Resource, owner_save: Resource) -> void:
 	if value is PackedScene:
 		var packed := value as PackedScene
 		_add_control(_kv_row(prop_name, "场景：%s" % packed.resource_path))
 		return
 	if value is Resource:
-		_render_resource_property(prop_name, value as Resource, depth, stack)
+		_render_resource_property(prop_name, value as Resource, depth, stack, owner_path, owner_save)
 		return
 	if value is Array:
-		_render_array_property(prop_name, value as Array, depth, stack)
+		_render_array_property(prop_name, value as Array, depth, stack, owner_path, owner_save)
 		return
-	var row := _kv_row(prop_name, _display_value(value, type, hint, hint_string))
+	var row := _scalar_row(prop_name, value, type, hint, hint_string, owner_path, owner_res, owner_save)
 	_add_control(row)
 
 
-func _render_resource_property(prop_name: String, value: Resource, depth: int, stack: Array) -> void:
+func _scalar_row(prop_name: String, value: Variant, type: int, hint: int, hint_string: String, owner_path: String, res: Resource, owner_save: Resource) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	var label := Label.new()
+	label.text = prop_name
+	label.custom_minimum_size.x = 190
+	label.add_theme_color_override("font_color", Color(0.72, 0.8, 0.92))
+	row.add_child(label)
+	var editor: Control = null
+
+	if hint == PROPERTY_HINT_ENUM and not hint_string.is_empty():
+		var option := OptionButton.new()
+		var names := hint_string.split(",")
+		for n in names:
+			option.add_item(n)
+		option.selected = clampi(int(value), 0, names.size() - 1)
+		option.item_selected.connect(func(index: int): _apply_scalar(res, prop_name, index, owner_path, owner_save))
+		editor = option
+	elif type == TYPE_BOOL:
+		var check := CheckBox.new()
+		check.button_pressed = bool(value)
+		check.toggled.connect(func(pressed: bool): _apply_scalar(res, prop_name, pressed, owner_path, owner_save))
+		editor = check
+	elif type == TYPE_INT:
+		var spin := SpinBox.new()
+		spin.min_value = -1e12
+		spin.max_value = 1e12
+		spin.step = 1
+		spin.value = int(value)
+		spin.value_changed.connect(func(number: float): _apply_scalar(res, prop_name, int(number), owner_path, owner_save))
+		editor = spin
+	elif type == TYPE_FLOAT:
+		var spin := SpinBox.new()
+		spin.min_value = -1e12
+		spin.max_value = 1e12
+		spin.step = 0.01
+		spin.allow_greater = true
+		spin.allow_lesser = true
+		spin.value = float(value)
+		spin.value_changed.connect(func(number: float): _apply_scalar(res, prop_name, number, owner_path, owner_save))
+		editor = spin
+	elif type == TYPE_PACKED_STRING_ARRAY:
+		var line := LineEdit.new()
+		line.text = "、".join(value as PackedStringArray)
+		line.tooltip_text = "用顿号或逗号分隔"
+		line.text_changed.connect(func(text: String):
+			var parts := PackedStringArray()
+			for part in text.replace(",", "、").split("、"):
+				var clean := part.strip_edges()
+				if not clean.is_empty(): parts.append(clean)
+			_apply_scalar(res, prop_name, parts, owner_path, owner_save)
+		)
+		editor = line
+	elif type == TYPE_STRING or type == TYPE_STRING_NAME:
+		if prop_name.contains("Note") or prop_name.contains("Description") or prop_name.contains("Template") or prop_name.contains("SkillDescription"):
+			var text := TextEdit.new()
+			text.text = str(value)
+			text.custom_minimum_size.y = 64
+			text.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+			text.text_changed.connect(func(): _apply_scalar(res, prop_name, text.text, owner_path, owner_save))
+			editor = text
+		else:
+			var line := LineEdit.new()
+			line.text = str(value)
+			line.text_changed.connect(func(text: String): _apply_scalar(res, prop_name, text, owner_path, owner_save))
+			editor = line
+	else:
+		var read := Label.new()
+		read.text = _display_value(value, type, hint, hint_string)
+		read.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		read.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		editor = read
+
+	editor.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(editor)
+	return row
+
+
+func _apply_scalar(res: Resource, prop_name: String, value: Variant, owner_path: String, owner_save: Resource) -> void:
+	res.set(prop_name, value)
+	_mark_dirty(owner_path, owner_save)
+
+
+func _render_resource_property(prop_name: String, value: Resource, depth: int, stack: Array, owner_path: String, owner_save: Resource) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	var label := Label.new()
@@ -407,12 +569,12 @@ func _render_resource_property(prop_name: String, value: Resource, depth: int, s
 		row.add_child(open)
 	_add_control(row)
 	if _should_inline(value, prop_name, depth):
-		_render_resource(value, depth + 1, stack, true)
+		_render_resource(value, depth + 1, stack, true, owner_path, owner_save)
 	else:
 		_add_note("外部资源：%s（点“打开”进入，避免误改共享文件）" % value.resource_path, Color(0.55, 0.68, 0.82))
 
 
-func _render_array_property(prop_name: String, array: Array, depth: int, stack: Array) -> void:
+func _render_array_property(prop_name: String, array: Array, depth: int, stack: Array, owner_path: String, owner_save: Resource) -> void:
 	_add_section("%s  [%d]" % [prop_name, array.size()])
 	if array.is_empty():
 		_add_note("（空）", Color(0.55, 0.6, 0.68))
@@ -422,11 +584,11 @@ func _render_array_property(prop_name: String, array: Array, depth: int, stack: 
 		if value is Resource:
 			var res := value as Resource
 			if _is_param_entry(res):
-				_render_param_entry(res, i)
+				_render_param_entry(res, i, owner_path, owner_save)
 			elif prop_name in COMPACT_ARRAYS and res.resource_path != "":
 				_render_compact_resource("%s[%d]" % [prop_name, i], res)
 			else:
-				_render_resource(res, depth + 1, stack, true)
+				_render_resource(res, depth + 1, stack, true, owner_path, owner_save)
 		elif value is Array:
 			_add_note("%s[%d] = %s" % [prop_name, i, _short(value)], Color(0.75, 0.78, 0.85))
 		elif value is Dictionary:
@@ -455,7 +617,7 @@ func _render_compact_resource(prop_name: String, res: Resource) -> void:
 	_add_control(row)
 
 
-func _render_param_entry(res: Resource, index: int) -> void:
+func _render_param_entry(res: Resource, index: int, owner_path: String, owner_save: Resource) -> void:
 	var card := PanelContainer.new()
 	card.add_theme_stylebox_override("panel", _small_card_style())
 	var box := VBoxContainer.new()
@@ -464,32 +626,122 @@ func _render_param_entry(res: Resource, index: int) -> void:
 	_add_control(card)
 
 	var head := HBoxContainer.new()
-	head.add_theme_constant_override("separation", 8)
-	var key := Label.new()
-	key.text = "[%d] %s" % [index, _text(res.get("Key"))]
-	key.add_theme_font_size_override("font_size", 15)
-	key.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(key)
+	head.add_theme_constant_override("separation", 6)
+	var index_label := Label.new()
+	index_label.text = "[%d]" % index
+	index_label.custom_minimum_size.x = 40
+	head.add_child(index_label)
+	var key_edit := LineEdit.new()
+	key_edit.text = _text(res.get("Key"))
+	key_edit.custom_minimum_size.x = 210
+	key_edit.tooltip_text = "参数名：对应目标组件上的同名 [Export] 属性"
+	key_edit.text_changed.connect(func(text: String):
+		res.set("Key", text)
+		_mark_dirty(owner_path, owner_save)
+	)
+	head.add_child(key_edit)
+
 	var value: Variant = res.get("Value")
-	var value_label := Label.new()
-	value_label.text = "%s  (%s)" % [_short(value), type_string(typeof(value))]
-	value_label.add_theme_color_override("font_color", Color(0.75, 0.9, 1.0))
-	head.add_child(value_label)
+	var types := [TYPE_FLOAT, TYPE_INT, TYPE_BOOL, TYPE_STRING, TYPE_PACKED_STRING_ARRAY]
+	var type_names := ["Float", "Int", "Bool", "String", "String[]"]
+	var type_select := OptionButton.new()
+	for name in type_names:
+		type_select.add_item(name)
+	var current_index := types.find(typeof(value))
+	type_select.selected = current_index if current_index >= 0 else 0
+	type_select.custom_minimum_size.x = 86
+	head.add_child(type_select)
+
+	var value_edit := LineEdit.new()
+	value_edit.text = _param_text(value)
+	value_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	value_edit.tooltip_text = "值：按左侧类型解析；字符串原样保存"
+	value_edit.text_changed.connect(func(text: String):
+		res.set("Value", _parse_param(text, types[type_select.selected]))
+		_mark_dirty(owner_path, owner_save)
+	)
+	head.add_child(value_edit)
+	type_select.item_selected.connect(func(selected: int):
+		var converted = _param_default(types[selected])
+		res.set("Value", converted)
+		value_edit.text = _param_text(converted)
+		_mark_dirty(owner_path, owner_save)
+	)
 	box.add_child(head)
 
-	var note := _text(res.get("Note"))
-	var note_label := Label.new()
-	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var note_caption := Label.new()
+	note_caption.text = "说明（用途 / 单位 / 范围；不要写版本变更）"
+	note_caption.add_theme_color_override("font_color", Color(0.62, 0.7, 0.8))
+	box.add_child(note_caption)
+	var note_edit := TextEdit.new()
+	note_edit.text = _text(res.get("Note"))
+	note_edit.custom_minimum_size.y = 46
+	note_edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+	box.add_child(note_edit)
+	var note_hint := Label.new()
+	note_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(note_hint)
+	_refresh_param_note(note_hint, _text(res.get("Note")))
+	note_edit.text_changed.connect(func():
+		var note := note_edit.text
+		res.set("Note", note)
+		_mark_dirty(owner_path, owner_save)
+		_refresh_param_note(note_hint, note)
+	)
+
+
+func _refresh_param_note(label: Label, note: String) -> void:
 	if note.is_empty():
-		note_label.text = "说明：未填写（应写清用在哪里、单位/范围）"
-		note_label.add_theme_color_override("font_color", Color(1, 0.65, 0.2))
+		label.text = "⚠ 未填写：应写清用在哪里、单位/范围"
+		label.add_theme_color_override("font_color", Color(1, 0.65, 0.2))
 	elif _legacy_note.search(note) != null:
-		note_label.text = "说明（疑似变更记录，建议改成用途）：%s" % note
-		note_label.add_theme_color_override("font_color", Color(1, 0.75, 0.25))
+		label.text = "⚠ 疑似变更记录，建议改成用途说明"
+		label.add_theme_color_override("font_color", Color(1, 0.75, 0.25))
 	else:
-		note_label.text = "说明：%s" % note
-		note_label.add_theme_color_override("font_color", Color(0.72, 0.82, 0.9))
-	box.add_child(note_label)
+		label.text = "✓ 用途说明"
+		label.add_theme_color_override("font_color", Color(0.45, 0.78, 0.55))
+
+
+func _param_text(value: Variant) -> String:
+	match typeof(value):
+		TYPE_BOOL:
+			return "true" if bool(value) else "false"
+		TYPE_PACKED_STRING_ARRAY:
+			return "、".join(value as PackedStringArray)
+		_:
+			return str(value)
+
+
+func _parse_param(text: String, type: int) -> Variant:
+	match type:
+		TYPE_FLOAT:
+			return text.to_float()
+		TYPE_INT:
+			return text.to_int()
+		TYPE_BOOL:
+			return text.strip_edges().to_lower() in ["true", "1", "yes", "on"]
+		TYPE_PACKED_STRING_ARRAY:
+			var parts := PackedStringArray()
+			for part in text.replace(",", "、").split("、"):
+				var clean := part.strip_edges()
+				if not clean.is_empty(): parts.append(clean)
+			return parts
+		_:
+			return text
+
+
+func _param_default(type: int) -> Variant:
+	match type:
+		TYPE_FLOAT:
+			return 0.0
+		TYPE_INT:
+			return 0
+		TYPE_BOOL:
+			return false
+		TYPE_PACKED_STRING_ARRAY:
+			return PackedStringArray()
+		_:
+			return ""
 
 
 func _should_inline(res: Resource, prop_name: String, depth: int) -> bool:
