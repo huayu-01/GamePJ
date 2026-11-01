@@ -24,6 +24,15 @@ const SKIP_FIELDS := ["script", "resource_path", "resource_name", "resource_loca
 const INLINE_EXTERNAL := ["TargetAbility", "RequiredEventAbility", "BonusAgainstAbility", "Tuning", "SpecializationBehavior"]
 const INLINE_ARRAYS := ["Effects", "Params", "AttackParams", "HandlerParams"]
 const COMPACT_ARRAYS := ["Skills", "ConvertedRewards", "SpecializationTargets", "RequiredWeaponTags", "RequiredCharacterIds", "Requires"]
+const FIELD_UNITS := {
+	"MaxHealth": "点", "StartingArmor": "点", "MaxShield": "点",
+	"ArmorDamageReduction": "0–0.9", "DamageReduction": "0–0.9", "KnockbackResistance": "0–1",
+	"MoveSpeed": "米/秒", "AttackDamage": "点", "AttackInterval": "秒", "AttackRange": "米", "AttackKnockback": "米/秒",
+	"Cooldown": "秒", "Windup": "秒", "Recover": "秒", "MaintainStartupSeconds": "秒",
+	"MaxCharges": "0=不覆盖", "RechargeSeconds": "秒", "MaxStacks": "0=不限", "Weight": "权重",
+	"Damage": "点", "Speed": "米/秒", "Radius": "米", "Duration": "秒", "Range": "米",
+	"ProjectileCount": "发", "Count": "发", "Pierce": "个", "Knockback": "米/秒",
+}
 
 var _table_filter: OptionButton
 var _search: LineEdit
@@ -469,11 +478,7 @@ func _render_property(prop_name: String, value: Variant, type: int, hint: int, h
 func _scalar_row(prop_name: String, value: Variant, type: int, hint: int, hint_string: String, owner_path: String, res: Resource, owner_save: Resource) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
-	var label := Label.new()
-	label.text = prop_name
-	label.custom_minimum_size.x = 190
-	label.add_theme_color_override("font_color", Color(0.72, 0.8, 0.92))
-	row.add_child(label)
+	row.add_child(_field_label(prop_name))
 	var editor: Control = null
 
 	if hint == PROPERTY_HINT_ENUM and not hint_string.is_empty():
@@ -552,11 +557,7 @@ func _apply_scalar(res: Resource, prop_name: String, value: Variant, owner_path:
 func _render_resource_property(prop_name: String, value: Resource, depth: int, stack: Array, owner_path: String, owner_save: Resource) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
-	var label := Label.new()
-	label.text = prop_name
-	label.custom_minimum_size.x = 190
-	label.add_theme_color_override("font_color", Color(0.7, 0.8, 0.95))
-	row.add_child(label)
+	row.add_child(_field_label(prop_name))
 	var value_label := Label.new()
 	value_label.text = _resource_label(value)
 	value_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -642,31 +643,18 @@ func _render_param_entry(res: Resource, index: int, owner_path: String, owner_sa
 	head.add_child(key_edit)
 
 	var value: Variant = res.get("Value")
-	var types := [TYPE_FLOAT, TYPE_INT, TYPE_BOOL, TYPE_STRING, TYPE_PACKED_STRING_ARRAY]
-	var type_names := ["Float", "Int", "Bool", "String", "String[]"]
-	var type_select := OptionButton.new()
-	for name in type_names:
-		type_select.add_item(name)
-	var current_index := types.find(typeof(value))
-	type_select.selected = current_index if current_index >= 0 else 0
-	type_select.custom_minimum_size.x = 86
-	head.add_child(type_select)
+	var value_type := typeof(value)
+	# 类型只读显示：ParamEntry.Value 的实际 Variant 类型由目标组件/消费方决定，
+	# 不允许在这里换类型，否则很容易把 Float 改成 String 之类造成运行期静默失效。
+	var type_label := Label.new()
+	type_label.text = _param_type_name(value_type)
+	type_label.custom_minimum_size.x = 78
+	type_label.add_theme_color_override("font_color", Color(0.62, 0.78, 0.92))
+	type_label.tooltip_text = "值的实际 Variant 类型（只读）"
+	head.add_child(type_label)
 
-	var value_edit := LineEdit.new()
-	value_edit.text = _param_text(value)
-	value_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	value_edit.tooltip_text = "值：按左侧类型解析；字符串原样保存"
-	value_edit.text_changed.connect(func(text: String):
-		res.set("Value", _parse_param(text, types[type_select.selected]))
-		_mark_dirty(owner_path, owner_save)
-	)
-	head.add_child(value_edit)
-	type_select.item_selected.connect(func(selected: int):
-		var converted = _param_default(types[selected])
-		res.set("Value", converted)
-		value_edit.text = _param_text(converted)
-		_mark_dirty(owner_path, owner_save)
-	)
+	var value_control := _param_value_control(res, value, value_type, owner_path, owner_save)
+	head.add_child(value_control)
 	box.add_child(head)
 
 	var note_caption := Label.new()
@@ -702,6 +690,90 @@ func _refresh_param_note(label: Label, note: String) -> void:
 		label.add_theme_color_override("font_color", Color(0.45, 0.78, 0.55))
 
 
+func _param_type_name(type: int) -> String:
+	match type:
+		TYPE_FLOAT:
+			return "Float"
+		TYPE_INT:
+			return "Int"
+		TYPE_BOOL:
+			return "Bool"
+		TYPE_STRING:
+			return "String"
+		TYPE_PACKED_STRING_ARRAY:
+			return "String[]"
+		_:
+			return type_string(type)
+
+
+func _param_value_control(res: Resource, value: Variant, type: int, owner_path: String, owner_save: Resource) -> Control:
+	match type:
+		TYPE_BOOL:
+			var check := CheckBox.new()
+			check.button_pressed = bool(value)
+			check.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			check.toggled.connect(func(pressed: bool):
+				res.set("Value", pressed)
+				_mark_dirty(owner_path, owner_save)
+			)
+			return check
+		TYPE_INT:
+			var spin := SpinBox.new()
+			spin.min_value = -1e12
+			spin.max_value = 1e12
+			spin.step = 1
+			spin.value = int(value)
+			spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			spin.value_changed.connect(func(number: float):
+				res.set("Value", int(number))
+				_mark_dirty(owner_path, owner_save)
+			)
+			return spin
+		TYPE_FLOAT:
+			var spin := SpinBox.new()
+			spin.min_value = -1e12
+			spin.max_value = 1e12
+			spin.step = 0.01
+			spin.allow_greater = true
+			spin.allow_lesser = true
+			spin.value = float(value)
+			spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			spin.value_changed.connect(func(number: float):
+				res.set("Value", number)
+				_mark_dirty(owner_path, owner_save)
+			)
+			return spin
+		TYPE_STRING:
+			var line := LineEdit.new()
+			line.text = str(value)
+			line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			line.text_changed.connect(func(text: String):
+				res.set("Value", text)
+				_mark_dirty(owner_path, owner_save)
+			)
+			return line
+		TYPE_PACKED_STRING_ARRAY:
+			var line := LineEdit.new()
+			line.text = "、".join(value as PackedStringArray)
+			line.tooltip_text = "用顿号或逗号分隔"
+			line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			line.text_changed.connect(func(text: String):
+				var parts := PackedStringArray()
+				for part in text.replace(",", "、").split("、"):
+					var clean := part.strip_edges()
+					if not clean.is_empty(): parts.append(clean)
+				res.set("Value", parts)
+				_mark_dirty(owner_path, owner_save)
+			)
+			return line
+		_:
+			var read := Label.new()
+			read.text = "%s  (%s)" % [_param_text(value), _param_type_name(type)]
+			read.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			read.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			return read
+
+
 func _param_text(value: Variant) -> String:
 	match typeof(value):
 		TYPE_BOOL:
@@ -710,38 +782,6 @@ func _param_text(value: Variant) -> String:
 			return "、".join(value as PackedStringArray)
 		_:
 			return str(value)
-
-
-func _parse_param(text: String, type: int) -> Variant:
-	match type:
-		TYPE_FLOAT:
-			return text.to_float()
-		TYPE_INT:
-			return text.to_int()
-		TYPE_BOOL:
-			return text.strip_edges().to_lower() in ["true", "1", "yes", "on"]
-		TYPE_PACKED_STRING_ARRAY:
-			var parts := PackedStringArray()
-			for part in text.replace(",", "、").split("、"):
-				var clean := part.strip_edges()
-				if not clean.is_empty(): parts.append(clean)
-			return parts
-		_:
-			return text
-
-
-func _param_default(type: int) -> Variant:
-	match type:
-		TYPE_FLOAT:
-			return 0.0
-		TYPE_INT:
-			return 0
-		TYPE_BOOL:
-			return false
-		TYPE_PACKED_STRING_ARRAY:
-			return PackedStringArray()
-		_:
-			return ""
 
 
 func _should_inline(res: Resource, prop_name: String, depth: int) -> bool:
@@ -804,14 +844,21 @@ func _is_param_entry(res: Resource) -> bool:
 	return script.resource_path.get_file().get_basename() == "ParamEntry"
 
 
+func _field_label(name: String) -> Label:
+	var label := Label.new()
+	var unit: String = FIELD_UNITS.get(name, "")
+	label.text = "%s  (%s)" % [name, unit] if not unit.is_empty() else name
+	label.custom_minimum_size.x = 190
+	label.add_theme_color_override("font_color", Color(0.72, 0.8, 0.92))
+	if not unit.is_empty():
+		label.tooltip_text = "%s：单位/范围 %s" % [name, unit]
+	return label
+
+
 func _kv_row(name: String, value_text: String) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
-	var label := Label.new()
-	label.text = name
-	label.custom_minimum_size.x = 190
-	label.add_theme_color_override("font_color", Color(0.72, 0.8, 0.92))
-	row.add_child(label)
+	row.add_child(_field_label(name))
 	var value := Label.new()
 	value.text = value_text
 	value.size_flags_horizontal = Control.SIZE_EXPAND_FILL
