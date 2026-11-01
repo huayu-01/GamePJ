@@ -78,7 +78,8 @@ public partial class SpecializationField : Node3D, IProjectileSlowField
 			else if (Kind == K.ThunderPool) Runtime.Thunder(target, Runtime.Value(Kind, "Damage"));
 			else
 			{
-				var attack = new AttackInstance { Attacker = SourceUnit, Ability = "Whirlwind", AbilityKind = Kind.ToString(), BaseDamage = Runtime.Value(Kind, "Damage") * AttackOffense.Capture(SourceUnit).DamageMultiplier, IsSecondary = true };
+				// 079：周期场地伤害不刷受击反馈（闪屏），但仍然结算、跳字、参与属性计算。
+				var attack = new AttackInstance { Attacker = SourceUnit, Ability = "Whirlwind", AbilityKind = Kind.ToString(), BaseDamage = Runtime.Value(Kind, "Damage") * AttackOffense.Capture(SourceUnit).DamageMultiplier, IsSecondary = true, SuppressFeedback = true };
 				target.ReceiveHit(attack.RollHit(target, Vector3.Zero, target.GlobalPosition));
 			}
 		}

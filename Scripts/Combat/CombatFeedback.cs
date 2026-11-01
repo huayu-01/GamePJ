@@ -48,8 +48,8 @@ public static class CombatFeedback
 		bool playerHurt = target.Faction == Faction.Player && !target.HasTag("Summon");
 		if (playerHurt && profile.Enabled && result.HealthLost + result.ArmorLost + result.ShieldLost > 0)
 			if (PlayerHurtFeedback.Ensure(target).Show(hit, result)) CameraCount++;
-		// 周期伤害仍结算与跳字，但不打断视觉节奏；来源失效时也不冒领玩家反馈。
-		if (!profile.Enabled || kind == ImpactKind.None || hit.Attack?.IsDamageOverTime == true) return;
+		// 周期伤害／明确声明不反馈的来源仍结算与跳字，但不打断视觉节奏；来源失效时也不冒领玩家反馈。
+		if (!profile.Enabled || kind == ImpactKind.None || hit.Attack?.IsDamageOverTime == true || hit.Attack?.SuppressFeedback == true) return;
 		if (kind == ImpactKind.Parry) hit.ParryFeedbackPresented = true;
 		ulong now = Time.GetTicksMsec();
 		bool priority = kind is ImpactKind.ArmorBreak or ImpactKind.Parry || result.Killed;

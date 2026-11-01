@@ -4,7 +4,8 @@
 script = ExtResource("script")
 Cooldown = 15
 Duration = 10
-MarkInterval = 0.2
+MarkInterval = 0.5
 MarkDuration = 6
 SearchRadius = 12
 StartupSeconds = 0.2
+

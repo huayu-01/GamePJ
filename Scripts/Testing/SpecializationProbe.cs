@@ -220,6 +220,16 @@ public partial class SpecializationProbe : Node3D
 		var windProjectile = GetTree().GetNodesInGroup("projectiles").OfType<Projectile>().Single(p => p.CurrentAttack?.Attacker == sword);
 		Grant(sword, "upg_wild_wind"); Near(windProjectile.SweepRadius, 0.525f, "狂风使已飞出的旋风弹判定同步增大");
 		await Wait(0.4); Check(victim.Health < 100, "旋风弹经真实物理扫掠命中");
+		// 078（2026-11-01 回归）：奔跑时**持续**发射，不是只发一发；停跑即停。
+		int shots = swordRuntime.WindShotCount;
+		for (int i = 0; i < 35; i++) Step(swordRuntime, 0.1f);
+		Check(swordRuntime.WindShotCount >= shots + 3, $"078持续奔跑 3.5 秒再发至少 3 枚（实发 {swordRuntime.WindShotCount - shots}）");
+		sword.GetNode<SprintController>("Sprint").DebugSprintOverride = false;
+		// SprintController 的 _sprinting 由真实物理帧维护：先放几帧真帧让它退出奔跑，再手动步进。
+		await Wait(0.2);
+		int stoppedAt = swordRuntime.WindShotCount;
+		for (int i = 0; i < 30; i++) Step(swordRuntime, 0.1f);
+		Check(swordRuntime.WindShotCount == stoppedAt, "078停止奔跑后不再发射");
 	}
 	private async Task<Unit> RealPlayer(PlayerCharacterKind character, WeaponPresetKind weapon)
 	{

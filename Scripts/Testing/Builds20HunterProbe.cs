@@ -81,11 +81,16 @@ public partial class Builds20HunterProbe : Builds20ProbeSupport
 		Check(Give("1352"), "069灵魂之眼在弓正常池可获取"); await Wait(.08);
 		var skill = Skill<SoulEyeAbility>(); var first = MakeEnemy(Player.GlobalPosition + new Vector3(-2, 0, -6));
 		var second = MakeEnemy(Player.GlobalPosition + new Vector3(2, 0, -7));
+		float healthBefore = first.Health + second.Health;
 		await Tap("weapon_skill_2"); Check(await Until(() => skill.Eye?.MarkCount >= 2), "069真实右键释放灵魂眼并依次标记可见敌人");
 		Check(first.GetStatusStacks("Mark") == 1 && second.GetStatusStacks("Mark") == 1 && !skill.IsActive && skill.Eye != null,
 			"069眼独立留场，短起手后恢复手动战斗");
 		int marks = skill.Eye!.MarkCount; await Wait(.5);
 		Check(skill.Eye.MarkCount == marks && first.GetStatusStacks("Mark") == 1, "069已标记目标不会反复叠层");
+		// 084（2026-11-01 口径）：标记间隔 0.5 秒；每次标记顺带一支真实灵魂箭（伤害 1，可触发增幅）。
+		Check(Mathf.IsEqualApprox(skill.Eye.Interval, .5f), $"084灵魂眼标记间隔为 0.5 秒（实测 {skill.Eye.Interval:0.##}）");
+		Check(skill.Eye.ArrowCount >= 2, $"084每次标记都射出灵魂箭（{skill.Eye.ArrowCount} 支）");
+		Check(await Until(() => first.Health + second.Health < healthBefore), "084灵魂箭经真实弹道命中目标并结算伤害");
 		await Shot("build20-soul-eye"); var eye = skill.Eye;
 		Release("1352"); await Wait(.05); Check(!IsInstanceValid(eye), "069撤销眼回收独立状态，不残留自动标记");
 		first.QueueFree(); second.QueueFree();

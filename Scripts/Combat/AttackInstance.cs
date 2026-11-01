@@ -78,6 +78,12 @@ public sealed class AttackInstance
 	public bool IsDamageOverTime { get; init; }
 	/// <summary>特化派生伤害，不再次触发同一套主攻击规则。</summary>
 	public bool IsSecondary { get; init; }
+	/// <summary>
+	/// **不触发受击反馈**（闪光／镜头冲击／命中音效），但仍然正常结算与跳字。
+	/// 给「特化周期场地」这类"会持续刷屏"的来源做归因用（079）：把抑制放在攻击实例上，
+	/// 而不是调大全局冷却（那会削弱真实受击手感）。
+	/// </summary>
+	public bool SuppressFeedback { get; init; }
 	public float CritChance { get; init; }
 	public float CritMultiplier { get; init; } = 2f;
 	public float Knockback { get; init; }
