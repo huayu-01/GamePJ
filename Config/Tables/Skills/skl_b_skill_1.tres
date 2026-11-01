@@ -7,7 +7,7 @@
 script = ExtResource("2_param")
 Key = "Distance"
 Value = 7
-Note = "冲刺距离（米）—— 文档写 n，预设 7"
+Note = "闪避冲刺距离（米）。"
 
 [sub_resource type="Resource" id="p_Duration"]
 script = ExtResource("2_param")
@@ -19,19 +19,19 @@ Note = "冲刺时长（秒）"
 script = ExtResource("2_param")
 Key = "PierceUnits"
 Value = true
-Note = "★ 全程穿透（只留世界层）"
+Note = "冲刺是否穿透单位；true = 只保留世界碰撞。"
 
 [sub_resource type="Resource" id="p_GrantInvulnerability"]
 script = ExtResource("2_param")
 Key = "GrantInvulnerability"
 Value = false
-Note = "文档没写无敌 → 关"
+Note = "冲刺期间是否授予无敌。"
 
 [sub_resource type="Resource" id="p_ShowPath"]
 script = ExtResource("2_param")
 Key = "ShowPath"
 Value = true
-Note = "★ 需要设立一条可视化的路径（文档第 101 行）"
+Note = "是否显示冲刺路径预览。"
 
 [sub_resource type="Resource" id="p_PathWidth"]
 script = ExtResource("2_param")

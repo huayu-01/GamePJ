@@ -7,24 +7,24 @@
 script = ExtResource("2_param")
 Key = "BackwardForce"
 Value = 20.0
-Note = "旧冲量模式兼容参数；定距模式BackwardDistance>0时不参与水平位移。"
+Note = "冲量后撤模式的速度参数；定距模式 BackwardDistance>0 时不参与水平位移。"
 
 [sub_resource type="Resource" id="p_a1_skill_1_1"]
 script = ExtResource("2_param")
 Key = "UpwardForce"
-Note = "额外抬高的垂直分量（0 = 纯水平后撤；文档没写 → 预设 0）"
+Note = "后撤时额外向上的速度分量；0 = 纯水平后撤。"
 
 [sub_resource type="Resource" id="p_a1_skill_1_2"]
 script = ExtResource("2_param")
 Key = "InvulnerableFromEvent"
 Value = "Dodge"
-Note = "★ 文档：帧 Dodge 开无敌"
+Note = "动画事件名：收到该事件时开启无敌，配合后撤动作。"
 
 [sub_resource type="Resource" id="p_a1_skill_1_3"]
 script = ExtResource("2_param")
 Key = "InvulnerableToEvent"
 Value = "Dodger"
-Note = "★ 文档：帧 Dodger 关无敌"
+Note = "动画事件名：收到该事件时关闭无敌。"
 
 [sub_resource type="Resource" id="p_a1_skill_1_4"]
 script = ExtResource("2_param")
@@ -35,7 +35,7 @@ Note = "超时兜底：Dodger 帧没来也要把无敌关掉（否则玩家会�
 [sub_resource type="Resource" id="p_distance"]
 script = ExtResource("2_param")
 Key = "BackwardDistance"
-Value = 12.0
+Value = 6.0
 Note = "066覆盖059：在6米基础上再次翻倍为12米。"
 
 [sub_resource type="Resource" id="p_travel"]

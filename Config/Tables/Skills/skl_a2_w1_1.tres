@@ -7,19 +7,19 @@
 script = ExtResource("2_param")
 Key = "ProjectileScenePath"
 Value = "res://Scenes/Combat/ThrowingKnife.tscn"
-Note = "独立飞刀外观；斩弹规则仍属于旧Arrow分类。"
+Note = "飞刀弹体场景路径；外观用飞刀，斩弹规则仍按 Arrow 分类。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_1"]
 script = ExtResource("2_param")
 Key = "Damage"
 Value = 16.2
-Note = "第三轮：猎手全武器基础伤害 +35%（12→16.2）。"
+Note = "每把飞刀的基础伤害（点）；三发各自结算。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_2"]
 script = ExtResource("2_param")
 Key = "Speed"
 Value = 36.0
-Note = "飞刀散掷初速预设36米/秒。"
+Note = "飞刀初速（米/秒）。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_3"]
 script = ExtResource("2_param")
@@ -31,13 +31,13 @@ Note = "允许近竖直上掷自然升降；接触地形仍立即结束。"
 script = ExtResource("2_param")
 Key = "Count"
 Value = 3.0
-Note = "★ 散射发数（文档：散射三发）"
+Note = "单次散射的飞刀数量（发）。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_5"]
 script = ExtResource("2_param")
 Key = "SpreadStepDegrees"
 Value = 20.0
-Note = "★ 相邻两发的夹角（文档：角度 20）"
+Note = "相邻飞刀夹角（度）；总夹角 = (Count-1)×本值。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_6"]
 script = ExtResource("2_param")
@@ -54,13 +54,13 @@ Note = "使用引擎重力的真实加速度。"
 script = ExtResource("2_param")
 Key = "Knockback"
 Value = 6.0
-Note = "★ 子弹特性：射速较高时造成击退（文档为 n → 预设 6）"
+Note = "命中击退（米/秒）；仅实际弹速达到 KnockbackMinSpeed 时生效。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_9"]
 script = ExtResource("2_param")
 Key = "KnockbackMinSpeed"
 Value = 36.0
-Note = "★ 弹速门槛：实际弹速 ≥ 它才吃上面的击退（「射速较高的时候才击退」就是这个门槛）"
+Note = "触发击退所需的最低实际弹速（米/秒）。"
 
 [sub_resource type="Resource" id="p_a2_w1_1_10"]
 script = ExtResource("2_param")

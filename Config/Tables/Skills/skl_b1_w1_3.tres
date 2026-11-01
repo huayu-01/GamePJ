@@ -7,7 +7,7 @@
 script = ExtResource("2_param")
 Key = "TriggerAbilityId"
 Value = "skl_b_fall"
-Note = "★ 上游：下落攻击那一行（落地时本被动出手）"
+Note = "触发本被动的上游技能行 Id；下落攻击落地时触发。"
 
 [sub_resource type="Resource" id="p_DamageScale"]
 script = ExtResource("2_param")

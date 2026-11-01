@@ -7,37 +7,37 @@
 script = ExtResource("2_param")
 Key = "ZoomFov"
 Value = 32.0
-Note = "★ 放大视角：放大后的视野角（度；越小越放大）。文档只写「放大视角」（n）→ 预设 32"
+Note = "开镜视野角（度）；越小放大越多。"
 
 [sub_resource type="Resource" id="p_a3_w1_2_1"]
 script = ExtResource("2_param")
 Key = "ZoomSharpness"
 Value = 8.0
-Note = "视角放大/还原的平滑速度（1/秒；预设 8）"
+Note = "开镜/还原的平滑速度（1/秒）。"
 
 [sub_resource type="Resource" id="p_a3_w1_2_2"]
 script = ExtResource("2_param")
 Key = "MarkStatusId"
 Value = "Mark"
-Note = "★ 「标记」状态的行 Id（效果表 eff_mark）：可叠加、不限单个目标"
+Note = "施加的标记状态 Id；对应效果表 eff_mark。"
 
 [sub_resource type="Resource" id="p_a3_w1_2_3"]
 script = ExtResource("2_param")
 Key = "MarkDuration"
 Value = 6.0
-Note = "★ 文档没写标记持续多久（n）→ 预设 6s"
+Note = "单层标记持续时间（秒）。"
 
 [sub_resource type="Resource" id="p_a3_w1_2_4"]
 script = ExtResource("2_param")
 Key = "MarkIntervalSeconds"
 Value = 0.5
-Note = "★ 文档：每 0.5 秒对准星附近某个目标施加标记"
+Note = "标记施加间隔（秒）。"
 
 [sub_resource type="Resource" id="p_a3_w1_2_5"]
 script = ExtResource("2_param")
 Key = "MarkRadius"
 Value = 3.0
-Note = "★ 「准星附近」的半径（文档为 n → 预设 3m）：在这个半径内挑离准星点最近的那个目标"
+Note = "准星附近选取标记目标的半径（米）；取最近目标。"
 
 [sub_resource type="Resource" id="p_a3_w1_2_6"]
 script = ExtResource("2_param")
@@ -49,7 +49,7 @@ Note = "求「准星打到的世界点」时射线的最大长度（与枪械/�
 script = ExtResource("2_param")
 Key = "DodgeAbilityId"
 Value = "skl_a1_skill_1"
-Note = "★ 「后撤」技能的行 Id：无动画软启动期间被击中时强制触发一次（不消耗层数）。按行 Id 找，不认节点名/类名"
+Note = "软启动期间受击时强制触发的后撤技能行 Id；不消耗后撤层数。"
 
 [resource]
 script = ExtResource("1_row")

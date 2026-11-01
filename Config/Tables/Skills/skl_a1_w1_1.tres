@@ -13,13 +13,13 @@ Note = "能量波预制体（直线 / 无下坠 / 穿透格挡）"
 script = ExtResource("2_param")
 Key = "Speed"
 Value = 45.0
-Note = "当前手感预设45米/秒，能清楚看到出手到命中的过程。"
+Note = "能量波飞行速度（米/秒）；影响出手到命中的时间。"
 
 [sub_resource type="Resource" id="p_a1_w1_1_2"]
 script = ExtResource("2_param")
 Key = "Damage"
 Value = 13.5
-Note = "第三轮：猎手全武器基础伤害 +35%（10→13.5）。"
+Note = "能量波单发基础伤害（点）；最终伤害再乘角色/武器/增幅倍率。"
 
 [sub_resource type="Resource" id="p_a1_w1_1_3"]
 script = ExtResource("2_param")
@@ -41,7 +41,7 @@ Note = "击退（doc 未写 = 0）"
 script = ExtResource("2_param")
 Key = "BypassBlock"
 Value = true
-Note = "★ 子弹特性：能穿透格挡（无视格挡效果）—— 文档「能量波」条目"
+Note = "是否无视格挡；true = 命中时跳过格挡结算。"
 
 [sub_resource type="Resource" id="p_a1_w1_1_7"]
 script = ExtResource("2_param")

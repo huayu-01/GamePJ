@@ -7,13 +7,13 @@
 script = ExtResource("2_param")
 Key = "Grant"
 Value = 1.0
-Note = "★ 文档：角色能在空中额外跳跃一次"
+Note = "灵动授予的额外空中跳跃次数；总次数受 MaxExtraAirJumps 上限约束。"
 
 [sub_resource type="Resource" id="p_a1_passive_1"]
 script = ExtResource("2_param")
 Key = "MaxExtraAirJumps"
 Value = 3.0
-Note = "★ 文档：正常情况下所有角色都只会有 1 次额外的获取方法，**上限最多 3 次**（异化「践踏死亡」也共用这条上限）"
+Note = "额外空中跳跃总次数上限；灵动与其他来源共用此上限。"
 
 [sub_resource type="Resource" id="p_attack_move"]
 script = ExtResource("2_param")
@@ -25,7 +25,7 @@ Note = "角色A可移动攻击，出招和蓄力期间主动移速降至35%，�
 script = ExtResource("2_param")
 Key = "AirborneDamageBonus"
 Value = 0.2
-Note = "第三轮：灵动新增，处于空中时造成伤害 +20%；落地立即移除。"
+Note = "空中伤害加成；0.2 = 造成伤害 ×1.2，落地移除。"
 
 [resource]
 script = ExtResource("1_row")

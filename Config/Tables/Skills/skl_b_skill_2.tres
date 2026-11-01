@@ -7,7 +7,7 @@
 script = ExtResource("2_param")
 Key = "StanceSeconds"
 Value = 1.5
-Note = "★ 文档 0.75 秒"
+Note = "架势/招架持续时间（秒）。"
 
 [sub_resource type="Resource" id="p_GuardOnEvent"]
 script = ExtResource("2_param")
@@ -35,8 +35,8 @@ Recover = 0.05
 NumericId = 1185
 Id = "skl_b_skill_2"
 DisplayName = "架"
+NameKey = "content.skl_b_skill_2.name"
 DescriptionTemplate = "进入持续{StanceSeconds:0.##}秒的招架窗口，可连续格挡并反弹敌方远程弹体；格挡者有自身硬直，窗口不因成功格挡提前结束。"
+DescriptionKey = "content.skl_b_skill_2.description"
 Note = "025/036：真实GuardOn开启，持续时间加倍；每次成功格挡触发各自反馈，反射保留原弹体并切换阵营。"
 Params = [SubResource("p_StanceSeconds"), SubResource("p_GuardOnEvent"), SubResource("p_GuardOffEvent")]
-NameKey = "content.skl_b_skill_2.name"
-DescriptionKey = "content.skl_b_skill_2.description"

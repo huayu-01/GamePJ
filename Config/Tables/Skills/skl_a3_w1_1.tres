@@ -13,13 +13,13 @@ Note = "箭的预制体"
 script = ExtResource("2_param")
 Key = "Damage"
 Value = 32.4
-Note = "第三轮：猎手全武器基础伤害 +35%（24→32.4）。"
+Note = "箭的基础伤害（点）；蓄力档位再乘威力。"
 
 [sub_resource type="Resource" id="p_a3_w1_1_2"]
 script = ExtResource("2_param")
 Key = "Speed"
 Value = 45.0
-Note = "当前基础箭速45米/秒；射程、上抛滞空由初速与重力共同决定。"
+Note = "箭的基础初速（米/秒）；射程和滞空由初速与重力决定。"
 
 [sub_resource type="Resource" id="p_a3_w1_1_3"]
 script = ExtResource("2_param")
@@ -37,13 +37,13 @@ Note = "足够覆盖龙之箭近竖直上射的完整升降；命中地形立即
 script = ExtResource("2_param")
 Key = "Count"
 Value = 1.0
-Note = "★ 一次一发（文档：射出一发弓箭）"
+Note = "单次射出的箭数（发）。"
 
 [sub_resource type="Resource" id="p_a3_w1_1_6"]
 script = ExtResource("2_param")
 Key = "Knockback"
 Value = 2.0
-Note = "击退（文档为 n → 预设 2）"
+Note = "箭命中击退（米/秒）。"
 
 [sub_resource type="Resource" id="p_a3_w1_1_7"]
 script = ExtResource("2_param")
@@ -55,13 +55,13 @@ Note = "无目标时从出手即受重力；贝塞尔追踪期间由曲线接管
 script = ExtResource("2_param")
 Key = "HomingStatusId"
 Value = "Mark"
-Note = "★ 文档（刹那之眼）：你射出的箭会追踪被打上「标记」的最近目标 —— 追踪是**箭自己的子弹特性**，所以填在武器 3 的两个武技行上；没有标记时这一项完全不影响弹道"
+Note = "箭的追踪状态 Id；目标带 Mark 时追踪最近标记目标，无标记不影响弹道。"
 
 [sub_resource type="Resource" id="p_a3_w1_1_9"]
 script = ExtResource("2_param")
 Key = "HomingTurnRateDegrees"
 Value = 360.0
-Note = "追踪转向速度（度/秒；预设 360）"
+Note = "追踪转向速度（度/秒）；越大转向越快。"
 
 [sub_resource type="Resource" id="p_a3_w1_1_10"]
 script = ExtResource("2_param")
@@ -91,7 +91,7 @@ Note = "暴击率基准（角色基础 5%）"
 script = ExtResource("2_param")
 Key = "SweepMaxHits"
 Value = 8
-Note = "J28：每物理帧命中预算8，与查询几何独立；0或负数也取默认8。细弹用射线查询穿透余程，粗弹由弹体场景QueryGeometry=1及SweepRadius配置形状扫掠。预算耗尽停在命中点下帧续飞，同一身体只结算一次，World阻挡。线段长度仍为实际弹速×物理帧时长。"
+Note = "每物理帧命中预算（次）；0/负数取默认8；预算耗尽下帧续飞，同一身体只结算一次。"
 
 [sub_resource type="Resource" id="p_homing_start"]
 script = ExtResource("2_param")

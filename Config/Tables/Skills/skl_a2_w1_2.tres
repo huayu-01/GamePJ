@@ -7,13 +7,13 @@
 script = ExtResource("2_param")
 Key = "ProjectileScenePath"
 Value = "res://Scenes/Combat/ThrowingKnife.tscn"
-Note = "独立飞刀外观；斩弹规则仍属于旧Arrow分类。"
+Note = "飞刀弹体场景路径；与武技1共用飞刀外观。"
 
 [sub_resource type="Resource" id="p_a2_w1_2_1"]
 script = ExtResource("2_param")
 Key = "Damage"
 Value = 12.0
-Note = "★ 文档为 n → 预设 12（每把飞刀的单发伤害）"
+Note = "每把蓄力飞刀的基础伤害（点）。"
 
 [sub_resource type="Resource" id="p_a2_w1_2_2"]
 script = ExtResource("2_param")
@@ -43,13 +43,13 @@ Note = "基础数量：基础蓄力后掷出3把飞刀。"
 script = ExtResource("2_param")
 Key = "CountPerChargeStep"
 Value = 2.0
-Note = "★ 后置蓄力**每档多发几支**（文档：每 0.2s 增加 2 支）—— 非倍率维度，所以是本单位自己的列（见 docs/abilities.md §1.3 第 4 条）"
+Note = "每个后置蓄力档增加的飞刀数量（发/档），不是伤害倍率。"
 
 [sub_resource type="Resource" id="p_a2_w1_2_7"]
 script = ExtResource("2_param")
 Key = "SpreadAngleDegrees"
 Value = 60.0
-Note = "固定散射总夹角，预设60°：准星两侧各30°，按最终飞刀数量均匀排列；单刀居中。"
+Note = "固定散射总夹角（度）；按最终飞刀数均分，单刀居中。"
 
 [sub_resource type="Resource" id="p_a2_w1_2_8"]
 script = ExtResource("2_param")
@@ -66,7 +66,7 @@ Note = "使用引擎重力的真实加速度；追踪接管时暂停重力。"
 script = ExtResource("2_param")
 Key = "Knockback"
 Value = 6.0
-Note = "★ 射速较高时造成击退（预设 6）"
+Note = "命中击退（米/秒）；仅高弹速时生效。"
 
 [sub_resource type="Resource" id="p_a2_w1_2_11"]
 script = ExtResource("2_param")

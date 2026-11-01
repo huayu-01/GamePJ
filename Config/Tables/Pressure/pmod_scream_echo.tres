@@ -7,7 +7,7 @@
 script = ExtResource("2_param")
 Key = "Cooldown"
 Value = 0.8
-Note = "尖啸冷却的倍率（相对当前值；14 秒→不适用，本行作用在技能行给的 7 秒上）"
+Note = "尖啸技能冷却倍率；乘在技能行冷却上，0.8 = 缩短20%。"
 
 [resource]
 script = ExtResource("1_row")

@@ -7,7 +7,7 @@
 script = ExtResource("2_param")
 Key = "Damage"
 Value = 1.25
-Note = "冲锋命中体伤害的倍率（20 → 25）"
+Note = "冲锋命中伤害倍率；乘在现有伤害上，1.25 = +25%。"
 
 [resource]
 script = ExtResource("1_row")
