@@ -1,4 +1,4 @@
-# 配置工作台 0.3：平铺编辑 + 字段提示
+# 配置工作台 0.4：平铺编辑 + 数组结构编辑
 
 2026-11-01。按“先做平铺原型，再接编辑”的路线落地；`.tres` 仍是唯一数据源。
 
@@ -24,6 +24,8 @@
   - `ParamEntry` 的 Key、值、说明可编辑；**值类型只读显示**（Float/Int/Bool/String/String[]），
     避免在编辑器里把消费方约定的 Variant 类型改坏；
   - 嵌套 Effect / TargetAbility / 内嵌子资源字段可编辑；
+  - `Effects` 可“添加效果…”（按 RewardEffects 脚本类型）和删除；
+  - `Params / AttackParams / HandlerParams` 可“+ 添加参数”和逐条删除；
   - 保存按 `_dirty` 里的真实 Resource 写回，避免“路径重新 load 出另一份默认值”；
   - 未保存计数、保存、还原；Ctrl+S / Ctrl+R。
 - `ParamEntry` 专用卡：
@@ -49,12 +51,12 @@
 - `ParamEntry.Note` 已清洗 65 条旧说明：172 条 ParamEntry Note 中，旧变更/文档口吻的
   `★|文档|第…轮|Jxx|验收|修复|用户|当前` 命中数从 65 降到 **0**；全部改为“用途 + 单位/范围/例外”。
 - 常用字段已加单位/范围提示（MaxHealth 点、Cooldown 秒、MaxStacks 0=不限等）；未覆盖全部字段。
-- 数组本身（Effects 增删、Skills 增删、字符串数组逐项）未做结构编辑；字段值可改。
+- `Skills` / `ConvertedRewards` 等外部资源数组仍只显示“打开”，未做结构增删。
 - 未接撤销（Ctrl+Z）；目前是保存/还原。
 - 未做批量编辑；ResourceTable 仍可用于多行数值对比。
 
 ## 下一步建议
 
-1. 接撤销、数组增删、外部资源保存确认。
+1. 接撤销、外部资源保存确认。
 2. 继续补冷门字段的单位/范围与字段级说明。
 3. 用工作台逐项复看 172 条 Note 的语义，而不是只看格式。

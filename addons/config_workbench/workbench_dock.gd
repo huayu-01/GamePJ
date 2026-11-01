@@ -24,6 +24,7 @@ const SKIP_FIELDS := ["script", "resource_path", "resource_name", "resource_loca
 const INLINE_EXTERNAL := ["TargetAbility", "RequiredEventAbility", "BonusAgainstAbility", "Tuning", "SpecializationBehavior"]
 const INLINE_ARRAYS := ["Effects", "Params", "AttackParams", "HandlerParams"]
 const COMPACT_ARRAYS := ["Skills", "ConvertedRewards", "SpecializationTargets", "RequiredWeaponTags", "RequiredCharacterIds", "Requires"]
+const PARAM_ARRAYS := ["Params", "AttackParams", "HandlerParams"]
 const FIELD_UNITS := {
 	"MaxHealth": "点", "StartingArmor": "点", "MaxShield": "点",
 	"ArmorDamageReduction": "0–0.9", "DamageReduction": "0–0.9", "KnockbackResistance": "0–1",
@@ -47,6 +48,7 @@ var _revert_button: Button
 var _dirty: Dictionary = {}
 var _entries: Array[Dictionary] = []
 var _visible: Array[Dictionary] = []
+var _effect_types: Array[Dictionary] = []
 var _selected_path := ""
 var _filesystem_path := ""
 var _legacy_note := RegEx.new()
@@ -66,8 +68,26 @@ func _ready() -> void:
 	_legacy_note.compile("★|文档|第[一二三四五六七八九十0-9]+轮|J\\d+|验收|修复|用户|当前|原版|旧|批次|本轮|新增|改动|预设|→")
 	_id_re.compile("(?m)^Id = \"(.*)\"$")
 	_name_re.compile("(?m)^DisplayName = \"(.*)\"$")
+	_load_effect_types()
 	_build_ui()
 	call_deferred("_refresh")
+
+
+func _load_effect_types() -> void:
+	var dir := DirAccess.open("res://Scripts/Config/RewardEffects")
+	if dir == null:
+		return
+	dir.list_dir_begin()
+	var name := dir.get_next()
+	while name != "":
+		if not dir.current_is_dir() and name.ends_with(".cs") and name not in ["RewardEffectDefinition.cs", "RewardEffectValidation.cs"]:
+			var path := "res://Scripts/Config/RewardEffects/" + name
+			var script := load(path)
+			if script is Script:
+				_effect_types.append({"name": name.get_basename(), "script": script})
+		name = dir.get_next()
+	dir.list_dir_end()
+	_effect_types.sort_custom(func(a, b): return str(a["name"]) < str(b["name"]))
 
 
 func on_show() -> void:
@@ -395,7 +415,7 @@ func _small_card_style() -> StyleBoxFlat:
 	return style
 
 
-func _render_resource(res: Resource, depth: int, stack: Array, draw_header: bool = true, owner_path: String = "", owner_save: Resource = null) -> void:
+func _render_resource(res: Resource, depth: int, stack: Array, draw_header: bool = true, owner_path: String = "", owner_save: Resource = null, on_remove: Callable = Callable()) -> void:
 	if res == null:
 		return
 	if depth > 10:
@@ -438,6 +458,12 @@ func _render_resource(res: Resource, depth: int, stack: Array, draw_header: bool
 			open.tooltip_text = "在配置工作台打开这个外部资源"
 			open.pressed.connect(_open_external.bind(res.resource_path), CONNECT_DEFERRED)
 			hbox.add_child(open)
+		if on_remove.is_valid():
+			var remove := Button.new()
+			remove.text = "删除"
+			remove.tooltip_text = "从当前数组移除此项（不会删除外部文件）"
+			remove.pressed.connect(on_remove, CONNECT_DEFERRED)
+			hbox.add_child(remove)
 		_add_control(header)
 
 	for prop in res.get_property_list():
@@ -575,8 +601,75 @@ func _render_resource_property(prop_name: String, value: Resource, depth: int, s
 		_add_note("外部资源：%s（点“打开”进入，避免误改共享文件）" % value.resource_path, Color(0.55, 0.68, 0.82))
 
 
+func _array_toolbar(prop_name: String, array: Array, owner_path: String, owner_save: Resource) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	if prop_name in PARAM_ARRAYS:
+		var add := Button.new()
+		add.text = "+ 添加参数"
+		add.tooltip_text = "新增一个 ParamEntry；Key 为空，值和说明可继续编辑"
+		add.pressed.connect(func(): _add_param(array, prop_name, owner_path, owner_save), CONNECT_DEFERRED)
+		row.add_child(add)
+	elif prop_name == "Effects":
+		var menu := OptionButton.new()
+		menu.add_item("+ 添加效果…")
+		for i in _effect_types.size():
+			menu.add_item(str(_effect_types[i]["name"]))
+		menu.item_selected.connect(func(index: int):
+			if index <= 0:
+				return
+			_add_effect(array, prop_name, owner_path, owner_save, index - 1)
+		)
+		row.add_child(menu)
+	if row.get_child_count() > 0:
+		_add_control(row)
+
+
+func _add_param(array: Array, prop_name: String, owner_path: String, owner_save: Resource) -> void:
+	var entry: Resource
+	if not array.is_empty() and array[0] is Resource:
+		entry = (array[0] as Resource).duplicate(true)
+	else:
+		var script := load("res://Scripts/Config/ParamEntry.cs")
+		if script is Script:
+			entry = (script as Script).new()
+	if entry == null:
+		_status.text = "无法创建 ParamEntry（脚本未加载）"
+		return
+	entry.set("Key", "")
+	entry.set("Value", 0.0)
+	entry.set("Note", "")
+	array.append(entry)
+	owner_save.set(prop_name, array)
+	_mark_dirty(owner_path, owner_save)
+	_show_path.call_deferred(_selected_path)
+
+
+func _add_effect(array: Array, prop_name: String, owner_path: String, owner_save: Resource, i: int) -> void:
+	if i < 0 or i >= _effect_types.size():
+		return
+	var effect = (_effect_types[i]["script"] as Script).new()
+	if effect == null:
+		_status.text = "无法创建效果：%s" % _effect_types[i]["name"]
+		return
+	array.append(effect)
+	owner_save.set(prop_name, array)
+	_mark_dirty(owner_path, owner_save)
+	_show_path.call_deferred(_selected_path)
+
+
+func _remove_array_item(array: Array, index: int, prop_name: String, owner_path: String, owner_save: Resource) -> void:
+	if index < 0 or index >= array.size():
+		return
+	array.remove_at(index)
+	owner_save.set(prop_name, array)
+	_mark_dirty(owner_path, owner_save)
+	_show_path.call_deferred(_selected_path)
+
+
 func _render_array_property(prop_name: String, array: Array, depth: int, stack: Array, owner_path: String, owner_save: Resource) -> void:
 	_add_section("%s  [%d]" % [prop_name, array.size()])
+	_array_toolbar(prop_name, array, owner_path, owner_save)
 	if array.is_empty():
 		_add_note("（空）", Color(0.55, 0.6, 0.68))
 		return
@@ -584,12 +677,13 @@ func _render_array_property(prop_name: String, array: Array, depth: int, stack: 
 		var value: Variant = array[i]
 		if value is Resource:
 			var res := value as Resource
+			var remove_cb := func(): _remove_array_item(array, i, prop_name, owner_path, owner_save)
 			if _is_param_entry(res):
-				_render_param_entry(res, i, owner_path, owner_save)
+				_render_param_entry(res, i, owner_path, owner_save, remove_cb)
 			elif prop_name in COMPACT_ARRAYS and res.resource_path != "":
 				_render_compact_resource("%s[%d]" % [prop_name, i], res)
 			else:
-				_render_resource(res, depth + 1, stack, true, owner_path, owner_save)
+				_render_resource(res, depth + 1, stack, true, owner_path, owner_save, remove_cb)
 		elif value is Array:
 			_add_note("%s[%d] = %s" % [prop_name, i, _short(value)], Color(0.75, 0.78, 0.85))
 		elif value is Dictionary:
@@ -618,7 +712,7 @@ func _render_compact_resource(prop_name: String, res: Resource) -> void:
 	_add_control(row)
 
 
-func _render_param_entry(res: Resource, index: int, owner_path: String, owner_save: Resource) -> void:
+func _render_param_entry(res: Resource, index: int, owner_path: String, owner_save: Resource, on_remove: Callable = Callable()) -> void:
 	var card := PanelContainer.new()
 	card.add_theme_stylebox_override("panel", _small_card_style())
 	var box := VBoxContainer.new()
@@ -655,6 +749,11 @@ func _render_param_entry(res: Resource, index: int, owner_path: String, owner_sa
 
 	var value_control := _param_value_control(res, value, value_type, owner_path, owner_save)
 	head.add_child(value_control)
+	if on_remove.is_valid():
+		var remove := Button.new()
+		remove.text = "删除"
+		remove.pressed.connect(on_remove, CONNECT_DEFERRED)
+		head.add_child(remove)
 	box.add_child(head)
 
 	var note_caption := Label.new()
