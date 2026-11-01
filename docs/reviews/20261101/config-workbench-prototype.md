@@ -1,0 +1,50 @@
+# 配置工作台 0.1：只读平铺原型
+
+2026-11-01。按“先做只读平铺原型”的方向落地第一版；不改 `.tres` 数据，不接保存。
+
+## 已实现
+
+- 新插件 `addons/config_workbench/`，已加入 `project.godot` 的 `editor_plugins`。
+- 编辑器主页面「配置工作台」（`_has_main_screen()`，和 ResourceTable 一样是顶部页签，不是侧边 Dock）：
+  - 顶部栏：标题、只读徽标、表筛选、搜索、刷新；
+  - 自适应：左侧固定 20%，右侧 80%；上下铺满编辑器主页面；
+  - 左侧按表筛选：技能 / 增幅 / 敌人 / 角色 / 武器 / Boss / 效果 / 符文 / 节点 / AI；
+  - 顶部搜索 Id、名称、路径；
+  - 在 FileSystem 中选中 `.tres` 时自动打开；
+  - 右侧全部字段平铺，不使用折叠树。
+- 递归展开：
+  - `RewardConfig.Effects` → `AbilityReplacementRewardEffect` → `TargetAbility`（外部 AbilityConfig）→ `Params` → `ParamEntry`；
+  - 每层嵌套资源有边框卡片 + 左侧缩进，直接看出层级；
+  - 外部资源显示“外部资源 + 打开”，避免误改共享文件；
+  - 递归上限 10 层，带循环检测。
+- “打开”使用 deferred 调用，避免按钮 `pressed` 信号发射期间销毁表单导致
+  `freed while signal is being emitted`。
+- `ParamEntry` 专用卡：
+  - `Key` / `Value` / `Value` 类型 / `说明` 直接展示；
+  - `说明` 为空或命中 `★|文档|第…轮|Jxx|验收|修复|用户|当前` 时标黄，提示改成用途说明。
+- 无编辑器预览：`Scenes/Debug/_ConfigWorkbenchPreview.tscn`，加载真实 `reward_1351` 和 `skl_a3_w1_1` 并截图。预览脚本**不是 `@tool`**，并带 `Engine.is_editor_hint()` 保护，避免在编辑器里打开时创建第二个工作台或误调 `quit`。
+
+## 证据
+
+- 配置工作台嵌套效果（1351）：
+  `Logs/evidence/config-workbench/reward-1351-flat.png`
+- 技能 Params / ParamEntry 说明：
+  `Logs/evidence/config-workbench/skill-params-flat.png`
+- GDScript 语法：`--check-only` 通过。
+- 无头编辑器加载插件：无工作台脚本错误；MCP 端口冲突与现有插件重复加载是环境噪声。
+- 预览场景已改为非 `@tool`；上次编辑器闪退的根因是预览脚本在编辑器里执行 `get_tree().quit()`，现已移除。
+- 已接顶部主页面、20/80 分栏和全高布局；左侧宽度按主页面宽度实时重算。
+
+## 当前限制
+
+- **只读**：字段是 Label，不接编辑、保存、撤销。
+- 外部资源只展开显示，不修改；后续编辑外部资源时必须明确保存目标。
+- `ParamEntry.Note` 只做识别/标黄，未清洗现有 65 条旧说明。
+- 未做字段单位/范围元数据（如 MaxHealth 点、Cooldown 秒）。
+- 未做批量编辑；ResourceTable 仍可用于多行数值对比。
+
+## 下一步建议
+
+1. 接标量、ParamEntry、Effects 内联编辑 + 保存/还原/脏标记。
+2. 给常用字段补单位/范围提示。
+3. 清洗 65 条旧 Note，统一为“作用对象 + 单位/范围 + 例外”。
