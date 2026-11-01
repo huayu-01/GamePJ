@@ -45,6 +45,12 @@ public partial class AirHoverController : Node3D
 	/// <summary>本帧有没有真的在"减缓下落"（自测取证用）。</summary>
 	public bool IsSlowFalling { get; private set; }
 
+	/// <summary>
+	/// **浮空时长倍率**（默认 1，不改变任何既有行为）。
+	/// 风之领域按用户口径「角色获得的**所有**浮空 +50%」在启用期间设为 1.5，撤销时还原。
+	/// </summary>
+	public float DurationScale { get; set; } = 1f;
+
 	/// <summary>累计授予过几次滞空（自测取证用）。</summary>
 	public int GrantCount { get; private set; }
 
@@ -78,6 +84,12 @@ public partial class AirHoverController : Node3D
 	/// </summary>
 	public void Grant(float seconds, float fallSlowPercent = -1f)
 	{
+		// 倍率只放大"新授予"的时长，默认 1 时与改动前逐位一致（风之领域启用期间为 1.5）。
+		if (float.IsFinite(DurationScale) && DurationScale > 0f)
+		{
+			seconds *= DurationScale;
+		}
+
 		if (seconds <= 0f)
 		{
 			return;

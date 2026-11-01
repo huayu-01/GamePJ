@@ -182,13 +182,40 @@ public sealed class WindHeartBehavior : DefinedSpecialization<WindHeartBehaviorD
 
 public sealed class WindDomainBehavior : DefinedSpecialization<WindDomainBehaviorDefinition>
 {
-	private AirHoverController? _hover; private SpecializationField? _field; private float _contactCooldown;
+	private AirHoverController? _hover; private SpecializationField? _field; private CharacterMovement? _movement;
+	private float _contactCooldown, _jumpCooldown;
 	public int ExtensionCount { get; private set; }
+	/// <summary>由"跳跃"额外授予浮空的次数（自测取证）。</summary>
+	public int JumpGrantCount { get; private set; }
 	public override int Priority => 120;
 	public WindDomainBehavior(SpecializationContext c, WindDomainBehaviorDefinition d) : base(c, d) { }
-	public override void Attach() => _hover = NodeSearch.FindInSubtree<AirHoverController>(Owner);
+	public override void Attach()
+	{
+		_hover = NodeSearch.FindInSubtree<AirHoverController>(Owner);
+		_movement = Owner.Movement;
+		// 口径 A（2026-11-01 用户确认）：启用期间角色获得的**所有**浮空都按倍率放大。
+		if (_hover != null && GodotObject.IsInstanceValid(_hover)) _hover.DurationScale = Data.HoverDurationScale;
+		if (_movement != null && GodotObject.IsInstanceValid(_movement)) _movement.JumpStarted += OnJumpStarted;
+	}
+	protected override void Remove()
+	{
+		if (_movement != null && GodotObject.IsInstanceValid(_movement)) _movement.JumpStarted -= OnJumpStarted;
+		_movement = null;
+		if (_hover != null && GodotObject.IsInstanceValid(_hover)) _hover.DurationScale = 1f;
+		_hover = null;
+		_jumpCooldown = 0f;
+	}
+	/// <summary>每次起跳（含空中跳）给一段浮空；<see cref="WindDomainBehaviorDefinition.JumpHoverRepeatSeconds"/> 内不重复。</summary>
+	private void OnJumpStarted(Vector3 _)
+	{
+		if (_jumpCooldown > 0f || _hover == null || !GodotObject.IsInstanceValid(_hover) || Data.JumpHoverSeconds <= 0f) return;
+		_hover.Grant(Data.JumpHoverSeconds);
+		_jumpCooldown = Mathf.Max(0f, Data.JumpHoverRepeatSeconds);
+		JumpGrantCount++;
+	}
 	public override void Tick(float dt)
 	{
+		_jumpCooldown = Mathf.Max(0f, _jumpCooldown - dt);
 		_contactCooldown = Mathf.Max(0, _contactCooldown - dt);
 		bool active = _hover is { IsHovering: true, Maintaining: true } && Owner.Movement is { IsGrounded: false }
 			&& ActRoguelike.World.MapManager.Instance is { IsReady: true };

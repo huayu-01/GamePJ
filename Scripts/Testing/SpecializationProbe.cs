@@ -365,6 +365,17 @@ public partial class SpecializationProbe : Node3D
 		await Clear();
 		player = await RealPlayer(PlayerCharacterKind.Hunter, WeaponPresetKind.EnergyPalm); runtime = Grant(player, "evo_wind_domain");
 		Step(runtime, .01f); Check(!Fields(runtime).Any(f => f.Kind == K.WindDomain && f.Active), "068地面静止不凭空生成浮空旋风，风之领域不再依赖镰刀");
+		// 077（2026-11-01 口径 A）：浮空时长 +50%、每次跳跃给 1 秒浮空且 3 秒内不重复。
+		var domainHover = player.GetNode<AirHoverController>("AirHover");
+		Near(domainHover.DurationScale, 1.5f, "风之领域把角色获得的浮空时长倍率设为 1.5");
+		domainHover.Grant(2f); Near(domainHover.HoverRemaining, 3f, "授予 2 秒浮空实际得到 3 秒（+50%）");
+		domainHover.ResetForLoadout(); Near(domainHover.HoverRemaining, 0f, "换装复位清空浮空");
+		var motion = player.Movement!;
+		Check(motion.TryJump(), "自测直接触发起跳事件");
+		Near(domainHover.HoverRemaining, 1.5f, "跳跃授予 1 秒浮空、经倍率后为 1.5 秒");
+		Check(runtime.Behavior<WindDomainBehavior>(K.WindDomain)!.JumpGrantCount == 1, "跳跃浮空已授予 1 次");
+		motion.TryJump(); Step(runtime, .2f); Check(runtime.Behavior<WindDomainBehavior>(K.WindDomain)!.JumpGrantCount == 1, "3 秒内再次跳跃不重复施加");
+		Step(runtime, 3.1f); motion.TryJump(); Check(runtime.Behavior<WindDomainBehavior>(K.WindDomain)!.JumpGrantCount == 2, "超过 3 秒后再次跳跃重新施加");
 		await Clear();
 		player = await RealPlayer(master, scytheKind); runtime = Grant(player, "evo_thunder_pool");
 		var masterSkill = Ability.FindByAbilityId(player, "skl_b_skill_2")!;
