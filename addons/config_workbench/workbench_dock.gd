@@ -33,6 +33,7 @@ const FIELD_UNITS := {
 	"MaxCharges": "0=不覆盖", "RechargeSeconds": "秒", "MaxStacks": "0=不限", "Weight": "权重",
 	"Damage": "点", "Speed": "米/秒", "Radius": "米", "Duration": "秒", "Range": "米",
 	"ProjectileCount": "发", "Count": "发", "Pierce": "个", "Knockback": "米/秒",
+	"CritChanceAdd": "小数（0.2=20%）", "CritMultiplierAdd": "小数（0.5=+50%）", "DamageReductionAdd": "小数（0.2=20%）",
 }
 
 var _table_filter: OptionButton
@@ -504,7 +505,11 @@ func _render_property(prop_name: String, value: Variant, type: int, hint: int, h
 func _scalar_row(prop_name: String, value: Variant, type: int, hint: int, hint_string: String, owner_path: String, res: Resource, owner_save: Resource) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
-	row.add_child(_field_label(prop_name))
+	var field_label := _field_label(prop_name)
+	row.add_child(field_label)
+	if _percent_value_suspicious(prop_name, value):
+		field_label.add_theme_color_override("font_color", Color(1, 0.45, 0.35))
+		field_label.tooltip_text = "百分比按小数填写（0.2=20%）；20 会被当成 2000%。"
 	var editor: Control = null
 
 	if hint == PROPERTY_HINT_ENUM and not hint_string.is_empty():
@@ -573,6 +578,19 @@ func _scalar_row(prop_name: String, value: Variant, type: int, hint: int, hint_s
 	editor.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(editor)
 	return row
+
+
+func _percent_value_suspicious(prop_name: String, value: Variant) -> bool:
+	if typeof(value) not in [TYPE_FLOAT, TYPE_INT]:
+		return false
+	var number := float(value)
+	match prop_name:
+		"CritChanceAdd":
+			return number > 1.0
+		"DamageReductionAdd":
+			return number > 0.9
+		_:
+			return false
 
 
 func _apply_scalar(res: Resource, prop_name: String, value: Variant, owner_path: String, owner_save: Resource) -> void:

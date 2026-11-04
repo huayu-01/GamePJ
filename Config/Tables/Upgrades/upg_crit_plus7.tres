@@ -1,15 +1,15 @@
-[gd_resource type="Resource" script_class="RewardConfig" format=3]
+[gd_resource type="Resource" script_class="RewardConfig" format=3 uid="uid://cfa7wh68q4owf"]
 
 [ext_resource type="Script" uid="uid://da28h1nkpc5p6" path="res://Scripts/Config/StatOverride.cs" id="1_stat"]
 [ext_resource type="Script" uid="uid://puhrw2j2dgut" path="res://Scripts/Config/RewardConfig.cs" id="2_row"]
 [ext_resource type="Script" uid="uid://btd62ngfrwmyp" path="res://Scripts/Config/RewardEffects/StatRewardEffect.cs" id="effect_0"]
-[ext_resource type="Resource" path="res://Config/Tables/Upgrades/upg_crit_plus6.tres" id="previous"]
+[ext_resource type="Resource" uid="uid://b4prn4y0xhgaq" path="res://Config/Tables/Upgrades/upg_crit_plus6.tres" id="previous"]
 
 [sub_resource type="Resource" id="Resource_m0"]
 script = ExtResource("1_stat")
 Stat = "CritChanceAdd"
 Operation = 0
-Value = 40.0
+Value = 0.4
 
 [sub_resource type="Resource" id="Resource_effect_0"]
 script = ExtResource("effect_0")
